@@ -1,0 +1,10 @@
+# Used for when working from a virtualenv.
+# Use this file by running "$ pip install -r requirements.txt"
+arrow
+flask
+python-openid
+python-openid-teams
+python-openid-cla
+pygit2 < 0.20
+pygments
+sqlalchemy
