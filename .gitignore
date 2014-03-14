@@ -1,0 +1,7 @@
+repos/
+forks/
+dist/
+build/
+*.pyc
+*.swp
+
