@@ -158,12 +158,13 @@ def view_file(repo, identifier, filename):
         branch = repo_obj.lookup_branch(identifier)
         commit = branch.get_object()
     else:
-        branchname = 'master'
         try:
-            commit = repo_obj.get(commitid)
+            commit = repo_obj.get(identifier)
+            branchname = identifier
         except ValueError:
             # If it's not a commit id then it's part of the filename
             commit = repo_obj[repo_obj.head.target]
+            branchname =  'master'
 
     def __get_file_in_tree(tree, filepath):
         ''' Retrieve the entry corresponding to the provided filename in a
