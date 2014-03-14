@@ -29,6 +29,8 @@ import progit.forms as forms
 
 # Create the application.
 APP = flask.Flask(__name__)
+APP.jinja_env.trim_blocks = True
+APP.jinja_env.lstrip_blocks = True
 
 # set up FAS
 APP.config.from_object('progit.default_config')
