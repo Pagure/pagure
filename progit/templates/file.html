@@ -13,6 +13,7 @@
   : {{ branchname }}/{{filename}}
 </h2>
 
+<h3>Tree</h3>
 <section class="repos_list">
   {% if output_type=='file' %}
   {% autoescape false %}
@@ -22,13 +23,14 @@
   <ul>
     {% for entry in content %}
     <li>
+        {{ branchname }}
       {% if entry.filemode == 16384 %}
       [ ]
       {% endif %}
       <a href="{{ url_for('view_file',
                 repo=repo,
                 identifier=branchname,
-                filename=filename + '/' + entry.name) }}">
+                filename=filename + '/' + entry.name if filename else entry.name) }}">
         {{ entry.name }}
       </a>
       {{ entry.hex }}

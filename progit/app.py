@@ -148,8 +148,6 @@ def view_file(repo, identifier, filename):
     """ Displays the content of a file or a tree for the specified repo.
     """
 
-
-
     if repo not in os.listdir(APP.config['GIT_FOLDER']):
         flask.abort(404, 'Git not found')
     repo_obj = pygit2.Repository(
@@ -238,4 +236,40 @@ def view_commit(repo, commitid):
         commit=commit,
         diff=diff,
         html_diff=html_diff,
+    )
+
+
+@APP.route('/<repo>/tree/')
+@APP.route('/<repo>/tree/<identifier>')
+def view_tree(repo, identifier=None):
+    """ Render the tree of the repo
+    """
+    if repo not in os.listdir(APP.config['GIT_FOLDER']):
+        flask.abort(404)
+    repo_obj = pygit2.Repository(
+        os.path.join(APP.config['GIT_FOLDER'], repo))
+
+    if identifier in repo_obj.listall_branches():
+        branchname = identifier
+        branch = repo_obj.lookup_branch(identifier)
+        commit = branch.get_object()
+    else:
+        try:
+            commit = repo_obj.get(identifier)
+            branchname = identifier
+        except (ValueError, TypeError):
+            # If it's not a commit id then it's part of the filename
+            commit = repo_obj[repo_obj.head.target]
+            branchname = repo_obj.head.target
+
+    content=sorted(commit.tree, key=lambda x: x.filemode)
+    output_type = 'tree'
+
+    return flask.render_template(
+        'file.html',
+        repo=repo,
+        branchname=branchname,
+        filename='',
+        content=content,
+        output_type=output_type,
     )
