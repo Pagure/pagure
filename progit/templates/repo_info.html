@@ -1,0 +1,86 @@
+{% extends "master.html" %}
+
+{% block title %}{{ repo }}{% endblock %}
+{%block tag %}home{% endblock %}
+
+
+{% block content %}
+<h2>
+  <a href="{{ url_for('view_repo', repo=repo)}}">
+    {{ repo.split('.git')[0] }}
+  </a>
+</h2>
+
+{% if total_page %}
+<table>
+    <tr>
+        <td>
+        {% if page > 1%}
+            <a href="{{ url_for('.%s' % origin, repo=repo) }}?page={{page - 1}}">
+                &lt; Previous
+            </a>
+        {% else %}
+            &lt; Previous
+        {% endif %}
+        </td>
+        <td>{{ page }} / {{ total_page }}</td>
+        <td>
+            {% if page < total_page %}
+            <a href="{{ url_for('.%s' % origin, repo=repo) }}?page={{page + 1}}">
+                Next &gt;
+            </a>
+            {% else %}
+            Next >
+            {% endif %}
+        </td>
+    </tr>
+</table>
+{% endif %}
+
+<section class="branch_list">
+  <h3>Branches</h3>
+  <ul>
+    {% for branch in branches %}
+    <li>
+      <a href="{{ url_for('view_repo_branch', repo=repo, branchname=branch) }}">
+        {{ branch }}
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section class="commit_list">
+  <h3>Last 10 commits</h3>
+  <ul>
+    {% for commit in last_commits %}
+    <li>
+      <a href="{{ url_for('view_commit', repo=repo, commitid=commit.hex) }}">
+        {{ commit.hex[:6] }}
+      </a>
+      {{ commit.message.split('\n')[0] }}
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section class="tree_list">
+  <h3>Current tree</h3>
+  <ul>
+    {% for entry in tree %}
+    <li>
+      {% if entry.filemode == 16384 %}
+      [ ]
+      {% endif %}
+      <a href="{{ url_for('view_file',
+                repo=repo, identifier=branchname, filename=entry.name) }}">
+        {{ entry.name }}
+      </a>
+      {{ entry.hex }}
+      {{ entry.id }}
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+
+{% endblock %}

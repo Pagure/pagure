@@ -1,0 +1,42 @@
+{% extends "master.html" %}
+
+{% block title %}Home{% endblock %}
+{%block tag %}home{% endblock %}
+
+
+{% block content %}
+
+<h2>
+  <a href="{{ url_for('view_repo', repo=repo)}}">
+    {{ repo.split('.git')[0] }}
+  </a>
+  : {{ branchname }}/{{filename}}
+</h2>
+
+<section class="repos_list">
+  {% if output_type=='file' %}
+  {% autoescape false %}
+  {{ content }}
+  {% endautoescape %}
+  {% else %}
+  <ul>
+    {% for entry in content %}
+    <li>
+      {% if entry.filemode == 16384 %}
+      [ ]
+      {% endif %}
+      <a href="{{ url_for('view_file',
+                repo=repo,
+                identifier=branchname,
+                filename=filename + '/' + entry.name) }}">
+        {{ entry.name }}
+      </a>
+      {{ entry.hex }}
+      {{ entry.id }}
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</section>
+
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "master.html" %}
+
+{% block title %}Home{% endblock %}
+{%block tag %}home{% endblock %}
+
+
+{% block content %}
+
+<h2>Repositories</h2>
+<section class="repos_list">
+  <ul>
+    {% for repo in repos %}
+    <li>
+      <a href="{{ url_for('view_repo', repo=repo)}}">
+        {{ repo.split('.git')[0] }}
+      </a>
+      <span class="commit_date">
+        {{ repos_obj[loop.index - 1] | lastcommit_date}}
+      </span>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "master.html" %}
+
+{% block title %}{{ repo }} - {{ commitid }}{% endblock %}
+{%block tag %}home{% endblock %}
+
+
+{% block content %}
+
+<h2>
+  <a href="{{ url_for('view_repo', repo=repo)}}">
+    {{ repo.split('.git')[0] }}
+  </a>
+</h2>
+
+<h3>Commit: {{ commitid }}</h3>
+<section class="commit_message">
+  <span class="commit_message_head">
+    {{ commit.message.split('\n')[0] }}
+  </span>
+  <span class="commit_message_body">
+    {{ commit.message.split('\n')[1] }}
+  </span>
+</section>
+
+<section class="commit_diff">
+  <h3>Diff:</h3>
+  {% autoescape false %}
+  {{ html_diff }}
+  {% endautoescape %}
+</section>
+
+{% endblock %}
