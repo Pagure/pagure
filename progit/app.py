@@ -261,7 +261,7 @@ def view_tree(repo, identifier=None):
         except (ValueError, TypeError):
             # If it's not a commit id then it's part of the filename
             commit = repo_obj[repo_obj.head.target]
-            branchname = repo_obj.head.target
+            branchname = 'master'
 
     content=sorted(commit.tree, key=lambda x: x.filemode)
     output_type = 'tree'
