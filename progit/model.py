@@ -67,26 +67,6 @@ def create_tables(db_url, alembic_ini=None, debug=False):
     return scopedsession
 
 
-class User(BASE):
-    """ Stores the user information.
-
-    Table -- users
-    """
-
-    __tablename__ = 'users'
-
-    id = sa.Column(sa.Integer, primary_key=True)
-    name = sa.Column(
-        sa.String(32), unique=True, nullable=False, index=True)
-    email = sa.Column(
-        sa.Text(), nullable=False, index=True)
-
-    date_created = sa.Column(
-        sa.DateTime, nullable=False, default=datetime.datetime.utcnow)
-
-    user = relation('User')
-
-
 class Project(BASE):
     """ Stores the projects.
 
@@ -96,11 +76,7 @@ class Project(BASE):
     __tablename__ = 'projects'
 
     id = sa.Column(sa.Integer, primary_key=True)
-    user_id = sa.Column(
-        sa.Integer,
-        sa.ForeignKey(
-            'users.id', ondelete='CASCADE', onupdate='CASCADE'),
-        nullable=False)
+    user = sa.Column(sa.String(32), nullable=False)
     name = sa.Column(sa.String(32), nullable=False, index=True)
     parent_id = sa.Column(
         sa.Integer,
