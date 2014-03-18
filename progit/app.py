@@ -95,7 +95,7 @@ def view_repo(user, repo):
     reponame = os.path.join(APP.config['GIT_FOLDER'], user, repo)
     if not os.path.exists(reponame):
         flask.abort(404)
-    repo_obj = pygit2.Repository(gitfolder)
+    repo_obj = pygit2.Repository(reponame)
 
     cnt = 0
     last_commits = []
@@ -122,7 +122,7 @@ def view_repo_branch(user, repo, branchname):
     reponame = os.path.join(APP.config['GIT_FOLDER'], user, repo)
     if not os.path.exists(reponame):
         flask.abort(404)
-    repo_obj = pygit2.Repository(gitfolder)
+    repo_obj = pygit2.Repository(reponame)
 
     if not branchname in repo_obj.listall_branches():
         flask.abort(404)
@@ -155,7 +155,7 @@ def view_log(user, repo, branchname=None):
     reponame = os.path.join(APP.config['GIT_FOLDER'], user, repo)
     if not os.path.exists(reponame):
         flask.abort(404)
-    repo_obj = pygit2.Repository(gitfolder)
+    repo_obj = pygit2.Repository(reponame)
 
     if branchname and not branchname in repo_obj.listall_branches():
         flask.abort(404)
@@ -204,7 +204,7 @@ def view_file(user, repo, identifier, filename):
     reponame = os.path.join(APP.config['GIT_FOLDER'], user, repo)
     if not os.path.exists(reponame):
         flask.abort(404)
-    repo_obj = pygit2.Repository(gitfolder)
+    repo_obj = pygit2.Repository(reponame)
 
     if identifier in repo_obj.listall_branches():
         branchname = identifier
@@ -268,7 +268,7 @@ def view_commit(user, repo, commitid):
     reponame = os.path.join(APP.config['GIT_FOLDER'], user, repo)
     if not os.path.exists(reponame):
         flask.abort(404)
-    repo_obj = pygit2.Repository(gitfolder)
+    repo_obj = pygit2.Repository(reponame)
 
     try:
         commit = repo_obj.get(commitid)
@@ -310,7 +310,7 @@ def view_tree(user, repo, identifier=None):
     reponame = os.path.join(APP.config['GIT_FOLDER'], user, repo)
     if not os.path.exists(reponame):
         flask.abort(404)
-    repo_obj = pygit2.Repository(gitfolder)
+    repo_obj = pygit2.Repository(reponame)
 
     if identifier in repo_obj.listall_branches():
         branchname = identifier
