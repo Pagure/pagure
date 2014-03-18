@@ -159,3 +159,4 @@ def auth_logout():
 ## Import the application
 
 import progit.app
+import progit.fork
