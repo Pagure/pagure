@@ -1,0 +1,49 @@
+{% extends "master.html" %}
+
+{% block title %}Users{% endblock %}
+{%block tag %}users{% endblock %}
+
+
+{% block content %}
+
+<h2>Users</h2>
+
+{% if total_page %}
+<table>
+    <tr>
+        <td>
+        {% if page > 1%}
+            <a href="{{ url_for('view_users') }}?page={{page - 1}}">
+                &lt; Previous
+            </a>
+        {% else %}
+            &lt; Previous
+        {% endif %}
+        </td>
+        <td>{{ page }} / {{ total_page }}</td>
+        <td>
+            {% if page < total_page %}
+            <a href="{{ url_for('view_users') }}?page={{page + 1}}">
+                Next &gt;
+            </a>
+            {% else %}
+            Next >
+            {% endif %}
+        </td>
+    </tr>
+</table>
+{% endif %}
+
+<section class="user_list">
+  <ul>
+    {% for user in users %}
+    <li>
+      <a href="{{ url_for('view_user', username=user)}}">
+        {{ user }}
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+
+{% endblock %}
