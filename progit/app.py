@@ -67,10 +67,6 @@ def view_user(username):
         page = 1
 
     repos = sorted(os.listdir(user_folder))
-    repos_obj = [
-        pygit2.Repository(
-            os.path.join(APP.config['FORK_FOLDER'], username, repo))
-        for repo in repos]
 
     limit = APP.config['ITEM_PER_PAGE']
     start = limit * (page - 1)
@@ -79,6 +75,11 @@ def view_user(username):
     repos = repos[start:end]
 
     total_page = int(ceil(repos_length / float(limit)))
+
+    repos_obj = [
+        pygit2.Repository(
+            os.path.join(APP.config['FORK_FOLDER'], username, repo))
+        for repo in repos]
 
     return flask.render_template(
         'user_info.html',
