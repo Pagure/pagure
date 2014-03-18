@@ -108,7 +108,7 @@ def view_repo_branch(repo, branchname):
     return flask.render_template(
         'repo_info.html',
         repo=repo,
-        branches=repo_obj.listall_branches(),
+        branches=sorted(repo_obj.listall_branches()),
         branchname=branchname,
         last_commits=last_commits,
         tree=sorted(last_commits[0].tree, key=lambda x: x.filemode),
@@ -155,7 +155,7 @@ def view_log(repo, branchname=None):
         'repo_info.html',
         origin='view_log',
         repo=repo,
-        branches=repo_obj.listall_branches(),
+        branches=sorted(repo_obj.listall_branches()),
         branchname=branchname,
         last_commits=last_commits,
         page=page,
