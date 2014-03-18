@@ -29,10 +29,20 @@ def index():
     """ Front page of the application.
     """
     page = flask.request.args.get('page', 1)
+    try:
+        page = int(page)
+    except ValueError:
+        page = 1
 
-    start = APP.config['ITEM_PER_PAGE'] * (page - 1)
-    end = APP.config['ITEM_PER_PAGE'] * page
-    repos = sorted(os.listdir(APP.config['GIT_FOLDER']))[start:end]
+    limit = APP.config['ITEM_PER_PAGE']
+    start = limit * (page - 1)
+    end = limit * page
+    repos = sorted(os.listdir(APP.config['GIT_FOLDER']))
+    repos_length = len(repos)
+
+    total_page = int(ceil(repos_length / float(limit)))
+
+    repos = repos[start:end]
     repos_obj = [
         pygit2.Repository(os.path.join(APP.config['GIT_FOLDER'], repo))
         for repo in repos]
@@ -41,6 +51,8 @@ def index():
         'index.html',
         repos=repos,
         repos_obj=repos_obj,
+        total_page=total_page,
+        page=page,
     )
 
 
