@@ -159,7 +159,7 @@ p#footer a {
 }
 
 body#home #mainNav li#homeTab a,
-body#locations #mainNav li#locationsTab a,
+body#users #mainNav li#usersTab a,
 body#mymeeting #mainNav li#mymeetingTab a,
 body#admin #mainNav li#adminTab a {
     background-color: #fff;
