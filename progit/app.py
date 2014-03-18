@@ -93,7 +93,7 @@ def view_repo(user, repo):
     """ Front page of a specific repo.
     """
     reponame = os.path.join(APP.config['GIT_FOLDER'], user, repo)
-    if repo not in os.path.exists(reponame):
+    if not os.path.exists(reponame):
         flask.abort(404)
     repo_obj = pygit2.Repository(gitfolder)
 
@@ -120,7 +120,7 @@ def view_repo_branch(user, repo, branchname):
     """ Displays the information about a specific branch.
     """
     reponame = os.path.join(APP.config['GIT_FOLDER'], user, repo)
-    if repo not in os.path.exists(reponame):
+    if not os.path.exists(reponame):
         flask.abort(404)
     repo_obj = pygit2.Repository(gitfolder)
 
@@ -153,7 +153,7 @@ def view_log(user, repo, branchname=None):
     """ Displays the logs of the specified repo.
     """
     reponame = os.path.join(APP.config['GIT_FOLDER'], user, repo)
-    if repo not in os.path.exists(reponame):
+    if not os.path.exists(reponame):
         flask.abort(404)
     repo_obj = pygit2.Repository(gitfolder)
 
@@ -202,7 +202,7 @@ def view_file(user, repo, identifier, filename):
     """ Displays the content of a file or a tree for the specified repo.
     """
     reponame = os.path.join(APP.config['GIT_FOLDER'], user, repo)
-    if repo not in os.path.exists(reponame):
+    if not os.path.exists(reponame):
         flask.abort(404)
     repo_obj = pygit2.Repository(gitfolder)
 
@@ -266,7 +266,7 @@ def view_commit(user, repo, commitid):
     """ Render a commit in a repo
     """
     reponame = os.path.join(APP.config['GIT_FOLDER'], user, repo)
-    if repo not in os.path.exists(reponame):
+    if not os.path.exists(reponame):
         flask.abort(404)
     repo_obj = pygit2.Repository(gitfolder)
 
@@ -308,7 +308,7 @@ def view_tree(user, repo, identifier=None):
     """ Render the tree of the repo
     """
     reponame = os.path.join(APP.config['GIT_FOLDER'], user, repo)
-    if repo not in os.path.exists(reponame):
+    if not os.path.exists(reponame):
         flask.abort(404)
     repo_obj = pygit2.Repository(gitfolder)
 
