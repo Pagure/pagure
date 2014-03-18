@@ -56,7 +56,7 @@ def index():
 def view_user(username):
     """ Front page of a specific user.
     """
-    user_folder = os.path.join(APP.config['GIT_FOLDER'], username)
+    user_folder = os.path.join(APP.config['FORK_FOLDER'], username)
     if not os.path.exists(user_folder):
         flask.abort(404)
 
@@ -69,7 +69,7 @@ def view_user(username):
     repos = sorted(os.listdir(user_folder))
     repos_obj = [
         pygit2.Repository(
-            os.path.join(APP.config['GIT_FOLDER'], username, repo))
+            os.path.join(APP.config['FORK_FOLDER'], username, repo))
         for repo in repos]
 
     limit = APP.config['ITEM_PER_PAGE']
