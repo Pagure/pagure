@@ -6,7 +6,7 @@
 
 {% block content %}
 
-<h2>...</h2>
+<h2>Projects</h2>
 
 {% if total_page %}
 <table>
@@ -34,12 +34,12 @@
 </table>
 {% endif %}
 
-<section class="user_list">
+<section class="repo_list">
   <ul>
-    {% for user in users %}
+    {% for repo in repos %}
     <li>
-      <a href="{{ url_for('view_user', username=user)}}">
-        {{ user }}
+      <a href="{{ url_for('view_repo', repo=repo)}}">
+        {{ repo }}
       </a>
     </li>
     {% endfor %}

@@ -6,7 +6,7 @@
 
 {% block content %}
 <h2>
-  <a href="{{ url_for('view_repo', username=username, repo=repo)}}">
+  <a href="{{ url_for('view_repo', repo=repo)}}">
     {{ repo.split('.git')[0] }}
   </a>
   {% if branchname %} ({{ branchname }}) {% endif %}
@@ -19,11 +19,11 @@
     {% for branch in branches %}
     <li>
       <a href="{{ url_for('view_repo_branch',
-                  username=username, repo=repo, branchname=branch) }}">
+                  repo=repo, branchname=branch) }}">
         {{ branch }}
       </a>
       (<a href="{{ url_for('view_log',
-                   username=username, repo=repo, branchname=branch) }}"
+                   repo=repo, branchname=branch) }}"
         >logs</a>)
     </li>
     {% endfor %}
@@ -36,7 +36,7 @@
         <td>
         {% if page > 1%}
             <a href="{{ url_for('.%s' % origin,
-                        username=username, repo=repo) }}?page={{page - 1}}">
+                        repo=repo) }}?page={{page - 1}}">
                 &lt; Previous
             </a>
         {% else %}
@@ -47,7 +47,7 @@
         <td>
             {% if page < total_page %}
             <a href="{{ url_for('.%s' % origin,
-                        username=username, repo=repo) }}?page={{page + 1}}">
+                        repo=repo) }}?page={{page + 1}}">
                 Next &gt;
             </a>
             {% else %}
@@ -68,7 +68,7 @@
     {% for commit in last_commits %}
     <li>
       <a href="{{ url_for('view_commit',
-                  username=username, repo=repo, commitid=commit.hex) }}">
+                  repo=repo, commitid=commit.hex) }}">
         {{ commit.hex[:6] }}
       </a>
       {{ commit.message.split('\n')[0] }}
@@ -86,7 +86,7 @@
         {% if entry.filemode == 16384 %}
         [ ]
         {% endif %}
-        <a href="{{ url_for('view_file', username=username,
+        <a href="{{ url_for('view_file',
                     repo=repo, identifier=branchname, filename=entry.name) }}">
           {{ entry.name }}
         </a>

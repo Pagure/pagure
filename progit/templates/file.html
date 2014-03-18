@@ -8,11 +8,11 @@
 
 <h2>
   <a href="{{ url_for('view_repo',
-              username=username, repo=repo)}}">
+              repo=repo)}}">
     {{ repo.split('.git')[0] }}
   </a>
   : <a href="{{ url_for('view_tree',
-                username=username, repo=repo, identifier=branchname) }}">
+                repo=repo, identifier=branchname) }}">
   {{ branchname }}</a>/{%
   for file in filename.split('/') %}
     {% if loop.first %}
@@ -22,7 +22,7 @@
     {% endif %}
     {% if loop.index != loop.length %}
 <a href="{{ url_for('view_file',
-            username=username, repo=repo, identifier=branchname,
+            repo=repo, identifier=branchname,
             filename=path)}}"
       >{{ file }}</a>/{%
     else %}
@@ -45,7 +45,6 @@
       [ ]
       {% endif %}
       <a href="{{ url_for('view_file',
-                username=username,
                 repo=repo,
                 identifier=branchname,
                 filename=filename + '/' + entry.name if filename else entry.name) }}">
