@@ -115,13 +115,22 @@ def view_repo_branch(repo, branchname):
     )
 
 @APP.route('/<repo>/log')
-def view_log(repo):
+@APP.route('/<repo>/log/<branchname>')
+def view_log(repo, branchname=None):
     """ Displays the logs of the specified repo.
     """
     if repo not in os.listdir(APP.config['GIT_FOLDER']):
         flask.abort(404)
     repo_obj = pygit2.Repository(
         os.path.join(APP.config['GIT_FOLDER'], repo))
+
+    if branchname and not branchname in repo_obj.listall_branches():
+        flask.abort(404)
+
+    if branchname:
+        branch = repo_obj.lookup_branch(branchname)
+    else:
+        branch = repo_obj.lookup_branch('master')
 
     try:
         page = int(flask.request.args.get('page', 1))
@@ -135,7 +144,7 @@ def view_log(repo):
     n_commits = 0
     last_commits = []
     for commit in repo_obj.walk(
-            repo_obj.head.target.hex, pygit2.GIT_SORT_TIME):
+            branch.get_object().hex, pygit2.GIT_SORT_TIME):
         if n_commits >= start and n_commits <= end:
             last_commits.append(commit)
         n_commits += 1
