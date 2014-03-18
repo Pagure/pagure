@@ -31,7 +31,9 @@
           <ul>
             <li id="homeTab"><a href="{{url_for('index')}}">Home</a></li>
             {% if g.fas_user %}
-            <li id="myreposTab"><a href="{{url_for('my_repos')}}">My repos</a></li>
+            <li id="myrepoTab">
+              <a href="{{ url_for('view_user', user=g.fas_user.username) }}">My repos</a>
+            </li>
             {% endif %}
             {% if admin %}
             <li id="adminTab"><a href="{{url_for('admin')}}">Admin</a></li>
@@ -42,7 +44,7 @@
         <span id="loginInfo">
           {% if g.fas_user %}
             <span class="text">logged in as </span>
-            <a href="{{url_for('my_repos',)}}">{{ g.fas_user.username }}</a> |
+            <a href="{{ url_for('view_user', user=g.fas_user.username) }}">{{ g.fas_user.username }}</a> |
             <a href="{{ url_for('auth_logout') }}?next={{request.url}}">log out</a>
           {% else %}
         <a href="{{ url_for('auth_login') }}?next={{request.url}}">login</a>
