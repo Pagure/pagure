@@ -52,6 +52,35 @@ def index():
     )
 
 
+@APP.route('/users/')
+def view_users():
+    """ Present the list of users.
+    """
+    page = flask.request.args.get('page', 1)
+    try:
+        page = int(page)
+    except ValueError:
+        page = 1
+
+    ## TODO: retrieve this from the DB
+    users = ['pingou']
+
+    limit = APP.config['ITEM_PER_PAGE']
+    start = limit * (page - 1)
+    end = limit * page
+    users_length = len(users)
+    users = users[start:end]
+
+    total_page = int(ceil(users_length / float(limit)))
+
+    return flask.render_template(
+        'user_list.html',
+        users=users,
+        total_page=total_page,
+        page=page,
+    )
+
+
 @APP.route('/user/<username>')
 def view_user(username):
     """ Front page of a specific user.
