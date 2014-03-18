@@ -16,6 +16,34 @@
 </h2>
 
 <h3>Commit: {{ commitid }}</h3>
+
+<table>
+  <tr>
+    <td>Author</td>
+    <td>
+      {{ commit.author.name }} {{ '<' + commit.author.email + '>' }}
+      - {{ commit.commit_time }}
+    </td>
+  </tr>
+  <tr>
+    <td>Committer</td>
+    <td>
+      {{ commit.committer.name }} {{ '<' + commit.committer.email + '>' }}
+      - {{ commit.commit_time }}
+    </td>
+  </tr>
+  <tr>
+    <td>Parent</td>
+    <td>
+      {% for parent in commit.parents %}
+      <a href="{{ url_for('view_commit', repo=repo, commitid=parent.oid.hex) }}">
+        {{ parent.oid.hex }}
+      </a> <br />
+      {% endfor %}
+    </td>
+  </tr>
+</table>
+
 <section class="commit_message">
   <span class="commit_message_head">
     {{ commit.message.split('\n')[0] }}
