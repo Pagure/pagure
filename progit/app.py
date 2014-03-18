@@ -109,6 +109,7 @@ def view_repo(username, repo):
     return flask.render_template(
         'repo_info.html',
         repo=repo,
+        username=username,
         branches=sorted(repo_obj.listall_branches()),
         branchname='master',
         last_commits=last_commits,
@@ -141,6 +142,7 @@ def view_repo_branch(username, repo, branchname):
     return flask.render_template(
         'repo_info.html',
         repo=repo,
+        username=username,
         branches=sorted(repo_obj.listall_branches()),
         branchname=branchname,
         last_commits=last_commits,
@@ -189,6 +191,7 @@ def view_log(username, repo, branchname=None):
         'repo_info.html',
         origin='view_log',
         repo=repo,
+        username=username,
         branches=sorted(repo_obj.listall_branches()),
         branchname=branchname,
         last_commits=last_commits,
@@ -255,6 +258,7 @@ def view_file(username, repo, identifier, filename):
     return flask.render_template(
         'file.html',
         repo=repo,
+        username=username,
         branchname=branchname,
         filename=filename,
         content=content,
@@ -296,6 +300,7 @@ def view_commit(username, repo, commitid):
     return flask.render_template(
         'commit.html',
         repo=repo,
+        username=username,
         commitid=commitid,
         commit=commit,
         diff=diff,
@@ -332,6 +337,7 @@ def view_tree(username, repo, identifier=None):
     return flask.render_template(
         'file.html',
         repo=repo,
+        username=username,
         branchname=branchname,
         filename='',
         content=content,
