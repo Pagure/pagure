@@ -114,6 +114,7 @@ def view_repo_branch(repo, branchname):
         tree=sorted(last_commits[0].tree, key=lambda x: x.filemode),
     )
 
+
 @APP.route('/<repo>/log')
 @APP.route('/<repo>/log/<branchname>')
 def view_log(repo, branchname=None):
@@ -185,7 +186,7 @@ def view_file(repo, identifier, filename):
         except ValueError:
             # If it's not a commit id then it's part of the filename
             commit = repo_obj[repo_obj.head.target]
-            branchname =  'master'
+            branchname = 'master'
 
     def __get_file_in_tree(tree, filepath):
         ''' Retrieve the entry corresponding to the provided filename in a
@@ -216,7 +217,7 @@ def view_file(repo, identifier, filename):
         )
         output_type = 'file'
     else:
-        content=sorted(content, key=lambda x: x.filemode)
+        content = sorted(content, key=lambda x: x.filemode)
         output_type = 'tree'
 
     return flask.render_template(
@@ -293,7 +294,7 @@ def view_tree(repo, identifier=None):
             commit = repo_obj[repo_obj.head.target]
             branchname = 'master'
 
-    content=sorted(commit.tree, key=lambda x: x.filemode)
+    content = sorted(commit.tree, key=lambda x: x.filemode)
     output_type = 'tree'
 
     return flask.render_template(

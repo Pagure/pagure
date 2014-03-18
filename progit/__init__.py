@@ -124,6 +124,7 @@ def inject_variables():
         admin=user_admin,
     )
 
+
 @APP.template_filter('lastcommit_date')
 def lastcommit_date_filter(repo):
     """ Template filter returning the last commit date of the provided repo.
