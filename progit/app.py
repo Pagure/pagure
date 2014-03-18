@@ -76,7 +76,7 @@ def view_repo(repo):
     return flask.render_template(
         'repo_info.html',
         repo=repo,
-        branches=repo_obj.listall_branches(),
+        branches=sorted(repo_obj.listall_branches()),
         branchname='master',
         last_commits=last_commits,
         tree=sorted(last_commits[0].tree, key=lambda x: x.filemode),
