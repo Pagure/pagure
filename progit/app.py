@@ -56,14 +56,14 @@ def index():
     )
 
 
-@APP.route('/<repo>')
-def view_repo(repo):
+@APP.route('/<user>/<repo>')
+def view_repo(user, repo):
     """ Front page of a specific repo.
     """
-    if repo not in os.listdir(APP.config['GIT_FOLDER']):
+    reponame = os.path.join(APP.config['GIT_FOLDER'], user, repo)
+    if repo not in os.path.exists(reponame):
         flask.abort(404)
-    repo_obj = pygit2.Repository(
-        os.path.join(APP.config['GIT_FOLDER'], repo))
+    repo_obj = pygit2.Repository(gitfolder)
 
     cnt = 0
     last_commits = []
@@ -83,14 +83,14 @@ def view_repo(repo):
     )
 
 
-@APP.route('/<repo>/branch/<branchname>')
-def view_repo_branch(repo, branchname):
+@APP.route('/<user>/<repo>/branch/<branchname>')
+def view_repo_branch(user, repo, branchname):
     """ Displays the information about a specific branch.
     """
-    if repo not in os.listdir(APP.config['GIT_FOLDER']):
+    reponame = os.path.join(APP.config['GIT_FOLDER'], user, repo)
+    if repo not in os.path.exists(reponame):
         flask.abort(404)
-    repo_obj = pygit2.Repository(
-        os.path.join(APP.config['GIT_FOLDER'], repo))
+    repo_obj = pygit2.Repository(gitfolder)
 
     if not branchname in repo_obj.listall_branches():
         flask.abort(404)
@@ -115,15 +115,15 @@ def view_repo_branch(repo, branchname):
     )
 
 
-@APP.route('/<repo>/log')
-@APP.route('/<repo>/log/<branchname>')
-def view_log(repo, branchname=None):
+@APP.route('/<user>/<repo>/log')
+@APP.route('/<user>/<repo>/log/<branchname>')
+def view_log(user, repo, branchname=None):
     """ Displays the logs of the specified repo.
     """
-    if repo not in os.listdir(APP.config['GIT_FOLDER']):
+    reponame = os.path.join(APP.config['GIT_FOLDER'], user, repo)
+    if repo not in os.path.exists(reponame):
         flask.abort(404)
-    repo_obj = pygit2.Repository(
-        os.path.join(APP.config['GIT_FOLDER'], repo))
+    repo_obj = pygit2.Repository(gitfolder)
 
     if branchname and not branchname in repo_obj.listall_branches():
         flask.abort(404)
@@ -164,16 +164,15 @@ def view_log(repo, branchname=None):
     )
 
 
-@APP.route('/<repo>/blob/<identifier>/<path:filename>')
-@APP.route('/<repo>/blob/<identifier>/<path:filename>')
-def view_file(repo, identifier, filename):
+@APP.route('/<user>/<repo>/blob/<identifier>/<path:filename>')
+@APP.route('/<user>/<repo>/blob/<identifier>/<path:filename>')
+def view_file(user, repo, identifier, filename):
     """ Displays the content of a file or a tree for the specified repo.
     """
-
-    if repo not in os.listdir(APP.config['GIT_FOLDER']):
-        flask.abort(404, 'Git not found')
-    repo_obj = pygit2.Repository(
-        os.path.join(APP.config['GIT_FOLDER'], repo))
+    reponame = os.path.join(APP.config['GIT_FOLDER'], user, repo)
+    if repo not in os.path.exists(reponame):
+        flask.abort(404)
+    repo_obj = pygit2.Repository(gitfolder)
 
     if identifier in repo_obj.listall_branches():
         branchname = identifier
@@ -230,14 +229,14 @@ def view_file(repo, identifier, filename):
     )
 
 
-@APP.route('/<repo>/<commitid>')
-def view_commit(repo, commitid):
+@APP.route('/<user>/<repo>/<commitid>')
+def view_commit(user, repo, commitid):
     """ Render a commit in a repo
     """
-    if repo not in os.listdir(APP.config['GIT_FOLDER']):
+    reponame = os.path.join(APP.config['GIT_FOLDER'], user, repo)
+    if repo not in os.path.exists(reponame):
         flask.abort(404)
-    repo_obj = pygit2.Repository(
-        os.path.join(APP.config['GIT_FOLDER'], repo))
+    repo_obj = pygit2.Repository(gitfolder)
 
     try:
         commit = repo_obj.get(commitid)
@@ -271,15 +270,15 @@ def view_commit(repo, commitid):
     )
 
 
-@APP.route('/<repo>/tree/')
-@APP.route('/<repo>/tree/<identifier>')
-def view_tree(repo, identifier=None):
+@APP.route('/<user>/<repo>/tree/')
+@APP.route('/<user>/<repo>/tree/<identifier>')
+def view_tree(user, repo, identifier=None):
     """ Render the tree of the repo
     """
-    if repo not in os.listdir(APP.config['GIT_FOLDER']):
+    reponame = os.path.join(APP.config['GIT_FOLDER'], user, repo)
+    if repo not in os.path.exists(reponame):
         flask.abort(404)
-    repo_obj = pygit2.Repository(
-        os.path.join(APP.config['GIT_FOLDER'], repo))
+    repo_obj = pygit2.Repository(gitfolder)
 
     if identifier in repo_obj.listall_branches():
         branchname = identifier
