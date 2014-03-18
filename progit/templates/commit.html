@@ -7,13 +7,24 @@
 {% block content %}
 
 <h2>
+  {% if '/fork/' in request.url %}
+  <a href="{{ url_for('view_fork_repo', username=username, repo=repo)}}">
+  {% else %}
   <a href="{{ url_for('view_repo', repo=repo)}}">
+  {% endif %}
     {{ repo.split('.git')[0] }}
   </a>
 
+  {% if '/fork/' in request.url %}
+  (<a href="{{ url_for('view_fork_tree', username=username,
+               repo=repo, identifier=commitid) }}"
+    >tree</a>)
+  {% else %}
   (<a href="{{ url_for('view_tree',
                repo=repo, identifier=commitid) }}"
     >tree</a>)
+  {% endif %}
+
 </h2>
 
 <h3>Commit: {{ commitid }}</h3>
@@ -37,8 +48,14 @@
     <td>Parent</td>
     <td>
       {% for parent in commit.parents %}
-      <a href="{{ url_for('view_commit',
+        {% if '/fork/' in request.url %}
+        <a href="{{ url_for('view_fork_commit', username=username,
                   repo=repo, commitid=parent.oid.hex) }}">
+        {% else %}
+        <a href="{{ url_for('view_commit',
+                  repo=repo, commitid=parent.oid.hex) }}">
+        {% endif %}
+
         {{ parent.oid.hex }}
       </a> <br />
       {% endfor %}

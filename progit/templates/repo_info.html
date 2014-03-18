@@ -6,7 +6,11 @@
 
 {% block content %}
 <h2>
+  {% if '/fork/' in request.url %}
+  <a href="{{ url_for('view_fork_repo', username=username, repo=repo)}}">
+  {% else %}
   <a href="{{ url_for('view_repo', repo=repo)}}">
+  {% endif %}
     {{ repo.split('.git')[0] }}
   </a>
   {% if branchname %} ({{ branchname }}) {% endif %}
@@ -18,13 +22,23 @@
   <ul>
     {% for branch in branches %}
     <li>
+      {% if '/fork/' in request.url %}
+        <a href="{{ url_for('view_fork_repo_branch',
+                  username=username, repo=repo, branchname=branch) }}">
+      {% else %}
       <a href="{{ url_for('view_repo_branch',
                   repo=repo, branchname=branch) }}">
+      {% endif %}
         {{ branch }}
       </a>
-      (<a href="{{ url_for('view_log',
-                   repo=repo, branchname=branch) }}"
-        >logs</a>)
+      {% if '/fork/' in request.url %}
+        (<a href="{{ url_for('view_fork_log', username=username,
+                   repo=repo, branchname=branch) }}">logs</a>)
+      {% else %}
+        (<a href="{{ url_for('view_log',
+                   repo=repo, branchname=branch) }}">logs</a>)
+      {% endif %}
+
     </li>
     {% endfor %}
   </ul>
@@ -67,8 +81,14 @@
   <ul>
     {% for commit in last_commits %}
     <li>
-      <a href="{{ url_for('view_commit',
+        {% if '/fork/' in request.url %}
+          <a href="{{ url_for('view_fork_commit', username=username,
                   repo=repo, commitid=commit.hex) }}">
+        {% else %}
+          <a href="{{ url_for('view_commit',
+                  repo=repo, commitid=commit.hex) }}">
+        {% endif %}
+
         {{ commit.hex[:6] }}
       </a>
       {{ commit.message.split('\n')[0] }}
@@ -86,8 +106,13 @@
         {% if entry.filemode == 16384 %}
         [ ]
         {% endif %}
-        <a href="{{ url_for('view_file',
+        {% if '/fork/' in request.url %}
+          <a href="{{ url_for('view_fork_file', username=username,
                     repo=repo, identifier=branchname, filename=entry.name) }}">
+        {% else %}
+          <a href="{{ url_for('view_file',
+                    repo=repo, identifier=branchname, filename=entry.name) }}">
+        {% endif %}
           {{ entry.name }}
         </a>
         {{ entry.hex }}

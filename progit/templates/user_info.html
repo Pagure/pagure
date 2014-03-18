@@ -34,11 +34,12 @@
 </table>
 {% endif %}
 
-<section class="repos_list">
+<section class="fork_list">
+  <h3>Forked repos</h3>
   <ul>
     {% for repo in repos %}
     <li>
-      <a href="{{ url_for('view_repo', repo=repo)}}">
+      <a href="{{ url_for('view_fork_repo', username=username, repo=repo)}}">
         {{ repo.split('.git')[0] }}
       </a>
       <span class="commit_date">

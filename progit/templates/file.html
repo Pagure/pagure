@@ -7,12 +7,21 @@
 {% block content %}
 
 <h2>
-  <a href="{{ url_for('view_repo',
-              repo=repo)}}">
+  {% if '/fork/' in request.url %}
+  <a href="{{ url_for('view_fork_repo', username=username, repo=repo)}}">
+  {% else %}
+  <a href="{{ url_for('view_repo', repo=repo)}}">
+  {% endif %}
     {{ repo.split('.git')[0] }}
   </a>
-  : <a href="{{ url_for('view_tree',
+  :
+  {% if '/fork/' in request.url %}
+    <a href="{{ url_for('view_fork_tree', username=username,
                 repo=repo, identifier=branchname) }}">
+  {% else %}
+    <a href="{{ url_for('view_tree',
+                repo=repo, identifier=branchname) }}">
+  {% endif %}
   {{ branchname }}</a>/{%
   for file in filename.split('/') %}
     {% if loop.first %}
@@ -21,10 +30,16 @@
     {% set path = path + '/' + file %}
     {% endif %}
     {% if loop.index != loop.length %}
-<a href="{{ url_for('view_file',
+{% if '/fork/' in request.url
+    %}<a href="{{ url_for('view_fork_file', username=username,
             repo=repo, identifier=branchname,
             filename=path)}}"
-      >{{ file }}</a>/{%
+      >{{ file }}</a>/
+{%
+else %}<a href="{{ url_for('view_file',
+            repo=repo, identifier=branchname,
+            filename=path)}}"
+      >{{ file }}</a>/{% endif %}{%
     else %}
 {{ file }}
     {% endif %}
@@ -44,10 +59,16 @@
       {% if entry.filemode == 16384 %}
       [ ]
       {% endif %}
+      {% if '/fork/' in request.url %}
+      <a href="{{ url_for('view_fork_file', username=username,
+                repo=repo, identifier=branchname,
+                filename=filename + '/' + entry.name if filename else entry.name) }}">
+      {% else %}
       <a href="{{ url_for('view_file',
                 repo=repo,
                 identifier=branchname,
                 filename=filename + '/' + entry.name if filename else entry.name) }}">
+      {% endif %}
         {{ entry.name }}
       </a>
       {{ entry.hex }}
