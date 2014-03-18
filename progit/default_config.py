@@ -10,10 +10,11 @@
 
 import os
 
+# secret key used to generate unique csrf token
+SECRET_KEY = '<insert here your own key>'
 
 # url to the database server:
 DB_URL = 'sqlite:////var/tmp/progit_dev.sqlite'
-
 
 # The FAS group in which the admin of fedocal are
 ADMIN_GROUP = 'progit_admin'
