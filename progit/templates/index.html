@@ -6,7 +6,7 @@
 
 {% block content %}
 
-<h2>Repositories</h2>
+<h2>...</h2>
 
 {% if total_page %}
 <table>
@@ -34,16 +34,13 @@
 </table>
 {% endif %}
 
-<section class="repos_list">
+<section class="user_list">
   <ul>
-    {% for repo in repos %}
+    {% for user in users %}
     <li>
-      <a href="{{ url_for('view_repo', repo=repo)}}">
-        {{ repo.split('.git')[0] }}
+      <a href="{{ url_for('view_user', user=user)}}">
+        {{ user }}
       </a>
-      <span class="commit_date">
-        {{ repos_obj[loop.index - 1] | lastcommit_date}}
-      </span>
     </li>
     {% endfor %}
   </ul>

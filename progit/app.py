@@ -37,18 +37,50 @@ def index():
     limit = APP.config['ITEM_PER_PAGE']
     start = limit * (page - 1)
     end = limit * page
-    repos = sorted(os.listdir(APP.config['GIT_FOLDER']))
+    users = sorted(os.listdir(APP.config['GIT_FOLDER']))
+    users_length = len(users)
+
+    total_page = int(ceil(users_length / float(limit)))
+
+    users = users[start:end]
+
+    return flask.render_template(
+        'index.html',
+        users=users,
+        total_page=total_page,
+        page=page,
+    )
+
+
+@APP.route('/<user>')
+def view_user(user):
+    """ Front page of a specific user.
+    """
+    user_folder = os.path.join(APP.config['GIT_FOLDER'], user)
+    if not os.path.exists(user_folder):
+        flask.abort(404)
+
+    page = flask.request.args.get('page', 1)
+    try:
+        page = int(page)
+    except ValueError:
+        page = 1
+
+    repos = sorted(os.listdir(user_folder))
+    repos_obj = [
+        pygit2.Repository(os.path.join(APP.config['GIT_FOLDER'], user, repo))
+        for repo in repos]
+
+    limit = APP.config['ITEM_PER_PAGE']
+    start = limit * (page - 1)
+    end = limit * page
     repos_length = len(repos)
 
     total_page = int(ceil(repos_length / float(limit)))
 
-    repos = repos[start:end]
-    repos_obj = [
-        pygit2.Repository(os.path.join(APP.config['GIT_FOLDER'], repo))
-        for repo in repos]
-
     return flask.render_template(
-        'index.html',
+        'user_info.html',
+        username=user,
         repos=repos,
         repos_obj=repos_obj,
         total_page=total_page,
