@@ -13,7 +13,7 @@
     <tr>
         <td>
         {% if page > 1%}
-            <a href="{{ url_for('index') }}?page={{page - 1}}">
+            <a href="{{ url_for('view_user', username=username) }}?page={{page - 1}}">
                 &lt; Previous
             </a>
         {% else %}
@@ -23,7 +23,7 @@
         <td>{{ page }} / {{ total_page }}</td>
         <td>
             {% if page < total_page %}
-            <a href="{{ url_for('index') }}?page={{page + 1}}">
+            <a href="{{ url_for('view_user', username=username) }}?page={{page + 1}}">
                 Next &gt;
             </a>
             {% else %}
