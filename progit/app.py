@@ -228,6 +228,7 @@ def view_file(repo, identifier, filename):
         output_type=output_type,
     )
 
+
 @APP.route('/<repo>/<commitid>')
 def view_commit(repo, commitid):
     """ Render a commit in a repo
@@ -241,8 +242,16 @@ def view_commit(repo, commitid):
         commit = repo_obj.get(commitid)
     except ValueError:
         flask.abort(404)
-    parent = repo_obj.revparse_single('%s^' % commitid)
-    diff = repo_obj.diff(parent, commit)
+
+    if commit.parents:
+        diff = commit.tree.diff_to_tree()
+
+        parent = repo_obj.revparse_single('%s^' % commitid)
+        diff = repo_obj.diff(parent, commit)
+    else:
+        # First commit in the repo
+        diff = commit.tree.diff_to_tree(swap=True)
+
     html_diff = highlight(
         diff.patch,
         DiffLexer(),
