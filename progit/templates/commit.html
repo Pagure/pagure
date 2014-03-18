@@ -7,11 +7,12 @@
 {% block content %}
 
 <h2>
-  <a href="{{ url_for('view_repo', repo=repo)}}">
+  <a href="{{ url_for('view_repo', username=username, repo=repo)}}">
     {{ repo.split('.git')[0] }}
   </a>
 
-  (<a href="{{ url_for('view_tree', repo=repo, identifier=commitid) }}"
+  (<a href="{{ url_for('view_tree',
+               username=username, repo=repo, identifier=commitid) }}"
     >tree</a>)
 </h2>
 
@@ -36,7 +37,8 @@
     <td>Parent</td>
     <td>
       {% for parent in commit.parents %}
-      <a href="{{ url_for('view_commit', repo=repo, commitid=parent.oid.hex) }}">
+      <a href="{{ url_for('view_commit',
+                  username=username, repo=repo, commitid=parent.oid.hex) }}">
         {{ parent.oid.hex }}
       </a> <br />
       {% endfor %}
