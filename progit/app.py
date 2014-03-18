@@ -76,6 +76,7 @@ def view_user(username):
     start = limit * (page - 1)
     end = limit * page
     repos_length = len(repos)
+    repos = repos[start:end]
 
     total_page = int(ceil(repos_length / float(limit)))
 
