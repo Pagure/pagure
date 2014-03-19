@@ -191,10 +191,14 @@ def view_repo(repo):
 def view_repo_branch(repo, branchname):
     """ Displays the information about a specific branch.
     """
-    reponame = os.path.join(APP.config['GIT_FOLDER'], repo)
-    if not os.path.exists(reponame):
+    repo = progit.lib.get_project(SESSION, repo)
+
+    if repo is None:
         flask.abort(404)
-    repo_obj = pygit2.Repository(reponame)
+
+    repo_obj = pygit2.Repository(os.path.join(APP.config["GIT_FOLDER"],
+                                 repo.path))
+
 
     if not branchname in repo_obj.listall_branches():
         flask.abort(404)
