@@ -80,7 +80,8 @@ def new_project(session, user, name, folder,
 
     return 'Project "%s" created' % name
 
-def list_projects(session, start=None, limit=None):
+
+def list_projects(session, start=None, limit=None, count=False):
     """List existing projects"""
     projects = session.query(model.Project)
 
@@ -90,12 +91,16 @@ def list_projects(session, start=None, limit=None):
     if limit is not None:
         projects = projects.limit(limit)
 
-    return projects.all()
+    if count:
+        return projects.count()
+    else:
+        return projects.all()
 
-def count_projects(session):
-    """Count the number of projects in the database"""
-    return session.query(model.Project).count()
 
 def get_project(session, name):
     """Get a project from the database"""
-    return session.query(model.Project).filter_by(name=name).first()
+    return session.query(
+        model.Project
+    ).filter_by(
+        name=name
+    ).first()

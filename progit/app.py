@@ -41,7 +41,7 @@ def index():
     start = limit * (page - 1)
 
     repos = progit.lib.list_projects(SESSION, start=start, limit=limit)
-    num_repos = progit.lib.count_projects(SESSION)
+    num_repos = progit.lib.list_projects(SESSION, count=True)
 
     total_page = int(ceil(num_repos / float(limit)))
 
