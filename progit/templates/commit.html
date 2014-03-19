@@ -1,6 +1,6 @@
 {% extends "master.html" %}
 
-{% block title %}{{ repo }} - {{ commitid }}{% endblock %}
+{% block title %}{{ repo.name }} - {{ commitid }}{% endblock %}
 {%block tag %}home{% endblock %}
 
 
@@ -8,20 +8,20 @@
 
 <h2>
   {% if '/fork/' in request.url %}
-  <a href="{{ url_for('view_fork_repo', username=username, repo=repo)}}">
+  <a href="{{ url_for('view_fork_repo', username=username, repo=repo.name)}}">
   {% else %}
-  <a href="{{ url_for('view_repo', repo=repo)}}">
+  <a href="{{ url_for('view_repo', repo=repo.name)}}">
   {% endif %}
-    {{ repo.split('.git')[0] }}
+    {{ repo.name }}
   </a>
 
   {% if '/fork/' in request.url %}
   (<a href="{{ url_for('view_fork_tree', username=username,
-               repo=repo, identifier=commitid) }}"
+               repo=repo.name, identifier=commitid) }}"
     >tree</a>)
   {% else %}
   (<a href="{{ url_for('view_tree',
-               repo=repo, identifier=commitid) }}"
+               repo=repo.name, identifier=commitid) }}"
     >tree</a>)
   {% endif %}
 
@@ -50,10 +50,10 @@
       {% for parent in commit.parents %}
         {% if '/fork/' in request.url %}
         <a href="{{ url_for('view_fork_commit', username=username,
-                  repo=repo, commitid=parent.oid.hex) }}">
+                  repo=repo.name, commitid=parent.oid.hex) }}">
         {% else %}
         <a href="{{ url_for('view_commit',
-                  repo=repo, commitid=parent.oid.hex) }}">
+                  repo=repo.name, commitid=parent.oid.hex) }}">
         {% endif %}
 
         {{ parent.oid.hex }}

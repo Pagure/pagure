@@ -1,17 +1,17 @@
 {% extends "master.html" %}
 
-{% block title %}{{ repo }}{% endblock %}
+{% block title %}{{ repo.name }}{% endblock %}
 {%block tag %}home{% endblock %}
 
 
 {% block content %}
 <h2>
   {% if '/fork/' in request.url %}
-  <a href="{{ url_for('view_fork_repo', username=username, repo=repo)}}">
+  <a href="{{ url_for('view_fork_repo', username=username, repo=repo.name)}}">
   {% else %}
-  <a href="{{ url_for('view_repo', repo=repo)}}">
+  <a href="{{ url_for('view_repo', repo=repo.name)}}">
   {% endif %}
-    {{ repo.split('.git')[0] }}
+    {{ repo.name }}
   </a>
   {% if branchname %} ({{ branchname }}) {% endif %}
 </h2>
@@ -24,19 +24,19 @@
     <li>
       {% if '/fork/' in request.url %}
         <a href="{{ url_for('view_fork_repo_branch',
-                  username=username, repo=repo, branchname=branch) }}">
+                  username=username, repo=repo.name, branchname=branch) }}">
       {% else %}
       <a href="{{ url_for('view_repo_branch',
-                  repo=repo, branchname=branch) }}">
+                  repo=repo.name, branchname=branch) }}">
       {% endif %}
         {{ branch }}
       </a>
       {% if '/fork/' in request.url %}
         (<a href="{{ url_for('view_fork_log', username=username,
-                   repo=repo, branchname=branch) }}">logs</a>)
+                   repo=repo.name, branchname=branch) }}">logs</a>)
       {% else %}
         (<a href="{{ url_for('view_log',
-                   repo=repo, branchname=branch) }}">logs</a>)
+                   repo=repo.name, branchname=branch) }}">logs</a>)
       {% endif %}
 
     </li>
@@ -50,7 +50,7 @@
         <td>
         {% if page > 1%}
             <a href="{{ url_for('.%s' % origin,
-                        repo=repo) }}?page={{page - 1}}">
+                        repo=repo.name) }}?page={{page - 1}}">
                 &lt; Previous
             </a>
         {% else %}
@@ -61,7 +61,7 @@
         <td>
             {% if page < total_page %}
             <a href="{{ url_for('.%s' % origin,
-                        repo=repo) }}?page={{page + 1}}">
+                        repo=repo.name) }}?page={{page + 1}}">
                 Next &gt;
             </a>
             {% else %}
@@ -83,10 +83,10 @@
     <li>
         {% if '/fork/' in request.url %}
           <a href="{{ url_for('view_fork_commit', username=username,
-                  repo=repo, commitid=commit.hex) }}">
+                  repo=repo.name, commitid=commit.hex) }}">
         {% else %}
           <a href="{{ url_for('view_commit',
-                  repo=repo, commitid=commit.hex) }}">
+                  repo=repo.name, commitid=commit.hex) }}">
         {% endif %}
 
         {{ commit.hex[:6] }}
@@ -108,10 +108,10 @@
         {% endif %}
         {% if '/fork/' in request.url %}
           <a href="{{ url_for('view_fork_file', username=username,
-                    repo=repo, identifier=branchname, filename=entry.name) }}">
+                    repo=repo.name, identifier=branchname, filename=entry.name) }}">
         {% else %}
           <a href="{{ url_for('view_file',
-                    repo=repo, identifier=branchname, filename=entry.name) }}">
+                    repo=repo.name, identifier=branchname, filename=entry.name) }}">
         {% endif %}
           {{ entry.name }}
         </a>

@@ -39,13 +39,11 @@ def index():
 
     limit = APP.config['ITEM_PER_PAGE']
     start = limit * (page - 1)
-    end = limit * page
-    repos = sorted(os.listdir(APP.config['GIT_FOLDER']))
-    repos_length = len(repos)
 
-    total_page = int(ceil(repos_length / float(limit)))
+    repos = progit.lib.list_projects(SESSION, start=start, limit=limit)
+    num_repos = progit.lib.count_projects(SESSION)
 
-    repos = repos[start:end]
+    total_page = int(ceil(num_repos / float(limit)))
 
     return flask.render_template(
         'index.html',
@@ -159,10 +157,13 @@ def new_project():
 def view_repo(repo):
     """ Front page of a specific repo.
     """
-    reponame = os.path.join(APP.config['GIT_FOLDER'], repo)
-    if not os.path.exists(reponame):
+    repo = progit.lib.get_project(SESSION, repo)
+
+    if repo is None:
         flask.abort(404)
-    repo_obj = pygit2.Repository(reponame)
+
+    repo_obj = pygit2.Repository(os.path.join(APP.config["GIT_FOLDER"],
+                                 repo.path))
 
     cnt = 0
     last_commits = []
@@ -190,10 +191,14 @@ def view_repo(repo):
 def view_repo_branch(repo, branchname):
     """ Displays the information about a specific branch.
     """
-    reponame = os.path.join(APP.config['GIT_FOLDER'], repo)
-    if not os.path.exists(reponame):
+    repo = progit.lib.get_project(SESSION, repo)
+
+    if repo is None:
         flask.abort(404)
-    repo_obj = pygit2.Repository(reponame)
+
+    repo_obj = pygit2.Repository(os.path.join(APP.config["GIT_FOLDER"],
+                                 repo.path))
+
 
     if not branchname in repo_obj.listall_branches():
         flask.abort(404)
@@ -223,10 +228,13 @@ def view_repo_branch(repo, branchname):
 def view_log(repo, branchname=None):
     """ Displays the logs of the specified repo.
     """
-    reponame = os.path.join(APP.config['GIT_FOLDER'], repo)
-    if not os.path.exists(reponame):
+    repo = progit.lib.get_project(SESSION, repo)
+
+    if repo is None:
         flask.abort(404)
-    repo_obj = pygit2.Repository(reponame)
+
+    repo_obj = pygit2.Repository(os.path.join(APP.config["GIT_FOLDER"],
+                                 repo.path))
 
     if branchname and not branchname in repo_obj.listall_branches():
         flask.abort(404)
@@ -272,10 +280,13 @@ def view_log(repo, branchname=None):
 def view_file(repo, identifier, filename):
     """ Displays the content of a file or a tree for the specified repo.
     """
-    reponame = os.path.join(APP.config['GIT_FOLDER'], repo)
-    if not os.path.exists(reponame):
+    repo = progit.lib.get_project(SESSION, repo)
+
+    if repo is None:
         flask.abort(404)
-    repo_obj = pygit2.Repository(reponame)
+
+    repo_obj = pygit2.Repository(os.path.join(APP.config["GIT_FOLDER"],
+                                 repo.path))
 
     if identifier in repo_obj.listall_branches():
         branchname = identifier
@@ -336,10 +347,13 @@ def view_file(repo, identifier, filename):
 def view_commit(repo, commitid):
     """ Render a commit in a repo
     """
-    reponame = os.path.join(APP.config['GIT_FOLDER'], repo)
-    if not os.path.exists(reponame):
+    repo = progit.lib.get_project(SESSION, repo)
+
+    if repo is None:
         flask.abort(404)
-    repo_obj = pygit2.Repository(reponame)
+
+    repo_obj = pygit2.Repository(os.path.join(APP.config["GIT_FOLDER"],
+                                 repo.path))
 
     try:
         commit = repo_obj.get(commitid)
@@ -378,10 +392,13 @@ def view_commit(repo, commitid):
 def view_tree(repo, identifier=None):
     """ Render the tree of the repo
     """
-    reponame = os.path.join(APP.config['GIT_FOLDER'], repo)
-    if not os.path.exists(reponame):
+    repo = progit.lib.get_project(SESSION, repo)
+
+    if repo is None:
         flask.abort(404)
-    repo_obj = pygit2.Repository(reponame)
+
+    repo_obj = pygit2.Repository(os.path.join(APP.config["GIT_FOLDER"],
+                                 repo.path))
 
     if identifier in repo_obj.listall_branches():
         branchname = identifier

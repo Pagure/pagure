@@ -38,8 +38,8 @@
   <ul>
     {% for repo in repos %}
     <li>
-      <a href="{{ url_for('view_repo', repo=repo)}}">
-        {{ repo }}
+      <a href="{{ url_for('view_repo', repo=repo.name)}}">
+        {{ repo.name }}
       </a>
     </li>
     {% endfor %}
