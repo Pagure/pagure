@@ -1,0 +1,90 @@
+{% extends "master.html" %}
+
+{% block title %}Home{% endblock %}
+{%block tag %}home{% endblock %}
+
+
+{% block content %}
+
+<h2>Request pull
+  {% if '/fork/' in request.url %}
+  <a href="{{ url_for('view_fork_repo', username=username, repo=repo.name)}}">
+  {% else %}
+  <a href="{{ url_for('view_repo', repo=repo.name)}}">
+  {% endif %}
+    {{ repo.name }}
+  </a>
+
+  {% if '/fork/' in request.url %}
+  (<a href="{{ url_for('view_fork_tree', username=username,
+               repo=repo.name, identifier=commitid) }}"
+    >tree</a>)
+  {% else %}
+  (<a href="{{ url_for('view_tree',
+               repo=repo.name, identifier=commitid) }}"
+    >tree</a>)
+  {% endif %}
+
+</h2>
+
+<section class="commit_list">
+  <ul>
+    {% for commit in diff_commits %}
+    <li>
+      <a href="{{ url_for('view_fork_commit', username=username,
+                  repo=repo.name, commitid=commit.oid.hex)}}">
+        {{ commit.message.split('\n')[0] }}
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section class="request_diff">
+  <h3>Diff:</h3>
+  {% for html_diff in html_diffs %}
+    <h3>Commit: {{ diff_commits[loop.index - 1].oid.hex }}</h3>
+
+    <table>
+      <tr>
+        <td>Author</td>
+        <td>
+          {{ diff_commits[loop.index - 1].author.name }} {{ '<' + diff_commits[loop.index - 1].author.email + '>' }}
+          - {{ diff_commits[loop.index - 1].commit_time }}
+        </td>
+      </tr>
+      <tr>
+        <td>Committer</td>
+        <td>
+          {{ diff_commits[loop.index - 1].committer.name }} {{ '<' + diff_commits[loop.index - 1].committer.email + '>' }}
+          - {{ diff_commits[loop.index - 1].commit_time }}
+        </td>
+      </tr>
+      <tr>
+        <td>Parent</td>
+        <td>
+          {% for parent in diff_commits[loop.index - 1].parents %}
+            {% if '/fork/' in request.url %}
+            <a href="{{ url_for('view_fork_commit', username=username,
+                      repo=repo.name, commitid=parent.oid.hex) }}">
+            {% else %}
+            <a href="{{ url_for('view_commit',
+                      repo=repo.name, commitid=parent.oid.hex) }}">
+            {% endif %}
+
+            {{ parent.oid.hex }}
+          </a> <br />
+          {% endfor %}
+        </td>
+      </tr>
+    </table>
+    <p>
+    {{ diff_commits[loop.index - 1].message }}
+    </p>
+    {% autoescape false %}
+        {{ html_diff }}
+    {% endautoescape %}
+  {% endfor %}
+</section>
+
+{% endblock %}
