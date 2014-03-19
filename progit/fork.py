@@ -20,6 +20,7 @@ from pygments.lexers.text import DiffLexer
 from pygments.formatters import HtmlFormatter
 
 
+import progit.lib
 from progit import APP, SESSION, LOG
 
 
@@ -28,26 +29,33 @@ from progit import APP, SESSION, LOG
 def fork_project(repo):
     """ Fork the project specified into the user's namespace
     """
-    reponame = os.path.join(APP.config['GIT_FOLDER'], repo)
-    if not os.path.exists(reponame):
+    repo = progit.lib.get_project(SESSION, repo)
+
+    if repo is None:
         flask.abort(404)
 
-    forkreponame = os.path.join(
-        APP.config['FORK_FOLDER'],
-        flask.g.fas_user.username,
-        repo)
+    try:
+        message = progit.lib.fork_project(
+            session=SESSION,
+            repo=repo,
+            repo_folder=APP.config['GIT_FOLDER'],
+            fork_folder=APP.config['FORK_FOLDER'],
+            user=flask.g.fas_user.username)
 
-    if os.path.exists(forkreponame):
-        flask.flash('Repo "%s/%s" already exists' % (
-            flask.g.fas_user.username, repo))
-    else:
-        pygit2.clone_repository(reponame, forkreponame)
-        flask.flash('Repo "%s" cloned to "%s/%s"' % (
-            repo, flask.g.fas_user.username, repo))
 
-    return flask.redirect(
-        flask.url_for('view_user', username=flask.g.fas_user.username)
-    )
+        SESSION.commit()
+        flask.flash(message)
+        return flask.redirect(
+            flask.url_for('view_fork_repo',
+                username=flask.g.fas_user.username, repo=repo.name)
+        )
+    except progit.exceptions.ProgitException, err:
+        flask.flash(str(err), 'error')
+    except SQLAlchemyError, err:  # pragma: no cover
+        SESSION.rollback()
+        flask.flash(str(err), 'error')
+
+    return flask.redirect(flask.url_for('view_repo',repo=repo.name))
 
 
 @APP.route('/fork/<username>/<repo>')
