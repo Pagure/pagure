@@ -1,0 +1,51 @@
+{% macro render_field(field, after="") %}
+<div class="row">
+  {{ field.label }}{{ field(**kwargs)|safe }}
+  {% if after %} {{ after }}{% endif %}
+  {% if field.errors %}
+  <ul class="errors">
+    {% for error in field.errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% macro render_field_invert(field, after="") %}
+<div class="row">
+  {{ field(**kwargs)|safe }}{{ field.label }}
+  {% if after %} {{ after }}{% endif %}
+  {% if field.errors %}
+  <ul class="errors">
+    {% for error in field.errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% macro render_field_in_row(field, after="") %}
+<tr>
+    <td>{{ field.label }}</td>
+    <td>{{ field(**kwargs)|safe }}</td>
+{% if after %} <td>{{ after }}</td>{% endif %}
+{% if field.errors %}
+{% for error in field.errors %}
+<td class="errors">{{ error }}</td>
+{% endfor %}
+{% endif %}
+</tr>
+{% endmacro %}
+
+{% macro render_field_in_cell(field, after="") %}
+    <td>{{ field.label }}</td>
+    <td>{{ field(**kwargs)|safe }}</td>
+{% if after %} <td>{{ after }}</td>{% endif %}
+{% if field.errors %}
+{% for error in field.errors %}
+<td class="errors">{{ error }}</td>
+{% endfor %}
+{% endif %}
+{% endmacro %}
