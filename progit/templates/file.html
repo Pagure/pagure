@@ -8,19 +8,19 @@
 
 <h2>
   {% if '/fork/' in request.url %}
-  <a href="{{ url_for('view_fork_repo', username=username, repo=repo)}}">
+  <a href="{{ url_for('view_fork_repo', username=username, repo=repo.name)}}">
   {% else %}
-  <a href="{{ url_for('view_repo', repo=repo)}}">
+  <a href="{{ url_for('view_repo', repo=repo.name)}}">
   {% endif %}
-    {{ repo.split('.git')[0] }}
+    {{ repo.name }}
   </a>
   :
   {% if '/fork/' in request.url %}
     <a href="{{ url_for('view_fork_tree', username=username,
-                repo=repo, identifier=branchname) }}">
+                repo=repo.name, identifier=branchname) }}">
   {% else %}
     <a href="{{ url_for('view_tree',
-                repo=repo, identifier=branchname) }}">
+                repo=repo.name, identifier=branchname) }}">
   {% endif %}
   {{ branchname }}</a>/{%
   for file in filename.split('/') %}
@@ -32,12 +32,12 @@
     {% if loop.index != loop.length %}
 {% if '/fork/' in request.url
     %}<a href="{{ url_for('view_fork_file', username=username,
-            repo=repo, identifier=branchname,
+            repo=repo.name, identifier=branchname,
             filename=path)}}"
       >{{ file }}</a>/
 {%
 else %}<a href="{{ url_for('view_file',
-            repo=repo, identifier=branchname,
+            repo=repo.name, identifier=branchname,
             filename=path)}}"
       >{{ file }}</a>/{% endif %}{%
     else %}
@@ -61,11 +61,11 @@ else %}<a href="{{ url_for('view_file',
       {% endif %}
       {% if '/fork/' in request.url %}
       <a href="{{ url_for('view_fork_file', username=username,
-                repo=repo, identifier=branchname,
+                repo=repo.name, identifier=branchname,
                 filename=filename + '/' + entry.name if filename else entry.name) }}">
       {% else %}
       <a href="{{ url_for('view_file',
-                repo=repo,
+                repo=repo.name,
                 identifier=branchname,
                 filename=filename + '/' + entry.name if filename else entry.name) }}">
       {% endif %}
