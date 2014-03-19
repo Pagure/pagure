@@ -118,10 +118,10 @@
   {% endif %}
 
   <section class="commit_list">
-    {% if origin != 'view_log' %}
-    <h3>Last 10 commits</h3>
-    {% else %}
+    {% if origin == 'view_log' or origin == 'view_fork_log' %}
     <h3>Commits list</h3>
+    {% else %}
+    <h3>Last 10 commits</h3>
     {% endif %}
     <ul>
       {% for commit in last_commits %}
