@@ -157,10 +157,13 @@ def new_project():
 def view_repo(repo):
     """ Front page of a specific repo.
     """
-    reponame = os.path.join(APP.config['GIT_FOLDER'], repo)
-    if not os.path.exists(reponame):
+    repo = progit.lib.get_project(SESSION, repo)
+
+    if repo is None:
         flask.abort(404)
-    repo_obj = pygit2.Repository(reponame)
+
+    repo_obj = pygit2.Repository(os.path.join(APP.config["GIT_FOLDER"],
+                                 repo.path))
 
     cnt = 0
     last_commits = []

@@ -95,3 +95,7 @@ def list_projects(session, start=None, limit=None):
 def count_projects(session):
     """Count the number of projects in the database"""
     return session.query(model.Project).count()
+
+def get_project(session, name):
+    """Get a project from the database"""
+    return session.query(model.Project).filter_by(name=name).first()
