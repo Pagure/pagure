@@ -97,7 +97,7 @@ class Project(BASE):
     @property
     def fork(self):
         ''' Return a boolean specifying if the project is a fork or not '''
-        return self.parent_id is None
+        return self.parent_id is not None
 
     @property
     def fullname(self):
@@ -105,7 +105,7 @@ class Project(BASE):
         project forked, otherwise it returns the project name.
         '''
         str_name = self.name
-        if not self.parent_id:
+        if self.parent_id:
             str_name = "%s/%s" % (self.user, str_name)
         return str_name
 
