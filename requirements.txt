@@ -3,6 +3,7 @@
 alembic
 arrow
 flask
+flask-wtf
 python-fedora
 python-openid
 python-openid-teams
@@ -10,3 +11,4 @@ python-openid-cla
 pygit2 < 0.20
 pygments
 sqlalchemy
+wtforms
