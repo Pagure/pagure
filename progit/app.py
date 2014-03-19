@@ -165,11 +165,14 @@ def view_repo(repo):
 
     cnt = 0
     last_commits = []
-    for commit in repo_obj.walk(repo_obj.head.target, pygit2.GIT_SORT_TIME):
-        last_commits.append(commit)
-        cnt += 1
-        if cnt == 10:
-            break
+    tree = []
+    if not repo_obj.is_empty:
+        for commit in repo_obj.walk(repo_obj.head.target, pygit2.GIT_SORT_TIME):
+            last_commits.append(commit)
+            cnt += 1
+            if cnt == 10:
+                break
+        tree = sorted(last_commits[0].tree, key=lambda x: x.filemode)
 
     return flask.render_template(
         'repo_info.html',
@@ -177,7 +180,7 @@ def view_repo(repo):
         branches=sorted(repo_obj.listall_branches()),
         branchname='master',
         last_commits=last_commits,
-        tree=sorted(last_commits[0].tree, key=lambda x: x.filemode),
+        tree=tree,
     )
 
 
