@@ -18,7 +18,9 @@
 
 {% if repo.fork %}
 <section id="parent">
-    Forked from <a href="">{{ repo.parent[0].name }}</a>
+  Forked from
+  <a href="{{ url_for('view_repo', repo=repo.parent.name)}}">
+    {{ repo.parent.name }}</a>
 </section>
 {% endif %}
 
