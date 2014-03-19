@@ -16,71 +16,94 @@
   {% if branchname %} ({{ branchname }}) {% endif %}
 </h2>
 
+{% if repo_obj and repo_obj.is_empty %}
 
-<section class="branch_list">
-  <h3>Branches</h3>
-  <ul>
-    {% for branch in branches %}
-    <li>
-      {% if '/fork/' in request.url %}
-        <a href="{{ url_for('view_fork_repo_branch',
-                  username=username, repo=repo.name, branchname=branch) }}">
-      {% else %}
-      <a href="{{ url_for('view_repo_branch',
-                  repo=repo.name, branchname=branch) }}">
-      {% endif %}
-        {{ branch }}
-      </a>
-      {% if '/fork/' in request.url %}
-        (<a href="{{ url_for('view_fork_log', username=username,
-                   repo=repo.name, branchname=branch) }}">logs</a>)
-      {% else %}
-        (<a href="{{ url_for('view_log',
-                   repo=repo.name, branchname=branch) }}">logs</a>)
-      {% endif %}
+  <section class="repo_info">
+    <p>This repo is brand new!</p>
 
-    </li>
-    {% endfor %}
-  </ul>
-</section>
+    <p>If you already have a git repo:</p>
+    <pre>
+      git remote add origin https://githosted.org/{{ repo.name }}.git
+      git push -u origin master
+    </pre>
 
-{% if total_page %}
-<table>
-    <tr>
-        <td>
-        {% if page > 1%}
-            <a href="{{ url_for('.%s' % origin,
-                        repo=repo.name) }}?page={{page - 1}}">
-                &lt; Previous
-            </a>
+    <p>If you have no create your git repo yet:</p>
+    <pre>
+      touch README.rst
+      git init
+      git add README.rst
+      git commit -m "Add README file"
+      git remote add origin https://githosted.org/{{ repo.name }}.git
+      git push -u origin master
+    </pre>
+
+    </section>
+
+{% else %}
+  <section class="branch_list">
+    <h3>Branches</h3>
+    <ul>
+      {% for branch in branches %}
+      <li>
+        {% if '/fork/' in request.url %}
+          <a href="{{ url_for('view_fork_repo_branch',
+                    username=username, repo=repo.name, branchname=branch) }}">
         {% else %}
-            &lt; Previous
+        <a href="{{ url_for('view_repo_branch',
+                    repo=repo.name, branchname=branch) }}">
         {% endif %}
-        </td>
-        <td>{{ page }} / {{ total_page }}</td>
-        <td>
-            {% if page < total_page %}
-            <a href="{{ url_for('.%s' % origin,
-                        repo=repo.name) }}?page={{page + 1}}">
-                Next &gt;
-            </a>
-            {% else %}
-            Next >
-            {% endif %}
-        </td>
-    </tr>
-</table>
-{% endif %}
+          {{ branch }}
+        </a>
+        {% if '/fork/' in request.url %}
+          (<a href="{{ url_for('view_fork_log', username=username,
+                     repo=repo.name, branchname=branch) }}">logs</a>)
+        {% else %}
+          (<a href="{{ url_for('view_log',
+                     repo=repo.name, branchname=branch) }}">logs</a>)
+        {% endif %}
 
-<section class="commit_list">
-  {% if origin != 'view_log' %}
-  <h3>Last 10 commits</h3>
-  {% else %}
-  <h3>Commits list</h3>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  {% if total_page %}
+  <table>
+    <tr>
+      <td>
+      {% if page > 1%}
+        <a href="{{ url_for('.%s' % origin,
+                    repo=repo.name) }}?page={{page - 1}}">
+            &lt; Previous
+        </a>
+      {% else %}
+          &lt; Previous
+      {% endif %}
+      </td>
+      <td>{{ page }} / {{ total_page }}</td>
+      <td>
+        {% if page < total_page %}
+        <a href="{{ url_for('.%s' % origin,
+                    repo=repo.name) }}?page={{page + 1}}">
+            Next &gt;
+        </a>
+        {% else %}
+        Next >
+        {% endif %}
+      </td>
+    </tr>
+  </table>
   {% endif %}
-  <ul>
-    {% for commit in last_commits %}
-    <li>
+
+  <section class="commit_list">
+    {% if origin != 'view_log' %}
+    <h3>Last 10 commits</h3>
+    {% else %}
+    <h3>Commits list</h3>
+    {% endif %}
+    <ul>
+      {% for commit in last_commits %}
+      <li>
         {% if '/fork/' in request.url %}
           <a href="{{ url_for('view_fork_commit', username=username,
                   repo=repo.name, commitid=commit.hex) }}">
@@ -90,37 +113,39 @@
         {% endif %}
 
         {{ commit.hex[:6] }}
-      </a>
-      {{ commit.message.split('\n')[0] }}
-    </li>
-    {% endfor %}
-  </ul>
-</section>
-
-{% if tree %}
-  <section class="tree_list">
-    <h3>Current tree</h3>
-    <ul>
-      {% for entry in tree %}
-      <li>
-        {% if entry.filemode == 16384 %}
-        [ ]
-        {% endif %}
-        {% if '/fork/' in request.url %}
-          <a href="{{ url_for('view_fork_file', username=username,
-                    repo=repo.name, identifier=branchname, filename=entry.name) }}">
-        {% else %}
-          <a href="{{ url_for('view_file',
-                    repo=repo.name, identifier=branchname, filename=entry.name) }}">
-        {% endif %}
-          {{ entry.name }}
         </a>
-        {{ entry.hex }}
-        {{ entry.id }}
+        {{ commit.message.split('\n')[0] }}
       </li>
       {% endfor %}
     </ul>
   </section>
+
+  {% if tree %}
+    <section class="tree_list">
+      <h3>Current tree</h3>
+      <ul>
+        {% for entry in tree %}
+        <li>
+          {% if entry.filemode == 16384 %}
+          [ ]
+          {% endif %}
+          {% if '/fork/' in request.url %}
+            <a href="{{ url_for('view_fork_file', username=username,
+                      repo=repo.name, identifier=branchname, filename=entry.name) }}">
+          {% else %}
+            <a href="{{ url_for('view_file',
+                      repo=repo.name, identifier=branchname, filename=entry.name) }}">
+          {% endif %}
+            {{ entry.name }}
+          </a>
+          {{ entry.hex }}
+          {{ entry.id }}
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
 {% endif %}
 
 {% endblock %}
