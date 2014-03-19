@@ -1,7 +1,9 @@
 # Used for when working from a virtualenv.
 # Use this file by running "$ pip install -r requirements.txt"
+alembic
 arrow
 flask
+python-fedora
 python-openid
 python-openid-teams
 python-openid-cla

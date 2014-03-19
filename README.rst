@@ -14,7 +14,7 @@ Get it running
 
 * Retrieve the sources::
 
-  git clone git//github.com:pypingou/fedora-owner-change.git
+  git clone git://github.com/pypingou/progit
 
 
 * Retrieve a bunch of git repositories::
