@@ -24,9 +24,46 @@
 </section>
 {% endif %}
 
-<section id="fork_repo">
-    <a href="{{ url_for('fork_project', repo=repo.name) }}">Fork project</a>
-</section>
+  <div class="horizontal-menu">
+    <ul>
+      <li class="selected">
+        <a href="/coprs/pingou/subsurface/">Overview</a>
+      </li>
+      <li class="unselected">
+        {% if '/fork/' in request.url %}
+          <a href="{{ url_for('view_fork_log', username=username,
+                     repo=repo.name) }}">Logs</a>
+        {% else %}
+          <a href="{{ url_for('view_log', repo=repo.name) }}">Logs</a>
+        {% endif %}
+      </li>
+      <li class="unselected">
+        {% if '/fork/' in request.url %}
+          <a href="{{ url_for('view_fork_tree', username=username,
+                     repo=repo.name) }}">Tree</a>
+        {% else %}
+          <a href="{{ url_for('view_tree', repo=repo.name) }}">Tree</a>
+        {% endif %}
+      </li>
+      <li class="unselected">
+        {% if '/fork/' in request.url %}
+          <a href="">Issues</a>
+        {% else %}
+          <a href="">Issues</a>
+        {% endif %}
+      </li>
+    </ul>
+    <ul class="right">
+      <li class=unselected">
+        <a href="/coprs/pingou/subsurface/edit/">Fork</a>
+      </li>
+      {% if g.fas_user and g.fas_user.username == repo.user %}
+      <li class="unselected">
+        <a href="/coprs/pingou/subsurface/delete/">Delete</a>
+      </li>
+      {% endif %}
+    </ul>
+  </div>
 
 {% if repo_obj and repo_obj.is_empty %}
 
