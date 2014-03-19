@@ -142,7 +142,7 @@ def view_fork_repo_branch(username, repo, branchname):
     diff_commits = []
     if not repo_obj.is_empty and not orig_repo.is_empty:
         orig_commit = orig_repo[orig_repo.head.target]
-        repo_commit = repo_obj[repo_obj.head.target]
+        repo_commit = repo_obj[branch.get_object().hex]
         diff = repo_obj.diff(
             repo_obj.revparse_single(orig_commit.oid.hex),
             repo_obj.revparse_single(repo_commit.oid.hex))
