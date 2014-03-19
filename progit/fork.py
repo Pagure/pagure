@@ -68,7 +68,6 @@ def view_fork_repo(username, repo):
         flask.abort(404)
 
     reponame = os.path.join(APP.config['FORK_FOLDER'], username, repo.path)
-
     repo_obj = pygit2.Repository(reponame)
 
     cnt = 0
@@ -83,6 +82,22 @@ def view_fork_repo(username, repo):
                 break
         tree = sorted(last_commits[0].tree, key=lambda x: x.filemode)
 
+    parentname = os.path.join(APP.config['GIT_FOLDER'], repo.parent.path)
+    orig_repo = pygit2.Repository(parentname)
+
+    diff_commits = []
+    if not repo_obj.is_empty and not orig_repo.is_empty:
+        orig_commit = orig_repo[orig_repo.head.target]
+        repo_commit = repo_obj[repo_obj.head.target]
+        diff = repo_obj.diff(
+            repo_obj.revparse_single(orig_commit.oid.hex),
+            repo_obj.revparse_single(repo_commit.oid.hex))
+        for commit in repo_obj.walk(
+                repo_obj.head.target, pygit2.GIT_SORT_TIME):
+            if commit.oid.hex == orig_commit.oid.hex:
+                break
+            diff_commits.append(commit.oid.hex)
+
     return flask.render_template(
         'repo_info.html',
         repo=repo,
@@ -92,6 +107,7 @@ def view_fork_repo(username, repo):
         branchname='master',
         last_commits=last_commits,
         tree=tree,
+        diff_commits=diff_commits,
     )
 
 
@@ -120,6 +136,22 @@ def view_fork_repo_branch(username, repo, branchname):
         if cnt == 10:
             break
 
+    parentname = os.path.join(APP.config['GIT_FOLDER'], repo.parent.path)
+    orig_repo = pygit2.Repository(parentname)
+
+    diff_commits = []
+    if not repo_obj.is_empty and not orig_repo.is_empty:
+        orig_commit = orig_repo[orig_repo.head.target]
+        repo_commit = repo_obj[repo_obj.head.target]
+        diff = repo_obj.diff(
+            repo_obj.revparse_single(orig_commit.oid.hex),
+            repo_obj.revparse_single(repo_commit.oid.hex))
+        for commit in repo_obj.walk(
+                repo_obj.head.target, pygit2.GIT_SORT_TIME):
+            if commit.oid.hex == orig_commit.oid.hex:
+                break
+            diff_commits.append(commit.oid.hex)
+
     return flask.render_template(
         'repo_info.html',
         repo=repo,
@@ -128,6 +160,7 @@ def view_fork_repo_branch(username, repo, branchname):
         branchname=branchname,
         last_commits=last_commits,
         tree=sorted(last_commits[0].tree, key=lambda x: x.filemode),
+        diff_commits=diff_commits,
     )
 
 
