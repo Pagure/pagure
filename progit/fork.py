@@ -204,6 +204,22 @@ def view_fork_log(username, repo, branchname=None):
 
     total_page = int(ceil(n_commits / float(limit)))
 
+    parentname = os.path.join(APP.config['GIT_FOLDER'], repo.parent.path)
+    orig_repo = pygit2.Repository(parentname)
+
+    diff_commits = []
+    if not repo_obj.is_empty and not orig_repo.is_empty:
+        orig_commit = orig_repo[orig_repo.head.target]
+        repo_commit = repo_obj[branch.get_object().hex]
+        diff = repo_obj.diff(
+            repo_obj.revparse_single(orig_commit.oid.hex),
+            repo_obj.revparse_single(repo_commit.oid.hex))
+        for commit in repo_obj.walk(
+                repo_obj.head.target, pygit2.GIT_SORT_TIME):
+            if commit.oid.hex == orig_commit.oid.hex:
+                break
+            diff_commits.append(commit.oid.hex)
+
     return flask.render_template(
         'repo_info.html',
         origin='view_fork_log',
@@ -212,6 +228,7 @@ def view_fork_log(username, repo, branchname=None):
         branches=sorted(repo_obj.listall_branches()),
         branchname=branchname,
         last_commits=last_commits,
+        diff_commits=diff_commits,
         page=page,
         total_page=total_page,
     )
