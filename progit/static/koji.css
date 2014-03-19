@@ -160,7 +160,7 @@ p#footer a {
 
 body#home #mainNav li#homeTab a,
 body#users #mainNav li#usersTab a,
-body#mymeeting #mainNav li#mymeetingTab a,
+body#new_project #mainNav li#new_project a,
 body#admin #mainNav li#adminTab a {
     background-color: #fff;
     color: #444;
