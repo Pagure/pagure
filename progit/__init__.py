@@ -128,8 +128,9 @@ def inject_variables():
 def lastcommit_date_filter(repo):
     """ Template filter returning the last commit date of the provided repo.
     """
-    commit = repo[repo.head.target]
-    return arrow.get(commit.commit_time).humanize()
+    if not repo.is_empty:
+        commit = repo[repo.head.target]
+        return arrow.get(commit.commit_time).humanize()
 
 
 @APP.route('/login/', methods=('GET', 'POST'))
