@@ -228,10 +228,13 @@ def view_repo_branch(repo, branchname):
 def view_log(repo, branchname=None):
     """ Displays the logs of the specified repo.
     """
-    reponame = os.path.join(APP.config['GIT_FOLDER'], repo)
-    if not os.path.exists(reponame):
+    repo = progit.lib.get_project(SESSION, repo)
+
+    if repo is None:
         flask.abort(404)
-    repo_obj = pygit2.Repository(reponame)
+
+    repo_obj = pygit2.Repository(os.path.join(APP.config["GIT_FOLDER"],
+                                 repo.path))
 
     if branchname and not branchname in repo_obj.listall_branches():
         flask.abort(404)
