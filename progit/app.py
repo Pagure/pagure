@@ -20,6 +20,9 @@ from pygments.lexers.text import DiffLexer
 from pygments.formatters import HtmlFormatter
 
 
+import progit.exceptions
+import progit.lib
+import progit.forms
 from progit import APP, SESSION, LOG
 
 
@@ -119,6 +122,37 @@ def view_user(username):
         page=page,
     )
 
+
+@APP.route('/new/', methods=('GET', 'POST'))
+def new_project():
+    """ Form to create a new project.
+    """
+    form = progit.forms.ProjectForm()
+    if form.validate_on_submit():
+        name = form.name.data
+        description = form.description.data
+
+        try:
+            message = progit.lib.new_project(
+                SESSION,
+                name=name,
+                description=description,
+                user=flask.g.fas_user.username,
+                folder=APP.config['GIT_FOLDER'],
+            )
+            SESSION.commit()
+            flask.flash(message)
+            return flask.redirect(flask.url_for('view_repo', repo=name))
+        except progit.exceptions.ProgitException, err:
+            flask.flash(str(err), 'error')
+        except SQLAlchemyError, err:  # pragma: no cover
+            SESSION.rollback()
+            flask.flash(str(err), 'error')
+
+    return flask.render_template(
+        'new_project.html',
+        form=form,
+    )
 
 @APP.route('/<repo>')
 def view_repo(repo):
