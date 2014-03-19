@@ -82,7 +82,7 @@ def new_project(session, user, name, folder,
 
 
 def list_projects(
-        session, username=None,
+        session, username=None, fork=None,
         start=None, limit=None, count=False):
     '''List existing projects
     '''
@@ -92,6 +92,16 @@ def list_projects(
         projects = projects.filter_by(
             user=username
         )
+
+    if fork is not None:
+        if fork is True:
+            projects = projects.filter(
+                model.Project.parent_id != None
+            )
+        elif fork is False:
+            projects = projects.filter_by(
+                parent_id = None
+            )
 
     if start is not None:
         projects = projects.offset(start)
