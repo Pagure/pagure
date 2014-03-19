@@ -84,8 +84,13 @@
     <tr>
       <td>
       {% if page > 1%}
-        <a href="{{ url_for('.%s' % origin,
+        {% if '/fork/' in request.url %}
+          <a href="{{ url_for('.%s' % origin, username=username,
                     repo=repo.name) }}?page={{page - 1}}">
+        {% else %}
+          <a href="{{ url_for('.%s' % origin,
+                    repo=repo.name) }}?page={{page - 1}}">
+        {% endif %}
             &lt; Previous
         </a>
       {% else %}
@@ -95,8 +100,13 @@
       <td>{{ page }} / {{ total_page }}</td>
       <td>
         {% if page < total_page %}
-        <a href="{{ url_for('.%s' % origin,
+        {% if '/fork/' in request.url %}
+        <a href="{{ url_for('.%s' % origin, username=username,
                     repo=repo.name) }}?page={{page + 1}}">
+        {% else %}
+          <a href="{{ url_for('.%s' % origin,
+                    repo=repo.name) }}?page={{page + 1}}">
+        {% endif %}
             Next &gt;
         </a>
         {% else %}
