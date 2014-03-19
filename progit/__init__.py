@@ -24,7 +24,7 @@ from flask_fas_openid import FAS
 from functools import wraps
 from sqlalchemy.exc import SQLAlchemyError
 
-import progit.forms as forms
+import progit.lib
 
 
 # Create the application.
@@ -40,8 +40,7 @@ if 'PROGIT_CONFIG' in os.environ:
 
 
 FAS = FAS(APP)
-SESSION = None
-#SESSION = progit.create_session(APP.config['DB_URL'])
+SESSION = progit.lib.create_session(APP.config['DB_URL'])
 
 # Set up the logger
 ## Send emails for big exception
