@@ -81,10 +81,17 @@ def new_project(session, user, name, folder,
     return 'Project "%s" created' % name
 
 
-def list_projects(session, start=None, limit=None, count=False):
+def list_projects(
+        session, username=None,
+        start=None, limit=None, count=False):
     '''List existing projects
     '''
     projects = session.query(model.Project)
+
+    if username is not None:
+        projects = projects.filter_by(
+            user=username
+        )
 
     if start is not None:
         projects = projects.offset(start)
