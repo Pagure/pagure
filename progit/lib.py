@@ -99,8 +99,8 @@ def list_projects(
                 model.Project.parent_id != None
             )
         elif fork is False:
-            projects = projects.filter_by(
-                parent_id = None
+            projects = projects.filter(
+                model.Project.parent_id == None
             )
 
     if start is not None:

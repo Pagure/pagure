@@ -103,7 +103,6 @@ def view_user(username):
     repo_start = limit * (repopage - 1)
     fork_start = limit * (forkpage - 1)
 
-
     repos = progit.lib.list_projects(
         SESSION,
         username=flask.g.fas_user.username,
@@ -233,7 +232,6 @@ def view_repo_branch(repo, branchname):
 
     repo_obj = pygit2.Repository(os.path.join(APP.config["GIT_FOLDER"],
                                  repo.path))
-
 
     if not branchname in repo_obj.listall_branches():
         flask.abort(404)

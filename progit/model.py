@@ -91,6 +91,7 @@ class Project(BASE):
     def path(self):
         return "%s.git" % self.name
 
+
 class Comment(BASE):
     """ Stores the comments made on a commit/file.
 
