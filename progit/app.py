@@ -344,10 +344,13 @@ def view_file(repo, identifier, filename):
 def view_commit(repo, commitid):
     """ Render a commit in a repo
     """
-    reponame = os.path.join(APP.config['GIT_FOLDER'], repo)
-    if not os.path.exists(reponame):
+    repo = progit.lib.get_project(SESSION, repo)
+
+    if repo is None:
         flask.abort(404)
-    repo_obj = pygit2.Repository(reponame)
+
+    repo_obj = pygit2.Repository(os.path.join(APP.config["GIT_FOLDER"],
+                                 repo.path))
 
     try:
         commit = repo_obj.get(commitid)
