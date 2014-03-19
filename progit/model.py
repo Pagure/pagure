@@ -92,6 +92,16 @@ class Project(BASE):
         ''' Return the name of the git repo on the filesystem. '''
         return "%s.git" % self.name
 
+    @property
+    def fullname(self):
+        ''' Return the name of the git repo as user/project if it is a
+        project forked, otherwise it returns the project name.
+        '''
+        str_name = self.name
+        if not self.parent_id:
+            str_name = "%s/%s" % (self.user, str_name)
+        return str_name
+
 
 class Comment(BASE):
     """ Stores the comments made on a commit/file.
