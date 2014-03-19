@@ -93,6 +93,11 @@ class Project(BASE):
         return "%s.git" % self.name
 
     @property
+    def fork(self):
+        ''' Return a boolean specifying if the project is a fork or not '''
+        return self.parent_id is None
+
+    @property
     def fullname(self):
         ''' Return the name of the git repo as user/project if it is a
         project forked, otherwise it returns the project name.
