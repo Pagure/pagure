@@ -386,3 +386,74 @@ def view_fork_tree(username, repo, identifier=None):
         content=content,
         output_type=output_type,
     )
+
+
+@APP.route('/fork/<username>/<repo>/request-pull')
+@APP.route('/fork/<username>/<repo>/request-pull/<commitid>')
+def request_pull_fork(username, repo, commitid=None):
+    """ Request pulling the changes from the fork into the project.
+    """
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404)
+
+    reponame = os.path.join(APP.config['FORK_FOLDER'], username, repo.path)
+    repo_obj = pygit2.Repository(reponame)
+
+    parentname = os.path.join(APP.config['GIT_FOLDER'], repo.parent.path)
+    orig_repo = pygit2.Repository(parentname)
+
+    if commitid is None:
+        commitid = repo_obj.head.target
+
+    diff_commits = []
+    diffs = []
+    if not repo_obj.is_empty and not orig_repo.is_empty:
+        orig_commit = orig_repo[orig_repo.head.target]
+        repo_commit = repo_obj[commitid]
+
+        for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
+            if commit.oid.hex == orig_commit.oid.hex:
+                break
+            diff_commits.append(commit)
+            diffs.append(
+                repo_obj.diff(
+                    repo_obj.revparse_single(commit.parents[0].oid.hex),
+                    repo_obj.revparse_single(commit.oid.hex)
+                )
+            )
+
+    elif orig_repo.is_empty:
+        repo_obj = repo_obj[repo_obj.head.target]
+        diff = repo_obj.tree.diff_to_tree(swap=True)
+    else:
+        flask.flash(
+            'Fork is empty, there are no commits to request pulling',
+            'error')
+        return flask.redirect(flask.url_for(
+            'view_fork_repo', username=username, repo=repo.name))
+
+
+    html_diffs = []
+    for diff in diffs:
+        html_diffs.append(
+            highlight(
+                diff.patch,
+                DiffLexer(),
+                HtmlFormatter(
+                    noclasses=True,
+                    style="tango",)
+            )
+        )
+
+    return flask.render_template(
+        'pull_request.html',
+        repo=repo,
+        username=username,
+        repo_obj=repo_obj,
+        orig_repo=orig_repo,
+        diff_commits=diff_commits,
+        diffs=diffs,
+        html_diffs=html_diffs,
+    )
