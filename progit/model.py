@@ -89,6 +89,7 @@ class Project(BASE):
 
     @property
     def path(self):
+        ''' Return the name of the git repo on the filesystem. '''
         return "%s.git" % self.name
 
 
