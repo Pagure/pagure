@@ -25,7 +25,7 @@ from progit import model
 
 
 def create_session(db_url, debug=False, pool_recycle=3600):
-    """ Create the Session object to use to query the database.
+    ''' Create the Session object to use to query the database.
 
     :arg db_url: URL used to connect to the database. The URL contains
     information with regards to the database engine, the host to connect
@@ -35,7 +35,7 @@ def create_session(db_url, debug=False, pool_recycle=3600):
         output of sqlalchemy or not.
     :return a Session that can be used to query the database.
 
-    """
+    '''
     engine = sqlalchemy.create_engine(
         db_url, echo=debug, pool_recycle=pool_recycle)
     scopedsession = scoped_session(sessionmaker(bind=engine))
@@ -82,7 +82,8 @@ def new_project(session, user, name, folder,
 
 
 def list_projects(session, start=None, limit=None, count=False):
-    """List existing projects"""
+    '''List existing projects
+    '''
     projects = session.query(model.Project)
 
     if start is not None:
@@ -98,7 +99,8 @@ def list_projects(session, start=None, limit=None, count=False):
 
 
 def get_project(session, name):
-    """Get a project from the database"""
+    '''Get a project from the database
+    '''
     return session.query(
         model.Project
     ).filter_by(
