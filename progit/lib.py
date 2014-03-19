@@ -81,6 +81,30 @@ def new_project(session, user, name, folder,
     return 'Project "%s" created' % name
 
 
+def fork_project(session, user, repo, repo_folder, fork_folder):
+    ''' Fork a given project into the user's forks. '''
+    reponame = os.path.join(repo_folder, repo.path)
+    forkreponame = os.path.join(fork_folder, user, repo.path)
+
+    if os.path.exists(forkreponame):
+        raise progit.exceptions.RepoExistsException(
+            'Repo "%s/%s" already exists' % (user, repo.name))
+
+    project = model.Project(
+        name=repo.name,
+        description=repo.description,
+        user=user,
+        parent_id=repo.id
+    )
+    session.add(project)
+    # Make sure we won't have SQLAlchemy error before we create the repo
+    session.flush()
+
+    pygit2.clone_repository(reponame, forkreponame)
+
+    return 'Repo "%s" cloned to "%s/%s"' % (repo.name, user, repo.name)
+
+
 def list_projects(
         session, username=None, fork=None,
         start=None, limit=None, count=False):
