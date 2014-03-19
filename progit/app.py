@@ -258,7 +258,7 @@ def view_repo_branch(repo, branchname):
 
 @APP.route('/<repo>/log')
 @APP.route('/<repo>/log/<branchname>')
-def view_log(repo, branchname=None):
+def view_log(repo, branchname='master'):
     """ Displays the logs of the specified repo.
     """
     repo = progit.lib.get_project(SESSION, repo)
@@ -272,10 +272,8 @@ def view_log(repo, branchname=None):
     if branchname and not branchname in repo_obj.listall_branches():
         flask.abort(404)
 
-    if branchname:
-        branch = repo_obj.lookup_branch(branchname)
-    else:
-        branch = repo_obj.lookup_branch('master')
+
+    branch = repo_obj.lookup_branch(branchname)
 
     try:
         page = int(flask.request.args.get('page', 1))
