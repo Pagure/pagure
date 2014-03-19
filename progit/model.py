@@ -78,6 +78,7 @@ class Project(BASE):
     id = sa.Column(sa.Integer, primary_key=True)
     user = sa.Column(sa.String(32), nullable=False)
     name = sa.Column(sa.String(32), nullable=False, index=True)
+    description = sa.Column(sa.Text, nullable=True)
     parent_id = sa.Column(
         sa.Integer,
         sa.ForeignKey('projects.id', onupdate='CASCADE'),
