@@ -87,6 +87,8 @@ class Project(BASE):
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
 
+    parent = relation('Project')
+
     @property
     def path(self):
         ''' Return the name of the git repo on the filesystem. '''
