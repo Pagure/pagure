@@ -9,6 +9,8 @@
 """
 
 
+import os
+
 import sqlalchemy
 from datetime import timedelta
 from sqlalchemy.orm import sessionmaker
@@ -16,6 +18,9 @@ from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import SQLAlchemyError
 
+import pygit2
+
+import progit.exceptions
 from progit import model
 
 
@@ -49,3 +54,28 @@ def get_user_project(session, username):
     )
 
     return query.all()
+
+
+def new_project(session, user, name, folder,
+                description=None, parent_id=None):
+    ''' Create a new project based on the information provided.
+    '''
+    gitrepo = os.path.join(folder, '%s.git' % name)
+    if os.path.exists(gitrepo):
+        raise progit.exceptions.RepoExistsException(
+            'The project "%s" already exists' % name
+        )
+
+    project = model.Project(
+        name=name,
+        description=description,
+        user=user,
+        parent_id=parent_id
+    )
+    session.add(project)
+    # Make sure we won't have SQLAlchemy error before we create the repo
+    session.flush()
+
+    pygit2.init_repository(gitrepo, bare=True)
+
+    return 'Project "%s" created' % name
