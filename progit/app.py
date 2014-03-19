@@ -392,10 +392,13 @@ def view_commit(repo, commitid):
 def view_tree(repo, identifier=None):
     """ Render the tree of the repo
     """
-    reponame = os.path.join(APP.config['GIT_FOLDER'], repo)
-    if not os.path.exists(reponame):
+    repo = progit.lib.get_project(SESSION, repo)
+
+    if repo is None:
         flask.abort(404)
-    repo_obj = pygit2.Repository(reponame)
+
+    repo_obj = pygit2.Repository(os.path.join(APP.config["GIT_FOLDER"],
+                                 repo.path))
 
     if identifier in repo_obj.listall_branches():
         branchname = identifier
