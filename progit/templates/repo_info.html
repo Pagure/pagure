@@ -16,6 +16,10 @@
   {% if branchname %} ({{ branchname }}) {% endif %}
 </h2>
 
+<section id="fork_repo">
+    <a href="{{ url_for('fork_project', repo=repo.name) }}">Fork project</a>
+</section>
+
 {% if repo_obj and repo_obj.is_empty %}
 
   <section class="repo_info">
