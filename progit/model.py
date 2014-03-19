@@ -86,8 +86,6 @@ class Project(BASE):
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
 
-    user = relation('User')
-
 
 class Comment(BASE):
     """ Stores the comments made on a commit/file.
