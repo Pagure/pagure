@@ -86,6 +86,7 @@ def view_fork_repo(username, repo):
     return flask.render_template(
         'repo_info.html',
         repo=repo,
+        repo_obj=repo_obj,
         username=username,
         branches=sorted(repo_obj.listall_branches()),
         branchname='master',
