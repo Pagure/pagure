@@ -139,11 +139,16 @@ def list_projects(
         return projects.all()
 
 
-def get_project(session, name):
+def get_project(session, name, user=None):
     '''Get a project from the database
     '''
-    return session.query(
+    query = session.query(
         model.Project
     ).filter_by(
         name=name
-    ).first()
+    )
+    if user is not None:
+        query = query.filter(
+            model.Project.user == user
+        )
+    return query.first()
