@@ -137,6 +137,9 @@
         {{ commit.hex[:6] }}
         </a>
         {{ commit.message.split('\n')[0] }}
+        {% if diff_commits and commit.oid.hex in diff_commits %}
+        <span class="error" title="Commit not in the main repo">*</span>
+        {% endif %}
       </li>
       {% endfor %}
     </ul>
