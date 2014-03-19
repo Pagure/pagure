@@ -40,8 +40,8 @@ def index():
     limit = APP.config['ITEM_PER_PAGE']
     start = limit * (page - 1)
 
-    repos = progit.lib.list_projects(SESSION, start=start, limit=limit)
-    num_repos = progit.lib.list_projects(SESSION, count=True)
+    repos = progit.lib.list_projects(SESSION, fork=False, start=start, limit=limit)
+    num_repos = progit.lib.list_projects(SESSION, fork=False, count=True)
 
     total_page = int(ceil(num_repos / float(limit)))
 
