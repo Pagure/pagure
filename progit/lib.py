@@ -144,8 +144,8 @@ def get_project(session, name, user=None):
     '''
     query = session.query(
         model.Project
-    ).filter_by(
-        name=name
+    ).filter(
+        model.Project.name == name
     )
     if user is not None:
         query = query.filter(
