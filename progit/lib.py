@@ -79,3 +79,19 @@ def new_project(session, user, name, folder,
     pygit2.init_repository(gitrepo, bare=True)
 
     return 'Project "%s" created' % name
+
+def list_projects(session, start=None, limit=None):
+    """List existing projects"""
+    projects = session.query(model.Project)
+
+    if start is not None:
+        projects = projects.offset(start)
+
+    if limit is not None:
+        projects = projects.limit(limit)
+
+    return projects.all()
+
+def count_projects(session):
+    """Count the number of projects in the database"""
+    return session.query(model.Project).count()

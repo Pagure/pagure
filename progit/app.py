@@ -39,13 +39,11 @@ def index():
 
     limit = APP.config['ITEM_PER_PAGE']
     start = limit * (page - 1)
-    end = limit * page
-    repos = sorted(os.listdir(APP.config['GIT_FOLDER']))
-    repos_length = len(repos)
 
-    total_page = int(ceil(repos_length / float(limit)))
+    repos = progit.lib.list_projects(SESSION, start=start, limit=limit)
+    num_repos = progit.lib.count_projects(SESSION)
 
-    repos = repos[start:end]
+    total_page = int(ceil(num_repos / float(limit)))
 
     return flask.render_template(
         'index.html',
