@@ -1,0 +1,26 @@
+{% extends "master.html" %}
+{% from "_formhelper.html" import render_field_in_row %}
+
+{% block title %}Home{% endblock %}
+{%block tag %}home{% endblock %}
+
+
+{% block content %}
+
+<h2>New projects</h2>
+
+<section class="new_project">
+  <form action="{{ url_for('.new_project') }}" method="post">
+    <table>
+      {{ render_field_in_row(form.name) }}
+      {{ render_field_in_row(form.description) }}
+    </table>
+    <p class="buttons indent">
+      <input type="submit" class="submit positive button" value="Create">
+      <input type="button" value="Cancel" class="button" onclick="history.back();">
+      {{ form.csrf_token }}
+    </p>
+  </form>
+</section>
+
+{% endblock %}
