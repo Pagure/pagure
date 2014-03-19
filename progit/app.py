@@ -86,38 +86,72 @@ def view_users():
 def view_user(username):
     """ Front page of a specific user.
     """
-    user_folder = os.path.join(APP.config['FORK_FOLDER'], username)
-    if not os.path.exists(user_folder):
-        flask.abort(404)
 
-    page = flask.request.args.get('page', 1)
+    repopage = flask.request.args.get('repopage', 1)
     try:
-        page = int(page)
+        repopage = int(repopage)
     except ValueError:
-        page = 1
+        repopage = 1
 
-    repos = sorted(os.listdir(user_folder))
+    forkpage = flask.request.args.get('forkpage', 1)
+    try:
+        forkpage = int(forkpage)
+    except ValueError:
+        forkpage = 1
 
     limit = APP.config['ITEM_PER_PAGE']
-    start = limit * (page - 1)
-    end = limit * page
-    repos_length = len(repos)
-    repos = repos[start:end]
+    repo_start = limit * (repopage - 1)
+    fork_start = limit * (forkpage - 1)
 
-    total_page = int(ceil(repos_length / float(limit)))
+
+    repos = progit.lib.list_projects(
+        SESSION,
+        username=flask.g.fas_user.username,
+        fork=False,
+        start=repo_start,
+        limit=limit)
+    repos_length = progit.lib.list_projects(
+        SESSION,
+        username=flask.g.fas_user.username,
+        fork=False,
+        count=True)
+
+    forks = progit.lib.list_projects(
+        SESSION,
+        username=flask.g.fas_user.username,
+        fork=True,
+        start=fork_start,
+        limit=limit)
+    forks_length = progit.lib.list_projects(
+        SESSION,
+        username=flask.g.fas_user.username,
+        fork=True,
+        count=True)
+
+    total_page_repos = int(ceil(repos_length / float(limit)))
+    total_page_forks = int(ceil(forks_length / float(limit)))
 
     repos_obj = [
         pygit2.Repository(
-            os.path.join(APP.config['FORK_FOLDER'], username, repo))
+            os.path.join(APP.config['GIT_FOLDER'], repo.path))
         for repo in repos]
+
+    forks_obj = [
+        pygit2.Repository(
+            os.path.join(APP.config['FORK_FOLDER'], username, repo.path))
+        for repo in forks]
 
     return flask.render_template(
         'user_info.html',
         username=username,
         repos=repos,
         repos_obj=repos_obj,
-        total_page=total_page,
-        page=page,
+        total_page_repos=total_page_repos,
+        forks=forks,
+        forks_obj=forks_obj,
+        total_page_forks=total_page_forks,
+        repopage=repopage,
+        forkpage=forkpage,
     )
 
 

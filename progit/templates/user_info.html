@@ -8,22 +8,22 @@
 
 <h2>{{ username }}</h2>
 
-{% if total_page %}
+{% if total_page_repos %}
 <table>
     <tr>
         <td>
-        {% if page > 1%}
-            <a href="{{ url_for('view_user', username=username) }}?page={{page - 1}}">
+        {% if repopage > 1%}
+            <a href="{{ url_for('view_user', username=username) }}?repopage={{repopage - 1}}">
                 &lt; Previous
             </a>
         {% else %}
             &lt; Previous
         {% endif %}
         </td>
-        <td>{{ page }} / {{ total_page }}</td>
+        <td>{{ repopage }} / {{ total_page_repos }}</td>
         <td>
-            {% if page < total_page %}
-            <a href="{{ url_for('view_user', username=username) }}?page={{page + 1}}">
+            {% if repopage < total_page_repos %}
+            <a href="{{ url_for('view_user', username=username) }}?repopage={{repopage + 1}}">
                 Next &gt;
             </a>
             {% else %}
@@ -33,21 +33,63 @@
     </tr>
 </table>
 {% endif %}
-
-<section class="fork_list">
-  <h3>Forked repos</h3>
+<section class="project_list">
+  <h3>Projects</h3>
   <ul>
     {% for repo in repos %}
     <li>
-      <a href="{{ url_for('view_fork_repo', username=username, repo=repo)}}">
-        {{ repo.split('.git')[0] }}
+      <a href="{{ url_for('view_repo', repo=repo.name)}}">
+        {{ repo.name }}
       </a>
       <span class="commit_date">
-        {{ repos_obj[loop.index - 1] | lastcommit_date}}
       </span>
     </li>
     {% endfor %}
   </ul>
 </section>
+
+
+{% if total_page_forks %}
+<table>
+    <tr>
+        <td>
+        {% if forkpage > 1%}
+            <a href="{{ url_for('view_user', username=username) }}?forkpage={{forkpage - 1}}">
+                &lt; Previous
+            </a>
+        {% else %}
+            &lt; Previous
+        {% endif %}
+        </td>
+        <td>{{ forkpage }} / {{ total_page_forks }}</td>
+        <td>
+            {% if forkpage < total_page_forks %}
+            <a href="{{ url_for('view_user', username=username) }}?forkpage={{forkpage + 1}}">
+                Next &gt;
+            </a>
+            {% else %}
+            Next >
+            {% endif %}
+        </td>
+    </tr>
+</table>
+{% endif %}
+{% if forks %}
+    <section class="fork_list">
+      <h3>Forked repos</h3>
+      <ul>
+        {% for repo in forks %}
+        <li>
+          <a href="{{ url_for('view_fork_repo', username=username, repo=repo.name)}}">
+            {{ repo.name }}
+          </a>
+          <span class="commit_date">
+            {{ forks_obj[loop.index - 1] | lastcommit_date}}
+          </span>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+{% endif %}
 
 {% endblock %}
