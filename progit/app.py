@@ -154,6 +154,7 @@ def new_project():
         form=form,
     )
 
+
 @APP.route('/<repo>')
 def view_repo(repo):
     """ Front page of a specific repo.
@@ -167,7 +168,8 @@ def view_repo(repo):
     last_commits = []
     tree = []
     if not repo_obj.is_empty:
-        for commit in repo_obj.walk(repo_obj.head.target, pygit2.GIT_SORT_TIME):
+        for commit in repo_obj.walk(
+                repo_obj.head.target, pygit2.GIT_SORT_TIME):
             last_commits.append(commit)
             cnt += 1
             if cnt == 10:

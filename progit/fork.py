@@ -32,18 +32,18 @@ def fork_project(repo):
     if not os.path.exists(reponame):
         flask.abort(404)
 
-    forkreponame  = os.path.join(
+    forkreponame = os.path.join(
         APP.config['FORK_FOLDER'],
         flask.g.fas_user.username,
         repo)
 
     if os.path.exists(forkreponame):
-        flask.flash('Repo "%s/%s" already exists' %
-            (flask.g.fas_user.username, repo))
+        flask.flash('Repo "%s/%s" already exists' % (
+            flask.g.fas_user.username, repo))
     else:
         pygit2.clone_repository(reponame, forkreponame)
-        flask.flash('Repo "%s" cloned to "%s/%s"' %
-            (repo, flask.g.fas_user.username, repo))
+        flask.flash('Repo "%s" cloned to "%s/%s"' % (
+            repo, flask.g.fas_user.username, repo))
 
     return flask.redirect(
         flask.url_for('view_user', username=flask.g.fas_user.username)
