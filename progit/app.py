@@ -180,6 +180,7 @@ def view_repo(repo):
     return flask.render_template(
         'repo_info.html',
         repo=repo,
+        repo_obj=repo_obj,
         branches=sorted(repo_obj.listall_branches()),
         branchname='master',
         last_commits=last_commits,
