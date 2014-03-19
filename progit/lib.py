@@ -100,7 +100,7 @@ def fork_project(session, user, repo, repo_folder, fork_folder):
     # Make sure we won't have SQLAlchemy error before we create the repo
     session.flush()
 
-    pygit2.clone_repository(reponame, forkreponame)
+    pygit2.clone_repository(reponame, forkreponame, bare=True)
 
     return 'Repo "%s" cloned to "%s/%s"' % (repo.name, user, repo.name)
 
