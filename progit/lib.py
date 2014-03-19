@@ -147,8 +147,16 @@ def get_project(session, name, user=None):
     ).filter(
         model.Project.name == name
     )
+
     if user is not None:
         query = query.filter(
             model.Project.user == user
+        ).filter(
+            model.Project.parent_id != None
         )
+    else:
+        query = query.filter(
+            model.Project.parent_id == None
+        )
+
     return query.first()
