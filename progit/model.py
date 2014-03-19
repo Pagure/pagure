@@ -87,6 +87,9 @@ class Project(BASE):
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
 
+    @property
+    def path(self):
+        return "%s.git" % self.name
 
 class Comment(BASE):
     """ Stores the comments made on a commit/file.
