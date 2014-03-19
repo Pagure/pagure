@@ -62,9 +62,13 @@ def fork_project(repo):
 def view_fork_repo(username, repo):
     """ Front page of a specific repo.
     """
-    reponame = os.path.join(APP.config['FORK_FOLDER'], username, repo)
-    if not os.path.exists(reponame):
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
         flask.abort(404)
+
+    reponame = os.path.join(APP.config['FORK_FOLDER'], username, repo.path)
+
     repo_obj = pygit2.Repository(reponame)
 
     cnt = 0
@@ -94,9 +98,12 @@ def view_fork_repo(username, repo):
 def view_fork_repo_branch(username, repo, branchname):
     """ Displays the information about a specific branch.
     """
-    reponame = os.path.join(APP.config['FORK_FOLDER'], username, repo)
-    if not os.path.exists(reponame):
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
         flask.abort(404)
+
+    reponame = os.path.join(APP.config['FORK_FOLDER'], username, repo.path)
     repo_obj = pygit2.Repository(reponame)
 
     if not branchname in repo_obj.listall_branches():
@@ -128,9 +135,12 @@ def view_fork_repo_branch(username, repo, branchname):
 def view_fork_log(username, repo, branchname=None):
     """ Displays the logs of the specified repo.
     """
-    reponame = os.path.join(APP.config['FORK_FOLDER'], username, repo)
-    if not os.path.exists(reponame):
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
         flask.abort(404)
+
+    reponame = os.path.join(APP.config['FORK_FOLDER'], username, repo.path)
     repo_obj = pygit2.Repository(reponame)
 
     if branchname and not branchname in repo_obj.listall_branches():
@@ -178,9 +188,12 @@ def view_fork_log(username, repo, branchname=None):
 def view_fork_file(username, repo, identifier, filename):
     """ Displays the content of a file or a tree for the specified repo.
     """
-    reponame = os.path.join(APP.config['FORK_FOLDER'], username, repo)
-    if not os.path.exists(reponame):
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
         flask.abort(404)
+
+    reponame = os.path.join(APP.config['FORK_FOLDER'], username, repo.path)
     repo_obj = pygit2.Repository(reponame)
 
     if identifier in repo_obj.listall_branches():
@@ -243,9 +256,12 @@ def view_fork_file(username, repo, identifier, filename):
 def view_fork_commit(username, repo, commitid):
     """ Render a commit in a repo
     """
-    reponame = os.path.join(APP.config['FORK_FOLDER'], username, repo)
-    if not os.path.exists(reponame):
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
         flask.abort(404)
+
+    reponame = os.path.join(APP.config['FORK_FOLDER'], username, repo.path)
     repo_obj = pygit2.Repository(reponame)
 
     try:
@@ -286,9 +302,12 @@ def view_fork_commit(username, repo, commitid):
 def view_fork_tree(username, repo, identifier=None):
     """ Render the tree of the repo
     """
-    reponame = os.path.join(APP.config['FORK_FOLDER'], username, repo)
-    if not os.path.exists(reponame):
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
         flask.abort(404)
+
+    reponame = os.path.join(APP.config['FORK_FOLDER'], username, repo.path)
     repo_obj = pygit2.Repository(reponame)
 
     if identifier in repo_obj.listall_branches():
