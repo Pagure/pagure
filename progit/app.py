@@ -480,3 +480,43 @@ def view_issues(repo):
         repo=repo,
         issues=issues,
     )
+
+
+@APP.route('/<repo>/new_issue', methods=('GET', 'POST'))
+def new_issue(repo):
+    """ Create a new issue
+    """
+    repo = progit.lib.get_project(SESSION, repo)
+
+    if repo is None:
+        flask.abort(404, 'Project not found')
+
+    form = progit.forms.IssueForm()
+    if form.validate_on_submit():
+        title = form.title.data
+        content = form.content.data
+
+        try:
+            message = progit.lib.new_issue(
+                SESSION,
+                repo=repo,
+                title=title,
+                content=content,
+                user=flask.g.fas_user.username,
+            )
+            SESSION.commit()
+            flask.flash(message)
+            return flask.redirect(flask.url_for(
+                'view_issues', repo=repo.name))
+        except progit.exceptions.ProgitException, err:
+            flask.flash(str(err), 'error')
+        except SQLAlchemyError, err:  # pragma: no cover
+            SESSION.rollback()
+            flask.flash(str(err), 'error')
+
+    return flask.render_template(
+        'new_issue.html',
+        select='issues',
+        form=form,
+        repo=repo,
+    )
