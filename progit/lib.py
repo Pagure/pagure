@@ -189,7 +189,7 @@ def get_issues(session, repo):
     return query.all()
 
 
-def get_issue(session, repo, issueid):
+def get_issue(session, issueid):
     ''' Retrieve the specified issue
     '''
     query = session.query(
