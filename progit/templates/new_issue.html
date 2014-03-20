@@ -7,10 +7,20 @@
 
 {% block repo %}
 
+{% if not type or type == 'new' %}
 <h2>New issue</h2>
+{% elif type and type == 'edit' %}
+<h2>Edit issue #{{ issue.id }}</h2>
+{% endif %}
+
 
 <section class="new_issue">
+  {% if not type or type == 'new' %}
   <form action="{{ url_for('.new_issue', repo=repo.name) }}" method="post">
+  {% elif type and type == 'edit' %}
+  <form action="{{ url_for('.edit_issue', repo=repo.name, issueid=issue.id) }}" method="post">
+  {% endif %}
+
     <table>
       {{ render_field_in_row(form.title) }}
       {{ render_field_in_row(form.content) }}
