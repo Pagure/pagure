@@ -25,8 +25,8 @@ from progit import APP, SESSION, LOG
 
 
 ### Application
-@APP.route('/fork/<repo>')
-@APP.route('/fork/<username>/<repo>')
+@APP.route('/do_fork/<repo>')
+@APP.route('/do_fork/<username>/<repo>')
 def fork_project(repo, username=None):
     """ Fork the project specified into the user's namespace
     """
