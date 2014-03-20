@@ -8,6 +8,23 @@
 
 <h2>Issue #{{ issue.id }}</h2>
 
+<section class="issue_action">
+  <ul>
+    <li>
+      {% if '/fork/' in request.url %}
+      <a href="{{ url_for('fork_edit_issue', username=username,
+                  repo=repo.name, issueid=issue.id) }}">
+      {% else %}
+      <a href="{{ url_for('edit_issue', repo=repo.name, issueid=issue.id) }}">
+      {% endif %}
+        Edit</a>
+    </li>
+    <li>
+      <a href="">Close</a>
+    </li>
+  </ul>
+</section>
+
 <section class="issue_info">
   <h3>
     {{ issue.title }}
