@@ -461,3 +461,22 @@ def view_tree(repo, identifier=None):
         content=content,
         output_type=output_type,
     )
+
+
+@APP.route('/<repo>/issues')
+def view_issues(repo):
+    """ List all issues associated to a repo
+    """
+    repo = progit.lib.get_project(SESSION, repo)
+
+    if repo is None:
+        flask.abort(404)
+
+    issues = progit.lib.get_issues(SESSION, repo)
+
+    return flask.render_template(
+        'issues.html',
+        select='issues',
+        repo=repo,
+        issues=issues,
+    )
