@@ -1,0 +1,26 @@
+{% extends "repo_master.html" %}
+{% from "_formhelper.html" import render_field_in_row %}
+
+{% block title %}Home{% endblock %}
+{%block tag %}new_project{% endblock %}
+
+
+{% block repo %}
+
+<h2>New issue</h2>
+
+<section class="new_issue">
+  <form action="{{ url_for('.new_issue', repo=repo.name) }}" method="post">
+    <table>
+      {{ render_field_in_row(form.title) }}
+      {{ render_field_in_row(form.content) }}
+    </table>
+    <p class="buttons indent">
+      <input type="submit" class="submit positive button" value="Create">
+      <input type="button" value="Cancel" class="button" onclick="history.back();">
+      {{ form.csrf_token }}
+    </p>
+  </form>
+</section>
+
+{% endblock %}
