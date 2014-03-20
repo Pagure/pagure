@@ -298,7 +298,7 @@ def view_fork_file(username, repo, identifier, filename):
 
     return flask.render_template(
         'file.html',
-        select='logs',
+        select='tree',
         repo=repo,
         username=username,
         branchname=branchname,
