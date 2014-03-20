@@ -410,11 +410,12 @@ def view_fork_issues(repo, username):
         'issues.html',
         select='issues',
         repo=repo,
+        username=username,
         issues=issues,
     )
 
 
-@APP.route('/fork/<username>/<repo>/new_issue')
+@APP.route('/fork/<username>/<repo>/new_issue', methods=('GET', 'POST'))
 def fork_new_issue(username, repo):
     """ Create a new issue
     """
@@ -447,10 +448,11 @@ def fork_new_issue(username, repo):
             flask.flash(str(err), 'error')
 
     return flask.render_template(
-        'new_issues.html',
+        'new_issue.html',
         select='issues',
         form=form,
         repo=repo,
+        username=username,
     )
 
 
@@ -473,6 +475,7 @@ def view_fork_issue(username, repo, issueid):
         select='issues',
         repo=repo,
         issue=issue,
+        username=username,
     )
 
 
