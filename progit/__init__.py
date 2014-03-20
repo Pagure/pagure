@@ -133,6 +133,13 @@ def lastcommit_date_filter(repo):
         return arrow.get(commit.commit_time).humanize()
 
 
+@APP.template_filter('rst2html')
+def rst2html(rst_string):
+    """ Template filter transforming rst text into html
+    """
+    return rst_string
+
+
 @APP.route('/login/', methods=('GET', 'POST'))
 def auth_login():
     """ Method to log into the application using FAS OpenID. """
