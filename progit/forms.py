@@ -22,3 +22,15 @@ class ProjectForm(wtf.Form):
         'description',
         [wtforms.validators.optional()]
     )
+
+
+class IssueForm(wtf.Form):
+    ''' Form to create or edit an issue. '''
+    title = wtforms.TextField(
+        'Title<span class="error">*</span>',
+        [wtforms.validators.Required()]
+    )
+    content = wtforms.TextAreaField(
+        'Content<span class="error">*</span>',
+        [wtforms.validators.Required()]
+    )
