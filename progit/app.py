@@ -543,6 +543,7 @@ def view_issue(repo, issueid):
         issue=issue,
     )
 
+
 @APP.route('/<repo>/issue/<issueid>/edit', methods=('GET', 'POST'))
 def edit_issue(repo, issueid):
     """ Edit the specified issue
