@@ -25,6 +25,7 @@ from functools import wraps
 from sqlalchemy.exc import SQLAlchemyError
 
 import progit.lib
+import progit.doc_utils
 
 
 # Create the application.
@@ -137,7 +138,7 @@ def lastcommit_date_filter(repo):
 def rst2html(rst_string):
     """ Template filter transforming rst text into html
     """
-    return rst_string
+    return progit.doc_utils.convert_doc(rst_string)
 
 
 @APP.route('/login/', methods=('GET', 'POST'))
