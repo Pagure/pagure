@@ -101,6 +101,7 @@ def view_fork_repo(username, repo):
 
     return flask.render_template(
         'repo_info.html',
+        select='overview',
         repo=repo,
         repo_obj=repo_obj,
         username=username,
@@ -155,6 +156,7 @@ def view_fork_repo_branch(username, repo, branchname):
 
     return flask.render_template(
         'repo_info.html',
+        select='overview',
         repo=repo,
         username=username,
         branches=sorted(repo_obj.listall_branches()),
@@ -223,6 +225,7 @@ def view_fork_log(username, repo, branchname=None):
 
     return flask.render_template(
         'repo_info.html',
+        select='logs',
         origin='view_fork_log',
         repo=repo,
         username=username,
@@ -295,6 +298,7 @@ def view_fork_file(username, repo, identifier, filename):
 
     return flask.render_template(
         'file.html',
+        select='logs',
         repo=repo,
         username=username,
         branchname=branchname,
@@ -340,6 +344,7 @@ def view_fork_commit(username, repo, commitid):
 
     return flask.render_template(
         'commit.html',
+        select='logs',
         repo=repo,
         username=username,
         commitid=commitid,
@@ -380,6 +385,7 @@ def view_fork_tree(username, repo, identifier=None):
 
     return flask.render_template(
         'file.html',
+        select='tree',
         repo=repo,
         username=username,
         branchname=branchname,
