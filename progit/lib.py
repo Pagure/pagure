@@ -160,3 +160,27 @@ def get_project(session, name, user=None):
         )
 
     return query.first()
+
+
+def get_issues(session, repo):
+    ''' Retrieve all the issues associated to a project
+    '''
+    query = session.query(
+        model.Issue
+    ).filter(
+        model.Issue.project_id == repo.id
+    )
+
+    return query.all()
+
+
+def get_issue(session, repo, issueid):
+    ''' Retrieve the specified issue
+    '''
+    query = session.query(
+        model.Issue
+    ).filter(
+        model.Issue.id == issueid
+    )
+
+    return query.first()
