@@ -8,6 +8,16 @@
 
 <h2>Issues</h2>
 
+<span class="create_issue">
+    {% if '/fork/' in request.url %}
+      <a href="{{ url_for('fork_new_issue', username=username, repo=repo.name) }}">
+    {% else %}
+      <a href="{{ url_for('new_issue', repo=repo.name) }}">
+    {% endif %}
+        <button>Create new issue</button>
+    </a>
+</span>
+
 <section class="issues_list">
   {% if issues %}
   <ul>
