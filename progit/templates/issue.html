@@ -1,0 +1,23 @@
+{% extends "repo_master.html" %}
+
+{% block title %}Home{% endblock %}
+{%block tag %}home{% endblock %}
+
+
+{% block repo %}
+
+<h2>Issue #{{ issue.id }}</h2>
+
+<section class="issue_info">
+  <h3>
+    {{ issue.title }}
+  </h3>
+
+  <span class="issue_body">
+    {% autoescape false %}
+      {{ issue.content | rst2html }}
+    {% endautoescape %}
+  </span>
+</section>
+
+{% endblock %}
