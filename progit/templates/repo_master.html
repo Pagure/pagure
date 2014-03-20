@@ -1,0 +1,77 @@
+{% extends "master.html" %}
+
+{% block title %}{{ repo.name }}{% endblock %}
+{%block tag %}home{% endblock %}
+
+
+{% block content %}
+<h2>
+  {% if '/fork/' in request.url %}
+  <a href="{{ url_for('view_fork_repo', username=username, repo=repo.name)}}">
+  {% else %}
+  <a href="{{ url_for('view_repo', repo=repo.name)}}">
+  {% endif %}
+    {{ repo.fullname }}
+  </a>
+  {% if branchname %} ({{ branchname }}) {% endif %}
+</h2>
+
+{% if repo.fork %}
+<section id="parent">
+  Forked from
+  <a href="{{ url_for('view_repo', repo=repo.parent.name)}}">
+    {{ repo.parent.name }}</a>
+</section>
+{% endif %}
+
+  <div class="horizontal-menu">
+    <ul>
+      <li {% if select == '' %}class="selected" {% endif %}>
+        {% if '/fork/' in request.url %}
+          <a href="{{ url_for('view_fork_repo', username=username,
+                     repo=repo.name) }}">
+        {% else %}
+          <a href="{{ url_for('view_repo', repo=repo.name) }}">
+        {% endif %}
+          Overview</a>
+      </li>
+      <li {% if select == '' %}class="selected" {% endif %}>
+        {% if '/fork/' in request.url %}
+          <a href="{{ url_for('view_fork_log', username=username,
+                     repo=repo.name) }}">Logs</a>
+        {% else %}
+          <a href="{{ url_for('view_log', repo=repo.name) }}">Logs</a>
+        {% endif %}
+      </li>
+      <li {% if select == '' %}class="selected" {% endif %}>
+        {% if '/fork/' in request.url %}
+          <a href="{{ url_for('view_fork_tree', username=username,
+                     repo=repo.name) }}">Tree</a>
+        {% else %}
+          <a href="{{ url_for('view_tree', repo=repo.name) }}">Tree</a>
+        {% endif %}
+      </li>
+      <li {% if select == '' %}class="selected" {% endif %}>
+        {% if '/fork/' in request.url %}
+          <a href="">Issues</a>
+        {% else %}
+          <a href="">Issues</a>
+        {% endif %}
+      </li>
+    </ul>
+    <ul class="right">
+      <li {% if select == '' %}class="selected" {% endif %}>
+        <a href="{{ url_for('fork_project', repo=repo.name) }}">Fork</a>
+      </li>
+      {% if g.fas_user and g.fas_user.username == repo.user %}
+      <li {% if select == '' %}class="selected" {% endif %}>
+        <a href="">Settings</a>
+      </li>
+      {% endif %}
+    </ul>
+  </div>
+
+{% block repo %}
+{% endblock %}
+
+{% endblock %}
