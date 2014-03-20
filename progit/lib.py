@@ -81,6 +81,21 @@ def new_project(session, user, name, folder,
     return 'Project "%s" created' % name
 
 
+def new_issue(session, repo, title, content, user):
+    ''' Create a new issue for the specified repo. '''
+    issue = model.Issue(
+        project_id=repo.id,
+        title=title,
+        content=content,
+        user=user,
+    )
+    session.add(issue)
+    # Make sure we won't have SQLAlchemy error before we create the repo
+    session.flush()
+
+    return 'Issue created'
+
+
 def fork_project(session, user, repo, repo_folder, fork_folder):
     ''' Fork a given project into the user's forks. '''
     reponame = os.path.join(repo_folder, repo.path)
