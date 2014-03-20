@@ -16,9 +16,21 @@
 
 <section class="new_issue">
   {% if not type or type == 'new' %}
-  <form action="{{ url_for('.new_issue', repo=repo.name) }}" method="post">
+    {% if '/fork/' in request.url %}
+      <form action="{{ url_for('.fork_new_issue',
+                       username=username, repo=repo.name) }}" method="post">
+    {% else %}
+      <form action="{{ url_for('.new_issue', repo=repo.name) }}" method="post">
+    {% endif %}
+
   {% elif type and type == 'edit' %}
-  <form action="{{ url_for('.edit_issue', repo=repo.name, issueid=issue.id) }}" method="post">
+  {% if '/fork/' in request.url %}
+      <form action="{{ url_for('.fork_edit_issue', username=username,
+                       repo=repo.name, issueid=issue.id) }}" method="post">
+    {% else %}
+      <form action="{{ url_for('.edit_issue',
+                       repo=repo.name, issueid=issue.id) }}" method="post">
+    {% endif %}
   {% endif %}
 
     <table>
