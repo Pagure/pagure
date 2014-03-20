@@ -26,10 +26,11 @@ from progit import APP, SESSION, LOG
 
 ### Application
 @APP.route('/fork/<repo>')
-def fork_project(repo):
+@APP.route('/fork/<username>/<repo>')
+def fork_project(repo, username=None):
     """ Fork the project specified into the user's namespace
     """
-    repo = progit.lib.get_project(SESSION, repo)
+    repo = progit.lib.get_project(SESSION, repo, user=username)
 
     if repo is None:
         flask.abort(404)

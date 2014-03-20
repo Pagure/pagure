@@ -61,7 +61,13 @@
     </ul>
     <ul class="right">
       <li {% if select == '' %}class="selected" {% endif %}>
-        <a href="{{ url_for('fork_project', repo=repo.name) }}">Fork</a>
+          {% if '/fork/' in request.url %}
+          <a href="{{ url_for(
+            'fork_project', repo=repo.name, username=username) }}">
+        {% else %}
+          <a href="{{ url_for('fork_project', repo=repo.name) }}">
+        {% endif %}
+        Fork</a>
       </li>
       {% if g.fas_user and g.fas_user.username == repo.user %}
       <li {% if select == '' %}class="selected" {% endif %}>
