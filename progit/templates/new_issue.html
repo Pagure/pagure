@@ -38,7 +38,11 @@
       {{ render_field_in_row(form.content) }}
     </table>
     <p class="buttons indent">
+      {% if not type or type == 'new' %}
       <input type="submit" class="submit positive button" value="Create">
+      {% elif type and type == 'edit' %}
+      <input type="submit" class="submit positive button" value="Edit">
+      {% endif %}
       <input type="button" value="Cancel" class="button" onclick="history.back();">
       {{ form.csrf_token }}
     </p>
