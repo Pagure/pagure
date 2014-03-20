@@ -454,6 +454,28 @@ def fork_new_issue(username, repo):
     )
 
 
+@APP.route('/fork/<username>/<repo>/issue/<issueid>')
+def view_fork_issue(username, repo, issueid):
+    """ List all issues associated to a repo
+    """
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if repo is None:
+        flask.abort(404, 'Project not found')
+
+    issue = progit.lib.get_issue(SESSION, issueid)
+
+    if issue is None:
+        flask.abort(404, 'Issue not found')
+
+    return flask.render_template(
+        'issue.html',
+        select='issues',
+        repo=repo,
+        issue=issue,
+    )
+
+
 @APP.route('/fork/<username>/<repo>/request-pull')
 @APP.route('/fork/<username>/<repo>/request-pull/<commitid>')
 def request_pull_fork(username, repo, commitid=None):
