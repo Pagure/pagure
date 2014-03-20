@@ -96,6 +96,25 @@ def new_issue(session, repo, title, content, user):
     return 'Issue created'
 
 
+def edit_issue(session, issue, title, content):
+    ''' Edit the specified issue.
+    '''
+    edit = []
+    if title != issue.title:
+        issue.title = title
+        edit.append('title')
+    if content != issue.content:
+        issue.content = content
+        edit.append('content')
+
+    if not edit:
+        return 'No changes to edit'
+    else:
+        session.add(issue)
+        session.flush()
+        return 'Edited successfully issue #%s' % issue.id
+
+
 def fork_project(session, user, repo, repo_folder, fork_folder):
     ''' Fork a given project into the user's forks. '''
     reponame = os.path.join(repo_folder, repo.path)
