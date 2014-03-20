@@ -395,6 +395,25 @@ def view_fork_tree(username, repo, identifier=None):
     )
 
 
+@APP.route('/fork/<username>/<repo>/issues')
+def view_fork_issues(repo, username):
+    """ List all issues associated to a repo
+    """
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if repo is None:
+        flask.abort(404)
+
+    issues = progit.lib.get_issues(SESSION, repo)
+
+    return flask.render_template(
+        'issues.html',
+        select='issues',
+        repo=repo,
+        issues=issues,
+    )
+
+
 @APP.route('/fork/<username>/<repo>/request-pull')
 @APP.route('/fork/<username>/<repo>/request-pull/<commitid>')
 def request_pull_fork(username, repo, commitid=None):
