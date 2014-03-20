@@ -163,6 +163,7 @@ class Issue(BASE):
     content = sa.Column(
         sa.Text(),
         nullable=False)
+    user = sa.Column(sa.String(32), nullable=False)
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
