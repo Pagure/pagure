@@ -479,6 +479,57 @@ def view_fork_issue(username, repo, issueid):
     )
 
 
+@APP.route('/fork/<username>/<repo>/issue/<issueid>/edit',
+           methods=('GET', 'POST'))
+def fork_edit_issue(username, repo, issueid):
+    """ Edit the specified issue opened against a fork
+    """
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if repo is None:
+        flask.abort(404, 'Project not found')
+
+    issue = progit.lib.get_issue(SESSION, issueid)
+
+    if issue is None:
+        flask.abort(404, 'Issue not found')
+
+    form = progit.forms.IssueForm()
+    if form.validate_on_submit():
+        title = form.title.data
+        content = form.content.data
+
+        try:
+            message = progit.lib.edit_issue(
+                SESSION,
+                issue=issue,
+                title=title,
+                content=content,
+            )
+            SESSION.commit()
+            flask.flash(message)
+            return flask.redirect(flask.url_for(
+                'view_fork_issues', username=username, repo=repo.name))
+        except progit.exceptions.ProgitException, err:
+            flask.flash(str(err), 'error')
+        except SQLAlchemyError, err:  # pragma: no cover
+            SESSION.rollback()
+            flask.flash(str(err), 'error')
+    elif flask.request.method == 'GET':
+        form.title.data = issue.title
+        form.content.data = issue.content
+
+    return flask.render_template(
+        'new_issue.html',
+        select='issues',
+        type='edit',
+        form=form,
+        repo=repo,
+        username=username,
+        issue=issue,
+    )
+
+
 @APP.route('/fork/<username>/<repo>/request-pull')
 @APP.route('/fork/<username>/<repo>/request-pull/<commitid>')
 def request_pull_fork(username, repo, commitid=None):
