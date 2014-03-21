@@ -532,7 +532,7 @@ def fork_edit_issue(username, repo, issueid):
 
 @APP.route('/fork/<username>/<repo>/request-pull')
 @APP.route('/fork/<username>/<repo>/request-pull/<commitid>')
-def request_pull_fork(username, repo, commitid=None):
+def request_pull(username, repo, commitid=None):
     """ Request pulling the changes from the fork into the project.
     """
     repo = progit.lib.get_project(SESSION, repo, user=username)

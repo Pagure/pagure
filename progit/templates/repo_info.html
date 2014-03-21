@@ -103,7 +103,7 @@
     {% endif %}
     {% if diff_commits %}
     <span id="request_pull">
-        <a href="{{ url_for('request_pull_fork',
+        <a href="{{ url_for('request_pull',
                     username=username, repo=repo.name) }}">Request pull</a>
     </span>
     {% endif %}
@@ -123,7 +123,7 @@
         {{ commit.message.split('\n')[0] }}
         {% if diff_commits and commit.oid.hex in diff_commits %}
         <span class="error" title="Commit not in the main repo">*</span>
-        (<a href="{{ url_for('request_pull_fork',
+        (<a href="{{ url_for('request_pull',
                     username=username, repo=repo.name, commitid=commit.oid.hex) }}"
                 >Request pull</a>)
         {% endif %}
