@@ -20,6 +20,7 @@ from pygments.lexers.text import DiffLexer
 from pygments.formatters import HtmlFormatter
 
 
+import progit.doc_utils
 import progit.lib
 from progit import APP, SESSION, LOG, __get_file_in_tree
 
@@ -83,6 +84,13 @@ def view_fork_repo(username, repo):
                 break
         tree = sorted(last_commits[0].tree, key=lambda x: x.filemode)
 
+    readme = None
+    for i in tree:
+        name, ext = os.path.splitext(i.name)
+        if name == 'README':
+            content = repo_obj[i.oid].data
+            readme = progit.doc_utils.convert_readme(content, ext)
+
     parentname = os.path.join(APP.config['GIT_FOLDER'], repo.parent.path)
     orig_repo = pygit2.Repository(parentname)
 
@@ -105,6 +113,7 @@ def view_fork_repo(username, repo):
         repo=repo,
         repo_obj=repo_obj,
         username=username,
+        readme=readme,
         branches=sorted(repo_obj.listall_branches()),
         branchname='master',
         last_commits=last_commits,
