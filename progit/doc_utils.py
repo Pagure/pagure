@@ -12,6 +12,7 @@
 import docutils
 import docutils.examples
 import markupsafe
+import markdown
 
 
 def modify_rst(rst):
@@ -68,3 +69,15 @@ def convert_doc(rst_string):
 
     html_string = markupsafe.Markup(html_string)
     return html_string
+
+
+def convert_readme(content, ext):
+    ''' Convert the provided content according to the extension of the file
+    provided.
+    '''
+    output = content
+    if ext and ext in ['.rst']:
+        output= convert_doc(unicode(content))
+    elif ext and ext in ['.mk']:
+        output = markdown.markdown(content)
+    return output
