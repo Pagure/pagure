@@ -20,6 +20,7 @@ from logging.handlers import SMTPHandler
 
 import arrow
 import flask
+import pygit2
 from flask_fas_openid import FAS
 from functools import wraps
 from sqlalchemy.exc import SQLAlchemyError
@@ -163,6 +164,22 @@ def auth_logout():
     FAS.logout()
     flask.flash('You have been logged out')
     return flask.redirect(flask.url_for('index'))
+
+
+def __get_file_in_tree(repo_obj, tree, filepath):
+    ''' Retrieve the entry corresponding to the provided filename in a
+    given tree.
+    '''
+    filename = filepath[0]
+    if isinstance(tree, pygit2.Blob):
+        return
+    for el in tree:
+        if el.name == filename:
+            if len(filepath) == 1:
+                return repo_obj[el.oid]
+            else:
+                return __get_file_in_tree(
+                    repo_obj, repo_obj[el.oid], filepath[1:])
 
 ## Import the application
 
