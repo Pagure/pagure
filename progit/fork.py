@@ -21,7 +21,7 @@ from pygments.formatters import HtmlFormatter
 
 
 import progit.lib
-from progit import APP, SESSION, LOG
+from progit import APP, SESSION, LOG, __get_file_in_tree
 
 
 ### Application
@@ -264,21 +264,7 @@ def view_fork_file(username, repo, identifier, filename):
             commit = repo_obj[repo_obj.head.target]
             branchname = 'master'
 
-    def __get_file_in_tree(tree, filepath):
-        ''' Retrieve the entry corresponding to the provided filename in a
-        given tree.
-        '''
-        filename = filepath[0]
-        if isinstance(tree, pygit2.Blob):
-            return
-        for el in tree:
-            if el.name == filename:
-                if len(filepath) == 1:
-                    return repo_obj[el.oid]
-                else:
-                    return __get_file_in_tree(repo_obj[el.oid], filepath[1:])
-
-    content = __get_file_in_tree(commit.tree, filename.split('/'))
+    content = __get_file_in_tree(repo_obj, commit.tree, filename.split('/'))
     if not content:
         flask.abort(404, 'File not found')
 
