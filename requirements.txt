@@ -5,6 +5,7 @@ arrow
 docutils
 flask
 flask-wtf
+markdown
 python-fedora
 python-openid
 python-openid-teams
