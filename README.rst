@@ -14,17 +14,17 @@ Get it running
 
 * Retrieve the sources::
 
-  git clone git://github.com/pypingou/progit
+    git clone git://github.com/pypingou/progit
 
 
 * Retrieve a bunch of git repositories::
 
-  sh get_repos.sh
+    sh get_repos.sh
 
 
 * Run it::
 
-  ./runserver.py
+    ./runserver.py
 
 
 This will launch the application at http://127.0.0.1:5000
