@@ -210,11 +210,19 @@ def view_repo(repo):
                 break
         tree = sorted(last_commits[0].tree, key=lambda x: x.filemode)
 
+    readme = None
+    for i in tree:
+        name, ext = os.path.splitext(i.name)
+        if name == 'README':
+            content = repo_obj[i.oid].data
+            readme = progit.doc_utils.convert_readme(content, ext)
+
     return flask.render_template(
         'repo_info.html',
         select='overview',
         repo=repo,
         repo_obj=repo_obj,
+        readme=readme,
         branches=sorted(repo_obj.listall_branches()),
         branchname='master',
         last_commits=last_commits,
