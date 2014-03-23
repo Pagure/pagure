@@ -535,8 +535,8 @@ def request_pull(username, repo, commitid=None):
     if not repo:
         flask.abort(404)
 
-    reponame = os.path.join(APP.config['FORK_FOLDER'], username, repo.path)
-    repo_obj = pygit2.Repository(reponame)
+    repopath = os.path.join(APP.config['FORK_FOLDER'], username, repo.path)
+    repo_obj = pygit2.Repository(repopath)
 
     parentname = os.path.join(APP.config['GIT_FOLDER'], repo.parent.path)
     orig_repo = pygit2.Repository(parentname)
@@ -562,15 +562,14 @@ def request_pull(username, repo, commitid=None):
             )
 
     elif orig_repo.is_empty:
-        repo_obj = repo_obj[repo_obj.head.target]
-        diff = repo_obj.tree.diff_to_tree(swap=True)
+        repo_commit = repo_obj[repo_obj.head.target]
+        diff = repo_commit.tree.diff_to_tree(swap=True)
     else:
         flask.flash(
             'Fork is empty, there are no commits to request pulling',
             'error')
         return flask.redirect(flask.url_for(
             'view_fork_repo', username=username, repo=repo.name))
-
 
     html_diffs = []
     for diff in diffs:
