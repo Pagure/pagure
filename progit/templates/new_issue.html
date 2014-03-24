@@ -36,6 +36,7 @@
     <table>
       {{ render_field_in_row(form.title) }}
       {{ render_field_in_row(form.content) }}
+      {{ render_field_in_row(form.status) }}
     </table>
     <p class="buttons indent">
       {% if not type or type == 'new' %}
