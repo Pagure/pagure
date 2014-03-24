@@ -201,3 +201,8 @@ class PullRequest(BASE):
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
+
+    repo = relation(
+        'Project', foreign_keys=[project_id], remote_side=[Project.id])
+    repo_from = relation(
+        'Project', foreign_keys=[project_id_from], remote_side=[Project.id])
