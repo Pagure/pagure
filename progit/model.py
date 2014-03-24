@@ -202,6 +202,7 @@ class PullRequest(BASE):
         sa.String(40),
         nullable=False)
     user = sa.Column(sa.String(32), nullable=False)
+    status = sa.Column(sa.Boolean, nullable=False, default=True)
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
