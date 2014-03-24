@@ -1,7 +1,7 @@
 {% extends "repo_master.html" %}
 {% from "_formhelper.html" import render_field_in_row %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Pull request #{{ request.id }} - {{ repo.name }}{% endblock %}
 {%block tag %}home{% endblock %}
 
 
