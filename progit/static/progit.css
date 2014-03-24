@@ -75,7 +75,7 @@ div.horizontal-menu a {
     display: block;
     font-size: 1.1em;
     font-weight: bold;
-    padding: 0.8em;
+    padding: 0.61em;
 }
 
 div.horizontal-menu li.selected a, div.horizontal-menu li.hovered a {
