@@ -183,6 +183,11 @@ class PullRequest(BASE):
         sa.ForeignKey(
             'projects.id', ondelete='CASCADE', onupdate='CASCADE'),
         nullable=False)
+    project_id_from = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(
+            'projects.id', ondelete='CASCADE', onupdate='CASCADE'),
+        nullable=False)
     title = sa.Column(
         sa.Text,
         nullable=False)
