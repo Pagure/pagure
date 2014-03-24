@@ -69,7 +69,7 @@ def view_fork_repo(username, repo):
     if not repo:
         flask.abort(404)
 
-    reponame = os.path.join(APP.config['FORK_FOLDER'], username, repo.path)
+    reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
     repo_obj = pygit2.Repository(reponame)
 
     cnt = 0
@@ -131,7 +131,7 @@ def view_fork_repo_branch(username, repo, branchname):
     if not repo:
         flask.abort(404)
 
-    reponame = os.path.join(APP.config['FORK_FOLDER'], username, repo.path)
+    reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
     repo_obj = pygit2.Repository(reponame)
 
     if not branchname in repo_obj.listall_branches():
@@ -186,7 +186,7 @@ def view_fork_log(username, repo, branchname=None):
     if not repo:
         flask.abort(404)
 
-    reponame = os.path.join(APP.config['FORK_FOLDER'], username, repo.path)
+    reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
     repo_obj = pygit2.Repository(reponame)
 
     if branchname and not branchname in repo_obj.listall_branches():
@@ -257,7 +257,7 @@ def view_fork_file(username, repo, identifier, filename):
     if not repo:
         flask.abort(404)
 
-    reponame = os.path.join(APP.config['FORK_FOLDER'], username, repo.path)
+    reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
     repo_obj = pygit2.Repository(reponame)
 
     if identifier in repo_obj.listall_branches():
@@ -312,7 +312,7 @@ def view_fork_commit(username, repo, commitid):
     if not repo:
         flask.abort(404)
 
-    reponame = os.path.join(APP.config['FORK_FOLDER'], username, repo.path)
+    reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
     repo_obj = pygit2.Repository(reponame)
 
     try:
@@ -359,7 +359,7 @@ def view_fork_tree(username, repo, identifier=None):
     if not repo:
         flask.abort(404)
 
-    reponame = os.path.join(APP.config['FORK_FOLDER'], username, repo.path)
+    reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
     repo_obj = pygit2.Repository(reponame)
 
     if identifier in repo_obj.listall_branches():
@@ -535,7 +535,7 @@ def request_pull(username, repo, commitid=None):
     if not repo:
         flask.abort(404)
 
-    repopath = os.path.join(APP.config['FORK_FOLDER'], username, repo.path)
+    repopath = os.path.join(APP.config['FORK_FOLDER'], repo.path)
     repo_obj = pygit2.Repository(repopath)
 
     parentname = os.path.join(APP.config['GIT_FOLDER'], repo.parent.path)

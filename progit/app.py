@@ -137,7 +137,7 @@ def view_user(username):
 
     forks_obj = [
         pygit2.Repository(
-            os.path.join(APP.config['FORK_FOLDER'], username, repo.path))
+            os.path.join(APP.config['FORK_FOLDER'], repo.path))
         for repo in forks]
 
     return flask.render_template(
