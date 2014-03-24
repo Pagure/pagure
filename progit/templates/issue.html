@@ -1,4 +1,5 @@
 {% extends "repo_master.html" %}
+{% from "_formhelper.html" import render_field_in_list %}
 
 {% block title %}Home{% endblock %}
 {%block tag %}home{% endblock %}
@@ -9,6 +10,13 @@
 <h2>Issue #{{ issue.id }}</h2>
 
 <section class="issue_action">
+  {% if username %}
+  <form action="{{ url_for('view_fork_issue', username=username,
+                   repo=repo.name, issueid=issue.id) }}" method="post">
+  {% else %}
+  <form action="{{ url_for('view_issue',
+                   repo=repo.name, issueid=issue.id) }}" method="post">
+  {% endif %}
   <ul>
     <li>
       {% if '/fork/' in request.url %}
@@ -19,10 +27,14 @@
       {% endif %}
         Edit</a>
     </li>
+    {{ render_field_in_list(form.status) }}
     <li>
-      <a href="">Close</a>
+      <input type="submit" class="submit positive button" value="Update">
+
     </li>
   </ul>
+  {{ form.csrf_token }}
+  </form>
 </section>
 
 <section class="issue_info">

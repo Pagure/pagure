@@ -310,14 +310,15 @@ def fork_new_issue(username, repo):
     return progit.app.new_issue(repo, username=username)
 
 
-@APP.route('/<repo>/issue/<issueid>')
+@APP.route('/<repo>/issue/<issueid>', methods=('GET', 'POST'))
 def view_issue(repo, issueid):
     """ List all issues associated to a repo
     """
     return progit.app.view_issue(repo, issueid)
 
 
-@APP.route('/fork/<username>/<repo>/issue/<issueid>')
+@APP.route('/fork/<username>/<repo>/issue/<issueid>',
+           methods=('GET', 'POST'))
 def view_fork_issue(username, repo, issueid):
     """ List all issues associated to a repo
     """

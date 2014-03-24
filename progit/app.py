@@ -442,12 +442,36 @@ def view_issue(repo, issueid, username=None):
     if issue is None:
         flask.abort(404, 'Issue not found')
 
+    status = progit.lib.get_issue_statuses(SESSION)
+    form = progit.forms.UpdateIssueStatusForm(status=status)
+
+    if form.validate_on_submit():
+        try:
+            message = progit.lib.edit_issue(
+                SESSION,
+                issue=issue,
+                status=form.status.data,
+            )
+            SESSION.commit()
+            flask.flash(message)
+            url = flask.url_for('view_issues', repo=repo.name)
+            if username:
+                url = flask.url_for(
+                    'view_fork_issues', username=username, repo=repo.name)
+            return flask.redirect(url)
+        except SQLAlchemyError, err:  # pragma: no cover
+            SESSION.rollback()
+            flask.flash(str(err), 'error')
+    elif flask.request.method == 'GET':
+        form.status.data = issue.status
+
     return flask.render_template(
         'issue.html',
         select='issues',
         repo=repo,
         username=username,
         issue=issue,
+        form=form,
     )
 
 
