@@ -118,13 +118,13 @@ def edit_issue(session, issue, title=None, content=None, status=None):
     ''' Edit the specified issue.
     '''
     edit = []
-    if title != issue.title:
+    if title and title != issue.title:
         issue.title = title
         edit.append('title')
-    if content != issue.content:
+    if content and content != issue.content:
         issue.content = content
         edit.append('content')
-    if status != issue.status:
+    if status and status != issue.status:
         issue.status = status
         edit.append('status')
 
