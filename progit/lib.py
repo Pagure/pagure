@@ -238,6 +238,32 @@ def get_issue(session, issueid):
     return query.first()
 
 
+def get_pull_requests(
+        session, project_id=None, project_id_from=None, status=None):
+    ''' Retrieve the specified issue
+    '''
+    query = session.query(
+        model.PullRequest
+    )
+
+    if project_id:
+        query = query.filter(
+            model.PullRequest.project_id == project_id
+        )
+
+    if project_id_from:
+        query = query.filter(
+            model.PullRequest.project_id_from == project_id_from
+        )
+
+    if status is not None:
+        query = query.filter(
+            model.PullRequest.status == status
+        )
+
+    return query.all()
+
+
 def get_pull_request(
         session, requestid, project_id=None, project_id_from=None):
     ''' Retrieve the specified issue
