@@ -183,5 +183,5 @@ def __get_file_in_tree(repo_obj, tree, filepath):
 
 ## Import the application
 
-import progit.app
 import progit.fork
+import progit.urls

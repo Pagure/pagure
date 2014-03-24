@@ -27,176 +27,18 @@ from progit import APP, SESSION, LOG, __get_file_in_tree
 
 
 ### Application
-@APP.route('/')
-def index():
-    """ Front page of the application.
-    """
-    page = flask.request.args.get('page', 1)
-    try:
-        page = int(page)
-    except ValueError:
-        page = 1
-
-    limit = APP.config['ITEM_PER_PAGE']
-    start = limit * (page - 1)
-
-    repos = progit.lib.list_projects(SESSION, fork=False, start=start, limit=limit)
-    num_repos = progit.lib.list_projects(SESSION, fork=False, count=True)
-
-    total_page = int(ceil(num_repos / float(limit)))
-
-    return flask.render_template(
-        'index.html',
-        repos=repos,
-        total_page=total_page,
-        page=page,
-    )
-
-
-@APP.route('/users/')
-def view_users():
-    """ Present the list of users.
-    """
-    page = flask.request.args.get('page', 1)
-    try:
-        page = int(page)
-    except ValueError:
-        page = 1
-
-    ## TODO: retrieve this from the DB
-    users = ['pingou']
-
-    limit = APP.config['ITEM_PER_PAGE']
-    start = limit * (page - 1)
-    end = limit * page
-    users_length = len(users)
-    users = users[start:end]
-
-    total_page = int(ceil(users_length / float(limit)))
-
-    return flask.render_template(
-        'user_list.html',
-        users=users,
-        total_page=total_page,
-        page=page,
-    )
-
-
-@APP.route('/user/<username>')
-def view_user(username):
-    """ Front page of a specific user.
-    """
-
-    repopage = flask.request.args.get('repopage', 1)
-    try:
-        repopage = int(repopage)
-    except ValueError:
-        repopage = 1
-
-    forkpage = flask.request.args.get('forkpage', 1)
-    try:
-        forkpage = int(forkpage)
-    except ValueError:
-        forkpage = 1
-
-    limit = APP.config['ITEM_PER_PAGE']
-    repo_start = limit * (repopage - 1)
-    fork_start = limit * (forkpage - 1)
-
-    repos = progit.lib.list_projects(
-        SESSION,
-        username=flask.g.fas_user.username,
-        fork=False,
-        start=repo_start,
-        limit=limit)
-    repos_length = progit.lib.list_projects(
-        SESSION,
-        username=flask.g.fas_user.username,
-        fork=False,
-        count=True)
-
-    forks = progit.lib.list_projects(
-        SESSION,
-        username=flask.g.fas_user.username,
-        fork=True,
-        start=fork_start,
-        limit=limit)
-    forks_length = progit.lib.list_projects(
-        SESSION,
-        username=flask.g.fas_user.username,
-        fork=True,
-        count=True)
-
-    total_page_repos = int(ceil(repos_length / float(limit)))
-    total_page_forks = int(ceil(forks_length / float(limit)))
-
-    repos_obj = [
-        pygit2.Repository(
-            os.path.join(APP.config['GIT_FOLDER'], repo.path))
-        for repo in repos]
-
-    forks_obj = [
-        pygit2.Repository(
-            os.path.join(APP.config['FORK_FOLDER'], repo.path))
-        for repo in forks]
-
-    return flask.render_template(
-        'user_info.html',
-        username=username,
-        repos=repos,
-        repos_obj=repos_obj,
-        total_page_repos=total_page_repos,
-        forks=forks,
-        forks_obj=forks_obj,
-        total_page_forks=total_page_forks,
-        repopage=repopage,
-        forkpage=forkpage,
-    )
-
-
-@APP.route('/new/', methods=('GET', 'POST'))
-def new_project():
-    """ Form to create a new project.
-    """
-    form = progit.forms.ProjectForm()
-    if form.validate_on_submit():
-        name = form.name.data
-        description = form.description.data
-
-        try:
-            message = progit.lib.new_project(
-                SESSION,
-                name=name,
-                description=description,
-                user=flask.g.fas_user.username,
-                folder=APP.config['GIT_FOLDER'],
-            )
-            SESSION.commit()
-            flask.flash(message)
-            return flask.redirect(flask.url_for('view_repo', repo=name))
-        except progit.exceptions.ProgitException, err:
-            flask.flash(str(err), 'error')
-        except SQLAlchemyError, err:  # pragma: no cover
-            SESSION.rollback()
-            flask.flash(str(err), 'error')
-
-    return flask.render_template(
-        'new_project.html',
-        form=form,
-    )
-
-
-@APP.route('/<repo>')
-def view_repo(repo):
+def view_repo(repo, username=None):
     """ Front page of a specific repo.
     """
-    repo = progit.lib.get_project(SESSION, repo)
+    repo = progit.lib.get_project(SESSION, repo, user=username)
 
     if repo is None:
         flask.abort(404)
 
-    repo_obj = pygit2.Repository(os.path.join(APP.config["GIT_FOLDER"],
-                                 repo.path))
+    reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
+    if repo.is_fork:
+        reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
+    repo_obj = pygit2.Repository(reponame)
 
     cnt = 0
     last_commits = []
@@ -217,30 +59,51 @@ def view_repo(repo):
             content = repo_obj[i.oid].data
             readme = progit.doc_utils.convert_readme(content, ext)
 
+    diff_commits = []
+    if repo.is_fork:
+        parentname = os.path.join(
+            APP.config['GIT_FOLDER'], repo.parent.path)
+        orig_repo = pygit2.Repository(parentname)
+
+        if not repo_obj.is_empty and not orig_repo.is_empty:
+            orig_commit = orig_repo[orig_repo.head.target]
+            repo_commit = repo_obj[repo_obj.head.target]
+            diff = repo_obj.diff(
+                repo_obj.revparse_single(orig_commit.oid.hex),
+                repo_obj.revparse_single(repo_commit.oid.hex))
+            for commit in repo_obj.walk(
+                    repo_obj.head.target, pygit2.GIT_SORT_TIME):
+                if commit.oid.hex == orig_commit.oid.hex:
+                    break
+                diff_commits.append(commit.oid.hex)
+
     return flask.render_template(
         'repo_info.html',
         select='overview',
         repo=repo,
         repo_obj=repo_obj,
+        username=username,
         readme=readme,
         branches=sorted(repo_obj.listall_branches()),
         branchname='master',
         last_commits=last_commits,
         tree=tree,
+        diff_commits=diff_commits,
     )
 
 
-@APP.route('/<repo>/branch/<branchname>')
-def view_repo_branch(repo, branchname):
+def view_repo_branch(repo, branchname, username=None):
     """ Displays the information about a specific branch.
     """
-    repo = progit.lib.get_project(SESSION, repo)
+    repo = progit.lib.get_project(SESSION, repo, user=username)
 
-    if repo is None:
+    if not repo:
         flask.abort(404)
 
-    repo_obj = pygit2.Repository(os.path.join(APP.config["GIT_FOLDER"],
-                                 repo.path))
+    reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
+    if repo.is_fork:
+        reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
+    repo_obj = pygit2.Repository(reponame)
 
     if not branchname in repo_obj.listall_branches():
         flask.abort(404)
@@ -255,35 +118,57 @@ def view_repo_branch(repo, branchname):
         if cnt == 10:
             break
 
+    diff_commits = []
+    if repo.is_fork:
+        parentname = os.path.join(
+            APP.config['GIT_FOLDER'], repo.parent.path)
+        orig_repo = pygit2.Repository(parentname)
+
+        if not repo_obj.is_empty and not orig_repo.is_empty:
+            orig_commit = orig_repo[orig_repo.head.target]
+            repo_commit = repo_obj[branch.get_object().hex]
+            diff = repo_obj.diff(
+                repo_obj.revparse_single(orig_commit.oid.hex),
+                repo_obj.revparse_single(repo_commit.oid.hex))
+            for commit in repo_obj.walk(
+                    repo_obj.head.target, pygit2.GIT_SORT_TIME):
+                if commit.oid.hex == orig_commit.oid.hex:
+                    break
+                diff_commits.append(commit.oid.hex)
+
     return flask.render_template(
         'repo_info.html',
         select='overview',
         repo=repo,
+        username=username,
         branches=sorted(repo_obj.listall_branches()),
         branchname=branchname,
         last_commits=last_commits,
         tree=sorted(last_commits[0].tree, key=lambda x: x.filemode),
+        diff_commits=diff_commits,
     )
 
 
-@APP.route('/<repo>/log')
-@APP.route('/<repo>/log/<branchname>')
-def view_log(repo, branchname='master'):
+def view_log(repo, branchname=None, username=None):
     """ Displays the logs of the specified repo.
     """
-    repo = progit.lib.get_project(SESSION, repo)
+    repo = progit.lib.get_project(SESSION, repo, user=username)
 
-    if repo is None:
+    if not repo:
         flask.abort(404)
 
-    repo_obj = pygit2.Repository(os.path.join(APP.config["GIT_FOLDER"],
-                                 repo.path))
+    reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
+    if repo.is_fork:
+        reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
+    repo_obj = pygit2.Repository(reponame)
 
     if branchname and not branchname in repo_obj.listall_branches():
         flask.abort(404)
 
-
-    branch = repo_obj.lookup_branch(branchname)
+    if branchname:
+        branch = repo_obj.lookup_branch(branchname)
+    else:
+        branch = repo_obj.lookup_branch('master')
 
     try:
         page = int(flask.request.args.get('page', 1))
@@ -304,31 +189,50 @@ def view_log(repo, branchname='master'):
 
     total_page = int(ceil(n_commits / float(limit)))
 
+    diff_commits = []
+    if repo.is_fork:
+        parentname = os.path.join(
+            APP.config['GIT_FOLDER'], repo.parent.path)
+        orig_repo = pygit2.Repository(parentname)
+        if not repo_obj.is_empty and not orig_repo.is_empty:
+            orig_commit = orig_repo[orig_repo.head.target]
+            repo_commit = repo_obj[branch.get_object().hex]
+            diff = repo_obj.diff(
+                repo_obj.revparse_single(orig_commit.oid.hex),
+                repo_obj.revparse_single(repo_commit.oid.hex))
+            for commit in repo_obj.walk(
+                    repo_obj.head.target, pygit2.GIT_SORT_TIME):
+                if commit.oid.hex == orig_commit.oid.hex:
+                    break
+                diff_commits.append(commit.oid.hex)
+
     return flask.render_template(
         'repo_info.html',
         select='logs',
-        origin='view_log',
+        origin='view_fork_log',
         repo=repo,
+        username=username,
         branches=sorted(repo_obj.listall_branches()),
         branchname=branchname,
         last_commits=last_commits,
+        diff_commits=diff_commits,
         page=page,
         total_page=total_page,
     )
 
 
-@APP.route('/<repo>/blob/<identifier>/<path:filename>')
-@APP.route('/<repo>/blob/<identifier>/<path:filename>')
-def view_file(repo, identifier, filename):
+def view_file(repo, identifier, filename, username=None):
     """ Displays the content of a file or a tree for the specified repo.
     """
-    repo = progit.lib.get_project(SESSION, repo)
+    repo = progit.lib.get_project(SESSION, repo, user=username)
 
-    if repo is None:
+    if not repo:
         flask.abort(404)
 
-    repo_obj = pygit2.Repository(os.path.join(APP.config["GIT_FOLDER"],
-                                 repo.path))
+    reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
+    if repo.is_fork:
+        reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
+    repo_obj = pygit2.Repository(reponame)
 
     if identifier in repo_obj.listall_branches():
         branchname = identifier
@@ -365,6 +269,7 @@ def view_file(repo, identifier, filename):
         'file.html',
         select='tree',
         repo=repo,
+        username=username,
         branchname=branchname,
         filename=filename,
         content=content,
@@ -372,17 +277,18 @@ def view_file(repo, identifier, filename):
     )
 
 
-@APP.route('/<repo>/<commitid>')
-def view_commit(repo, commitid):
+def view_commit(repo, commitid, username=None):
     """ Render a commit in a repo
     """
-    repo = progit.lib.get_project(SESSION, repo)
+    repo = progit.lib.get_project(SESSION, repo, user=username)
 
-    if repo is None:
+    if not repo:
         flask.abort(404)
 
-    repo_obj = pygit2.Repository(os.path.join(APP.config["GIT_FOLDER"],
-                                 repo.path))
+    reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
+    if repo.is_fork:
+        reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
+    repo_obj = pygit2.Repository(reponame)
 
     try:
         commit = repo_obj.get(commitid)
@@ -410,6 +316,7 @@ def view_commit(repo, commitid):
         'commit.html',
         select='logs',
         repo=repo,
+        username=username,
         commitid=commitid,
         commit=commit,
         diff=diff,
@@ -417,9 +324,7 @@ def view_commit(repo, commitid):
     )
 
 
-@APP.route('/<repo>/tree/')
-@APP.route('/<repo>/tree/<identifier>')
-def view_tree(repo, identifier=None):
+def view_tree(repo, identifier=None, username=None):
     """ Render the tree of the repo
     """
     repo = progit.lib.get_project(SESSION, repo)
@@ -427,8 +332,10 @@ def view_tree(repo, identifier=None):
     if repo is None:
         flask.abort(404)
 
-    repo_obj = pygit2.Repository(os.path.join(APP.config["GIT_FOLDER"],
-                                 repo.path))
+    reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
+    if repo.is_fork:
+        reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
+    repo_obj = pygit2.Repository(reponame)
 
     if identifier in repo_obj.listall_branches():
         branchname = identifier
@@ -450,6 +357,7 @@ def view_tree(repo, identifier=None):
         'file.html',
         select='tree',
         repo=repo,
+        username=username,
         branchname=branchname,
         filename='',
         content=content,
@@ -457,11 +365,10 @@ def view_tree(repo, identifier=None):
     )
 
 
-@APP.route('/<repo>/issues')
-def view_issues(repo):
+def view_issues(repo, username=None):
     """ List all issues associated to a repo
     """
-    repo = progit.lib.get_project(SESSION, repo)
+    repo = progit.lib.get_project(SESSION, repo, user=username)
 
     if repo is None:
         flask.abort(404)
@@ -472,15 +379,15 @@ def view_issues(repo):
         'issues.html',
         select='issues',
         repo=repo,
+        username=username,
         issues=issues,
     )
 
 
-@APP.route('/<repo>/new_issue', methods=('GET', 'POST'))
-def new_issue(repo):
+def new_issue(repo, username=None):
     """ Create a new issue
     """
-    repo = progit.lib.get_project(SESSION, repo)
+    repo = progit.lib.get_project(SESSION, repo, user=username)
 
     if repo is None:
         flask.abort(404, 'Project not found')
@@ -501,7 +408,7 @@ def new_issue(repo):
             SESSION.commit()
             flask.flash(message)
             return flask.redirect(flask.url_for(
-                'view_issues', repo=repo.name))
+                'view_fork_issues', username=username, repo=repo.name))
         except progit.exceptions.ProgitException, err:
             flask.flash(str(err), 'error')
         except SQLAlchemyError, err:  # pragma: no cover
@@ -513,14 +420,14 @@ def new_issue(repo):
         select='issues',
         form=form,
         repo=repo,
+        username=username,
     )
 
 
-@APP.route('/<repo>/issue/<issueid>')
-def view_issue(repo, issueid):
+def view_issue(repo, issueid, username=None):
     """ List all issues associated to a repo
     """
-    repo = progit.lib.get_project(SESSION, repo)
+    repo = progit.lib.get_project(SESSION, repo, user=username)
 
     if repo is None:
         flask.abort(404, 'Project not found')
@@ -534,15 +441,15 @@ def view_issue(repo, issueid):
         'issue.html',
         select='issues',
         repo=repo,
+        username=username,
         issue=issue,
     )
 
 
-@APP.route('/<repo>/issue/<issueid>/edit', methods=('GET', 'POST'))
-def edit_issue(repo, issueid):
+def edit_issue(repo, issueid, username=None):
     """ Edit the specified issue
     """
-    repo = progit.lib.get_project(SESSION, repo)
+    repo = progit.lib.get_project(SESSION, repo, user=username)
 
     if repo is None:
         flask.abort(404, 'Project not found')
@@ -567,7 +474,7 @@ def edit_issue(repo, issueid):
             SESSION.commit()
             flask.flash(message)
             return flask.redirect(flask.url_for(
-                'view_issues', repo=repo.name))
+                'view_fork_issues', username=username, repo=repo.name))
         except progit.exceptions.ProgitException, err:
             flask.flash(str(err), 'error')
         except SQLAlchemyError, err:  # pragma: no cover
@@ -583,5 +490,80 @@ def edit_issue(repo, issueid):
         type='edit',
         form=form,
         repo=repo,
+        username=username,
         issue=issue,
+    )
+
+
+def request_pull(repo, requestid=None, username=None):
+    """ Request pulling the changes from the fork into the project.
+    """
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    request = progit.lib.get_pull_request(
+        SESSION, project_id=repo.id, requestid=requestid)
+
+    if not request:
+        flask.abort(404, 'Pull-request not found')
+
+    repopath = os.path.join(
+        APP.config['FORK_FOLDER'], request.repo_from.path)
+    repo_obj = pygit2.Repository(repopath)
+
+    parentname = os.path.join(
+        APP.config['GIT_FOLDER'], request.repo.path)
+    orig_repo = pygit2.Repository(parentname)
+
+    diff_commits = []
+    diffs = []
+    repo_commit = repo_obj[request.stop_id]
+    if not repo_obj.is_empty and not orig_repo.is_empty:
+        orig_commit = orig_repo[request.start_id]
+
+        for commit in repo_obj.walk(request.stop_id, pygit2.GIT_SORT_TIME):
+            if commit.oid.hex == orig_commit.oid.hex:
+                break
+            diff_commits.append(commit)
+            diffs.append(
+                repo_obj.diff(
+                    repo_obj.revparse_single(commit.parents[0].oid.hex),
+                    repo_obj.revparse_single(commit.oid.hex)
+                )
+            )
+
+    elif orig_repo.is_empty:
+        orig_commit = None
+        diff = repo_commit.tree.diff_to_tree(swap=True)
+    else:
+        flask.flash(
+            'Fork is empty, there are no commits to request pulling',
+            'error')
+        return flask.redirect(flask.url_for(
+            'view_fork_repo', username=username, repo=repo.name))
+
+    html_diffs = []
+    for diff in diffs:
+        html_diffs.append(
+            highlight(
+                diff.patch,
+                DiffLexer(),
+                HtmlFormatter(
+                    noclasses=True,
+                    style="tango",)
+            )
+        )
+
+    return flask.render_template(
+        'pull_request.html',
+        repo=repo,
+        username=username or request.user,
+        request=request,
+        repo_obj=repo_obj,
+        orig_repo=orig_repo,
+        diff_commits=diff_commits,
+        diffs=diffs,
+        html_diffs=html_diffs,
     )
