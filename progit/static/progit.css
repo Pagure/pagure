@@ -415,3 +415,11 @@ th.month .ui-button-text {
     border-color:#adadad;
     padding-left:1em;
 }
+
+.inline h2 {
+    display: inline-block;
+}
+
+.inline a {
+    display: inline-block;
+}
