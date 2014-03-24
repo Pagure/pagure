@@ -69,6 +69,7 @@
         {% endif %}
               Pull-requests</a>
       </li>
+
       {% if repo.forks %}
       <li {% if select == 'forks' %}class="selected" {% endif %}>
         {% if '/fork/' in request.url %}
@@ -77,9 +78,10 @@
         {% else %}
           <a href="{{ url_for('view_forks', repo=repo.name) }}">
         {% endif %}
-            Forks</a>
+            Forks ({{ repo.forks |length }})</a>
       </li>
       {% endif %}
+
     </ul>
     <ul class="right">
       <li {% if select == '' %}class="selected" {% endif %}>
