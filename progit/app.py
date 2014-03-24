@@ -206,10 +206,14 @@ def view_log(repo, branchname=None, username=None):
                     break
                 diff_commits.append(commit.oid.hex)
 
+    origin = 'view_log'
+    if username:
+        origin = 'view_fork_log'
+
     return flask.render_template(
         'repo_info.html',
         select='logs',
-        origin='view_fork_log',
+        origin=origin,
         repo=repo,
         username=username,
         branches=sorted(repo_obj.listall_branches()),
