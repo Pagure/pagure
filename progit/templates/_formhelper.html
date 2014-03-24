@@ -49,3 +49,14 @@
 {% endfor %}
 {% endif %}
 {% endmacro %}
+
+
+{% macro render_field_in_list(field) %}
+    <li>{{ field.label }}</li>
+    <li>{{ field(**kwargs)|safe }}</li>
+{% if field.errors %}
+{% for error in field.errors %}
+<li class="errors">{{ error }}</li>
+{% endfor %}
+{% endif %}
+{% endmacro %}
