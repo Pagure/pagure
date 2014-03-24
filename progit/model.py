@@ -16,6 +16,7 @@ import logging
 
 import sqlalchemy as sa
 from sqlalchemy import create_engine
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
@@ -64,7 +65,25 @@ def create_tables(db_url, alembic_ini=None, debug=False):
         command.stamp(alembic_cfg, "head")
 
     scopedsession = scoped_session(sessionmaker(bind=engine))
+    # Insert the default data into the db
+    create_default_status(scopedsession)
     return scopedsession
+
+
+def create_default_status(session):
+    """ Insert the defaults status in the status tables.
+    """
+
+    for status in ['Open', 'Invalid', 'Insufficient data', 'Fixed']:
+        ticket_stat = StatusIssue(status=status)
+        session.add(ticket_stat)
+        try:
+            session.flush()
+        except SQLAlchemyError, err:
+            ERROR_LOG.debug('Status %s could not be added', ticket_stat)
+            ERROR_LOG.exception(err)
+
+    session.commit()
 
 
 class Project(BASE):
@@ -147,6 +166,17 @@ class Comment(BASE):
                              default=datetime.datetime.utcnow)
 
 
+class StatusIssue(BASE):
+    """ Stores the status a ticket can have.
+
+    Table -- status_issue
+    """
+    __tablename__ = 'status_issue'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    status = sa.Column(sa.Text, nullable=False, unique=True)
+
+
 class Issue(BASE):
     """ Stores the issues reported on a project.
 
@@ -168,6 +198,12 @@ class Issue(BASE):
         sa.Text(),
         nullable=False)
     user = sa.Column(sa.String(32), nullable=False)
+    status = sa.Column(
+        sa.Text,
+        sa.ForeignKey(
+            'status_issue.status', ondelete='CASCADE', onupdate='CASCADE'),
+        default='Open',
+        nullable=False)
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
