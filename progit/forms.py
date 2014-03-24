@@ -34,6 +34,22 @@ class IssueForm(wtf.Form):
         'Content<span class="error">*</span>',
         [wtforms.validators.Required()]
     )
+    status = wtforms.SelectField(
+        'Status',
+        [wtforms.validators.Required()],
+        choices=[(item, item) for item in []]
+    )
+
+    def __init__(self, *args, **kwargs):
+        """ Calls the default constructor with the normal argument but
+        uses the list of collection provided to fill the choices of the
+        drop-down list.
+        """
+        super(IssueForm, self).__init__(*args, **kwargs)
+        if 'status' in kwargs:
+            self.status.choices = [
+                (status, status) for status in kwargs['status']
+            ]
 
 
 class RequestPullForm(wtf.Form):
