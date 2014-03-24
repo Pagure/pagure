@@ -188,7 +188,7 @@ class PullRequest(BASE):
         nullable=False)
     start_id = sa.Column(
         sa.String(40),
-        nullable=False)
+        nullable=True)
     stop_id = sa.Column(
         sa.String(40),
         nullable=False)
