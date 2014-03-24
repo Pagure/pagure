@@ -10,6 +10,7 @@
 
 import flask
 import os
+import tempfile
 from math import ceil
 
 import pygit2
@@ -592,3 +593,75 @@ def request_pull(repo, requestid, username=None):
         diffs=diffs,
         html_diffs=html_diffs,
     )
+
+
+def merge_request_pull(repo, requestid, username=None):
+    """ Merge a request pulling the changes from the fork into the project.
+    """
+
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    request = progit.lib.get_pull_request(
+        SESSION, project_id=repo.id, requestid=requestid)
+
+    if not request:
+        flask.abort(404, 'Pull-request not found')
+
+
+    error_output = flask.url_for(
+        'request_pull', repo=repo.name, requestid=requestid)
+    if username:
+        error_output = flask.url_for(
+        'fork_request_pull', repo=repo.name, requestid=requestid,
+        username=username)
+
+    # Get the fork
+    repopath = os.path.join(
+        APP.config['FORK_FOLDER'], request.repo_from.path)
+    fork_obj = pygit2.Repository(repopath)
+
+    # Get the original repo
+    parentpath = os.path.join(APP.config['GIT_FOLDER'], request.repo.path)
+    orig_repo = pygit2.Repository(parentpath)
+
+    if orig_repo.get(request.stop_id, None):
+        flask.flash('These chanages have already been merged.', 'error')
+        # Update status
+        progit.lib.close_pull_request(SESSION, request)
+        return flask.redirect(error_output)
+
+    # Clone the original repo into a temp folder
+    newpath = tempfile.mkdtemp()
+    new_repo = pygit2.clone_repository(parentpath, newpath)
+
+    repo_commit = fork_obj[request.stop_id]
+
+    ori_remote = new_repo.remotes[0]
+    # Add the fork as remote repo
+    reponame = '%s_%s' % (request.user, repo.name)
+    remote = new_repo.create_remote(reponame, repopath)
+
+    # Fetch the commits
+    remote.fetch()
+
+    merge = new_repo.merge(repo_commit.oid)
+    master_ref = new_repo.lookup_reference('HEAD').resolve()
+
+    if merge.is_fastforward:
+        master_ref.target = merge.fastforward_oid
+        refname = '%s:%s' % (master_ref.name, master_ref.name)
+        ori_remote.push(refname)
+        flask.flash('Changes merged!')
+    else:
+        flask.flash(
+            'This merge is not fast-forward and cannot be applied via '
+            'progit', 'error')
+        flask.redirect(error_output)
+
+    # Update status
+    progit.lib.close_pull_request(SESSION, request)
+
+    return flask.redirect(flask.url_for('view_repo', repo=repo.name))

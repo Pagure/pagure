@@ -358,3 +358,17 @@ def fork_request_pull(username, repo, requestid):
     """ Request pulling the changes from the fork into the project.
     """
     return progit.app.request_pull(repo, requestid=requestid, username=username)
+
+
+@APP.route('/<repo>/request-pull/merge/<requestid>')
+def merge_request_pull(repo, requestid):
+    """ Request pulling the changes from the fork into the project.
+    """
+    return progit.app.merge_request_pull(repo, requestid)
+
+
+@APP.route('/fork/<username>/<repo>/request-pull/merge/<requestid>')
+def fork_merge_request_pull(username, repo, requestid):
+    """ Request pulling the changes from the fork into the project.
+    """
+    return progit.app.merge_request_pull(repo, requestid, username=username)
