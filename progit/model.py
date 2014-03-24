@@ -167,3 +167,32 @@ class Issue(BASE):
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
+
+
+class PullRequest(BASE):
+    """ Stores the pull requests created on a project.
+
+    Table -- pull_requests
+    """
+
+    __tablename__ = 'pull_requests'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    project_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(
+            'projects.id', ondelete='CASCADE', onupdate='CASCADE'),
+        nullable=False)
+    title = sa.Column(
+        sa.Text,
+        nullable=False)
+    start_id = sa.Column(
+        sa.String(40),
+        nullable=False)
+    stop_id = sa.Column(
+        sa.String(40),
+        nullable=False)
+    user = sa.Column(sa.String(32), nullable=False)
+
+    date_created = sa.Column(sa.DateTime, nullable=False,
+                             default=datetime.datetime.utcnow)
