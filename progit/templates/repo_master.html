@@ -60,6 +60,15 @@
         {% endif %}
               Issues</a>
       </li>
+      <li {% if select == 'issues' %}class="selected" {% endif %}>
+        {% if '/fork/' in request.url %}
+          <a href="{{ url_for('fork_request_pulls', username=username,
+                     repo=repo.name) }}">
+        {% else %}
+          <a href="{{ url_for('request_pulls', repo=repo.name) }}">
+        {% endif %}
+              Pull-requests</a>
+      </li>
     </ul>
     <ul class="right">
       <li {% if select == '' %}class="selected" {% endif %}>
