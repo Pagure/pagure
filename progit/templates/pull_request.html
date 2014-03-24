@@ -1,4 +1,5 @@
 {% extends "master.html" %}
+{% from "_formhelper.html" import render_field_in_row %}
 
 {% block title %}Home{% endblock %}
 {%block tag %}home{% endblock %}
@@ -27,6 +28,10 @@
 
 </h2>
 
+{% if request %}
+<h3>Title: {{ request.title }}</h3>
+{% endif %}
+
 <section class="commit_list">
   <ul>
     {% for commit in diff_commits %}
@@ -39,6 +44,22 @@
     {% endfor %}
   </ul>
 </section>
+
+{% if form %}
+<section class="new_project">
+  <form action="{{ url_for('.new_request_pull', username=username,
+    repo=repo.name, commitid=commitid) }}" method="post">
+    <table>
+      {{ render_field_in_row(form.title) }}
+    </table>
+    <p class="buttons indent">
+      <input type="submit" class="submit positive button" value="Create">
+      <input type="button" value="Cancel" class="button" onclick="history.back();">
+      {{ form.csrf_token }}
+    </p>
+  </form>
+</section>
+{% endif %}
 
 <section class="request_diff">
   <h3>Diff:</h3>
