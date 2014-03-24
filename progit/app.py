@@ -631,6 +631,7 @@ def merge_request_pull(repo, requestid, username=None):
         flask.flash('These chanages have already been merged.', 'error')
         # Update status
         progit.lib.close_pull_request(SESSION, request)
+        SESSION.commit()
         return flask.redirect(error_output)
 
     # Clone the original repo into a temp folder
@@ -663,5 +664,6 @@ def merge_request_pull(repo, requestid, username=None):
 
     # Update status
     progit.lib.close_pull_request(SESSION, request)
+    SESSION.commit()
 
     return flask.redirect(flask.url_for('view_repo', repo=repo.name))
