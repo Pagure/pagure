@@ -391,6 +391,7 @@ def view_issues(repo, username=None, status=None):
         select='issues',
         repo=repo,
         username=username,
+        status=status,
         issues=issues,
     )
 
