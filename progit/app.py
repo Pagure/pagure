@@ -332,7 +332,7 @@ def view_commit(repo, commitid, username=None):
 def view_tree(repo, identifier=None, username=None):
     """ Render the tree of the repo
     """
-    repo = progit.lib.get_project(SESSION, repo)
+    repo = progit.lib.get_project(SESSION, repo, user=username)
 
     if repo is None:
         flask.abort(404)
