@@ -464,10 +464,12 @@ def edit_issue(repo, issueid, username=None):
     if issue is None:
         flask.abort(404, 'Issue not found')
 
-    form = progit.forms.IssueForm()
+    status = progit.lib.get_issue_statuses(SESSION)
+    form = progit.forms.IssueForm(status=status)
     if form.validate_on_submit():
         title = form.title.data
         content = form.content.data
+        status = form.status.data
 
         try:
             message = progit.lib.edit_issue(
@@ -475,11 +477,15 @@ def edit_issue(repo, issueid, username=None):
                 issue=issue,
                 title=title,
                 content=content,
+                status=status,
             )
             SESSION.commit()
             flask.flash(message)
-            return flask.redirect(flask.url_for(
-                'view_fork_issues', username=username, repo=repo.name))
+            url = flask.url_for('view_issues', repo=repo.name)
+            if username:
+                url = flask.url_for(
+                    'view_fork_issues', username=username, repo=repo.name)
+            return flask.redirect(url)
         except progit.exceptions.ProgitException, err:
             flask.flash(str(err), 'error')
         except SQLAlchemyError, err:  # pragma: no cover
@@ -488,6 +494,7 @@ def edit_issue(repo, issueid, username=None):
     elif flask.request.method == 'GET':
         form.title.data = issue.title
         form.content.data = issue.content
+        form.status.data = issue.status
 
     return flask.render_template(
         'new_issue.html',
