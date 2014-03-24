@@ -378,7 +378,7 @@ def view_issues(repo, username=None):
     if repo is None:
         flask.abort(404)
 
-    issues = progit.lib.get_issues(SESSION, repo)
+    issues = progit.lib.get_issues(SESSION, repo, status='Open')
 
     return flask.render_template(
         'issues.html',
