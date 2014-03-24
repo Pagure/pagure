@@ -538,7 +538,7 @@ def edit_issue(repo, issueid, username=None):
     )
 
 
-def request_pulls(repo, username=None):
+def request_pulls(repo, username=None, status=True):
     """ Returns the list of pull-requests opened on a project.
     """
     repo = progit.lib.get_project(SESSION, repo, user=username)
@@ -546,8 +546,12 @@ def request_pulls(repo, username=None):
     if not repo:
         flask.abort(404, 'Project not found')
 
-    requests = progit.lib.get_pull_requests(
-        SESSION, project_id=repo.id, status=True)
+    if status is False or str(status).lower() == 'closed':
+        requests = progit.lib.get_pull_requests(
+            SESSION, project_id=repo.id, status=False)
+    else:
+        requests = progit.lib.get_pull_requests(
+            SESSION, project_id=repo.id, status=status)
 
     return flask.render_template(
         'requests.html',
@@ -555,6 +559,7 @@ def request_pulls(repo, username=None):
         repo=repo,
         username=username,
         requests=requests,
+        status=status,
     )
 
 

@@ -346,14 +346,16 @@ def fork_edit_issue(username, repo, issueid):
 def request_pulls(repo):
     """ Request pulling the changes from the fork into the project.
     """
-    return progit.app.request_pulls(repo)
+    status = flask.request.args.get('status', True)
+    return progit.app.request_pulls(repo, status=status)
 
 
 @APP.route('/fork/<username>/<repo>/request-pulls')
 def fork_request_pulls(username, repo):
     """ Request pulling the changes from the fork into the project.
     """
-    return progit.app.request_pulls(repo, username=username)
+    status = flask.request.args.get('status', True)
+    return progit.app.request_pulls(repo, username=username, status=status)
 
 
 @APP.route('/<repo>/request-pull/<requestid>')
