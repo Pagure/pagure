@@ -16,7 +16,7 @@ body {
     margin: 0px;
     padding: 0px;
     font-size: small;
-    font-family: "Liberation Sans","Lucida Grande", "Luxi Sans", "Bitstream Vera Sans", helvetica, verdana, arial, sans-serif;
+    font-family: Cantarell, sans-serif;
     color: #666;
     background: #fff url(http://koji.fedoraproject.org/koji-static/images/header-bg.png) repeat-x;
 }
