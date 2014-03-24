@@ -495,7 +495,7 @@ def edit_issue(repo, issueid, username=None):
     )
 
 
-def request_pull(repo, requestid=None, username=None):
+def request_pull(repo, requestid, username=None):
     """ Request pulling the changes from the fork into the project.
     """
     repo = progit.lib.get_project(SESSION, repo, user=username)
