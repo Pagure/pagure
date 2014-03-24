@@ -285,3 +285,11 @@ def get_pull_request(
         )
 
     return query.first()
+
+
+def close_pull_request(session, request):
+    ''' Close the provided pull-request.
+    '''
+    request.status = False
+    session.add(request)
+    session.flush()
