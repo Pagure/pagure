@@ -90,7 +90,7 @@ def new_issue(session, repo, title, content, user):
         user=user,
     )
     session.add(issue)
-    # Make sure we won't have SQLAlchemy error before we create the repo
+    # Make sure we won't have SQLAlchemy error before we create the issue
     session.flush()
 
     return 'Issue created'
