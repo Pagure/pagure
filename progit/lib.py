@@ -96,10 +96,12 @@ def new_issue(session, repo, title, content, user):
     return 'Issue created'
 
 
-def new_pull_request(session, repo, title, user, stop_id, start_id=None):
+def new_pull_request(
+        session, repo, repo_from, title, user, stop_id, start_id=None):
     ''' Create a new pull request on the specified repo. '''
     request = model.PullRequest(
         project_id=repo.id,
+        project_id_from=repo_from.id,
         title=title,
         start_id=start_id,
         stop_id=stop_id,
