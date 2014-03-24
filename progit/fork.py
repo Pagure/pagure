@@ -45,12 +45,13 @@ def fork_project(repo, username=None):
             fork_folder=APP.config['FORK_FOLDER'],
             user=flask.g.fas_user.username)
 
-
         SESSION.commit()
         flask.flash(message)
         return flask.redirect(
-            flask.url_for('view_fork_repo',
-                username=flask.g.fas_user.username, repo=repo.name)
+            flask.url_for(
+                'view_fork_repo',
+                username=flask.g.fas_user.username,
+                repo=repo.name)
         )
     except progit.exceptions.ProgitException, err:
         flask.flash(str(err), 'error')
@@ -58,7 +59,7 @@ def fork_project(repo, username=None):
         SESSION.rollback()
         flask.flash(str(err), 'error')
 
-    return flask.redirect(flask.url_for('view_repo',repo=repo.name))
+    return flask.redirect(flask.url_for('view_repo', repo=repo.name))
 
 
 @APP.route('/fork/<username>/<repo>/request-pull/new',

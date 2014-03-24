@@ -41,8 +41,15 @@ def index():
     limit = APP.config['ITEM_PER_PAGE']
     start = limit * (page - 1)
 
-    repos = progit.lib.list_projects(SESSION, fork=False, start=start, limit=limit)
-    num_repos = progit.lib.list_projects(SESSION, fork=False, count=True)
+    repos = progit.lib.list_projects(
+        SESSION,
+        fork=False,
+        start=start,
+        limit=limit)
+    num_repos = progit.lib.list_projects(
+        SESSION,
+        fork=False,
+        count=True)
 
     total_page = int(ceil(num_repos / float(limit)))
 
@@ -350,14 +357,14 @@ def fork_request_pulls(username, repo):
 def request_pull(repo, requestid):
     """ Request pulling the changes from the fork into the project.
     """
-    return progit.app.request_pull(repo, requestid=requestid)
+    return progit.app.request_pull(repo, requestid)
 
 
 @APP.route('/fork/<username>/<repo>/request-pull/<requestid>')
 def fork_request_pull(username, repo, requestid):
     """ Request pulling the changes from the fork into the project.
     """
-    return progit.app.request_pull(repo, requestid=requestid, username=username)
+    return progit.app.request_pull(repo, requestid, username=username)
 
 
 @APP.route('/<repo>/request-pull/merge/<requestid>')

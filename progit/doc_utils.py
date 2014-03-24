@@ -77,7 +77,7 @@ def convert_readme(content, ext):
     '''
     output = content
     if ext and ext in ['.rst']:
-        output= convert_doc(unicode(content))
+        output = convert_doc(unicode(content))
     elif ext and ext in ['.mk']:
         output = markdown.markdown(content)
     return output

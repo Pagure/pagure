@@ -610,13 +610,14 @@ def merge_request_pull(repo, requestid, username=None):
     if not request:
         flask.abort(404, 'Pull-request not found')
 
-
     error_output = flask.url_for(
         'request_pull', repo=repo.name, requestid=requestid)
     if username:
         error_output = flask.url_for(
-        'fork_request_pull', repo=repo.name, requestid=requestid,
-        username=username)
+            'fork_request_pull',
+            repo=repo.name,
+            requestid=requestid,
+            username=username)
 
     # Get the fork
     repopath = os.path.join(
