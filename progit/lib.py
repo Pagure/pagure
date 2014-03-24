@@ -96,6 +96,22 @@ def new_issue(session, repo, title, content, user):
     return 'Issue created'
 
 
+def new_pull_request(session, repo, title, user, stop_id, start_id=None):
+    ''' Create a new pull request on the specified repo. '''
+    request = model.PullRequest(
+        project_id=repo.id,
+        title=title,
+        start_id=start_id,
+        stop_id=stop_id,
+        user=user,
+    )
+    session.add(request)
+    # Make sure we won't have SQLAlchemy error before we create the request
+    session.flush()
+
+    return 'Request created'
+
+
 def edit_issue(session, issue, title, content):
     ''' Edit the specified issue.
     '''
