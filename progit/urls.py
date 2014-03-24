@@ -286,14 +286,16 @@ def view_fork_tree(username, repo, identifier=None):
 def view_issues(repo):
     """ List all issues associated to a repo
     """
-    return progit.app.view_issues(repo)
+    status = flask.request.args.get('status', None)
+    return progit.app.view_issues(repo, status=status)
 
 
 @APP.route('/fork/<username>/<repo>/issues')
 def view_fork_issues(repo, username):
     """ List all issues associated to a repo
     """
-    return progit.app.view_issues(repo, username=username)
+    status = flask.request.args.get('status', None)
+    return progit.app.view_issues(repo, username=username, status=status)
 
 
 @APP.route('/<repo>/new_issue', methods=('GET', 'POST'))

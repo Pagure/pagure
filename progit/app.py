@@ -370,7 +370,7 @@ def view_tree(repo, identifier=None, username=None):
     )
 
 
-def view_issues(repo, username=None):
+def view_issues(repo, username=None, status=None):
     """ List all issues associated to a repo
     """
     repo = progit.lib.get_project(SESSION, repo, user=username)
@@ -378,7 +378,13 @@ def view_issues(repo, username=None):
     if repo is None:
         flask.abort(404)
 
-    issues = progit.lib.get_issues(SESSION, repo, status='Open')
+    if status is not None:
+        if status.lower() == 'closed':
+            issues = progit.lib.get_issues(SESSION, repo, closed=True)
+        else:
+            issues = progit.lib.get_issues(SESSION, repo, status=status)
+    else:
+        issues = progit.lib.get_issues(SESSION, repo, status='Open')
 
     return flask.render_template(
         'issues.html',
