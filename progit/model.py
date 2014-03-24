@@ -87,7 +87,7 @@ class Project(BASE):
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
 
-    parent = relation('Project', remote_side=[id])
+    parent = relation('Project', remote_side=[id], backref='forks')
 
     @property
     def path(self):
