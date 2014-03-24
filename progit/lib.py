@@ -114,7 +114,7 @@ def new_pull_request(
     return 'Request created'
 
 
-def edit_issue(session, issue, title, content):
+def edit_issue(session, issue, title=None, content=None, status=None):
     ''' Edit the specified issue.
     '''
     edit = []
@@ -124,6 +124,9 @@ def edit_issue(session, issue, title, content):
     if content != issue.content:
         issue.content = content
         edit.append('content')
+    if status != issue.status:
+        issue.status = status
+        edit.append('status')
 
     if not edit:
         return 'No changes to edit'
@@ -214,7 +217,7 @@ def get_project(session, name, user=None):
     return query.first()
 
 
-def get_issues(session, repo):
+def get_issues(session, repo, status=None):
     ''' Retrieve all the issues associated to a project
     '''
     query = session.query(
@@ -222,6 +225,11 @@ def get_issues(session, repo):
     ).filter(
         model.Issue.project_id == repo.id
     )
+
+    if status is not None:
+        query = query.filter(
+            model.Issue.status == status
+        )
 
     return query.all()
 
@@ -293,3 +301,13 @@ def close_pull_request(session, request):
     request.status = False
     session.add(request)
     session.flush()
+
+
+def get_issue_statuses(session):
+    ''' Return the complete list of status an issue can have.
+    '''
+    output = []
+    statuses = session.query(model.StatusIssue).all()
+    for status in statuses:
+        output.append(status.status)
+    return output
