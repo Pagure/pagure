@@ -667,3 +667,19 @@ def merge_request_pull(repo, requestid, username=None):
     SESSION.commit()
 
     return flask.redirect(flask.url_for('view_repo', repo=repo.name))
+
+
+def view_forks(repo, username=None):
+    """ Return the list of forks of a project.
+    """
+
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    return flask.render_template(
+        'forks.html',
+        select='forks',
+        repo=repo,
+    )

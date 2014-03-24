@@ -372,3 +372,17 @@ def fork_merge_request_pull(username, repo, requestid):
     """ Request pulling the changes from the fork into the project.
     """
     return progit.app.merge_request_pull(repo, requestid, username=username)
+
+
+@APP.route('/<repo>/forks')
+def view_forks(repo):
+    """ Presents all the forks of the project.
+    """
+    return progit.app.view_forks(repo)
+
+
+@APP.route('/fork/<username>/<repo>/forks')
+def fork_view_forks(username, repo):
+    """ Presents all the forks of the fork.
+    """
+    return progit.app.view_forks(repo, username=username)
