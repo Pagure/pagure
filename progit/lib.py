@@ -217,8 +217,13 @@ def get_project(session, name, user=None):
     return query.first()
 
 
-def get_issues(session, repo, status=None):
+def get_issues(session, repo, status=None, closed=False):
     ''' Retrieve all the issues associated to a project
+
+    Watch out that the closed argument is incompatible with the status
+    argument. The closed argument will return all the issues whose status
+    is not 'Open', otherwise it will return the issues having the specified
+    status.
     '''
     query = session.query(
         model.Issue
@@ -226,9 +231,13 @@ def get_issues(session, repo, status=None):
         model.Issue.project_id == repo.id
     )
 
-    if status is not None:
+    if status is not None and not closed:
         query = query.filter(
             model.Issue.status == status
+        )
+    if closed:
+        query = query.filter(
+            model.Issue.status != 'Open'
         )
 
     return query.all()
