@@ -208,6 +208,7 @@ class PullRequest(BASE):
                              default=datetime.datetime.utcnow)
 
     repo = relation(
-        'Project', foreign_keys=[project_id], remote_side=[Project.id])
+        'Project', foreign_keys=[project_id], remote_side=[Project.id],
+        backref='requests')
     repo_from = relation(
         'Project', foreign_keys=[project_id_from], remote_side=[Project.id])
