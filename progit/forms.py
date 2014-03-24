@@ -34,3 +34,11 @@ class IssueForm(wtf.Form):
         'Content<span class="error">*</span>',
         [wtforms.validators.Required()]
     )
+
+
+class RequestPullForm(wtf.Form):
+    ''' Form to create a request pull. '''
+    title = wtforms.TextField(
+        'Title<span class="error">*</span>',
+        [wtforms.validators.Required()]
+    )
