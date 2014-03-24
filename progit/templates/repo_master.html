@@ -16,7 +16,7 @@
   {% if branchname %} ({{ branchname }}) {% endif %}
 </h2>
 
-{% if repo.fork %}
+{% if repo.is_fork %}
 <section id="parent">
   Forked from
   <a href="{{ url_for('view_repo', repo=repo.parent.name)}}">

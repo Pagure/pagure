@@ -99,7 +99,7 @@ class Project(BASE):
         return path
 
     @property
-    def fork(self):
+    def is_fork(self):
         ''' Return a boolean specifying if the project is a fork or not '''
         return self.parent_id is not None
 
