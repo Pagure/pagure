@@ -1,0 +1,40 @@
+{% extends "repo_master.html" %}
+
+{% block title %}Home{% endblock %}
+{%block tag %}home{% endblock %}
+
+
+{% block repo %}
+
+<h2>Pull-requests</h2>
+
+<section class="requests_list">
+  {% if requests %}
+  <ul>
+    {% for request in requests %}
+    <li>
+      #{{ request.id }}
+      {% if '/fork/' in request.url %}
+      <a href="{{ url_for('fork_request_pull', username=username,
+                repo=repo.name, requestid=request.id) }}">
+      {% else %}
+      <a href="{{ url_for('request_pull',
+                repo=repo.name, requestid=request.id) }}">
+      {% endif %}
+        {{ request.title }}
+      </a>
+      <span> Opened by
+      <a href="{{ url_for('view_user', username=request.user) }}">
+      {{request.user}}
+      </a> on {{ request.date_created.strftime('%Y-%m-%d %H:%M') }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>
+    No pull-request have been opened for this project.
+  </p>
+  {% endif %}
+</section>
+
+{% endblock %}

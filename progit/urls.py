@@ -332,6 +332,20 @@ def fork_edit_issue(username, repo, issueid):
     return progit.app.edit_issue(repo, issueid, username=username)
 
 
+@APP.route('/<repo>/request-pulls')
+def request_pulls(repo):
+    """ Request pulling the changes from the fork into the project.
+    """
+    return progit.app.request_pulls(repo)
+
+
+@APP.route('/fork/<username>/<repo>/request-pulls')
+def fork_request_pulls(username, repo):
+    """ Request pulling the changes from the fork into the project.
+    """
+    return progit.app.request_pulls(repo, username=username)
+
+
 @APP.route('/<repo>/request-pull/<requestid>')
 def request_pull(repo, requestid):
     """ Request pulling the changes from the fork into the project.

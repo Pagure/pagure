@@ -499,6 +499,26 @@ def edit_issue(repo, issueid, username=None):
     )
 
 
+def request_pulls(repo, username=None):
+    """ Returns the list of pull-requests opened on a project.
+    """
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    requests = progit.lib.get_pull_requests(
+        SESSION, project_id=repo.id, status=True)
+
+    return flask.render_template(
+        'requests.html',
+        select='requests',
+        repo=repo,
+        username=username,
+        requests=requests,
+    )
+
+
 def request_pull(repo, requestid, username=None):
     """ Request pulling the changes from the fork into the project.
     """
@@ -562,6 +582,7 @@ def request_pull(repo, requestid, username=None):
 
     return flask.render_template(
         'pull_request.html',
+        select='requests',
         repo=repo,
         username=username or request.user,
         request=request,
