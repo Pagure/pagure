@@ -24,7 +24,7 @@ import progit.app
 import progit.exceptions
 import progit.lib
 import progit.forms
-from progit import APP, SESSION, LOG, __get_file_in_tree
+from progit import APP, SESSION, LOG, __get_file_in_tree, cla_required
 
 
 ### Application
@@ -163,6 +163,7 @@ def view_user(username):
 
 
 @APP.route('/new/', methods=('GET', 'POST'))
+@cla_required
 def new_project():
     """ Form to create a new project.
     """
@@ -299,6 +300,7 @@ def view_fork_issues(repo, username):
 
 
 @APP.route('/<repo>/new_issue', methods=('GET', 'POST'))
+@cla_required
 def new_issue(repo):
     """ Create a new issue
     """
@@ -306,6 +308,7 @@ def new_issue(repo):
 
 
 @APP.route('/fork/<username>/<repo>/new_issue', methods=('GET', 'POST'))
+@cla_required
 def fork_new_issue(username, repo):
     """ Create a new issue
     """
@@ -313,6 +316,7 @@ def fork_new_issue(username, repo):
 
 
 @APP.route('/<repo>/issue/<issueid>', methods=('GET', 'POST'))
+@cla_required
 def view_issue(repo, issueid):
     """ List all issues associated to a repo
     """
@@ -321,6 +325,7 @@ def view_issue(repo, issueid):
 
 @APP.route('/fork/<username>/<repo>/issue/<issueid>',
            methods=('GET', 'POST'))
+@cla_required
 def view_fork_issue(username, repo, issueid):
     """ List all issues associated to a repo
     """
@@ -328,6 +333,7 @@ def view_fork_issue(username, repo, issueid):
 
 
 @APP.route('/<repo>/issue/<issueid>/edit', methods=('GET', 'POST'))
+@cla_required
 def edit_issue(repo, issueid):
     """ Edit the specified issue
     """
@@ -336,6 +342,7 @@ def edit_issue(repo, issueid):
 
 @APP.route('/fork/<username>/<repo>/issue/<issueid>/edit',
            methods=('GET', 'POST'))
+@cla_required
 def fork_edit_issue(username, repo, issueid):
     """ Edit the specified issue opened against a fork
     """

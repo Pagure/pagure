@@ -23,12 +23,13 @@ from pygments.formatters import HtmlFormatter
 import progit.doc_utils
 import progit.lib
 import progit.forms
-from progit import APP, SESSION, LOG, __get_file_in_tree
+from progit import APP, SESSION, LOG, __get_file_in_tree, cla_required
 
 
 ### Application
 @APP.route('/do_fork/<repo>')
 @APP.route('/do_fork/<username>/<repo>')
+@cla_required
 def fork_project(repo, username=None):
     """ Fork the project specified into the user's namespace
     """
@@ -66,6 +67,7 @@ def fork_project(repo, username=None):
            methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/request-pull/new/<commitid>',
            methods=('GET', 'POST'))
+@cla_required
 def new_request_pull(username, repo, commitid=None):
     """ Request pulling the changes from the fork into the project.
     """
