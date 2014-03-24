@@ -17,7 +17,7 @@
   <form action="{{ url_for('view_issue',
                    repo=repo.name, issueid=issue.id) }}" method="post">
   {% endif %}
-  <ul>
+  <ul class="inline">
     <li>
       {% if '/fork/' in request.url %}
       <a href="{{ url_for('fork_edit_issue', username=username,
