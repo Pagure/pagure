@@ -1,0 +1,55 @@
+{% extends "repo_master.html" %}
+
+{% block title %}Wiki - {{ repo.name }}{% endblock %}
+{%block tag %}home{% endblock %}
+
+
+{% block repo %}
+
+<h2>Wiki</h2>
+<h3>
+  <a href="{{ url_for('view_wiki', username=username,
+              repo=repo.name, branchname=branchname) }}">
+  {{ branchname }}</a>/{% if filename %}{%
+  for file in filename.split('/') %}
+    {% if loop.first %}
+    {% set path = file %}
+    {% else %}
+    {% set path = path + '/' + file %}
+    {% endif %}
+    {% if loop.index != loop.length %}<a href="{{
+        url_for('view_wiki', username=username,
+                repo=repo.name, branchname=branchname, filename=path) }}"
+    >{{ file }}</a>/{% else %}{{ file }}{% endif %}
+  {% endfor %}{% endif %}
+</h3>
+
+{% if tree %}
+<section class="tree_view">
+    <ul>
+    {% for entry in tree %}
+    <li>
+      {% if entry.filemode == 16384 %}
+      [ ]
+      <a href="{{ url_for('view_wiki', username=username,
+                repo=repo.name, branchname=branchname,
+                filename=filename + '/' + entry.name if filename else entry.name) }}">
+      {% else %}
+      <a href="{{ url_for('view_wiki', username=username,
+                repo=repo.name, branchname=branchname,
+                filename=filename.rsplit('/', 1)[0] + '/' + entry.name if filename else entry.name) }}">
+      {% endif %}
+       {{ entry.name }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+<section class="repos_list">
+  {% autoescape false %}
+  {{ content }}
+  {% endautoescape %}
+</section>
+
+{% endblock %}

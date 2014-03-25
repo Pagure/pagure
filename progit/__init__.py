@@ -187,3 +187,4 @@ import progit.app
 import progit.fork
 import progit.issues
 import progit.repo
+import progit.wiki
