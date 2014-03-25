@@ -35,6 +35,7 @@
         {% endif %}
           Overview</a>
       </li>
+
       <li {% if select == 'logs' %}class="selected" {% endif %}>
         {% if '/fork/' in request.url %}
           <a href="{{ url_for('view_fork_log', username=username,
@@ -43,6 +44,7 @@
           <a href="{{ url_for('view_log', repo=repo.name) }}">Logs</a>
         {% endif %}
       </li>
+
       <li {% if select == 'tree' %}class="selected" {% endif %}>
         {% if '/fork/' in request.url %}
           <a href="{{ url_for('view_fork_tree', username=username,
