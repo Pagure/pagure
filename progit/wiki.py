@@ -80,6 +80,9 @@ def do_view_wiki(repo, username=None, branchname=None, filename=None):
     if not repo:
         flask.abort(404, 'Project not found')
 
+    if not repo.project_wiki:
+        flask.abort(404, 'No documentation found for this project')
+
     reponame = os.path.join(APP.config['WIKI_FOLDER'], repo.path)
     repo_obj = pygit2.Repository(reponame)
 
