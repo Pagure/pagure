@@ -378,6 +378,9 @@ def view_issues(repo, username=None, status=None):
     if repo is None:
         flask.abort(404, 'Project not found')
 
+    if not repo.issue_tracker:
+        flask.abort(404, 'No issue tracker found for this project')
+
     if status is not None:
         if status.lower() == 'closed':
             issues = progit.lib.get_issues(SESSION, repo, closed=True)
@@ -444,6 +447,9 @@ def view_issue(repo, issueid, username=None):
     if repo is None:
         flask.abort(404, 'Project not found')
 
+    if not repo.issue_tracker:
+        flask.abort(404, 'No issue tracker found for this project')
+
     issue = progit.lib.get_issue(SESSION, issueid)
 
     if issue is None:
@@ -489,6 +495,9 @@ def edit_issue(repo, issueid, username=None):
 
     if repo is None:
         flask.abort(404, 'Project not found')
+
+    if not repo.issue_tracker:
+        flask.abort(404, 'No issue tracker found for this project')
 
     issue = progit.lib.get_issue(SESSION, issueid)
 
