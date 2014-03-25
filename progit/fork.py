@@ -26,7 +26,231 @@ import progit.forms
 from progit import APP, SESSION, LOG, __get_file_in_tree, cla_required
 
 
-### Application
+def do_merge_request_pull(repo, requestid, username=None):
+    """ Merge a request pulling the changes from the fork into the project.
+    """
+
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    request = progit.lib.get_pull_request(
+        SESSION, project_id=repo.id, requestid=requestid)
+
+    if not request:
+        flask.abort(404, 'Pull-request not found')
+
+    error_output = flask.url_for(
+        'request_pull', repo=repo.name, requestid=requestid)
+    if username:
+        error_output = flask.url_for(
+            'fork_request_pull',
+            repo=repo.name,
+            requestid=requestid,
+            username=username)
+
+    # Get the fork
+    repopath = os.path.join(
+        APP.config['FORK_FOLDER'], request.repo_from.path)
+    fork_obj = pygit2.Repository(repopath)
+
+    # Get the original repo
+    parentpath = os.path.join(APP.config['GIT_FOLDER'], request.repo.path)
+    orig_repo = pygit2.Repository(parentpath)
+
+    if orig_repo.get(request.stop_id, None):
+        flask.flash('These chanages have already been merged.', 'error')
+        # Update status
+        progit.lib.close_pull_request(SESSION, request)
+        SESSION.commit()
+        return flask.redirect(error_output)
+
+    # Clone the original repo into a temp folder
+    newpath = tempfile.mkdtemp()
+    new_repo = pygit2.clone_repository(parentpath, newpath)
+
+    repo_commit = fork_obj[request.stop_id]
+
+    ori_remote = new_repo.remotes[0]
+    # Add the fork as remote repo
+    reponame = '%s_%s' % (request.user, repo.name)
+    remote = new_repo.create_remote(reponame, repopath)
+
+    # Fetch the commits
+    remote.fetch()
+
+    merge = new_repo.merge(repo_commit.oid)
+    master_ref = new_repo.lookup_reference('HEAD').resolve()
+
+    if merge.is_fastforward:
+        master_ref.target = merge.fastforward_oid
+        refname = '%s:%s' % (master_ref.name, master_ref.name)
+        ori_remote.push(refname)
+        flask.flash('Changes merged!')
+    else:
+        flask.flash(
+            'This merge is not fast-forward and cannot be applied via '
+            'progit', 'error')
+        flask.redirect(error_output)
+
+    # Update status
+    progit.lib.close_pull_request(SESSION, request)
+    SESSION.commit()
+
+    return flask.redirect(flask.url_for('view_repo', repo=repo.name))
+
+
+def do_request_pull(repo, requestid, username=None):
+    """ Request pulling the changes from the fork into the project.
+    """
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    request = progit.lib.get_pull_request(
+        SESSION, project_id=repo.id, requestid=requestid)
+
+    if not request:
+        flask.abort(404, 'Pull-request not found')
+
+    repopath = os.path.join(
+        APP.config['FORK_FOLDER'], request.repo_from.path)
+    repo_obj = pygit2.Repository(repopath)
+
+    parentname = os.path.join(
+        APP.config['GIT_FOLDER'], request.repo.path)
+    orig_repo = pygit2.Repository(parentname)
+
+    diff_commits = []
+    diffs = []
+    repo_commit = repo_obj[request.stop_id]
+    if not repo_obj.is_empty and not orig_repo.is_empty:
+        orig_commit = orig_repo[request.start_id]
+
+        for commit in repo_obj.walk(request.stop_id, pygit2.GIT_SORT_TIME):
+            if commit.oid.hex == orig_commit.oid.hex:
+                break
+            diff_commits.append(commit)
+            diffs.append(
+                repo_obj.diff(
+                    repo_obj.revparse_single(commit.parents[0].oid.hex),
+                    repo_obj.revparse_single(commit.oid.hex)
+                )
+            )
+
+    elif orig_repo.is_empty:
+        orig_commit = None
+        diff = repo_commit.tree.diff_to_tree(swap=True)
+    else:
+        flask.flash(
+            'Fork is empty, there are no commits to request pulling',
+            'error')
+        return flask.redirect(flask.url_for(
+            'view_fork_repo', username=username, repo=repo.name))
+
+    html_diffs = []
+    for diff in diffs:
+        html_diffs.append(
+            highlight(
+                diff.patch,
+                DiffLexer(),
+                HtmlFormatter(
+                    noclasses=True,
+                    style="tango",)
+            )
+        )
+
+    return flask.render_template(
+        'pull_request.html',
+        select='requests',
+        repo=repo,
+        username=username or request.user,
+        request=request,
+        repo_obj=repo_obj,
+        orig_repo=orig_repo,
+        diff_commits=diff_commits,
+        diffs=diffs,
+        html_diffs=html_diffs,
+    )
+
+
+def do_request_pulls(repo, username=None, status=True):
+    """ Returns the list of pull-requests opened on a project.
+    """
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    if status is False or str(status).lower() == 'closed':
+        requests = progit.lib.get_pull_requests(
+            SESSION, project_id=repo.id, status=False)
+    else:
+        requests = progit.lib.get_pull_requests(
+            SESSION, project_id=repo.id, status=status)
+
+    return flask.render_template(
+        'requests.html',
+        select='requests',
+        repo=repo,
+        username=username,
+        requests=requests,
+        status=status,
+    )
+
+
+## URLs
+
+
+@APP.route('/<repo>/request-pulls')
+def request_pulls(repo):
+    """ Request pulling the changes from the fork into the project.
+    """
+    status = flask.request.args.get('status', True)
+    return do_request_pulls(repo, status=status)
+
+
+@APP.route('/fork/<username>/<repo>/request-pulls')
+def fork_request_pulls(username, repo):
+    """ Request pulling the changes from the fork into the project.
+    """
+    status = flask.request.args.get('status', True)
+    return do_request_pulls(repo, username=username, status=status)
+
+
+@APP.route('/<repo>/request-pull/<requestid>')
+def request_pull(repo, requestid):
+    """ Request pulling the changes from the fork into the project.
+    """
+    return do_request_pull(repo, requestid)
+
+
+@APP.route('/fork/<username>/<repo>/request-pull/<requestid>')
+def fork_request_pull(username, repo, requestid):
+    """ Request pulling the changes from the fork into the project.
+    """
+    return do_request_pull(repo, requestid, username=username)
+
+
+@APP.route('/<repo>/request-pull/merge/<requestid>')
+def merge_request_pull(repo, requestid):
+    """ Request pulling the changes from the fork into the project.
+    """
+    return do_merge_request_pull(repo, requestid)
+
+
+@APP.route('/fork/<username>/<repo>/request-pull/merge/<requestid>')
+def fork_merge_request_pull(username, repo, requestid):
+    """ Request pulling the changes from the fork into the project.
+    """
+    return do_merge_request_pull(repo, requestid, username=username)
+
+
+## Specific actions
+
+
 @APP.route('/do_fork/<repo>')
 @APP.route('/do_fork/<username>/<repo>')
 @cla_required
