@@ -46,10 +46,12 @@
 </section>
 {% endif %}
 
-<section class="repos_list">
+{% if content %}
+<section class="file_content">
   {% autoescape false %}
   {{ content }}
   {% endautoescape %}
 </section>
+{% endif %}
 
 {% endblock %}
