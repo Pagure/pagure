@@ -416,6 +416,13 @@ th.month .ui-button-text {
     padding-left:1em;
 }
 
+.docs_content {
+    border-style:solid;
+    border-width:5px;
+    border-color:#3979D3;
+    padding-left:1em;
+}
+
 .inline h2, .inline a, .inline li{
     display: inline-block;
 }
