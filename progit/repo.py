@@ -182,11 +182,12 @@ def do_view_log(repo, branchname=None, username=None):
 
     n_commits = 0
     last_commits = []
-    for commit in repo_obj.walk(
-            branch.get_object().hex, pygit2.GIT_SORT_TIME):
-        if n_commits >= start and n_commits <= end:
-            last_commits.append(commit)
-        n_commits += 1
+    if branch:
+        for commit in repo_obj.walk(
+                branch.get_object().hex, pygit2.GIT_SORT_TIME):
+            if n_commits >= start and n_commits <= end:
+                last_commits.append(commit)
+            n_commits += 1
 
     total_page = int(ceil(n_commits / float(limit)))
 
@@ -215,6 +216,7 @@ def do_view_log(repo, branchname=None, username=None):
         'repo_info.html',
         select='logs',
         origin=origin,
+        repo_obj=repo_obj,
         repo=repo,
         username=username,
         branches=sorted(repo_obj.listall_branches()),
@@ -342,25 +344,30 @@ def do_view_tree(repo, identifier=None, username=None):
         reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
     repo_obj = pygit2.Repository(reponame)
 
-    if identifier in repo_obj.listall_branches():
-        branchname = identifier
-        branch = repo_obj.lookup_branch(identifier)
-        commit = branch.get_object()
-    else:
-        try:
-            commit = repo_obj.get(identifier)
+    branchname = None
+    content = None
+    output_type = None
+    if not repo_obj.is_empty:
+        if identifier in repo_obj.listall_branches():
             branchname = identifier
-        except (ValueError, TypeError):
-            # If it's not a commit id then it's part of the filename
-            commit = repo_obj[repo_obj.head.target]
-            branchname = 'master'
+            branch = repo_obj.lookup_branch(identifier)
+            commit = branch.get_object()
+        else:
+            try:
+                commit = repo_obj.get(identifier)
+                branchname = identifier
+            except (ValueError, TypeError):
+                # If it's not a commit id then it's part of the filename
+                commit = repo_obj[repo_obj.head.target]
+                branchname = 'master'
 
-    content = sorted(commit.tree, key=lambda x: x.filemode)
-    output_type = 'tree'
+        content = sorted(commit.tree, key=lambda x: x.filemode)
+        output_type = 'tree'
 
     return flask.render_template(
         'file.html',
         select='tree',
+        repo_obj=repo_obj,
         repo=repo,
         username=username,
         branchname=branchname,
