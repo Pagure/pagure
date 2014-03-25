@@ -298,7 +298,7 @@ def view_commit(repo, commitid, username=None):
     try:
         commit = repo_obj.get(commitid)
     except ValueError:
-        flask.abort(404)
+        flask.abort(404, 'Commit not found')
 
     if commit.parents:
         diff = commit.tree.diff_to_tree()
