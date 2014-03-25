@@ -108,7 +108,7 @@ def do_view_wiki(repo, username=None, branchname=None, filename=None):
 
     return flask.render_template(
         'wiki.html',
-        select='wiki',
+        select='docs',
         repo=repo,
         username=username,
         branchname=branchname,
@@ -121,15 +121,15 @@ def do_view_wiki(repo, username=None, branchname=None, filename=None):
 ## URLs
 
 
-@APP.route('/<repo>/wiki')
-@APP.route('/<repo>/wiki/<path:filename>')
-@APP.route('/<repo>/wiki/<branchname>')
-@APP.route('/<repo>/wiki/<branchname>/<path:filename>')
+@APP.route('/<repo>/docs')
+@APP.route('/<repo>/docs/<path:filename>')
+@APP.route('/<repo>/docs/<branchname>')
+@APP.route('/<repo>/docs/<branchname>/<path:filename>')
 
-@APP.route('/fork/<username>/<repo>/wiki')
-@APP.route('/fork/<username>/<repo>/wiki/<path:filename>')
-@APP.route('/fork/<username>/<repo>/wiki/<branchname>')
-@APP.route('/fork/<username>/<repo>/wiki/<branchname>/<path:filename>')
+@APP.route('/fork/<username>/<repo>/docs')
+@APP.route('/fork/<username>/<repo>/docs/<path:filename>')
+@APP.route('/fork/<username>/<repo>/docs/<branchname>')
+@APP.route('/fork/<username>/<repo>/docs/<branchname>/<path:filename>')
 def view_wiki(repo, username=None, branchname=None, filename=None):
     """ Display the documentation
     """
