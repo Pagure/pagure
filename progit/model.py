@@ -102,6 +102,7 @@ class Project(BASE):
         sa.Integer,
         sa.ForeignKey('projects.id', onupdate='CASCADE'),
         nullable=True)
+    issue_tracker = sa.Column(sa.Boolean, nullable=False, default=True)
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
