@@ -94,6 +94,7 @@ def do_view_wiki(repo, username=None, branchname=None, filename=None):
         branchname = 'master'
 
     content = None
+    tree = None
     startswith = False
     if not filename:
         path = ['index']
