@@ -266,8 +266,9 @@ def fork_project(repo, username=None):
         message = progit.lib.fork_project(
             session=SESSION,
             repo=repo,
-            repo_folder=APP.config['GIT_FOLDER'],
-            fork_folder=APP.config['FORK_FOLDER'],
+            repofolder=APP.config['GIT_FOLDER'],
+            forkfolder=APP.config['FORK_FOLDER'],
+            docfolder=APP.config['WIKI_FOLDER'],
             user=flask.g.fas_user.username)
 
         SESSION.commit()

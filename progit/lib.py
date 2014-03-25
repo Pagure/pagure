@@ -56,11 +56,11 @@ def get_user_project(session, username):
     return query.all()
 
 
-def new_project(session, user, name, folder,
+def new_project(session, user, name, gitfolder, docfolder,
                 description=None, parent_id=None):
     ''' Create a new project based on the information provided.
     '''
-    gitrepo = os.path.join(folder, '%s.git' % name)
+    gitrepo = os.path.join(gitfolder, '%s.git' % name)
     if os.path.exists(gitrepo):
         raise progit.exceptions.RepoExistsException(
             'The project "%s" already exists' % name
@@ -76,6 +76,13 @@ def new_project(session, user, name, folder,
     # Make sure we won't have SQLAlchemy error before we create the repo
     session.flush()
 
+    pygit2.init_repository(gitrepo, bare=True)
+
+    gitrepo = os.path.join(docfolder, project.path)
+    if os.path.exists(gitrepo):
+        raise progit.exceptions.RepoExistsException(
+            'The wiki "%s" already exists' % project.path
+        )
     pygit2.init_repository(gitrepo, bare=True)
 
     return 'Project "%s" created' % name
@@ -136,7 +143,7 @@ def edit_issue(session, issue, title=None, content=None, status=None):
         return 'Edited successfully issue #%s' % issue.id
 
 
-def fork_project(session, user, repo, repo_folder, fork_folder):
+def fork_project(session, user, repo, gitfolder, forkfolder, docfolder):
     ''' Fork a given project into the user's forks. '''
     reponame = os.path.join(repo_folder, repo.path)
     forkreponame = os.path.join(fork_folder, user, repo.path)
@@ -156,6 +163,13 @@ def fork_project(session, user, repo, repo_folder, fork_folder):
     session.flush()
 
     pygit2.clone_repository(reponame, forkreponame, bare=True)
+
+    gitrepo = os.path.join(docfolder, project.path)
+    if os.path.exists(gitrepo):
+        raise progit.exceptions.RepoExistsException(
+            'The wiki "%s" already exists' % project.path
+        )
+    pygit2.init_repository(gitrepo, bare=True)
 
     return 'Repo "%s" cloned to "%s/%s"' % (repo.name, user, repo.name)
 
