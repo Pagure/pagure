@@ -6,52 +6,78 @@
 
 {% block repo %}
 
-<h2>Wiki</h2>
-<h3>
-  <a href="{{ url_for('view_wiki', username=username,
-              repo=repo.name, branchname=branchname) }}">
-  {{ branchname }}</a>/{% if filename %}{%
-  for file in filename.split('/') %}
-    {% if loop.first %}
-    {% set path = file %}
-    {% else %}
-    {% set path = path + '/' + file %}
-    {% endif %}
-    {% if loop.index != loop.length %}<a href="{{
-        url_for('view_wiki', username=username,
-                repo=repo.name, branchname=branchname, filename=path) }}"
-    >{{ file }}</a>/{% else %}{{ file }}{% endif %}
-  {% endfor %}{% endif %}
-</h3>
+<h2>Docs</h2>
 
-{% if tree %}
-<section class="tree_view">
-    <ul>
-    {% for entry in tree %}
-    <li>
-      {% if entry.filemode == 16384 %}
-      [ ]
-      <a href="{{ url_for('view_wiki', username=username,
-                repo=repo.name, branchname=branchname,
-                filename=filename + '/' + entry.name if filename else entry.name) }}">
+{% if repo_obj and repo_obj.is_empty %}
+
+  <section class="repo_info">
+    <p>This repo is brand new!</p>
+
+    <p>If you already have a git repo:</p>
+    <pre>
+      git remote add origin https://githosted.org/{{ repo.name }}.git
+      git push -u origin master
+    </pre>
+
+    <p>If you have no create your git repo yet:</p>
+    <pre>
+      touch README.rst
+      git init
+      git add README.rst
+      git commit -m "Add README file"
+      git remote add origin https://githosted.org/{{ repo.name }}.git
+      git push -u origin master
+    </pre>
+
+    </section>
+
+{% else %}
+  <h3>
+    <a href="{{ url_for('view_wiki', username=username,
+                repo=repo.name, branchname=branchname) }}">
+    {{ branchname }}</a>/{% if filename %}{%
+    for file in filename.split('/') %}
+      {% if loop.first %}
+      {% set path = file %}
       {% else %}
-      <a href="{{ url_for('view_wiki', username=username,
-                repo=repo.name, branchname=branchname,
-                filename=filename.rsplit('/', 1)[0] + '/' + entry.name if filename else entry.name) }}">
+      {% set path = path + '/' + file %}
       {% endif %}
-       {{ entry.name }}</a>
-    </li>
-    {% endfor %}
-  </ul>
-</section>
-{% endif %}
+      {% if loop.index != loop.length %}<a href="{{
+          url_for('view_wiki', username=username,
+                  repo=repo.name, branchname=branchname, filename=path) }}"
+      >{{ file }}</a>/{% else %}{{ file }}{% endif %}
+    {% endfor %}{% endif %}
+  </h3>
 
-{% if content %}
-<section class="file_content">
-  {% autoescape false %}
-  {{ content }}
-  {% endautoescape %}
-</section>
+  {% if tree %}
+  <section class="tree_view">
+      <ul>
+      {% for entry in tree %}
+      <li>
+        {% if entry.filemode == 16384 %}
+        [ ]
+        <a href="{{ url_for('view_wiki', username=username,
+                  repo=repo.name, branchname=branchname,
+                  filename=filename + '/' + entry.name if filename else entry.name) }}">
+        {% else %}
+        <a href="{{ url_for('view_wiki', username=username,
+                  repo=repo.name, branchname=branchname,
+                  filename=filename.rsplit('/', 1)[0] + '/' + entry.name if filename else entry.name) }}">
+        {% endif %}
+         {{ entry.name }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  {% if content %}
+  <section class="file_content">
+    {% autoescape false %}
+    {{ content }}
+    {% endautoescape %}
+  </section>
+  {% endif %}
 {% endif %}
 
 {% endblock %}
