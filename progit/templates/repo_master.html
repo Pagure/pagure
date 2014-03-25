@@ -51,6 +51,8 @@
           <a href="{{ url_for('view_tree', repo=repo.name) }}">Tree</a>
         {% endif %}
       </li>
+
+      {% if repo.issue_tracker %}
       <li {% if select == 'issues' %}class="selected" {% endif %}>
         {% if '/fork/' in request.url %}
           <a href="{{ url_for('view_fork_issues', username=username,
@@ -60,6 +62,8 @@
         {% endif %}
               Issues</a>
       </li>
+      {% endif %}
+
       <li {% if select == 'requests' %}class="selected" {% endif %}>
         {% if '/fork/' in request.url %}
           <a href="{{ url_for('fork_request_pulls', username=username,
