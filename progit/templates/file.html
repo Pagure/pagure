@@ -39,6 +39,7 @@ else %}<a href="{{ url_for('view_file',
 </h2>
 
 <h3>Tree</h3>
+{% if content %}
 <section class="repos_list">
   {% if output_type=='file' %}
   {% autoescape false %}
@@ -70,5 +71,8 @@ else %}<a href="{{ url_for('view_file',
   </ul>
   {% endif %}
 </section>
+{% else %}
+No content found in this repository
+{% endif %}
 
 {% endblock %}
