@@ -112,6 +112,7 @@ def do_view_wiki(repo, username=None, branchname=None, filename=None):
     return flask.render_template(
         'wiki.html',
         select='docs',
+        repo_obj=repo_obj,
         repo=repo,
         username=username,
         branchname=branchname,
