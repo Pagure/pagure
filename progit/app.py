@@ -34,7 +34,7 @@ def view_repo(repo, username=None):
     repo = progit.lib.get_project(SESSION, repo, user=username)
 
     if repo is None:
-        flask.abort(404)
+        flask.abort(404, 'Project not found')
 
     reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
     if repo.is_fork:
@@ -99,7 +99,7 @@ def view_repo_branch(repo, branchname, username=None):
     repo = progit.lib.get_project(SESSION, repo, user=username)
 
     if not repo:
-        flask.abort(404)
+        flask.abort(404, 'Project not found')
 
     reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
     if repo.is_fork:
@@ -156,7 +156,7 @@ def view_log(repo, branchname=None, username=None):
     repo = progit.lib.get_project(SESSION, repo, user=username)
 
     if not repo:
-        flask.abort(404)
+        flask.abort(404, 'Project not found')
 
     reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
     if repo.is_fork:
@@ -232,7 +232,7 @@ def view_file(repo, identifier, filename, username=None):
     repo = progit.lib.get_project(SESSION, repo, user=username)
 
     if not repo:
-        flask.abort(404)
+        flask.abort(404, 'Project not found')
 
     reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
     if repo.is_fork:
@@ -288,7 +288,7 @@ def view_commit(repo, commitid, username=None):
     repo = progit.lib.get_project(SESSION, repo, user=username)
 
     if not repo:
-        flask.abort(404)
+        flask.abort(404, 'Project not found')
 
     reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
     if repo.is_fork:
@@ -335,7 +335,7 @@ def view_tree(repo, identifier=None, username=None):
     repo = progit.lib.get_project(SESSION, repo, user=username)
 
     if repo is None:
-        flask.abort(404)
+        flask.abort(404, 'Project not found')
 
     reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
     if repo.is_fork:
@@ -376,7 +376,7 @@ def view_issues(repo, username=None, status=None):
     repo = progit.lib.get_project(SESSION, repo, user=username)
 
     if repo is None:
-        flask.abort(404)
+        flask.abort(404, 'Project not found')
 
     if status is not None:
         if status.lower() == 'closed':
