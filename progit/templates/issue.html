@@ -10,21 +10,12 @@
 <h2>Issue #{{ issue.id }}</h2>
 
 <section class="issue_action">
-  {% if username %}
-  <form action="{{ url_for('view_fork_issue', username=username,
+  <form action="{{ url_for('view_issue', username=username,
                    repo=repo.name, issueid=issue.id) }}" method="post">
-  {% else %}
-  <form action="{{ url_for('view_issue',
-                   repo=repo.name, issueid=issue.id) }}" method="post">
-  {% endif %}
   <ul class="inline">
     <li>
-      {% if '/fork/' in request.url %}
-      <a href="{{ url_for('fork_edit_issue', username=username,
+      <a href="{{ url_for('edit_issue', username=username,
                   repo=repo.name, issueid=issue.id) }}">
-      {% else %}
-      <a href="{{ url_for('edit_issue', repo=repo.name, issueid=issue.id) }}">
-      {% endif %}
         Edit</a>
     </li>
     {{ render_field_in_list(form.status) }}

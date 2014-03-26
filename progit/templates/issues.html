@@ -14,31 +14,19 @@
     Issues
   </h2>
     {% if status and status != 'Open' %}
-        {% if '/fork/' in request.url %}
-          <a href="{{ url_for('view_fork_issues', username=username,
-                     repo=repo.name) }}">
-        {% else %}
-          <a href="{{ url_for('view_issues', repo=repo.name) }}">
-        {% endif %}
-        (Open)</a>
+      <a href="{{ url_for('view_issues', username=username,
+                 repo=repo.name) }}">
+      (Open)</a>
     {% else %}
-        {% if '/fork/' in request.url %}
-          <a href="{{ url_for('view_fork_issues', username=username,
-                     repo=repo.name) }}?status=Closed">
-        {% else %}
-          <a href="{{ url_for('view_issues', repo=repo.name) }}?status=Closed">
-        {% endif %}
-        (Closed)</a>
+      <a href="{{ url_for('view_issues', username=username,
+                 repo=repo.name) }}?status=Closed">
+      (Closed)</a>
     {% endif %}
 </div>
 
 <span class="create_issue">
-    {% if '/fork/' in request.url %}
-      <a href="{{ url_for('fork_new_issue', username=username, repo=repo.name) }}">
-    {% else %}
-      <a href="{{ url_for('new_issue', repo=repo.name) }}">
-    {% endif %}
-        <button>Create new issue</button>
+    <a href="{{ url_for('new_issue', username=username, repo=repo.name) }}">
+      <button>Create new issue</button>
     </a>
 </span>
 
@@ -48,13 +36,8 @@
     {% for issue in issues %}
     <li>
       #{{ issue.id }}
-      {% if '/fork/' in request.url %}
-      <a href="{{ url_for('view_fork_issue', username=username,
+      <a href="{{ url_for('view_issue', username=username,
                 repo=repo.name, issueid=issue.id) }}">
-      {% else %}
-      <a href="{{ url_for('view_issue',
-                repo=repo.name, issueid=issue.id) }}">
-      {% endif %}
         {{ issue.title }}
       </a>
       <span> Opened by
