@@ -75,7 +75,7 @@ def __get_tree_and_content(repo_obj, commit, path, startswith):
         name, ext = os.path.splitext(blob_or_tree.name)
         content = progit.doc_utils.convert_readme(blob_or_tree_obj.data, ext)
     else:  # Returned a tree
-        raise progit.exceptions.FileNotException('File not found')
+        raise progit.exceptions.FileNotFoundException('File not found')
 
     tree = sorted(tree_obj, key=lambda x: x.filemode)
     return (tree, content)
