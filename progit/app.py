@@ -163,7 +163,6 @@ def view_user(username):
     )
 
 
-
 @APP.route('/new/', methods=('GET', 'POST'))
 @cla_required
 def new_project():
@@ -196,4 +195,3 @@ def new_project():
         'new_project.html',
         form=form,
     )
-
