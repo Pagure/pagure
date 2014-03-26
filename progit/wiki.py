@@ -96,6 +96,13 @@ def view_wiki(repo, username=None, branchname=None, filename=None):
         flask.abort(404, 'No documentation found for this project')
 
     reponame = os.path.join(APP.config['WIKI_FOLDER'], repo.path)
+    if not os.path.exists(reponame):
+        flask.flash(
+            'No wiki repository could be found, please contact an admin',
+            'error')
+        return flask.redirect(flask.url_for(
+            'view_repo', repo=repo.name, username=username))
+
     repo_obj = pygit2.Repository(reponame)
 
     if branchname in repo_obj.listall_branches():
