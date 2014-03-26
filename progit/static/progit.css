@@ -424,6 +424,20 @@ th.month .ui-button-text {
     min-height: 400px;
 }
 
+.sep {
+    background: #adadad no-repeat scroll center;
+    margin:auto;
+    width:50em;
+    height:2px;
+    margin-top:1em;
+    margin-bottom:1em;
+}
+
 .inline h2, .inline a, .inline li{
     display: inline-block;
+}
+
+#comment {
+   min-width: 500px;
+   min-height: 120px;
 }

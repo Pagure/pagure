@@ -30,7 +30,6 @@
     {{ render_field_in_list(form.status) }}
     <li>
       <input type="submit" class="submit positive button" value="Update">
-
     </li>
   </ul>
   {{ form.csrf_token }}
@@ -47,6 +46,44 @@
       {{ issue.content | rst2html }}
     {% endautoescape %}
   </span>
+  <p>
+      Opened by
+      <a href="{{ url_for('view_user', username=issue.user)}}">
+        {{ issue.user }}
+      </a>
+      on {{ issue.date_created | humanize}}
+    </p>
+</section>
+
+<div class="sep"></div>
+
+<section class="issue_comments">
+  {% for comment in issue.comments %}
+  <span class="comment_body">
+    {% autoescape false %}
+      {{ comment.comment | rst2html }}
+    {% endautoescape %}
+    <p>
+      <a href="{{ url_for('view_user', username=comment.user)}}">
+        {{ comment.user }}
+      </a>
+      on {{ comment.date_created | humanize}}
+    </p>
+  </span>
+  {% endfor %}
+</section>
+
+<div class="sep"></div>
+
+<section class="add_comment">
+  <form action="{{ url_for('add_comment_issue', username=username,
+                   repo=repo.name, issueid=issue.id) }}" method="post">
+    <div>
+      <textarea id="comment" name="comment" title="comment"></textarea>
+    </div>
+  {{ form.csrf_token }}
+  <input type="submit" class="submit positive button" value="Comment">
+  </form>
 </section>
 
 {% endblock %}
