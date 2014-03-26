@@ -72,9 +72,24 @@ def __get_tree_and_content(repo_obj, commit, path, startswith):
     return (tree, content)
 
 
-def do_view_wiki(repo, username=None, branchname=None, filename=None):
-    """ List all issues associated to a repo
+
+## URLs
+
+
+@APP.route('/<repo>/docs')
+@APP.route('/<repo>/docs/<path:filename>')
+@APP.route('/<repo>/docs/<branchname>')
+@APP.route('/<repo>/docs/<branchname>/<path:filename>')
+
+@APP.route('/fork/<username>/<repo>/docs')
+@APP.route('/fork/<username>/<repo>/docs/<path:filename>')
+@APP.route('/fork/<username>/<repo>/docs/<branchname>')
+@APP.route('/fork/<username>/<repo>/docs/<branchname>/<path:filename>')
+def view_wiki(repo, username=None, branchname=None, filename=None):
+    """ Display the documentation
     """
+    status = flask.request.args.get('status', None)
+
     repo = progit.lib.get_project(SESSION, repo, user=username)
 
     if not repo:
@@ -121,22 +136,3 @@ def do_view_wiki(repo, username=None, branchname=None, filename=None):
         content=content,
     )
 
-
-## URLs
-
-
-@APP.route('/<repo>/docs')
-@APP.route('/<repo>/docs/<path:filename>')
-@APP.route('/<repo>/docs/<branchname>')
-@APP.route('/<repo>/docs/<branchname>/<path:filename>')
-
-@APP.route('/fork/<username>/<repo>/docs')
-@APP.route('/fork/<username>/<repo>/docs/<path:filename>')
-@APP.route('/fork/<username>/<repo>/docs/<branchname>')
-@APP.route('/fork/<username>/<repo>/docs/<branchname>/<path:filename>')
-def view_wiki(repo, username=None, branchname=None, filename=None):
-    """ Display the documentation
-    """
-    status = flask.request.args.get('status', None)
-    return do_view_wiki(
-        repo, username=username, branchname=branchname, filename=filename)
