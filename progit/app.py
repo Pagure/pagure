@@ -180,7 +180,7 @@ def new_project():
                 description=description,
                 user=flask.g.fas_user.username,
                 gitfolder=APP.config['GIT_FOLDER'],
-                docfolder=APP.config['WIKI_FOLDER'],
+                docfolder=APP.config['DOCS_FOLDER'],
             )
             SESSION.commit()
             flask.flash(message)

@@ -95,7 +95,7 @@ def new_project(session, user, name, gitfolder, docfolder,
     gitrepo = os.path.join(docfolder, project.path)
     if os.path.exists(gitrepo):
         raise progit.exceptions.RepoExistsException(
-            'The wiki "%s" already exists' % project.path
+            'The docs "%s" already exists' % project.path
         )
     pygit2.init_repository(gitrepo, bare=True)
 
@@ -181,7 +181,7 @@ def fork_project(session, user, repo, gitfolder, forkfolder, docfolder):
     gitrepo = os.path.join(docfolder, project.path)
     if os.path.exists(gitrepo):
         raise progit.exceptions.RepoExistsException(
-            'The wiki "%s" already exists' % project.path
+            'The docs "%s" already exists' % project.path
         )
     pygit2.init_repository(gitrepo, bare=True)
 

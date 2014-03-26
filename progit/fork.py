@@ -230,7 +230,7 @@ def fork_project(repo, username=None):
             repo=repo,
             repofolder=APP.config['GIT_FOLDER'],
             forkfolder=APP.config['FORK_FOLDER'],
-            docfolder=APP.config['WIKI_FOLDER'],
+            docfolder=APP.config['DOCS_FOLDER'],
             user=flask.g.fas_user.username)
 
         SESSION.commit()

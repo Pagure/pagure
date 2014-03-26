@@ -42,9 +42,9 @@ FORK_FOLDER = os.path.join(
     'forks'
 )
 
-# Folder containing the wiki repos
-WIKI_FOLDER = os.path.join(
+# Folder containing the docs repos
+DOCS_FOLDER = os.path.join(
     os.path.abspath(os.path.dirname(__file__)),
     '..',
-    'wikis'
+    'docs'
 )

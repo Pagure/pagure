@@ -82,7 +82,7 @@ def __get_tree_and_content(repo_obj, commit, path, startswith):
 @APP.route('/fork/<username>/<repo>/docs/<path:filename>')
 @APP.route('/fork/<username>/<repo>/docs/<branchname>')
 @APP.route('/fork/<username>/<repo>/docs/<branchname>/<path:filename>')
-def view_wiki(repo, username=None, branchname=None, filename=None):
+def view_docs(repo, username=None, branchname=None, filename=None):
     """ Display the documentation
     """
     status = flask.request.args.get('status', None)
@@ -92,13 +92,13 @@ def view_wiki(repo, username=None, branchname=None, filename=None):
     if not repo:
         flask.abort(404, 'Project not found')
 
-    if not repo.project_wiki:
+    if not repo.project_docs:
         flask.abort(404, 'No documentation found for this project')
 
-    reponame = os.path.join(APP.config['WIKI_FOLDER'], repo.path)
+    reponame = os.path.join(APP.config['DOCS_FOLDER'], repo.path)
     if not os.path.exists(reponame):
         flask.flash(
-            'No wiki repository could be found, please contact an admin',
+            'No docs repository could be found, please contact an admin',
             'error')
         return flask.redirect(flask.url_for(
             'view_repo', repo=repo.name, username=username))
@@ -129,7 +129,7 @@ def view_wiki(repo, username=None, branchname=None, filename=None):
             repo_obj, commit, path, startswith)
 
     return flask.render_template(
-        'wiki.html',
+        'docs.html',
         select='docs',
         repo_obj=repo_obj,
         repo=repo,

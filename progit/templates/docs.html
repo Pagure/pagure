@@ -33,7 +33,7 @@
 
 {% else %}
   <h3>
-    <a href="{{ url_for('view_wiki', username=username,
+    <a href="{{ url_for('view_docs', username=username,
                 repo=repo.name, branchname=branchname) }}">
     {{ branchname }}</a>/{% if filename %}{%
     for file in filename.split('/') %}
@@ -43,7 +43,7 @@
       {% set path = path + '/' + file %}
       {% endif %}
       {% if loop.index != loop.length %}<a href="{{
-          url_for('view_wiki', username=username,
+          url_for('view_docs', username=username,
                   repo=repo.name, branchname=branchname, filename=path) }}"
       >{{ file }}</a>/{% else %}{{ file }}{% endif %}
     {% endfor %}{% endif %}
@@ -56,11 +56,11 @@
       <li>
         {% if entry.filemode == 16384 %}
         [ ]
-        <a href="{{ url_for('view_wiki', username=username,
+        <a href="{{ url_for('view_docs', username=username,
                   repo=repo.name, branchname=branchname,
                   filename=filename + '/' + entry.name if filename else entry.name) }}">
         {% else %}
-        <a href="{{ url_for('view_wiki', username=username,
+        <a href="{{ url_for('view_docs', username=username,
                   repo=repo.name, branchname=branchname,
                   filename=filename.rsplit('/', 1)[0] + '/' + entry.name if filename else entry.name) }}">
         {% endif %}
