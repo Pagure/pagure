@@ -159,8 +159,8 @@ def edit_issue(session, issue, title=None, content=None, status=None):
 
 def fork_project(session, user, repo, gitfolder, forkfolder, docfolder):
     ''' Fork a given project into the user's forks. '''
-    reponame = os.path.join(repo_folder, repo.path)
-    forkreponame = os.path.join(fork_folder, user, repo.path)
+    reponame = os.path.join(gitfolder, repo.path)
+    forkreponame = os.path.join(forkfolder, repo.path)
 
     if os.path.exists(forkreponame):
         raise progit.exceptions.RepoExistsException(
