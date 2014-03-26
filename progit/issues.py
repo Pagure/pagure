@@ -44,7 +44,7 @@ def add_comment_issue(repo, issueid, username=None):
 
     issue = progit.lib.get_issue(SESSION, issueid)
 
-    if issue is None:
+    if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
 
     form = progit.forms.AddIssueCommentForm()
@@ -215,7 +215,7 @@ def edit_issue(repo, issueid, username=None):
 
     issue = progit.lib.get_issue(SESSION, issueid)
 
-    if issue is None:
+    if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
 
     status = progit.lib.get_issue_statuses(SESSION)
