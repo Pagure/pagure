@@ -28,8 +28,7 @@ from progit import APP, SESSION, LOG, __get_file_in_tree, cla_required
 
 ## URLs
 
-@APP.route('/<repo>/issue/<issueid>/add',
-           methods=('GET','POST'))
+@APP.route('/<repo>/issue/<issueid>/add', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/issue/<issueid>/add',
            methods=('GET', 'POST'))
 def add_comment_issue(repo, issueid, username=None):

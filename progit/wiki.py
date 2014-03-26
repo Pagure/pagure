@@ -58,7 +58,6 @@ def __get_tree_and_content(repo_obj, commit, path, startswith):
     if not repo_obj[blob_or_tree.oid]:
         flask.abort(404, 'File not found')
 
-
     blob_or_tree_obj = repo_obj[blob_or_tree.oid]
     blob = repo_obj[blob_or_tree.oid]
     if isinstance(blob, pygit2.Blob):  # Returned a file
@@ -72,7 +71,6 @@ def __get_tree_and_content(repo_obj, commit, path, startswith):
     return (tree, content)
 
 
-
 ## URLs
 
 
@@ -80,7 +78,6 @@ def __get_tree_and_content(repo_obj, commit, path, startswith):
 @APP.route('/<repo>/docs/<path:filename>')
 @APP.route('/<repo>/docs/<branchname>')
 @APP.route('/<repo>/docs/<branchname>/<path:filename>')
-
 @APP.route('/fork/<username>/<repo>/docs')
 @APP.route('/fork/<username>/<repo>/docs/<path:filename>')
 @APP.route('/fork/<username>/<repo>/docs/<branchname>')
@@ -121,7 +118,7 @@ def view_wiki(repo, username=None, branchname=None, filename=None):
         path = filename.split('/')
 
     if commit:
-        (tree, content ) = __get_tree_and_content(
+        (tree, content) = __get_tree_and_content(
             repo_obj, commit, path, startswith)
 
     return flask.render_template(
@@ -135,4 +132,3 @@ def view_wiki(repo, username=None, branchname=None, filename=None):
         tree=tree,
         content=content,
     )
-
