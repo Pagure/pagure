@@ -21,6 +21,7 @@ from pygments.formatters import HtmlFormatter
 
 
 import progit.doc_utils
+import progit.exceptions
 import progit.lib
 import progit.forms
 from progit import APP, SESSION, LOG, cla_required
@@ -41,31 +42,40 @@ def __get_tree(repo_obj, tree, filepath, startswith=False):
             ok = True
         if el.name == filename:
             ok = True
-        if ok:
-            if len(filepath) == 1:
-                return (el, tree)
-            else:
-                return __get_tree(
-                    repo_obj, repo_obj[el.oid], filepath[1:])
+        if ok and len(filepath) == 1:
+            return (el, tree)
+        elif ok:
+            return __get_tree(
+                repo_obj, repo_obj[el.oid], filepath[1:])
+
+    if len(filepath) == 1:
+        raise progit.exceptions.FileNotFoundException('File not found')
+    else:
+        return __get_tree(
+            repo_obj, repo_obj[tree.oid], filepath[1:])
 
 
 def __get_tree_and_content(repo_obj, commit, path, startswith):
     ''' Return the tree and the content of the specified file. '''
 
-    (blob_or_tree, tree_obj) = __get_tree(
-        repo_obj, commit.tree, path, startswith=startswith)
+    try:
+        (blob_or_tree, tree_obj) = __get_tree(
+            repo_obj, commit.tree, path, startswith=startswith)
+    except progit.exceptions.FileNotFoundException:
+        flask.abort(404, 'File not found')
 
     if not repo_obj[blob_or_tree.oid]:
         flask.abort(404, 'File not found')
 
     blob_or_tree_obj = repo_obj[blob_or_tree.oid]
     blob = repo_obj[blob_or_tree.oid]
+
+    content = None
     if isinstance(blob, pygit2.Blob):  # Returned a file
         name, ext = os.path.splitext(blob_or_tree.name)
         content = progit.doc_utils.convert_readme(blob_or_tree_obj.data, ext)
     else:  # Returned a tree
-        path.append('index')
-        return __get_tree_and_content(repo_obj, commit, path, startswith)
+        raise progit.exceptions.FileNotException('File not found')
 
     tree = sorted(tree_obj, key=lambda x: x.filemode)
     return (tree, content)
@@ -125,6 +135,13 @@ def view_docs(repo, username=None, branchname=None, filename=None):
         path = filename.split('/')
 
     if commit:
+        try:
+            (tree, content) = __get_tree_and_content(
+                repo_obj, commit, path, startswith)
+        except progit.exceptions.FileNotFoundException:
+            if not path[0].startswith('index'):
+                path.append('index')
+                filename = filename + '/'
         (tree, content) = __get_tree_and_content(
             repo_obj, commit, path, startswith)
 
