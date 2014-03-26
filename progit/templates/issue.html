@@ -55,6 +55,7 @@
     </p>
 </section>
 
+{% if issue.comments %}
 <div class="sep"></div>
 
 <section class="issue_comments">
@@ -72,6 +73,8 @@
   </span>
   {% endfor %}
 </section>
+
+{% endif %}
 
 <div class="sep"></div>
 
