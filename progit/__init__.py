@@ -135,6 +135,13 @@ def lastcommit_date_filter(repo):
         return arrow.get(commit.commit_time).humanize()
 
 
+@APP.template_filter('humanize')
+def humanize_date(date):
+    """ Template filter returning the last commit date of the provided repo.
+    """
+    return arrow.get(date).humanize()
+
+
 @APP.template_filter('rst2html')
 def rst2html(rst_string):
     """ Template filter transforming rst text into html
