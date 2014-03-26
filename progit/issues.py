@@ -205,6 +205,45 @@ def do_view_issues(repo, username=None, status=None):
 
 ## URLs
 
+@APP.route('/<repo>/issue/<issueid>/add',
+           methods=('GET','POST'))
+@APP.route('/fork/<username>/<repo>/issue/<issueid>/add',
+           methods=('GET', 'POST'))
+def add_comment_issue(repo, issueid, username=None):
+    ''' Add a comment to an issue. '''
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if repo is None:
+        flask.abort(404, 'Project not found')
+
+    if not repo.issue_tracker:
+        flask.abort(404, 'No issue tracker found for this project')
+
+    issue = progit.lib.get_issue(SESSION, issueid)
+
+    if issue is None:
+        flask.abort(404, 'Issue not found')
+
+    form = progit.forms.AddIssueCommentForm()
+    if form.validate_on_submit():
+        comment = form.comment.data
+
+        try:
+            message = progit.lib.add_issue_comment(
+                SESSION,
+                issue=issue,
+                comment=comment,
+                user=flask.g.fas_user.username,
+            )
+            SESSION.commit()
+            flask.flash(message)
+        except SQLAlchemyError, err:  # pragma: no cover
+            SESSION.rollback()
+            flask.flash(str(err), 'error')
+
+    return flask.redirect(flask.url_for(
+        'view_issue', username=username, repo=repo.name, issueid=issue.id))
+
 
 @APP.route('/<repo>/issues')
 def view_issues(repo):
