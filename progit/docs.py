@@ -38,7 +38,7 @@ def __get_tree(repo_obj, tree, filepath, startswith=False):
     for el in tree:
         cnt += 1
         ok = False
-        if cnt == len(tree) and el.name.startswith(filename):
+        if el.name.startswith(filename):
             ok = True
         if el.name == filename:
             ok = True
@@ -46,13 +46,15 @@ def __get_tree(repo_obj, tree, filepath, startswith=False):
             return (el, tree)
         elif ok:
             return __get_tree(
-                repo_obj, repo_obj[el.oid], filepath[1:])
+                repo_obj, repo_obj[el.oid], filepath[1:],
+                startswith=startswith)
 
     if len(filepath) == 1:
         raise progit.exceptions.FileNotFoundException('File not found')
     else:
         return __get_tree(
-            repo_obj, repo_obj[tree.oid], filepath[1:])
+            repo_obj, repo_obj[tree.oid], filepath[1:],
+            startswith=startswith)
 
 
 def __get_tree_and_content(repo_obj, commit, path, startswith):
@@ -143,7 +145,7 @@ def view_docs(repo, username=None, branchname=None, filename=None):
                 path.append('index')
                 filename = filename + '/'
         (tree, content) = __get_tree_and_content(
-            repo_obj, commit, path, startswith)
+            repo_obj, commit, path, startswith=True)
 
     return flask.render_template(
         'docs.html',
