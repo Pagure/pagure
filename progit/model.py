@@ -215,6 +215,37 @@ class Issue(BASE):
         backref='issues')
 
 
+class IssueComment(BASE):
+    """ Stores the comments made on a commit/file.
+
+    Table -- issue_comments
+    """
+
+    __tablename__ = 'issue_comments'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    issue_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(
+            'issues.id', ondelete='CASCADE', onupdate='CASCADE'),
+        index=True)
+    comment = sa.Column(
+        sa.Text(),
+        nullable=False)
+    parent_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey('comments.id', onupdate='CASCADE'),
+        nullable=True)
+    user = sa.Column(sa.String(32), nullable=False)
+
+    date_created = sa.Column(sa.DateTime, nullable=False,
+                             default=datetime.datetime.utcnow)
+
+    issue = relation(
+        'Issue', foreign_keys=[issue_id], remote_side=[Issue.id],
+        backref='comments')
+
+
 class PullRequest(BASE):
     """ Stores the pull requests created on a project.
 
