@@ -11,21 +11,13 @@
   Pull-requests
   </h2>
   {% if status and status not in [False, 'Closed'] %}
-    {% if '/fork/' in request.url %}
-        <a href="{{ url_for('fork_request_pulls', username=username,
-                   repo=repo.name) }}?status=Closed">
-      {% else %}
-        <a href="{{ url_for('request_pulls', repo=repo.name) }}?status=Closed">
-      {% endif %}
+    <a href="{{ url_for('request_pulls', username=username,
+               repo=repo.name) }}?status=Closed">
       (Closed)</a>
   {% else %}
-    {% if '/fork/' in request.url %}
-      <a href="{{ url_for('fork_request_pulls', username=username,
+    <a href="{{ url_for('request_pulls', username=username,
                  repo=repo.name) }}">
-    {% else %}
-      <a href="{{ url_for('request_pulls', repo=repo.name) }}">
-    {% endif %}
-    (Open)</a>
+      (Open)</a>
   {% endif %}
 </div>
 
@@ -35,13 +27,8 @@
     {% for request in requests %}
     <li>
       #{{ request.id }}
-      {% if '/fork/' in request.url %}
-      <a href="{{ url_for('fork_request_pull', username=username,
+      <a href="{{ url_for('request_pull', username=username,
                 repo=repo.name, requestid=request.id) }}">
-      {% else %}
-      <a href="{{ url_for('request_pull',
-                repo=repo.name, requestid=request.id) }}">
-      {% endif %}
         {{ request.title }}
       </a>
       <span> Opened by

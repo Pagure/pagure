@@ -22,15 +22,10 @@
 <h3>Title: {{ request.title }}</h3>
   {% if request.status %}
   <span>
-      {% if '/fork/' in request.url %}
-        <a href="{{ url_for('fork_merge_request_pull', username=username,
-                  repo=repo.name, requestid=request.id) }}" class="message">
-        {% else %}
-        <a href="{{ url_for('merge_request_pull',
-                  repo=repo.name, requestid=request.id) }}" class="message">
-        {% endif %}
-        Merge
-      </a>
+    <a href="{{ url_for('merge_request_pull', username=username,
+              repo=repo.name, requestid=request.id) }}" class="message">
+      Merge
+    </a>
   </span>
   {% else %}
   <span class="error">Merged</span>

@@ -205,44 +205,25 @@ def do_request_pulls(repo, username=None, status=True):
 
 
 @APP.route('/<repo>/request-pulls')
-def request_pulls(repo):
-    """ Request pulling the changes from the fork into the project.
-    """
-    status = flask.request.args.get('status', True)
-    return do_request_pulls(repo, status=status)
-
-
 @APP.route('/fork/<username>/<repo>/request-pulls')
-def fork_request_pulls(username, repo):
+def request_pulls(repo, username=None):
     """ Request pulling the changes from the fork into the project.
     """
     status = flask.request.args.get('status', True)
-    return do_request_pulls(repo, username=username, status=status)
+    return do_request_pulls(repo, status=status, username=username)
 
 
 @APP.route('/<repo>/request-pull/<requestid>')
-def request_pull(repo, requestid):
-    """ Request pulling the changes from the fork into the project.
-    """
-    return do_request_pull(repo, requestid)
-
-
 @APP.route('/fork/<username>/<repo>/request-pull/<requestid>')
-def fork_request_pull(username, repo, requestid):
+def request_pull(repo, requestid, username=None):
     """ Request pulling the changes from the fork into the project.
     """
     return do_request_pull(repo, requestid, username=username)
 
 
 @APP.route('/<repo>/request-pull/merge/<requestid>')
-def merge_request_pull(repo, requestid):
-    """ Request pulling the changes from the fork into the project.
-    """
-    return do_merge_request_pull(repo, requestid)
-
-
 @APP.route('/fork/<username>/<repo>/request-pull/merge/<requestid>')
-def fork_merge_request_pull(username, repo, requestid):
+def merge_request_pull(repo, requestid, username=None):
     """ Request pulling the changes from the fork into the project.
     """
     return do_merge_request_pull(repo, requestid, username=username)
