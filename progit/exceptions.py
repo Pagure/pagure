@@ -21,3 +21,10 @@ class RepoExistsException(ProgitException):
     exists.
     '''
     pass
+
+
+class FileNotFoundException(ProgitException):
+    ''' Exception thrown when trying to create a repository that already
+    exists.
+    '''
+    pass
