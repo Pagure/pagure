@@ -139,7 +139,8 @@ def lastcommit_date_filter(repo):
 def rst2html(rst_string):
     """ Template filter transforming rst text into html
     """
-    return progit.doc_utils.convert_doc(rst_string)
+    if rst_string:
+        return progit.doc_utils.convert_doc(unicode(rst_string))
 
 
 @APP.route('/login/', methods=('GET', 'POST'))
