@@ -42,6 +42,20 @@ def create_session(db_url, debug=False, pool_recycle=3600):
     return scopedsession
 
 
+def add_issue_comment(session, issue, comment, user):
+    ''' Add a comment to an issue. '''
+    isse_comment = model.IssueComment(
+        issue_id=issue.id,
+        comment=comment,
+        user=user,
+    )
+    session.add(isse_comment)
+    # Make sure we won't have SQLAlchemy error before we create the repo
+    session.flush()
+
+    return 'Comment added'
+
+
 def get_user_project(session, username):
     ''' Retrieve the list of projects managed by a user.
 
