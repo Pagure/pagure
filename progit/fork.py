@@ -10,6 +10,7 @@
 
 import flask
 import os
+import tempfile
 from math import ceil
 
 import pygit2
@@ -166,7 +167,7 @@ def do_request_pull(repo, requestid, username=None):
         'pull_request.html',
         select='requests',
         repo=repo,
-        username=username or request.user,
+        username=username,
         request=request,
         repo_obj=repo_obj,
         orig_repo=orig_repo,
