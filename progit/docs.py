@@ -50,7 +50,7 @@ def __get_tree(repo_obj, tree, filepath, startswith=False):
                 startswith=startswith)
 
     if len(filepath) == 1:
-        raise progit.exceptions.FileNotFoundException('File not found')
+        return None, tree
     else:
         return __get_tree(
             repo_obj, repo_obj[tree.oid], filepath[1:],
@@ -60,11 +60,11 @@ def __get_tree(repo_obj, tree, filepath, startswith=False):
 def __get_tree_and_content(repo_obj, commit, path, startswith):
     ''' Return the tree and the content of the specified file. '''
 
-    try:
-        (blob_or_tree, tree_obj) = __get_tree(
-            repo_obj, commit.tree, path, startswith=startswith)
-    except progit.exceptions.FileNotFoundException:
-        flask.abort(404, 'File not found')
+    (blob_or_tree, tree_obj) = __get_tree(
+        repo_obj, commit.tree, path, startswith=startswith)
+
+    if blob_or_tree is None:
+        return tree_obj, None
 
     if not repo_obj[blob_or_tree.oid]:
         flask.abort(404, 'File not found')
@@ -144,6 +144,7 @@ def view_docs(repo, username=None, branchname=None, filename=None):
             if not path[0].startswith('index'):
                 path.append('index')
                 filename = filename + '/'
+
         (tree, content) = __get_tree_and_content(
             repo_obj, commit, path, startswith=True)
 
