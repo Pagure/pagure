@@ -86,6 +86,17 @@ def create_default_status(session):
     session.commit()
 
 
+class StatusIssue(BASE):
+    """ Stores the status a ticket can have.
+
+    Table -- status_issue
+    """
+    __tablename__ = 'status_issue'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    status = sa.Column(sa.Text, nullable=False, unique=True)
+
+
 class Project(BASE):
     """ Stores the projects.
 
@@ -166,17 +177,6 @@ class Comment(BASE):
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
-
-
-class StatusIssue(BASE):
-    """ Stores the status a ticket can have.
-
-    Table -- status_issue
-    """
-    __tablename__ = 'status_issue'
-
-    id = sa.Column(sa.Integer, primary_key=True)
-    status = sa.Column(sa.Text, nullable=False, unique=True)
 
 
 class Issue(BASE):
