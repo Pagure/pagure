@@ -26,8 +26,9 @@ import progit.forms
 from progit import APP, SESSION, LOG, __get_file_in_tree, cla_required
 
 
-### Application
-def do_view_repo(repo, username=None):
+@APP.route('/<repo>')
+@APP.route('/fork/<username>/<repo>')
+def view_repo(repo, username=None):
     """ Front page of a specific repo.
     """
     repo = progit.lib.get_project(SESSION, repo, user=username)
@@ -92,9 +93,9 @@ def do_view_repo(repo, username=None):
     )
 
 
-def do_view_repo_branch(repo, branchname, username=None):
-    """ Displays the information about a specific branch.
-    """
+@APP.route('/<repo>/branch/<branchname>')
+@APP.route('/fork/<username>/<repo>/branch/<branchname>')
+def view_repo_branch(repo, branchname, username=None):
     repo = progit.lib.get_project(SESSION, repo, user=username)
 
     if not repo:
@@ -149,7 +150,11 @@ def do_view_repo_branch(repo, branchname, username=None):
     )
 
 
-def do_view_log(repo, branchname=None, username=None):
+@APP.route('/<repo>/log')
+@APP.route('/<repo>/log/<branchname>')
+@APP.route('/fork/<username>/<repo>/log')
+@APP.route('/fork/<username>/<repo>/log/<branchname>')
+def view_log(repo, branchname=None, username=None):
     """ Displays the logs of the specified repo.
     """
     repo = progit.lib.get_project(SESSION, repo, user=username)
@@ -225,7 +230,11 @@ def do_view_log(repo, branchname=None, username=None):
     )
 
 
-def do_view_file(repo, identifier, filename, username=None):
+@APP.route('/<repo>/blob/<identifier>/<path:filename>')
+@APP.route('/<repo>/blob/<identifier>/<path:filename>')
+@APP.route('/fork/<username>/<repo>/blob/<identifier>/<path:filename>')
+@APP.route('/fork/<username>/<repo>/blob/<identifier>/<path:filename>')
+def view_file(repo, identifier, filename, username=None):
     """ Displays the content of a file or a tree for the specified repo.
     """
     repo = progit.lib.get_project(SESSION, repo, user=username)
@@ -281,7 +290,9 @@ def do_view_file(repo, identifier, filename, username=None):
     )
 
 
-def do_view_commit(repo, commitid, username=None):
+@APP.route('/<repo>/<commitid>')
+@APP.route('/fork/<username>/<repo>/<commitid>')
+def view_commit(repo, commitid, username=None):
     """ Render a commit in a repo
     """
     repo = progit.lib.get_project(SESSION, repo, user=username)
@@ -328,7 +339,11 @@ def do_view_commit(repo, commitid, username=None):
     )
 
 
-def do_view_tree(repo, identifier=None, username=None):
+@APP.route('/<repo>/tree/')
+@APP.route('/<repo>/tree/<identifier>')
+@APP.route('/fork/<username>/<repo>/tree/')
+@APP.route('/fork/<username>/<repo>/tree/<identifier>')
+def view_tree(repo, identifier=None, username=None):
     """ Render the tree of the repo
     """
     repo = progit.lib.get_project(SESSION, repo, user=username)
@@ -374,10 +389,11 @@ def do_view_tree(repo, identifier=None, username=None):
     )
 
 
-def do_view_forks(repo, username=None):
-    """ Return the list of forks of a project.
+@APP.route('/<repo>/forks')
+@APP.route('/fork/<username>/<repo>/forks')
+def view_forks(repo, username=None):
+    """ Presents all the forks of the project.
     """
-
     repo = progit.lib.get_project(SESSION, repo, user=username)
 
     if not repo:
@@ -389,66 +405,3 @@ def do_view_forks(repo, username=None):
         username=username,
         repo=repo,
     )
-
-
-## URLs
-
-
-@APP.route('/<repo>')
-@APP.route('/fork/<username>/<repo>')
-def view_repo(repo, username=None):
-    """ Front page of a specific repo.
-    """
-    return do_view_repo(repo=repo, username=username)
-
-
-@APP.route('/<repo>/branch/<branchname>')
-@APP.route('/fork/<username>/<repo>/branch/<branchname>')
-def view_repo_branch(repo, branchname, username=None):
-    return do_view_repo_branch(repo, branchname, username=username)
-
-
-@APP.route('/<repo>/log')
-@APP.route('/<repo>/log/<branchname>')
-@APP.route('/fork/<username>/<repo>/log')
-@APP.route('/fork/<username>/<repo>/log/<branchname>')
-def view_log(repo, branchname=None, username=None):
-    """ Displays the logs of the specified repo.
-    """
-    return do_view_log(repo, branchname, username=username)
-
-
-@APP.route('/<repo>/blob/<identifier>/<path:filename>')
-@APP.route('/<repo>/blob/<identifier>/<path:filename>')
-@APP.route('/fork/<username>/<repo>/blob/<identifier>/<path:filename>')
-@APP.route('/fork/<username>/<repo>/blob/<identifier>/<path:filename>')
-def view_file(repo, identifier, filename, username=None):
-    """ Displays the content of a file or a tree for the specified repo.
-    """
-    return do_view_file(repo, identifier, filename, username=username)
-
-
-@APP.route('/<repo>/<commitid>')
-@APP.route('/fork/<username>/<repo>/<commitid>')
-def view_commit(repo, commitid, username=None):
-    """ Render a commit in a repo
-    """
-    return do_view_commit(repo, commitid, username=username)
-
-
-@APP.route('/<repo>/tree/')
-@APP.route('/<repo>/tree/<identifier>')
-@APP.route('/fork/<username>/<repo>/tree/')
-@APP.route('/fork/<username>/<repo>/tree/<identifier>')
-def view_tree(repo, identifier=None, username=None):
-    """ Render the tree of the repo
-    """
-    return do_view_tree(repo, identifier=identifier, username=username)
-
-
-@APP.route('/<repo>/forks')
-@APP.route('/fork/<username>/<repo>/forks')
-def view_forks(repo, username=None):
-    """ Presents all the forks of the project.
-    """
-    return do_view_forks(repo, username=username)
