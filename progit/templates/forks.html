@@ -13,8 +13,8 @@
   <ul>
     {% for fork in repo.forks %}
     <li>
-      <a href="{{ url_for('view_fork_repo', username=repo.user,
-                repo=repo.name) }}"> {{ fork.user }}/{{ fork.name }} </a>
+      <a href="{{ url_for('view_repo', username=repo.user,
+                  repo=repo.name) }}"> {{ fork.user }}/{{ fork.name }} </a>
       <span> Created on {{ fork.date_created.strftime('%Y-%m-%d %H:%M') }}</span>
     </li>
     {% endfor %}

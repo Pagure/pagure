@@ -209,8 +209,6 @@ def do_view_log(repo, branchname=None, username=None):
                 diff_commits.append(commit.oid.hex)
 
     origin = 'view_log'
-    if username:
-        origin = 'view_fork_log'
 
     return flask.render_template(
         'repo_info.html',
@@ -389,6 +387,7 @@ def do_view_forks(repo, username=None):
     return flask.render_template(
         'forks.html',
         select='forks',
+        username=username,
         repo=repo,
     )
 
@@ -397,42 +396,24 @@ def do_view_forks(repo, username=None):
 
 
 @APP.route('/<repo>')
-def view_repo(repo):
-    """ Front page of a specific repo.
-    """
-    return do_view_repo(repo=repo)
-
-
 @APP.route('/fork/<username>/<repo>')
-def view_fork_repo(username, repo):
+def view_repo(repo, username=None):
     """ Front page of a specific repo.
     """
     return do_view_repo(repo=repo, username=username)
 
 
 @APP.route('/<repo>/branch/<branchname>')
-def view_repo_branch(repo, branchname):
-    return do_view_repo_branch(repo, branchname)
-
-
 @APP.route('/fork/<username>/<repo>/branch/<branchname>')
-def view_fork_repo_branch(username, repo, branchname):
-    """ Displays the information about a specific branch.
-    """
+def view_repo_branch(repo, branchname, username=None):
     return do_view_repo_branch(repo, branchname, username=username)
 
 
 @APP.route('/<repo>/log')
 @APP.route('/<repo>/log/<branchname>')
-def view_log(repo, branchname=None):
-    """ Displays the logs of the specified repo.
-    """
-    return do_view_log(repo, branchname)
-
-
 @APP.route('/fork/<username>/<repo>/log')
 @APP.route('/fork/<username>/<repo>/log/<branchname>')
-def view_fork_log(username, repo, branchname=None):
+def view_log(repo, branchname=None, username=None):
     """ Displays the logs of the specified repo.
     """
     return do_view_log(repo, branchname, username=username)
@@ -440,29 +421,17 @@ def view_fork_log(username, repo, branchname=None):
 
 @APP.route('/<repo>/blob/<identifier>/<path:filename>')
 @APP.route('/<repo>/blob/<identifier>/<path:filename>')
-def view_file(repo, identifier, filename):
-    """ Displays the content of a file or a tree for the specified repo.
-    """
-    return do_view_file(repo, identifier, filename)
-
-
 @APP.route('/fork/<username>/<repo>/blob/<identifier>/<path:filename>')
 @APP.route('/fork/<username>/<repo>/blob/<identifier>/<path:filename>')
-def view_fork_file(username, repo, identifier, filename):
+def view_file(repo, identifier, filename, username=None):
     """ Displays the content of a file or a tree for the specified repo.
     """
     return do_view_file(repo, identifier, filename, username=username)
 
 
 @APP.route('/<repo>/<commitid>')
-def view_commit(repo, commitid):
-    """ Render a commit in a repo
-    """
-    return do_view_commit(repo, commitid)
-
-
 @APP.route('/fork/<username>/<repo>/<commitid>')
-def view_fork_commit(username, repo, commitid):
+def view_commit(repo, commitid, username=None):
     """ Render a commit in a repo
     """
     return do_view_commit(repo, commitid, username=username)
@@ -470,29 +439,17 @@ def view_fork_commit(username, repo, commitid):
 
 @APP.route('/<repo>/tree/')
 @APP.route('/<repo>/tree/<identifier>')
-def view_tree(repo, identifier=None):
-    """ Render the tree of the repo
-    """
-    return do_view_tree(repo, identifier=identifier)
-
-
 @APP.route('/fork/<username>/<repo>/tree/')
 @APP.route('/fork/<username>/<repo>/tree/<identifier>')
-def view_fork_tree(username, repo, identifier=None):
+def view_tree(repo, identifier=None, username=None):
     """ Render the tree of the repo
     """
     return do_view_tree(repo, identifier=identifier, username=username)
 
 
 @APP.route('/<repo>/forks')
-def view_forks(repo):
-    """ Presents all the forks of the project.
-    """
-    return do_view_forks(repo)
-
-
 @APP.route('/fork/<username>/<repo>/forks')
-def fork_view_forks(username, repo):
-    """ Presents all the forks of the fork.
+def view_forks(repo, username=None):
+    """ Presents all the forks of the project.
     """
     return do_view_forks(repo, username=username)

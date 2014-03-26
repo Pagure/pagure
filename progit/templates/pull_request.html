@@ -8,23 +8,13 @@
 {% block repo %}
 
 <h2>Request pull
-  {% if '/fork/' in request.url %}
-  <a href="{{ url_for('view_fork_repo', username=username, repo=repo.name)}}">
-  {% else %}
-  <a href="{{ url_for('view_repo', repo=repo.name)}}">
-  {% endif %}
+  <a href="{{ url_for('view_repo', username=username, repo=repo.name)}}">
     {{ repo.name }}
   </a>
 
-  {% if '/fork/' in request.url %}
-  (<a href="{{ url_for('view_fork_tree', username=username,
+  (<a href="{{ url_for('view_tree', username=username,
                repo=repo.name, identifier=commitid) }}"
     >tree</a>)
-  {% else %}
-  (<a href="{{ url_for('view_tree',
-               repo=repo.name, identifier=commitid) }}"
-    >tree</a>)
-  {% endif %}
 
 </h2>
 
@@ -51,7 +41,7 @@
   <ul>
     {% for commit in diff_commits %}
     <li>
-      <a href="{{ url_for('view_fork_commit', username=username,
+      <a href="{{ url_for('view_commit', username=username,
                   repo=repo.name, commitid=commit.oid.hex)}}">
         {{ commit.message.split('\n')[0] }}
       </a>
@@ -100,13 +90,8 @@
         <td>Parent</td>
         <td>
           {% for parent in diff_commits[loop.index - 1].parents %}
-            {% if '/fork/' in request.url %}
-            <a href="{{ url_for('view_fork_commit', username=username,
+            <a href="{{ url_for('view_commit', username=username,
                       repo=repo.name, commitid=parent.oid.hex) }}">
-            {% else %}
-            <a href="{{ url_for('view_commit',
-                      repo=repo.name, commitid=parent.oid.hex) }}">
-            {% endif %}
 
             {{ parent.oid.hex }}
           </a> <br />

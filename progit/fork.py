@@ -148,7 +148,7 @@ def do_request_pull(repo, requestid, username=None):
             'Fork is empty, there are no commits to request pulling',
             'error')
         return flask.redirect(flask.url_for(
-            'view_fork_repo', username=username, repo=repo.name))
+            'view_repo', username=username, repo=repo.name))
 
     html_diffs = []
     for diff in diffs:
@@ -275,7 +275,7 @@ def fork_project(repo, username=None):
         flask.flash(message)
         return flask.redirect(
             flask.url_for(
-                'view_fork_repo',
+                'view_repo',
                 username=flask.g.fas_user.username,
                 repo=repo.name)
         )
@@ -336,7 +336,7 @@ def new_request_pull(username, repo, commitid=None):
             'Fork is empty, there are no commits to request pulling',
             'error')
         return flask.redirect(flask.url_for(
-            'view_fork_repo', username=username, repo=repo.name))
+            'view_repo', username=username, repo=repo.name))
 
     html_diffs = []
     for diff in diffs:
@@ -367,7 +367,7 @@ def new_request_pull(username, repo, commitid=None):
             SESSION.commit()
             flask.flash(message)
             return flask.redirect(flask.url_for(
-                'view_fork_issues', username=username, repo=repo.name))
+                'view_issues', username=username, repo=repo.name))
         except progit.exceptions.ProgitException, err:
             flask.flash(str(err), 'error')
         except SQLAlchemyError, err:  # pragma: no cover
