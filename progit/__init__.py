@@ -108,7 +108,7 @@ work.
                 flask.url_for('auth_login', next=flask.request.url))
         elif not flask.g.fas_user.cla_done:
             flask.flash('You must sign the CLA (Contributor License '
-                        'Agreement to use fedocal', 'errors')
+                        'Agreement to use progit', 'errors')
             return flask.redirect(flask.url_for('.index'))
         return function(*args, **kwargs)
     return decorated_function
