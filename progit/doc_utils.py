@@ -10,7 +10,7 @@
 """
 
 import docutils
-import docutils.examples
+import docutils.core
 import markupsafe
 import markdown
 
@@ -60,10 +60,15 @@ def modify_html(html):
 
 def convert_doc(rst_string):
     """ Utility to load an RST file and turn it into fancy HTML. """
-
     rst = modify_rst(rst_string)
 
-    html_string = docutils.examples.html_body(rst)
+    overrides = {'report_level':'quiet'}
+    html = docutils.core.publish_parts(
+        source=rst,
+        writer_name='html',
+        settings_overrides=overrides)
+
+    html_string = html['html_body']
 
     html_string = modify_html(html_string)
 
