@@ -10,7 +10,6 @@
 
 import flask
 import os
-import tempfile
 from math import ceil
 
 import pygit2
