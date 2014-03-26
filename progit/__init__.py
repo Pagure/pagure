@@ -50,7 +50,7 @@ mail_handler = SMTPHandler(
     APP.config.get('SMTP_SERVER', '127.0.0.1'),
     'nobody@fedoraproject.org',
     APP.config.get('MAIL_ADMIN', APP.config['EMAIL_ERROR']),
-    'Fedocal error')
+    'Progit error')
 mail_handler.setFormatter(logging.Formatter('''
     Message type:       %(levelname)s
     Location:           %(pathname)s:%(lineno)d
