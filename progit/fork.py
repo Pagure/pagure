@@ -338,6 +338,7 @@ def new_request_pull(username, repo, commitid=None):
 
     return flask.render_template(
         'pull_request.html',
+        select='requests',
         repo=repo,
         username=username,
         commitid=commitid,
