@@ -441,3 +441,8 @@ th.month .ui-button-text {
    min-width: 500px;
    min-height: 120px;
 }
+
+#issue_content {
+    min-width: 500px;
+    min-height: 120px;
+}
