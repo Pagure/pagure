@@ -23,7 +23,8 @@ from pygments.formatters import HtmlFormatter
 import progit.doc_utils
 import progit.lib
 import progit.forms
-from progit import APP, SESSION, LOG, __get_file_in_tree, cla_required
+from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
+                    is_repo_admin)
 
 
 ## URLs
@@ -211,6 +212,10 @@ def edit_issue(repo, issueid, username=None):
 
     if not repo.issue_tracker:
         flask.abort(404, 'No issue tracker found for this project')
+
+    if not is_repo_admin(repo):
+        flask.abort(
+            403, 'You are not allowed to edit issues for this project')
 
     issue = progit.lib.get_issue(SESSION, issueid)
 
