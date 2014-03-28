@@ -348,3 +348,21 @@ def get_issue_statuses(session):
     for status in statuses:
         output.append(status.status)
     return output
+
+
+def generate_gitolite_acls(session, configfile):
+    ''' Generate the configuration file for gitolite for all projects
+    on the forge.
+    '''
+    config = []
+    for project in session.query(model.Project).all():
+        config.append('repo %s' % project.fullname)
+        config.append('  RW+ = %s' % project.user)
+        for user in project.users:
+            if user != project.user:
+                config.append('  RW+ = %s' % user)
+        config.append('')
+
+    with open(configfile) as stream:
+        for row in output:
+            stream.write(row)
