@@ -24,7 +24,8 @@ from pygments.formatters import HtmlFormatter
 import progit.doc_utils
 import progit.lib
 import progit.forms
-from progit import APP, SESSION, LOG, __get_file_in_tree, cla_required
+from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
+                    is_repo_admin)
 
 
 @APP.route('/<repo>/request-pulls')
@@ -262,6 +263,11 @@ def new_request_pull(username, repo, commitid=None):
 
     if not repo:
         flask.abort(404)
+
+    if not is_repo_admin(repo):
+        flask.abort(
+            403,
+            'You are not allowed to create pull-requests for this project')
 
     repopath = os.path.join(APP.config['FORK_FOLDER'], repo.path)
     repo_obj = pygit2.Repository(repopath)
