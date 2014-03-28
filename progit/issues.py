@@ -24,7 +24,7 @@ import progit.doc_utils
 import progit.lib
 import progit.forms
 from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
-                    is_repo_admin)
+                    is_repo_admin, authenticated)
 
 
 ## URLs
@@ -147,7 +147,6 @@ def new_issue(repo, username=None):
 @APP.route('/<repo>/issue/<issueid>', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/issue/<issueid>',
            methods=('GET', 'POST'))
-@cla_required
 def view_issue(repo, issueid, username=None):
     """ List all issues associated to a repo
     """
@@ -166,27 +165,30 @@ def view_issue(repo, issueid, username=None):
         flask.abort(404, 'Issue not found')
 
     status = progit.lib.get_issue_statuses(SESSION)
-    form = progit.forms.UpdateIssueStatusForm(status=status)
 
-    if form.validate_on_submit():
-        try:
-            message = progit.lib.edit_issue(
-                SESSION,
-                issue=issue,
-                status=form.status.data,
-            )
-            SESSION.commit()
-            flask.flash(message)
-            url = flask.url_for('view_issues', repo=repo.name)
-            if username:
-                url = flask.url_for(
-                    'view_fork_issues', username=username, repo=repo.name)
-            return flask.redirect(url)
-        except SQLAlchemyError, err:  # pragma: no cover
-            SESSION.rollback()
-            flask.flash(str(err), 'error')
-    elif flask.request.method == 'GET':
-        form.status.data = issue.status
+    form = None
+    if authenticated() and is_repo_admin(repo):
+        form = progit.forms.UpdateIssueStatusForm(status=status)
+
+        if form.validate_on_submit():
+            try:
+                message = progit.lib.edit_issue(
+                    SESSION,
+                    issue=issue,
+                    status=form.status.data,
+                )
+                SESSION.commit()
+                flask.flash(message)
+                url = flask.url_for('view_issues', repo=repo.name)
+                if username:
+                    url = flask.url_for(
+                        'view_fork_issues', username=username, repo=repo.name)
+                return flask.redirect(url)
+            except SQLAlchemyError, err:  # pragma: no cover
+                SESSION.rollback()
+                flask.flash(str(err), 'error')
+        elif flask.request.method == 'GET':
+            form.status.data = issue.status
 
     return flask.render_template(
         'issue.html',
