@@ -102,7 +102,7 @@ def is_repo_admin(repo_obj):
 
     user = flask.g.fas_user.username
 
-    return repo_obj.user or user in repo_obj.users
+    return user == repo_obj.user or user in repo_obj.users
 
 
 def cla_required(function):
