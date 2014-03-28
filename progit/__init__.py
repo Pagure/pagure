@@ -105,6 +105,13 @@ def is_repo_admin(repo_obj):
     return user == repo_obj.user or user in repo_obj.users
 
 
+def generate_gitolite_acls():
+    """ Generate the gitolite configuration file for all repos
+    """
+    progit.lib.generate_gitolite_acls(
+        SESSION, flask.config['GITOLITE_CONFIG'])
+
+
 def cla_required(function):
     """ Flask decorator to retrict access to CLA signed user.
 To use this decorator you need to have a function named 'auth_login'.
