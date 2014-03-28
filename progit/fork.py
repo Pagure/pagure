@@ -176,7 +176,7 @@ def merge_request_pull(repo, requestid, username=None):
     orig_repo = pygit2.Repository(parentpath)
 
     if orig_repo.get(request.stop_id, None):
-        flask.flash('These chanages have already been merged.', 'error')
+        flask.flash('These changes have already been merged.', 'error')
         # Update status
         progit.lib.close_pull_request(SESSION, request)
         SESSION.commit()
