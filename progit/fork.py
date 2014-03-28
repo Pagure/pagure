@@ -339,8 +339,16 @@ def new_request_pull(username, repo, commitid=None):
             )
             SESSION.commit()
             flask.flash(message)
-            return flask.redirect(flask.url_for(
-                'view_issues', username=username, repo=repo.name))
+
+            if not repo.parent.is_fork:
+                url = flask.url_for(
+                    'request_pulls', username=None, repo=repo.parent.name)
+            else:
+                url = flask.url_for(
+                    'request_pulls', username=repo.parent.user,
+                    repo=repo.parent.name)
+
+            return flask.redirect(url)
         except progit.exceptions.ProgitException, err:
             flask.flash(str(err), 'error')
         except SQLAlchemyError, err:  # pragma: no cover
