@@ -23,7 +23,8 @@ from pygments.formatters import HtmlFormatter
 import progit.exceptions
 import progit.lib
 import progit.forms
-from progit import APP, SESSION, LOG, __get_file_in_tree, cla_required
+from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
+                    generate_gitolite_acls)
 
 
 ### Application
@@ -183,6 +184,7 @@ def new_project():
                 docfolder=APP.config['DOCS_FOLDER'],
             )
             SESSION.commit()
+            generate_gitolite_acls()
             flask.flash(message)
             return flask.redirect(flask.url_for('view_repo', repo=name))
         except progit.exceptions.ProgitException, err:
