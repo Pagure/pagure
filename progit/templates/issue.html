@@ -9,6 +9,7 @@
 
 <h2>Issue #{{ issue.id }}</h2>
 
+{% if authenticated and form %}
 <section class="issue_action">
   <form action="{{ url_for('view_issue', username=username,
                    repo=repo.name, issueid=issue.id) }}" method="post">
@@ -26,6 +27,7 @@
   {{ form.csrf_token }}
   </form>
 </section>
+{% endif %}
 
 <section class="issue_info">
   <h3>
@@ -69,6 +71,7 @@
 
 <div class="sep"></div>
 
+{% if authenticated %}
 <section class="add_comment">
   <form action="{{ url_for('add_comment_issue', username=username,
                    repo=repo.name, issueid=issue.id) }}" method="post">
@@ -79,5 +82,8 @@
   <input type="submit" class="submit positive button" value="Comment">
   </form>
 </section>
+{% else %}
+<p><a href="{{ url_for('auth_login') }}">Login</a> to comment on this ticket.</p>
+{% endif %}
 
 {% endblock %}
