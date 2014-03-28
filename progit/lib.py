@@ -364,5 +364,5 @@ def generate_gitolite_acls(session, configfile):
         config.append('')
 
     with open(configfile) as stream:
-        for row in output:
+        for row in config:
             stream.write(row)
