@@ -151,6 +151,11 @@ def merge_request_pull(repo, requestid, username=None):
     if not request:
         flask.abort(404, 'Pull-request not found')
 
+    if not is_repo_admin(repo):
+        flask.abort(
+            403,
+            'You are not allowed to merge pull-request for this project')
+
     error_output = flask.url_for(
         'request_pull', repo=repo.name, requestid=requestid)
     if username:
