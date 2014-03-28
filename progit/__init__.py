@@ -94,6 +94,17 @@ def is_admin():
     return not groups.isdisjoint(admins)
 
 
+def is_repo_admin(repo_obj):
+    """ Return whether the user is an admin of the provided repo. """
+    if not authenticated() \
+            or not flask.g.fas_user.cla_done:
+        return False
+
+    user = flask.g.fas_user.username
+
+    return repo_obj.user or user in repo_obj.users
+
+
 def cla_required(function):
     """ Flask decorator to retrict access to CLA signed user.
 To use this decorator you need to have a function named 'auth_login'.
