@@ -48,3 +48,10 @@ DOCS_FOLDER = os.path.join(
     '..',
     'docs'
 )
+
+# Configuration file for gitolite
+GITOLITE_CONFIG = os.path.join(
+    os.path.abspath(os.path.dirname(__file__)),
+    '..',
+    'gitolite.conf'
+)
