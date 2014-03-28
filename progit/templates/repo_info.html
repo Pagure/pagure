@@ -102,7 +102,7 @@
     {% else %}
     <h3>Last 10 commits</h3>
     {% endif %}
-    {% if diff_commits %}
+    {% if diff_commits and authenticated %}
     <span id="request_pull">
         <a href="{{ url_for('new_request_pull',
                     username=username, repo=repo.name) }}">Request pull</a>
@@ -118,9 +118,11 @@
         {{ commit.message.split('\n')[0] }}
         {% if diff_commits and commit.oid.hex in diff_commits %}
         <span class="error" title="Commit not in the main repo">*</span>
+        {% if authenticated %}
         (<a href="{{ url_for('new_request_pull',
                     username=username, repo=repo.name, commitid=commit.oid.hex) }}"
                 >Request pull</a>)
+        {% endif %}
         {% endif %}
       </li>
       {% endfor %}
