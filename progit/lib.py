@@ -363,6 +363,6 @@ def generate_gitolite_acls(session, configfile):
                 config.append('  RW+ = %s' % user)
         config.append('')
 
-    with open(configfile) as stream:
+    with open(configfile, 'w') as stream:
         for row in config:
             stream.write(row)
