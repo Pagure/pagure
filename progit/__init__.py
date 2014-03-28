@@ -134,6 +134,7 @@ def inject_variables():
     return dict(
         version=__version__,
         admin=user_admin,
+        authenticated=authenticated(),
     )
 
 
