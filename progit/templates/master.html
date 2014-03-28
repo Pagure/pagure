@@ -35,9 +35,6 @@
               <a href="{{ url_for('view_users') }}">Users</a>
             </li>
             {% endif %}
-            {% if admin %}
-            <li id="adminTab"><a href="{{url_for('admin')}}">Admin</a></li>
-            {% endif %}
             <li id="new_project" class="right">
               <a href="{{url_for('new_project')}}">
                 New project
