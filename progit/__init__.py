@@ -109,7 +109,7 @@ def generate_gitolite_acls():
     """ Generate the gitolite configuration file for all repos
     """
     progit.lib.generate_gitolite_acls(
-        SESSION, flask.config['GITOLITE_CONFIG'])
+        SESSION, APP.config['GITOLITE_CONFIG'])
 
 
 def cla_required(function):
