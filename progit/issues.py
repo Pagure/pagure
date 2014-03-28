@@ -112,10 +112,11 @@ def new_issue(repo, username=None):
     if repo is None:
         flask.abort(404, 'Project not found')
 
-    form = progit.forms.IssueForm()
+    status = progit.lib.get_issue_statuses(SESSION)
+    form = progit.forms.IssueForm(status=status)
     if form.validate_on_submit():
         title = form.title.data
-        content = form.content.data
+        content = form.issue_content.data
 
         try:
             message = progit.lib.new_issue(

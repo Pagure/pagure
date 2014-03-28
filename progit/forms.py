@@ -30,7 +30,7 @@ class IssueForm(wtf.Form):
         'Title<span class="error">*</span>',
         [wtforms.validators.Required()]
     )
-    content = wtforms.TextAreaField(
+    issue_content = wtforms.TextAreaField(
         'Content<span class="error">*</span>',
         [wtforms.validators.Required()]
     )
