@@ -146,6 +146,29 @@ class Project(BASE):
         return str_name
 
 
+class ProjectUser(BASE):
+    """ Stores the user of a projects.
+
+    Table -- user_projects
+    """
+
+    __tablename__ = 'user_projects'
+    __table_args__ = (
+        sa.UniqueConstraint('project_id', 'user'),
+    )
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    project_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey('projects.id', onupdate='CASCADE'),
+        nullable=False)
+    user = sa.Column(sa.String(32), nullable=False)
+
+    project = relation(
+        'Project', foreign_keys=[project_id], remote_side=[Project.id],
+        backref='users')
+
+
 class Comment(BASE):
     """ Stores the comments made on a commit/file.
 
