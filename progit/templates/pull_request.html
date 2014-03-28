@@ -20,14 +20,14 @@
 
 {% if request %}
 <h3>Title: {{ request.title }}</h3>
-  {% if request.status %}
+  {% if request.status and repo_admin%}
   <span>
     <a href="{{ url_for('merge_request_pull', username=username,
               repo=repo.name, requestid=request.id) }}" class="message">
       Merge
     </a>
   </span>
-  {% elif not form %}
+  {% elif not request.status %}
   <span class="error">Merged</span>
   {% endif %}
 {% endif %}

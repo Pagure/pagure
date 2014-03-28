@@ -127,6 +127,7 @@ def request_pull(repo, requestid, username=None):
         repo=repo,
         username=username,
         request=request,
+        repo_admin=is_repo_admin(request.repo),
         repo_obj=repo_obj,
         orig_repo=orig_repo,
         diff_commits=diff_commits,
