@@ -365,4 +365,4 @@ def generate_gitolite_acls(session, configfile):
 
     with open(configfile, 'w') as stream:
         for row in config:
-            stream.write(row)
+            stream.write(row + '\n')
