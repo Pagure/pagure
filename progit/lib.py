@@ -157,6 +157,24 @@ def edit_issue(session, issue, title=None, content=None, status=None):
         return 'Edited successfully issue #%s' % issue.id
 
 
+def update_project_settings(session, repo, issue_tracker, project_docs):
+    ''' Update the settings of a project. '''
+    update = []
+    if issue_tracker != repo.issue_tracker:
+        repo.issue_tracker = issue_tracker
+        update.append('issue_tracker')
+    if project_docs != repo.project_docs:
+        repo.project_docs = project_docs
+        update.append('project_docs')
+
+    if not update:
+        return 'No settings to change'
+    else:
+        session.add(repo)
+        session.flush()
+        return 'Edited successfully setting of repo: %s' % repo.fullname
+
+
 def fork_project(session, user, repo, gitfolder, forkfolder, docfolder):
     ''' Fork a given project into the user's forks. '''
     reponame = os.path.join(gitfolder, repo.path)
