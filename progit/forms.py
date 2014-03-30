@@ -86,3 +86,25 @@ class UpdateIssueStatusForm(wtf.Form):
             self.status.choices = [
                 (status, status) for status in kwargs['status']
             ]
+
+
+class ProjectSettingsForm(wtf.Form):
+    ''' Form to update the settings of a project. '''
+    issue_tracker = wtforms.BooleanField(
+        'Activate issue tracker',
+        [wtforms.validators.optional()],
+    )
+    project_docs = wtforms.BooleanField(
+        'Activate project documentation',
+        [wtforms.validators.optional()],
+    )
+
+    def __init__(self, *args, **kwargs):
+        """ Calls the default constructor with the normal argument but
+        uses the list of collection provided to fill the choices of the
+        drop-down list.
+        """
+        super(ProjectSettingsForm, self).__init__(*args, **kwargs)
+        if 'project' in kwargs:
+            self.issue_tracker.data = kwargs['project'].issue_tracker
+            self.project_docs.data = kwargs['project'].project_docs
