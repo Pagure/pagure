@@ -13,7 +13,7 @@
 
     <p>If you already have a git repo:</p>
     <pre>
-      git remote add origin https://githosted.org/{{ repo.name }}.git
+      git remote add origin {{ config.get('GIT_URL') }}:{{ repo.name }}.git
       git push -u origin master
     </pre>
 
@@ -23,7 +23,7 @@
       git init
       git add README.rst
       git commit -m "Add README file"
-      git remote add origin https://githosted.org/{{ repo.name }}.git
+      git remote add origin {{ config.get('GIT_URL') }}:{{ repo.name }}.git
       git push -u origin master
     </pre>
 
