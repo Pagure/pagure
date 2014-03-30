@@ -79,7 +79,9 @@
       </li>
       {% if g.fas_user and g.fas_user.username == repo.user %}
       <li {% if select == 'settings' %}class="selected" {% endif %}>
-        <a href="">Settings</a>
+        <a href="{{ url_for(
+            'view_settings', repo=repo.name, username=username) }}">
+          Settings</a>
       </li>
       {% endif %}
     </ul>
