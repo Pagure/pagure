@@ -23,7 +23,10 @@ ADMIN_GROUP = 'progit_admin'
 EMAIL_ERROR = 'pingou@pingoured.fr'
 
 # The URL at which the project is available.
-APP_URL = 'https://apps.fedoraproject.org/progit/'
+APP_URL = 'https://fedorahosted.org/progit/'
+
+# The URL to use to clone the git repositories.
+GIT_URL = 'git@progit.fedorahosted.org'
 
 # Number of items displayed per page
 ITEM_PER_PAGE = 50
