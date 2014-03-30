@@ -18,7 +18,10 @@ ADMIN_GROUP = ['sysadmin-main', 'sysadmin-cvs']
 EMAIL_ERROR = 'pingou@pingoured.fr'
 
 ### The URL at which the project is available.
-APP_URL = 'https://apps.fedoraproject.org/progit/'
+APP_URL = 'https://fedorahosted.org/progit/'
+
+### The URL to use to clone git repositories.
+GIT_URL = 'git@progit.fedorahosted.org'
 
 ### Folder containing to the git repos
 GIT_FOLDER = os.path.join(
