@@ -440,7 +440,7 @@ def view_settings(repo, username=None):
             SESSION.commit()
             flask.flash(message)
             return flask.redirect(flask.url_for(
-                'view_repo', repo=repo.name))
+                'view_repo', username=username, repo=repo.name))
         except progit.exceptions.ProgitException, err:
             flask.flash(str(err), 'error')
         except SQLAlchemyError, err:  # pragma: no cover
