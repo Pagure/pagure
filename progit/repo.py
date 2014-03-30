@@ -23,7 +23,8 @@ from pygments.formatters import HtmlFormatter
 import progit.exceptions
 import progit.lib
 import progit.forms
-from progit import APP, SESSION, LOG, __get_file_in_tree, cla_required
+from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
+                    is_repo_admin)
 
 
 @APP.route('/<repo>')
@@ -404,4 +405,54 @@ def view_forks(repo, username=None):
         select='forks',
         username=username,
         repo=repo,
+    )
+
+
+@APP.route('/<repo>/settings', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/settings', methods=('GET', 'POST'))
+@cla_required
+def view_settings(repo, username=None):
+    """ Presents the settings of the project.
+    """
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    if not is_repo_admin(repo):
+        flask.abort(
+            403,
+            'You are not allowed to change the settings for this project')
+
+    form = progit.forms.ProjectSettingsForm()
+
+    if form.validate_on_submit():
+        issue_tracker = form.issue_tracker.data
+        project_docs = form.project_docs.data
+
+        try:
+            message = progit.lib.update_project_settings(
+                SESSION,
+                repo=repo,
+                issue_tracker=issue_tracker,
+                project_docs=project_docs,
+            )
+            SESSION.commit()
+            flask.flash(message)
+            return flask.redirect(flask.url_for(
+                'view_repo', repo=repo.name))
+        except progit.exceptions.ProgitException, err:
+            flask.flash(str(err), 'error')
+        except SQLAlchemyError, err:  # pragma: no cover
+            SESSION.rollback()
+            flask.flash(str(err), 'error')
+    elif flask.request.method == 'GET':
+        form = progit.forms.ProjectSettingsForm(project=repo)
+
+    return flask.render_template(
+        'settings.html',
+        select='settings',
+        username=username,
+        repo=repo,
+        form=form,
     )
