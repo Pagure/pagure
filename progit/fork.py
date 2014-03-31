@@ -190,7 +190,7 @@ def merge_request_pull(repo, requestid, username=None):
 
     ori_remote = new_repo.remotes[0]
     # Add the fork as remote repo
-    reponame = '%s_%s' % (request.user, repo.name)
+    reponame = '%s_%s' % (request.user.user, repo.name)
     remote = new_repo.create_remote(reponame, repopath)
 
     # Fetch the commits
