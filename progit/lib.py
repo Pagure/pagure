@@ -456,3 +456,19 @@ def set_up_user(session, username, fullname, user_email):
             email=user_email)
         session.add(useremail)
         session.flush()
+
+
+def update_user_ssh(session, user, ssh_key):
+    ''' Set up a new user into the database or update its information. '''
+    if isinstance(user, basestring):
+        user = get_user(session, user)
+
+    message = 'Nothing to update'
+
+    if ssh_key != user.public_ssh_key:
+        user.public_ssh_key = ssh_key
+        session.add(user)
+        session.flush()
+        message = 'Public ssh key updated'
+
+    return message
