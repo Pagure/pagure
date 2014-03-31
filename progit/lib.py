@@ -42,13 +42,19 @@ def create_session(db_url, debug=False, pool_recycle=3600):
     return scopedsession
 
 
-def add_issue_comment(session, issue, comment, user):
-    ''' Add a comment to an issue. '''
-    user_obj = session.query(
+def get_user(session, username):
+    ''' Return the user corresponding to this username, or None. '''
+    user = session.query(
         model.User
     ).filter(
-        model.User.user == user
+        model.User.user == username
     ).first()
+    return user
+
+
+def add_issue_comment(session, issue, comment, user):
+    ''' Add a comment to an issue. '''
+    user_obj = get_user(session, username)
 
     if not user_obj:
         raise progit.exceptions.ProgitException(
@@ -91,11 +97,7 @@ def new_project(session, user, name, gitfolder, docfolder,
             'The project "%s" already exists' % name
         )
 
-    user_obj = session.query(
-        model.User
-    ).filter(
-        model.User.user == user
-    ).first()
+    user_obj = get_user(session, username)
 
     if not user_obj:
         raise progit.exceptions.ProgitException(
@@ -126,11 +128,7 @@ def new_project(session, user, name, gitfolder, docfolder,
 
 def new_issue(session, repo, title, content, user):
     ''' Create a new issue for the specified repo. '''
-    user_obj = session.query(
-        model.User
-    ).filter(
-        model.User.user == user
-    ).first()
+    user_obj = get_user(session, username)
 
     if not user_obj:
         raise progit.exceptions.ProgitException(
@@ -153,11 +151,7 @@ def new_issue(session, repo, title, content, user):
 def new_pull_request(
         session, repo, repo_from, title, user, stop_id, start_id=None):
     ''' Create a new pull request on the specified repo. '''
-    user_obj = session.query(
-        model.User
-    ).filter(
-        model.User.user == user
-    ).first()
+    user_obj = get_user(session, username)
 
     if not user_obj:
         raise progit.exceptions.ProgitException(
@@ -228,11 +222,7 @@ def fork_project(session, user, repo, gitfolder, forkfolder, docfolder):
         raise progit.exceptions.RepoExistsException(
             'Repo "%s/%s" already exists' % (user, repo.name))
 
-    user_obj = session.query(
-        model.User
-    ).filter(
-        model.User.user == user
-    ).first()
+    user_obj = get_user(session, username)
 
     if not user_obj:
         raise progit.exceptions.ProgitException(
@@ -447,11 +437,7 @@ def generate_gitolite_acls(session, configfile):
 
 def set_up_user(session, username, fullname, user_email):
     ''' Set up a new user into the database or update its information. '''
-    user = session.query(
-        model.User
-    ).filter(
-        model.User.user == username
-    ).first()
+    user = get_user(session, username)
     if not user:
         user = model.User(
             user=username,
