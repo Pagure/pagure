@@ -41,8 +41,8 @@
   </span>
   <p>
       Opened by
-      <a href="{{ url_for('view_user', username=issue.user)}}">
-        {{ issue.user }}
+      <a href="{{ url_for('view_user', username=issue.user.user)}}">
+        {{ issue.user.user }}
       </a>
       on {{ issue.date_created | humanize}}
     </p>
@@ -58,8 +58,8 @@
       {{ comment.comment | rst2html }}
     {% endautoescape %}
     <p>
-      <a href="{{ url_for('view_user', username=comment.user)}}">
-        {{ comment.user }}
+      <a href="{{ url_for('view_user', username=comment.user.user)}}">
+        {{ comment.user.user }}
       </a>
       on {{ comment.date_created | humanize}}
     </p>
