@@ -108,3 +108,11 @@ class ProjectSettingsForm(wtf.Form):
         if 'project' in kwargs:
             self.issue_tracker.data = kwargs['project'].issue_tracker
             self.project_docs.data = kwargs['project'].project_docs
+
+
+class UserSettingsForm(wtf.Form):
+    ''' Form to create or edit project. '''
+    ssh_key = wtforms.TextAreaField(
+        'Public ssh key <span class="error">*</span>',
+        [wtforms.validators.Required()]
+    )
