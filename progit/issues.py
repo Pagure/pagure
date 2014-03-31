@@ -229,7 +229,7 @@ def edit_issue(repo, issueid, username=None):
     form = progit.forms.IssueForm(status=status)
     if form.validate_on_submit():
         title = form.title.data
-        content = form.content.data
+        content = form.issue_content.data
         status = form.status.data
 
         try:
@@ -253,7 +253,7 @@ def edit_issue(repo, issueid, username=None):
             flask.flash(str(err), 'error')
     elif flask.request.method == 'GET':
         form.title.data = issue.title
-        form.content.data = issue.content
+        form.issue_content.data = issue.content
         form.status.data = issue.status
 
     return flask.render_template(
