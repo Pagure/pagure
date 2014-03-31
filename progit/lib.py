@@ -427,7 +427,7 @@ def generate_gitolite_acls(session, configfile):
         config.append('  RW+ = %s' % project.user)
         for user in project.users:
             if user != project.user:
-                config.append('  RW+ = %s' % user)
+                config.append('  RW+ = %s' % user.user)
         config.append('')
 
     with open(configfile, 'w') as stream:
