@@ -54,7 +54,7 @@ def get_user(session, username):
 
 def add_issue_comment(session, issue, comment, user):
     ''' Add a comment to an issue. '''
-    user_obj = get_user(session, username)
+    user_obj = get_user(session, user)
 
     if not user_obj:
         raise progit.exceptions.ProgitException(
@@ -97,7 +97,7 @@ def new_project(session, user, name, gitfolder, docfolder,
             'The project "%s" already exists' % name
         )
 
-    user_obj = get_user(session, username)
+    user_obj = get_user(session, user)
 
     if not user_obj:
         raise progit.exceptions.ProgitException(
@@ -128,7 +128,7 @@ def new_project(session, user, name, gitfolder, docfolder,
 
 def new_issue(session, repo, title, content, user):
     ''' Create a new issue for the specified repo. '''
-    user_obj = get_user(session, username)
+    user_obj = get_user(session, user)
 
     if not user_obj:
         raise progit.exceptions.ProgitException(
@@ -151,7 +151,7 @@ def new_issue(session, repo, title, content, user):
 def new_pull_request(
         session, repo, repo_from, title, user, stop_id, start_id=None):
     ''' Create a new pull request on the specified repo. '''
-    user_obj = get_user(session, username)
+    user_obj = get_user(session, user)
 
     if not user_obj:
         raise progit.exceptions.ProgitException(
@@ -222,7 +222,7 @@ def fork_project(session, user, repo, gitfolder, forkfolder, docfolder):
         raise progit.exceptions.RepoExistsException(
             'Repo "%s/%s" already exists' % (user, repo.name))
 
-    user_obj = get_user(session, username)
+    user_obj = get_user(session, user)
 
     if not user_obj:
         raise progit.exceptions.ProgitException(
