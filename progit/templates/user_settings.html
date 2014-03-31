@@ -39,4 +39,9 @@
   </form>
 </section>
 
+<section class="user_links">
+  <p>
+    <a href="{{ url_for('view_user', username=user.user) }}">Public profile page</a>
+  </p>
+</section>
 {% endblock %}
