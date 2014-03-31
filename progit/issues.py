@@ -129,7 +129,7 @@ def new_issue(repo, username=None):
             SESSION.commit()
             flask.flash(message)
             return flask.redirect(flask.url_for(
-                'view_fork_issues', username=username, repo=repo.name))
+                'view_issues', username=username, repo=repo.name))
         except progit.exceptions.ProgitException, err:
             flask.flash(str(err), 'error')
         except SQLAlchemyError, err:  # pragma: no cover
