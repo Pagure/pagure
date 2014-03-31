@@ -153,13 +153,24 @@ def new_issue(session, repo, title, content, user):
 def new_pull_request(
         session, repo, repo_from, title, user, stop_id, start_id=None):
     ''' Create a new pull request on the specified repo. '''
+    user_obj = session.query(
+        model.User
+    ).filter(
+        model.User.user == user
+    ).first()
+
+    if not user_obj:
+        raise progit.exceptions.ProgitException(
+            'No user "%s" found' % user
+        )
+
     request = model.PullRequest(
         project_id=repo.id,
         project_id_from=repo_from.id,
         title=title,
         start_id=start_id,
         stop_id=stop_id,
-        user=user,
+        user_id=user_obj.id,
     )
     session.add(request)
     # Make sure we won't have SQLAlchemy error before we create the request
