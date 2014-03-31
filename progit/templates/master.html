@@ -46,7 +46,7 @@
         <span id="loginInfo">
           {% if g.fas_user %}
             <span class="text">logged in as </span>
-            <a href="{{ url_for('view_user', username=g.fas_user.username) }}">
+            <a href="{{ url_for('user_settings') }}">
                 {{ g.fas_user.username }}</a> |
             <a href="{{ url_for('auth_logout') }}?next={{request.url}}">log out</a>
           {% else %}
