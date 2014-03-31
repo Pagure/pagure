@@ -424,7 +424,7 @@ def generate_gitolite_acls(session, configfile):
     config = []
     for project in session.query(model.Project).all():
         config.append('repo %s' % project.fullname)
-        config.append('  RW+ = %s' % project.user)
+        config.append('  RW+ = %s' % project.user.user)
         for user in project.users:
             if user != project.user:
                 config.append('  RW+ = %s' % user.user)
