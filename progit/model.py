@@ -160,7 +160,7 @@ class Project(BASE):
     def path(self):
         ''' Return the name of the git repo on the filesystem. '''
         if self.parent_id:
-            path = '%s/%s.git' % (self.user, self.name)
+            path = '%s/%s.git' % (self.user.user, self.name)
         else:
             path = '%s.git' % (self.name)
         return path
@@ -177,7 +177,7 @@ class Project(BASE):
         '''
         str_name = self.name
         if self.parent_id:
-            str_name = "%s/%s" % (self.user, str_name)
+            str_name = "%s/%s" % (self.user.user, str_name)
         return str_name
 
 
