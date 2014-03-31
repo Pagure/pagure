@@ -182,6 +182,8 @@ def set_user(return_url):
         )
         SESSION.commit()
     except SQLAlchemyError, err:
+        LOG.debug(err)
+        LOG.exception(err)
         flask.flash(
             'Could not set up you as a user properly, please contact '
             'an admin', 'error')
