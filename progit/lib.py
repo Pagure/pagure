@@ -432,3 +432,30 @@ def generate_gitolite_acls(session, configfile):
     with open(configfile, 'w') as stream:
         for row in config:
             stream.write(row + '\n')
+
+
+def set_up_user(session, username, fullname, user_email):
+    ''' Set up a new user into the database or update its information. '''
+    user = session.query(
+        model.User
+    ).filter(
+        model.User.user == username
+    ).first()
+    if not user:
+        user = model.User(
+            user=username,
+            fullname=fullname)
+        session.add(user)
+        session.flush()
+
+    if user.fullname != fullname:
+        user.fullname = fullname
+        session.add(user)
+        session.flush()
+
+    if user_email not in user.emails:
+        useremail = model.UserEmail(
+            user_id=user.id,
+            email=user_email)
+        session.add(useremail)
+        session.flush()
