@@ -44,10 +44,21 @@ def create_session(db_url, debug=False, pool_recycle=3600):
 
 def add_issue_comment(session, issue, comment, user):
     ''' Add a comment to an issue. '''
+    user_obj = session.query(
+        model.User
+    ).filter(
+        model.User.user == user
+    ).first()
+
+    if not user_obj:
+        raise progit.exceptions.ProgitException(
+            'No user "%s" found' % user
+        )
+
     isse_comment = model.IssueComment(
         issue_id=issue.id,
         comment=comment,
-        user=user,
+        user_id=user_obj.id,
     )
     session.add(isse_comment)
     # Make sure we won't have SQLAlchemy error before we create the repo
@@ -80,10 +91,21 @@ def new_project(session, user, name, gitfolder, docfolder,
             'The project "%s" already exists' % name
         )
 
+    user_obj = session.query(
+        model.User
+    ).filter(
+        model.User.user == user
+    ).first()
+
+    if not user_obj:
+        raise progit.exceptions.ProgitException(
+            'No user "%s" found' % user
+        )
+
     project = model.Project(
         name=name,
         description=description,
-        user=user,
+        user_id=user_obj.id,
         parent_id=parent_id
     )
     session.add(project)
@@ -104,11 +126,22 @@ def new_project(session, user, name, gitfolder, docfolder,
 
 def new_issue(session, repo, title, content, user):
     ''' Create a new issue for the specified repo. '''
+    user_obj = session.query(
+        model.User
+    ).filter(
+        model.User.user == user
+    ).first()
+
+    if not user_obj:
+        raise progit.exceptions.ProgitException(
+            'No user "%s" found' % user
+        )
+
     issue = model.Issue(
         project_id=repo.id,
         title=title,
         content=content,
-        user=user,
+        user_id=user_obj.id,
     )
     session.add(issue)
     # Make sure we won't have SQLAlchemy error before we create the issue
@@ -178,16 +211,27 @@ def update_project_settings(session, repo, issue_tracker, project_docs):
 def fork_project(session, user, repo, gitfolder, forkfolder, docfolder):
     ''' Fork a given project into the user's forks. '''
     reponame = os.path.join(gitfolder, repo.path)
-    forkreponame = os.path.join(forkfolder, repo.path)
+    forkreponame = os.path.join(forkfolder, user, repo.path)
 
     if os.path.exists(forkreponame):
         raise progit.exceptions.RepoExistsException(
             'Repo "%s/%s" already exists' % (user, repo.name))
 
+    user_obj = session.query(
+        model.User
+    ).filter(
+        model.User.user == user
+    ).first()
+
+    if not user_obj:
+        raise progit.exceptions.ProgitException(
+            'No user "%s" found' % user
+        )
+
     project = model.Project(
         name=repo.name,
         description=repo.description,
-        user=user,
+        user_id=user_obj.id,
         parent_id=repo.id
     )
     session.add(project)
@@ -214,8 +258,10 @@ def list_projects(
     projects = session.query(model.Project)
 
     if username is not None:
-        projects = projects.filter_by(
-            user=username
+        projects = projects.filter(
+            model.User.user == username
+        ).filter(
+            model.User.id == model.Project.user_id
         )
 
     if fork is not None:
@@ -251,7 +297,9 @@ def get_project(session, name, user=None):
 
     if user is not None:
         query = query.filter(
-            model.Project.user == user
+            model.User.user == user
+        ).filter(
+            model.User.id == model.Project.user_id
         ).filter(
             model.Project.parent_id != None
         )
