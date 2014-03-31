@@ -169,10 +169,27 @@ def rst2html(rst_string):
         return progit.doc_utils.convert_doc(unicode(rst_string))
 
 
+@FAS.postlogin
+def set_user(return_url):
+    ''' After login method. '''
+    try:
+        progit.lib.set_up_user(
+            session=SESSION,
+            username=flask.g.fas_user.username,
+            fullname=flask.g.fas_user.fullname,
+            user_email=flask.g.fas_user.email,
+        )
+        SESSION.commit()
+    except SQLAlchemyError, err:
+        flask.flash(
+            'Could not set up you as a user properly, please contact '
+            'an admin', 'error')
+    return flask.redirect(return_url)
+
+
 @APP.route('/login/', methods=('GET', 'POST'))
 def auth_login():
     """ Method to log into the application using FAS OpenID. """
-
     return_point = flask.url_for('index')
     if 'next' in flask.request.args:
         return_point = flask.request.args['next']
