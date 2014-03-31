@@ -62,7 +62,7 @@ def convert_doc(rst_string):
     """ Utility to load an RST file and turn it into fancy HTML. """
     rst = modify_rst(rst_string)
 
-    overrides = {'report_level':'quiet'}
+    overrides = {'report_level': 'quiet'}
     html = docutils.core.publish_parts(
         source=rst,
         writer_name='html',

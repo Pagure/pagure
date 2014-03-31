@@ -117,7 +117,8 @@ class UserEmail(BASE):
 
     __tablename__ = 'user_emails'
     id = sa.Column(sa.Integer, primary_key=True)
-    user_id = sa.Column(sa.Integer,
+    user_id = sa.Column(
+        sa.Integer,
         sa.ForeignKey('users.id', onupdate='CASCADE'),
         nullable=False,
         index=True)
@@ -136,7 +137,8 @@ class Project(BASE):
     __tablename__ = 'projects'
 
     id = sa.Column(sa.Integer, primary_key=True)
-    user_id = sa.Column(sa.Integer,
+    user_id = sa.Column(
+        sa.Integer,
         sa.ForeignKey('users.id', onupdate='CASCADE'),
         nullable=False,
         index=True)
@@ -197,7 +199,8 @@ class ProjectUser(BASE):
         sa.Integer,
         sa.ForeignKey('projects.id', onupdate='CASCADE'),
         nullable=False)
-    user_id = sa.Column(sa.Integer,
+    user_id = sa.Column(
+        sa.Integer,
         sa.ForeignKey('users.id', onupdate='CASCADE'),
         nullable=False,
         index=True)
@@ -227,7 +230,8 @@ class Comment(BASE):
         sa.String(40),
         nullable=False,
         index=True)
-    user_id = sa.Column(sa.Integer,
+    user_id = sa.Column(
+        sa.Integer,
         sa.ForeignKey('users.id', onupdate='CASCADE'),
         nullable=False,
         index=True)
@@ -269,7 +273,8 @@ class Issue(BASE):
     content = sa.Column(
         sa.Text(),
         nullable=False)
-    user_id = sa.Column(sa.Integer,
+    user_id = sa.Column(
+        sa.Integer,
         sa.ForeignKey('users.id', onupdate='CASCADE'),
         nullable=False,
         index=True)
@@ -311,7 +316,8 @@ class IssueComment(BASE):
         sa.Integer,
         sa.ForeignKey('comments.id', onupdate='CASCADE'),
         nullable=True)
-    user_id = sa.Column(sa.Integer,
+    user_id = sa.Column(
+        sa.Integer,
         sa.ForeignKey('users.id', onupdate='CASCADE'),
         nullable=False,
         index=True)
@@ -354,7 +360,8 @@ class PullRequest(BASE):
     stop_id = sa.Column(
         sa.String(40),
         nullable=False)
-    user_id = sa.Column(sa.Integer,
+    user_id = sa.Column(
+        sa.Integer,
         sa.ForeignKey('users.id', onupdate='CASCADE'),
         nullable=False,
         index=True)
