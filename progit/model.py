@@ -107,6 +107,7 @@ class User(BASE):
     id = sa.Column(sa.Integer, primary_key=True)
     user = sa.Column(sa.String(32), nullable=False, unique=True, index=True)
     fullname = sa.Column(sa.Text, nullable=False, index=True)
+    public_ssh_key = sa.Column(sa.Text, nullable=True)
 
 
 class UserEmail(BASE):
