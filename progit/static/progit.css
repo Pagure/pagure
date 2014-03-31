@@ -446,3 +446,8 @@ th.month .ui-button-text {
     min-width: 500px;
     min-height: 120px;
 }
+
+#ssh_key {
+    min-width: 500px;
+    min-height: 120px;
+}

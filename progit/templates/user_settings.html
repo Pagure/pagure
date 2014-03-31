@@ -1,0 +1,42 @@
+{% extends "master.html" %}
+{% from "_formhelper.html" import render_field_in_cell %}
+
+{% block title %}Settings {{username}}{% endblock %}
+{%block tag %}users{% endblock %}
+
+
+{% block content %}
+
+<h2>Setting {{ user.user }}</h2>
+
+
+<section class="user_settings">
+  <form action="{{ url_for('user_settings') }}" method="post">
+    <table>
+      <tr>
+        <th>Full name</th>
+        <td> {{ user.fullname }} </td>
+      </tr>
+      <tr>
+        <th rowspan="{{ user.emails | length }}">Emails</th>
+        {% for email in user.emails %}
+        {% if loop.first %}
+          <td> {{ email.email }} </td>
+        {% else %}
+          <tr>
+            <td>{{ email.email }}</td>
+          </tr>
+        {% endif %}
+        {% endfor %}
+        {{ render_field_in_cell(form.ssh_key) }}
+      </tr>
+    </table>
+    <p class="buttons indent">
+      <input type="submit" class="submit positive button" value="Update">
+      <input type="button" value="Cancel" class="button" onclick="history.back();">
+      {{ form.csrf_token }}
+    </p>
+  </form>
+</section>
+
+{% endblock %}

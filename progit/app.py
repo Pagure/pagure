@@ -197,3 +197,37 @@ def new_project():
         'new_project.html',
         form=form,
     )
+
+
+@APP.route('/settings/', methods=('GET', 'POST'))
+@cla_required
+def user_settings():
+    """ Update the user settings.
+    """
+    user = progit.lib.get_user(SESSION, flask.g.fas_user.username)
+
+    form = progit.forms.UserSettingsForm()
+    if form.validate_on_submit():
+        ssh_key = form.ssh_key.data
+
+        try:
+            message = progit.lib.update_user_ssh(
+                SESSION,
+                user=user,
+                ssh_key=ssh_key,
+            )
+            SESSION.commit()
+            flask.flash(message)
+            return flask.redirect(
+                flask.url_for('view_user', username=user.user))
+        except SQLAlchemyError, err:  # pragma: no cover
+            SESSION.rollback()
+            flask.flash(str(err), 'error')
+    elif flask.request.method == 'GET':
+        form.ssh_key.data = user.public_ssh_key
+
+    return flask.render_template(
+        'user_settings.html',
+        user=user,
+        form=form,
+    )
