@@ -97,6 +97,36 @@ class StatusIssue(BASE):
     status = sa.Column(sa.Text, nullable=False, unique=True)
 
 
+class User(BASE):
+    """ Stores information about users.
+
+    Table -- users
+    """
+
+    __tablename__ = 'users'
+    id = sa.Column(sa.Integer, primary_key=True)
+    user = sa.Column(sa.String(32), nullable=False, unique=True, index=True)
+    fullname = sa.Column(sa.Text, nullable=False, index=True)
+
+
+class UserEmail(BASE):
+    """ Stores email information about the users.
+
+    Table -- user_emails
+    """
+
+    __tablename__ = 'user_emails'
+    id = sa.Column(sa.Integer, primary_key=True)
+    user_id = sa.Column(sa.Integer,
+        sa.ForeignKey('users.id', onupdate='CASCADE'),
+        nullable=False,
+        index=True)
+    email = sa.Column(sa.Text, nullable=False, unique=True)
+
+    user = relation('User', foreign_keys=[user_id],
+                    remote_side=[User.id], backref='emails')
+
+
 class Project(BASE):
     """ Stores the projects.
 
@@ -106,7 +136,10 @@ class Project(BASE):
     __tablename__ = 'projects'
 
     id = sa.Column(sa.Integer, primary_key=True)
-    user = sa.Column(sa.String(32), nullable=False)
+    user_id = sa.Column(sa.Integer,
+        sa.ForeignKey('users.id', onupdate='CASCADE'),
+        nullable=False,
+        index=True)
     name = sa.Column(sa.String(32), nullable=False, index=True)
     description = sa.Column(sa.Text, nullable=True)
     parent_id = sa.Column(
@@ -120,6 +153,8 @@ class Project(BASE):
                              default=datetime.datetime.utcnow)
 
     parent = relation('Project', remote_side=[id], backref='forks')
+    user = relation('User', foreign_keys=[user_id],
+                    remote_side=[User.id], backref='projects')
 
     @property
     def path(self):
@@ -154,7 +189,7 @@ class ProjectUser(BASE):
 
     __tablename__ = 'user_projects'
     __table_args__ = (
-        sa.UniqueConstraint('project_id', 'user'),
+        sa.UniqueConstraint('project_id', 'user_id'),
     )
 
     id = sa.Column(sa.Integer, primary_key=True)
@@ -162,11 +197,16 @@ class ProjectUser(BASE):
         sa.Integer,
         sa.ForeignKey('projects.id', onupdate='CASCADE'),
         nullable=False)
-    user = sa.Column(sa.String(32), nullable=False)
+    user_id = sa.Column(sa.Integer,
+        sa.ForeignKey('users.id', onupdate='CASCADE'),
+        nullable=False,
+        index=True)
 
     project = relation(
         'Project', foreign_keys=[project_id], remote_side=[Project.id],
         backref='users')
+    user = relation('User', foreign_keys=[user_id],
+                    remote_side=[User.id], backref='co_projects')
 
 
 class Comment(BASE):
@@ -187,6 +227,10 @@ class Comment(BASE):
         sa.String(40),
         nullable=False,
         index=True)
+    user_id = sa.Column(sa.Integer,
+        sa.ForeignKey('users.id', onupdate='CASCADE'),
+        nullable=False,
+        index=True)
     line = sa.Column(
         sa.Integer,
         nullable=True)
@@ -200,6 +244,9 @@ class Comment(BASE):
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
+
+    user = relation('User', foreign_keys=[user_id],
+                    remote_side=[User.id], backref='comments')
 
 
 class Issue(BASE):
@@ -222,7 +269,10 @@ class Issue(BASE):
     content = sa.Column(
         sa.Text(),
         nullable=False)
-    user = sa.Column(sa.String(32), nullable=False)
+    user_id = sa.Column(sa.Integer,
+        sa.ForeignKey('users.id', onupdate='CASCADE'),
+        nullable=False,
+        index=True)
     status = sa.Column(
         sa.Text,
         sa.ForeignKey(
@@ -236,6 +286,8 @@ class Issue(BASE):
     project = relation(
         'Project', foreign_keys=[project_id], remote_side=[Project.id],
         backref='issues')
+    user = relation('User', foreign_keys=[user_id],
+                    remote_side=[User.id], backref='issues')
 
 
 class IssueComment(BASE):
@@ -259,7 +311,10 @@ class IssueComment(BASE):
         sa.Integer,
         sa.ForeignKey('comments.id', onupdate='CASCADE'),
         nullable=True)
-    user = sa.Column(sa.String(32), nullable=False)
+    user_id = sa.Column(sa.Integer,
+        sa.ForeignKey('users.id', onupdate='CASCADE'),
+        nullable=False,
+        index=True)
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
@@ -267,6 +322,8 @@ class IssueComment(BASE):
     issue = relation(
         'Issue', foreign_keys=[issue_id], remote_side=[Issue.id],
         backref='comments')
+    user = relation('User', foreign_keys=[user_id],
+                    remote_side=[User.id], backref='comment_issues')
 
 
 class PullRequest(BASE):
@@ -297,7 +354,10 @@ class PullRequest(BASE):
     stop_id = sa.Column(
         sa.String(40),
         nullable=False)
-    user = sa.Column(sa.String(32), nullable=False)
+    user_id = sa.Column(sa.Integer,
+        sa.ForeignKey('users.id', onupdate='CASCADE'),
+        nullable=False,
+        index=True)
     status = sa.Column(sa.Boolean, nullable=False, default=True)
 
     date_created = sa.Column(sa.DateTime, nullable=False,
@@ -308,3 +368,5 @@ class PullRequest(BASE):
         backref='requests')
     repo_from = relation(
         'Project', foreign_keys=[project_id_from], remote_side=[Project.id])
+    user = relation('User', foreign_keys=[user_id],
+                    remote_side=[User.id], backref='pull_requests')
