@@ -32,8 +32,8 @@
         {{ request.title }}
       </a>
       <span> Opened by
-      <a href="{{ url_for('view_user', username=request.user) }}">
-      {{request.user}}
+      <a href="{{ url_for('view_user', username=request.user.user) }}">
+      {{request.user.user}}
       </a> on {{ request.date_created.strftime('%Y-%m-%d %H:%M') }}</span>
     </li>
     {% endfor %}
