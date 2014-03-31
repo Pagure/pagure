@@ -8,7 +8,7 @@
 
 <h2>{{ username }}</h2>
 
-{% if total_page_repos %}
+{% if total_page_repos and total_page_repos > 1 %}
 <table>
     <tr>
         <td>
@@ -49,7 +49,7 @@
 </section>
 
 
-{% if total_page_forks %}
+{% if total_page_forks and total_page_forks > 1 %}
 <table>
     <tr>
         <td>
