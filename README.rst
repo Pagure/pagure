@@ -17,9 +17,9 @@ Get it running
     git clone git://github.com/pypingou/progit
 
 
-* Retrieve a bunch of git repositories::
+* Create the folder that will receive the projects, forks and docs' git repo::
 
-    sh get_repos.sh
+    mkdir {repos,docs,forks}
 
 
 * Run it::
