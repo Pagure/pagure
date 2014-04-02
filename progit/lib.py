@@ -256,7 +256,11 @@ def list_projects(
         start=None, limit=None, count=False):
     '''List existing projects
     '''
-    projects = session.query(model.Project)
+    projects = session.query(
+        model.Project
+    ).order_by(
+        model.Project.date_created
+    )
 
     if username is not None:
         projects = projects.filter(
