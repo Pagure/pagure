@@ -6,11 +6,11 @@ docutils
 flask
 flask-wtf
 markdown
-python-fedora
-python-openid
-python-openid-teams
-python-openid-cla
 pygit2 >= 0.20.1
 pygments
+python-fedora
+python-openid
+python-openid-cla
+python-openid-teams
 sqlalchemy
 wtforms
