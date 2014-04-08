@@ -38,8 +38,8 @@
   <ul>
     {% for user in users %}
     <li>
-      <a href="{{ url_for('view_user', username=user)}}">
-        {{ user }}
+      <a href="{{ url_for('view_user', username=user.user)}}">
+        {{ user.fullname }} ({{ user.user }})
       </a>
     </li>
     {% endfor %}
