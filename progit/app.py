@@ -73,8 +73,7 @@ def view_users():
     except ValueError:
         page = 1
 
-    ## TODO: retrieve this from the DB
-    users = ['pingou']
+    users = progit.lib.get_all_users(SESSION)
 
     limit = APP.config['ITEM_PER_PAGE']
     start = limit * (page - 1)
