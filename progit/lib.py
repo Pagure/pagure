@@ -52,6 +52,14 @@ def get_user(session, username):
     return user
 
 
+def get_all_users(session):
+    ''' Return the user corresponding to this username, or None. '''
+    users = session.query(
+        model.User
+    ).all()
+    return users
+
+
 def add_issue_comment(session, issue, comment, user):
     ''' Add a comment to an issue. '''
     user_obj = get_user(session, user)
