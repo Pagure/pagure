@@ -115,19 +115,16 @@ def generate_gitolite_acls():
 
     gitolite_folder = APP.config.get('GITOLITE_HOME', None)
     if gitolite_folder:
-        cur_wd = os.getcwd()
-        os.chdir(gitolite_folder)
         cmd = 'GL_RC=%s GL_BINDIR=%s gl-compile-conf' % (
             APP.config.get('GL_RC'), APP.config.get('GL_BINDIR')
         )
-        subprocess.Popen(
-            ' '.join(cmd),
+        output = subprocess.Popen(
+            cmd,
             shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             cwd=gitolite_folder
         )
-        os.chdir(cur_wd)
 
 
 def generate_gitolite_key(user, key):
