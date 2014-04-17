@@ -16,6 +16,7 @@ __version__ = '0.1'
 
 import logging
 import os
+import subprocess
 from logging.handlers import SMTPHandler
 
 import arrow
