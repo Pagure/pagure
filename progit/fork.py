@@ -25,7 +25,7 @@ import progit.doc_utils
 import progit.lib
 import progit.forms
 from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
-                    is_repo_admin)
+                    is_repo_admin, generate_gitolite_acls)
 
 
 @APP.route('/<repo>/request-pulls')
@@ -241,6 +241,7 @@ def fork_project(repo, username=None):
             user=flask.g.fas_user.username)
 
         SESSION.commit()
+        generate_gitolite_acls()
         flask.flash(message)
         return flask.redirect(
             flask.url_for(
