@@ -74,13 +74,13 @@ def view_repo(repo, username=None):
                 diff = repo_obj.diff(
                     repo_obj.revparse_single(orig_commit.oid.hex),
                     repo_obj.revparse_single(repo_commit.oid.hex))
+                for commit in repo_obj.walk(
+                        repo_obj.head.target, pygit2.GIT_SORT_TIME):
+                    if commit.oid.hex == orig_commit.oid.hex:
+                        break
+                    diff_commits.append(commit.oid.hex)
             except KeyError:
                 pass
-            for commit in repo_obj.walk(
-                    repo_obj.head.target, pygit2.GIT_SORT_TIME):
-                if commit.oid.hex == orig_commit.oid.hex:
-                    break
-                diff_commits.append(commit.oid.hex)
 
     return flask.render_template(
         'repo_info.html',
