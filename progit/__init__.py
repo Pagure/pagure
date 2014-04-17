@@ -112,6 +112,18 @@ def generate_gitolite_acls():
     progit.lib.generate_gitolite_acls(
         SESSION, APP.config['GITOLITE_CONFIG'])
 
+    gitolite_folder = APP.config.get('GITOLITE_HOME', None)
+    if gitolite_folder:
+        cur_wd = os.getcwd()
+        os.chdir(gitolite_folder)
+        cmd = [
+            'export GL_RC=%s' % APP.config.get('GL_RC'),
+            'export GL_BINDIR=%s' % APP.config.get('GL_BINDIR'),
+            '%s/gl-compile-conf' % APP.config.get('GL_BINDIR'),
+        ]
+        subprocess.call(cmd, shell=True)
+        os.chdir(cur_wd)
+
 
 def cla_required(function):
     """ Flask decorator to retrict access to CLA signed user.
