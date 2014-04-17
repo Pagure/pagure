@@ -58,3 +58,11 @@ GITOLITE_CONFIG = os.path.join(
     '..',
     'gitolite.conf'
 )
+
+# Home folder of the gitolite user -- Folder where to run gl-compile-conf from
+GITOLITE_HOME = None
+
+# Path to the gitolite.rc file
+GL_RC = None
+# Path to the /bin directory where the gitolite tools can be found
+GL_BINDIR = None
