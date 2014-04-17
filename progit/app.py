@@ -215,7 +215,7 @@ def user_settings():
                 user=user,
                 ssh_key=ssh_key,
             )
-            generate_gitolite_key(user.username, ssh_key)
+            generate_gitolite_key(user.user, ssh_key)
             SESSION.commit()
             flask.flash(message)
             return flask.redirect(
