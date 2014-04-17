@@ -132,14 +132,17 @@ def view_repo_branch(repo, branchname, username=None):
         if not repo_obj.is_empty and not orig_repo.is_empty:
             orig_commit = orig_repo[orig_repo.head.target]
             repo_commit = repo_obj[branch.get_object().hex]
-            diff = repo_obj.diff(
-                repo_obj.revparse_single(orig_commit.oid.hex),
-                repo_obj.revparse_single(repo_commit.oid.hex))
-            for commit in repo_obj.walk(
-                    repo_obj.head.target, pygit2.GIT_SORT_TIME):
-                if commit.oid.hex == orig_commit.oid.hex:
-                    break
-                diff_commits.append(commit.oid.hex)
+            try:
+                diff = repo_obj.diff(
+                    repo_obj.revparse_single(orig_commit.oid.hex),
+                    repo_obj.revparse_single(repo_commit.oid.hex))
+                for commit in repo_obj.walk(
+                        repo_obj.head.target, pygit2.GIT_SORT_TIME):
+                    if commit.oid.hex == orig_commit.oid.hex:
+                        break
+                    diff_commits.append(commit.oid.hex)
+            except KeyError:
+                pass
 
     return flask.render_template(
         'repo_info.html',
@@ -207,14 +210,17 @@ def view_log(repo, branchname=None, username=None):
         if not repo_obj.is_empty and not orig_repo.is_empty:
             orig_commit = orig_repo[orig_repo.head.target]
             repo_commit = repo_obj[branch.get_object().hex]
-            diff = repo_obj.diff(
-                repo_obj.revparse_single(orig_commit.oid.hex),
-                repo_obj.revparse_single(repo_commit.oid.hex))
-            for commit in repo_obj.walk(
-                    repo_obj.head.target, pygit2.GIT_SORT_TIME):
-                if commit.oid.hex == orig_commit.oid.hex:
-                    break
-                diff_commits.append(commit.oid.hex)
+            try:
+                diff = repo_obj.diff(
+                    repo_obj.revparse_single(orig_commit.oid.hex),
+                    repo_obj.revparse_single(repo_commit.oid.hex))
+                for commit in repo_obj.walk(
+                        repo_obj.head.target, pygit2.GIT_SORT_TIME):
+                    if commit.oid.hex == orig_commit.oid.hex:
+                        break
+                    diff_commits.append(commit.oid.hex)
+            except KeyError:
+                pass
 
     origin = 'view_log'
 
