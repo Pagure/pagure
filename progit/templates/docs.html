@@ -78,6 +78,10 @@
     {% endautoescape %}
   </section>
   {% endif %}
+
+  <section class="git_links">
+    git url: {{ config.get('GIT_URL') }}:{{ repo.fullname }}.git
+  </section>
 {% endif %}
 
 {% endblock %}
