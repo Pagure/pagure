@@ -125,6 +125,16 @@ def generate_gitolite_acls():
         os.chdir(cur_wd)
 
 
+def generate_gitolite_key(user, key):
+    """ Generate the gitolite ssh key file for the specified user
+    """
+    gitolite_keydir = APP.config.get('GITOLITE_KEYDIR', None)
+    if gitolite_keydir:
+        keyfile = os.path.join(gitolite_keydir, '%s.pub' % user)
+        with open(keyfile, 'w') as stream:
+            stream.write(key + '\n')
+
+
 def cla_required(function):
     """ Flask decorator to retrict access to CLA signed user.
 To use this decorator you need to have a function named 'auth_login'.
