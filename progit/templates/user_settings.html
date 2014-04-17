@@ -22,12 +22,18 @@
         {% for email in user.emails %}
         {% if loop.first %}
           <td> {{ email.email }} </td>
+        {% elif loop.last %}
+      </tr>
+      <tr>
+          <td>{{ email.email }}</td>
         {% else %}
-          <tr>
+      </tr>
+      <tr>
             <td>{{ email.email }}</td>
-          </tr>
         {% endif %}
         {% endfor %}
+      </tr>
+      <tr>
         {{ render_field_in_cell(form.ssh_key) }}
       </tr>
     </table>
@@ -35,7 +41,7 @@
       <input type="submit" class="submit positive button" value="Update">
       <input type="button" value="Cancel" class="button" onclick="history.back();">
       {{ form.csrf_token }}
-    </p>
+</p>
   </form>
 </section>
 
