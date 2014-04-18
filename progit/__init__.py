@@ -142,7 +142,7 @@ def generate_authorized_key_file():
     """
     gitolite_home = APP.config.get('GITOLITE_HOME', None)
     if gitolite_home:
-        users = get_all_users(SESSION)
+        users = progit.lib.get_all_users(SESSION)
 
         authorized_file = os.path.join(
             gitolite_home, '.ssh', 'authorized_keys')
