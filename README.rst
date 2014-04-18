@@ -9,6 +9,8 @@ ProGit isa light-weight web-interface for git repo based on pygit2.
 Ultimately, there are bigger plans for ProGit but let's start small and
 improve from there.
 
+Homepage: https://github.com/pypingou/ProGit
+
 Get it running
 ==============
 
