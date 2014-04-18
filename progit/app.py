@@ -216,8 +216,9 @@ def user_settings():
                 user=user,
                 ssh_key=ssh_key,
             )
-            generate_gitolite_key(user.user, ssh_key)
-            generate_authorized_key_file()
+            if message != 'Nothing to update':
+                generate_gitolite_key(user.user, ssh_key)
+                generate_authorized_key_file()
             SESSION.commit()
             flask.flash(message)
             return flask.redirect(
