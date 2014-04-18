@@ -223,8 +223,11 @@ def update_project_settings(session, repo, issue_tracker, project_docs):
 
 def fork_project(session, user, repo, gitfolder, forkfolder, docfolder):
     ''' Fork a given project into the user's forks. '''
-    reponame = os.path.join(gitfolder, repo.path)
-    forkreponame = os.path.join(forkfolder, user, repo.path)
+    if repo.is_fork:
+        reponame = os.path.join(forkfolder, repo.path)
+    else:
+        reponame = os.path.join(gitfolder, repo.path)
+    forkreponame = '%s.git' % os.path.join(forkfolder, user, repo.name)
 
     if os.path.exists(forkreponame):
         raise progit.exceptions.RepoExistsException(
