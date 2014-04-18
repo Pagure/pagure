@@ -206,6 +206,7 @@ def set_user(return_url):
         )
         SESSION.commit()
     except SQLAlchemyError, err:
+        SESSION.rollback()
         LOG.debug(err)
         LOG.exception(err)
         flask.flash(
