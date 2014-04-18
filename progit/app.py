@@ -114,25 +114,25 @@ def view_user(username):
 
     repos = progit.lib.list_projects(
         SESSION,
-        username=flask.g.fas_user.username,
+        username=username,
         fork=False,
         start=repo_start,
         limit=limit)
     repos_length = progit.lib.list_projects(
         SESSION,
-        username=flask.g.fas_user.username,
+        username=username,
         fork=False,
         count=True)
 
     forks = progit.lib.list_projects(
         SESSION,
-        username=flask.g.fas_user.username,
+        username=username,
         fork=True,
         start=fork_start,
         limit=limit)
     forks_length = progit.lib.list_projects(
         SESSION,
-        username=flask.g.fas_user.username,
+        username=username,
         fork=True,
         count=True)
 
