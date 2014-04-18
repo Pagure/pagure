@@ -181,10 +181,8 @@ def view_issue(repo, issueid, username=None):
                 )
                 SESSION.commit()
                 flask.flash(message)
-                url = flask.url_for('view_issues', repo=repo.name)
-                if username:
-                    url = flask.url_for(
-                        'view_fork_issues', username=username, repo=repo.name)
+                url = flask.url_for(
+                    'view_issues', username=username, repo=repo.name)
                 return flask.redirect(url)
             except SQLAlchemyError, err:  # pragma: no cover
                 SESSION.rollback()
