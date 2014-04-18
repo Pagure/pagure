@@ -65,6 +65,9 @@ def view_repo(repo, username=None):
     if repo.is_fork:
         parentname = os.path.join(
             APP.config['GIT_FOLDER'], repo.parent.path)
+        if repo.parent.is_fork:
+            parentname = os.path.join(
+                APP.config['FORK_FOLDER'], repo.parent.path)
         orig_repo = pygit2.Repository(parentname)
 
         if not repo_obj.is_empty and not orig_repo.is_empty:
@@ -127,6 +130,10 @@ def view_repo_branch(repo, branchname, username=None):
     if repo.is_fork:
         parentname = os.path.join(
             APP.config['GIT_FOLDER'], repo.parent.path)
+        if repo.parent.is_fork:
+            parentname = os.path.join(
+                APP.config['FORK_FOLDER'], repo.parent.path)
+
         orig_repo = pygit2.Repository(parentname)
 
         if not repo_obj.is_empty and not orig_repo.is_empty:
@@ -206,6 +213,10 @@ def view_log(repo, branchname=None, username=None):
     if repo.is_fork:
         parentname = os.path.join(
             APP.config['GIT_FOLDER'], repo.parent.path)
+        if repo.parent.is_fork:
+            parentname = os.path.join(
+                APP.config['FORK_FOLDER'], repo.parent.path)
+
         orig_repo = pygit2.Repository(parentname)
         if not repo_obj.is_empty and not orig_repo.is_empty:
             orig_commit = orig_repo[orig_repo.head.target]
