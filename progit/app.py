@@ -24,7 +24,8 @@ import progit.exceptions
 import progit.lib
 import progit.forms
 from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
-                    generate_gitolite_acls, generate_gitolite_key)
+                    generate_gitolite_acls, generate_gitolite_key,
+                    generate_authorized_key_file)
 
 
 ### Application
@@ -216,6 +217,7 @@ def user_settings():
                 ssh_key=ssh_key,
             )
             generate_gitolite_key(user.user, ssh_key)
+            generate_authorized_key_file()
             SESSION.commit()
             flask.flash(message)
             return flask.redirect(
