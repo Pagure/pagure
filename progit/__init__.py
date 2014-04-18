@@ -137,6 +137,28 @@ def generate_gitolite_key(user, key):
             stream.write(key + '\n')
 
 
+def generate_authorized_key_file():
+    """ Regenerate the `authorized_keys` file used by gitolite.
+    """
+    gitolite_home = APP.config.get('GITOLITE_HOME', None)
+    if gitolite_home:
+        users = get_all_users(SESSION)
+
+        authorized_file = os.path.join(
+            gitolite_home, '.ssh', 'authorized_keys')
+        with open(keyfile, 'w') as stream:
+            stream.write('# gitolite start\n')
+            for user in users:
+                if not user.public_ssh_key:
+                    continue
+                row = 'command="/usr/bin/gl-auth-command %s",' \
+                      'no-port-forwarding,no-X11-forwarding,'\
+                      'no-agent-forwarding,no-pty %s' % (
+                        user.user, user.public_ssh_key)
+                stream.write(row + '\n')
+            stream.write('# gitolite end\n')
+
+
 def cla_required(function):
     """ Flask decorator to retrict access to CLA signed user.
 To use this decorator you need to have a function named 'auth_login'.
