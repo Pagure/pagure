@@ -229,6 +229,10 @@ def fork_project(session, user, repo, gitfolder, forkfolder, docfolder):
         reponame = os.path.join(gitfolder, repo.path)
     forkreponame = '%s.git' % os.path.join(forkfolder, user, repo.name)
 
+    if repo.user.user == user:
+        raise progit.exceptions.RepoExistsException(
+            'You may not fork your own repo')
+
     if os.path.exists(forkreponame):
         raise progit.exceptions.RepoExistsException(
             'Repo "%s/%s" already exists' % (user, repo.name))
