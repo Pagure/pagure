@@ -479,7 +479,8 @@ def set_up_user(session, username, fullname, user_email):
         session.add(user)
         session.flush()
 
-    if user_email not in user.emails:
+    emails = [email.email for email in user.emails]
+    if user_email not in emails:
         useremail = model.UserEmail(
             user_id=user.id,
             email=user_email)
