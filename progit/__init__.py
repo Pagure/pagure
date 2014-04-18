@@ -146,7 +146,7 @@ def generate_authorized_key_file():
 
         authorized_file = os.path.join(
             gitolite_home, '.ssh', 'authorized_keys')
-        with open(keyfile, 'w') as stream:
+        with open(authorized_file, 'w') as stream:
             stream.write('# gitolite start\n')
             for user in users:
                 if not user.public_ssh_key:
