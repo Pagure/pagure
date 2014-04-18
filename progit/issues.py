@@ -167,6 +167,7 @@ def view_issue(repo, issueid, username=None):
 
     status = progit.lib.get_issue_statuses(SESSION)
 
+    form_comment = progit.forms.AddIssueCommentForm()
     form = None
     if authenticated() and is_repo_admin(repo):
         form = progit.forms.UpdateIssueStatusForm(status=status)
@@ -198,6 +199,7 @@ def view_issue(repo, issueid, username=None):
         username=username,
         issue=issue,
         form=form,
+        form_comment=form_comment,
     )
 
 
