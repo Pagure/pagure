@@ -30,11 +30,9 @@
           <h4 class="hide">Main Site Links:</h4>
           <ul>
             <li id="homeTab"><a href="{{url_for('index')}}">Home</a></li>
-            {% if g.fas_user %}
             <li id="usersTab">
               <a href="{{ url_for('view_users') }}">Users</a>
             </li>
-            {% endif %}
             <li id="new_project" class="right">
               <a href="{{url_for('new_project')}}">
                 New project
