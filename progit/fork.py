@@ -175,6 +175,7 @@ def merge_request_pull(repo, requestid, username=None):
     parentpath = os.path.join(APP.config['GIT_FOLDER'], request.repo.path)
     orig_repo = pygit2.Repository(parentpath)
 
+    # Check if changes have been merged
     if orig_repo.get(request.stop_id, None):
         flask.flash('These changes have already been merged.', 'error')
         # Update status
@@ -199,16 +200,25 @@ def merge_request_pull(repo, requestid, username=None):
     merge = new_repo.merge(repo_commit.oid)
     master_ref = new_repo.lookup_reference('HEAD').resolve()
 
+    refname = '%s:%s' % (master_ref.name, master_ref.name)
     if merge.is_fastforward:
         master_ref.target = merge.fastforward_oid
-        refname = '%s:%s' % (master_ref.name, master_ref.name)
         ori_remote.push(refname)
         flask.flash('Changes merged!')
     else:
-        flask.flash(
-            'This merge is not fast-forward and cannot be applied via '
-            'progit', 'error')
-        return flask.redirect(error_output)
+        new_repo.index.write()
+        tree = new_repo.index.write_tree()
+        head = new_repo.lookup_reference('HEAD').get_object()
+        commit = new_repo[head.oid]
+        sha = new_repo.create_commit(
+            'refs/heads/master',
+            repo_commit.author,
+            repo_commit.committer,
+            'Merge #%s `%s`' % (request.id, request.title),
+            tree,
+            [head.hex, repo_commit.oid.hex])
+        ori_remote.push(refname)
+        flask.flash('Changes merged!')
 
     # Update status
     progit.lib.close_pull_request(SESSION, request)
