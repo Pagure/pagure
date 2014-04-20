@@ -175,14 +175,6 @@ def merge_request_pull(repo, requestid, username=None):
     parentpath = os.path.join(APP.config['GIT_FOLDER'], request.repo.path)
     orig_repo = pygit2.Repository(parentpath)
 
-    # Check if changes have been merged
-    if orig_repo.get(request.stop_id, None):
-        flask.flash('These changes have already been merged.', 'error')
-        # Update status
-        progit.lib.close_pull_request(SESSION, request)
-        SESSION.commit()
-        return flask.redirect(error_output)
-
     # Clone the original repo into a temp folder
     newpath = tempfile.mkdtemp()
     new_repo = pygit2.clone_repository(parentpath, newpath)
