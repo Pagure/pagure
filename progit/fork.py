@@ -201,7 +201,12 @@ def merge_request_pull(repo, requestid, username=None):
     master_ref = new_repo.lookup_reference('HEAD').resolve()
 
     refname = '%s:%s' % (master_ref.name, master_ref.name)
-    if merge.is_fastforward:
+    if merge.is_uptodate:
+        flask.flash('Nothing to do, changes were already merged', 'error')
+        progit.lib.close_pull_request(SESSION, request)
+        SESSION.commit()
+        return flask.redirect(error_output)
+    elif merge.is_fastforward:
         master_ref.target = merge.fastforward_oid
         ori_remote.push(refname)
         flask.flash('Changes merged!')
