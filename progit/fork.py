@@ -89,7 +89,7 @@ def request_pull(repo, requestid, username=None):
         orig_commit = orig_repo[request.start_id]
 
         for commit in repo_obj.walk(request.stop_id, pygit2.GIT_SORT_TIME):
-            if commit.oid.hex == orig_commit.oid.hex:
+            if commit.oid.hex in orig_repo:
                 break
             diff_commits.append(commit)
             diffs.append(
@@ -208,7 +208,7 @@ def merge_request_pull(repo, requestid, username=None):
         flask.flash(
             'This merge is not fast-forward and cannot be applied via '
             'progit', 'error')
-        flask.redirect(error_output)
+        return flask.redirect(error_output)
 
     # Update status
     progit.lib.close_pull_request(SESSION, request)
@@ -292,7 +292,7 @@ def new_request_pull(username, repo, commitid=None):
         repo_commit = repo_obj[commitid]
 
         for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
-            if commit.oid.hex == orig_commit.oid.hex:
+            if commit.oid.hex in orig_repo:
                 break
             diff_commits.append(commit)
             diffs.append(
