@@ -22,7 +22,24 @@
       {{ form.csrf_token }}
     </p>
   </form>
-  </section>
+</section>
 
+{% if plugins %}
+<section class="hooks">
+  <h3>Hooks</h3>
+  <ul>
+  {% for plugin in plugins %}
+    <li>
+      <a href="{{ url_for('.view_plugin', repo=repo.name, username=username,
+        plugin=plugin) }}">{{ plugin }}</a>
+    </li>
+  {% endfor %}
+  </ul>
+</section>
+{% endif %}
 
+{% endblock %}
+
+{% block jscripts %}
+{{ super() }}
 {% endblock %}
