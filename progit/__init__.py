@@ -281,4 +281,5 @@ import progit.app
 import progit.docs
 import progit.fork
 import progit.issues
+import progit.plugins
 import progit.repo
