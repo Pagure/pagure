@@ -1,0 +1,32 @@
+{% if full %}
+{% extends "repo_master.html" %}
+{% from "_formhelper.html" import render_field_in_row %}
+
+{% block title %}{{ select.capitalize() }} {{ plugin.name }} - {{ repo.name }}{% endblock %}
+{%block tag %}home{% endblock %}
+{% endif %}
+
+
+{% block repo %}
+
+<section class="settings">
+  <h3>{{ plugin.name }}</h3>
+
+  <form action="{{ url_for('.view_plugin_page',
+                  username=username, repo=repo.name, plugin=plugin.name,
+                  full=full) }}" method="post">
+  <table>
+    {% for field in fields %}
+      {{ render_field_in_row(field) }}
+    {% endfor %}
+  </table>
+  <p class="buttons indent">
+      <input type="submit" class="submit positive button" value="Update">
+      <input type="button" value="Cancel" class="button" onclick="history.back();">
+      {{ form.csrf_token }}
+    </p>
+  </form>
+  </section>
+
+
+{% endblock %}
