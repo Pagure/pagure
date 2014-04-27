@@ -62,25 +62,25 @@ class IrcForm(wtf.Form):
         [wtforms.validators.Required()]
     )
     nick = wtforms.TextField(
-        'Nick <span class="error">*</span>',
-        [wtforms.validators.Required()]
+        'Nick',
+        [wtforms.validators.Optional()]
     )
     nick_pass = wtforms.TextField(
-        'Nickserv Password <span class="error">*</span>',
-        [wtforms.validators.Required()]
+        'Nickserv Password',
+        [wtforms.validators.Optional()]
     )
 
     active = wtforms.BooleanField(
         'Acive',
-        [wtforms.validators.Required()]
+        [wtforms.validators.Optional()]
     )
     join = wtforms.BooleanField(
         'Message Without Join',
-        [wtforms.validators.Required()]
+        [wtforms.validators.Optional()]
     )
     ssl = wtforms.BooleanField(
         'Use SSL',
-        [wtforms.validators.Required()]
+        [wtforms.validators.Optional()]
     )
 
 
