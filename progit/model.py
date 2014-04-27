@@ -43,6 +43,8 @@ def create_tables(db_url, alembic_ini=None, debug=False):
 
     """
     engine = create_engine(db_url, echo=debug)
+    from progit.plugins import get_plugin_tables
+    get_plugin_tables()
     BASE.metadata.create_all(engine)
     #engine.execute(collection_package_create_view(driver=engine.driver))
     if db_url.startswith('sqlite:'):
@@ -66,7 +68,10 @@ def create_tables(db_url, alembic_ini=None, debug=False):
 
     scopedsession = scoped_session(sessionmaker(bind=engine))
     # Insert the default data into the db
-    create_default_status(scopedsession)
+    try:
+        create_default_status(scopedsession)
+    except SQLAlchemyError:
+        pass
     return scopedsession
 
 
@@ -81,7 +86,6 @@ def create_default_status(session):
             session.flush()
         except SQLAlchemyError, err:
             ERROR_LOG.debug('Status %s could not be added', ticket_stat)
-            ERROR_LOG.exception(err)
 
     session.commit()
 
