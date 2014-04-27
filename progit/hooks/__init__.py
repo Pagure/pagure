@@ -15,7 +15,8 @@ class BaseHook(object):
     name = None
     form = None
 
-    def install(project):
+    @classmethod
+    def install(cls, project):
         ''' Method called to install the hook for a project.
 
         :arg project: a ``progit.model.Project`` object to which the hook
@@ -24,7 +25,8 @@ class BaseHook(object):
         '''
         pass
 
-    def remove(project):
+    @classmethod
+    def remove(cls, project):
         ''' Method called to remove the hook of a project.
 
         :arg project: a ``progit.model.Project`` object to which the hook
