@@ -83,7 +83,7 @@ class Hook(BaseHook):
     ''' IRC hooks. '''
 
     name = 'IRC'
-    form = IrcForm()
+    form = IrcForm
     form_fields = [
         'server', 'port', 'room', 'nick', 'nick_pass', 'active', 'join',
         'ssl'
