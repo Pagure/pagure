@@ -8,12 +8,13 @@
 
 """
 
-from flask.ext import wtf
 import sqlalchemy as sa
 import wtforms
+from flask.ext import wtf
+from sqlalchemy.orm import relation
 
 from progit.hooks import BaseHook
-from progit.model import BASE
+from progit.model import BASE, Project
 from progit import SESSION
 
 
@@ -30,6 +31,7 @@ class IrcTable(BASE):
         sa.Integer,
         sa.ForeignKey('projects.id', onupdate='CASCADE'),
         nullable=False,
+        unique=True,
         index=True)
 
     server = sa.Column(sa.Text, nullable=False)
@@ -40,6 +42,9 @@ class IrcTable(BASE):
     active = sa.Column(sa.Boolean, nullable=False, default=False)
     join = sa.Column(sa.Boolean, nullable=False, default=True)
     ssl = sa.Column(sa.Boolean, nullable=False, default=True)
+
+    project = relation(
+        'Project', remote_side=[Project.id], backref='irc_hook')
 
 
 class IrcForm(wtf.Form):
@@ -84,6 +89,8 @@ class Hook(BaseHook):
 
     name = 'IRC'
     form = IrcForm
+    db_object = IrcTable
+    backref = 'irc_hook'
     form_fields = [
         'server', 'port', 'room', 'nick', 'nick_pass', 'active', 'join',
         'ssl'
