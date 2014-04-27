@@ -21,8 +21,8 @@ from hooks import BaseHook
 import progit.exceptions
 import progit.lib
 import progit.forms
-from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
-                    is_repo_admin)
+from progit import APP, SESSION, LOG, cla_required, is_repo_admin
+from progit.model import BASE
 
 
 def get_plugin_names():
@@ -30,6 +30,12 @@ def get_plugin_names():
     plugins = load('progit.hooks', subclasses=BaseHook)
     output = [plugin.name for plugin in plugins]
     return output
+
+
+def get_plugin_tables():
+    ''' Return the list of all plugins. '''
+    plugins = load('progit.hooks', subclasses=BASE)
+    return plugins
 
 
 def get_plugin(plugin_name):
@@ -70,8 +76,9 @@ def view_plugin_page(repo, plugin, full, username=None):
 
     plugin = get_plugin(plugin)
     fields = []
+    form = plugin.form()
     for field in plugin.form_fields:
-        fields.append(getattr(plugin.form, field))
+        fields.append(getattr(form, field))
 
     return flask.render_template(
         'plugin.html',
@@ -80,7 +87,7 @@ def view_plugin_page(repo, plugin, full, username=None):
         repo=repo,
         username=username,
         plugin=plugin,
-        form=plugin.form,
+        form=form,
         fields=fields,
     )
 
