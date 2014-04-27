@@ -8,10 +8,38 @@
 
 """
 
-from . import BaseHook
-
 from flask.ext import wtf
+import sqlalchemy as sa
 import wtforms
+
+from progit.hooks import BaseHook
+from progit.model import BASE
+from progit import SESSION
+
+
+class IrcTable(BASE):
+    """ Stores information about the irc hook deployed on a project.
+
+    Table -- hook_irc
+    """
+
+    __tablename__ = 'hook_irc'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    project_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey('projects.id', onupdate='CASCADE'),
+        nullable=False,
+        index=True)
+
+    server = sa.Column(sa.Text, nullable=False)
+    port = sa.Column(sa.Text, nullable=False)
+    room = sa.Column(sa.Text, nullable=False)
+    nick = sa.Column(sa.Text, nullable=True, default=None)
+    nick_pass = sa.Column(sa.Text, nullable=True, default=None)
+    active = sa.Column(sa.Boolean, nullable=False, default=False)
+    join = sa.Column(sa.Boolean, nullable=False, default=True)
+    ssl = sa.Column(sa.Boolean, nullable=False, default=True)
 
 
 class IrcForm(wtf.Form):
