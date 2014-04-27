@@ -76,9 +76,54 @@ def view_plugin_page(repo, plugin, full, username=None):
 
     plugin = get_plugin(plugin)
     fields = []
-    form = plugin.form()
+    new = True
+    dbobj = plugin.db_object()
+    if hasattr(repo, plugin.backref):
+        dbobj = getattr(repo, plugin.backref)
+        # There should always be only one, but let's double check
+        if dbobj and len(dbobj) > 0:
+            dbobj = dbobj[0]
+            new = False
+        else:
+            dbobj = plugin.db_object()
+
+    form = plugin.form(obj=dbobj)
     for field in plugin.form_fields:
         fields.append(getattr(form, field))
+
+    if form.validate_on_submit():
+        form.populate_obj(obj=dbobj)
+        if new:
+            dbobj.project_id = repo.id
+            SESSION.add(dbobj)
+        try:
+            SESSION.flush()
+        except SQLAlchemyError, err:
+            APP.logger.debug('Could not add plugin %s', plugin.name)
+            APP.logger.exception(err)
+            flask.flash(
+                'Could not add plugin %s, please contact an admin'
+                % plugin.name)
+
+            return flask.render_template(
+                'plugin.html',
+                select='settings',
+                full=full,
+                repo=repo,
+                username=username,
+                plugin=plugin,
+                form=form,
+                fields=fields,
+            )
+
+        if form.active.data:
+            plugin.install(repo)
+            flask.flash('Hook activated')
+        else:
+            plugin.remove(repo)
+            flask.flash('Hook inactived')
+
+        SESSION.commit()
 
     return flask.render_template(
         'plugin.html',
@@ -90,6 +135,3 @@ def view_plugin_page(repo, plugin, full, username=None):
         form=form,
         fields=fields,
     )
-
-
-
