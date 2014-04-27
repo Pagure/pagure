@@ -13,4 +13,5 @@ python-openid
 python-openid-cla
 python-openid-teams
 sqlalchemy
+straight.plugin==1.4.0-post-1
 wtforms
