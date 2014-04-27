@@ -12,9 +12,9 @@
 <section class="settings">
   <h3>{{ plugin.name }}</h3>
 
-  <form action="{{ url_for('.view_plugin_page',
+  <form action="{{ url_for('.view_plugin',
                   username=username, repo=repo.name, plugin=plugin.name,
-                  full=full) }}" method="post">
+                  ) }}" method="post">
   <table>
     {% for field in fields %}
       {{ render_field_in_row(field) }}
