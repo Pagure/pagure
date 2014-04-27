@@ -10,4 +10,4 @@ from progit import model
 model.create_tables(
     APP.config['DB_URL'],
     APP.config.get('PATH_ALEMBIC_INI', None),
-    True)
+    debug=True)
