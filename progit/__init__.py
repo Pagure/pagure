@@ -17,6 +17,7 @@ __version__ = '0.1'
 import logging
 import os
 import subprocess
+import urlparse
 from logging.handlers import SMTPHandler
 
 import arrow
@@ -77,6 +78,17 @@ LOG = APP.logger
 
 def authenticated():
     return hasattr(flask.g, 'fas_user') and flask.g.fas_user
+
+
+def is_safe_url(target):
+    """ Checks that the target url is safe and sending to the current
+    website not some other malicious one.
+    """
+    ref_url = urlparse.urlparse(flask.request.host_url)
+    test_url = urlparse.urlparse(
+        urlparse.urljoin(flask.request.host_url, target))
+    return test_url.scheme in ('http', 'https') and \
+        ref_url.netloc == test_url.netloc
 
 
 def is_admin():
@@ -242,7 +254,8 @@ def auth_login():
     """ Method to log into the application using FAS OpenID. """
     return_point = flask.url_for('index')
     if 'next' in flask.request.args:
-        return_point = flask.request.args['next']
+        if is_safe_url(flask.request.args['next']):
+            return_point = flask.request.args['next']
 
     if authenticated():
         return flask.redirect(return_point)
