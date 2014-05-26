@@ -1,0 +1,24 @@
+{% extends "master.html" %}
+
+{% block title %}Home{% endblock %}
+{%block tag %}home{% endblock %}
+
+
+{% block content %}
+
+<h2>Admin section</h2>
+
+<ul>
+  <li>
+    <a href="{{ url_for('admin_generate_acl') }}">
+     Re-generate gitolite ACLs file
+    </a>
+  </li>
+  <li>
+    <a href="{{ url_for('admin_refresh_ssh') }}">
+     Re-generate ssh authorized_key file
+    </a>
+  </li>
+</ul>
+
+{% endblock %}
