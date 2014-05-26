@@ -451,3 +451,11 @@ th.month .ui-button-text {
     min-width: 500px;
     min-height: 120px;
 }
+
+
+.delete_icon {
+  padding-left: 20px !important;
+  background-image: url(delete.png);
+  background-repeat: no-repeat;
+  background-position: 0px 50%;
+}
