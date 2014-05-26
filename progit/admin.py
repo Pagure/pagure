@@ -36,6 +36,7 @@ def admin_required(function):
 
 
 @APP.route('/admin')
+@admin_required
 def admin_index():
     """ Front page of the admin section of the application.
     """
@@ -46,6 +47,7 @@ def admin_index():
 
 
 @APP.route('/admin/gitolite')
+@admin_required
 def admin_generate_acl():
     """ Regenerate the gitolite ACL file. """
     generate_gitolite_acls()
@@ -54,6 +56,7 @@ def admin_generate_acl():
 
 
 @APP.route('/admin/ssh')
+@admin_required
 def admin_refresh_ssh():
     """ Regenerate the gitolite ACL file. """
     generate_authorized_key_file()
