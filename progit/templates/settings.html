@@ -10,6 +10,15 @@
 <section class="settings">
   <h3>Settings</h3>
 
+  <form action="{{ url_for('.delete_repo',
+                  username=username, repo=repo.name) }}" method="post">
+    <button class="delete_icon" type="submit"
+      onclick="return confirm('Are you sure to delete this project/fork?');"
+      title="Delete the project/forl">
+      Delete project
+    </button>
+  </form>
+
   <form action="{{ url_for('.view_settings',
                   username=username, repo=repo.name) }}" method="post">
   <table>
