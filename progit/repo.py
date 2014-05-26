@@ -464,3 +464,32 @@ def view_settings(repo, username=None):
         form=form,
         plugins=plugins,
     )
+
+
+@APP.route('/<repo>/delete', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/delete', methods=['POST'])
+@cla_required
+def delete_repo(repo, username=None):
+    """ Delete the present project.
+    """
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    if not is_repo_admin(repo):
+        flask.abort(
+            403,
+            'You are not allowed to change the settings for this project')
+
+    SESSION.delete(repo)
+
+    try:
+        SESSION.commit()
+    except SQLAlchemyError, err:  # pragma: no cover
+        SESSION.rollback()
+        APP.logger.exception(err)
+        flask.flash('Could not delete the project', 'error')
+
+    return flask.redirect(
+        flask.url_for('view_user', username=flask.g.fas_user.username))
