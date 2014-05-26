@@ -8,11 +8,28 @@
 
 """
 
+from functools import wraps
+
 import flask
 
-from progit import (APP, SESSION, LOG, cla_required,
+from progit import (APP, SESSION, LOG, cla_required, authenticated,
                     generate_gitolite_acls, generate_authorized_key_file)
 
+
+def admin_required(function):
+    """ Flask decorator to retrict access to admins of progit.
+    """
+    @wraps(function)
+    def decorated_function(*args, **kwargs):
+        """ Decorated function, actually does the work. """
+        if not authenticated():
+            return flask.redirect(
+                flask.url_for('auth_login', next=flask.request.url))
+        elif not is_admin():
+            flask.flash('Access restricted', 'error')
+            return flask.redirect(flask.url_for('.index'))
+        return function(*args, **kwargs)
+    return decorated_function
 
 
 ### Application
