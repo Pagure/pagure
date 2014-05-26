@@ -47,7 +47,8 @@ def get_plugin(plugin_name):
 
 
 @APP.route('/<repo>/settings/<plugin>', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/settings/<plugin>', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/settings/<plugin>',
+           methods=('GET', 'POST'))
 @cla_required
 def view_plugin(repo, plugin, username=None):
     """ Presents the settings of the project.

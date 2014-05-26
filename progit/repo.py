@@ -108,7 +108,7 @@ def view_repo_branch(repo, branchname, username=None):
         reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
     repo_obj = pygit2.Repository(reponame)
 
-    if not branchname in repo_obj.listall_branches():
+    if branchname not in repo_obj.listall_branches():
         flask.abort(404, 'Branch no found')
 
     branch = repo_obj.lookup_branch(branchname)
@@ -171,7 +171,7 @@ def view_log(repo, branchname=None, username=None):
         reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
     repo_obj = pygit2.Repository(reponame)
 
-    if branchname and not branchname in repo_obj.listall_branches():
+    if branchname and branchname not in repo_obj.listall_branches():
         flask.abort(404, 'Branch no found')
 
     if branchname:

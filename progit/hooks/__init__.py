@@ -34,4 +34,3 @@ class BaseHook(object):
 
         '''
         pass
-

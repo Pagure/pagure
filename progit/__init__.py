@@ -166,7 +166,7 @@ def generate_authorized_key_file():
                 row = 'command="/usr/bin/gl-auth-command %s",' \
                       'no-port-forwarding,no-X11-forwarding,'\
                       'no-agent-forwarding,no-pty %s' % (
-                        user.user, user.public_ssh_key)
+                          user.user, user.public_ssh_key)
                 stream.write(row + '\n')
             stream.write('# gitolite end\n')
 
