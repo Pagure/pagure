@@ -482,6 +482,12 @@ def delete_repo(repo, username=None):
             403,
             'You are not allowed to change the settings for this project')
 
+    for issue in repo.issues:
+        for comment in issue.comments:
+            SESSION.delete(comment)
+        SESSION.delete(issue)
+    for request in repo.requests:
+        SESSION.delete(request)
     SESSION.delete(repo)
 
     try:
