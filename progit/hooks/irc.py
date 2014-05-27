@@ -8,14 +8,17 @@
 
 """
 
+import os
+
 import sqlalchemy as sa
+import pygit2
 import wtforms
 from flask.ext import wtf
 from sqlalchemy.orm import relation
 
 from progit.hooks import BaseHook
 from progit.model import BASE, Project
-from progit import SESSION
+from progit import SESSION, APP
 
 
 class IrcTable(BASE):
@@ -95,3 +98,28 @@ class Hook(BaseHook):
         'server', 'port', 'room', 'nick', 'nick_pass', 'active', 'join',
         'ssl'
     ]
+
+    @classmethod
+    def install(cls, project, dbobj):
+        ''' Method called to install the hook for a project.
+
+        :arg project: a ``progit.model.Project`` object to which the hook
+            should be installed
+
+        '''
+        repopath = os.path.join(APP.config['GIT_FOLDER'], project.path)
+        if project.is_fork:
+            repopath = os.path.join(APP.config['FORK_FOLDER'], project.path)
+        hook_files = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), 'files')
+        repo_obj = pygit2.Repository(repopath)
+
+        # Configure the hook
+        # repo_obj.config.set_multivar()
+
+        # Install the hook itself
+        #shutil.copyfile(
+            #os.path.join(hook_files, 'git_irc.py'),
+            #os.path.join(repopath, 'hooks', 'post-receive.irc')
+        #)
+        #os.chmod(os.path.join(repopath, 'hooks', 'post-receive.irc'), 0755)
