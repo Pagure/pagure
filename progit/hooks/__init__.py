@@ -40,11 +40,13 @@ class BaseHook(object):
             os.chmod(postreceive, 0755)
 
     @classmethod
-    def install(cls, project):
+    def install(cls, project, dbobj):
         ''' Method called to install the hook for a project.
 
         :arg project: a ``progit.model.Project`` object to which the hook
             should be installed
+        :arg dbobj: the DB object the hook uses to store the settings
+            information.
 
         '''
         pass
