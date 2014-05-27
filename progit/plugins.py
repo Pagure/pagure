@@ -100,6 +100,7 @@ def view_plugin_page(repo, plugin, full, username=None):
         try:
             SESSION.flush()
         except SQLAlchemyError, err:
+            SESSION.rollback()
             APP.logger.debug('Could not add plugin %s', plugin.name)
             APP.logger.exception(err)
             flask.flash(
