@@ -9,6 +9,7 @@
 """
 
 import os
+import shutil
 
 from progit import APP
 
