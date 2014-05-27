@@ -18,7 +18,7 @@ body {
     font-size: small;
     font-family: Cantarell, sans-serif;
     color: #666;
-    background: #fff url(http://koji.fedoraproject.org/koji-static/images/header-bg.png) repeat-x;
+    background: #fff url(header-bg.png) repeat-x;
 }
 
 a, a:visited, a:hover {
