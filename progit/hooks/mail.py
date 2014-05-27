@@ -97,3 +97,15 @@ class Mail(BaseHook):
         )
         os.chmod(os.path.join(repopath, 'hooks', 'post-receive.mail'), 0755)
 
+    @classmethod
+    def remove(cls, project):
+        ''' Method called to remove the hook of a project.
+
+        :arg project: a ``progit.model.Project`` object to which the hook
+            should be installed
+
+        '''
+        repopath = os.path.join(APP.config['GIT_FOLDER'], project.path)
+        if project.is_fork:
+            repopath = os.path.join(APP.config['FORK_FOLDER'], project.path)
+        os.unlink(os.path.join(repopath, 'hooks', 'post-receive.mail'))
