@@ -9,6 +9,7 @@
 """
 
 import flask
+import shutil
 import os
 from math import ceil
 
@@ -490,8 +491,18 @@ def delete_repo(repo, username=None):
         SESSION.delete(request)
     SESSION.delete(repo)
 
+    repopath = os.path.join(APP.config['GIT_FOLDER'], repo.path)
+    if repo.is_fork:
+        repopath = os.path.join(APP.config['FORK_FOLDER'], repo.path)
+    docpath = os.path.join(APP.config['DOCS_FOLDER'], repo.path)
+
     try:
+        shutil.rmtree(repopath)
+        shutil.rmtree(docpath)
         SESSION.commit()
+    except (OSError, IOError), err:
+        APP.logger.exception(err)
+        flask.flash('Could not delete the project from the system', 'error')
     except SQLAlchemyError, err:  # pragma: no cover
         SESSION.rollback()
         APP.logger.exception(err)
