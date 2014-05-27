@@ -13,7 +13,7 @@
   <form action="{{ url_for('.delete_repo',
                   username=username, repo=repo.name) }}" method="post">
     <button class="delete_icon" type="submit"
-      onclick="return confirm('Are you sure to delete this project/fork?');"
+      onclick="return confirm('Are you sure to delete this project/fork? \nThis is final and cannot be un-done.');"
       title="Delete the project/forl">
       Delete project
     </button>
