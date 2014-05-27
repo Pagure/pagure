@@ -118,7 +118,10 @@ def view_plugin_page(repo, plugin, full, username=None):
             )
 
         if form.active.data:
-            plugin.install(repo)
+            # Set up the main script if necessary
+            plugin.set_up(repo)
+            # Install the plugin itself
+            plugin.install(repo, dbobj)
             flask.flash('Hook activated')
         else:
             plugin.remove(repo)
