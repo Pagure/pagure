@@ -388,10 +388,21 @@ def get_issues(session, repo, status=None, closed=False):
 def get_issue(session, issueid):
     ''' Retrieve the specified issue
     '''
+    subquery = session.query(
+        model.GlobalId,
+        sqlalchemy.over(
+            sqlalchemy.func.row_number(),
+            partition_by=model.GlobalId.project_id,
+            order_by=model.GlobalId.id
+        ).label('global_id')
+    ).subquery()
+
     query = session.query(
         model.Issue
     ).filter(
-        model.Issue.id == issueid
+        subquery.c.project_id == model.Issue.project_id
+    ).filter(
+        subquery.c.global_id == issueid
     )
 
     return query.first()
