@@ -35,15 +35,15 @@
   <ul>
     {% for issue in issues %}
     <li>
-      #{{ issue.id }}
+      #{{ issue[1]}}
       <a href="{{ url_for('view_issue', username=username,
-                repo=repo.name, issueid=issue.id) }}">
-        {{ issue.title }}
+                repo=repo.name, issueid=issue[1]) }}">
+        {{ issue[0].title }}
       </a>
       <span> Opened by
-      <a href="{{ url_for('view_user', username=issue.user.user) }}">
-      {{issue.user.user}}
-      </a> on {{ issue.date_created.strftime('%Y-%m-%d %H:%M') }}</span>
+      <a href="{{ url_for('view_user', username=issue[0].user.user) }}">
+      {{issue[0].user.user}}
+      </a> on {{ issue[0].date_created.strftime('%Y-%m-%d %H:%M') }}</span>
     </li>
     {% endfor %}
   </ul>
