@@ -470,7 +470,11 @@ def get_pull_request(
     ).filter(
         subquery.c.project_id == model.PullRequest.project_id
     ).filter(
+        subquery.c.request_id == model.PullRequest.id
+    ).filter(
         subquery.c.global_id == requestid
+    ).order_by(
+        model.PullRequest.id
     )
 
     if project_id:
