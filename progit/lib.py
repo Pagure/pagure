@@ -371,6 +371,8 @@ def get_issues(session, repo, status=None, closed=False):
         subquery.c.issue_id == model.Issue.id
     ).filter(
         subquery.c.project_id == model.Issue.project_id
+    ).filter(
+        model.Issue.project_id == repo.id
     ).order_by(
         model.Issue.id
     )
