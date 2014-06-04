@@ -89,7 +89,7 @@ def request_pull(repo, requestid, username=None):
         orig_commit = orig_repo[request.start_id]
 
         for commit in repo_obj.walk(request.stop_id, pygit2.GIT_SORT_TIME):
-            if commit.oid.hex in orig_repo:
+            if commit.oid.hex == request.start_id:
                 break
             diff_commits.append(commit)
             diffs.append(
