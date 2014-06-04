@@ -332,6 +332,10 @@ def new_request_pull(repo, username=None, commitid=None):
 
     if commitid is None:
         commitid = repo_obj.head.target
+        branchname = flask.request.args.get('branch', None)
+        if branchname:
+            branch = repo_obj.lookup_branch(branchname)
+            commitid = branch.get_object().hex
 
     diff_commits = []
     diffs = []
