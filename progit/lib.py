@@ -355,10 +355,22 @@ def get_issues(session, repo, status=None, closed=False):
     is not 'Open', otherwise it will return the issues having the specified
     status.
     '''
+    subquery = session.query(
+        model.GlobalId,
+        sqlalchemy.over(
+            sqlalchemy.func.row_number(),
+            partition_by=model.GlobalId.project_id,
+            order_by=model.GlobalId.id
+        ).label('global_id')
+    ).subquery()
+
     query = session.query(
-        model.Issue
+        model.Issue,
+        subquery.c.global_id
     ).filter(
-        model.Issue.project_id == repo.id
+        subquery.c.issue_id == model.Issue.id
+    ).filter(
+        subquery.c.project_id == model.Issue.project_id
     )
 
     if status is not None and not closed:
