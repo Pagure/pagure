@@ -387,3 +387,8 @@ class PullRequest(BASE):
         'Project', foreign_keys=[project_id_from], remote_side=[Project.id])
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id], backref='pull_requests')
+
+    def __repr__(self):
+        return 'PullRequest(%s, project:%s, user:%s, title:%s)' % (
+            self.id, self.repo.name, self.user.user, self.title
+        )
