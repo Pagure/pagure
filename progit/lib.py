@@ -402,6 +402,8 @@ def get_issue(session, issueid):
     ).filter(
         subquery.c.project_id == model.Issue.project_id
     ).filter(
+        subquery.c.issue_id == model.Issue.id
+    ).filter(
         subquery.c.global_id == issueid
     )
 
