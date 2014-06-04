@@ -401,8 +401,23 @@ def get_pull_requests(
         session, project_id=None, project_id_from=None, status=None):
     ''' Retrieve the specified issue
     '''
+
+    subquery = session.query(
+        model.GlobalId,
+        sqlalchemy.over(
+            sqlalchemy.func.row_number(),
+            partition_by=model.GlobalId.project_id,
+            order_by=model.GlobalId.id
+        ).label('global_id')
+    ).subquery()
+
     query = session.query(
-        model.PullRequest
+        model.PullRequest,
+        subquery.c.global_id
+    ).filter(
+        subquery.c.request_id == model.PullRequest.id
+    ).filter(
+        subquery.c.project_id == model.PullRequest.project_id
     )
 
     if project_id:
