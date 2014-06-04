@@ -10,6 +10,7 @@
 
 import flask
 import os
+import shutil
 import tempfile
 from math import ceil
 
@@ -227,6 +228,7 @@ def merge_request_pull(repo, requestid, username=None):
         try:
             tree = new_repo.index.write_tree()
         except pygit2.GitError:
+            shutil.rmtree(newpath)
             flask.flash('Merge conflicts!', 'error')
             return flask.redirect(flask.url_for(
                 'request_pull',
@@ -248,6 +250,7 @@ def merge_request_pull(repo, requestid, username=None):
     # Update status
     progit.lib.close_pull_request(SESSION, request)
     SESSION.commit()
+    shutil.rmtree(newpath)
 
     return flask.redirect(flask.url_for('view_repo', repo=repo.name))
 
