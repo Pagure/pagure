@@ -299,6 +299,11 @@ class Issue(BASE):
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id], backref='issues')
 
+    def __repr__(self):
+        return 'Issue(%s, project:%s, user:%s, title:%s)' % (
+            self.id, self.project.name, self.user.user, self.title
+        )
+
 
 class IssueComment(BASE):
     """ Stores the comments made on a commit/file.
