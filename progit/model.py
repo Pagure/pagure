@@ -392,3 +392,37 @@ class PullRequest(BASE):
         return 'PullRequest(%s, project:%s, user:%s, title:%s)' % (
             self.id, self.repo.name, self.user.user, self.title
         )
+
+
+class GlobalId(BASE):
+    """ Store the mapping of the project with their issue and pull-request
+    and provides us with a way to get global identifier per project
+
+    Table -- global_id
+    """
+
+    __tablename__ = 'global_id'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    project_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(
+            'projects.id', ondelete='CASCADE', onupdate='CASCADE'),
+        nullable=False)
+    issue_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(
+            'issues.id', ondelete='CASCADE', onupdate='CASCADE'),
+        nullable=True)
+    request_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(
+            'pull_requests.id', ondelete='CASCADE', onupdate='CASCADE'),
+        nullable=True)
+
+    __table_args__ = (
+        # Both fields should not be NULL
+        sa.CheckConstraint('NOT(request_id IS NULL AND issue_id IS NULL)'),
+        # Both fields should not be not NULL (ie: only one of them should)
+        sa.CheckConstraint('NOT(request_id IS NOT NULL AND issue_id IS NOT NULL)'),
+    )
