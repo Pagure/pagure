@@ -153,6 +153,14 @@ def new_issue(session, repo, title, content, user):
     # Make sure we won't have SQLAlchemy error before we create the issue
     session.flush()
 
+    global_id = model.GlobalId(
+        project_id=repo.id,
+        issue_id=issue.id,
+    )
+
+    session.add(global_id)
+    session.flush()
+
     return 'Issue created'
 
 
