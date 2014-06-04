@@ -186,6 +186,14 @@ def new_pull_request(
     # Make sure we won't have SQLAlchemy error before we create the request
     session.flush()
 
+    global_id = model.GlobalId(
+        project_id=repo.id,
+        request_id=request.id,
+    )
+
+    session.add(global_id)
+    session.flush()
+
     return 'Request created'
 
 
