@@ -371,6 +371,8 @@ def get_issues(session, repo, status=None, closed=False):
         subquery.c.issue_id == model.Issue.id
     ).filter(
         subquery.c.project_id == model.Issue.project_id
+    ).order_by(
+        model.Issue.id
     )
 
     if status is not None and not closed:
@@ -405,6 +407,8 @@ def get_issue(session, issueid):
         subquery.c.issue_id == model.Issue.id
     ).filter(
         subquery.c.global_id == issueid
+    ).order_by(
+        model.Issue.id
     )
 
     return query.first()
@@ -431,6 +435,8 @@ def get_pull_requests(
         subquery.c.request_id == model.PullRequest.id
     ).filter(
         subquery.c.project_id == model.PullRequest.project_id
+    ).order_by(
+        model.PullRequest.id
     )
 
     if project_id:
