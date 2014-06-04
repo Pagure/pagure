@@ -137,7 +137,7 @@ def view_repo_branch(repo, branchname, username=None):
             repo_commit = repo_obj[branch.get_object().hex]
 
             for commit in repo_obj.walk(
-                    repo_obj.head.target, pygit2.GIT_SORT_TIME):
+                    repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
                 if commit.oid.hex in orig_repo:
                     break
                 diff_commits.append(commit.oid.hex)
@@ -214,7 +214,7 @@ def view_log(repo, branchname=None, username=None):
             repo_commit = repo_obj[branch.get_object().hex]
 
             for commit in repo_obj.walk(
-                    repo_obj.head.target, pygit2.GIT_SORT_TIME):
+                    repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
                 if commit.oid.hex in orig_repo:
                     break
                 diff_commits.append(commit.oid.hex)
