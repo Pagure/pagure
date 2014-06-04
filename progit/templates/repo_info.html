@@ -104,8 +104,14 @@
     {% endif %}
     {% if diff_commits and authenticated %}
     <span id="request_pull">
+        {% if branchname %}
         <a href="{{ url_for('new_request_pull',
+                    username=username, repo=repo.name,
+                    branch=branchname) }}">Request pull</a>
+        {% else %}
+            <a href="{{ url_for('new_request_pull',
                     username=username, repo=repo.name) }}">Request pull</a>
+        {% endif %}
     </span>
     {% endif %}
     <ul>
