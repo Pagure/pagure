@@ -74,22 +74,37 @@ def request_pull(repo, requestid, username=None):
     if not request:
         flask.abort(404, 'Pull-request not found')
 
-    repopath = os.path.join(
-        APP.config['FORK_FOLDER'], request.repo_from.path)
+    if repo.is_fork:
+        repopath = os.path.join(APP.config['FORK_FOLDER'], repo.path)
+    else:
+        repopath = os.path.join(APP.config['GIT_FOLDER'], repo.path)
     repo_obj = pygit2.Repository(repopath)
 
-    parentname = os.path.join(
-        APP.config['GIT_FOLDER'], request.repo.path)
+    if repo.parent:
+        parentname = os.path.join(APP.config['GIT_FOLDER'], repo.parent.path)
+    else:
+        parentname = os.path.join(APP.config['GIT_FOLDER'], repo.path)
     orig_repo = pygit2.Repository(parentname)
 
     diff_commits = []
     diffs = []
     repo_commit = repo_obj[request.stop_id]
     if not repo_obj.is_empty and not orig_repo.is_empty:
-        orig_commit = orig_repo[request.start_id]
+        orig_commit = orig_repo[
+            orig_repo.lookup_branch('master').get_object().hex]
 
-        for commit in repo_obj.walk(request.stop_id, pygit2.GIT_SORT_TIME):
-            if commit.oid.hex == request.start_id:
+        master_commits = [
+            commit.oid.hex
+            for commit in orig_repo.walk(
+                orig_repo.lookup_branch('master').get_object().hex,
+                pygit2.GIT_SORT_TIME)
+        ]
+
+        repo_commit = repo_obj[request.start_id]
+
+        for commit in repo_obj.walk(
+                request.stop_id, pygit2.GIT_SORT_TIME):
+            if commit.oid.hex in master_commits:
                 break
             diff_commits.append(commit)
             diffs.append(
@@ -168,8 +183,12 @@ def merge_request_pull(repo, requestid, username=None):
             username=username)
 
     # Get the fork
-    repopath = os.path.join(
-        APP.config['FORK_FOLDER'], request.repo_from.path)
+    if request.repo_from.is_fork:
+        repopath = os.path.join(
+            APP.config['FORK_FOLDER'], request.repo_from.path)
+    else:
+        repopath = os.path.join(
+            APP.config['GIT_FOLDER'], request.repo_from.path)
     fork_obj = pygit2.Repository(repopath)
 
     # Get the original repo
@@ -205,7 +224,15 @@ def merge_request_pull(repo, requestid, username=None):
         flask.flash('Changes merged!')
     else:
         new_repo.index.write()
-        tree = new_repo.index.write_tree()
+        try:
+            tree = new_repo.index.write_tree()
+        except pygit2.GitError:
+            flask.flash('Merge conflicts!', 'error')
+            return flask.redirect(flask.url_for(
+                'request_pull',
+                repo=repo.name,
+                username=username,
+                requestid=requestid))
         head = new_repo.lookup_reference('HEAD').get_object()
         commit = new_repo[head.oid]
         sha = new_repo.create_commit(
@@ -266,12 +293,16 @@ def fork_project(repo, username=None):
     return flask.redirect(flask.url_for('view_repo', repo=repo.name))
 
 
+@APP.route('/<repo>/request-pull/new',
+           methods=('GET', 'POST'))
+@APP.route('/<repo>/request-pull/new/<commitid>',
+           methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/request-pull/new',
            methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/request-pull/new/<commitid>',
            methods=('GET', 'POST'))
 @cla_required
-def new_request_pull(username, repo, commitid=None):
+def new_request_pull(repo, username=None, commitid=None):
     """ Request pulling the changes from the fork into the project.
     """
     repo = progit.lib.get_project(SESSION, repo, user=username)
@@ -284,10 +315,16 @@ def new_request_pull(username, repo, commitid=None):
             403,
             'You are not allowed to create pull-requests for this project')
 
-    repopath = os.path.join(APP.config['FORK_FOLDER'], repo.path)
+    if repo.is_fork:
+        repopath = os.path.join(APP.config['FORK_FOLDER'], repo.path)
+    else:
+        repopath = os.path.join(APP.config['GIT_FOLDER'], repo.path)
     repo_obj = pygit2.Repository(repopath)
 
-    parentname = os.path.join(APP.config['GIT_FOLDER'], repo.parent.path)
+    if repo.parent:
+        parentname = os.path.join(APP.config['GIT_FOLDER'], repo.parent.path)
+    else:
+        parentname = os.path.join(APP.config['GIT_FOLDER'], repo.path)
     orig_repo = pygit2.Repository(parentname)
 
     if commitid is None:
@@ -296,11 +333,21 @@ def new_request_pull(username, repo, commitid=None):
     diff_commits = []
     diffs = []
     if not repo_obj.is_empty and not orig_repo.is_empty:
-        orig_commit = orig_repo[orig_repo.head.target]
+        orig_commit = orig_repo[
+            orig_repo.lookup_branch('master').get_object().hex]
+
+        master_commits = [
+            commit.oid.hex
+            for commit in orig_repo.walk(
+                orig_repo.lookup_branch('master').get_object().hex,
+                pygit2.GIT_SORT_TIME)
+        ]
+
         repo_commit = repo_obj[commitid]
 
-        for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
-            if commit.oid.hex in orig_repo:
+        for commit in repo_obj.walk(
+                repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
+            if commit.oid.hex in master_commits:
                 break
             diff_commits.append(commit)
             diffs.append(
@@ -338,9 +385,14 @@ def new_request_pull(username, repo, commitid=None):
         try:
             if orig_commit:
                 orig_commit = orig_commit.oid.hex
+
+            parent = repo
+            if repo.parent:
+                parent = repo.parent
+
             message = progit.lib.new_pull_request(
                 SESSION,
-                repo=repo.parent,
+                repo=parent,
                 repo_from=repo,
                 title=form.title.data,
                 start_id=orig_commit,
@@ -350,13 +402,12 @@ def new_request_pull(username, repo, commitid=None):
             SESSION.commit()
             flask.flash(message)
 
-            if not repo.parent.is_fork:
+            if not parent.is_fork:
                 url = flask.url_for(
-                    'request_pulls', username=None, repo=repo.parent.name)
+                    'request_pulls', username=None, repo=parent.name)
             else:
                 url = flask.url_for(
-                    'request_pulls', username=repo.parent.user,
-                    repo=repo.parent.name)
+                    'request_pulls', username=parent.user, repo=parent.name)
 
             return flask.redirect(url)
         except progit.exceptions.ProgitException, err:
