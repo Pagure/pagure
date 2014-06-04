@@ -453,10 +453,22 @@ def get_pull_request(
         session, requestid, project_id=None, project_id_from=None):
     ''' Retrieve the specified issue
     '''
+
+    subquery = session.query(
+        model.GlobalId,
+        sqlalchemy.over(
+            sqlalchemy.func.row_number(),
+            partition_by=model.GlobalId.project_id,
+            order_by=model.GlobalId.id
+        ).label('global_id')
+    ).subquery()
+
     query = session.query(
         model.PullRequest
     ).filter(
-        model.PullRequest.id == requestid
+        subquery.c.project_id == model.PullRequest.project_id
+    ).filter(
+        subquery.c.global_id == requestid
     )
 
     if project_id:
