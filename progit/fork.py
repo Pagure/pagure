@@ -124,6 +124,7 @@ def request_pull(repo, requestid, username=None):
     return flask.render_template(
         'pull_request.html',
         select='requests',
+        requestid=requestid,
         repo=repo,
         username=username,
         request=request,
