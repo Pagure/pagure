@@ -233,7 +233,7 @@ def format_loc(loc):
     """ Template filter putting the provided lines of code into a table
     """
     output = [
-        '<div class="highlight" style="background: #f8f8f8">',
+        '<div class="highlight">',
         '<table class="code_table">'
     ]
     cnt = 1
