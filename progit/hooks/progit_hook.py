@@ -52,7 +52,7 @@ class ProgitForm(wtf.Form):
     )
 
 
-class Debug(BaseHook):
+class ProgitHook(BaseHook):
     ''' Progit hook. '''
 
     name = 'Progit hooks for tickets'
