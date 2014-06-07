@@ -228,6 +228,33 @@ def rst2html(rst_string):
         return progit.doc_utils.convert_doc(unicode(rst_string))
 
 
+@APP.template_filter('format_loc')
+def format_loc(loc):
+    """ Template filter putting the provided lines of code into a table
+    """
+    output = [
+        '<div class="highlight" style="background: #f8f8f8">',
+        '<table class="code_table">'
+    ]
+    cnt = 1
+    for line in loc.split('\n'):
+        output.append(
+            '<tr><td><a id="%s" href="#%s">%s</a></td>' % (cnt, cnt, cnt))
+        cnt += 1
+        if not line:
+            output.append(line)
+            continue
+        if line == '</pre></div>':
+            continue
+        if line.startswith('<div'):
+            line = line.split('<pre style="line-height: 125%">')[1]
+        output.append('<td><pre>%s</pre></td>' % line)
+        output.append('</tr>')
+    output.append('</table></div>')
+
+    return '\n'.join(output)
+
+
 @FAS.postlogin
 def set_user(return_url):
     ''' After login method. '''
