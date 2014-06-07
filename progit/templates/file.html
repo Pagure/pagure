@@ -29,7 +29,7 @@
 <section class="repos_list">
   {% if output_type=='file' %}
   {% autoescape false %}
-  {{ content }}
+  {{ content | format_loc}}
   {% endautoescape %}
   {% else %}
   <ul>
