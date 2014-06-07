@@ -459,3 +459,13 @@ th.month .ui-button-text {
   background-repeat: no-repeat;
   background-position: 0px 50%;
 }
+
+.code_table tr td{
+    padding:0;
+    padding-right:5px;
+}
+
+.code_table tr td pre{
+    padding:0;
+    margin:0;
+}
