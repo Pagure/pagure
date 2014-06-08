@@ -5,6 +5,7 @@
 relates to an issue.
 """
 
+import os
 import re
 import sys
 import subprocess
@@ -81,6 +82,13 @@ def get_commits_id(fromrev, torev):
     return read_git_lines(cmd)
 
 
+def get_repo_name():
+    ''' Return the name of the git repo based on its path.
+    '''
+    repo = os.path.basename(os.getcwd()).split('.git')[0]
+    return repo
+
+
 def run_as_post_receive_hook():
     changes = []
     for line in sys.stdin:
@@ -95,6 +103,8 @@ def run_as_post_receive_hook():
         print refname
 
         generate_revision_change_log(get_commits_id(oldrev, newrev))
+
+    print 'repo:', get_repo_name()
 
 
 def main(args):
