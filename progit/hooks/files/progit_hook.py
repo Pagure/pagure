@@ -89,7 +89,13 @@ def get_repo_name():
     return repo
 
 
+def get_pusher():
+    ''' Return the name of the person that pushed the commit. '''
+    return os.environ.get('GL_USER', os.environ.get('USER', 'unknown user'))
+
+
 def run_as_post_receive_hook():
+
     changes = []
     for line in sys.stdin:
         print line
