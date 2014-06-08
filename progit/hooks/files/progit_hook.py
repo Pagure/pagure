@@ -12,12 +12,16 @@ import subprocess
 
 FIXES = [
     re.compile('fixe[sd]?:? #(\d+)', re.I),
+    re.compile('.*\s+fixe[sd]?:? #(\d+)', re.I),
     re.compile('fixe[sd]?:? https?://.*/(\w+)/issue/(\d+)', re.I),
+    re.compile('.*\s+fixe[sd]?:? https?://.*/(\w+)/issue/(\d+)', re.I),
 ]
 
 RELATES = [
     re.compile('relate[sd]?:? #(\d+)', re.I),
+    re.compile('.*\s+relate[sd]?:? #(\d+)', re.I),
     re.compile('relate[sd]?:? https?://.*/(\w+)/issue/(\d+)', re.I),
+    re.compile('.*\s+relate[sd]?:? https?://.*/(\w+)/issue/(\d+)', re.I),
 ]
 
 def read_git_output(args, input=None, keepends=False, **kw):
