@@ -67,10 +67,10 @@ def generate_revision_change_log(new_commits_list):
         print '*', line
         for motif in FIXES:
             if motif.match(line):
-                print 'fixes', motif.groups()
+                print 'fixes', motif.match(line).groups()
         for motif in RELATES:
             if motif.match(line):
-                print 'relates to', motif.groups()
+                print 'relates to', motif.match(line).groups()
 
 
 def get_commits_id(fromrev, torev):
