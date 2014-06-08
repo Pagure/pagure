@@ -55,7 +55,7 @@ class ProgitForm(wtf.Form):
 class ProgitHook(BaseHook):
     ''' Progit hook. '''
 
-    name = 'Progit hooks for tickets'
+    name = 'progit'
     form = ProgitForm
     db_object = ProgitTable
     backref = 'progit_hook'
