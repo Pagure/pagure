@@ -78,7 +78,7 @@ class ProgitHook(BaseHook):
 
         # Install the hook itself
         shutil.copyfile(
-            os.path.join(hook_files, 'progit.py'),
+            os.path.join(hook_files, 'progit_hook.py'),
             os.path.join(repopath, 'hooks', 'post-receive.progit')
         )
         os.chmod(os.path.join(repopath, 'hooks', 'post-receive.progit'), 0755)
