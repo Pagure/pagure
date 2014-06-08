@@ -94,4 +94,6 @@ class ProgitHook(BaseHook):
         repopath = os.path.join(APP.config['GIT_FOLDER'], project.path)
         if project.is_fork:
             repopath = os.path.join(APP.config['FORK_FOLDER'], project.path)
-        os.unlink(os.path.join(repopath, 'hooks', 'post-receive.progit'))
+        hook_path = os.path.join(repopath, 'hooks', 'post-receive.progit')
+        if os.path.exists(hook_path):
+            os.unlink(hook_path)
