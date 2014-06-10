@@ -59,12 +59,16 @@ def read_output(cmd, input=None, keepends=False, **kw):
 def generate_revision_change_log(new_commits_list):
 
     print 'Detailed log of new commits:\n\n'
+    commitid = None
     for line in read_git_lines(
             ['log', '--no-walk']
             + new_commits_list
             + ['--'],
             keepends=False,
         ):
+        if line.startswith('commit'):
+            commitid = line.split('commit ')[-1]
+
         print '*', line
         for motif in FIXES:
             if motif.match(line):
