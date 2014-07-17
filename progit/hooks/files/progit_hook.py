@@ -25,10 +25,10 @@ FIXES = [
 ]
 
 RELATES = [
-    re.compile('relate[sd]?:? #(\d+)', re.I),
-    re.compile('.*\s+relate[sd]?:? #(\d+)', re.I),
-    re.compile('relate[sd]?:? https?://.*/(\w+)/issue/(\d+)', re.I),
-    re.compile('.*\s+relate[sd]?:? https?://.*/(\w+)/issue/(\d+)', re.I),
+    re.compile('relate[sd]?:?\s?#(\d+)', re.I),
+    re.compile('.*\s+relate[sd]?:?\s?#(\d+)', re.I),
+    re.compile('relate[sd]?:?\s?https?://.*/(\w+)/issue/(\d+)', re.I),
+    re.compile('.*\s+relate[sd]?:?\s?https?://.*/(\w+)/issue/(\d+)', re.I),
 ]
 
 def read_git_output(args, input=None, keepends=False, **kw):
