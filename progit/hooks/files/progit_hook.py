@@ -79,6 +79,12 @@ def generate_revision_change_log(new_commits_list):
         for motif in FIXES:
             if motif.match(line):
                 print 'fixes', motif.match(line).groups()
+                project = None
+                if len(motif.match(line).groups()) > 2:
+                    project = motif.match(line).group(2)
+                fixes_commit(
+                    commitid, motif.match(line).group(1), project
+                )
         for motif in RELATES:
             if motif.match(line):
                 print 'relates to', motif.match(line).groups()
@@ -115,6 +121,44 @@ def relates_commit(commitid, issueid, project=None):
         progit.SESSION.commit()
     except progit.exceptions.ProgitException as err:
         print err
+
+
+def fixes_commit(commitid, issueid, project=None):
+    ''' Add a comment to an issue that this commit fixes it and update
+    the status if the commit is in the master branch. '''
+    import progit
+    import progit.exceptions
+
+    issue = progit.lib.get_issue(progit.SESSION, issueid)
+
+    repo = project or get_repo_name()
+
+    if issue is None or issue.project.name != repo:
+        return
+
+    comment = ''' Commit `%s <../%s>`_ fixes this ticket''' % (
+        commitid[:8], commitid[:8])
+
+    try:
+        message = progit.lib.add_issue_comment(
+            progit.SESSION,
+            issue=issue,
+            comment=comment,
+            user=get_pusher(commitid),
+        )
+        progit.SESSION.commit()
+    except progit.exceptions.ProgitException as err:
+        print err
+
+    branches = read_git_lines(
+        ['branch', '--contains', commit], keepends=False).replace('* ', '')
+
+    if 'master' in branches:
+        try:
+            progit.lib.edit_issue(progit.SESSION, issue, status='Fixed')
+            progit.SESSION.commit()
+        except progit.exceptions.ProgitException as err:
+            print err
 
 
 def get_commits_id(fromrev, torev):
