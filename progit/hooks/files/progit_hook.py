@@ -150,8 +150,11 @@ def fixes_commit(commitid, issueid, project=None):
     except progit.exceptions.ProgitException as err:
         print err
 
-    branches = read_git_lines(
-        ['branch', '--contains', commit], keepends=False).replace('* ', '')
+    branches = [
+        item.replace('* ', '') for item in read_git_lines(
+            ['branch', '--contains', commitid],
+            keepends=False)
+    ]
 
     if 'master' in branches:
         try:
