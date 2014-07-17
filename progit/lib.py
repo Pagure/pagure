@@ -52,6 +52,17 @@ def get_user(session, username):
     return user
 
 
+def get_user_by_email(session, user_mail):
+    ''' Return the user corresponding to this email, or None. '''
+    mail = session.query(
+        model.UserEmail
+    ).filter(
+        model.UserEmail.email == user_mail
+    ).first()
+    if mail:
+        return mail.user
+
+
 def get_all_users(session):
     ''' Return the user corresponding to this username, or None. '''
     users = session.query(
