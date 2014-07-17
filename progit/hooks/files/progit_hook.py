@@ -92,24 +92,36 @@ def generate_revision_change_log(new_commits_list):
 
 def relates_commit(commitid, issueid, project=None):
     ''' Add a comment to an issue that this commit relates to it. '''
-    from progit import SESSION
+    import progit
+    import progit.exceptions
 
-    issue = progit.lib.get_issue(SESSION, issueid)
+    issue = progit.lib.get_issue(progit.SESSION, issueid)
 
-    repo = progect or get_repo_name()
+    repo = project or get_repo_name()
 
-    if issue is None or issue.project != repo:
+    print issue
+    print repo
+    print issue.project.name
+
+    if issue is None or issue.project.name != repo:
         return
 
     comment = ''' Commit %s relates to this ticket''' % commitid
 
-    message = progit.lib.add_issue_comment(
-        SESSION,
-        issue=issue,
-        comment=comment,
-        user=get_pusher(),
-    )
-    SESSION.commit()
+    print comment
+    print issue
+    print get_pusher()
+
+    try:
+        message = progit.lib.add_issue_comment(
+            progit.SESSION,
+            issue=issue,
+            comment=comment,
+            user=get_pusher(),
+        )
+        progit.SESSION.commit()
+    except progit.exceptions.ProgitException as err:
+        print err
 
 
 def get_commits_id(fromrev, torev):
