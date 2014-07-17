@@ -74,6 +74,8 @@ def get_all_users(session):
 def add_issue_comment(session, issue, comment, user):
     ''' Add a comment to an issue. '''
     user_obj = get_user(session, user)
+    if not user_obj:
+        user_obj = get_user_by_email(session, user)
 
     if not user_obj:
         raise progit.exceptions.ProgitException(
