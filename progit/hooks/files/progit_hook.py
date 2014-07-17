@@ -11,6 +11,12 @@ import sys
 import subprocess
 
 
+if 'PROGIT_CONFIG' not in os.environ \
+        and os.path.exists('/etc/progit/progit.cfg'):
+    print 'Using configuration file `/etc/progit/progit.cfg`'
+    os.environ['PROGIT_CONFIG'] = '/etc/progit/progit.cfg'
+
+
 FIXES = [
     re.compile('fixe[sd]?:? #(\d+)', re.I),
     re.compile('.*\s+fixe[sd]?:? #(\d+)', re.I),
