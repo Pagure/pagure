@@ -18,10 +18,10 @@ if 'PROGIT_CONFIG' not in os.environ \
 
 
 FIXES = [
-    re.compile('fixe[sd]?:? #(\d+)', re.I),
-    re.compile('.*\s+fixe[sd]?:? #(\d+)', re.I),
-    re.compile('fixe[sd]?:? https?://.*/(\w+)/issue/(\d+)', re.I),
-    re.compile('.*\s+fixe[sd]?:? https?://.*/(\w+)/issue/(\d+)', re.I),
+    re.compile('fixe[sd]?:?\s?#(\d+)', re.I),
+    re.compile('.*\s+fixe[sd]?:?\s?#(\d+)', re.I),
+    re.compile('fixe[sd]?:?\s?https?://.*/(\w+)/issue/(\d+)', re.I),
+    re.compile('.*\s+fixe[sd]?:?\s?https?://.*/(\w+)/issue/(\d+)', re.I),
 ]
 
 RELATES = [
