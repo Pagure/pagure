@@ -139,9 +139,16 @@ def get_repo_name():
     return repo
 
 
-def get_pusher():
+def get_pusher(commit):
     ''' Return the name of the person that pushed the commit. '''
-    return os.environ.get('GL_USER', os.environ.get('USER', 'unknown user'))
+    user = None
+    output = read_git_lines(
+        ['show', '--pretty=format:"%ae"', commit], keepends=False)
+    if output:
+        user = output[0].replace('"', '')
+    if not user:
+        user = os.environ.get('GL_USER', os.environ.get('USER', None))
+    return user
 
 
 def run_as_post_receive_hook():
