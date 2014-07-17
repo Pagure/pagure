@@ -99,25 +99,18 @@ def relates_commit(commitid, issueid, project=None):
 
     repo = project or get_repo_name()
 
-    print issue
-    print repo
-    print issue.project.name
-
     if issue is None or issue.project.name != repo:
         return
 
-    comment = ''' Commit %s relates to this ticket''' % commitid
-
-    print comment
-    print issue
-    print get_pusher()
+    comment = ''' Commit `%s <../%s>`_ relates to this ticket''' % (
+        commitid[:8], commitid[:8])
 
     try:
         message = progit.lib.add_issue_comment(
             progit.SESSION,
             issue=issue,
             comment=comment,
-            user=get_pusher(),
+            user=get_pusher(commitid),
         )
         progit.SESSION.commit()
     except progit.exceptions.ProgitException as err:
