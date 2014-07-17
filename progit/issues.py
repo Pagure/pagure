@@ -196,6 +196,7 @@ def view_issue(repo, issueid, username=None):
         repo=repo,
         username=username,
         issue=issue,
+        issueid=issueid,
         form=form,
         form_comment=form_comment,
     )
