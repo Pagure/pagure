@@ -17,6 +17,7 @@ __version__ = '0.1'
 import logging
 import os
 import subprocess
+import textwrap
 import urlparse
 from logging.handlers import SMTPHandler
 
@@ -253,6 +254,19 @@ def format_loc(loc):
     output.append('</table></div>')
 
     return '\n'.join(output)
+
+
+@APP.template_filter('wraps')
+def text_wraps(text, size=10):
+    """ Template filter to wrap text at a specified size
+    """
+    if text:
+        parts = textwrap.wrap(text, size)
+        if len(parts) > 1:
+            parts = '%s...' % parts[0]
+        else:
+            parts = parts[0]
+        return parts
 
 
 @FAS.postlogin
