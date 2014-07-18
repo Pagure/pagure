@@ -354,12 +354,12 @@ th.month .ui-button-text {
     border: 1px solid #DDDDDD;
 }
 
-.calendar_list {
+.project_list {
     display: table;
     border-spacing: 1em;
 }
 
-.calendar_link {
+.project_link {
     border: 1px solid #CCCCCC;
     border-radius: 5px 5px 5px 5px;
     color: black;
@@ -367,23 +367,23 @@ th.month .ui-button-text {
     /*margin: 1em auto;*/
     overflow: hidden;
     padding: 2em;
-    width: 15em;
+    /*width: 15em;*/
 }
 
-.calendar_link img, .calendar_link span {
+.project_link img, .project_link span {
     display: block;
 }
 
-.calendar_name {
+.project_name {
     font-weight: bold;
     margin: .5em 0;
 }
 
-.calendar_row {
+.project_row {
     display: table-row;
 }
 
-.calendar_row[a] {
+.project_row[a] {
     display: block;
 }
 

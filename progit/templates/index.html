@@ -4,6 +4,23 @@
 {%block tag %}home{% endblock %}
 
 
+{% macro render_row(items) -%}
+    {% for row in items %}
+    <div class="project_row">
+        {% for repo in row %}
+            <a class="project_link"
+                href="{{ url_for('view_repo', repo=repo.name) }}">
+                <img src='{{ url_for("static", filename="fedocal.png") }}' alt="" />
+                <span class="repo_name">{{ repo.name }}</span>
+                <span class="repo_desc">{{ repo.description | wraps(20) }}</span>
+            </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No project found</p>
+    {% endfor %}
+{%- endmacro %}
+
 {% block content %}
 
 <h2>Projects</h2>
@@ -34,16 +51,8 @@
 </table>
 {% endif %}
 
-<section class="repo_list">
-  <ul>
-    {% for repo in repos %}
-    <li>
-      <a href="{{ url_for('view_repo', repo=repo.name)}}">
-        {{ repo.name }}
-      </a>
-    </li>
-    {% endfor %}
-  </ul>
+<section class="project_list">
+  {{ render_row(repos) }}
 </section>
 
 {% endblock %}
