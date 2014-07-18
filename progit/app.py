@@ -28,6 +28,13 @@ from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
                     generate_authorized_key_file)
 
 
+def chunks(item_list, chunks_size):
+    """ Yield successive n-sized chunks from item_list.
+    """
+    for i in xrange(0, len(item_list), chunks_size):
+        yield item_list[i: i + chunks_size]
+
+
 ### Application
 
 
@@ -58,7 +65,7 @@ def index():
 
     return flask.render_template(
         'index.html',
-        repos=repos,
+        repos=chunks(repos, 3),
         total_page=total_page,
         page=page,
     )
