@@ -89,7 +89,7 @@
     </ul>
   </div>
 
-  <p>{{ repo.description }}</p>
+  <p>{{ repo.description | rst2html }}</p>
 
 {% block repo %}
 {% endblock %}
