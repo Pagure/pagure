@@ -241,7 +241,7 @@ def edit_issue(session, issue, ticketfolder,
         issue.status = status
         edit.append('status')
 
-    update_git_ticket(issue, repo=repo, ticketfolder=ticketfolder)
+    update_git_ticket(issue, repo=issue.project, ticketfolder=ticketfolder)
 
     if not edit:
         return 'No changes to edit'
