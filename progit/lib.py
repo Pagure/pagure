@@ -115,7 +115,7 @@ def new_project(session, user, name, gitfolder, docfolder,
     gitrepo = os.path.join(gitfolder, '%s.git' % name)
     if os.path.exists(gitrepo):
         raise progit.exceptions.RepoExistsException(
-            'The project "%s" already exists' % name
+            'The project repo "%s" already exists' % name
         )
 
     user_obj = get_user(session, user)
@@ -140,7 +140,7 @@ def new_project(session, user, name, gitfolder, docfolder,
     gitrepo = os.path.join(docfolder, project.path)
     if os.path.exists(gitrepo):
         raise progit.exceptions.RepoExistsException(
-            'The docs "%s" already exists' % project.path
+            'The docs repo "%s" already exists' % project.path
         )
     pygit2.init_repository(gitrepo, bare=True)
 
