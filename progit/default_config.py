@@ -52,6 +52,13 @@ DOCS_FOLDER = os.path.join(
     'docs'
 )
 
+# Folder containing the tickets repos
+TICKETS_FOLDER = os.path.join(
+    os.path.abspath(os.path.dirname(__file__)),
+    '..',
+    'tickets'
+)
+
 # Configuration file for gitolite
 GITOLITE_CONFIG = os.path.join(
     os.path.abspath(os.path.dirname(__file__)),
