@@ -13,6 +13,7 @@ import json
 import os
 import shutil
 import tempfile
+import uuid
 
 import sqlalchemy
 from datetime import timedelta
@@ -173,6 +174,7 @@ def new_issue(session, repo, title, content, user, ticketfolder):
         title=title,
         content=content,
         user_id=user_obj.id,
+        uid=uuid.uuid4().hex,
     )
     session.add(issue)
     # Make sure we won't have SQLAlchemy error before we create the issue
