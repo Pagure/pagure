@@ -74,7 +74,7 @@ def get_all_users(session):
     return users
 
 
-def add_issue_comment(session, issue, comment, user):
+def add_issue_comment(session, issue, comment, user, ticketfolder):
     ''' Add a comment to an issue. '''
     user_obj = get_user(session, user)
     if not user_obj:
@@ -93,6 +93,8 @@ def add_issue_comment(session, issue, comment, user):
     session.add(isse_comment)
     # Make sure we won't have SQLAlchemy error before we create the repo
     session.flush()
+
+    update_git_ticket(issue, repo=issue.project, ticketfolder=ticketfolder)
 
     return 'Comment added'
 
@@ -157,7 +159,7 @@ def new_project(session, user, name, gitfolder, docfolder, ticketfolder,
     return 'Project "%s" created' % name
 
 
-def new_issue(session, repo, title, content, user):
+def new_issue(session, repo, title, content, user, ticketfolder):
     ''' Create a new issue for the specified repo. '''
     user_obj = get_user(session, user)
 
@@ -183,6 +185,8 @@ def new_issue(session, repo, title, content, user):
 
     session.add(global_id)
     session.flush()
+
+    update_git_ticket(issue, repo=repo, ticketfolder=ticketfolder)
 
     return 'Issue created'
 
@@ -220,7 +224,8 @@ def new_pull_request(
     return 'Request created'
 
 
-def edit_issue(session, issue, title=None, content=None, status=None):
+def edit_issue(session, issue, ticketfolder,
+               title=None, content=None, status=None):
     ''' Edit the specified issue.
     '''
     edit = []
@@ -233,6 +238,8 @@ def edit_issue(session, issue, title=None, content=None, status=None):
     if status and status != issue.status:
         issue.status = status
         edit.append('status')
+
+    update_git_ticket(issue, repo=repo, ticketfolder=ticketfolder)
 
     if not edit:
         return 'No changes to edit'

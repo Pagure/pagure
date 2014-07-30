@@ -57,6 +57,7 @@ def add_comment_issue(repo, issueid, username=None):
                 issue=issue,
                 comment=comment,
                 user=flask.g.fas_user.username,
+                ticketfolder=APP.config['TICKETS_FOLDER'],
             )
             SESSION.commit()
             flask.flash(message)
@@ -125,6 +126,7 @@ def new_issue(repo, username=None):
                 title=title,
                 content=content,
                 user=flask.g.fas_user.username,
+                ticketfolder=APP.config['TICKETS_FOLDER'],
             )
             SESSION.commit()
             flask.flash(message)
@@ -178,6 +180,7 @@ def view_issue(repo, issueid, username=None):
                     SESSION,
                     issue=issue,
                     status=form.status.data,
+                    ticketfolder=APP.config['TICKETS_FOLDER'],
                 )
                 SESSION.commit()
                 flask.flash(message)
@@ -240,6 +243,7 @@ def edit_issue(repo, issueid, username=None):
                 title=title,
                 content=content,
                 status=status,
+                ticketfolder=APP.config['TICKETS_FOLDER'],
             )
             SESSION.commit()
             flask.flash(message)
