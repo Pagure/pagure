@@ -108,7 +108,7 @@ def get_user_project(session, username):
     return query.all()
 
 
-def new_project(session, user, name, gitfolder, docfolder,
+def new_project(session, user, name, gitfolder, docfolder, ticketfolder,
                 description=None, parent_id=None):
     ''' Create a new project based on the information provided.
     '''
@@ -141,6 +141,13 @@ def new_project(session, user, name, gitfolder, docfolder,
     if os.path.exists(gitrepo):
         raise progit.exceptions.RepoExistsException(
             'The docs repo "%s" already exists' % project.path
+        )
+    pygit2.init_repository(gitrepo, bare=True)
+
+    gitrepo = os.path.join(ticketfolder, project.path)
+    if os.path.exists(gitrepo):
+        raise progit.exceptions.RepoExistsException(
+            'The tickets repo "%s" already exists' % project.path
         )
     pygit2.init_repository(gitrepo, bare=True)
 
