@@ -267,6 +267,7 @@ class Issue(BASE):
     __tablename__ = 'issues'
 
     id = sa.Column(sa.Integer, primary_key=True)
+    uid = sa.Column(sa.Text(32), unique=True)
     project_id = sa.Column(
         sa.Integer,
         sa.ForeignKey(
