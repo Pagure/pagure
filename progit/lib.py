@@ -692,7 +692,7 @@ def update_git_ticket(issue, repo, ticketfolder):
         index.add(filename)
 
     # If not change, return
-    if not files or added:
+    if not files and not added:
         shutil.rmtree(newpath)
         return
 
