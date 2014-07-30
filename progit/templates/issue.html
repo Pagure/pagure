@@ -12,11 +12,11 @@
 {% if authenticated and form %}
 <section class="issue_action">
   <form action="{{ url_for('view_issue', username=username,
-                   repo=repo.name, issueid=issue.id) }}" method="post">
+                   repo=repo.name, issueid=issueid) }}" method="post">
   <ul class="inline">
     <li>
       <a href="{{ url_for('edit_issue', username=username,
-                  repo=repo.name, issueid=issue.id) }}">
+                  repo=repo.name, issueid=issueid) }}">
         Edit</a>
     </li>
     {{ render_field_in_list(form.status) }}
@@ -74,7 +74,7 @@
 {% if authenticated %}
 <section class="add_comment">
   <form action="{{ url_for('add_comment_issue', username=username,
-                   repo=repo.name, issueid=issue.id) }}" method="post">
+                   repo=repo.name, issueid=issueid) }}" method="post">
     <div>
       <textarea id="comment" name="comment" title="comment"></textarea>
     </div>

@@ -66,7 +66,7 @@ def add_comment_issue(repo, issueid, username=None):
             flask.flash(str(err), 'error')
 
     return flask.redirect(flask.url_for(
-        'view_issue', username=username, repo=repo.name, issueid=issue.id))
+        'view_issue', username=username, repo=repo.name, issueid=issueid))
 
 
 @APP.route('/<repo>/issues')
@@ -249,7 +249,7 @@ def edit_issue(repo, issueid, username=None):
             flask.flash(message)
             url = flask.url_for(
                 'view_issue', username=username,
-                repo=repo.name, issueid=issue.id)
+                repo=repo.name, issueid=issueid)
             return flask.redirect(url)
         except progit.exceptions.ProgitException, err:
             flask.flash(str(err), 'error')
