@@ -19,9 +19,10 @@ Get it running
     git clone git://github.com/pypingou/progit
 
 
-* Create the folder that will receive the projects, forks and docs' git repo::
+* Create the folder that will receive the projects, forks, docs and tickets'
+  git repo::
 
-    mkdir {repos,docs,forks}
+    mkdir {repos,docs,forks,tickets}
 
 
 * Run it::
