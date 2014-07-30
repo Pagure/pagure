@@ -189,6 +189,7 @@ def new_project():
                 user=flask.g.fas_user.username,
                 gitfolder=APP.config['GIT_FOLDER'],
                 docfolder=APP.config['DOCS_FOLDER'],
+                ticketfolder=APP.config['TICKETS_FOLDER']
             )
             SESSION.commit()
             generate_gitolite_acls()
