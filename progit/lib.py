@@ -11,6 +11,8 @@
 
 import json
 import os
+import shutil
+import tempfile
 
 import sqlalchemy
 from datetime import timedelta
@@ -637,3 +639,84 @@ def issue_to_json(issue):
     output['comments'] = comments
 
     return json.dumps(output)
+
+
+def update_git_ticket(issue, repo, ticketfolder):
+    """ Update the given issue in its git.
+
+    This method forks the provided repo, add/edit the issue whose file name
+    is defined by the uid field of the issue and if there are additions/
+    changes commit them and push them back to the original repo.
+
+    """
+
+    # Get the fork
+    repopath = os.path.join(ticketfolder, repo.path)
+    ticket_repo = pygit2.Repository(repopath)
+
+    # Clone the repo into a temp folder
+    newpath = tempfile.mkdtemp()
+    new_repo = pygit2.clone_repository(repopath, newpath)
+
+    file_path = os.path.join(newpath, issue.uid)
+
+    # Get the current index
+    index = new_repo.index
+
+    # Are we adding files
+    added = False
+    if not os.path.exists(file_path):
+        added = True
+
+    # Write down what changed
+    with open(file_path, 'w') as stream:
+        stream.write(issue_to_json(issue))
+
+    # Retrieve the list of files that changed
+    diff = new_repo.diff()
+    files = [patch.new_file_path for patch in diff]
+
+    # Add the changes to the index
+    if added:
+        index.add(issue.uid)
+    for filename in files:
+        index.add(filename)
+
+    # If not change, return
+    if not files or added:
+        shutil.rmtree(newpath)
+        return
+
+    # See if there is a parent to this commit
+    parent = None
+    try:
+        parent = new_repo.head.get_object().oid
+    except pygit2.GitError:
+        pass
+
+    parents = []
+    if parent:
+        parents.append(parent)
+
+    # Author/commiter will always be this one
+    author = pygit2.Signature(name='progit', email='progit')
+
+    # Actually commit
+    sha = new_repo.create_commit(
+        'refs/heads/master',
+        author,
+        author,
+        'Updated ticket %s: %s' % (issue.uid, issue.title),
+        new_repo.index.write_tree(),
+        parents)
+    index.write()
+
+    # Push to origin
+    ori_remote = new_repo.remotes[0]
+    master_ref = new_repo.lookup_reference('HEAD').resolve()
+    refname = '%s:%s' % (master_ref.name, master_ref.name)
+
+    ori_remote.push(refname)
+
+    # Remove the clone
+    shutil.rmtree(newpath)
