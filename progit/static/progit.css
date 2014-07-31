@@ -473,3 +473,7 @@ th.month .ui-button-text {
     padding: 0;
     margin: 0;
 }
+
+.git_links {
+    padding-top: 3em;
+}
