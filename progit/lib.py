@@ -269,7 +269,8 @@ def update_project_settings(session, repo, issue_tracker, project_docs):
         return 'Edited successfully setting of repo: %s' % repo.fullname
 
 
-def fork_project(session, user, repo, gitfolder, forkfolder, docfolder):
+def fork_project(session, user, repo, gitfolder,
+                 forkfolder, docfolder,ticketfolder):
     ''' Fork a given project into the user's forks. '''
     if repo.is_fork:
         reponame = os.path.join(forkfolder, repo.path)
@@ -308,6 +309,13 @@ def fork_project(session, user, repo, gitfolder, forkfolder, docfolder):
     if os.path.exists(gitrepo):
         raise progit.exceptions.RepoExistsException(
             'The docs "%s" already exists' % project.path
+        )
+    pygit2.init_repository(gitrepo, bare=True)
+
+    gitrepo = os.path.join(ticketfolder, project.path)
+    if os.path.exists(gitrepo):
+        raise progit.exceptions.RepoExistsException(
+            'The tickets repo "%s" already exists' % project.path
         )
     pygit2.init_repository(gitrepo, bare=True)
 
