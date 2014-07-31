@@ -13,7 +13,8 @@ from functools import wraps
 import flask
 
 from progit import (APP, SESSION, LOG, cla_required, authenticated,
-                    generate_gitolite_acls, generate_authorized_key_file)
+                    generate_gitolite_acls, generate_authorized_key_file,
+                    is_admin)
 
 
 def admin_required(function):
