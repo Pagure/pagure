@@ -142,7 +142,29 @@
   {% endif %}
 
   <section class="git_links">
-    git url: {{ config.get('GIT_URL') }}:{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
+    <table>
+      <tr>
+        <td>Project</td>
+        <td>:</td>
+        <td>
+          {{ config.get('GIT_URL') }}:{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
+        </td>
+      </tr>
+      <tr>
+        <td>Docs</td>
+        <td>:</td>
+        <td>
+          {{ config.get('GIT_URL') }}:docs/{{ repo.fullname }}.git
+        </td>
+      </tr>
+      <tr>
+        <td>Tickets</td>
+        <td>:</td>
+        <td>
+          {{ config.get('GIT_URL') }}:ticket/{{ repo.fullname }}.git
+        </td>
+      </tr>
+    </table>
   </section>
 {% endif %}
 
