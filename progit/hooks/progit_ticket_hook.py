@@ -41,7 +41,7 @@ class ProgitTicketsTable(BASE):
     active = sa.Column(sa.Boolean, nullable=False, default=False)
 
     project = relation(
-        'Project', remote_side=[Project.id], backref='progit_hook')
+        'Project', remote_side=[Project.id], backref='progit_hook_tickets')
 
 
 class ProgitTicketsForm(wtf.Form):
