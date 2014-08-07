@@ -26,7 +26,9 @@ EMAIL_ERROR = 'pingou@pingoured.fr'
 APP_URL = 'https://fedorahosted.org/progit/'
 
 # The URL to use to clone the git repositories.
-GIT_URL = 'git@progit.fedorahosted.org'
+GIT_URL_SSH = 'git@progit.fedorahosted.org'
+GIT_URL_GIT = 'git://progit.fedorahosted.org'
+
 
 # Number of items displayed per page
 ITEM_PER_PAGE = 50
