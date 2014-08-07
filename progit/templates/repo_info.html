@@ -147,26 +147,36 @@
         <th>Git URLs</th>
         <td></td>
         <td></td>
+        <td></td>
       </tr>
       <tr>
         <td>Project</td>
         <td>:</td>
         <td>
-          {{ config.get('GIT_URL') }}:{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
+          {{ config.get('GIT_URL_SSH') }}:{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
+        </td>
+        <td>
+          {{ config.get('GIT_URL_GIT') }}:{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
         </td>
       </tr>
       <tr>
         <td>Docs</td>
         <td>:</td>
         <td>
-          {{ config.get('GIT_URL') }}:docs/{{ repo.fullname }}.git
+          {{ config.get('GIT_URL_SSH') }}:docs/{{ repo.fullname }}.git
+        </td>
+        <td>
+          {{ config.get('GIT_URL_GIT') }}:docs/{{ repo.fullname }}.git
         </td>
       </tr>
       <tr>
         <td>Tickets</td>
         <td>:</td>
         <td>
-          {{ config.get('GIT_URL') }}:ticket/{{ repo.fullname }}.git
+          {{ config.get('GIT_URL_SSH') }}:ticket/{{ repo.fullname }}.git
+        </td>
+        <td>
+          {{ config.get('GIT_URL_GIT') }}:tickets/{{ repo.fullname }}.git
         </td>
       </tr>
     </table>
