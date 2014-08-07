@@ -240,7 +240,8 @@ def format_loc(loc):
     cnt = 1
     for line in loc.split('\n'):
         output.append(
-            '<tr><td><a id="%s" href="#%s">%s</a></td>' % (cnt, cnt, cnt))
+            '<tr><td class="cell1"><a id="%s" href="#%s">%s</a></td>' % (
+                cnt, cnt, cnt))
         cnt += 1
         if not line:
             output.append(line)
@@ -249,7 +250,7 @@ def format_loc(loc):
             continue
         if line.startswith('<div'):
             line = line.split('<pre style="line-height: 125%">')[1]
-        output.append('<td><pre>%s</pre></td>' % line)
+        output.append('<td class="cell2"><pre>%s</pre></td>' % line)
         output.append('</tr>')
     output.append('</table></div>')
 
