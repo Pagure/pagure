@@ -474,6 +474,11 @@ th.month .ui-button-text {
     margin: 0;
 }
 
+.code_table tr .cell1{
+    width: 20px;
+}
+
+
 .git_links {
     padding-top: 3em;
 }
