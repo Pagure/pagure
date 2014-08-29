@@ -98,7 +98,7 @@
     {{ diff_commits[loop.index - 1].message }}
     </p>
     {% autoescape false %}
-        {{ html_diff }}
+        {{ html_diff | format_loc}}
     {% endautoescape %}
   {% endfor %}
 </section>
