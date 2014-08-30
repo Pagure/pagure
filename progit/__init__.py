@@ -205,6 +205,13 @@ def inject_variables():
     )
 
 
+# pylint: disable=W0613
+@APP.before_request
+def set_session():
+    """ Set the flask session as permanent. """
+    flask.session.permanent = True
+
+
 @APP.template_filter('lastcommit_date')
 def lastcommit_date_filter(repo):
     """ Template filter returning the last commit date of the provided repo.
