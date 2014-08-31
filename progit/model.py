@@ -217,47 +217,6 @@ class ProjectUser(BASE):
                     remote_side=[User.id], backref='co_projects')
 
 
-class Comment(BASE):
-    """ Stores the comments made on a commit/file.
-
-    Table -- comments
-    """
-
-    __tablename__ = 'comments'
-
-    id = sa.Column(sa.Integer, primary_key=True)
-    project_id = sa.Column(
-        sa.Integer,
-        sa.ForeignKey(
-            'projects.id', ondelete='CASCADE', onupdate='CASCADE'),
-        nullable=False)
-    commit_id = sa.Column(
-        sa.String(40),
-        nullable=False,
-        index=True)
-    user_id = sa.Column(
-        sa.Integer,
-        sa.ForeignKey('users.id', onupdate='CASCADE'),
-        nullable=False,
-        index=True)
-    line = sa.Column(
-        sa.Integer,
-        nullable=True)
-    comment = sa.Column(
-        sa.Text(),
-        nullable=False)
-    parent_id = sa.Column(
-        sa.Integer,
-        sa.ForeignKey('comments.id', onupdate='CASCADE'),
-        nullable=True)
-
-    date_created = sa.Column(sa.DateTime, nullable=False,
-                             default=datetime.datetime.utcnow)
-
-    user = relation('User', foreign_keys=[user_id],
-                    remote_side=[User.id], backref='comments')
-
-
 class Issue(BASE):
     """ Stores the issues reported on a project.
 
@@ -393,6 +352,50 @@ class PullRequest(BASE):
         return 'PullRequest(%s, project:%s, user:%s, title:%s)' % (
             self.id, self.repo.name, self.user.user, self.title
         )
+
+
+class PullRequestComment(BASE):
+    """ Stores the comments made on a pull-request.
+
+    Table -- pull_request_comments
+    """
+
+    __tablename__ = 'pull_request_comments'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    pull_request_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(
+            'pull_requests.id', ondelete='CASCADE', onupdate='CASCADE'),
+        nullable=False)
+    commit_id = sa.Column(
+        sa.String(40),
+        nullable=False,
+        index=True)
+    user_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey('users.id', onupdate='CASCADE'),
+        nullable=False,
+        index=True)
+    line = sa.Column(
+        sa.Integer,
+        nullable=True)
+    comment = sa.Column(
+        sa.Text(),
+        nullable=False)
+    parent_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey('pull_request_comments.id', onupdate='CASCADE'),
+        nullable=True)
+
+    date_created = sa.Column(sa.DateTime, nullable=False,
+                             default=datetime.datetime.utcnow)
+
+    user = relation('User', foreign_keys=[user_id],
+                    remote_side=[User.id], backref='pull_request_comments')
+    pull_request = relation(
+        'PullRequest', foreign_keys=[pull_request_id], remote_side=[PullRequest.id],
+        backref='comments')
 
 
 class GlobalId(BASE):
