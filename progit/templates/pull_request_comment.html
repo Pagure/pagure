@@ -1,0 +1,16 @@
+{% if authenticated %}
+<section class="add_comment">
+  <form action="{{ url_for(
+    'pull_request_add_comment', username=username, repo=repo.name,
+    requestid=requestid, commit=commit, row=row) }}" method="post">
+    <div>
+      <textarea id="comment" name="comment" title="comment"></textarea>
+    </div>
+  {{ form.csrf_token }}
+  <input type="submit" class="submit positive button" value="Comment">
+  <input type="button" class="cancel" value="Cancel">
+  </form>
+</section>
+{% else %}
+<p><a href="{{ url_for('auth_login') }}">Login</a> to comment on this ticket.</p>
+{% endif %}
