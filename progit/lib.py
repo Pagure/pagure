@@ -100,6 +100,31 @@ def add_issue_comment(session, issue, comment, user, ticketfolder):
     return 'Comment added'
 
 
+def add_pull_request_comment(session, request, commit, row, comment, user):
+    ''' Add a comment to a pull-request. '''
+    user_obj = get_user(session, user)
+    if not user_obj:
+        user_obj = get_user_by_email(session, user)
+
+    if not user_obj:
+        raise progit.exceptions.ProgitException(
+            'No user "%s" found' % user
+        )
+
+    pr_comment = model.PullRequestComment(
+        pull_request_id=request.id,
+        commit_id=commit,
+        line=row,
+        comment=comment,
+        user_id=user_obj.id,
+    )
+    session.add(pr_comment)
+    # Make sure we won't have SQLAlchemy error before we create the repo
+    session.flush()
+
+    return 'Comment added'
+
+
 def get_user_project(session, username):
     ''' Retrieve the list of projects managed by a user.
 
