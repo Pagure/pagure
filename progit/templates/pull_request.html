@@ -103,4 +103,48 @@
   {% endfor %}
 </section>
 
+
+{% endblock %}
+
+{% block jscripts %}
+{{ super() }}
+<script type="text/javascript">
+  function comment() {
+    $( ".cancel" ).click(
+      function() {
+        $(this).parent().parent().parent().parent().remove();
+      }
+    );
+  };
+
+ $(function(){
+  $( "tr" ).hover(
+    function() {
+      $( this ).find( "img" ).show().width(13);
+    }, function() {
+      $( this ).find( "img" ).hide();
+    }
+  );
+
+  $( ".prc" ).click(
+    function() {
+      var row = $( this ).attr('data-row');
+      var commit = $( this ).attr('data-commit');
+      var url = "{{ url_for(
+        'pull_request_add_comment', username=username, repo=repo.name,
+        requestid=requestid, commit='', row='') }}".slice(0, -1);
+      url = url + commit + '/' + row;
+      var current_row = $( this ).parent();
+      if (current_row.next().find('.pr_comment').length == 0){
+        $.get( url , function( data ) {
+          current_row.after(
+            '<tr><td></td><td colspan="2" class="pr_comment">' + data + '</td></tr>' );
+          comment();
+        });
+      }
+    }
+  );
+
+ });
+</script>
 {% endblock %}
