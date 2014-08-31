@@ -482,3 +482,17 @@ th.month .ui-button-text {
 .git_links {
     padding-top: 3em;
 }
+
+.prc {
+    width: 13px;
+}
+
+.prc p {
+    padding:0;
+    margin:0;
+}
+
+.prc img {
+    display: none;
+    cursor: pointer;
+}
