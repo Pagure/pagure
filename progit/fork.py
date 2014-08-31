@@ -178,7 +178,27 @@ def pull_request_add_comment(repo, requestid, commit, row, username=None):
     form.requestid.data = requestid
     form.row.data = row
 
-    print form.validate_on_submit()
+    if form.validate_on_submit():
+        comment = form.comment.data
+
+        try:
+            message = progit.lib.add_pull_request_comment(
+                SESSION,
+                request=request,
+                commit=commit,
+                row=row,
+                comment=comment,
+                user=flask.g.fas_user.username,
+            )
+            SESSION.commit()
+            flask.flash(message)
+        except SQLAlchemyError, err:  # pragma: no cover
+            SESSION.rollback()
+            flask.flash(str(err), 'error')
+
+        return flask.redirect(flask.url_for(
+            'request_pull', username=username,
+            repo=repo.name, requestid=requestid))
 
     return flask.render_template(
         'pull_request_comment.html',
