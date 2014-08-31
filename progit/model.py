@@ -284,7 +284,7 @@ class IssueComment(BASE):
         nullable=False)
     parent_id = sa.Column(
         sa.Integer,
-        sa.ForeignKey('comments.id', onupdate='CASCADE'),
+        sa.ForeignKey('issue_comments.id', onupdate='CASCADE'),
         nullable=True)
     user_id = sa.Column(
         sa.Integer,
