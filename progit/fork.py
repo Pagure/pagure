@@ -154,6 +154,45 @@ def request_pull(repo, requestid, username=None):
     )
 
 
+@APP.route('/<repo>/request-pull/<requestid>/comment/<commit>/<row>',
+           methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/request-pull/<requestid>/comment/'
+           '<commit>/<row>', methods=('GET', 'POST'))
+def pull_request_add_comment(repo, requestid, commit, row, username=None):
+    """ Add a comment to a commit in a pull-request.
+    """
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    request = progit.lib.get_pull_request(
+        SESSION, project_id=repo.id, requestid=requestid)
+    repo = request.repo_from
+
+    if not request:
+        flask.abort(404, 'Pull-request not found')
+
+    form = progit.forms.AddPullRequestCommentForm()
+    form.commit.data = commit
+    form.requestid.data = requestid
+    form.row.data = row
+
+    print form.validate_on_submit()
+
+    return flask.render_template(
+        'pull_request_comment.html',
+        select='requests',
+        requestid=requestid,
+        repo=repo,
+        username=username,
+        commit=commit,
+        row=row,
+        form=form,
+    )
+
+
+
 @APP.route('/<repo>/request-pull/merge/<requestid>')
 @APP.route('/fork/<username>/<repo>/request-pull/merge/<requestid>')
 def merge_request_pull(repo, requestid, username=None):
