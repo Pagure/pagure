@@ -141,6 +141,8 @@
             '<tr><td></td><td colspan="2" class="pr_comment">' + data + '</td></tr>' );
           comment();
         });
+      } else {
+          current_row.next().find('.pr_comment').remove();
       }
     }
   );
