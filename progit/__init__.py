@@ -237,7 +237,7 @@ def rst2html(rst_string):
 
 
 @APP.template_filter('format_loc')
-def format_loc(loc):
+def format_loc(loc, commit=None):
     """ Template filter putting the provided lines of code into a table
     """
     output = [
@@ -246,9 +246,29 @@ def format_loc(loc):
     ]
     cnt = 1
     for line in loc.split('\n'):
-        output.append(
-            '<tr><td class="cell1"><a id="%s" href="#%s">%s</a></td>' % (
-                cnt, cnt, cnt))
+        if commit:
+            output.append(
+                '<tr><td class="cell1">'
+                '<a id="%(cnt)s" href="#%(cnt)s">%(cnt)s</a></td>'
+                '<td class="prc" data-row="%(cnt)s" data-commit="%(commitid)s">'
+                '<p>'
+                '<img src="%(img)s" alt="Add comment" title="Add comment"/>'
+                '</p>'
+                '</td>' % (
+                    {
+                        'cnt': cnt,
+                        'img': flask.url_for('static', filename='users.png'),
+                        'commitid': commit.oid.hex,
+                    }
+                )
+            )
+        else:
+            output.append(
+                '<tr><td class="cell1">'
+                '<a id="%(cnt)s" href="#%(cnt)s">%(cnt)s</a></td>'
+                % ({'cnt': cnt})
+            )
+
         cnt += 1
         if not line:
             output.append(line)
