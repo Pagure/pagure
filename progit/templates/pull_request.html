@@ -71,14 +71,14 @@
         <td>Author</td>
         <td>
           {{ diff_commits[loop.index - 1].author.name }} {{ '<' + diff_commits[loop.index - 1].author.email + '>' }}
-          - {{ diff_commits[loop.index - 1].commit_time }}
+          - {{ diff_commits[loop.index - 1].commit_time | format_ts }}
         </td>
       </tr>
       <tr>
         <td>Committer</td>
         <td>
           {{ diff_commits[loop.index - 1].committer.name }} {{ '<' + diff_commits[loop.index - 1].committer.email + '>' }}
-          - {{ diff_commits[loop.index - 1].commit_time }}
+          - {{ diff_commits[loop.index - 1].commit_time | format_ts }}
         </td>
       </tr>
       <tr>
