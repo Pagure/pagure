@@ -15,13 +15,13 @@
 
     <p>If you already have a git repo:</p>
     <pre>
-      git remote add origin {{ config.get('GIT_URL') }}:docs/{{ repo.fullname }}.git
+      git remote add origin {{ config.get('GIT_URL_SSH') }}:docs/{{ repo.fullname }}.git
       git push -u origin master
     </pre>
 
     <p>If you have no create your git repo yet:</p>
     <pre>
-      git clone {{ config.get('GIT_URL') }}:docs/{{ repo.fullname }}.git
+      git clone {{ config.get('GIT_URL_SSH') }}:docs/{{ repo.fullname }}.git
       cd {{ repo.name }}
       touch README.rst
       git add README.rst
