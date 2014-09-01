@@ -496,3 +496,7 @@ th.month .ui-button-text {
     display: none;
     cursor: pointer;
 }
+
+.pr_comment {
+    background: #fff;
+}
