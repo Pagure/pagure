@@ -249,7 +249,12 @@ def format_loc(loc, commit=None, prequest=None):
     if prequest:
         for com in prequest.comments:
             if commit and com.commit_id == commit.oid.hex:
-                comments[com.line] = com
+                if com.line in comments:
+                    comments[com.line].append(com)
+                else:
+                    comments[com.line] = [com]
+    for key in comments:
+        comments[key] = sorted(comments[key], key=lambda obj: obj.date_created)
 
     cnt = 1
     for line in loc.split('\n'):
