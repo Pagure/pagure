@@ -17,14 +17,14 @@
     <td>Author</td>
     <td>
       {{ commit.author.name }} {{ '<' + commit.author.email + '>' }}
-      - {{ commit.commit_time }}
+      - {{ commit.commit_time | format_ts}}
     </td>
   </tr>
   <tr>
     <td>Committer</td>
     <td>
       {{ commit.committer.name }} {{ '<' + commit.committer.email + '>' }}
-      - {{ commit.commit_time }}
+      - {{ commit.commit_time | format_ts }}
     </td>
   </tr>
   <tr>
