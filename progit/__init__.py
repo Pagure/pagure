@@ -14,6 +14,7 @@ import pkg_resources
 
 __version__ = '0.1'
 
+import datetime
 import logging
 import os
 import subprocess
@@ -234,6 +235,14 @@ def rst2html(rst_string):
     """
     if rst_string:
         return progit.doc_utils.convert_doc(unicode(rst_string))
+
+
+@APP.template_filter('format_ts')
+def format_ts(string):
+    """ Template filter transforming a timestamp to a date
+    """
+    dt = datetime.datetime.fromtimestamp(int(string))
+    return dt.strftime('%b %d %Y %H:%M:%S')
 
 
 @APP.template_filter('format_loc')
