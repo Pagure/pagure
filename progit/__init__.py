@@ -237,13 +237,20 @@ def rst2html(rst_string):
 
 
 @APP.template_filter('format_loc')
-def format_loc(loc, commit=None):
+def format_loc(loc, commit=None, prequest=None):
     """ Template filter putting the provided lines of code into a table
     """
     output = [
         '<div class="highlight">',
         '<table class="code_table">'
     ]
+
+    comments = {}
+    if prequest:
+        for com in prequest.comments:
+            if commit and com.commit_id == commit.oid.hex:
+                comments[com.line] = com
+
     cnt = 1
     for line in loc.split('\n'):
         if commit:
@@ -279,6 +286,26 @@ def format_loc(loc, commit=None):
             line = line.split('<pre style="line-height: 125%">')[1]
         output.append('<td class="cell2"><pre>%s</pre></td>' % line)
         output.append('</tr>')
+
+        if cnt - 1 in comments:
+            output.append(
+                '<tr><td></td>'
+                '<td colspan="2"><table style="width:100%%"><tr>'
+                '<td><a href="%(url)s">%(user)s</a></td><td class="right">%(date)s</td>'
+                '</tr>'
+                '<tr><td colspan="2" class="pr_comment">%(comment)s</td></tr>'
+                '</table></td></tr>' % (
+                    {
+                        'url': flask.url_for(
+                            'view_user', username=comments[cnt -1].user.user),
+                        'user': comments[cnt -1].user.user,
+                        'date': comments[cnt -1].date_created.strftime(
+                            '%b %d %Y %H:%M:%S'),
+                        'comment': comments[cnt -1].comment,
+                    }
+                )
+            )
+
     output.append('</table></div>')
 
     return '\n'.join(output)
