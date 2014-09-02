@@ -134,17 +134,16 @@
         'pull_request_add_comment', username=username, repo=repo.name,
         requestid=requestid, commit='', row='') }}".slice(0, -1);
       url = url + commit + '/' + row;
-      var current_row = $( this ).parent();
-      var table = current_row.parent();
+      var table = $( this ).parent().parent();
       var next_row = table.find('#' + (+row + 1)).parent().parent();
-      if (current_row.next().find('.pr_comment_form').length == 0){
+      if (next_row.prev().find('.pr_comment_form').length == 0){
         $.get( url , function( data ) {
           next_row.before(
             '<tr><td></td><td colspan="2" class="pr_comment_form">' + data + '</td></tr>' );
           comment();
         });
       } else {
-          current_row.next().find('.pr_comment_form').remove();
+          next_row.prev().find('.pr_comment_form').remove();
       }
     }
   );
