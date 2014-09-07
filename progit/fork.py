@@ -502,4 +502,9 @@ def new_request_pull(repo, username=None, commitid=None):
         diffs=diffs,
         html_diffs=html_diffs,
         form=form,
+        branches=[
+            branch.replace('refs/heads/', '')
+            for branch in sorted(orig_repo.listall_references())
+        ],
+        branchname=branchname,
     )
