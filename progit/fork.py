@@ -71,10 +71,11 @@ def request_pull(repo, requestid, username=None):
 
     request = progit.lib.get_pull_request(
         SESSION, project_id=repo.id, requestid=requestid)
-    repo = request.repo_from
 
     if not request:
         flask.abort(404, 'Pull-request not found')
+
+    repo = request.repo_from
 
     if repo.is_fork:
         repopath = os.path.join(APP.config['FORK_FOLDER'], repo.path)
