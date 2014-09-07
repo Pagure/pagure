@@ -391,9 +391,14 @@ def new_request_pull(repo, username=None, commitid=None):
         parentname = os.path.join(APP.config['GIT_FOLDER'], repo.path)
     orig_repo = pygit2.Repository(parentname)
 
+    branchname = flask.request.args.get('branch', 'master')
+    branch = orig_repo.lookup_branch(branchname)
+    if not branch:
+        flask.flash('Branch %s does not exist' % branchname, 'error')
+        branchname = 'master'
+
     if commitid is None:
         commitid = repo_obj.head.target
-        branchname = flask.request.args.get('branch', None)
         if branchname:
             branch = repo_obj.lookup_branch(branchname)
             commitid = branch.get_object().hex
@@ -402,12 +407,12 @@ def new_request_pull(repo, username=None, commitid=None):
     diffs = []
     if not repo_obj.is_empty and not orig_repo.is_empty:
         orig_commit = orig_repo[
-            orig_repo.lookup_branch('master').get_object().hex]
+            orig_repo.lookup_branch(branchname).get_object().hex]
 
         master_commits = [
             commit.oid.hex
             for commit in orig_repo.walk(
-                orig_repo.lookup_branch('master').get_object().hex,
+                orig_repo.lookup_branch(branchname).get_object().hex,
                 pygit2.GIT_SORT_TIME)
         ]
 
@@ -462,6 +467,7 @@ def new_request_pull(repo, username=None, commitid=None):
                 SESSION,
                 repo=parent,
                 repo_from=repo,
+                branch=branchname,
                 title=form.title.data,
                 start_id=orig_commit,
                 stop_id=repo_commit.oid.hex,
