@@ -51,6 +51,19 @@
     repo=repo.name, commitid=commitid) }}" method="post">
     <table>
       {{ render_field_in_row(form.title) }}
+      <tr>
+        <td>To branch</td>
+        <td>
+          <select id="branch_select">
+              <option>{{ branchname }}</option>
+            {% for branch in branches |reverse %}
+              {% if branch != branchname %}
+              <option>{{ branch }}</option>
+              {% endif %}
+            {% endfor %}
+          </select>
+        </td>
+      </tr>
     </table>
     <p class="buttons indent">
       <input type="submit" class="submit positive button" value="Create">
@@ -109,6 +122,16 @@
 {% block jscripts %}
 {{ super() }}
 <script type="text/javascript">
+ $(function(){
+  $( "#branch_select" ).change(
+    function() {
+      var url = $(location).attr('href').split('?branch')[0];
+      var sel = $('#branch_select');
+      window.location.href = url + '?branch=' + sel.val();
+    }
+  );
+ });
+
   function comment() {
     $( ".cancel" ).click(
       function() {
