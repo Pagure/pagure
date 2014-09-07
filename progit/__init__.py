@@ -255,7 +255,7 @@ def format_loc(loc, commit=None, prequest=None):
     ]
 
     comments = {}
-    if prequest:
+    if prequest and not isinstance(prequest, flask.wrappers.Request):
         for com in prequest.comments:
             if commit and com.commit_id == commit.oid.hex:
                 if com.line in comments:
