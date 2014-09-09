@@ -125,9 +125,24 @@
  $(function(){
   $( "#branch_select" ).change(
     function() {
-      var url = $(location).attr('href').split('?branch')[0];
+      var url = $(location).attr('href').split('?')[0];
+      var params = $(location).attr('search').replace('?', '').split('&');
       var sel = $('#branch_select');
-      window.location.href = url + '?branch=' + sel.val();
+      /* Check all the current argument in the URL */
+      var changed = false;
+      for (i = 0; i < params.length; i++) {
+        /* If we find branch=, updated it */
+        if (params[i].match("^branch=")) {
+          params[i] = 'branch=' + sel.val();
+          changed = true;
+        }
+      }
+      /* Otherwise add it */
+      if (!changed) {
+        params.push('branch=' + sel.val());
+      }
+      var final_url = url + '?' + params.join('&');
+      window.location.href = final_url;
     }
   );
  });
