@@ -392,6 +392,12 @@ def new_request_pull(repo, username=None, commitid=None):
         parentname = os.path.join(APP.config['GIT_FOLDER'], repo.path)
     orig_repo = pygit2.Repository(parentname)
 
+    frombranchname = flask.request.args.get('from_branch', 'master')
+    frombranch = repo_obj.lookup_branch(frombranchname)
+    if not frombranch:
+        flask.flash('Branch %s does not exist' % frombranchname, 'error')
+        frombranchname = 'master'
+
     branchname = flask.request.args.get('branch', 'master')
     branch = orig_repo.lookup_branch(branchname)
     if not branch:
@@ -401,7 +407,7 @@ def new_request_pull(repo, username=None, commitid=None):
     if commitid is None:
         commitid = repo_obj.head.target
         if branchname:
-            branch = repo_obj.lookup_branch(branchname)
+            branch = repo_obj.lookup_branch(frombranchname)
             commitid = branch.get_object().hex
 
     diff_commits = []
