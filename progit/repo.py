@@ -9,6 +9,7 @@
 """
 
 import flask
+import datetime
 import shutil
 import os
 from math import ceil
@@ -389,6 +390,57 @@ def view_commit(repo, commitid, username=None):
         diff=diff,
         html_diff=html_diff,
     )
+
+
+@APP.route('/<repo>/<commitid>.patch')
+@APP.route('/fork/<username>/<repo>/<commitid>.patch')
+def view_commit_patch(repo, commitid, username=None):
+    """ Render a commit in a repo as patch
+    """
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
+    if repo.is_fork:
+        reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
+    repo_obj = pygit2.Repository(reponame)
+
+    try:
+        commit = repo_obj.get(commitid)
+    except ValueError:
+        flask.abort(404, 'Commit not found')
+
+    if commit.parents:
+        diff = commit.tree.diff_to_tree()
+
+        parent = repo_obj.revparse_single('%s^' % commitid)
+        diff = repo_obj.diff(parent, commit)
+    else:
+        # First commit in the repo
+        diff = commit.tree.diff_to_tree(swap=True)
+
+    patch = """commit %(commit)s
+From: %(author_name)s <%(author_email)s>
+Date: %(date)s
+
+%(msg)s
+
+%(patch)s
+""" % (
+        {
+            'commit': commit.oid.hex,
+            'author_name': commit.author.name,
+            'author_email': commit.author.email,
+            'date': datetime.datetime.fromtimestamp(
+                commit.commit_time).strftime('%b %d %Y %H:%M:%S'),
+            'msg': commit.message,
+            'patch': diff.patch,
+        }
+    )
+
+    return flask.Response(patch, content_type="text/plain;charset=UTF-8")
 
 
 @APP.route('/<repo>/tree/')
