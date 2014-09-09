@@ -47,38 +47,51 @@ def create_session(db_url, debug=False, pool_recycle=3600):
     return scopedsession
 
 
-def commit_to_patch(repo_obj, commit):
+def commit_to_patch(repo_obj, commits):
     ''' For a given commit (PyGit2 commit object) of a specified git repo,
     returns a string representation of the changes the commit did in a
     format that allows it to be used as patch.
     '''
-    if commit.parents:
-        diff = commit.tree.diff_to_tree()
+    if not isinstance(commits, list):
+        commits = [commits]
 
-        parent = repo_obj.revparse_single('%s^' % commit.oid.hex)
-        diff = repo_obj.diff(parent, commit)
-    else:
-        # First commit in the repo
-        diff = commit.tree.diff_to_tree(swap=True)
+    patch = ""
+    for cnt, commit in enumerate(commits):
+        if commit.parents:
+            diff = commit.tree.diff_to_tree()
 
-    patch = """From %(commit)s
+            parent = repo_obj.revparse_single('%s^' % commit.oid.hex)
+            diff = repo_obj.diff(parent, commit)
+        else:
+            # First commit in the repo
+            diff = commit.tree.diff_to_tree(swap=True)
+
+        subject, message = commit.message.split('\n', 1)
+
+        if len(commits) > 1:
+            subject = '[PATCH %s/%s] %s' % (cnt + 1, len(commits), subject)
+
+        patch += """From %(commit)s Mon Sep 17 00:00:00 2001
 From: %(author_name)s <%(author_email)s>
 Date: %(date)s
+Subject: %(subject)s
 
 %(msg)s
+---
 
 %(patch)s
 """ % (
-        {
-            'commit': commit.oid.hex,
-            'author_name': commit.author.name,
-            'author_email': commit.author.email,
-            'date': datetime.datetime.utcfromtimestamp(
-                commit.commit_time).strftime('%b %d %Y %H:%M:%S +0000'),
-            'msg': commit.message,
-            'patch': diff.patch,
-        }
-    )
+            {
+                'commit': commit.oid.hex,
+                'author_name': commit.author.name,
+                'author_email': commit.author.email,
+                'date': datetime.datetime.utcfromtimestamp(
+                    commit.commit_time).strftime('%b %d %Y %H:%M:%S +0000'),
+                'subject': subject,
+                'msg': message,
+                'patch': diff.patch,
+            }
+        )
     return patch
 
 
