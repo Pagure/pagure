@@ -154,6 +154,73 @@ def request_pull(repo, requestid, username=None):
         html_diffs=html_diffs,
     )
 
+@APP.route('/<repo>/request-pull/<requestid>.patch')
+@APP.route('/fork/<username>/<repo>/request-pull/<requestid>.patch')
+def request_pull_patch(repo, requestid, username=None):
+    """ Returns the commits from the specified pull-request as patches.
+    """
+
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    request = progit.lib.get_pull_request(
+        SESSION, project_id=repo.id, requestid=requestid)
+
+    if not request:
+        flask.abort(404, 'Pull-request not found')
+
+    repo = request.repo_from
+
+    if repo.is_fork:
+        repopath = os.path.join(APP.config['FORK_FOLDER'], repo.path)
+    else:
+        repopath = os.path.join(APP.config['GIT_FOLDER'], repo.path)
+    repo_obj = pygit2.Repository(repopath)
+
+    if repo.parent:
+        parentname = os.path.join(APP.config['GIT_FOLDER'], repo.parent.path)
+    else:
+        parentname = os.path.join(APP.config['GIT_FOLDER'], repo.path)
+    orig_repo = pygit2.Repository(parentname)
+
+    diff_commits = []
+    repo_commit = repo_obj[request.stop_id]
+    if not repo_obj.is_empty and not orig_repo.is_empty:
+        orig_commit = orig_repo[
+            orig_repo.lookup_branch('master').get_object().hex]
+
+        master_commits = [
+            commit.oid.hex
+            for commit in orig_repo.walk(
+                orig_repo.lookup_branch('master').get_object().hex,
+                pygit2.GIT_SORT_TIME)
+        ]
+
+        repo_commit = repo_obj[request.start_id]
+
+        for commit in repo_obj.walk(
+                request.stop_id, pygit2.GIT_SORT_TIME):
+            if commit.oid.hex in master_commits:
+                break
+            diff_commits.append(commit)
+
+    elif orig_repo.is_empty:
+        orig_commit = None
+        diff = repo_commit.tree.diff_to_tree(swap=True)
+    else:
+        flask.flash(
+            'Fork is empty, there are no commits to request pulling',
+            'error')
+        return flask.redirect(flask.url_for(
+            'view_repo', username=username, repo=repo.name))
+
+    diff_commits.reverse()
+    patch = progit.lib.commit_to_patch(repo_obj, diff_commits)
+
+    return flask.Response(patch, content_type="text/plain;charset=UTF-8")
+
 
 @APP.route('/<repo>/request-pull/<requestid>/comment/<commit>/<row>',
            methods=('GET', 'POST'))
