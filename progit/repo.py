@@ -9,7 +9,6 @@
 """
 
 import flask
-import datetime
 import shutil
 import os
 from math import ceil
@@ -412,33 +411,7 @@ def view_commit_patch(repo, commitid, username=None):
     except ValueError:
         flask.abort(404, 'Commit not found')
 
-    if commit.parents:
-        diff = commit.tree.diff_to_tree()
-
-        parent = repo_obj.revparse_single('%s^' % commitid)
-        diff = repo_obj.diff(parent, commit)
-    else:
-        # First commit in the repo
-        diff = commit.tree.diff_to_tree(swap=True)
-
-    patch = """From %(commit)s
-From: %(author_name)s <%(author_email)s>
-Date: %(date)s
-
-%(msg)s
-
-%(patch)s
-""" % (
-        {
-            'commit': commit.oid.hex,
-            'author_name': commit.author.name,
-            'author_email': commit.author.email,
-            'date': datetime.datetime.utcfromtimestamp(
-                commit.commit_time).strftime('%b %d %Y %H:%M:%S +0000'),
-            'msg': commit.message,
-            'patch': diff.patch,
-        }
-    )
+    patch = progit.lib.commit_to_patch(repo_obj, commit)
 
     return flask.Response(patch, content_type="text/plain;charset=UTF-8")
 
