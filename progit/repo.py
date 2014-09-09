@@ -421,7 +421,7 @@ def view_commit_patch(repo, commitid, username=None):
         # First commit in the repo
         diff = commit.tree.diff_to_tree(swap=True)
 
-    patch = """commit %(commit)s
+    patch = """From %(commit)s
 From: %(author_name)s <%(author_email)s>
 Date: %(date)s
 
@@ -433,8 +433,8 @@ Date: %(date)s
             'commit': commit.oid.hex,
             'author_name': commit.author.name,
             'author_email': commit.author.email,
-            'date': datetime.datetime.fromtimestamp(
-                commit.commit_time).strftime('%b %d %Y %H:%M:%S'),
+            'date': datetime.datetime.utcfromtimestamp(
+                commit.commit_time).strftime('%b %d %Y %H:%M:%S +0000'),
             'msg': commit.message,
             'patch': diff.patch,
         }
