@@ -164,7 +164,7 @@ def view_issue(repo, issueid, username=None):
 
     issue = progit.lib.get_issue(SESSION, issueid)
 
-    if issue is None or issue.project != repo:
+    if issue is None or issue.project.name != repo.name:
         flask.abort(404, 'Issue not found')
 
     status = progit.lib.get_issue_statuses(SESSION)
