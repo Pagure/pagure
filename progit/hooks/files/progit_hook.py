@@ -101,9 +101,9 @@ def relates_commit(commitid, issueid, project=None):
     import progit
     import progit.exceptions
 
-    issue = progit.lib.get_issue(progit.SESSION, issueid)
-
     repo = project or get_repo_name()
+
+    issue = progit.lib.get_issue(progit.SESSION, repo.id, issueid)
 
     if issue is None or issue.project.name != repo:
         return
