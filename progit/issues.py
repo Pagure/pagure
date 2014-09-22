@@ -42,7 +42,7 @@ def add_comment_issue(repo, issueid, username=None):
     if not repo.issue_tracker:
         flask.abort(404, 'No issue tracker found for this project')
 
-    issue = progit.lib.get_issue(SESSION, issueid)
+    issue = progit.lib.get_issue(SESSION, repo.id, issueid)
 
     if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
@@ -162,7 +162,7 @@ def view_issue(repo, issueid, username=None):
     if not repo.issue_tracker:
         flask.abort(404, 'No issue tracker found for this project')
 
-    issue = progit.lib.get_issue(SESSION, issueid)
+    issue = progit.lib.get_issue(SESSION, repo.id, issueid)
 
     if issue is None or issue.project.name != repo.name:
         flask.abort(404, 'Issue not found')
@@ -224,7 +224,7 @@ def edit_issue(repo, issueid, username=None):
         flask.abort(
             403, 'You are not allowed to edit issues for this project')
 
-    issue = progit.lib.get_issue(SESSION, issueid)
+    issue = progit.lib.get_issue(SESSION, repo.id, issueid)
 
     if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
