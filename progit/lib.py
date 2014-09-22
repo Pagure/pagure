@@ -505,7 +505,7 @@ def get_issues(session, repo, status=None, closed=False):
     return query.all()
 
 
-def get_issue(session, issueid):
+def get_issue(session, projectid, issueid):
     ''' Retrieve the specified issue
     '''
     subquery = session.query(
@@ -519,6 +519,10 @@ def get_issue(session, issueid):
 
     query = session.query(
         model.Issue
+    ).filter(
+        model.Issue.project_id == projectid
+    ).filter(
+        model.Issue.project_id == projectid
     ).filter(
         subquery.c.project_id == model.Issue.project_id
     ).filter(
