@@ -83,3 +83,7 @@ GITOLITE_KEYDIR = None
 GL_RC = None
 # Path to the /bin directory where the gitolite tools can be found
 GL_BINDIR = None
+
+
+# Default SMTP server to use for sending emails
+SMTP_SERVER = 'localhost'
