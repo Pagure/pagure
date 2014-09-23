@@ -264,6 +264,13 @@ class Issue(BASE):
             self.id, self.project.name, self.user.user, self.title
         )
 
+    @property
+    def mail_id(self):
+        ''' Return a unique reprensetation of the issue as string that
+        can be used when sending emails.
+        '''
+        return '%s-ticket-%s@progit' % (self.project.name, self.id)
+
 
 class IssueComment(BASE):
     """ Stores the comments made on a commit/file.
