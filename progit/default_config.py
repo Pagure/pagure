@@ -87,3 +87,6 @@ GL_BINDIR = None
 
 # Default SMTP server to use for sending emails
 SMTP_SERVER = 'localhost'
+
+# Email used to sent emails
+FROM_EMAIL = 'progit@fedoraproject.org'
