@@ -135,12 +135,12 @@ def add_issue_comment(session, issue, comment, user, ticketfolder):
             'No user "%s" found' % user
         )
 
-    isse_comment = model.IssueComment(
+    issue_comment = model.IssueComment(
         issue_id=issue.id,
         comment=comment,
         user_id=user_obj.id,
     )
-    session.add(isse_comment)
+    session.add(issue_comment)
     # Make sure we won't have SQLAlchemy error before we create the repo
     session.flush()
 
