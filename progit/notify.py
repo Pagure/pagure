@@ -50,7 +50,7 @@ def notify_new_comment(comment):
     to the issue.
     '''
     text = """
-%s added a new comment has been added to an issue you are following.
+%s added a new comment to an issue you are following.
 
 New comment:
 
