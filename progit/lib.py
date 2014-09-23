@@ -26,6 +26,7 @@ from sqlalchemy.exc import SQLAlchemyError
 import pygit2
 
 import progit.exceptions
+import progit.notify
 from progit import model
 
 
@@ -145,6 +146,8 @@ def add_issue_comment(session, issue, comment, user, ticketfolder):
     session.flush()
 
     update_git_ticket(issue, repo=issue.project, ticketfolder=ticketfolder)
+
+    progit.notify.notify_new_comment(issue_comment)
 
     return 'Comment added'
 
