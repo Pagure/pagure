@@ -33,6 +33,24 @@
   </form>
 </section>
 
+<section class="users">
+  <h3>Users</h3>
+
+  <p>Here below is the list of user having commit rights to this repo.</p>
+
+  <ul>
+    <li>
+      <a href="{{ url_for('.view_user', username=repo.user.user) }}">{{ repo.user.user }}</a>
+    </li>
+  {% for user in repo.users %}
+    <li>
+      <a href="{{ url_for('.view_user', username=user.user) }}">{{ user.user }}</a>
+    </li>
+  {% endfor %}
+  </ul>
+</section>
+
+
 {% if plugins %}
 <section class="hooks">
   <h3>Hooks</h3>
