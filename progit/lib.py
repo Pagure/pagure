@@ -267,6 +267,8 @@ def new_issue(session, repo, title, content, user, ticketfolder):
 
     update_git_ticket(issue, repo=repo, ticketfolder=ticketfolder)
 
+    progit.notify.notify_new_issue(issue)
+
     return 'Issue created'
 
 
