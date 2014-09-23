@@ -16,7 +16,8 @@ import progit
 from email.mime.text import MIMEText
 
 
-def send_email(text, subject, to_mail, from_mail=None):
+def send_email(text, subject, to_mail, from_mail=None, mail_id=None,
+               in_reply_to=None):
     ''' Send an email with the specified information.
 
     :arg text: the content of the email to send
@@ -25,6 +26,9 @@ def send_email(text, subject, to_mail, from_mail=None):
         coma
     :kwarg from_mail: the email address the email is sent from.
         Defaults to nobody@progit
+    :kwarg mail_id: if defined, the header `mail-id` is set with this value
+    :kwarg in_reply_to: if defined, the header `In-Reply-To` is set with
+        this value
 
     '''
     msg = MIMEText(text.encode('utf-8'), 'plain', 'utf-8')
@@ -33,6 +37,12 @@ def send_email(text, subject, to_mail, from_mail=None):
         from_email = 'progit@fedoraproject.org'
     msg['From'] = from_email
     msg['Bcc'] = to_mail.replace(',', ', ')
+
+    if mail_id:
+        msg['mail-id'] = mail_id
+
+    if in_reply_to:
+        msg['In-Reply-To'] = '<%s>' % in_reply_to
 
     # Send the message via our own SMTP server, but don't include the
     # envelope header.
