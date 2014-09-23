@@ -116,5 +116,6 @@ New issue:
     send_email(
         text,
         'New issue `%s`' % issue.title,
-        ','.join(mail_to)
+        ','.join(mail_to),
+        mail_id=issue.mail_id,
     )
