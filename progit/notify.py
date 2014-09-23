@@ -75,3 +75,36 @@ New comment:
         'Update to issue `%s`' % comment.issue.title,
         ','.join(mail_to)
     )
+
+
+def notify_new_issue(issue):
+    ''' Notify the people following a project that a new issue was added
+    to it.
+    '''
+    text = """
+%s reported a new issue against the project: `%s` that you are following.
+
+New issue:
+
+``
+%s
+``
+
+%s
+""" % (
+    issue.user.user,
+    issue.project.name,
+    issue.content,
+    '%s/%s/issue/%s' % (
+        progit.APP.config['APP_URL'],
+        issue.project.name,
+        issue.id,
+    ),
+    )
+    mail_to = set([cmt.user.emails[0].email for cmt in issue.comments])
+    mail_to.add(issue.project.user.emails[0].email)
+    send_email(
+        text,
+        'New issue `%s`' % issue.title,
+        ','.join(mail_to)
+    )
