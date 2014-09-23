@@ -32,7 +32,7 @@ def send_email(text, subject, to_mail, from_mail=None):
     if not from_mail:
         from_email = 'progit@fedoraproject.org'
     msg['From'] = from_email
-    msg['To'] = to_mail.replace(',', ', ')
+    msg['Bcc'] = to_mail.replace(',', ', ')
 
     # Send the message via our own SMTP server, but don't include the
     # envelope header.
