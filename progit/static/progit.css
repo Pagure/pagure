@@ -514,3 +514,11 @@ form.icon button {
     padding-left: 0.5em;
     text-decoration: none;
 }
+
+.avatar {
+    vertical-align: middle;
+}
+
+.circle {
+    border-radius: 50%;
+}
