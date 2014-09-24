@@ -6,7 +6,7 @@
 
 {% block content %}
 
-<h2>{{ username }}</h2>
+<h2>{{ username | avatar(36) | safe }} {{ username }}</h2>
 
 {% if g.fas_user and g.fas_user.username == username %}
 <a href="{{ url_for('user_settings') }}">Update settings</a>
