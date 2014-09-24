@@ -371,7 +371,13 @@ def auth_login():
     if authenticated():
         return flask.redirect(return_point)
 
-    return FAS.login(return_url=return_point)
+    admins = APP.config['ADMIN_GROUP']
+    if isinstance(admins, basestring):
+        admins = set([admins])
+    else:  # pragma: no cover
+        admins = set(admins)
+
+    return FAS.login(return_url=return_point, groups=admins)
 
 
 @APP.route('/logout/')
