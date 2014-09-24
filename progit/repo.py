@@ -596,7 +596,7 @@ def remove_user(repo, userid, username=None):
     if not is_repo_admin(repo):
         flask.abort(
             403,
-            'You are not allowed to change the settings for this project')
+            'You are not allowed to change the users for this project')
 
     userids = [str(user.user.id) for user in repo.users]
 
@@ -634,7 +634,7 @@ def add_user(repo, username=None):
     if not is_repo_admin(repo):
         flask.abort(
             403,
-            'You are not allowed to change the settings for this project')
+            'You are not allowed to add users to this project')
 
     form = progit.forms.AddUserForm()
 
