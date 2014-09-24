@@ -614,6 +614,8 @@ def remove_user(repo, userid, username=None):
             break
     SESSION.commit()
 
+    progit.generate_gitolite_acls()
+
     flask.flash('User removed')
     return flask.redirect(
         flask.url_for('.view_settings', repo=repo.name, username=username)
@@ -642,6 +644,8 @@ def add_user(repo, username=None):
         msg = progit.lib.add_user_to_project(SESSION, repo, form.user.data)
 
         SESSION.commit()
+
+        progit.generate_gitolite_acls()
 
         flask.flash(msg)
         return flask.redirect(
