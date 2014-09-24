@@ -582,6 +582,44 @@ def delete_repo(repo, username=None):
         flask.url_for('view_user', username=flask.g.fas_user.username))
 
 
+@APP.route('/<repo>/dropuser/<userid>', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/dropuser/<userid>', methods=['POST'])
+@cla_required
+def remove_user(repo, userid, username=None):
+    """ Remove the specified user from the project.
+    """
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    if not is_repo_admin(repo):
+        flask.abort(
+            403,
+            'You are not allowed to change the settings for this project')
+
+    userids = [str(user.user.id) for user in repo.users]
+
+    if str(userid) not in userids:
+        flask.flash(
+            'User does not have commit or cannot loose it right', 'error')
+        return flask.redirect(
+            flask.url_for(
+                '.view_settings', repo=repo.name, username=username)
+        )
+
+    for user in repo.users:
+        if str(user.user.id) == str(userid):
+            SESSION.delete(user)
+            break
+    SESSION.commit()
+
+    flask.flash('User removed')
+    return flask.redirect(
+        flask.url_for('.view_settings', repo=repo.name, username=username)
+    )
+
+
 @APP.route('/<repo>/adduser', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/adduser', methods=('GET', 'POST'))
 @cla_required
