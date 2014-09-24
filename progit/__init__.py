@@ -339,6 +339,18 @@ def text_wraps(text, size=10):
         return parts
 
 
+@APP.template_filter('avatar')
+def avatar(packager, size=64):
+    """ Template filter sorting the given branches, Fedora first then EPEL,
+    then whatever is left.
+    """
+    output = '<img class="avatar circle" src="%s"/>' % (
+        progit.lib.avatar_url(packager, size)
+    )
+
+    return output
+
+
 @FAS.postlogin
 def set_user(return_url):
     ''' After login method. '''
