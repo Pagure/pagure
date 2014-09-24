@@ -500,3 +500,17 @@ th.month .ui-button-text {
 .pr_comment {
     background: #fff;
 }
+
+.del_icon {
+    display: inline;
+}
+
+/* Stealed this from flask-admin */
+form.icon button {
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
+    border: medium none;
+    line-height: normal;
+    padding: 0;
+    padding-left: 0.5em;
+    text-decoration: none;
+}
