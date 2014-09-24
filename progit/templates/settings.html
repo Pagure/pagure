@@ -38,6 +38,13 @@
 
   <p>Here below is the list of user having commit rights to this repo.</p>
 
+  <p>
+    <a href="{{ url_for('.add_user', username=username, repo=repo.name) }}"
+        class="icon icon-plus-sign blue">
+        [add]
+    </a>
+  </p>
+
   <ul>
     <li>
       <a href="{{ url_for('.view_user', username=repo.user.user) }}">{{ repo.user.user }}</a>
