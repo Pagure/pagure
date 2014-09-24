@@ -114,6 +114,10 @@ New issue:
     )
     mail_to = set([cmt.user.emails[0].email for cmt in issue.comments])
     mail_to.add(issue.project.user.emails[0].email)
+    for prouser in issue.project.user:
+        if prouser.user.emails:
+            mail_to.add(prouser.user.emails[0].email)
+
     send_email(
         text,
         'New issue `%s`' % issue.title,
