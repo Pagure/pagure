@@ -12,7 +12,9 @@
                 href="{{ url_for('view_repo', repo=repo.name) }}">
                 <img src='{{ url_for("static", filename="fedocal.png") }}' alt="" />
                 <span class="repo_name">{{ repo.name }}</span>
+                {% if repo.description %}
                 <span class="repo_desc">{{ repo.description | wraps(20) }}</span>
+                {% endif %}
             </a>
         {% endfor %}
     </div>
