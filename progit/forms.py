@@ -127,3 +127,11 @@ class UserSettingsForm(wtf.Form):
         'Public ssh key <span class="error">*</span>',
         [wtforms.validators.Required()]
     )
+
+
+class AddUserForm(wtf.Form):
+    ''' Form to add a user to a project. '''
+    user = wtforms.TextField(
+        'Username <span class="error">*</span>',
+        [wtforms.validators.Required()]
+    )
