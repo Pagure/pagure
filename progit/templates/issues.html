@@ -40,7 +40,7 @@
                 repo=repo.name, issueid=issue[1]) }}">
         {{ issue[0].title }}
       </a>
-      <span> Opened by
+      <span> Opened by {{ issue[0].user.user | avatar(16) | safe }}
       <a href="{{ url_for('view_user', username=issue[0].user.user) }}">
       {{issue[0].user.user}}
       </a> on {{ issue[0].date_created.strftime('%Y-%m-%d %H:%M') }}</span>
