@@ -152,6 +152,27 @@ def add_issue_comment(session, issue, comment, user, ticketfolder):
     return 'Comment added'
 
 
+def add_user_to_project(session, project, user):
+    ''' Add a specified user to a specified project. '''
+    user_obj = get_user(session, user)
+    if not user_obj:
+        user_obj = get_user_by_email(session, user)
+
+    if not user_obj:
+        raise progit.exceptions.ProgitException(
+            'No user "%s" found' % user
+        )
+
+    project_user = model.ProjectUser(
+        project_id=project.id,
+        user_id=user_obj.id,
+    )
+    session.add(project_user)
+    # Make sure we won't have SQLAlchemy error before we create the repo
+    session.flush()
+
+    return 'Comment added'
+
 def add_pull_request_comment(session, request, commit, row, comment, user):
     ''' Add a comment to a pull-request. '''
     user_obj = get_user(session, user)
