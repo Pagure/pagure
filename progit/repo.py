@@ -580,3 +580,39 @@ def delete_repo(repo, username=None):
 
     return flask.redirect(
         flask.url_for('view_user', username=flask.g.fas_user.username))
+
+
+@APP.route('/<repo>/adduser', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/adduser', methods=('GET', 'POST'))
+@cla_required
+def add_user(repo, username=None):
+    """ Add the specified user from the project.
+    """
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    if not is_repo_admin(repo):
+        flask.abort(
+            403,
+            'You are not allowed to change the settings for this project')
+
+    form = progit.forms.AddUserForm()
+
+    if form.validate_on_submit():
+        msg = progit.lib.add_user_to_project(SESSION, repo, form.user.data)
+
+        SESSION.commit()
+
+        flask.flash(msg)
+        return flask.redirect(
+            flask.url_for('.view_settings', repo=repo.name, username=username)
+        )
+
+    return flask.render_template(
+        'add_user.html',
+        form=form,
+        username=username,
+        repo=repo,
+    )
