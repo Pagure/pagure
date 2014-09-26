@@ -537,6 +537,38 @@ def view_settings(repo, username=None):
     )
 
 
+@APP.route('/<repo>/updatedesc', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/updatedesc', methods=['POST'])
+@cla_required
+def update_description(repo, username=None):
+    """ Update the description of a project.
+    """
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    if not is_repo_admin(repo):
+        flask.abort(
+            403,
+            'You are not allowed to change the settings for this project')
+
+    form = progit.forms.DescriptionForm()
+
+    if form.validate_on_submit():
+        try:
+            repo.description = form.description.data
+            SESSION.add(repo)
+            SESSION.commit()
+            flask.flash('Description updated')
+        except SQLAlchemyError, err:  # pragma: no cover
+            SESSION.rollback()
+            flask.flash(str(err), 'error')
+
+    return flask.redirect(flask.url_for(
+        'view_settings', username=username, repo=repo.name))
+
+
 @APP.route('/<repo>/delete', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/delete', methods=['POST'])
 @cla_required
