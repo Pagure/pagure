@@ -12,17 +12,31 @@
 {% block repo %}
 
 <section class="settings">
-  <h3>Settings</h3>
+  <h2>Settings</h2>
 
+  <div>
+    <h3>Update description</h3>
+    <form action="{{ url_for('.update_description',
+                    username=username, repo=repo.name) }}" method="post">
+      <input name="description" value="{{ repo.description }}" />
+      <button type="submit" title="Update description">
+        Update
+      </button>
+      {{ form.csrf_token }}
+    </form>
+  </div>
+
+  <h3>Delete project</h3>
   <form action="{{ url_for('.delete_repo',
                   username=username, repo=repo.name) }}" method="post">
     <button class="delete_icon" type="submit"
       onclick="return confirm('Are you sure to delete this project/fork? \nThis is final and cannot be un-done.');"
       title="Delete the project/forl">
-      Delete project
+      Delete
     </button>
   </form>
 
+  <h3>Project's options</h3>
   <form action="{{ url_for('.view_settings',
                   username=username, repo=repo.name) }}" method="post">
   <table>
@@ -38,7 +52,7 @@
 </section>
 
 <section class="users">
-  <h3>Users</h3>
+  <h2>Users</h2>
 
   <p>Here below is the list of user having commit rights to this repo.</p>
 
@@ -73,7 +87,7 @@
 
 {% if plugins %}
 <section class="hooks">
-  <h3>Hooks</h3>
+  <h2>Hooks</h2>
   <ul>
   {% for plugin in plugins %}
     <li>
