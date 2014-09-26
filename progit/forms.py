@@ -135,3 +135,11 @@ class AddUserForm(wtf.Form):
         'Username <span class="error">*</span>',
         [wtforms.validators.Required()]
     )
+
+
+class DescriptionForm(wtf.Form):
+    ''' Form to edit the description of a project. '''
+    description = wtforms.TextField(
+        'description <span class="error">*</span>',
+        [wtforms.validators.Required()]
+    )
