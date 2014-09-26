@@ -522,3 +522,7 @@ form.icon button {
 .circle {
     border-radius: 50%;
 }
+
+.settings div {
+    padding: 0em 0em 1em 0em;
+}
