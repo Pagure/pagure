@@ -395,11 +395,17 @@ def auth_login():
 @APP.route('/logout/')
 def auth_logout():
     """ Method to log out from the application. """
+    return_point = flask.url_for('index')
+    if 'next' in flask.request.args:
+        if is_safe_url(flask.request.args['next']):
+            return_point = flask.request.args['next']
+
     if not authenticated():
-        return flask.redirect(flask.url_for('index'))
+        return flask.redirect(return_point)
+
     FAS.logout()
     flask.flash('You have been logged out')
-    return flask.redirect(flask.url_for('index'))
+    return flask.redirect(return_point)
 
 
 def __get_file_in_tree(repo_obj, tree, filepath):
