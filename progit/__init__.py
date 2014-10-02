@@ -30,6 +30,7 @@ from functools import wraps
 from sqlalchemy.exc import SQLAlchemyError
 
 import progit.lib
+import progit.mail_logging
 import progit.doc_utils
 
 
@@ -48,27 +49,11 @@ if 'PROGIT_CONFIG' in os.environ:
 FAS = FAS(APP)
 SESSION = progit.lib.create_session(APP.config['DB_URL'])
 
-# Set up the logger
-## Send emails for big exception
-mail_handler = SMTPHandler(
-    APP.config.get('SMTP_SERVER', '127.0.0.1'),
-    'nobody@fedoraproject.org',
-    APP.config.get('MAIL_ADMIN', APP.config['EMAIL_ERROR']),
-    'Progit error')
-mail_handler.setFormatter(logging.Formatter('''
-    Message type:       %(levelname)s
-    Location:           %(pathname)s:%(lineno)d
-    Module:             %(module)s
-    Function:           %(funcName)s
-    Time:               %(asctime)s
-
-    Message:
-
-    %(message)s
-'''))
-mail_handler.setLevel(logging.ERROR)
 if not APP.debug:
-    APP.logger.addHandler(mail_handler)
+    APP.logger.addHandler(progit.mail_logging.get_mail_handler(
+        smtp_server=APP.config.get('SMTP_SERVER', '127.0.0.1'),
+        mail_admin=APP.config.get('MAIL_ADMIN', APP.config['EMAIL_ERROR'])
+    ))
 
 ## Send classic logs into syslog
 handler = logging.StreamHandler()
