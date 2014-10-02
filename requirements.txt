@@ -6,6 +6,7 @@ docutils
 flask
 flask-wtf
 markdown
+psutil
 pygit2 >= 0.20.1
 pygments
 python-fedora
