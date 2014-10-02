@@ -14,6 +14,17 @@ Homepage: https://github.com/pypingou/ProGit
 Dev instance: http://209.132.184.222/ (/!\\ May change unexpectedly, it's a dev instance ;-))
 
 
+UI overview
+-----------
+
+.. image:: overview.png
+   :height: 800px
+   :width: 400 px
+   :scale: 50 %
+   :alt: Small overview of Anitya's UI
+   :align: center
+   :target: overview.png
+
 
 Get it running
 ==============
