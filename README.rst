@@ -23,7 +23,7 @@ UI overview
    :scale: 50 %
    :alt: Small overview of Anitya's UI
    :align: center
-   :target: overview.png
+   :target: ./overview.png
 
 
 Get it running
