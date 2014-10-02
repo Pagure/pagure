@@ -4,10 +4,13 @@ ProGit
 :Author: Pierre-Yves Chibon <pingou@pingoured.fr>
 
 
-ProGit isa light-weight web-interface for git repo based on pygit2.
+ProGit is a light-weight git-centered forge based on pygit2.
 
-Ultimately, there are bigger plans for ProGit but let's start small and
-improve from there.
+Currently, ProGit offers a decent web-interface for git repositories, a
+simplistic ticket system (that needs improvements) and possibilities to create
+new projects, fork existing ones and create/merge pull-requests across or
+within projects.
+
 
 Homepage: https://github.com/pypingou/ProGit
 
