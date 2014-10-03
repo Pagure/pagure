@@ -94,6 +94,7 @@ def view_users():
     return flask.render_template(
         'user_list.html',
         users=users,
+        users_length=users_length,
         total_page=total_page,
         page=page,
     )
