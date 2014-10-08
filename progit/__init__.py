@@ -81,18 +81,24 @@ def is_safe_url(target):
 
 def is_admin():
     """ Return whether the user is admin for this application or not. """
-    if not authenticated() \
-            or not flask.g.fas_user.cla_done \
-            or len(flask.g.fas_user.groups) < 1:
+    if not authenticated():
         return False
+
+    auth_method = APP.config.get('PROGIT_AUTH', None)
+    if auth_method == 'fas':
+        if not user.cla_done or len(user.groups) < 1:
+            return False
 
     admins = APP.config['ADMIN_GROUP']
     if isinstance(admins, basestring):
-        admins = set([admins])
-    else:  # pragma: no cover
-        admins = set(admins)
-    groups = set(flask.g.fas_user.groups)
-    return not groups.isdisjoint(admins)
+        admins = [admins]
+    admins = set(admins)
+
+    if auth_method in ('fas', 'local'):
+        groups = set(flask.g.fas_user.groups)
+        return not groups.isdisjoint(admins)
+    else:
+        return user in admins
 
 
 def is_repo_admin(repo_obj):
