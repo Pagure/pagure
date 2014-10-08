@@ -1,0 +1,33 @@
+{% extends "master.html" %}
+{% from "_formhelper.html" import render_field_in_row %}
+
+{% block title %}New user{% endblock %}
+{%block tag %}home{% endblock %}
+
+{% block content %}
+<h2>New user</h2>
+
+<p>
+  If you wish to become a mirror for this project you will have to create a
+  user in this application.
+  You will be asked to provide a valid email address.
+</p>
+
+<form action="{{ url_for('new_user') }}" method="POST">
+  <table>
+    {{ render_field_in_row(form.user) }}
+    {{ render_field_in_row(form.fullname) }}
+    {{ render_field_in_row(form.email_address) }}
+    {{ render_field_in_row(form.password) }}
+    {{ render_field_in_row(form.confirm_password) }}
+  </table>
+  <p class="buttons indent">
+    <input type="submit" class="submit positive button" value="Create user">
+    <a href="{{ url_for('index') }}">
+      <input type="button" value="Cancel" class="button">
+    </a>
+    {{ form.csrf_token }}
+  </p>
+</form>
+
+{% endblock %}
