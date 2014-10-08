@@ -284,6 +284,56 @@ def admin_groups():
     )
 
 
+@APP.route('/admin/group/<group>', methods=['GET', 'POST'])
+@admin_required
+def admin_group(group):
+    """ List of the users in a certain group
+    """
+    group_obj = progit.lib.get_group(SESSION, group)
+
+    if not group_obj:
+        flask.flash('No group `%s` found' % groupname, 'error')
+        return flask.redirect(flask.url_for('.admin_groups'))
+
+    # Add new user to the group if asked
+    form = forms.LostPasswordForm()
+    if form.validate_on_submit():
+        user = progit.lib.get_user(SESSION, form.username.data)
+        if not user:
+            flask.flash('No user `%s` found' % form.username.data, 'error')
+            return flask.redirect(flask.url_for('.admin_group', group=group))
+
+        grp = model.ProgitUserGroup(
+            group_id = group_obj.id,
+            user_id = user.id
+        )
+        SESSION.add(grp)
+        try:
+            SESSION.flush()
+        except SQLAlchemyError as err:
+            SESSION.rollback()
+            flask.flash(
+                'Could not add user `%s` to group `%s`.' % (
+                    user.user, group_obj.group),
+                'error')
+            APP.logger.debug(
+                'Could not add user `%s` to group `%s`.' % (
+                    user.user, group_obj.group))
+            APP.logger.exception(err)
+
+        flask.flash('User `%s` added.' % user.user)
+        SESSION.commit()
+
+    users = progit.lib.get_users_by_group(SESSION, group)
+
+    return flask.render_template(
+        'login/admin_users.html',
+        form=form,
+        group=group_obj,
+        users=users,
+    )
+
+
 #
 # Methods specific to local login.
 #
