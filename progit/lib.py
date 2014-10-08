@@ -914,9 +914,9 @@ def get_session_by_visitkey(session, sessionid):
 
     '''
     query = session.query(
-        model.UserVisit
+        model.ProgitUserVisit
     ).filter(
-        model.UserVisit.visit_key == sessionid
+        model.ProgitUserVisit.visit_key == sessionid
     )
 
     return query.first()
