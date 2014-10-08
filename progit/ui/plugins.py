@@ -16,7 +16,7 @@ from math import ceil
 import pygit2
 from sqlalchemy.exc import SQLAlchemyError
 from straight.plugin import load
-from hooks import BaseHook
+from progit.hooks import BaseHook
 
 import progit.exceptions
 import progit.lib
