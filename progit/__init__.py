@@ -397,8 +397,12 @@ def auth_logout():
     if not authenticated():
         return flask.redirect(return_point)
 
-    FAS.logout()
-    flask.flash('You have been logged out')
+    if APP.config.get('PROGIT_AUTH', None) == 'fas':
+        if hasattr(flask.g, 'fas_user') and flask.g.fas_user is not None:
+            FAS.logout()
+            flask.flash("You are no longer logged-in")
+    elif APP.config.get('PROGIT_AUTH', None) == 'local':
+        login.logout()
     return flask.redirect(return_point)
 
 
