@@ -143,3 +143,6 @@ class DescriptionForm(wtf.Form):
         'description <span class="error">*</span>',
         [wtforms.validators.Required()]
     )
+
+class ConfirmationForm(wtf.Form):
+    pass
