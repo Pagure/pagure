@@ -527,6 +527,7 @@ form.icon button {
     padding: 0em 0em 1em 0em;
 }
 
-.list_users form {
+.list_users form,
+.list_groups form  {
     display: inline;
 }
