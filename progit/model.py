@@ -125,6 +125,16 @@ class User(BASE):
         default=sa.func.now(),
         onupdate=sa.func.now())
 
+    # Relations
+    group_objs = relation(
+        "ProgitGroup",
+        secondary="progit_user_group",
+        primaryjoin="users.c.id==progit_user_group.c.user_id",
+        secondaryjoin="progit_group.c.id==progit_user_group.c.group_id",
+        backref="users",
+    )
+    session = relation("ProgitUserVisit", backref="user")
+
     @property
     def username(self):
         ''' Return the username. '''
