@@ -88,7 +88,7 @@ install -m 644 files/progit.cfg.sample $RPM_BUILD_ROOT/%{_sysconfdir}/progit/pro
 
 # Install WSGI file
 mkdir -p $RPM_BUILD_ROOT/%{_datadir}/progit
-install -m 644 ffiles/progit.wsgi $RPM_BUILD_ROOT/%{_datadir}/progit/progit.wsgi
+install -m 644 files/progit.wsgi $RPM_BUILD_ROOT/%{_datadir}/progit/progit.wsgi
 
 # Install the createdb script
 install -m 644 createdb.py $RPM_BUILD_ROOT/%{_datadir}/progit/progit_createdb.py
@@ -107,4 +107,3 @@ install -m 644 createdb.py $RPM_BUILD_ROOT/%{_datadir}/progit/progit_createdb.py
 %changelog
 * Wed Oct 08 2014 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.0-1.20141008
 - Initial packaging work for Fedora
-
