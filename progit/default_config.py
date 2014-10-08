@@ -22,7 +22,7 @@ SECRET_KEY = '<insert here your own key>'
 DB_URL = 'sqlite:////var/tmp/progit_dev.sqlite'
 
 # The FAS group in which the admin of progit are
-ADMIN_GROUP = 'progit_admin'
+ADMIN_GROUP = 'sysadmin-main'
 
 # The email address to which the flask.log will send the errors (tracebacks)
 EMAIL_ERROR = 'pingou@pingoured.fr'
