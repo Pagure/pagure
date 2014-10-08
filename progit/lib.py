@@ -953,3 +953,24 @@ def get_group(session, group):
     )
 
     return query.first()
+
+
+def get_users_by_group(session, group):
+    ''' Return the list of users for a specified group.
+
+    :arg session: the session with which to connect to the database.
+
+    '''
+    query = session.query(
+        model.User
+    ).filter(
+        model.User.id == model.ProgitUserGroup.user_id
+    ).filter(
+        model.ProgitUserGroup.group_id == model.ProgitGroup.id
+    ).filter(
+        model.ProgitGroup.group_name == group
+    ).order_by(
+        model.User.user
+    )
+
+    return query.all()
