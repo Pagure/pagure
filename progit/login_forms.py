@@ -84,3 +84,11 @@ class NewUserForm(wtf.Form):
         'Confirm password  <span class="error">*</span>',
         [wtforms.validators.Required(), same_password]
     )
+
+
+class NewGroupForm(wtf.Form):
+    """ Form to ask for a password change. """
+    group_name = wtforms.TextField(
+        'Group name  <span class="error">*</span>',
+        [wtforms.validators.Required(), wtforms.validators.Length(max=16)]
+    )
