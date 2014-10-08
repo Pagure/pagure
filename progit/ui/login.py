@@ -334,6 +334,34 @@ def admin_group(group):
     )
 
 
+@APP.route('/admin/group/<group>/<user>/delete', methods=['POST'])
+@admin_required
+def admin_group_user_delete(user, group):
+    """ Delete an user from a certain group
+    """
+    # Add new user to the group if asked
+    form = forms.ConfirmationForm()
+    if form.validate_on_submit():
+        group_obj = progit.lib.get_group(SESSION, group)
+
+        if not group_obj:
+            flask.flash('No group `%s` found' % groupname, 'error')
+            return flask.redirect(flask.url_for('.admin_groups'))
+
+        user = progit.lib.get_user(SESSION, user)
+        if not user:
+            flask.flash('No user `%s` found' % user, 'error')
+            return flask.redirect(flask.url_for('.admin_groups'))
+
+        user_grp = progit.lib.get_user_group(SESSION, user.id, group_obj.id)
+        SESSION.delete(user_grp)
+
+        SESSION.commit()
+        flask.flash(
+            'User `%s` removed from the group `%s`' % (user.user, group))
+
+    return flask.redirect(flask.url_for('.admin_group', group=group))
+
 #
 # Methods specific to local login.
 #
