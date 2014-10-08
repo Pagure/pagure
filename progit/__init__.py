@@ -410,10 +410,10 @@ def __get_file_in_tree(repo_obj, tree, filepath):
 
 ## Import the application
 
-import progit.app
-import progit.admin
-import progit.docs
-import progit.fork
-import progit.issues
-import progit.plugins
-import progit.repo
+import progit.ui.app
+import progit.ui.admin
+import progit.ui.docs
+import progit.ui.fork
+import progit.ui.issues
+import progit.ui.plugins
+import progit.ui.repo
