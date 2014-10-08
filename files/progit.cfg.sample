@@ -7,10 +7,6 @@ SECRET_KEY='<The web application secret key>'
 #DB_URL=postgres://user:pass@host/db_name
 DB_URL = 'sqlite:////var/tmp/progit_dev.sqlite'
 
-### the number of items (packages, packagers..) to display on the search
-### pages
-ITEMS_PER_PAGE = 50
-
 ### The FAS group in which the admin of progit are
 ADMIN_GROUP = ['sysadmin-main', 'sysadmin-cvs']
 
@@ -50,3 +46,31 @@ GITOLITE_CONFIG = os.path.join(
     '..',
     'gitolite.conf'
 )
+
+
+### Home folder of the gitolite user
+### Folder where to run gl-compile-conf from
+GITOLITE_HOME = None
+
+### Folder containing all the public ssh keys for gitolite
+GITOLITE_KEYDIR = None
+
+### Path to the gitolite.rc file
+GL_RC = None
+
+### Path to the /bin directory where the gitolite tools can be found
+GL_BINDIR = None
+
+
+
+# Optional configuration
+
+### Default SMTP server to use for sending emails
+#SMTP_SERVER = 'localhost'
+
+### Email used to sent emails
+#FROM_EMAIL = 'progit@fedoraproject.org'
+
+### the number of items (packages, packagers..) to display on the search
+### pages
+ITEMS_PER_PAGE = 50
