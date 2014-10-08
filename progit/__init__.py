@@ -84,6 +84,8 @@ def is_admin():
     if not authenticated():
         return False
 
+    user = flask.g.fas_user
+
     auth_method = APP.config.get('PROGIT_AUTH', None)
     if auth_method == 'fas':
         if not user.cla_done or len(user.groups) < 1:
@@ -93,12 +95,9 @@ def is_admin():
     if isinstance(admins, basestring):
         admins = [admins]
     admins = set(admins)
+    groups = set(flask.g.fas_user.groups)
 
-    if auth_method in ('fas', 'local'):
-        groups = set(flask.g.fas_user.groups)
-        return not groups.isdisjoint(admins)
-    else:
-        return user in admins
+    return not groups.isdisjoint(admins)
 
 
 def is_repo_admin(repo_obj):
