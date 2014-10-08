@@ -90,3 +90,31 @@ SMTP_SERVER = 'localhost'
 
 # Email used to sent emails
 FROM_EMAIL = 'progit@fedoraproject.org'
+
+# Specify which authentication method to use, defaults to `fas` can be or
+# `local`
+# Default: ``fas``.
+PROGIT_AUTH = 'fas'
+
+# When this is set to True, the session cookie will only be returned to the
+# server via ssl (https). If you connect to the server via plain http, the
+# cookie will not be sent. This prevents sniffing of the cookie contents.
+# This may be set to False when testing your application but should always
+# be set to True in production.
+# Default: ``True``.
+PROGIT_COOKIE_REQUIRES_HTTPS = False
+
+# The name of the cookie used to store the session id.
+# Default: ``.MirrorManager``.
+PROGIT_COOKIE_NAME = 'progit'
+
+# If not specified the application will rely on the root_url when sending
+# emails, otherwise it will use this URL
+# Default: ``None``.
+APPLICATION_URL = None
+
+# Boolean specifying wether to check the user's IP address when retrieving
+# its session. This make things more secure (thus is on by default) but
+# under certain setup it might not work (for example is there are proxies
+# in front of the application).
+CHECK_SESSION_IP = True
