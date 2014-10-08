@@ -170,13 +170,14 @@ To use this decorator you need to have a function named 'auth_login'.
 Without that function the redirect if the user is not logged in will not
 work.
 """
+    auth_method = APP.config.get('PROGIT_AUTH', None)
     @wraps(function)
     def decorated_function(*args, **kwargs):
         """ Decorated function, actually does the work. """
         if not authenticated():
             return flask.redirect(
                 flask.url_for('auth_login', next=flask.request.url))
-        elif not flask.g.fas_user.cla_done:
+        elif auth_method == 'fas' and not flask.g.fas_user.cla_done:
             flask.flash('You must sign the CLA (Contributor License '
                         'Agreement to use progit', 'errors')
             return flask.redirect(flask.url_for('.index'))
