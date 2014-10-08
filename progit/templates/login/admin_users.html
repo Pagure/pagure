@@ -37,7 +37,8 @@
             group=group.group_name, user=user.user) }}">
         {{ conf_form.csrf_token }}
         <button
-          onclick="return confirm('Are you sure to remove this user from this group?');"
+          onclick="return confirm('Are you sure to remove user `{{
+            user.user}}` of group `{{group.group_name}}`?');"
           title="Remove user from group">
           <span class="icon icon-trash blue"></span>
         </button>
