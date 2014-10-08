@@ -19,6 +19,13 @@
      Re-generate ssh authorized_key file
     </a>
   </li>
+{% if config['PROGIT_AUTH'] == 'local' %}
+  <li>
+    <a href="{{ url_for('admin_groups') }}">
+     Groups/Users management
+    </a>
+  </li>
+{% endif %}
 </ul>
 
 {% endblock %}
