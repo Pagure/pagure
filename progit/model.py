@@ -43,7 +43,7 @@ def create_tables(db_url, alembic_ini=None, debug=False):
 
     """
     engine = create_engine(db_url, echo=debug)
-    from progit.plugins import get_plugin_tables
+    from progit.ui.plugins import get_plugin_tables
     get_plugin_tables()
     BASE.metadata.create_all(engine)
     #engine.execute(collection_package_create_view(driver=engine.driver))

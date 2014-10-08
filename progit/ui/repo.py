@@ -23,7 +23,7 @@ from pygments.formatters import HtmlFormatter
 import progit.exceptions
 import progit.lib
 import progit.forms
-import progit.plugins
+import progit.ui.plugins
 from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
                     is_repo_admin)
 
@@ -500,7 +500,7 @@ def view_settings(repo, username=None):
             403,
             'You are not allowed to change the settings for this project')
 
-    plugins = progit.plugins.get_plugin_names()
+    plugins = progit.ui.plugins.get_plugin_names()
 
     form = progit.forms.ProjectSettingsForm()
 
