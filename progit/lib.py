@@ -936,3 +936,20 @@ def get_groups(session):
     )
 
     return query.all()
+
+
+def get_group(session, group):
+    ''' Return a specific group for the specified group name.
+
+    :arg session: the session with which to connect to the database.
+
+    '''
+    query = session.query(
+        model.ProgitGroup
+    ).filter(
+        model.ProgitGroup.group_name == group
+    ).order_by(
+        model.ProgitGroup.group_name
+    )
+
+    return query.first()
