@@ -20,6 +20,7 @@ import progit.login_forms as forms
 import progit.lib
 import progit.notify
 from progit import APP, SESSION, is_admin
+from progit.ui.admin import admin_required
 import progit.model as model
 
 
@@ -244,6 +245,42 @@ def reset_password(token):
         'login/password_reset.html',
         form=form,
         token=token,
+    )
+
+
+#
+# Admin endpoint specific to local login
+#
+
+@APP.route('/admin/groups', methods=['GET', 'POST'])
+@admin_required
+def admin_groups():
+    """ List of the groups present in the system
+    """
+    # Add new group if asked
+    form = forms.NewGroupForm()
+    if form.validate_on_submit():
+
+        grp = model.ProgitGroup()
+        form.populate_obj(obj=grp)
+        SESSION.add(grp)
+        try:
+            SESSION.flush()
+        except SQLAlchemyError as err:
+            SESSION.rollback()
+            flask.flash('Could not create group.')
+            APP.logger.debug('Could not create group.')
+            APP.logger.exception(err)
+
+        flask.flash('Group `%s` created.' % grp.group_name)
+        SESSION.commit()
+
+    groups = progit.lib.get_groups(SESSION)
+
+    return flask.render_template(
+        'login/admin_groups.html',
+        groups=groups,
+        form=form,
     )
 
 
