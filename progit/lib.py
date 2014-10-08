@@ -202,6 +202,7 @@ def add_user_to_project(session, project, user):
 
     return 'Comment added'
 
+
 def add_pull_request_comment(session, request, commit, row, comment, user):
     ''' Add a comment to a pull-request. '''
     user_obj = get_user(session, user)
@@ -920,3 +921,18 @@ def get_session_by_visitkey(session, sessionid):
     )
 
     return query.first()
+
+
+def get_groups(session):
+    ''' Return the list of groups present in the database.
+
+    :arg session: the session with which to connect to the database.
+
+    '''
+    query = session.query(
+        model.ProgitGroup
+    ).order_by(
+        model.ProgitGroup.group_name
+    )
+
+    return query.all()
