@@ -905,3 +905,18 @@ def avatar_url_from_openid(openid, size=64, default='retro', dns=False):
         query = urllib.urlencode({'s': size, 'd': default})
         hash = hashlib.sha256(openid).hexdigest()
         return "https://seccdn.libravatar.org/avatar/%s?%s" % (hash, query)
+
+
+def get_session_by_visitkey(session, sessionid):
+    ''' Return a specified VisitUser via its session identifier (visit_key).
+
+    :arg session: the session with which to connect to the database.
+
+    '''
+    query = session.query(
+        model.UserVisit
+    ).filter(
+        model.UserVisit.visit_key == sessionid
+    )
+
+    return query.first()
