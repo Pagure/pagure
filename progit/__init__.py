@@ -32,6 +32,7 @@ from sqlalchemy.exc import SQLAlchemyError
 import progit.lib
 import progit.mail_logging
 import progit.doc_utils
+import progit.login_forms
 
 
 # Create the application.
@@ -374,7 +375,15 @@ def auth_login():
     else:  # pragma: no cover
         admins = set(admins)
 
-    return FAS.login(return_url=return_point, groups=admins)
+    if APP.config.get('PROGIT_AUTH', None) == 'fas':
+        return FAS.login(return_url=return_point, groups=admins)
+    elif APP.config.get('PROGIT_AUTH', None) == 'local':
+        form = progit.login_forms.LoginForm()
+        return flask.render_template(
+            'login/login.html',
+            next_url=return_point,
+            form=form,
+        )
 
 
 @APP.route('/logout/')
