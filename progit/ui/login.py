@@ -329,6 +329,7 @@ def admin_group(group):
     return flask.render_template(
         'login/admin_users.html',
         form=form,
+        conf_form=forms.ConfirmationForm(),
         group=group_obj,
         users=users,
     )
