@@ -103,8 +103,7 @@ def is_admin():
 
 def is_repo_admin(repo_obj):
     """ Return whether the user is an admin of the provided repo. """
-    if not authenticated() \
-            or not flask.g.fas_user.cla_done:
+    if not authenticated():
         return False
 
     user = flask.g.fas_user.username
