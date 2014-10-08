@@ -467,3 +467,65 @@ class GlobalId(BASE):
         # Both fields should not be not NULL (ie: only one of them should)
         sa.CheckConstraint('NOT(request_id IS NOT NULL AND issue_id IS NOT NULL)'),
     )
+
+
+# ##########################################################
+# These classes are only used if you're using the `local`
+#                  authentication method
+# ##########################################################
+
+
+class ProgitUserVisit(BASE):
+
+    __tablename__ = 'progit_user_visit'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    user_id = sa.Column(
+        sa.Integer, sa.ForeignKey('users.id'), nullable=False)
+    visit_key = sa.Column(
+        sa.String(40), nullable=False, unique=True, index=True)
+    user_ip = sa.Column(sa.String(50), nullable=False)
+    created = sa.Column(
+        sa.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    expiry = sa.Column(sa.DateTime)
+
+
+class ProgitGroup(BASE):
+    """
+    An ultra-simple group definition.
+    """
+
+    # names like "Group", "Order" and "User" are reserved words in SQL
+    # so we set the name to something safe for SQL
+    __tablename__ = 'progit_group'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    group_name = sa.Column(sa.String(16), nullable=False, unique=True)
+    display_name = sa.Column(sa.String(255), nullable=True)
+    created = sa.Column(
+        sa.DateTime, nullable=False, default=datetime.datetime.utcnow)
+
+    def __repr__(self):
+        ''' Return a string representation of this object. '''
+
+        return 'Group: %s - name %s' % (self.id, self.group_name)
+
+
+class ProgitUserGroup(BASE):
+    """
+    Association table linking the mm_user table to the mm_group table.
+    This allow linking users to groups.
+    """
+
+    __tablename__ = 'progit_user_group'
+
+    user_id = sa.Column(
+        sa.Integer, sa.ForeignKey('users.id'), primary_key=True)
+    group_id = sa.Column(
+        sa.Integer, sa.ForeignKey('progit_group.id'), primary_key=True)
+
+    # Constraints
+    __table_args__ = (
+        sa.UniqueConstraint(
+            'user_id', 'group_id'),
+    )
