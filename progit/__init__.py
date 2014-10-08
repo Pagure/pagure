@@ -427,8 +427,8 @@ def __get_file_in_tree(repo_obj, tree, filepath):
                 return __get_file_in_tree(
                     repo_obj, repo_obj[el.oid], filepath[1:])
 
-## Import the application
 
+## Import the application
 import progit.ui.app
 import progit.ui.admin
 import progit.ui.docs
@@ -436,3 +436,10 @@ import progit.ui.fork
 import progit.ui.issues
 import progit.ui.plugins
 import progit.ui.repo
+
+
+# Only import the login controller if the app is set up for local login
+if APP.config.get('PROGIT_AUTH', None) == 'local':
+    import progit.ui.login as login
+    APP.before_request(login._check_session_cookie)
+    APP.after_request(login._send_session_cookie)
