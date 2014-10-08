@@ -526,3 +526,7 @@ form.icon button {
 .settings div {
     padding: 0em 0em 1em 0em;
 }
+
+.list_users form {
+    display: inline;
+}
