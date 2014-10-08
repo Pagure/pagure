@@ -511,7 +511,6 @@ class ProgitGroup(BASE):
 
     id = sa.Column(sa.Integer, primary_key=True)
     group_name = sa.Column(sa.String(16), nullable=False, unique=True)
-    display_name = sa.Column(sa.String(255), nullable=True)
     created = sa.Column(
         sa.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
