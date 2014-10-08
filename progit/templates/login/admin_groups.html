@@ -4,6 +4,11 @@
 {% block title %}Groups{% endblock %}
 {%block tag %}admin{% endblock %}
 
+{% block header %}
+<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css"
+  rel="stylesheet">
+{% endblock %}
+
 {% block content %}
 <h2>Progit Groups</h2>
 
@@ -16,6 +21,7 @@
   </form>
 </section>
 
+<section class="list_groups">
 {% if groups %}
 <ul>
     {% for group in groups %}
@@ -23,11 +29,22 @@
       <a href="{{ url_for('admin_group', group=group.group_name) }}">
          {{ group.group_name }}
       </a>
+      <form class="icon" method="POST"
+        action="{{ url_for('admin_group_delete', group=group.group_name) }}">
+        {{ conf_form.csrf_token }}
+        <button
+          onclick="return confirm('Are you sure to delete group`{{
+            group.group_name }}`?');"
+          title="Delete group">
+          <span class="icon icon-trash blue"></span>
+        </button>
+      </form>
     </li>
     {% endfor %}
 </ul>
 {% else %}
 <p>No group found</p>
 {% endif %}
+</section>
 
 {% endblock %}
