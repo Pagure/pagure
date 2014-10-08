@@ -132,6 +132,20 @@ def get_user_by_email(session, user_mail):
         return mail.user
 
 
+def get_user_by_token(session, token):
+    ''' Return a specified User via its token.
+
+    :arg session: the session with which to connect to the database.
+
+    '''
+    user = session.query(
+        model.User
+    ).filter(
+        model.User.token == token
+    ).first()
+    return user
+
+
 def get_all_users(session):
     ''' Return the user corresponding to this username, or None. '''
     users = session.query(
