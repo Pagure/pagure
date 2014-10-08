@@ -6,4 +6,4 @@ dist/
 build/
 *.pyc
 *.swp
-
+*.egg-info
