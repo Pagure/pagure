@@ -113,6 +113,33 @@ class User(BASE):
     fullname = sa.Column(sa.Text, nullable=False, index=True)
     public_ssh_key = sa.Column(sa.Text, nullable=True)
 
+    password = sa.Column(sa.Text, nullable=True)
+    token = sa.Column(sa.String(50), nullable=True)
+    created = sa.Column(
+        sa.DateTime,
+        nullable=False,
+        default=sa.func.now())
+    updated_on = sa.Column(
+        sa.DateTime,
+        nullable=False,
+        default=sa.func.now(),
+        onupdate=sa.func.now())
+
+    @property
+    def username(self):
+        ''' Return the username. '''
+        return self.user
+
+    @property
+    def groups(self):
+        ''' Return the list of Group.group_name in which the user is. '''
+        return [group.group_name for group in self.group_objs]
+
+    def __repr__(self):
+        ''' Return a string representation of this object. '''
+
+        return 'User: %s - name %s' % (self.id, self.user)
+
 
 class UserEmail(BASE):
     """ Stores email information about the users.
