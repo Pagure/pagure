@@ -107,7 +107,9 @@ def request_pull(repo, requestid, username=None):
 
         for commit in repo_obj.walk(
                 request.stop_id, pygit2.GIT_SORT_TIME):
-            if commit.oid.hex in master_commits:
+            if request.status is False and commit.oid.hex == request.start_id:
+                break
+            elif request.status and commit.oid.hex in master_commits:
                 break
             diff_commits.append(commit)
             diffs.append(
