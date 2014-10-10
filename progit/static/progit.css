@@ -588,8 +588,8 @@ pre {
 {
     color:white;
 }
-.commit_list li > a,
-.tree_list li > a {
+.commit_list li > a:first-child,
+.tree_list li > a:first-child {
     display: block;
 }
 
@@ -599,4 +599,8 @@ pre {
     color: #4d4d4d;
     display: inline-block;
     width: 5em;
+}
+
+.pr {
+    float: right;
 }
