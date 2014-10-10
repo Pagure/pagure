@@ -118,3 +118,6 @@ APPLICATION_URL = None
 # under certain setup it might not work (for example is there are proxies
 # in front of the application).
 CHECK_SESSION_IP = True
+
+# Lenght for short commits ids or file hex
+SHORT_LENGTH = 6

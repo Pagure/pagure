@@ -24,32 +24,28 @@
   {% endfor %}
 </h2>
 
-<h3>Tree</h3>
 {% if content %}
-<section class="repos_list">
   {% if output_type=='file' %}
-  {% autoescape false %}
-  {{ content | format_loc}}
-  {% endautoescape %}
+    {% autoescape false %}
+      {{ content | format_loc}}
+    {% endautoescape %}
   {% else %}
+  <section class="tree_list">
+  <h3>Tree</h3>
   <ul>
     {% for entry in content %}
-    <li>
-      {% if entry.filemode == 16384 %}
-      [ ]
-      {% endif %}
+    <li class="{% if entry.filemode == 16384 %}folder{% else %}file{% endif %}">
       <a href="{{ url_for('view_file', username=username,
                 repo=repo.name, identifier=branchname,
                 filename=filename + '/' + entry.name if filename else entry.name) }}">
         {{ entry.name }}
-      </a>
-      {{ entry.hex }}
-      {{ entry.id }}
+        </a>
+        <span class="filehex">{{ entry.hex|short }}</span>
     </li>
     {% endfor %}
   </ul>
+  </section>
   {% endif %}
-</section>
 {% else %}
 No content found in this repository
 {% endif %}

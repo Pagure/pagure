@@ -342,6 +342,12 @@ def avatar(packager, size=64):
     return output
 
 
+@APP.template_filter('short')
+def shorted_commit(cid):
+    """Gets short version of the commit id"""
+    return cid[:APP.config['SHORT_LENGTH']]
+
+
 @FAS.postlogin
 def set_user(return_url):
     ''' After login method. '''

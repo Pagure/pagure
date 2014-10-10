@@ -531,3 +531,43 @@ form.icon button {
 .list_groups form  {
     display: inline;
 }
+
+pre {
+    font-size: 1.3em;
+}
+
+.tree_list li.folder {
+    list-style-image: url(images/folder.png);
+}
+
+.tree_list li.file {
+    list-style-image: url(images/file.png);
+}
+
+.tree_list .view_commit,
+.tree_list .filehex
+{
+    float: right;
+}
+
+.tree_list li:nth-child(odd) {
+    background-color: #ededed;
+}
+
+.tree_list li:hover,
+.commit_list li:hover
+{
+    color: white;
+    background-color: #0066cc;
+}
+
+.tree_list li:hover a,
+.commit_list li:hover a
+{
+    color:white;
+}
+
+.commit_list li > a:first-child {
+    display: inline-block;
+    width: 5em;
+}

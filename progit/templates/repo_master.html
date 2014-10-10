@@ -5,12 +5,15 @@
 
 
 {% block content %}
-<h2>
-  <a href="{{ url_for('view_repo', username=username, repo=repo.name)}}">
-    {{ repo.fullname }}
-  </a>
-  {% if branchname %} ({{ branchname }}) {% endif %}
-</h2>
+<header>
+    <h2>
+        <a href="{{ url_for('view_repo', username=username, repo=repo.name)}}">
+            {{ repo.fullname }}
+        </a>
+        {% if branchname %} ({{ branchname }}) {% endif %}
+    </h2>
+    {{ repo.description | rst2html }}
+</header>
 
 {% if repo.is_fork %}
 <section id="parent">
@@ -88,9 +91,6 @@
       {% endif %}
     </ul>
   </div>
-
-  {{ repo.description | rst2html }}
-
 {% block repo %}
 {% endblock %}
 
