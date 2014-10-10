@@ -83,9 +83,9 @@
         <li class="{% if entry.filemode == 16384 %}folder{% else %}file{% endif %}">
             <a href="{{ url_for('view_file', username=username,
                       repo=repo.name, identifier=branchname, filename=entry.name) }}">
-              {{ entry.name }}
+                {{ entry.name }}
+                <span class="filehex" >{{ entry.hex|short }}</span>
             </a>
-            <span class="filehex" >{{ entry.hex|short }}</span>
         </li>
         {% endfor %}
       </ul>

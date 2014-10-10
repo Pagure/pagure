@@ -548,6 +548,7 @@ pre {
 .tree_list .filehex
 {
     float: right;
+    text-align: right;
 }
 
 .tree_list li:nth-child(odd),
@@ -556,13 +557,21 @@ pre {
     background-color: #ededed;
 }
 
+.tree_list ul {
+    padding-left: 25px;
+}
+
 .commit_list ul {
     padding-left: 0;
 }
 
 .commit_list li {
     list-style-type: none;
-    padding-left: .5em;
+}
+
+.commit_list li,
+.tree_list li {
+    padding:0 .5em;
 }
 
 .tree_list li:hover,
@@ -574,15 +583,19 @@ pre {
 
 .tree_list li:hover a,
 .commit_list li:hover a,
-.commit_list li:hover > a > span.commitid
+.commit_list li:hover > a > span.commitid,
+.tree_list li:hover > a > span.filehex
 {
     color:white;
 }
-.commit_list li > a {
+.commit_list li > a,
+.tree_list li > a {
     display: block;
 }
 
-.commit_list li > a > span.commitid {
+.commit_list li > a > span.commitid,
+.tree_list li > a > span.filehex
+{
     color: #4d4d4d;
     display: inline-block;
     width: 5em;
