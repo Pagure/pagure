@@ -40,6 +40,7 @@ def send_email(text, subject, to_mail, from_mail=None, mail_id=None,
 
     if mail_id:
         msg['mail-id'] = mail_id
+        msg['Message-Id'] = mail_id
 
     if in_reply_to:
         msg['In-Reply-To'] = '<%s>' % in_reply_to
