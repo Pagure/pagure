@@ -75,18 +75,18 @@ def request_pull(repo, requestid, username=None):
     if not request:
         flask.abort(404, 'Pull-request not found')
 
-    repo = request.repo_from
+    repo_from = request.repo_from
 
-    if repo.is_fork:
-        repopath = os.path.join(APP.config['FORK_FOLDER'], repo.path)
+    if repo_from.is_fork:
+        repopath = os.path.join(APP.config['FORK_FOLDER'], repo_from.path)
     else:
-        repopath = os.path.join(APP.config['GIT_FOLDER'], repo.path)
+        repopath = os.path.join(APP.config['GIT_FOLDER'], repo_from.path)
     repo_obj = pygit2.Repository(repopath)
 
-    if repo.parent:
-        parentname = os.path.join(APP.config['GIT_FOLDER'], repo.parent.path)
+    if repo_from.parent:
+        parentname = os.path.join(APP.config['GIT_FOLDER'], repo_from.parent.path)
     else:
-        parentname = os.path.join(APP.config['GIT_FOLDER'], repo.path)
+        parentname = os.path.join(APP.config['GIT_FOLDER'], repo_from.path)
     orig_repo = pygit2.Repository(parentname)
 
     diff_commits = []
