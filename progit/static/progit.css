@@ -432,6 +432,14 @@ th.month .ui-button-text {
     margin-bottom:1em;
 }
 
+.inline {
+    margin: 2em 0 1em;
+}
+
+.inline h2 {
+    margin: 0;
+}
+
 .inline h2, .inline a, .inline li{
     display: inline-block;
 }
@@ -551,7 +559,8 @@ pre {
 }
 
 .tree_list li:nth-child(odd),
-.commit_list li:nth-child(odd)
+.commit_list li:nth-child(odd),
+table.issues_list tr:nth-child(odd) td
 {
     background-color: #ededed;
 }
@@ -574,7 +583,9 @@ pre {
 }
 
 .tree_list li:hover,
-.commit_list li:hover
+.commit_list li:hover,
+table.issues_list tr:hover td
+
 {
     color: white;
     background-color: #0066cc;
@@ -583,12 +594,15 @@ pre {
 .tree_list li:hover a,
 .commit_list li:hover a,
 .commit_list li:hover > a > span.commitid,
-.tree_list li:hover > a > span.filehex
+.tree_list li:hover > a > span.filehex,
+table.issues_list tr:hover td > a
 {
     color:white;
 }
 .commit_list li > a:first-child,
-.tree_list li > a:first-child {
+.tree_list li > a:first-child,
+table.issues_list tbody td > a
+{
     display: block;
 }
 
@@ -602,6 +616,42 @@ pre {
 
 .pr {
     float: right;
+}
+
+a.btn_create {
+    float: right;
+}
+
+table.issues_list {
+    width: 100%;
+}
+
+table.issues_list th {
+    padding: .2em;
+}
+
+table.issues_list td
+{
+    padding: .1em .2em;
+}
+
+table.issues_list thead th {
+    background-color: #06C;
+    color: white;
+}
+
+table.issues_list td:first-child {
+    width: 2em;
+}
+
+table.issues_list .open_date,
+table.issues_list .open_by {
+    width: 9em;
+}
+
+td.noresult {
+    text-align: center;
+    font-weight: bold;
 }
 
 .highlight {

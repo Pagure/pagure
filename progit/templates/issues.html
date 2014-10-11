@@ -11,7 +11,7 @@
     {% if status and status != 'Open' %}
     Closed
     {% endif %}
-    Issues
+    Issues ({{ issues|count }})
   </h2>
     {% if status and status != 'Open' %}
       <a href="{{ url_for('view_issues', username=username,
@@ -22,36 +22,70 @@
                  repo=repo.name) }}?status=Closed">
       (Closed)</a>
     {% endif %}
-</div>
 
-<span class="create_issue">
-    <a href="{{ url_for('new_issue', username=username, repo=repo.name) }}">
+    <a class="btn_create" href="{{ url_for('new_issue', username=username, repo=repo.name) }}">
       <button>Create new issue</button>
     </a>
-</span>
+</div>
 
-<section class="issues_list">
-  {% if issues %}
-  <ul>
+<table class="issues_list">
+    <thead>
+        {# Just an idea... #}
+        {#<tr>
+            <th colspan="4">
+                <form>
+                    <fieldset>
+                        <legend>Filters</legend>
+                        <div>
+                            <label for="open">Open</label>
+                            <input type="checkbox" name="filter_state[]" value="open" checked="checked"/>
+                            <label for="close">Closed</label>
+                            <input type="checkbox" name="filter_state[]" value="close"/>
+                        </div>
+                        <div>
+                            <input type="submit" value="Filter"/>
+                        </div>
+                    </fieldset>
+                </form>
+            </th>
+        </tr>#}
+        <tr>
+            <th>#</th>
+            <th>Title</th>
+            <th class="open_by">Opened by</th>
+            <th class="open_date">Opened on</th>
+        </tr>
+    </thead>
+    <tfoot>
+    </tfoot>
+    <tbody>
     {% for issue in issues %}
-    <li>
-      #{{ issue[1] }}
-      <a href="{{ url_for('view_issue', username=username,
-                repo=repo.name, issueid=issue[1]) }}">
-        {{ issue[0].title }}
-      </a>
-      <span> Opened by {{ issue[0].user.user | avatar(16) | safe }}
-      <a href="{{ url_for('view_user', username=issue[0].user.user) }}">
-      {{issue[0].user.user}}
-      </a> on {{ issue[0].date_created.strftime('%Y-%m-%d %H:%M') }}</span>
-    </li>
+        <tr>
+            <td>#{{ issue[1] }}</td>
+            <td>
+                <a href="{{ url_for('view_issue', username=username,
+                    repo=repo.name, issueid=issue[1]) }}">
+                    {{ issue[0].title }}
+                </a>
+            </td>
+            <td>
+                <a href="{{ url_for('view_user', username=issue[0].user.user) }}">
+                    {{ issue[0].user.user | avatar(16) | safe }}
+                    {{issue[0].user.user}}
+                </a>
+            </td>
+            <td>
+                {{ issue[0].date_created.strftime('%Y-%m-%d %H:%M') }}
+            </td>
+
+            </td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="4" class="noresult">No issues found</td>
+        </tr>
     {% endfor %}
-  </ul>
-  {% else %}
-  <p>
-    No issues have been opened for this project.
-  </p>
-  {% endif %}
-</section>
+    </tbody>
+</table>
 
 {% endblock %}
