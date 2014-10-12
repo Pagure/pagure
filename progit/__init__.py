@@ -33,6 +33,7 @@ import progit.lib
 import progit.mail_logging
 import progit.doc_utils
 import progit.login_forms
+import markdown
 
 
 # Create the application.
@@ -346,6 +347,17 @@ def avatar(packager, size=64):
 def shorted_commit(cid):
     """Gets short version of the commit id"""
     return cid[:APP.config['SHORT_LENGTH']]
+
+
+@APP.template_filter('markdown')
+def markdown_filter(text):
+    """ Template filter converting a string into html content using the
+    markdown library.
+    """
+    if text:
+        return markdown.markdown(text)
+
+    return ''
 
 
 @FAS.postlogin

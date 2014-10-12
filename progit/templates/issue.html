@@ -36,7 +36,7 @@
 
   <span class="issue_body">
     {% autoescape false %}
-      {{ issue.content | rst2html }}
+      {{ issue.content | markdown }}
     {% endautoescape %}
   </span>
   <p>
@@ -55,7 +55,7 @@
   {% for comment in issue.comments %}
   <span class="comment_body">
     {% autoescape false %}
-      {{ comment.comment | rst2html }}
+      {{ comment.comment | markdown }}
     {% endautoescape %}
     <p>
       {{ comment.user.user | avatar(16) | safe }}
