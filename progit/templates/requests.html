@@ -8,7 +8,7 @@
 
 <div class="inline">
   <h2>
-  Pull-requests
+    Pull-requests ({{ requests|count }})
   </h2>
   {% if status and status not in [False, 'Closed'] %}
     <a href="{{ url_for('request_pulls', username=username,
@@ -21,28 +21,44 @@
   {% endif %}
 </div>
 
-<section class="requests_list">
-  {% if requests %}
-  <ul>
+<table class="list requests">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Title</th>
+            <th class="open_by">Opened by</th>
+            <th class="open_date">Opened on</th>
+        </tr>
+    </thead>
+    <tfoot>
+    </tfoot>
+    <tbody>
     {% for request in requests %}
-    <li>
-      #{{ request[1] }}
-      <a href="{{ url_for('request_pull', username=username,
-                repo=repo.name, requestid=request[1]) }}">
-        {{ request[0].title }}
-      </a>
-      <span> Opened by
-      <a href="{{ url_for('view_user', username=request[0].user.user) }}">
-      {{request[0].user.user}}
-      </a> on {{ request[0].date_created.strftime('%Y-%m-%d %H:%M') }}</span>
-    </li>
-    {% endfor %}
-  </ul>
-  {% else %}
-  <p>
-    No pull-request have been opened for this project.
-  </p>
-  {% endif %}
-</section>
+        <tr>
+            <td>#{{ request[1] }}</td>
+            <td>
+                <a href="{{ url_for('request_pull', username=username,
+                    repo=repo.name, requestid=request[1]) }}">
+                    {{ request[0].title }}
+                </a>
+            </td>
+            <td>
+                <a href="{{ url_for('view_user', username=request[0].user.user) }}">
+                    {{ request[0].user.user | avatar(16) | safe }}
+                    {{ request[0].user.user }}
+                </a>
+            </td>
+            <td>
+                {{ request[0].date_created.strftime('%Y-%m-%d %H:%M') }}
+            </td>
 
+            </td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="4" class="noresult">No pull-request found</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
