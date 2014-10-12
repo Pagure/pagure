@@ -402,7 +402,7 @@ def cancel_request_pull(repo, requestid, username=None):
     if not is_repo_admin(repo):
         flask.abort(
             403,
-            'You are not allowed to merge pull-request for this project')
+            'You are not allowed to cancel pull-request for this project')
 
     progit.lib.close_pull_request(SESSION, request, merged=False)
     SESSION.commit()
