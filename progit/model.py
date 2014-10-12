@@ -400,6 +400,13 @@ class PullRequest(BASE):
             self.id, self.repo.name, self.user.user, self.title
         )
 
+    @property
+    def mail_id(self):
+        ''' Return a unique reprensetation of the issue as string that
+        can be used when sending emails.
+        '''
+        return '%s-pull-request-%s@progit' % (self.repo.name, self.id)
+
 
 class PullRequestComment(BASE):
     """ Stores the comments made on a pull-request.
