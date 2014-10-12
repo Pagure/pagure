@@ -238,7 +238,7 @@ def format_ts(string):
 
 
 @APP.template_filter('format_loc')
-def format_loc(loc, commit=None, prequest=None):
+def format_loc(loc, commit=None, prequest=None, index=None):
     """ Template filter putting the provided lines of code into a table
     """
     output = [
@@ -257,19 +257,23 @@ def format_loc(loc, commit=None, prequest=None):
     for key in comments:
         comments[key] = sorted(comments[key], key=lambda obj: obj.date_created)
 
+    if not index:
+        index = ''
+
     cnt = 1
     for line in loc.split('\n'):
         if commit:
             output.append(
                 '<tr><td class="cell1">'
-                '<a id="%(cnt)s" href="#%(cnt)s">%(cnt)s</a></td>'
+                '<a id="%(cnt)s" href="#%(cnt)s">%(cnt_lbl)s</a></td>'
                 '<td class="prc" data-row="%(cnt)s" data-commit="%(commitid)s">'
                 '<p>'
                 '<img src="%(img)s" alt="Add comment" title="Add comment"/>'
                 '</p>'
                 '</td>' % (
                     {
-                        'cnt': cnt,
+                        'cnt': '%s_%s' % (index, cnt),
+                        'cnt_lbl': cnt,
                         'img': flask.url_for('static', filename='users.png'),
                         'commitid': commit.oid.hex,
                     }
@@ -279,7 +283,12 @@ def format_loc(loc, commit=None, prequest=None):
             output.append(
                 '<tr><td class="cell1">'
                 '<a id="%(cnt)s" href="#%(cnt)s">%(cnt)s</a></td>'
-                % ({'cnt': cnt})
+                % (
+                    {
+                        'cnt': '%s_%s' % (index, cnt),
+                        'cnt_lbl': cnt,
+                    }
+                )
             )
 
         cnt += 1
