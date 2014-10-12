@@ -282,7 +282,7 @@ def format_loc(loc, commit=None, prequest=None, index=None):
         else:
             output.append(
                 '<tr><td class="cell1">'
-                '<a id="%(cnt)s" href="#%(cnt)s">%(cnt)s</a></td>'
+                '<a id="%(cnt)s" href="#%(cnt)s">%(cnt_lbl)s</a></td>'
                 % (
                     {
                         'cnt': '%s_%s' % (index, cnt),
