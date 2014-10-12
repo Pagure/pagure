@@ -683,6 +683,8 @@ def close_pull_request(session, request):
     session.add(request)
     session.flush()
 
+    progit.notify.notify_merge_pull_request(request)
+
 
 def get_issue_statuses(session):
     ''' Return the complete list of status an issue can have.
