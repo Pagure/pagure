@@ -1,90 +1,76 @@
 {% extends "repo_master.html" %}
-{% from "_formhelper.html" import render_field_in_list %}
+{% from "_formhelper.html" import render_field %}
 
 {% block title %}Issue #{{ issueid }} - {{ repo.name }}{% endblock %}
 {%block tag %}home{% endblock %}
 
+{% macro show_comment(user, date, content, aside=False) %}
+  <section class="issue_comment">
+    <header>
+      {{ user.user | avatar(16) | safe }}
+      <a href="{{ url_for('view_user', username=user.user)}}">
+        {{ user.user }}
+      </a> - {{ date | humanize}}
+      {% if aside %}
+        {% if authenticated and form %}
+        <aside class="issue_action">
+          <form action="{{ url_for('view_issue', username=username,
+                   repo=repo.name, issueid=issueid) }}" method="post">
+            {{ render_field(form.status) }}
+            <input type="submit" class="submit positive button" value="Update">
+            {{ form.csrf_token }}
+          </form>
+        </aside>
+        {% endif %}
+      {% endif %}
+    </header>
+    <div class="comment_body">
+      {% autoescape false %}
+        {{ content | markdown }}
+      {% endautoescape %}
+    </div>
+  </section>
+{% endmacro %}
 
 {% block repo %}
 
-<h2>Issue #{{ issueid }}</h2>
-
-{% if authenticated and form %}
-<section class="issue_action">
-  <form action="{{ url_for('view_issue', username=username,
-                   repo=repo.name, issueid=issueid) }}" method="post">
-  <ul class="inline">
-    <li>
-      <a href="{{ url_for('edit_issue', username=username,
+<h2>
+    <span class="issueid">#{{ issueid }}</span> {{ issue.title }}
+    {% if authenticated %}
+    -  <a href="{{ url_for('edit_issue', username=username,
                   repo=repo.name, issueid=issueid) }}">
         Edit</a>
-    </li>
-    {{ render_field_in_list(form.status) }}
-    <li>
-      <input type="submit" class="submit positive button" value="Update">
-    </li>
-  </ul>
-  {{ form.csrf_token }}
-  </form>
-</section>
-{% endif %}
+    {% endif %}
+</h2>
 
-<section class="issue_info">
-  <h3>
-    {{ issue.title }}
-  </h3>
-
-  <span class="issue_body">
-    {% autoescape false %}
-      {{ issue.content | markdown }}
-    {% endautoescape %}
-  </span>
-  <p>
-      Opened by {{ issue.user.user | avatar(16) | safe }}
-      <a href="{{ url_for('view_user', username=issue.user.user)}}">
-        {{ issue.user.user }}
-      </a>
-      on {{ issue.date_created | humanize}}
-    </p>
-</section>
+{{ show_comment(issue.user, issue.date_created, issue.content, True) }}
 
 {% if issue.comments %}
-<div class="sep"></div>
-
-<section class="issue_comments">
   {% for comment in issue.comments %}
-  <span class="comment_body">
-    {% autoescape false %}
-      {{ comment.comment | markdown }}
-    {% endautoescape %}
-    <p>
-      {{ comment.user.user | avatar(16) | safe }}
-      <a href="{{ url_for('view_user', username=comment.user.user)}}">
-        {{ comment.user.user }}
-      </a>
-      on {{ comment.date_created | humanize}}
-    </p>
-  </span>
+    {{ show_comment(comment.user, comment.date_created, comment.comment) }}
   {% endfor %}
-</section>
-
 {% endif %}
 
-<div class="sep"></div>
-
+<section class="issue_comment add_comment">
 {% if authenticated %}
-<section class="add_comment">
   <form action="{{ url_for('add_comment_issue', username=username,
                    repo=repo.name, issueid=issueid) }}" method="post">
+    <header>
+      <label for="comment">Add new comment</label>
+      (supports the <a href="http://daringfireball.net/projects/markdown/syntax"
+        target="_blank">Markdown syntax</a>)
+    </header>
     <div>
-      <textarea id="comment" name="comment" title="comment"></textarea>
+      <textarea id="comment" name="comment" placeholder="Enter your comment here"></textarea>
+      {{ form_comment.csrf_token }}
     </div>
-  {{ form_comment.csrf_token }}
-  <input type="submit" class="submit positive button" value="Comment">
+    <div>
+      <input type="submit" class="submit positive button" value="Comment">
+    </div>
   </form>
-</section>
 {% else %}
-<p><a href="{{ url_for('auth_login') }}">Login</a> to comment on this ticket.</p>
+  <p><a href="{{ url_for('auth_login') }}">Login</a> to comment on this ticket.</p>
 {% endif %}
+</section>
 
 {% endblock %}

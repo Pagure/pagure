@@ -9,6 +9,11 @@ h4 {
     margin: 0.8em 0 0.4em;
 }
 
+textarea {
+    border: 1px #ccc solid;
+    background: rgba(255, 255, 255, 0.5);
+}
+
 .message {
     color: green;
 }
@@ -37,7 +42,8 @@ h4 {
     float:right!important;
 }
 
-header#mainheader{
+table.issues_list thead th,
+.fgradient{
     color: white;
     background: #426ead; /* Old browsers */
     background: -moz-linear-gradient(top, #426ead 0%, #1e4a88 100%); /* FF3.6+ */
@@ -110,24 +116,6 @@ header h1 span {
 
 #tzones {
     width: 152px;
-}
-
-section header,
-section aside,
-section nav {
-    display: inline-block;
-    vertical-align: middle;
-}
-
-#content section > header {
-    margin-bottom: .5em;
-    background: url(calendar.png) 0 50% no-repeat;
-    padding-left: 40px;
-    color: #666;
-}
-
-#content section > header p {
-    font-style: italic;
 }
 
 #content {
@@ -635,11 +623,6 @@ table.issues_list td
     padding: .1em .2em;
 }
 
-table.issues_list thead th {
-    background-color: #06C;
-    color: white;
-}
-
 table.issues_list td:first-child {
     width: 2em;
 }
@@ -652,6 +635,51 @@ table.issues_list .open_by {
 td.noresult {
     text-align: center;
     font-weight: bold;
+}
+
+.issueid {
+    color: #aaa;
+}
+
+.issue_comment, .add_comment {
+    background-color: #ededed;
+    border-radius: 10px;
+    margin-bottom: 1em;
+}
+
+.issue_comment > div,
+.issue_comment > form > div {
+    padding: .2em .5em;
+}
+
+.issue_comment p {
+    margin: .5em 0 1em;
+}
+
+.issue_comment > header,
+.issue_comment > form > header {
+    border-radius: 10px 10px 0 0;
+    background: #ccc;
+    padding: .5em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+
+    background: #426ead; /* Old browsers */
+    background: -moz-linear-gradient(top, #ccc 0%, #ededed 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ccc), color-stop(100%,#ededed)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #ccc 0%,#1e4a88 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #ccc 0%,#ededed 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #ccc 0%,#ededed 100%); /* IE10+ */
+    background: linear-gradient(to bottom, #ccc 0%,#ededed 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ccc', endColorstr='#ededed',GradientType=0 ); /* IE6-9 */
+}
+
+.issue_action {
+    float: right;
+    text-align: right;
+}
+
+.issue_action div {
+    display: inline-block;
 }
 
 .highlight {
