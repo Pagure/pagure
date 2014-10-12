@@ -383,6 +383,34 @@ def merge_request_pull(repo, requestid, username=None):
     return flask.redirect(flask.url_for('view_repo', repo=repo.name))
 
 
+@APP.route('/<repo>/request-pull/cancel/<requestid>')
+@APP.route('/fork/<username>/<repo>/request-pull/cancel/<requestid>')
+def cancel_request_pull(repo, requestid, username=None):
+    """ Cancel request pulling request.
+    """
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    request = progit.lib.get_pull_request(
+        SESSION, project_id=repo.id, requestid=requestid)
+
+    if not request:
+        flask.abort(404, 'Pull-request not found')
+
+    if not is_repo_admin(repo):
+        flask.abort(
+            403,
+            'You are not allowed to merge pull-request for this project')
+
+    progit.lib.close_pull_request(SESSION, request, merged=False)
+    SESSION.commit()
+    flask.flash('Request pull canceled!')
+
+    return flask.redirect(flask.url_for('view_repo', repo=repo.name))
+
+
 ## Specific actions
 
 

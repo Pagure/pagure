@@ -21,12 +21,16 @@
 {% if request %}
 <h3>Title: {{ request.title }}</h3>
   {% if request.status and repo_admin %}
-  <span>
+  <div>
     <a href="{{ url_for('merge_request_pull', username=username,
-              repo=repo.name, requestid=requestid) }}" class="message">
-      Merge
+              repo=repo.name, requestid=requestid) }}">
+        <button>Merge</button>
     </a>
-  </span>
+    <a href="{{ url_for('cancel_request_pull', username=username,
+              repo=repo.name, requestid=requestid) }}" id="cancel_pr">
+        <button>Cancel</button>
+    </a>
+  </div>
   {% elif request and request.status == False %}
   <span class="error">Merged</span>
   {% endif %}
@@ -151,6 +155,10 @@
       window.location.href = final_url;
     }
   );
+
+  $('#cancel_pr').click(function(){
+        return window.confirm("Are you sure you want to cancel requested pull?");
+  });
  });
 
   function comment() {
