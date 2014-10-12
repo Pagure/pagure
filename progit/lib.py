@@ -82,7 +82,11 @@ def commit_to_patch(repo_obj, commits):
             # First commit in the repo
             diff = commit.tree.diff_to_tree(swap=True)
 
-        subject, message = commit.message.split('\n', 1)
+        subject = message = ''
+        if '\n' in commit.message:
+            subject, message = commit.message.split('\n', 1)
+        else:
+            subject = commit.message
 
         if len(commits) > 1:
             subject = '[PATCH %s/%s] %s' % (cnt + 1, len(commits), subject)
