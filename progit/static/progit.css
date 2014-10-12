@@ -54,8 +54,6 @@ table.list thead th,
     background: -ms-linear-gradient(top, #426ead 0%,#1e4a88 100%); /* IE10+ */
     background: linear-gradient(to bottom, #426ead 0%,#1e4a88 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#426ead', endColorstr='#1e4a88',GradientType=0 ); /* IE6-9 */
-    padding: .5em;
-    margin-bottom: .5em;
 }
 
 
@@ -365,7 +363,7 @@ table.list {
 }
 
 table.list th {
-    padding: .2em;
+    padding: .5em;
 }
 
 table.list td {
