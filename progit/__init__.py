@@ -266,7 +266,7 @@ def format_loc(loc, commit=None, prequest=None, index=None):
             output.append(
                 '<tr><td class="cell1">'
                 '<a id="%(cnt)s" href="#%(cnt)s">%(cnt_lbl)s</a></td>'
-                '<td class="prc" data-row="%(cnt)s" data-commit="%(commitid)s">'
+                '<td class="prc" data-row="%(cnt_lbl)s" data-commit="%(commitid)s">'
                 '<p>'
                 '<img src="%(img)s" alt="Add comment" title="Add comment"/>'
                 '</p>'
