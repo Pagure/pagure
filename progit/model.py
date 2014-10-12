@@ -478,6 +478,16 @@ class GlobalId(BASE):
             'pull_requests.id', ondelete='CASCADE', onupdate='CASCADE'),
         nullable=True)
 
+    project = relation(
+        'Project', foreign_keys=[project_id], remote_side=[Project.id],
+        backref='global_id')
+    issue = relation(
+        'Issue', foreign_keys=[issue_id], remote_side=[Issue.id],
+        backref='global_id')
+    request = relation(
+        'PullRequest', foreign_keys=[request_id], remote_side=[PullRequest.id],
+        backref='global_id')
+
     __table_args__ = (
         # Both fields should not be NULL
         sa.CheckConstraint('NOT(request_id IS NULL AND issue_id IS NULL)'),
