@@ -103,8 +103,6 @@ def request_pull(repo, requestid, username=None):
                 pygit2.GIT_SORT_TIME)
         ]
 
-        repo_commit = repo_obj[request.start_id]
-
         for commit in repo_obj.walk(
                 request.stop_id, pygit2.GIT_SORT_TIME):
             if request.status is False and commit.oid.hex == request.start_id:
