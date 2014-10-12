@@ -355,6 +355,8 @@ def new_pull_request(
     session.add(global_id)
     session.flush()
 
+    progit.notify.notify_new_pull_request(request)
+
     return 'Request created'
 
 
