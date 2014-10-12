@@ -139,6 +139,8 @@ def request_pull(repo, requestid, username=None):
             )
         )
 
+    form = progit.forms.ConfirmationForm()
+
     return flask.render_template(
         'pull_request.html',
         select='requests',
@@ -152,6 +154,7 @@ def request_pull(repo, requestid, username=None):
         diff_commits=diff_commits,
         diffs=diffs,
         html_diffs=html_diffs,
+        mergeform=form,
     )
 
 @APP.route('/<repo>/request-pull/<requestid>.patch')
@@ -286,6 +289,10 @@ def pull_request_add_comment(repo, requestid, commit, row, username=None):
 def merge_request_pull(repo, requestid, username=None):
     """ Request pulling the changes from the fork into the project.
     """
+
+    form = progit.forms.ConfirmationForm()
+    form.validate_on_submit()
+
     repo = progit.lib.get_project(SESSION, repo, user=username)
 
     if not repo:
@@ -383,11 +390,17 @@ def merge_request_pull(repo, requestid, username=None):
     return flask.redirect(flask.url_for('view_repo', repo=repo.name))
 
 
-@APP.route('/<repo>/request-pull/cancel/<requestid>')
-@APP.route('/fork/<username>/<repo>/request-pull/cancel/<requestid>')
+@APP.route('/<repo>/request-pull/cancel/<requestid>',
+        methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/request-pull/cancel/<requestid>',
+        methods=('GET', 'POST'))
 def cancel_request_pull(repo, requestid, username=None):
     """ Cancel request pulling request.
     """
+
+    form = progit.forms.ConfirmationForm()
+    form.validate_on_submit()
+
     repo = progit.lib.get_project(SESSION, repo, user=username)
 
     if not repo:

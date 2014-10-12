@@ -21,15 +21,17 @@
 {% if request %}
 <h3>Title: {{ request.title }}</h3>
   {% if request.status and repo_admin %}
-  <div>
-    <a href="{{ url_for('merge_request_pull', username=username,
-              repo=repo.name, requestid=requestid) }}">
-        <button>Merge</button>
-    </a>
-    <a href="{{ url_for('cancel_request_pull', username=username,
-              repo=repo.name, requestid=requestid) }}" id="cancel_pr">
-        <button>Cancel</button>
-    </a>
+  <div class="pr_actions">
+    <form action="{{ url_for('merge_request_pull', username=username,
+        repo=repo.name, requestid=requestid) }}" method="POST">
+        {{ mergeform.csrf_token }}
+        <input type="submit" value="Merge"/>
+    </form>
+    <form action="{{ url_for('cancel_request_pull', username=username,
+        repo=repo.name, requestid=requestid) }}" method="POST">
+        {{ mergeform.csrf_token }}
+        <input type="submit" value="Cancel" id="cancel_pr"/>
+    </form>
   </div>
   {% elif request and request.status == False %}
   <span class="error">Merged</span>

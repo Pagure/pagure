@@ -437,6 +437,10 @@ td.noresult {
     overflow: auto;
 }
 
+.pr_actions form {
+    display: inline-block;
+}
+
 .user_list li {
     list-style-type: none;
     display: inline-block;
