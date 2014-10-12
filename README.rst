@@ -16,19 +16,6 @@ Homepage: https://github.com/pypingou/ProGit
 
 Dev instance: http://209.132.184.222/ (/!\\ May change unexpectedly, it's a dev instance ;-))
 
-
-UI overview
------------
-
-.. image:: overview.png
-   :height: 800px
-   :width: 400 px
-   :scale: 50 %
-   :alt: Small overview of Anitya's UI
-   :align: center
-   :target: ./overview.png
-
-
 Get it running
 ==============
 
@@ -49,3 +36,48 @@ Get it running
 
 
 This will launch the application at http://127.0.0.1:5000
+
+UI overview
+-----------
+
+.. image:: screenshots/overview_home.png
+   :scale: 50 %
+   :alt: ProGit's home page overview
+   :align: center
+   :target: https://github.com/pypingou/ProGit/raw/master/screenshots/overview_home.png
+
+.. image:: screenshots/overview_main.png
+   :scale: 50 %
+   :alt: ProGit's project page overview
+   :align: center
+   :target: https://github.com/pypingou/ProGit/raw/master/screenshots/overview_main.png
+
+.. image:: screenshots/overview_commit.png
+   :scale: 50 %
+   :alt: ProGit's commit overview
+   :align: center
+   :target: https://github.com/pypingou/ProGit/raw/master/screenshots/overview_commit.png
+
+.. image:: screenshots/overview_request_pull.png
+   :scale: 50 %
+   :alt: ProGit's pull-request overview
+   :align: center
+   :target: https://github.com/pypingou/ProGit/raw/master/screenshots/overview_request_pull.png
+
+.. image:: screenshots/overview_issues_list.png
+   :scale: 50 %
+   :alt: ProGit's issues list overview
+   :align: center
+   :target: https://github.com/pypingou/ProGit/raw/master/screenshots/overview_issues_list.png
+
+.. image:: screenshots/overview_issue.png
+   :scale: 50 %
+   :alt: ProGit's issue overview
+   :align: center
+   :target: https://github.com/pypingou/ProGit/raw/master/screenshots/overview_issue.png
+
+.. image:: screenshots/overview_users.png
+   :scale: 50 %
+   :alt: ProGit's users overview
+   :align: center
+   :target: https://github.com/pypingou/ProGit/raw/master/screenshots/overview_users.png
