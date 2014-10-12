@@ -12,16 +12,18 @@
         {{ user.user }}
       </a> - {{ date | humanize}}
       {% if aside %}
-        {% if authenticated and form %}
         <aside class="issue_action">
+        {% if authenticated and form %}
           <form action="{{ url_for('view_issue', username=username,
                    repo=repo.name, issueid=issueid) }}" method="post">
             {{ render_field(form.status) }}
             <input type="submit" class="submit positive button" value="Update">
             {{ form.csrf_token }}
           </form>
-        </aside>
+        {% else %}
+            Status: {{ issue.status }}
         {% endif %}
+        </aside>
       {% endif %}
     </header>
     <div class="comment_body">
