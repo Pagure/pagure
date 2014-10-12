@@ -43,6 +43,7 @@ textarea {
 }
 
 table.list thead th,
+.user_list a:hover,
 .fgradient{
     color: white;
     background: #426ead; /* Old browsers */
@@ -687,4 +688,18 @@ td.noresult {
 
 .highlight {
     overflow: auto;
+}
+
+.user_list li {
+    list-style-type: none;
+    display: inline-block;
+    width: 25em;
+    margin: 0 .5em;
+}
+
+
+.user_list a {
+    display: inline-block;
+    width: 100%;
+    padding: .5em;
 }
