@@ -163,3 +163,41 @@ New pull-request:
         ','.join(mail_to),
         mail_id=request.mail_id,
     )
+
+
+def notify_merge_pull_request(request):
+    ''' Notify the people following a project that a pull-request was merged
+    in it.
+    '''
+    text = """
+%s merged a pull-request against the project: `%s` that you are following.
+
+Merged pull-request:
+
+``
+%s
+``
+
+%s
+""" % (
+    request.user.user,
+    request.repo.name,
+    request.title,
+    '%s/%s/request-pull/%s' % (
+        progit.APP.config['APP_URL'],
+        request.repo.name,
+        request.id,
+    ),
+    )
+    mail_to = set([cmt.user.emails[0].email for cmt in request.comments])
+    mail_to.add(request.repo.user.emails[0].email)
+    for prouser in request.repo.users:
+        if prouser.user.emails:
+            mail_to.add(prouser.user.emails[0].email)
+
+    send_email(
+        text,
+        'Pull-Request #%s `%s`' % (request.id, request.title),
+        ','.join(mail_to),
+        mail_id=request.mail_id,
+    )
