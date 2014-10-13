@@ -110,12 +110,13 @@ def request_pull(repo, requestid, username=None):
             elif request.status and commit.oid.hex in master_commits:
                 break
             diff_commits.append(commit)
-            diffs.append(
-                repo_obj.diff(
-                    repo_obj.revparse_single(commit.parents[0].oid.hex),
-                    repo_obj.revparse_single(commit.oid.hex)
+            if commit.parents:
+                diffs.append(
+                    repo_obj.diff(
+                        repo_obj.revparse_single(commit.parents[0].oid.hex),
+                        repo_obj.revparse_single(commit.oid.hex)
+                    )
                 )
-            )
 
     elif orig_repo.is_empty:
         orig_commit = None
