@@ -385,7 +385,7 @@ def merge_request_pull(repo, requestid, username=None):
         flask.flash('Changes merged!')
 
     # Update status
-    progit.lib.close_pull_request(SESSION, request)
+    progit.lib.close_pull_request(SESSION, request, flask.g.fas_user)
     SESSION.commit()
     shutil.rmtree(newpath)
 
@@ -419,7 +419,8 @@ def cancel_request_pull(repo, requestid, username=None):
                 403,
                 'You are not allowed to cancel pull-request for this project')
 
-        progit.lib.close_pull_request(SESSION, request, merged=False)
+        progit.lib.close_pull_request(
+            SESSION, request, flask.g.fas_user, merged=False)
         SESSION.commit()
         flask.flash('Request pull canceled!')
     else:
