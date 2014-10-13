@@ -379,7 +379,7 @@ table.list .open_by {
     width: 9em;
 }
 
-td.noresult {
+.noresult {
     text-align: center;
     font-weight: bold;
 }
@@ -408,9 +408,10 @@ td.noresult {
 }
 
 .issue_comment > header,
-.issue_comment > form > header {
+.issue_comment > form > header,
+.file_content > .buttons
+{
     border-radius: 10px 10px 0 0;
-    background: #ccc;
     padding: .5em;
     border-bottom: 1px solid rgba(237, 237, 237, 0.4);
 
@@ -453,4 +454,44 @@ td.noresult {
     display: inline-block;
     width: 100%;
     padding: .5em;
+}
+
+.buttons {
+    padding: 0;
+    list-style-type: none;
+    text-align: right;
+    /*padding: .2em .5em 1em;*/
+    margin: 0;
+}
+
+.buttons li {
+    display: inline-block;
+    padding-left: .5em;
+}
+
+.button {
+    display: inline-block;
+    color: white;
+    background: #0066cc;
+    border-radius: 3px;
+    padding: .2em .5em;
+    background-image: -webkit-linear-gradient(top, #0066cc, #34609f);
+    background-image: -moz-linear-gradient(top, #0066cc, #34609f);
+    background-image: -o-linear-gradient(top, #0066cc, #34609f);
+    background-image: linear-gradient(to bottom, #0066cc, #34609f);
+    -webkit-box-shadow: inset 0 1px rgba(255, 255, 255, 0.5), 0 0 2px rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.5), 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+.button:hover {
+    background-image: linear-gradient(to bottom, #34609f, #0066cc);
+}
+
+a.button:visited, a.button:hover {
+    color: white;
+}
+
+.file_content {
+    border: 1px solid rgba(237, 237, 237, 0.4);
+    border-radius: 10px 10px 0 0;
 }

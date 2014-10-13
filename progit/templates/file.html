@@ -25,10 +25,26 @@
 </h2>
 
 {% if content %}
-  {% if output_type=='file' %}
-    {% autoescape false %}
-      {{ content | format_loc}}
-    {% endautoescape %}
+  {% if output_type == 'file' or output_type == 'binary' or output_type == 'image' %}
+  <div class="file_content">
+    <ul class="buttons">
+        <li><a class="button blob" href="{{ url_for('view_file', username=username,
+                    repo=repo.name, identifier=branchname,
+                    filename=filename) }}" title="View as blob">Blob</a></li>
+        <li><a class="button raw" href="{{ url_for('view_raw_file', username=username,
+                    repo=repo.name, identifier=branchname,
+                    filename=filename) }}" title="View as raw">Raw</a></li>
+    </ul>
+    {% if output_type=='file' %}
+        {% autoescape false %}
+        {{ content | format_loc}}
+        {% endautoescape %}
+    {% elif output_type == 'binary' or output_type == 'image' %}
+        <p class="noresult">Binary files cannot be rendered.<br/>Please <a href="{{ url_for('view_raw_file', username=username,
+                    repo=repo.name, identifier=branchname,
+                    filename=filename) }}">view the raw version</a></p>
+    {% endif %}
+  </div>
   {% else %}
   <section class="tree_list">
   <h3>Tree</h3>

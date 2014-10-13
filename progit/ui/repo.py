@@ -20,6 +20,9 @@ from pygments.lexers import guess_lexer
 from pygments.lexers.text import DiffLexer
 from pygments.formatters import HtmlFormatter
 
+import mimetypes
+import chardet
+
 import progit.exceptions
 import progit.lib
 import progit.forms
@@ -283,8 +286,6 @@ def view_log(repo, branchname=None, username=None):
 
 
 @APP.route('/<repo>/blob/<identifier>/<path:filename>')
-@APP.route('/<repo>/blob/<identifier>/<path:filename>')
-@APP.route('/fork/<username>/<repo>/blob/<identifier>/<path:filename>')
 @APP.route('/fork/<username>/<repo>/blob/<identifier>/<path:filename>')
 def view_file(repo, identifier, filename, username=None):
     """ Displays the content of a file or a tree for the specified repo.
@@ -318,14 +319,22 @@ def view_file(repo, identifier, filename, username=None):
 
     content = repo_obj[content.oid]
     if isinstance(content, pygit2.Blob):
-        content = highlight(
-            content.data,
-            guess_lexer(content.data),
-            HtmlFormatter(
-                noclasses=True,
-                style="tango",)
-        )
-        output_type = 'file'
+        if content.is_binary:
+            ext = filename[filename.rfind('.'):]
+            if ext in ('.gif', '.png', '.bmp', '.tif', '.tiff', '.jpg',
+                    '.jpeg', '.ppm', '.pnm', '.pbm', '.pgm', '.webp', '.ico'):
+                output_type = 'image'
+            else:
+                output_type = 'binary'
+        else:
+            content = highlight(
+                content.data,
+                guess_lexer(content.data),
+                HtmlFormatter(
+                    noclasses=True,
+                    style="tango",)
+            )
+            output_type = 'file'
     else:
         content = sorted(content, key=lambda x: x.filemode)
         output_type = 'tree'
@@ -340,6 +349,57 @@ def view_file(repo, identifier, filename, username=None):
         content=content,
         output_type=output_type,
     )
+
+
+@APP.route('/<repo>/raw/<identifier>/<path:filename>')
+@APP.route('/fork/<username>/<repo>/raw/<identifier>/<path:filename>')
+def view_raw_file(repo, identifier, filename, username=None):
+    """ Displays the raw content of a file for the specified repo.
+    """
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
+    if repo.is_fork:
+        reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
+    repo_obj = pygit2.Repository(reponame)
+
+    if identifier in repo_obj.listall_branches():
+        branch = repo_obj.lookup_branch(identifier)
+        commit = branch.get_object()
+    else:
+        try:
+            commit = repo_obj.get(identifier)
+        except ValueError:
+            # If it's not a commit id then it's part of the filename
+            commit = repo_obj[repo_obj.head.target]
+
+    content = __get_file_in_tree(repo_obj, commit.tree, filename.split('/'))
+    if not content:
+        flask.abort(404, 'File not found')
+
+    mimetype, encoding = mimetypes.guess_type(filename)
+    data = repo_obj[content.oid].data
+
+    if not mimetype and data[:2] == '#!':
+        mimetype = 'text/plain'
+
+    if not mimetype:
+        if '\0' in data:
+            mimetype = 'application/octet-stream'
+        else:
+            mimetype = 'text/plain'
+
+    if mimetype.startswith('text/') and not encoding:
+        encoding = chardet.detect(data)['encoding']
+
+    headers = {'Content-Type': mimetype}
+    if encoding:
+        headers['Content-Encoding'] = encoding
+
+    return (data, 200, headers)
 
 
 @APP.route('/<repo>/<commitid>')
