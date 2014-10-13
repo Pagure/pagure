@@ -91,7 +91,6 @@ def request_pull(repo, requestid, username=None):
 
     diff_commits = []
     diffs = []
-    repo_commit = repo_obj[request.stop_id]
     if not repo_obj.is_empty and not orig_repo.is_empty:
         orig_commit = orig_repo[
             orig_repo.lookup_branch('master').get_object().hex]
@@ -120,6 +119,7 @@ def request_pull(repo, requestid, username=None):
 
     elif orig_repo.is_empty:
         orig_commit = None
+        repo_commit = repo_obj[request.stop_id]
         diff = repo_commit.tree.diff_to_tree(swap=True)
     else:
         flask.flash(
@@ -190,7 +190,6 @@ def request_pull_patch(repo, requestid, username=None):
     orig_repo = pygit2.Repository(parentname)
 
     diff_commits = []
-    repo_commit = repo_obj[request.stop_id]
     if not repo_obj.is_empty and not orig_repo.is_empty:
         orig_commit = orig_repo[
             orig_repo.lookup_branch('master').get_object().hex]
@@ -202,8 +201,6 @@ def request_pull_patch(repo, requestid, username=None):
                 pygit2.GIT_SORT_TIME)
         ]
 
-        repo_commit = repo_obj[request.start_id]
-
         for commit in repo_obj.walk(
                 request.stop_id, pygit2.GIT_SORT_TIME):
             if commit.oid.hex in master_commits:
@@ -212,6 +209,7 @@ def request_pull_patch(repo, requestid, username=None):
 
     elif orig_repo.is_empty:
         orig_commit = None
+        repo_commit = repo_obj[request.stop_id]
         diff = repo_commit.tree.diff_to_tree(swap=True)
     else:
         flask.flash(
