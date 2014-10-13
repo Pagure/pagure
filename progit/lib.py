@@ -680,7 +680,7 @@ def get_pull_request(
     return query.first()
 
 
-def close_pull_request(session, request, merged=True):
+def close_pull_request(session, request, user, merged=True):
     ''' Close the provided pull-request.
     '''
     request.status = False
@@ -688,9 +688,9 @@ def close_pull_request(session, request, merged=True):
     session.flush()
 
     if merged == True:
-        progit.notify.notify_merge_pull_request(request)
+        progit.notify.notify_merge_pull_request(request, user)
     else:
-        progit.notify.notify_cancelled_pull_request(request)
+        progit.notify.notify_cancelled_pull_request(request, user)
 
 
 def get_issue_statuses(session):
