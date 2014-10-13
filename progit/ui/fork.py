@@ -284,8 +284,9 @@ def pull_request_add_comment(repo, requestid, commit, row, username=None):
 
 
 
-@APP.route('/<repo>/request-pull/merge/<requestid>')
-@APP.route('/fork/<username>/<repo>/request-pull/merge/<requestid>')
+@APP.route('/<repo>/request-pull/merge/<requestid>', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/request-pull/merge/<requestid>',
+           methods=['POST'])
 def merge_request_pull(repo, requestid, username=None):
     """ Request pulling the changes from the fork into the project.
     """
@@ -393,9 +394,9 @@ def merge_request_pull(repo, requestid, username=None):
 
 
 @APP.route('/<repo>/request-pull/cancel/<requestid>',
-        methods=('GET', 'POST'))
+        methods=['POST'])
 @APP.route('/fork/<username>/<repo>/request-pull/cancel/<requestid>',
-        methods=('GET', 'POST'))
+        methods=['POST'])
 def cancel_request_pull(repo, requestid, username=None):
     """ Cancel request pulling request.
     """
