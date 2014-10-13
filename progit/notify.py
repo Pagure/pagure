@@ -165,7 +165,7 @@ New pull-request:
     )
 
 
-def notify_merge_pull_request(request):
+def notify_merge_pull_request(request, user):
     ''' Notify the people following a project that a pull-request was merged
     in it.
     '''
@@ -180,7 +180,7 @@ Merged pull-request:
 
 %s
 """ % (
-    request.user.user,
+    user.username,
     request.repo.name,
     request.title,
     '%s/%s/request-pull/%s' % (
@@ -203,7 +203,7 @@ Merged pull-request:
     )
 
 
-def notify_cancelled_pull_request(request):
+def notify_cancelled_pull_request(request, user):
     ''' Notify the people following a project that a pull-request was
     cancelled in it.
     '''
@@ -218,7 +218,7 @@ Cancelled pull-request:
 
 %s
 """ % (
-    request.user.user,
+    user.username,
     request.repo.name,
     request.title,
     '%s/%s/request-pull/%s' % (
