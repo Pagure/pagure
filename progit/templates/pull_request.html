@@ -18,9 +18,9 @@
 
 </h2>
 
-{% if request %}
-<h3>Title: {{ request.title }}</h3>
-  {% if request.status and repo_admin %}
+{% if pull_request %}
+<h3>Title: {{ pull_request.title }}</h3>
+  {% if pull_request.status and repo_admin %}
   <div class="pr_actions">
     <form action="{{ url_for('merge_request_pull', username=username,
         repo=repo.name, requestid=requestid) }}" method="POST">
@@ -33,7 +33,7 @@
         <input type="submit" value="Cancel" id="cancel_pr"/>
     </form>
   </div>
-  {% elif request and request.status == False %}
+  {% elif pull_request and pull_request.status == False %}
   <span class="error">Merged</span>
   {% endif %}
 {% endif %}
@@ -42,9 +42,9 @@
   <ul>
     {% for commit in diff_commits %}
     <li>
-    {% if request and request.status and request.repo_from.is_fork %}
-      <a href="{{ url_for('view_commit', username=request.repo_from.user.user,
-                  repo=request.repo_from.name, commitid=commit.oid.hex)}}">
+    {% if pull_request and pull_request.status and pull_request.repo_from.is_fork %}
+      <a href="{{ url_for('view_commit', username=pull_request.repo_from.user.user,
+                  repo=pull_request.repo_from.name, commitid=commit.oid.hex)}}">
     {% else %}
       <a href="{{ url_for('view_commit', username=username,
                   repo=repo.name, commitid=commit.oid.hex)}}">
@@ -122,7 +122,7 @@
     {{ diff_commits[loop.index - 1].message }}
     </p>
     {% autoescape false %}
-        {{ html_diff | format_loc(diff_commits[loop.index - 1], request,
+        {{ html_diff | format_loc(diff_commits[loop.index - 1], pull_request,
             index=loop.index) }}
     {% endautoescape %}
   {% endfor %}
