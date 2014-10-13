@@ -291,7 +291,9 @@ def merge_request_pull(repo, requestid, username=None):
     """
 
     form = progit.forms.ConfirmationForm()
-    form.validate_on_submit()
+    if not form.validate_on_submit():
+        flask.flash('Invalid input submitted', 'error')
+        return flask.redirect(flask.url_for('view_repo', repo=repo.name))
 
     repo = progit.lib.get_project(SESSION, repo, user=username)
 
@@ -399,27 +401,29 @@ def cancel_request_pull(repo, requestid, username=None):
     """
 
     form = progit.forms.ConfirmationForm()
-    form.validate_on_submit()
+    if form.validate_on_submit():
 
-    repo = progit.lib.get_project(SESSION, repo, user=username)
+        repo = progit.lib.get_project(SESSION, repo, user=username)
 
-    if not repo:
-        flask.abort(404, 'Project not found')
+        if not repo:
+            flask.abort(404, 'Project not found')
 
-    request = progit.lib.get_pull_request(
-        SESSION, project_id=repo.id, requestid=requestid)
+        request = progit.lib.get_pull_request(
+            SESSION, project_id=repo.id, requestid=requestid)
 
-    if not request:
-        flask.abort(404, 'Pull-request not found')
+        if not request:
+            flask.abort(404, 'Pull-request not found')
 
-    if not is_repo_admin(repo):
-        flask.abort(
-            403,
-            'You are not allowed to cancel pull-request for this project')
+        if not is_repo_admin(repo):
+            flask.abort(
+                403,
+                'You are not allowed to cancel pull-request for this project')
 
-    progit.lib.close_pull_request(SESSION, request, merged=False)
-    SESSION.commit()
-    flask.flash('Request pull canceled!')
+        progit.lib.close_pull_request(SESSION, request, merged=False)
+        SESSION.commit()
+        flask.flash('Request pull canceled!')
+    else:
+        flask.flash('Invalid input submitted', 'error')
 
     return flask.redirect(flask.url_for('view_repo', repo=repo.name))
 
