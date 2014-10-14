@@ -44,6 +44,7 @@ textarea {
 
 table.list thead th,
 .user_list a:hover,
+.project_list > header,
 .fgradient{
     color: white;
     background: #426ead; /* Old browsers */
@@ -109,6 +110,12 @@ header h1 span {
     position: relative;
     margin: .5em;
     min-height: 450px;
+}
+
+.project_list > header {
+    border-radius: 10px 10px 0 0;
+    padding: .5em;
+    border-bottom: 1px solid rgba(237, 237, 237, 0.4);
 }
 
 .project_list header h3 {
@@ -419,7 +426,6 @@ table.list .open_by {
 
 .issue_comment > header,
 .issue_comment > form > header,
-.project_list > header,
 .file_content > .buttons
 {
     border-radius: 10px 10px 0 0;
