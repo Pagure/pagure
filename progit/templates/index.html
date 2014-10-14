@@ -62,13 +62,13 @@
     {% if username %}
         <h2>{{ username | avatar(36) | safe }} {{ username }}</h2>
 
-        <h3>Projects</h3>
+        <h3>My Projects</h3>
         {{ render_repos(user_repos, total_page_repos, repopage) }}
 
-        <h3>Forks</h3>
+        <h3>My Forks</h3>
         {{ render_repos(user_forks, total_page_forks, forkpage) }}
-    {% else %}
-        <h2>Projects</h2>
-        {{ render_repos(repos, total_page, page) }}
     {% endif %}
+
+    <h{% if username %}3{% else %}2{% endif %}>{% if username %}All {% endif %}Projects</h{% if username %}3{% else %}2{% endif %}>
+    {{ render_repos(repos, total_page, page) }}
 {% endblock %}
