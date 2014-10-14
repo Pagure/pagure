@@ -188,8 +188,10 @@
         'pull_request_add_comment', username=username, repo=repo.name,
         requestid=requestid, commit='', row='') }}".slice(0, -1);
       url = url + commit + '/' + row;
+      var rowid = $(this).prev().find('a').attr('id');
       var table = $( this ).parent().parent();
-      var next_row = table.find('#' + (+row + 1)).parent().parent();
+      var nextid = rowid.replace('_' + row, '_' + (Number(row) + 1));
+      var next_row = table.find('#' + nextid).parent().parent();
       if (next_row.prev().find('.pr_comment_form').length == 0){
         $.get( url , function( data ) {
           next_row.before(
