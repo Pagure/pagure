@@ -141,6 +141,9 @@ def index():
         total_page_forks=total_page_forks,
         repos_obj=repos_obj,
         forks_obj=forks_obj,
+        user_repos_length=user_repos_length,
+        user_forks_length=user_forks_length,
+        repos_length=num_repos,
     )
 
 
