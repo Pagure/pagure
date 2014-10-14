@@ -111,7 +111,11 @@ header h1 span {
     min-height: 450px;
 }
 
-.project_list {
+.project_list header h3 {
+    margin:0;
+}
+
+.project_list > div {
     display: table;
     border-spacing: 1em;
 }
@@ -394,7 +398,7 @@ table.list .open_by {
     color: #aaa;
 }
 
-.issue_comment, .add_comment {
+.issue_comment, .add_comment, .project_list {
     background-color: #fff;
     border-radius: 10px;
     margin-bottom: 1em;
@@ -415,6 +419,7 @@ table.list .open_by {
 
 .issue_comment > header,
 .issue_comment > form > header,
+.project_list > header,
 .file_content > .buttons
 {
     border-radius: 10px 10px 0 0;
