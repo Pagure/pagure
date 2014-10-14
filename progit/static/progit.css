@@ -127,7 +127,13 @@ header h1 span {
     /*width: 15em;*/
 }
 
-.project_link img, .project_link span {
+.project_link {
+    background-repeat: no-repeat;
+    background-position: 5px 50%;
+    padding-left: 85px;
+}
+
+.project_link span {
     display: block;
 }
 

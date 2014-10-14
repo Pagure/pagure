@@ -19,7 +19,6 @@ from pygments.lexers import guess_lexer
 from pygments.lexers.text import DiffLexer
 from pygments.formatters import HtmlFormatter
 
-
 import progit.exceptions
 import progit.lib
 import progit.forms
@@ -63,11 +62,85 @@ def index():
 
     total_page = int(ceil(num_repos / float(limit)))
 
+    repopage = None
+    forkpage = None
+    user_repos = None
+    user_forks = None
+    total_page_repos = None
+    total_page_forks = None
+    repos_obj = None
+    forks_obj = None
+    username = None
+
+    if flask.g.fas_user:
+        username = flask.g.fas_user.username
+
+        repopage = flask.request.args.get('repopage', 1)
+        try:
+            repopage = int(repopage)
+        except ValueError:
+            repopage = 1
+
+        forkpage = flask.request.args.get('forkpage', 1)
+        try:
+            forkpage = int(forkpage)
+        except ValueError:
+            forkpage = 1
+
+        repo_start = limit * (repopage - 1)
+        fork_start = limit * (forkpage - 1)
+
+        user_repos = progit.lib.list_projects(
+            SESSION,
+            username=username,
+            fork=False,
+            start=repo_start,
+            limit=limit)
+        user_repos_length = progit.lib.list_projects(
+            SESSION,
+            username=username,
+            fork=False,
+            count=True)
+
+        user_forks = progit.lib.list_projects(
+            SESSION,
+            username=username,
+            fork=True,
+            start=fork_start,
+            limit=limit)
+        user_forks_length = progit.lib.list_projects(
+            SESSION,
+            username=username,
+            fork=True,
+            count=True)
+
+        total_page_repos = int(ceil(user_repos_length / float(limit)))
+        total_page_forks = int(ceil(user_forks_length / float(limit)))
+
+        #repos_obj = [
+        #    pygit2.Repository(
+        #        os.path.join(APP.config['GIT_FOLDER'], repo.path))
+        #    for repo in user_repos]
+
+        #forks_obj = [
+        #    pygit2.Repository(
+        #        os.path.join(APP.config['FORK_FOLDER'], repo.path))
+        #    for repo in user_forks]
+
     return flask.render_template(
         'index.html',
-        repos=chunks(repos, 3),
+        repos=repos,
         total_page=total_page,
         page=page,
+        username=username,
+        repopage=repopage,
+        forkpage=forkpage,
+        user_repos=user_repos,
+        user_forks=user_forks,
+        total_page_repos=total_page_repos,
+        total_page_forks=total_page_forks,
+        repos_obj=repos_obj,
+        forks_obj=forks_obj,
     )
 
 
