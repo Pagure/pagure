@@ -16,9 +16,11 @@ from math import ceil
 import pygit2
 from sqlalchemy.exc import SQLAlchemyError
 from pygments import highlight
-from pygments.lexers import guess_lexer
-from pygments.lexers.text import DiffLexer
 from pygments.formatters import HtmlFormatter
+from pygments.lexers import guess_lexer_for_filename
+from pygments.lexers.text import DiffLexer
+from pygments.lexers.special import TextLexer
+from pygments.util import ClassNotFound
 
 import mimetypes
 import chardet
@@ -327,9 +329,17 @@ def view_file(repo, identifier, filename, username=None):
             else:
                 output_type = 'binary'
         else:
+            try:
+                lexer = guess_lexer_for_filename(
+                    filename,
+                    content.data
+                )
+            except ClassNotFound:
+                lexer = TextLexer()
+
             content = highlight(
                 content.data,
-                guess_lexer(content.data),
+                lexer,
                 HtmlFormatter(
                     noclasses=True,
                     style="tango",)
