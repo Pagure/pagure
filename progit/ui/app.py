@@ -119,15 +119,15 @@ def index():
         total_page_repos = int(ceil(user_repos_length / float(limit)))
         total_page_forks = int(ceil(user_forks_length / float(limit)))
 
-        #repos_obj = [
-        #    pygit2.Repository(
-        #        os.path.join(APP.config['GIT_FOLDER'], repo.path))
-        #    for repo in user_repos]
+        repos_obj = [
+            pygit2.Repository(
+                os.path.join(APP.config['GIT_FOLDER'], repo.path))
+            for repo in user_repos]
 
-        #forks_obj = [
-        #    pygit2.Repository(
-        #        os.path.join(APP.config['FORK_FOLDER'], repo.path))
-        #    for repo in user_forks]
+        forks_obj = [
+            pygit2.Repository(
+                os.path.join(APP.config['FORK_FOLDER'], repo.path))
+            for repo in user_forks]
 
     return flask.render_template(
         'index.html',
@@ -247,6 +247,8 @@ def view_user(username):
         total_page_forks=total_page_forks,
         repopage=repopage,
         forkpage=forkpage,
+        repos_length=repos_length,
+        forks_length=forks_length,
     )
 
 

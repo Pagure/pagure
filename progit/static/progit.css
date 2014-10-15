@@ -525,3 +525,13 @@ a.button:visited, a.button:hover {
 [id=error] h2 {
     color: red;
 }
+
+.user_settings {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    text-indent: 20px;
+    overflow: hidden;
+    background: url(images/edit.png) top left no-repeat;
+    vertical-align: middle;
+}

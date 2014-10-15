@@ -4,96 +4,26 @@
 {%block tag %}users{% endblock %}
 
 
+{% block header %}
+    <link rel="stylesheet" type="text/css" media="screen"
+        href="{{ url_for('static', filename='toggle.css') }}"/>
+{% endblock %}
+
+
+{% from "render_repo.html" import render_repos %}
+{% from "render_repo.html" import repos_switch %}
+
+
 {% block content %}
-
-<h2>{{ username | avatar(36) | safe }} {{ username }}</h2>
-
-{% if g.fas_user and g.fas_user.username == username %}
-<a href="{{ url_for('user_settings') }}">Update settings</a>
-{% endif %}
-
-{% if total_page_repos and total_page_repos > 1 %}
-<table>
-    <tr>
-        <td>
-        {% if repopage > 1%}
-            <a href="{{ url_for('view_user', username=username) }}?repopage={{repopage - 1}}">
-                &lt; Previous
-            </a>
-        {% else %}
-            &lt; Previous
+    <h2>
+        {{ username | avatar(36) | safe }} {{ username }}
+        {% if g.fas_user and g.fas_user.username == username %}
+            <a class="user_settings" href="{{ url_for('user_settings') }}" title="Update your settings">Settings</a>
         {% endif %}
-        </td>
-        <td>{{ repopage }} / {{ total_page_repos }}</td>
-        <td>
-            {% if repopage < total_page_repos %}
-            <a href="{{ url_for('view_user', username=username) }}?repopage={{repopage + 1}}">
-                Next &gt;
-            </a>
-            {% else %}
-            Next >
-            {% endif %}
-        </td>
-    </tr>
-</table>
-{% endif %}
-<section class="project_list">
-  <h3>Projects</h3>
-  <ul>
-    {% for repo in repos %}
-    <li>
-      <a href="{{ url_for('view_repo', repo=repo.name)}}">
-        {{ repo.name }}
-      </a>
-      <span class="commit_date">
-      </span>
-    </li>
-    {% endfor %}
-  </ul>
-</section>
 
+    </h2>
+    {{ repos_switch() }}
 
-{% if total_page_forks and total_page_forks > 1 %}
-<table>
-    <tr>
-        <td>
-        {% if forkpage > 1%}
-            <a href="{{ url_for('view_user', username=username) }}?forkpage={{forkpage - 1}}">
-                &lt; Previous
-            </a>
-        {% else %}
-            &lt; Previous
-        {% endif %}
-        </td>
-        <td>{{ forkpage }} / {{ total_page_forks }}</td>
-        <td>
-            {% if forkpage < total_page_forks %}
-            <a href="{{ url_for('view_user', username=username) }}?forkpage={{forkpage + 1}}">
-                Next &gt;
-            </a>
-            {% else %}
-            Next >
-            {% endif %}
-        </td>
-    </tr>
-</table>
-{% endif %}
-{% if forks %}
-    <section class="fork_list">
-      <h3>Forked repos</h3>
-      <ul>
-        {% for repo in forks %}
-        <li>
-          <a href="{{ url_for('view_repo', username=username, repo=repo.name)}}">
-            {{ repo.name }}
-          </a>
-          <span class="commit_date">
-            {{ forks_obj[loop.index - 1] | lastcommit_date}}
-          </span>
-        </li>
-        {% endfor %}
-      </ul>
-    </section>
-{% endif %}
-
+    {{ render_repos(repos, total_page_repos, repopage, 'Projects', repos_length, 'repos') }}
+    {{ render_repos(forks, total_page_forks, forkpage, 'Forks', forks_length, 'forks') }}
 {% endblock %}
