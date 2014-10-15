@@ -24,9 +24,8 @@
   width: 58px;
   line-height: 26px;
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(0, 0, 0, 0.15);
   text-align: center;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.45);
   cursor: pointer;
   font-weight: bold;
 }
