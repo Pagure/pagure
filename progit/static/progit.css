@@ -526,7 +526,7 @@ a.button:visited, a.button:hover {
     color: red;
 }
 
-.user_settings {
+a.user_settings {
     display: inline-block;
     width: 16px;
     height: 16px;
