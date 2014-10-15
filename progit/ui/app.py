@@ -71,6 +71,8 @@ def index():
     repos_obj = None
     forks_obj = None
     username = None
+    user_repos_length = None
+    user_forks_length = None
 
     if flask.g.fas_user:
         username = flask.g.fas_user.username
