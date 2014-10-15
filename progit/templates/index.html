@@ -4,6 +4,11 @@
 {%block tag %}home{% endblock %}
 
 
+{% block header %}
+    <link rel="stylesheet" type="text/css" media="screen"
+        href="{{ url_for('static', filename='toggle.css') }}"/>
+{% endblock %}
+
 {% macro render_row(items) -%}
     {% for repo in items %}
         {% if loop.index is divisibleby(3) %}
@@ -26,8 +31,8 @@
     {% endfor %}
 {%- endmacro %}
 
-{% macro render_repos(list, total, page, title, count) %}
-    <section class="project_list">
+{% macro render_repos(list, total, page, title, count, id) %}
+<section class="project_list" id="{{ id }}">
         <header>
             <h{% if username %}3{% else %}2{% endif %}>{{ title }} ({{ count }})</h{% if username %}3{% else %}2{% endif %}>
         </header>
@@ -67,9 +72,48 @@
 {% block content %}
     {% if username %}
         <h2>{{ username | avatar(36) | safe }} {{ username }}</h2>
+        <aside class="show_parts">
+            <strong>My repos:</strong>
+            <div class="switch oneline">
+                <input type="radio" class="switch-input" name="myrepos" value="on" id="myreposon" checked="checked">
+                <label for="myreposon" class="switch-label switch-label-off">Show</label>
+                <input type="radio" class="switch-input" name="myrepos" value="off" id="myreposoff">
+                <label for="myreposoff" class="switch-label switch-label-on">Hide</label>
+                <span class="switch-selection"></span>
+            </div>
+            <strong>Forks:</strong>
+            <div class="switch oneline">
+                <input type="radio" class="switch-input" name="myforks" value="on" id="forkson" checked="checked">
+                <label for="forkson" class="switch-label switch-label-off">Show</label>
+                <input type="radio" class="switch-input" name="myforks" value="off" id="forksoff">
+                <label for="forksoff" class="switch-label switch-label-on">Hide</label>
+                <span class="switch-selection"></span>
+            </div>
+            <strong>All repos:</strong>
+            <div class="switch oneline">
+                <input type="radio" class="switch-input" name="repos" value="on" id="reposon" checked="checked">
+                <label for="reposon" class="switch-label switch-label-off">Show</label>
+                <input type="radio" class="switch-input" name="repos" value="off" id="reposoff">
+                <label for="reposoff" class="switch-label switch-label-on">Hide</label>
+                <span class="switch-selection"></span>
+            </div>
+        </aside>
 
-        {{ render_repos(user_repos, total_page_repos, repopage, 'My Projects', user_repos_length) }}
-        {{ render_repos(user_forks, total_page_forks, forkpage, 'My Forks', user_forks_length) }}
+        {{ render_repos(user_repos, total_page_repos, repopage, 'My Projects', user_repos_length, 'myrepos') }}
+        {{ render_repos(user_forks, total_page_forks, forkpage, 'My Forks', user_forks_length, 'myforks') }}
     {% endif %}
-    {{ render_repos(repos, total_page, page, 'All Projects', repos_length) }}
+    {{ render_repos(repos, total_page, page, 'All Projects', repos_length, 'repos') }}
+{% endblock %}
+
+{% block jscripts %}
+    {{ super() }}
+    {% if username %}
+    <script type="text/javascript">
+        $(function(){
+            $('.show_parts input[type="radio"]').change(function(){
+                $('#' + $(this).attr('name')).toggle();
+            });
+        });
+    </script>
+    {% endif %}
 {% endblock %}

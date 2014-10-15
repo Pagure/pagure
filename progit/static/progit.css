@@ -118,7 +118,8 @@ header h1 span {
     border-bottom: 1px solid rgba(237, 237, 237, 0.4);
 }
 
-.project_list header h3 {
+.project_list header h3, .project_list header h2 {
+    font-size: 1em;
     margin:0;
 }
 
@@ -132,16 +133,19 @@ header h1 span {
     border-radius: 5px 5px 5px 5px;
     color: black;
     display: table-cell;
-    /*margin: 1em auto;*/
     overflow: hidden;
     padding: 2em;
-    /*width: 15em;*/
-}
-
-.project_link {
     background-repeat: no-repeat;
     background-position: 5px 50%;
     padding-left: 85px;
+}
+
+.project_link:visited {
+    color: black;
+}
+
+.project_link:hover {
+    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);
 }
 
 .project_link span {
@@ -511,6 +515,11 @@ a.button:visited, a.button:hover {
 .file_content {
     border: 1px solid rgba(237, 237, 237, 0.4);
     border-radius: 10px 10px 0 0;
+}
+
+.show_parts {
+    float: right;
+    margin-top: -3.6em;
 }
 
 [id=error] h2 {
