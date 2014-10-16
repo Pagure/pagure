@@ -35,6 +35,12 @@ Get it running
     ./runserver.py
 
 
+* To get some profiling information you can also run it as::
+
+    ./runserver.py --profile
+
+
+
 This will launch the application at http://127.0.0.1:5000
 
 UI overview
