@@ -495,3 +495,7 @@ a.button:visited, a.button:hover {
     border: 1px solid rgba(237, 237, 237, 0.4);
     border-radius: 10px 10px 0 0;
 }
+
+[id=error] h2 {
+    color: red;
+}

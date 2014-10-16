@@ -1,0 +1,12 @@
+{% extends "master.html" %}
+
+{% block title %}Unauthorized :'({% endblock %}
+{%block tag %}error{% endblock %}
+
+
+{% block content %}
+    <h2>Unauthorized (401)</h2>
+    <p>You are not authorized to display the requested page.</p>
+    <p>If you're not logged in, try to login; if you're already done,
+    that probably means you do not have sufficient access.</p>
+{% endblock %}
