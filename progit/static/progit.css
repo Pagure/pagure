@@ -109,7 +109,6 @@ header h1 span {
 #content {
     position: relative;
     margin: .5em;
-    min-height: 450px;
 }
 
 .project_list > header {
