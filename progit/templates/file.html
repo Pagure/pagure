@@ -26,7 +26,8 @@
 
 {% if content %}
   {% if output_type == 'file' or output_type == 'binary' or output_type == 'image' %}
-  <div class="file_content">
+  <section class="file_content">
+      <header>
     <ul class="buttons">
         <li><a class="button blob" href="{{ url_for('view_file', username=username,
                     repo=repo.name, identifier=branchname,
@@ -35,6 +36,7 @@
                     repo=repo.name, identifier=branchname,
                     filename=filename) }}" title="View as raw">Raw</a></li>
     </ul>
+        </header>
     {% if output_type=='file' %}
         {% autoescape false %}
         {{ content | format_loc}}
@@ -44,7 +46,7 @@
                     repo=repo.name, identifier=branchname,
                     filename=filename) }}">view the raw version</a></p>
     {% endif %}
-  </div>
+  </section>
   {% else %}
   <section class="tree_list">
   <h3>Tree</h3>
