@@ -138,6 +138,7 @@ header h1 span {
     background-repeat: no-repeat;
     background-position: 5px 50%;
     padding-left: 85px;
+    width: 15em;
 }
 
 .project_link:visited {
@@ -146,6 +147,7 @@ header h1 span {
 
 .project_link:hover {
     box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);
+    color: #0066CC;
 }
 
 .project_link span {
