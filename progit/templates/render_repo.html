@@ -1,6 +1,6 @@
 {% macro render_row(items) -%}
     {% for repo in items %}
-        {% if loop.index is divisibleby(3) %}
+        {% if loop.index == 1 %}
     <div class="project_row">
         {% endif %}
         <a class="project_link"
@@ -12,8 +12,11 @@
             <span class="repo_desc">{{ repo.description | wraps(20) }}</span>
             {% endif %}
         </a>
-        {% if loop.index is divisibleby(3) %}
+        {% if loop.last %}
     </div>
+        {% elif loop.index is divisibleby(3) or loop.last %}
+    </div>
+    <div class="project_row">
         {% endif %}
     {% else %}
     <p>No project found</p>
