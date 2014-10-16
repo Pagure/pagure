@@ -1,16 +1,15 @@
 {% extends "master.html" %}
 {% from "_formhelper.html" import render_field_in_cell %}
 
-{% block title %}Settings {{username}}{% endblock %}
+{% block title %}{{ user.user }}'s settings{% endblock %}
 {%block tag %}users{% endblock %}
 
 
 {% block content %}
-
-<h2>Setting {{ user.user }}</h2>
-
-
 <section class="user_settings">
+    <header>
+        <h2>{{ user.user }}'s settings</h2>
+    </header>
   <form action="{{ url_for('user_settings') }}" method="post">
     <table>
       <tr>
@@ -43,11 +42,11 @@
       {{ form.csrf_token }}
 </p>
   </form>
-</section>
+    <aside>
+        <div id="profile_button">
+            <a href="{{ url_for('view_user', username=user.user) }}">Public profile page</a>
+        </div>
+    </aside>
 
-<section class="user_links">
-  <p>
-    <a href="{{ url_for('view_user', username=user.user) }}">Public profile page</a>
-  </p>
 </section>
 {% endblock %}

@@ -47,6 +47,7 @@ table.list thead th,
 .project_list > header,
 [id=fork_button]:hover,
 [id=settings_button]:hover,
+[id=profile_button]:hover,
 .fgradient{
     color: white;
     background: #426ead; /* Old browsers */
@@ -77,7 +78,8 @@ div.horizontal-menu li {
     height: 100%;
 }
 
-div.horizontal-menu a {
+div.horizontal-menu a,
+#profile_button a {
     color: #4D4D4D;
     display: block;
     font-size: 1.1em;
@@ -544,12 +546,13 @@ a.user_settings {
     float: right;
 }
 
-#fork_button, #settings_button {
+#fork_button, #settings_button, #profile_button {
     border-radius: 10px;
 }
 
 #fork_button a,
-#settings_button a {
+#settings_button a,
+#profile_button a {
     background-position: 8px 50%;
     background-repeat: no-repeat;
     margin-top: .2em;
@@ -565,8 +568,13 @@ a.user_settings {
     background-image: url(images/settings_button.png);
 }
 
+#profile_button a {
+    background-image: url(images/profile_button.png);
+}
+
 #fork_button:hover a,
-#settings_button:hover a {
+#settings_button:hover a,
+#profile_button:hover a {
     color: white;
 }
 
@@ -576,4 +584,12 @@ a.user_settings {
 
 #settings_button:hover a {
     background-image: url(images/settings_button_hover.png);
+}
+
+#profile_button:hover a {
+    background-image: url(images/profile_button_hover.png);
+}
+
+#profile_button {
+    display: inline-block;
 }
