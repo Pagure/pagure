@@ -65,19 +65,21 @@
 
 {% macro repos_switch(all = True) %}
     <aside class="show_parts">
-        <strong>My repos:</strong>
+        <strong>
+            {% if all %}My repos:{% else %}Repos:{% endif %}
+        </strong>
         <div class="switch oneline">
-            <input type="radio" class="switch-input" name="myrepos" value="on" id="myreposon" checked="checked">
+            <input type="radio" class="switch-input" name="{% if all %}my{% endif %}repos" value="on" id="myreposon" checked="checked">
             <label for="myreposon" class="switch-label switch-label-off">Show</label>
-            <input type="radio" class="switch-input" name="myrepos" value="off" id="myreposoff">
+            <input type="radio" class="switch-input" name="{% if all %}my{% endif %}repos" value="off" id="myreposoff">
             <label for="myreposoff" class="switch-label switch-label-on">Hide</label>
             <span class="switch-selection"></span>
         </div>
         <strong>Forks:</strong>
         <div class="switch oneline">
-            <input type="radio" class="switch-input" name="myforks" value="on" id="forkson" checked="checked">
+            <input type="radio" class="switch-input" name="{% if all %}my{% endif %}forks" value="on" id="forkson" checked="checked">
             <label for="forkson" class="switch-label switch-label-off">Show</label>
-            <input type="radio" class="switch-input" name="myforks" value="off" id="forksoff">
+            <input type="radio" class="switch-input" name="{% if all %}my{% endif %}forks" value="off" id="forksoff">
             <label for="forksoff" class="switch-label switch-label-on">Hide</label>
             <span class="switch-selection"></span>
         </div>
