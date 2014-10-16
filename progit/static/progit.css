@@ -45,6 +45,8 @@ textarea {
 table.list thead th,
 .user_list a:hover,
 .project_list > header,
+[id=fork_button]:hover,
+[id=settings_button]:hover,
 .fgradient{
     color: white;
     background: #426ead; /* Old browsers */
@@ -57,7 +59,6 @@ table.list thead th,
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#426ead', endColorstr='#1e4a88',GradientType=0 ); /* IE6-9 */
 }
 
-
 div.horizontal-menu {
     background-color: #EDEDED;
     border-radius: 10px;
@@ -68,11 +69,12 @@ div.horizontal-menu ul {
     float: left;
     margin: 0;
     padding: 0;
+    height: 100%;
 }
 
 div.horizontal-menu li {
-    display: inline;
-    float: left;
+    display: inline-block;
+    height: 100%;
 }
 
 div.horizontal-menu a {
@@ -80,7 +82,7 @@ div.horizontal-menu a {
     display: block;
     font-size: 1.1em;
     font-weight: bold;
-    padding: 0.61em;
+    padding: .61em .61em .9em;
 }
 
 div.horizontal-menu li.selected a, div.horizontal-menu li.hovered a {
@@ -541,3 +543,36 @@ a.user_settings {
     float: right;
 }
 
+#fork_button, #settings_button {
+    border-radius: 10px;
+}
+
+#fork_button a,
+#settings_button a {
+    background-position: 8px 50%;
+    background-repeat: no-repeat;
+    margin-top: .2em;
+    padding-left: 30px;
+    padding-bottom: .61em;
+}
+
+#fork_button a {
+    background-image: url(images/fork_button.png);
+}
+
+#settings_button a {
+    background-image: url(images/settings_button.png);
+}
+
+#fork_button:hover a,
+#settings_button:hover a {
+    color: white;
+}
+
+#fork_button:hover a {
+    background-image: url(images/fork_button_hover.png);
+}
+
+#settings_button:hover a {
+    background-image: url(images/settings_button_hover.png);
+}

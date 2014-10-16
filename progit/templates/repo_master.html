@@ -78,14 +78,14 @@
     </ul>
     <ul class="right">
       {% if g.fas_user and g.fas_user.username != repo.user.user %}
-      <li {% if select == '' %}class="selected" {% endif %}>
+      <li id="fork_button" {% if select == '' %}class="selected" {% endif %}>
         <a href="{{ url_for(
             'fork_project', repo=repo.name, username=username) }}">
         Fork</a>
       </li>
       {% endif %}
       {% if g.fas_user and g.fas_user.username == repo.user.user %}
-      <li {% if select == 'settings' %}class="selected" {% endif %}>
+      <li id="settings_button" {% if select == 'settings' %}class="selected" {% endif %}>
         <a href="{{ url_for(
             'view_settings', repo=repo.name, username=username) }}">
           Settings</a>
