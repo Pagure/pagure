@@ -12,20 +12,22 @@
         </a>
         {% if branchname %} ({{ branchname }}) {% endif %}
     </h2>
-    {{ repo.description | rst2html }}
-</header>
+    {% if repo.description %}{{ repo.description | rst2html }}{% else %}-{% endif %}
 
-{% if repo.is_fork %}
-<section id="parent">
-  Forked from
-  {% if repo.parent.is_fork %}
-  <a href="{{ url_for('view_repo', repo=repo.parent.name, username=repo.parent.user.user)}}">
-  {% else %}
-  <a href="{{ url_for('view_repo', repo=repo.parent.name)}}">
-  {% endif %}
-    {{ repo.parent.fullname }}</a>
-</section>
-{% endif %}
+    {% if repo.is_fork %}
+    <aside id="parent">
+        Forked from
+        {% if repo.parent.is_fork %}
+        <a href="{{ url_for('view_repo', repo=repo.parent.name, username=repo.parent.user.user)}}">
+        {% else %}
+        <a href="{{ url_for('view_repo', repo=repo.parent.name)}}">
+        {% endif %}
+            {{ repo.parent.fullname }}
+        </a>
+    </aside>
+    {% endif %}
+
+</header>
 
   <div class="horizontal-menu">
     <ul>

@@ -536,3 +536,8 @@ a.user_settings {
     background: url(images/edit.png) top left no-repeat;
     vertical-align: middle;
 }
+
+[id=parent] {
+    float: right;
+}
+
