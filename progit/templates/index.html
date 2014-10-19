@@ -21,10 +21,10 @@
             {% endif %}
         </h2>
         {{ repos_switch() }}
-        {{ render_repos(user_repos, total_page_repos, repopage, 'My Projects', user_repos_length, 'myrepos') }}
-        {{ render_repos(user_forks, total_page_forks, forkpage, 'My Forks', user_forks_length, 'myforks') }}
+        {{ render_repos(user_repos, total_page_repos, repopage, 'My Projects', user_repos_length, 'myrepos', username) }}
+        {{ render_repos(user_forks, total_page_forks, forkpage, 'My Forks', user_forks_length, 'myforks', username) }}
     {% endif %}
-    {{ render_repos(repos, total_page, page, 'All Projects', repos_length, 'repos') }}
+    {{ render_repos(repos, total_page, page, 'All Projects', repos_length, 'repos', username) }}
 {% endblock %}
 
 {% block jscripts %}

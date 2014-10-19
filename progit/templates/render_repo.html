@@ -24,10 +24,11 @@
 {%- endmacro %}
 
 
-{% macro render_repos(list, total, page, title, count, id) %}
+{% macro render_repos(list, total, page, title, count, id, username=None) %}
 <section class="project_list" id="{{ id }}">
         <header>
-            <h{% if username %}3{% else %}2{% endif %}>{{ title }} ({{ count }})</h{% if username %}3{% else %}2{% endif %}>
+            {% set title_lvl = 3 if username else 2 %}
+            <h{{ title_lvl }}>{{ title }} ({{ count }})</h{{ title_lvl }}>
         </header>
         {% if total and total > 1 %}
         <aside>
