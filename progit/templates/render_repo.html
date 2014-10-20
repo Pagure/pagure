@@ -3,8 +3,13 @@
         {% if loop.index == 1 %}
     <div class="project_row">
         {% endif %}
+        {% if repo.is_fork %}
+        {% set url = url_for('view_repo', username=repo.user.username, repo=repo.name) %}
+        {% else %}
+        {% set url = url_for('view_repo', repo=repo.name) %}
+        {% endif %}
         <a class="project_link logo_link"
-            href="{% if repo.is_fork %}{{ url_for('view_repo', username=repo.user.username, repo=repo.name)}}{% else %}{{ url_for('view_repo', repo=repo.name) }}{% endif %}"
+            href="{{ url }}"
             style="background-image: url({{ url_for('static', filename='placebo.png') }})">
             {# TODO: get project logo #}
             <span class="repo_name">{{ repo.name }}</span>
