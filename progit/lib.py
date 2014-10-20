@@ -154,6 +154,8 @@ def get_all_users(session):
     ''' Return the user corresponding to this username, or None. '''
     users = session.query(
         model.User
+    ).order_by(
+        model.User.user
     ).all()
     return users
 
