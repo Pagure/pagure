@@ -560,6 +560,16 @@ a.user_settings {
     float: right;
 }
 
+header.repo {
+    background: url(images/git.png) 0 50% no-repeat;
+    padding-left: 40px;
+}
+
+
+header.repo.forked {
+    background-image: url(images/forked.png);
+}
+
 #fork_button, #settings_button, #profile_button {
     border-radius: 10px;
 }
