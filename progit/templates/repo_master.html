@@ -12,7 +12,8 @@
         </a>
         {% if branchname %} ({{ branchname }}) {% endif %}
     </h2>
-    {% if repo.description %}{{ repo.description | rst2html }}{% else %}-{% endif %}
+    {% if repo.description %}{% autoescape false %}
+    {{ repo.description | markdown }}{% endautoescape %}{% else %}-{% endif %}
 
     {% if repo.is_fork %}
     <aside id="parent">
