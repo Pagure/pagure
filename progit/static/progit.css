@@ -570,6 +570,11 @@ header.repo.forked {
     background-image: url(images/forked.png);
 }
 
+
+header.repo.forked > p {
+    display: inline-block;
+}
+
 #fork_button, #settings_button, #profile_button {
     border-radius: 10px;
 }
