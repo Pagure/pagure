@@ -35,6 +35,9 @@ import progit.doc_utils
 import progit.login_forms
 import markdown
 
+from pygments import highlight
+from pygments.lexers.text import DiffLexer
+from pygments.formatters import HtmlFormatter
 
 # Create the application.
 APP = flask.Flask(__name__)
@@ -367,6 +370,30 @@ def markdown_filter(text):
         return markdown.markdown(text)
 
     return ''
+
+
+@APP.template_filter('html_diff')
+def html_diff(diff):
+    """Display diff as HTML"""
+    return highlight(
+        diff,
+        DiffLexer(),
+        HtmlFormatter(
+            noclasses=True,
+            style="tango",)
+    )
+
+
+@APP.template_filter('patch_to_diff')
+def patch_to_diff(patch):
+    """Render a hunk as a diff"""
+    content = ""
+    for hunk in patch.hunks:
+        content = content + "@@ -%i,%i +%i,%i @@\n" % (hunk.old_start,
+            hunk.old_lines, hunk.new_start, hunk.new_lines)
+        for line in hunk.lines:
+            content = content + ' '.join(line)
+    return content
 
 
 @FAS.postlogin

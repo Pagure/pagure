@@ -14,6 +14,10 @@ textarea {
     background: rgba(255, 255, 255, 0.5);
 }
 
+td, th {
+    padding: .1em .2em;
+}
+
 .message {
     color: green;
 }
@@ -435,7 +439,8 @@ table.list .open_by {
 
 .issue_comment > header,
 .issue_comment > form > header,
-.file_content > header
+.file_content > header,
+.commit_diff > header
 {
     border-radius: 10px 10px 0 0;
     padding: .5em;
@@ -482,17 +487,22 @@ table.list .open_by {
     padding: .5em;
 }
 
+.header .buttons,
 header .buttons {
+    display: inline-block;
+    float: right;
     list-style-type: none;
     text-align: right;
     margin: 0;
 }
 
+.header .buttons li,
 header .buttons li {
     display: inline-block;
     padding-left: .5em;
 }
 
+.header .button,
 header .button {
     display: inline-block;
     color: white;
@@ -509,16 +519,20 @@ header .button {
     box-shadow: inset 0 1px rgba(255, 255, 255, 0.5), 0 0 2px rgba(0, 0, 0, 0.2);
 }
 
+.header .button:hover,
 header .button:hover {
     background-image: linear-gradient(to bottom, #34609f, #0066cc);
 }
 
+.header a.button:visited,
+.header a.button:hover,
 header a.button:visited,
 header a.button:hover {
     color: white;
 }
 
-.file_content {
+.file_content,
+.commit_diff {
     border: 1px solid rgba(237, 237, 237, 0.4);
     border-radius: 10px 10px 0 0;
 }
@@ -544,6 +558,21 @@ a.user_settings {
 
 [id=parent] {
     float: right;
+}
+
+header.repo {
+    background: url(images/git.png) 0 50% no-repeat;
+    padding-left: 40px;
+}
+
+
+header.repo.forked {
+    background-image: url(images/forked.png);
+}
+
+
+header.repo.forked > p {
+    display: inline-block;
 }
 
 #fork_button, #settings_button, #profile_button {
@@ -592,4 +621,43 @@ a.user_settings {
 
 #profile_button {
     display: inline-block;
+}
+
+.header > h3,
+.commit_diff > header h3 {
+    display: inline-block;
+    margin: .4em 0 0;
+}
+
+.commit_message_body {
+    display: block;
+    font-weight: normal;
+    font-size: .9em;
+}
+
+.commit_diff {
+    margin-top: 2em;
+}
+
+.addrem_bar {
+    display: inline-block;
+    width: 100px;
+    padding: 0!important;
+    text-align: left;
+    background-color: #ffdddd;
+}
+
+.addrem_bar > span {
+    display: block;
+    background-color: #dbffdb;
+}
+
+ul.changes {
+    margin: 0;
+    list-style-type: none;
+    padding: 0;
+}
+
+.header {
+    padding: .5em 0;
 }

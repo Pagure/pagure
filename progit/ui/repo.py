@@ -361,10 +361,12 @@ def view_file(repo, identifier, filename, username=None):
     )
 
 
+@APP.route('/<repo>/raw/<identifier>', defaults={'filename': None})
 @APP.route('/<repo>/raw/<identifier>/<path:filename>')
+@APP.route('/fork/<username>/<repo>/raw/<identifier>', defaults={'filename': None})
 @APP.route('/fork/<username>/<repo>/raw/<identifier>/<path:filename>')
-def view_raw_file(repo, identifier, filename, username=None):
-    """ Displays the raw content of a file for the specified repo.
+def view_raw_file(repo, identifier, filename=None, username=None):
+    """ Displays the raw content of a file of a commit for the specified repo.
     """
     repo = progit.lib.get_project(SESSION, repo, user=username)
 
@@ -386,12 +388,25 @@ def view_raw_file(repo, identifier, filename, username=None):
             # If it's not a commit id then it's part of the filename
             commit = repo_obj[repo_obj.head.target]
 
-    content = __get_file_in_tree(repo_obj, commit.tree, filename.split('/'))
-    if not content:
-        flask.abort(404, 'File not found')
+    mimetype = None
+    encoding = None
+    if filename:
+        content = __get_file_in_tree(repo_obj, commit.tree, filename.split('/'))
+        if not content:
+            flask.abort(404, 'File not found')
 
-    mimetype, encoding = mimetypes.guess_type(filename)
-    data = repo_obj[content.oid].data
+        mimetype, encoding = mimetypes.guess_type(filename)
+        data = repo_obj[content.oid].data
+    else:
+        if commit.parents:
+            diff = commit.tree.diff_to_tree()
+
+            parent = repo_obj.revparse_single('%s^' % identifier)
+            diff = repo_obj.diff(parent, commit)
+        else:
+            # First commit in the repo
+            diff = commit.tree.diff_to_tree(swap=True)
+        data = diff.patch
 
     if not mimetype and data[:2] == '#!':
         mimetype = 'text/plain'
@@ -441,14 +456,6 @@ def view_commit(repo, commitid, username=None):
         # First commit in the repo
         diff = commit.tree.diff_to_tree(swap=True)
 
-    html_diff = highlight(
-        diff.patch,
-        DiffLexer(),
-        HtmlFormatter(
-            noclasses=True,
-            style="tango",)
-    )
-
     return flask.render_template(
         'commit.html',
         select='logs',
@@ -457,7 +464,6 @@ def view_commit(repo, commitid, username=None):
         commitid=commitid,
         commit=commit,
         diff=diff,
-        html_diff=html_diff,
     )
 
 

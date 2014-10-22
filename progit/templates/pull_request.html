@@ -19,23 +19,35 @@
 </h2>
 
 {% if pull_request %}
-<h3>Title: {{ pull_request.title }}</h3>
+<div class="header">
+    <h3>Title: {{ pull_request.title }}</h3>
+    <ul class="buttons">
   {% if pull_request.status and repo_admin %}
-  <div class="pr_actions">
+      <li>
     <form action="{{ url_for('merge_request_pull', username=username,
         repo=repo.name, requestid=requestid) }}" method="POST">
         {{ mergeform.csrf_token }}
-        <input type="submit" value="Merge"/>
+        <input class="button" type="submit" value="Merge"/>
     </form>
+    </li>
+    <li>
     <form action="{{ url_for('cancel_request_pull', username=username,
         repo=repo.name, requestid=requestid) }}" method="POST">
         {{ mergeform.csrf_token }}
-        <input type="submit" value="Cancel" id="cancel_pr"/>
+        <input type="submit" value="Cancel" id="cancel_pr" class="button"/>
     </form>
-  </div>
+    </li>
   {% elif pull_request and pull_request.status == False %}
+    <li>
   <span class="error">Merged</span>
+    </li>
   {% endif %}
+        <li>
+            <a class="button patch" href="{{ url_for('request_pull_patch', username=username,
+                repo=repo.name, requestid=requestid) }}">Patch</a>
+        </li>
+    </ul>
+</div>
 {% endif %}
 
 <section class="commit_list">
@@ -49,6 +61,7 @@
       <a href="{{ url_for('view_commit', username=username,
                   repo=repo.name, commitid=commit.oid.hex)}}">
     {% endif %}
+        <span class="commitid">{{ commit.oid.hex|short }}</span>
         {{ commit.message.split('\n')[0] }}
       </a>
     </li>
@@ -86,47 +99,105 @@
 {% endif %}
 
 <section class="request_diff">
-  <h3>Diff:</h3>
-  {% for html_diff in html_diffs %}
-    <h3>Commit: {{ diff_commits[loop.index - 1].oid.hex }}</h3>
+  {% for commit in diff_commits %}
+    {% set splitted_message = commit.message.split('\n') %}
+    {% set diff = diffs[loop.index - 1] %}
+    {% set commitid = commit.oid.hex %}
 
-    <table>
-      <tr>
-        <td>Author</td>
-        <td>
-          {{ diff_commits[loop.index - 1].author.name }}
-          {{ '<' + diff_commits[loop.index - 1].author.email + '>' }}
-          - {{ diff_commits[loop.index - 1].commit_time | format_ts }}
-        </td>
-      </tr>
-      <tr>
-        <td>Committer</td>
-        <td>
-          {{ diff_commits[loop.index - 1].committer.name }}
-          {{ '<' + diff_commits[loop.index - 1].committer.email + '>' }}
-          - {{ diff_commits[loop.index - 1].commit_time | format_ts }}
-        </td>
-      </tr>
-      <tr>
-        <td>Parent</td>
-        <td>
-          {% for parent in diff_commits[loop.index - 1].parents %}
-            <a href="{{ url_for('view_commit', username=username,
-                      repo=repo.name, commitid=parent.oid.hex) }}">
+<div class="header">
+<h3>
+    {{ splitted_message[0] }}
+    (<span class="commitid" title="{{ commitid }}">commit: {{ commitid|short }}
+    </span> - <a href="{{ url_for('view_tree', username=username,
+        repo=repo.name, identifier=commitid) }}">tree</a>)
+    {% if splitted_message|length > 1 %}
+    <span class="commit_message_body">
+        {% for message in splitted_message %}
+            {% if loop.index > 1 %}
+                {{ message }}
+            {% endif %}
+        {% endfor %}
+    </span>
+    {% endif %}
+</h3>
 
-            {{ parent.oid.hex }}
-          </a> <br />
-          {% endfor %}
-        </td>
-      </tr>
-    </table>
-    <p>
-    {{ diff_commits[loop.index - 1].message }}
-    </p>
-    {% autoescape false %}
-        {{ html_diff | format_loc(diff_commits[loop.index - 1], pull_request,
-            index=loop.index) }}
-    {% endautoescape %}
+</div>
+<table>
+  <tr>
+    <th>Author</th>
+    <td>
+      {{ commit.author.name }} {{ '<' + commit.author.email + '>' }}
+      - {{ commit.commit_time | format_ts}}
+    </td>
+  </tr>
+  <tr>
+    <th>Committer</th>
+    <td>
+      {{ commit.committer.name }} {{ '<' + commit.committer.email + '>' }}
+      - {{ commit.commit_time | format_ts }}
+    </td>
+  </tr>
+  <tr>
+    <th>Parent</th>
+    <td>
+      {% for parent in commit.parents %}
+        <a href="{{ url_for('view_commit', username=username,
+                  repo=repo.name, commitid=parent.oid.hex) }}">
+          {{ parent.oid.hex }}
+        </a> <br />
+      {% endfor %}
+    </td>
+  </tr>
+  <tr>
+      <th>Changes</th>
+      <td>
+        <ul class="changes">
+        {% for patch in diff %}
+          <li>
+            <span class="addrem_bar">
+              <span style="width: {{ (100.0 * patch.additions / (patch.additions + patch.deletions))|round|int }}%">
+                    {% if patch.additions > 0 %}+{{ patch.additions }}{% endif %}
+                    {% if patch.deletions > 0 %}-{{ patch.deletions }}{% endif %}
+              </span>
+            </span>
+            {{ patch.new_file_path }}
+          </li>
+        {% endfor %}
+        </ul>
+      </td>
+  </tr>
+</table>
+
+{% for patch in diff %}
+<section class="commit_diff">
+    <header>
+        <h3>{{  patch.new_file_path }}</h3>
+        <ul class="buttons">
+            <li class="addrem_bar">
+            <span style="width: {{ (100.0 * patch.additions / (patch.additions + patch.deletions))|round|int }}%">
+                    {% if patch.additions > 0 %}+{{ patch.additions }}{% endif %}
+                    {% if patch.deletions > 0 %}-{{ patch.deletions }}{% endif %}
+                </span>
+            </li>
+            <li>
+                <a class="button view" href="{{ url_for('view_file', username=username,
+                    repo=repo.name, identifier=commitid,
+                    filename=patch.new_file_path) }}" title="View file as of {{ commitid|short }}">View</a>
+            </li>
+        </ul>
+    </header>
+
+    {% if patch.is_binary %}
+        <p class="noresult">Binary diffs cannot be rendered.</p>
+    {% else %}
+        {% autoescape false %}
+        {{ patch|patch_to_diff|html_diff|format_loc(diff_commits[loop.index - 1], pull_request,
+            index=loop.index)}}
+        {% endautoescape %}
+    {% endif %}
+</section>
+
+{% endfor %}
   {% endfor %}
 </section>
 
