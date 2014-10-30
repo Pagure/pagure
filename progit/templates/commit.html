@@ -66,10 +66,12 @@
         {% for patch in diff %}
           <li>
             <span class="addrem_bar">
+              {% if not patch.is_binary %}
               <span style="width: {{ (100.0 * patch.additions / (patch.additions + patch.deletions))|round|int }}%">
                     {% if patch.additions > 0 %}+{{ patch.additions }}{% endif %}
                     {% if patch.deletions > 0 %}-{{ patch.deletions }}{% endif %}
               </span>
+              {% endif %}
             </span>
             {{ patch.new_file_path }}
           </li>
@@ -85,10 +87,12 @@
         <h3>{{  patch.new_file_path }}</h3>
         <ul class="buttons">
             <li class="addrem_bar">
+            {% if not patch.is_binary %}
             <span style="width: {{ (100.0 * patch.additions / (patch.additions + patch.deletions))|round|int }}%">
                     {% if patch.additions > 0 %}+{{ patch.additions }}{% endif %}
                     {% if patch.deletions > 0 %}-{{ patch.deletions }}{% endif %}
                 </span>
+            {% endif %}
             </li>
             <li>
                 <a class="button view" href="{{ url_for('view_file', username=username,
