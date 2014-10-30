@@ -447,6 +447,9 @@ def view_commit(repo, commitid, username=None):
     except ValueError:
         flask.abort(404, 'Commit not found')
 
+    if commit is None:
+        flask.abort(404, 'Commit not found')
+
     if commit.parents:
         diff = commit.tree.diff_to_tree()
 
