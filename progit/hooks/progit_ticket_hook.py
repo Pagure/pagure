@@ -76,7 +76,7 @@ class ProgitTicketHook(BaseHook):
 
         # Install the hook itself
         shutil.copyfile(
-            os.path.join(hook_files, 'progit_tickets_hook.py'),
+            os.path.join(hook_files, 'progit_hook_tickets.py'),
             os.path.join(repopath, 'hooks', 'post-receive.progit')
         )
         os.chmod(
