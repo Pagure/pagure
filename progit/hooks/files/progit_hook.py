@@ -108,6 +108,7 @@ def relates_commit(commitid, issueid, project=None):
     username = get_username()
     print 'username:', username
 
+    repo = progit.lib.get_project(progit.SESSION, repo, user=username)
     issue = progit.lib.get_issue(progit.SESSION, repo.id, issueid)
 
     if issue is None or issue.project.name != repo:
