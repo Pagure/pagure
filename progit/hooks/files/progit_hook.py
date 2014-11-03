@@ -114,7 +114,7 @@ def relates_commit(commitid, issueid, project=None):
     if issue is None or issue.project != repo:
         return
 
-    comment = ''' Commit `%s <../%s>`_ relates to this ticket''' % (
+    comment = ''' Commit [%s](../%s) relates to this ticket''' % (
         commitid[:8], commitid[:8])
 
     try:
@@ -140,7 +140,7 @@ def fixes_commit(commitid, issueid, project=None):
     if issue is None or issue.project != repo:
         return
 
-    comment = ''' Commit `%s <../%s>`_ fixes this ticket''' % (
+    comment = ''' Commit [%s](../%s) fixes this ticket''' % (
         commitid[:8], commitid[:8])
 
     try:
