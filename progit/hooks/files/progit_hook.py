@@ -86,7 +86,7 @@ def generate_revision_change_log(new_commits_list):
             if motif.match(line):
                 print 'fixes', motif.match(line).groups()
                 project = None
-                if len(motif.match(line).groups()) > 2:
+                if len(motif.match(line).groups()) >= 2:
                     project = motif.match(line).group(2)
                 fixes_commit(
                     commitid, motif.match(line).group(1), project
@@ -95,7 +95,7 @@ def generate_revision_change_log(new_commits_list):
             if motif.match(line):
                 print 'relates to', motif.match(line).groups()
                 project = None
-                if len(motif.match(line).groups()) > 2:
+                if len(motif.match(line).groups()) >= 2:
                     project = motif.match(line).group(2)
                 relates_commit(
                     commitid, motif.match(line).group(1), project
