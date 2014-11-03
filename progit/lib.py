@@ -365,7 +365,10 @@ def new_pull_request(
     session.add(global_id)
     session.flush()
 
-    progit.notify.notify_new_pull_request(request)
+    globalid = get_pull_request_global_id(
+        session, request.project.id, request.id)
+
+    progit.notify.notify_new_pull_request(request, globalid)
 
     return 'Request created'
 

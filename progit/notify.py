@@ -127,7 +127,7 @@ New issue:
     )
 
 
-def notify_new_pull_request(request):
+def notify_new_pull_request(request, globalid):
     ''' Notify the people following a project that a new pull-request was
     added to it.
     '''
@@ -148,7 +148,7 @@ New pull-request:
     '%s/%s/request-pull/%s' % (
         progit.APP.config['APP_URL'],
         request.repo.name,
-        request.id,
+        globalid,
     ),
     )
     mail_to = set([cmt.user.emails[0].email for cmt in request.comments])
