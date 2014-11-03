@@ -182,7 +182,9 @@ def add_issue_comment(session, issue, comment, user, ticketfolder):
 
     update_git_ticket(issue, repo=issue.project, ticketfolder=ticketfolder)
 
-    progit.notify.notify_new_comment(issue_comment)
+    globalid = get_issue_global_id(session, issue.project.id, issue.id)
+
+    progit.notify.notify_new_comment(issue_comment, globalid)
 
     return 'Comment added'
 

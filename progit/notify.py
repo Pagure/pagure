@@ -56,7 +56,7 @@ def send_email(text, subject, to_mail, from_mail=None, mail_id=None,
     return msg
 
 
-def notify_new_comment(comment):
+def notify_new_comment(comment, globalib):
     ''' Notify the people following an issue that a new comment was added
     to the issue.
     '''
@@ -76,7 +76,7 @@ New comment:
     '%s/%s/issue/%s' % (
         progit.APP.config['APP_URL'],
         comment.issue.project.name,
-        comment.issue.id,
+        globalib,
     ),
     )
     mail_to = set([cmt.user.emails[0].email for cmt in comment.issue.comments])
