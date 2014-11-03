@@ -105,6 +105,8 @@ def generate_revision_change_log(new_commits_list):
 def relates_commit(commitid, issueid, project=None):
     ''' Add a comment to an issue that this commit relates to it. '''
     repo = project or get_repo_name()
+    username = get_username()
+    print 'username:', username
 
     issue = progit.lib.get_issue(progit.SESSION, repo.id, issueid)
 
@@ -177,6 +179,16 @@ def get_repo_name():
     '''
     repo = os.path.basename(os.getcwd()).split('.git')[0]
     return repo
+
+
+def get_username():
+    ''' Return the username of the git repo based on its path.
+    '''
+    username = None
+    repo = os.path.abspath(os.path.join(os.getcwd(), '..'))
+    if progit.APP.config['FORK_FOLDER'] in repo:
+        username = repo.split(progit.APP.config['FORK_FOLDER'])[1]
+    return username
 
 
 def get_pusher(commit):
