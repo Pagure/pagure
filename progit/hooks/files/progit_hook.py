@@ -106,7 +106,6 @@ def relates_commit(commitid, issueid, project=None):
     ''' Add a comment to an issue that this commit relates to it. '''
     repo = project or get_repo_name()
     username = get_username()
-    print 'username:', username
 
     repo = progit.lib.get_project(progit.SESSION, repo, user=username)
     issue = progit.lib.get_issue(progit.SESSION, repo.id, issueid)
@@ -133,9 +132,11 @@ def relates_commit(commitid, issueid, project=None):
 def fixes_commit(commitid, issueid, project=None):
     ''' Add a comment to an issue that this commit fixes it and update
     the status if the commit is in the master branch. '''
-    issue = progit.lib.get_issue(progit.SESSION, issueid)
-
     repo = project or get_repo_name()
+    username = get_username()
+
+    repo = progit.lib.get_project(progit.SESSION, repo, user=username)
+    issue = progit.lib.get_issue(progit.SESSION, repo.id, issueid)
 
     if issue is None or issue.project != repo:
         return
