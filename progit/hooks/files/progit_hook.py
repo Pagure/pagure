@@ -75,6 +75,8 @@ def generate_revision_change_log(new_commits_list):
         if line.startswith('commit'):
             commitid = line.split('commit ')[-1]
 
+        line = line.strip()
+
         print '*', line
         for motif in FIXES:
             if motif.match(line):
