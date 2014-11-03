@@ -712,6 +712,32 @@ def get_pull_request(
     return query.first()
 
 
+def get_pull_request_global_id(session, projectid, requestid):
+    ''' Retrieve the global identifier of a specific request based on its
+    identifier.
+    '''
+    subquery = session.query(
+        model.GlobalId,
+        sqlalchemy.over(
+            sqlalchemy.func.row_number(),
+            partition_by=model.GlobalId.project_id,
+            order_by=model.GlobalId.id
+        ).label('global_id')
+    ).subquery()
+
+    query = session.query(
+        subquery.c.global_id
+    ).filter(
+        subquery.c.project_id == projectid
+    ).filter(
+        subquery.c.request_id == requestid
+    )
+
+    data = query.first()
+
+    return data[0]
+
+
 def close_pull_request(session, request, user, merged=True):
     ''' Close the provided pull-request.
     '''
