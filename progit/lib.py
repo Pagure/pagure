@@ -326,7 +326,9 @@ def new_issue(session, repo, title, content, user, ticketfolder):
 
     update_git_ticket(issue, repo=repo, ticketfolder=ticketfolder)
 
-    progit.notify.notify_new_issue(issue)
+    globalid = get_issue_global_id(session, issue.project.id, issue.id)
+
+    progit.notify.notify_new_issue(issue, globalid)
 
     return 'Issue created'
 

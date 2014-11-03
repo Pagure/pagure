@@ -89,7 +89,7 @@ New comment:
     )
 
 
-def notify_new_issue(issue):
+def notify_new_issue(issue, globalib):
     ''' Notify the people following a project that a new issue was added
     to it.
     '''
@@ -110,7 +110,7 @@ New issue:
     '%s/%s/issue/%s' % (
         progit.APP.config['APP_URL'],
         issue.project.name,
-        issue.id,
+        globalib,
     ),
     )
     mail_to = set([cmt.user.emails[0].email for cmt in issue.comments])
