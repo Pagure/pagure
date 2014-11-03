@@ -165,7 +165,11 @@ def fixes_commit(commitid, issueid, project=None):
 
     if 'master' in branches:
         try:
-            progit.lib.edit_issue(progit.SESSION, issue, status='Fixed')
+            progit.lib.edit_issue(
+                progit.SESSION,
+                issue,
+                ticketfolder=progit.APP.config['TICKETS_FOLDER'],
+                status='Fixed')
             progit.SESSION.commit()
         except progit.exceptions.ProgitException as err:
             print err
