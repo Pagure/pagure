@@ -17,6 +17,10 @@ if 'PROGIT_CONFIG' not in os.environ \
     os.environ['PROGIT_CONFIG'] = '/etc/progit/progit.cfg'
 
 
+import progit
+import progit.exceptions
+
+
 FIXES = [
     re.compile('fixe?[sd]?:?\s?#(\d+)', re.I),
     re.compile('.*\s+fixe?[sd]?:?\s?#(\d+)', re.I),
@@ -100,9 +104,6 @@ def generate_revision_change_log(new_commits_list):
 
 def relates_commit(commitid, issueid, project=None):
     ''' Add a comment to an issue that this commit relates to it. '''
-    import progit
-    import progit.exceptions
-
     repo = project or get_repo_name()
 
     issue = progit.lib.get_issue(progit.SESSION, repo.id, issueid)
@@ -128,9 +129,6 @@ def relates_commit(commitid, issueid, project=None):
 def fixes_commit(commitid, issueid, project=None):
     ''' Add a comment to an issue that this commit fixes it and update
     the status if the commit is in the master branch. '''
-    import progit
-    import progit.exceptions
-
     issue = progit.lib.get_issue(progit.SESSION, issueid)
 
     repo = project or get_repo_name()
