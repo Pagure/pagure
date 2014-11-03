@@ -569,6 +569,32 @@ def get_issues(session, repo, status=None, closed=False):
     return query.all()
 
 
+def get_issue_global_id(session, projectid, issueid):
+    ''' Retrieve the global identifier of a specific issue based on its
+    identifier.
+    '''
+    subquery = session.query(
+        model.GlobalId,
+        sqlalchemy.over(
+            sqlalchemy.func.row_number(),
+            partition_by=model.GlobalId.project_id,
+            order_by=model.GlobalId.id
+        ).label('global_id')
+    ).subquery()
+
+    query = session.query(
+        subquery.c.global_id
+    ).filter(
+        subquery.c.project_id == projectid
+    ).filter(
+        subquery.c.issue_id == issueid
+    )
+
+    data = query.first()
+
+    return data[0]
+
+
 def get_issue(session, projectid, issueid):
     ''' Retrieve the specified issue
     '''
