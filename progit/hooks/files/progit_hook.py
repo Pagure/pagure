@@ -123,6 +123,7 @@ def relates_commit(commitid, issueid, project=None):
             issue=issue,
             comment=comment,
             user=get_pusher(commitid),
+            ticketfolder=progit.APP.config['TICKETS_FOLDER'],
         )
         progit.SESSION.commit()
     except progit.exceptions.ProgitException as err:
@@ -148,6 +149,7 @@ def fixes_commit(commitid, issueid, project=None):
             issue=issue,
             comment=comment,
             user=get_pusher(commitid),
+            ticketfolder=progit.APP.config['TICKETS_FOLDER'],
         )
         progit.SESSION.commit()
     except progit.exceptions.ProgitException as err:
