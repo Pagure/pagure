@@ -35,6 +35,7 @@ RELATES = [
     re.compile('.*\s+relate[sd]?:?\s?https?://.*/(\w+)/issue/(\d+)', re.I),
 ]
 
+
 def read_git_output(args, input=None, keepends=False, **kw):
     """Read the output of a Git command."""
 
