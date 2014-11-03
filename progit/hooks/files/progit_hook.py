@@ -111,7 +111,7 @@ def relates_commit(commitid, issueid, project=None):
     repo = progit.lib.get_project(progit.SESSION, repo, user=username)
     issue = progit.lib.get_issue(progit.SESSION, repo.id, issueid)
 
-    if issue is None or issue.project.name != repo:
+    if issue is None or issue.project != repo:
         return
 
     comment = ''' Commit `%s <../%s>`_ relates to this ticket''' % (
@@ -136,7 +136,7 @@ def fixes_commit(commitid, issueid, project=None):
 
     repo = project or get_repo_name()
 
-    if issue is None or issue.project.name != repo:
+    if issue is None or issue.project != repo:
         return
 
     comment = ''' Commit `%s <../%s>`_ fixes this ticket''' % (
