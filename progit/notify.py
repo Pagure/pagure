@@ -165,7 +165,7 @@ New pull-request:
     )
 
 
-def notify_merge_pull_request(request, user):
+def notify_merge_pull_request(request, user, globalid):
     ''' Notify the people following a project that a pull-request was merged
     in it.
     '''
@@ -186,7 +186,7 @@ Merged pull-request:
     '%s/%s/request-pull/%s' % (
         progit.APP.config['APP_URL'],
         request.repo.name,
-        request.id,
+        globalid,
     ),
     )
     mail_to = set([cmt.user.emails[0].email for cmt in request.comments])
@@ -203,7 +203,7 @@ Merged pull-request:
     )
 
 
-def notify_cancelled_pull_request(request, user):
+def notify_cancelled_pull_request(request, user, globalid):
     ''' Notify the people following a project that a pull-request was
     cancelled in it.
     '''
@@ -224,7 +224,7 @@ Cancelled pull-request:
     '%s/%s/request-pull/%s' % (
         progit.APP.config['APP_URL'],
         request.repo.name,
-        request.id,
+        globalid,
     ),
     )
     mail_to = set([cmt.user.emails[0].email for cmt in request.comments])

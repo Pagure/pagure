@@ -748,10 +748,13 @@ def close_pull_request(session, request, user, merged=True):
     session.add(request)
     session.flush()
 
+    globalid = get_pull_request_global_id(
+        session, request.project.id, request.id)
+
     if merged == True:
-        progit.notify.notify_merge_pull_request(request, user)
+        progit.notify.notify_merge_pull_request(request, user, globalid)
     else:
-        progit.notify.notify_cancelled_pull_request(request, user)
+        progit.notify.notify_cancelled_pull_request(request, user, globalid)
 
 
 def get_issue_statuses(session):
