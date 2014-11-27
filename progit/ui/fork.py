@@ -58,8 +58,8 @@ def request_pulls(repo, username=None):
     )
 
 
-@APP.route('/<repo>/request-pull/<requestid>')
-@APP.route('/fork/<username>/<repo>/request-pull/<requestid>')
+@APP.route('/<repo>/request-pull/<int:requestid>')
+@APP.route('/fork/<username>/<repo>/request-pull/<int:requestid>')
 def request_pull(repo, requestid, username=None):
     """ Request pulling the changes from the fork into the project.
     """
@@ -158,8 +158,8 @@ def request_pull(repo, requestid, username=None):
         mergeform=form,
     )
 
-@APP.route('/<repo>/request-pull/<requestid>.patch')
-@APP.route('/fork/<username>/<repo>/request-pull/<requestid>.patch')
+@APP.route('/<repo>/request-pull/<int:requestid>.patch')
+@APP.route('/fork/<username>/<repo>/request-pull/<int:requestid>.patch')
 def request_pull_patch(repo, requestid, username=None):
     """ Returns the commits from the specified pull-request as patches.
     """
@@ -224,9 +224,9 @@ def request_pull_patch(repo, requestid, username=None):
     return flask.Response(patch, content_type="text/plain;charset=UTF-8")
 
 
-@APP.route('/<repo>/request-pull/<requestid>/comment/<commit>/<row>',
+@APP.route('/<repo>/request-pull/<int:requestid>/comment/<commit>/<row>',
            methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/request-pull/<requestid>/comment/'
+@APP.route('/fork/<username>/<repo>/request-pull/<int:requestid>/comment/'
            '<commit>/<row>', methods=('GET', 'POST'))
 def pull_request_add_comment(repo, requestid, commit, row, username=None):
     """ Add a comment to a commit in a pull-request.
@@ -283,8 +283,8 @@ def pull_request_add_comment(repo, requestid, commit, row, username=None):
 
 
 
-@APP.route('/<repo>/request-pull/merge/<requestid>', methods=['POST'])
-@APP.route('/fork/<username>/<repo>/request-pull/merge/<requestid>',
+@APP.route('/<repo>/request-pull/merge/<int:requestid>', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/request-pull/merge/<int:requestid>',
            methods=['POST'])
 def merge_request_pull(repo, requestid, username=None):
     """ Request pulling the changes from the fork into the project.
@@ -392,9 +392,9 @@ def merge_request_pull(repo, requestid, username=None):
     return flask.redirect(flask.url_for('view_repo', repo=repo.name))
 
 
-@APP.route('/<repo>/request-pull/cancel/<requestid>',
+@APP.route('/<repo>/request-pull/cancel/<int:requestid>',
         methods=['POST'])
-@APP.route('/fork/<username>/<repo>/request-pull/cancel/<requestid>',
+@APP.route('/fork/<username>/<repo>/request-pull/cancel/<int:requestid>',
         methods=['POST'])
 def cancel_request_pull(repo, requestid, username=None):
     """ Cancel request pulling request.
