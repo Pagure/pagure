@@ -330,7 +330,7 @@ def view_file(repo, identifier, filename, username=None):
                     Image.open(filename)
                     output_type = 'image'
                 except IOError as err:
-                    APP.log.debug(
+                    LOG.debug(
                         'Failed to load image %s, error: %s', filename, err
                     )
                     output_type = 'binary'
