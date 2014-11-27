@@ -1,7 +1,9 @@
 {% extends "repo_master.html" %}
 {% from "_formhelper.html" import render_field_in_row %}
 
-{% block title %}New issue - {{ repo.name }}{% endblock %}
+{% block title %}{% if not type or type == 'new'
+    %}New issue{% elif type and type == 'edit'
+    %}Edit issue #{{ issueid }} {% endif %} - {{ repo.name }}{% endblock %}
 {%block tag %}new_project{% endblock %}
 
 
