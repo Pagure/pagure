@@ -24,50 +24,31 @@
     <ul class="buttons">
   {% if pull_request.status and repo_admin %}
       <li>
-    <form action="{{ url_for('merge_request_pull', username=username,
-        repo=repo.name, requestid=requestid) }}" method="POST">
-        {{ mergeform.csrf_token }}
-        <input class="button" type="submit" value="Merge"/>
-    </form>
-    </li>
-    <li>
-    <form action="{{ url_for('cancel_request_pull', username=username,
-        repo=repo.name, requestid=requestid) }}" method="POST">
-        {{ mergeform.csrf_token }}
-        <input type="submit" value="Cancel" id="cancel_pr" class="button"/>
-    </form>
-    </li>
+        <form action="{{ url_for('merge_request_pull', username=username,
+            repo=repo.name, requestid=requestid) }}" method="POST">
+          {{ mergeform.csrf_token }}
+          <input class="button" type="submit" value="Merge"/>
+        </form>
+      </li>
+      <li>
+        <form action="{{ url_for('cancel_request_pull', username=username,
+            repo=repo.name, requestid=requestid) }}" method="POST">
+          {{ mergeform.csrf_token }}
+          <input type="submit" value="Cancel" id="cancel_pr" class="button"/>
+        </form>
+      </li>
   {% elif pull_request and pull_request.status == False %}
     <li>
-  <span class="error">Merged</span>
+      <span class="error">Merged</span>
     </li>
   {% endif %}
-        <li>
-            <a class="button patch" href="{{ url_for('request_pull_patch', username=username,
-                repo=repo.name, requestid=requestid) }}">Patch</a>
-        </li>
+      <li>
+        <a class="button patch" href="{{ url_for('request_pull_patch', username=username,
+            repo=repo.name, requestid=requestid) }}">Patch</a>
+      </li>
     </ul>
 </div>
 {% endif %}
-
-<section class="commit_list">
-  <ul>
-    {% for commit in diff_commits %}
-    <li>
-    {% if pull_request and pull_request.status and pull_request.repo_from.is_fork %}
-      <a href="{{ url_for('view_commit', username=pull_request.repo_from.user.user,
-                  repo=pull_request.repo_from.name, commitid=commit.oid.hex)}}">
-    {% else %}
-      <a href="{{ url_for('view_commit', username=username,
-                  repo=repo.name, commitid=commit.oid.hex)}}">
-    {% endif %}
-        <span class="commitid">{{ commit.oid.hex|short }}</span>
-        {{ commit.message.split('\n')[0] }}
-      </a>
-    </li>
-    {% endfor %}
-  </ul>
-</section>
 
 {% if form %}
 <section class="new_project">
@@ -97,6 +78,25 @@
   </form>
 </section>
 {% endif %}
+
+<section class="commit_list">
+  <ul>
+    {% for commit in diff_commits %}
+    <li>
+    {% if pull_request and pull_request.status and pull_request.repo_from.is_fork %}
+      <a href="{{ url_for('view_commit', username=pull_request.repo_from.user.user,
+                  repo=pull_request.repo_from.name, commitid=commit.oid.hex)}}">
+    {% else %}
+      <a href="{{ url_for('view_commit', username=username,
+                  repo=repo.name, commitid=commit.oid.hex)}}">
+    {% endif %}
+        <span class="commitid">{{ commit.oid.hex|short }}</span>
+        {{ commit.message.split('\n')[0] }}
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
 
 <section class="request_diff">
   {% for commit in diff_commits %}
