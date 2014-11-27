@@ -15,6 +15,7 @@ from math import ceil
 
 import pygit2
 from sqlalchemy.exc import SQLAlchemyError
+from PIL import Image
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import guess_lexer_for_filename
@@ -325,7 +326,11 @@ def view_file(repo, identifier, filename, username=None):
             ext = filename[filename.rfind('.'):]
             if ext in ('.gif', '.png', '.bmp', '.tif', '.tiff', '.jpg',
                     '.jpeg', '.ppm', '.pnm', '.pbm', '.pgm', '.webp', '.ico'):
-                output_type = 'image'
+                try:
+                    Image.open(filename)
+                    output_type = 'image'
+                except IOError:
+                    output_type = 'binary'
             else:
                 output_type = 'binary'
         else:
