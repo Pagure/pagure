@@ -367,7 +367,17 @@ def markdown_filter(text):
     markdown library.
     """
     if text:
-        return markdown.markdown(text)
+        # Hack to allow blockquotes to be marked by ~~~
+        ntext = []
+        indent = False
+        for line in text.split('\n'):
+            if line.startswith('~~~'):
+                indent = not indent
+                continue
+            if indent:
+                line = '    %s' % line
+            ntext.append(line)
+        return markdown.markdown('\n'.join(ntext))
 
     return ''
 
