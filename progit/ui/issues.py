@@ -29,8 +29,8 @@ from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
 
 ## URLs
 
-@APP.route('/<repo>/issue/<issueid>/add', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/issue/<issueid>/add',
+@APP.route('/<repo>/issue/<int:issueid>/add', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/add',
            methods=('GET', 'POST'))
 def add_comment_issue(repo, issueid, username=None):
     ''' Add a comment to an issue. '''
@@ -147,8 +147,8 @@ def new_issue(repo, username=None):
     )
 
 
-@APP.route('/<repo>/issue/<issueid>', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/issue/<issueid>',
+@APP.route('/<repo>/issue/<int:issueid>', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/issue/<int:issueid>',
            methods=('GET', 'POST'))
 def view_issue(repo, issueid, username=None):
     """ List all issues associated to a repo
@@ -206,8 +206,8 @@ def view_issue(repo, issueid, username=None):
     )
 
 
-@APP.route('/<repo>/issue/<issueid>/edit', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/issue/<issueid>/edit',
+@APP.route('/<repo>/issue/<int:issueid>/edit', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/edit',
            methods=('GET', 'POST'))
 @cla_required
 def edit_issue(repo, issueid, username=None):
@@ -270,4 +270,5 @@ def edit_issue(repo, issueid, username=None):
         repo=repo,
         username=username,
         issue=issue,
+        issueid=issueid,
     )
