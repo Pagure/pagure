@@ -94,6 +94,8 @@
         {{ commit.message.split('\n')[0] }}
       </a>
     </li>
+    {% else %}
+      <p class="error"> No commits found </p>
     {% endfor %}
   </ul>
 </section>
