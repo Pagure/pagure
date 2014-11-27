@@ -24,7 +24,7 @@ import progit.lib
 import progit.forms
 from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
                     generate_gitolite_acls, generate_gitolite_key,
-                    generate_authorized_key_file)
+                    generate_authorized_key_file, markdown_filter)
 
 
 def chunks(item_list, chunks_size):
@@ -323,3 +323,13 @@ def user_settings():
         user=user,
         form=form,
     )
+
+
+@APP.route('/markdown/', methods=['POST'])
+@cla_required
+def markdown_preview():
+    """ Return the provided markdown text in html.
+
+    The text has to be provided via the parameter 'content' of a POST query.
+    """
+    return progit.markdown_filter(flask.request.form['content'])
