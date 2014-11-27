@@ -113,20 +113,12 @@
     <ul>
       {% for commit in last_commits %}
       <li>
-        {% if diff_commits and commit.oid.hex in diff_commits %}
-        <div class="pr">
-            <span class="error" title="Commit not in the main repo">*</span>
-            {% if authenticated %}
-            (<a href="{{ url_for('new_request_pull',
-                    username=username, repo=repo.name, commitid=commit.oid.hex) }}"
-                >Request pull</a>)
-            {% endif %}
-        </div>
-        {% endif %}
-
         <a href="{{ url_for('view_commit', username=username,
                 repo=repo.name, commitid=commit.hex) }}">
             <span class="commitid">{{ commit.hex|short }}</span>
+            {% if diff_commits and commit.oid.hex in diff_commits %}
+            <span class="new_commit" title="Commit not in the main repo">*</span>
+            {% endif %}
             {{ commit.message.split('\n')[0] }}
         </a>
       </li>

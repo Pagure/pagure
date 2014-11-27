@@ -22,12 +22,16 @@ td, th {
     color: green;
 }
 
-.errors {
+.errors, .new_commit {
     color: red;
 }
 
 .warnings {
     color: orange;
+}
+
+.new_commit {
+    margin-left: -12px;
 }
 
 .nobutton {
