@@ -14,6 +14,7 @@ import os
 from math import ceil
 
 import pygit2
+from cStringIO import StringIO
 from sqlalchemy.exc import SQLAlchemyError
 from PIL import Image
 from pygments import highlight
@@ -327,7 +328,7 @@ def view_file(repo, identifier, filename, username=None):
             if ext in ('.gif', '.png', '.bmp', '.tif', '.tiff', '.jpg',
                     '.jpeg', '.ppm', '.pnm', '.pbm', '.pgm', '.webp', '.ico'):
                 try:
-                    Image.open(filename)
+                    Image.open(StringIO(content.data))
                     output_type = 'image'
                 except IOError as err:
                     LOG.debug(
