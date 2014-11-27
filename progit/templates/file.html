@@ -41,7 +41,11 @@
         {% autoescape false %}
         {{ content | format_loc}}
         {% endautoescape %}
-    {% elif output_type == 'binary' or output_type == 'image' %}
+    {% elif output_type == 'image' %}
+        <img src="{{ url_for('view_raw_file', username=username,
+                    repo=repo.name, identifier=branchname,
+                    filename=filename) }}"/>
+    {% elif output_type == 'binary' %}
         <p class="noresult">
           Binary files cannot be rendered.<br/>
           Please
