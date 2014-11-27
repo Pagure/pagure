@@ -329,7 +329,10 @@ def view_file(repo, identifier, filename, username=None):
                 try:
                     Image.open(filename)
                     output_type = 'image'
-                except IOError:
+                except IOError as err:
+                    APP.log.debug(
+                        'Failed to load image %s, error: %s', filename, err
+                    )
                     output_type = 'binary'
             else:
                 output_type = 'binary'
