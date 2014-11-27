@@ -10,7 +10,7 @@
 {% if not type or type == 'new' %}
 <h2>New issue</h2>
 {% elif type and type == 'edit' %}
-<h2>Edit issue #{{ issue.id }}</h2>
+<h2>Edit issue #{{ issueid }}</h2>
 {% endif %}
 
 
@@ -21,7 +21,7 @@
 
   {% elif type and type == 'edit' %}
       <form action="{{ url_for('.edit_issue', username=username,
-                       repo=repo.name, issueid=issue.id) }}" method="post">
+                       repo=repo.name, issueid=issueid) }}" method="post">
   {% endif %}
 
     <table>
