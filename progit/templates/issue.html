@@ -4,27 +4,13 @@
 {% block title %}Issue #{{ issueid }} - {{ repo.name }}{% endblock %}
 {%block tag %}home{% endblock %}
 
-{% macro show_comment(user, date, content, aside=False) %}
+{% macro show_comment(user, date, content) %}
   <section class="issue_comment">
     <header>
       {{ user.user | avatar(16) | safe }}
       <a href="{{ url_for('view_user', username=user.user)}}">
         {{ user.user }}
       </a> - <span title="{{ date }}">{{ date | humanize}}</span>
-      {% if aside %}
-        <aside class="issue_action">
-        {% if authenticated and form %}
-          <form action="{{ url_for('view_issue', username=username,
-                   repo=repo.name, issueid=issueid) }}" method="post">
-            {{ render_field(form.status) }}
-            <input type="submit" class="submit positive button" value="Update">
-            {{ form.csrf_token }}
-          </form>
-        {% else %}
-            Status: {{ issue.status }}
-        {% endif %}
-        </aside>
-      {% endif %}
     </header>
     <div class="comment_body">
       {% autoescape false %}
@@ -43,9 +29,21 @@
                   repo=repo.name, issueid=issueid) }}">
         Edit</a>
     {% endif %}
+    <aside class="issue_action">
+    {% if authenticated and form %}
+      <form action="{{ url_for('view_issue', username=username,
+               repo=repo.name, issueid=issueid) }}" method="post">
+        {{ render_field(form.status) }}
+        <input type="submit" class="submit positive button" value="Update">
+        {{ form.csrf_token }}
+      </form>
+    {% else %}
+        Status: {{ issue.status }}
+    {% endif %}
+    </aside>
 </h2>
 
-{{ show_comment(issue.user, issue.date_created, issue.content, True) }}
+{{ show_comment(issue.user, issue.date_created, issue.content) }}
 
 {% if issue.comments %}
   {% for comment in issue.comments %}
