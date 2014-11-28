@@ -665,3 +665,8 @@ ul.changes {
 .header {
     padding: .5em 0;
 }
+
+.reply {
+    cursor: pointer;
+    padding-right: 1em;
+}

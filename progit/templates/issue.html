@@ -11,6 +11,11 @@
       <a href="{{ url_for('view_user', username=user.user)}}">
         {{ user.user }}
       </a> - <span title="{{ date }}">{{ date | humanize}}</span>
+      <aside class="issue_action">
+        <a class="reply" title="Reply to this comment - loose formating">
+          reply
+        </a>
+      </aside>
     </header>
     <div class="comment_body">
       {% autoescape false %}
@@ -113,6 +118,20 @@ $(function() {
       }
     }
   );
+
+  $( ".reply" ).click(
+    function() {
+        var _section = $(this).parent().parent().parent();
+        var _comment = _section.find('.comment_body');
+        var _text = _comment.text().split("\n");
+        var _output = new Array();
+        for (cnt = 0; cnt < _text.length - 1; cnt ++) {
+            _output[cnt] = '> ' + jQuery.trim(_text[cnt + 1]);
+        }
+        $( "#comment" ).val(_output.join("\n"));
+    }
+  );
+
 });
 </script>
 {% endblock %}
