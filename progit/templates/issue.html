@@ -78,6 +78,7 @@
         </div>
         <div>
           <input type="submit" class="submit positive button" value="Comment">
+          <input type="button" value="Clear" id="clear_comment" />
         </div>
       </form>
     </div>
@@ -129,6 +130,12 @@ $(function() {
             _output[cnt] = '> ' + jQuery.trim(_text[cnt + 1]);
         }
         $( "#comment" ).val(_output.join("\n"));
+    }
+  );
+
+  $( "#clear_comment").click(
+    function() {
+      $( "#comment" ).val("");
     }
   );
 
