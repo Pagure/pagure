@@ -346,6 +346,33 @@ class IssueComment(BASE):
                     remote_side=[User.id], backref='comment_issues')
 
 
+class Tag(BASE):
+    """ Stores the tags.
+
+    Table -- tags
+    """
+
+    __tablename__ = 'tags'
+
+    tag = sa.Column(sa.Text(), primary_key=True)
+    date_created = sa.Column(sa.DateTime, nullable=False,
+                             default=datetime.datetime.utcnow)
+
+
+class TagIssue(BASE):
+    """ Stores the tag associated with an issue.
+
+    Table -- tags_issues
+    """
+
+    __tablename__ = 'tags_issues'
+
+    tag = sa.Column(sa.Text(), primary_key=True)
+    issue_id = sa.Column(sa.Integer, primary_key=True)
+    date_created = sa.Column(sa.DateTime, nullable=False,
+                             default=datetime.datetime.utcnow)
+
+
 class PullRequest(BASE):
     """ Stores the pull requests created on a project.
 
