@@ -372,6 +372,10 @@ class TagIssue(BASE):
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
 
+    issue = relation(
+        'Issue', foreign_keys=[issue_id], remote_side=[Issue.id],
+        backref='tags')
+
 
 class PullRequest(BASE):
     """ Stores the pull requests created on a project.
