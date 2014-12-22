@@ -534,13 +534,16 @@ def get_project(session, name, user=None):
     return query.first()
 
 
-def get_issues(session, repo, status=None, closed=False):
+def get_issues(session, repo, status=None, closed=False, tags=None):
     ''' Retrieve all the issues associated to a project
 
     Watch out that the closed argument is incompatible with the status
     argument. The closed argument will return all the issues whose status
     is not 'Open', otherwise it will return the issues having the specified
     status.
+    The `tags` argument can be used to filter the issues returned based on
+    a certain tag.
+
     '''
     subquery = session.query(
         model.GlobalId,
@@ -571,6 +574,12 @@ def get_issues(session, repo, status=None, closed=False):
     if closed:
         query = query.filter(
             model.Issue.status != 'Open'
+        )
+    if tags is not None:
+        query = query.filter(
+            model.Issue.id == model.TagIssue.issue_id
+        ).filter(
+            model.TagIssue.tag.in_(tags)
         )
 
     return query.all()
