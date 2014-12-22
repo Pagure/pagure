@@ -75,6 +75,7 @@ def view_issues(repo, username=None):
     """ List all issues associated to a repo
     """
     status = flask.request.args.get('status', None)
+    tags = flask.request.args.getlist('tags', None)
 
     repo = progit.lib.get_project(SESSION, repo, user=username)
 
@@ -86,11 +87,14 @@ def view_issues(repo, username=None):
 
     if status is not None:
         if status.lower() == 'closed':
-            issues = progit.lib.get_issues(SESSION, repo, closed=True)
+            issues = progit.lib.get_issues(
+                SESSION, repo, closed=True, tags=tags)
         else:
-            issues = progit.lib.get_issues(SESSION, repo, status=status)
+            issues = progit.lib.get_issues(
+                SESSION, repo, status=status, tags=tags)
     else:
-        issues = progit.lib.get_issues(SESSION, repo, status='Open')
+        issues = progit.lib.get_issues(
+            SESSION, repo, status='Open', tags=tags)
 
     return flask.render_template(
         'issues.html',
