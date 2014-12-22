@@ -575,7 +575,7 @@ def get_issues(session, repo, status=None, closed=False, tags=None):
         query = query.filter(
             model.Issue.status != 'Open'
         )
-    if tags is not None:
+    if tags is not None and tags != []:
         query = query.filter(
             model.Issue.id == model.TagIssue.issue_id
         ).filter(
