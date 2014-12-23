@@ -368,7 +368,11 @@ class TagIssue(BASE):
     __tablename__ = 'tags_issues'
 
     tag = sa.Column(sa.Text(), primary_key=True)
-    issue_id = sa.Column(sa.Integer, primary_key=True)
+    issue_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(
+            'issues.id', ondelete='CASCADE', onupdate='CASCADE'),
+        primary_key=True)
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
 
