@@ -76,6 +76,7 @@ def view_issues(repo, username=None):
     """
     status = flask.request.args.get('status', None)
     tags = flask.request.args.getlist('tags', None)
+    tags = [tag for tag in tags if tag]
 
     repo = progit.lib.get_project(SESSION, repo, user=username)
 
