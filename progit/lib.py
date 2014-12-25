@@ -641,6 +641,24 @@ def get_issue(session, projectid, issueid):
 
     return query.first()
 
+def get_tags_of_project(session, project):
+    ''' Returns the list of tags associated with the issues of a project.
+    '''
+    query = session.query(
+        model.Tag
+    ).filter(
+        model.Tag.tag == model.TagIssue.tag
+    ).filter(
+        model.TagIssue.issue_id == model.Issue.id
+    ).filter(
+        model.Issue.project_id == project.id
+    ).order_by(
+        model.Tag.tag
+    )
+
+    return query.all()
+
+
 
 def get_pull_requests(
         session, project_id=None, project_id_from=None, status=None):
