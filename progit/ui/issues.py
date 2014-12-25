@@ -96,6 +96,8 @@ def view_issues(repo, username=None):
         issues = progit.lib.get_issues(
             SESSION, repo, status='Open', tags=tags)
 
+    tag_list = progit.lib.get_tags_of_project(SESSION, repo)
+
     return flask.render_template(
         'issues.html',
         select='issues',
@@ -103,6 +105,8 @@ def view_issues(repo, username=None):
         username=username,
         status=status,
         issues=issues,
+        tags=tags,
+        tag_list=tag_list,
     )
 
 
