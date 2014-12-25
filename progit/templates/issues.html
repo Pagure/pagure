@@ -27,7 +27,7 @@
       <form action="{{ url_for('view_issues', username=username,
                                repo=repo.name) }}" method="get">
           <select name="tags">
-            <option value=""></option>
+            <option></option>
             {% for tag in tag_list %}
             <option value="{{ tag.tag }}" {%
                 if tags and tag.tag in tags %} selected {% endif %}>{{ tag.tag }}</option>
