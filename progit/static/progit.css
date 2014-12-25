@@ -388,7 +388,7 @@ table.list tbody td > a
     float: right;
 }
 
-a.btn_create {
+#issue_action {
     float: right;
 }
 
