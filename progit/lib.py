@@ -189,6 +189,30 @@ def add_issue_comment(session, issue, comment, user, ticketfolder):
     return 'Comment added'
 
 
+def add_issue_tag(session, issue, tag, user, ticketfolder):
+    ''' Add a tag to an issue. '''
+    user_obj = get_user(session, user)
+    if not user_obj:
+        user_obj = get_user_by_email(session, user)
+
+    if not user_obj:
+        raise progit.exceptions.ProgitException(
+            'No user "%s" found' % user
+        )
+
+    issue_tag = model.IssueTag(
+        issue_id=issue.id,
+        tag=tag,
+    )
+    session.add(issue_tag)
+    # Make sure we won't have SQLAlchemy error before we create the repo
+    session.flush()
+
+    update_git_ticket(issue, repo=issue.project, ticketfolder=ticketfolder)
+
+    return 'Tag added'
+
+
 def add_user_to_project(session, project, user):
     ''' Add a specified user to a specified project. '''
     user_obj = get_user(session, user)
