@@ -62,8 +62,16 @@ class RequestPullForm(wtf.Form):
 
 class AddIssueCommentForm(wtf.Form):
     ''' Form to add a comment to an issue. '''
-    comment = wtforms.TextAreaField(
+    t = wtforms.TextAreaField(
         'Comment<span class="error">*</span>',
+        [wtforms.validators.Required()]
+    )
+
+
+class AddIssueTagForm(wtf.Form):
+    ''' Form to add a tag to an issue. '''
+    tag = wtforms.TextField(
+        'tag<span class="error">*</span>',
         [wtforms.validators.Required()]
     )
 
