@@ -69,6 +69,47 @@ def add_comment_issue(repo, issueid, username=None):
         'view_issue', username=username, repo=repo.name, issueid=issueid))
 
 
+@APP.route('/<repo>/issue/<int:issueid>/tag', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/tag',
+           methods=('GET', 'POST'))
+def add_tag_issue(repo, issueid, username=None):
+    ''' Add a tag to an issue. '''
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if repo is None:
+        flask.abort(404, 'Project not found')
+
+    if not repo.issue_tracker:
+        flask.abort(404, 'No issue tracker found for this project')
+
+    issue = progit.lib.get_issue(SESSION, repo.id, issueid)
+
+    if issue is None or issue.project != repo:
+        flask.abort(404, 'Issue not found')
+
+    form = progit.forms.AddIssueTagForm()
+    if form.validate_on_submit():
+        tag = form.tag.data
+
+        try:
+            message = progit.lib.add_issue_tag(
+                SESSION,
+                issue=issue,
+                tag=tag,
+                user=flask.g.fas_user.username,
+                ticketfolder=APP.config['TICKETS_FOLDER'],
+            )
+            SESSION.commit()
+            flask.flash(message)
+        except SQLAlchemyError, err:  # pragma: no cover
+            SESSION.rollback()
+            flask.flash(str(err), 'error')
+
+
+    return flask.redirect(flask.url_for(
+        'view_issue', username=username, repo=repo.name, issueid=issueid))
+
+
 @APP.route('/<repo>/issues')
 @APP.route('/fork/<username>/<repo>/issues')
 def view_issues(repo, username=None):
