@@ -220,9 +220,10 @@ def view_issue(repo, issueid, username=None):
     status = progit.lib.get_issue_statuses(SESSION)
 
     form_comment = progit.forms.AddIssueCommentForm()
-    form = None
+    form = form_tag = None
     if authenticated() and is_repo_admin(repo):
         form = progit.forms.UpdateIssueStatusForm(status=status)
+        form_tag = progit.forms.AddIssueTagForm()
 
         if form.validate_on_submit():
             try:
@@ -253,6 +254,7 @@ def view_issue(repo, issueid, username=None):
         issueid=issueid,
         form=form,
         form_comment=form_comment,
+        form_tag=form_tag,
     )
 
 

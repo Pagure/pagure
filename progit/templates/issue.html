@@ -55,13 +55,13 @@
                repo=repo.name, tags=tag.tag) }}">
         {{ tag.tag }}</a>{% if not loop.last %},{% endif %}
     {% endfor %}
-    {% if authenticated and tagform %}
+    {% if authenticated and form_tag %}
       <form action="{{ url_for('view_issue', username=username,
                repo=repo.name, issueid=issueid) }}" method="post">
-        {{ render_field(tagform.tags) }}
+        {{ render_field(form_tag.tag) }}
         <input id="add_tags" type="submit"
             class="submit positive button" value="Add">
-        {{ form.csrf_token }}
+        {{ form_tag.csrf_token }}
       </form>
     {% endif %}
 </section>
