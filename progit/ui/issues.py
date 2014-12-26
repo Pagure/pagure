@@ -89,22 +89,27 @@ def add_tag_issue(repo, issueid, username=None):
 
     form = progit.forms.AddIssueTagForm()
     if form.validate_on_submit():
-        tag = form.tag.data
+        tags = form.tag.data
+
+        for tag in tags.split(','):
+            try:
+                message = progit.lib.add_issue_tag(
+                    SESSION,
+                    issue=issue,
+                    tag=tag.strip(),
+                    user=flask.g.fas_user.username,
+                    ticketfolder=APP.config['TICKETS_FOLDER'],
+                )
+            except SQLAlchemyError, err:  # pragma: no cover
+                SESSION.rollback()
+                flask.flash(str(err), 'error')
 
         try:
-            message = progit.lib.add_issue_tag(
-                SESSION,
-                issue=issue,
-                tag=tag,
-                user=flask.g.fas_user.username,
-                ticketfolder=APP.config['TICKETS_FOLDER'],
-            )
             SESSION.commit()
-            flask.flash(message)
+            flask.flash('Tags %s added' % tags)
         except SQLAlchemyError, err:  # pragma: no cover
-            SESSION.rollback()
-            flask.flash(str(err), 'error')
-
+                SESSION.rollback()
+                flask.flash(str(err), 'error')
 
     return flask.redirect(flask.url_for(
         'view_issue', username=username, repo=repo.name, issueid=issueid))
