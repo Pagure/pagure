@@ -200,7 +200,7 @@ def add_issue_tag(session, issue, tag, user, ticketfolder):
             'No user "%s" found' % user
         )
 
-    issue_tag = model.IssueTag(
+    issue_tag = model.TagIssue(
         issue_id=issue.id,
         tag=tag,
     )
