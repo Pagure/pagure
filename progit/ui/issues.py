@@ -104,19 +104,12 @@ def add_tag_issue(repo, issueid, username=None, chrome=True):
                     user=flask.g.fas_user.username,
                     ticketfolder=APP.config['TICKETS_FOLDER'],
                 )
+                SESSION.commit()
+                msg = 'Tag %s added' % tag.strip()
+                flask.flash(msg)
             except SQLAlchemyError, err:  # pragma: no cover
                 SESSION.rollback()
                 flask.flash(str(err), 'error')
-
-        try:
-            SESSION.commit()
-            msg = 'Tags %s added' % tags
-            flask.flash(msg)
-        except SQLAlchemyError, err:  # pragma: no cover
-                SESSION.rollback()
-                msg = str(err)
-                cat = 'error'
-                flask.flash(msg, cat)
 
     if not chrome:
         if cat is not None:
