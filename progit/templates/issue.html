@@ -58,7 +58,7 @@
     {% if authenticated and form_tag %}
       <form action="{{ url_for('add_tag_issue', username=username,
                repo=repo.name, issueid=issueid) }}" method="post">
-        {{ render_field(form_tag.tag) }}
+        {{ render_field(form_tag.tag, placeholder="tag1,tag2") }}
         <input id="add_tags" type="submit"
             class="submit positive button" value="Add">
         {{ form_tag.csrf_token }}
