@@ -75,6 +75,7 @@ def add_comment_issue(repo, issueid, username=None):
 @APP.route('/<repo>/issue/<int:issueid>/tag/<chrome>', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/issue/<int:issueid>/tag/<chrome>',
            methods=('GET', 'POST'))
+@cla_required
 def add_tag_issue(repo, issueid, username=None, chrome=True):
     ''' Add a tag to an issue. '''
     repo = progit.lib.get_project(SESSION, repo, user=username)
