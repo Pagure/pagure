@@ -200,9 +200,14 @@ def add_issue_tag(session, issue, tag, user, ticketfolder):
             'No user "%s" found' % user
         )
 
+    tagobj = get_tag(session, tag)
+    if not tagobj:
+        tagobj = model.Tag(tag=tag)
+        session.add(tagobj)
+
     issue_tag = model.TagIssue(
         issue_id=issue.id,
-        tag=tag,
+        tag=tagobj.tag,
     )
     session.add(issue_tag)
     # Make sure we won't have SQLAlchemy error before we create the repo
