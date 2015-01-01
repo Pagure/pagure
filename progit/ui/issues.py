@@ -106,7 +106,7 @@ def add_tag_issue(repo, issueid, username=None, chrome=True):
                     ticketfolder=APP.config['TICKETS_FOLDER'],
                 )
                 SESSION.commit()
-                msg = 'Tag %s added' % tag.strip()
+                msg = 'Added tag: %s' % tag.strip()
                 flask.flash(msg)
             except SQLAlchemyError, err:  # pragma: no cover
                 SESSION.rollback()
