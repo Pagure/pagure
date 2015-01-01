@@ -683,6 +683,17 @@ def get_tags_of_project(session, project):
     return query.all()
 
 
+def get_tag(session, tag):
+    ''' Returns a Tag object for the given tag text.
+    '''
+    query = session.query(
+        model.Tag
+    ).filter(
+        model.Tag.tag == tag
+    )
+
+    return query.first()
+
 
 def get_pull_requests(
         session, project_id=None, project_id_from=None, status=None):
