@@ -97,20 +97,22 @@ def add_tag_issue(repo, issueid, username=None, chrome=True):
         tags = form.tag.data
 
         for tag in tags.split(','):
+            tag = tag.strip()
             try:
                 message = progit.lib.add_issue_tag(
                     SESSION,
                     issue=issue,
-                    tag=tag.strip(),
+                    tag=tag,
                     user=flask.g.fas_user.username,
                     ticketfolder=APP.config['TICKETS_FOLDER'],
                 )
                 SESSION.commit()
-                msg = 'Added tag: %s' % tag.strip()
+                msg = 'Added tag: %s' % tag
                 flask.flash(msg)
             except SQLAlchemyError, err:  # pragma: no cover
                 SESSION.rollback()
-                flask.flash(str(err), 'error')
+                LOG.error(err)
+                flask.flash('Could not add tag: %s' % tag, 'error')
 
     if not chrome:
         if cat is not None:
