@@ -131,6 +131,54 @@ def add_tag_issue(repo, issueid, username=None, chrome=True):
             'view_issue', username=username, repo=repo.name, issueid=issueid))
 
 
+
+@APP.route('/<repo>/droptag/', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/droptag/', methods=['POST'])
+@cla_required
+def remove_tag(repo, username=None):
+    """ Remove the specified tag from the project.
+    """
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    if not is_repo_admin(repo):
+        flask.abort(
+            403,
+            'You are not allowed to change the users for this project')
+
+    form = progit.forms.AddIssueTagForm()
+    if form.validate_on_submit():
+        tags = form.tag.data
+        msgs = []
+
+        tags = [tag.strip() for tag in tags.split(',')]
+
+        issues = progit.lib.get_issues(
+            SESSION, repo, closed=False, tags=tags)
+        issues.extend(progit.lib.get_issues(
+            SESSION, repo, closed=True, tags=tags)
+        )
+
+        if not issues:
+            flask.flash('No issue found with the tag: %s' % tag, 'error')
+        else:
+            for issue in issues:
+                for issue_tag in issue[0].tags:
+                    if issue_tag.tag in tags:
+                        tag = issue_tag.tag
+                        SESSION.delete(issue_tag)
+                        msgs.append('Removed tag: %s' % tag)
+
+        SESSION.commit()
+        for msg in msgs:
+            flask.flash(msg)
+
+    return flask.redirect(
+        flask.url_for('.view_settings', repo=repo.name, username=username)
+    )
+
 @APP.route('/<repo>/issues')
 @APP.route('/fork/<username>/<repo>/issues')
 def view_issues(repo, username=None):
