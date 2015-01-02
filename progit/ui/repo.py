@@ -589,8 +589,10 @@ def view_settings(repo, username=None):
             'You are not allowed to change the settings for this project')
 
     plugins = progit.ui.plugins.get_plugin_names()
+    tags = progit.lib.get_tags_of_project(SESSION, repo)
 
     form = progit.forms.ProjectSettingsForm()
+    tag_form = progit.forms.AddIssueTagForm()
 
     if form.validate_on_submit():
         issue_tracker = form.issue_tracker.data
@@ -621,6 +623,8 @@ def view_settings(repo, username=None):
         username=username,
         repo=repo,
         form=form,
+        tag_form=tag_form,
+        tags=tags,
         plugins=plugins,
     )
 

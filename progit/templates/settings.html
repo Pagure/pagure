@@ -100,6 +100,36 @@
 </section>
 {% endif %}
 
+<section class="tags">
+  <h2>Tags</h2>
+
+  <p>
+    Here below is the list of tags associated with one or more issue of
+    the project.
+  </p>
+
+  <ul>
+  {% for tag in tags %}
+    <li>
+      <a href="{{ url_for('view_issues', username=username,
+        repo=repo.name, tags=tag.tag) }}">
+        {{ tag.tag }}
+      </a>
+      <form class="icon del_icon" method="POST"
+        action="{{ url_for('remove_tag', username=username, repo=repo.name) }}">
+        <input type="hidden" value="{{ tag.tag }}" name="tag" />
+        {{ tag_form.csrf_token }}
+        <button
+          onclick="return confirm('You sure you want to remove this tag from this project?');"
+          title="Remove tag">
+          <span class="icon icon-trash blue"></span>
+        </button>
+      </form>
+    </li>
+  {% endfor %}
+  </ul>
+</section>
+
 {% endblock %}
 
 {% block jscripts %}
