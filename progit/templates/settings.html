@@ -120,7 +120,7 @@
         <input type="hidden" value="{{ tag.tag }}" name="tag" />
         {{ tag_form.csrf_token }}
         <button
-          onclick="return confirm('You sure you want to remove this tag from this project?');"
+          onclick="return confirm('Do you really want to remove the tag: {{ tag.tag }}?');"
           title="Remove tag">
           <span class="icon icon-trash blue"></span>
         </button>
