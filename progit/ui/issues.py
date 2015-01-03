@@ -151,25 +151,9 @@ def remove_tag(repo, username=None):
     form = progit.forms.AddIssueTagForm()
     if form.validate_on_submit():
         tags = form.tag.data
-        msgs = []
-
         tags = [tag.strip() for tag in tags.split(',')]
 
-        issues = progit.lib.get_issues(
-            SESSION, repo, closed=False, tags=tags)
-        issues.extend(progit.lib.get_issues(
-            SESSION, repo, closed=True, tags=tags)
-        )
-
-        if not issues:
-            flask.flash('No issue found with the tag: %s' % tag, 'error')
-        else:
-            for issue in issues:
-                for issue_tag in issue[0].tags:
-                    if issue_tag.tag in tags:
-                        tag = issue_tag.tag
-                        SESSION.delete(issue_tag)
-                        msgs.append('Removed tag: %s' % tag)
+        msgs = progit.lib.remove_issue_tags(SESSION, repo, tags)
 
         SESSION.commit()
         for msg in msgs:

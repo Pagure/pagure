@@ -218,6 +218,29 @@ def add_issue_tag(session, issue, tag, user, ticketfolder):
     return 'Tag added'
 
 
+def remove_issue_tags(session, project, tags):
+    ''' Removes the specified tag of a project. '''
+
+    if not isinstance(tags, list):
+        tags = [tags]
+
+    issues = get_issues(session, project, closed=False, tags=tags)
+    issues.extend(get_issues(session, project, closed=True, tags=tags))
+
+    msgs = []
+    if not issues:
+        raise progit.exceptions.ProgitException(
+            'No issue found with the tag: %s' % tag)
+    else:
+        for issue in issues:
+            for issue_tag in issue[0].tags:
+                if issue_tag.tag in tags:
+                    tag = issue_tag.tag
+                    session.delete(issue_tag)
+                    msgs.append('Removed tag: %s' % tag)
+    return msgs
+
+
 def add_user_to_project(session, project, user):
     ''' Add a specified user to a specified project. '''
     user_obj = get_user(session, user)
