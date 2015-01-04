@@ -131,6 +131,44 @@ def add_tag_issue(repo, issueid, username=None, chrome=True):
             'view_issue', username=username, repo=repo.name, issueid=issueid))
 
 
+@APP.route('/<repo>/tag/<tag>/edit', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/tag/<tag>/edit', methods=('GET', 'POST'))
+@cla_required
+def edit_tag(repo, tag, username=None):
+    """ Edit the specified tag of a project.
+    """
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    if not is_repo_admin(repo):
+        flask.abort(
+            403,
+            'You are not allowed to add users to this project')
+
+    form = progit.forms.AddIssueTagForm()
+    if form.validate_on_submit():
+        new_tag = form.tag.data
+
+        msgs = progit.lib.edit_issue_tags(SESSION, repo, tag, new_tag)
+
+        SESSION.commit()
+        for msg in msgs:
+            flask.flash(msg)
+
+        return flask.redirect(flask.url_for(
+            '.view_settings', repo=repo.name, username=username)
+        )
+
+    return flask.render_template(
+        'edit_tag.html',
+        form=form,
+        username=username,
+        repo=repo,
+        tag=tag,
+    )
+
 
 @APP.route('/<repo>/droptag/', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/droptag/', methods=['POST'])
