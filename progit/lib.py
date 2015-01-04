@@ -241,6 +241,41 @@ def remove_issue_tags(session, project, tags):
     return msgs
 
 
+def edit_issue_tags(session, project, old_tag, new_tag):
+    ''' Removes the specified tag of a project. '''
+
+    if not isinstance(old_tag, list):
+        old_tags = [old_tag]
+
+    issues = get_issues(session, project, closed=False, tags=old_tags)
+    issues.extend(get_issues(session, project, closed=True, tags=old_tags))
+
+    msgs = []
+    if not issues:
+        raise progit.exceptions.ProgitException(
+            'No issue found with the tags: %s' % old_tag)
+    else:
+        tagobj = get_tag(session, new_tag)
+        if not tagobj:
+            tagobj = model.Tag(tag=new_tag)
+            session.add(tagobj)
+
+        for issue in issues:
+            # Drop the old tag
+            for issue_tag in issue[0].tags:
+                if issue_tag.tag in old_tags:
+                    tag = issue_tag.tag
+                    session.delete(issue_tag)
+            # Add the new one
+            issue_tag = model.TagIssue(
+                issue_id=issue[0].id,
+                tag=new_tag
+            )
+            session.add(issue_tag)
+            msgs.append('Edited tag: %s to %s' % (old_tag, new_tag))
+
+    return msgs
+
 def add_user_to_project(session, project, user):
     ''' Add a specified user to a specified project. '''
     user_obj = get_user(session, user)
