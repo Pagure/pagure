@@ -125,6 +125,12 @@
           <span class="icon icon-trash blue"></span>
         </button>
       </form>
+      <a href="{{ url_for(
+            '.edit_tag',username=username, repo=repo.name, tag=tag.tag) }}">
+        <button class="icon_button" title="Edit tag">
+          <span class="icon icon-edit blue"></span>
+        </button>
+      </a>
     </li>
   {% endfor %}
   </ul>
