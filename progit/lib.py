@@ -661,7 +661,8 @@ def get_project(session, name, user=None):
     return query.first()
 
 
-def get_issues(session, repo, status=None, closed=False, tags=None):
+def get_issues(
+        session, repo, status=None, closed=False, tags=None, assignee=None):
     ''' Retrieve all the issues associated to a project
 
     Watch out that the closed argument is incompatible with the status
@@ -707,6 +708,12 @@ def get_issues(session, repo, status=None, closed=False, tags=None):
             model.Issue.id == model.TagIssue.issue_id
         ).filter(
             model.TagIssue.tag.in_(tags)
+        )
+    if assignee is not None:
+        query = query.filter(
+            model.Issue.assignee_id == model.User.id
+        ).filter(
+            model.User.user == assignee
         )
 
     return query.all()
