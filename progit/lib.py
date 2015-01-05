@@ -252,7 +252,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
             issue, repo=issue.project, ticketfolder=ticketfolder)
 
         globalid = get_issue_global_id(session, issue.project.id, issue.id)
-        progit.notify.notify_assigned_issue(issue, globalid)
+        progit.notify.notify_assigned_issue(issue, user_obj, globalid)
 
         return 'Issue assigned'
 

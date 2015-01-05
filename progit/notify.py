@@ -131,7 +131,7 @@ New issue:
     )
 
 
-def notify_assigned_issue(issue, globalib):
+def notify_assigned_issue(issue, new_assignee, globalib):
     ''' Notify the people following an issue that the assignee changed.
     '''
     text = """
@@ -153,6 +153,8 @@ The issue: `%s` of project: `%s` has been assigned to `%s` by %s.
     mail_to.add(issue.project.user.emails[0].email)
     if issue.assignee and issue.assignee.emails:
         mail_to.add(issue.assignee.emails[0].email)
+    if new_assignee and new_assignee.emails:
+        mail_to.add(new_assignee.emails[0].email)
 
     send_email(
         text,
