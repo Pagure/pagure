@@ -261,18 +261,23 @@ def edit_issue_tags(session, project, old_tag, new_tag):
             session.add(tagobj)
 
         for issue in issues:
+            add = True
             # Drop the old tag
             for issue_tag in issue[0].tags:
                 if issue_tag.tag in old_tags:
                     tag = issue_tag.tag
                     session.delete(issue_tag)
-            # Add the new one
-            issue_tag = model.TagIssue(
-                issue_id=issue[0].id,
-                tag=new_tag
-            )
-            session.add(issue_tag)
-            msgs.append('Edited tag: %s to %s' % (old_tag, new_tag))
+                if issue_tag.tag == new_tag:
+                    add = False
+
+            if add:
+                # Add the new one
+                issue_tag = model.TagIssue(
+                    issue_id=issue[0].id,
+                    tag=new_tag
+                )
+                session.add(issue_tag)
+                msgs.append('Edited tag: %s to %s' % (old_tag, new_tag))
 
     return msgs
 
