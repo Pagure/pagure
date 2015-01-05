@@ -666,7 +666,8 @@ def get_project(session, name, user=None):
 
 
 def get_issues(
-        session, repo, status=None, closed=False, tags=None, assignee=None):
+        session, repo, status=None, closed=False, tags=None,
+        assignee=None, author=None):
     ''' Retrieve all the issues associated to a project
 
     Watch out that the closed argument is incompatible with the status
@@ -723,6 +724,12 @@ def get_issues(
         else:
             query = query.filter(
                 model.Issue.assignee_id == None
+            )
+    if author is not None:
+        query = query.filter(
+                model.Issue.user_id == model.User.id
+            ).filter(
+                model.User.user == author
             )
 
     return query.all()
