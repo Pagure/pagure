@@ -680,8 +680,9 @@ ul.changes {
     padding-right: 1em;
 }
 
-.inline_form div,
-.inline_form input {
+.tag_form,
+.tag_form input {
     display: inline-block;
+    margin-left: 0.3em;
     margin-bottom: 0.3em;
 }
