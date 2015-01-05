@@ -131,6 +131,37 @@ New issue:
     )
 
 
+def notify_assigned_issue(issue, globalib):
+    ''' Notify the people following an issue that the assignee changed.
+    '''
+    text = """
+The issue: `%s` of project: `%s` has been assigned to `%s` by %s.
+
+%s
+""" % (
+    issue.title,
+    issue.project.name,
+    issue.assignee.user,
+    issue.user.user,
+    '%s/%s/issue/%s' % (
+        progit.APP.config['APP_URL'],
+        issue.project.name,
+        globalib,
+    ),
+    )
+    mail_to = set([cmt.user.emails[0].email for cmt in issue.comments])
+    mail_to.add(issue.project.user.emails[0].email)
+    if issue.assignee and issue.assignee.emails:
+        mail_to.add(issue.assignee.emails[0].email)
+
+    send_email(
+        text,
+        'Issue `%s` assigned' % issue.title,
+        ','.join(mail_to),
+        mail_id=issue.mail_id,
+    )
+
+
 def notify_new_pull_request(request, globalid):
     ''' Notify the people following a project that a new pull-request was
     added to it.

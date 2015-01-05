@@ -250,6 +250,10 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
         session.flush()
         update_git_ticket(
             issue, repo=issue.project, ticketfolder=ticketfolder)
+
+        globalid = get_issue_global_id(session, issue.project.id, issue.id)
+        progit.notify.notify_assigned_issue(issue, globalid)
+
         return 'Issue assigned'
 
 
