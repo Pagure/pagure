@@ -301,7 +301,7 @@ class Issue(BASE):
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id], backref='issues')
     assignee = relation('User', foreign_keys=[assignee_id],
-                        remote_side=[User.id], backref='issues')
+                        remote_side=[User.id], backref='assigned_issues')
 
     def __repr__(self):
         return 'Issue(%s, project:%s, user:%s, title:%s)' % (
