@@ -51,6 +51,7 @@ td, th {
 }
 
 table.list thead th,
+table.list thead th a,
 .user_list a:hover,
 .project_list > header,
 [id=fork_button]:hover,
@@ -418,7 +419,8 @@ table.list td:first-child {
 }
 
 table.list .open_date,
-table.list .open_by {
+table.list .open_by,
+table.list .assigned {
     width: 9em;
 }
 
