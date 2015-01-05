@@ -200,6 +200,10 @@ def add_issue_tag(session, issue, tag, user, ticketfolder):
             'No user "%s" found' % user
         )
 
+    for tag_issue in issue.tags:
+        if tag_issue.tag == tag:
+            return 'Tag already present: %s' % tag
+
     tagobj = get_tag(session, tag)
     if not tagobj:
         tagobj = model.Tag(tag=tag)
