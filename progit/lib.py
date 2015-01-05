@@ -710,11 +710,16 @@ def get_issues(
             model.TagIssue.tag.in_(tags)
         )
     if assignee is not None:
-        query = query.filter(
-            model.Issue.assignee_id == model.User.id
-        ).filter(
-            model.User.user == assignee
-        )
+        if assignee not in [0, '0']:
+            query = query.filter(
+                model.Issue.assignee_id == model.User.id
+            ).filter(
+                model.User.user == assignee
+            )
+        else:
+            query = query.filter(
+                model.Issue.assignee_id == None
+            )
 
     return query.all()
 
