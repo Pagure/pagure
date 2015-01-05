@@ -679,3 +679,9 @@ ul.changes {
     cursor: pointer;
     padding-right: 1em;
 }
+
+.inline_form div,
+.inline_form input {
+    display: inline-block;
+    margin-bottom: 0.3em;
+}
