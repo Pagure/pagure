@@ -46,7 +46,8 @@
     Tags:
     {% for tag in tag_list %}
     <a href="{{ url_for('view_issues', username=username,
-               repo=repo.name, tags=tag.tag) }}">
+               repo=repo.name, tags=tag.tag) }}"
+               title="Filter issues by tag">
         {{ tag.tag }}</a>{% if not loop.last %},{% endif %}
     {% endfor %}
 </section>
@@ -81,7 +82,8 @@
             </td>
             <td>
                 <a href="{{ url_for('view_issues', username=username,
-                    repo=repo.name, author=issue[0].user.user) }}">
+                    repo=repo.name, author=issue[0].user.user) }}"
+                    title="Filter issues by reporter">
                     {{ issue[0].user.user | avatar(16) | safe }}
                     {{issue[0].user.user}}
                 </a>
@@ -92,7 +94,8 @@
             <td>
               {% if issue[0].assignee %}
               <a href="{{ url_for('view_issues', username=username,
-                repo=repo.name, assignee=issue[0].assignee.username) }}">
+                repo=repo.name, assignee=issue[0].assignee.username) }}"
+                title="Filter issues by assignee">
                 {{ issue[0].user.user | avatar(16) | safe }}
                 {{ issue[0].assignee.user }}
               </a>
