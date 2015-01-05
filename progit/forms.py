@@ -76,6 +76,14 @@ class AddIssueTagForm(wtf.Form):
     )
 
 
+class AddIssueAssigneeForm(wtf.Form):
+    ''' Form to add a tag to an issue. '''
+    assignee = wtforms.TextField(
+        'assignee<span class="error">*</span>',
+        [wtforms.validators.Required()]
+    )
+
+
 class AddPullRequestCommentForm(wtf.Form):
     ''' Form to add a comment to a pull-request. '''
     commit = wtforms.HiddenField('commit identifier')
