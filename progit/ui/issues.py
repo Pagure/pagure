@@ -238,6 +238,7 @@ def view_issues(repo, username=None):
     tags = flask.request.args.getlist('tags', None)
     tags = [tag for tag in tags if tag]
     assignee = flask.request.args.get('assignee', None)
+    author = flask.request.args.get('author', None)
 
     repo = progit.lib.get_project(SESSION, repo, user=username)
 
@@ -255,6 +256,7 @@ def view_issues(repo, username=None):
                 closed=True,
                 tags=tags,
                 assignee=assignee,
+                author=author,
             )
         else:
             issues = progit.lib.get_issues(
@@ -263,10 +265,12 @@ def view_issues(repo, username=None):
                 status=status,
                 tags=tags,
                 assignee=assignee,
+                author=author,
             )
     else:
         issues = progit.lib.get_issues(
-            SESSION, repo, status='Open', tags=tags, assignee=assignee)
+            SESSION, repo, status='Open', tags=tags, assignee=assignee,
+            author=author)
 
     tag_list = progit.lib.get_tags_of_project(SESSION, repo)
 
