@@ -222,6 +222,37 @@ def add_issue_tag(session, issue, tag, user, ticketfolder):
     return 'Tag added'
 
 
+def add_issue_assignee(session, issue, assignee, user, ticketfolder):
+    ''' Add an assignee to an issue, in other words, assigned an issue. '''
+    user_obj = get_user(session, user)
+    if not user_obj:
+        user_obj = get_user_by_email(session, user)
+
+    if not user_obj:
+        raise progit.exceptions.ProgitException(
+            'No user "%s" found' % user
+        )
+
+    # Validate the assignee
+    user_obj = get_user(session, assignee)
+    if not user_obj:
+        user_obj = get_user_by_email(session, assignee)
+
+    if not user_obj:
+        raise progit.exceptions.ProgitException(
+            'No user "%s" found' % assignee
+        )
+
+    if issue.assignee_id != user_obj.id:
+        issue.assignee_id = user_obj.id
+        session.add(issue)
+        # Make sure we won't have SQLAlchemy error before we create the repo
+        session.flush()
+        update_git_ticket(
+            issue, repo=issue.project, ticketfolder=ticketfolder)
+        return 'Issue assigned'
+
+
 def remove_issue_tags(session, project, tags):
     ''' Removes the specified tag of a project. '''
 
