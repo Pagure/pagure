@@ -280,6 +280,11 @@ class Issue(BASE):
         sa.ForeignKey('users.id', onupdate='CASCADE'),
         nullable=False,
         index=True)
+    assignee_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey('users.id', onupdate='CASCADE'),
+        nullable=True,
+        index=True)
     status = sa.Column(
         sa.Text,
         sa.ForeignKey(
@@ -295,6 +300,8 @@ class Issue(BASE):
         backref='issues')
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id], backref='issues')
+    assignee = relation('User', foreign_keys=[assignee_id],
+                        remote_side=[User.id], backref='issues')
 
     def __repr__(self):
         return 'Issue(%s, project:%s, user:%s, title:%s)' % (
