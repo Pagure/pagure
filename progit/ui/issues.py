@@ -69,14 +69,11 @@ def add_comment_issue(repo, issueid, username=None):
         'view_issue', username=username, repo=repo.name, issueid=issueid))
 
 
-@APP.route('/<repo>/issue/<int:issueid>/tag', methods=('GET', 'POST'))
+@APP.route('/<repo>/issue/<int:issueid>/tag', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/issue/<int:issueid>/tag',
-           methods=('GET', 'POST'))
-@APP.route('/<repo>/issue/<int:issueid>/tag/<chrome>', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/tag/<chrome>',
-           methods=('GET', 'POST'))
+           methods=['POST'])
 @cla_required
-def add_tag_issue(repo, issueid, username=None, chrome=True):
+def add_tag_issue(repo, issueid, username=None):
     ''' Add a tag to an issue. '''
     repo = progit.lib.get_project(SESSION, repo, user=username)
 
@@ -107,28 +104,14 @@ def add_tag_issue(repo, issueid, username=None, chrome=True):
                     ticketfolder=APP.config['TICKETS_FOLDER'],
                 )
                 SESSION.commit()
-                msg = 'Added tag: %s' % tag
-                flask.flash(msg)
+                flask.flash(message)
             except SQLAlchemyError, err:  # pragma: no cover
                 SESSION.rollback()
                 LOG.error(err)
                 flask.flash('Could not add tag: %s' % tag, 'error')
 
-    if not chrome:
-        if cat is not None:
-            output = {'output': 'notok', 'message': msg}
-            httpcode = 500
-        else:
-            output = {'output': 'ok', 'message': msg}
-            httpcode = 200
-
-        jsonout = flask.jsonify(output)
-        jsonout.status_code = httpcode
-        return jsonout
-
-    else:
-        return flask.redirect(flask.url_for(
-            'view_issue', username=username, repo=repo.name, issueid=issueid))
+    return flask.redirect(flask.url_for(
+        'view_issue', username=username, repo=repo.name, issueid=issueid))
 
 
 @APP.route('/<repo>/tag/<tag>/edit', methods=('GET', 'POST'))
