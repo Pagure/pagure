@@ -238,7 +238,8 @@
       window.location.href = final_url;
     }
   );
-
+{% if pull_request %}
+{# These lines are only for existing pull-requests, not new ones #}
   $('#cancel_pr').click(function(){
         return window.confirm("Are you sure you want to cancel this requested pull?");
   });
@@ -284,6 +285,7 @@
       }
     }
   );
+{% endif %}
 
  });
 </script>
