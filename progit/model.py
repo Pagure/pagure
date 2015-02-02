@@ -401,27 +401,30 @@ class PullRequest(BASE):
     __tablename__ = 'pull_requests'
 
     id = sa.Column(sa.Integer, primary_key=True)
+    title = sa.Column(
+        sa.Text,
+        nullable=False)
     project_id = sa.Column(
         sa.Integer,
         sa.ForeignKey(
             'projects.id', ondelete='CASCADE', onupdate='CASCADE'),
+        nullable=False)
+    branch = sa.Column(
+        sa.Text(),
         nullable=False)
     project_id_from = sa.Column(
         sa.Integer,
         sa.ForeignKey(
             'projects.id', ondelete='CASCADE', onupdate='CASCADE'),
         nullable=False)
-    title = sa.Column(
-        sa.Text,
-        nullable=False)
-    branch = sa.Column(
+    branch_from = sa.Column(
         sa.Text(),
         nullable=False)
-    start_id = sa.Column(
-        sa.String(40),
+    commit_start = sa.Column(
+        sa.Text(),
         nullable=True)
-    stop_id = sa.Column(
-        sa.String(40),
+    commit_stop = sa.Column(
+        sa.Text(),
         nullable=False)
     user_id = sa.Column(
         sa.Integer,
