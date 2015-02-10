@@ -124,3 +124,6 @@ SHORT_LENGTH = 6
 
 # Make browsers send session cookie only via HTTPS
 SESSION_COOKIE_SECURE = True
+
+# Used by SESSION_COOKIE_PATH
+APPLICATION_ROOT = '/progit'
