@@ -121,3 +121,6 @@ CHECK_SESSION_IP = True
 
 # Lenght for short commits ids or file hex
 SHORT_LENGTH = 6
+
+# Make browsers send session cookie only via HTTPS
+SESSION_COOKIE_SECURE = True
