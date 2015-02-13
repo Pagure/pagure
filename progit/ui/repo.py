@@ -689,10 +689,12 @@ def delete_repo(repo, username=None):
     if repo.is_fork:
         repopath = os.path.join(APP.config['FORK_FOLDER'], repo.path)
     docpath = os.path.join(APP.config['DOCS_FOLDER'], repo.path)
+    ticketpath = os.path.join(APP.config['TICKETS_FOLDER'], repo.path)
 
     try:
         shutil.rmtree(repopath)
         shutil.rmtree(docpath)
+        shutil.rmtree(ticketpath)
         SESSION.commit()
     except (OSError, IOError), err:
         APP.logger.exception(err)
