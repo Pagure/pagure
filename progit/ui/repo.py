@@ -427,7 +427,7 @@ def view_raw_file(repo, identifier, filename=None, username=None):
             mimetype = 'text/plain'
 
     if mimetype.startswith('text/') and not encoding:
-        encoding = chardet.detect(data)['encoding']
+        encoding = chardet.detect(bytes(data))['encoding']
 
     headers = {'Content-Type': mimetype}
     if encoding:
