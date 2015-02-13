@@ -339,7 +339,7 @@ def add_user_to_project(session, project, user):
     # Make sure we won't have SQLAlchemy error before we create the repo
     session.flush()
 
-    return 'Comment added'
+    return 'User added'
 
 
 def add_pull_request_comment(session, request, commit, row, comment, user):
