@@ -244,6 +244,9 @@ def format_ts(string):
 def format_loc(loc, commit=None, prequest=None, index=None):
     """ Template filter putting the provided lines of code into a table
     """
+    if loc is None:
+        return
+
     output = [
         '<div class="highlight">',
         '<table class="code_table">'
@@ -385,6 +388,8 @@ def markdown_filter(text):
 @APP.template_filter('html_diff')
 def html_diff(diff):
     """Display diff as HTML"""
+    if diff is None:
+        return
     return highlight(
         diff,
         DiffLexer(),
