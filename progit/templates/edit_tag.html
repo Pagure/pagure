@@ -1,0 +1,28 @@
+{% extends "repo_master.html" %}
+{% from "_formhelper.html" import render_field_in_row %}
+
+{% block title %}Edit tag: {{ tag }} - {{ repo.name }}{% endblock %}
+{%block tag %}home{% endblock %}
+
+
+{% block repo %}
+
+<h2>Edit tag: {{ tag }}</h2>
+
+<section class="edit_tag">
+    <form action="{{ url_for('.edit_tag',
+                     username=username, repo=repo.name, tag=tag) }}" method="post">
+
+    <p>Enter in the field below the new name for the tag: "{{ tag }}"</p>
+    <table>
+      {{ render_field_in_row(form.tag) }}
+    </table>
+    <p class="buttons indent">
+      <input type="submit" class="submit positive button" value="Edit">
+      <input type="button" value="Cancel" class="button" onclick="history.back();">
+      {{ form.csrf_token }}
+    </p>
+  </form>
+</section>
+
+{% endblock %}
