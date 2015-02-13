@@ -58,22 +58,6 @@ class RequestPullForm(wtf.Form):
         'Title<span class="error">*</span>',
         [wtforms.validators.Required()]
     )
-    branch = wtforms.SelectField(
-        'Request merge to branch<span class="error">*</span>',
-        [wtforms.validators.Required()],
-        choices=[(item, item) for item in []]
-    )
-
-    def __init__(self, *args, **kwargs):
-        """ Calls the default constructor with the normal argument but
-        uses the list of collection provided to fill the choices of the
-        drop-down list.
-        """
-        super(RequestPullForm, self).__init__(*args, **kwargs)
-        if 'branches' in kwargs:
-            self.branch.choices = [
-                (branch, branch) for branch in kwargs['branches']
-            ]
 
 
 class AddIssueCommentForm(wtf.Form):
