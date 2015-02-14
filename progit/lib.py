@@ -935,7 +935,7 @@ def close_pull_request(session, request, user, merged=True):
     session.flush()
 
     globalid = get_pull_request_global_id(
-        session, request.project.id, request.id)
+        session, request.repo.id, request.id)
 
     if merged == True:
         progit.notify.notify_merge_pull_request(request, user, globalid)
