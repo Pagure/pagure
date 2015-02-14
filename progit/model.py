@@ -249,7 +249,8 @@ class ProjectUser(BASE):
 
     project = relation(
         'Project', foreign_keys=[project_id], remote_side=[Project.id],
-        backref='users')
+        backref='users', cascade="delete, delete-orphan",
+        single_parent=True)
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id], backref='co_projects')
 
@@ -297,7 +298,8 @@ class Issue(BASE):
 
     project = relation(
         'Project', foreign_keys=[project_id], remote_side=[Project.id],
-        backref='issues')
+        backref='issues', cascade="delete, delete-orphan",
+        single_parent=True)
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id], backref='issues')
     assignee = relation('User', foreign_keys=[assignee_id],
@@ -389,7 +391,7 @@ class TagIssue(BASE):
 
     issue = relation(
         'Issue', foreign_keys=[issue_id], remote_side=[Issue.id],
-        backref='tags')
+        backref='tags', cascade="delete, delete-orphan", single_parent=True)
 
 
 class PullRequest(BASE):
@@ -438,7 +440,8 @@ class PullRequest(BASE):
 
     repo = relation(
         'Project', foreign_keys=[project_id], remote_side=[Project.id],
-        backref='requests')
+        backref='requests', cascade="delete, delete-orphan",
+        single_parent=True)
     repo_from = relation(
         'Project', foreign_keys=[project_id_from], remote_side=[Project.id])
     user = relation('User', foreign_keys=[user_id],
@@ -529,13 +532,16 @@ class GlobalId(BASE):
 
     project = relation(
         'Project', foreign_keys=[project_id], remote_side=[Project.id],
-        backref='global_id')
+        backref='global_id', cascade="delete, delete-orphan",
+        single_parent=True)
     issue = relation(
         'Issue', foreign_keys=[issue_id], remote_side=[Issue.id],
-        backref='global_id')
+        backref='global_id', cascade="delete, delete-orphan",
+        single_parent=True)
     request = relation(
         'PullRequest', foreign_keys=[request_id], remote_side=[PullRequest.id],
-        backref='global_id')
+        backref='global_id', cascade="delete, delete-orphan",
+        single_parent=True)
 
     __table_args__ = (
         # Both fields should not be NULL
