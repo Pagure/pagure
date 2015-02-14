@@ -427,7 +427,7 @@ class PullRequest(BASE):
         nullable=True)
     commit_stop = sa.Column(
         sa.Text(),
-        nullable=False)
+        nullable=True)
     user_id = sa.Column(
         sa.Integer,
         sa.ForeignKey('users.id', onupdate='CASCADE'),
