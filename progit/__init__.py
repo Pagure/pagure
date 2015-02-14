@@ -411,6 +411,20 @@ def patch_to_diff(patch):
     return content
 
 
+@APP.template_filter('diff_to_diff')
+def diff_to_diff(diff):
+    """Render a hunk as a diff"""
+    content = ""
+    patches = [p for p in diff]
+    for patch in patches:
+        for hunk in patch.hunks:
+            content = content + "@@ -%i,%i +%i,%i @@\n" % (hunk.old_start,
+                hunk.old_lines, hunk.new_start, hunk.new_lines)
+            for line in hunk.lines:
+                content = content + ' '.join(line)
+    return content
+
+
 @FAS.postlogin
 def set_user(return_url):
     ''' After login method. '''
