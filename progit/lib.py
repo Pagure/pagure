@@ -464,9 +464,8 @@ def new_issue(session, repo, title, content, user, ticketfolder):
     return 'Issue created'
 
 
-def new_pull_request(
-        session, repo, repo_from, branch, title, user, stop_id,
-        start_id=None):
+def new_pull_request(session, repo_from, branch_from,
+                     repo_to, branch_to, title, user):
     ''' Create a new pull request on the specified repo. '''
     user_obj = get_user(session, user)
 
@@ -476,12 +475,11 @@ def new_pull_request(
         )
 
     request = model.PullRequest(
-        project_id=repo.id,
+        project_id=repo_to.id,
         project_id_from=repo_from.id,
-        branch=branch,
+        branch=branch_to,
+        branch_from=branch_from,
         title=title,
-        start_id=start_id,
-        stop_id=stop_id,
         user_id=user_obj.id,
     )
     session.add(request)
@@ -489,7 +487,7 @@ def new_pull_request(
     session.flush()
 
     global_id = model.GlobalId(
-        project_id=repo.id,
+        project_id=repo_to.id,
         request_id=request.id,
     )
 
@@ -497,7 +495,7 @@ def new_pull_request(
     session.flush()
 
     globalid = get_pull_request_global_id(
-        session, request.project.id, request.id)
+        session, request.repo.id, request.id)
 
     progit.notify.notify_new_pull_request(request, globalid)
 
