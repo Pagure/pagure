@@ -41,7 +41,8 @@ class ProgitTicketsTable(BASE):
     active = sa.Column(sa.Boolean, nullable=False, default=False)
 
     project = relation(
-        'Project', remote_side=[Project.id], backref='progit_hook_tickets')
+        'Project', remote_side=[Project.id], backref='progit_hook_tickets',
+        cascade="delete, delete-orphan", single_parent=True)
 
 
 class ProgitTicketsForm(wtf.Form):

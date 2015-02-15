@@ -42,7 +42,8 @@ class MailTable(BASE):
     active = sa.Column(sa.Boolean, nullable=False, default=False)
 
     project = relation(
-        'Project', remote_side=[Project.id], backref='mail_hook')
+        'Project', remote_side=[Project.id], backref='mail_hook',
+        cascade="delete, delete-orphan", single_parent=True)
 
 
 class MailForm(wtf.Form):

@@ -47,7 +47,8 @@ class IrcTable(BASE):
     ssl = sa.Column(sa.Boolean, nullable=False, default=True)
 
     project = relation(
-        'Project', remote_side=[Project.id], backref='irc_hook')
+        'Project', remote_side=[Project.id], backref='irc_hook',
+        cascade="delete, delete-orphan", single_parent=True)
 
 
 class IrcForm(wtf.Form):
