@@ -768,16 +768,18 @@ def add_user(repo, username=None):
     form = progit.forms.AddUserForm()
 
     if form.validate_on_submit():
-        msg = progit.lib.add_user_to_project(SESSION, repo, form.user.data)
-
-        SESSION.commit()
-
-        progit.generate_gitolite_acls()
-
-        flask.flash(msg)
-        return flask.redirect(
-            flask.url_for('.view_settings', repo=repo.name, username=username)
-        )
+        try:
+            msg = progit.lib.add_user_to_project(
+                SESSION, repo, form.user.data)
+            SESSION.commit()
+            progit.generate_gitolite_acls()
+            flask.flash(msg)
+            return flask.redirect(
+                flask.url_for(
+                    '.view_settings', repo=repo.name, username=username)
+            )
+        except progit.exceptions.ProgitException as msg:
+            flask.flash(msg, 'error')
 
     return flask.render_template(
         'add_user.html',
