@@ -208,6 +208,14 @@ def set_session():
     flask.session.permanent = True
 
 
+@APP.template_filter('hasattr')
+def jinja_hasattr(obj, string):
+    """ Template filter checking if the provided object at the provided
+    string as attribute
+    """
+    return hasattr(obj, string)
+
+
 @APP.template_filter('lastcommit_date')
 def lastcommit_date_filter(repo):
     """ Template filter returning the last commit date of the provided repo.

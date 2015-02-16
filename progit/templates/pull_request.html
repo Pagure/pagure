@@ -138,7 +138,11 @@
                 identifier=branch_from,
                 filename=patch.new_file_path) }}"
         {% endif %}
+        {% if patch |hasattr('new_id') %}
         title="View file as of {{ patch.new_id|short }}">View</a>
+        {% else %}
+        title="View file as of {{ patch.new_oid|short }}">View</a>
+        {% endif %}
       </li>
     </ul>
 </header>
