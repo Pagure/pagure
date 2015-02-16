@@ -739,11 +739,15 @@ def remove_user(repo, userid, username=None):
         if str(user.user.id) == str(userid):
             SESSION.delete(user)
             break
-    SESSION.commit()
+    try:
+        SESSION.commit()
+        progit.generate_gitolite_acls()
+        flask.flash('User removed')
+    except SQLAlchemyError as err:
+        SESSION.rollback()
+        APP.logger.exception(err)
+        flask.flash('User could not be removed', 'error')
 
-    progit.generate_gitolite_acls()
-
-    flask.flash('User removed')
     return flask.redirect(
         flask.url_for('.view_settings', repo=repo.name, username=username)
     )
@@ -779,7 +783,12 @@ def add_user(repo, username=None):
                     '.view_settings', repo=repo.name, username=username)
             )
         except progit.exceptions.ProgitException as msg:
+            SESSION.rollback()
             flask.flash(msg, 'error')
+        except SQLAlchemyError as err:
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash('User could not be added', 'error')
 
     return flask.render_template(
         'add_user.html',
