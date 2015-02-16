@@ -13,6 +13,8 @@ __requires__ = ['SQLAlchemy >= 0.8', 'jinja2 >= 2.4']
 import pkg_resources
 
 __version__ = '0.0'
+__api_version__ = '0'
+
 
 import datetime
 import logging
@@ -533,6 +535,9 @@ import progit.ui.fork
 import progit.ui.issues
 import progit.ui.plugins
 import progit.ui.repo
+
+import progit.api
+APP.register_blueprint(progit.api.API)
 
 
 # Only import the login controller if the app is set up for local login
