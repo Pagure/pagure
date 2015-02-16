@@ -336,7 +336,8 @@ def merge_request_pull(repo, requestid, username=None):
     newpath = tempfile.mkdtemp()
     new_repo = pygit2.clone_repository(parentpath, newpath)
 
-    repo_commit = fork_obj[request.stop_id]
+    repo_commit = fork_obj[
+        fork_obj.lookup_branch(request.branch_from).get_object().hex]
 
     ori_remote = new_repo.remotes[0]
     # Add the fork as remote repo
@@ -347,18 +348,37 @@ def merge_request_pull(repo, requestid, username=None):
     remote.fetch()
 
     merge = new_repo.merge(repo_commit.oid)
-    master_ref = new_repo.lookup_reference('HEAD').resolve()
+    if merge is None:
+        mergecode, prefcode = new_repo.merge_analysis(repo_commit.oid)
 
-    refname = '%s:%s' % (master_ref.name, master_ref.name)
-    if merge.is_uptodate:
+    try:
+        branch_ref = new_repo.lookup_reference(
+            request.branch).resolve()
+    except ValueError:
+        branch_ref = new_repo.lookup_reference(
+            'refs/heads/%s' % request.branch).resolve()
+
+    refname = '%s:%s' % (branch_ref.name, branch_ref.name)
+    if ((merge is not None and merge.is_uptodate)
+            or
+            (merge is None and mergecode & pygit2.GIT_MERGE_ANALYSIS_UP_TO_DATE)):
         flask.flash('Nothing to do, changes were already merged', 'error')
         progit.lib.close_pull_request(SESSION, request)
         SESSION.commit()
         return flask.redirect(error_output)
-    elif merge.is_fastforward:
-        master_ref.target = merge.fastforward_oid
+    elif ((merge is not None and merge.is_fastforward)
+           or
+           (merge is None and mergecode & pygit2.GIT_MERGE_ANALYSIS_FASTFORWARD)):
+        if merge is not None:
+            branch_ref.target = merge.fastforward_oid
+            sha = merge.fastforward_oid
+        elif merge is None and mergecode is not None:
+            print repo_commit.oid
+            branch_ref.set_target(repo_commit.oid.hex)
+            sha = branch_ref.target
         ori_remote.push(refname)
         flask.flash('Changes merged!')
+
     else:
         new_repo.index.write()
         try:
