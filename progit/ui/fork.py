@@ -29,6 +29,28 @@ from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
                     is_repo_admin, generate_gitolite_acls)
 
 
+def _get_repo_path(repo):
+    """ Return the pat of the git repository corresponding to the provided
+    Repository object from the DB.
+    """
+    if repo.is_fork:
+        repopath = os.path.join(APP.config['FORK_FOLDER'], repo.path)
+    else:
+        repopath = os.path.join(APP.config['GIT_FOLDER'], repo.path)
+    return repopath
+
+
+def _get_parent_repo_path(repo):
+    """ Return the path of the parent git repository corresponding to the
+    provided Repository object from the DB.
+    """
+    if repo.parent:
+        parentpath = os.path.join(APP.config['GIT_FOLDER'], repo.parent.path)
+    else:
+        parentpath = os.path.join(APP.config['GIT_FOLDER'], repo.path)
+    return parentpath
+
+
 @APP.route('/<repo>/request-pulls')
 @APP.route('/fork/<username>/<repo>/request-pulls')
 def request_pulls(repo, username=None):
@@ -76,18 +98,11 @@ def request_pull(repo, requestid, username=None):
         flask.abort(404, 'Pull-request not found')
 
     repo_from = request.repo_from
-
-    if repo_from.is_fork:
-        repopath = os.path.join(APP.config['FORK_FOLDER'], repo_from.path)
-    else:
-        repopath = os.path.join(APP.config['GIT_FOLDER'], repo_from.path)
+    repopath = _get_repo_path(repo_from)
     repo_obj = pygit2.Repository(repopath)
 
-    if repo_from.parent:
-        parentname = os.path.join(APP.config['GIT_FOLDER'], repo_from.parent.path)
-    else:
-        parentname = os.path.join(APP.config['GIT_FOLDER'], repo_from.path)
-    orig_repo = pygit2.Repository(parentname)
+    parentpath = _get_parent_repo_path(repo_from)
+    orig_repo = pygit2.Repository(parentpath)
 
     branch = repo_obj.lookup_branch(request.branch_from)
     commitid = branch.get_object().hex
@@ -169,19 +184,12 @@ def request_pull_patch(repo, requestid, username=None):
     if not request:
         flask.abort(404, 'Pull-request not found')
 
-    repo = request.repo_from
-
-    if repo.is_fork:
-        repopath = os.path.join(APP.config['FORK_FOLDER'], repo.path)
-    else:
-        repopath = os.path.join(APP.config['GIT_FOLDER'], repo.path)
+    repo_from = request.repo_from
+    repopath = _get_repo_path(repo_from)
     repo_obj = pygit2.Repository(repopath)
 
-    if repo.parent:
-        parentname = os.path.join(APP.config['GIT_FOLDER'], repo.parent.path)
-    else:
-        parentname = os.path.join(APP.config['GIT_FOLDER'], repo.path)
-    orig_repo = pygit2.Repository(parentname)
+    parentpath = _get_parent_repo_path(repo_from)
+    orig_repo = pygit2.Repository(parentpath)
 
     branch = repo_obj.lookup_branch(request.branch_from)
     commitid = branch.get_object().hex
@@ -512,17 +520,11 @@ def new_request_pull(repo,  branch_to, branch_from, username=None):
             403,
             'You are not allowed to create pull-requests for this project')
 
-    if repo.is_fork:
-        repopath = os.path.join(APP.config['FORK_FOLDER'], repo.path)
-    else:
-        repopath = os.path.join(APP.config['GIT_FOLDER'], repo.path)
+    repopath = _get_repo_path(repo)
     repo_obj = pygit2.Repository(repopath)
 
-    if repo.parent:
-        parentname = os.path.join(APP.config['GIT_FOLDER'], repo.parent.path)
-    else:
-        parentname = os.path.join(APP.config['GIT_FOLDER'], repo.path)
-    orig_repo = pygit2.Repository(parentname)
+    parentpath = _get_parent_repo_path(repo)
+    orig_repo = pygit2.Repository(parentpath)
 
     frombranch = repo_obj.lookup_branch(branch_from)
     if not frombranch:
