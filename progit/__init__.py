@@ -241,7 +241,7 @@ def format_ts(string):
 
 
 @APP.template_filter('format_loc')
-def format_loc(loc, commit=None, prequest=None, index=None):
+def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
     """ Template filter putting the provided lines of code into a table
     """
     if loc is None:
@@ -255,24 +255,26 @@ def format_loc(loc, commit=None, prequest=None, index=None):
     comments = {}
     if prequest and not isinstance(prequest, flask.wrappers.Request):
         for com in prequest.comments:
-            if commit and com.commit_id == commit.oid.hex:
+            if commit and com.commit_id == commit:
                 if com.line in comments:
                     comments[com.line].append(com)
                 else:
                     comments[com.line] = [com]
     for key in comments:
-        comments[key] = sorted(comments[key], key=lambda obj: obj.date_created)
+        comments[key] = sorted(
+            comments[key], key=lambda obj: obj.date_created)
 
     if not index:
         index = ''
 
     cnt = 1
     for line in loc.split('\n'):
-        if commit:
+        if filename and commit:
             output.append(
                 '<tr><td class="cell1">'
                 '<a id="%(cnt)s" href="#%(cnt)s">%(cnt_lbl)s</a></td>'
-                '<td class="prc" data-row="%(cnt_lbl)s" data-commit="%(commitid)s">'
+                '<td class="prc" data-row="%(cnt_lbl)s"'
+                ' data-filename="%(filename)s" data-commit="%(commit)s">'
                 '<p>'
                 '<img src="%(img)s" alt="Add comment" title="Add comment"/>'
                 '</p>'
@@ -281,7 +283,8 @@ def format_loc(loc, commit=None, prequest=None, index=None):
                         'cnt': '%s_%s' % (index, cnt),
                         'cnt_lbl': cnt,
                         'img': flask.url_for('static', filename='users.png'),
-                        'commitid': commit.oid.hex,
+                        'filename': filename,
+                        'commit': commit,
                     }
                 )
             )

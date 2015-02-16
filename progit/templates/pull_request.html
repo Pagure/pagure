@@ -121,7 +121,10 @@
     </h3>
 {% autoescape false %}
     {{ patch | patch_to_diff | html_diff | format_loc(
-            filename=patch.new_file_path, prequest=pull_request)}}
+            filename=patch.new_file_path,
+            commit=patch.new_id,
+            prequest=pull_request,
+            index=loop.index)}}
 {% endautoescape %}
 {% endfor %}
 {% endif %}
