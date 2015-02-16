@@ -103,15 +103,12 @@
   </ul>
 </section>
 
-
-
 <section class="request_diff">
 
 <header>
 <table>
   <tr>
     <th>Changes</th>
-    {% for patch in diff %}
     <td>
         <ul class="changes">
         {% for patch in diff %}
@@ -129,7 +126,6 @@
         {% endfor %}
         </ul>
     </td>
-    {% endfor %}
 </header>
 
 {% if diff %}
