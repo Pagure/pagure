@@ -556,7 +556,6 @@ def new_request_pull(repo,  branch_to, branch_from, username=None):
 
     diff_commits = []
     if not repo_obj.is_empty and not orig_repo.is_empty:
-        print 'case 1'
         orig_commit = orig_repo[
             orig_repo.lookup_branch(branch_to).get_object().hex]
 
@@ -581,7 +580,6 @@ def new_request_pull(repo,  branch_to, branch_from, username=None):
         )
 
     elif orig_repo.is_empty:
-        print 'case 2'
         orig_commit = None
         repo_commit = repo_obj[repo_obj.head.target]
         diff = repo_commit.tree.diff_to_tree(swap=True)
@@ -627,8 +625,6 @@ def new_request_pull(repo,  branch_to, branch_from, username=None):
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')
-    else:
-        print form.errors
 
     return flask.render_template(
         'pull_request.html',
