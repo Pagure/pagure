@@ -105,33 +105,23 @@
 
 <section class="request_diff">
 
-<header>
-<table>
-  <tr>
-    <th>Changes</th>
-    <td>
-        <ul class="changes">
-        {% for patch in diff %}
-          <li>
-            <span class="addrem_bar">
-              {% if (patch.additions + patch.deletions) %}
-                <span style="width: {{ (100.0 * patch.additions / (patch.additions + patch.deletions))|round|int }}%">
-                    {% if patch.additions > 0 %}+{{ patch.additions }}{% endif %}
-                    {% if patch.deletions > 0 %}-{{ patch.deletions }}{% endif %}
-                </span>
-              {% endif %}
-            </span>
-            {{ patch.new_file_path }}
-          </li>
-        {% endfor %}
-        </ul>
-    </td>
-</header>
 
 {% if diff %}
+{% for patch in diff %}
+    <span class="addrem_bar">
+      {% if (patch.additions + patch.deletions) %}
+        <span style="width: {{ (100.0 * patch.additions / (patch.additions + patch.deletions))|round|int }}%">
+            {% if patch.additions > 0 %}+{{ patch.additions }}{% endif %}
+            {% if patch.deletions > 0 %}-{{ patch.deletions }}{% endif %}
+        </span>
+      {% endif %}
+    </span>
+    {{ patch.new_file_path }}
 {% autoescape false %}
-    {{ diff.patch|html_diff|format_loc(prequest=pull_request)}}
+    {{ patch | patch_to_diff | html_diff | format_loc(
+            filename=patch.new_file_path, prequest=pull_request)}}
 {% endautoescape %}
+{% endfor %}
 {% endif %}
 
 </section>
