@@ -207,20 +207,25 @@ def request_pull_patch(repo, requestid, username=None):
         orig_commit = orig_repo[
             orig_repo.lookup_branch(request.branch).get_object().hex]
 
-        master_commits = [
-            commit.oid.hex
-            for commit in orig_repo.walk(
-                orig_repo.lookup_branch(request.branch).get_object().hex,
-                pygit2.GIT_SORT_TIME)
-        ]
-
-        for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
-            if request.status is False \
-                    and commit.oid.hex == request.commit_start:
-                break
-            elif request.status and commit.oid.hex in master_commits:
-                break
-            diff_commits.append(commit)
+        # Closed pull-request
+        if request.status is False:
+            commitid = request.commit_stop
+            for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
+                diff_commits.append(commit)
+                if commit.oid.hex == request.commit_start:
+                    break
+        # Pull-request open
+        else:
+            master_commits = [
+                commit.oid.hex
+                for commit in orig_repo.walk(
+                    orig_repo.lookup_branch(request.branch).get_object().hex,
+                    pygit2.GIT_SORT_TIME)
+            ]
+            for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
+                if request.status and commit.oid.hex in master_commits:
+                    break
+                diff_commits.append(commit)
 
     elif orig_repo.is_empty:
         orig_commit = None
