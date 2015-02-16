@@ -87,6 +87,7 @@ class AddIssueAssigneeForm(wtf.Form):
 class AddPullRequestCommentForm(wtf.Form):
     ''' Form to add a comment to a pull-request. '''
     commit = wtforms.HiddenField('commit identifier')
+    filename = wtforms.HiddenField('file changed')
     row = wtforms.HiddenField('row')
     requestid = wtforms.HiddenField('requestid')
     comment = wtforms.TextAreaField(
