@@ -108,6 +108,7 @@
 
 {% if diff %}
 {% for patch in diff %}
+    <h3>
     <span class="addrem_bar">
       {% if (patch.additions + patch.deletions) %}
         <span style="width: {{ (100.0 * patch.additions / (patch.additions + patch.deletions))|round|int }}%">
@@ -117,6 +118,7 @@
       {% endif %}
     </span>
     {{ patch.new_file_path }}
+    </h3>
 {% autoescape false %}
     {{ patch | patch_to_diff | html_diff | format_loc(
             filename=patch.new_file_path, prequest=pull_request)}}
