@@ -2,7 +2,8 @@
 <section class="add_comment">
   <form action="{{ url_for(
     'pull_request_add_comment', username=username, repo=repo.name,
-    requestid=requestid, commit=commit, row=row) }}" method="post">
+    requestid=requestid, commit=commit, filename=filename, row=row) }}"
+    method="post">
     <div>
       <textarea id="comment" name="comment" title="comment"></textarea>
     </div>
