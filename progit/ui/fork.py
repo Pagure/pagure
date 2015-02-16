@@ -138,7 +138,14 @@ def request_pull(repo, requestid, username=None):
                 request.commit_start = first_commit.oid.hex
                 request.commit_stop = diff_commits[0].oid.hex
                 SESSION.add(request)
-                SESSION.commit()
+                try:
+                    SESSION.commit()
+                except SQLAlchemyError as err:
+                    SESSION.rollback()
+                    APP.logger.exception(err)
+                    flask.flash(
+                        'Could not update this pull-request in the database',
+                        'error')
 
         if diff_commits:
             first_commit = repo_obj[diff_commits[-1].oid.hex]
@@ -287,6 +294,7 @@ def pull_request_add_comment(repo, requestid, commit, filename, row,
             flask.flash(message)
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
+            APP.logger.exception(err)
             flask.flash(str(err), 'error')
 
         return flask.redirect(flask.url_for(
@@ -389,7 +397,12 @@ def merge_request_pull(repo, requestid, username=None):
             (merge is None and mergecode & pygit2.GIT_MERGE_ANALYSIS_UP_TO_DATE)):
         flask.flash('Nothing to do, changes were already merged', 'error')
         progit.lib.close_pull_request(SESSION, request)
-        SESSION.commit()
+        try:
+            SESSION.commit()
+        except SQLAlchemyError as err:
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash('Could not close this pull-request', 'error')
         return flask.redirect(error_output)
     elif ((merge is not None and merge.is_fastforward)
            or
@@ -430,7 +443,14 @@ def merge_request_pull(repo, requestid, username=None):
 
     # Update status
     progit.lib.close_pull_request(SESSION, request, flask.g.fas_user)
-    SESSION.commit()
+    try:
+        SESSION.commit()
+    except SQLAlchemyError as err:
+        SESSION.rollback()
+        APP.logger.exception(err)
+        flask.flash(
+            'Could not update this pull-request in the database',
+            'error')
     shutil.rmtree(newpath)
 
     return flask.redirect(flask.url_for('view_repo', repo=repo.name))
