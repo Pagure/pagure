@@ -485,8 +485,15 @@ def cancel_request_pull(repo, requestid, username=None):
 
         progit.lib.close_pull_request(
             SESSION, request, flask.g.fas_user, merged=False)
-        SESSION.commit()
-        flask.flash('Request pull canceled!')
+        try:
+            SESSION.commit()
+            flask.flash('Request pull canceled!')
+        except SQLAlchemyError as err:
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash(
+                'Could not update this pull-request in the database',
+                'error')
     else:
         flask.flash('Invalid input submitted', 'error')
 
@@ -629,8 +636,15 @@ def new_request_pull(repo,  branch_to, branch_from, username=None):
                 title=form.title.data,
                 user=flask.g.fas_user.username,
             )
-            SESSION.commit()
-            flask.flash(message)
+            try:
+                SESSION.commit()
+                flask.flash(message)
+            except SQLAlchemyError as err:
+                SESSION.rollback()
+                APP.logger.exception(err)
+                flask.flash(
+                    'Could not register this pull-request in the database',
+                    'error')
 
             if not parent.is_fork:
                 url = flask.url_for(
