@@ -490,16 +490,12 @@ def fork_project(repo, username=None):
     return flask.redirect(flask.url_for('view_repo', repo=repo.name))
 
 
-@APP.route('/<repo>/request-pull/new',
+@APP.route('/<repo>/diff/<branch_to>..<branch_from>',
            methods=('GET', 'POST'))
-@APP.route('/<repo>/request-pull/new/<commitid>',
-           methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/request-pull/new',
-           methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/request-pull/new/<commitid>',
+@APP.route('/fork/<username>/<repo>/diff/<branch_to>..<branch_from>',
            methods=('GET', 'POST'))
 @cla_required
-def new_request_pull(repo, username=None, commitid=None):
+def new_request_pull(repo,  branch_to, branch_from, username=None):
     """ Request pulling the changes from the fork into the project.
     """
     repo = progit.lib.get_project(SESSION, repo, user=username)
@@ -524,35 +520,31 @@ def new_request_pull(repo, username=None, commitid=None):
         parentname = os.path.join(APP.config['GIT_FOLDER'], repo.path)
     orig_repo = pygit2.Repository(parentname)
 
-    frombranchname = flask.request.args.get('from_branch', 'master')
-    frombranch = repo_obj.lookup_branch(frombranchname)
+    frombranch = repo_obj.lookup_branch(branch_from)
     if not frombranch:
-        flask.flash('Branch %s does not exist' % frombranchname, 'error')
-        frombranchname = 'master'
+        flask.abort(
+            400,
+            'Branch %s does not exist' % branch_from)
 
-    branchname = flask.request.args.get('branch', 'master')
-    branch = orig_repo.lookup_branch(branchname)
+    branch = orig_repo.lookup_branch(branch_to)
     if not branch:
-        flask.flash('Branch %s does not exist' % branchname, 'error')
-        branchname = 'master'
+        flask.abort(
+            400,
+            'Branch %s could not be found in the target repo' % branch_to)
 
-    if commitid is None:
-        commitid = repo_obj.head.target
-        if branchname:
-            branch = repo_obj.lookup_branch(frombranchname)
-            commitid = branch.get_object().hex
+    branch = repo_obj.lookup_branch(branch_from)
+    commitid = branch.get_object().hex
 
     diff_commits = []
-    diffs = []
     if not repo_obj.is_empty and not orig_repo.is_empty:
+        print 'case 1'
         orig_commit = orig_repo[
-            orig_repo.lookup_branch(branchname).get_object().hex]
+            orig_repo.lookup_branch(branch_to).get_object().hex]
 
         master_commits = [
             commit.oid.hex
             for commit in orig_repo.walk(
-                orig_repo.lookup_branch(branchname).get_object().hex,
-                pygit2.GIT_SORT_TIME)
+                orig_commit.oid.hex, pygit2.GIT_SORT_TIME)
         ]
 
         repo_commit = repo_obj[commitid]
@@ -562,14 +554,15 @@ def new_request_pull(repo, username=None, commitid=None):
             if commit.oid.hex in master_commits:
                 break
             diff_commits.append(commit)
-            diffs.append(
-                repo_obj.diff(
-                    repo_obj.revparse_single(commit.parents[0].oid.hex),
-                    repo_obj.revparse_single(commit.oid.hex)
-                )
-            )
+
+        first_commit = repo_obj[diff_commits[-1].oid.hex]
+        diff = repo_obj.diff(
+            repo_obj.revparse_single(first_commit.parents[0].oid.hex),
+            repo_obj.revparse_single(diff_commits[0].oid.hex)
+        )
 
     elif orig_repo.is_empty:
+        print 'case 2'
         orig_commit = None
         repo_commit = repo_obj[repo_obj.head.target]
         diff = repo_commit.tree.diff_to_tree(swap=True)
@@ -579,18 +572,6 @@ def new_request_pull(repo, username=None, commitid=None):
             'error')
         return flask.redirect(flask.url_for(
             'view_repo', username=username, repo=repo.name))
-
-    html_diffs = []
-    for diff in diffs:
-        html_diffs.append(
-            highlight(
-                diff.patch,
-                DiffLexer(),
-                HtmlFormatter(
-                    noclasses=True,
-                    style="tango",)
-            )
-        )
 
     form = progit.forms.RequestPullForm()
     if form.validate_on_submit():
@@ -604,12 +585,11 @@ def new_request_pull(repo, username=None, commitid=None):
 
             message = progit.lib.new_pull_request(
                 SESSION,
-                repo=parent,
+                repo_to=parent,
+                branch_to=branch_to,
+                branch_from=branch_from,
                 repo_from=repo,
-                branch=branchname,
                 title=form.title.data,
-                start_id=orig_commit,
-                stop_id=repo_commit.oid.hex,
                 user=flask.g.fas_user.username,
             )
             SESSION.commit()
@@ -628,22 +608,23 @@ def new_request_pull(repo, username=None, commitid=None):
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')
+    else:
+        print form.errors
 
     return flask.render_template(
         'pull_request.html',
         select='requests',
         repo=repo,
         username=username,
-        commitid=commitid,
         repo_obj=repo_obj,
         orig_repo=orig_repo,
         diff_commits=diff_commits,
-        diffs=diffs,
-        html_diffs=html_diffs,
+        diff=diff,
         form=form,
         branches=[
             branch.replace('refs/heads/', '')
             for branch in sorted(orig_repo.listall_references())
         ],
-        branchname=branchname,
+        branch_to=branch_to,
+        branch_from=branch_from,
     )
