@@ -483,6 +483,9 @@ class PullRequestComment(BASE):
         sa.ForeignKey('users.id', onupdate='CASCADE'),
         nullable=False,
         index=True)
+    filename = sa.Column(
+        sa.Text,
+        nullable=True)
     line = sa.Column(
         sa.Integer,
         nullable=True)
