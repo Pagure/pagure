@@ -183,21 +183,26 @@ def request_pull_patch(repo, requestid, username=None):
         parentname = os.path.join(APP.config['GIT_FOLDER'], repo.path)
     orig_repo = pygit2.Repository(parentname)
 
+    branch = repo_obj.lookup_branch(request.branch_from)
+    commitid = branch.get_object().hex
+
     diff_commits = []
     if not repo_obj.is_empty and not orig_repo.is_empty:
         orig_commit = orig_repo[
-            orig_repo.lookup_branch('master').get_object().hex]
+            orig_repo.lookup_branch(request.branch).get_object().hex]
 
         master_commits = [
             commit.oid.hex
             for commit in orig_repo.walk(
-                orig_repo.lookup_branch('master').get_object().hex,
+                orig_repo.lookup_branch(request.branch).get_object().hex,
                 pygit2.GIT_SORT_TIME)
         ]
 
-        for commit in repo_obj.walk(
-                request.stop_id, pygit2.GIT_SORT_TIME):
-            if commit.oid.hex in master_commits:
+        for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
+            if request.status is False \
+                    and commit.oid.hex == request.commit_start:
+                break
+            elif request.status and commit.oid.hex in master_commits:
                 break
             diff_commits.append(commit)
 
