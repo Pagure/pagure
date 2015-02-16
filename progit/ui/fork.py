@@ -223,11 +223,12 @@ def request_pull_patch(repo, requestid, username=None):
     return flask.Response(patch, content_type="text/plain;charset=UTF-8")
 
 
-@APP.route('/<repo>/request-pull/<int:requestid>/comment/<commit>/<row>',
-           methods=('GET', 'POST'))
+@APP.route('/<repo>/request-pull/<int:requestid>/comment/<commit>/'
+           '<filename>/<row>', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/request-pull/<int:requestid>/comment/'
-           '<commit>/<row>', methods=('GET', 'POST'))
-def pull_request_add_comment(repo, requestid, commit, row, username=None):
+           '<commit>/<filename>/<row>', methods=('GET', 'POST'))
+def pull_request_add_comment(repo, requestid, commit, filename, row,
+                             username=None):
     """ Add a comment to a commit in a pull-request.
     """
     repo = progit.lib.get_project(SESSION, repo, user=username)
@@ -244,6 +245,7 @@ def pull_request_add_comment(repo, requestid, commit, row, username=None):
 
     form = progit.forms.AddPullRequestCommentForm()
     form.commit.data = commit
+    form.filename.data = filename
     form.requestid.data = requestid
     form.row.data = row
 
@@ -255,6 +257,7 @@ def pull_request_add_comment(repo, requestid, commit, row, username=None):
                 SESSION,
                 request=request,
                 commit=commit,
+                filename=filename,
                 row=row,
                 comment=comment,
                 user=flask.g.fas_user.username,
@@ -276,6 +279,7 @@ def pull_request_add_comment(repo, requestid, commit, row, username=None):
         repo=repo,
         username=username,
         commit=commit,
+        filename=filename,
         row=row,
         form=form,
     )
