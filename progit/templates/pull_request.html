@@ -121,6 +121,7 @@
       {% endif %}
       </li>
       <li>
+        {% if pull_request %}
         <a class="button view" href="{{
             url_for(
                 'view_file',
@@ -128,6 +129,15 @@
                 repo=pull_request.repo_from.name,
                 identifier=pull_request.branch_from,
                 filename=patch.new_file_path) }}"
+        {% else %}
+        <a class="button view" href="{{
+            url_for(
+                'view_file',
+                username=username,
+                repo=repo.name,
+                identifier=branch_from,
+                filename=patch.new_file_path) }}"
+        {% endif %}
         title="View file as of {{ patch.new_id|short }}">View</a>
       </li>
     </ul>
