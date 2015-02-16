@@ -132,8 +132,6 @@
 </section>
 
 
-
-
 {% endblock %}
 
 {% block jscripts %}
@@ -178,10 +176,11 @@
     function() {
       var row = $( this ).attr('data-row');
       var commit = $( this ).attr('data-commit');
+      var filename = $( this ).attr('data-filename');
       var url = "{{ url_for(
         'pull_request_add_comment', username=username, repo=repo.name,
-        requestid=requestid, commit='', row='') }}".slice(0, -1);
-      url = url + commit + '/' + row;
+        requestid=requestid, commit='', filename='', row='') }}".slice(0, -2);
+      url = url + commit + '/' + filename + '/' + row;
       var rowid = $(this).prev().find('a').attr('id');
       var table = $( this ).parent().parent();
       var nextid = rowid.replace('_' + row, '_' + (Number(row) + 1));
