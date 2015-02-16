@@ -123,8 +123,10 @@
       <li>
         <a class="button view" href="{{
             url_for(
-                'view_file', username=username,
-                repo=repo.name, identifier=patch.new_id,
+                'view_file',
+                username=pull_request.repo_from.user.username,
+                repo=pull_request.repo_from.name,
+                identifier=pull_request.branch_from,
                 filename=patch.new_file_path) }}"
         title="View file as of {{ patch.new_id|short }}">View</a>
       </li>
