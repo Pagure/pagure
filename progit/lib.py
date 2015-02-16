@@ -150,13 +150,21 @@ def get_user_by_token(session, token):
     return user
 
 
-def get_all_users(session):
+def get_all_users(session, pattern=None):
     ''' Return the user corresponding to this username, or None. '''
-    users = session.query(
+    query = session.query(
         model.User
     ).order_by(
         model.User.user
-    ).all()
+    )
+
+    if pattern:
+        pattern = pattern.replace('*', '%')
+        query = query.filter(
+            model.User.user.like(pattern)
+        )
+
+    users = query.all()
     return users
 
 
