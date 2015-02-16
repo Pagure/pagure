@@ -282,8 +282,8 @@ def pull_request_add_comment(repo, requestid, commit, row, username=None):
 
 
 
-@APP.route('/<repo>/request-pull/merge/<int:requestid>', methods=['POST'])
-@APP.route('/fork/<username>/<repo>/request-pull/merge/<int:requestid>',
+@APP.route('/<repo>/request-pull/<int:requestid>/merge', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/request-pull/<int:requestid>/merge',
            methods=['POST'])
 def merge_request_pull(repo, requestid, username=None):
     """ Request pulling the changes from the fork into the project.
