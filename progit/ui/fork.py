@@ -89,33 +89,40 @@ def request_pull(repo, requestid, username=None):
         parentname = os.path.join(APP.config['GIT_FOLDER'], repo_from.path)
     orig_repo = pygit2.Repository(parentname)
 
+    branch = repo_obj.lookup_branch(request.branch_from)
+    commitid = branch.get_object().hex
+
     diff_commits = []
-    diffs = []
+    diff = None
     if not repo_obj.is_empty and not orig_repo.is_empty:
         orig_commit = orig_repo[
-            orig_repo.lookup_branch('master').get_object().hex]
+            orig_repo.lookup_branch(request.branch).get_object().hex]
 
         master_commits = [
             commit.oid.hex
             for commit in orig_repo.walk(
-                orig_repo.lookup_branch('master').get_object().hex,
+                orig_repo.lookup_branch(request.branch).get_object().hex,
                 pygit2.GIT_SORT_TIME)
         ]
-
-        for commit in repo_obj.walk(
-                request.stop_id, pygit2.GIT_SORT_TIME):
-            if request.status is False and commit.oid.hex == request.start_id:
+        for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
+            if request.status is False \
+                    and commit.oid.hex == request.commit_start:
                 break
             elif request.status and commit.oid.hex in master_commits:
                 break
             diff_commits.append(commit)
-            if commit.parents:
-                diffs.append(
-                    repo_obj.diff(
-                        repo_obj.revparse_single(commit.parents[0].oid.hex),
-                        repo_obj.revparse_single(commit.oid.hex)
-                    )
-                )
+
+        if diff_commits:
+            first_commit = repo_obj[diff_commits[-1].oid.hex]
+            diff = repo_obj.diff(
+                repo_obj.revparse_single(first_commit.parents[0].oid.hex),
+                repo_obj.revparse_single(diff_commits[0].oid.hex)
+            )
+            if request.status:
+                request.commit_start = first_commit.oid.hex
+                request.commit_stop = diff_commits[0].oid.hex
+                SESSION.add(request)
+                SESSION.commit()
 
     elif orig_repo.is_empty:
         orig_commit = None
@@ -128,17 +135,6 @@ def request_pull(repo, requestid, username=None):
         return flask.redirect(flask.url_for(
             'view_repo', username=username, repo=repo.name))
 
-    html_diffs = []
-    for diff in diffs:
-        html_diffs.append(
-            highlight(
-                diff.patch,
-                DiffLexer(),
-                HtmlFormatter(
-                    noclasses=True,
-                    style="tango",)
-            )
-        )
 
     form = progit.forms.ConfirmationForm()
 
@@ -150,13 +146,11 @@ def request_pull(repo, requestid, username=None):
         username=username,
         pull_request=request,
         repo_admin=is_repo_admin(request.repo),
-        repo_obj=repo_obj,
-        orig_repo=orig_repo,
         diff_commits=diff_commits,
-        diffs=diffs,
-        html_diffs=html_diffs,
+        diff=diff,
         mergeform=form,
     )
+
 
 @APP.route('/<repo>/request-pull/<int:requestid>.patch')
 @APP.route('/fork/<username>/<repo>/request-pull/<int:requestid>.patch')
