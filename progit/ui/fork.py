@@ -119,9 +119,13 @@ def request_pull(repo, requestid, username=None):
                 orig_repo.lookup_branch(request.branch).get_object().hex,
                 pygit2.GIT_SORT_TIME)
         ]
+        if request.status is False:
+            commitid = request.commit_stop
         for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
             if request.status is False \
                     and commit.oid.hex == request.commit_start:
+                if request.commit_start == request.commit_stop:
+                    diff_commits.append(commit)
                 break
             elif request.status and commit.oid.hex in master_commits:
                 break
