@@ -113,23 +113,32 @@ def request_pull(repo, requestid, username=None):
         orig_commit = orig_repo[
             orig_repo.lookup_branch(request.branch).get_object().hex]
 
-        master_commits = [
-            commit.oid.hex
-            for commit in orig_repo.walk(
-                orig_repo.lookup_branch(request.branch).get_object().hex,
-                pygit2.GIT_SORT_TIME)
-        ]
+        # Closed pull-request
         if request.status is False:
             commitid = request.commit_stop
-        for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
-            if request.status is False \
-                    and commit.oid.hex == request.commit_start:
-                if request.commit_start == request.commit_stop:
-                    diff_commits.append(commit)
-                break
-            elif request.status and commit.oid.hex in master_commits:
-                break
-            diff_commits.append(commit)
+            for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
+                diff_commits.append(commit)
+                if commit.oid.hex == request.commit_start:
+                    break
+        # Pull-request open
+        else:
+            master_commits = [
+                commit.oid.hex
+                for commit in orig_repo.walk(
+                    orig_repo.lookup_branch(request.branch).get_object().hex,
+                    pygit2.GIT_SORT_TIME)
+            ]
+            for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
+                if request.status and commit.oid.hex in master_commits:
+                    break
+                diff_commits.append(commit)
+
+            if request.status:
+                first_commit = repo_obj[diff_commits[-1].oid.hex]
+                request.commit_start = first_commit.oid.hex
+                request.commit_stop = diff_commits[0].oid.hex
+                SESSION.add(request)
+                SESSION.commit()
 
         if diff_commits:
             first_commit = repo_obj[diff_commits[-1].oid.hex]
@@ -137,11 +146,6 @@ def request_pull(repo, requestid, username=None):
                 repo_obj.revparse_single(first_commit.parents[0].oid.hex),
                 repo_obj.revparse_single(diff_commits[0].oid.hex)
             )
-            if request.status:
-                request.commit_start = first_commit.oid.hex
-                request.commit_stop = diff_commits[0].oid.hex
-                SESSION.add(request)
-                SESSION.commit()
 
     elif orig_repo.is_empty:
         orig_commit = None
