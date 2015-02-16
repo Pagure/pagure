@@ -342,7 +342,8 @@ def add_user_to_project(session, project, user):
     return 'User added'
 
 
-def add_pull_request_comment(session, request, commit, row, comment, user):
+def add_pull_request_comment(session, request, commit, filename, row,
+                             comment, user):
     ''' Add a comment to a pull-request. '''
     user_obj = get_user(session, user)
     if not user_obj:
@@ -356,6 +357,7 @@ def add_pull_request_comment(session, request, commit, row, comment, user):
     pr_comment = model.PullRequestComment(
         pull_request_id=request.id,
         commit_id=commit,
+        filename=filename,
         line=row,
         comment=comment,
         user_id=user_obj.id,
