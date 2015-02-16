@@ -317,11 +317,18 @@ def view_file(repo, identifier, filename, username=None):
             commit = repo_obj[repo_obj.head.target]
             branchname = 'master'
 
-    content = __get_file_in_tree(repo_obj, commit.tree, filename.split('/'))
-    if not content:
-        flask.abort(404, 'File not found')
+    if commit and not isinstance(commit, pygit2.Blob):
+        content = __get_file_in_tree(
+            repo_obj, commit.tree, filename.split('/'))
+        if not content:
+            flask.abort(404, 'File not found')
+        content = repo_obj[content.oid]
+    else:
+        content = commit
 
-    content = repo_obj[content.oid]
+    if not content:
+            flask.abort(404, 'File not found')
+
     if isinstance(content, pygit2.Blob):
         if content.is_binary:
             ext = filename[filename.rfind('.'):]
