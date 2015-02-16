@@ -34,7 +34,7 @@
         <form action="{{ url_for('cancel_request_pull', username=username,
             repo=repo.name, requestid=requestid) }}" method="POST">
           {{ mergeform.csrf_token }}
-          <input type="submit" value="Cancel" id="cancel_pr" class="button"/>
+          <input type="submit" value="Close" id="cancel_pr" class="button"/>
         </form>
       </li>
   {% elif pull_request and pull_request.status == False %}
@@ -53,16 +53,17 @@
 {% if form %}
 <section class="new_project">
   <form action="{{ url_for('.new_request_pull', username=username,
-    repo=repo.name, commitid=commitid) }}" method="post">
+    repo=repo.name, commitid=commitid, branch_from=branch_from,
+    branch_to=branch_to) }}" method="post">
     <table>
       {{ render_field_in_row(form.title) }}
       <tr>
         <td>To branch</td>
         <td>
-          <select id="branch_select">
-              <option>{{ branchname }}</option>
+          <select id="branch_select" name="branch_to">
+              <option>{{ branch_to }}</option>
             {% for branch in branches |reverse %}
-              {% if branch != branchname %}
+              {% if branch != branch_to %}
               <option>{{ branch }}</option>
               {% endif %}
             {% endfor %}
@@ -102,59 +103,16 @@
   </ul>
 </section>
 
+
+
 <section class="request_diff">
-  {% for commit in diff_commits %}
-    {% set splitted_message = commit.message.split('\n') %}
-    {% set diff = diffs[loop.index - 1] %}
-    {% set commitid = commit.oid.hex %}
 
-<div class="header">
-<h3>
-    {{ splitted_message[0] }}
-    (<span class="commitid" title="{{ commitid }}">commit: {{ commitid|short }}
-    </span> - <a href="{{ url_for('view_tree', username=username,
-        repo=repo.name, identifier=commitid) }}">tree</a>)
-    {% if splitted_message|length > 1 %}
-    <span class="commit_message_body">
-        {% for message in splitted_message %}
-            {% if loop.index > 1 %}
-                {{ message }}
-            {% endif %}
-        {% endfor %}
-    </span>
-    {% endif %}
-</h3>
-
-</div>
+<header>
 <table>
   <tr>
-    <th>Author</th>
+    <th>Changes</th>
+    {% for patch in diff %}
     <td>
-      {{ commit.author.name }} {{ '<' + commit.author.email + '>' }}
-      - {{ commit.commit_time | format_ts}}
-    </td>
-  </tr>
-  <tr>
-    <th>Committer</th>
-    <td>
-      {{ commit.committer.name }} {{ '<' + commit.committer.email + '>' }}
-      - {{ commit.commit_time | format_ts }}
-    </td>
-  </tr>
-  <tr>
-    <th>Parent</th>
-    <td>
-      {% for parent in commit.parents %}
-        <a href="{{ url_for('view_commit', username=username,
-                  repo=repo.name, commitid=parent.oid.hex) }}">
-          {{ parent.oid.hex }}
-        </a> <br />
-      {% endfor %}
-    </td>
-  </tr>
-  <tr>
-      <th>Changes</th>
-      <td>
         <ul class="changes">
         {% for patch in diff %}
           <li>
@@ -170,44 +128,19 @@
           </li>
         {% endfor %}
         </ul>
-      </td>
-  </tr>
-</table>
+    </td>
+    {% endfor %}
+</header>
 
-{% for patch in diff %}
-<section class="commit_diff">
-    <header>
-        <h3>{{  patch.new_file_path }}</h3>
-        <ul class="buttons">
-            <li class="addrem_bar">
-              {% if (patch.additions + patch.deletions) %}
-                <span style="width: {{ (100.0 * patch.additions / (patch.additions + patch.deletions))|round|int }}%">
-                    {% if patch.additions > 0 %}+{{ patch.additions }}{% endif %}
-                    {% if patch.deletions > 0 %}-{{ patch.deletions }}{% endif %}
-                </span>
-              {% endif %}
-            </li>
-            <li>
-                <a class="button view" href="{{ url_for('view_file', username=username,
-                    repo=repo.name, identifier=commitid,
-                    filename=patch.new_file_path) }}" title="View file as of {{ commitid|short }}">View</a>
-            </li>
-        </ul>
-    </header>
+{% if diff %}
+{% autoescape false %}
+    {{ diff.patch|html_diff|format_loc(prequest=pull_request)}}
+{% endautoescape %}
+{% endif %}
 
-    {% if patch.is_binary %}
-        <p class="noresult">Binary diffs cannot be rendered.</p>
-    {% else %}
-        {% autoescape false %}
-        {{ patch|patch_to_diff|html_diff|format_loc(diff_commits[loop.index - 1], pull_request,
-            index=loop.index)}}
-        {% endautoescape %}
-    {% endif %}
 </section>
 
-{% endfor %}
-  {% endfor %}
-</section>
+
 
 
 {% endblock %}
@@ -218,30 +151,18 @@
  $(function(){
   $( "#branch_select" ).change(
     function() {
-      var url = $(location).attr('href').split('?')[0];
-      var params = $(location).attr('search').replace('?', '').split('&');
       var sel = $('#branch_select');
-      /* Check all the current argument in the URL */
-      var changed = false;
-      for (i = 0; i < params.length; i++) {
-        /* If we find branch=, updated it */
-        if (params[i].match("^branch=")) {
-          params[i] = 'branch=' + sel.val();
-          changed = true;
-        }
-      }
-      /* Otherwise add it */
-      if (!changed) {
-        params.push('branch=' + sel.val());
-      }
-      var final_url = url + '?' + params.join('&');
+      var final_url = "{{ url_for('.new_request_pull', username=username,
+        repo=repo.name, commitid=commitid, branch_from=branch_from,
+        branch_to='--') }}";
+      final_url = final_url.replace('--', sel.val());
       window.location.href = final_url;
     }
   );
 {% if pull_request %}
 {# These lines are only for existing pull-requests, not new ones #}
   $('#cancel_pr').click(function(){
-        return window.confirm("Are you sure you want to cancel this requested pull?");
+        return window.confirm("Are you sure you want to close this requested pull?");
   });
  });
 
