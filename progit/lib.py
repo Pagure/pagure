@@ -216,6 +216,7 @@ def add_issue_tag(session, issue, tag, user, ticketfolder):
     if not tagobj:
         tagobj = model.Tag(tag=tag)
         session.add(tagobj)
+        session.flush()
 
     issue_tag = model.TagIssue(
         issue_id=issue.id,
