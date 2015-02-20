@@ -286,6 +286,38 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
         return 'Issue assigned'
 
 
+def add_issue_dependancy(session, issue, issue_blocked, user, ticketfolder):
+    ''' Add a depdency between two issues. '''
+    user_obj = get_user(session, user)
+    if not user_obj:
+        user_obj = get_user_by_email(session, user)
+
+    if not user_obj:
+        raise progit.exceptions.ProgitException(
+            'No user "%s" found' % user
+        )
+
+    if issue_blocked not in issue.children:
+        i2i = model.IssueToIssue(
+            parent_issue_id=issue_blocked.uid,
+            child_issue_id=issue.uid
+        )
+        session.add(i2i)
+        # Make sure we won't have SQLAlchemy error before we create the repo
+        session.flush()
+        update_git_ticket(
+            issue, repo=issue.project, ticketfolder=ticketfolder)
+        update_git_ticket(
+            issue_blocked,
+            repo=issue_blocked.project,
+            ticketfolder=ticketfolder)
+
+        #progit.notify.notify_assigned_issue(issue, user_obj)
+        #progit.notify.notify_assigned_issue(issue_blocked, user_obj)
+
+        return 'Issue assigned'
+
+
 def remove_issue_tags(session, project, tags):
     ''' Removes the specified tag of a project. '''
 
