@@ -189,14 +189,14 @@ def add_dependent_issue(repo, issueid, issuetype, username=None):
 
         try:
             if issuetype == 'parent':
-                message = progit.lib.add_issue_dependancy(
+                message = progit.lib.add_issue_dependency(
                     SESSION,
                     issue=issue,
                     issue_blocked=issue_blocked,
                     user=flask.g.fas_user.username,
                     ticketfolder=APP.config['TICKETS_FOLDER'],)
             else:
-                message = progit.lib.add_issue_dependancy(
+                message = progit.lib.add_issue_dependency(
                     SESSION,
                     issue=issue_blocked,
                     issue_blocked=issue,

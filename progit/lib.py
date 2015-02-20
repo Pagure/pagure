@@ -286,8 +286,8 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
         return 'Issue assigned'
 
 
-def add_issue_dependancy(session, issue, issue_blocked, user, ticketfolder):
-    ''' Add a depdency between two issues. '''
+def add_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
+    ''' Add a dependency between two issues. '''
     user_obj = get_user(session, user)
     if not user_obj:
         user_obj = get_user_by_email(session, user)
