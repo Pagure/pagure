@@ -536,53 +536,6 @@ class PullRequestComment(BASE):
         backref='comments')
 
 
-class GlobalId(BASE):
-    """ Store the mapping of the project with their issue and pull-request
-    and provides us with a way to get global identifier per project
-
-    Table -- global_id
-    """
-
-    __tablename__ = 'global_id'
-
-    id = sa.Column(sa.Integer, primary_key=True)
-    project_id = sa.Column(
-        sa.Integer,
-        sa.ForeignKey(
-            'projects.id', ondelete='CASCADE', onupdate='CASCADE'),
-        nullable=False)
-    issue_id = sa.Column(
-        sa.Integer,
-        sa.ForeignKey(
-            'issues.id', ondelete='CASCADE', onupdate='CASCADE'),
-        nullable=True)
-    request_id = sa.Column(
-        sa.Integer,
-        sa.ForeignKey(
-            'pull_requests.id', ondelete='CASCADE', onupdate='CASCADE'),
-        nullable=True)
-
-    project = relation(
-        'Project', foreign_keys=[project_id], remote_side=[Project.id],
-        backref='global_id', cascade="delete, delete-orphan",
-        single_parent=True)
-    issue = relation(
-        'Issue', foreign_keys=[issue_id], remote_side=[Issue.id],
-        backref='global_id', cascade="delete, delete-orphan",
-        single_parent=True)
-    request = relation(
-        'PullRequest', foreign_keys=[request_id], remote_side=[PullRequest.id],
-        backref='global_id', cascade="delete, delete-orphan",
-        single_parent=True)
-
-    __table_args__ = (
-        # Both fields should not be NULL
-        sa.CheckConstraint('NOT(request_id IS NULL AND issue_id IS NULL)'),
-        # Both fields should not be not NULL (ie: only one of them should)
-        sa.CheckConstraint('NOT(request_id IS NOT NULL AND issue_id IS NOT NULL)'),
-    )
-
-
 # ##########################################################
 # These classes are only used if you're using the `local`
 #                  authentication method
