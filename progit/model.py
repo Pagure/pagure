@@ -305,6 +305,14 @@ class Issue(BASE):
     assignee = relation('User', foreign_keys=[assignee_id],
                         remote_side=[User.id], backref='assigned_issues')
 
+    parents = relation(
+        "Issue",
+        secondary="issue_to_issue",
+        primaryjoin="issues.c.id==issue_to_issue.c.child_issue_id",
+        secondaryjoin="issue_to_issue.c.parent_issue_id==issues.c.id",
+        backref="children",
+    )
+
     def __repr__(self):
         return 'Issue(%s, project:%s, user:%s, title:%s)' % (
             self.id, self.project.name, self.user.user, self.title
