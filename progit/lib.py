@@ -497,6 +497,8 @@ def new_pull_request(session, repo_from, branch_from,
         )
 
     request = model.PullRequest(
+        id=get_next_id(session, repo_to.id),
+        uid=uuid.uuid4().hex,
         project_id=repo_to.id,
         project_id_from=repo_from.id,
         branch=branch_to,
