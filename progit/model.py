@@ -355,10 +355,10 @@ class IssueComment(BASE):
     __tablename__ = 'issue_comments'
 
     id = sa.Column(sa.Integer, primary_key=True)
-    issue_id = sa.Column(
-        sa.Integer,
+    issue_uid = sa.Column(
+        sa.Text,
         sa.ForeignKey(
-            'issues.id', ondelete='CASCADE', onupdate='CASCADE'),
+            'issues.uid', ondelete='CASCADE', onupdate='CASCADE'),
         index=True)
     comment = sa.Column(
         sa.Text(),
@@ -377,7 +377,7 @@ class IssueComment(BASE):
                              default=datetime.datetime.utcnow)
 
     issue = relation(
-        'Issue', foreign_keys=[issue_id], remote_side=[Issue.id],
+        'Issue', foreign_keys=[issue_uid], remote_side=[Issue.uid],
         backref='comments')
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id], backref='comment_issues')
