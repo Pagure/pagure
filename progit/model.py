@@ -378,7 +378,7 @@ class IssueComment(BASE):
 
     issue = relation(
         'Issue', foreign_keys=[issue_uid], remote_side=[Issue.uid],
-        backref='comments')
+        order_by="IssueComment.date_created", backref='comments')
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id], backref='comment_issues')
 
