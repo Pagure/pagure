@@ -286,9 +286,15 @@ def remove_tag(repo, username=None):
 
         msgs = progit.lib.remove_issue_tags(SESSION, repo, tags)
 
-        SESSION.commit()
-        for msg in msgs:
-            flask.flash(msg)
+        try:
+            SESSION.commit()
+            for msg in msgs:
+                flask.flash(msg)
+        except SQLAlchemyError, err:  # pragma: no cover
+            SESSION.rollback()
+            LOG.error(err)
+            flask.flash(
+                'Could not remove tag: %s' % ','.join(tags), 'error')
 
     return flask.redirect(
         flask.url_for('.view_settings', repo=repo.name, username=username)
