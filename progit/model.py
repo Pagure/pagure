@@ -18,6 +18,7 @@ import sqlalchemy as sa
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import backref
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import relation
@@ -378,7 +379,8 @@ class IssueComment(BASE):
 
     issue = relation(
         'Issue', foreign_keys=[issue_uid], remote_side=[Issue.uid],
-        order_by="IssueComment.date_created", backref='comments')
+        backref=backref('comments', order_by="IssueComment.date_created")
+    )
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id], backref='comment_issues')
 
