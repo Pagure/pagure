@@ -84,6 +84,14 @@ class AddIssueAssigneeForm(wtf.Form):
     )
 
 
+class AddIssueDependencyForm(wtf.Form):
+    ''' Form to add a blocked issue to an issue. '''
+    depends = wtforms.TextField(
+        'dependency issue<span class="error">*</span>',
+        [wtforms.validators.Required()]
+    )
+
+
 class AddPullRequestCommentForm(wtf.Form):
     ''' Form to add a comment to a pull-request. '''
     commit = wtforms.HiddenField('commit identifier')
