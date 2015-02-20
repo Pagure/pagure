@@ -318,6 +318,27 @@ class Issue(BASE):
         return '%s-ticket-%s@progit' % (self.project.name, self.id)
 
 
+class IssueToIssue(BASE):
+    """ Stores the parent/child relationship between two issues.
+
+    Table -- issue_to_issue
+    """
+
+    __tablename__ = 'issue_to_issue'
+
+    id = sa.Column(sa.Integer, unique=True, nullable=False)
+    parent_issue_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(
+            'issues.id', ondelete='CASCADE', onupdate='CASCADE'),
+        primary_key=True)
+    child_issue_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(
+            'issues.id', ondelete='CASCADE', onupdate='CASCADE'),
+        primary_key=True)
+
+
 class IssueComment(BASE):
     """ Stores the comments made on a commit/file.
 
