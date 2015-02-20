@@ -159,6 +159,56 @@ def add_assignee_issue(repo, issueid, username=None):
         'view_issue', username=username, repo=repo.name, issueid=issueid))
 
 
+@APP.route('/<repo>/issue/<int:issueid>/blocked', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/blocked',
+           methods=['POST'])
+@cla_required
+def add_blocked_issue(repo, issueid, username=None):
+    ''' Add a blocked issue to an issue. '''
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if repo is None:
+        flask.abort(404, 'Project not found')
+
+    if not repo.issue_tracker:
+        flask.abort(404, 'No issue tracker found for this project')
+
+    issue = progit.lib.get_issue(SESSION, repo.id, issueid)
+
+    if issue is None or issue.project != repo:
+        flask.abort(404, 'Issue not found')
+
+    form = progit.forms.AddIssueDependencyForm()
+    cat = None
+    if form.validate_on_submit():
+        blocked = form.depends.data
+        issue_blocked = progit.lib.get_issue(SESSION, repo.id, blocked)
+        if issue_blocked is None or issue_blocked.project != repo:
+            flask.abort(404, 'Issue blocked not found')
+
+        try:
+            message = progit.lib.add_issue_dependancy(
+                SESSION,
+                issue=issue,
+                issue_blocked=issue_blocked,
+                user=flask.g.fas_user.username,
+                ticketfolder=APP.config['TICKETS_FOLDER'],)
+            if message:
+                SESSION.commit()
+                flask.flash(message)
+        except progit.exceptions.ProgitException, err:
+            flask.flash(str(err), 'error')
+        except SQLAlchemyError, err:  # pragma: no cover
+            SESSION.rollback()
+            LOG.error(err)
+            flask.flash(
+                'Could not blocked issue: %s with %s' % (blocked, issue.id),
+                'error')
+
+    return flask.redirect(flask.url_for(
+        'view_issue', username=username, repo=repo.name, issueid=issueid))
+
+
 @APP.route('/<repo>/tag/<tag>/edit', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/tag/<tag>/edit', methods=('GET', 'POST'))
 @cla_required
