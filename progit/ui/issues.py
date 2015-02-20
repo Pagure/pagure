@@ -159,11 +159,12 @@ def add_assignee_issue(repo, issueid, username=None):
         'view_issue', username=username, repo=repo.name, issueid=issueid))
 
 
-@APP.route('/<repo>/issue/<int:issueid>/blocked', methods=['POST'])
-@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/blocked',
+@APP.route('/<repo>/issue/<int:issueid>/blocked/<issuetype>',
+           methods=['POST'])
+@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/blocked<issuetype>/',
            methods=['POST'])
 @cla_required
-def add_blocked_issue(repo, issueid, username=None):
+def add_dependent_issue(repo, issueid, issuetype, username=None):
     ''' Add a blocked issue to an issue. '''
     repo = progit.lib.get_project(SESSION, repo, user=username)
 
@@ -187,12 +188,20 @@ def add_blocked_issue(repo, issueid, username=None):
             flask.abort(404, 'Issue blocked not found')
 
         try:
-            message = progit.lib.add_issue_dependancy(
-                SESSION,
-                issue=issue,
-                issue_blocked=issue_blocked,
-                user=flask.g.fas_user.username,
-                ticketfolder=APP.config['TICKETS_FOLDER'],)
+            if issuetype == 'parent':
+                message = progit.lib.add_issue_dependancy(
+                    SESSION,
+                    issue=issue,
+                    issue_blocked=issue_blocked,
+                    user=flask.g.fas_user.username,
+                    ticketfolder=APP.config['TICKETS_FOLDER'],)
+            else:
+                message = progit.lib.add_issue_dependancy(
+                    SESSION,
+                    issue=issue_blocked,
+                    issue_blocked=issue,
+                    user=flask.g.fas_user.username,
+                    ticketfolder=APP.config['TICKETS_FOLDER'],)
             if message:
                 SESSION.commit()
                 flask.flash(message)
