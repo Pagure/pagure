@@ -498,10 +498,10 @@ class PullRequestComment(BASE):
     __tablename__ = 'pull_request_comments'
 
     id = sa.Column(sa.Integer, primary_key=True)
-    pull_request_id = sa.Column(
-        sa.Integer,
+    pull_request_uid = sa.Column(
+        sa.Text,
         sa.ForeignKey(
-            'pull_requests.id', ondelete='CASCADE', onupdate='CASCADE'),
+            'pull_requests.uid', ondelete='CASCADE', onupdate='CASCADE'),
         nullable=False)
     commit_id = sa.Column(
         sa.String(40),
@@ -532,8 +532,9 @@ class PullRequestComment(BASE):
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id], backref='pull_request_comments')
     pull_request = relation(
-        'PullRequest', foreign_keys=[pull_request_id], remote_side=[PullRequest.id],
-        backref='comments')
+        'PullRequest', backref='comments',
+        foreign_keys=[pull_request_uid],
+        remote_side=[PullRequest.uid])
 
 
 # ##########################################################
