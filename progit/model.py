@@ -264,7 +264,7 @@ class Issue(BASE):
     __tablename__ = 'issues'
 
     id = sa.Column(sa.Integer, primary_key=True)
-    uid = sa.Column(sa.String(32), unique=True)
+    uid = sa.Column(sa.String(32), unique=True, nullable=False)
     project_id = sa.Column(
         sa.Integer,
         sa.ForeignKey(
@@ -431,7 +431,7 @@ class PullRequest(BASE):
     __tablename__ = 'pull_requests'
 
     id = sa.Column(sa.Integer, primary_key=True)
-    uid = sa.Column(sa.String(32), unique=True)
+    uid = sa.Column(sa.String(32), unique=True, nullable=False)
     title = sa.Column(
         sa.Text,
         nullable=False)
