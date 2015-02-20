@@ -70,20 +70,20 @@ def get_next_id(session, projectid):
     based on the identifier already in the database.
     """
     q1 = session.query(
-        model.Issue.id
+        func.max(model.Issue.id)
     ).filter(
         model.Issue.project_id == projectid
     )
 
     q2 = session.query(
-        model.PullRequest.id
+        func.max(model.PullRequest.id)
     ).filter(
         model.PullRequest.project_id == projectid
     )
 
-    query = session.query(func.max(q1.union(q2).as_scalar()))
+    nid = max([el[0] for el in q1.union(q2).all()]) or 0
 
-    return query.first()[0] + 1
+    return nid + 1
 
 
 def commit_to_patch(repo_obj, commits):
