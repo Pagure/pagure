@@ -241,9 +241,14 @@ def edit_tag(repo, tag, username=None):
 
         msgs = progit.lib.edit_issue_tags(SESSION, repo, tag, new_tag)
 
-        SESSION.commit()
-        for msg in msgs:
-            flask.flash(msg)
+        try:
+            SESSION.commit()
+            for msg in msgs:
+                flask.flash(msg)
+        except SQLAlchemyError, err:  # pragma: no cover
+            SESSION.rollback()
+            LOG.error(err)
+            flask.flash('Could not edit tag: %s' % tag,'error')
 
         return flask.redirect(flask.url_for(
             '.view_settings', repo=repo.name, username=username)
