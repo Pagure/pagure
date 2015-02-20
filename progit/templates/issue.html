@@ -88,6 +88,52 @@
     {% endif %}
 </section>
 
+<section id="blocks">
+    Blocking:
+    {% if issue.parents %}
+    {% for ticket in issue.parents %}
+        <a href="{{ url_for('view_issue', username=username,
+                  repo=repo.name, issueid=ticket.id) }}">
+        {{ ticket.id }}</a>
+    {% endfor %}
+    {% endif %}
+
+    {% if authenticated and form_tag %}
+      <form action="{{ url_for('add_dependent_issue', username=username,
+               repo=repo.name, issueid=issueid, issuetype='parent') }}" method="post"
+               class="tag_form">
+        <input id="depends" type="text"
+            placeholder="issue blocked" name="depends">
+        <input id="add_blocks" type="submit"
+            class="submit positive button" value="Add">
+        {{ form_tag.csrf_token }}
+      </form>
+    {% endif %}
+</section>
+
+<section id="depends">
+    Depends on:
+    {% if issue.children %}
+    {% for ticket in issue.children %}
+        <a href="{{ url_for('view_issue', username=username,
+                  repo=repo.name, issueid=ticket.id) }}">
+        {{ ticket.id }}</a>
+    {% endfor %}
+    {% endif %}
+
+    {% if authenticated and form_tag %}
+      <form action="{{ url_for('add_dependent_issue', username=username,
+               repo=repo.name, issueid=issueid, issuetype='child') }}" method="post"
+               class="tag_form">
+        <input id="depends" type="text"
+            placeholder="issue depending" name="depends">
+        <input id="add_depends" type="submit"
+            class="submit positive button" value="Add">
+        {{ form_tag.csrf_token }}
+      </form>
+    {% endif %}
+</section>
+
 {{ show_comment(issue.user, issue.date_created, issue.content) }}
 
 {% if issue.comments %}
