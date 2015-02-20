@@ -269,7 +269,7 @@ class Issue(BASE):
         sa.Integer,
         sa.ForeignKey(
             'projects.id', ondelete='CASCADE', onupdate='CASCADE'),
-        nullable=False)
+        primary_key=True)
     title = sa.Column(
         sa.Text,
         nullable=False)
