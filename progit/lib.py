@@ -729,7 +729,7 @@ def get_tags_of_project(session, project):
     ).filter(
         model.Tag.tag == model.TagIssue.tag
     ).filter(
-        model.TagIssue.issue_id == model.Issue.id
+        model.TagIssue.issue_uid == model.Issue.uid
     ).filter(
         model.Issue.project_id == project.id
     ).order_by(
