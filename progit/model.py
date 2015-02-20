@@ -532,7 +532,11 @@ class PullRequestComment(BASE):
                              default=datetime.datetime.utcnow)
 
     user = relation('User', foreign_keys=[user_id],
-                    remote_side=[User.id], backref='pull_request_comments')
+                    remote_side=[User.id],
+                    backref=backref(
+                        'pull_request_comments',
+                        order_by="PullRequestComment.date_created")
+                    )
     pull_request = relation(
         'PullRequest', backref='comments',
         foreign_keys=[pull_request_uid],
