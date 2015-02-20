@@ -19,7 +19,9 @@ import tempfile
 import uuid
 
 import sqlalchemy
+import sqlalchemy.schema
 from datetime import timedelta
+from sqlalchemy import func
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm.exc import NoResultFound
@@ -61,6 +63,27 @@ def id_generator(size=15, chars=string.ascii_uppercase + string.digits):
         idenfitier.
     """
     return ''.join(random.choice(chars) for x in range(size))
+
+
+def get_next_id(session, projectid):
+    """ Returns the next identifier of a project ticket or pull-request
+    based on the identifier already in the database.
+    """
+    q1 = session.query(
+        model.Issue.id
+    ).filter(
+        model.Issue.project_id == projectid
+    )
+
+    q2 = session.query(
+        model.PullRequest.id
+    ).filter(
+        model.PullRequest.project_id == projectid
+    )
+
+    query = session.query(func.max(q1.union(q2).as_scalar()))
+
+    return query.first()[0] + 1
 
 
 def commit_to_patch(repo_obj, commits):
@@ -445,6 +468,7 @@ def new_issue(session, repo, title, content, user, ticketfolder):
         )
 
     issue = model.Issue(
+        id=get_next_id(session, repo.id),
         project_id=repo.id,
         title=title,
         content=content,
