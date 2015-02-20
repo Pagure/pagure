@@ -308,8 +308,8 @@ class Issue(BASE):
     parents = relation(
         "Issue",
         secondary="issue_to_issue",
-        primaryjoin="issues.c.id==issue_to_issue.c.child_issue_id",
-        secondaryjoin="issue_to_issue.c.parent_issue_id==issues.c.id",
+        primaryjoin="issues.c.uid==issue_to_issue.c.child_issue_id",
+        secondaryjoin="issue_to_issue.c.parent_issue_id==issues.c.uid",
         backref="children",
     )
 
@@ -334,16 +334,15 @@ class IssueToIssue(BASE):
 
     __tablename__ = 'issue_to_issue'
 
-    id = sa.Column(sa.Integer, unique=True, nullable=False)
     parent_issue_id = sa.Column(
-        sa.Integer,
+        sa.Text,
         sa.ForeignKey(
-            'issues.id', ondelete='CASCADE', onupdate='CASCADE'),
+            'issues.uid', ondelete='CASCADE', onupdate='CASCADE'),
         primary_key=True)
     child_issue_id = sa.Column(
-        sa.Integer,
+        sa.Text,
         sa.ForeignKey(
-            'issues.id', ondelete='CASCADE', onupdate='CASCADE'),
+            'issues.uid', ondelete='CASCADE', onupdate='CASCADE'),
         primary_key=True)
 
 
