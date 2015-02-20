@@ -409,16 +409,16 @@ class TagIssue(BASE):
         sa.ForeignKey(
             'tags.tag', ondelete='CASCADE', onupdate='CASCADE'),
         primary_key=True)
-    issue_id = sa.Column(
-        sa.Integer,
+    issue_uid = sa.Column(
+        sa.Text,
         sa.ForeignKey(
-            'issues.id', ondelete='CASCADE', onupdate='CASCADE'),
+            'issues.uid', ondelete='CASCADE', onupdate='CASCADE'),
         primary_key=True)
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
 
     issue = relation(
-        'Issue', foreign_keys=[issue_id], remote_side=[Issue.id],
+        'Issue', foreign_keys=[issue_uid], remote_side=[Issue.uid],
         backref='tags', cascade="delete, delete-orphan", single_parent=True)
 
 
