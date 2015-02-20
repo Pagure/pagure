@@ -203,7 +203,7 @@ def add_issue_comment(session, issue, comment, user, ticketfolder):
         )
 
     issue_comment = model.IssueComment(
-        issue_id=issue.id,
+        issue_uid=issue.uid,
         comment=comment,
         user_id=user_obj.id,
     )
