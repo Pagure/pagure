@@ -63,6 +63,7 @@ def add_comment_issue(repo, issueid, username=None):
             flask.flash(message)
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
+            APP.logger.exception(err)
             flask.flash(str(err), 'error')
 
     return flask.redirect(flask.url_for(

@@ -131,7 +131,7 @@ New issue:
     )
 
 
-def notify_assigned_issue(issue, new_assignee):
+def notify_assigned_issue(issue, new_assignee, username):
     ''' Notify the people following an issue that the assignee changed.
     '''
     text = """
@@ -142,7 +142,7 @@ The issue: `%s` of project: `%s` has been assigned to `%s` by %s.
     issue.title,
     issue.project.name,
     issue.assignee.user,
-    issue.user.user,
+    username,
     '%s/%s/issue/%s' % (
         progit.APP.config['APP_URL'],
         issue.project.name,
