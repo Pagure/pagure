@@ -432,6 +432,7 @@ class PullRequest(BASE):
     __tablename__ = 'pull_requests'
 
     id = sa.Column(sa.Integer, primary_key=True)
+    uid = sa.Column(sa.String(32), unique=True)
     title = sa.Column(
         sa.Text,
         nullable=False)
@@ -439,7 +440,7 @@ class PullRequest(BASE):
         sa.Integer,
         sa.ForeignKey(
             'projects.id', ondelete='CASCADE', onupdate='CASCADE'),
-        nullable=False)
+        primary_key=True)
     branch = sa.Column(
         sa.Text(),
         nullable=False)
