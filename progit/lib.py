@@ -315,7 +315,7 @@ def add_issue_dependancy(session, issue, issue_blocked, user, ticketfolder):
         #progit.notify.notify_assigned_issue(issue, user_obj)
         #progit.notify.notify_assigned_issue(issue_blocked, user_obj)
 
-        return 'Issue assigned'
+        return 'Dependency added'
 
 
 def remove_issue_tags(session, project, tags):
