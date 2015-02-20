@@ -900,6 +900,7 @@ def generate_gitolite_acls(session, configfile):
             config.append('repo forks/%s' % project.fullname)
         else:
             config.append('repo %s' % project.fullname)
+        config.append('  R   = @all')
         config.append('  RW+ = %s' % project.user.user)
         for user in project.users:
             if user != project.user:
@@ -907,6 +908,7 @@ def generate_gitolite_acls(session, configfile):
         config.append('')
 
         config.append('repo docs/%s' % project.fullname)
+        config.append('  R   = @all')
         config.append('  RW+ = %s' % project.user.user)
         for user in project.users:
             if user != project.user:
@@ -914,6 +916,7 @@ def generate_gitolite_acls(session, configfile):
         config.append('')
 
         config.append('repo tickets/%s' % project.fullname)
+        config.append('  R   = @all')
         config.append('  RW+ = %s' % project.user.user)
         for user in project.users:
             if user != project.user:
