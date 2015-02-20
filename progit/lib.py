@@ -297,6 +297,11 @@ def add_issue_dependancy(session, issue, issue_blocked, user, ticketfolder):
             'No user "%s" found' % user
         )
 
+    if issue.uid == issue_blocked.uid:
+        raise progit.exceptions.ProgitException(
+            'An issue cannot depend on itself'
+        )
+
     if issue_blocked not in issue.children:
         i2i = model.IssueToIssue(
             parent_issue_id=issue_blocked.uid,
