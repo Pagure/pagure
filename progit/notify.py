@@ -56,7 +56,7 @@ def send_email(text, subject, to_mail, from_mail=None, mail_id=None,
     return msg
 
 
-def notify_new_comment(comment, globalib):
+def notify_new_comment(comment):
     ''' Notify the people following an issue that a new comment was added
     to the issue.
     '''
@@ -76,7 +76,7 @@ New comment:
     '%s/%s/issue/%s' % (
         progit.APP.config['APP_URL'],
         comment.issue.project.name,
-        globalib,
+        comment.issue.id,
     ),
     )
     mail_to = set([cmt.user.emails[0].email for cmt in comment.issue.comments])
@@ -91,7 +91,7 @@ New comment:
     )
 
 
-def notify_new_issue(issue, globalib):
+def notify_new_issue(issue):
     ''' Notify the people following a project that a new issue was added
     to it.
     '''
@@ -112,7 +112,7 @@ New issue:
     '%s/%s/issue/%s' % (
         progit.APP.config['APP_URL'],
         issue.project.name,
-        globalib,
+        issue.id,
     ),
     )
     mail_to = set([cmt.user.emails[0].email for cmt in issue.comments])
@@ -131,7 +131,7 @@ New issue:
     )
 
 
-def notify_assigned_issue(issue, new_assignee, globalib):
+def notify_assigned_issue(issue, new_assignee):
     ''' Notify the people following an issue that the assignee changed.
     '''
     text = """
@@ -146,7 +146,7 @@ The issue: `%s` of project: `%s` has been assigned to `%s` by %s.
     '%s/%s/issue/%s' % (
         progit.APP.config['APP_URL'],
         issue.project.name,
-        globalib,
+        issue.id,
     ),
     )
     mail_to = set([cmt.user.emails[0].email for cmt in issue.comments])
@@ -164,7 +164,7 @@ The issue: `%s` of project: `%s` has been assigned to `%s` by %s.
     )
 
 
-def notify_new_pull_request(request, globalid):
+def notify_new_pull_request(request):
     ''' Notify the people following a project that a new pull-request was
     added to it.
     '''
@@ -185,7 +185,7 @@ New pull-request:
     '%s/%s/request-pull/%s' % (
         progit.APP.config['APP_URL'],
         request.repo.name,
-        globalid,
+        request.id,
     ),
     )
     mail_to = set([cmt.user.emails[0].email for cmt in request.comments])
@@ -202,7 +202,7 @@ New pull-request:
     )
 
 
-def notify_merge_pull_request(request, user, globalid):
+def notify_merge_pull_request(request, user):
     ''' Notify the people following a project that a pull-request was merged
     in it.
     '''
@@ -223,7 +223,7 @@ Merged pull-request:
     '%s/%s/request-pull/%s' % (
         progit.APP.config['APP_URL'],
         request.repo.name,
-        globalid,
+        request.id,
     ),
     )
     mail_to = set([cmt.user.emails[0].email for cmt in request.comments])
@@ -240,7 +240,7 @@ Merged pull-request:
     )
 
 
-def notify_cancelled_pull_request(request, user, globalid):
+def notify_cancelled_pull_request(request, user):
     ''' Notify the people following a project that a pull-request was
     cancelled in it.
     '''
@@ -261,7 +261,7 @@ Cancelled pull-request:
     '%s/%s/request-pull/%s' % (
         progit.APP.config['APP_URL'],
         request.repo.name,
-        globalid,
+        request.id,
     ),
     )
     mail_to = set([cmt.user.emails[0].email for cmt in request.comments])
