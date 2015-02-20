@@ -421,7 +421,7 @@ def add_pull_request_comment(session, request, commit, filename, row,
         )
 
     pr_comment = model.PullRequestComment(
-        pull_request_id=request.id,
+        pull_request_uid=request.uid,
         commit_id=commit,
         filename=filename,
         line=row,
