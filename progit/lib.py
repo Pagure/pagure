@@ -190,9 +190,7 @@ def add_issue_comment(session, issue, comment, user, ticketfolder):
 
     update_git_ticket(issue, repo=issue.project, ticketfolder=ticketfolder)
 
-    globalid = get_issue_global_id(session, issue.project.id, issue.id)
-
-    progit.notify.notify_new_comment(issue_comment, globalid)
+    progit.notify.notify_new_comment(issue_comment)
 
     return 'Comment added'
 
@@ -260,8 +258,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
         update_git_ticket(
             issue, repo=issue.project, ticketfolder=ticketfolder)
 
-        globalid = get_issue_global_id(session, issue.project.id, issue.id)
-        progit.notify.notify_assigned_issue(issue, user_obj, globalid)
+        progit.notify.notify_assigned_issue(issue, user_obj)
 
         return 'Issue assigned'
 
@@ -458,19 +455,9 @@ def new_issue(session, repo, title, content, user, ticketfolder):
     # Make sure we won't have SQLAlchemy error before we create the issue
     session.flush()
 
-    global_id = model.GlobalId(
-        project_id=repo.id,
-        issue_id=issue.id,
-    )
-
-    session.add(global_id)
-    session.flush()
-
     update_git_ticket(issue, repo=repo, ticketfolder=ticketfolder)
 
-    globalid = get_issue_global_id(session, issue.project.id, issue.id)
-
-    progit.notify.notify_new_issue(issue, globalid)
+    #progit.notify.notify_new_issue(issue)
 
     return 'Issue created'
 
@@ -497,18 +484,7 @@ def new_pull_request(session, repo_from, branch_from,
     # Make sure we won't have SQLAlchemy error before we create the request
     session.flush()
 
-    global_id = model.GlobalId(
-        project_id=repo_to.id,
-        request_id=request.id,
-    )
-
-    session.add(global_id)
-    session.flush()
-
-    globalid = get_pull_request_global_id(
-        session, request.repo.id, request.id)
-
-    progit.notify.notify_new_pull_request(request, globalid)
+    progit.notify.notify_new_pull_request(request)
 
     return 'Request created'
 
@@ -687,22 +663,8 @@ def get_issues(
     a certain tag.
 
     '''
-    subquery = session.query(
-        model.GlobalId,
-        sqlalchemy.over(
-            sqlalchemy.func.row_number(),
-            partition_by=model.GlobalId.project_id,
-            order_by=model.GlobalId.id
-        ).label('global_id')
-    ).subquery()
-
     query = session.query(
-        model.Issue,
-        subquery.c.global_id
-    ).filter(
-        subquery.c.issue_id == model.Issue.id
-    ).filter(
-        subquery.c.project_id == model.Issue.project_id
+        model.Issue
     ).filter(
         model.Issue.project_id == repo.id
     ).order_by(
@@ -744,56 +706,15 @@ def get_issues(
     return query.all()
 
 
-def get_issue_global_id(session, projectid, issueid):
-    ''' Retrieve the global identifier of a specific issue based on its
-    identifier.
-    '''
-    subquery = session.query(
-        model.GlobalId,
-        sqlalchemy.over(
-            sqlalchemy.func.row_number(),
-            partition_by=model.GlobalId.project_id,
-            order_by=model.GlobalId.id
-        ).label('global_id')
-    ).subquery()
-
-    query = session.query(
-        subquery.c.global_id
-    ).filter(
-        subquery.c.project_id == projectid
-    ).filter(
-        subquery.c.issue_id == issueid
-    )
-
-    data = query.first()
-
-    return data[0]
-
-
 def get_issue(session, projectid, issueid):
     ''' Retrieve the specified issue
     '''
-    subquery = session.query(
-        model.GlobalId,
-        sqlalchemy.over(
-            sqlalchemy.func.row_number(),
-            partition_by=model.GlobalId.project_id,
-            order_by=model.GlobalId.id
-        ).label('global_id')
-    ).subquery()
-
     query = session.query(
         model.Issue
     ).filter(
         model.Issue.project_id == projectid
     ).filter(
-        model.Issue.project_id == projectid
-    ).filter(
-        subquery.c.project_id == model.Issue.project_id
-    ).filter(
-        subquery.c.issue_id == model.Issue.id
-    ).filter(
-        subquery.c.global_id == issueid
+        model.Issue.id == issueid
     ).order_by(
         model.Issue.id
     )
@@ -835,22 +756,8 @@ def get_pull_requests(
     ''' Retrieve the specified issue
     '''
 
-    subquery = session.query(
-        model.GlobalId,
-        sqlalchemy.over(
-            sqlalchemy.func.row_number(),
-            partition_by=model.GlobalId.project_id,
-            order_by=model.GlobalId.id
-        ).label('global_id')
-    ).subquery()
-
     query = session.query(
-        model.PullRequest,
-        subquery.c.global_id
-    ).filter(
-        subquery.c.request_id == model.PullRequest.id
-    ).filter(
-        subquery.c.project_id == model.PullRequest.project_id
+        model.PullRequest
     ).order_by(
         model.PullRequest.id
     )
@@ -878,23 +785,8 @@ def get_pull_request(
     ''' Retrieve the specified issue
     '''
 
-    subquery = session.query(
-        model.GlobalId,
-        sqlalchemy.over(
-            sqlalchemy.func.row_number(),
-            partition_by=model.GlobalId.project_id,
-            order_by=model.GlobalId.id
-        ).label('global_id')
-    ).subquery()
-
     query = session.query(
         model.PullRequest
-    ).filter(
-        subquery.c.project_id == model.PullRequest.project_id
-    ).filter(
-        subquery.c.request_id == model.PullRequest.id
-    ).filter(
-        subquery.c.global_id == requestid
     ).order_by(
         model.PullRequest.id
     )
@@ -912,32 +804,6 @@ def get_pull_request(
     return query.first()
 
 
-def get_pull_request_global_id(session, projectid, requestid):
-    ''' Retrieve the global identifier of a specific request based on its
-    identifier.
-    '''
-    subquery = session.query(
-        model.GlobalId,
-        sqlalchemy.over(
-            sqlalchemy.func.row_number(),
-            partition_by=model.GlobalId.project_id,
-            order_by=model.GlobalId.id
-        ).label('global_id')
-    ).subquery()
-
-    query = session.query(
-        subquery.c.global_id
-    ).filter(
-        subquery.c.project_id == projectid
-    ).filter(
-        subquery.c.request_id == requestid
-    )
-
-    data = query.first()
-
-    return data[0]
-
-
 def close_pull_request(session, request, user, merged=True):
     ''' Close the provided pull-request.
     '''
@@ -945,13 +811,10 @@ def close_pull_request(session, request, user, merged=True):
     session.add(request)
     session.flush()
 
-    globalid = get_pull_request_global_id(
-        session, request.repo.id, request.id)
-
     if merged == True:
-        progit.notify.notify_merge_pull_request(request, user, globalid)
+        progit.notify.notify_merge_pull_request(request, user)
     else:
-        progit.notify.notify_cancelled_pull_request(request, user, globalid)
+        progit.notify.notify_cancelled_pull_request(request, user)
 
 
 def get_issue_statuses(session):
