@@ -73,31 +73,31 @@
     <tbody>
     {% for issue in issues %}
         <tr>
-            <td>#{{ issue[1] }}</td>
+            <td>#{{ issue.id }}</td>
             <td>
                 <a href="{{ url_for('view_issue', username=username,
-                    repo=repo.name, issueid=issue[1]) }}">
-                    {{ issue[0].title }}
+                    repo=repo.name, issueid=issue.id) }}">
+                    {{ issue.title }}
                 </a>
             </td>
             <td>
                 <a href="{{ url_for('view_issues', username=username,
-                    repo=repo.name, author=issue[0].user.user) }}"
+                    repo=repo.name, author=issue.user.user) }}"
                     title="Filter issues by reporter">
-                    {{ issue[0].user.user | avatar(16) | safe }}
-                    {{issue[0].user.user}}
+                    {{ issue.user.user | avatar(16) | safe }}
+                    {{issue.user.user}}
                 </a>
             </td>
             <td>
-                {{ issue[0].date_created.strftime('%Y-%m-%d %H:%M') }}
+                {{ issue.date_created.strftime('%Y-%m-%d %H:%M') }}
             </td>
             <td>
-              {% if issue[0].assignee %}
+              {% if issue.assignee %}
               <a href="{{ url_for('view_issues', username=username,
-                repo=repo.name, assignee=issue[0].assignee.username) }}"
+                repo=repo.name, assignee=issue.assignee.username) }}"
                 title="Filter issues by assignee">
-                {{ issue[0].user.user | avatar(16) | safe }}
-                {{ issue[0].assignee.user }}
+                {{ issue.user.user | avatar(16) | safe }}
+                {{ issue.assignee.user }}
               </a>
               {% else %}
               <a href="{{ url_for('view_issues', username=username,
