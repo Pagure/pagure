@@ -240,7 +240,7 @@ def add_issue_tag(session, issue, tag, user, ticketfolder):
         session.flush()
 
     issue_tag = model.TagIssue(
-        issue_id=issue.id,
+        issue_uid=issue.uid,
         tag=tagobj.tag,
     )
     session.add(issue_tag)
