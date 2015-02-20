@@ -419,11 +419,24 @@ def view_issue(repo, issueid, username=None):
         form_tag = progit.forms.AddIssueTagForm()
 
         if form.validate_on_submit():
+            new_status = form.status.data
+            if new_status == 'Fixed' and issue.parents:
+                for parent in issue.parents:
+                    print parent
+                    if parent.status == 'Open':
+                        flask.flash(
+                            'You cannot close a ticket that has ticket '
+                            'depending that are still open.',
+                            'error')
+                        return flask.redirect(flask.url_for(
+                            'view_issue', repo=repo.name, username=username,
+                            issueid=issueid))
+
             try:
                 message = progit.lib.edit_issue(
                     SESSION,
                     issue=issue,
-                    status=form.status.data,
+                    status=new_status,
                     ticketfolder=APP.config['TICKETS_FOLDER'],
                 )
                 SESSION.commit()
