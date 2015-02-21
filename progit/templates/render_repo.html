@@ -71,33 +71,34 @@
 
 {% macro repos_switch(all = True) %}
     <aside class="show_parts">
+        <div class="container">
         <strong>
             {% if all %}My repos:{% else %}Repos:{% endif %}
         </strong>
-        <div class="switch oneline">
-            <input type="radio" class="switch-input" name="{% if all %}my{% endif %}repos" value="on" id="myreposon" checked="checked">
-            <label for="myreposon" class="switch-label switch-label-off">Show</label>
-            <input type="radio" class="switch-input" name="{% if all %}my{% endif %}repos" value="off" id="myreposoff">
-            <label for="myreposoff" class="switch-label switch-label-on">Hide</label>
-            <span class="switch-selection"></span>
-        </div>
+
+            <label class="switch">
+                <input type="checkbox" class="switch-input"
+                    name="myrepos" id="monitor" checked>
+                <span class="switch-label" data-on="On" data-off="Off"></span>
+                <span class="switch-handle"></span>
+            </label>
         <strong>Forks:</strong>
-        <div class="switch oneline">
-            <input type="radio" class="switch-input" name="{% if all %}my{% endif %}forks" value="on" id="forkson" checked="checked">
-            <label for="forkson" class="switch-label switch-label-off">Show</label>
-            <input type="radio" class="switch-input" name="{% if all %}my{% endif %}forks" value="off" id="forksoff">
-            <label for="forksoff" class="switch-label switch-label-on">Hide</label>
-            <span class="switch-selection"></span>
-        </div>
+            <label class="switch">
+                <input type="checkbox" class="switch-input"
+                    name="{% if all %}my{% endif %}forks" id="forks"
+                    checked>
+                <span class="switch-label" data-on="On" data-off="Off"></span>
+                <span class="switch-handle"></span>
+            </label>
         {% if all %}
         <strong>All repos:</strong>
-        <div class="switch oneline">
-            <input type="radio" class="switch-input" name="repos" value="on" id="reposon" checked="checked">
-            <label for="reposon" class="switch-label switch-label-off">Show</label>
-            <input type="radio" class="switch-input" name="repos" value="off" id="reposoff">
-            <label for="reposoff" class="switch-label switch-label-on">Hide</label>
-            <span class="switch-selection"></span>
-        </div>
+            <label class="switch">
+                <input type="checkbox" class="switch-input"
+                    name="repos" id="allrepos" checked />
+                <span class="switch-label" data-on="On" data-off="Off"></span>
+                <span class="switch-handle"></span>
+            </label>
         {% endif %}
+        </div>
     </aside>
 {% endmacro %}
