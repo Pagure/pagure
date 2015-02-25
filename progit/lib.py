@@ -378,7 +378,7 @@ def edit_issue_tags(session, project, old_tag, new_tag):
             if add:
                 # Add the new one
                 issue_tag = model.TagIssue(
-                    issue_id=issue[0].id,
+                    issue_id=issue[0].uid,
                     tag=new_tag
                 )
                 session.add(issue_tag)
@@ -744,7 +744,7 @@ def get_issues(
         )
     if tags is not None and tags != []:
         query = query.filter(
-            model.Issue.id == model.TagIssue.issue_id
+            model.Issue.id == model.TagIssue.issue_uid
         ).filter(
             model.TagIssue.tag.in_(tags)
         )
