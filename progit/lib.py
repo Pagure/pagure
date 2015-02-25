@@ -744,7 +744,7 @@ def get_issues(
         )
     if tags is not None and tags != []:
         query = query.filter(
-            model.Issue.id == model.TagIssue.issue_uid
+            model.Issue.uid == model.TagIssue.issue_uid
         ).filter(
             model.TagIssue.tag.in_(tags)
         )
