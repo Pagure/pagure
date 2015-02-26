@@ -136,7 +136,7 @@ def notify_assigned_issue(issue, new_assignee, username):
     '''
     action = 'reset'
     if new_assignee:
-        action = 'assigned to `%s`' % new_assignee
+        action = 'assigned to `%s`' % new_assignee.user
     text = """
 The issue: `%s` of project: `%s` has been %s by %s.
 
