@@ -76,14 +76,6 @@ class AddIssueTagForm(wtf.Form):
     )
 
 
-class AddIssueAssigneeForm(wtf.Form):
-    ''' Form to add a tag to an issue. '''
-    assignee = wtforms.TextField(
-        'assignee<span class="error">*</span>',
-        [wtforms.validators.Required()]
-    )
-
-
 class AddIssueDependencyForm(wtf.Form):
     ''' Form to add a blocked issue to an issue. '''
     depends = wtforms.TextField(
