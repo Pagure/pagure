@@ -230,6 +230,29 @@ $(function() {
     }
   );
 
+  var cache = {};
+  $( "#tag" ).autocomplete({
+    source: function( request, response ) {
+      var pattern = request.term;
+      if ( pattern in cache ) {
+        response( cache[ pattern ] );
+        return;
+      }
+
+      $.getJSON(
+        "{{ url_for('api_ns.api_project_tags', repo=repo.name, username=username) }}", {
+          pattern: request.term
+        },
+        function( data ) {
+          cache[ pattern ] = data.tags;
+          response( data.tags );
+        }
+      );
+    },
+    minLength: 0,
+    delay: 200,
+  });
+
 });
 </script>
 {% endblock %}
