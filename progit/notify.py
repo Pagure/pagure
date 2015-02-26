@@ -134,7 +134,7 @@ New issue:
 def notify_assigned_issue(issue, new_assignee, username):
     ''' Notify the people following an issue that the assignee changed.
     '''
-    action = 'reset',
+    action = 'reset'
     if new_assignee:
         action = 'assigned to `%s`' % new_assignee
     text = """
