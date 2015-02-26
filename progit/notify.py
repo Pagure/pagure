@@ -141,7 +141,7 @@ The issue: `%s` of project: `%s` has been assigned to `%s` by %s.
 """ % (
     issue.title,
     issue.project.name,
-    issue.assignee.user,
+    new_assignee,
     username,
     '%s/%s/issue/%s' % (
         progit.APP.config['APP_URL'],
