@@ -290,7 +290,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
         update_git_ticket(
             issue, repo=issue.project, ticketfolder=ticketfolder)
 
-        progit.notify.notify_assigned_issue(issue, user_obj.user, user)
+        progit.notify.notify_assigned_issue(issue, user_obj, user)
 
         return 'Issue assigned'
 
