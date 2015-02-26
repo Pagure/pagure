@@ -74,8 +74,6 @@ def api_users():
     if pattern is not None and not pattern.endswith('*'):
         pattern += '*'
 
-    print pattern
-
     return flask.jsonify(
         {
             'users': [
