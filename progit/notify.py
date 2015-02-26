@@ -134,14 +134,17 @@ New issue:
 def notify_assigned_issue(issue, new_assignee, username):
     ''' Notify the people following an issue that the assignee changed.
     '''
+    action = 'reset',
+    if new_assignee:
+        action = 'assigned to `%s`' % new_assignee
     text = """
-The issue: `%s` of project: `%s` has been assigned to `%s` by %s.
+The issue: `%s` of project: `%s` has been %s by %s.
 
 %s
 """ % (
     issue.title,
     issue.project.name,
-    new_assignee,
+    action,
     username,
     '%s/%s/issue/%s' % (
         progit.APP.config['APP_URL'],
