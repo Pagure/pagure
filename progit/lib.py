@@ -254,6 +254,16 @@ def add_issue_tag(session, issue, tag, user, ticketfolder):
 
 def add_issue_assignee(session, issue, assignee, user, ticketfolder):
     ''' Add an assignee to an issue, in other words, assigned an issue. '''
+    if assignee is None:
+        issue.assignee_id = None
+        session.add(issue)
+        session.commit()
+        update_git_ticket(
+            issue, repo=issue.project, ticketfolder=ticketfolder)
+
+        progit.notify.notify_assigned_issue(issue, None, user)
+        return 'Assignee reset'
+
     user_obj = get_user(session, user)
     if not user_obj:
         user_obj = get_user_by_email(session, user)
@@ -276,7 +286,6 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
     if issue.assignee_id != user_obj.id:
         issue.assignee_id = user_obj.id
         session.add(issue)
-        # Make sure we won't have SQLAlchemy error before we create the repo
         session.flush()
         update_git_ticket(
             issue, repo=issue.project, ticketfolder=ticketfolder)
