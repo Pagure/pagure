@@ -793,7 +793,7 @@ def get_issue(session, projectid, issueid):
 
     return query.first()
 
-def get_tags_of_project(session, project):
+def get_tags_of_project(session, project, pattern=None):
     ''' Returns the list of tags associated with the issues of a project.
     '''
     query = session.query(
@@ -807,6 +807,11 @@ def get_tags_of_project(session, project):
     ).order_by(
         model.Tag.tag
     )
+
+    if pattern:
+        query = query.filter(
+            model.Tag.tag.ilike(pattern.replace('*', '%'))
+        )
 
     return query.all()
 
