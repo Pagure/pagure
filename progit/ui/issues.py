@@ -134,10 +134,10 @@ def add_assignee_issue(repo, issueid, username=None):
     if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
 
-    form = progit.forms.AddIssueAssigneeForm()
+    form = progit.forms.ConfirmationForm()
     cat = None
     if form.validate_on_submit():
-        assignee = form.assignee.data
+        assignee = flask.request.form.get('assignee') or None
 
         try:
             message = progit.lib.add_issue_assignee(
