@@ -78,6 +78,22 @@
       <form action="{{ url_for('add_assignee_issue', username=username,
                repo=repo.name, issueid=issueid) }}" method="post"
                class="tag_form">
+        <input type="hidden" value="{{ g.fas_user.username }}" name="assignee">
+        <input id="take_assignement" type="submit"
+            class="submit positive button" value="Take">
+        {{ form_tag.csrf_token }}
+      </form>
+      <form action="{{ url_for('add_assignee_issue', username=username,
+               repo=repo.name, issueid=issueid) }}" method="post"
+               class="tag_form">
+        <input type="hidden" value="" name="assignee">
+        <input type="submit" class="submit positive button" value="Reset">
+        {{ form_tag.csrf_token }}
+      </form>
+      {% if g.fas_user and g.fas_user.username == repo.user.user %}
+      <form action="{{ url_for('add_assignee_issue', username=username,
+               repo=repo.name, issueid=issueid) }}" method="post"
+               class="tag_form">
         <input id="assignee" type="text" value="{%
             if issue.assigne %}{{ issue.assignee }}{% endif %}"
             placeholder="assignee" name="assignee">
@@ -85,6 +101,7 @@
             class="submit positive button" value="Update">
         {{ form_tag.csrf_token }}
       </form>
+      {% endif %}
     {% endif %}
 </section>
 
