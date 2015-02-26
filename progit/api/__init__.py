@@ -83,3 +83,52 @@ def api_users():
             ]
         }
     )
+
+
+@API.route('/<repo>/tags')
+@API.route('/<repo>/tags/')
+@API.route('/fork/<username>/<repo>/tags')
+@API.route('/fork/<username>/<repo>/tags/')
+def api_project_tags(repo, username=None):
+    '''
+    List all the tags of a project
+    ------------------------------
+    Returns the list of all tags of the specified project.
+
+    ::
+
+        /api/<repo>/tags
+
+        /api/fork/<username>/<repo>/tags
+
+    Accepts GET queries only.
+
+    Sample response:
+
+    ::
+
+        {
+          "tags": ["tag1", "tag2"]
+        }
+
+    '''
+    pattern = flask.request.args.get('pattern', None)
+    if pattern is not None and not pattern.endswith('*'):
+        pattern += '*'
+
+    project = progit.lib.get_project(SESSION, repo, username)
+    if not project:
+        output = {'output': 'notok', 'error': 'Project not found'}
+        jsonout = flask.jsonify(output)
+        jsonout.status_code = 404
+        return jsonout
+
+    return flask.jsonify(
+        {
+            'tags': [
+                tag.tag
+                for tag in progit.lib.get_tags_of_project(
+                    SESSION, project, pattern=pattern)
+            ]
+        }
+    )
