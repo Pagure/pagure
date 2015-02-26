@@ -31,18 +31,18 @@
 <script type="text/javascript">
   $(function() {
     $('#user').autocomplete({
-        source: function( request, response ) {
-            $.getJSON(
-              "{{ url_for('api_ns.api_users') }}", {
-                pattern: request.term
-              },
-              function( data ) {
-                response( data.users );
-              }
-            );
-        },
-        minLength: 2,
-        delay: 500,
+      source: function( request, response ) {
+        $.getJSON(
+          "{{ url_for('api_ns.api_users') }}", {
+            pattern: request.term
+          },
+          function( data ) {
+            response( data.users );
+          }
+        );
+      },
+      minLength: 2,
+      delay: 500,
     });
   });
 </script>
