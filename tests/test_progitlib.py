@@ -289,6 +289,14 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(issues[0].status, 'Open')
         self.assertEqual([tag.tag for tag in issues[0].tags], ['tag1'])
 
+        # Issues by authors
+        issues = progit.lib.search_issues(self.session, repo, author='foo')
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].id, 2)
+        self.assertEqual(issues[0].project_id, 1)
+        self.assertEqual(issues[0].status, 'Invalid')
+        self.assertEqual(issues[0].tags, [])
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
