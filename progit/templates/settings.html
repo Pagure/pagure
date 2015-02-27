@@ -70,9 +70,9 @@
     </li>
   {% for user in repo.users %}
     <li>
-      <a href="{{ url_for('.view_user', username=user.user) }}">{{ user.user.user }}</a>
+      <a href="{{ url_for('.view_user', username=user.user) }}">{{ user.user }}</a>
       <form class="icon del_icon" method="POST"
-        action="{{ url_for('.remove_user', username=username, repo=repo.name, userid=user.user.id) }}">
+        action="{{ url_for('.remove_user', username=username, repo=repo.name, userid=user.id) }}">
         <button
           onclick="return confirm('You sure you want to remove this user from this project?');"
           title="Remove user">

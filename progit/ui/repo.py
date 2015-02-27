@@ -726,7 +726,7 @@ def remove_user(repo, userid, username=None):
             403,
             'You are not allowed to change the users for this project')
 
-    userids = [str(user.user.id) for user in repo.users]
+    userids = [str(user.id) for user in repo.users]
 
     if str(userid) not in userids:
         flask.flash(
@@ -737,7 +737,7 @@ def remove_user(repo, userid, username=None):
         )
 
     for user in repo.users:
-        if str(user.user.id) == str(userid):
+        if str(user.id) == str(userid):
             SESSION.delete(user)
             break
     try:
