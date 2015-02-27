@@ -31,7 +31,7 @@ import pygit2
 
 import progit.exceptions
 import progit.notify
-from progit import model
+from progit.lib import model
 
 
 def create_session(db_url, debug=False, pool_recycle=3600):

@@ -22,7 +22,7 @@ import progit.exceptions
 import progit.lib
 import progit.forms
 from progit import APP, SESSION, LOG, cla_required, is_repo_admin
-from progit.model import BASE
+from progit.lib.model import BASE
 
 
 def get_plugin_names():

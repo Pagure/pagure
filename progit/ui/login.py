@@ -21,7 +21,7 @@ import progit.lib
 import progit.notify
 from progit import APP, SESSION, is_admin
 from progit.ui.admin import admin_required
-import progit.model as model
+import progit.lib.model as model
 
 
 @APP.route('/user/new', methods=['GET', 'POST'])

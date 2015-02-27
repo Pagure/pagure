@@ -17,7 +17,7 @@ from flask.ext import wtf
 from sqlalchemy.orm import relation
 
 from progit.hooks import BaseHook
-from progit.model import BASE, Project
+from progit.lib.model import BASE, Project
 from progit import SESSION, APP
 
 
