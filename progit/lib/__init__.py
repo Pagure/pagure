@@ -912,7 +912,7 @@ def update_git_ticket(issue, repo, ticketfolder):
 
     # Write down what changed
     with open(file_path, 'w') as stream:
-        stream.write(issue_to_json(issue))
+        stream.write(issue.to_json())
 
     # Retrieve the list of files that changed
     diff = new_repo.diff()
