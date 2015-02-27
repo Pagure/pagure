@@ -724,6 +724,34 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(
             statuses, ['Open', 'Invalid', 'Insufficient data', 'Fixed'])
 
+    def test_set_up_user(self):
+        """ Test the set_up_user of progit.lib. """
+
+        items = progit.lib.search_user(self.session)
+        self.assertEqual(2, len(items))
+        self.assertEqual(1, items[0].id)
+        self.assertEqual('pingou', items[0].user)
+        self.assertEqual(2, items[1].id)
+        self.assertEqual('foo', items[1].user)
+
+        progit.lib.set_up_user(
+            session=self.session,
+            username='skvidal',
+            fullname='Seth',
+            user_email='skvidal@fp.o'
+        )
+        self.session.commit()
+
+        items = progit.lib.search_user(self.session)
+        self.assertEqual(3, len(items))
+        self.assertEqual(1, items[0].id)
+        self.assertEqual('pingou', items[0].user)
+        self.assertEqual(2, items[1].id)
+        self.assertEqual('foo', items[1].user)
+        self.assertEqual(3, items[2].id)
+        self.assertEqual('skvidal', items[2].user)
+        self.assertEqual(
+            ['skvidal@fp.o'], [email.email for email in items[2].emails])
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
