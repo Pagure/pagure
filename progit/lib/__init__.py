@@ -86,48 +86,44 @@ def get_next_id(session, projectid):
     return nid + 1
 
 
-def get_user(session, username):
-    ''' Return the user corresponding to this username, or None. '''
-    user = session.query(
-        model.User
-    ).filter(
-        model.User.user == username
-    ).first()
-    return user
+def search_user(session, username=None, email=None, token=None, pattern=None):
+    ''' Searches the database for the user or users matching the given
+    criterias.
 
-
-def get_user_by_email(session, user_mail):
-    ''' Return the user corresponding to this email, or None. '''
-    mail = session.query(
-        model.UserEmail
-    ).filter(
-        model.UserEmail.email == user_mail
-    ).first()
-    if mail:
-        return mail.user
-
-
-def get_user_by_token(session, token):
-    ''' Return a specified User via its token.
-
-    :arg session: the session with which to connect to the database.
+    :arg session: the session to use to connect to the database.
+    :kwarg username: the username of the user to look for.
+    :type username: string or None
+    :kwarg email: the email or one of the email of the user to look for
+    :type email: string or None
+    :kwarg token: the token of the user to look for
+    :type token: string or None
+    :kwarg pattern: a pattern to search the users with.
+    :type pattern: string or None
+    :return: A single User object if any of username, email or token is
+        specified, a list of User objects otherwise.
+    :rtype: User or [User]
 
     '''
-    user = session.query(
-        model.User
-    ).filter(
-        model.User.token == token
-    ).first()
-    return user
-
-
-def get_all_users(session, pattern=None):
-    ''' Return the user corresponding to this username, or None. '''
     query = session.query(
         model.User
-    ).order_by(
-        model.User.user
     )
+
+    if username is not None:
+        query = query.filter(
+            model.User.user == username
+        )
+
+    if email is not None:
+        query = query.filter(
+            model.UserEmail.user_id == model.User.id
+        ).filter(
+            model.UserEmail.email == email
+        )
+
+    if token is not None:
+        query = query.filter(
+            model.User.token == token
+        )
 
     if pattern:
         pattern = pattern.replace('*', '%')
@@ -135,8 +131,12 @@ def get_all_users(session, pattern=None):
             model.User.user.like(pattern)
         )
 
-    users = query.all()
-    return users
+    if any([username, email, token]):
+        output = query.first()
+    else:
+        output = query.all()
+
+    return output
 
 
 def add_issue_comment(session, issue, comment, user, ticketfolder):
