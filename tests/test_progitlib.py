@@ -672,6 +672,34 @@ class ProgitLibtests(tests.Modeltests):
         self.assertFalse(repo.issue_tracker)
         self.assertFalse(repo.project_docs)
 
+    def test_search_projects(self):
+        """ Test the search_projects of progit.lib. """
+        tests.create_projects(self.session)
+
+        projects = progit.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 2)
+        self.assertEqual(projects[0].id, 1)
+        self.assertEqual(projects[1].id, 2)
+
+        projects = progit.lib.search_projects(self.session, username='foo')
+        self.assertEqual(len(projects), 0)
+
+        projects = progit.lib.search_projects(self.session, username='pingou')
+        self.assertEqual(len(projects), 2)
+        self.assertEqual(projects[0].id, 1)
+        self.assertEqual(projects[1].id, 2)
+
+        projects = progit.lib.search_projects(self.session, start=1)
+        self.assertEqual(len(projects), 1)
+        self.assertEqual(projects[0].id, 2)
+
+        projects = progit.lib.search_projects(self.session, limit=1)
+        self.assertEqual(len(projects), 1)
+        self.assertEqual(projects[0].id, 1)
+
+        projects = progit.lib.search_projects(self.session, count=True)
+        self.assertEqual(projects, 2)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
