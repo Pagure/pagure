@@ -143,6 +143,19 @@ class ProgitLibtests(tests.Modeltests):
         issues = progit.lib.search_issues(self.session, repo)
         self.assertEqual(len(issues), 0)
 
+        # See where it fails
+        self.assertRaises(
+            progit.exceptions.ProgitException,
+            progit.lib.new_issue,
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='blah',
+            ticketfolder=None
+        )
+
+        # Create issues to play with
         msg = progit.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -151,11 +164,23 @@ class ProgitLibtests(tests.Modeltests):
             user='pingou',
             ticketfolder=None
         )
+        self.session.commit()
+        self.assertEqual(msg, 'Issue created')
+
+        msg = progit.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='foo',
+            ticketfolder=None
+        )
+        self.session.commit()
         self.assertEqual(msg, 'Issue created')
 
         # After
         issues = progit.lib.search_issues(self.session, repo)
-        self.assertEqual(len(issues), 1)
+        self.assertEqual(len(issues), 2)
 
 
 if __name__ == '__main__':
