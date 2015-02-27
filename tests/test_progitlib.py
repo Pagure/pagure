@@ -750,6 +750,7 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual('foo', items[1].user)
         self.assertEqual(3, items[2].id)
         self.assertEqual('skvidal', items[2].user)
+        self.assertEqual('Seth', items[2].fullname)
         self.assertEqual(
             ['skvidal@fp.o'], [email.email for email in items[2].emails])
 
@@ -757,7 +758,7 @@ class ProgitLibtests(tests.Modeltests):
         progit.lib.set_up_user(
             session=self.session,
             username='skvidal',
-            fullname='Seth',
+            fullname='Seth V',
             user_email='skvidal@fp.o'
         )
         self.session.commit()
@@ -765,6 +766,7 @@ class ProgitLibtests(tests.Modeltests):
         items = progit.lib.search_user(self.session)
         self.assertEqual(3, len(items))
         self.assertEqual('skvidal', items[2].user)
+        self.assertEqual('Seth V', items[2].fullname)
         self.assertEqual(
             ['skvidal@fp.o'], [email.email for email in items[2].emails])
 
@@ -797,7 +799,7 @@ class ProgitLibtests(tests.Modeltests):
         msg = progit.lib.update_user_ssh(self.session, user, 'blah')
         self.assertEqual(msg, 'Nothing to update')
 
-        msg = progit.lib.update_user_ssh(self.session, user, None)
+        msg = progit.lib.update_user_ssh(self.session, 'foo', None)
         self.assertEqual(msg, 'Public ssh key updated')
 
 
