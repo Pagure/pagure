@@ -782,7 +782,8 @@ def get_tag(session, tag):
 
 
 def get_pull_requests(
-        session, project_id=None, project_id_from=None, status=None):
+        session, requestid=None, project_id=None, project_id_from=None,
+        status=None):
     ''' Retrieve the specified issue
     '''
 
@@ -791,6 +792,11 @@ def get_pull_requests(
     ).order_by(
         model.PullRequest.id
     )
+
+    if requestid:
+        query = query.filter(
+            model.PullRequest.id == requestid
+        )
 
     if project_id:
         query = query.filter(
@@ -807,31 +813,12 @@ def get_pull_requests(
             model.PullRequest.status == status
         )
 
-    return query.all()
+    if requestid:
+        output = query.first()
+    else:
+        output = query.all()
 
-
-def get_pull_request(
-        session, requestid, project_id=None, project_id_from=None):
-    ''' Retrieve the specified issue
-    '''
-
-    query = session.query(
-        model.PullRequest
-    ).order_by(
-        model.PullRequest.id
-    )
-
-    if project_id:
-        query = query.filter(
-            model.PullRequest.project_id == project_id
-        )
-
-    if project_id_from:
-        query = query.filter(
-            model.PullRequest.project_id_from == project_id_from
-        )
-
-    return query.first()
+    return output
 
 
 def close_pull_request(session, request, user, merged=True):
