@@ -1034,6 +1034,34 @@ class ProgitLibtests(tests.Modeltests):
         )
         self.assertEqual(msg, 'Comment added')
 
+    def test_search_pull_requests(self):
+        """ Test search_pull_requests of progit.lib. """
+
+        self.test_new_pull_request()
+
+        prs = progit.lib.search_pull_requests(
+            session=self.session
+        )
+        self.assertEqual(len(prs), 1)
+
+        prs = progit.lib.search_pull_requests(
+            session=self.session,
+            project_id=1
+        )
+        self.assertEqual(len(prs), 1)
+
+        prs = progit.lib.search_pull_requests(
+            session=self.session,
+            project_id_from=3
+        )
+        self.assertEqual(len(prs), 1)
+
+        prs = progit.lib.search_pull_requests(
+            session=self.session,
+            status='Merged'
+        )
+        self.assertEqual(len(prs), 0)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
