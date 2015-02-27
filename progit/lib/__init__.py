@@ -529,7 +529,7 @@ def fork_project(session, user, repo, gitfolder,
     return 'Repo "%s" cloned to "%s/%s"' % (repo.name, user, repo.name)
 
 
-def list_projects(
+def search_projects(
         session, username=None, fork=None,
         start=None, limit=None, count=False):
     '''List existing projects
