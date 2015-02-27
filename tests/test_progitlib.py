@@ -297,6 +297,58 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(issues[0].status, 'Invalid')
         self.assertEqual(issues[0].tags, [])
 
+    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.notify.send_email')
+    def test_add_issue_assignee(self, p_send_email, p_ugt):
+        """ Test the add_issue_assignee of progit.lib. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        self.test_new_issue()
+        repo = progit.lib.get_project(self.session, 'test')
+        issue = progit.lib.search_issues(self.session, repo, issueid=2)
+
+        # Before
+        issues = progit.lib.search_issues(
+            self.session, repo, assignee='pingou')
+        self.assertEqual(len(issues), 0)
+
+        msg = progit.lib.add_issue_assignee(
+            session=self.session,
+            issue=issue,
+            assignee='pingou',
+            user='pingou',
+            ticketfolder=None)
+        self.session.commit()
+        self.assertEqual(msg, 'Issue assigned')
+
+        # After  -- Searches by assignee
+        issues = progit.lib.search_issues(
+            self.session, repo, assignee='pingou')
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].id, 2)
+        self.assertEqual(issues[0].project_id, 1)
+        self.assertEqual(issues[0].status, 'Open')
+        self.assertEqual(issues[0].tags, [])
+
+        issues = progit.lib.search_issues(
+            self.session, repo, assignee=True)
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].id, 2)
+        self.assertEqual(issues[0].title, 'Test issue #2')
+        self.assertEqual(issues[0].project_id, 1)
+        self.assertEqual(issues[0].status, 'Open')
+        self.assertEqual(issues[0].tags, [])
+
+        issues = progit.lib.search_issues(
+            self.session, repo, assignee=False)
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].id, 1)
+        self.assertEqual(issues[0].title, 'Test issue')
+        self.assertEqual(issues[0].project_id, 1)
+        self.assertEqual(issues[0].status, 'Open')
+        self.assertEqual(issues[0].tags, [])
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
