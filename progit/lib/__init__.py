@@ -343,6 +343,7 @@ def edit_issue_tags(session, project, old_tag, new_tag):
 
     return msgs
 
+
 def add_user_to_project(session, project, user):
     ''' Add a specified user to a specified project. '''
     user_obj = search_user(session, username=user)
@@ -390,20 +391,6 @@ def add_pull_request_comment(session, request, commit, filename, row,
     session.flush()
 
     return 'Comment added'
-
-
-def get_user_project(session, username):
-    ''' Retrieve the list of projects managed by a user.
-
-    '''
-
-    query = session.query(
-        model.Project
-    ).filter(
-        model.Project.user == username
-    )
-
-    return query.all()
 
 
 def new_project(session, user, name, gitfolder, docfolder, ticketfolder,
