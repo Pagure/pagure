@@ -718,6 +718,12 @@ class ProgitLibtests(tests.Modeltests):
         tags = progit.lib.get_tags_of_project(self.session, repo)
         self.assertEqual([tag.tag for tag in tags], [])
 
+    def test_get_issue_statuses(self):
+        """ Test the get_issue_statuses of progit.lib. """
+        statuses = progit.lib.get_issue_statuses(self.session)
+        self.assertEqual(
+            statuses, ['Open', 'Invalid', 'Insufficient data', 'Fixed'])
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
