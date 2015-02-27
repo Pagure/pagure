@@ -46,7 +46,7 @@ def new_user():
             form.password.data, APP.config.get('PASSWORD_SEED', None))
         form.password.data = hashlib.sha512(password).hexdigest()
 
-        token = progit.lib.id_generator(40)
+        token = progit.lib.login.id_generator(40)
 
         user = model.User()
         user.token = token
@@ -109,7 +109,7 @@ def do_login():
                 'provided by email?', 'error')
             return flask.redirect(flask.url_for('auth_login'))
         else:
-            visit_key = progit.lib.id_generator(40)
+            visit_key = progit.lib.login.id_generator(40)
             expiry = datetime.datetime.now() + APP.config.get(
                 'PERMANENT_SESSION_LIFETIME')
             session = model.ProgitUserVisit(
@@ -180,7 +180,7 @@ def lost_password():
                 'change?', 'error')
             return flask.redirect(flask.url_for('auth_login'))
 
-        token = progit.lib.id_generator(40)
+        token = progit.lib.login.id_generator(40)
         user_obj.token = token
         SESSION.add(user_obj)
 
