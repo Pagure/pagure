@@ -202,6 +202,12 @@ class Project(BASE):
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id], backref='projects')
 
+    users = relation('User',
+        secondary="user_projects",
+        primaryjoin="projects.c.id==user_projects.c.project_id",
+        secondaryjoin="users.c.id==user_projects.c.user_id",
+        backref='co_projects')
+
     @property
     def path(self):
         ''' Return the name of the git repo on the filesystem. '''
@@ -248,13 +254,6 @@ class ProjectUser(BASE):
         sa.ForeignKey('users.id', onupdate='CASCADE'),
         nullable=False,
         index=True)
-
-    project = relation(
-        'Project', foreign_keys=[project_id], remote_side=[Project.id],
-        backref='users', cascade="delete, delete-orphan",
-        single_parent=True)
-    user = relation('User', foreign_keys=[user_id],
-                    remote_side=[User.id], backref='co_projects')
 
 
 class Issue(BASE):
