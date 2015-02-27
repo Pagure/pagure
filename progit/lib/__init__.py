@@ -28,7 +28,7 @@ import pygit2
 
 import progit.exceptions
 import progit.lib.git
-import progit.notify
+import progit.lib.notify
 from progit.lib import model
 
 

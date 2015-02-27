@@ -130,7 +130,7 @@ class ProgitLibtests(tests.Modeltests):
             [], [email.email for email in items[1].emails])
 
     @patch('progit.lib.git.update_git_ticket')
-    @patch('progit.notify.send_email')
+    @patch('progit.lib.notify.send_email')
     def test_new_issue(self, p_send_email, p_ugt):
         """ Test the new_issue of progit.lib. """
         p_send_email.return_value = True

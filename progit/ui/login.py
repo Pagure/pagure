@@ -19,10 +19,10 @@ from sqlalchemy.exc import SQLAlchemyError
 import progit.login_forms as forms
 import progit.lib
 import progit.lib.login
-import progit.notify
+import progit.lib.model as model
+import progit.lib.notify
 from progit import APP, SESSION, is_admin
 from progit.ui.admin import admin_required
-import progit.lib.model as model
 
 
 @APP.route('/user/new', methods=['GET', 'POST'])

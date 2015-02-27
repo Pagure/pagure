@@ -21,7 +21,7 @@ import uuid
 import pygit2
 
 import progit.exceptions
-import progit.notify
+import progit.lib.notify
 from progit.lib import model
 
 
