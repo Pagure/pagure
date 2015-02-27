@@ -225,6 +225,45 @@ class ProgitLibtests(tests.Modeltests):
 
     @patch('progit.lib.git.update_git_ticket')
     @patch('progit.lib.notify.send_email')
+    def test_add_issue_dependency(self, p_send_email, p_ugt):
+        """ Test the add_issue_dependency of progit.lib. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        self.test_new_issue()
+        repo = progit.lib.get_project(self.session, 'test')
+        issue = progit.lib.search_issues(self.session, repo, issueid=1)
+        issue_blocked = progit.lib.search_issues(
+            self.session, repo, issueid=2)
+
+        # Before
+        self.assertEqual(issue.parents, [])
+        self.assertEqual(issue.children, [])
+        self.assertEqual(issue_blocked.parents, [])
+        self.assertEqual(issue_blocked.children, [])
+
+        msg = progit.lib.add_issue_dependency(
+            session=self.session,
+            issue=issue,
+            issue_blocked=issue_blocked,
+            user='pingou',
+            ticketfolder=None)
+        self.session.commit()
+        self.assertEqual(msg, 'Dependency added')
+
+        # After
+        self.assertEqual(len(issue.parents), 1)
+        self.assertEqual(issue.parents[0].id, 2)
+        self.assertEqual(len(issue.children), 0)
+        self.assertEqual(issue.children, [])
+
+        self.assertEqual(len(issue_blocked.parents), 0)
+        self.assertEqual(issue_blocked.parents, [])
+        self.assertEqual(len(issue_blocked.children), 1)
+        self.assertEqual(issue_blocked.children[0].id, 1)
+
+    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.notify.send_email')
     def test_add_issue_tag(self, p_send_email, p_ugt):
         """ Test the add_issue_tag of progit.lib. """
         p_send_email.return_value = True
