@@ -784,6 +784,22 @@ class ProgitLibtests(tests.Modeltests):
             ['skvidal@fp.o', 'svidal@fp.o'],
             [email.email for email in items[2].emails])
 
+    def test_update_user_ssh(self):
+        """ Test the update_user_ssh of progit.lib. """
+
+        # Before
+        user = progit.lib.search_user(self.session, username='foo')
+        self.assertEqual(user.public_ssh_key, None)
+
+        msg = progit.lib.update_user_ssh(self.session, user, 'blah')
+        self.assertEqual(msg, 'Public ssh key updated')
+
+        msg = progit.lib.update_user_ssh(self.session, user, 'blah')
+        self.assertEqual(msg, 'Nothing to update')
+
+        msg = progit.lib.update_user_ssh(self.session, user, None)
+        self.assertEqual(msg, 'Public ssh key updated')
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
