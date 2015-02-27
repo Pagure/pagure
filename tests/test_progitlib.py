@@ -1062,6 +1062,45 @@ class ProgitLibtests(tests.Modeltests):
         )
         self.assertEqual(len(prs), 0)
 
+    @patch('progit.lib.notify.notify_merge_pull_request')
+    @patch('progit.lib.notify.notify_cancelled_pull_request')
+    def test_close_pull_request(self, mpr, cpr):
+        """ Test close_pull_request of progit.lib. """
+        mpr.return_value = True
+        cpr.return_value = True
+
+        self.test_new_pull_request()
+
+        request = progit.lib.search_pull_requests(self.session, requestid=1)
+
+        progit.lib.close_pull_request(
+            session=self.session,
+            request=request,
+            user='pingou',
+            merged=True)
+        self.session.commit()
+
+        prs = progit.lib.search_pull_requests(
+            session=self.session,
+            status=False
+        )
+        self.assertEqual(len(prs), 1)
+
+        # Does not change much, just the notification sent
+
+        progit.lib.close_pull_request(
+            session=self.session,
+            request=request,
+            user='pingou',
+            merged=False)
+        self.session.commit()
+
+        prs = progit.lib.search_pull_requests(
+            session=self.session,
+            status=False
+        )
+        self.assertEqual(len(prs), 1)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
