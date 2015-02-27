@@ -83,12 +83,24 @@ class Modeltests(unittest.TestCase):
             password='foo',
         )
         self.session.add(item)
+        item = progit.lib.model.UserEmail(
+            user_id=1,
+            email='bar@pingou.com')
+        self.session.add(item)
+        item = progit.lib.model.UserEmail(
+            user_id=1,
+            email='foo@pingou.com')
+        self.session.add(item)
 
         item = progit.lib.model.User(
             user='foo',
             fullname='foo bar',
             password='foo',
         )
+        self.session.add(item)
+        item = progit.lib.model.UserEmail(
+            user_id=2,
+            email='foo@bar.com')
         self.session.add(item)
 
         self.session.commit()
