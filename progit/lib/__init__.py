@@ -369,19 +369,22 @@ def new_project(session, user, name, gitfolder, docfolder, ticketfolder,
 
     pygit2.init_repository(gitrepo, bare=True)
 
-    gitrepo = os.path.join(docfolder, project.path)
-    if os.path.exists(gitrepo):
+    docrepo = os.path.join(docfolder, project.path)
+    if os.path.exists(docrepo):
+        shutil.rmtree(gitrepo)
         raise progit.exceptions.RepoExistsException(
             'The docs repo "%s" already exists' % project.path
         )
-    pygit2.init_repository(gitrepo, bare=True)
+    pygit2.init_repository(docrepo, bare=True)
 
-    gitrepo = os.path.join(ticketfolder, project.path)
-    if os.path.exists(gitrepo):
+    ticketrepo = os.path.join(ticketfolder, project.path)
+    if os.path.exists(ticketrepo):
+        shutil.rmtree(gitrepo)
+        shutil.rmtree(docrepo)
         raise progit.exceptions.RepoExistsException(
             'The tickets repo "%s" already exists' % project.path
         )
-    pygit2.init_repository(gitrepo, bare=True)
+    pygit2.init_repository(ticketrepo, bare=True)
 
     return 'Project "%s" created' % name
 
