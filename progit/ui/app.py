@@ -50,12 +50,12 @@ def index():
     limit = APP.config['ITEM_PER_PAGE']
     start = limit * (page - 1)
 
-    repos = progit.lib.list_projects(
+    repos = progit.lib.search_projects(
         SESSION,
         fork=False,
         start=start,
         limit=limit)
-    num_repos = progit.lib.list_projects(
+    num_repos = progit.lib.search_projects(
         SESSION,
         fork=False,
         count=True)
@@ -92,25 +92,25 @@ def index():
         repo_start = limit * (repopage - 1)
         fork_start = limit * (forkpage - 1)
 
-        user_repos = progit.lib.list_projects(
+        user_repos = progit.lib.search_projects(
             SESSION,
             username=username,
             fork=False,
             start=repo_start,
             limit=limit)
-        user_repos_length = progit.lib.list_projects(
+        user_repos_length = progit.lib.search_projects(
             SESSION,
             username=username,
             fork=False,
             count=True)
 
-        user_forks = progit.lib.list_projects(
+        user_forks = progit.lib.search_projects(
             SESSION,
             username=username,
             fork=True,
             start=fork_start,
             limit=limit)
-        user_forks_length = progit.lib.list_projects(
+        user_forks_length = progit.lib.search_projects(
             SESSION,
             username=username,
             fork=True,
@@ -199,25 +199,25 @@ def view_user(username):
     repo_start = limit * (repopage - 1)
     fork_start = limit * (forkpage - 1)
 
-    repos = progit.lib.list_projects(
+    repos = progit.lib.search_projects(
         SESSION,
         username=username,
         fork=False,
         start=repo_start,
         limit=limit)
-    repos_length = progit.lib.list_projects(
+    repos_length = progit.lib.search_projects(
         SESSION,
         username=username,
         fork=False,
         count=True)
 
-    forks = progit.lib.list_projects(
+    forks = progit.lib.search_projects(
         SESSION,
         username=username,
         fork=True,
         start=fork_start,
         limit=limit)
-    forks_length = progit.lib.list_projects(
+    forks_length = progit.lib.search_projects(
         SESSION,
         username=username,
         fork=True,
