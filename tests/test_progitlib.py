@@ -285,6 +285,40 @@ class ProgitLibtests(tests.Modeltests):
 
         self.assertEqual(msgs, [u'Removed tag: tag1'])
 
+    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.notify.send_email')
+    def test_edit_issue_tags(self, p_send_email, p_ugt):
+        """ Test the edit_issue_tags of progit.lib. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        self.test_add_issue_tag()
+        repo = progit.lib.get_project(self.session, 'test')
+        issue = progit.lib.search_issues(self.session, repo, issueid=1)
+
+        self.assertRaises(
+            progit.exceptions.ProgitException,
+            progit.lib.edit_issue_tags,
+            session=self.session,
+            project=repo,
+            old_tag='foo',
+            new_tag='bar')
+
+        msgs = progit.lib.edit_issue_tags(
+            session=self.session,
+            project=repo,
+            old_tag='tag1',
+            new_tag='tag2')
+        self.session.commit()
+        self.assertEqual(msgs, ['Edited tag: tag1 to tag2'])
+
+        self.assertRaises(
+            progit.exceptions.ProgitException,
+            progit.lib.edit_issue_tags,
+            session=self.session,
+            project=repo,
+            old_tag='tag2',
+            new_tag='tag2')
 
     @patch('progit.lib.git.update_git_ticket')
     @patch('progit.lib.notify.send_email')
