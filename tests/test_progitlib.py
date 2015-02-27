@@ -1016,6 +1016,24 @@ class ProgitLibtests(tests.Modeltests):
         )
         self.assertEqual(msg, 'Request created')
 
+    def test_add_pull_request_comment(self):
+        """ Test add_pull_request_comment of progit.lib. """
+
+        self.test_new_pull_request()
+
+        request = progit.lib.search_pull_requests(self.session, requestid=1)
+
+        msg = progit.lib.add_pull_request_comment(
+            session=self.session,
+            request=request,
+            commit='commithash',
+            filename='file',
+            row=None,
+            comment='This is awesome, I got to remember it!',
+            user='foo'
+        )
+        self.assertEqual(msg, 'Comment added')
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
