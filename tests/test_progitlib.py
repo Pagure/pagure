@@ -987,6 +987,35 @@ class ProgitLibtests(tests.Modeltests):
         projects = progit.lib.search_projects(self.session)
         self.assertEqual(len(projects), 3)
 
+    def test_new_pull_request(self):
+        """ test new_pull_request of progit.lib. """
+        tests.create_projects(self.session)
+
+        # Create a forked repo
+        item = progit.lib.model.Project(
+            user_id=1,  # pingou
+            name='test',
+            description='test project #1',
+            parent_id=1,
+        )
+        self.session.commit()
+        self.session.add(item)
+
+        repo = progit.lib.get_project(self.session, 'test')
+        forked_repo = progit.lib.get_project(
+            self.session, 'test', user='pingou')
+
+        msg = progit.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou'
+        )
+        self.assertEqual(msg, 'Request created')
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
