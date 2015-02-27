@@ -297,8 +297,6 @@ def edit_issue_tags(session, project, old_tag, new_tag):
             for issue_tag in issue.tags:
                 if issue_tag.tag == old_tag:
                     session.delete(issue_tag)
-                if issue_tag.tag == new_tag:
-                    add = False
 
             if add:
                 # Add the new one
