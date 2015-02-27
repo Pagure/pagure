@@ -242,6 +242,15 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(issue_blocked.parents, [])
         self.assertEqual(issue_blocked.children, [])
 
+        self.assertRaises(
+            progit.exceptions.ProgitException,
+            progit.lib.add_issue_dependency,
+            session=self.session,
+            issue=issue,
+            issue_blocked=issue,
+            user='pingou',
+            ticketfolder=None)
+
         msg = progit.lib.add_issue_dependency(
             session=self.session,
             issue=issue,
