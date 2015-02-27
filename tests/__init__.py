@@ -12,6 +12,7 @@ __requires__ = ['SQLAlchemy >= 0.7']
 import pkg_resources
 
 import unittest
+import shutil
 import sys
 import tempfile
 import os
