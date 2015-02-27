@@ -286,8 +286,8 @@ def remove_issue_tags(session, project, tags):
     if not isinstance(tags, list):
         tags = [tags]
 
-    issues = get_issues(session, project, closed=False, tags=tags)
-    issues.extend(get_issues(session, project, closed=True, tags=tags))
+    issues = search_issues(session, project, closed=False, tags=tags)
+    issues.extend(search_issues(session, project, closed=True, tags=tags))
 
     msgs = []
     if not issues:
@@ -309,8 +309,8 @@ def edit_issue_tags(session, project, old_tag, new_tag):
     if not isinstance(old_tag, list):
         old_tags = [old_tag]
 
-    issues = get_issues(session, project, closed=False, tags=old_tags)
-    issues.extend(get_issues(session, project, closed=True, tags=old_tags))
+    issues = search_issues(session, project, closed=False, tags=old_tags)
+    issues.extend(search_issues(session, project, closed=True, tags=old_tags))
 
     msgs = []
     if not issues:
