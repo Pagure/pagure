@@ -514,6 +514,39 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(issue.comments[0].comment, 'Hey look a comment!')
         self.assertEqual(issue.comments[0].user.user, 'foo')
 
+    @patch('progit.lib.notify.send_email')
+    def test_add_user_to_project(self, p_send_email):
+        """ Test the add_user_to_project of progit.lib. """
+        p_send_email.return_value = True
+
+        tests.create_projects(self.session)
+
+        # Before
+        repo = progit.lib.get_project(self.session, 'test')
+        self.assertEqual(len(repo.users), 0)
+
+        # Add an user to a project
+        self.assertRaises(
+            progit.exceptions.ProgitException,
+            progit.lib.add_user_to_project,
+            session=self.session,
+            project=repo,
+            user='foobar',
+        )
+
+        msg = progit.lib.add_user_to_project(
+            session=self.session,
+            project=repo,
+            user='foo',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User added')
+
+        # After
+        repo = progit.lib.get_project(self.session, 'test')
+        self.assertEqual(len(repo.users), 1)
+        self.assertEqual(repo.users[0].user, 'foo')
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
