@@ -700,6 +700,24 @@ class ProgitLibtests(tests.Modeltests):
         projects = progit.lib.search_projects(self.session, count=True)
         self.assertEqual(projects, 2)
 
+    def test_get_tags_of_project(self):
+        """ Test the get_tags_of_project of progit.lib. """
+
+        self.test_add_issue_tag()
+        repo = progit.lib.get_project(self.session, 'test')
+
+        tags = progit.lib.get_tags_of_project(self.session, repo)
+        self.assertEqual([tag.tag for tag in tags], ['tag1'])
+
+        tags = progit.lib.get_tags_of_project(
+            self.session, repo, pattern='T*')
+        self.assertEqual([tag.tag for tag in tags], ['tag1'])
+
+        repo = progit.lib.get_project(self.session, 'test2')
+
+        tags = progit.lib.get_tags_of_project(self.session, repo)
+        self.assertEqual([tag.tag for tag in tags], [])
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
