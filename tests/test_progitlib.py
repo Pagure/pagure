@@ -960,6 +960,11 @@ class ProgitLibtests(tests.Modeltests):
         projects = progit.lib.search_projects(self.session)
         self.assertEqual(len(projects), 3)
 
+        # Since we have two forks, let's search them
+        projects = progit.lib.search_projects(self.session, fork=True)
+        self.assertEqual(len(projects), 2)
+        projects = progit.lib.search_projects(self.session, fork=False)
+        self.assertEqual(len(projects), 1)
 
 
 if __name__ == '__main__':
