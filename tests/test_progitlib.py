@@ -224,6 +224,34 @@ class ProgitLibtests(tests.Modeltests):
 
     @patch('progit.lib.git.update_git_ticket')
     @patch('progit.lib.notify.send_email')
+    def test_add_issue_tag(self, p_send_email, p_ugt):
+        """ Test the add_issue_tag of progit.lib. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        self.test_edit_issue()
+        repo = progit.lib.get_project(self.session, 'test')
+        issue = progit.lib.search_issues(self.session, repo, issueid=1)
+
+        # Add a tag to the issue
+        msg = progit.lib.add_issue_tag(
+            session=self.session,
+            issue=issue,
+            tag='tag1',
+            user='pingou',
+            ticketfolder=None)
+        self.session.commit()
+        self.assertEqual(msg, 'Tag added')
+
+        issues = progit.lib.search_issues(self.session, repo, tags='tag1')
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(issues[0].id, 1)
+        self.assertEqual(issues[0].project_id, 1)
+        self.assertEqual(issues[0].status, 'Open')
+        self.assertEqual([tag.tag for tag in issues[0].tags], ['tag1'])
+
+    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.notify.send_email')
     def test_search_issues(self, p_send_email, p_ugt):
         """ Test the search_issues of progit.lib. """
         p_send_email.return_value = True
@@ -271,23 +299,6 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(issue.title, 'Test issue')
         self.assertEqual(issue.user.user, 'pingou')
         self.assertEqual(issue.tags, [])
-
-        # Add a tag to the issue
-        msg = progit.lib.add_issue_tag(
-            session=self.session,
-            issue=issue,
-            tag='tag1',
-            user='pingou',
-            ticketfolder=None)
-        self.session.commit()
-        self.assertEqual(msg, 'Tag added')
-
-        issues = progit.lib.search_issues(self.session, repo, tags='tag1')
-        self.assertEqual(len(issues), 1)
-        self.assertEqual(issues[0].id, 1)
-        self.assertEqual(issues[0].project_id, 1)
-        self.assertEqual(issues[0].status, 'Open')
-        self.assertEqual([tag.tag for tag in issues[0].tags], ['tag1'])
 
         # Issues by authors
         issues = progit.lib.search_issues(self.session, repo, author='foo')
