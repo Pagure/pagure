@@ -706,7 +706,7 @@ class ProgitLibtests(tests.Modeltests):
 
         # Create two forked repo
         item = progit.lib.model.Project(
-            user_id=2,  # pingou
+            user_id=2,  # foo
             name='test',
             description='test project #1',
             parent_id=1,
@@ -714,7 +714,7 @@ class ProgitLibtests(tests.Modeltests):
         self.session.add(item)
 
         item = progit.lib.model.Project(
-            user_id=2,  # pingou
+            user_id=2,  # foo
             name='test2',
             description='test project #2',
             parent_id=2,
