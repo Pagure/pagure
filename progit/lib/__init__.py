@@ -512,19 +512,22 @@ def fork_project(session, user, repo, gitfolder,
 
     pygit2.clone_repository(reponame, forkreponame, bare=True)
 
-    gitrepo = os.path.join(docfolder, project.path)
-    if os.path.exists(gitrepo):
+    docrepo = os.path.join(docfolder, project.path)
+    if os.path.exists(docrepo):
+        shutil.rmtree(forkreponame)
         raise progit.exceptions.RepoExistsException(
             'The docs "%s" already exists' % project.path
         )
-    pygit2.init_repository(gitrepo, bare=True)
+    pygit2.init_repository(docrepo, bare=True)
 
-    gitrepo = os.path.join(ticketfolder, project.path)
-    if os.path.exists(gitrepo):
+    ticketrepo = os.path.join(ticketfolder, project.path)
+    if os.path.exists(ticketrepo):
+        shutil.rmtree(forkreponame)
+        shutil.rmtree(docrepo)
         raise progit.exceptions.RepoExistsException(
             'The tickets repo "%s" already exists' % project.path
         )
-    pygit2.init_repository(gitrepo, bare=True)
+    pygit2.init_repository(ticketrepo, bare=True)
 
     return 'Repo "%s" cloned to "%s/%s"' % (repo.name, user, repo.name)
 
