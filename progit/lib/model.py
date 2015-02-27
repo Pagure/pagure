@@ -13,6 +13,7 @@ import pkg_resources
 
 import datetime
 import logging
+import json
 
 import sqlalchemy as sa
 from sqlalchemy import create_engine
@@ -325,6 +326,39 @@ class Issue(BASE):
         can be used when sending emails.
         '''
         return '%s-ticket-%s@progit' % (self.project.name, self.id)
+
+    def to_json(self):
+        ''' Returns a JSON representation of the issue using the JSON module
+
+        '''
+        output = {
+            'title': issue.title,
+            'content': issue.content,
+            'status': issue.status,
+            'date_created': issue.date_created.strftime('%s'),
+            'user': {
+                'name': issue.user.user,
+                'emails': [email.email for email in issue.user.emails],
+            }
+        }
+
+        comments = []
+        for comment in issue.comments:
+            cmt = {
+                'id': comment.id,
+                'comment': comment.comment,
+                'parent': comment.parent_id,
+                'date_created': comment.date_created.strftime('%s'),
+                'user': {
+                    'name': comment.user.user,
+                    'emails': [email.email for email in comment.user.emails],
+                }
+            }
+            comments.append(cmt)
+
+        output['comments'] = comments
+
+        return json.dumps(output)
 
 
 class IssueToIssue(BASE):

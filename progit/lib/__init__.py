@@ -10,7 +10,6 @@
 
 
 import datetime
-import json
 import os
 import random
 import shutil
@@ -882,40 +881,6 @@ def update_user_ssh(session, user, ssh_key):
         message = 'Public ssh key updated'
 
     return message
-
-
-def issue_to_json(issue):
-    """ Convert all the data related to an issue (a ticket) as json object.
-
-    """
-    output = {
-        'title': issue.title,
-        'content': issue.content,
-        'status': issue.status,
-        'date_created': issue.date_created.strftime('%s'),
-        'user': {
-            'name': issue.user.user,
-            'emails': [email.email for email in issue.user.emails],
-        }
-    }
-
-    comments = []
-    for comment in issue.comments:
-        cmt = {
-            'id': comment.id,
-            'comment': comment.comment,
-            'parent': comment.parent_id,
-            'date_created': comment.date_created.strftime('%s'),
-            'user': {
-                'name': comment.user.user,
-                'emails': [email.email for email in comment.user.emails],
-            }
-        }
-        comments.append(cmt)
-
-    output['comments'] = comments
-
-    return json.dumps(output)
 
 
 def update_git_ticket(issue, repo, ticketfolder):
