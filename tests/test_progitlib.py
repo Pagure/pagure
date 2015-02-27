@@ -401,6 +401,38 @@ class ProgitLibtests(tests.Modeltests):
             self.session, repo, assignee=True)
         self.assertEqual(len(issues), 0)
 
+    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.notify.send_email')
+    def test_add_issue_comment(self, p_send_email, p_ugt):
+        """ Test the add_issue_comment of progit.lib. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+        self.test_new_issue()
+        repo = progit.lib.get_project(self.session, 'test')
+
+        # Before
+        issue = progit.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(len(issue.comments), 0)
+
+        # Add a comment to that issue
+        msg = progit.lib.add_issue_comment(
+            session=self.session,
+            issue=issue,
+            comment='Hey look a comment!',
+            user='foo',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Comment added')
+
+        # After
+        issue = progit.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(len(issue.comments), 1)
+        self.assertEqual(issue.comments[0].comment, 'Hey look a comment!')
+        self.assertEqual(issue.comments[0].user.user, 'foo')
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
