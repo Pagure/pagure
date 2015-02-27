@@ -30,6 +30,21 @@ class ProgitLibtests(tests.Modeltests):
         tests.create_projects(self.session)
         self.assertEqual(1, progit.lib.get_next_id(self.session, 1))
 
+    def test_search_user_all(self):
+        """ Test the search_user of progit.lib. """
+
+        # Retrieve all users
+        items = progit.lib.search_user(self.session)
+        self.assertEqual(2, len(items))
+        self.assertEqual(1, items[0].id)
+        self.assertEqual('pingou', items[0].user)
+        self.assertEqual('pingou', items[0].username)
+        self.assertEqual([], items[0].groups)
+        self.assertEqual(2, items[1].id)
+        self.assertEqual('foo', items[1].user)
+        self.assertEqual('foo', items[1].username)
+        self.assertEqual([], items[1].groups)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
