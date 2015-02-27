@@ -42,7 +42,7 @@ def add_comment_issue(repo, issueid, username=None):
     if not repo.issue_tracker:
         flask.abort(404, 'No issue tracker found for this project')
 
-    issue = progit.lib.get_issue(SESSION, repo.id, issueid)
+    issue = progit.lib.get_issues(SESSION, repo.id, issueid=issueid)
 
     if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
@@ -84,7 +84,7 @@ def add_tag_issue(repo, issueid, username=None):
     if not repo.issue_tracker:
         flask.abort(404, 'No issue tracker found for this project')
 
-    issue = progit.lib.get_issue(SESSION, repo.id, issueid)
+    issue = progit.lib.get_issues(SESSION, repo.id, issueid=issueid)
 
     if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
@@ -129,7 +129,7 @@ def add_assignee_issue(repo, issueid, username=None):
     if not repo.issue_tracker:
         flask.abort(404, 'No issue tracker found for this project')
 
-    issue = progit.lib.get_issue(SESSION, repo.id, issueid)
+    issue = progit.lib.get_issues(SESSION, repo.id, issueid=issueid)
 
     if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
@@ -175,7 +175,7 @@ def add_dependent_issue(repo, issueid, issuetype, username=None):
     if not repo.issue_tracker:
         flask.abort(404, 'No issue tracker found for this project')
 
-    issue = progit.lib.get_issue(SESSION, repo.id, issueid)
+    issue = progit.lib.get_issues(SESSION, repo.id, issueid=issueid)
 
     if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
@@ -184,7 +184,8 @@ def add_dependent_issue(repo, issueid, issuetype, username=None):
     cat = None
     if form.validate_on_submit():
         blocked = form.depends.data
-        issue_blocked = progit.lib.get_issue(SESSION, repo.id, blocked)
+        issue_blocked = progit.lib.get_issues(
+            SESSION, repo.id, issueid=blocked)
         if issue_blocked is None or issue_blocked.project != repo:
             flask.abort(404, 'Issue blocked not found')
 
@@ -417,7 +418,7 @@ def view_issue(repo, issueid, username=None):
     if not repo.issue_tracker:
         flask.abort(404, 'No issue tracker found for this project')
 
-    issue = progit.lib.get_issue(SESSION, repo.id, issueid)
+    issue = progit.lib.get_issues(SESSION, repo.id, issueid=issueid)
 
     if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
@@ -495,7 +496,7 @@ def edit_issue(repo, issueid, username=None):
         flask.abort(
             403, 'You are not allowed to edit issues for this project')
 
-    issue = progit.lib.get_issue(SESSION, repo.id, issueid)
+    issue = progit.lib.get_issues(SESSION, repo.id, issueid=issueid)
 
     if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
