@@ -811,6 +811,156 @@ class ProgitLibtests(tests.Modeltests):
             '01fe73d687f4db328da1183f2a1b5b22962ca9d9c50f0728aafeac974856311c'
             '?s=64&d=retro')
 
+    def test_fork_project(self):
+        """ Test the fork_project of progit.lib. """
+        gitfolder = os.path.join(self.path, 'repos')
+        docfolder = os.path.join(self.path, 'docs')
+        ticketfolder = os.path.join(self.path, 'tickets')
+        forkfolder = os.path.join(self.path, 'forks')
+
+        os.mkdir(gitfolder)
+        os.mkdir(docfolder)
+        os.mkdir(ticketfolder)
+
+        projects = progit.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+
+        # Create a new project
+        msg = progit.lib.new_project(
+            session=self.session,
+            user='pingou',
+            name='testproject',
+            gitfolder=gitfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            description='description for testproject',
+            parent_id=None
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Project "testproject" created')
+
+        projects = progit.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 1)
+
+        repo = progit.lib.get_project(self.session, 'testproject')
+        gitrepo = os.path.join(gitfolder, repo.path)
+        docrepo = os.path.join(docfolder, repo.path)
+        ticketrepo = os.path.join(ticketfolder, repo.path)
+
+        self.assertTrue(os.path.exists(gitrepo))
+        self.assertTrue(os.path.exists(docrepo))
+        self.assertTrue(os.path.exists(ticketrepo))
+
+        # Fail to fork
+
+        # Cannot fail your own project
+        self.assertRaises(
+            progit.exceptions.ProgitException,
+            progit.lib.fork_project,
+            session=self.session,
+            user='pingou',
+            repo=repo,
+            gitfolder=gitfolder,
+            forkfolder=forkfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+        )
+        self.session.rollback()
+
+        # Git repo exists
+        grepo = '%s.git' % os.path.join(forkfolder, 'foo', 'testproject')
+        os.makedirs(grepo)
+        self.assertRaises(
+            progit.exceptions.ProgitException,
+            progit.lib.fork_project,
+            session=self.session,
+            user='foo',
+            repo=repo,
+            gitfolder=gitfolder,
+            forkfolder=forkfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+        )
+        self.session.rollback()
+        shutil.rmtree(grepo)
+
+        # Doc repo exists
+        grepo = '%s.git' % os.path.join(docfolder, 'foo', 'testproject')
+        os.makedirs(grepo)
+        self.assertRaises(
+            progit.exceptions.ProgitException,
+            progit.lib.fork_project,
+            session=self.session,
+            user='foo',
+            repo=repo,
+            gitfolder=gitfolder,
+            forkfolder=forkfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+        )
+        self.session.rollback()
+        shutil.rmtree(grepo)
+
+        # Ticket repo exists
+        grepo = '%s.git' % os.path.join(ticketfolder, 'foo', 'testproject')
+        os.makedirs(grepo)
+        self.assertRaises(
+            progit.exceptions.ProgitException,
+            progit.lib.fork_project,
+            session=self.session,
+            user='foo',
+            repo=repo,
+            gitfolder=gitfolder,
+            forkfolder=forkfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+        )
+        self.session.rollback()
+        shutil.rmtree(grepo)
+
+        projects = progit.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 1)
+
+        # Fork worked
+
+        msg = progit.lib.fork_project(
+            session=self.session,
+            user='foo',
+            repo=repo,
+            gitfolder=gitfolder,
+            forkfolder=forkfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+        )
+        self.session.commit()
+        self.assertEqual(
+            msg, 'Repo "testproject" cloned to "foo/testproject"')
+
+        projects = progit.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 2)
+
+        # Fork a fork
+
+        repo = progit.lib.get_project(
+            self.session, 'testproject', user='foo')
+
+        msg = progit.lib.fork_project(
+            session=self.session,
+            user='pingou',
+            repo=repo,
+            gitfolder=gitfolder,
+            forkfolder=forkfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+        )
+        self.session.commit()
+        self.assertEqual(
+            msg, 'Repo "testproject" cloned to "pingou/testproject"')
+
+        projects = progit.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 3)
+
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
