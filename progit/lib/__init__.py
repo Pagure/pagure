@@ -209,7 +209,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
         )
 
     # Validate the assignee
-    user_obj = search_user(session, user=assignee)
+    user_obj = search_user(session, username=assignee)
     if not user_obj:
         user_obj = search_user(session, email=assignee)
 
