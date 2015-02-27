@@ -658,9 +658,10 @@ def get_project(session, name, user=None):
 
 
 def get_issues(
-        session, repo, status=None, closed=False, tags=None,
+        session, repo, issueid=None, status=None, closed=False, tags=None,
         assignee=None, author=None):
-    ''' Retrieve all the issues associated to a project
+    ''' Retrieve one or more issues associated to a project with the given
+    criterias.
 
     Watch out that the closed argument is incompatible with the status
     argument. The closed argument will return all the issues whose status
@@ -668,6 +669,25 @@ def get_issues(
     status.
     The `tags` argument can be used to filter the issues returned based on
     a certain tag.
+    If the `issueid` argument is specified a single Issue object (or None)
+    will be returned instead of a list of Issue objects.
+
+    :arg session: the session to use to connect to the database.
+    :arg repo: a Project object to which the issues should be associated
+    :type repo: progit.lib.model.Project
+    :kwarg issueid: the identifier of the issue to look for
+    :type issueid: int or None
+    :kwarg status: the status of the issue to look for (incompatible with
+        the `closed` argument).
+    :type status: str or None
+    :kwarg closed: a boolean indicating whether the issue to retrieve are
+        closed or open (incompatible with the `status` argument).
+    :type closed: bool or None
+    :kwarg tags: a tag the issue(s) returned should be associated with
+    :type tags: str or list(str) or None
+    :return: A single Issue object if issueid is specified, a list of Project
+        objects otherwise.
+    :rtype: Project or [Project]
 
     '''
     query = session.query(
@@ -678,6 +698,11 @@ def get_issues(
         model.Issue.id
     )
 
+    if issueid is not None:
+        query = query.filter(
+            model.Issue.id == issueid
+        )
+
     if status is not None and not closed:
         query = query.filter(
             model.Issue.status == status
@@ -687,6 +712,9 @@ def get_issues(
             model.Issue.status != 'Open'
         )
     if tags is not None and tags != []:
+        if isinstance(tags, basestring):
+            tags = [tags]
+
         query = query.filter(
             model.Issue.uid == model.TagIssue.issue_uid
         ).filter(
@@ -710,23 +738,13 @@ def get_issues(
                 model.User.user == author
             )
 
-    return query.all()
+    if issueid is not None:
+        output = query.first()
+    else:
+        output = query.all()
 
+    return output
 
-def get_issue(session, projectid, issueid):
-    ''' Retrieve the specified issue
-    '''
-    query = session.query(
-        model.Issue
-    ).filter(
-        model.Issue.project_id == projectid
-    ).filter(
-        model.Issue.id == issueid
-    ).order_by(
-        model.Issue.id
-    )
-
-    return query.first()
 
 def get_tags_of_project(session, project, pattern=None):
     ''' Returns the list of tags associated with the issues of a project.
