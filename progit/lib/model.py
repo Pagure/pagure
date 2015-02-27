@@ -332,18 +332,18 @@ class Issue(BASE):
 
         '''
         output = {
-            'title': issue.title,
-            'content': issue.content,
-            'status': issue.status,
-            'date_created': issue.date_created.strftime('%s'),
+            'title': self.title,
+            'content': self.content,
+            'status': self.status,
+            'date_created': self.date_created.strftime('%s'),
             'user': {
-                'name': issue.user.user,
-                'emails': [email.email for email in issue.user.emails],
+                'name': self.user.user,
+                'emails': [email.email for email in self.user.emails],
             }
         }
 
         comments = []
-        for comment in issue.comments:
+        for comment in self.comments:
             cmt = {
                 'id': comment.id,
                 'comment': comment.comment,
