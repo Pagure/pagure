@@ -182,6 +182,26 @@ class ProgitLibtests(tests.Modeltests):
         issues = progit.lib.search_issues(self.session, repo)
         self.assertEqual(len(issues), 2)
 
+    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.notify.send_email')
+    def test_edit_issue(self, p_send_email, p_ugt):
+        """ Test the edit_issue of progit.lib. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        self.test_new_issue()
+        repo = progit.lib.get_project(self.session, 'test')
+        issue = progit.lib.search_issues(self.session, repo, issueid=2)
+
+        # Edit the issue
+        msg = progit.lib.edit_issue(
+            session=self.session,
+            issue=issue,
+            ticketfolder=None,
+            status='Invalid')
+        self.session.commit()
+        self.assertEqual(msg, 'Edited successfully issue #2')
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
