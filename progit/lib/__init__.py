@@ -259,10 +259,10 @@ def remove_issue_tags(session, project, tags):
     msgs = []
     if not issues:
         raise progit.exceptions.ProgitException(
-            'No issue found with the tag: %s' % tag)
+            'No issue found with the tags: %s' % ', '.join(tags))
     else:
         for issue in issues:
-            for issue_tag in issue[0].tags:
+            for issue_tag in issue.tags:
                 if issue_tag.tag in tags:
                     tag = issue_tag.tag
                     session.delete(issue_tag)
