@@ -1058,7 +1058,7 @@ class ProgitLibtests(tests.Modeltests):
 
         prs = progit.lib.search_pull_requests(
             session=self.session,
-            status='Merged'
+            status=False
         )
         self.assertEqual(len(prs), 0)
 
