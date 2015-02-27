@@ -273,11 +273,13 @@ def remove_issue_tags(session, project, tags):
 def edit_issue_tags(session, project, old_tag, new_tag):
     ''' Removes the specified tag of a project. '''
 
-    if not isinstance(old_tag, list):
-        old_tags = [old_tag]
+    if old_tag == new_tag:
+        raise progit.exceptions.ProgitException(
+            'Old tag: "%s" is the same as new tag "%s", nothing to change'
+            % (old_tag, new_tag))
 
-    issues = search_issues(session, project, closed=False, tags=old_tags)
-    issues.extend(search_issues(session, project, closed=True, tags=old_tags))
+    issues = search_issues(session, project, closed=False, tags=old_tag)
+    issues.extend(search_issues(session, project, closed=True, tags=old_tag))
 
     msgs = []
     if not issues:
@@ -292,9 +294,8 @@ def edit_issue_tags(session, project, old_tag, new_tag):
         for issue in issues:
             add = True
             # Drop the old tag
-            for issue_tag in issue[0].tags:
-                if issue_tag.tag in old_tags:
-                    tag = issue_tag.tag
+            for issue_tag in issue.tags:
+                if issue_tag.tag == old_tag:
                     session.delete(issue_tag)
                 if issue_tag.tag == new_tag:
                     add = False
@@ -302,7 +303,7 @@ def edit_issue_tags(session, project, old_tag, new_tag):
             if add:
                 # Add the new one
                 issue_tag = model.TagIssue(
-                    issue_id=issue[0].uid,
+                    issue_uid=issue.uid,
                     tag=new_tag
                 )
                 session.add(issue_tag)
