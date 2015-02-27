@@ -181,7 +181,7 @@ def add_issue_tag(session, issue, tag, user, ticketfolder):
     # Make sure we won't have SQLAlchemy error before we create the repo
     session.flush()
 
-    progit.lib.gitupdate_git_ticket(
+    progit.lib.git.update_git_ticket(
         issue, repo=issue.project, ticketfolder=ticketfolder)
 
     return 'Tag added'
