@@ -166,7 +166,8 @@ def add_issue_tag(session, issue, tag, user, ticketfolder):
 
     for tag_issue in issue.tags:
         if tag_issue.tag == tag:
-            return 'Tag already present: %s' % tag
+            raise progit.exceptions.ProgitException(
+                'Tag already present: %s' % tag)
 
     tagobj = get_tag(session, tag)
     if not tagobj:
