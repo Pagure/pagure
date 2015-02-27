@@ -700,6 +700,33 @@ class ProgitLibtests(tests.Modeltests):
         projects = progit.lib.search_projects(self.session, count=True)
         self.assertEqual(projects, 2)
 
+    def test_search_project_forked(self):
+        """ Test the search_project for forked projects in progit.lib. """
+        tests.create_projects(self.session)
+
+        # Create two forked repo
+        item = progit.lib.model.Project(
+            user_id=2,  # pingou
+            name='test',
+            description='test project #1',
+            parent_id=1,
+        )
+        self.session.add(item)
+
+        item = progit.lib.model.Project(
+            user_id=2,  # pingou
+            name='test2',
+            description='test project #2',
+            parent_id=2,
+        )
+        self.session.add(item)
+
+        # Since we have two forks, let's search them
+        projects = progit.lib.search_projects(self.session, fork=True)
+        self.assertEqual(len(projects), 2)
+        projects = progit.lib.search_projects(self.session, fork=False)
+        self.assertEqual(len(projects), 2)
+
     def test_get_tags_of_project(self):
         """ Test the get_tags_of_project of progit.lib. """
 
@@ -959,12 +986,6 @@ class ProgitLibtests(tests.Modeltests):
 
         projects = progit.lib.search_projects(self.session)
         self.assertEqual(len(projects), 3)
-
-        # Since we have two forks, let's search them
-        projects = progit.lib.search_projects(self.session, fork=True)
-        self.assertEqual(len(projects), 2)
-        projects = progit.lib.search_projects(self.session, fork=False)
-        self.assertEqual(len(projects), 1)
 
 
 if __name__ == '__main__':
