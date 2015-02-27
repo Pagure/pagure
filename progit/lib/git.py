@@ -77,7 +77,7 @@ Subject: %(subject)s
     return patch
 
 
-def generate_gitolite_acls(session, configfile):
+def write_gitolite_acls(session, configfile):
     ''' Generate the configuration file for gitolite for all projects
     on the forge.
     '''
