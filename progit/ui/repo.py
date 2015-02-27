@@ -29,6 +29,7 @@ import chardet
 
 import progit.exceptions
 import progit.lib
+import progit.lib.git
 import progit.forms
 import progit.ui.plugins
 from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
@@ -506,7 +507,7 @@ def view_commit_patch(repo, commitid, username=None):
     except ValueError:
         flask.abort(404, 'Commit not found')
 
-    patch = progit.lib.commit_to_patch(repo_obj, commit)
+    patch = progit.lib.git.commit_to_patch(repo_obj, commit)
 
     return flask.Response(patch, content_type="text/plain;charset=UTF-8")
 

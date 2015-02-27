@@ -24,6 +24,7 @@ from pygments.formatters import HtmlFormatter
 
 import progit.doc_utils
 import progit.lib
+import progit.lib.git
 import progit.forms
 from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
                     is_repo_admin, generate_gitolite_acls)
@@ -246,7 +247,7 @@ def request_pull_patch(repo, requestid, username=None):
             'view_repo', username=username, repo=repo.name))
 
     diff_commits.reverse()
-    patch = progit.lib.commit_to_patch(repo_obj, diff_commits)
+    patch = progit.lib.git.commit_to_patch(repo_obj, diff_commits)
 
     return flask.Response(patch, content_type="text/plain;charset=UTF-8")
 
