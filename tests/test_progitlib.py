@@ -313,12 +313,33 @@ class ProgitLibtests(tests.Modeltests):
             self.session, repo, assignee='pingou')
         self.assertEqual(len(issues), 0)
 
+        # Test when it fails
+        self.assertRaises(
+            progit.exceptions.ProgitException,
+            progit.lib.add_issue_assignee,
+            session=self.session,
+            issue=issue,
+            assignee='foo@foobar.com',
+            user='foo@pingou.com',
+            ticketfolder=None
+        )
+
+        self.assertRaises(
+            progit.exceptions.ProgitException,
+            progit.lib.add_issue_assignee,
+            session=self.session,
+            issue=issue,
+            assignee='foo@bar.com',
+            user='foo@foopingou.com',
+            ticketfolder=None
+        )
+
         # Set the assignee by its email
         msg = progit.lib.add_issue_assignee(
             session=self.session,
             issue=issue,
             assignee='foo@bar.com',
-            user='pingou',
+            user='foo@pingou.com',
             ticketfolder=None)
         self.session.commit()
         self.assertEqual(msg, 'Issue assigned')
