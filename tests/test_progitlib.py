@@ -45,6 +45,18 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual('foo', items[1].username)
         self.assertEqual([], items[1].groups)
 
+    def test_search_user_username(self):
+        """ Test the search_user of progit.lib. """
+
+        # Retrieve user by username
+        item = progit.lib.search_user(self.session, username='foo')
+        self.assertEqual('foo', item.user)
+        self.assertEqual('foo', item.username)
+        self.assertEqual([], item.groups)
+
+        item = progit.lib.search_user(self.session, username='bar')
+        self.assertEqual(None, item)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
