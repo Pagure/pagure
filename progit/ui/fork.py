@@ -92,7 +92,7 @@ def request_pull(repo, requestid, username=None):
     if not repo:
         flask.abort(404, 'Project not found')
 
-    request = progit.lib.get_pull_request(
+    request = progit.lib.get_pull_requests(
         SESSION, project_id=repo.id, requestid=requestid)
 
     if not request:
@@ -194,7 +194,7 @@ def request_pull_patch(repo, requestid, username=None):
     if not repo:
         flask.abort(404, 'Project not found')
 
-    request = progit.lib.get_pull_request(
+    request = progit.lib.get_pull_requests(
         SESSION, project_id=repo.id, requestid=requestid)
 
     if not request:
@@ -265,7 +265,7 @@ def pull_request_add_comment(repo, requestid, commit, filename, row,
     if not repo:
         flask.abort(404, 'Project not found')
 
-    request = progit.lib.get_pull_request(
+    request = progit.lib.get_pull_requests(
         SESSION, project_id=repo.id, requestid=requestid)
     repo = request.repo_from
 
@@ -333,7 +333,7 @@ def merge_request_pull(repo, requestid, username=None):
     if not repo:
         flask.abort(404, 'Project not found')
 
-    request = progit.lib.get_pull_request(
+    request = progit.lib.get_pull_requests(
         SESSION, project_id=repo.id, requestid=requestid)
 
     if not request:
@@ -473,7 +473,7 @@ def cancel_request_pull(repo, requestid, username=None):
         if not repo:
             flask.abort(404, 'Project not found')
 
-        request = progit.lib.get_pull_request(
+        request = progit.lib.get_pull_requests(
             SESSION, project_id=repo.id, requestid=requestid)
 
         if not request:
