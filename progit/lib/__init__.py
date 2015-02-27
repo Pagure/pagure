@@ -147,7 +147,7 @@ def add_issue_comment(session, issue, comment, user, ticketfolder):
     progit.lib.git.update_git_ticket(
         issue, repo=issue.project, ticketfolder=ticketfolder)
 
-    progit.notify.notify_new_comment(issue_comment)
+    progit.lib.notify.notify_new_comment(issue_comment)
 
     return 'Comment added'
 
@@ -196,7 +196,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
         progit.lib.git.update_git_ticket(
             issue, repo=issue.project, ticketfolder=ticketfolder)
 
-        progit.notify.notify_assigned_issue(issue, None, user)
+        progit.lib.notify.notify_assigned_issue(issue, None, user)
         return 'Assignee reset'
 
     user_obj = search_user(session, username=user)
@@ -225,7 +225,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
         progit.lib.git.update_git_ticket(
             issue, repo=issue.project, ticketfolder=ticketfolder)
 
-        progit.notify.notify_assigned_issue(issue, user_obj, user)
+        progit.lib.notify.notify_assigned_issue(issue, user_obj, user)
 
         return 'Issue assigned'
 
@@ -261,8 +261,8 @@ def add_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
             repo=issue_blocked.project,
             ticketfolder=ticketfolder)
 
-        #progit.notify.notify_assigned_issue(issue, user_obj)
-        #progit.notify.notify_assigned_issue(issue_blocked, user_obj)
+        #progit.lib.notify.notify_assigned_issue(issue, user_obj)
+        #progit.lib.notify.notify_assigned_issue(issue_blocked, user_obj)
 
         return 'Dependency added'
 
@@ -450,7 +450,7 @@ def new_issue(session, repo, title, content, user, ticketfolder):
     progit.lib.git.update_git_ticket(
         issue, repo=repo, ticketfolder=ticketfolder)
 
-    progit.notify.notify_new_issue(issue)
+    progit.lib.notify.notify_new_issue(issue)
 
     return 'Issue created'
 
@@ -479,7 +479,7 @@ def new_pull_request(session, repo_from, branch_from,
     # Make sure we won't have SQLAlchemy error before we create the request
     session.flush()
 
-    progit.notify.notify_new_pull_request(request)
+    progit.lib.notify.notify_new_pull_request(request)
 
     return 'Request created'
 
@@ -818,9 +818,9 @@ def close_pull_request(session, request, user, merged=True):
     session.flush()
 
     if merged == True:
-        progit.notify.notify_merge_pull_request(request, user)
+        progit.lib.notify.notify_merge_pull_request(request, user)
     else:
-        progit.notify.notify_cancelled_pull_request(request, user)
+        progit.lib.notify.notify_cancelled_pull_request(request, user)
 
 
 def get_issue_statuses(session):
