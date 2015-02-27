@@ -244,14 +244,14 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(msg, 'Tag added')
 
         # Try a second time
-        msg = progit.lib.add_issue_tag(
+        self.assertRaises(
+            progit.exceptions.ProgitException,
+            progit.lib.add_issue_tag,
             session=self.session,
             issue=issue,
             tag='tag1',
             user='pingou',
             ticketfolder=None)
-        self.session.commit()
-        self.assertEqual(msg, 'Tag already present: tag1')
 
         issues = progit.lib.search_issues(self.session, repo, tags='tag1')
         self.assertEqual(len(issues), 1)
