@@ -710,11 +710,15 @@ def search_issues(
             model.TagIssue.tag.in_(tags)
         )
     if assignee is not None:
-        if assignee not in [0, '0']:
+        if str(assignee).lower() not in ['false', '0', 'true', '1']:
             query = query.filter(
                 model.Issue.assignee_id == model.User.id
             ).filter(
                 model.User.user == assignee
+            )
+        elif str(assignee).lower() in ['true', '1']:
+            query = query.filter(
+                model.Issue.assignee_id != None
             )
         else:
             query = query.filter(
