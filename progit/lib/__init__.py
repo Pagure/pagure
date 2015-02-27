@@ -781,7 +781,7 @@ def get_tag(session, tag):
     return query.first()
 
 
-def get_pull_requests(
+def search_pull_requests(
         session, requestid=None, project_id=None, project_id_from=None,
         status=None):
     ''' Retrieve the specified issue
