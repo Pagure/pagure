@@ -111,6 +111,14 @@ class Modeltests(unittest.TestCase):
     def tearDown(self):
         """ Remove the test.db database if there is one. """
         self.session.close()
+
+        # Clear temp directory
+        if sys.exc_info() == (None, None, None):
+            shutil.rmtree(self.path)
+        else:
+            print('FAILED TESTS AT %s' % self.path)
+
+        # Clear DB
         if os.path.exists(DB_PATH):
             os.unlink(DB_PATH)
         if DB_PATH.startswith('postgres'):
