@@ -19,15 +19,15 @@ sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
 import progit.lib
-from tests import Modeltests, create_projects
+import tests
 
 
-class ProgitLibtests(Modeltests):
+class ProgitLibtests(tests.Modeltests):
     """ Tests for progit.lib """
 
     def test_get_next_id(self):
         """ Test the get_next_id function of progit.lib. """
-        create_projects(self.session)
+        tests.create_projects(self.session)
         self.assertEqual(1, progit.lib.get_next_id(self.session, 1))
 
 
