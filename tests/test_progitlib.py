@@ -641,6 +641,37 @@ class ProgitLibtests(tests.Modeltests):
         self.assertFalse(os.path.exists(docrepo))
         self.assertTrue(os.path.exists(ticketrepo))
 
+    def test_update_project_settings(self):
+        """ Test the update_project_settings of progit.lib. """
+
+        tests.create_projects(self.session)
+
+        # Before
+        repo = progit.lib.get_project(self.session, 'test2')
+        self.assertTrue(repo.issue_tracker)
+        self.assertTrue(repo.project_docs)
+
+        msg = progit.lib.update_project_settings(
+            session=self.session,
+            repo=repo,
+            issue_tracker=True,
+            project_docs=True
+        )
+        self.assertEqual(msg, 'No settings to change')
+
+        msg = progit.lib.update_project_settings(
+            session=self.session,
+            repo=repo,
+            issue_tracker=False,
+            project_docs=False
+        )
+        self.assertEqual(msg, 'Edited successfully settings of repo: test2')
+
+        # After
+        repo = progit.lib.get_project(self.session, 'test2')
+        self.assertFalse(repo.issue_tracker)
+        self.assertFalse(repo.project_docs)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
