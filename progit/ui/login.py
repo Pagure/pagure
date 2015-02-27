@@ -18,6 +18,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 import progit.login_forms as forms
 import progit.lib
+import progit.lib.login
 import progit.notify
 from progit import APP, SESSION, is_admin
 from progit.ui.admin import admin_required
@@ -275,7 +276,7 @@ def admin_groups():
         flask.flash('Group `%s` created.' % grp.group_name)
         SESSION.commit()
 
-    groups = progit.lib.get_groups(SESSION)
+    groups = progit.lib.login.get_groups(SESSION)
 
     return flask.render_template(
         'login/admin_groups.html',
@@ -290,7 +291,7 @@ def admin_groups():
 def admin_group(group):
     """ List of the users in a certain group
     """
-    group_obj = progit.lib.get_group(SESSION, group)
+    group_obj = progit.lib.login.get_group(SESSION, group)
 
     if not group_obj:
         flask.flash('No group `%s` found' % groupname, 'error')
@@ -325,7 +326,7 @@ def admin_group(group):
         flask.flash('User `%s` added.' % user.user)
         SESSION.commit()
 
-    users = progit.lib.get_users_by_group(SESSION, group)
+    users = progit.lib.login.get_users_by_group(SESSION, group)
 
     return flask.render_template(
         'login/admin_users.html',
@@ -344,7 +345,7 @@ def admin_group_user_delete(user, group):
     # Add new user to the group if asked
     form = forms.ConfirmationForm()
     if form.validate_on_submit():
-        group_obj = progit.lib.get_group(SESSION, group)
+        group_obj = progit.lib.login.get_group(SESSION, group)
 
         if not group_obj:
             flask.flash('No group `%s` found' % groupname, 'error')
@@ -355,7 +356,8 @@ def admin_group_user_delete(user, group):
             flask.flash('No user `%s` found' % user, 'error')
             return flask.redirect(flask.url_for('.admin_groups'))
 
-        user_grp = progit.lib.get_user_group(SESSION, user.id, group_obj.id)
+        user_grp = progit.lib.login.get_user_group(
+            SESSION, user.id, group_obj.id)
         SESSION.delete(user_grp)
 
         SESSION.commit()
@@ -373,7 +375,7 @@ def admin_group_delete(group):
     # Add new user to the group if asked
     form = forms.ConfirmationForm()
     if form.validate_on_submit():
-        group_obj = progit.lib.get_group(SESSION, group)
+        group_obj = progit.lib.login.get_group(SESSION, group)
 
         if not group_obj:
             flask.flash('No group `%s` found' % groupname, 'error')
@@ -490,7 +492,7 @@ def _check_session_cookie():
 
     if cookie_name and cookie_name in flask.request.cookies:
         sessionid = flask.request.cookies[cookie_name]
-        session = progit.lib.get_session_by_visitkey(SESSION, sessionid)
+        session = progit.lib.login.get_session_by_visitkey(SESSION, sessionid)
         if session and session.user:
             now = datetime.datetime.now()
             new_expiry = now + APP.config.get('PERMANENT_SESSION_LIFETIME')
