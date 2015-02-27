@@ -455,7 +455,9 @@ class TagIssue(BASE):
 
     issue = relation(
         'Issue', foreign_keys=[issue_uid], remote_side=[Issue.uid],
-        backref='tags', cascade="delete, delete-orphan", single_parent=True)
+        backref=backref(
+            'tags', cascade="delete, delete-orphan", single_parent=True)
+        )
 
 
 class PullRequest(BASE):
