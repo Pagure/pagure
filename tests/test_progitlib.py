@@ -802,6 +802,15 @@ class ProgitLibtests(tests.Modeltests):
         msg = progit.lib.update_user_ssh(self.session, 'foo', None)
         self.assertEqual(msg, 'Public ssh key updated')
 
+    def test_avatar_url(self):
+        """ Test the avatar_url of progit.lib. """
+        output = progit.lib.avatar_url('pingou')
+        self.assertEqual(
+            output,
+            'https://seccdn.libravatar.org/avatar/'
+            '01fe73d687f4db328da1183f2a1b5b22962ca9d9c50f0728aafeac974856311c'
+            '?s=64&d=retro')
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
