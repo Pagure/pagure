@@ -12,6 +12,7 @@ __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
 import unittest
+import shutil
 import sys
 import os
 
@@ -546,6 +547,99 @@ class ProgitLibtests(tests.Modeltests):
         repo = progit.lib.get_project(self.session, 'test')
         self.assertEqual(len(repo.users), 1)
         self.assertEqual(repo.users[0].user, 'foo')
+
+    def test_new_project(self):
+        """ Test the new_project of progit.lib. """
+        gitfolder = os.path.join(self.path, 'repos')
+        docfolder = os.path.join(self.path, 'docs')
+        ticketfolder = os.path.join(self.path, 'tickets')
+
+        os.mkdir(gitfolder)
+        os.mkdir(docfolder)
+        os.mkdir(ticketfolder)
+
+        # Create a new project
+        msg = progit.lib.new_project(
+            session=self.session,
+            user='pingou',
+            name='testproject',
+            gitfolder=gitfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            description='description for testproject',
+            parent_id=None
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Project "testproject" created')
+
+        repo = progit.lib.get_project(self.session, 'testproject')
+        self.assertEqual(repo.path, 'testproject.git')
+
+        gitrepo = os.path.join(gitfolder, repo.path)
+        docrepo = os.path.join(docfolder, repo.path)
+        ticketrepo = os.path.join(ticketfolder, repo.path)
+
+        self.assertTrue(os.path.exists(gitrepo))
+        self.assertTrue(os.path.exists(docrepo))
+        self.assertTrue(os.path.exists(ticketrepo))
+
+        # Try re-creating it but all repos are existing
+        self.assertRaises(
+            progit.exceptions.ProgitException,
+            progit.lib.new_project,
+            session=self.session,
+            user='pingou',
+            name='testproject',
+            gitfolder=gitfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            description='description for testproject',
+            parent_id=None
+        )
+        self.session.rollback()
+
+        self.assertTrue(os.path.exists(gitrepo))
+        self.assertTrue(os.path.exists(docrepo))
+        self.assertTrue(os.path.exists(ticketrepo))
+
+        # Drop the main git repo and try again
+        shutil.rmtree(gitrepo)
+        self.assertRaises(
+            progit.exceptions.ProgitException,
+            progit.lib.new_project,
+            session=self.session,
+            user='pingou',
+            name='testproject',
+            gitfolder=gitfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            description='description for testproject',
+            parent_id=None
+        )
+        self.session.rollback()
+
+        self.assertFalse(os.path.exists(gitrepo))
+        self.assertTrue(os.path.exists(docrepo))
+        self.assertTrue(os.path.exists(ticketrepo))
+
+        # Drop the doc repo and try again
+        shutil.rmtree(docrepo)
+        self.assertRaises(
+            progit.exceptions.ProgitException,
+            progit.lib.new_project,
+            session=self.session,
+            user='pingou',
+            name='testproject',
+            gitfolder=gitfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            description='description for testproject',
+            parent_id=None
+        )
+        self.session.rollback()
+        self.assertFalse(os.path.exists(gitrepo))
+        self.assertFalse(os.path.exists(docrepo))
+        self.assertTrue(os.path.exists(ticketrepo))
 
 
 if __name__ == '__main__':
