@@ -13,6 +13,7 @@ import pkg_resources
 
 import unittest
 import sys
+import tempfile
 import os
 
 from datetime import date
@@ -70,6 +71,7 @@ class Modeltests(unittest.TestCase):
         """ Constructor. """
         unittest.TestCase.__init__(self, method_name)
         self.session = None
+        self.path = tempfile.mkdtemp(prefix='progit-tests')
 
     # pylint: disable=C0103
     def setUp(self):
