@@ -32,6 +32,21 @@ import progit.lib.notify
 from progit.lib import model
 
 
+def __get_user(session, key):
+    """ Searches for a user in the database for a given username or email.
+    """
+    user_obj = search_user(session, username=key)
+    if not user_obj:
+        user_obj = search_user(session, email=key)
+
+    if not user_obj:
+        raise progit.exceptions.ProgitException(
+            'No user "%s" found' % key
+        )
+
+    return user_obj
+
+
 def create_session(db_url, debug=False, pool_recycle=3600):
     ''' Create the Session object to use to query the database.
 
@@ -126,14 +141,7 @@ def search_user(session, username=None, email=None, token=None, pattern=None):
 
 def add_issue_comment(session, issue, comment, user, ticketfolder):
     ''' Add a comment to an issue. '''
-    user_obj = search_user(session, username=user)
-    if not user_obj:
-        user_obj = search_user(session, email=user)
-
-    if not user_obj:
-        raise progit.exceptions.ProgitException(
-            'No user "%s" found' % user
-        )
+    user_obj = __get_user(session, user)
 
     issue_comment = model.IssueComment(
         issue_uid=issue.uid,
@@ -154,14 +162,7 @@ def add_issue_comment(session, issue, comment, user, ticketfolder):
 
 def add_issue_tag(session, issue, tag, user, ticketfolder):
     ''' Add a tag to an issue. '''
-    user_obj = search_user(session, username=user)
-    if not user_obj:
-        user_obj = search_user(session, email=user)
-
-    if not user_obj:
-        raise progit.exceptions.ProgitException(
-            'No user "%s" found' % user
-        )
+    user_obj = __get_user(session, user)
 
     for tag_issue in issue.tags:
         if tag_issue.tag == tag:
@@ -199,24 +200,9 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
         progit.lib.notify.notify_assigned_issue(issue, None, user)
         return 'Assignee reset'
 
-    user_obj = search_user(session, username=user)
-    if not user_obj:
-        user_obj = search_user(session, email=user)
-
-    if not user_obj:
-        raise progit.exceptions.ProgitException(
-            'No user "%s" found' % user
-        )
-
+    user_obj = __get_user(session, user)
     # Validate the assignee
-    user_obj = search_user(session, username=assignee)
-    if not user_obj:
-        user_obj = search_user(session, email=assignee)
-
-    if not user_obj:
-        raise progit.exceptions.ProgitException(
-            'No user "%s" found' % assignee
-        )
+    user_obj = __get_user(session, assignee)
 
     if issue.assignee_id != user_obj.id:
         issue.assignee_id = user_obj.id
@@ -232,14 +218,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
 
 def add_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
     ''' Add a dependency between two issues. '''
-    user_obj = search_user(session, username=user)
-    if not user_obj:
-        user_obj = search_user(session, email=user)
-
-    if not user_obj:
-        raise progit.exceptions.ProgitException(
-            'No user "%s" found' % user
-        )
+    user_obj = __get_user(session, user)
 
     if issue.uid == issue_blocked.uid:
         raise progit.exceptions.ProgitException(
@@ -333,14 +312,7 @@ def edit_issue_tags(session, project, old_tag, new_tag):
 
 def add_user_to_project(session, project, user):
     ''' Add a specified user to a specified project. '''
-    user_obj = search_user(session, username=user)
-    if not user_obj:
-        user_obj = search_user(session, email=user)
-
-    if not user_obj:
-        raise progit.exceptions.ProgitException(
-            'No user "%s" found' % user
-        )
+    user_obj = __get_user(session, user)
 
     project_user = model.ProjectUser(
         project_id=project.id,
@@ -356,14 +328,7 @@ def add_user_to_project(session, project, user):
 def add_pull_request_comment(session, request, commit, filename, row,
                              comment, user):
     ''' Add a comment to a pull-request. '''
-    user_obj = search_user(session, username=user)
-    if not user_obj:
-        user_obj = search_user(session, email=user)
-
-    if not user_obj:
-        raise progit.exceptions.ProgitException(
-            'No user "%s" found' % user
-        )
+    user_obj = __get_user(session, user)
 
     pr_comment = model.PullRequestComment(
         pull_request_uid=request.uid,
@@ -390,12 +355,7 @@ def new_project(session, user, name, gitfolder, docfolder, ticketfolder,
             'The project repo "%s" already exists' % name
         )
 
-    user_obj = search_user(session, username=user)
-
-    if not user_obj:
-        raise progit.exceptions.ProgitException(
-            'No user "%s" found' % user
-        )
+    user_obj = __get_user(session, user)
 
     project = model.Project(
         name=name,
@@ -428,12 +388,7 @@ def new_project(session, user, name, gitfolder, docfolder, ticketfolder,
 
 def new_issue(session, repo, title, content, user, ticketfolder):
     ''' Create a new issue for the specified repo. '''
-    user_obj = search_user(session, username=user)
-
-    if not user_obj:
-        raise progit.exceptions.ProgitException(
-            'No user "%s" found' % user
-        )
+    user_obj = __get_user(session, user)
 
     issue = model.Issue(
         id=get_next_id(session, repo.id),
@@ -458,12 +413,7 @@ def new_issue(session, repo, title, content, user, ticketfolder):
 def new_pull_request(session, repo_from, branch_from,
                      repo_to, branch_to, title, user):
     ''' Create a new pull request on the specified repo. '''
-    user_obj = search_user(session, username=user)
-
-    if not user_obj:
-        raise progit.exceptions.ProgitException(
-            'No user "%s" found' % user
-        )
+    user_obj = __get_user(session, user)
 
     request = model.PullRequest(
         id=get_next_id(session, repo_to.id),
@@ -545,12 +495,7 @@ def fork_project(session, user, repo, gitfolder,
         raise progit.exceptions.RepoExistsException(
             'Repo "%s/%s" already exists' % (user, repo.name))
 
-    user_obj = search_user(session, username=user)
-
-    if not user_obj:
-        raise progit.exceptions.ProgitException(
-            'No user "%s" found' % user
-        )
+    user_obj = __get_user(session, user)
 
     project = model.Project(
         name=repo.name,
@@ -864,7 +809,7 @@ def set_up_user(session, username, fullname, user_email):
 def update_user_ssh(session, user, ssh_key):
     ''' Set up a new user into the database or update its information. '''
     if isinstance(user, basestring):
-        user = search_user(session, username=user)
+        user = __get_user(session, user)
 
     message = 'Nothing to update'
 
