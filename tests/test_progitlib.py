@@ -15,6 +15,8 @@ import unittest
 import sys
 import os
 
+from mock import patch
+
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
@@ -126,6 +128,34 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual([], items[1].groups)
         self.assertEqual(
             [], [email.email for email in items[1].emails])
+
+    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.notify.send_email')
+    def test_new_issue(self, p_send_email, p_ugt):
+        """ Test the new_issue of progit.lib. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+        repo = progit.lib.get_project(self.session, 'test')
+
+        # Before
+        issues = progit.lib.search_issues(self.session, repo)
+        self.assertEqual(len(issues), 0)
+
+        msg = progit.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.assertEqual(msg, 'Issue created')
+
+        # After
+        issues = progit.lib.search_issues(self.session, repo)
+        self.assertEqual(len(issues), 1)
 
 
 if __name__ == '__main__':
