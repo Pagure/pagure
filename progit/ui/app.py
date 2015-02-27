@@ -293,7 +293,8 @@ def new_project():
 def user_settings():
     """ Update the user settings.
     """
-    user = progit.lib.get_user(SESSION, flask.g.fas_user.username)
+    user = progit.lib.search_user(
+        SESSION, username=flask.g.fas_user.username)
 
     form = progit.forms.UserSettingsForm()
     if form.validate_on_submit():

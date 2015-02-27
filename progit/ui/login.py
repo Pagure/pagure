@@ -32,12 +32,12 @@ def new_user():
     if form.validate_on_submit():
 
         username = form.user.data
-        if progit.lib.get_user(SESSION, username):
+        if progit.lib.search_user(SESSION, username=username):
             flask.flash('Username already taken.', 'error')
             return flask.redirect(flask.request.url)
 
         email = form.email_address.data
-        if progit.lib.get_user_by_email(SESSION, email):
+        if progit.lib.search_user(SESSION, email=email):
             flask.flash('Email address already taken.', 'error')
             return flask.redirect(flask.request.url)
 
@@ -98,7 +98,7 @@ def do_login():
             form.password.data, APP.config.get('PASSWORD_SEED', None))
         password = hashlib.sha512(password).hexdigest()
 
-        user_obj = progit.lib.get_user(SESSION, username)
+        user_obj = progit.lib.search_user(SESSION, username=username)
         if not user_obj or user_obj.password != password:
             flask.flash('Username or password invalid.', 'error')
             return flask.redirect(flask.url_for('auth_login'))
@@ -139,7 +139,7 @@ def do_login():
 def confirm_user(token):
     """ Confirm a user account.
     """
-    user_obj = progit.lib.get_user_by_token(SESSION, token)
+    user_obj = progit.lib.search_user(SESSION, token=token)
     if not user_obj:
         flask.flash('No user associated with this token.', 'error')
     else:
@@ -168,7 +168,7 @@ def lost_password():
     if form.validate_on_submit():
 
         username = form.username.data
-        user_obj = progit.lib.get_user(SESSION, username)
+        user_obj = progit.lib.search_user(SESSION, username=username)
         if not user_obj:
             flask.flash('Username invalid.', 'error')
             return flask.redirect(flask.url_for('auth_login'))
@@ -210,7 +210,7 @@ def reset_password(token):
     """
     form = forms.ResetPasswordForm()
 
-    user_obj = progit.lib.get_user_by_token(SESSION, token)
+    user_obj = progit.lib.search_user(SESSION, token=token)
     if not user_obj:
         flask.flash('No user associated with this token.', 'error')
         return flask.redirect(flask.url_for('auth_login'))
@@ -299,7 +299,7 @@ def admin_group(group):
     # Add new user to the group if asked
     form = forms.LostPasswordForm()
     if form.validate_on_submit():
-        user = progit.lib.get_user(SESSION, form.username.data)
+        user = progit.lib.search_user(SESSION, username=form.username.data)
         if not user:
             flask.flash('No user `%s` found' % form.username.data, 'error')
             return flask.redirect(flask.url_for('.admin_group', group=group))
@@ -350,7 +350,7 @@ def admin_group_user_delete(user, group):
             flask.flash('No group `%s` found' % groupname, 'error')
             return flask.redirect(flask.url_for('.admin_groups'))
 
-        user = progit.lib.get_user(SESSION, user)
+        user = progit.lib.search_user(SESSION, username=user)
         if not user:
             flask.flash('No user `%s` found' % user, 'error')
             return flask.redirect(flask.url_for('.admin_groups'))
