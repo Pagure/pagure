@@ -78,7 +78,7 @@ def api_users():
         {
             'users': [
                 user.username
-                for user in progit.lib.get_all_users(
+                for user in progit.lib.search_user(
                     SESSION, pattern=pattern)
             ]
         }

@@ -159,7 +159,7 @@ def view_users():
     except ValueError:
         page = 1
 
-    users = progit.lib.get_all_users(SESSION)
+    users = progit.lib.search_user(SESSION)
 
     limit = APP.config['ITEM_PER_PAGE']
     start = limit * (page - 1)
