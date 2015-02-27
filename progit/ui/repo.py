@@ -738,7 +738,7 @@ def remove_user(repo, userid, username=None):
 
     for user in repo.users:
         if str(user.id) == str(userid):
-            SESSION.delete(user)
+            repo.users.remove(user)
             break
     try:
         SESSION.commit()
