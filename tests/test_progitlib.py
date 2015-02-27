@@ -57,6 +57,26 @@ class ProgitLibtests(tests.Modeltests):
         item = progit.lib.search_user(self.session, username='bar')
         self.assertEqual(None, item)
 
+    def test_search_user_email(self):
+        """ Test the search_user of progit.lib. """
+
+        # Retrieve user by email
+        item = progit.lib.search_user(self.session, email='foo@foo.com')
+        self.assertEqual(None, item)
+
+        item = progit.lib.search_user(self.session, email='foo@bar.com')
+        self.assertEqual('foo', item.user)
+        self.assertEqual('foo', item.username)
+        self.assertEqual([], item.groups)
+        self.assertEqual(
+            ['foo@bar.com'], [email.email for email in item.emails])
+
+        item = progit.lib.search_user(self.session, email='foo@pingou.com')
+        self.assertEqual('pingou', item.user)
+        self.assertEqual(
+            ['bar@pingou.com', 'foo@pingou.com'],
+            [email.email for email in item.emails])
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
