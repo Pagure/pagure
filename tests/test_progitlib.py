@@ -313,6 +313,17 @@ class ProgitLibtests(tests.Modeltests):
             self.session, repo, assignee='pingou')
         self.assertEqual(len(issues), 0)
 
+        # Set the assignee by its email
+        msg = progit.lib.add_issue_assignee(
+            session=self.session,
+            issue=issue,
+            assignee='foo@bar.com',
+            user='pingou',
+            ticketfolder=None)
+        self.session.commit()
+        self.assertEqual(msg, 'Issue assigned')
+
+        # Change the assignee to someone else by its username
         msg = progit.lib.add_issue_assignee(
             session=self.session,
             issue=issue,
@@ -348,6 +359,26 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(issues[0].project_id, 1)
         self.assertEqual(issues[0].status, 'Open')
         self.assertEqual(issues[0].tags, [])
+
+        # Reset the assignee to no-one
+        msg = progit.lib.add_issue_assignee(
+            session=self.session,
+            issue=issue,
+            assignee=None,
+            user='pingou',
+            ticketfolder=None)
+        self.session.commit()
+        self.assertEqual(msg, 'Assignee reset')
+
+        issues = progit.lib.search_issues(
+            self.session, repo, assignee=False)
+        self.assertEqual(len(issues), 2)
+        self.assertEqual(issues[0].id, 1)
+        self.assertEqual(issues[1].id, 2)
+
+        issues = progit.lib.search_issues(
+            self.session, repo, assignee=True)
+        self.assertEqual(len(issues), 0)
 
 
 if __name__ == '__main__':
