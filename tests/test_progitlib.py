@@ -753,6 +753,38 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(
             ['skvidal@fp.o'], [email.email for email in items[2].emails])
 
+        # Add the user a second time
+        progit.lib.set_up_user(
+            session=self.session,
+            username='skvidal',
+            fullname='Seth',
+            user_email='skvidal@fp.o'
+        )
+        self.session.commit()
+        # Nothing changed
+        items = progit.lib.search_user(self.session)
+        self.assertEqual(3, len(items))
+        self.assertEqual('skvidal', items[2].user)
+        self.assertEqual(
+            ['skvidal@fp.o'], [email.email for email in items[2].emails])
+
+        # Add the user a third time with a different email
+        progit.lib.set_up_user(
+            session=self.session,
+            username='skvidal',
+            fullname='Seth',
+            user_email='svidal@fp.o'
+        )
+        self.session.commit()
+        # Email added
+        items = progit.lib.search_user(self.session)
+        self.assertEqual(3, len(items))
+        self.assertEqual('skvidal', items[2].user)
+        self.assertEqual(
+            ['skvidal@fp.o', 'svidal@fp.o'],
+            [email.email for email in items[2].emails])
+
+
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
     unittest.TextTestRunner(verbosity=2).run(SUITE)
