@@ -478,7 +478,7 @@ def update_project_settings(session, repo, issue_tracker, project_docs):
     else:
         session.add(repo)
         session.flush()
-        return 'Edited successfully setting of repo: %s' % repo.fullname
+        return 'Edited successfully settings of repo: %s' % repo.fullname
 
 
 def fork_project(session, user, repo, gitfolder,
