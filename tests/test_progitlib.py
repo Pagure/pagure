@@ -77,6 +77,25 @@ class ProgitLibtests(tests.Modeltests):
             ['bar@pingou.com', 'foo@pingou.com'],
             [email.email for email in item.emails])
 
+    def test_search_user_token(self):
+        """ Test the search_user of progit.lib. """
+
+        # Retrieve user by token
+        item = progit.lib.search_user(self.session, token='aaa')
+        self.assertEqual(None, item)
+
+        item = progit.lib.model.User(
+            user='pingou2',
+            fullname='PY C',
+            token='aaabbb',
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        item = progit.lib.search_user(self.session, token='aaabbb')
+        self.assertEqual('pingou2', item.user)
+        self.assertEqual('PY C', item.fullname)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
