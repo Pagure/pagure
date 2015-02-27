@@ -120,7 +120,7 @@ def is_repo_admin(repo_obj):
 def generate_gitolite_acls():
     """ Generate the gitolite configuration file for all repos
     """
-    progit.lib.generate_gitolite_acls(
+    progit.lib.git.write_gitolite_acls(
         SESSION, APP.config['GITOLITE_CONFIG'])
 
     gitolite_folder = APP.config.get('GITOLITE_HOME', None)
