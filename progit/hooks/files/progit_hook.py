@@ -116,7 +116,7 @@ def relates_commit(commitid, issueid, project=None):
         repo = progit.lib.get_project(
             progit.SESSION, get_repo_name(), user=username)
     issue = progit.lib.search_issues(
-        progit.SESSION, repo.id, issueid=issueid)
+        progit.SESSION, repo, issueid=issueid)
 
     if issue is None or issue.project != repo:
         return
@@ -148,7 +148,7 @@ def fixes_commit(commitid, issueid, project=None):
         repo = progit.lib.get_project(
             progit.SESSION, get_repo_name(), user=username)
     issue = progit.lib.search_issues(
-        progit.SESSION, repo.id, issueid=issueid)
+        progit.SESSION, repo, issueid=issueid)
 
     if issue is None or issue.project != repo:
         return
