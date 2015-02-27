@@ -844,44 +844,6 @@ def get_issue_statuses(session):
     return output
 
 
-def generate_gitolite_acls(session, configfile):
-    ''' Generate the configuration file for gitolite for all projects
-    on the forge.
-    '''
-    config = []
-    for project in session.query(model.Project).all():
-        if project.parent_id:
-            config.append('repo forks/%s' % project.fullname)
-        else:
-            config.append('repo %s' % project.fullname)
-        config.append('  R   = @all')
-        config.append('  RW+ = %s' % project.user.user)
-        for user in project.users:
-            if user != project.user:
-                config.append('  RW+ = %s' % user.user.user)
-        config.append('')
-
-        config.append('repo docs/%s' % project.fullname)
-        config.append('  R   = @all')
-        config.append('  RW+ = %s' % project.user.user)
-        for user in project.users:
-            if user != project.user:
-                config.append('  RW+ = %s' % user.user.user)
-        config.append('')
-
-        config.append('repo tickets/%s' % project.fullname)
-        config.append('  R   = @all')
-        config.append('  RW+ = %s' % project.user.user)
-        for user in project.users:
-            if user != project.user:
-                config.append('  RW+ = %s' % user.user.user)
-        config.append('')
-
-    with open(configfile, 'w') as stream:
-        for row in config:
-            stream.write(row + '\n')
-
-
 def set_up_user(session, username, fullname, user_email):
     ''' Set up a new user into the database or update its information. '''
     user = search_user(session, username=username)
