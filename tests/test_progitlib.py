@@ -170,8 +170,8 @@ class ProgitLibtests(tests.Modeltests):
         msg = progit.lib.new_issue(
             session=self.session,
             repo=repo,
-            title='Test issue',
-            content='We should work on this',
+            title='Test issue #2',
+            content='We should work on this for the second time',
             user='foo',
             ticketfolder=None
         )
@@ -197,7 +197,27 @@ class ProgitLibtests(tests.Modeltests):
         msg = progit.lib.edit_issue(
             session=self.session,
             issue=issue,
+            ticketfolder=None)
+        self.session.commit()
+        self.assertEqual(msg, 'No changes to edit')
+
+        msg = progit.lib.edit_issue(
+            session=self.session,
+            issue=issue,
             ticketfolder=None,
+            title='Test issue #2',
+            content='We should work on this for the second time',
+            status='Open',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'No changes to edit')
+
+        msg = progit.lib.edit_issue(
+            session=self.session,
+            issue=issue,
+            ticketfolder=None,
+            title='Foo issue #2',
+            content='We should work on this period',
             status='Invalid')
         self.session.commit()
         self.assertEqual(msg, 'Edited successfully issue #2')
