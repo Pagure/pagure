@@ -657,7 +657,7 @@ def get_project(session, name, user=None):
     return query.first()
 
 
-def get_issues(
+def search_issues(
         session, repo, issueid=None, status=None, closed=False, tags=None,
         assignee=None, author=None):
     ''' Retrieve one or more issues associated to a project with the given
