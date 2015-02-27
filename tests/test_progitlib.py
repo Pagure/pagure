@@ -96,6 +96,37 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual('pingou2', item.user)
         self.assertEqual('PY C', item.fullname)
 
+    def test_search_user_pattern(self):
+        """ Test the search_user of progit.lib. """
+
+        # Retrieve user by pattern
+        item = progit.lib.search_user(self.session, pattern='a*')
+        self.assertEqual([], item)
+
+        item = progit.lib.model.User(
+            user='pingou2',
+            fullname='PY C',
+            token='aaabbb',
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        items = progit.lib.search_user(self.session, pattern='p*')
+        self.assertEqual(2, len(items))
+        self.assertEqual(1, items[0].id)
+        self.assertEqual('pingou', items[0].user)
+        self.assertEqual('pingou', items[0].username)
+        self.assertEqual([], items[0].groups)
+        self.assertEqual(
+            ['bar@pingou.com', 'foo@pingou.com'],
+            [email.email for email in items[0].emails])
+        self.assertEqual(3, items[1].id)
+        self.assertEqual('pingou2', items[1].user)
+        self.assertEqual('pingou2', items[1].username)
+        self.assertEqual([], items[1].groups)
+        self.assertEqual(
+            [], [email.email for email in items[1].emails])
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
