@@ -34,7 +34,7 @@ def chunks(item_list, chunks_size):
         yield item_list[i: i + chunks_size]
 
 
-### Application
+# Application
 
 
 @APP.route('/')

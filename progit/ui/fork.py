@@ -166,7 +166,6 @@ def request_pull(repo, requestid, username=None):
         return flask.redirect(flask.url_for(
             'view_repo', username=username, repo=repo.name))
 
-
     form = progit.forms.ConfirmationForm()
 
     return flask.render_template(
@@ -315,7 +314,6 @@ def pull_request_add_comment(repo, requestid, commit, filename, row,
     )
 
 
-
 @APP.route('/<repo>/request-pull/<int:requestid>/merge', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/request-pull/<int:requestid>/merge',
            methods=['POST'])
@@ -393,9 +391,12 @@ def merge_request_pull(repo, requestid, username=None):
             'refs/heads/%s' % request.branch).resolve()
 
     refname = '%s:%s' % (branch_ref.name, branch_ref.name)
-    if ((merge is not None and merge.is_uptodate)
+    if (
+            (merge is not None and merge.is_uptodate)
             or
-            (merge is None and mergecode & pygit2.GIT_MERGE_ANALYSIS_UP_TO_DATE)):
+            (merge is None and
+             mergecode & pygit2.GIT_MERGE_ANALYSIS_UP_TO_DATE
+             )):
         flask.flash('Nothing to do, changes were already merged', 'error')
         progit.lib.close_pull_request(SESSION, request)
         try:
@@ -405,9 +406,12 @@ def merge_request_pull(repo, requestid, username=None):
             APP.logger.exception(err)
             flask.flash('Could not close this pull-request', 'error')
         return flask.redirect(error_output)
-    elif ((merge is not None and merge.is_fastforward)
-           or
-           (merge is None and mergecode & pygit2.GIT_MERGE_ANALYSIS_FASTFORWARD)):
+    elif (
+            (merge is not None and merge.is_fastforward)
+            or
+            (merge is None and
+             mergecode & pygit2.GIT_MERGE_ANALYSIS_FASTFORWARD
+             )):
         if merge is not None:
             branch_ref.target = merge.fastforward_oid
             sha = merge.fastforward_oid
@@ -458,9 +462,9 @@ def merge_request_pull(repo, requestid, username=None):
 
 
 @APP.route('/<repo>/request-pull/cancel/<int:requestid>',
-        methods=['POST'])
+           methods=['POST'])
 @APP.route('/fork/<username>/<repo>/request-pull/cancel/<int:requestid>',
-        methods=['POST'])
+           methods=['POST'])
 def cancel_request_pull(repo, requestid, username=None):
     """ Cancel request pulling request.
     """
@@ -501,7 +505,7 @@ def cancel_request_pull(repo, requestid, username=None):
     return flask.redirect(flask.url_for('view_repo', repo=repo.name))
 
 
-## Specific actions
+# Specific actions
 
 
 @APP.route('/do_fork/<repo>')

@@ -8,7 +8,7 @@
 
 """
 
-## These two lines are needed to run on EL6
+# These two lines are needed to run on EL6
 __requires__ = ['SQLAlchemy >= 0.8', 'jinja2 >= 2.4']
 import pkg_resources
 
@@ -62,7 +62,7 @@ if not APP.debug:
         mail_admin=APP.config.get('MAIL_ADMIN', APP.config['EMAIL_ERROR'])
     ))
 
-## Send classic logs into syslog
+# Send classic logs into syslog
 handler = logging.StreamHandler()
 handler.setLevel(APP.config.get('log_level', 'INFO'))
 APP.logger.addHandler(handler)
@@ -176,6 +176,7 @@ Without that function the redirect if the user is not logged in will not
 work.
 """
     auth_method = APP.config.get('PROGIT_AUTH', None)
+
     @wraps(function)
     def decorated_function(*args, **kwargs):
         """ Decorated function, actually does the work. """
@@ -322,13 +323,15 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
         output.append('</tr>')
 
         if cnt - 1 in comments:
-            for comment in comments[cnt -1]:
+            for comment in comments[cnt - 1]:
                 output.append(
                     '<tr><td></td>'
                     '<td colspan="2"><table style="width:100%%"><tr>'
-                    '<td><a href="%(url)s">%(user)s</a></td><td class="right">%(date)s</td>'
+                    '<td><a href="%(url)s">%(user)s</a></td>'
+                    '<td class="right">%(date)s</td>'
                     '</tr>'
-                    '<tr><td colspan="2" class="pr_comment">%(comment)s</td></tr>'
+                    '<tr><td colspan="2" class="pr_comment">%(comment)s'
+                    '</td></tr>'
                     '</table></td></tr>' % (
                         {
                             'url': flask.url_for(
@@ -417,8 +420,8 @@ def patch_to_diff(patch):
     """Render a hunk as a diff"""
     content = ""
     for hunk in patch.hunks:
-        content = content + "@@ -%i,%i +%i,%i @@\n" % (hunk.old_start,
-            hunk.old_lines, hunk.new_start, hunk.new_lines)
+        content = content + "@@ -%i,%i +%i,%i @@\n" % (
+            hunk.old_start, hunk.old_lines, hunk.new_start, hunk.new_lines)
         for line in hunk.lines:
             content = content + ' '.join(line)
     return content
@@ -527,7 +530,7 @@ def __get_file_in_tree(repo_obj, tree, filepath):
                     repo_obj, repo_obj[el.oid], filepath[1:])
 
 
-## Import the application
+# Import the application
 import progit.ui.app
 import progit.ui.admin
 import progit.ui.docs

@@ -27,7 +27,7 @@ from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
                     is_repo_admin, authenticated)
 
 
-## URLs
+# URLs
 
 @APP.route('/<repo>/issue/<int:issueid>/add', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/issue/<int:issueid>/add',
@@ -249,7 +249,7 @@ def edit_tag(repo, tag, username=None):
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
             LOG.error(err)
-            flask.flash('Could not edit tag: %s' % tag,'error')
+            flask.flash('Could not edit tag: %s' % tag, 'error')
 
         return flask.redirect(flask.url_for(
             '.view_settings', repo=repo.name, username=username)
@@ -300,6 +300,7 @@ def remove_tag(repo, username=None):
     return flask.redirect(
         flask.url_for('.view_settings', repo=repo.name, username=username)
     )
+
 
 @APP.route('/<repo>/issues')
 @APP.route('/fork/<username>/<repo>/issues')

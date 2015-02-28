@@ -18,7 +18,7 @@ import markdown
 def modify_rst(rst):
     """ Downgrade some of our rst directives if docutils is too old. """
 
-    ## We catch Exception if we want :-p
+    # We catch Exception if we want :-p
     # pylint: disable=W0703
     try:
         # The rst features we need were introduced in this version

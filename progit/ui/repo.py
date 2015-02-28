@@ -333,7 +333,8 @@ def view_file(repo, identifier, filename, username=None):
     if isinstance(content, pygit2.Blob):
         if content.is_binary:
             ext = filename[filename.rfind('.'):]
-            if ext in ('.gif', '.png', '.bmp', '.tif', '.tiff', '.jpg',
+            if ext in (
+                    '.gif', '.png', '.bmp', '.tif', '.tiff', '.jpg',
                     '.jpeg', '.ppm', '.pnm', '.pbm', '.pgm', '.webp', '.ico'):
                 try:
                     Image.open(StringIO(content.data))
@@ -380,7 +381,8 @@ def view_file(repo, identifier, filename, username=None):
 
 @APP.route('/<repo>/raw/<identifier>', defaults={'filename': None})
 @APP.route('/<repo>/raw/<identifier>/<path:filename>')
-@APP.route('/fork/<username>/<repo>/raw/<identifier>', defaults={'filename': None})
+@APP.route('/fork/<username>/<repo>/raw/<identifier>',
+           defaults={'filename': None})
 @APP.route('/fork/<username>/<repo>/raw/<identifier>/<path:filename>')
 def view_raw_file(repo, identifier, filename=None, username=None):
     """ Displays the raw content of a file of a commit for the specified repo.
@@ -408,7 +410,8 @@ def view_raw_file(repo, identifier, filename=None, username=None):
     mimetype = None
     encoding = None
     if filename:
-        content = __get_file_in_tree(repo_obj, commit.tree, filename.split('/'))
+        content = __get_file_in_tree(
+            repo_obj, commit.tree, filename.split('/'))
         if not content:
             flask.abort(404, 'File not found')
 

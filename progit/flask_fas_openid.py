@@ -155,7 +155,7 @@ class FAS(object):
             return 'Strange state: %s' % info.status
 
     def _check_session(self):
-        if not 'FLASK_FAS_OPENID_USER' in flask.session \
+        if 'FLASK_FAS_OPENID_USER' not in flask.session \
                 or flask.session['FLASK_FAS_OPENID_USER'] is None:
             flask.g.fas_user = None
         else:

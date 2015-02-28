@@ -161,5 +161,6 @@ class DescriptionForm(wtf.Form):
         [wtforms.validators.Required()]
     )
 
+
 class ConfirmationForm(wtf.Form):
     pass

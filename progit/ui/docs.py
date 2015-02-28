@@ -83,7 +83,7 @@ def __get_tree_and_content(repo_obj, commit, path, startswith):
     return (tree, content)
 
 
-## URLs
+# URLs
 
 
 @APP.route('/<repo>/docs')

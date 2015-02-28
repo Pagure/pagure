@@ -306,8 +306,8 @@ def admin_group(group):
             return flask.redirect(flask.url_for('.admin_group', group=group))
 
         grp = model.ProgitUserGroup(
-            group_id = group_obj.id,
-            user_id = user.id
+            group_id=group_obj.id,
+            user_id=user.id
         )
         SESSION.add(grp)
         try:

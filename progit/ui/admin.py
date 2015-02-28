@@ -33,7 +33,7 @@ def admin_required(function):
     return decorated_function
 
 
-### Application
+# Application
 
 
 @APP.route('/admin')
