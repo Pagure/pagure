@@ -58,8 +58,7 @@ def get_files_to_load(new_commits_list):
     for line in read_git_lines(
             ['show', '--pretty="format:"', '--name-only', '-r']
             + new_commits_list,
-            keepends=False,
-        ):
+            keepends=False,):
         if line.strip():
             file_list.append(line.strip())
 
@@ -70,7 +69,7 @@ def get_commits_id(fromrev, torev):
     ''' Retrieve the list commit between two revisions and return the list
     of their identifier.
     '''
-    cmd = ['rev-list', '%s...%s' %(torev, fromrev)]
+    cmd = ['rev-list', '%s...%s' % (torev, fromrev)]
     return read_git_lines(cmd)
 
 
