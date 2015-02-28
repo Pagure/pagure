@@ -482,7 +482,7 @@ def update_project_settings(session, repo, issue_tracker, project_docs):
 
 
 def fork_project(session, user, repo, gitfolder,
-                 forkfolder, docfolder,ticketfolder):
+                 forkfolder, docfolder, ticketfolder):
     ''' Fork a given project into the user's forks. '''
     if repo.is_fork:
         reponame = os.path.join(forkfolder, repo.path)
@@ -677,10 +677,10 @@ def search_issues(
             )
     if author is not None:
         query = query.filter(
-                model.Issue.user_id == model.User.id
-            ).filter(
-                model.User.user == author
-            )
+            model.Issue.user_id == model.User.id
+        ).filter(
+            model.User.user == author
+        )
 
     if issueid is not None:
         output = query.first()
@@ -848,7 +848,8 @@ def avatar_url_from_openid(openid, size=64, default='retro', dns=False):
             default=default,
         )
     else:
-        import urllib, hashlib
+        import urllib
+        import hashlib
         query = urllib.urlencode({'s': size, 'd': default})
         hash = hashlib.sha256(openid).hexdigest()
         return "https://seccdn.libravatar.org/avatar/%s?%s" % (hash, query)

@@ -71,13 +71,13 @@ New comment:
 
 %s
 """ % (
-    comment.user.user,
-    comment.comment,
-    '%s/%s/issue/%s' % (
-        progit.APP.config['APP_URL'],
-        comment.issue.project.name,
-        comment.issue.id,
-    ),
+        comment.user.user,
+        comment.comment,
+        '%s/%s/issue/%s' % (
+            progit.APP.config['APP_URL'],
+            comment.issue.project.name,
+            comment.issue.id,
+        ),
     )
     mail_to = set([cmt.user.emails[0].email for cmt in comment.issue.comments])
     mail_to.add(comment.issue.project.user.emails[0].email)
@@ -106,14 +106,14 @@ New issue:
 
 %s
 """ % (
-    issue.user.user,
-    issue.project.name,
-    issue.content,
-    '%s/%s/issue/%s' % (
-        progit.APP.config['APP_URL'],
+        issue.user.user,
         issue.project.name,
-        issue.id,
-    ),
+        issue.content,
+        '%s/%s/issue/%s' % (
+            progit.APP.config['APP_URL'],
+            issue.project.name,
+            issue.id,
+        ),
     )
     mail_to = set([cmt.user.emails[0].email for cmt in issue.comments])
     mail_to.add(issue.project.user.emails[0].email)
@@ -142,15 +142,15 @@ The issue: `%s` of project: `%s` has been %s by %s.
 
 %s
 """ % (
-    issue.title,
-    issue.project.name,
-    action,
-    username,
-    '%s/%s/issue/%s' % (
-        progit.APP.config['APP_URL'],
+        issue.title,
         issue.project.name,
-        issue.id,
-    ),
+        action,
+        username,
+        '%s/%s/issue/%s' % (
+            progit.APP.config['APP_URL'],
+            issue.project.name,
+            issue.id,
+        ),
     )
     mail_to = set([cmt.user.emails[0].email for cmt in issue.comments])
     mail_to.add(issue.project.user.emails[0].email)
@@ -182,14 +182,14 @@ New pull-request:
 
 %s
 """ % (
-    request.user.user,
-    request.repo.name,
-    request.title,
-    '%s/%s/request-pull/%s' % (
-        progit.APP.config['APP_URL'],
+        request.user.user,
         request.repo.name,
-        request.id,
-    ),
+        request.title,
+        '%s/%s/request-pull/%s' % (
+            progit.APP.config['APP_URL'],
+            request.repo.name,
+            request.id,
+        ),
     )
     mail_to = set([cmt.user.emails[0].email for cmt in request.comments])
     mail_to.add(request.repo.user.emails[0].email)
@@ -220,14 +220,14 @@ Merged pull-request:
 
 %s
 """ % (
-    user.username,
-    request.repo.name,
-    request.title,
-    '%s/%s/request-pull/%s' % (
-        progit.APP.config['APP_URL'],
+        user.username,
         request.repo.name,
-        request.id,
-    ),
+        request.title,
+        '%s/%s/request-pull/%s' % (
+            progit.APP.config['APP_URL'],
+            request.repo.name,
+            request.id,
+        ),
     )
     mail_to = set([cmt.user.emails[0].email for cmt in request.comments])
     mail_to.add(request.repo.user.emails[0].email)
@@ -258,14 +258,14 @@ Cancelled pull-request:
 
 %s
 """ % (
-    user.username,
-    request.repo.name,
-    request.title,
-    '%s/%s/request-pull/%s' % (
-        progit.APP.config['APP_URL'],
+        user.username,
         request.repo.name,
-        request.id,
-    ),
+        request.title,
+        '%s/%s/request-pull/%s' % (
+            progit.APP.config['APP_URL'],
+            request.repo.name,
+            request.id,
+        ),
     )
     mail_to = set([cmt.user.emails[0].email for cmt in request.comments])
     mail_to.add(request.repo.user.emails[0].email)

@@ -27,7 +27,6 @@ def id_generator(size=15, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for x in range(size))
 
 
-
 def get_session_by_visitkey(session, sessionid):
     ''' Return a specified VisitUser via its session identifier (visit_key).
 
