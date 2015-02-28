@@ -31,7 +31,8 @@ FIXES = [
 RELATES = [
     re.compile('relate[sd]?:?\s?(?:to)?\s?#(\d+)', re.I),
     re.compile('.*\s+relate[sd]?:?\s?#(\d+)', re.I),
-    re.compile('relate[sd]?:?\s?(?:to)?\s?https?://.*/(\w+)/issue/(\d+)', re.I),
+    re.compile(
+        'relate[sd]?:?\s?(?:to)?\s?https?://.*/(\w+)/issue/(\d+)', re.I),
     re.compile('.*\s+relate[sd]?:?\s?https?://.*/(\w+)/issue/(\d+)', re.I),
 ]
 
@@ -75,8 +76,7 @@ def generate_revision_change_log(new_commits_list):
             ['log', '--no-walk']
             + new_commits_list
             + ['--'],
-            keepends=False,
-        ):
+            keepends=False,):
         if line.startswith('commit'):
             commitid = line.split('commit ')[-1]
 
@@ -190,7 +190,7 @@ def get_commits_id(fromrev, torev):
     ''' Retrieve the list commit between two revisions and return the list
     of their identifier.
     '''
-    cmd = ['rev-list', '%s...%s' %(torev, fromrev)]
+    cmd = ['rev-list', '%s...%s' % (torev, fromrev)]
     return read_git_lines(cmd)
 
 
