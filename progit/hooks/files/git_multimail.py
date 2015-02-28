@@ -74,8 +74,10 @@ except ImportError:
 DEBUG = False
 
 ZEROS = '0' * 40
-LOGBEGIN = '- Log -----------------------------------------------------------------\n'
-LOGEND = '-----------------------------------------------------------------------\n'
+LOGBEGIN = '- Log -------------------------------------------------------'\
+    '----------\n'
+LOGEND = '---------------------------------------------------------------'\
+    '--------\n'
 
 ADDR_HEADERS = set(['from', 'to', 'cc', 'bcc', 'reply-to', 'sender'])
 
@@ -297,7 +299,9 @@ def choose_git_command():
             # do it.
             cmd = [GIT_EXECUTABLE, '-c', 'foo.bar=baz', '--version']
             read_output(cmd)
-            GIT_CMD = [GIT_EXECUTABLE, '-c', 'i18n.logoutputencoding=%s' % (ENCODING,)]
+            GIT_CMD = [
+                GIT_EXECUTABLE, '-c',
+                'i18n.logoutputencoding=%s' % (ENCODING,)]
         except CommandError:
             GIT_CMD = [GIT_EXECUTABLE]
 
@@ -308,7 +312,8 @@ def read_git_output(args, input=None, keepends=False, **kw):
     if GIT_CMD is None:
         choose_git_command()
 
-    return read_output(GIT_CMD + args, input=input, keepends=keepends, **kw)
+    return read_output(
+        GIT_CMD + args, input=input, keepends=keepends, **kw)
 
 
 def read_output(cmd, input=None, keepends=False, **kw):
@@ -317,7 +322,8 @@ def read_output(cmd, input=None, keepends=False, **kw):
     else:
         stdin = None
     p = subprocess.Popen(
-        cmd, stdin=stdin, stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kw
+        cmd, stdin=stdin, stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE, **kw
         )
     (out, err) = p.communicate(input)
     retcode = p.wait()
@@ -388,9 +394,9 @@ class Config(object):
     def get(self, name, default=None):
         try:
             values = self._split(read_git_output(
-                    ['config', '--get', '--null', '%s.%s' % (self.section, name)],
-                    env=self.env, keepends=True,
-                    ))
+                ['config', '--get', '--null', '%s.%s' % (self.section, name)],
+                env=self.env, keepends=True,
+                ))
             assert len(values) == 1
             return values[0]
         except CommandError:
@@ -414,7 +420,8 @@ class Config(object):
 
         try:
             return self._split(read_git_output(
-                ['config', '--get-all', '--null', '%s.%s' % (self.section, name)],
+                ['config', '--get-all', '--null', '%s.%s' % (
+                    elf.section, name)],
                 env=self.env, keepends=True,
                 ))
         except CommandError, e:
@@ -517,7 +524,8 @@ class CommitSet(object):
         return len(self._names)
 
     def __contains__(self, sha1_abbrev):
-        """Return True iff this set contains sha1_abbrev (which might be abbreviated)."""
+        """Return True iff this set contains sha1_abbrev (which might
+        be abbreviated)."""
 
         i = bisect.bisect_left(self._names, sha1_abbrev)
         return i < len(self) and self._names[i].startswith(sha1_abbrev)
@@ -529,7 +537,8 @@ class GitObject(object):
             self.sha1 = self.type = self.commit_sha1 = None
         else:
             self.sha1 = sha1
-            self.type = type or read_git_output(['cat-file', '-t', self.sha1])
+            self.type = type or read_git_output(
+                ['cat-file', '-t', self.sha1])
 
             if self.type == 'commit':
                 self.commit_sha1 = self.sha1
@@ -623,7 +632,8 @@ class Change(object):
             yield line % values
 
     def expand_header_lines(self, template, **extra_values):
-        """Break template into lines and expand each line as an RFC 2822 header.
+        """Break template into lines and expand each line as an RFC 2822
+        header.
 
         Encode values and split up lines that are too long.  Silently
         skip lines that contain references to unknown variables."""
@@ -637,7 +647,8 @@ class Change(object):
             except KeyError, e:
                 if DEBUG:
                     sys.stderr.write(
-                        'Warning: unknown variable %r in the following line; line skipped:\n'
+                        'Warning: unknown variable %r in the following '
+                        'line; line skipped:\n'
                         '    %s\n'
                         % (e.args[0], line,)
                         )
@@ -646,11 +657,13 @@ class Change(object):
                     value = addr_header_encode(value, name)
                 else:
                     value = header_encode(value, name)
-                for splitline in ('%s: %s\n' % (name, value)).splitlines(True):
+                for splitline in (
+                        '%s: %s\n' % (name, value)).splitlines(True):
                     yield splitline
 
     def generate_email_header(self):
-        """Generate the RFC 2822 email headers for this Change, a line at a time.
+        """Generate the RFC 2822 email headers for this Change, a line at a
+        time.
 
         The output should not include the trailing blank line."""
 
@@ -719,7 +732,8 @@ class Revision(Change):
         self.refname = self.reference_change.refname
         self.num = num
         self.tot = tot
-        self.author = read_git_output(['log', '--no-walk', '--format=%aN <%aE>', self.rev.sha1])
+        self.author = read_git_output(
+            ['log', '--no-walk', '--format=%aN <%aE>', self.rev.sha1])
         self.recipients = self.environment.get_revision_recipients(self)
 
     def _compute_values(self):
@@ -750,8 +764,7 @@ class Revision(Change):
 
     def generate_email_header(self, **extra_values):
         for line in self.expand_header_lines(
-            REVISION_HEADER_TEMPLATE, **extra_values
-            ):
+                REVISION_HEADER_TEMPLATE, **extra_values):
             yield line
 
     def generate_email_intro(self):
@@ -824,24 +837,21 @@ class ReferenceChange(Change):
                 # Tracking branch:
                 sys.stderr.write(
                     '*** Push-update of tracking branch %r\n'
-                    '***  - incomplete email generated.\n'
-                     % (refname,)
+                    '***  - incomplete email generated.\n' % (refname,)
                     )
                 klass = OtherReferenceChange
             else:
                 # Some other reference namespace:
                 sys.stderr.write(
                     '*** Push-update of strange reference %r\n'
-                    '***  - incomplete email generated.\n'
-                     % (refname,)
+                    '***  - incomplete email generated.\n' % (refname,)
                     )
                 klass = OtherReferenceChange
         else:
             # Anything else (is there anything else?)
             sys.stderr.write(
                 '*** Unknown type of update to %r (%s)\n'
-                '***  - incomplete email generated.\n'
-                 % (refname, rev.type,)
+                '***  - incomplete email generated.\n' % (refname, rev.type,)
                 )
             klass = OtherReferenceChange
 
@@ -854,9 +864,9 @@ class ReferenceChange(Change):
     def __init__(self, environment, refname, short_refname, old, new, rev):
         Change.__init__(self, environment)
         self.change_type = {
-            (False, True) : 'create',
-            (True, True) : 'update',
-            (True, False) : 'delete',
+            (False, True): 'create',
+            (True, True): 'update',
+            (True, False): 'delete',
             }[bool(old), bool(new)]
         self.refname = refname
         self.short_refname = short_refname
@@ -896,9 +906,9 @@ class ReferenceChange(Change):
 
     def get_subject(self):
         template = {
-            'create' : REF_CREATED_SUBJECT_TEMPLATE,
-            'update' : REF_UPDATED_SUBJECT_TEMPLATE,
-            'delete' : REF_DELETED_SUBJECT_TEMPLATE,
+            'create': REF_CREATED_SUBJECT_TEMPLATE,
+            'update': REF_UPDATED_SUBJECT_TEMPLATE,
+            'delete': REF_DELETED_SUBJECT_TEMPLATE,
             }[self.change_type]
         return self.expand(template)
 
@@ -907,8 +917,7 @@ class ReferenceChange(Change):
             extra_values['subject'] = self.get_subject()
 
         for line in self.expand_header_lines(
-            REFCHANGE_HEADER_TEMPLATE, **extra_values
-            ):
+                REFCHANGE_HEADER_TEMPLATE, **extra_values):
             yield line
 
     def generate_email_intro(self):
@@ -922,9 +931,9 @@ class ReferenceChange(Change):
         generate_update_summary() / generate_delete_summary()."""
 
         change_summary = {
-            'create' : self.generate_create_summary,
-            'delete' : self.generate_delete_summary,
-            'update' : self.generate_update_summary,
+            'create': self.generate_create_summary,
+            'delete': self.generate_delete_summary,
+            'update': self.generate_update_summary,
             }[self.change_type](push)
         for line in change_summary:
             yield line
@@ -944,12 +953,12 @@ class ReferenceChange(Change):
                     + self.logopts
                     + new_commits_list
                     + ['--'],
-                    keepends=True,
-                ):
+                    keepends=True,):
                 yield line
 
     def generate_revision_change_summary(self, push):
-        """Generate a summary of the revisions added/removed by this change."""
+        """Generate a summary of the revisions added/removed by this
+        change."""
 
         if self.new.commit_sha1 and not self.old.commit_sha1:
             # A new reference was created.  List the new revisions
@@ -965,7 +974,9 @@ class ReferenceChange(Change):
                 ]
 
             if new_revisions:
-                yield self.expand('This %(refname_type)s includes the following new commits:\n')
+                yield self.expand(
+                    'This %(refname_type)s includes the following new '
+                    'commits:\n')
                 yield '\n'
                 for r in new_revisions:
                     (sha1, subject) = r.rev.get_summary()
@@ -975,7 +986,8 @@ class ReferenceChange(Change):
                 yield '\n'
                 for line in self.expand_lines(NEW_REVISIONS_TEMPLATE, tot=tot):
                     yield line
-                for line in self.generate_revision_change_log([r.rev.sha1 for r in new_revisions]):
+                for line in self.generate_revision_change_log(
+                        [r.rev.sha1 for r in new_revisions]):
                     yield line
             else:
                 for line in self.expand_lines(NO_NEW_REVISIONS_TEMPLATE):
@@ -993,16 +1005,16 @@ class ReferenceChange(Change):
             # revisions in the summary even though we will not send
             # new notification emails for them.
             adds = list(generate_summaries(
-                    '--topo-order', '--reverse', '%s..%s'
-                    % (self.old.commit_sha1, self.new.commit_sha1,)
-                    ))
+                '--topo-order', '--reverse', '%s..%s'
+                % (self.old.commit_sha1, self.new.commit_sha1,)
+                ))
 
             # List of the revisions that were removed from the branch
             # by this update.  This will be empty except for
             # non-fast-forward updates.
             discards = list(generate_summaries(
-                    '%s..%s' % (self.new.commit_sha1, self.old.commit_sha1,)
-                    ))
+                '%s..%s' % (self.new.commit_sha1, self.old.commit_sha1,)
+                ))
 
             if adds:
                 new_commits_list = push.get_new_commits(self)
@@ -1011,7 +1023,8 @@ class ReferenceChange(Change):
             new_commits = CommitSet(new_commits_list)
 
             if discards:
-                discarded_commits = CommitSet(push.get_discarded_commits(self))
+                discarded_commits = CommitSet(
+                    push.get_discarded_commits(self))
             else:
                 discarded_commits = CommitSet([])
 
@@ -1071,9 +1084,11 @@ class ReferenceChange(Change):
             yield '\n'
 
             if new_commits:
-                for line in self.expand_lines(NEW_REVISIONS_TEMPLATE, tot=len(new_commits)):
+                for line in self.expand_lines(
+                        NEW_REVISIONS_TEMPLATE, tot=len(new_commits)):
                     yield line
-                for line in self.generate_revision_change_log(new_commits_list):
+                for line in self.generate_revision_change_log(
+                        new_commits_list):
                     yield line
             else:
                 for line in self.expand_lines(NO_NEW_REVISIONS_TEMPLATE):
@@ -1089,11 +1104,11 @@ class ReferenceChange(Change):
             yield '\n'
             yield 'Summary of changes:\n'
             for line in read_git_lines(
-                ['diff-tree']
-                + self.diffopts
-                + ['%s..%s' % (self.old.commit_sha1, self.new.commit_sha1,)],
-                keepends=True,
-                ):
+                    ['diff-tree']
+                    + self.diffopts
+                    + ['%s..%s' % (
+                        self.old.commit_sha1, self.new.commit_sha1,)],
+                    keepends=True,):
                 yield line
 
         elif self.old.commit_sha1 and not self.new.commit_sha1:
@@ -1114,10 +1129,12 @@ class ReferenceChange(Change):
                 for r in discarded_revisions:
                     (sha1, subject) = r.rev.get_summary()
                     yield r.expand(
-                        BRIEF_SUMMARY_TEMPLATE, action='discards', text=subject,
+                        BRIEF_SUMMARY_TEMPLATE, action='discards',
+                        text=subject,
                         )
             else:
-                for line in self.expand_lines(NO_DISCARDED_REVISIONS_TEMPLATE):
+                for line in self.expand_lines(
+                        NO_DISCARDED_REVISIONS_TEMPLATE):
                     yield line
 
         elif not self.old.commit_sha1 and not self.new.commit_sha1:
@@ -1188,7 +1205,8 @@ class AnnotatedTagChange(ReferenceChange):
         # Use git for-each-ref to pull out the individual fields from
         # the tag
         [tagobject, tagtype, tagger, tagged] = read_git_lines(
-            ['for-each-ref', '--format=%s' % (self.ANNOTATED_TAG_FORMAT,), self.refname],
+            ['for-each-ref', '--format=%s' % (
+                self.ANNOTATED_TAG_FORMAT,), self.refname],
             )
 
         yield self.expand(
@@ -1200,14 +1218,16 @@ class AnnotatedTagChange(ReferenceChange):
             # release, and so we calculate which tag this tag is
             # replacing
             try:
-                prevtag = read_git_output(['describe', '--abbrev=0', '%s^' % (self.new,)])
+                prevtag = read_git_output(
+                    ['describe', '--abbrev=0', '%s^' % (self.new,)])
             except CommandError:
                 prevtag = None
             if prevtag:
                 yield '  replaces  %s\n' % (prevtag,)
         else:
             prevtag = None
-            yield '    length  %s bytes\n' % (read_git_output(['cat-file', '-s', tagobject]),)
+            yield '    length  %s bytes\n' % (read_git_output(
+                ['cat-file', '-s', tagobject]),)
 
         yield ' tagged by  %s\n' % (tagger,)
         yield '        on  %s\n' % (tagged,)
@@ -1216,7 +1236,8 @@ class AnnotatedTagChange(ReferenceChange):
         # Show the content of the tag message; this might contain a
         # change log or release notes so is worth displaying.
         yield LOGBEGIN
-        contents = list(read_git_lines(['cat-file', 'tag', self.new.sha1], keepends=True))
+        contents = list(read_git_lines(
+            ['cat-file', 'tag', self.new.sha1], keepends=True))
         contents = contents[contents.index('\n') + 1:]
         if contents and contents[-1][-1:] != '\n':
             contents.append('\n')
@@ -1230,7 +1251,8 @@ class AnnotatedTagChange(ReferenceChange):
             if prevtag:
                 # Show changes since the previous release
                 revlist = read_git_output(
-                    ['rev-list', '--pretty=short', '%s..%s' % (prevtag, self.new,)],
+                    ['rev-list', '--pretty=short',
+                     '%s..%s' % (prevtag, self.new,)],
                     keepends=True,
                     )
             else:
@@ -1240,7 +1262,8 @@ class AnnotatedTagChange(ReferenceChange):
                     ['rev-list', '--pretty=short', '%s' % (self.new,)],
                     keepends=True,
                     )
-            for line in read_git_lines(['shortlog'], input=revlist, keepends=True):
+            for line in read_git_lines(
+                    ['shortlog'], input=revlist, keepends=True):
                 yield line
 
         yield LOGEND
@@ -1410,8 +1433,10 @@ class SMTPMailer(Mailer):
     def __init__(self, envelopesender, smtpserver):
         if not envelopesender:
             sys.stderr.write(
-                'fatal: git_multimail: cannot use SMTPMailer without a sender address.\n'
-                'please set either multimailhook.envelopeSender or user.email\n'
+                'fatal: git_multimail: cannot use SMTPMailer without a '
+                'sender address.\n'
+                'please set either multimailhook.envelopeSender or '
+                'user.email\n'
                 )
             sys.exit(1)
         self.envelopesender = envelopesender
@@ -1419,7 +1444,9 @@ class SMTPMailer(Mailer):
         try:
             self.smtp = smtplib.SMTP(self.smtpserver)
         except Exception, e:
-            sys.stderr.write('*** Error establishing SMTP connection to %s***\n' % self.smtpserver)
+            sys.stderr.write(
+                '*** Error establishing SMTP connection to %s***\n' %
+                self.smtpserver)
             sys.stderr.write('*** %s\n' % str(e))
             sys.exit(1)
 
@@ -1431,7 +1458,8 @@ class SMTPMailer(Mailer):
             msg = ''.join(lines)
             # turn comma-separated list into Python list if needed.
             if isinstance(to_addrs, basestring):
-                to_addrs = [email for (name, email) in getaddresses([to_addrs])]
+                to_addrs = [
+                    email for (name, email) in getaddresses([to_addrs])]
             self.smtp.sendmail(self.envelopesender, to_addrs, msg)
         except Exception, e:
             sys.stderr.write('*** Error sending email***\n')
@@ -1441,7 +1469,8 @@ class SMTPMailer(Mailer):
 
 
 class OutputMailer(Mailer):
-    """Write emails to an output stream, bracketed by lines of '=' characters.
+    """Write emails to an output stream, bracketed by lines of '='
+    characters.
 
     This is intended for debugging purposes."""
 
@@ -1599,7 +1628,8 @@ class Environment(object):
         self._values = None
 
     def get_repo_shortname(self):
-        """Use the last part of the repo path, with ".git" stripped off if present."""
+        """Use the last part of the repo path, with ".git" stripped off if
+        present."""
 
         basename = os.path.basename(os.path.abspath(self.get_repo_path()))
         m = self.REPO_NAME_RE.match(basename)
@@ -1661,7 +1691,8 @@ class Environment(object):
         raise NotImplementedError()
 
     def get_announce_recipients(self, annotated_tag_change):
-        """Return the recipients for notifications about annotated_tag_change.
+        """Return the recipients for notifications about
+        annotated_tag_change.
 
         Return the list of email addresses to which notifications
         about the specified AnnotatedTagChange should be sent."""
@@ -1716,7 +1747,8 @@ class ConfigEnvironmentMixin(Environment):
 
 
 class ConfigOptionsEnvironmentMixin(ConfigEnvironmentMixin):
-    """An Environment that reads most of its information from "git config"."""
+    """An Environment that reads most of its information from "git config".
+    """
 
     def __init__(self, config, **kw):
         super(ConfigOptionsEnvironmentMixin, self).__init__(
@@ -1737,7 +1769,8 @@ class ConfigOptionsEnvironmentMixin(ConfigEnvironmentMixin):
                 self.maxcommitemails = int(maxcommitemails)
             except ValueError:
                 sys.stderr.write(
-                    '*** Malformed value for multimailhook.maxCommitEmails: %s\n' % maxcommitemails
+                    '*** Malformed value for multimailhook.maxCommitEmails: '
+                    '%s\n' % maxcommitemails
                     + '*** Expected a number.  Ignoring.\n'
                     )
 
@@ -1754,27 +1787,30 @@ class ConfigOptionsEnvironmentMixin(ConfigEnvironmentMixin):
             self.commitlogopts = shlex.split(commitlogopts)
 
         reply_to = config.get('replyTo')
-        self.__reply_to_refchange = config.get('replyToRefchange', default=reply_to)
+        self.__reply_to_refchange = config.get(
+            'replyToRefchange', default=reply_to)
         if (
             self.__reply_to_refchange is not None
-            and self.__reply_to_refchange.lower() == 'author'
-            ):
+                and self.__reply_to_refchange.lower() == 'author'):
             raise ConfigurationException(
                 '"author" is not an allowed setting for replyToRefchange'
                 )
-        self.__reply_to_commit = config.get('replyToCommit', default=reply_to)
+        self.__reply_to_commit = config.get(
+            'replyToCommit', default=reply_to)
 
     def get_administrator(self):
         return (
             self.config.get('administrator')
             or self.get_sender()
-            or super(ConfigOptionsEnvironmentMixin, self).get_administrator()
+            or super(
+                ConfigOptionsEnvironmentMixin, self).get_administrator()
             )
 
     def get_repo_shortname(self):
         return (
             self.config.get('reponame')
-            or super(ConfigOptionsEnvironmentMixin, self).get_repo_shortname()
+            or super(
+                ConfigOptionsEnvironmentMixin, self).get_repo_shortname()
             )
 
     def get_emailprefix(self):
@@ -1802,7 +1838,9 @@ class ConfigOptionsEnvironmentMixin(ConfigEnvironmentMixin):
 
     def get_reply_to_refchange(self, refchange):
         if self.__reply_to_refchange is None:
-            return super(ConfigOptionsEnvironmentMixin, self).get_reply_to_refchange(refchange)
+            return super(
+                ConfigOptionsEnvironmentMixin, self
+            ).get_reply_to_refchange(refchange)
         elif self.__reply_to_refchange.lower() == 'pusher':
             return self.get_pusher_email()
         elif self.__reply_to_refchange.lower() == 'none':
@@ -1812,7 +1850,9 @@ class ConfigOptionsEnvironmentMixin(ConfigEnvironmentMixin):
 
     def get_reply_to_commit(self, revision):
         if self.__reply_to_commit is None:
-            return super(ConfigOptionsEnvironmentMixin, self).get_reply_to_commit(revision)
+            return super(
+                ConfigOptionsEnvironmentMixin, self
+            ).get_reply_to_commit(revision)
         elif self.__reply_to_commit.lower() == 'author':
             return revision.get_author()
         elif self.__reply_to_commit.lower() == 'pusher':
@@ -1862,9 +1902,8 @@ class FilterLinesEnvironmentMixin(Environment):
 
 
 class ConfigFilterLinesEnvironmentMixin(
-    ConfigEnvironmentMixin,
-    FilterLinesEnvironmentMixin,
-    ):
+        ConfigEnvironmentMixin,
+        FilterLinesEnvironmentMixin,):
     """Handle encoding and maximum line length based on config."""
 
     def __init__(self, config, **kw):
@@ -1896,9 +1935,8 @@ class MaxlinesEnvironmentMixin(Environment):
 
 
 class ConfigMaxlinesEnvironmentMixin(
-    ConfigEnvironmentMixin,
-    MaxlinesEnvironmentMixin,
-    ):
+        ConfigEnvironmentMixin,
+        MaxlinesEnvironmentMixin,):
     """Limit the email body to the number of lines specified in config."""
 
     def __init__(self, config, **kw):
@@ -1927,9 +1965,8 @@ class FQDNEnvironmentMixin(Environment):
 
 
 class ConfigFQDNEnvironmentMixin(
-    ConfigEnvironmentMixin,
-    FQDNEnvironmentMixin,
-    ):
+        ConfigEnvironmentMixin,
+        FQDNEnvironmentMixin,):
     """Read the FQDN from the config."""
 
     def __init__(self, config, **kw):
@@ -1963,17 +2000,16 @@ class PusherDomainEnvironmentMixin(ConfigEnvironmentMixin):
             # Derive the pusher's full email address in the default way:
             return '%s@%s' % (self.get_pusher(), self.__emaildomain)
         else:
-            return super(PusherDomainEnvironmentMixin, self).get_pusher_email()
+            return super(
+                PusherDomainEnvironmentMixin, self).get_pusher_email()
 
 
 class StaticRecipientsEnvironmentMixin(Environment):
     """Set recipients statically based on constructor parameters."""
 
     def __init__(
-        self,
-        refchange_recipients, announce_recipients, revision_recipients,
-        **kw
-        ):
+            self, refchange_recipients, announce_recipients,
+            revision_recipients, **kw):
         super(StaticRecipientsEnvironmentMixin, self).__init__(**kw)
 
         # The recipients for various types of notification emails, as
@@ -2002,9 +2038,8 @@ class StaticRecipientsEnvironmentMixin(Environment):
 
 
 class ConfigRecipientsEnvironmentMixin(
-    ConfigEnvironmentMixin,
-    StaticRecipientsEnvironmentMixin
-    ):
+        ConfigEnvironmentMixin,
+        StaticRecipientsEnvironmentMixin):
     """Determine recipients statically based on config."""
 
     def __init__(self, config, **kw):
@@ -2056,8 +2091,10 @@ class ProjectdescEnvironmentMixin(Environment):
 
         git_dir = get_git_dir()
         try:
-            projectdesc = open(os.path.join(git_dir, 'description')).readline().strip()
-            if projectdesc and not projectdesc.startswith('Unnamed repository'):
+            projectdesc = open(
+                os.path.join(git_dir, 'description')).readline().strip()
+            if projectdesc and not projectdesc.startswith(
+                    'Unnamed repository'):
                 return projectdesc
         except IOError:
             pass
@@ -2071,16 +2108,16 @@ class GenericEnvironmentMixin(Environment):
 
 
 class GenericEnvironment(
-    ProjectdescEnvironmentMixin,
-    ConfigMaxlinesEnvironmentMixin,
-    ComputeFQDNEnvironmentMixin,
-    ConfigFilterLinesEnvironmentMixin,
-    ConfigRecipientsEnvironmentMixin,
-    PusherDomainEnvironmentMixin,
-    ConfigOptionsEnvironmentMixin,
-    GenericEnvironmentMixin,
-    Environment,
-    ):
+        ProjectdescEnvironmentMixin,
+        ConfigMaxlinesEnvironmentMixin,
+        ComputeFQDNEnvironmentMixin,
+        ConfigFilterLinesEnvironmentMixin,
+        ConfigRecipientsEnvironmentMixin,
+        PusherDomainEnvironmentMixin,
+        ConfigOptionsEnvironmentMixin,
+        GenericEnvironmentMixin,
+        Environment,
+        ):
     pass
 
 
@@ -2116,16 +2153,16 @@ class IncrementalDateTime(object):
 
 
 class GitoliteEnvironment(
-    ProjectdescEnvironmentMixin,
-    ConfigMaxlinesEnvironmentMixin,
-    ComputeFQDNEnvironmentMixin,
-    ConfigFilterLinesEnvironmentMixin,
-    ConfigRecipientsEnvironmentMixin,
-    PusherDomainEnvironmentMixin,
-    ConfigOptionsEnvironmentMixin,
-    GitoliteEnvironmentMixin,
-    Environment,
-    ):
+        ProjectdescEnvironmentMixin,
+        ConfigMaxlinesEnvironmentMixin,
+        ComputeFQDNEnvironmentMixin,
+        ConfigFilterLinesEnvironmentMixin,
+        ConfigRecipientsEnvironmentMixin,
+        PusherDomainEnvironmentMixin,
+        ConfigOptionsEnvironmentMixin,
+        GitoliteEnvironmentMixin,
+        Environment,
+        ):
     pass
 
 
@@ -2235,10 +2272,13 @@ class Push(object):
 
     @classmethod
     def _sort_key(klass, change):
-        return (klass.SORT_ORDER[change.__class__, change.change_type], change.refname,)
+        return (
+            klass.SORT_ORDER[change.__class__, change.change_type],
+            change.refname,)
 
     def _compute_other_ref_sha1s(self):
-        """Return the GitObjects referred to by references unaffected by this push."""
+        """Return the GitObjects referred to by references unaffected by
+        this push."""
 
         # The refnames being changed by this push:
         updated_refs = set(
@@ -2333,8 +2373,10 @@ class Push(object):
                     % (change.refname, change.old.sha1, change.new.sha1,)
                     )
             else:
-                sys.stderr.write('Sending notification emails to: %s\n' % (change.recipients,))
-                extra_values = {'send_date' : send_date.next()}
+                sys.stderr.write(
+                    'Sending notification emails to: %s\n' % (
+                        change.recipients,))
+                extra_values = {'send_date': send_date.next()}
                 mailer.send(
                     change.generate_email(self, body_filter, extra_values),
                     change.recipients,
@@ -2349,16 +2391,20 @@ class Push(object):
             max_emails = change.environment.maxcommitemails
             if max_emails and len(sha1s) > max_emails:
                 sys.stderr.write(
-                    '*** Too many new commits (%d), not sending commit emails.\n' % len(sha1s)
-                    + '*** Try setting multimailhook.maxCommitEmails to a greater value\n'
-                    + '*** Currently, multimailhook.maxCommitEmails=%d\n' % max_emails
+                    '*** Too many new commits (%d), not sending commit '
+                    'emails.\n' % len(sha1s)
+                    + '*** Try setting multimailhook.maxCommitEmails to a '
+                    'greater value\n'
+                    '*** Currently, multimailhook.maxCommitEmails=%d\n' %
+                    max_emails
                     )
                 return
 
             for (num, sha1) in enumerate(sha1s):
-                rev = Revision(change, GitObject(sha1), num=num+1, tot=len(sha1s))
+                rev = Revision(
+                    change, GitObject(sha1), num=num+1, tot=len(sha1s))
                 if rev.recipients:
-                    extra_values = {'send_date' : send_date.next()}
+                    extra_values = {'send_date': send_date.next()}
                     mailer.send(
                         rev.generate_email(self, body_filter, extra_values),
                         rev.recipients,
@@ -2403,17 +2449,21 @@ def choose_mailer(config, environment):
     if mailer == 'smtp':
         smtpserver = config.get('smtpserver', default='localhost')
         mailer = SMTPMailer(
-            envelopesender=(environment.get_sender() or environment.get_fromaddr()),
+            envelopesender=(
+                environment.get_sender() or environment.get_fromaddr()
+            ),
             smtpserver=smtpserver,
             )
     elif mailer == 'sendmail':
         command = config.get('sendmailcommand')
         if command:
             command = shlex.split(command)
-        mailer = SendMailer(command=command, envelopesender=environment.get_sender())
+        mailer = SendMailer(
+            command=command, envelopesender=environment.get_sender())
     else:
         sys.stderr.write(
-            'fatal: multimailhook.mailer is set to an incorrect value: "%s"\n' % mailer
+            'fatal: multimailhook.mailer is set to an incorrect value: '
+            '"%s"\n' % mailer
             + 'please use one of "smtp" or "sendmail".\n'
             )
         sys.exit(1)
@@ -2421,8 +2471,8 @@ def choose_mailer(config, environment):
 
 
 KNOWN_ENVIRONMENTS = {
-    'generic' : GenericEnvironmentMixin,
-    'gitolite' : GitoliteEnvironmentMixin,
+    'generic': GenericEnvironmentMixin,
+    'gitolite': GitoliteEnvironmentMixin,
     }
 
 
@@ -2439,8 +2489,8 @@ def choose_environment(config, osenv=None, env=None, recipients=None):
         ConfigOptionsEnvironmentMixin,
         ]
     environment_kw = {
-        'osenv' : osenv,
-        'config' : config,
+        'osenv': osenv,
+        'config': config,
         }
 
     if not env:
@@ -2513,8 +2563,8 @@ def main(args):
 
         if options.show_env:
             sys.stderr.write('Environment values:\n')
-            for (k,v) in sorted(environment.get_values().items()):
-                sys.stderr.write('    %s : %r\n' % (k,v))
+            for (k, v) in sorted(environment.get_values().items()):
+                sys.stderr.write('    %s : %r\n' % (k, v))
             sys.stderr.write('\n')
 
         if options.stdout:
