@@ -51,6 +51,8 @@ class ProgitLibGittests(tests.Modeltests):
             'repo docs/test2\n  R   = @all\n  RW+ = pingou\n\n'
             'repo tickets/test2\n  R   = @all\n  RW+ = pingou\n\n')
 
+        os.unlink(outputconf)
+        self.assertFalse(os.path.exists(outputconf))
 
 
 if __name__ == '__main__':
