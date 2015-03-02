@@ -27,13 +27,6 @@ from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
                     generate_authorized_key_file, markdown_filter)
 
 
-def chunks(item_list, chunks_size):
-    """ Yield successive n-sized chunks from item_list.
-    """
-    for i in xrange(0, len(item_list), chunks_size):
-        yield item_list[i: i + chunks_size]
-
-
 # Application
 
 
