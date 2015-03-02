@@ -63,6 +63,46 @@ class ProgitLibModeltests(tests.Modeltests):
             str(issues[0]),
             'Issue(1, project:test, user:pingou, title:Test issue)')
 
+    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.notify.send_email')
+    def test_pullrequest__repr__(self, p_send_email, p_ugt):
+        """ Test the PullRequest.__repr__ function of progit.lib.model. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+        # Create a forked repo
+        item = progit.lib.model.Project(
+            user_id=1,  # pingou
+            name='test',
+            description='test project #1',
+            parent_id=1,
+        )
+        self.session.commit()
+        self.session.add(item)
+
+        repo = progit.lib.get_project(self.session, 'test')
+        forked_repo = progit.lib.get_project(
+            self.session, 'test', user='pingou')
+
+        # Create an pull-request
+        msg = progit.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou'
+        )
+        self.assertEqual(msg, 'Request created')
+
+        request = progit.lib.search_pull_requests(self.session, requestid=1)
+        self.assertEqual(
+            str(request),
+            'PullRequest(1, project:test, user:pingou, '
+            'title:test pull-request)')
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibModeltests)
