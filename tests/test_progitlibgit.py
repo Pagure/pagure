@@ -35,6 +35,25 @@ class ProgitLibGittests(tests.Modeltests):
         """ Test the write_gitolite_acls function of progit.lib.git. """
         tests.create_projects(self.session)
 
+        repo = progit.lib.get_project(self.session, 'test')
+        # Add an user to a project
+        msg = progit.lib.add_user_to_project(
+            session=self.session,
+            project=repo,
+            user='foo',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User added')
+        # Add a forked project
+        item = progit.lib.model.Project(
+            user_id=1,  # pingou
+            name='test3',
+            description='test project #2',
+            parent_id=1
+        )
+        self.session.add(item)
+        self.session.commit()
+
         outputconf = os.path.join(HERE, 'test_gitolite.conf')
 
         progit.lib.git.write_gitolite_acls(self.session, outputconf)
@@ -44,14 +63,47 @@ class ProgitLibGittests(tests.Modeltests):
         with open(outputconf) as stream:
             data = stream.read()
 
-        self.assertEqual(
-            data,
-            'repo test\n  R   = @all\n  RW+ = pingou\n\n'
-            'repo docs/test\n  R   = @all\n  RW+ = pingou\n\n'
-            'repo tickets/test\n  R   = @all\n  RW+ = pingou\n\n'
-            'repo test2\n  R   = @all\n  RW+ = pingou\n\n'
-            'repo docs/test2\n  R   = @all\n  RW+ = pingou\n\n'
-            'repo tickets/test2\n  R   = @all\n  RW+ = pingou\n\n')
+        exp = """repo test
+  R   = @all
+  RW+ = pingou
+  RW+ = foo
+
+repo docs/test
+  R   = @all
+  RW+ = pingou
+  RW+ = foo
+
+repo tickets/test
+  R   = @all
+  RW+ = pingou
+  RW+ = foo
+
+repo test2
+  R   = @all
+  RW+ = pingou
+
+repo docs/test2
+  R   = @all
+  RW+ = pingou
+
+repo tickets/test2
+  R   = @all
+  RW+ = pingou
+
+repo forks/pingou/test3
+  R   = @all
+  RW+ = pingou
+
+repo docs/pingou/test3
+  R   = @all
+  RW+ = pingou
+
+repo tickets/pingou/test3
+  R   = @all
+  RW+ = pingou
+
+"""
+        self.assertEqual(data, exp)
 
         os.unlink(outputconf)
         self.assertFalse(os.path.exists(outputconf))
