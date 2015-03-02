@@ -150,7 +150,7 @@ def add_issue_comment(session, issue, comment, user, ticketfolder):
     )
     session.add(issue_comment)
     # Make sure we won't have SQLAlchemy error before we create the repo
-    session.flush()
+    session.commit()
 
     progit.lib.git.update_git_ticket(
         issue, repo=issue.project, ticketfolder=ticketfolder)
