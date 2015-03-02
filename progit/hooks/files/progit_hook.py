@@ -135,6 +135,9 @@ def relates_commit(commitid, issueid, project=None):
         progit.SESSION.commit()
     except progit.exceptions.ProgitException as err:
         print err
+    except SQLAlchemyError, err:  # pragma: no cover
+        progit.SESSION.rollback()
+        progit.APP.logger.exception(err)
 
 
 def fixes_commit(commitid, issueid, project=None):
@@ -167,6 +170,9 @@ def fixes_commit(commitid, issueid, project=None):
         progit.SESSION.commit()
     except progit.exceptions.ProgitException as err:
         print err
+    except SQLAlchemyError, err:  # pragma: no cover
+        progit.SESSION.rollback()
+        progit.APP.logger.exception(err)
 
     branches = [
         item.replace('* ', '') for item in read_git_lines(
@@ -184,6 +190,9 @@ def fixes_commit(commitid, issueid, project=None):
             progit.SESSION.commit()
         except progit.exceptions.ProgitException as err:
             print err
+        except SQLAlchemyError, err:  # pragma: no cover
+            progit.SESSION.rollback()
+            progit.APP.logger.exception(err)
 
 
 def get_commits_id(fromrev, torev):
