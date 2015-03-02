@@ -37,6 +37,7 @@ import progit.lib.model
 
 DB_PATH = 'sqlite:///:memory:'
 FAITOUT_URL = 'http://209.132.184.152/faitout/'
+HERE = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 
 
 if os.environ.get('BUILD_ID'):
