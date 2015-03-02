@@ -36,6 +36,33 @@ class ProgitLibModeltests(tests.Modeltests):
         self.assertEqual('foo', item.username)
         self.assertEqual([], item.groups)
 
+    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.notify.send_email')
+    def test_issue__repr__(self, p_send_email, p_ugt):
+        """ Test the Issue.__repr__ function of progit.lib.model. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+        repo = progit.lib.get_project(self.session, 'test')
+
+        # Create an issue
+        msg = progit.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.assertEqual(msg, 'Issue created')
+
+        issues = progit.lib.search_issues(self.session, repo)
+        self.assertEqual(len(issues), 1)
+        self.assertEqual(
+            str(issues[0]),
+            'Issue(1, project:test, user:pingou, title:Test issue)')
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibModeltests)
