@@ -117,6 +117,9 @@ New issue:
     )
     mail_to = set([cmt.user.emails[0].email for cmt in issue.comments])
     mail_to.add(issue.project.user.emails[0].email)
+    # I will keeps this here as things might change in the future, but
+    # basically we should never enter this `if` as currently an issue cannot
+    # be created assigned to someone, it is always a 2 steps process.
     if issue.assignee:
         mail_to.add(issue.assignee.emails[0].email)
     for prouser in issue.project.users:
