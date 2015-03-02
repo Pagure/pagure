@@ -84,6 +84,7 @@ class Modeltests(unittest.TestCase):
         """ Set up the environnment, ran before every tests. """
         # Clean up eventual git repo left in the present folder.
         for filename in os.listdir(HERE):
+            filename = os.path.join(HERE, filename)
             if filename.endswith('.git') and os.path.isdir(filename):
                 print '**', filename
                 shutil.rmtree(filename)
