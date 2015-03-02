@@ -74,6 +74,7 @@ class Modeltests(unittest.TestCase):
         self.session = None
         self.path = tempfile.mkdtemp(prefix='progit-tests')
         self.gitrepo = None
+        self.gitrepos = None
 
     # pylint: disable=C0103
     def setUp(self):
@@ -133,6 +134,11 @@ class Modeltests(unittest.TestCase):
         # Clear eventual git repo
         if self.gitrepo and os.path.exists(self.gitrepo):
             shutil.rmtree(self.gitrepo)
+
+        if self.gitrepos:
+            for repo in self.gitrepo:
+                if os.path.exists(repo):
+                    shutil.rmtree(repo)
 
 
 class FakeGroup(object):
