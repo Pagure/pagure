@@ -88,6 +88,12 @@ class Modeltests(unittest.TestCase):
             if filename.endswith('.git') and os.path.isdir(filename):
                 shutil.rmtree(filename)
 
+        for folder in ['tickets', 'repos', 'forks', 'docs']:
+            folder = os.path.join(HERE, folder)
+            if os.path.exists(folder):
+                shutil.rmtree(folder)
+            os.mkdir(folder)
+
         self.session = progit.lib.model.create_tables(DB_PATH)
 
         # Create a couple of users
