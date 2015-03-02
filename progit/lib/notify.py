@@ -120,8 +120,8 @@ New issue:
     if issue.assignee:
         mail_to.add(issue.assignee.emails[0].email)
     for prouser in issue.project.users:
-        if prouser.user.emails:
-            mail_to.add(prouser.user.emails[0].email)
+        if prouser.emails:
+            mail_to.add(prouser.emails[0].email)
 
     send_email(
         text,
