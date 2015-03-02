@@ -21,6 +21,8 @@ from datetime import date
 from datetime import timedelta
 from functools import wraps
 
+import pygit2
+
 from contextlib import contextmanager
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -197,6 +199,18 @@ def create_projects(session):
     session.add(item)
 
     session.commit()
+
+
+def create_projects_git(folder):
+    """ Create some projects in the database. """
+    repos = []
+    for project in ['test.git', 'test2.git']:
+        repo_path = os.path.join(folder, project)
+        repos.append(repo_path)
+        os.makedirs(repo_path)
+        pygit2.init_repository(repo_path)
+
+    return repos
 
 
 if __name__ == '__main__':
