@@ -86,7 +86,6 @@ class Modeltests(unittest.TestCase):
         for filename in os.listdir(HERE):
             filename = os.path.join(HERE, filename)
             if filename.endswith('.git') and os.path.isdir(filename):
-                print '**', filename
                 shutil.rmtree(filename)
 
         self.session = progit.lib.model.create_tables(DB_PATH)
