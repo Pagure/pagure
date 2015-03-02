@@ -156,6 +156,16 @@ class ProgitLibtests(tests.Modeltests):
             ticketfolder=None
         )
 
+        # Add an extra user to project `foo`
+        repo = progit.lib.get_project(self.session, 'test')
+        msg = progit.lib.add_user_to_project(
+            session=self.session,
+            project=repo,
+            user='foo',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User added')
+
         # Create issues to play with
         msg = progit.lib.new_issue(
             session=self.session,
