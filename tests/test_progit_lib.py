@@ -556,6 +556,16 @@ class ProgitLibtests(tests.Modeltests):
         issue = progit.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 0)
 
+        # Set the assignee by its email
+        msg = progit.lib.add_issue_assignee(
+            session=self.session,
+            issue=issue,
+            assignee='foo@bar.com',
+            user='foo@pingou.com',
+            ticketfolder=None)
+        self.session.commit()
+        self.assertEqual(msg, 'Issue assigned')
+
         # Add a comment to that issue
         msg = progit.lib.add_issue_comment(
             session=self.session,
