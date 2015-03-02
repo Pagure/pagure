@@ -88,11 +88,23 @@ class ProgitFlaskApptests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertTrue(
             '<section class="project_list" id="repos">' in output.data)
-        self.assertTrue('<h2>Projects (1)</h2>' in output.data)
+        self.assertTrue('<h2>Projects (0)</h2>' in output.data)
         self.assertTrue(
             '<section class="project_list" id="forks">' in output.data)
-        self.assertTrue('<h2>Forks (1)</h2>' in output.data)
+        self.assertTrue('<h2>Forks (0)</h2>' in output.data)
 
+        tests.create_projects(self.session)
+        self.gitrepo = tests.create_projects_git(
+            progit.APP.config['GIT_FOLDER'])
+
+        output = self.app.get('/user/pingou?repopage=abc&forkpage=def')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue(
+            '<section class="project_list" id="repos">' in output.data)
+        self.assertTrue('<h2>Projects (2)</h2>' in output.data)
+        self.assertTrue(
+            '<section class="project_list" id="forks">' in output.data)
+        self.assertTrue('<h2>Forks (0)</h2>' in output.data)
 
 
 if __name__ == '__main__':
