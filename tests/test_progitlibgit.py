@@ -11,6 +11,7 @@
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
+import json
 import unittest
 import shutil
 import sys
@@ -251,6 +252,155 @@ index 9f44358..2a552bb 100644
                 row = row.split(' ', 2)[2]
             npatch.append(row)
 
+        patch = '\n'.join(npatch)
+        self.assertEqual(patch, exp)
+
+    @patch('progit.lib.notify.send_email')
+    def test_update_git_ticket(self, email_f):
+        """ Test the update_git_ticket of progit.lib.git. """
+        email_f.return_value = True
+
+        # Create project
+        item = progit.lib.model.Project(
+            user_id=1,  # pingou
+            name='test_ticket_repo',
+            description='test project for ticket',
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        # Create repo
+        self.gitrepo = os.path.join(HERE, 'test_ticket_repo.git')
+        os.makedirs(self.gitrepo)
+        repo_obj = pygit2.init_repository(self.gitrepo, bare=True)
+
+        repo = progit.lib.get_project(self.session, 'test_ticket_repo')
+        # Create an issue to play with
+        msg = progit.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=HERE
+        )
+        self.assertEqual(msg, 'Issue created')
+        issue = progit.lib.search_issues(self.session, repo, issueid=1)
+        progit.lib.git.update_git_ticket(issue, repo, HERE)
+
+        repo = pygit2.Repository(self.gitrepo)
+        commit = repo.revparse_single('HEAD')
+
+        # Use patch to validate the repo
+        patch = progit.lib.git.commit_to_patch(repo, commit)
+        exp = """Mon Sep 17 00:00:00 2001
+From: progit <progit>
+Subject: Updated ticket <hash>: Test issue
+
+
+---
+
+diff --git a/123 b/456
+new file mode 100644
+index 0000000..60f7480
+--- /dev/null
++++ b/456
+@@ -0,0 +1 @@
++{"status": "Open", "title": "Test issue", "comments": [], "content": "We should work on this", "user": {"name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null}
+\ No newline at end of file
+
+"""
+        npatch = []
+        for row in patch.split('\n'):
+            if row.startswith('Date:'):
+                continue
+            elif row.startswith('From '):
+                row = row.split(' ', 2)[2]
+            elif row.startswith('diff --git '):
+                row = row.split(' ')
+                row[2] = 'a/123'
+                row[3] = 'b/456'
+                row = ' '.join(row)
+            elif 'Updated ticket' in row:
+                row = row.split()
+                row[3] = '<hash>:'
+                row = ' '.join(row)
+            elif 'date_created' in row:
+                data = json.loads(row[1:])
+                data['date_created'] = None
+                row = '+' + json.dumps(data)
+            elif row.startswith('index 00'):
+                row = 'index 0000000..60f7480'
+            elif row.startswith('+++ b/'):
+                row = '+++ b/456'
+            npatch.append(row)
+        patch = '\n'.join(npatch)
+        self.assertEqual(patch, exp)
+
+        # Test again after adding a comment
+        msg = progit.lib.add_issue_comment(
+            session=self.session,
+            issue=issue,
+            comment='Hey look a comment!',
+            user='foo',
+            ticketfolder=HERE
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Comment added')
+
+        # Use patch to validate the repo
+        repo = pygit2.Repository(self.gitrepo)
+        commit = repo.revparse_single('HEAD')
+        patch = progit.lib.git.commit_to_patch(repo, commit)
+        exp = """Mon Sep 17 00:00:00 2001
+From: progit <progit>
+Subject: Updated ticket <hash>: Test issue
+
+
+---
+
+diff --git a/123 b/456
+index 458821a..77674a8
+--- a/123
++++ b/456
+@@ -1 +1 @@
+-{"status": "Open", "title": "Test issue", "comments": [], "content": "We should work on this", "user": {"name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null}
+\ No newline at end of file
++{"status": "Open", "title": "Test issue", "comments": [{"comment": "Hey look a comment!", "date_created": null, "id": 1, "parent": null, "user": {"name": "foo", "emails": ["foo@bar.com"]}}], "content": "We should work on this", "user": {"name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null}
+\ No newline at end of file
+
+"""
+        npatch = []
+        for row in patch.split('\n'):
+            if row.startswith('Date:'):
+                continue
+            elif row.startswith('From '):
+                row = row.split(' ', 2)[2]
+            elif row.startswith('diff --git '):
+                row = row.split(' ')
+                row[2] = 'a/123'
+                row[3] = 'b/456'
+                row = ' '.join(row)
+            elif 'Updated ticket' in row:
+                row = row.split()
+                row[3] = '<hash>:'
+                row = ' '.join(row)
+            elif 'date_created' in row:
+                data = json.loads(row[1:])
+                data['date_created'] = None
+                comments = []
+                for comment in data['comments']:
+                    comment['date_created'] = None
+                    comments.append(comment)
+                data['comments'] = comments
+                row = row[0] + json.dumps(data)
+            elif row.startswith('index'):
+                row = 'index 458821a..77674a8'
+            elif row.startswith('--- a/'):
+                row = '--- a/123'
+            elif row.startswith('+++ b/'):
+                row = '+++ b/456'
+            npatch.append(row)
         patch = '\n'.join(npatch)
         self.assertEqual(patch, exp)
 
