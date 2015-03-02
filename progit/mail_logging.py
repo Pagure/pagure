@@ -33,14 +33,14 @@ import traceback
 psutil = None
 try:
     import psutil
-except (OSError, ImportError):
+except (OSError, ImportError):  # pragma: no cover
     # We run into issues when trying to import psutil from inside mod_wsgi on
     # rhel7.  If we hit that here, then just fail quietly.
     # https://github.com/jmflinuxtx/kerneltest-harness/pull/17#issuecomment-48007837
     pass
 
 
-class ContextInjector(logging.Filter):
+class ContextInjector(logging.Filter):  # pragma: no cover
     """ Logging filter that adds context to log records.
 
     Filters are typically used to "filter" log records.  They declare a filter
