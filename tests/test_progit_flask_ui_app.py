@@ -71,6 +71,19 @@ class ProgitFlaskApptests(tests.Modeltests):
         self.assertTrue('<a href="/user/pingou">' in output.data)
         self.assertTrue('<a href="/user/foo">' in output.data)
 
+    def test_view_user(self):
+        """ Test the view_user endpoint.  """
+
+        output = self.app.get('/user/pingou?repopage=abc&forkpage=def')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue(
+            '<section class="project_list" id="repos">' in output.data)
+        self.assertTrue('<h2>Projects (1)</h2>' in output.data)
+        self.assertTrue(
+            '<section class="project_list" id="forks">' in output.data)
+        self.assertTrue('<h2>Forks (1)</h2>' in output.data)
+
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskApptests)
