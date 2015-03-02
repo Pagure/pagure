@@ -73,6 +73,7 @@ class Modeltests(unittest.TestCase):
         unittest.TestCase.__init__(self, method_name)
         self.session = None
         self.path = tempfile.mkdtemp(prefix='progit-tests')
+        self.gitrepo = None
 
     # pylint: disable=C0103
     def setUp(self):
@@ -128,6 +129,10 @@ class Modeltests(unittest.TestCase):
             else:
                 db_name = DB_PATH.rsplit('/', 1)[1]
                 requests.get('%s/clean/%s' % (FAITOUT_URL, db_name))
+
+        # Clear eventual git repo
+        if self.gitrepo and os.path.exists(self.gitrepo):
+            shutil.rmtree(self.gitrepo)
 
 
 class FakeGroup(object):
