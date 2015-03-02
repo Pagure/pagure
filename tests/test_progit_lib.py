@@ -1130,12 +1130,10 @@ class ProgitLibtests(tests.Modeltests):
         )
         self.assertEqual(len(prs), 0)
 
-    @patch('progit.lib.notify.notify_merge_pull_request')
-    @patch('progit.lib.notify.notify_cancelled_pull_request')
-    def test_close_pull_request(self, mpr, cpr):
+    @patch('progit.lib.notify.send_email')
+    def test_close_pull_request(self, send_email):
         """ Test close_pull_request of progit.lib. """
-        mpr.return_value = True
-        cpr.return_value = True
+        send_email.return_value = True
 
         self.test_new_pull_request()
 
@@ -1144,7 +1142,7 @@ class ProgitLibtests(tests.Modeltests):
         progit.lib.close_pull_request(
             session=self.session,
             request=request,
-            user='pingou',
+            user=tests.FakeUser(),
             merged=True)
         self.session.commit()
 
@@ -1159,7 +1157,7 @@ class ProgitLibtests(tests.Modeltests):
         progit.lib.close_pull_request(
             session=self.session,
             request=request,
-            user='pingou',
+            user=tests.FakeUser(),
             merged=False)
         self.session.commit()
 
