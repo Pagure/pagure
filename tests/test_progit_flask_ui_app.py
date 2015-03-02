@@ -37,11 +37,16 @@ class ProgitFlaskApptests(tests.Modeltests):
         progit.SESSION = self.session
         progit.ui.SESSION = self.session
         progit.ui.app.SESSION = self.session
-        self.app = progit.APP.test_client()
+        progit.ui.repo.SESSION = self.session
+
         progit.APP.config['GIT_FOLDER'] = tests.HERE
-        progit.APP.config['FORK_FOLDER'] = tests.HERE
-        progit.APP.config['TICKET_FOLDER'] = tests.HERE
-        progit.APP.config['DOC_FOLDER'] = tests.HERE
+        progit.APP.config['FORK_FOLDER'] = os.path.join(
+            tests.HERE, 'forks')
+        progit.APP.config['TICKETS_FOLDER'] = os.path.join(
+            tests.HERE, 'tickets')
+        progit.APP.config['DOCS_FOLDER'] = os.path.join(
+            tests.HERE, 'docs')
+        self.app = progit.APP.test_client()
 
     def test_index(self):
         """ Test the index endpoint. """
