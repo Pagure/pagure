@@ -103,6 +103,15 @@ class ProgitLibModeltests(tests.Modeltests):
             'PullRequest(1, project:test, user:pingou, '
             'title:test pull-request)')
 
+    def test_progitgroup__repr__(self):
+        """ Test the ProgitGroup.__repr__ function of progit.lib.model. """
+        item = progit.lib.model.ProgitGroup(
+            group_name='admin',
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        self.assertEqual(str(item), 'Group: 1 - name admin')
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibModeltests)
