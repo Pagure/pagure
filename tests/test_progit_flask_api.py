@@ -62,6 +62,64 @@ class ProgitFlaskApitests(tests.Modeltests):
         self.assertEqual(data['users'], ['pingou'])
         self.assertEqual(data.keys(), ['users'])
 
+    def test_api_project_tags(self):
+        """ Test the api_project_tags function.  """
+        tests.create_projects(self.session)
+
+        output = self.app.get('/api/0/foo/tags/')
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertEqual(data.keys(), ['output', 'error'])
+        self.assertEqual(data['output'], 'notok')
+        self.assertEqual(data['error'], 'Project not found')
+
+        output = self.app.get('/api/0/test/tags/')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertEqual(data.keys(), ['tags'])
+        self.assertEqual(data['tags'], [])
+
+        # Add an issue and tag it so that we can list them
+        item = progit.lib.model.Issue(
+            id=1,
+            uid='foobar',
+            project_id=1,
+            title='issue',
+            content='a bug report',
+            user_id=1,  # pingou
+        )
+        self.session.add(item)
+        self.session.commit()
+        item = progit.lib.model.Tag(
+            tag='tag1',
+        )
+        self.session.add(item)
+        self.session.commit()
+        item = progit.lib.model.TagIssue(
+            tag='tag1',
+            issue_uid='foobar',
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        output = self.app.get('/api/0/test/tags/')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertEqual(data.keys(), ['tags'])
+        self.assertEqual(data['tags'], ['tag1'])
+
+        output = self.app.get('/api/0/test/tags/?pattern=t')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertEqual(data.keys(), ['tags'])
+        self.assertEqual(data['tags'], ['tag1'])
+
+        output = self.app.get('/api/0/test/tags/?pattern=p')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertEqual(data.keys(), ['tags'])
+        self.assertEqual(data['tags'], [])
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskApitests)
