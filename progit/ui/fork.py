@@ -398,7 +398,7 @@ def merge_request_pull(repo, requestid, username=None):
              mergecode & pygit2.GIT_MERGE_ANALYSIS_UP_TO_DATE
              )):
         flask.flash('Nothing to do, changes were already merged', 'error')
-        progit.lib.close_pull_request(SESSION, request)
+        progit.lib.close_pull_request(SESSION, request, flask.g.fas_user)
         try:
             SESSION.commit()
         except SQLAlchemyError as err:
