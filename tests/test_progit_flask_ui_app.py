@@ -45,6 +45,23 @@ class ProgitFlaskApptests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertTrue('<h2>All Projects (2)</h2>' in output.data)
 
+        output = self.app.get('/?page=abc')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('<h2>All Projects (2)</h2>' in output.data)
+
+        user = tests.FakeUser()
+        with tests.user_set(progit.APP, user):
+            output = self.app.get('/?repopage=abc&forkpage=def')
+            self.assertTrue(
+                '<section class="project_list" id="repos">' in output.data)
+            self.assertTrue('<h3>My Forks (0)</h3>' in output.data)
+            self.assertTrue(
+                '<section class="project_list" id="myforks">' in output.data)
+            self.assertTrue('<h3>My Projects (0)</h3>' in output.data)
+            self.assertTrue(
+                '<section class="project_list" id="myrepos">' in output.data)
+            self.assertTrue('<h3>All Projects (2)</h3>' in output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskApptests)
