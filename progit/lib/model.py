@@ -52,7 +52,7 @@ def create_tables(db_url, alembic_ini=None, debug=False):
     if db_url.startswith('sqlite:'):
         # Ignore the warning about con_record
         # pylint: disable=W0613
-        def _fk_pragma_on_connect(dbapi_con, con_record):
+        def _fk_pragma_on_connect(dbapi_con, con_record):  # pragma: no cover
             ''' Tries to enforce referential constraints on sqlite. '''
             dbapi_con.execute('pragma foreign_keys=ON')
         sa.event.listen(engine, 'connect', _fk_pragma_on_connect)
@@ -72,7 +72,7 @@ def create_tables(db_url, alembic_ini=None, debug=False):
     # Insert the default data into the db
     try:
         create_default_status(scopedsession)
-    except SQLAlchemyError:
+    except SQLAlchemyError:  # pragma: no cover
         pass
     return scopedsession
 
