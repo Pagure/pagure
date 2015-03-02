@@ -222,6 +222,33 @@ class ProgitFlaskApptests(tests.Modeltests):
             self.assertTrue(
                 '<section class="project_list" id="forks">' in output.data)
 
+    def test_markdown_preview(self):
+        """ Test the markdown_preview endpoint. """
+
+        data = {
+            'content': 'test\n----\n\n * 1\n * item 2'
+        }
+
+        output = self.app.post(
+            '/markdown/', data=data)
+        self.assertEqual(output.status_code, 302)
+        self.assertTrue(
+            '<p>You should be redirected automatically to target URL: '
+            '<a href="/login/?next=http%3A%2F%2Flocalhost%2Fmarkdown%2F">'
+            '/login/?next=http%3A%2F%2Flocalhost%2Fmarkdown%2F</a>.  '
+            'If not click the link.' in output.data)
+
+        user = tests.FakeUser()
+        with tests.user_set(progit.APP, user):
+            output = self.app.post('/markdown/', data=data)
+            self.assertEqual(output.status_code, 200)
+            exp = """<h2>test</h2>
+<ul>
+<li>1</li>
+<li>item 2</li>
+</ul>"""
+            self.assertEqual(output.data, exp)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskApptests)
