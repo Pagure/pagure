@@ -288,6 +288,8 @@ def user_settings():
     """
     user = progit.lib.search_user(
         SESSION, username=flask.g.fas_user.username)
+    if not user:
+        flask.abort(404, 'User not found')
 
     form = progit.forms.UserSettingsForm()
     if form.validate_on_submit():
