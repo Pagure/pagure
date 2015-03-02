@@ -32,7 +32,7 @@ from bunch import Bunch
 import flask
 try:
     from flask import _app_ctx_stack as stack
-except ImportError:
+except ImportError:  # pragma: no cover
     from flask import _request_ctx_stack as stack
 
 import openid
@@ -45,7 +45,7 @@ from openid_teams import teams
 from fedora import __version__
 
 
-class FASJSONEncoder(flask.json.JSONEncoder):
+class FASJSONEncoder(flask.json.JSONEncoder):  # pragma: no cover
     """ Dedicated JSON encoder for the FAS openid information. """
 
     def default(self, o):
@@ -70,7 +70,7 @@ class FASJSONEncoder(flask.json.JSONEncoder):
         return flask.json.JSONEncoder.default(self, o)
 
 
-class FAS(object):
+class FAS(object):  # pragma: no cover
 
     def __init__(self, app=None):
         self.postlogin_func = None
@@ -248,7 +248,7 @@ class FAS(object):
 # to require a login.
 # If the user is not logged in, it will redirect them to the login form.
 # http://flask.pocoo.org/docs/patterns/viewdecorators/#login-required-decorator
-def fas_login_required(function):
+def fas_login_required(function):  # pragma: no cover
     """ Flask decorator to ensure that the user is logged in against FAS.
     To use this decorator you need to have a function named 'auth_login'.
     Without that function the redirect if the user is not logged in will not
@@ -263,7 +263,7 @@ def fas_login_required(function):
     return decorated_function
 
 
-def cla_plus_one_required(function):
+def cla_plus_one_required(function):  # pragma: no cover
     """ Flask decorator to retrict access to CLA+1.
     To use this decorator you need to have a function named 'auth_login'.
     Without that function the redirect if the user is not logged in will not
