@@ -176,6 +176,52 @@ class ProgitFlaskApptests(tests.Modeltests):
         self.assertTrue(os.path.exists(
             os.path.join(tests.HERE, 'docs', 'project#1.git')))
 
+    def test_user_settings(self):
+        """ Test the user_settings endpoint. """
+        self.test_new_project()
+
+        user = tests.FakeUser()
+        with tests.user_set(progit.APP, user):
+            output = self.app.get('/settings/')
+            self.assertEqual(output.status_code, 404)
+            self.assertTrue('<h2>Page not found (404)</h2>' in output.data)
+
+        user.username = 'foo'
+        with tests.user_set(progit.APP, user):
+            output = self.app.get('/settings/')
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue("<h2>foo's settings</h2>" in output.data)
+            self.assertTrue(
+                '<textarea id="ssh_key" name="ssh_key"></textarea>'
+                in output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+                'ssh_key': 'this is my ssh key',
+            }
+
+            output = self.app.post('/settings/', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue("<h2>foo's settings</h2>" in output.data)
+            self.assertTrue(
+                '<textarea id="ssh_key" name="ssh_key">this is my ssh key'
+                '</textarea>' in output.data)
+
+            data['csrf_token'] =  csrf_token
+
+            output = self.app.post(
+                '/settings/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue(
+                '<li class="message">Public ssh key updated</li>'
+                in output.data)
+            self.assertTrue(
+                '<section class="project_list" id="repos">' in output.data)
+            self.assertTrue(
+                '<section class="project_list" id="forks">' in output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskApptests)
