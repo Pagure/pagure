@@ -44,7 +44,7 @@ class ProgitFlaskApptests(tests.Modeltests):
         progit.APP.config['DOC_FOLDER'] = tests.HERE
 
     def test_index(self):
-        """ Test the index endpoint.  """
+        """ Test the index endpoint. """
 
         output = self.app.get('/')
         self.assertEqual(output.status_code, 200)
@@ -70,7 +70,7 @@ class ProgitFlaskApptests(tests.Modeltests):
             self.assertTrue('<h3>All Projects (2)</h3>' in output.data)
 
     def test_view_users(self):
-        """ Test the view_users endpoint.  """
+        """ Test the view_users endpoint. """
 
         output = self.app.get('/users/?page=abc')
         self.assertEqual(output.status_code, 200)
@@ -79,7 +79,7 @@ class ProgitFlaskApptests(tests.Modeltests):
         self.assertTrue('<a href="/user/foo">' in output.data)
 
     def test_view_user(self):
-        """ Test the view_user endpoint.  """
+        """ Test the view_user endpoint. """
 
         output = self.app.get('/user/pingou?repopage=abc&forkpage=def')
         self.assertEqual(output.status_code, 200)
