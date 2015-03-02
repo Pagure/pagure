@@ -26,9 +26,6 @@ import progit.lib
 import tests
 
 
-HERE = os.path.join(os.path.dirname(os.path.abspath(__file__)))
-
-
 class ProgitFlaskApptests(tests.Modeltests):
     """ Tests for flask app of progit """
 
@@ -41,10 +38,10 @@ class ProgitFlaskApptests(tests.Modeltests):
         progit.ui.SESSION = self.session
         progit.ui.app.SESSION = self.session
         self.app = progit.APP.test_client()
-        progit.APP.config['GIT_FOLDER'] = HERE
-        progit.APP.config['FORK_FOLDER'] = HERE
-        progit.APP.config['TICKET_FOLDER'] = HERE
-        progit.APP.config['DOC_FOLDER'] = HERE
+        progit.APP.config['GIT_FOLDER'] = tests.HERE
+        progit.APP.config['FORK_FOLDER'] = tests.HERE
+        progit.APP.config['TICKET_FOLDER'] = tests.HERE
+        progit.APP.config['DOC_FOLDER'] = tests.HERE
 
     def test_index(self):
         """ Test the index endpoint.  """

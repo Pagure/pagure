@@ -26,8 +26,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 import progit.lib.git
 import tests
 
-HERE = os.path.join(os.path.dirname(os.path.abspath(__file__)))
-
 
 class ProgitLibGittests(tests.Modeltests):
     """ Tests for progit.lib.git """
@@ -55,7 +53,7 @@ class ProgitLibGittests(tests.Modeltests):
         self.session.add(item)
         self.session.commit()
 
-        outputconf = os.path.join(HERE, 'test_gitolite.conf')
+        outputconf = os.path.join(tests.HERE, 'test_gitolite.conf')
 
         progit.lib.git.write_gitolite_acls(self.session, outputconf)
 
@@ -112,7 +110,7 @@ repo tickets/pingou/test3
     def test_commit_to_patch(self):
         """ Test the commit_to_patch function of progit.lib.git. """
         # Create a git repo to play with
-        self.gitrepo = os.path.join(HERE, 'test_repo.git')
+        self.gitrepo = os.path.join(tests.HERE, 'test_repo.git')
         os.makedirs(self.gitrepo)
         repo = pygit2.init_repository(self.gitrepo)
 
@@ -270,7 +268,7 @@ index 9f44358..2a552bb 100644
         self.session.commit()
 
         # Create repo
-        self.gitrepo = os.path.join(HERE, 'test_ticket_repo.git')
+        self.gitrepo = os.path.join(tests.HERE, 'test_ticket_repo.git')
         os.makedirs(self.gitrepo)
         repo_obj = pygit2.init_repository(self.gitrepo, bare=True)
 
@@ -282,11 +280,11 @@ index 9f44358..2a552bb 100644
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=HERE
+            ticketfolder=tests.HERE
         )
         self.assertEqual(msg, 'Issue created')
         issue = progit.lib.search_issues(self.session, repo, issueid=1)
-        progit.lib.git.update_git_ticket(issue, repo, HERE)
+        progit.lib.git.update_git_ticket(issue, repo, tests.HERE)
 
         repo = pygit2.Repository(self.gitrepo)
         commit = repo.revparse_single('HEAD')
@@ -343,7 +341,7 @@ index 0000000..60f7480
             issue=issue,
             comment='Hey look a comment!',
             user='foo',
-            ticketfolder=HERE
+            ticketfolder=tests.HERE
         )
         self.session.commit()
         self.assertEqual(msg, 'Comment added')
