@@ -24,6 +24,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 import progit.lib.git
 import tests
 
+HERE = os.path.join(os.path.dirname(os.path.abspath(__file__)))
+
 
 class ProgitLibGittests(tests.Modeltests):
     """ Tests for progit.lib.git """
@@ -32,8 +34,7 @@ class ProgitLibGittests(tests.Modeltests):
         """ Test the write_gitolite_acls function of progit.lib.git. """
         tests.create_projects(self.session)
 
-        here = os.path.join(os.path.dirname(os.path.abspath(__file__)))
-        outputconf = os.path.join(here, 'test_gitolite.conf')
+        outputconf = os.path.join(HERE, 'test_gitolite.conf')
 
         progit.lib.git.write_gitolite_acls(self.session, outputconf)
 
