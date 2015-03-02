@@ -365,7 +365,7 @@ def new_project(session, user, name, gitfolder, docfolder, ticketfolder,
     )
     session.add(project)
     # Make sure we won't have SQLAlchemy error before we create the repo
-    session.flush()
+    session.commit()
 
     pygit2.init_repository(gitrepo, bare=True)
 
