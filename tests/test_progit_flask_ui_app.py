@@ -94,7 +94,7 @@ class ProgitFlaskApptests(tests.Modeltests):
         self.assertTrue('<h2>Forks (0)</h2>' in output.data)
 
         tests.create_projects(self.session)
-        self.gitrepo = tests.create_projects_git(
+        self.gitrepos = tests.create_projects_git(
             progit.APP.config['GIT_FOLDER'])
 
         output = self.app.get('/user/pingou?repopage=abc&forkpage=def')

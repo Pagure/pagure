@@ -138,7 +138,7 @@ class Modeltests(unittest.TestCase):
             shutil.rmtree(self.gitrepo)
 
         if self.gitrepos:
-            for repo in self.gitrepo:
+            for repo in self.gitrepos:
                 if os.path.exists(repo):
                     shutil.rmtree(repo)
 
