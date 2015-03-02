@@ -39,6 +39,7 @@ class ProgitFlaskApptests(tests.Modeltests):
         progit.APP.config['TESTING'] = True
         progit.SESSION = self.session
         progit.ui.SESSION = self.session
+        progit.ui.app.SESSION = self.session
         self.app = progit.APP.test_client()
         progit.APP.config['GIT_FOLDER'] = HERE
         progit.APP.config['FORK_FOLDER'] = HERE
