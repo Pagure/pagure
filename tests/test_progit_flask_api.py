@@ -47,6 +47,21 @@ class ProgitFlaskApitests(tests.Modeltests):
         self.assertEqual(data['version'], progit.__api_version__)
         self.assertEqual(data.keys(), ['version'])
 
+    def test_api_users(self):
+        """ Test the api_users function.  """
+
+        output = self.app.get('/api/0/users')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertEqual(data['users'], ['pingou', 'foo'])
+        self.assertEqual(data.keys(), ['users'])
+
+        output = self.app.get('/api/0/users?pattern=p')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertEqual(data['users'], ['pingou'])
+        self.assertEqual(data.keys(), ['users'])
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskApitests)
