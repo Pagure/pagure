@@ -17,7 +17,7 @@ from email.mime.text import MIMEText
 
 
 def send_email(text, subject, to_mail, from_mail=None, mail_id=None,
-               in_reply_to=None):
+               in_reply_to=None):  # pragma: no cover
     ''' Send an email with the specified information.
 
     :arg text: the content of the email to send
