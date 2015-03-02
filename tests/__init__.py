@@ -82,6 +82,12 @@ class Modeltests(unittest.TestCase):
     # pylint: disable=C0103
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
+        # Clean up eventual git repo left in the present folder.
+        for filename in os.listdir(HERE):
+            if filename.endswith('.git') and os.path.isdir(filename):
+                print '**', filename
+                shutil.rmtree(filename)
+
         self.session = progit.lib.model.create_tables(DB_PATH)
 
         # Create a couple of users
@@ -133,15 +139,6 @@ class Modeltests(unittest.TestCase):
             else:
                 db_name = DB_PATH.rsplit('/', 1)[1]
                 requests.get('%s/clean/%s' % (FAITOUT_URL, db_name))
-
-        # Clear eventual git repo
-        if self.gitrepo and os.path.exists(self.gitrepo):
-            shutil.rmtree(self.gitrepo)
-
-        if self.gitrepos:
-            for repo in self.gitrepos:
-                if os.path.exists(repo):
-                    shutil.rmtree(repo)
 
 
 class FakeGroup(object):
