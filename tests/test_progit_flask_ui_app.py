@@ -51,7 +51,9 @@ class ProgitFlaskApptests(tests.Modeltests):
 
         output = self.app.get('/')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue('<h2>All Projects (2)</h2>' in output.data)
+        self.assertTrue('<h2>All Projects (0)</h2>' in output.data)
+
+        tests.create_projects(self.session)
 
         output = self.app.get('/?page=abc')
         self.assertEqual(output.status_code, 200)
