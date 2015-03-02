@@ -1049,6 +1049,16 @@ class ProgitLibtests(tests.Modeltests):
         self.session.commit()
         self.session.add(item)
 
+        # Add an extra user to project `foo`
+        repo = progit.lib.get_project(self.session, 'test')
+        msg = progit.lib.add_user_to_project(
+            session=self.session,
+            project=repo,
+            user='foo',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User added')
+
         repo = progit.lib.get_project(self.session, 'test')
         forked_repo = progit.lib.get_project(
             self.session, 'test', user='pingou')
