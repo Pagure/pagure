@@ -232,8 +232,8 @@ Merged pull-request:
     mail_to = set([cmt.user.emails[0].email for cmt in request.comments])
     mail_to.add(request.repo.user.emails[0].email)
     for prouser in request.repo.users:
-        if prouser.user.emails:
-            mail_to.add(prouser.user.emails[0].email)
+        if prouser.emails:
+            mail_to.add(prouser.emails[0].email)
 
     send_email(
         text,
