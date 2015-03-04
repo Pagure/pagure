@@ -135,6 +135,10 @@ def view_repo_branch(repo, branchname, username=None):
     reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
     if repo.is_fork:
         reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
+
+    if not os.path.exists(reponame):
+        flask.abort(404, 'No git repo found')
+
     repo_obj = pygit2.Repository(reponame)
 
     if branchname not in repo_obj.listall_branches():
@@ -212,6 +216,10 @@ def view_log(repo, branchname=None, username=None):
     reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
     if repo.is_fork:
         reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
+
+    if not os.path.exists(reponame):
+        flask.abort(404, 'No git repo found')
+
     repo_obj = pygit2.Repository(reponame)
 
     if branchname and branchname not in repo_obj.listall_branches():
@@ -307,6 +315,10 @@ def view_file(repo, identifier, filename, username=None):
     reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
     if repo.is_fork:
         reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
+
+    if not os.path.exists(reponame):
+        flask.abort(404, 'No git repo found')
+
     repo_obj = pygit2.Repository(reponame)
 
     if identifier in repo_obj.listall_branches():
@@ -399,6 +411,10 @@ def view_raw_file(repo, identifier, filename=None, username=None):
     reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
     if repo.is_fork:
         reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
+
+    if not os.path.exists(reponame):
+        flask.abort(404, 'No git repo found')
+
     repo_obj = pygit2.Repository(reponame)
 
     if identifier in repo_obj.listall_branches():
@@ -464,6 +480,10 @@ def view_commit(repo, commitid, username=None):
     reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
     if repo.is_fork:
         reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
+
+    if not os.path.exists(reponame):
+        flask.abort(404, 'No git repo found')
+
     repo_obj = pygit2.Repository(reponame)
 
     try:
@@ -507,6 +527,10 @@ def view_commit_patch(repo, commitid, username=None):
     reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
     if repo.is_fork:
         reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
+
+    if not os.path.exists(reponame):
+        flask.abort(404, 'No git repo found')
+
     repo_obj = pygit2.Repository(reponame)
 
     try:
@@ -534,6 +558,10 @@ def view_tree(repo, identifier=None, username=None):
     reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
     if repo.is_fork:
         reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
+
+    if not os.path.exists(reponame):
+        flask.abort(404, 'No git repo found')
+
     repo_obj = pygit2.Repository(reponame)
 
     branchname = None
