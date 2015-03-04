@@ -27,60 +27,55 @@ import progit.forms
 from progit import APP, SESSION, LOG, cla_required
 
 
-def __get_tree(repo_obj, tree, filepath, startswith=False):
+def __get_tree(repo_obj, tree, filepath, index=0, extended=False):
     ''' Retrieve the entry corresponding to the provided filename in a
     given tree.
     '''
-    filename = filepath[0]
-    if isinstance(tree, pygit2.Blob):
+    filename = filepath[index]
+    if isinstance(tree, pygit2.Blob): # pragma: no cover
+        # If we were given a blob, then let's just return it
         return (tree, None)
     cnt = 0
-    for el in tree:
-        cnt += 1
-        ok = False
-        if el.name.startswith(filename):
-            ok = True
-        if el.name == filename:
-            ok = True
-        if ok and len(filepath) == 1:
-            return (el, tree)
-        elif ok:
-            return __get_tree(
-                repo_obj, repo_obj[el.oid], filepath[1:],
-                startswith=startswith)
 
-    if len(filepath) == 1:
-        return None, tree
+    for el in tree:
+        if el.name == filename or el.name.startswith('index'):
+            # If we have a folder we must go one level deeper
+            if el.filemode == 16384:
+                if (index + 1) == len(filepath):
+                    filepath.append('')
+                return __get_tree(
+                    repo_obj, repo_obj[el.oid], filepath, index=index + 1,
+                    extended=True)
+            else:
+                return (el, tree, False)
+
+    if filename == '':
+        return (None, tree, extended)
     else:
-        return __get_tree(
-            repo_obj, repo_obj[tree.oid], filepath[1:],
-            startswith=startswith)
+        raise progit.exceptions.FileNotFoundException(
+            'File %s not found' % ('/'.join(filepath),))
 
 
 def __get_tree_and_content(repo_obj, commit, path, startswith):
     ''' Return the tree and the content of the specified file. '''
 
-    (blob_or_tree, tree_obj) = __get_tree(
-        repo_obj, commit.tree, path, startswith=startswith)
+    (blob_or_tree, tree_obj, extended) = __get_tree(
+        repo_obj, commit.tree, path)
 
     if blob_or_tree is None:
-        return tree_obj, None
+        return (tree_obj, None, extended)
 
     if not repo_obj[blob_or_tree.oid]:
+        # Not tested and no idea how to test it, but better safe than sorry
         flask.abort(404, 'File not found')
 
-    blob_or_tree_obj = repo_obj[blob_or_tree.oid]
-    blob = repo_obj[blob_or_tree.oid]
-
-    content = None
-    if isinstance(blob, pygit2.Blob):  # Returned a file
+    if isinstance(blob_or_tree, pygit2.TreeEntry):  # Returned a file
         name, ext = os.path.splitext(blob_or_tree.name)
-        content = progit.doc_utils.convert_readme(blob_or_tree_obj.data, ext)
-    else:  # Returned a tree
-        raise progit.exceptions.FileNotFoundException('File not found')
+        blob_obj = repo_obj[blob_or_tree.oid]
+        content = progit.doc_utils.convert_readme(blob_obj.data, ext)
 
     tree = sorted(tree_obj, key=lambda x: x.filemode)
-    return (tree, content)
+    return (tree, content, extended)
 
 
 # URLs
@@ -131,22 +126,19 @@ def view_docs(repo, username=None, branchname=None, filename=None):
     tree = None
     startswith = False
     if not filename:
-        path = ['index']
+        path = ['']
         startswith = True
     else:
-        path = filename.split('/')
+        path = [it for it in filename.split('/') if it]
 
     if commit:
         try:
-            (tree, content) = __get_tree_and_content(
-                repo_obj, commit, path, startswith)
-        except progit.exceptions.FileNotFoundException:
-            if not path[0].startswith('index'):
-                path.append('index')
-                filename = filename + '/'
-
-        (tree, content) = __get_tree_and_content(
-            repo_obj, commit, path, startswith=True)
+            (tree, content, extended) = __get_tree_and_content(
+                repo_obj, commit, path, startswith=True)
+            if extended:
+                filename += '/'
+        except progit.exceptions.FileNotFoundException as err:
+            flask.flash(err.message, 'error')
 
     return flask.render_template(
         'docs.html',
