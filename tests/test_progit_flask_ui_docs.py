@@ -66,6 +66,29 @@ class ProgitFlaskDocstests(tests.Modeltests):
             '<li class="error">No docs repository could be found, please '
             'contact an admin</li>' in output.data)
 
+    def test_view_docs_project_no_docs(self):
+        """ Test the view_docs endpoint with a project that disabled the
+        docs.
+        """
+        tests.create_projects(self.session)
+        repo = progit.lib.get_project(self.session, 'test')
+        tests.create_projects_git(os.path.join(tests.HERE, 'docs'))
+
+        output = self.app.get('/test/docs')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('<h2>Docs</h2>' in output.data)
+        self.assertTrue('<p>This repo is brand new!</p>' in output.data)
+        self.assertTrue(
+            'git clone git@progit.fedorahosted.org:docs/test.git'
+            in output.data)
+
+        repo.project_docs = False
+        self.session.add(repo)
+        self.session.commit()
+
+        output = self.app.get('/test/docs', follow_redirects=True)
+        self.assertEqual(output.status_code, 404)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskDocstests)
