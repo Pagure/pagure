@@ -332,6 +332,7 @@ def view_issue(repo, issueid, username=None):
     status = progit.lib.get_issue_statuses(SESSION)
 
     form = progit.forms.UpdateIssueForm(status=status)
+    form.status.data = issue.status
 
     return flask.render_template(
         'issue.html',
