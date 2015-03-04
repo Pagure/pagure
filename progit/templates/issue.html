@@ -34,13 +34,13 @@
 
 <h2>
     <span class="issueid">#{{ issueid }}</span> {{ issue.title }}
-    {% if authenticated %}
+    {% if authenticated and repo_admin %}
     -  <a href="{{ url_for('edit_issue', username=username,
                   repo=repo.name, issueid=issueid) }}">
         Edit</a>
     {% endif %}
     <aside class="issue_action">
-    {% if authenticated and form %}
+    {% if authenticated and repo_admin %}
         {{ render_field(form.status) }}
         <input type="submit" class="submit positive button" value="Update">
         {{ form.csrf_token }}
@@ -57,7 +57,7 @@
                repo=repo.name, tags=tag.tag) }}">
         {{ tag.tag }}</a>{% if not loop.last %},{% endif %}
     {% endfor %}
-    {% if authenticated %}
+    {% if authenticated and repo_admin %}
         <input id="tag" type="text" value="" placeholder="tag1, tag2" name="tag">
     {% endif %}
 </section>
