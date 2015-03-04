@@ -225,6 +225,49 @@ class ProgitFlaskIssuestests(tests.Modeltests):
 
         user.username = 'pingou'
         with tests.user_set(progit.APP, user):
+            output = self.app.get('/test/issue/1')
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<p>test project #1</p>' in output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+
+    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.notify.send_email')
+    def test_update_issue(self, p_send_email, p_ugt):
+        """ Test the update_issue endpoint. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        output = self.app.get('/foo/issue/1')
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+
+        output = self.app.get('/test/issue/1')
+        self.assertEqual(output.status_code, 404)
+
+        # Create issues to play with
+        repo = progit.lib.get_project(self.session, 'test')
+        msg = progit.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Issue created')
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(progit.APP, user):
+            output = self.app.get('/test/issue/1')
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<p>test project #1</p>' in output.data)
+
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
@@ -232,25 +275,26 @@ class ProgitFlaskIssuestests(tests.Modeltests):
                 'status': 'fixed'
             }
 
-            output = self.app.post('/test/issue/1', data=data)
+            output = self.app.post(
+                '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
-            self.assertTrue('<li>Not a valid choice</li>' in output.data)
             self.assertFalse(
                 '<option selected value="Fixed">Fixed</option>'
                 in output.data)
 
             data['status'] = 'Fixed'
-            output = self.app.post('/test/issue/1', data=data)
+            output = self.app.post(
+                '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
-            self.assertTrue(
+            self.assertFalse(
                 '<option selected value="Fixed">Fixed</option>'
                 in output.data)
 
             data['csrf_token'] = csrf_token
             output = self.app.post(
-                '/test/issue/1', data=data, follow_redirects=True)
+                '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
             self.assertTrue(
@@ -287,7 +331,7 @@ class ProgitFlaskIssuestests(tests.Modeltests):
 
             data['csrf_token'] = csrf_token
             output = self.app.post(
-                '/test/issue/2', data=data, follow_redirects=True)
+                '/test/issue/2/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
             self.assertTrue(
