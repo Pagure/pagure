@@ -306,6 +306,104 @@ class ProgitFlaskIssuestests(tests.Modeltests):
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 404)
 
+    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.notify.send_email')
+    def test_edit_issue(self, p_send_email, p_ugt):
+        """ Test the edit_issue endpoint. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        output = self.app.get('/foo/issue/1/edit')
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser()
+        with tests.user_set(progit.APP, user):
+            output = self.app.get('/foo/issue/1/edit')
+            self.assertEqual(output.status_code, 404)
+
+            tests.create_projects(self.session)
+
+            output = self.app.get('/test/issue/1/edit')
+            self.assertEqual(output.status_code, 403)
+
+        user.username = 'pingou'
+        with tests.user_set(progit.APP, user):
+            output = self.app.get('/test/issue/1/edit')
+            self.assertEqual(output.status_code, 404)
+
+        # Create issues to play with
+        repo = progit.lib.get_project(self.session, 'test')
+        msg = progit.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Issue created')
+
+        user = tests.FakeUser()
+        with tests.user_set(progit.APP, user):
+            output = self.app.get('/test/issue/1/edit')
+            self.assertEqual(output.status_code, 403)
+
+        user.username = 'pingou'
+        with tests.user_set(progit.APP, user):
+            output = self.app.get('/test/issue/1/edit')
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>Edit issue #1</h2>' in output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+                'issue_content': 'We should work on this!'
+            }
+
+            output = self.app.post('/test/issue/1/edit', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>Edit issue #1</h2>' in output.data)
+            self.assertEqual(output.data.count(
+                '<td class="errors">This field is required.</td>'), 1)
+            self.assertEqual(output.data.count(
+                '<td class="errors">Not a valid choice</td>'), 1)
+
+            data['status'] = 'Open'
+            data['title'] = 'Test issue #1'
+            output = self.app.post('/test/issue/1/edit', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>Edit issue #1</h2>' in output.data)
+            self.assertEqual(output.data.count(
+                '<td class="errors">This field is required.</td>'), 0)
+            self.assertEqual(output.data.count(
+                '<td class="errors">Not a valid choice</td>'), 0)
+
+            data['csrf_token'] = csrf_token
+            output = self.app.post(
+                '/test/issue/1/edit', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue(
+                '<span class="issueid">#1</span> Test issue #1'
+                in output.data)
+            self.assertEqual(output.data.count(
+                '<option selected value="Open">Open</option>'), 1)
+            self.assertEqual(output.data.count(
+                '<div class="comment_body">\n        '
+                '<p>We should work on this!</p>'), 1)
+
+        # Project w/o issue tracker
+        repo = progit.lib.get_project(self.session, 'test')
+        repo.issue_tracker = False
+        self.session.add(repo)
+        self.session.commit()
+
+        user.username = 'pingou'
+        with tests.user_set(progit.APP, user):
+            output = self.app.post('/test/issue/1/edit', data=data)
+            self.assertEqual(output.status_code, 404)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskIssuestests)
