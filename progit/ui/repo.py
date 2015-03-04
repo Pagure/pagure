@@ -49,6 +49,10 @@ def view_repo(repo, username=None):
     reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
     if repo.is_fork:
         reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
+
+    if not os.path.exists(reponame):
+        flask.abort(404, 'No git repo found')
+
     repo_obj = pygit2.Repository(reponame)
 
     cnt = 0
