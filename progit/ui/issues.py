@@ -29,10 +29,10 @@ from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
 
 # URLs
 
-@APP.route('/<repo>/issue/<int:issueid>/add', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/add',
+@APP.route('/<repo>/issue/<int:issueid>/update', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/update',
            methods=('GET', 'POST'))
-def add_comment_issue(repo, issueid, username=None):
+def update_issue(repo, issueid, username=None):
     ''' Add a comment to an issue. '''
     repo = progit.lib.get_project(SESSION, repo, user=username)
 
@@ -47,20 +47,74 @@ def add_comment_issue(repo, issueid, username=None):
     if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
 
-    form = progit.forms.AddIssueCommentForm()
+    status = progit.lib.get_issue_statuses(SESSION)
+    form = progit.forms.UpdateIssueForm(status=status)
+
     if form.validate_on_submit():
         comment = form.comment.data
+        depends = form.depends.data
+        assignee = form.assignee.data
+        new_status = form.status.data
+        tags = [
+            tag.strip()
+            for tag in form.tag.data.split(',')
+            if tag.strip()]
 
         try:
-            message = progit.lib.add_issue_comment(
-                SESSION,
-                issue=issue,
-                comment=comment,
-                user=flask.g.fas_user.username,
-                ticketfolder=APP.config['TICKETS_FOLDER'],
-            )
-            SESSION.commit()
-            flask.flash(message)
+            if comment:
+                message = progit.lib.add_issue_comment(
+                    SESSION,
+                    issue=issue,
+                    comment=comment,
+                    user=flask.g.fas_user.username,
+                    ticketfolder=APP.config['TICKETS_FOLDER'],
+                )
+                SESSION.commit()
+                flask.flash(message)
+
+            if tags:
+                for tag in tags:
+                    message = progit.lib.add_issue_tag(
+                            SESSION,
+                            issue=issue,
+                            tag=tag,
+                            user=flask.g.fas_user.username,
+                            ticketfolder=APP.config['TICKETS_FOLDER'],
+                        )
+                    SESSION.commit()
+                    flask.flash(message)
+
+            if assignee:
+                message = progit.lib.add_issue_assignee(
+                    SESSION,
+                    issue=issue,
+                    assignee=assignee,
+                    user=flask.g.fas_user.username,
+                    ticketfolder=APP.config['TICKETS_FOLDER'],)
+                if message:
+                    SESSION.commit()
+                    flask.flash(message)
+
+            if new_status == 'Fixed' and issue.parents:
+                for parent in issue.parents:
+                    print parent
+                    if parent.status == 'Open':
+                        flask.flash(
+                            'You cannot close a ticket that has ticket '
+                            'depending that are still open.',
+                            'error')
+                        return flask.redirect(flask.url_for(
+                            'view_issue', repo=repo.name, username=username,
+                            issueid=issueid))
+
+                message = progit.lib.edit_issue(
+                    SESSION,
+                    issue=issue,
+                    status=new_status,
+                    ticketfolder=APP.config['TICKETS_FOLDER'],
+                )
+                SESSION.commit()
+                flask.flash(message)
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
             APP.logger.exception(err)
@@ -69,155 +123,6 @@ def add_comment_issue(repo, issueid, username=None):
     return flask.redirect(flask.url_for(
         'view_issue', username=username, repo=repo.name, issueid=issueid))
 
-
-@APP.route('/<repo>/issue/<int:issueid>/tag', methods=['POST'])
-@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/tag',
-           methods=['POST'])
-@cla_required
-def add_tag_issue(repo, issueid, username=None):
-    ''' Add a tag to an issue. '''
-    repo = progit.lib.get_project(SESSION, repo, user=username)
-
-    if repo is None:
-        flask.abort(404, 'Project not found')
-
-    if not repo.issue_tracker:
-        flask.abort(404, 'No issue tracker found for this project')
-
-    issue = progit.lib.search_issues(SESSION, repo, issueid=issueid)
-
-    if issue is None or issue.project != repo:
-        flask.abort(404, 'Issue not found')
-
-    form = progit.forms.AddIssueTagForm()
-    cat = None
-    if form.validate_on_submit():
-        tags = form.tag.data
-
-        for tag in tags.split(','):
-            tag = tag.strip()
-            try:
-                message = progit.lib.add_issue_tag(
-                    SESSION,
-                    issue=issue,
-                    tag=tag,
-                    user=flask.g.fas_user.username,
-                    ticketfolder=APP.config['TICKETS_FOLDER'],
-                )
-                SESSION.commit()
-                flask.flash(message)
-            except SQLAlchemyError, err:  # pragma: no cover
-                SESSION.rollback()
-                LOG.error(err)
-                flask.flash('Could not add tag: %s' % tag, 'error')
-
-    return flask.redirect(flask.url_for(
-        'view_issue', username=username, repo=repo.name, issueid=issueid))
-
-
-@APP.route('/<repo>/issue/<int:issueid>/assigned', methods=['POST'])
-@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/assigned',
-           methods=['POST'])
-@cla_required
-def add_assignee_issue(repo, issueid, username=None):
-    ''' Add an assignee to an issue. '''
-    repo = progit.lib.get_project(SESSION, repo, user=username)
-
-    if repo is None:
-        flask.abort(404, 'Project not found')
-
-    if not repo.issue_tracker:
-        flask.abort(404, 'No issue tracker found for this project')
-
-    issue = progit.lib.search_issues(SESSION, repo, issueid=issueid)
-
-    if issue is None or issue.project != repo:
-        flask.abort(404, 'Issue not found')
-
-    form = progit.forms.ConfirmationForm()
-    cat = None
-    if form.validate_on_submit():
-        assignee = flask.request.form.get('assignee') or None
-
-        try:
-            message = progit.lib.add_issue_assignee(
-                SESSION,
-                issue=issue,
-                assignee=assignee,
-                user=flask.g.fas_user.username,
-                ticketfolder=APP.config['TICKETS_FOLDER'],)
-            if message:
-                SESSION.commit()
-                flask.flash(message)
-        except progit.exceptions.ProgitException, err:
-            flask.flash(str(err), 'error')
-        except SQLAlchemyError, err:  # pragma: no cover
-            SESSION.rollback()
-            LOG.error(err)
-            flask.flash('Could not assigned issue to: %s' % assignee, 'error')
-
-    return flask.redirect(flask.url_for(
-        'view_issue', username=username, repo=repo.name, issueid=issueid))
-
-
-@APP.route('/<repo>/issue/<int:issueid>/blocked/<issuetype>',
-           methods=['POST'])
-@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/blocked<issuetype>/',
-           methods=['POST'])
-@cla_required
-def add_dependent_issue(repo, issueid, issuetype, username=None):
-    ''' Add a blocked issue to an issue. '''
-    repo = progit.lib.get_project(SESSION, repo, user=username)
-
-    if repo is None:
-        flask.abort(404, 'Project not found')
-
-    if not repo.issue_tracker:
-        flask.abort(404, 'No issue tracker found for this project')
-
-    issue = progit.lib.search_issues(SESSION, repo, issueid=issueid)
-
-    if issue is None or issue.project != repo:
-        flask.abort(404, 'Issue not found')
-
-    form = progit.forms.AddIssueDependencyForm()
-    cat = None
-    if form.validate_on_submit():
-        blocked = form.depends.data
-        issue_blocked = progit.lib.search_issues(
-            SESSION, repo, issueid=blocked)
-        if issue_blocked is None or issue_blocked.project != repo:
-            flask.abort(404, 'Issue blocked not found')
-
-        try:
-            if issuetype == 'parent':
-                message = progit.lib.add_issue_dependency(
-                    SESSION,
-                    issue=issue,
-                    issue_blocked=issue_blocked,
-                    user=flask.g.fas_user.username,
-                    ticketfolder=APP.config['TICKETS_FOLDER'],)
-            else:
-                message = progit.lib.add_issue_dependency(
-                    SESSION,
-                    issue=issue_blocked,
-                    issue_blocked=issue,
-                    user=flask.g.fas_user.username,
-                    ticketfolder=APP.config['TICKETS_FOLDER'],)
-            if message:
-                SESSION.commit()
-                flask.flash(message)
-        except progit.exceptions.ProgitException, err:
-            flask.flash(str(err), 'error')
-        except SQLAlchemyError, err:  # pragma: no cover
-            SESSION.rollback()
-            LOG.error(err)
-            flask.flash(
-                'Could not blocked issue: %s with %s' % (blocked, issue.id),
-                'error')
-
-    return flask.redirect(flask.url_for(
-        'view_issue', username=username, repo=repo.name, issueid=issueid))
 
 
 @APP.route('/<repo>/tag/<tag>/edit', methods=('GET', 'POST'))
@@ -426,44 +331,7 @@ def view_issue(repo, issueid, username=None):
 
     status = progit.lib.get_issue_statuses(SESSION)
 
-    form_comment = progit.forms.AddIssueCommentForm()
-    form = form_tag = None
-    if authenticated() and is_repo_admin(repo):
-        form = progit.forms.UpdateIssueStatusForm(status=status)
-        form_tag = progit.forms.AddIssueTagForm()
-
-        if form.validate_on_submit():
-            new_status = form.status.data
-            if new_status == 'Fixed' and issue.parents:
-                for parent in issue.parents:
-                    print parent
-                    if parent.status == 'Open':
-                        flask.flash(
-                            'You cannot close a ticket that has ticket '
-                            'depending that are still open.',
-                            'error')
-                        return flask.redirect(flask.url_for(
-                            'view_issue', repo=repo.name, username=username,
-                            issueid=issueid))
-
-            try:
-                message = progit.lib.edit_issue(
-                    SESSION,
-                    issue=issue,
-                    status=new_status,
-                    ticketfolder=APP.config['TICKETS_FOLDER'],
-                )
-                SESSION.commit()
-                flask.flash(message)
-                url = flask.url_for(
-                    'view_issue', username=username, repo=repo.name,
-                    issueid=issueid)
-                return flask.redirect(url)
-            except SQLAlchemyError, err:  # pragma: no cover
-                SESSION.rollback()
-                flask.flash(str(err), 'error')
-        elif flask.request.method == 'GET':
-            form.status.data = issue.status
+    form = progit.forms.UpdateIssueForm(status=status)
 
     return flask.render_template(
         'issue.html',
@@ -473,8 +341,7 @@ def view_issue(repo, issueid, username=None):
         issue=issue,
         issueid=issueid,
         form=form,
-        form_comment=form_comment,
-        form_tag=form_tag,
+        repo_admin = is_repo_admin(repo),
     )
 
 

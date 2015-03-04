@@ -27,6 +27,11 @@
 
 {% block repo %}
 
+{% if authenticated and form %}
+  <form action="{{ url_for('update_issue', username=username,
+           repo=repo.name, issueid=issueid) }}" method="post">
+{% endif %}
+
 <h2>
     <span class="issueid">#{{ issueid }}</span> {{ issue.title }}
     {% if authenticated %}
@@ -36,12 +41,9 @@
     {% endif %}
     <aside class="issue_action">
     {% if authenticated and form %}
-      <form action="{{ url_for('view_issue', username=username,
-               repo=repo.name, issueid=issueid) }}" method="post">
         {{ render_field(form.status) }}
         <input type="submit" class="submit positive button" value="Update">
         {{ form.csrf_token }}
-      </form>
     {% else %}
         Status: {{ issue.status }}
     {% endif %}
@@ -55,15 +57,8 @@
                repo=repo.name, tags=tag.tag) }}">
         {{ tag.tag }}</a>{% if not loop.last %},{% endif %}
     {% endfor %}
-    {% if authenticated and form_tag %}
-      <form action="{{ url_for('add_tag_issue', username=username,
-               repo=repo.name, issueid=issueid) }}" method="post"
-               class="tag_form">
+    {% if authenticated %}
         <input id="tag" type="text" value="" placeholder="tag1, tag2" name="tag">
-        <input id="add_tags" type="submit"
-            class="submit positive button" value="Add">
-        {{ form_tag.csrf_token }}
-      </form>
     {% endif %}
 </section>
 
@@ -74,22 +69,8 @@
                repo=repo.name, assignee=issue.assignee.username) }}">
         {{ issue.assignee.username }}</a>
     {% endif %}
-    {% if authenticated and form_tag %}
-      <form action="{{ url_for('add_assignee_issue', username=username,
-               repo=repo.name, issueid=issueid) }}" method="post"
-               class="tag_form">
+    {% if authenticated %}
         <input type="hidden" value="{{ g.fas_user.username }}" name="assignee">
-        <input id="take_assignement" type="submit"
-            class="submit positive button" value="Take">
-        {{ form_tag.csrf_token }}
-      </form>
-      <form action="{{ url_for('add_assignee_issue', username=username,
-               repo=repo.name, issueid=issueid) }}" method="post"
-               class="tag_form">
-        <input type="hidden" value="" name="assignee">
-        <input type="submit" class="submit positive button" value="Reset">
-        {{ form_tag.csrf_token }}
-      </form>
     {% endif %}
 </section>
 
@@ -103,16 +84,9 @@
     {% endfor %}
     {% endif %}
 
-    {% if authenticated and form_tag %}
-      <form action="{{ url_for('add_dependent_issue', username=username,
-               repo=repo.name, issueid=issueid, issuetype='parent') }}" method="post"
-               class="tag_form">
+    {% if authenticated %}
         <input id="depends" type="text"
             placeholder="issue blocked" name="depends">
-        <input id="add_blocks" type="submit"
-            class="submit positive button" value="Add">
-        {{ form_tag.csrf_token }}
-      </form>
     {% endif %}
 </section>
 
@@ -126,16 +100,9 @@
     {% endfor %}
     {% endif %}
 
-    {% if authenticated and form_tag %}
-      <form action="{{ url_for('add_dependent_issue', username=username,
-               repo=repo.name, issueid=issueid, issuetype='child') }}" method="post"
-               class="tag_form">
+    {% if authenticated %}
         <input id="depends" type="text"
             placeholder="issue depending" name="depends">
-        <input id="add_depends" type="submit"
-            class="submit positive button" value="Add">
-        {{ form_tag.csrf_token }}
-      </form>
     {% endif %}
 </section>
 
@@ -148,7 +115,7 @@
 {% endif %}
 
 <section class="issue_comment add_comment">
-{% if authenticated %}
+{% if authenticated and form %}
   <header>
     <label for="comment">Add new comment</label>
     (supports the <a href="http://daringfireball.net/projects/markdown/syntax"
@@ -160,18 +127,13 @@
       <li><a href="#preview">Preview</a></li>
     </ul>
     <div id="edit">
-      <form action="{{ url_for('add_comment_issue', username=username,
-                       repo=repo.name, issueid=issueid) }}" method="post">
-
-        <div>
-          <textarea id="comment" name="comment" placeholder="Enter your comment here"></textarea>
-          {{ form_comment.csrf_token }}
-        </div>
-        <div>
-          <input type="submit" class="submit positive button" value="Comment">
-          <input type="button" value="Clear" id="clear_comment" />
-        </div>
-      </form>
+      <div>
+        <textarea id="comment" name="comment" placeholder="Enter your comment here"></textarea>
+      </div>
+      <div>
+        <input type="submit" class="submit positive button" value="Comment">
+        <input type="button" value="Clear" id="clear_comment" />
+      </div>
     </div>
     <div id="preview">
     </div>
@@ -180,6 +142,10 @@
   <p><a href="{{ url_for('auth_login') }}">Login</a> to comment on this ticket.</p>
 {% endif %}
 </section>
+
+{% if authenticated and form %}
+  </form>
+{% endif %}
 
 {% endblock %}
 
