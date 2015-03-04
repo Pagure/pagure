@@ -54,6 +54,18 @@ class ProgitFlaskDocstests(tests.Modeltests):
         output = self.app.get('/foo/docs')
         self.assertEqual(output.status_code, 404)
 
+    def test_view_docs_project_no_git(self):
+        """ Test the view_docs endpoint with a project that has no
+        corresponding git repo.
+        """
+        tests.create_projects(self.session)
+
+        output = self.app.get('/test/docs', follow_redirects=True)
+        self.assertEqual(output.status_code, 404)
+        self.assertTrue(
+            '<li class="error">No docs repository could be found, please '
+            'contact an admin</li>' in output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskDocstests)
