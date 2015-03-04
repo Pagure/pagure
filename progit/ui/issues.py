@@ -524,8 +524,6 @@ def edit_issue(repo, issueid, username=None):
                 'view_issue', username=username,
                 repo=repo.name, issueid=issueid)
             return flask.redirect(url)
-        except progit.exceptions.ProgitException, err:
-            flask.flash(str(err), 'error')
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')
