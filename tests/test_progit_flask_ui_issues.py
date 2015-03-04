@@ -120,6 +120,65 @@ class ProgitFlaskIssuestests(tests.Modeltests):
             self.assertTrue('<p>test project #1</p>' in output.data)
             self.assertTrue('<h2>\n    Issues (1)\n  </h2>' in output.data)
 
+    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.notify.send_email')
+    def test_view_issues(self, p_send_email, p_ugt):
+        """ Test the view_issues endpoint. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        output = self.app.get('/foo/issues')
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+
+        output = self.app.get('/test/issues')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('<p>test project #1</p>' in output.data)
+        self.assertTrue('<h2>\n    Issues (0)\n  </h2>' in output.data)
+
+        # Create issues to play with
+        repo = progit.lib.get_project(self.session, 'test')
+        msg = progit.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Issue created')
+
+        # Whole list
+        output = self.app.get('/test/issues')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('<p>test project #1</p>' in output.data)
+        self.assertTrue('<h2>\n    Issues (1)\n  </h2>' in output.data)
+
+        # Status = closed
+        output = self.app.get('/test/issues?status=cloSED')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('<p>test project #1</p>' in output.data)
+        self.assertTrue(
+            '<h2>\n    Closed\n    Issues (0)\n  </h2>' in output.data)
+
+        # Status = fixed
+        output = self.app.get('/test/issues?status=fixed')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('<p>test project #1</p>' in output.data)
+        self.assertTrue(
+            '<h2>\n    Closed\n    Issues (0)\n  </h2>' in output.data)
+
+        # Project w/o issue tracker
+        repo = progit.lib.get_project(self.session, 'test')
+        repo.issue_tracker = False
+        self.session.add(repo)
+        self.session.commit()
+
+        output = self.app.get('/test/issues')
+        self.assertEqual(output.status_code, 404)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskIssuestests)
