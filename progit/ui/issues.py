@@ -310,9 +310,8 @@ def new_issue(repo, username=None):
     )
 
 
-@APP.route('/<repo>/issue/<int:issueid>', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/issue/<int:issueid>',
-           methods=('GET', 'POST'))
+@APP.route('/<repo>/issue/<int:issueid>')
+@APP.route('/fork/<username>/<repo>/issue/<int:issueid>')
 def view_issue(repo, issueid, username=None):
     """ List all issues associated to a repo
     """
