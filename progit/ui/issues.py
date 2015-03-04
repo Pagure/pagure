@@ -341,7 +341,7 @@ def view_issue(repo, issueid, username=None):
         issue=issue,
         issueid=issueid,
         form=form,
-        repo_admin = is_repo_admin(repo),
+        repo_admin=is_repo_admin(repo),
     )
 
 
