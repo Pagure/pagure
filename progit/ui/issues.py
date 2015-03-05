@@ -128,7 +128,6 @@ def update_issue(repo, issueid, username=None):
         'view_issue', username=username, repo=repo.name, issueid=issueid))
 
 
-
 @APP.route('/<repo>/tag/<tag>/edit', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/tag/<tag>/edit', methods=('GET', 'POST'))
 @cla_required
