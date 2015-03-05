@@ -116,6 +116,9 @@ def update_issue(repo, issueid, username=None):
                 )
                 SESSION.commit()
                 flask.flash(message)
+        except progit.exceptions.ProgitException, err:
+            SESSION.rollback()
+            flask.flash(str(err), 'error')
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
             APP.logger.exception(err)
