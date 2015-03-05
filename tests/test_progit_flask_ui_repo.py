@@ -289,6 +289,18 @@ class ProgitFlaskRepotests(tests.Modeltests):
                 '<input id="issue_tracker" name="issue_tracker" '
                 'type="checkbox" value="y">' in output.data)
 
+    def test_view_forks(self):
+        """ Test the view_forks endpoint. """
+
+        output = self.app.get('/foo/forks')
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+
+        output = self.app.get('/test/forks')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('This project has not been forked.' in output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskRepotests)
