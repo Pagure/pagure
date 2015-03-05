@@ -623,6 +623,10 @@ class ProgitFlaskIssuestests(tests.Modeltests):
                 '<li class="message">Edited tag: tag1 to tag2</li>'
                 in output.data)
 
+        # After edit, list tags
+        tags = progit.lib.get_tags_of_project(self.session, repo)
+        self.assertEqual([tag.tag for tag in tags], ['tag2'])
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskIssuestests)
