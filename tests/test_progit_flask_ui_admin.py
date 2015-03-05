@@ -73,6 +73,32 @@ class ProgitFlaskAdmintests(tests.Modeltests):
             self.assertTrue(
                 'Re-generate ssh authorized_key file' in output.data)
 
+    @patch('progit.lib.git.write_gitolite_acls')
+    def test_admin_generate_acl(self, wga):
+        """ Test the admin_generate_acl endpoint. """
+        wga.return_value = True
+
+        output = self.app.get('/admin/gitolite')
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser()
+        with tests.user_set(progit.APP, user):
+            output = self.app.get('/admin/gitolite', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue(
+                '<li class="error">Access restricted</li>' in output.data)
+
+        user = tests.FakeUser(
+            username='pingou',
+            groups=progit.APP.config['ADMIN_GROUP'])
+        with tests.user_set(progit.APP, user):
+            output = self.app.get('/admin/gitolite', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>Admin section</h2>' in output.data)
+            self.assertTrue('Re-generate gitolite ACLs file' in output.data)
+            self.assertTrue(
+                'Re-generate ssh authorized_key file' in output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskAdmintests)
