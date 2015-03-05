@@ -205,6 +205,90 @@ class ProgitFlaskRepotests(tests.Modeltests):
                 '<li class="message">Description updated</li>'
                 in output.data)
 
+    def test_view_settings(self):
+        """ Test the view_settings endpoint. """
+        output = self.app.get('/foo/settings')
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser()
+        with tests.user_set(progit.APP, user):
+            output = self.app.get('/foo/settings')
+            self.assertEqual(output.status_code, 404)
+
+            tests.create_projects(self.session)
+            tests.create_projects_git(tests.HERE)
+
+            output = self.app.get('/test/settings')
+            self.assertEqual(output.status_code, 403)
+
+        user.username = 'pingou'
+        with tests.user_set(progit.APP, user):
+            output = self.app.get('/test/settings', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<header class="repo">' in output.data)
+            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertTrue(
+                '<ul id="flashes">\n                </ul>' in output.data)
+            # Both checkbox checked before
+            self.assertTrue(
+                '<input checked id="project_docs" name="project_docs" '
+                'type="checkbox" value="y">' in output.data)
+            self.assertTrue(
+                '<input checked id="issue_tracker" name="issue_tracker" '
+                'type="checkbox" value="y">' in output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {}
+            output = self.app.post(
+                '/test/settings', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<header class="repo">' in output.data)
+            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertTrue(
+                '<ul id="flashes">\n                </ul>' in output.data)
+
+            # Both checkbox are still checked
+            output = self.app.get('/test/settings', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<header class="repo">' in output.data)
+            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertTrue(
+                '<ul id="flashes">\n                </ul>' in output.data)
+            self.assertTrue(
+                '<input checked id="project_docs" name="project_docs" '
+                'type="checkbox" value="y">' in output.data)
+            self.assertTrue(
+                '<input checked id="issue_tracker" name="issue_tracker" '
+                'type="checkbox" value="y">' in output.data)
+
+            data = {'csrf_token': csrf_token}
+            output = self.app.post(
+                '/test/settings', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<header class="repo">' in output.data)
+            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertTrue(
+                '<title>Overview - test - ProGit</title>' in output.data)
+            self.assertTrue(
+                '<li class="message">Edited successfully settings of '
+                'repo: test</li>' in output.data)
+
+            # Both checkbox are now un-checked
+            output = self.app.get('/test/settings', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<header class="repo">' in output.data)
+            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertTrue(
+                '<ul id="flashes">\n                </ul>' in output.data)
+            self.assertTrue(
+                '<input id="project_docs" name="project_docs" '
+                'type="checkbox" value="y">' in output.data)
+            self.assertTrue(
+                '<input id="issue_tracker" name="issue_tracker" '
+                'type="checkbox" value="y">' in output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskRepotests)
