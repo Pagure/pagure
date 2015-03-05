@@ -349,6 +349,46 @@ Dev instance: http://209.132.184.222/ (/!\\ May change unexpectedly, it's a dev 
     )
 
 
+def add_commit_git_repo(folder, ncommits=10):
+    """ Create some more commits for the specified git repo. """
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+    repo = pygit2.init_repository(folder)
+
+    for index in range(ncommits):
+        # Create a file in that git repo
+        with open(os.path.join(folder, 'sources'), 'a') as stream:
+            stream.write('Row %s\n' % index)
+        repo.index.add('sources')
+        repo.index.write()
+
+        parents = []
+        commit = None
+        try:
+            commit = repo.revparse_single('HEAD')
+        except KeyError:
+            pass
+        if commit:
+            parents = [commit.oid.hex]
+
+        # Commits the files added
+        tree = repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        repo.create_commit(
+            'refs/heads/master',  # the name of the reference to update
+            author,
+            committer,
+            'Add row %s to sources file' % index,
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            parents,
+        )
+
+
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(Modeltests)
     unittest.TextTestRunner(verbosity=2).run(SUITE)
