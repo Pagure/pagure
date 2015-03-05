@@ -98,6 +98,9 @@ class ProgitFlaskAdmintests(tests.Modeltests):
             self.assertTrue('Re-generate gitolite ACLs file' in output.data)
             self.assertTrue(
                 'Re-generate ssh authorized_key file' in output.data)
+            self.assertTrue(
+                '<li class="message">Gitolite ACLs updated</li>'
+                in output.data)
 
     @patch('progit.generate_authorized_key_file')
     def test_admin_refresh_ssh(self, gakf):
@@ -124,6 +127,9 @@ class ProgitFlaskAdmintests(tests.Modeltests):
             self.assertTrue('Re-generate gitolite ACLs file' in output.data)
             self.assertTrue(
                 'Re-generate ssh authorized_key file' in output.data)
+            self.assertTrue(
+                '<li class="message">Authorized file updated</li>'
+                in output.data)
 
 
 if __name__ == '__main__':
