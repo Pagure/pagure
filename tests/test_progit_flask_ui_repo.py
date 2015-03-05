@@ -120,7 +120,15 @@ class ProgitFlaskRepotests(tests.Modeltests):
 
         user.username = 'pingou'
         with tests.user_set(progit.APP, user):
-            output = self.app.post('/test/dropuser/1', follow_redirects=True)
+            output = self.app.post('/test/settings')
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {'csrf_token': csrf_token}
+
+            output = self.app.post(
+                '/test/dropuser/2', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<header class="repo">' in output.data)
             self.assertTrue('<h2>Settings</h2>' in output.data)
@@ -140,6 +148,17 @@ class ProgitFlaskRepotests(tests.Modeltests):
 
         with tests.user_set(progit.APP, user):
             output = self.app.post('/test/dropuser/2', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<header class="repo">' in output.data)
+            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertTrue(
+                '<ul id="flashes">\n                </ul>' in output.data)
+            self.assertFalse(
+                '<li class="message">User removed</li>' in output.data)
+
+            data = {'csrf_token': csrf_token}
+            output = self.app.post(
+                '/test/dropuser/2', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<header class="repo">' in output.data)
             self.assertTrue('<h2>Settings</h2>' in output.data)
