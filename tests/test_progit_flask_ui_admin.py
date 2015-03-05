@@ -62,8 +62,9 @@ class ProgitFlaskAdmintests(tests.Modeltests):
             self.assertTrue(
                 '<li class="error">Access restricted</li>' in output.data)
 
-        user.username = 'pingou'
-        user.groups.append(progit.APP.config['ADMIN_GROUP'])
+        user = tests.FakeUser(
+            username='pingou',
+            groups=progit.APP.config['ADMIN_GROUP'])
         with tests.user_set(progit.APP, user):
             output = self.app.get('/admin', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
