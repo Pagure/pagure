@@ -229,6 +229,15 @@ def add_content_git_repo(folder):
     repo.index.add('sources')
     repo.index.write()
 
+    parents = []
+    commit = None
+    try:
+        commit = repo.revparse_single('HEAD')
+    except KeyError:
+        pass
+    if commit:
+        parents = [commit.oid.hex]
+
     # Commits the files added
     tree = repo.index.write_tree()
     author = pygit2.Signature(
@@ -243,9 +252,17 @@ def add_content_git_repo(folder):
         # binary string representing the tree object ID
         tree,
         # list of binary strings representing parents of the new commit
-        []
+        parents,
     )
-    commit = repo.revparse_single('HEAD')
+
+    parents = []
+    commit = None
+    try:
+        commit = repo.revparse_single('HEAD')
+    except KeyError:
+        pass
+    if commit:
+        parents = [commit.oid.hex]
 
     subfolder = os.path.join('folder1', 'folder2')
     if not os.path.exists(os.path.join(folder, subfolder)):
@@ -270,7 +287,7 @@ def add_content_git_repo(folder):
         # binary string representing the tree object ID
         tree,
         # list of binary strings representing parents of the new commit
-        [commit.oid.hex]
+        parents
     )
 
 
@@ -300,7 +317,11 @@ Dev instance: http://209.132.184.222/ (/!\\ May change unexpectedly, it's a dev 
 """
 
     parents = []
-    commit = repo.revparse_single('HEAD')
+    commit = None
+    try:
+        commit = repo.revparse_single('HEAD')
+    except KeyError:
+        pass
     if commit:
         parents = [commit.oid.hex]
 
