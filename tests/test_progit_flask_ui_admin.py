@@ -79,11 +79,14 @@ class ProgitFlaskAdmintests(tests.Modeltests):
         wga.return_value = True
 
         output = self.app.get('/admin/gitolite')
+        self.assertEqual(output.status_code, 404)
+
+        output = self.app.post('/admin/gitolite')
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
         with tests.user_set(progit.APP, user):
-            output = self.app.get('/admin/gitolite', follow_redirects=True)
+            output = self.app.post('/admin/gitolite', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
                 '<li class="error">Access restricted</li>' in output.data)
@@ -92,7 +95,23 @@ class ProgitFlaskAdmintests(tests.Modeltests):
             username='pingou',
             groups=progit.APP.config['ADMIN_GROUP'])
         with tests.user_set(progit.APP, user):
-            output = self.app.get('/admin/gitolite', follow_redirects=True)
+            output = self.app.post('/admin/gitolite', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>Admin section</h2>' in output.data)
+            self.assertTrue('Re-generate gitolite ACLs file' in output.data)
+            self.assertTrue(
+                'Re-generate ssh authorized_key file' in output.data)
+            self.assertFalse(
+                '<li class="message">Gitolite ACLs updated</li>'
+                in output.data)
+
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {'csrf_token': csrf_token}
+            output = self.app.post(
+                '/admin/gitolite', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<h2>Admin section</h2>' in output.data)
             self.assertTrue('Re-generate gitolite ACLs file' in output.data)
@@ -108,11 +127,14 @@ class ProgitFlaskAdmintests(tests.Modeltests):
         gakf.return_value = True
 
         output = self.app.get('/admin/ssh')
+        self.assertEqual(output.status_code, 404)
+
+        output = self.app.post('/admin/ssh')
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
         with tests.user_set(progit.APP, user):
-            output = self.app.get('/admin/ssh', follow_redirects=True)
+            output = self.app.post('/admin/ssh', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
                 '<li class="error">Access restricted</li>' in output.data)
@@ -121,7 +143,22 @@ class ProgitFlaskAdmintests(tests.Modeltests):
             username='pingou',
             groups=progit.APP.config['ADMIN_GROUP'])
         with tests.user_set(progit.APP, user):
-            output = self.app.get('/admin/ssh', follow_redirects=True)
+            output = self.app.post('/admin/ssh', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>Admin section</h2>' in output.data)
+            self.assertTrue('Re-generate gitolite ACLs file' in output.data)
+            self.assertTrue(
+                'Re-generate ssh authorized_key file' in output.data)
+            self.assertFalse(
+                '<li class="message">Authorized file updated</li>'
+                in output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {'csrf_token': csrf_token}
+            output = self.app.post(
+                '/admin/ssh', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<h2>Admin section</h2>' in output.data)
             self.assertTrue('Re-generate gitolite ACLs file' in output.data)
