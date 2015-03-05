@@ -217,6 +217,63 @@ def create_projects_git(folder):
     return repos
 
 
+def add_content_git_repo(folder):
+    """ Create some content for the specified git repo. """
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+    repo = pygit2.init_repository(folder)
+
+    # Create a file in that git repo
+    with open(os.path.join(folder, 'sources'), 'w') as stream:
+        stream.write('foo\n bar')
+    repo.index.add('sources')
+    repo.index.write()
+
+    # Commits the files added
+    tree = repo.index.write_tree()
+    author = pygit2.Signature(
+        'Alice Author', 'alice@authors.tld')
+    committer = pygit2.Signature(
+        'Cecil Committer', 'cecil@committers.tld')
+    repo.create_commit(
+        'refs/heads/master',  # the name of the reference to update
+        author,
+        committer,
+        'Add sources file for testing',
+        # binary string representing the tree object ID
+        tree,
+        # list of binary strings representing parents of the new commit
+        []
+    )
+    commit = repo.revparse_single('HEAD')
+
+    subfolder = os.path.join('folder1', 'folder2')
+    if not os.path.exists(os.path.join(folder, subfolder)):
+        os.makedirs(os.path.join(folder, subfolder))
+    # Create a file in that git repo
+    with open(os.path.join(folder, subfolder, 'file'), 'w') as stream:
+        stream.write('foo\n bar\nbaz')
+    repo.index.add(os.path.join(subfolder, 'file'))
+    repo.index.write()
+
+    # Commits the files added
+    tree = repo.index.write_tree()
+    author = pygit2.Signature(
+        'Alice Author', 'alice@authors.tld')
+    committer = pygit2.Signature(
+        'Cecil Committer', 'cecil@committers.tld')
+    repo.create_commit(
+        'refs/heads/master',  # the name of the reference to update
+        author,
+        committer,
+        'Add some directory and a file for more testing',
+        # binary string representing the tree object ID
+        tree,
+        # list of binary strings representing parents of the new commit
+        [commit.oid.hex]
+    )
+
+
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(Modeltests)
     unittest.TextTestRunner(verbosity=2).run(SUITE)
