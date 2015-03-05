@@ -102,6 +102,46 @@ class ProgitFlaskRepotests(tests.Modeltests):
             self.assertTrue(
                 '<li class="message">User added</li>' in output.data)
 
+    def test_remove_user(self):
+        """ Test the remove_user endpoint. """
+
+        output = self.app.post('/foo/dropuser/1')
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser()
+        with tests.user_set(progit.APP, user):
+            output = self.app.post('/foo/dropuser/1')
+            self.assertEqual(output.status_code, 404)
+
+            tests.create_projects(self.session)
+
+            output = self.app.post('/test/dropuser/1')
+            self.assertEqual(output.status_code, 403)
+
+        user.username = 'pingou'
+        with tests.user_set(progit.APP, user):
+            output = self.app.post('/test/dropuser/1', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue(
+                '<li class="error">User does not have commit or cannot '
+                'loose it right</li>' in output.data)
+
+        # Add an user to a project
+        repo = progit.lib.get_project(self.session, 'test')
+        msg = progit.lib.add_user_to_project(
+            session=self.session,
+            project=repo,
+            user='foo',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User added')
+
+        with tests.user_set(progit.APP, user):
+            output = self.app.post('/test/dropuser/2', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue(
+                '<li class="message">User removed</li>' in output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskRepotests)
