@@ -321,6 +321,9 @@ def view_file(repo, identifier, filename, username=None):
 
     repo_obj = pygit2.Repository(reponame)
 
+    if repo_obj.is_empty:
+        flask.abort(404, 'Empty repo cannot have a file')
+
     if identifier in repo_obj.listall_branches():
         branchname = identifier
         branch = repo_obj.lookup_branch(identifier)
@@ -342,9 +345,6 @@ def view_file(repo, identifier, filename, username=None):
         content = repo_obj[content.oid]
     else:
         content = commit
-
-    if not content:
-            flask.abort(404, 'File not found')
 
     if isinstance(content, pygit2.Blob):
         if content.is_binary:
