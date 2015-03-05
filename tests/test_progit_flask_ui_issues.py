@@ -232,6 +232,14 @@ class ProgitFlaskIssuestests(tests.Modeltests):
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
+        # Project w/o issue tracker
+        repo = progit.lib.get_project(self.session, 'test')
+        repo.issue_tracker = False
+        self.session.add(repo)
+        self.session.commit()
+
+        output = self.app.get('/test/issue/1')
+        self.assertEqual(output.status_code, 404)
 
     @patch('progit.lib.git.update_git_ticket')
     @patch('progit.lib.notify.send_email')
