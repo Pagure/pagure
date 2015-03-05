@@ -389,6 +389,60 @@ def add_commit_git_repo(folder, ncommits=10):
         )
 
 
+def add_binary_git_repo(folder, filename):
+    """ Create a fake image file for the specified git repo. """
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+    repo = pygit2.init_repository(folder)
+
+    content = """<89>PNG^M
+^Z
+^@^@^@^MIHDR^@^@^@K^@^@^@K^H^F^@^@^@8Nzê^@^@^@^FbKGD^@ÿ^@ÿ^@ÿ ½§<93>^@^@^@  pHYs^@^@^M×^@^@^M×^AB(<9b>x^@^@^@^GtIM
+E^GÞ
+^N^U^F^[<88>]·<9c>^@^@  <8a>IDATxÚí<9c>ÛO^Tg^_Ç?3³»ì^B
+<8b>®ËË<8b>X^NÕõ^EQÚ^Z­^Qc<82>^Pk5Úô¦iMÄ^[{×^K<9b>&^^Xÿ^A<8d>WM^S^SmÒ<8b>j¯Zê<8d>   6^QO^Dª¶´/Ö^M^T5^^*¼¬<9c>^Oî<8
+1><99>÷<82>Y<8b>03;3»<83>hù&d óìÃÌw~§çûüf`^Q<8b>XÄ"^V±<88>^?:<84>^Er^N^R ª¿^K3ÎK<99>ñ3^EÈêïÿ8²ò<81> <90>¥C^T^Z<84>
+É@^Tè^E<86>_g²²<80>^\<95>$^?<86>æ^\TI^[SI|åÉ^R<81>Õ*QNb^\èVÝõ<95>#Ë^M^T^C^Eóì-<83>ÀC þ*<90>%^B+<80>^?¿äÄñ^XèÏ¤¥e<9
+a>,^O°^Vp-<90>l<9f>^@Â<99><8a>gR^FOÌ^O<84>TËZ(HZù3õ'íÉ2<81>^R Ìé+oll¤½½<9d>þþ~^TEAQ^T"<91>^HW¯^åèÑ£¸\º^F]^F¬|Ùn(^@
+å@<9e>S^DíÚµ<8b>cÇ<8e>±iÓ¦<94>cãñ8Ç<8f>^_§©©<89>^[7nh^M^Y^Fþ|YdU8ET0^X¤©©<89>Í<9b>7[þî^W_|ÁÄÄ^DçÏ<9f>çÑ£G^Y#,<9d><
+98>µ^RXæ^DQõõõ´¶¶RVfÏ³ÇÇÇyøð!<95><95><95>dggsïÞ½<99><87>½j^B^Z<99>¯<98>åW^CgÆ±sçN<9a><9b><9b>ÉÎÎ¶=G<þw<89>µaÃ^F^Z^
+Z^Zf^OYag^UaÇ²<jÖË86nÜÈåË<97>§ã<83>`?B<9c>9sæï<85>¥¢^P^L^Fµ,Ì^O^LX©Ã$^[<96>XéTyðË/¿<90><9b><9b>kûûCCC<9c>:u<8a>ÁÁÁ
+^WÈN^RöøñcFF^ð¾^B bVÉ°Z<^F<9c>*8¿ùæ^[<82>Á á<98>X,FKK^K'O<9e>äâÅ<8b>È²LAA^A[·n¥¸¸^XA^Pp»ÝºV¹wï^¾üòËÙ×^_PU<8c><8c>f
+C7Pí^DQeee<84>ÃaÜn·î<98><9e><9e>^^¶oß®<95>Ý¦M^^T©®®¦®®<8e>©©)Ý1×¯_§½½}ö¡ßÍ¬%­¸S±SµÔ<9e>={^L<89>úé§<9f>¨¨¨Ð%
+"""
+
+    parents = []
+    commit = None
+    try:
+        commit = repo.revparse_single('HEAD')
+    except KeyError:
+        pass
+    if commit:
+        parents = [commit.oid.hex]
+
+    # Create a file in that git repo
+    with open(os.path.join(folder, filename), 'w') as stream:
+        stream.write(content)
+    repo.index.add(filename)
+    repo.index.write()
+
+    # Commits the files added
+    tree = repo.index.write_tree()
+    author = pygit2.Signature(
+        'Alice Author', 'alice@authors.tld')
+    committer = pygit2.Signature(
+        'Cecil Committer', 'cecil@committers.tld')
+    repo.create_commit(
+        'refs/heads/master',  # the name of the reference to update
+        author,
+        committer,
+        'Add a fake image file',
+        # binary string representing the tree object ID
+        tree,
+        # list of binary strings representing parents of the new commit
+        parents
+    )
+
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(Modeltests)
     unittest.TextTestRunner(verbosity=2).run(SUITE)
