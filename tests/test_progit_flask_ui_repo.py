@@ -146,6 +146,46 @@ class ProgitFlaskRepotests(tests.Modeltests):
             self.assertTrue(
                 '<li class="message">User removed</li>' in output.data)
 
+    def test_update_description(self):
+        """ Test the update_description endpoint. """
+        output = self.app.post('/foo/updatedesc')
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser()
+        with tests.user_set(progit.APP, user):
+            output = self.app.post('/foo/updatedesc')
+            self.assertEqual(output.status_code, 404)
+
+            tests.create_projects(self.session)
+
+            output = self.app.post('/test/updatedesc')
+            self.assertEqual(output.status_code, 403)
+
+        user.username = 'pingou'
+        with tests.user_set(progit.APP, user):
+            output = self.app.post('/test/updatedesc', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<header class="repo">' in output.data)
+            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertTrue(
+                '<ul id="flashes">\n                </ul>' in output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+                'description': 'new description for test project #1',
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/updatedesc', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<header class="repo">' in output.data)
+            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertTrue(
+                '<li class="message">Description updated</li>'
+                in output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskRepotests)
