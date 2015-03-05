@@ -779,7 +779,7 @@ def remove_user(repo, userid, username=None):
         SESSION.commit()
         progit.generate_gitolite_acls()
         flask.flash('User removed')
-    except SQLAlchemyError as err:
+    except SQLAlchemyError as err:  # pragma: no cover
         SESSION.rollback()
         APP.logger.exception(err)
         flask.flash('User could not be removed', 'error')
@@ -821,7 +821,7 @@ def add_user(repo, username=None):
         except progit.exceptions.ProgitException as msg:
             SESSION.rollback()
             flask.flash(msg, 'error')
-        except SQLAlchemyError as err:
+        except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             APP.logger.exception(err)
             flask.flash('User could not be added', 'error')
