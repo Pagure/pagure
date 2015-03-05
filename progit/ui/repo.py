@@ -435,7 +435,7 @@ def view_raw_file(repo, identifier, filename=None, username=None):
     if filename:
         content = __get_file_in_tree(
             repo_obj, commit.tree, filename.split('/'))
-        if not content:
+        if not content or isinstance(content, pygit2.Tree):
             flask.abort(404, 'File not found')
 
         mimetype, encoding = mimetypes.guess_type(filename)
