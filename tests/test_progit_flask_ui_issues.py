@@ -240,12 +240,12 @@ class ProgitFlaskIssuestests(tests.Modeltests):
         p_send_email.return_value = True
         p_ugt.return_value = True
 
-        output = self.app.get('/foo/issue/1')
+        output = self.app.get('/foo/issue/1/update')
         self.assertEqual(output.status_code, 404)
 
         tests.create_projects(self.session)
 
-        output = self.app.get('/test/issue/1')
+        output = self.app.get('/test/issue/1/update')
         self.assertEqual(output.status_code, 404)
 
         # Create issues to play with
@@ -347,8 +347,9 @@ class ProgitFlaskIssuestests(tests.Modeltests):
         self.session.add(repo)
         self.session.commit()
 
-        output = self.app.get('/test/issue/1')
-        self.assertEqual(output.status_code, 404)
+        with tests.user_set(progit.APP, user):
+            output = self.app.get('/test/issue/1/update')
+            self.assertEqual(output.status_code, 404)
 
     @patch('progit.lib.git.update_git_ticket')
     @patch('progit.lib.notify.send_email')
