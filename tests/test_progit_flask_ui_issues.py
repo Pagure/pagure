@@ -544,6 +544,85 @@ class ProgitFlaskIssuestests(tests.Modeltests):
             output = self.app.post('/test/issue/1/edit', data=data)
             self.assertEqual(output.status_code, 404)
 
+    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.notify.send_email')
+    def test_edit_tag(self, p_send_email, p_ugt):
+        """ Test the edit_tag endpoint. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        output = self.app.get('/foo/tag/foo/edit')
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser()
+        with tests.user_set(progit.APP, user):
+            output = self.app.get('/foo/tag/foo/edit')
+            self.assertEqual(output.status_code, 404)
+
+            tests.create_projects(self.session)
+
+            output = self.app.get('/test/tag/foo/edit')
+            self.assertEqual(output.status_code, 403)
+
+        # Create issues to play with
+        repo = progit.lib.get_project(self.session, 'test')
+        msg = progit.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Issue created')
+
+        # Add a tag to the issue
+        issue = progit.lib.search_issues(self.session, repo, issueid=1)
+        msg = progit.lib.add_issue_tag(
+            session=self.session,
+            issue=issue,
+            tag='tag1',
+            user='pingou',
+            ticketfolder=None)
+        self.session.commit()
+        self.assertEqual(msg, 'Tag added')
+
+        # Before edit, list tags
+        tags = progit.lib.get_tags_of_project(self.session, repo)
+        self.assertEqual([tag.tag for tag in tags], ['tag1'])
+
+        # Edit tag
+        user.username = 'pingou'
+        with tests.user_set(progit.APP, user):
+            output = self.app.get('/test/tag/tag1/edit')
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>Edit tag: tag1</h2>' in output.data)
+            self.assertTrue(
+                '<p>Enter in the field below the new name for the tag: '
+                '"tag1"</p>' in output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {'tag': 'tag2'}
+
+            output = self.app.post('/test/tag/tag1/edit', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>Edit tag: tag1</h2>' in output.data)
+            self.assertTrue(
+                '<p>Enter in the field below the new name for the tag: '
+                '"tag1"</p>' in output.data)
+
+            data['csrf_token'] = csrf_token
+            output = self.app.post(
+                '/test/tag/tag1/edit', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertTrue(
+                '<li class="message">Edited tag: tag1 to tag2</li>'
+                in output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskIssuestests)
