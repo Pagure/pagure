@@ -301,6 +301,88 @@ class ProgitFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertTrue('This project has not been forked.' in output.data)
 
+    def test_view_repo(self):
+        """ Test the view_repo endpoint. """
+
+        output = self.app.get('/foo')
+        # No project registered in the DB
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+
+        output = self.app.get('/test')
+        # No git repo associated
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects_git(tests.HERE)
+
+        output = self.app.get('/test')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('<p>This repo is brand new!</p>' in output.data)
+        self.assertTrue('<p>test project #1</p>' in output.data)
+
+        # Add some content to the git repo
+        tests.add_content_git_repo(os.path.join(tests.HERE, 'test.git'))
+        tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
+
+        output = self.app.get('/test')
+        self.assertEqual(output.status_code, 200)
+        self.assertFalse('<p>This repo is brand new!</p>' in output.data)
+        self.assertFalse('Forked from' in output.data)
+        self.assertTrue('<p>test project #1</p>' in output.data)
+        self.assertEqual(
+            output.data.count('<span class="commitid">'), 3)
+
+        # Turn that repo into a fork
+        repo = progit.lib.get_project(self.session, 'test')
+        repo.parent_id = 2
+        self.session.add(repo)
+        self.session.commit()
+
+        # View the repo in the UI
+        output = self.app.get('/test')
+        self.assertEqual(output.status_code, 404)
+
+        # Add some content to the git repo
+        tests.add_content_git_repo(
+            os.path.join(tests.HERE, 'forks', 'pingou', 'test.git'))
+        tests.add_readme_git_repo(
+            os.path.join(tests.HERE, 'forks', 'pingou', 'test.git'))
+
+        output = self.app.get('/fork/pingou/test')
+        self.assertEqual(output.status_code, 200)
+        self.assertFalse('<p>This repo is brand new!</p>' in output.data)
+        self.assertTrue('<p>test project #1</p>' in output.data)
+        self.assertTrue('Forked from' in output.data)
+        self.assertEqual(
+            output.data.count('<span class="commitid">'), 3)
+
+        # Add a fork of a fork
+        item = progit.lib.model.Project(
+            user_id=1,  # pingou
+            name='test3',
+            description='test project #3',
+            parent_id=1,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        tests.add_content_git_repo(
+            os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'))
+        tests.add_readme_git_repo(
+            os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'))
+        tests.add_commit_git_repo(
+            os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'),
+            ncommits=10)
+
+        output = self.app.get('/fork/pingou/test3')
+        self.assertEqual(output.status_code, 200)
+        self.assertFalse('<p>This repo is brand new!</p>' in output.data)
+        self.assertTrue('<p>test project #3</p>' in output.data)
+        self.assertTrue('Forked from' in output.data)
+        self.assertEqual(
+            output.data.count('<span class="commitid">'), 10)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskRepotests)
