@@ -14,8 +14,9 @@ import os
 from math import ceil
 
 import pygit2
+import kitchen.text.converters as ktc
+
 from cStringIO import StringIO
-from sqlalchemy.exc import SQLAlchemyError
 from PIL import Image
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
@@ -23,6 +24,7 @@ from pygments.lexers import guess_lexer_for_filename
 from pygments.lexers.text import DiffLexer
 from pygments.lexers.special import TextLexer
 from pygments.util import ClassNotFound
+from sqlalchemy.exc import SQLAlchemyError
 
 import mimetypes
 import chardet
@@ -461,7 +463,7 @@ def view_raw_file(repo, identifier, filename=None, username=None):
             mimetype = 'text/plain'
 
     if mimetype.startswith('text/') and not encoding:
-        encoding = chardet.detect(bytes(data))['encoding']
+        encoding = chardet.detect(ktc.to_bytes(data))['encoding']
 
     headers = {'Content-Type': mimetype}
     if encoding:
