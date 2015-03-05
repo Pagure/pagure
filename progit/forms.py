@@ -60,6 +60,13 @@ class RequestPullForm(wtf.Form):
     )
 
 
+class AddIssueTagForm(wtf.Form):
+    ''' Form to add a comment to an issue. '''
+    tag = wtforms.TextField(
+        'tag', [wtforms.validators.Optional()]
+    )
+
+
 class UpdateIssueForm(wtf.Form):
     ''' Form to add a comment to an issue. '''
     tag = wtforms.TextField(
