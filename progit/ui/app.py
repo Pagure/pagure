@@ -24,7 +24,8 @@ import progit.lib
 import progit.forms
 from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
                     generate_gitolite_acls, generate_gitolite_key,
-                    generate_authorized_key_file, markdown_filter)
+                    generate_authorized_key_file, markdown_filter,
+                    authenticated)
 
 
 # Application
@@ -67,7 +68,7 @@ def index():
     user_repos_length = None
     user_forks_length = None
 
-    if flask.g.fas_user:
+    if authenticated():
         username = flask.g.fas_user.username
 
         repopage = flask.request.args.get('repopage', 1)
