@@ -11,12 +11,13 @@
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
+import json
 import unittest
 import shutil
 import sys
 import os
 
-import json
+import pygit2
 from mock import patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(
@@ -546,6 +547,119 @@ class ProgitFlaskRepotests(tests.Modeltests):
         self.assertTrue('Forked from' in output.data)
         self.assertEqual(
             output.data.count('<span class="commitid">'), 13)
+
+    def test_view_file(self):
+        """ Test the view_file endpoint. """
+        output = self.app.get('/foo/blob/foo/sources')
+        # No project registered in the DB
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+
+        output = self.app.get('/test/blob/foo/sources')
+        # No git repo associated
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects_git(tests.HERE)
+
+        output = self.app.get('/test/blob/foo/sources')
+        self.assertEqual(output.status_code, 404)
+
+        # Add some content to the git repo
+        tests.add_content_git_repo(os.path.join(tests.HERE, 'test.git'))
+        tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
+        tests.add_binary_git_repo(
+            os.path.join(tests.HERE, 'test.git'), 'test.jpg')
+        tests.add_binary_git_repo(
+            os.path.join(tests.HERE, 'test.git'), 'test_binary')
+
+        output = self.app.get('/test/blob/master/foofile')
+        self.assertEqual(output.status_code, 404)
+
+        # View in a branch
+        output = self.app.get('/test/blob/master/sources')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('<section class="file_content">' in output.data)
+        self.assertTrue(
+            '<tr><td class="cell1"><a id="_1" href="#_1">1</a></td>'
+            in output.data)
+        self.assertTrue(
+            '<td class="cell2"><pre> bar</pre></td>' in output.data)
+
+        # View what's supposed to be an image
+        output = self.app.get('/test/blob/master/test.jpg')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('<section class="file_content">' in output.data)
+        self.assertTrue(
+            'Binary files cannot be rendered.<br/>' in output.data)
+
+        # View by commit id
+        repo = pygit2.init_repository(os.path.join(tests.HERE, 'test.git'))
+        commit = repo.revparse_single('HEAD')
+
+        output = self.app.get('/test/blob/%s/test.jpg' % commit.oid.hex)
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('<section class="file_content">' in output.data)
+        self.assertTrue(
+            'Binary files cannot be rendered.<br/>' in output.data)
+
+        # View by image name -- somehow we support this
+        output = self.app.get('/test/blob/sources/test.jpg')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('<section class="file_content">' in output.data)
+        self.assertTrue(
+            'Binary files cannot be rendered.<br/>'
+            in output.data)
+
+        # View binary file
+        output = self.app.get('/test/blob/sources/test_binary')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('<section class="file_content">' in output.data)
+        self.assertTrue(
+            'Binary files cannot be rendered.<br/>'
+            in output.data)
+
+        # View folder
+        output = self.app.get('/test/blob/master/folder1')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('<section class="tree_list">' in output.data)
+        self.assertTrue('<h3>Tree</h3>' in output.data)
+        self.assertTrue(
+            '<a href="/test/blob/master/folder1/folder2">' in output.data)
+
+        # View by image name -- with a non-existant file
+        output = self.app.get('/test/blob/sources/testfoo.jpg')
+        self.assertEqual(output.status_code, 404)
+        output = self.app.get('/test/blob/master/folder1/testfoo.jpg')
+        self.assertEqual(output.status_code, 404)
+
+        # Add a fork of a fork
+        item = progit.lib.model.Project(
+            user_id=1,  # pingou
+            name='test3',
+            description='test project #3',
+            parent_id=1,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        tests.add_content_git_repo(
+            os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'))
+        tests.add_readme_git_repo(
+            os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'))
+        tests.add_commit_git_repo(
+            os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'),
+            ncommits=10)
+
+        output = self.app.get('/fork/pingou/test3/blob/master/sources')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('<section class="file_content">' in output.data)
+        self.assertTrue(
+            '<tr><td class="cell1"><a id="_1" href="#_1">1</a></td>'
+            in output.data)
+        self.assertTrue(
+            '<td class="cell2"><pre> barRow 0</pre></td>' in output.data)
+
 
 
 if __name__ == '__main__':
