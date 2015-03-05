@@ -122,6 +122,8 @@ class ProgitFlaskRepotests(tests.Modeltests):
         with tests.user_set(progit.APP, user):
             output = self.app.post('/test/dropuser/1', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            self.assertTrue('<header class="repo">' in output.data)
+            self.assertTrue('<h2>Settings</h2>' in output.data)
             self.assertTrue(
                 '<li class="error">User does not have commit or cannot '
                 'loose it right</li>' in output.data)
@@ -139,6 +141,8 @@ class ProgitFlaskRepotests(tests.Modeltests):
         with tests.user_set(progit.APP, user):
             output = self.app.post('/test/dropuser/2', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            self.assertTrue('<header class="repo">' in output.data)
+            self.assertTrue('<h2>Settings</h2>' in output.data)
             self.assertTrue(
                 '<li class="message">User removed</li>' in output.data)
 
