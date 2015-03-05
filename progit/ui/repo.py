@@ -761,28 +761,30 @@ def remove_user(repo, userid, username=None):
             403,
             'You are not allowed to change the users for this project')
 
-    userids = [str(user.id) for user in repo.users]
+    form = progit.forms.ConfirmationForm()
+    if form.validate_on_submit():
+        userids = [str(user.id) for user in repo.users]
 
-    if str(userid) not in userids:
-        flask.flash(
-            'User does not have commit or cannot loose it right', 'error')
-        return flask.redirect(
-            flask.url_for(
-                '.view_settings', repo=repo.name, username=username)
-        )
+        if str(userid) not in userids:
+            flask.flash(
+                'User does not have commit or cannot loose it right', 'error')
+            return flask.redirect(
+                flask.url_for(
+                    '.view_settings', repo=repo.name, username=username)
+            )
 
-    for user in repo.users:
-        if str(user.id) == str(userid):
-            repo.users.remove(user)
-            break
-    try:
-        SESSION.commit()
-        progit.generate_gitolite_acls()
-        flask.flash('User removed')
-    except SQLAlchemyError as err:  # pragma: no cover
-        SESSION.rollback()
-        APP.logger.exception(err)
-        flask.flash('User could not be removed', 'error')
+        for user in repo.users:
+            if str(user.id) == str(userid):
+                repo.users.remove(user)
+                break
+        try:
+            SESSION.commit()
+            progit.generate_gitolite_acls()
+            flask.flash('User removed')
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash('User could not be removed', 'error')
 
     return flask.redirect(
         flask.url_for('.view_settings', repo=repo.name, username=username)
