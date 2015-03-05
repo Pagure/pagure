@@ -274,6 +274,60 @@ def add_content_git_repo(folder):
     )
 
 
+def add_readme_git_repo(folder):
+    """ Create a README file for the specified git repo. """
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+    repo = pygit2.init_repository(folder)
+
+    content = """ProGit
+======
+
+:Author: Pierre-Yves Chibon <pingou@pingoured.fr>
+
+
+ProGit is a light-weight git-centered forge based on pygit2.
+
+Currently, ProGit offers a decent web-interface for git repositories, a
+simplistic ticket system (that needs improvements) and possibilities to create
+new projects, fork existing ones and create/merge pull-requests across or
+within projects.
+
+
+Homepage: https://github.com/pypingou/ProGit
+
+Dev instance: http://209.132.184.222/ (/!\\ May change unexpectedly, it's a dev instance ;-))
+"""
+
+    parents = []
+    commit = repo.revparse_single('HEAD')
+    if commit:
+        parents = [commit.oid.hex]
+
+    # Create a file in that git repo
+    with open(os.path.join(folder, 'README.rst'), 'w') as stream:
+        stream.write(content)
+    repo.index.add('README.rst')
+    repo.index.write()
+
+    # Commits the files added
+    tree = repo.index.write_tree()
+    author = pygit2.Signature(
+        'Alice Author', 'alice@authors.tld')
+    committer = pygit2.Signature(
+        'Cecil Committer', 'cecil@committers.tld')
+    repo.create_commit(
+        'refs/heads/master',  # the name of the reference to update
+        author,
+        committer,
+        'Add a README file',
+        # binary string representing the tree object ID
+        tree,
+        # list of binary strings representing parents of the new commit
+        parents
+    )
+
+
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(Modeltests)
     unittest.TextTestRunner(verbosity=2).run(SUITE)
