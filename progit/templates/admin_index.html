@@ -10,14 +10,18 @@
 
 <ul>
   <li>
-    <a href="{{ url_for('admin_generate_acl') }}">
-     Re-generate gitolite ACLs file
-    </a>
+    <form action="{{ url_for('admin_generate_acl') }}" method="post">
+    <input type="submit" class="submit positive button"
+        value="Re-generate gitolite ACLs file">
+    {{ form.csrf_token }}
+    </form>
   </li>
   <li>
-    <a href="{{ url_for('admin_refresh_ssh') }}">
-     Re-generate ssh authorized_key file
-    </a>
+    <form action="{{ url_for('admin_refresh_ssh') }}" method="post">
+    <input type="submit" class="submit positive button"
+        value="Re-generate ssh authorized_key file">
+    {{ form.csrf_token }}
+    </form>
   </li>
 {% if config['PROGIT_AUTH'] == 'local' %}
   <li>
