@@ -27,7 +27,7 @@ import tests
 
 
 class ProgitFlaskApitests(tests.Modeltests):
-    """ Tests for flask API of progit """
+    """ Tests for flask API controller of progit """
 
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
