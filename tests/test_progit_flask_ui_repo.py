@@ -660,6 +660,101 @@ class ProgitFlaskRepotests(tests.Modeltests):
         self.assertTrue(
             '<td class="cell2"><pre> barRow 0</pre></td>' in output.data)
 
+    def test_view_raw_file(self):
+        """ Test the view_raw_file endpoint. """
+        output = self.app.get('/foo/raw/foo/sources')
+        # No project registered in the DB
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+
+        output = self.app.get('/test/raw/foo/sources')
+        # No git repo associated
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects_git(tests.HERE)
+
+        output = self.app.get('/test/raw/foo/sources')
+        self.assertEqual(output.status_code, 404)
+
+        # Add some content to the git repo
+        tests.add_content_git_repo(os.path.join(tests.HERE, 'test.git'))
+        tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
+        tests.add_binary_git_repo(
+            os.path.join(tests.HERE, 'test.git'), 'test.jpg')
+        tests.add_binary_git_repo(
+            os.path.join(tests.HERE, 'test.git'), 'test_binary')
+
+        output = self.app.get('/test/raw/master/foofile')
+        self.assertEqual(output.status_code, 404)
+
+        # View in a branch
+        output = self.app.get('/test/raw/master/sources')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('foo\n bar' in output.data)
+
+        # View what's supposed to be an image
+        output = self.app.get('/test/raw/master/test.jpg')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue(output.data.startswith('<89>PNG^M'))
+
+        # View by commit id
+        repo = pygit2.init_repository(os.path.join(tests.HERE, 'test.git'))
+        commit = repo.revparse_single('HEAD')
+
+        output = self.app.get('/test/raw/%s/test.jpg' % commit.oid.hex)
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue(output.data.startswith('<89>PNG^M'))
+
+        # View by image name -- somehow we support this
+        output = self.app.get('/test/raw/sources/test.jpg')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue(output.data.startswith('<89>PNG^M'))
+
+        # View binary file
+        output = self.app.get('/test/raw/sources/test_binary')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue(output.data.startswith('<89>PNG^M'))
+
+        # View folder
+        output = self.app.get('/test/raw/master/folder1')
+        self.assertEqual(output.status_code, 404)
+
+        # View by image name -- with a non-existant file
+        output = self.app.get('/test/raw/sources/testfoo.jpg')
+        self.assertEqual(output.status_code, 404)
+        output = self.app.get('/test/raw/master/folder1/testfoo.jpg')
+        self.assertEqual(output.status_code, 404)
+
+        output = self.app.get('/test/raw/master/')
+        self.assertEqual(output.status_code, 404)
+
+        output = self.app.get('/test/raw/%s' % commit.oid.hex)
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue(output.data.startswith(
+            'diff --git a/test_binary b/test_binary\n'))
+
+        # Add a fork of a fork
+        item = progit.lib.model.Project(
+            user_id=1,  # pingou
+            name='test3',
+            description='test project #3',
+            parent_id=1,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        tests.add_content_git_repo(
+            os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'))
+        tests.add_readme_git_repo(
+            os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'))
+        tests.add_commit_git_repo(
+            os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'),
+            ncommits=10)
+
+        output = self.app.get('/fork/pingou/test3/raw/master/sources')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('foo\n bar' in output.data)
 
 
 if __name__ == '__main__':
