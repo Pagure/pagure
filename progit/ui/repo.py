@@ -417,6 +417,9 @@ def view_raw_file(repo, identifier, filename=None, username=None):
 
     repo_obj = pygit2.Repository(reponame)
 
+    if repo_obj.is_empty:
+        flask.abort(404, 'Empty repo cannot have a file')
+
     if identifier in repo_obj.listall_branches():
         branch = repo_obj.lookup_branch(identifier)
         commit = branch.get_object()
