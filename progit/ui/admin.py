@@ -12,6 +12,7 @@ from functools import wraps
 
 import flask
 
+import progit.forms
 from progit import (APP, SESSION, LOG, cla_required, authenticated,
                     generate_gitolite_acls, generate_authorized_key_file,
                     is_admin)
@@ -41,25 +42,30 @@ def admin_required(function):
 def admin_index():
     """ Front page of the admin section of the application.
     """
+    form = progit.forms.ConfirmationForm()
 
     return flask.render_template(
-        'admin_index.html',
+        'admin_index.html', form=form,
     )
 
 
-@APP.route('/admin/gitolite')
+@APP.route('/admin/gitolite', methods=['POST'])
 @admin_required
 def admin_generate_acl():
     """ Regenerate the gitolite ACL file. """
-    generate_gitolite_acls()
-    flask.flash('Gitolite ACLs updated')
+    form = progit.forms.ConfirmationForm()
+    if form.validate_on_submit():
+        generate_gitolite_acls()
+        flask.flash('Gitolite ACLs updated')
     return flask.redirect(flask.url_for('admin_index'))
 
 
-@APP.route('/admin/ssh')
+@APP.route('/admin/ssh', methods=['POST'])
 @admin_required
 def admin_refresh_ssh():
     """ Regenerate the gitolite ACL file. """
-    generate_authorized_key_file()
-    flask.flash('Authorized file updated')
+    form = progit.forms.ConfirmationForm()
+    if form.validate_on_submit():
+        generate_authorized_key_file()
+        flask.flash('Authorized file updated')
     return flask.redirect(flask.url_for('admin_index'))
