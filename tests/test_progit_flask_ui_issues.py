@@ -304,6 +304,93 @@ class ProgitFlaskIssuestests(tests.Modeltests):
                 '<option selected value="Fixed">Fixed</option>'
                 in output.data)
 
+            # Add new comment
+            data = {
+                'csrf_token': csrf_token,
+                'status': 'Fixed',
+                'comment': 'Woohoo a second comment !',
+            }
+            output = self.app.post(
+                '/test/issue/1/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertTrue(
+                '<li class="message">Comment added</li>' in output.data)
+            self.assertTrue(
+                'li class="message">No changes to edit</li>' in output.data)
+            self.assertTrue(
+                '<p>Woohoo a second comment !</p>' in output.data)
+            self.assertEqual(
+                output.data.count('<div class="comment_body">'), 2)
+            self.assertTrue(
+                '<option selected value="Fixed">Fixed</option>'
+                in output.data)
+
+            # Add new tag
+            data = {
+                'csrf_token': csrf_token,
+                'status': 'Fixed',
+                'tag': 'tag#2',
+            }
+            output = self.app.post(
+                '/test/issue/1/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertTrue(
+                '<li class="message">Tag added</li>' in output.data)
+            self.assertTrue(
+                'li class="message">No changes to edit</li>' in output.data)
+            self.assertTrue(
+                '<p>Woohoo a second comment !</p>' in output.data)
+            self.assertEqual(
+                output.data.count('<div class="comment_body">'), 2)
+            self.assertTrue(
+                '<option selected value="Fixed">Fixed</option>'
+                in output.data)
+
+            # Assign issue to an non-existent user
+            data = {
+                'csrf_token': csrf_token,
+                'status': 'Fixed',
+                'assignee': 'ralph',
+            }
+            output = self.app.post(
+                '/test/issue/1/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertTrue(
+                '<li class="error">No user &#34;ralph&#34; found</li>'
+                in output.data)
+            self.assertTrue(
+                '<p>Woohoo a second comment !</p>' in output.data)
+            self.assertEqual(
+                output.data.count('<div class="comment_body">'), 2)
+            self.assertTrue(
+                '<option selected value="Fixed">Fixed</option>'
+                in output.data)
+
+            # Assign issue properly
+            data = {
+                'csrf_token': csrf_token,
+                'status': 'Fixed',
+                'assignee': 'pingou',
+            }
+            output = self.app.post(
+                '/test/issue/1/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertTrue(
+                '<li class="message">Issue assigned</li>' in output.data)
+            self.assertTrue(
+                '<a href="/test/issues?assignee=pingou">' in output.data)
+            self.assertTrue(
+                '<p>Woohoo a second comment !</p>' in output.data)
+            self.assertEqual(
+                output.data.count('<div class="comment_body">'), 2)
+            self.assertTrue(
+                '<option selected value="Fixed">Fixed</option>'
+                in output.data)
+
         # Create another issue with a dependency
         repo = progit.lib.get_project(self.session, 'test')
         msg = progit.lib.new_issue(
