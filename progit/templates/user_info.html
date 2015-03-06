@@ -24,17 +24,21 @@
     </h2>
     {{ repos_switch(False) }}
 
-    {{ render_repos(repos, total_page_repos, repopage, 'Projects', repos_length, 'repos') }}
-    {{ render_repos(forks, total_page_forks, forkpage, 'Forks', forks_length, 'forks') }}
+    {{ render_repos(
+            repos, total_page_repos, repopage,
+            'Projects', repos_length, 'repos') }}
+    {{ render_repos(
+            forks, total_page_forks, forkpage,
+            'Forks', forks_length, 'forks') }}
 {% endblock %}
 
 {% block jscripts %}
     {{ super() }}
     <script type="text/javascript">
-        $(function(){
-            $('.show_parts input[type="radio"]').change(function(){
-                $('#' + $(this).attr('name')).toggle();
-            });
+      $(function(){
+        $('.show_parts input[type="checkbox"]').change(function(){
+          $('#' + $(this).attr('name')).toggle();
         });
+      });
     </script>
 {% endblock %}
