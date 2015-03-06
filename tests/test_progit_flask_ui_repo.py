@@ -1033,6 +1033,104 @@ index 0000000..10d2e1c
         self.assertFalse(
             'No content found in this repository' in output.data)
 
+    def test_delete_repo(self):
+        """ Test the delete_repo endpoint. """
+        output = self.app.post('/foo/delete')
+        # User not logged in
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser()
+        with tests.user_set(progit.APP, user):
+            output = self.app.post('/foo/delete')
+            # No project registered in the DB
+            self.assertEqual(output.status_code, 404)
+
+            tests.create_projects(self.session)
+
+            output = self.app.post('/test/delete')
+            # No git repo associated
+            self.assertEqual(output.status_code, 403)
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(progit.APP, user):
+            output = self.app.post('/test/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue(
+                '<li class="error">Could not delete all the repos from the '
+                'system</li>' in output.data)
+            self.assertTrue('<h2>Projects (1)</h2>' in output.data)
+            self.assertTrue('<h2>Forks (0)</h2>' in output.data)
+
+            # Only git repo
+            item = progit.lib.model.Project(
+                user_id=1,  # pingou
+                name='test',
+                description='test project #1',
+            )
+            self.session.add(item)
+            self.session.commit()
+            tests.create_projects_git(tests.HERE)
+            output = self.app.post('/test/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue(
+                '<li class="error">Could not delete all the repos from the '
+                'system</li>' in output.data)
+            self.assertTrue('<h2>Projects (1)</h2>' in output.data)
+            self.assertTrue('<h2>Forks (0)</h2>' in output.data)
+
+            # Only git and doc repo
+            item = progit.lib.model.Project(
+                user_id=1,  # pingou
+                name='test',
+                description='test project #1',
+            )
+            self.session.add(item)
+            self.session.commit()
+            tests.create_projects_git(tests.HERE)
+            tests.create_projects_git(os.path.join(tests.HERE, 'docs'))
+            output = self.app.post('/test/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue(
+                '<li class="error">Could not delete all the repos from the '
+                'system</li>' in output.data)
+
+            # All repo there
+            item = progit.lib.model.Project(
+                user_id=1,  # pingou
+                name='test',
+                description='test project #1',
+            )
+            self.session.add(item)
+            self.session.commit()
+            tests.create_projects_git(tests.HERE)
+            tests.create_projects_git(os.path.join(tests.HERE, 'docs'))
+            tests.create_projects_git(os.path.join(tests.HERE, 'tickets'))
+            output = self.app.post('/test/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>Projects (1)</h2>' in output.data)
+            self.assertTrue('<h2>Forks (0)</h2>' in output.data)
+
+            # Add a fork of a fork
+            item = progit.lib.model.Project(
+                user_id=1,  # pingou
+                name='test3',
+                description='test project #3',
+                parent_id=1,
+            )
+            self.session.add(item)
+            self.session.commit()
+            tests.add_content_git_repo(
+                os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'))
+            tests.add_content_git_repo(
+                os.path.join(tests.HERE, 'docs', 'pingou', 'test3.git'))
+            tests.add_content_git_repo(
+                os.path.join(tests.HERE, 'tickets', 'pingou', 'test3.git'))
+
+            output = self.app.post(
+                '/fork/pingou/test3/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>Projects (1)</h2>' in output.data)
+            self.assertTrue('<h2>Forks (0)</h2>' in output.data)
 
 
 if __name__ == '__main__':
