@@ -839,6 +839,130 @@ class ProgitFlaskRepotests(tests.Modeltests):
         self.assertTrue(
             '<span style="color: #00A000">+ ======</span>' in output.data)
 
+    def test_view_commit_patch(self):
+        """ Test the view_commit_patch endpoint. """
+        output = self.app.get('/foo/bar.patch')
+        # No project registered in the DB
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+
+        output = self.app.get('/test/bar.patch')
+        # No git repo associated
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects_git(tests.HERE)
+
+        output = self.app.get('/test/bar.patch')
+        self.assertEqual(output.status_code, 404)
+
+        # Add a README to the git repo - First commit
+        tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
+        repo = pygit2.init_repository(os.path.join(tests.HERE, 'test.git'))
+        commit = repo.revparse_single('HEAD')
+
+        # View first commit
+        output = self.app.get('/test/%s.patch' % commit.oid.hex)
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('''diff --git a/README.rst b/README.rst
+new file mode 100644
+index 0000000..10d2e1c
+--- /dev/null
++++ b/README.rst
+@@ -0,0 +1,17 @@
++ProGit
++======
++
++:Author: Pierre-Yves Chibon <pingou@pingoured.fr>
++
++
++ProGit is a light-weight git-centered forge based on pygit2.
++
++Currently, ProGit offers a decent web-interface for git repositories, a
++simplistic ticket system (that needs improvements) and possibilities to create
++new projects, fork existing ones and create/merge pull-requests across or
++within projects.
++
++
++Homepage: https://github.com/pypingou/ProGit
++
++Dev instance: http://209.132.184.222/ (/!\ May change unexpectedly, it's a dev instance ;-))
+''' in output.data)
+        self.assertTrue('Subject: Add a README file' in output.data)
+
+        # Add some content to the git repo
+        tests.add_content_git_repo(os.path.join(tests.HERE, 'test.git'))
+
+        repo = pygit2.init_repository(os.path.join(tests.HERE, 'test.git'))
+        commit = repo.revparse_single('HEAD')
+
+        # View another commit
+        output = self.app.get('/test/%s.patch' % commit.oid.hex)
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue(
+            'Subject: Add some directory and a file for more testing'
+            in output.data)
+        self.assertTrue('''diff --git a/folder1/folder2/file b/folder1/folder2/file
+new file mode 100644
+index 0000000..11980b1
+--- /dev/null
++++ b/folder1/folder2/file
+@@ -0,0 +1,3 @@
++foo
++ bar
++baz
+\ No newline at end of file
+''' in output.data)
+
+        # Add a fork of a fork
+        item = progit.lib.model.Project(
+            user_id=1,  # pingou
+            name='test3',
+            description='test project #3',
+            parent_id=1,
+        )
+        self.session.add(item)
+        self.session.commit()
+        forkedgit = os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git')
+
+        tests.add_content_git_repo(forkedgit)
+        tests.add_readme_git_repo(forkedgit)
+
+        repo = pygit2.init_repository(forkedgit)
+        commit = repo.revparse_single('HEAD')
+
+        # Commit does not exist in anothe repo :)
+        output = self.app.get('/test/%s.patch' % commit.oid.hex)
+        self.assertEqual(output.status_code, 404)
+
+        # View commit of fork
+        output = self.app.get('/fork/pingou/test3/%s.patch' % commit.oid.hex)
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('''diff --git a/README.rst b/README.rst
+new file mode 100644
+index 0000000..10d2e1c
+--- /dev/null
++++ b/README.rst
+@@ -0,0 +1,17 @@
++ProGit
++======
++
++:Author: Pierre-Yves Chibon <pingou@pingoured.fr>
++
++
++ProGit is a light-weight git-centered forge based on pygit2.
++
++Currently, ProGit offers a decent web-interface for git repositories, a
++simplistic ticket system (that needs improvements) and possibilities to create
++new projects, fork existing ones and create/merge pull-requests across or
++within projects.
++
++
++Homepage: https://github.com/pypingou/ProGit
++
++Dev instance: http://209.132.184.222/ (/!\ May change unexpectedly, it's a dev instance ;-))
+''' in output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskRepotests)
