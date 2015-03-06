@@ -211,7 +211,8 @@ def create_projects_git(folder):
     for project in ['test.git', 'test2.git']:
         repo_path = os.path.join(folder, project)
         repos.append(repo_path)
-        os.makedirs(repo_path)
+        if not os.path.exists(repo_path):
+            os.makedirs(repo_path)
         pygit2.init_repository(repo_path)
 
     return repos
