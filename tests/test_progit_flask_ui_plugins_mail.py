@@ -104,6 +104,9 @@ class ProgitFlaskPluginMailtests(tests.Modeltests):
                 '<input id="active" name="active" type="checkbox" value="y">'
                 in output.data)
 
+            self.assertFalse(os.path.exists(os.path.join(
+                tests.HERE, 'test.git', 'hooks', 'post-receive.mail')))
+
             # Missing the required mail_to
             data = {'csrf_token': csrf_token, 'active': 'y'}
 
@@ -119,6 +122,9 @@ class ProgitFlaskPluginMailtests(tests.Modeltests):
             self.assertTrue(
                 '<input checked id="active" name="active" type="checkbox" '
                 'value="y">' in output.data)
+
+            self.assertFalse(os.path.exists(os.path.join(
+                tests.HERE, 'test.git', 'hooks', 'post-receive.mail')))
 
             # Activate hook
             data = {
@@ -139,6 +145,9 @@ class ProgitFlaskPluginMailtests(tests.Modeltests):
                 '<input checked id="active" name="active" type="checkbox" '
                 'value="y">' in output.data)
 
+            self.assertTrue(os.path.exists(os.path.join(
+                tests.HERE, 'test.git', 'hooks', 'post-receive.mail')))
+
             # De-Activate hook
             data = {'csrf_token': csrf_token}
             output = self.app.post('/test/settings/Mail', data=data)
@@ -152,6 +161,9 @@ class ProgitFlaskPluginMailtests(tests.Modeltests):
             self.assertTrue(
                 '<input id="active" name="active" type="checkbox" '
                 'value="y">' in output.data)
+
+            self.assertFalse(os.path.exists(os.path.join(
+                tests.HERE, 'test.git', 'hooks', 'post-receive.mail')))
 
 
 if __name__ == '__main__':
