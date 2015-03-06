@@ -22,10 +22,10 @@ from pygments.formatters import HtmlFormatter
 import progit.exceptions
 import progit.lib
 import progit.forms
+import progit.ui.filters
 from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
                     generate_gitolite_acls, generate_gitolite_key,
-                    generate_authorized_key_file, markdown_filter,
-                    authenticated)
+                    generate_authorized_key_file, authenticated)
 
 
 # Application
@@ -337,4 +337,4 @@ def markdown_preview():
 
     The text has to be provided via the parameter 'content' of a POST query.
     """
-    return progit.markdown_filter(flask.request.form['content'])
+    return progit.ui.filters.markdown_filter(flask.request.form['content'])
