@@ -11,7 +11,7 @@
 import os
 import shutil
 
-from progit import APP
+from progit import APP, get_repo_path
 
 
 class BaseHook(object):
@@ -25,9 +25,7 @@ class BaseHook(object):
         ''' Install the generic post-receive hook that allow us to call
         multiple post-receive hooks as set per plugin.
         '''
-        repopath = os.path.join(APP.config['GIT_FOLDER'], project.path)
-        if project.is_fork:
-            repopath = os.path.join(APP.config['FORK_FOLDER'], project.path)
+        repopath = get_repo_path(project)
 
         hook_files = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), 'files')
