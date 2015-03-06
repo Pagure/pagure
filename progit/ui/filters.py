@@ -35,36 +35,11 @@ from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
 # Jinja filters
 
 
-@APP.template_filter('hasattr')
-def jinja_hasattr(obj, string):
-    """ Template filter checking if the provided object at the provided
-    string as attribute
-    """
-    return hasattr(obj, string)
-
-
-@APP.template_filter('lastcommit_date')
-def lastcommit_date_filter(repo):
-    """ Template filter returning the last commit date of the provided repo.
-    """
-    if not repo.is_empty:
-        commit = repo[repo.head.target]
-        return arrow.get(commit.commit_time).humanize()
-
-
 @APP.template_filter('humanize')
 def humanize_date(date):
     """ Template filter returning the last commit date of the provided repo.
     """
     return arrow.get(date).humanize()
-
-
-@APP.template_filter('rst2html')
-def rst2html(rst_string):
-    """ Template filter transforming rst text into html
-    """
-    if rst_string:
-        return progit.doc_utils.convert_doc(unicode(rst_string))
 
 
 @APP.template_filter('format_ts')
