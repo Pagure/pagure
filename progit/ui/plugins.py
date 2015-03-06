@@ -99,7 +99,7 @@ def view_plugin_page(repo, plugin, full, username=None):
             SESSION.add(dbobj)
         try:
             SESSION.flush()
-        except SQLAlchemyError, err:
+        except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
             APP.logger.debug('Could not add plugin %s', plugin.name)
             APP.logger.exception(err)
