@@ -79,7 +79,7 @@ class ProgitFlaskPluginProgitHooktests(tests.Modeltests):
 
             data['csrf_token'] = csrf_token
             # No git found
-            output = self.app.post('/test/settings/Mail', data=data)
+            output = self.app.post('/test/settings/progit', data=data)
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects_git(tests.HERE)
