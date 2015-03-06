@@ -26,6 +26,7 @@ import progit.doc_utils
 import progit.lib
 import progit.lib.git
 import progit.forms
+import progit
 from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
                     is_repo_admin, generate_gitolite_acls)
 
@@ -89,7 +90,7 @@ def request_pull(repo, requestid, username=None):
         flask.abort(404, 'Pull-request not found')
 
     repo_from = request.repo_from
-    repopath = _get_repo_path(repo_from)
+    repopath = progit.get_repo_path(repo_from)
     repo_obj = pygit2.Repository(repopath)
 
     parentpath = _get_parent_repo_path(repo_from)
@@ -190,7 +191,7 @@ def request_pull_patch(repo, requestid, username=None):
         flask.abort(404, 'Pull-request not found')
 
     repo_from = request.repo_from
-    repopath = _get_repo_path(repo_from)
+    repopath = progit.get_repo_path(repo_from)
     repo_obj = pygit2.Repository(repopath)
 
     parentpath = _get_parent_repo_path(repo_from)
@@ -342,16 +343,11 @@ def merge_request_pull(repo, requestid, username=None):
             username=username)
 
     # Get the fork
-    if request.repo_from.is_fork:
-        repopath = os.path.join(
-            APP.config['FORK_FOLDER'], request.repo_from.path)
-    else:
-        repopath = os.path.join(
-            APP.config['GIT_FOLDER'], request.repo_from.path)
+    repopath = progit.get_repo_path(request.repo_from)
     fork_obj = pygit2.Repository(repopath)
 
     # Get the original repo
-    parentpath = os.path.join(APP.config['GIT_FOLDER'], request.repo.path)
+    parentpath = progit.get_repo_path(request.repo)
     orig_repo = pygit2.Repository(parentpath)
 
     # Clone the original repo into a temp folder
@@ -555,7 +551,7 @@ def new_request_pull(repo,  branch_to, branch_from, username=None):
             403,
             'You are not allowed to create pull-requests for this project')
 
-    repopath = _get_repo_path(repo)
+    repopath = progit.get_repo_path(request.epo)
     repo_obj = pygit2.Repository(repopath)
 
     parentpath = _get_parent_repo_path(repo)
