@@ -31,6 +31,7 @@ from sqlalchemy.orm import scoped_session
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
+import progit
 import progit.lib
 import progit.lib.model
 
@@ -49,6 +50,9 @@ if os.environ.get('BUILD_ID'):
             print 'Using faitout at: %s' % DB_PATH
     except:
         pass
+
+# Remove the log handlers for the tests
+progit.LOG.handlers = []
 
 
 @contextmanager
