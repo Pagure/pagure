@@ -123,3 +123,17 @@ class Hook(BaseHook):
             #os.path.join(repopath, 'hooks', 'post-receive.irc')
         #)
         #os.chmod(os.path.join(repopath, 'hooks', 'post-receive.irc'), 0755)
+
+    @classmethod
+    def remove(cls, project):
+        ''' Method called to remove the hook of a project.
+
+        :arg project: a ``progit.model.Project`` object to which the hook
+            should be installed
+
+        '''
+        repopath = get_repo_path(project)
+
+        #hook_path = os.path.join(repopath, 'hooks', 'post-receive.irc')
+        #if os.path.exists(hook_path):
+            #os.unlink(hook_path)
