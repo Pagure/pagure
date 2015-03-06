@@ -756,6 +756,89 @@ class ProgitFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertTrue('foo\n bar' in output.data)
 
+    def test_view_commit(self):
+        """ Test the view_commit endpoint. """
+        output = self.app.get('/foo/bar')
+        # No project registered in the DB
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+
+        output = self.app.get('/test/bar')
+        # No git repo associated
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects_git(tests.HERE)
+
+        output = self.app.get('/test/bar')
+        self.assertEqual(output.status_code, 404)
+
+        # Add a README to the git repo - First commit
+        tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
+        repo = pygit2.init_repository(os.path.join(tests.HERE, 'test.git'))
+        commit = repo.revparse_single('HEAD')
+
+        # View first commit
+        output = self.app.get('/test/%s' % commit.oid.hex)
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('<section class="commit_diff">' in output.data)
+        self.assertTrue('<th>Author</th>' in output.data)
+        self.assertTrue('<th>Committer</th>' in output.data)
+        self.assertTrue(
+            '<span style="color: #00A000">+ ProGit</span>' in output.data)
+        self.assertTrue(
+            '<span style="color: #00A000">+ ======</span>' in output.data)
+
+        # Add some content to the git repo
+        tests.add_content_git_repo(os.path.join(tests.HERE, 'test.git'))
+
+        repo = pygit2.init_repository(os.path.join(tests.HERE, 'test.git'))
+        commit = repo.revparse_single('HEAD')
+
+        # View another commit
+        output = self.app.get('/test/%s' % commit.oid.hex)
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('<section class="commit_diff">' in output.data)
+        self.assertTrue('<th>Author</th>' in output.data)
+        self.assertTrue('<th>Committer</th>' in output.data)
+        self.assertTrue(
+            '<div class="highlight" style="background: #f8f8f8">'
+            '<pre style="line-height: 125%">'
+            '<span style="color: #800080; font-weight: bold">'
+            '@@ -0,0 +1,3 @@</span>' in output.data)
+
+        # Add a fork of a fork
+        item = progit.lib.model.Project(
+            user_id=1,  # pingou
+            name='test3',
+            description='test project #3',
+            parent_id=1,
+        )
+        self.session.add(item)
+        self.session.commit()
+        forkedgit = os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git')
+
+        tests.add_content_git_repo(forkedgit)
+        tests.add_readme_git_repo(forkedgit)
+
+        repo = pygit2.init_repository(forkedgit)
+        commit = repo.revparse_single('HEAD')
+
+        # Commit does not exist in anothe repo :)
+        output = self.app.get('/test/%s' % commit.oid.hex)
+        self.assertEqual(output.status_code, 404)
+
+        # View commit of fork
+        output = self.app.get('/fork/pingou/test3/%s' % commit.oid.hex)
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('<section class="commit_diff">' in output.data)
+        self.assertTrue('<th>Author</th>' in output.data)
+        self.assertTrue('<th>Committer</th>' in output.data)
+        self.assertTrue(
+            '<span style="color: #00A000">+ ProGit</span>' in output.data)
+        self.assertTrue(
+            '<span style="color: #00A000">+ ======</span>' in output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskRepotests)
