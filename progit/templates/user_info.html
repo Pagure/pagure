@@ -23,6 +23,9 @@
 
     </h2>
     {{ repos_switch(False) }}
+    <p title="{{ user.created.strftime('%Y-%m-%d') }}">
+      Joined {{ user.created | humanize }}
+    </p>
 
     {{ render_repos(
             repos, total_page_repos, repopage,
