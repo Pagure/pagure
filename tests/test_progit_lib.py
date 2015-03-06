@@ -210,7 +210,7 @@ class ProgitLibtests(tests.Modeltests):
             issue=issue,
             ticketfolder=None)
         self.session.commit()
-        self.assertEqual(msg, 'No changes to edit')
+        self.assertEqual(msg, None)
 
         msg = progit.lib.edit_issue(
             session=self.session,
@@ -221,7 +221,7 @@ class ProgitLibtests(tests.Modeltests):
             status='Open',
         )
         self.session.commit()
-        self.assertEqual(msg, 'No changes to edit')
+        self.assertEqual(msg, None)
 
         msg = progit.lib.edit_issue(
             session=self.session,

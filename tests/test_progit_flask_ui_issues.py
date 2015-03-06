@@ -324,7 +324,7 @@ class ProgitFlaskIssuestests(tests.Modeltests):
             self.assertTrue('<p>test project #1</p>' in output.data)
             self.assertTrue(
                 '<li class="message">Comment added</li>' in output.data)
-            self.assertTrue(
+            self.assertFalse(
                 'li class="message">No changes to edit</li>' in output.data)
             self.assertTrue(
                 '<p>Woohoo a second comment !</p>' in output.data)
@@ -346,7 +346,7 @@ class ProgitFlaskIssuestests(tests.Modeltests):
             self.assertTrue('<p>test project #1</p>' in output.data)
             self.assertTrue(
                 '<li class="message">Tag added</li>' in output.data)
-            self.assertTrue(
+            self.assertFalse(
                 'li class="message">No changes to edit</li>' in output.data)
             self.assertTrue(
                 '<p>Woohoo a second comment !</p>' in output.data)
