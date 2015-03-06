@@ -78,15 +78,14 @@
 
             <label class="switch">
                 <input type="checkbox" class="switch-input"
-                    name="myrepos" id="monitor" checked>
+                    name="{% if all %}my{% endif %}repos" checked>
                 <span class="switch-label" data-on="On" data-off="Off"></span>
                 <span class="switch-handle"></span>
             </label>
         <strong>Forks:</strong>
             <label class="switch">
                 <input type="checkbox" class="switch-input"
-                    name="{% if all %}my{% endif %}forks" id="forks"
-                    checked>
+                    name="{% if all %}my{% endif %}forks" checked>
                 <span class="switch-label" data-on="On" data-off="Off"></span>
                 <span class="switch-handle"></span>
             </label>
