@@ -543,6 +543,9 @@ def view_commit_patch(repo, commitid, username=None):
     except ValueError:
         flask.abort(404, 'Commit not found')
 
+    if commit is None:
+        flask.abort(404, 'Commit not found')
+
     patch = progit.lib.git.commit_to_patch(repo_obj, commit)
 
     return flask.Response(patch, content_type="text/plain;charset=UTF-8")
