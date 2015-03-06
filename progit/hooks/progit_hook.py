@@ -19,7 +19,7 @@ from sqlalchemy.orm import relation
 
 from progit.hooks import BaseHook
 from progit.lib.model import BASE, Project
-from progit import SESSION, APP
+from progit import SESSION, APP, get_repo_path
 
 
 class ProgitTable(BASE):
@@ -70,9 +70,8 @@ class ProgitHook(BaseHook):
             should be installed
 
         '''
-        repopath = os.path.join(APP.config['GIT_FOLDER'], project.path)
-        if project.is_fork:
-            repopath = os.path.join(APP.config['FORK_FOLDER'], project.path)
+        repopath = get_repo_path(project)
+
         hook_files = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), 'files')
         repo_obj = pygit2.Repository(repopath)
@@ -92,9 +91,8 @@ class ProgitHook(BaseHook):
             should be installed
 
         '''
-        repopath = os.path.join(APP.config['GIT_FOLDER'], project.path)
-        if project.is_fork:
-            repopath = os.path.join(APP.config['FORK_FOLDER'], project.path)
+        repopath = get_repo_path(project)
+
         hook_path = os.path.join(repopath, 'hooks', 'post-receive.progit')
         if os.path.exists(hook_path):
             os.unlink(hook_path)
