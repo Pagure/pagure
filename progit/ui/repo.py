@@ -33,6 +33,7 @@ import progit.exceptions
 import progit.lib
 import progit.lib.git
 import progit.forms
+import progit
 import progit.ui.plugins
 from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
                     is_repo_admin)
@@ -48,12 +49,7 @@ def view_repo(repo, username=None):
     if repo is None:
         flask.abort(404, 'Project not found')
 
-    reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
-    if repo.is_fork:
-        reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
-
-    if not os.path.exists(reponame):
-        flask.abort(404, 'No git repo found')
+    reponame = progit.get_repo_path(repo)
 
     repo_obj = pygit2.Repository(reponame)
 
@@ -134,12 +130,7 @@ def view_repo_branch(repo, branchname, username=None):
     if not repo:
         flask.abort(404, 'Project not found')
 
-    reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
-    if repo.is_fork:
-        reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
-
-    if not os.path.exists(reponame):
-        flask.abort(404, 'No git repo found')
+    reponame = progit.get_repo_path(repo)
 
     repo_obj = pygit2.Repository(reponame)
 
@@ -215,12 +206,7 @@ def view_log(repo, branchname=None, username=None):
     if not repo:
         flask.abort(404, 'Project not found')
 
-    reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
-    if repo.is_fork:
-        reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
-
-    if not os.path.exists(reponame):
-        flask.abort(404, 'No git repo found')
+    reponame = progit.get_repo_path(repo)
 
     repo_obj = pygit2.Repository(reponame)
 
@@ -314,12 +300,7 @@ def view_file(repo, identifier, filename, username=None):
     if not repo:
         flask.abort(404, 'Project not found')
 
-    reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
-    if repo.is_fork:
-        reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
-
-    if not os.path.exists(reponame):
-        flask.abort(404, 'No git repo found')
+    reponame = progit.get_repo_path(repo)
 
     repo_obj = pygit2.Repository(reponame)
 
@@ -410,12 +391,7 @@ def view_raw_file(repo, identifier, filename=None, username=None):
     if not repo:
         flask.abort(404, 'Project not found')
 
-    reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
-    if repo.is_fork:
-        reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
-
-    if not os.path.exists(reponame):
-        flask.abort(404, 'No git repo found')
+    reponame = progit.get_repo_path(repo)
 
     repo_obj = pygit2.Repository(reponame)
 
@@ -482,12 +458,7 @@ def view_commit(repo, commitid, username=None):
     if not repo:
         flask.abort(404, 'Project not found')
 
-    reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
-    if repo.is_fork:
-        reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
-
-    if not os.path.exists(reponame):
-        flask.abort(404, 'No git repo found')
+    reponame = progit.get_repo_path(repo)
 
     repo_obj = pygit2.Repository(reponame)
 
@@ -529,12 +500,7 @@ def view_commit_patch(repo, commitid, username=None):
     if not repo:
         flask.abort(404, 'Project not found')
 
-    reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
-    if repo.is_fork:
-        reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
-
-    if not os.path.exists(reponame):
-        flask.abort(404, 'No git repo found')
+    reponame = progit.get_repo_path(repo)
 
     repo_obj = pygit2.Repository(reponame)
 
@@ -563,12 +529,7 @@ def view_tree(repo, identifier=None, username=None):
     if repo is None:
         flask.abort(404, 'Project not found')
 
-    reponame = os.path.join(APP.config['GIT_FOLDER'], repo.path)
-    if repo.is_fork:
-        reponame = os.path.join(APP.config['FORK_FOLDER'], repo.path)
-
-    if not os.path.exists(reponame):
-        flask.abort(404, 'No git repo found')
+    reponame = progit.get_repo_path(repo)
 
     repo_obj = pygit2.Repository(reponame)
 
