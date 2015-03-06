@@ -82,23 +82,22 @@ class Mail(BaseHook):
         repo_obj = pygit2.Repository(repopath)
 
         # Configure the hook
-        if dbobj.mail_to:
-            repo_obj.config.set_multivar(
-                'multimailhook.mailingList',
-                '',
-                dbobj.mail_to
-            )
-            repo_obj.config.set_multivar(
-                'multimailhook.environment', '', 'gitolite')
+        repo_obj.config.set_multivar(
+            'multimailhook.mailingList',
+            '',
+            dbobj.mail_to
+        )
+        repo_obj.config.set_multivar(
+            'multimailhook.environment', '', 'gitolite')
 
-            # Install the hook itself
-            shutil.copyfile(
-                os.path.join(hook_files, 'git_multimail.py'),
-                os.path.join(repopath, 'hooks', 'post-receive.mail')
-            )
-            os.chmod(
-                os.path.join(repopath, 'hooks', 'post-receive.mail'),
-                0755)
+        # Install the hook itself
+        shutil.copyfile(
+            os.path.join(hook_files, 'git_multimail.py'),
+            os.path.join(repopath, 'hooks', 'post-receive.mail')
+        )
+        os.chmod(
+            os.path.join(repopath, 'hooks', 'post-receive.mail'),
+            0755)
 
     @classmethod
     def remove(cls, project):
