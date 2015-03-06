@@ -16,7 +16,7 @@ import wtforms
 from flask.ext import wtf
 from sqlalchemy.orm import relation
 
-from progit.hooks import BaseHook
+from progit.hooks import BaseHook, RequiredIf
 from progit.lib.model import BASE, Project
 from progit import SESSION, APP, get_repo_path
 
@@ -55,15 +55,15 @@ class IrcForm(wtf.Form):
     ''' Form to configure the irc hook. '''
     server = wtforms.TextField(
         'Server <span class="error">*</span>',
-        [wtforms.validators.Required()]
+        [RequiredIf('active')]
     )
     port = wtforms.TextField(
         'Port <span class="error">*</span>',
-        [wtforms.validators.Required()]
+        [RequiredIf('active')]
     )
     room = wtforms.TextField(
         'Room <span class="error">*</span>',
-        [wtforms.validators.Required()]
+        [RequiredIf('active')]
     )
     nick = wtforms.TextField(
         'Nick',
