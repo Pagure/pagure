@@ -66,7 +66,7 @@ class BaseHook(object):
             os.chmod(postreceive, 0755)
 
     @classmethod
-    def install(cls, project, dbobj):
+    def install(cls, project, dbobj):  # pragma: no cover
         ''' Method called to install the hook for a project.
 
         :arg project: a ``progit.model.Project`` object to which the hook
@@ -78,7 +78,7 @@ class BaseHook(object):
         pass
 
     @classmethod
-    def remove(cls, project):
+    def remove(cls, project):  # pragma: no cover
         ''' Method called to remove the hook of a project.
 
         :arg project: a ``progit.model.Project`` object to which the hook
