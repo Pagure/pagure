@@ -457,9 +457,7 @@ def edit_issue(session, issue, ticketfolder,
     progit.lib.git.update_git_ticket(
         issue, repo=issue.project, ticketfolder=ticketfolder)
 
-    if not edit:
-        return 'No changes to edit'
-    else:
+    if edit:
         session.add(issue)
         session.flush()
         return 'Edited successfully issue #%s' % issue.id
