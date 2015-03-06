@@ -53,7 +53,7 @@ class MailForm(wtf.Form):
         [RequiredIf('active')]
     )
     active = wtforms.BooleanField(
-        'Acive',
+        'Active',
         [wtforms.validators.Optional()]
     )
 
