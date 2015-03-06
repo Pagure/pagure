@@ -65,6 +65,11 @@ class ProgitFlaskPluginstests(tests.Modeltests):
             output = self.app.get('/test/settings/Mail')
             self.assertEqual(output.status_code, 403)
 
+    def test_plugin_mail(self):
+        """ Test the mail plugin on/off endpoint. """
+
+        tests.create_projects(self.session)
+
         user = tests.FakeUser(username='pingou')
         with tests.user_set(progit.APP, user):
             output = self.app.get('/test/settings/Mail')
@@ -72,8 +77,7 @@ class ProgitFlaskPluginstests(tests.Modeltests):
             self.assertTrue('<p>test project #1</p>' in output.data)
             self.assertTrue('<h3>Mail</h3>' in output.data)
             self.assertTrue(
-                '<td><label for="mail_to">Mail to '
-                '<span class="error">*</span></label></td>'
+                '<td><label for="mail_to">Mail to</label></td>'
                 in output.data)
             self.assertTrue(
                 '<input id="active" name="active" type="checkbox" value="y">'
@@ -82,17 +86,14 @@ class ProgitFlaskPluginstests(tests.Modeltests):
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
-            data = {
-                'mail_to': 'foo@bar',
-            }
+            data = {}
 
             output = self.app.post('/test/settings/Mail', data=data)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
             self.assertTrue('<h3>Mail</h3>' in output.data)
             self.assertTrue(
-                '<td><label for="mail_to">Mail to '
-                '<span class="error">*</span></label></td>'
+                '<td><label for="mail_to">Mail to</label></td>'
                 in output.data)
             self.assertTrue(
                 '<input id="active" name="active" type="checkbox" value="y">'
@@ -113,15 +114,34 @@ class ProgitFlaskPluginstests(tests.Modeltests):
             self.assertTrue(
                 '<li class="message">Hook inactived</li>' in output.data)
             self.assertTrue(
-                '<td><label for="mail_to">Mail to '
-                '<span class="error">*</span></label></td>'
+                '<td><label for="mail_to">Mail to</label></td>'
                 in output.data)
             self.assertTrue(
                 '<input id="active" name="active" type="checkbox" value="y">'
                 in output.data)
 
-            data['csrf_token'] = csrf_token
-            data['active'] = 'y'
+            # Missing the required mail_to
+            data = {'csrf_token': csrf_token, 'active': 'y'}
+
+            output = self.app.post('/test/settings/Mail', data=data)
+            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertTrue('<h3>Mail</h3>' in output.data)
+            self.assertFalse(
+                '<li class="message">Hook activated</li>' in output.data)
+            self.assertTrue(
+                '<input id="mail_to" name="mail_to" type="text" value=""></td>'
+                '\n<td class="errors">This field is required.</td>'
+                in output.data)
+            self.assertTrue(
+                '<input checked id="active" name="active" type="checkbox" '
+                'value="y">' in output.data)
+
+            # Activate hook
+            data = {
+                'csrf_token': csrf_token,
+                'active': 'y',
+                'mail_to': 'foo@bar'
+            }
 
             output = self.app.post('/test/settings/Mail', data=data)
             self.assertTrue('<p>test project #1</p>' in output.data)
@@ -129,11 +149,24 @@ class ProgitFlaskPluginstests(tests.Modeltests):
             self.assertTrue(
                 '<li class="message">Hook activated</li>' in output.data)
             self.assertTrue(
-                '<td><label for="mail_to">Mail to '
-                '<span class="error">*</span></label></td>'
+                '<td><label for="mail_to">Mail to</label></td>'
                 in output.data)
             self.assertTrue(
                 '<input checked id="active" name="active" type="checkbox" '
+                'value="y">' in output.data)
+
+            # De-Activate hook
+            data = {'csrf_token': csrf_token}
+            output = self.app.post('/test/settings/Mail', data=data)
+            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertTrue('<h3>Mail</h3>' in output.data)
+            self.assertTrue(
+                '<li class="message">Hook inactived</li>' in output.data)
+            self.assertTrue(
+                '<td><label for="mail_to">Mail to</label></td>'
+                in output.data)
+            self.assertTrue(
+                '<input id="active" name="active" type="checkbox" '
                 'value="y">' in output.data)
 
 
