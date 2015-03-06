@@ -61,6 +61,15 @@ class ProgitFlaskApptests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertTrue('<h2>All Projects (2)</h2>' in output.data)
 
+        # Add a 3rd project with a long description
+        item = progit.lib.model.Project(
+            user_id=2,  # foo
+            name='test3',
+            description='test project #3 with a very long description',
+        )
+        self.session.add(item)
+        self.session.commit()
+
         user = tests.FakeUser()
         with tests.user_set(progit.APP, user):
             output = self.app.get('/?repopage=abc&forkpage=def')
@@ -72,7 +81,7 @@ class ProgitFlaskApptests(tests.Modeltests):
             self.assertTrue('<h3>My Projects (0)</h3>' in output.data)
             self.assertTrue(
                 '<section class="project_list" id="myrepos">' in output.data)
-            self.assertTrue('<h3>All Projects (2)</h3>' in output.data)
+            self.assertTrue('<h3>All Projects (3)</h3>' in output.data)
 
     def test_view_users(self):
         """ Test the view_users endpoint. """
