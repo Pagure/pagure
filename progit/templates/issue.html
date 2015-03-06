@@ -70,7 +70,11 @@
         {{ issue.assignee.username }}</a>
     {% endif %}
     {% if authenticated %}
-        <input type="hidden" value="{{ g.fas_user.username }}" name="assignee">
+        {% if issue.assignee -%}
+        <input value="{{ issue.assignee.username or '' }}" name="assignee">
+        {%- else -%}
+        <input value="" name="assignee" placeholer="username">
+        {%- endif -%}
     {% endif %}
 </section>
 
