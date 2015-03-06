@@ -50,7 +50,7 @@ class MailForm(wtf.Form):
     ''' Form to configure the mail hook. '''
     mail_to = wtforms.TextField(
         'Mail to <span class="error">*</span>',
-        [wtforms.validators.Required()]
+        [wtforms.validators.Optional()]
     )
     active = wtforms.BooleanField(
         'Acive',
