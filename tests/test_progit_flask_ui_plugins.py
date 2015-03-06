@@ -18,13 +18,25 @@ import sys
 import os
 
 import pygit2
+import wtforms
 from mock import patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
 import progit.lib
+import progit.hooks
 import tests
+
+
+class FakeForm(wtforms.Form):
+    ''' Form to configure the mail hook. '''
+    field1 = wtforms.TextField(
+        'Title', [progit.hooks.RequiredIf('active')]
+    )
+    field2 = wtforms.BooleanField(
+        'Title2', [wtforms.validators.Optional()]
+    )
 
 
 class ProgitFlaskPluginstests(tests.Modeltests):
@@ -64,6 +76,16 @@ class ProgitFlaskPluginstests(tests.Modeltests):
 
             output = self.app.get('/test/settings/Mail')
             self.assertEqual(output.status_code, 403)
+
+    def test_RequiredIf(self):
+        """ Test the behavior of the RequiredIf validator. """
+        form = FakeForm()
+
+        try:
+            form.validate()
+        except Exception, err:
+            self.assertEqual(
+                str(err), 'no field named "active" in form')
 
 
 if __name__ == '__main__':
