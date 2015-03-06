@@ -30,16 +30,6 @@ from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
                     is_repo_admin, generate_gitolite_acls)
 
 
-def _get_repo_path(repo):
-    """ Return the pat of the git repository corresponding to the provided
-    Repository object from the DB.
-    """
-    if repo.is_fork:
-        repopath = os.path.join(APP.config['FORK_FOLDER'], repo.path)
-    else:
-        repopath = os.path.join(APP.config['GIT_FOLDER'], repo.path)
-    return repopath
-
 
 def _get_parent_repo_path(repo):
     """ Return the path of the parent git repository corresponding to the

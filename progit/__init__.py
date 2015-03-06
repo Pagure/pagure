@@ -310,6 +310,21 @@ def __get_file_in_tree(repo_obj, tree, filepath):
                     repo_obj, repo_obj[el.oid], filepath[1:])
 
 
+def get_repo_path(repo):
+    """ Return the pat of the git repository corresponding to the provided
+    Repository object from the DB.
+    """
+    if repo.is_fork:
+        repopath = os.path.join(APP.config['FORK_FOLDER'], repo.path)
+    else:
+        repopath = os.path.join(APP.config['GIT_FOLDER'], repo.path)
+
+    if not os.path.exists(repopath):
+        flask.abort(404, 'No git repo found')
+
+    return repopath
+
+
 # Import the application
 import progit.ui.app
 import progit.ui.admin
