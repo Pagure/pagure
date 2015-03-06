@@ -70,7 +70,8 @@ def update_issue(repo, issueid, username=None):
                     ticketfolder=APP.config['TICKETS_FOLDER'],
                 )
                 SESSION.commit()
-                flask.flash(message)
+                if message:
+                    flask.flash(message)
 
             if tags:
                 for tag in tags:
@@ -82,7 +83,8 @@ def update_issue(repo, issueid, username=None):
                             ticketfolder=APP.config['TICKETS_FOLDER'],
                         )
                     SESSION.commit()
-                    flask.flash(message)
+                    if message:
+                        flask.flash(message)
 
             if assignee:
                 message = progit.lib.add_issue_assignee(
@@ -115,7 +117,8 @@ def update_issue(repo, issueid, username=None):
                     ticketfolder=APP.config['TICKETS_FOLDER'],
                 )
                 SESSION.commit()
-                flask.flash(message)
+                if message:
+                    flask.flash(message)
         except progit.exceptions.ProgitException, err:
             SESSION.rollback()
             flask.flash(str(err), 'error')
