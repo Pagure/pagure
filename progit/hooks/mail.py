@@ -17,7 +17,7 @@ import wtforms
 from flask.ext import wtf
 from sqlalchemy.orm import relation
 
-from progit.hooks import BaseHook
+from progit.hooks import BaseHook, RequiredIf
 from progit.lib.model import BASE, Project
 from progit import SESSION, APP, get_repo_path
 
@@ -50,7 +50,7 @@ class MailForm(wtf.Form):
     ''' Form to configure the mail hook. '''
     mail_to = wtforms.TextField(
         'Mail to',
-        [wtforms.validators.Optional()]
+        [RequiredIf('active')]
     )
     active = wtforms.BooleanField(
         'Acive',
