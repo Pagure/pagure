@@ -121,6 +121,9 @@
             <span class="new_commit" title="Commit not in the main repo">*</span>
             {% endif %}
             {{ commit.message.split('\n')[0] }}
+            <span class="commitdate" title="{{ commit.commit_time|format_ts }}">
+              {{ commit.commit_time|humanize }}
+            </span>
         </a>
       </li>
       {% endfor %}

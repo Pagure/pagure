@@ -374,6 +374,7 @@ table.list tr:hover td
 .tree_list li:hover a,
 .commit_list li:hover a,
 .commit_list li:hover > a > span.commitid,
+.commit_list li:hover > a > span.commitdate,
 .tree_list li:hover > a > span.filehex,
 table.list tr:hover td > a
 {
@@ -392,6 +393,13 @@ table.list tbody td > a
     color: #4d4d4d;
     display: inline-block;
     width: 5em;
+}
+
+.commit_list li > a > span.commitdate
+{
+    color: #4d4d4d;
+    display: inline-block;
+    float: right;
 }
 
 .pr {
