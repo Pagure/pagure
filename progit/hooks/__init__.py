@@ -30,8 +30,13 @@ class BaseHook(object):
         hook_files = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), 'files')
 
+        # Make sure the hooks folder exists
+        hookfolder = os.path.join(repopath, 'hooks')
+        if not os.path.exists(hookfolder):
+            os.makedirs(hookfolder)
+
         # Install the main post-receive file
-        postreceive = os.path.join(repopath, 'hooks', 'post-receive')
+        postreceive = os.path.join(hookfolder, 'post-receive')
         if not os.path.exists(postreceive):
             shutil.copyfile(
                 os.path.join(hook_files, 'post-receive'),
