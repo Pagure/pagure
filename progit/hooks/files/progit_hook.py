@@ -92,18 +92,17 @@ def generate_revision_change_log(new_commits_list):
                     project = motif.match(line).group(1)
                 else:
                     issueid = motif.match(line).group(1)
-                fixes_commit(
-                    commitid, issueid, project
-                )
+                fixes_commit(commitid, issueid, project)
         for motif in RELATES:
             if motif.match(line):
                 print 'relates to', motif.match(line).groups()
                 project = None
                 if len(motif.match(line).groups()) >= 2:
-                    project = motif.match(line).group(2)
-                relates_commit(
-                    commitid, motif.match(line).group(1), project
-                )
+                    issueid = motif.match(line).group(2)
+                    project = motif.match(line).group(1)
+                else:
+                    issueid = motif.match(line).group(1)
+                relates_commit(commitid, issueid, project)
 
 
 def relates_commit(commitid, issueid, project=None):
@@ -116,7 +115,7 @@ def relates_commit(commitid, issueid, project=None):
         repo = progit.lib.get_project(
             progit.SESSION, get_repo_name(), user=username)
     issue = progit.lib.search_issues(
-        progit.SESSION, repo, issueid=issueid)
+        progit.SESSION, repo=repo, issueid=issueid)
 
     if issue is None or issue.project != repo:
         return
