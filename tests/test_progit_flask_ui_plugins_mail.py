@@ -27,12 +27,12 @@ import progit.lib
 import tests
 
 
-class ProgitFlaskPluginstests(tests.Modeltests):
+class ProgitFlaskPluginMailtests(tests.Modeltests):
     """ Tests for flask plugins controller of progit """
 
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
-        super(ProgitFlaskPluginstests, self).setUp()
+        super(ProgitFlaskPluginMailtests, self).setUp()
 
         progit.APP.config['TESTING'] = True
         progit.SESSION = self.session
@@ -155,5 +155,6 @@ class ProgitFlaskPluginstests(tests.Modeltests):
 
 
 if __name__ == '__main__':
-    SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskPluginstests)
+    SUITE = unittest.TestLoader().loadTestsFromTestCase(
+        ProgitFlaskPluginMailtests)
     unittest.TextTestRunner(verbosity=2).run(SUITE)
