@@ -738,10 +738,12 @@ def delete_repo(repo, username=None):
         shutil.rmtree(repopath)
         shutil.rmtree(docpath)
         shutil.rmtree(ticketpath)
-        SESSION.commit()
     except (OSError, IOError), err:
         APP.logger.exception(err)
-        flask.flash('Could not delete the project from the system', 'error')
+        flask.flash('Could not delete all the repos from the system', 'error')
+
+    try:
+        SESSION.commit()
     except SQLAlchemyError, err:  # pragma: no cover
         SESSION.rollback()
         APP.logger.exception(err)
