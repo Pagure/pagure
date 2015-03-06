@@ -95,6 +95,9 @@ class ProgitFlaskPluginProgitHooktests(tests.Modeltests):
                 '<input id="active" name="active" type="checkbox" value="y">'
                 in output.data)
 
+            self.assertFalse(os.path.exists(os.path.join(
+                tests.HERE, 'test.git', 'hooks', 'post-receive.progit')))
+
             # Activate hook
             data = {
                 'csrf_token': csrf_token,
@@ -110,6 +113,9 @@ class ProgitFlaskPluginProgitHooktests(tests.Modeltests):
                 '<input checked id="active" name="active" type="checkbox" '
                 'value="y">' in output.data)
 
+            self.assertTrue(os.path.exists(os.path.join(
+                tests.HERE, 'test.git', 'hooks', 'post-receive.progit')))
+
             # De-Activate hook
             data = {'csrf_token': csrf_token}
             output = self.app.post('/test/settings/progit', data=data)
@@ -120,6 +126,9 @@ class ProgitFlaskPluginProgitHooktests(tests.Modeltests):
             self.assertTrue(
                 '<input id="active" name="active" type="checkbox" '
                 'value="y">' in output.data)
+
+            self.assertFalse(os.path.exists(os.path.join(
+                tests.HERE, 'test.git', 'hooks', 'post-receive.progit')))
 
 
 if __name__ == '__main__':
