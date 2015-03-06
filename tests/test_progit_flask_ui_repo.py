@@ -963,6 +963,77 @@ index 0000000..10d2e1c
 +Dev instance: http://209.132.184.222/ (/!\ May change unexpectedly, it's a dev instance ;-))
 ''' in output.data)
 
+    def test_view_tree(self):
+        """ Test the view_tree endpoint. """
+        output = self.app.get('/foo/tree/')
+        # No project registered in the DB
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+
+        output = self.app.get('/test/tree/')
+        # No git repo associated
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects_git(tests.HERE)
+
+        output = self.app.get('/test/tree/')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue(
+            '<h2>\n    <a href="/test/tree/">None</a>/</h2>' in output.data)
+        self.assertTrue(
+            'No content found in this repository' in output.data)
+
+        # Add a README to the git repo - First commit
+        tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
+        repo = pygit2.init_repository(os.path.join(tests.HERE, 'test.git'))
+        commit = repo.revparse_single('HEAD')
+
+        # View first commit
+        output = self.app.get('/test/tree/%s' % commit.oid.hex)
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('<p>test project #1</p>' in output.data)
+        self.assertTrue('<h3>Tree</h3>' in output.data)
+        self.assertTrue('README.rst' in output.data)
+        self.assertFalse(
+            'No content found in this repository' in output.data)
+
+        # View tree by branch
+        output = self.app.get('/test/tree/master')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('<p>test project #1</p>' in output.data)
+        self.assertTrue('<h3>Tree</h3>' in output.data)
+        self.assertTrue('README.rst' in output.data)
+        self.assertFalse(
+            'No content found in this repository' in output.data)
+
+        # Add a fork of a fork
+        item = progit.lib.model.Project(
+            user_id=1,  # pingou
+            name='test3',
+            description='test project #3',
+            parent_id=1,
+        )
+        self.session.add(item)
+        self.session.commit()
+        forkedgit = os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git')
+
+        tests.add_content_git_repo(forkedgit)
+
+        output = self.app.get('/fork/pingou/test3/tree/')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('<p>test project #3</p>' in output.data)
+        self.assertTrue('<h3>Tree</h3>' in output.data)
+        self.assertTrue(
+            '<a href="/fork/pingou/test3/blob/master/folder1">'
+            in output.data)
+        self.assertTrue(
+            '<a href="/fork/pingou/test3/blob/master/sources">'
+            in output.data)
+        self.assertFalse(
+            'No content found in this repository' in output.data)
+
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskRepotests)
