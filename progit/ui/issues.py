@@ -86,16 +86,15 @@ def update_issue(repo, issueid, username=None):
                     if message:
                         flask.flash(message)
 
-            if assignee:
-                message = progit.lib.add_issue_assignee(
-                    SESSION,
-                    issue=issue,
-                    assignee=assignee,
-                    user=flask.g.fas_user.username,
-                    ticketfolder=APP.config['TICKETS_FOLDER'],)
-                if message:
-                    SESSION.commit()
-                    flask.flash(message)
+            message = progit.lib.add_issue_assignee(
+                SESSION,
+                issue=issue,
+                assignee=assignee or None,
+                user=flask.g.fas_user.username,
+                ticketfolder=APP.config['TICKETS_FOLDER'],)
+            if message:
+                SESSION.commit()
+                flask.flash(message)
 
             if new_status == 'Fixed' and issue.parents:
                 for parent in issue.parents:
