@@ -99,6 +99,13 @@ class ProgitFlaskPluginstests(tests.Modeltests):
                 in output.data)
 
             data['csrf_token'] = csrf_token
+            # No git found
+            output = self.app.post('/test/settings/Mail', data=data)
+            self.assertEqual(output.status_code, 404)
+
+            tests.create_projects_git(tests.HERE)
+
+            # With the git repo
             output = self.app.post('/test/settings/Mail', data=data)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
@@ -115,13 +122,7 @@ class ProgitFlaskPluginstests(tests.Modeltests):
 
             data['csrf_token'] = csrf_token
             data['active'] = 'y'
-            # No git found
-            output = self.app.post('/test/settings/Mail', data=data)
-            self.assertEqual(output.status_code, 404)
 
-            tests.create_projects_git(tests.HERE)
-
-            # With the git and all
             output = self.app.post('/test/settings/Mail', data=data)
             self.assertTrue('<p>test project #1</p>' in output.data)
             self.assertTrue('<h3>Mail</h3>' in output.data)
