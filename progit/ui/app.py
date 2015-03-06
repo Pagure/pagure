@@ -223,12 +223,18 @@ def view_user(username):
     repos_obj = [
         pygit2.Repository(
             os.path.join(APP.config['GIT_FOLDER'], repo.path))
-        for repo in repos]
+        for repo in repos
+        if os.path.exists(
+            os.path.join(APP.config['GIT_FOLDER'], repo.path))
+        ]
 
     forks_obj = [
         pygit2.Repository(
             os.path.join(APP.config['FORK_FOLDER'], repo.path))
-        for repo in forks]
+        for repo in forks
+        if os.path.exists(
+            os.path.join(APP.config['FORK_FOLDER'], repo.path))
+        ]
 
     return flask.render_template(
         'user_info.html',
