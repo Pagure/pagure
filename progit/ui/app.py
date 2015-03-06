@@ -176,6 +176,7 @@ def view_users():
 def view_user(username):
     """ Front page of a specific user.
     """
+    user = progit.lib.search_user(SESSION, username=username)
 
     repopage = flask.request.args.get('repopage', 1)
     try:
@@ -239,6 +240,7 @@ def view_user(username):
     return flask.render_template(
         'user_info.html',
         username=username,
+        user=user,
         repos=repos,
         repos_obj=repos_obj,
         total_page_repos=total_page_repos,
