@@ -191,7 +191,7 @@ def add_issue_tag(session, issue, tag, user, ticketfolder):
 
 def add_issue_assignee(session, issue, assignee, user, ticketfolder):
     ''' Add an assignee to an issue, in other words, assigned an issue. '''
-    if assignee is None:
+    if assignee is None and issue.assignee != None:
         issue.assignee_id = None
         session.add(issue)
         session.commit()
@@ -200,6 +200,8 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
 
         progit.lib.notify.notify_assigned_issue(issue, None, user)
         return 'Assignee reset'
+    elif assignee is None and issue.assignee == None:
+        return
 
     user_obj = __get_user(session, user)
     # Validate the assignee
