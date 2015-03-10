@@ -11,6 +11,7 @@
 import os
 import shutil
 
+import flask
 import sqlalchemy as sa
 import pygit2
 import wtforms
@@ -61,6 +62,31 @@ class ProgitTicketHook(BaseHook):
     db_object = ProgitTicketsTable
     backref = 'progit_hook_tickets'
     form_fields = ['active']
+
+    @classmethod
+    def set_up(cls, project):
+        ''' Install the generic post-receive hook that allow us to call
+        multiple post-receive hooks as set per plugin.
+        '''
+        repopath = os.path.join(APP.config['TICKETS_FOLDER'], project.path)
+        if not os.path.exists(repopath):
+            flask.abort(404, 'No git repo found')
+
+        hook_files = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), 'files')
+
+        # Make sure the hooks folder exists
+        hookfolder = os.path.join(repopath, 'hooks')
+        if not os.path.exists(hookfolder):
+            os.makedirs(hookfolder)
+
+        # Install the main post-receive file
+        postreceive = os.path.join(hookfolder, 'post-receive')
+        if not os.path.exists(postreceive):
+            shutil.copyfile(
+                os.path.join(hook_files, 'post-receive'),
+                postreceive)
+            os.chmod(postreceive, 0755)
 
     @classmethod
     def install(cls, project, dbobj):
