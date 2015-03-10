@@ -59,7 +59,7 @@ class ProgitTicketHook(BaseHook):
     name = 'progit tickets'
     form = ProgitTicketsForm
     db_object = ProgitTicketsTable
-    backref = 'progit_tickets_hook'
+    backref = 'progit_hook_tickets'
     form_fields = ['active']
 
     @classmethod
