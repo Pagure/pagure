@@ -97,6 +97,9 @@ class ProgitTicketHook(BaseHook):
 
         '''
         repopath = os.path.join(APP.config['TICKETS_FOLDER'], project.path)
+        if not os.path.exists(repopath):
+            flask.abort(404, 'No git repo found')
+
         hook_files = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), 'files')
         repo_obj = pygit2.Repository(repopath)
@@ -119,6 +122,9 @@ class ProgitTicketHook(BaseHook):
 
         '''
         repopath = os.path.join(APP.config['TICKETS_FOLDER'], project.path)
+        if not os.path.exists(repopath):
+            flask.abort(404, 'No git repo found')
+
         hook_path = os.path.join(
             repopath, 'hooks', 'post-receive.progit_tickets')
         if os.path.exists(hook_path):
