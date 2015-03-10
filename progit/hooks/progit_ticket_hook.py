@@ -48,7 +48,7 @@ class ProgitTicketsTable(BASE):
 class ProgitTicketsForm(wtf.Form):
     ''' Form to configure the progit hook. '''
     active = wtforms.BooleanField(
-        'Acive',
+        'Active',
         [wtforms.validators.Optional()]
     )
 
