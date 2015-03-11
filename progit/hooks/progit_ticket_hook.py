@@ -110,7 +110,7 @@ class ProgitTicketHook(BaseHook):
             os.path.join(repopath, 'hooks', 'post-receive.progit')
         )
         os.chmod(
-            os.path.join(repopath, 'hooks', 'post-receive.progit_tickets'),
+            os.path.join(repopath, 'hooks', 'post-receive.progit'),
             0755)
 
     @classmethod
@@ -126,6 +126,6 @@ class ProgitTicketHook(BaseHook):
             flask.abort(404, 'No git repo found')
 
         hook_path = os.path.join(
-            repopath, 'hooks', 'post-receive.progit_tickets')
+            repopath, 'hooks', 'post-receive.progit')
         if os.path.exists(hook_path):
             os.unlink(hook_path)
