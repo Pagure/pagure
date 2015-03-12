@@ -38,6 +38,7 @@ class ProgitFlaskAdmintests(tests.Modeltests):
         progit.SESSION = self.session
         progit.ui.SESSION = self.session
         progit.ui.app.SESSION = self.session
+        progit.ui.repo.SESSION = self.session
         progit.ui.admin.SESSION = self.session
 
         progit.APP.config['GIT_FOLDER'] = tests.HERE
