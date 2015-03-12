@@ -39,7 +39,6 @@ class ProgitFlaskPluginProgitTicketHooktests(tests.Modeltests):
         progit.ui.SESSION = self.session
         progit.ui.app.SESSION = self.session
         progit.ui.plugins.SESSION = self.session
-        progit.hooks.progit_ticket_hook.SESSION = self.session
 
         progit.APP.config['GIT_FOLDER'] = tests.HERE
         progit.APP.config['FORK_FOLDER'] = os.path.join(
@@ -50,8 +49,8 @@ class ProgitFlaskPluginProgitTicketHooktests(tests.Modeltests):
             tests.HERE, 'docs')
         self.app = progit.APP.test_client()
 
-    def test_plugin_mail(self):
-        """ Test the mail plugin on/off endpoint. """
+    def test_plugin_progit_ticket(self):
+        """ Test the progit_ticket plugin on/off endpoint. """
 
         tests.create_projects(self.session)
 
@@ -99,7 +98,7 @@ class ProgitFlaskPluginProgitTicketHooktests(tests.Modeltests):
 
             self.assertFalse(os.path.exists(os.path.join(
                 tests.HERE, 'tickets', 'test.git', 'hooks',
-                'post-receive.progit_tickets')))
+                'post-receive.progit')))
 
             # Activate hook
             data = {
@@ -119,7 +118,7 @@ class ProgitFlaskPluginProgitTicketHooktests(tests.Modeltests):
 
             self.assertTrue(os.path.exists(os.path.join(
                 tests.HERE, 'tickets', 'test.git', 'hooks',
-                'post-receive.progit_tickets')))
+                'post-receive.progit')))
 
             # De-Activate hook
             data = {'csrf_token': csrf_token}
@@ -134,7 +133,7 @@ class ProgitFlaskPluginProgitTicketHooktests(tests.Modeltests):
 
             self.assertFalse(os.path.exists(os.path.join(
                 tests.HERE, 'tickets', 'test.git', 'hooks',
-                'post-receive.progit_tickets')))
+                'post-receive.progit')))
 
 
 if __name__ == '__main__':
