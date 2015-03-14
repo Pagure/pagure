@@ -21,6 +21,8 @@ import progit
 import progit.exceptions
 
 
+# TODO: Move this to progit.lib so that it can also be used in comments
+# in tickets or pull-requests
 FIXES = [
     re.compile('fixe?[sd]?:?\s?#(\d+)', re.I),
     re.compile('.*\s+fixe?[sd]?:?\s?#(\d+)', re.I),
