@@ -295,6 +295,7 @@ class Issue(BASE):
             'status_issue.status', ondelete='CASCADE', onupdate='CASCADE'),
         default='Open',
         nullable=False)
+    private = sa.Column(sa.Boolean, nullable=False, default=False)
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
@@ -340,7 +341,8 @@ class Issue(BASE):
             'user': {
                 'name': self.user.user,
                 'emails': [email.email for email in self.user.emails],
-            }
+            },
+            'private': self.private,
         }
 
         comments = []
