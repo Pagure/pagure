@@ -70,11 +70,8 @@
         {{ issue.assignee.username }}</a>
     {% endif %}
     {% if authenticated %}
-        {% if issue.assignee -%}
-        <input value="{{ issue.assignee.username or '' }}" name="assignee" id="assignee">
-        {%- else -%}
-        <input value="" name="assignee" placeholer="username" id="assignee">
-        {%- endif -%}
+        <input value="{{ issue.assignee.username or '' }}"
+          name="assignee" id="assignee" placeholder="username" >
     {% endif %}
 </section>
 
