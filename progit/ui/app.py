@@ -331,10 +331,13 @@ def user_settings():
 
 
 @APP.route('/markdown/', methods=['POST'])
-@cla_required
 def markdown_preview():
     """ Return the provided markdown text in html.
 
     The text has to be provided via the parameter 'content' of a POST query.
     """
-    return progit.ui.filters.markdown_filter(flask.request.form['content'])
+    form = progit.forms.ConfirmationForm()
+    if form.validate_on_submit():
+        return progit.ui.filters.markdown_filter(flask.request.form['content'])
+    else:
+        flask.abort(400, 'Invalid request')
