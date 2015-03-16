@@ -604,7 +604,7 @@ def get_project(session, name, user=None):
 
 def search_issues(
         session, repo, issueid=None, status=None, closed=False, tags=None,
-        assignee=None, author=None):
+        assignee=None, author=None, private=None):
     ''' Retrieve one or more issues associated to a project with the given
     criterias.
 
@@ -634,6 +634,13 @@ def search_issues(
     :type assignee: str or None
     :kwarg author: the name of the user who created the issues to search
     :type author: str or None
+    :kwarg private: boolean or string to use to include or exclude private
+        tickets. Defaults to False.
+        If False: private tickets are excluded
+        If None: private tickets are included
+        If user name is specified: private tickets reported by that user
+        are included.
+    :type private: False, None or str
 
     :return: A single Issue object if issueid is specified, a list of Project
         objects otherwise.
@@ -690,6 +697,22 @@ def search_issues(
             model.Issue.user_id == model.User.id
         ).filter(
             model.User.user == author
+        )
+
+    if private is False:
+        query = query.filter(
+            model.Issue.private == False
+        )
+    elif isinstance(private, basestring):
+        query = query.filter(
+            or_(
+                model.Issue.private == False,
+                and_(
+                    model.Issue.private == True,
+                    model.Issue.user_id == model.User.id,
+                    model.User.user == private,
+                )
+            )
         )
 
     if issueid is not None:
