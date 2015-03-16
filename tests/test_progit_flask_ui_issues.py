@@ -232,6 +232,37 @@ class ProgitFlaskIssuestests(tests.Modeltests):
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
+        # Create private issue
+        repo = progit.lib.get_project(self.session, 'test')
+        msg = progit.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None,
+            private=True,
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Issue created')
+
+        # Not logged in
+        output = self.app.get('/test/issue/2')
+        self.assertEqual(output.status_code, 403)
+
+        # Wrong user
+        user = tests.FakeUser()
+        with tests.user_set(progit.APP, user):
+            output = self.app.get('/test/issue/2')
+            self.assertEqual(output.status_code, 403)
+
+        # reporter
+        user.username = 'pingou'
+        with tests.user_set(progit.APP, user):
+            output = self.app.get('/test/issue/2')
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<p>test project #1</p>' in output.data)
+
         # Project w/o issue tracker
         repo = progit.lib.get_project(self.session, 'test')
         repo.issue_tracker = False
@@ -435,6 +466,27 @@ class ProgitFlaskIssuestests(tests.Modeltests):
             self.assertTrue(
                 '<option selected value="Open">Open</option>'
                 in output.data)
+
+        # Create private issue
+        repo = progit.lib.get_project(self.session, 'test')
+        msg = progit.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None,
+            private=True,
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Issue created')
+
+        # Wrong user
+        user = tests.FakeUser()
+        with tests.user_set(progit.APP, user):
+            output = self.app.post(
+                '/test/issue/3/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 403)
 
         # Project w/o issue tracker
         repo = progit.lib.get_project(self.session, 'test')
