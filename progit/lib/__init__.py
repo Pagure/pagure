@@ -442,7 +442,7 @@ def new_pull_request(session, repo_from, branch_from,
 
 
 def edit_issue(session, issue, ticketfolder,
-               title=None, content=None, status=None):
+               title=None, content=None, status=None, private=False):
     ''' Edit the specified issue.
     '''
     edit = []
@@ -455,6 +455,9 @@ def edit_issue(session, issue, ticketfolder,
     if status and status != issue.status:
         issue.status = status
         edit.append('status')
+    if private in [True, False] and private != issue.private:
+        issue.private = private
+        edit.append('private')
 
     progit.lib.git.update_git_ticket(
         issue, repo=issue.project, ticketfolder=ticketfolder)
