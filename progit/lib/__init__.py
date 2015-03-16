@@ -391,7 +391,8 @@ def new_project(session, user, name, gitfolder, docfolder, ticketfolder,
     return 'Project "%s" created' % name
 
 
-def new_issue(session, repo, title, content, user, ticketfolder):
+def new_issue(session, repo, title, content, user, ticketfolder,
+              private=False):
     ''' Create a new issue for the specified repo. '''
     user_obj = __get_user(session, user)
 
@@ -402,6 +403,7 @@ def new_issue(session, repo, title, content, user, ticketfolder):
         content=content,
         user_id=user_obj.id,
         uid=uuid.uuid4().hex,
+        private=private,
     )
     session.add(issue)
     # Make sure we won't have SQLAlchemy error before we create the issue
