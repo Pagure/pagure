@@ -238,25 +238,33 @@ class ProgitFlaskApptests(tests.Modeltests):
             'content': 'test\n----\n\n * 1\n * item 2'
         }
 
-        output = self.app.post(
-            '/markdown/', data=data)
-        self.assertEqual(output.status_code, 302)
-        self.assertTrue(
-            '<p>You should be redirected automatically to target URL: '
-            '<a href="/login/?next=http%3A%2F%2Flocalhost%2Fmarkdown%2F">'
-            '/login/?next=http%3A%2F%2Flocalhost%2Fmarkdown%2F</a>.  '
-            'If not click the link.' in output.data)
+        # CSRF missing
+        output = self.app.post('/markdown/', data=data)
+        self.assertEqual(output.status_code, 400)
 
         user = tests.FakeUser()
+        user.username = 'foo'
         with tests.user_set(progit.APP, user):
-            output = self.app.post('/markdown/', data=data)
+            output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
-            exp = """<h2>test</h2>
+            self.assertTrue("<h2>foo's settings</h2>" in output.data)
+            self.assertTrue(
+                '<textarea id="ssh_key" name="ssh_key"></textarea>'
+                in output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+        # With CSRF
+        data['csrf_token'] = csrf_token
+        output = self.app.post('/markdown/', data=data)
+        self.assertEqual(output.status_code, 200)
+        exp = """<h2>test</h2>
 <ul>
 <li>1</li>
 <li>item 2</li>
 </ul>"""
-            self.assertEqual(output.data, exp)
+        self.assertEqual(output.data, exp)
 
 
 if __name__ == '__main__':
