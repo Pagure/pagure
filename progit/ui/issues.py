@@ -48,7 +48,9 @@ def update_issue(repo, issueid, username=None):
         flask.abort(404, 'Issue not found')
 
     if issue.private and not is_repo_admin(repo) \
-            and not issue.user.user == flask.g.fas_user.username:
+            and (
+                not authenticated() or
+                not issue.user.user == flask.g.fas_user.username):
         flask.abort(
             403, 'This issue is private and you are not allowed to view it')
 
@@ -341,7 +343,9 @@ def view_issue(repo, issueid, username=None):
         flask.abort(404, 'Issue not found')
 
     if issue.private and not is_repo_admin(repo) \
-            and not issue.user.user == flask.g.fas_user.username:
+            and (
+                not authenticated() or
+                not issue.user.user == flask.g.fas_user.username):
         flask.abort(
             403, 'This issue is private and you are not allowed to view it')
 
@@ -387,7 +391,9 @@ def edit_issue(repo, issueid, username=None):
         flask.abort(404, 'Issue not found')
 
     if issue.private and not is_repo_admin(repo) \
-            and not issue.user.user == flask.g.fas_user.username:
+            and (
+                not authenticated() or
+                not issue.user.user == flask.g.fas_user.username):
         flask.abort(
             403, 'This issue is private and you are not allowed to view it')
 
