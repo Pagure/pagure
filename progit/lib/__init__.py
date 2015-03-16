@@ -630,6 +630,11 @@ def search_issues(
     :type closed: bool or None
     :kwarg tags: a tag the issue(s) returned should be associated with
     :type tags: str or list(str) or None
+    :kwarg assignee: the name of the user assigned to the issues to search
+    :type assignee: str or None
+    :kwarg author: the name of the user who created the issues to search
+    :type author: str or None
+
     :return: A single Issue object if issueid is specified, a list of Project
         objects otherwise.
     :rtype: Project or [Project]
