@@ -304,7 +304,7 @@ index 0000000..60f7480
 --- /dev/null
 +++ b/456
 @@ -0,0 +1 @@
-+{"status": "Open", "title": "Test issue", "comments": [], "content": "We should work on this", "user": {"name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null}
++{"status": "Open", "title": "Test issue", "private": false, "content": "We should work on this", "user": {"name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "comments": []}
 \ No newline at end of file
 
 """
@@ -362,9 +362,9 @@ index 458821a..77674a8
 --- a/123
 +++ b/456
 @@ -1 +1 @@
--{"status": "Open", "title": "Test issue", "comments": [], "content": "We should work on this", "user": {"name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null}
+-{"status": "Open", "title": "Test issue", "private": false, "content": "We should work on this", "user": {"name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "comments": []}
 \ No newline at end of file
-+{"status": "Open", "title": "Test issue", "comments": [{"comment": "Hey look a comment!", "date_created": null, "id": 1, "parent": null, "user": {"name": "foo", "emails": ["foo@bar.com"]}}], "content": "We should work on this", "user": {"name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null}
++{"status": "Open", "title": "Test issue", "private": false, "content": "We should work on this", "user": {"name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "comments": [{"comment": "Hey look a comment!", "date_created": null, "id": 1, "parent": null, "user": {"name": "foo", "emails": ["foo@bar.com"]}}]}
 \ No newline at end of file
 
 """
