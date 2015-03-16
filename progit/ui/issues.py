@@ -405,6 +405,7 @@ def edit_issue(repo, issueid, username=None):
         form.title.data = issue.title
         form.issue_content.data = issue.content
         form.status.data = issue.status
+        form.private.data = issue.private
 
     return flask.render_template(
         'new_issue.html',
