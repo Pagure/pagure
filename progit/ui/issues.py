@@ -397,6 +397,7 @@ def edit_issue(repo, issueid, username=None):
         title = form.title.data
         content = form.issue_content.data
         status = form.status.data
+        private = form.private.data
 
         try:
             message = progit.lib.edit_issue(
@@ -406,6 +407,7 @@ def edit_issue(repo, issueid, username=None):
                 content=content,
                 status=status,
                 ticketfolder=APP.config['TICKETS_FOLDER'],
+                private=private,
             )
             SESSION.commit()
             flask.flash(message)
