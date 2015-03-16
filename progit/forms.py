@@ -87,7 +87,7 @@ class UpdateIssueForm(wtf.Form):
     )
     status = wtforms.SelectField(
         'Status',
-        [wtforms.validators.Required()],
+        [wtforms.validators.Optional()],
         choices=[(item, item) for item in []]
     )
 
