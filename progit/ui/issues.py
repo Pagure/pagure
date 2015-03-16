@@ -105,7 +105,6 @@ def update_issue(repo, issueid, username=None):
 
             if new_status == 'Fixed' and issue.parents:
                 for parent in issue.parents:
-                    print parent
                     if parent.status == 'Open':
                         flask.flash(
                             'You cannot close a ticket that has ticket '
