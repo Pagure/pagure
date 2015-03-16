@@ -71,9 +71,9 @@
     {% endif %}
     {% if authenticated %}
         {% if issue.assignee -%}
-        <input value="{{ issue.assignee.username or '' }}" name="assignee">
+        <input value="{{ issue.assignee.username or '' }}" name="assignee" id="assignee">
         {%- else -%}
-        <input value="" name="assignee" placeholer="username">
+        <input value="" name="assignee" placeholer="username" id="assignee">
         {%- endif -%}
     {% endif %}
 </section>
@@ -223,6 +223,21 @@ $(function() {
       );
     },
     minLength: 0,
+    delay: 200,
+  });
+
+  $('#assignee').autocomplete({
+    source: function( request, response ) {
+      $.getJSON(
+        "{{ url_for('api_ns.api_users') }}", {
+          pattern: request.term
+        },
+        function( data ) {
+          response( data.users );
+        }
+      );
+    },
+    minLength: 2,
     delay: 200,
   });
 
