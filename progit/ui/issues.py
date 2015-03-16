@@ -47,6 +47,11 @@ def update_issue(repo, issueid, username=None):
     if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
 
+    if issue.private and not is_repo_admin(repo) \
+            and not issue.user.user == flask.g.fas_user.username:
+        flask.abort(
+            403, 'This issue is private and you are not allowed to view it')
+
     status = progit.lib.get_issue_statuses(SESSION)
     form = progit.forms.UpdateIssueForm(status=status)
 
