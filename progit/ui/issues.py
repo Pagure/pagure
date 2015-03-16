@@ -114,7 +114,7 @@ def update_issue(repo, issueid, username=None):
                             'view_issue', repo=repo.name, username=username,
                             issueid=issueid))
 
-            if new_status:
+            if new_status in status:
                 message = progit.lib.edit_issue(
                     SESSION,
                     issue=issue,
