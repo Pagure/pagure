@@ -167,7 +167,10 @@ $(function() {
           $.ajax({
               url: _url ,
               type: 'POST',
-              data: {content: _text},
+              data: {
+                content: _text,
+                csrf_token: "{{ form.csrf_token.current_token }}",
+              },
               dataType: 'html',
               success: function(res) {
                   $( "#preview" ).html(res);
