@@ -237,6 +237,15 @@ def view_issues(repo, username=None):
     if not repo.issue_tracker:
         flask.abort(404, 'No issue tracker found for this project')
 
+    # Hide private tickets
+    private = False
+    # If user is authenticated, show him/her his/her private tickets
+    if authenticated():
+        private = flask.g.fas_user.username
+    # If user is repo admin, show all tickets included the private ones
+    if is_repo_admin(repo):
+        private = None
+
     if status is not None:
         if status.lower() == 'closed':
             issues = progit.lib.search_issues(
@@ -246,6 +255,7 @@ def view_issues(repo, username=None):
                 tags=tags,
                 assignee=assignee,
                 author=author,
+                private=private,
             )
         else:
             issues = progit.lib.search_issues(
@@ -255,11 +265,12 @@ def view_issues(repo, username=None):
                 tags=tags,
                 assignee=assignee,
                 author=author,
+                private=private,
             )
     else:
         issues = progit.lib.search_issues(
             SESSION, repo, status='Open', tags=tags, assignee=assignee,
-            author=author)
+            author=author, private=private)
 
     tag_list = progit.lib.get_tags_of_project(SESSION, repo)
 
