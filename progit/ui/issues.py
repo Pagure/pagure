@@ -285,6 +285,7 @@ def new_issue(repo, username=None):
     if form.validate_on_submit():
         title = form.title.data
         content = form.issue_content.data
+        private = form.private.data
 
         try:
             message = progit.lib.new_issue(
@@ -292,6 +293,7 @@ def new_issue(repo, username=None):
                 repo=repo,
                 title=title,
                 content=content,
+                private=private or False,
                 user=flask.g.fas_user.username,
                 ticketfolder=APP.config['TICKETS_FOLDER'],
             )
