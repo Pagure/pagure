@@ -79,6 +79,9 @@ class UpdateIssueForm(wtf.Form):
     depends = wtforms.TextField(
         'dependency issue', [wtforms.validators.Optional()]
     )
+    blocks = wtforms.TextField(
+        'blocked issue', [wtforms.validators.Optional()]
+    )
     comment = wtforms.TextAreaField(
         'Comment', [wtforms.validators.Optional()]
     )
