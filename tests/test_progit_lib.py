@@ -321,8 +321,8 @@ class ProgitLibtests(tests.Modeltests):
 
     @patch('progit.lib.git.update_git_ticket')
     @patch('progit.lib.notify.send_email')
-    def test_remove_issue_tags(self, p_send_email, p_ugt):
-        """ Test the remove_issue_tags of progit.lib. """
+    def test_remove_tags(self, p_send_email, p_ugt):
+        """ Test the remove_tags of progit.lib. """
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -332,12 +332,12 @@ class ProgitLibtests(tests.Modeltests):
 
         self.assertRaises(
             progit.exceptions.ProgitException,
-            progit.lib.remove_issue_tags,
+            progit.lib.remove_tags,
             session=self.session,
             project=repo,
             tags='foo')
 
-        msgs = progit.lib.remove_issue_tags(
+        msgs = progit.lib.remove_tags(
             session=self.session,
             project=repo,
             tags='tag1')

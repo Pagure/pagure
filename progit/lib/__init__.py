@@ -251,7 +251,7 @@ def add_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
         return 'Dependency added'
 
 
-def remove_issue_tags(session, project, tags):
+def remove_tags(session, project, tags):
     ''' Removes the specified tag of a project. '''
 
     if not isinstance(tags, list):
