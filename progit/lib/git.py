@@ -21,6 +21,7 @@ import uuid
 import pygit2
 
 import progit.exceptions
+import progit.lib
 import progit.lib.notify
 from progit.lib import model
 
@@ -197,3 +198,102 @@ def update_git_ticket(issue, repo, ticketfolder):
 
     # Remove the clone
     shutil.rmtree(newpath)
+
+
+def get_user_from_json(session, jsondata):
+    """ From the given json blob, retrieve the user info and search for it
+    in the db and create the user if it does not already exist.
+    """
+    user = None
+
+    username = jsondata.get('user', {}).get('name')
+    fullname = jsondata.get('user', {}).get('fullname')
+    useremails = jsondata.get('user', {}).get('emails')
+    user = progit.lib.search_user(session, username=username)
+    if not user:
+        for email in useremails:
+            user = progit.lib.search_user(session, email=email)
+            if user:
+                break
+
+    if not user:
+        user = progit.lib.set_up_user(
+            session=session,
+            username=username,
+            fullname=fullname or username,
+            user_email=useremails[0],
+        )
+        session.commit()
+
+    return user
+
+
+
+def update_ticket_from_git(
+        session, reponame, username, issue_uid, json_data):
+    """ Update the specified issue (identified by its unique identifier)
+    with the data present in the json blob provided.
+
+    :arg session: the session to connect to the database with.
+    :arg repo: the name of the project to update
+    :arg issue_uid: the unique identifier of the issue to update
+    :arg json_data: the json representation of the issue taken from the git
+        and used to update the data in the database.
+
+    """
+    print json.dumps(json_data, sort_keys=True,
+                     indent=4, separators=(',', ': '))
+
+    repo = progit.lib.get_project(session, reponame, user=username)
+    if not repo:
+        raise progit.exceptions.ProgitException(
+            'Unknown repo %s of username: %s' % (reponame, username))
+
+    user = get_user_from_json(session, json_data)
+
+    issue = progit.lib.get_issue_by_uid(session, issue_uid=issue_uid)
+    if not issue:
+        # Create new issue
+        progit.lib.new_issue(
+            session,
+            repo=repo,
+            title=json_data.get('title'),
+            content=json_data.get('content'),
+            user=user.username,
+            ticketfolder=None,
+            issue_id=json_data.get('id'),
+            issue_uid=issue_uid,
+            private=json_data.get('private'),
+            status=json_data.get('status'),
+            notify=False,
+        )
+
+    else:
+        # Edit existing issue
+        progit.lib.edit_issue(
+            session,
+            issue=issue,
+            ticketfolder=None,
+            title=json_data.get('title'),
+            content=json_data.get('content'),
+            status=json_data.get('status'),
+            private=json_data.get('private'),
+        )
+    session.commit()
+
+    issue = progit.lib.get_issue_by_uid(session, issue_uid=issue_uid)
+
+    for comment in json_data['comments']:
+        user = get_user_from_json(session, comment)
+        commentobj = progit.lib.get_issue_comment(
+            session, issue_uid, comment['id'])
+        if not commentobj:
+            progit.lib.add_issue_comment(
+                session,
+                issue=issue,
+                comment=comment['comment'],
+                user=user.username,
+                ticketfolder=None,
+                notify=False,
+            )
+    session.commit()

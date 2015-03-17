@@ -5,6 +5,7 @@
 the information pushed in the tickets git repository.
 """
 
+import json
 import os
 import re
 import sys
@@ -19,6 +20,7 @@ if 'PROGIT_CONFIG' not in os.environ \
 
 sys.path.insert(0, os.path.expanduser('~/repos/gitrepo/progit'))
 
+import progit.lib.git
 
 def read_git_output(args, input=None, keepends=False, **kw):
     """Read the output of a Git command."""
@@ -53,14 +55,16 @@ def read_output(cmd, input=None, keepends=False, **kw):
 
 def get_files_to_load(new_commits_list):
 
-    print 'Files changed by new commits:\n\n'
+    print 'Files changed by new commits:\n'
     file_list = []
-    for line in read_git_lines(
-            ['show', '--pretty="format:"', '--name-only', '-r']
-            + new_commits_list,
-            keepends=False,):
-        if line.strip():
-            file_list.append(line.strip())
+    new_commits_list.reverse()
+    for commit in new_commits_list:
+        filenames = read_git_lines(
+            ['diff-tree', '--no-commit-id', '--name-only', '-r', commit],
+            keepends=False)
+        for line in filenames:
+            if line.strip():
+                file_list.append(line.strip())
 
     return file_list
 
@@ -70,7 +74,10 @@ def get_commits_id(fromrev, torev):
     of their identifier.
     '''
     cmd = ['rev-list', '%s...%s' % (torev, fromrev)]
-    return read_git_lines(cmd)
+    if set(fromrev) == set('0'):
+        cmd = ['rev-list', '%s' % torev]
+    output = read_git_lines(cmd)
+    return output
 
 
 def get_repo_name():
@@ -78,6 +85,16 @@ def get_repo_name():
     '''
     repo = os.path.basename(os.getcwd()).split('.git')[0]
     return repo
+
+
+def get_username():
+    ''' Return the username of the git repo based on its path.
+    '''
+    username = None
+    repo = os.path.abspath(os.path.join(os.getcwd(), '..'))
+    if progit.APP.config['TICKETS_FOLDER'] in repo:
+        username = repo.split(progit.APP.config['TICKETS_FOLDER'])[1]
+    return username
 
 
 def run_as_post_receive_hook():
@@ -94,17 +111,29 @@ def run_as_post_receive_hook():
         print '  -- Ref name'
         print refname
 
-        file_list.union(
-            set(get_files_to_load(get_commits_id(oldrev, newrev))))
+        tmp = set(get_files_to_load(get_commits_id(oldrev, newrev)))
+        file_list = file_list.union(tmp)
+
+    reponame = get_repo_name()
+    username = get_username()
+    print 'repo:', reponame, username
 
     for filename in file_list:
         print 'To load: %s' % filename
-
-    print 'repo:', get_repo_name()
+        data = ''.join(read_git_lines(['show', 'HEAD:%s' % filename]))
+        if data:
+            data = json.loads(data)
+        if data:
+            progit.lib.git.update_ticket_from_git(
+                progit.SESSION,
+                reponame=reponame,
+                username=username,
+                issue_uid=filename,
+                json_data=data)
 
 
 def main(args):
-        run_as_post_receive_hook()
+    run_as_post_receive_hook()
 
 
 if __name__ == '__main__':
