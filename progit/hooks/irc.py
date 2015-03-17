@@ -15,6 +15,7 @@ import pygit2
 import wtforms
 from flask.ext import wtf
 from sqlalchemy.orm import relation
+from sqlalchemy.orm import backref
 
 from progit.hooks import BaseHook, RequiredIf
 from progit.lib.model import BASE, Project
@@ -47,8 +48,11 @@ class IrcTable(BASE):
     ssl = sa.Column(sa.Boolean, nullable=False, default=True)
 
     project = relation(
-        'Project', remote_side=[Project.id], backref='irc_hook',
-        cascade="delete, delete-orphan", single_parent=True)
+        'Project', remote_side=[Project.id],
+        backref=backref(
+            'irc_hook', cascade="delete, delete-orphan",
+            single_parent=True)
+        )
 
 
 class IrcForm(wtf.Form):

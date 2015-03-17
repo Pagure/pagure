@@ -16,6 +16,7 @@ import pygit2
 import wtforms
 from flask.ext import wtf
 from sqlalchemy.orm import relation
+from sqlalchemy.orm import backref
 
 from progit.hooks import BaseHook
 from progit.lib.model import BASE, Project
@@ -41,8 +42,11 @@ class ProgitTable(BASE):
     active = sa.Column(sa.Boolean, nullable=False, default=False)
 
     project = relation(
-        'Project', remote_side=[Project.id], backref='progit_hook',
-        cascade="delete, delete-orphan", single_parent=True)
+        'Project', remote_side=[Project.id],
+        backref=backref(
+            'progit_hook', cascade="delete, delete-orphan",
+            single_parent=True)
+        )
 
 
 class ProgitForm(wtf.Form):

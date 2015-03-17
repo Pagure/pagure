@@ -16,6 +16,7 @@ import pygit2
 import wtforms
 from flask.ext import wtf
 from sqlalchemy.orm import relation
+from sqlalchemy.orm import backref
 
 from progit.hooks import BaseHook, RequiredIf
 from progit.lib.model import BASE, Project
@@ -42,8 +43,11 @@ class MailTable(BASE):
     active = sa.Column(sa.Boolean, nullable=False, default=False)
 
     project = relation(
-        'Project', remote_side=[Project.id], backref='mail_hook',
-        cascade="delete, delete-orphan", single_parent=True)
+        'Project', remote_side=[Project.id],
+        backref=backref(
+            'mail_hook', cascade="delete, delete-orphan",
+            single_parent=True)
+        )
 
 
 class MailForm(wtf.Form):
