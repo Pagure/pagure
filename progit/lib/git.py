@@ -124,6 +124,9 @@ def update_git_ticket(issue, repo, ticketfolder):
 
     """
 
+    if not ticketfolder:
+        return
+
     # Get the fork
     repopath = os.path.join(ticketfolder, repo.path)
     ticket_repo = pygit2.Repository(repopath)
