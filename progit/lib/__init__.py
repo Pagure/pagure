@@ -19,6 +19,7 @@ import sqlalchemy
 import sqlalchemy.schema
 from datetime import timedelta
 from sqlalchemy import func
+from sqlalchemy.orm import aliased
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm.exc import NoResultFound
@@ -736,10 +737,11 @@ def search_issues(
         )
     if assignee is not None:
         if str(assignee).lower() not in ['false', '0', 'true', '1']:
+            user2 = aliased(model.User)
             query = query.filter(
-                model.Issue.assignee_id == model.User.id
+                model.Issue.assignee_id == user2.id
             ).filter(
-                model.User.user == assignee
+                user2.user == assignee
             )
         elif str(assignee).lower() in ['true', '1']:
             query = query.filter(
