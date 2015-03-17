@@ -394,12 +394,13 @@ def new_project(session, user, name, gitfolder, docfolder, ticketfolder,
 
 
 def new_issue(session, repo, title, content, user, ticketfolder,
-              issue_uid=None, private=False, status=None, notify=True):
+              issue_id=None, issue_uid=None, private=False, status=None,
+              notify=True):
     ''' Create a new issue for the specified repo. '''
     user_obj = __get_user(session, user)
 
     issue = model.Issue(
-        id=get_next_id(session, repo.id),
+        id=issue_id or et_next_id(session, repo.id),
         project_id=repo.id,
         title=title,
         content=content,
