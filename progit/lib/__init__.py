@@ -839,6 +839,27 @@ def get_issue_comment(session, issue_uid, comment_id):
     return query.first()
 
 
+def get_issue_by_uid(session, issue_uid):
+    ''' Return the issue corresponding to the specified unique identifier.
+
+    :arg session: the session to use to connect to the database.
+    :arg issue_uid: the unique identifier of an issue. This identifier is
+        unique accross all projects on this progit instance and should be
+        unique accross multiple progit instances as well
+    :type issue_uid: str or None
+
+    :return: A single Issue object.
+    :rtype: progit.lib.model.Issue
+
+    '''
+    query = session.query(
+        model.Issue
+    ).filter(
+        model.Issue.uid == issue_uid
+    )
+    return query.first()
+
+
 def set_up_user(session, username, fullname, user_email):
     ''' Set up a new user into the database or update its information. '''
     user = search_user(session, username=username)
