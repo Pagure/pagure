@@ -687,7 +687,20 @@ def delete_repo(repo, username=None):
             403,
             'You are not allowed to change the settings for this project')
 
-    SESSION.delete(repo)
+    try:
+        for issue in repo.issues:
+            for comment in issue.comments:
+                SESSION.delete(comment)
+            SESSION.commit()
+            SESSION.delete(issue)
+        for preq in repo.requests:
+            SESSION.delete(preq)
+        SESSION.delete(repo)
+        SESSION.commit()
+    except SQLAlchemyError, err:  # pragma: no cover
+        SESSION.rollback()
+        APP.logger.exception(err)
+        flask.flash('Could not delete the project', 'error')
 
     repopath = os.path.join(APP.config['GIT_FOLDER'], repo.path)
     if repo.is_fork:
@@ -701,14 +714,8 @@ def delete_repo(repo, username=None):
         shutil.rmtree(ticketpath)
     except (OSError, IOError), err:
         APP.logger.exception(err)
-        flask.flash('Could not delete all the repos from the system', 'error')
-
-    try:
-        SESSION.commit()
-    except SQLAlchemyError, err:  # pragma: no cover
-        SESSION.rollback()
-        APP.logger.exception(err)
-        flask.flash('Could not delete the project', 'error')
+        flask.flash(
+            'Could not delete all the repos from the system', 'error')
 
     return flask.redirect(
         flask.url_for('view_user', username=flask.g.fas_user.username))
