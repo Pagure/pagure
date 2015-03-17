@@ -87,8 +87,9 @@
     {% endif %}
 
     {% if authenticated %}
-        <input id="depends" type="text"
-            placeholder="issue blocked" name="depends">
+        <input id="blocks" type="text"
+            placeholder="issue blocked" name="blocks"
+            value="{{ issue.blocks_text | join(',') }}">
     {% endif %}
 </section>
 
@@ -104,7 +105,8 @@
 
     {% if authenticated %}
         <input id="depends" type="text"
-            placeholder="issue depending" name="depends">
+            placeholder="issue depending" name="depends"
+            value="{{ issue.depends_text | join(',') }}">
     {% endif %}
 </section>
 
