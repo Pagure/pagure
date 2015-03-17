@@ -139,7 +139,8 @@ def search_user(session, username=None, email=None, token=None, pattern=None):
     return output
 
 
-def add_issue_comment(session, issue, comment, user, ticketfolder):
+def add_issue_comment(session, issue, comment, user, ticketfolder,
+                      notify=True):
     ''' Add a comment to an issue. '''
     user_obj = __get_user(session, user)
 
@@ -155,7 +156,8 @@ def add_issue_comment(session, issue, comment, user, ticketfolder):
     progit.lib.git.update_git_ticket(
         issue, repo=issue.project, ticketfolder=ticketfolder)
 
-    progit.lib.notify.notify_new_comment(issue_comment)
+    if notify:
+        progit.lib.notify.notify_new_comment(issue_comment)
 
     return 'Comment added'
 
@@ -392,7 +394,7 @@ def new_project(session, user, name, gitfolder, docfolder, ticketfolder,
 
 
 def new_issue(session, repo, title, content, user, ticketfolder,
-              issue_uid=None, private=False, status=None):
+              issue_uid=None, private=False, status=None, notify=True):
     ''' Create a new issue for the specified repo. '''
     user_obj = __get_user(session, user)
 
@@ -416,13 +418,14 @@ def new_issue(session, repo, title, content, user, ticketfolder,
     progit.lib.git.update_git_ticket(
         issue, repo=repo, ticketfolder=ticketfolder)
 
-    progit.lib.notify.notify_new_issue(issue)
+    if notify:
+        progit.lib.notify.notify_new_issue(issue)
 
     return 'Issue created'
 
 
 def new_pull_request(session, repo_from, branch_from,
-                     repo_to, branch_to, title, user):
+                     repo_to, branch_to, title, user, notify=True):
     ''' Create a new pull request on the specified repo. '''
     user_obj = __get_user(session, user)
 
@@ -440,7 +443,8 @@ def new_pull_request(session, repo_from, branch_from,
     # Make sure we won't have SQLAlchemy error before we create the request
     session.flush()
 
-    progit.lib.notify.notify_new_pull_request(request)
+    if notify:
+        progit.lib.notify.notify_new_pull_request(request)
 
     return 'Request created'
 
