@@ -347,8 +347,8 @@ def view_issues(repo, username=None):
     """ List all issues associated to a repo
     """
     status = flask.request.args.get('status', None)
-    tags = flask.request.args.getlist('tags', None)
-    tags = [tag for tag in tags if tag]
+    tags = flask.request.args.getlist('tags')
+    tags = [tag.strip() for tag in tags if tag.strip()]
     assignee = flask.request.args.get('assignee', None)
     author = flask.request.args.get('author', None)
 
@@ -402,10 +402,12 @@ def view_issues(repo, username=None):
         select='issues',
         repo=repo,
         username=username,
+        tag_list=tag_list,
         status=status,
         issues=issues,
         tags=tags,
-        tag_list=tag_list,
+        assignee=assignee,
+        author=author,
     )
 
 
