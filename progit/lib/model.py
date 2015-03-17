@@ -340,6 +340,7 @@ class Issue(BASE):
             'date_created': self.date_created.strftime('%s'),
             'user': {
                 'name': self.user.user,
+                'fullname': comment.user.fullname,
                 'emails': [email.email for email in self.user.emails],
             },
             'private': self.private,
@@ -354,6 +355,7 @@ class Issue(BASE):
                 'date_created': comment.date_created.strftime('%s'),
                 'user': {
                     'name': comment.user.user,
+                    'fullname': comment.user.fullname,
                     'emails': [email.email for email in comment.user.emails],
                 }
             }
