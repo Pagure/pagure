@@ -883,6 +883,8 @@ def set_up_user(session, username, fullname, user_email):
         session.add(useremail)
         session.flush()
 
+    return user
+
 
 def update_user_ssh(session, user, ssh_key):
     ''' Set up a new user into the database or update its information. '''
