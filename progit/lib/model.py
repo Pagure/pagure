@@ -335,6 +335,7 @@ class Issue(BASE):
 
         '''
         output = {
+            'id': self.id,
             'title': self.title,
             'content': self.content,
             'status': self.status,
