@@ -342,7 +342,7 @@ class Issue(BASE):
             'date_created': self.date_created.strftime('%s'),
             'user': {
                 'name': self.user.user,
-                'fullname': comment.user.fullname,
+                'fullname': self.user.fullname,
                 'emails': [email.email for email in self.user.emails],
             },
             'private': self.private,
