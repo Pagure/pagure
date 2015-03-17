@@ -330,6 +330,11 @@ class Issue(BASE):
         '''
         return '%s-ticket-%s@progit' % (self.project.name, self.id)
 
+    @property
+    def tags_text(self):
+        ''' Return the list of tags in a simple text form. '''
+        return [tag.tag for tag in self.tags]
+
     def to_json(self):
         ''' Returns a JSON representation of the issue using the JSON module
 
