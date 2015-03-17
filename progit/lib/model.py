@@ -335,6 +335,16 @@ class Issue(BASE):
         ''' Return the list of tags in a simple text form. '''
         return [tag.tag for tag in self.tags]
 
+    @property
+    def depends_text(self):
+        ''' Return the list of issue this issue depends on in simple text. '''
+        return [issue.id for issue in self.children]
+
+    @property
+    def blocks_text(self):
+        ''' Return the list of issue this issue blocks on in simple text. '''
+        return [issue.id for issue in self.parents]
+
     def to_json(self):
         ''' Returns a JSON representation of the issue using the JSON module
 
