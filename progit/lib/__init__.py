@@ -392,7 +392,7 @@ def new_project(session, user, name, gitfolder, docfolder, ticketfolder,
 
 
 def new_issue(session, repo, title, content, user, ticketfolder,
-              private=False):
+              issue_uid=None, private=False, status=None):
     ''' Create a new issue for the specified repo. '''
     user_obj = __get_user(session, user)
 
@@ -402,9 +402,13 @@ def new_issue(session, repo, title, content, user, ticketfolder,
         title=title,
         content=content,
         user_id=user_obj.id,
-        uid=uuid.uuid4().hex,
+        uid=issue_uid or uuid.uuid4().hex,
         private=private,
     )
+
+    if status is not None:
+        issue.status = status
+
     session.add(issue)
     # Make sure we won't have SQLAlchemy error before we create the issue
     session.flush()
