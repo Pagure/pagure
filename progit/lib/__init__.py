@@ -825,6 +825,20 @@ def get_issue_statuses(session):
     return output
 
 
+def get_issue_comment(session, issue_uid, comment_id):
+    ''' Return a specific comment of a specified issue.
+    '''
+    query = session.query(
+        model.IssueComment
+    ).filter(
+        model.IssueComment.issue_uid == issue_uid
+    ).filter(
+        model.IssueComment.id == comment_id
+    )
+
+    return query.first()
+
+
 def set_up_user(session, username, fullname, user_email):
     ''' Set up a new user into the database or update its information. '''
     user = search_user(session, username=username)
