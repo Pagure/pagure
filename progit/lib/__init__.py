@@ -251,6 +251,35 @@ def add_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
         return 'Dependency added'
 
 
+def remove_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
+    ''' Remove a dependency between two issues. '''
+    user_obj = __get_user(session, user)
+
+    if issue.uid == issue_blocked.uid:
+        raise progit.exceptions.ProgitException(
+            'An issue cannot depend on itself'
+        )
+
+    if issue_blocked in issue.children:
+        for child in issue.children:
+            if child.uid == issue_blocked.uid:
+                issue.children.remove(child)
+
+        # Make sure we won't have SQLAlchemy error before we create the repo
+        session.flush()
+        progit.lib.git.update_git_ticket(
+            issue, repo=issue.project, ticketfolder=ticketfolder)
+        progit.lib.git.update_git_ticket(
+            issue_blocked,
+            repo=issue_blocked.project,
+            ticketfolder=ticketfolder)
+
+        #progit.lib.notify.notify_assigned_issue(issue, user_obj)
+        #progit.lib.notify.notify_assigned_issue(issue_blocked, user_obj)
+
+        return 'Dependency removed'
+
+
 def remove_tags(session, project, tags):
     ''' Removes the specified tag of a project. '''
 
