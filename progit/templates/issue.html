@@ -55,10 +55,11 @@
     {% for tag in issue.tags %}
     <a href="{{ url_for('view_issues', username=username,
                repo=repo.name, tags=tag.tag) }}">
-        {{ tag.tag }}</a>{% if not loop.last %},{% endif %}
+        {{ tag.tag }}</a>{%- if not loop.last -%},{%- endif -%}
     {% endfor %}
     {% if authenticated and repo_admin %}
-        <input id="tag" type="text" value="" placeholder="tag1, tag2" name="tag">
+      <input id="tag" type="text" value="{{ issue.tags_text | join(',') }}"
+        placeholder="tag1, tag2" name="tag" title="comma separated list of tags">
     {% endif %}
 </section>
 
