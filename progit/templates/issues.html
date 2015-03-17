@@ -87,7 +87,7 @@
             <td>
                 <a href="{{ url_for('view_issues', username=username,
                     repo=repo.name, author=issue.user.user,
-                    tags=tags, assignee=assignee, status=status) }}"
+                    tags=tags, status=status) }}"
                     title="Filter issues by reporter">
                     {{ issue.user.user | avatar(16) | safe }}
                     {{issue.user.user}}
@@ -100,7 +100,7 @@
               {% if issue.assignee %}
               <a href="{{ url_for('view_issues', username=username,
                 repo=repo.name, assignee=issue.assignee.username,
-                tags=tags, author=author, status=status) }}"
+                tags=tags, status=status) }}"
                 title="Filter issues by assignee">
                 {{ issue.assignee.user | avatar(16) | safe }}
                 {{ issue.assignee.user }}
