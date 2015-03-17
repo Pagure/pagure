@@ -274,6 +274,25 @@ def remove_tags(session, project, tags):
     return msgs
 
 
+def remove_tags_issue(session, issue, tags, ticketfolder):
+    ''' Removes the specified tag(s) of a issue. '''
+
+    if isinstance(tags, basestring):
+        tags = [tags]
+
+    msgs = []
+    for issue_tag in issue.tags:
+        if issue_tag.tag in tags:
+            tag = issue_tag.tag
+            session.delete(issue_tag)
+            msgs.append('Removed tag: %s' % tag)
+
+    progit.lib.git.update_git_ticket(
+        issue, repo=issue.project, ticketfolder=ticketfolder)
+
+    return msgs
+
+
 def edit_issue_tags(session, project, old_tag, new_tag):
     ''' Removes the specified tag of a project. '''
 
