@@ -15,11 +15,12 @@
   </h2>
     {% if status and status != 'Open' %}
       <a href="{{ url_for('view_issues', username=username,
-                 repo=repo.name) }}">
+                 repo=repo.name, tags=tags, author=author, assignee=assignee) }}">
       (Open)</a>
     {% else %}
       <a href="{{ url_for('view_issues', username=username,
-                 repo=repo.name) }}?status=Closed">
+                 repo=repo.name, status='Closed', tags=tags, author=author,
+                 assignee=assignee) }}">
       (Closed)</a>
     {% endif %}
 
@@ -46,7 +47,8 @@
     Tags:
     {% for tag in tag_list %}
     <a href="{{ url_for('view_issues', username=username,
-               repo=repo.name, tags=tag.tag) }}"
+               repo=repo.name, tags=tag.tag,
+               author=author, assignee=assignee, status=status) }}"
                title="Filter issues by tag">
         {{ tag.tag }}</a>{% if not loop.last %},{% endif %}
     {% endfor %}
@@ -59,12 +61,14 @@
             <th>Title</th>
             <th class="open_by">
                 Opened by (<a href="{{ url_for('view_issues', username=username,
-                repo=repo.name) }}">reset</a>)
+                repo=repo.name, tags=tags, assignee=assignee,
+                status=status) }}">reset</a>)
             </th>
             <th class="open_date">Opened on</th>
             <th class="assigned">
               Assigned to (<a href="{{ url_for('view_issues', username=username,
-                repo=repo.name) }}">reset</a>)
+                repo=repo.name, tags=tags, author=author,
+                status=status) }}">reset</a>)
             </th>
         </tr>
     </thead>
@@ -82,7 +86,8 @@
             </td>
             <td>
                 <a href="{{ url_for('view_issues', username=username,
-                    repo=repo.name, author=issue.user.user) }}"
+                    repo=repo.name, author=issue.user.user,
+                    tags=tags, assignee=assignee, status=status) }}"
                     title="Filter issues by reporter">
                     {{ issue.user.user | avatar(16) | safe }}
                     {{issue.user.user}}
@@ -94,14 +99,15 @@
             <td>
               {% if issue.assignee %}
               <a href="{{ url_for('view_issues', username=username,
-                repo=repo.name, assignee=issue.assignee.username) }}"
+                repo=repo.name, assignee=issue.assignee.username,
+                tags=tags, author=author, status=status) }}"
                 title="Filter issues by assignee">
                 {{ issue.assignee.user | avatar(16) | safe }}
                 {{ issue.assignee.user }}
               </a>
               {% else %}
               <a href="{{ url_for('view_issues', username=username,
-                repo=repo.name, assignee=0) }}">(unassigned)</a>
+                repo=repo.name, tags=tags, author=author, status=status) }}">(unassigned)</a>
               {% endif %}
             </td>
         </tr>
