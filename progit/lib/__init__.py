@@ -400,7 +400,7 @@ def new_issue(session, repo, title, content, user, ticketfolder,
     user_obj = __get_user(session, user)
 
     issue = model.Issue(
-        id=issue_id or et_next_id(session, repo.id),
+        id=issue_id or get_next_id(session, repo.id),
         project_id=repo.id,
         title=title,
         content=content,
