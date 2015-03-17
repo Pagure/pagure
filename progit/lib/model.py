@@ -271,7 +271,7 @@ class Issue(BASE):
     project_id = sa.Column(
         sa.Integer,
         sa.ForeignKey(
-            'projects.id', ondelete='CASCADE', onupdate='CASCADE'),
+            'projects.id', onupdate='CASCADE'),
         primary_key=True)
     title = sa.Column(
         sa.Text,
@@ -292,7 +292,7 @@ class Issue(BASE):
     status = sa.Column(
         sa.Text,
         sa.ForeignKey(
-            'status_issue.status', ondelete='CASCADE', onupdate='CASCADE'),
+            'status_issue.status', onupdate='CASCADE'),
         default='Open',
         nullable=False)
     private = sa.Column(sa.Boolean, nullable=False, default=False)
@@ -302,8 +302,9 @@ class Issue(BASE):
 
     project = relation(
         'Project', foreign_keys=[project_id], remote_side=[Project.id],
-        backref='issues', cascade="delete, delete-orphan",
-        single_parent=True)
+        backref=backref(
+            'issues', cascade="delete, delete-orphan", single_parent=True)
+        )
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id], backref='issues')
     assignee = relation('User', foreign_keys=[assignee_id],
