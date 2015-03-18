@@ -25,18 +25,10 @@
     {% endif %}
 
     <aside id="issue_action">
-      <form action="{{ url_for('view_issues', username=username,
-                               repo=repo.name) }}" method="get">
-          <select name="tags">
-            <option></option>
-            {% for tag in tag_list %}
-            <option value="{{ tag.tag }}" {%
-                if tags and tag.tag in tags %} selected {% endif %}>{{ tag.tag }}</option>
-            {% endfor %}
-          </select>
-          <input type="submit" class="submit positive button" value="Filter">
-      </form>
-
+      <a class="btn_reset" href="{{ url_for('view_issues', username=username,
+                 repo=repo.name) }}">
+        <button>Reset all filters</button>
+      </a>
       <a class="btn_create" href="{{ url_for('new_issue', username=username, repo=repo.name) }}">
         <button>Create new issue</button>
       </a>

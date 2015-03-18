@@ -408,6 +408,14 @@ table.list tbody td > a
 
 #issue_action {
     float: right;
+    display: inline-block;
+    width: 134px;
+    vertical-align: top;
+}
+
+.btn_reset button, .btn_create button {
+    width: 130px;
+    padding: auto;
 }
 
 table.list {
