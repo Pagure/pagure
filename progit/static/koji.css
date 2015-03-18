@@ -445,3 +445,12 @@ span#loginInfo {
 .error {
     color: red;
 }
+
+a.headerlink {
+    color: #666;
+    visibility: hidden;
+}
+
+header:hover > a.headerlink {
+    visibility: visible;
+}

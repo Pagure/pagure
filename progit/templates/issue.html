@@ -4,13 +4,15 @@
 {% block title %}Issue #{{ issueid }} - {{ repo.name }}{% endblock %}
 {%block tag %}home{% endblock %}
 
-{% macro show_comment(user, date, content) %}
+{% macro show_comment(user, date, content, id) %}
   <section class="issue_comment">
-    <header>
+    <header id="comment-{{ id }}">
       {{ user.user | avatar(16) | safe }}
       <a href="{{ url_for('view_user', username=user.user)}}">
         {{ user.user }}
       </a> - <span title="{{ date }}">{{ date | humanize}}</span>
+      <a class="headerlink" title="Permalink to this headline"
+        href="#comment-{{ id }}">¶</a>
       <aside class="issue_action">
         <a class="reply" title="Reply to this comment - loose formating">
           reply
@@ -110,11 +112,12 @@
     {% endif %}
 </section>
 
-{{ show_comment(issue.user, issue.date_created, issue.content) }}
+{{ show_comment(issue.user, issue.date_created, issue.content, 0) }}
 
 {% if issue.comments %}
   {% for comment in issue.comments %}
-    {{ show_comment(comment.user, comment.date_created, comment.comment) }}
+    {{ show_comment(comment.user, comment.date_created, comment.comment,
+        comment.id) }}
   {% endfor %}
 {% endif %}
 
