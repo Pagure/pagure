@@ -11,6 +11,7 @@
 import datetime
 import textwrap
 import os
+import re
 from math import ceil
 
 import flask
@@ -188,7 +189,21 @@ def markdown_filter(text):
         # Hack to allow blockquotes to be marked by ~~~
         ntext = []
         indent = False
+        regexes = [
+            re.compile('.*\s(http(s)?:\/\/\S+).*'),
+            re.compile('^(http(s)?:\/\/\S+).*'),
+            re.compile('.*\s(ftp(s)?:\/\/\S+).*'),
+            re.compile('^(ftp(s)?:\/\/\S+).*'),
+        ]
         for line in text.split('\n'):
+            # Automatically link URLs
+            for regex in regexes:
+                if regex.match(line):
+                    line = line.replace(
+                        regex.match(line).group(1),
+                        regex.sub(r'<\1>', line)
+                    )
+
             if line.startswith('~~~'):
                 indent = not indent
                 continue
