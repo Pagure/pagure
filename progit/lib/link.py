@@ -57,10 +57,7 @@ def get_relation(session, reponame, username, text, reftype='relates'):
     for motif in regex:
         issueid = None
         project = None
-        print text, motif
-        print motif.match(text)
         if motif.match(text):
-            print 'references', motif.match(text).groups()
             if len(motif.match(text).groups()) >= 2:
                 issueid = motif.match(text).group(2)
                 project = motif.match(text).group(1)
@@ -73,7 +70,6 @@ def get_relation(session, reponame, username, text, reftype='relates'):
             if issue is None or issue.project.name not in [project, repo.name]:
                 continue
 
-            print issueid, project, repo.name
             issues.append(issue)
 
     return issues
