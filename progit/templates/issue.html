@@ -244,6 +244,27 @@ $(function() {
     delay: 200,
   });
 
+  var cur_hash = null;
+
+  highlight_comment = function() {
+    var _hash = window.location.hash;
+    if (_hash != cur_hash) {
+      $( cur_hash ).css(
+        "background", "linear-gradient(to bottom, #ededed 0%, #fff 100%)"
+      );
+    };
+    cur_hash = _hash;
+    if ( _hash ) {
+      $( _hash ).css(
+        "background", "linear-gradient(to bottom, #eded98 0%, #fff 100%)"
+      );
+    };
+    return false;
+  };
+
+  $(window.onload=highlight_comment());
+  $(window).on('hashchange', highlight_comment);
+
 });
 </script>
 {% endblock %}
