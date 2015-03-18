@@ -19,7 +19,7 @@
     </header>
     <div class="comment_body">
       {% autoescape false %}
-        {{ content | markdown }}
+        {{ content | crossref | markdown }}
       {% endautoescape %}
     </div>
   </section>
