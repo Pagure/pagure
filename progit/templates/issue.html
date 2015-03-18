@@ -117,7 +117,7 @@
 {% if issue.comments %}
   {% for comment in issue.comments %}
     {{ show_comment(comment.user, comment.date_created, comment.comment,
-        comment.id) }}
+        loop.index) }}
   {% endfor %}
 {% endif %}
 
