@@ -70,6 +70,7 @@ def get_relation(session, reponame, username, text, reftype='relates'):
             if issue is None or issue.project.name not in [project, repo.name]:
                 continue
 
-            issues.append(issue)
+            if issue not in issues:
+                issues.append(issue)
 
     return issues
