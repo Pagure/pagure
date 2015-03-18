@@ -21,24 +21,6 @@ import progit
 import progit.exceptions
 
 
-# TODO: Move this to progit.lib so that it can also be used in comments
-# in tickets or pull-requests
-FIXES = [
-    re.compile('fixe?[sd]?:?\s?#(\d+)', re.I),
-    re.compile('.*\s+fixe?[sd]?:?\s?#(\d+)', re.I),
-    re.compile('fixe?[sd]?:?\s?https?://.*/(\w+)/issue/(\d+)', re.I),
-    re.compile('.*\s+fixe?[sd]?:?\s?https?://.*/(\w+)/issue/(\d+)', re.I),
-]
-
-RELATES = [
-    re.compile('relate[sd]?:?\s?(?:to)?\s?#(\d+)', re.I),
-    re.compile('.*\s+relate[sd]?:?\s?#(\d+)', re.I),
-    re.compile(
-        'relate[sd]?:?\s?(?:to)?\s?https?://.*/(\w+)/issue/(\d+)', re.I),
-    re.compile('.*\s+relate[sd]?:?\s?(?:to)?\s?https?://.*/(\w+)/issue/(\d+)', re.I),
-]
-
-
 def read_git_output(args, input=None, keepends=False, **kw):
     """Read the output of a Git command."""
 
@@ -85,42 +67,19 @@ def generate_revision_change_log(new_commits_list):
         line = line.strip()
 
         print '*', line
-        for motif in FIXES:
-            if motif.match(line):
-                print 'fixes', motif.match(line).groups()
-                project = None
-                if len(motif.match(line).groups()) >= 2:
-                    issueid = motif.match(line).group(2)
-                    project = motif.match(line).group(1)
-                else:
-                    issueid = motif.match(line).group(1)
-                fixes_commit(commitid, issueid, project)
-        for motif in RELATES:
-            if motif.match(line):
-                print 'relates to', motif.match(line).groups()
-                project = None
-                if len(motif.match(line).groups()) >= 2:
-                    issueid = motif.match(line).group(2)
-                    project = motif.match(line).group(1)
-                else:
-                    issueid = motif.match(line).group(1)
-                relates_commit(commitid, issueid, project)
+        for issue in progit.lib.link.get_relation(
+                progit.SESSION, get_repo_name(), get_username(),
+                line, 'fixes')
+            fixes_commit(commitid, issue, project)
+
+        for issue in progit.lib.link.get_relates_link(
+                progit.SESSION, get_repo_name(), get_username(),
+                line, 'relates')
+            relates_commit(commitid, issue, project)
 
 
-def relates_commit(commitid, issueid, project=None):
+def relates_commit(commitid, issue, project=None):
     ''' Add a comment to an issue that this commit relates to it. '''
-    repo = project or get_repo_name()
-    username = get_username()
-
-    repo = progit.lib.get_project(progit.SESSION, repo, user=username)
-    if not repo:
-        repo = progit.lib.get_project(
-            progit.SESSION, get_repo_name(), user=username)
-    issue = progit.lib.search_issues(
-        progit.SESSION, repo=repo, issueid=issueid)
-
-    if issue is None or issue.project != repo:
-        return
 
     comment = ''' Commit [%s](../%s) relates to this ticket''' % (
         commitid[:8], commitid[:8])
@@ -141,21 +100,9 @@ def relates_commit(commitid, issueid, project=None):
         progit.APP.logger.exception(err)
 
 
-def fixes_commit(commitid, issueid, project=None):
+def fixes_commit(commitid, issue, project=None):
     ''' Add a comment to an issue that this commit fixes it and update
     the status if the commit is in the master branch. '''
-    repo = project or get_repo_name()
-    username = get_username()
-
-    repo = progit.lib.get_project(progit.SESSION, repo, user=username)
-    if not repo:
-        repo = progit.lib.get_project(
-            progit.SESSION, get_repo_name(), user=username)
-    issue = progit.lib.search_issues(
-        progit.SESSION, repo, issueid=issueid)
-
-    if issue is None or issue.project != repo:
-        return
 
     comment = ''' Commit [%s](../%s) fixes this ticket''' % (
         commitid[:8], commitid[:8])
