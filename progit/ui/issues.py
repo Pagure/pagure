@@ -19,6 +19,7 @@ from pygments.lexers import guess_lexer
 from pygments.lexers.text import DiffLexer
 from pygments.formatters import HtmlFormatter
 
+import mimetypes
 
 import progit.doc_utils
 import progit.lib
@@ -568,3 +569,115 @@ def edit_issue(repo, issueid, username=None):
         issue=issue,
         issueid=issueid,
     )
+
+
+@APP.route('/<repo>/issue/<int:issueid>/upload', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/upload',
+           methods=['POST'])
+@cla_required
+def upload_issue(repo, issueid, username=None):
+    ''' Upload a file to a ticket.
+    '''
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if repo is None:
+        flask.abort(404, 'Project not found')
+
+    if not repo.issue_tracker:
+        flask.abort(404, 'No issue tracker found for this project')
+
+    if not is_repo_admin(repo):
+        flask.abort(
+            403, 'You are not allowed to edit issues for this project')
+
+    issue = progit.lib.search_issues(SESSION, repo, issueid=issueid)
+
+    if issue is None or issue.project != repo:
+        flask.abort(404, 'Issue not found')
+
+    form = progit.forms.UploadFileForm()
+    # pylint: disable=E1101
+    if form.validate_on_submit():
+        filestream = flask.request.files['filestream']
+        new_filename = progit.lib.git.add_file_to_git(
+            repo=repo,
+            issue=issue,
+            ticketfolder=APP.config['TICKETS_FOLDER'],
+            user=flask.g.fas_user,
+            filename=filestream.filename,
+            filestream=filestream.stream,
+        )
+        return flask.jsonify({
+            'output': 'ok',
+            'filename': new_filename.split('-', 1)[1],
+            'filelocation': flask.url_for(
+                'view_issue_raw_file',
+                repo=repo.name,
+                username=username,
+                filename=new_filename,
+            )
+        })
+    else:
+        return flask.jsonify({'output': 'notok'})
+
+
+@APP.route('/<repo>/issue/raw/<path:filename>')
+@APP.route('/fork/<username>/<repo>/issue/raw/<path:filename>')
+def view_issue_raw_file(repo, filename=None, username=None):
+    """ Displays the raw content of a file of a commit for the specified
+    ticket repo.
+    """
+    repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    reponame = os.path.join(APP.config['TICKETS_FOLDER'], repo.path)
+
+    repo_obj = pygit2.Repository(reponame)
+
+    if repo_obj.is_empty:
+        flask.abort(404, 'Empty repo cannot have a file')
+
+
+    branch = repo_obj.lookup_branch('master')
+    commit = branch.get_object()
+
+    mimetype = None
+    encoding = None
+    if filename:
+        content = __get_file_in_tree(
+            repo_obj, commit.tree, filename.split('/'))
+        if not content or isinstance(content, pygit2.Tree):
+            flask.abort(404, 'File not found')
+
+        mimetype, encoding = mimetypes.guess_type(filename)
+        data = repo_obj[content.oid].data
+    else:
+        if commit.parents:
+            diff = commit.tree.diff_to_tree()
+
+            parent = repo_obj.revparse_single('%s^' % identifier)
+            diff = repo_obj.diff(parent, commit)
+        else:
+            # First commit in the repo
+            diff = commit.tree.diff_to_tree(swap=True)
+        data = diff.patch
+
+    if not mimetype and data[:2] == '#!':
+        mimetype = 'text/plain'
+
+    if not mimetype:
+        if '\0' in data:
+            mimetype = 'application/octet-stream'
+        else:
+            mimetype = 'text/plain'
+
+    if mimetype.startswith('text/') and not encoding:
+        encoding = chardet.detect(ktc.to_bytes(data))['encoding']
+
+    headers = {'Content-Type': mimetype}
+    if encoding:
+        headers['Content-Encoding'] = encoding
+
+    return (data, 200, headers)
