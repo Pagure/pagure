@@ -31,7 +31,8 @@
 
 {% if authenticated and form %}
   <form action="{{ url_for('update_issue', username=username,
-           repo=repo.name, issueid=issueid) }}" method="post">
+           repo=repo.name, issueid=issueid) }}" method="post"
+           enctype="multipart/form-data">
   {{ form.csrf_token }}
 {% endif %}
 
@@ -128,6 +129,13 @@
     (supports the <a href="http://daringfireball.net/projects/markdown/syntax"
       target="_blank">Markdown syntax</a>)
   </header>
+  Select files OR drag them into the comment field below.
+  <input id="file-picker" type="file" name="file" accept="image/*" multiple>
+  <fieldset id="progress" style="display: none">
+    <div class="progress-trough">
+      <div id="progress-bar" class="progress-bar">0%</div>
+    </div>
+  </fieldset>
   <div id="tabs">
     <ul>
       <li><a href="#edit">Comment</a></li>
@@ -159,6 +167,24 @@
 {% block jscripts %}
 {{ super() }}
 <script type="text/javascript">
+  var UPLOAD_URL = "{{ url_for('upload_issue', repo=repo.name, issueid=issue.id, username=username) }}";
+</script>
+<script type="text/javascript"
+  src="{{ url_for('static', filename='upload.js') }}">
+</script>
+<script type="text/javascript">
+{% if authenticated and form %}
+$(document).ready(function() {
+  // Set up the drag/drop zone.
+  initDropbox("{{ form.csrf_token.current_token }}");
+
+  // Set up the handler for the file input box.
+  $("#file-picker").on("change", function() {
+    doUpload("{{ form.csrf_token.current_token }}", this.files);
+  });
+});
+{% endif %}
+
 $(function() {
   $( "#tabs" ).tabs();
 

@@ -704,3 +704,20 @@ ul.changes {
     margin-left: 0.3em;
     margin-bottom: 0.3em;
 }
+
+.progress-trough {
+    border: 1px solid #000000;
+    height: 18px;
+    width: 100%;
+    position: relative;
+}
+
+.progress-bar {
+    width: 50%;
+    height: 100%;
+    background-color: #0066cc;
+}
+
+#preview img {
+    width: 50%;
+}
