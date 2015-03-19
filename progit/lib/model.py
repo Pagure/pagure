@@ -346,7 +346,7 @@ class Issue(BASE):
         return [issue.id for issue in self.parents]
 
     def to_json(self):
-        ''' Returns a JSON representation of the issue using the JSON module
+        ''' Returns a JSON representation of the issue.
 
         '''
         output = {
