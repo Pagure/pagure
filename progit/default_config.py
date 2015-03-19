@@ -38,6 +38,9 @@ GIT_URL_GIT = 'git://progit.fedorahosted.org'
 # Number of items displayed per page
 ITEM_PER_PAGE = 50
 
+# Maximum size of the uploaded content
+MAX_CONTENT_LENGTH = 4 * 1024 * 1024  # 4 megabytes
+
 # Folder containing to the git repos
 GIT_FOLDER = os.path.join(
     os.path.abspath(os.path.dirname(__file__)),
