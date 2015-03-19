@@ -21,6 +21,7 @@ import time
 import uuid
 
 import pygit2
+import werkzeug
 
 import progit
 import progit.exceptions
@@ -319,7 +320,7 @@ def add_file_to_git(repo, issue, ticketfolder, user, filename, filestream):
     # Prefix the filename with a timestamp:
     filename = '%s-%s' % (
         hashlib.sha256(filestream.read()).hexdigest(),
-        filename
+        werkzeug.secure_filename(filename)
     )
 
     # Get the fork
