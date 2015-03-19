@@ -120,7 +120,7 @@ def write_gitolite_acls(session, configfile):
             stream.write(row + '\n')
 
 
-def update_git_ticket(issue, repo, ticketfolder):
+def update_git(obj, repo, repofolder, objtype='ticket'):
     """ Update the given issue in its git.
 
     This method forks the provided repo, add/edit the issue whose file name
@@ -129,18 +129,18 @@ def update_git_ticket(issue, repo, ticketfolder):
 
     """
 
-    if not ticketfolder:
+    if not repofolder:
         return
 
     # Get the fork
-    repopath = os.path.join(ticketfolder, repo.path)
+    repopath = os.path.join(repofolder, repo.path)
     ticket_repo = pygit2.Repository(repopath)
 
     # Clone the repo into a temp folder
     newpath = tempfile.mkdtemp()
     new_repo = pygit2.clone_repository(repopath, newpath)
 
-    file_path = os.path.join(newpath, issue.uid)
+    file_path = os.path.join(newpath, obj.uid)
 
     # Get the current index
     index = new_repo.index
@@ -152,7 +152,7 @@ def update_git_ticket(issue, repo, ticketfolder):
 
     # Write down what changed
     with open(file_path, 'w') as stream:
-        stream.write(issue.to_json())
+        stream.write(obj.to_json())
 
     # Retrieve the list of files that changed
     diff = new_repo.diff()
@@ -160,7 +160,7 @@ def update_git_ticket(issue, repo, ticketfolder):
 
     # Add the changes to the index
     if added:
-        index.add(issue.uid)
+        index.add(obj.uid)
     for filename in files:
         index.add(filename)
 
@@ -188,7 +188,7 @@ def update_git_ticket(issue, repo, ticketfolder):
         'refs/heads/master',
         author,
         author,
-        'Updated ticket %s: %s' % (issue.uid, issue.title),
+        'Updated %s %s: %s' % (objtype, obj.uid, obj.title),
         new_repo.index.write_tree(),
         parents)
     index.write()
