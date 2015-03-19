@@ -78,6 +78,26 @@ function doUpload(csrf_token, files) {
         1000  /* 1 000ms = 2 s */
       );
     },
+    error: function(data) {
+      $("#progress").hide();
+      var text = data.responseText;
+      if ( !text || text === "" ) {
+        text = '<p> An error occured when uploading your file. Could it be '
+          + 'that it exceeds the maximum limit allowed? </p>'
+          + '<p>Please contact an admin if this problem persist or is '
+          + 'blocking you. Thanks! </p>';
+      }
+      var _elt = $('<div title="Error">' + text + '</div>');
+      _elt.dialog({
+        height: 'auto',
+        width: '50%',
+        modal: true,
+        cache: false,
+        close: function() {
+            $(this).html("");
+        },
+      });
+    }
   });
 }
 
