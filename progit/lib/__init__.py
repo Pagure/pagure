@@ -154,8 +154,8 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
     # Make sure we won't have SQLAlchemy error before we create the repo
     session.commit()
 
-    progit.lib.git.update_git_ticket(
-        issue, repo=issue.project, ticketfolder=ticketfolder)
+    progit.lib.git.update_git(
+        issue, repo=issue.project, repofolder=ticketfolder)
 
     if notify:
         progit.lib.notify.notify_new_comment(issue_comment)
@@ -186,7 +186,7 @@ def add_issue_tag(session, issue, tag, user, ticketfolder):
     # Make sure we won't have SQLAlchemy error before we create the repo
     session.flush()
 
-    progit.lib.git.update_git_ticket(
+    progit.lib.git.update_git(
         issue, repo=issue.project, ticketfolder=ticketfolder)
 
     return 'Tag added'
@@ -198,7 +198,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
         issue.assignee_id = None
         session.add(issue)
         session.commit()
-        progit.lib.git.update_git_ticket(
+        progit.lib.git.update_git(
             issue, repo=issue.project, ticketfolder=ticketfolder)
 
         progit.lib.notify.notify_assigned_issue(issue, None, user)
@@ -214,7 +214,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
         issue.assignee_id = user_obj.id
         session.add(issue)
         session.flush()
-        progit.lib.git.update_git_ticket(
+        progit.lib.git.update_git(
             issue, repo=issue.project, ticketfolder=ticketfolder)
 
         progit.lib.notify.notify_assigned_issue(issue, user_obj, user)
@@ -239,9 +239,9 @@ def add_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
         session.add(i2i)
         # Make sure we won't have SQLAlchemy error before we create the repo
         session.flush()
-        progit.lib.git.update_git_ticket(
+        progit.lib.git.update_git(
             issue, repo=issue.project, ticketfolder=ticketfolder)
-        progit.lib.git.update_git_ticket(
+        progit.lib.git.update_git(
             issue_blocked,
             repo=issue_blocked.project,
             ticketfolder=ticketfolder)
@@ -268,9 +268,9 @@ def remove_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
 
         # Make sure we won't have SQLAlchemy error before we create the repo
         session.flush()
-        progit.lib.git.update_git_ticket(
+        progit.lib.git.update_git(
             issue, repo=issue.project, ticketfolder=ticketfolder)
-        progit.lib.git.update_git_ticket(
+        progit.lib.git.update_git(
             issue_blocked,
             repo=issue_blocked.project,
             ticketfolder=ticketfolder)
@@ -317,7 +317,7 @@ def remove_tags_issue(session, issue, tags, ticketfolder):
             session.delete(issue_tag)
             msgs.append('Removed tag: %s' % tag)
 
-    progit.lib.git.update_git_ticket(
+    progit.lib.git.update_git(
         issue, repo=issue.project, ticketfolder=ticketfolder)
 
     return msgs
@@ -465,8 +465,8 @@ def new_issue(session, repo, title, content, user, ticketfolder,
     # Make sure we won't have SQLAlchemy error before we create the issue
     session.flush()
 
-    progit.lib.git.update_git_ticket(
-        issue, repo=repo, ticketfolder=ticketfolder)
+    progit.lib.git.update_git(
+        issue, repo=repo, repofolder=ticketfolder)
 
     if notify:
         progit.lib.notify.notify_new_issue(issue)
@@ -517,7 +517,7 @@ def edit_issue(session, issue, ticketfolder,
         issue.private = private
         edit.append('private')
 
-    progit.lib.git.update_git_ticket(
+    progit.lib.git.update_git(
         issue, repo=issue.project, ticketfolder=ticketfolder)
 
     if edit:
