@@ -10,16 +10,19 @@
 
 
 import datetime
+import hashlib
 import json
 import os
 import random
 import shutil
 import string
 import tempfile
+import time
 import uuid
 
 import pygit2
 
+import progit
 import progit.exceptions
 import progit.lib
 import progit.lib.notify
@@ -228,7 +231,6 @@ def get_user_from_json(session, jsondata):
     return user
 
 
-
 def update_ticket_from_git(
         session, reponame, username, issue_uid, json_data):
     """ Update the specified issue (identified by its unique identifier)
@@ -297,3 +299,110 @@ def update_ticket_from_git(
                 notify=False,
             )
     session.commit()
+
+
+def add_file_to_git(repo, issue, ticketfolder, user, filename, filestream):
+    ''' Add a given file to the specified ticket git repository.
+
+    :arg repo: the Project object from the database
+    :arg ticketfolder: the folder on the filesystem where the git repo for
+        tickets are stored
+    :arg user: the user object with its username and email
+    :arg filename: the name of the file to save
+    :arg filestream: the actual content of the file
+
+    '''
+
+    if not ticketfolder:
+        return
+
+    # Prefix the filename with a timestamp:
+    filename = '%s-%s' % (
+        hashlib.sha256(filestream.read()).hexdigest(),
+        filename
+    )
+
+    # Get the fork
+    repopath = os.path.join(ticketfolder, repo.path)
+    ticket_repo = pygit2.Repository(repopath)
+
+    # Clone the repo into a temp folder
+    newpath = tempfile.mkdtemp()
+    new_repo = pygit2.clone_repository(repopath, newpath)
+
+    folder_path = os.path.join(newpath, 'files')
+    file_path = os.path.join(folder_path, filename)
+
+    # Get the current index
+    index = new_repo.index
+
+    # Are we adding files
+    added = False
+    if not os.path.exists(file_path):
+        added = True
+    else:
+        # File exists, remove the clone and return
+        shutil.rmtree(newpath)
+        return os.path.join('files', filename)
+
+    if not os.path.exists(folder_path):
+        os.mkdir(folder_path)
+
+    # Write down what changed
+    filestream.seek(0)
+    with open(file_path, 'w') as stream:
+        stream.write(filestream.read())
+
+    # Retrieve the list of files that changed
+    diff = new_repo.diff()
+    files = [patch.new_file_path for patch in diff]
+
+    # Add the changes to the index
+    if added:
+        index.add(os.path.join('files', filename))
+    for filename in files:
+        index.add(filename)
+
+    # If not change, return
+    if not files and not added:
+        shutil.rmtree(newpath)
+        return
+
+    # See if there is a parent to this commit
+    parent = None
+    try:
+        parent = new_repo.head.get_object().oid
+    except pygit2.GitError:
+        pass
+
+    parents = []
+    if parent:
+        parents.append(parent)
+
+    # Author/commiter will always be this one
+    author = pygit2.Signature(
+        name=user.username,
+        email=user.email
+    )
+
+    # Actually commit
+    sha = new_repo.create_commit(
+        'refs/heads/master',
+        author,
+        author,
+        'Add file %s to ticket %s: %s' % (filename, issue.uid, issue.title),
+        new_repo.index.write_tree(),
+        parents)
+    index.write()
+
+    # Push to origin
+    ori_remote = new_repo.remotes[0]
+    master_ref = new_repo.lookup_reference('HEAD').resolve()
+    refname = '%s:%s' % (master_ref.name, master_ref.name)
+
+    ori_remote.push(refname)
+
+    # Remove the clone
+    shutil.rmtree(newpath)
+
+    return os.path.join('files', filename)
