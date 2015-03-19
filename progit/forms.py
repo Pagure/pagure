@@ -166,3 +166,10 @@ class DescriptionForm(wtf.Form):
 
 class ConfirmationForm(wtf.Form):
     pass
+
+
+class UploadFileForm(wtf.Form):
+    ''' Form to upload a file. '''
+    filestream = wtforms.FileField(
+        'File',
+        [wtforms.validators.Required()])
