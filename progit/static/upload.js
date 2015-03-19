@@ -38,7 +38,7 @@ function doUpload(csrf_token, files) {
           }
 
           // Set the progress bar.
-          if (percent > 10){
+          if (percent > 2){
             $progressBar.css({"color": "white"});
           }
           $progressBar.css({"width": percent + "%"});
