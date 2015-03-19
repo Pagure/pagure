@@ -1,6 +1,11 @@
-/************************************************************************
- * HTML5 Multiple File Uploader Demo                                    *
- ************************************************************************/
+/**
+ * HTML5 Drag and Drop uploader
+ *
+ * This file has been adapted for the needs of progit from the work done by
+ * Noah Petherbridge in https://github.com/kirsle/flask-multi-upload/
+ * (released under public domain).
+ *
+ */
 
 function doUpload(csrf_token, files) {
   $("#progress").show();
