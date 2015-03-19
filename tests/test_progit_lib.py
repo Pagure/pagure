@@ -130,7 +130,7 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(
             [], [email.email for email in items[1].emails])
 
-    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.git.update_git')
     @patch('progit.lib.notify.send_email')
     def test_new_issue(self, p_send_email, p_ugt):
         """ Test the new_issue of progit.lib. """
@@ -193,7 +193,7 @@ class ProgitLibtests(tests.Modeltests):
         issues = progit.lib.search_issues(self.session, repo)
         self.assertEqual(len(issues), 2)
 
-    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.git.update_git')
     @patch('progit.lib.notify.send_email')
     def test_edit_issue(self, p_send_email, p_ugt):
         """ Test the edit_issue of progit.lib. """
@@ -233,7 +233,7 @@ class ProgitLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Edited successfully issue #2')
 
-    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.git.update_git')
     @patch('progit.lib.notify.send_email')
     def test_add_issue_dependency(self, p_send_email, p_ugt):
         """ Test the add_issue_dependency of progit.lib. """
@@ -281,7 +281,7 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(len(issue_blocked.children), 1)
         self.assertEqual(issue_blocked.children[0].id, 1)
 
-    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.git.update_git')
     @patch('progit.lib.notify.send_email')
     def test_add_issue_tag(self, p_send_email, p_ugt):
         """ Test the add_issue_tag of progit.lib. """
@@ -319,7 +319,7 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(issues[0].status, 'Open')
         self.assertEqual([tag.tag for tag in issues[0].tags], ['tag1'])
 
-    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.git.update_git')
     @patch('progit.lib.notify.send_email')
     def test_remove_tags(self, p_send_email, p_ugt):
         """ Test the remove_tags of progit.lib. """
@@ -344,7 +344,7 @@ class ProgitLibtests(tests.Modeltests):
 
         self.assertEqual(msgs, [u'Removed tag: tag1'])
 
-    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.git.update_git')
     @patch('progit.lib.notify.send_email')
     def test_edit_issue_tags(self, p_send_email, p_ugt):
         """ Test the edit_issue_tags of progit.lib. """
@@ -379,7 +379,7 @@ class ProgitLibtests(tests.Modeltests):
             old_tag='tag2',
             new_tag='tag2')
 
-    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.git.update_git')
     @patch('progit.lib.notify.send_email')
     def test_search_issues(self, p_send_email, p_ugt):
         """ Test the search_issues of progit.lib. """
@@ -437,7 +437,7 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(issues[0].status, 'Invalid')
         self.assertEqual(issues[0].tags, [])
 
-    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.git.update_git')
     @patch('progit.lib.notify.send_email')
     def test_add_issue_assignee(self, p_send_email, p_ugt):
         """ Test the add_issue_assignee of progit.lib. """
@@ -541,7 +541,7 @@ class ProgitLibtests(tests.Modeltests):
             self.session, repo, assignee=True)
         self.assertEqual(len(issues), 0)
 
-    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.git.update_git')
     @patch('progit.lib.notify.send_email')
     def test_add_issue_comment(self, p_send_email, p_ugt):
         """ Test the add_issue_comment of progit.lib. """

@@ -36,7 +36,7 @@ class ProgitLibModeltests(tests.Modeltests):
         self.assertEqual('foo', item.username)
         self.assertEqual([], item.groups)
 
-    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.git.update_git')
     @patch('progit.lib.notify.send_email')
     def test_issue__repr__(self, p_send_email, p_ugt):
         """ Test the Issue.__repr__ function of progit.lib.model. """
@@ -63,7 +63,7 @@ class ProgitLibModeltests(tests.Modeltests):
             str(issues[0]),
             'Issue(1, project:test, user:pingou, title:Test issue)')
 
-    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.git.update_git')
     @patch('progit.lib.notify.send_email')
     def test_pullrequest__repr__(self, p_send_email, p_ugt):
         """ Test the PullRequest.__repr__ function of progit.lib.model. """

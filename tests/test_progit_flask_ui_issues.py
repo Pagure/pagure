@@ -50,7 +50,7 @@ class ProgitFlaskIssuestests(tests.Modeltests):
             tests.HERE, 'docs')
         self.app = progit.APP.test_client()
 
-    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.git.update_git')
     @patch('progit.lib.notify.send_email')
     def test_new_issue(self, p_send_email, p_ugt):
         """ Test the new_issue endpoint. """
@@ -120,7 +120,7 @@ class ProgitFlaskIssuestests(tests.Modeltests):
             self.assertTrue('<p>test project #1</p>' in output.data)
             self.assertTrue('<h2>\n    Issues (1)\n  </h2>' in output.data)
 
-    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.git.update_git')
     @patch('progit.lib.notify.send_email')
     def test_view_issues(self, p_send_email, p_ugt):
         """ Test the view_issues endpoint. """
@@ -179,7 +179,7 @@ class ProgitFlaskIssuestests(tests.Modeltests):
         output = self.app.get('/test/issues')
         self.assertEqual(output.status_code, 404)
 
-    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.git.update_git')
     @patch('progit.lib.notify.send_email')
     def test_view_issue(self, p_send_email, p_ugt):
         """ Test the view_issue endpoint. """
@@ -272,7 +272,7 @@ class ProgitFlaskIssuestests(tests.Modeltests):
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 404)
 
-    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.git.update_git')
     @patch('progit.lib.notify.send_email')
     def test_update_issue(self, p_send_email, p_ugt):
         """ Test the update_issue endpoint. """
@@ -498,7 +498,7 @@ class ProgitFlaskIssuestests(tests.Modeltests):
             output = self.app.get('/test/issue/1/update')
             self.assertEqual(output.status_code, 404)
 
-    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.git.update_git')
     @patch('progit.lib.notify.send_email')
     def test_edit_issue(self, p_send_email, p_ugt):
         """ Test the edit_issue endpoint. """
@@ -596,7 +596,7 @@ class ProgitFlaskIssuestests(tests.Modeltests):
             output = self.app.post('/test/issue/1/edit', data=data)
             self.assertEqual(output.status_code, 404)
 
-    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.git.update_git')
     @patch('progit.lib.notify.send_email')
     def test_edit_tag(self, p_send_email, p_ugt):
         """ Test the edit_tag endpoint. """
@@ -679,7 +679,7 @@ class ProgitFlaskIssuestests(tests.Modeltests):
         tags = progit.lib.get_tags_of_project(self.session, repo)
         self.assertEqual([tag.tag for tag in tags], ['tag2'])
 
-    @patch('progit.lib.git.update_git_ticket')
+    @patch('progit.lib.git.update_git')
     @patch('progit.lib.notify.send_email')
     def test_remove_tag(self, p_send_email, p_ugt):
         """ Test the remove_tag endpoint. """

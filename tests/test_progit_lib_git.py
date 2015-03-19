@@ -254,8 +254,8 @@ index 9f44358..2a552bb 100644
         self.assertEqual(patch, exp)
 
     @patch('progit.lib.notify.send_email')
-    def test_update_git_ticket(self, email_f):
-        """ Test the update_git_ticket of progit.lib.git. """
+    def test_update_git(self, email_f):
+        """ Test the update_git of progit.lib.git. """
         email_f.return_value = True
 
         # Create project
@@ -284,7 +284,7 @@ index 9f44358..2a552bb 100644
         )
         self.assertEqual(msg, 'Issue created')
         issue = progit.lib.search_issues(self.session, repo, issueid=1)
-        progit.lib.git.update_git_ticket(issue, repo, tests.HERE)
+        progit.lib.git.update_git(issue, repo, tests.HERE)
 
         repo = pygit2.Repository(self.gitrepo)
         commit = repo.revparse_single('HEAD')
