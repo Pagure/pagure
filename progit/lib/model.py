@@ -548,6 +548,51 @@ class PullRequest(BASE):
         '''
         return '%s-pull-request-%s@progit' % (self.repo.name, self.id)
 
+    def to_json(self):
+        ''' Returns a JSON representation of the pull-request using the
+        JSON module
+
+        '''
+        output = {
+            'id': self.id,
+            'title': self.title,
+            'branch': self.branch,
+            'repo': self.repo.path,
+            'branch_from': self.branch_from,
+            'repo_from': self.repo_from.path,
+            'date_created': self.date_created.strftime('%s'),
+            'user': {
+                'name': self.user.user,
+                'fullname': self.user.fullname,
+                'emails': [email.email for email in self.user.emails],
+            },
+            'status': self.status,
+            'commit_start': self.commit_start,
+            'commit_stop': self.commit_stop,
+        }
+
+        comments = []
+        for comment in self.comments:
+            cmt = {
+                'id': comment.id,
+                'commit': comment.commit_id,
+                'filename': comment.filename,
+                'line': comment.line,
+                'comment': comment.comment,
+                'parent': comment.parent_id,
+                'date_created': comment.date_created.strftime('%s'),
+                'user': {
+                    'name': comment.user.user,
+                    'fullname': comment.user.fullname,
+                    'emails': [email.email for email in comment.user.emails],
+                }
+            }
+            comments.append(cmt)
+
+        output['comments'] = comments
+
+        return json.dumps(output)
+
 
 class PullRequestComment(BASE):
     """ Stores the comments made on a pull-request.
