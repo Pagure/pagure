@@ -1442,7 +1442,7 @@ class ProgitLibtests(tests.Modeltests):
             self.session, repo, issue, '2', 'pingou', ticketfolder=None)
         self.assertEqual(messages, ['Dependency added'])
         messages = progit.lib.update_dependency_issue(
-            self.session, repo, issue, ['3'], 'pingou',
+            self.session, repo, issue, ['3', '4', 5], 'pingou',
             ticketfolder=None)
         self.assertEqual(
             messages, ['Dependency added', 'Dependency removed'])
