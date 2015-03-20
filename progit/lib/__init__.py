@@ -1176,9 +1176,10 @@ def update_blocked_issue(
     # Add issue blocked
     for block in toadd:
         issue_block = search_issues(session, repo, issueid=block)
-        if issue_block is None or issue_block.project != repo:
+        if issue_block is None:
             continue
-        if issue_block.id in issue.blocks_text:
+        if issue_block.id in issue.blocks_text:  # pragma: no cover
+            # we should never be in this case but better safe than sorry...
             continue
 
         messages.append(
@@ -1195,10 +1196,13 @@ def update_blocked_issue(
     # Remove issue blocked
     for block in torm:
         issue_block = search_issues(session, repo, issueid=block)
-        if issue_block is None or issue_block.project != repo:
+        if issue_block is None:  # pragma: no cover
+            # We cannot test this as it would mean we managed to put in an
+            # invalid ticket as dependency earlier
             continue
 
-        if issue_block.id not in issue.blocks_text:
+        if issue_block.id not in issue.blocks_text:  # pragma: no cover
+            # we should never be in this case but better safe than sorry...
             continue
 
         messages.append(
