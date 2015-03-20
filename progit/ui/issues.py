@@ -99,29 +99,12 @@ def update_issue(repo, issueid, username=None):
                     flask.flash(message)
 
             # Adjust (add/remove) tags
-            toadd = set(tags) - set(issue.tags_text)
-            torm = set(issue.tags_text) - set(tags)
-            for tag in toadd:
-                message = progit.lib.add_issue_tag(
-                        SESSION,
-                        issue=issue,
-                        tag=tag,
-                        user=flask.g.fas_user.username,
-                        ticketfolder=APP.config['TICKETS_FOLDER'],
-                    )
-                SESSION.commit()
-                if message:
-                    flask.flash(message)
-            if torm:
-                messages = progit.lib.remove_tags_issue(
-                        SESSION,
-                        issue=issue,
-                        tags=torm,
-                        ticketfolder=APP.config['TICKETS_FOLDER'],
-                    )
-                SESSION.commit()
-                for message in messages:
-                    flask.flash(message)
+            messages = progit.lib.update_tags_issue(
+                SESSION, issue, tags,
+                username=flask.g.fas_user.username,
+                ticketfolder=APP.config['TICKETS_FOLDER'])
+            for message in messages:
+                flask.flash(message)
 
             # Assign or update assignee of the ticket
             message = progit.lib.add_issue_assignee(

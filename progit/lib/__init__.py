@@ -1008,3 +1008,38 @@ def avatar_url_from_openid(openid, size=64, default='retro', dns=False):
         query = urllib.urlencode({'s': size, 'd': default})
         hash = hashlib.sha256(openid).hexdigest()
         return "https://seccdn.libravatar.org/avatar/%s?%s" % (hash, query)
+
+
+def update_tags_issue(session, issue, tags, username, ticketfolder):
+    """ Update the tags of a specified issue (adding or removing them).
+
+    """
+    if isinstance(tags, basestring):
+        tags = [tags]
+
+    toadd = set(tags) - set(issue.tags_text)
+    torm = set(issue.tags_text) - set(tags)
+    messages = []
+    for tag in toadd:
+        messages.append(
+            add_issue_tag(
+                session,
+                issue=issue,
+                tag=tag,
+                user=username,
+                ticketfolder=ticketfolder,
+            )
+        )
+
+    if torm:
+        messages.append(
+            remove_tags_issue(
+                session,
+                issue=issue,
+                tags=torm,
+                ticketfolder=ticketfolder,
+            )
+        )
+    session.commit()
+
+    return messages
