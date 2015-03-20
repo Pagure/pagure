@@ -409,8 +409,12 @@ table.list tbody td > a
 #issue_action {
     float: right;
     display: inline-block;
-    width: 134px;
+    width: 138px;
     vertical-align: top;
+}
+
+#issue_action a {
+    padding-left: 4px;
 }
 
 .btn_reset button, .btn_create button {
