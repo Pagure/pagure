@@ -141,95 +141,20 @@ def update_issue(repo, issueid, username=None):
                     flask.flash(message)
 
             # Update ticket this one depends on
-            toadd = set(depends) - set(issue.depends_text)
-            torm = set(issue.depends_text) - set(depends)
-            # Add issue depending
-            for depend in toadd:
-                issue_depend = progit.lib.search_issues(
-                    SESSION, repo, issueid=depend)
-                if issue_depend is None or issue_depend.project != repo:
-                    flask.flash('Issue %s not found' % depend, 'error')
-                    continue
-                if issue_depend.id in issue.depends_text:
-                    continue
-
-                message = progit.lib.add_issue_dependency(
-                    SESSION,
-                    issue=issue_depend,
-                    issue_blocked=issue,
-                    user=flask.g.fas_user.username,
-                    ticketfolder=APP.config['TICKETS_FOLDER'],
-                )
-                SESSION.commit()
-                if message:
-                    flask.flash(message)
-
-            # Remove issue depending
-            for depend in torm:
-                issue_depend = progit.lib.search_issues(
-                    SESSION, repo, issueid=depend)
-                if issue_depend is None or issue_depend.project != repo:
-                    flask.flash('Issue %s not found' % depend, 'error')
-                    continue
-                if issue_depend.id not in issue.depends_text:
-                    continue
-
-                message = progit.lib.remove_issue_dependency(
-                    SESSION,
-                    issue=issue,
-                    issue_blocked=issue_depend,
-                    user=flask.g.fas_user.username,
-                    ticketfolder=APP.config['TICKETS_FOLDER'],
-                )
-                SESSION.commit()
-                if message:
-                    flask.flash(message)
+            messages = progit.lib.update_dependency_issue(
+                SESSION, issue, depends,
+                username=flask.g.fas_user.username,
+                ticketfolder=APP.config['TICKETS_FOLDER'])
+            for message in messages:
+                flask.flash(message)
 
             # Update ticket(s) depending on this one
-            toadd = set(blocks) - set(issue.blocks_text)
-            torm = set(issue.blocks_text) - set(blocks)
-            # Add issue blocked
-            for block in toadd:
-                issue_block = progit.lib.search_issues(
-                    SESSION, repo, issueid=block)
-                if issue_block is None or issue_block.project != repo:
-                    flask.flash('Issue %s not found' % block, 'error')
-                    continue
-                if issue_block.id in issue.blocks_text:
-                    continue
-
-                message = progit.lib.add_issue_dependency(
-                    SESSION,
-                    issue=issue,
-                    issue_blocked=issue_block,
-                    user=flask.g.fas_user.username,
-                    ticketfolder=APP.config['TICKETS_FOLDER'],
-                )
-                SESSION.commit()
-                if message:
-                    flask.flash(message)
-
-            # Remove issue blocked
-            for block in torm:
-                issue_block = progit.lib.search_issues(
-                    SESSION, repo, issueid=block)
-                if issue_block is None or issue_block.project != repo:
-                    flask.flash('Issue %s not found' % block, 'error')
-                    continue
-
-                if issue_block.id not in issue.blocks_text:
-                    continue
-
-                message = progit.lib.remove_issue_dependency(
-                    SESSION,
-                    issue=issue_block,
-                    issue_blocked=issue,
-                    user=flask.g.fas_user.username,
-                    ticketfolder=APP.config['TICKETS_FOLDER'],
-                )
-                SESSION.commit()
-                if message:
-                    flask.flash(message)
+            messages = progit.lib.update_blocked_issue(
+                SESSION, issue, depends,
+                username=flask.g.fas_user.username,
+                ticketfolder=APP.config['TICKETS_FOLDER'])
+            for message in messages:
+                flask.flash(message)
 
         except progit.exceptions.ProgitException, err:
             SESSION.rollback()

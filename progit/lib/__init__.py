@@ -1043,3 +1043,108 @@ def update_tags_issue(session, issue, tags, username, ticketfolder):
     session.commit()
 
     return messages
+
+
+def update_dependency_issue(session, issue, depends, username, ticketfolder):
+    """ Update the dependency of a specified issue (adding or removing them)
+
+    """
+    if isinstance(depends, basestring):
+        depends = [depends]
+
+    toadd = set(depends) - set(issue.depends_text)
+    torm = set(issue.depends_text) - set(depends)
+    messages = []
+
+    # Add issue depending
+    for depend in toadd:
+        issue_depend = search_issues(session, repo, issueid=depend)
+        if issue_depend is None or issue_depend.project != repo:
+            continue
+        if issue_depend.id in issue.depends_text:
+            continue
+
+        messages.append(
+            add_issue_dependency(
+                session,
+                issue=issue_depend,
+                issue_blocked=issue,
+                user=username,
+                ticketfolder=ticketfolder,
+            )
+        )
+
+    # Remove issue depending
+    for depend in torm:
+        issue_depend = search_issues(session, repo, issueid=depend)
+        if issue_depend is None or issue_depend.project != repo:
+            continue
+        if issue_depend.id not in issue.depends_text:
+            continue
+
+        messages.append(
+            remove_issue_dependency(
+                session,
+                issue=issue,
+                issue_blocked=issue_depend,
+                user=username,
+                ticketfolder=ticketfolder,
+            )
+        )
+
+    session.commit()
+    return messages
+
+
+def update_blocked_issue(session, issue, blocks, username, ticketfolder):
+    """ Update the upstream dependency of a specified issue (adding or
+    removing them)
+
+    """
+    if isinstance(blocks, basestring):
+        blocks = [blocks]
+
+    toadd = set(blocks) - set(issue.blocks_text)
+    torm = set(issue.blocks_text) - set(blocks)
+    messages = []
+
+    # Add issue blocked
+    for block in toadd:
+        issue_block = search_issues(session, repo, issueid=block)
+        if issue_block is None or issue_block.project != repo:
+            continue
+        if issue_block.id in issue.blocks_text:
+            continue
+
+        messages.append(
+            add_issue_dependency(
+                session,
+                issue=issue,
+                issue_blocked=issue_block,
+                user=username,
+                ticketfolder=ticketfolder,
+            )
+        )
+        session.commit()
+
+    # Remove issue blocked
+    for block in torm:
+        issue_block = search_issues(session, repo, issueid=block)
+        if issue_block is None or issue_block.project != repo:
+            continue
+
+        if issue_block.id not in issue.blocks_text:
+            continue
+
+        messages.append(
+            remove_issue_dependency(
+                session,
+                issue=issue_block,
+                issue_blocked=issue,
+                user=username,
+                ticketfolder=ticketfolder,
+            )
+        )
+
+    session.commit()
+    return messages
