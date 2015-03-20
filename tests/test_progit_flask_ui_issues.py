@@ -280,12 +280,12 @@ class ProgitFlaskIssuestests(tests.Modeltests):
         p_ugt.return_value = True
 
         output = self.app.get('/foo/issue/1/update')
-        self.assertEqual(output.status_code, 404)
+        self.assertEqual(output.status_code, 302)
 
         tests.create_projects(self.session)
 
         output = self.app.get('/test/issue/1/update')
-        self.assertEqual(output.status_code, 404)
+        self.assertEqual(output.status_code, 302)
 
         # Create issues to play with
         repo = progit.lib.get_project(self.session, 'test')
@@ -496,7 +496,7 @@ class ProgitFlaskIssuestests(tests.Modeltests):
 
         with tests.user_set(progit.APP, user):
             output = self.app.get('/test/issue/1/update')
-            self.assertEqual(output.status_code, 404)
+            self.assertEqual(output.status_code, 302)
 
     @patch('progit.lib.git.update_git')
     @patch('progit.lib.notify.send_email')
