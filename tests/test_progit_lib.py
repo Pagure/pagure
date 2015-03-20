@@ -1383,6 +1383,31 @@ class ProgitLibtests(tests.Modeltests):
         new_issue = progit.lib.get_issue_by_uid(self.session, issue.uid)
         self.assertEqual(issue, new_issue)
 
+    @patch('progit.lib.git.update_git')
+    @patch('progit.lib.notify.send_email')
+    def test_update_tags_issue(self, p_send_email, p_ugt):
+        """ Test the update_tags_issue of progit.lib. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        self.test_new_issue()
+        repo = progit.lib.get_project(self.session, 'test')
+        issue = progit.lib.search_issues(self.session, repo, issueid=1)
+
+        # before
+        self.assertEqual(issue.tags_text, [])
+
+        messages = progit.lib.update_tags_issue(
+            self.session, issue, 'tag', 'pingou', ticketfolder=None)
+        self.assertEqual(messages, ['Tag added'])
+        messages = progit.lib.update_tags_issue(
+            self.session, issue, ['tag2', 'tag3'], 'pingou',
+            ticketfolder=None)
+        self.assertEqual(
+            messages, ['Tag added', 'Tag added', 'Removed tag: tag'])
+
+        # after
+        self.assertEqual(issue.tags_text, ['tag2', 'tag3'])
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
