@@ -118,17 +118,6 @@ def update_issue(repo, issueid, username=None):
                 flask.flash(message)
 
             # Update status
-            if new_status == 'Fixed' and issue.parents:
-                for parent in issue.parents:
-                    if parent.status == 'Open':
-                        flask.flash(
-                            'You cannot close a ticket that has ticket '
-                            'depending that are still open.',
-                            'error')
-                        return flask.redirect(flask.url_for(
-                            'view_issue', repo=repo.name, username=username,
-                            issueid=issueid))
-
             if new_status in status:
                 message = progit.lib.edit_issue(
                     SESSION,
@@ -158,7 +147,7 @@ def update_issue(repo, issueid, username=None):
 
         except progit.exceptions.ProgitException, err:
             SESSION.rollback()
-            flask.flash(str(err), 'error')
+            flask.flash(err.message, 'error')
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
             APP.logger.exception(err)

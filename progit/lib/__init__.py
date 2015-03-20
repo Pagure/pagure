@@ -523,6 +523,13 @@ def edit_issue(session, issue, ticketfolder,
                title=None, content=None, status=None, private=False):
     ''' Edit the specified issue.
     '''
+    if status == 'Fixed' and issue.parents:
+        for parent in issue.parents:
+            if parent.status == 'Open':
+                raise progit.exceptions.ProgitException(
+                    'You cannot close a ticket that has ticket '
+                    'depending that are still open.')
+
     edit = []
     if title and title != issue.title:
         issue.title = title
