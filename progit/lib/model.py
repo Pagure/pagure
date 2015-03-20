@@ -362,8 +362,8 @@ class Issue(BASE):
             },
             'private': self.private,
             'tags': ','.join(self.tags_text),
-            'depends': ','.join(self.depends_text),
-            'blocks': ','.join(self.blocks_text),
+            'depends': ','.join([str(item) for item in self.depends_text]),
+            'blocks': ','.join([str(item) for item in self.blocks_text]),
         }
 
         comments = []
