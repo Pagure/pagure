@@ -1452,6 +1452,49 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(issue.depends_text, [3])
         self.assertEqual(issue.blocks_text, [])
 
+    @patch('progit.lib.git.update_git')
+    @patch('progit.lib.notify.send_email')
+    def test_update_blocked_issue(self, p_send_email, p_ugt):
+        """ Test the update_blocked_issue of progit.lib. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        self.test_new_issue()
+        repo = progit.lib.get_project(self.session, 'test')
+        issue = progit.lib.search_issues(self.session, repo, issueid=1)
+
+        # Create issues to play with
+        msg = progit.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #3',
+            content='We should work on this (3rd time!)',
+            user='pingou',
+            ticketfolder=None,
+            private=True,
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Issue created')
+
+        # before
+        self.assertEqual(issue.tags_text, [])
+        self.assertEqual(issue.depends_text, [])
+        self.assertEqual(issue.blocks_text, [])
+
+        messages = progit.lib.update_blocked_issue(
+            self.session, repo, issue, '2', 'pingou', ticketfolder=None)
+        self.assertEqual(messages, ['Dependency added'])
+        messages = progit.lib.update_blocked_issue(
+            self.session, repo, issue, ['3', '4', 5], 'pingou',
+            ticketfolder=None)
+        self.assertEqual(
+            messages, ['Dependency added', 'Dependency removed'])
+
+        # after
+        self.assertEqual(issue.tags_text, [])
+        self.assertEqual(issue.depends_text, [])
+        self.assertEqual(issue.blocks_text, [3])
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
