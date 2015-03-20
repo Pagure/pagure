@@ -808,9 +808,9 @@ def search_issues(
         )
     elif isinstance(private, basestring):
         query = query.filter(
-            or_(
+            sqlalchemy.or_(
                 model.Issue.private == False,
-                and_(
+                sqlalchemy.and_(
                     model.Issue.private == True,
                     model.Issue.user_id == model.User.id,
                     model.User.user == private,
