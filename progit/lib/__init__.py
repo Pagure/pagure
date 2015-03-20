@@ -1091,7 +1091,7 @@ def update_tags_issue(session, issue, tags, username, ticketfolder):
         )
 
     if torm:
-        messages.append(
+        messages.extend(
             remove_tags_issue(
                 session,
                 issue=issue,
