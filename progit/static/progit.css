@@ -412,12 +412,8 @@ table.list tbody td > a
     vertical-align: top;
 }
 
-#issue_action a {
-    padding-right: 4px;
-}
-
 .btn_reset button, .btn_create button {
-    width: 130px;
+    width: 135px;
     padding: auto;
 }
 
