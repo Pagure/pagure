@@ -402,6 +402,124 @@ index 458821a..77674a8
         patch = '\n'.join(npatch)
         self.assertEqual(patch, exp)
 
+    def test_update_ticket_from_git(self):
+        """ Test the update_ticket_from_git method from progit.lib.git. """
+        tests.create_projects(self.session)
+
+        repo = progit.lib.get_project(self.session, 'test')
+
+        # Before
+        self.assertEqual(len(repo.issues), 0)
+        self.assertEqual(repo.issues, [])
+
+        data = {
+            "status": "Open", "title": "foo", "comments": [],
+            "content": "bar", "date_created": "1426500263",
+            "user": {
+                "name": "pingou", "emails": ["pingou@fedoraproject.org"]},
+        }
+
+        self.assertRaises(
+            progit.exceptions.ProgitException,
+            progit.lib.git.update_ticket_from_git,
+            self.session,
+            reponame='foobar',
+            username=None,
+            issue_uid='foobar',
+            json_data=data
+        )
+
+        progit.lib.git.update_ticket_from_git(
+            self.session, reponame='test', username=None,
+            issue_uid='foobar', json_data=data
+        )
+        self.session.commit()
+
+        # After 1 insertion
+        self.assertEqual(len(repo.issues), 1)
+        self.assertEqual(repo.issues[0].id, 1)
+        self.assertEqual(repo.issues[0].uid, 'foobar')
+        self.assertEqual(repo.issues[0].title, 'foo')
+        self.assertEqual(repo.issues[0].depends_text, [])
+        self.assertEqual(repo.issues[0].blocks_text, [])
+
+        data["title"] = "fake issue for tests"
+        progit.lib.git.update_ticket_from_git(
+            self.session, reponame='test', username=None,
+            issue_uid='foobar', json_data=data
+        )
+        self.session.commit()
+
+        # After edit
+        self.assertEqual(len(repo.issues), 1)
+        self.assertEqual(repo.issues[0].id, 1)
+        self.assertEqual(repo.issues[0].uid, 'foobar')
+        self.assertEqual(repo.issues[0].title, 'fake issue for tests')
+        self.assertEqual(repo.issues[0].depends_text, [])
+        self.assertEqual(repo.issues[0].blocks_text, [])
+
+        data = {
+            "status": "Open", "title": "Rename progit", "private": False,
+            "content": "This is too much of a conflict with the book",
+            "user": {
+                "fullname": "Pierre-YvesChibon", "name": "pingou",
+                "emails": ["pingou@fedoraproject.org"]
+            },
+            "id": 20,
+            "blocks": [1],
+            "depends": [3, 4],
+            "date_created": "1426595224",
+            "comments": [
+                {
+                    "comment": "Nirik:\r\n\r\n- sourceforge++ \r\n- "
+                    "gitmaker\r\n- mastergit \r\n- hostomatic\r\n- "
+                    "gitcorp\r\n- git-keiretsu \r\n- gitbuffet\r\n- "
+                    "cogitator\r\n- cogitate\r\n\r\nrandomuser:\r\n\r\n- "
+                    "COLLABORATRON5000\r\n- git-sm\u00f6rg\u00e5sbord\r\n- "
+                    "thislittlegittywenttomarket\r\n- git-o-rama\r\n- "
+                    "gitsundheit",
+                    "date_created": "1426595224", "id": 250, "parent": None,
+                    "user": {
+                        "fullname": "Pierre-YvesChibon",
+                        "name": "pingou",
+                        "emails": ["pingou@fedoraproject.org"]
+                    }
+                },
+                {
+                    "comment": "Nirik:\r\n\r\n- sourceforge++ \r\n- "
+                    "gitmaker\r\n- mastergit \r\n- hostomatic\r\n- "
+                    "gitcorp\r\n- git-keiretsu \r\n- gitbuffet\r\n- "
+                    "cogitator\r\n- cogitate\r\n\r\nrandomuser:\r\n\r\n- "
+                    "COLLABORATRON5000\r\n- git-sm\u00f6rg\u00e5sbord\r\n- "
+                    "thislittlegittywenttomarket\r\n- git-o-rama\r\n- "
+                    "gitsundheit",
+                    "date_created": "1426595340", "id": 324, "parent": None,
+                    "user": {
+                        "fullname": "Ralph Bean",
+                        "name": "ralph",
+                        "emails": ["ralph@fedoraproject.org"]
+                    }
+                }
+            ]
+        }
+
+        progit.lib.git.update_ticket_from_git(
+            self.session, reponame='test', username=None,
+            issue_uid='foobar2', json_data=data
+        )
+
+        # After second insertion
+        self.assertEqual(len(repo.issues), 2)
+        self.assertEqual(repo.issues[0].uid, 'foobar')
+        self.assertEqual(repo.issues[0].title, 'fake issue for tests')
+        self.assertEqual(repo.issues[0].depends_text, [20])
+        self.assertEqual(repo.issues[0].blocks_text, [])
+        # New one
+        self.assertEqual(repo.issues[1].uid, 'foobar2')
+        self.assertEqual(repo.issues[1].title, 'Rename progit')
+        self.assertEqual(repo.issues[1].depends_text, [])
+        self.assertEqual(repo.issues[1].blocks_text, [1])
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibGittests)
