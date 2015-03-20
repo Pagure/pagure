@@ -452,6 +452,8 @@ class ProgitLibtests(tests.Modeltests):
         # Issues by tag
         issues = progit.lib.search_issues(self.session, repo, tags='foo')
         self.assertEqual(len(issues), 0)
+        issues = progit.lib.search_issues(self.session, repo, tags='!foo')
+        self.assertEqual(len(issues), 2)
 
         # Issue by id
         issue = progit.lib.search_issues(self.session, repo, issueid=1)
@@ -466,6 +468,15 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(issues[0].project_id, 1)
         self.assertEqual(issues[0].status, 'Invalid')
         self.assertEqual(issues[0].tags, [])
+
+        # Issues by assignee
+        issues = progit.lib.search_issues(self.session, repo, assignee='foo')
+        self.assertEqual(len(issues), 0)
+        issues = progit.lib.search_issues(self.session, repo, assignee='!foo')
+        self.assertEqual(len(issues), 2)
+
+        issues = progit.lib.search_issues(self.session, repo, private='foo')
+        self.assertEqual(len(issues), 2)
 
     @patch('progit.lib.git.update_git')
     @patch('progit.lib.notify.send_email')
