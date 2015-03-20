@@ -323,7 +323,7 @@ def remove_tags_issue(session, issue, tags, ticketfolder):
     return msgs
 
 
-def edit_issue_tags(session, project, old_tag, new_tag):
+def edit_issue_tags(session, project, old_tag, new_tag, ticketfolder):
     ''' Removes the specified tag of a project. '''
 
     if old_tag == new_tag:
@@ -359,6 +359,8 @@ def edit_issue_tags(session, project, old_tag, new_tag):
                 )
                 session.add(issue_tag)
                 msgs.append('Edited tag: %s to %s' % (old_tag, new_tag))
+            progit.lib.git.update_git(
+                issue, repo=issue.project, ticketfolder=ticketfolder)
 
     return msgs
 

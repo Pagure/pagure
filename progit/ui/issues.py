@@ -280,7 +280,10 @@ def edit_tag(repo, tag, username=None):
     if form.validate_on_submit():
         new_tag = form.tag.data
 
-        msgs = progit.lib.edit_issue_tags(SESSION, repo, tag, new_tag)
+        msgs = progit.lib.edit_issue_tags(
+            SESSION, repo, tag, new_tag,
+            ticketfolder=APP.config['TICKETS_FOLDER']
+        )
 
         try:
             SESSION.commit()
