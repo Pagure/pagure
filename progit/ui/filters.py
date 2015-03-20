@@ -36,6 +36,14 @@ from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
 # Jinja filters
 
 
+@APP.template_filter('hasattr')
+def jinja_hasattr(obj, string):
+    """ Template filter checking if the provided object at the provided
+    string as attribute
+    """
+    return hasattr(obj, string)
+
+
 @APP.template_filter('humanize')
 def humanize_date(date):
     """ Template filter returning the last commit date of the provided repo.
