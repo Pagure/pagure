@@ -16,12 +16,22 @@
     {% if status and status != 'Open' %}
       <a href="{{ url_for('view_issues', username=username,
                  repo=repo.name, tags=tags, author=author, assignee=assignee) }}">
-      (Open)</a>
+      ({{ oth_issues }} Open)</a>
     {% else %}
       <a href="{{ url_for('view_issues', username=username,
                  repo=repo.name, status='Closed', tags=tags, author=author,
                  assignee=assignee) }}">
-      (Closed)</a>
+      ({{ oth_issues }} Closed)</a>
+    {% endif %}
+
+    {% if oth_issues %}
+    <div class="addrem_bar issues_pbar">
+      {% if (issues | length + oth_issues) %}
+        <span style="width: {{ (100.0 * issues | length / (issues | length + oth_issues))|round|int }}%">
+            {{ (100.0 * (1 - issues | length / (issues | length + oth_issues)))|round|int }}%
+        </span>
+      {% endif %}
+    </div>
     {% endif %}
 
     <aside id="issue_action">

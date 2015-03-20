@@ -683,6 +683,14 @@ header.repo.forked > p {
     background-color: #dbffdb;
 }
 
+.issues_pbar {
+    background-color: #ffdddd!important;
+}
+
+.issues_pbar > span {
+    background-color: #8bf08b;
+}
+
 ul.changes {
     margin: 0;
     list-style-type: none;
