@@ -1,10 +1,18 @@
+# Default folder where the git repos are located
 repos/
 forks/
 tickets/
 docs/
+requests/
+
+# Other python/editor specific files to ignore
 dist/
 build/
 *.pyc
 *.swp
 *.egg-info
+*.conf
 .coverage
+
+# Just a local folder I use for testing
+clones/
