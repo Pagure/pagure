@@ -556,7 +556,7 @@ def update_project_settings(session, repo, issue_tracker, project_docs):
 
 
 def fork_project(session, user, repo, gitfolder,
-                 forkfolder, docfolder, ticketfolder):
+                 forkfolder, docfolder, ticketfolder, requestfolder):
     ''' Fork a given project into the user's forks. '''
     if repo.is_fork:
         reponame = os.path.join(forkfolder, repo.path)
@@ -602,6 +602,16 @@ def fork_project(session, user, repo, gitfolder,
             'The tickets repo "%s" already exists' % project.path
         )
     pygit2.init_repository(ticketrepo, bare=True)
+
+    requestrepo = os.path.join(requestfolder, project.path)
+    if os.path.exists(requestrepo):
+        shutil.rmtree(forkreponame)
+        shutil.rmtree(docrepo)
+        shutil.rmtree(ticketrepo)
+        raise progit.exceptions.RepoExistsException(
+            'The requests repo "%s" already exists' % project.path
+        )
+    pygit2.init_repository(requestrepo, bare=True)
 
     return 'Repo "%s" cloned to "%s/%s"' % (repo.name, user, repo.name)
 
