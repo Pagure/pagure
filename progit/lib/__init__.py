@@ -1013,6 +1013,27 @@ def get_issue_by_uid(session, issue_uid):
     return query.first()
 
 
+def get_request_by_uid(session, request_uid):
+    ''' Return the request corresponding to the specified unique identifier.
+
+    :arg session: the session to use to connect to the database.
+    :arg request_uid: the unique identifier of a request. This identifier is
+        unique accross all projects on this progit instance and should be
+        unique accross multiple progit instances as well
+    :type request_uid: str or None
+
+    :return: A single Issue object.
+    :rtype: progit.lib.model.PullRequest
+
+    '''
+    query = session.query(
+        model.PullRequest
+    ).filter(
+        model.PullRequest.uid == request_uid
+    )
+    return query.first()
+
+
 def set_up_user(session, username, fullname, user_email):
     ''' Set up a new user into the database or update its information. '''
     user = search_user(session, username=username)
