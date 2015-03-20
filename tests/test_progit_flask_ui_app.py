@@ -46,6 +46,8 @@ class ProgitFlaskApptests(tests.Modeltests):
             tests.HERE, 'tickets')
         progit.APP.config['DOCS_FOLDER'] = os.path.join(
             tests.HERE, 'docs')
+        progit.APP.config['REQUESTS_FOLDER'] = os.path.join(
+            tests.HERE, 'requests')
         self.app = progit.APP.test_client()
 
     def test_index(self):
@@ -128,6 +130,8 @@ class ProgitFlaskApptests(tests.Modeltests):
             os.path.join(tests.HERE, 'tickets', 'project#1.git')))
         self.assertFalse(os.path.exists(
             os.path.join(tests.HERE, 'docs', 'project#1.git')))
+        self.assertFalse(os.path.exists(
+            os.path.join(tests.HERE, 'requests', 'project#1.git')))
 
         user = tests.FakeUser()
         with tests.user_set(progit.APP, user):
@@ -184,6 +188,8 @@ class ProgitFlaskApptests(tests.Modeltests):
             os.path.join(tests.HERE, 'tickets', 'project#1.git')))
         self.assertTrue(os.path.exists(
             os.path.join(tests.HERE, 'docs', 'project#1.git')))
+        self.assertTrue(os.path.exists(
+            os.path.join(tests.HERE, 'requests', 'project#1.git')))
 
     def test_user_settings(self):
         """ Test the user_settings endpoint. """

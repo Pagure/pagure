@@ -92,7 +92,7 @@ class Modeltests(unittest.TestCase):
             if filename.endswith('.git') and os.path.isdir(filename):
                 shutil.rmtree(filename)
 
-        for folder in ['tickets', 'repos', 'forks', 'docs']:
+        for folder in ['tickets', 'repos', 'forks', 'docs', 'requests']:
             folder = os.path.join(HERE, folder)
             if os.path.exists(folder):
                 shutil.rmtree(folder)
