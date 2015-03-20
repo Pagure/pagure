@@ -398,7 +398,8 @@ def add_pull_request_comment(session, request, commit, filename, row,
     return 'Comment added'
 
 
-def new_project(session, user, name, gitfolder, docfolder, ticketfolder,
+def new_project(session, user, name,
+                gitfolder, docfolder, ticketfolder, requestfolder,
                 description=None, parent_id=None):
     ''' Create a new project based on the information provided.
     '''
@@ -438,6 +439,16 @@ def new_project(session, user, name, gitfolder, docfolder, ticketfolder,
             'The tickets repo "%s" already exists' % project.path
         )
     pygit2.init_repository(ticketrepo, bare=True)
+
+    requestrepo = os.path.join(requestfolder, project.path)
+    if os.path.exists(requestrepo):
+        shutil.rmtree(gitrepo)
+        shutil.rmtree(docrepo)
+        shutil.rmtree(ticketrepo)
+        raise progit.exceptions.RepoExistsException(
+            'The requests repo "%s" already exists' % project.path
+        )
+    pygit2.init_repository(requestrepo, bare=True)
 
     return 'Project "%s" created' % name
 
