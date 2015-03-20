@@ -1119,9 +1119,10 @@ def update_dependency_issue(
     # Add issue depending
     for depend in toadd:
         issue_depend = search_issues(session, repo, issueid=depend)
-        if issue_depend is None or issue_depend.project != repo:
+        if issue_depend is None:
             continue
-        if issue_depend.id in issue.depends_text:
+        if issue_depend.id in issue.depends_text:  # pragma: no cover
+            # we should never be in this case but better safe than sorry...
             continue
 
         messages.append(
@@ -1137,9 +1138,10 @@ def update_dependency_issue(
     # Remove issue depending
     for depend in torm:
         issue_depend = search_issues(session, repo, issueid=depend)
-        if issue_depend is None or issue_depend.project != repo:
+        if issue_depend is None:
             continue
-        if issue_depend.id not in issue.depends_text:
+        if issue_depend.id not in issue.depends_text:  # pragma: no cover
+            # we should never be in this case but better safe than sorry...
             continue
 
         messages.append(
