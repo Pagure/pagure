@@ -1274,7 +1274,7 @@ class ProgitLibtests(tests.Modeltests):
             request=request,
             user=tests.FakeUser(),
             requestfolder=None,
-            merged=True,
+            merged=False,
         )
         self.session.commit()
 
