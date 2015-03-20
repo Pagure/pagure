@@ -140,7 +140,7 @@
     <table>
       <tr>
         <th>Git URLs</th>
-        <td></td>
+        <td><a id="more_gits">more</a></td>
         <td></td>
         <td></td>
       </tr>
@@ -152,9 +152,6 @@
         </td>
         <td>
           {{ config.get('GIT_URL_GIT') }}/{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
-        </td>
-        <td>
-          <a id="more_gits">more</a>
         </td>
       </tr>
       <tr class="extra_gits">
@@ -202,7 +199,15 @@ $(document).ready(function() {
 $(function() {
     $( "#more_gits" ).click(
       function() {
-        $(".extra_gits").toggle();
+        var _xgits = $(".extra_gits");
+        _xgits.toggle();
+        console.log(_xgits[0]);
+        console.log(_xgits.is(':visible'));
+        if (_xgits.is(':visible')) {
+            $( "#more_gits" ).html('less');
+        } else {
+            $( "#more_gits" ).html('more');
+        }
       }
     );
 });
