@@ -579,11 +579,12 @@ class PullRequest(BASE):
         '''
         output = {
             'id': self.id,
+            'uid': self.uid,
             'title': self.title,
             'branch': self.branch,
-            'repo': self.repo.path,
+            'repo': self.repo.to_json(),
             'branch_from': self.branch_from,
-            'repo_from': self.repo_from.path,
+            'repo_from': self.repo_from.to_json(),
             'date_created': self.date_created.strftime('%s'),
             'user': {
                 'name': self.user.user,
