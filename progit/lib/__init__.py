@@ -776,12 +776,32 @@ def search_issues(
     if tags is not None and tags != []:
         if isinstance(tags, basestring):
             tags = [tags]
+        notags = []
+        ytags = []
+        for tag in tags:
+            if tag.startswith('!'):
+                notags.append(tag[1:])
+            else:
+                ytags.append(tag)
 
-        query = query.filter(
-            model.Issue.uid == model.TagIssue.issue_uid
-        ).filter(
-            model.TagIssue.tag.in_(tags)
-        )
+        if ytags:
+            query = query.filter(
+                model.Issue.uid == model.TagIssue.issue_uid
+            ).filter(
+                model.TagIssue.tag.in_(ytags)
+            )
+        if notags:
+            sub = session.query(
+                model.Issue.uid
+            ).filter(
+                    model.Issue.uid == model.TagIssue.issue_uid
+            ).filter(
+                    model.TagIssue.tag.in_(notags)
+            )
+
+            query = query.filter(
+                ~model.Issue.uid.in_(sub)
+            )
     if assignee is not None:
         if str(assignee).lower() not in ['false', '0', 'true', '1']:
             user2 = aliased(model.User)
