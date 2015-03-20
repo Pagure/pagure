@@ -1084,7 +1084,7 @@ class ProgitLibtests(tests.Modeltests):
         shutil.rmtree(grepo)
 
         # Request repo exists
-        grepo = '%s.git' % os.path.join(ticketfolder, 'foo', 'testproject')
+        grepo = '%s.git' % os.path.join(requestfolder, 'foo', 'testproject')
         os.makedirs(grepo)
         self.assertRaises(
             progit.exceptions.ProgitException,
