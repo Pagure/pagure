@@ -230,7 +230,9 @@ class ProgitLibtests(tests.Modeltests):
             ticketfolder=None,
             title='Foo issue #2',
             content='We should work on this period',
-            status='Invalid')
+            status='Invalid',
+            private=True
+        )
         self.session.commit()
         self.assertEqual(msg, 'Edited successfully issue #2')
 
