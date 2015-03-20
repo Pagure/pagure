@@ -234,6 +234,27 @@ class Project(BASE):
             str_name = "%s/%s" % (self.user.user, str_name)
         return str_name
 
+    def to_json(self):
+        ''' Return a representation of the project as JSON.
+        '''
+
+        output = {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'parent': self.parent.to_json() if self.parent else None,
+            'issue_tracker': self.issue_tracker,
+            'project_docs': self.project_docs,
+            'date_created': self.date_created.strftime('%s'),
+            'user': {
+                'name': self.user.user,
+                'fullname': self.user.fullname,
+                'emails': [email.email for email in self.user.emails],
+            },
+        }
+
+        return output
+
 
 class ProjectUser(BASE):
     """ Stores the user of a projects.
