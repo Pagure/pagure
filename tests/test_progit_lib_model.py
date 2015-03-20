@@ -93,7 +93,8 @@ class ProgitLibModeltests(tests.Modeltests):
             repo_to=repo,
             branch_to='master',
             title='test pull-request',
-            user='pingou'
+            user='pingou',
+            requestfolder=None,
         )
         self.assertEqual(msg, 'Request created')
 
