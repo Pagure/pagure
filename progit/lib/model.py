@@ -361,6 +361,9 @@ class Issue(BASE):
                 'emails': [email.email for email in self.user.emails],
             },
             'private': self.private,
+            'tags': ','.join(self.tags_text),
+            'depends': ','.join(self.depends_text),
+            'blocks': ','.join(self.blocks_text),
         }
 
         comments = []
