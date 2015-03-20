@@ -69,6 +69,13 @@ TICKETS_FOLDER = os.path.join(
     'tickets'
 )
 
+# Folder containing the pull-requests repos
+REQUESTS_FOLDER = os.path.join(
+    os.path.abspath(os.path.dirname(__file__)),
+    '..',
+    'requests'
+)
+
 # Configuration file for gitolite
 GITOLITE_CONFIG = os.path.join(
     os.path.abspath(os.path.dirname(__file__)),
