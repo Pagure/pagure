@@ -1049,7 +1049,8 @@ def update_tags_issue(session, issue, tags, username, ticketfolder):
     return messages
 
 
-def update_dependency_issue(session, issue, depends, username, ticketfolder):
+def update_dependency_issue(
+        session, repo, issue, depends, username, ticketfolder):
     """ Update the dependency of a specified issue (adding or removing them)
 
     """
@@ -1100,7 +1101,8 @@ def update_dependency_issue(session, issue, depends, username, ticketfolder):
     return messages
 
 
-def update_blocked_issue(session, issue, blocks, username, ticketfolder):
+def update_blocked_issue(
+        session, repo, issue, blocks, username, ticketfolder):
     """ Update the upstream dependency of a specified issue (adding or
     removing them)
 

@@ -142,7 +142,7 @@ def update_issue(repo, issueid, username=None):
 
             # Update ticket this one depends on
             messages = progit.lib.update_dependency_issue(
-                SESSION, issue, depends,
+                SESSION, repo, issue, depends,
                 username=flask.g.fas_user.username,
                 ticketfolder=APP.config['TICKETS_FOLDER'])
             for message in messages:
@@ -150,7 +150,7 @@ def update_issue(repo, issueid, username=None):
 
             # Update ticket(s) depending on this one
             messages = progit.lib.update_blocked_issue(
-                SESSION, issue, depends,
+                SESSION, repo, issue, blocks,
                 username=flask.g.fas_user.username,
                 ticketfolder=APP.config['TICKETS_FOLDER'])
             for message in messages:
