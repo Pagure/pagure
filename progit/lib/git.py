@@ -286,6 +286,23 @@ def update_ticket_from_git(
 
     issue = progit.lib.get_issue_by_uid(session, issue_uid=issue_uid)
 
+    # Update tags
+    tags = json_data.get('tags', [])
+    progit.lib.update_tags_issue(
+        session, issue, tags, username=progit, ticketfolder=None)
+
+    # Update depends
+    depends = json_data.get('depends', [])
+    progit.lib.update_tags_issue(
+        session, issue.repo, issue, depends,
+        username=progit, ticketfolder=None)
+
+    # Update blocks
+    blocks = json_data.get('blocks', [])
+    progit.lib.update_tags_issue(
+        session, issue.repo, issue, blocks,
+        username=progit, ticketfolder=None)
+
     for comment in json_data['comments']:
         user = get_user_from_json(session, comment)
         commentobj = progit.lib.get_issue_comment(
