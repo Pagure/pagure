@@ -522,6 +522,7 @@ def fork_project(repo, username=None):
             forkfolder=APP.config['FORK_FOLDER'],
             docfolder=APP.config['DOCS_FOLDER'],
             ticketfolder=APP.config['TICKETS_FOLDER'],
+            requestfolder=APP.config['REQUESTS_FOLDER'],
             user=flask.g.fas_user.username)
 
         SESSION.commit()
