@@ -978,6 +978,19 @@ def get_issue_comment(session, issue_uid, comment_id):
 
     return query.first()
 
+def get_request_comment(session, request_uid, comment_id):
+    ''' Return a specific comment of a specified issue.
+    '''
+    query = session.query(
+        model.PullRequestComment
+    ).filter(
+        model.PullRequestComment.pull_request_uid == request_uid
+    ).filter(
+        model.PullRequestComment.id == comment_id
+    )
+
+    return query.first()
+
 
 def get_issue_by_uid(session, issue_uid):
     ''' Return the issue corresponding to the specified unique identifier.
