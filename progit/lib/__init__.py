@@ -187,7 +187,7 @@ def add_issue_tag(session, issue, tag, user, ticketfolder):
     session.flush()
 
     progit.lib.git.update_git(
-        issue, repo=issue.project, ticketfolder=ticketfolder)
+        issue, repo=issue.project, repofolder=ticketfolder)
 
     return 'Tag added'
 
@@ -199,7 +199,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
         session.add(issue)
         session.commit()
         progit.lib.git.update_git(
-            issue, repo=issue.project, ticketfolder=ticketfolder)
+            issue, repo=issue.project, repofolder=ticketfolder)
 
         progit.lib.notify.notify_assigned_issue(issue, None, user)
         return 'Assignee reset'
@@ -215,7 +215,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
         session.add(issue)
         session.flush()
         progit.lib.git.update_git(
-            issue, repo=issue.project, ticketfolder=ticketfolder)
+            issue, repo=issue.project, repofolder=ticketfolder)
 
         progit.lib.notify.notify_assigned_issue(issue, user_obj, user)
 
@@ -240,11 +240,13 @@ def add_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
         # Make sure we won't have SQLAlchemy error before we create the repo
         session.flush()
         progit.lib.git.update_git(
-            issue, repo=issue.project, ticketfolder=ticketfolder)
+            issue,
+            repo=issue.project,
+            repofolder=ticketfolder)
         progit.lib.git.update_git(
             issue_blocked,
             repo=issue_blocked.project,
-            ticketfolder=ticketfolder)
+            repofolder=ticketfolder)
 
         #progit.lib.notify.notify_assigned_issue(issue, user_obj)
         #progit.lib.notify.notify_assigned_issue(issue_blocked, user_obj)
@@ -269,11 +271,13 @@ def remove_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
         # Make sure we won't have SQLAlchemy error before we create the repo
         session.flush()
         progit.lib.git.update_git(
-            issue, repo=issue.project, ticketfolder=ticketfolder)
+            issue,
+            repo=issue.project,
+            repofolder=ticketfolder)
         progit.lib.git.update_git(
             issue_blocked,
             repo=issue_blocked.project,
-            ticketfolder=ticketfolder)
+            repofolder=ticketfolder)
 
         #progit.lib.notify.notify_assigned_issue(issue, user_obj)
         #progit.lib.notify.notify_assigned_issue(issue_blocked, user_obj)
@@ -302,7 +306,7 @@ def remove_tags(session, project, tags, ticketfolder):
                     session.delete(issue_tag)
                     msgs.append('Removed tag: %s' % tag)
             progit.lib.git.update_git(
-                issue, repo=issue.project, ticketfolder=ticketfolder)
+                issue, repo=issue.project, repofolder=ticketfolder)
 
     return msgs
 
@@ -321,7 +325,7 @@ def remove_tags_issue(session, issue, tags, ticketfolder):
             msgs.append('Removed tag: %s' % tag)
 
     progit.lib.git.update_git(
-        issue, repo=issue.project, ticketfolder=ticketfolder)
+        issue, repo=issue.project, repofolder=ticketfolder)
 
     return msgs
 
@@ -363,7 +367,7 @@ def edit_issue_tags(session, project, old_tag, new_tag, ticketfolder):
                 session.add(issue_tag)
                 msgs.append('Edited tag: %s to %s' % (old_tag, new_tag))
             progit.lib.git.update_git(
-                issue, repo=issue.project, ticketfolder=ticketfolder)
+                issue, repo=issue.project, repofolder=ticketfolder)
 
     return msgs
 
@@ -534,7 +538,7 @@ def edit_issue(session, issue, ticketfolder,
         edit.append('private')
 
     progit.lib.git.update_git(
-        issue, repo=issue.project, ticketfolder=ticketfolder)
+        issue, repo=issue.project, repofolder=ticketfolder)
 
     if edit:
         session.add(issue)
