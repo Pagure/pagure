@@ -132,6 +132,9 @@ def request_pull(repo, requestid, username=None):
                 SESSION.add(request)
                 try:
                     SESSION.commit()
+                    progit.lib.git.update_git(
+                        request, repo=request.repo,
+                        repofolder=APP.config['REQUESTS_FOLDER'])
                 except SQLAlchemyError as err:
                     SESSION.rollback()
                     APP.logger.exception(err)
