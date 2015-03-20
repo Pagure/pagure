@@ -1158,7 +1158,8 @@ class ProgitLibtests(tests.Modeltests):
             repo_to=repo,
             branch_to='master',
             title='test pull-request',
-            user='pingou'
+            user='pingou',
+            requestfolder=None,
         )
         self.assertEqual(msg, 'Request created')
 
@@ -1176,7 +1177,8 @@ class ProgitLibtests(tests.Modeltests):
             filename='file',
             row=None,
             comment='This is awesome, I got to remember it!',
-            user='foo'
+            user='foo',
+            requestfolder=None,
         )
         self.assertEqual(msg, 'Comment added')
 
@@ -1221,7 +1223,9 @@ class ProgitLibtests(tests.Modeltests):
             session=self.session,
             request=request,
             user=tests.FakeUser(),
-            merged=True)
+            requestfolder=None,
+            merged=True,
+        )
         self.session.commit()
 
         prs = progit.lib.search_pull_requests(
@@ -1236,7 +1240,9 @@ class ProgitLibtests(tests.Modeltests):
             session=self.session,
             request=request,
             user=tests.FakeUser(),
-            merged=False)
+            requestfolder=None,
+            merged=True,
+        )
         self.session.commit()
 
         prs = progit.lib.search_pull_requests(
