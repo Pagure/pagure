@@ -1138,7 +1138,9 @@ def update_dependency_issue(
     # Remove issue depending
     for depend in torm:
         issue_depend = search_issues(session, repo, issueid=depend)
-        if issue_depend is None:
+        if issue_depend is None:  # pragma: no cover
+            # We cannot test this as it would mean we managed to put in an
+            # invalid ticket as dependency earlier
             continue
         if issue_depend.id not in issue.depends_text:  # pragma: no cover
             # we should never be in this case but better safe than sorry...
