@@ -388,7 +388,7 @@ def add_user_to_project(session, project, user):
 
 
 def add_pull_request_comment(session, request, commit, filename, row,
-                             comment, user):
+                             comment, user, requestfolder):
     ''' Add a comment to a pull-request. '''
     user_obj = __get_user(session, user)
 
@@ -403,6 +403,9 @@ def add_pull_request_comment(session, request, commit, filename, row,
     session.add(pr_comment)
     # Make sure we won't have SQLAlchemy error before we create the repo
     session.flush()
+
+    progit.lib.git.update_git(
+        request, repo=request.repo, repofolder=requestfolder)
 
     return 'Comment added'
 
@@ -495,7 +498,8 @@ def new_issue(session, repo, title, content, user, ticketfolder,
 
 
 def new_pull_request(session, repo_from, branch_from,
-                     repo_to, branch_to, title, user, notify=True):
+                     repo_to, branch_to, title, user, requestfolder,
+                     notify=True):
     ''' Create a new pull request on the specified repo. '''
     user_obj = __get_user(session, user)
 
@@ -512,6 +516,9 @@ def new_pull_request(session, repo_from, branch_from,
     session.add(request)
     # Make sure we won't have SQLAlchemy error before we create the request
     session.flush()
+
+    progit.lib.git.update_git(
+        request, repo=request.repo, repofolder=requestfolder)
 
     if notify:
         progit.lib.notify.notify_new_pull_request(request)
@@ -894,7 +901,7 @@ def search_pull_requests(
     return output
 
 
-def close_pull_request(session, request, user, merged=True):
+def close_pull_request(session, request, user, requestfolder, merged=True):
     ''' Close the provided pull-request.
     '''
     request.status = False
@@ -905,6 +912,9 @@ def close_pull_request(session, request, user, merged=True):
         progit.lib.notify.notify_merge_pull_request(request, user)
     else:
         progit.lib.notify.notify_cancelled_pull_request(request, user)
+
+    progit.lib.git.update_git(
+        request, repo=request.repo, repofolder=requestfolder)
 
 
 def get_issue_statuses(session):

@@ -280,6 +280,7 @@ def pull_request_add_comment(repo, requestid, commit, filename, row,
                 row=row,
                 comment=comment,
                 user=flask.g.fas_user.username,
+                requestfolder=APP.config['REQUESTS_FOLDER'],
             )
             SESSION.commit()
             flask.flash(message)
@@ -433,7 +434,10 @@ def merge_request_pull(repo, requestid, username=None):
         flask.flash('Changes merged!')
 
     # Update status
-    progit.lib.close_pull_request(SESSION, request, flask.g.fas_user)
+    progit.lib.close_pull_request(
+        SESSION, request, flask.g.fas_user,
+        requestfolder=APP.config['REQUESTS_FOLDER'],
+    )
     try:
         SESSION.commit()
     except SQLAlchemyError as err:
@@ -475,7 +479,9 @@ def cancel_request_pull(repo, requestid, username=None):
                 'You are not allowed to cancel pull-request for this project')
 
         progit.lib.close_pull_request(
-            SESSION, request, flask.g.fas_user, merged=False)
+            SESSION, request, flask.g.fas_user,
+            requestfolder=APP.config['REQUESTS_FOLDER'],
+            merged=False)
         try:
             SESSION.commit()
             flask.flash('Request pull canceled!')
@@ -626,6 +632,7 @@ def new_request_pull(repo,  branch_to, branch_from, username=None):
                 repo_from=repo,
                 title=form.title.data,
                 user=flask.g.fas_user.username,
+                requestfolder=APP.config['REQUESTS_FOLDER'],
             )
             try:
                 SESSION.commit()
