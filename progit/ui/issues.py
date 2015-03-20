@@ -30,12 +30,18 @@ from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
 
 # URLs
 
-@APP.route('/<repo>/issue/<int:issueid>/update', methods=('GET', 'POST'))
+@APP.route('/<repo>/issue/<int:issueid>/update', methods=['GET', 'POST'])
 @APP.route('/fork/<username>/<repo>/issue/<int:issueid>/update',
-           methods=('GET', 'POST'))
+           methods=['GET', 'POST'])
+@cla_required
 def update_issue(repo, issueid, username=None):
     ''' Add a comment to an issue. '''
     repo = progit.lib.get_project(SESSION, repo, user=username)
+
+    if flask.request.method == 'GET':
+        flask.flash('Invalid method: GET', 'error')
+        return flask.redirect(flask.url_for(
+            'view_issue', username=username, repo=repo.name, issueid=issueid))
 
     if repo is None:
         flask.abort(404, 'Project not found')
