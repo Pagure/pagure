@@ -498,20 +498,22 @@ def new_issue(session, repo, title, content, user, ticketfolder,
 
 
 def new_pull_request(session, repo_from, branch_from,
-                     repo_to, branch_to, title, user, requestfolder,
-                     notify=True):
+                     repo_to, branch_to, title, user,
+                     requestfolder, requestuid=None, requestid=None,
+                     status=True, notify=True):
     ''' Create a new pull request on the specified repo. '''
     user_obj = __get_user(session, user)
 
     request = model.PullRequest(
-        id=get_next_id(session, repo_to.id),
-        uid=uuid.uuid4().hex,
+        id=requestid or get_next_id(session, repo_to.id),
+        uid=requestuid or uuid.uuid4().hex,
         project_id=repo_to.id,
         project_id_from=repo_from.id,
         branch=branch_to,
         branch_from=branch_from,
         title=title,
         user_id=user_obj.id,
+        status=status,
     )
     session.add(request)
     # Make sure we won't have SQLAlchemy error before we create the request
