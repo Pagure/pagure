@@ -335,12 +335,14 @@ class ProgitLibtests(tests.Modeltests):
             progit.lib.remove_tags,
             session=self.session,
             project=repo,
-            tags='foo')
+            tags='foo',
+            ticketfolder=None)
 
         msgs = progit.lib.remove_tags(
             session=self.session,
             project=repo,
-            tags='tag1')
+            tags='tag1',
+            ticketfolder=None)
 
         self.assertEqual(msgs, [u'Removed tag: tag1'])
 
@@ -361,13 +363,17 @@ class ProgitLibtests(tests.Modeltests):
             session=self.session,
             project=repo,
             old_tag='foo',
-            new_tag='bar')
+            new_tag='bar',
+            ticketfolder=None,
+        )
 
         msgs = progit.lib.edit_issue_tags(
             session=self.session,
             project=repo,
             old_tag='tag1',
-            new_tag='tag2')
+            new_tag='tag2',
+            ticketfolder=None,
+        )
         self.session.commit()
         self.assertEqual(msgs, ['Edited tag: tag1 to tag2'])
 
@@ -377,7 +383,9 @@ class ProgitLibtests(tests.Modeltests):
             session=self.session,
             project=repo,
             old_tag='tag2',
-            new_tag='tag2')
+            new_tag='tag2',
+            ticketfolder=None,
+        )
 
     @patch('progit.lib.git.update_git')
     @patch('progit.lib.notify.send_email')
@@ -621,10 +629,12 @@ class ProgitLibtests(tests.Modeltests):
         gitfolder = os.path.join(self.path, 'repos')
         docfolder = os.path.join(self.path, 'docs')
         ticketfolder = os.path.join(self.path, 'tickets')
+        requestfolder = os.path.join(self.path, 'requests')
 
         os.mkdir(gitfolder)
         os.mkdir(docfolder)
         os.mkdir(ticketfolder)
+        os.mkdir(requestfolder)
 
         # Create a new project
         msg = progit.lib.new_project(
@@ -634,8 +644,9 @@ class ProgitLibtests(tests.Modeltests):
             gitfolder=gitfolder,
             docfolder=docfolder,
             ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
             description='description for testproject',
-            parent_id=None
+            parent_id=None,
         )
         self.session.commit()
         self.assertEqual(msg, 'Project "testproject" created')
@@ -646,10 +657,12 @@ class ProgitLibtests(tests.Modeltests):
         gitrepo = os.path.join(gitfolder, repo.path)
         docrepo = os.path.join(docfolder, repo.path)
         ticketrepo = os.path.join(ticketfolder, repo.path)
+        requestrepo = os.path.join(requestfolder, repo.path)
 
         self.assertTrue(os.path.exists(gitrepo))
         self.assertTrue(os.path.exists(docrepo))
         self.assertTrue(os.path.exists(ticketrepo))
+        self.assertTrue(os.path.exists(requestrepo))
 
         # Try re-creating it but all repos are existing
         self.assertRaises(
@@ -661,6 +674,7 @@ class ProgitLibtests(tests.Modeltests):
             gitfolder=gitfolder,
             docfolder=docfolder,
             ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
             description='description for testproject',
             parent_id=None
         )
@@ -669,6 +683,7 @@ class ProgitLibtests(tests.Modeltests):
         self.assertTrue(os.path.exists(gitrepo))
         self.assertTrue(os.path.exists(docrepo))
         self.assertTrue(os.path.exists(ticketrepo))
+        self.assertTrue(os.path.exists(requestrepo))
 
         # Drop the main git repo and try again
         shutil.rmtree(gitrepo)
@@ -681,6 +696,7 @@ class ProgitLibtests(tests.Modeltests):
             gitfolder=gitfolder,
             docfolder=docfolder,
             ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
             description='description for testproject',
             parent_id=None
         )
@@ -689,6 +705,7 @@ class ProgitLibtests(tests.Modeltests):
         self.assertFalse(os.path.exists(gitrepo))
         self.assertTrue(os.path.exists(docrepo))
         self.assertTrue(os.path.exists(ticketrepo))
+        self.assertTrue(os.path.exists(requestrepo))
 
         # Drop the doc repo and try again
         shutil.rmtree(docrepo)
@@ -701,6 +718,7 @@ class ProgitLibtests(tests.Modeltests):
             gitfolder=gitfolder,
             docfolder=docfolder,
             ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
             description='description for testproject',
             parent_id=None
         )
@@ -708,6 +726,28 @@ class ProgitLibtests(tests.Modeltests):
         self.assertFalse(os.path.exists(gitrepo))
         self.assertFalse(os.path.exists(docrepo))
         self.assertTrue(os.path.exists(ticketrepo))
+        self.assertTrue(os.path.exists(requestrepo))
+
+        # Drop the request repo and try again
+        shutil.rmtree(ticketrepo)
+        self.assertRaises(
+            progit.exceptions.ProgitException,
+            progit.lib.new_project,
+            session=self.session,
+            user='pingou',
+            name='testproject',
+            gitfolder=gitfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
+            description='description for testproject',
+            parent_id=None
+        )
+        self.session.rollback()
+        self.assertFalse(os.path.exists(gitrepo))
+        self.assertFalse(os.path.exists(docrepo))
+        self.assertFalse(os.path.exists(ticketrepo))
+        self.assertTrue(os.path.exists(requestrepo))
 
     def test_update_project_settings(self):
         """ Test the update_project_settings of progit.lib. """
@@ -911,6 +951,7 @@ class ProgitLibtests(tests.Modeltests):
         gitfolder = os.path.join(self.path, 'repos')
         docfolder = os.path.join(self.path, 'docs')
         ticketfolder = os.path.join(self.path, 'tickets')
+        requestfolder = os.path.join(self.path, 'requests')
         forkfolder = os.path.join(self.path, 'forks')
 
         os.mkdir(gitfolder)
@@ -928,6 +969,7 @@ class ProgitLibtests(tests.Modeltests):
             gitfolder=gitfolder,
             docfolder=docfolder,
             ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
             description='description for testproject',
             parent_id=None
         )
@@ -941,10 +983,12 @@ class ProgitLibtests(tests.Modeltests):
         gitrepo = os.path.join(gitfolder, repo.path)
         docrepo = os.path.join(docfolder, repo.path)
         ticketrepo = os.path.join(ticketfolder, repo.path)
+        requestrepo = os.path.join(requestfolder, repo.path)
 
         self.assertTrue(os.path.exists(gitrepo))
         self.assertTrue(os.path.exists(docrepo))
         self.assertTrue(os.path.exists(ticketrepo))
+        self.assertTrue(os.path.exists(requestrepo))
 
         # Fail to fork
 
@@ -959,6 +1003,7 @@ class ProgitLibtests(tests.Modeltests):
             forkfolder=forkfolder,
             docfolder=docfolder,
             ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
         )
         self.session.rollback()
 
@@ -975,6 +1020,7 @@ class ProgitLibtests(tests.Modeltests):
             forkfolder=forkfolder,
             docfolder=docfolder,
             ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
         )
         self.session.rollback()
         shutil.rmtree(grepo)
@@ -992,6 +1038,7 @@ class ProgitLibtests(tests.Modeltests):
             forkfolder=forkfolder,
             docfolder=docfolder,
             ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
         )
         self.session.rollback()
         shutil.rmtree(grepo)
@@ -1009,6 +1056,25 @@ class ProgitLibtests(tests.Modeltests):
             forkfolder=forkfolder,
             docfolder=docfolder,
             ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
+        )
+        self.session.rollback()
+        shutil.rmtree(grepo)
+
+        # Request repo exists
+        grepo = '%s.git' % os.path.join(ticketfolder, 'foo', 'testproject')
+        os.makedirs(grepo)
+        self.assertRaises(
+            progit.exceptions.ProgitException,
+            progit.lib.fork_project,
+            session=self.session,
+            user='foo',
+            repo=repo,
+            gitfolder=gitfolder,
+            forkfolder=forkfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
         )
         self.session.rollback()
         shutil.rmtree(grepo)
@@ -1026,6 +1092,7 @@ class ProgitLibtests(tests.Modeltests):
             forkfolder=forkfolder,
             docfolder=docfolder,
             ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
         )
         self.session.commit()
         self.assertEqual(
@@ -1047,6 +1114,7 @@ class ProgitLibtests(tests.Modeltests):
             forkfolder=forkfolder,
             docfolder=docfolder,
             ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
         )
         self.session.commit()
         self.assertEqual(
