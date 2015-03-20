@@ -281,7 +281,7 @@ def remove_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
         return 'Dependency removed'
 
 
-def remove_tags(session, project, tags):
+def remove_tags(session, project, tags, ticketfolder):
     ''' Removes the specified tag of a project. '''
 
     if not isinstance(tags, list):
@@ -301,6 +301,9 @@ def remove_tags(session, project, tags):
                     tag = issue_tag.tag
                     session.delete(issue_tag)
                     msgs.append('Removed tag: %s' % tag)
+            progit.lib.git.update_git(
+                issue, repo=issue.project, ticketfolder=ticketfolder)
+
     return msgs
 
 

@@ -328,7 +328,10 @@ def remove_tag(repo, username=None):
         tags = form.tag.data
         tags = [tag.strip() for tag in tags.split(',')]
 
-        msgs = progit.lib.remove_tags(SESSION, repo, tags)
+        msgs = progit.lib.remove_tags(
+            SESSION, repo, tags,
+            ticketfolder=APP.config['TICKETS_FOLDER']
+        )
 
         try:
             SESSION.commit()
