@@ -805,11 +805,24 @@ def search_issues(
     if assignee is not None:
         if str(assignee).lower() not in ['false', '0', 'true', '1']:
             user2 = aliased(model.User)
-            query = query.filter(
-                model.Issue.assignee_id == user2.id
-            ).filter(
-                user2.user == assignee
-            )
+            if assignee.startswith('!'):
+                sub = session.query(
+                    model.Issue.uid
+                ).filter(
+                    model.Issue.assignee_id == user2.id
+                ).filter(
+                    user2.user == assignee[1:]
+                )
+
+                query = query.filter(
+                    ~model.Issue.uid.in_(sub)
+                )
+            else:
+                query = query.filter(
+                    model.Issue.assignee_id == user2.id
+                ).filter(
+                    user2.user == assignee
+                )
         elif str(assignee).lower() in ['true', '1']:
             query = query.filter(
                 model.Issue.assignee_id != None
