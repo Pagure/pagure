@@ -184,6 +184,7 @@ class ProgitLibtests(tests.Modeltests):
             title='Test issue #2',
             content='We should work on this for the second time',
             user='foo',
+            status='Open',
             ticketfolder=None
         )
         self.session.commit()
