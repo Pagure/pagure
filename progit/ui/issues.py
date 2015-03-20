@@ -279,6 +279,7 @@ def view_issues(repo, username=None):
     if is_repo_admin(repo):
         private = None
 
+    oth_issues = None
     if status is not None:
         if status.lower() == 'closed':
             issues = progit.lib.search_issues(
@@ -290,6 +291,16 @@ def view_issues(repo, username=None):
                 author=author,
                 private=private,
             )
+            oth_issues = progit.lib.search_issues(
+                SESSION,
+                repo,
+                status='Open',
+                tags=tags,
+                assignee=assignee,
+                author=author,
+                private=private,
+                count=True,
+            )
         else:
             issues = progit.lib.search_issues(
                 SESSION,
@@ -300,10 +311,14 @@ def view_issues(repo, username=None):
                 author=author,
                 private=private,
             )
+
     else:
         issues = progit.lib.search_issues(
             SESSION, repo, status='Open', tags=tags, assignee=assignee,
             author=author, private=private)
+        oth_issues = progit.lib.search_issues(
+            SESSION, repo, closed=True, tags=tags, assignee=assignee,
+            author=author, private=private, count=True)
 
     tag_list = progit.lib.get_tags_of_project(SESSION, repo)
 
@@ -315,6 +330,7 @@ def view_issues(repo, username=None):
         tag_list=tag_list,
         status=status,
         issues=issues,
+        oth_issues=oth_issues,
         tags=tags,
         assignee=assignee,
         author=author,
