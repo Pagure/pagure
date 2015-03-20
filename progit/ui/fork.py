@@ -561,7 +561,7 @@ def new_request_pull(repo,  branch_to, branch_from, username=None):
             403,
             'You are not allowed to create pull-requests for this project')
 
-    repopath = progit.get_repo_path(request.epo)
+    repopath = progit.get_repo_path(repo)
     repo_obj = pygit2.Repository(repopath)
 
     parentpath = _get_parent_repo_path(repo)
