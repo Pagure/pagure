@@ -1363,6 +1363,26 @@ class ProgitLibtests(tests.Modeltests):
         comment = progit.lib.get_issue_comment(self.session, issue.uid, 1)
         self.assertEqual(comment.comment, 'Hey look a comment!')
 
+    @patch('progit.lib.git.update_git')
+    @patch('progit.lib.notify.send_email')
+    def test_get_issue_by_uid(self, p_send_email, p_ugt):
+        """ Test the get_issue_by_uid of progit.lib. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        self.test_new_issue()
+
+        repo = progit.lib.get_project(self.session, 'test')
+        issue = progit.lib.search_issues(self.session, repo, issueid=1)
+
+        self.assertEqual(
+            progit.lib.get_issue_by_uid(self.session, 'foobar'),
+            None
+        )
+
+        new_issue = progit.lib.get_issue_by_uid(self.session, issue.uid)
+        self.assertEqual(issue, new_issue)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
