@@ -232,6 +232,47 @@ def get_user_from_json(session, jsondata):
     return user
 
 
+def get_project_from_json(
+        session, jsondata, gitfolder, docfolder, ticketfolder, requestfolder):
+    """ From the given json blob, retrieve the project info and search for
+    it in the db and create the projec if it does not already exist.
+    """
+    project = None
+
+
+    user = get_user_from_json(session, jsondata)
+    name = jsondata.get('name')
+    project_user = None
+    if jsondata.get('parent'):
+        project_user = user.username
+    project = progit.lib.get_project(session, name, user=project_user)
+
+
+    if not project:
+        parent = None
+        if jsondata.get('parent'):
+            parent = get_project_from_json(
+                session, jsondata.get('parent'),
+                gitfolder, docfolder, ticketfolder, requestfolder)
+
+        progit.lib.new_project(
+            session,
+            user=user.username,
+            name=name,
+            description=jsondata.get('description'),
+            parent_id=parent.id if parent else None,
+            gitfolder=gitfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
+        )
+
+        session.commit()
+        project = progit.lib.get_project(session, name, user=user.username)
+
+    return project
+
+
 def update_ticket_from_git(
         session, reponame, username, issue_uid, json_data):
     """ Update the specified issue (identified by its unique identifier)
@@ -315,6 +356,82 @@ def update_ticket_from_git(
                 user=user.username,
                 ticketfolder=None,
                 notify=False,
+            )
+    session.commit()
+
+def update_request_from_git(
+        session, reponame, username, request_uid, json_data,
+        gitfolder, docfolder, ticketfolder, requestfolder):
+    """ Update the specified request (identified by its unique identifier)
+    with the data present in the json blob provided.
+
+    :arg session: the session to connect to the database with.
+    :arg repo: the name of the project to update
+    :arg username: the username to find the repo, is not None for forked
+        projects
+    :arg request_uid: the unique identifier of the issue to update
+    :arg json_data: the json representation of the issue taken from the git
+        and used to update the data in the database.
+
+    """
+    print json.dumps(json_data, sort_keys=True,
+                     indent=4, separators=(',', ': '))
+
+    repo = progit.lib.get_project(session, reponame, user=username)
+    if not repo:
+        raise progit.exceptions.ProgitException(
+            'Unknown repo %s of username: %s' % (reponame, username))
+
+    user = get_user_from_json(session, json_data)
+
+    request = progit.lib.get_request_by_uid(
+        session, request_uid=request_uid)
+
+    if not request:
+        repo_from = get_project_from_json(
+            session, json_data.get('repo_from'),
+            gitfolder, docfolder, ticketfolder, requestfolder
+        )
+
+        repo_to = get_project_from_json(
+            session, json_data.get('repo'),
+            gitfolder, docfolder, ticketfolder, requestfolder
+        )
+
+        # Create new request
+        progit.lib.new_pull_request(
+            session,
+            repo_from=repo_from,
+            branch_from=json_data.get('branch_from'),
+            repo_to=repo_to,
+            branch_to=json_data.get('branch'),
+            title=json_data.get('title'),
+            user=user.username,
+            requestuid=json_data.get('uid'),
+            requestid=json_data.get('id'),
+            status= json_data.get('status'),
+            requestfolder=None,
+            notify=False,
+        )
+        session.commit()
+
+    request = progit.lib.get_request_by_uid(
+        session, request_uid=request_uid)
+
+    for comment in json_data['comments']:
+        user = get_user_from_json(session, comment)
+        commentobj = progit.lib.get_request_comment(
+            session, request_uid, comment['id'])
+        if not commentobj:
+            progit.lib.add_pull_request_comment(
+                session,
+                request,
+                commit=comment['commit'],
+                filename=comment['filename'],
+                row=comment['line'],
+                comment=comment['comment'],
+                user=user.username,
+                requestfolder=None,
             )
     session.commit()
 
