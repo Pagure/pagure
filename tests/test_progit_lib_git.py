@@ -520,6 +520,251 @@ index 458821a..77674a8
         self.assertEqual(repo.issues[1].depends_text, [])
         self.assertEqual(repo.issues[1].blocks_text, [1])
 
+    def test_update_request_from_git(self):
+        """ Test the update_request_from_git method from progit.lib.git. """
+        tests.create_projects(self.session)
+
+        repo = progit.lib.get_project(self.session, 'test')
+
+        # Before
+        self.assertEqual(len(repo.requests), 0)
+        self.assertEqual(repo.requests, [])
+
+        data = {
+            "status": True,
+            "uid": "d4182a2ac2d541d884742d3037c26e56",
+            "repo": {
+                "parent": None,
+                "issue_tracker": True,
+                "name": "test",
+                "date_created": "1426500194",
+                "user": {
+                    "fullname": "fake user",
+                    "name": "fake",
+                    "emails": ["fake@fedoraproject.org"]
+                },
+                "project_docs": True,
+                "id": 1,
+                "description": "test project"
+            },
+            "commit_stop": "eface8e13bc2a08a3fb22af9a72a8c90e36b8b89",
+            "user": {
+                "fullname": "Pierre-YvesChibon",
+                "name": "pingou",
+                "emails": ["pingou@fedoraproject.org"]
+            },
+            "id": 7,
+            "comments": [
+                {
+                    "comment": "really?",
+                    "user": {
+                        "fullname": "Pierre-YvesChibon",
+                        "name": "pingou",
+                        "emails": ["pingou@fedoraproject.org"]
+                    },
+                    "parent": None,
+                    "date_created": "1426843778",
+                    "commit": "fa72f315373ec5f98f2b08c8ffae3645c97aaad2",
+                    "line": 5,
+                    "id": 1,
+                    "filename": "test"
+                },
+                {
+                    "comment": "Again ?",
+                    "user": {
+                        "fullname": "Pierre-YvesChibon",
+                        "name": "pingou",
+                        "emails": [
+                            "pingou@fedoraproject.org"
+                        ]
+                    },
+                    "parent": None,
+                    "date_created": "1426866781",
+                    "commit": "94ebaf900161394059478fd88aec30e59092a1d7",
+                    "line": 5,
+                    "id": 2,
+                    "filename": "test2"
+                },
+                {
+                    "comment": "Should be fine in fact",
+                    "user": {
+                        "fullname": "Pierre-YvesChibon",
+                        "name": "pingou",
+                        "emails": [
+                            "pingou@fedoraproject.org"
+                        ]
+                    },
+                    "parent": None,
+                    "date_created": "1426866950",
+                    "commit": "94ebaf900161394059478fd88aec30e59092a1d7",
+                    "line": 5,
+                    "id": 3,
+                    "filename": "test2"
+                }
+            ],
+            "branch_from": "master",
+            "title": "test request",
+            "commit_start": "788efeaaf86bde8618f594a8181abb402e1dd904",
+            "repo_from": {
+                "parent": {
+                    "parent": None,
+                    "issue_tracker": True,
+                    "name": "test",
+                    "date_created": "1426500194",
+                    "user": {
+                        "fullname": "fake user",
+                        "name": "fake",
+                        "emails": [
+                            "py@pingoured.fr"
+                        ]
+                    },
+                    "project_docs": True,
+                    "id": 1,
+                    "description": "test project"
+                },
+                "issue_tracker": True,
+                "name": "test",
+                "date_created": "1426843440",
+                "user": {
+                    "fullname": "Pierre-YvesChibon",
+                    "name": "pingou",
+                    "emails": [
+                        "pingou@fedoraproject.org"
+                    ]
+                },
+                "project_docs": True,
+                "id": 6,
+                "description": "test project"
+            },
+            "branch": "master",
+            "date_created": "1426843732"
+        }
+
+        self.assertRaises(
+            progit.exceptions.ProgitException,
+            progit.lib.git.update_request_from_git,
+            self.session,
+            reponame='foobar',
+            username=None,
+            request_uid='d4182a2ac2d541d884742d3037c26e56',
+            json_data=data,
+            gitfolder=tests.HERE,
+            docfolder=os.path.join(tests.HERE, 'docs'),
+            ticketfolder=os.path.join(tests.HERE, 'tickets'),
+            requestfolder=os.path.join(tests.HERE, 'requests')
+        )
+
+        progit.lib.git.update_request_from_git(
+            self.session,
+            reponame='test',
+            username=None,
+            request_uid='d4182a2ac2d541d884742d3037c26e56',
+            json_data=data,
+            gitfolder=tests.HERE,
+            docfolder=os.path.join(tests.HERE, 'docs'),
+            ticketfolder=os.path.join(tests.HERE, 'tickets'),
+            requestfolder=os.path.join(tests.HERE, 'requests')
+        )
+        self.session.commit()
+
+        # After 1 st insertion
+        self.assertEqual(len(repo.requests), 1)
+        self.assertEqual(repo.requests[0].id, 7)
+        self.assertEqual(
+            repo.requests[0].uid, 'd4182a2ac2d541d884742d3037c26e56')
+        self.assertEqual(repo.requests[0].title, 'test request')
+        self.assertEqual(len(repo.requests[0].comments), 3)
+
+        data = {
+            "status": True,
+            "uid": "d4182a2ac2d541d884742d3037c26e57",
+            "repo": {
+                "parent": None,
+                "issue_tracker": True,
+                "name": "test",
+                "date_created": "1426500194",
+                "user": {
+                    "fullname": "fake user",
+                    "name": "fake",
+                    "emails": ["fake@fedoraproject.org"]
+                },
+                "project_docs": True,
+                "id": 1,
+                "description": "test project"
+            },
+            "commit_stop": "eface8e13bc2a08a3fb22af9a72a8c90e36b8b89",
+            "user": {
+                "fullname": "Pierre-YvesChibon",
+                "name": "pingou",
+                "emails": ["pingou@fedoraproject.org"]
+            },
+            "id": 4,
+            "comments": [],
+            "branch_from": "master",
+            "title": "test request #2",
+            "commit_start": "788efeaaf86bde8618f594a8181abb402e1dd904",
+            "repo_from": {
+                "parent": {
+                    "parent": None,
+                    "issue_tracker": True,
+                    "name": "test",
+                    "date_created": "1426500194",
+                    "user": {
+                        "fullname": "fake user",
+                        "name": "fake",
+                        "emails": [
+                            "py@pingoured.fr"
+                        ]
+                    },
+                    "project_docs": True,
+                    "id": 1,
+                    "description": "test project"
+                },
+                "issue_tracker": True,
+                "name": "test",
+                "date_created": "1426843440",
+                "user": {
+                    "fullname": "Pierre-YvesChibon",
+                    "name": "pingou",
+                    "emails": [
+                        "pingou@fedoraproject.org"
+                    ]
+                },
+                "project_docs": True,
+                "id": 6,
+                "description": "test project"
+            },
+            "branch": "master",
+            "date_created": "1426843745"
+        }
+
+        progit.lib.git.update_request_from_git(
+            self.session,
+            reponame='test',
+            username=None,
+            request_uid='d4182a2ac2d541d884742d3037c26e57',
+            json_data=data,
+            gitfolder=tests.HERE,
+            docfolder=os.path.join(tests.HERE, 'docs'),
+            ticketfolder=os.path.join(tests.HERE, 'tickets'),
+            requestfolder=os.path.join(tests.HERE, 'requests')
+        )
+        self.session.commit()
+
+        # After 2 nd insertion
+        self.assertEqual(len(repo.requests), 2)
+        self.assertEqual(repo.requests[0].id, 7)
+        self.assertEqual(
+            repo.requests[0].uid, 'd4182a2ac2d541d884742d3037c26e56')
+        self.assertEqual(repo.requests[0].title, 'test request')
+        self.assertEqual(len(repo.requests[0].comments), 3)
+        # 2 entry
+        self.assertEqual(repo.requests[1].id, 4)
+        self.assertEqual(
+            repo.requests[1].uid, 'd4182a2ac2d541d884742d3037c26e57')
+        self.assertEqual(repo.requests[1].title, 'test request #2')
+        self.assertEqual(len(repo.requests[1].comments), 0)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibGittests)
