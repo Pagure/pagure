@@ -649,6 +649,7 @@ index 458821a..77674a8
             request_uid='d4182a2ac2d541d884742d3037c26e56',
             json_data=data,
             gitfolder=tests.HERE,
+            forkfolder=os.path.join(tests.HERE, 'forks'),
             docfolder=os.path.join(tests.HERE, 'docs'),
             ticketfolder=os.path.join(tests.HERE, 'tickets'),
             requestfolder=os.path.join(tests.HERE, 'requests')
@@ -661,6 +662,7 @@ index 458821a..77674a8
             request_uid='d4182a2ac2d541d884742d3037c26e56',
             json_data=data,
             gitfolder=tests.HERE,
+            forkfolder=os.path.join(tests.HERE, 'forks'),
             docfolder=os.path.join(tests.HERE, 'docs'),
             ticketfolder=os.path.join(tests.HERE, 'tickets'),
             requestfolder=os.path.join(tests.HERE, 'requests')
@@ -745,6 +747,7 @@ index 458821a..77674a8
             request_uid='d4182a2ac2d541d884742d3037c26e57',
             json_data=data,
             gitfolder=tests.HERE,
+            forkfolder=os.path.join(tests.HERE, 'forks'),
             docfolder=os.path.join(tests.HERE, 'docs'),
             ticketfolder=os.path.join(tests.HERE, 'tickets'),
             requestfolder=os.path.join(tests.HERE, 'requests')
