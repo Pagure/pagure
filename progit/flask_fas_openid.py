@@ -26,6 +26,7 @@ FAS-OpenID authentication plugin for the flask web framework
 
 ..versionadded:: 0.3.33
 '''
+import datetime
 from functools import wraps
 
 from bunch import Bunch
@@ -139,6 +140,7 @@ class FAS(object):  # pragma: no cover
             user['fullname'] = sreg_resp.get('fullname')
             user['email'] = sreg_resp.get('email')
             user['timezone'] = sreg_resp.get('timezone')
+            user['login_time'] = datetime.datetime.utcnow()
             if cla_resp:
                 user['cla_done'] = cla.CLA_URI_FEDORA_DONE in cla_resp.clas
             if teams_resp:
