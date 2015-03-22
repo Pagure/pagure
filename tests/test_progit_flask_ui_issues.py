@@ -211,7 +211,8 @@ class ProgitFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertTrue('<p>test project #1</p>' in output.data)
         self.assertTrue(
-            '<p><a href="/login/">Login</a> to comment on this ticket.</p>'
+            '<p><a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1'
+            '">Login</a> to comment on this ticket.</p>'
             in output.data)
 
         user = tests.FakeUser()
