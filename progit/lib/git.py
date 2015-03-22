@@ -233,7 +233,8 @@ def get_user_from_json(session, jsondata):
 
 
 def get_project_from_json(
-        session, jsondata, gitfolder, docfolder, ticketfolder, requestfolder):
+        session, jsondata,
+        gitfolder, forkfolder, docfolder, ticketfolder, requestfolder):
     """ From the given json blob, retrieve the project info and search for
     it in the db and create the projec if it does not already exist.
     """
@@ -253,7 +254,7 @@ def get_project_from_json(
         if jsondata.get('parent'):
             parent = get_project_from_json(
                 session, jsondata.get('parent'),
-                gitfolder, docfolder, ticketfolder, requestfolder)
+                gitfolder, forkfolder, docfolder, ticketfolder, requestfolder)
 
         progit.lib.new_project(
             session,
@@ -261,7 +262,7 @@ def get_project_from_json(
             name=name,
             description=jsondata.get('description'),
             parent_id=parent.id if parent else None,
-            gitfolder=gitfolder,
+            gitfolder=forkfolder if parent else gitfolder,
             docfolder=docfolder,
             ticketfolder=ticketfolder,
             requestfolder=requestfolder,
@@ -361,7 +362,7 @@ def update_ticket_from_git(
 
 def update_request_from_git(
         session, reponame, username, request_uid, json_data,
-        gitfolder, docfolder, ticketfolder, requestfolder):
+        gitfolder, forkfolder, docfolder, ticketfolder, requestfolder):
     """ Update the specified request (identified by its unique identifier)
     with the data present in the json blob provided.
 
@@ -390,12 +391,12 @@ def update_request_from_git(
     if not request:
         repo_from = get_project_from_json(
             session, json_data.get('repo_from'),
-            gitfolder, docfolder, ticketfolder, requestfolder
+            gitfolder, forkfolder, docfolder, ticketfolder, requestfolder
         )
 
         repo_to = get_project_from_json(
             session, json_data.get('repo'),
-            gitfolder, docfolder, ticketfolder, requestfolder
+            gitfolder, forkfolder, docfolder, ticketfolder, requestfolder
         )
 
         # Create new request
