@@ -69,12 +69,12 @@ def generate_revision_change_log(new_commits_list):
         print '*', line
         for issue in progit.lib.link.get_relation(
                 progit.SESSION, get_repo_name(), get_username(),
-                line, 'fixes')
+                line, 'fixes'):
             fixes_commit(commitid, issue, progit.APP.config.get('APP_URL'))
 
         for issue in progit.lib.link.get_relates_link(
                 progit.SESSION, get_repo_name(), get_username(),
-                line, 'relates')
+                line, 'relates'):
             relates_commit(commitid, issue, progit.APP.config.get('APP_URL'))
 
 
