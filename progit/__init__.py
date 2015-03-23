@@ -16,6 +16,7 @@ __version__ = '0.0'
 __api_version__ = '0'
 
 
+import datetime
 import logging
 import os
 import subprocess
@@ -68,6 +69,23 @@ LOG = APP.logger
 
 def authenticated():
     return hasattr(flask.g, 'fas_user') and flask.g.fas_user
+
+
+def admin_session_timedout():
+    ''' Check if the current user has been authenticated for more than what
+    is allowed (defaults to 15 minutes).
+    If it is the case, the user is logged out and the method returns True,
+    otherwise it returns False.
+    '''
+    timedout = False
+    if not authenticated():
+        return True
+    if (datetime.datetime.utcnow() - flask.g.fas_user.login_time) > \
+            APP.config.get(
+                'ADMIN_SESSION_LIFETIME', datetime.timedelta(minutes=15)):
+        timedout = True
+        FAS.logout()
+    return timedout
 
 
 def is_safe_url(target):
