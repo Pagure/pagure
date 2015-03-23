@@ -86,7 +86,7 @@ def relates_commit(commitid, issue, app_url=None):
     if app_url:
         url = '%s/%s/%s' % (app_url, issue.project.name, commitid[:8])
 
-    comment = ''' Commit [%s](../%s) relates to this ticket''' % (
+    comment = ''' Commit [%s](%s) relates to this ticket''' % (
         commitid[:8], url)
 
     try:
@@ -113,7 +113,7 @@ def fixes_commit(commitid, issue, app_url=None):
     if app_url:
         url = '%s/%s/%s' % (app_url, issue.project.name, commitid[:8])
 
-    comment = ''' Commit [%s](../%s) fixes this ticket''' % (
+    comment = ''' Commit [%s](%s) fixes this ticket''' % (
         commitid[:8], url)
 
     try:
@@ -206,6 +206,7 @@ def run_as_post_receive_hook():
         generate_revision_change_log(get_commits_id(oldrev, newrev))
 
     print 'repo:', get_repo_name()
+    print 'user:', get_username()
 
 
 def main(args):
