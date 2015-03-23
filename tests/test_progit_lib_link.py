@@ -158,6 +158,29 @@ class ProgitLibLinktests(tests.Modeltests):
             else:
                 self.assertEqual(link, [])
 
+    def test_regex(self):
+        ''' Test the regex present in progit.lib.link. '''
+        text = 'relates  to   http://localhost/fork/pingou/test/issue/1'
+        for index, regex in enumerate(progit.lib.link.RELATES):
+            if index == 2:
+                self.assertNotEqual(regex.match(text), None)
+            else:
+                self.assertEqual(regex.match(text), None)
+
+        text = 'This relates  to  #5'
+        for index, regex in enumerate(progit.lib.link.RELATES):
+            if index == 0:
+                self.assertNotEqual(regex.match(text), None)
+            else:
+                self.assertEqual(regex.match(text), None)
+
+        text = 'Could this be related to  '\
+            ' https://fedorahosted.org/progit/tests2/issue/6'
+        for index, regex in enumerate(progit.lib.link.RELATES):
+            if index == 2:
+                self.assertNotEqual(regex.match(text), None)
+            else:
+                self.assertEqual(regex.match(text), None)
 
 
 if __name__ == '__main__':
