@@ -189,6 +189,37 @@ class ProgitLibLinktests(tests.Modeltests):
             else:
                 self.assertEqual(regex.match(text), None)
 
+    def test_fixes_regex(self):
+        ''' Test the fixes regex present in progit.lib.link. '''
+        text = 'fixes     http://localhost/fork/pingou/test/issue/1'
+        for index, regex in enumerate(progit.lib.link.FIXES):
+            if index in [2, 3]:
+                self.assertNotEqual(regex.match(text), None)
+            else:
+                self.assertEqual(regex.match(text), None)
+
+        text = 'fix http://209.132.184.222/fork/pingou/test/issue/1'
+        for index, regex in enumerate(progit.lib.link.FIXES):
+            if index in [2, 3]:
+                self.assertNotEqual(regex.match(text), None)
+            else:
+                self.assertEqual(regex.match(text), None)
+
+        text = 'This fixed  #5'
+        for index, regex in enumerate(progit.lib.link.FIXES):
+            if index == 1:
+                self.assertNotEqual(regex.match(text), None)
+            else:
+                self.assertEqual(regex.match(text), None)
+
+        text = 'Could this be fixes  '\
+            ' https://fedorahosted.org/progit/tests2/issue/6'
+        for index, regex in enumerate(progit.lib.link.FIXES):
+            if index == 3:
+                self.assertNotEqual(regex.match(text), None)
+            else:
+                self.assertEqual(regex.match(text), None)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibLinktests)
