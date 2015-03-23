@@ -681,6 +681,10 @@ def update_description(repo, username=None):
 def delete_repo(repo, username=None):
     """ Delete the present project.
     """
+    if admin_session_timedout():
+        return flask.redirect(
+            flask.url_for('auth_login', next=flask.request.url))
+
     repo = progit.lib.get_project(SESSION, repo, user=username)
 
     if not repo:
@@ -731,6 +735,10 @@ def delete_repo(repo, username=None):
 def remove_user(repo, userid, username=None):
     """ Remove the specified user from the project.
     """
+    if admin_session_timedout():
+        return flask.redirect(
+            flask.url_for('auth_login', next=flask.request.url))
+
     repo = progit.lib.get_project(SESSION, repo, user=username)
 
     if not repo:
@@ -777,6 +785,10 @@ def remove_user(repo, userid, username=None):
 def add_user(repo, username=None):
     """ Add the specified user from the project.
     """
+    if admin_session_timedout():
+        return flask.redirect(
+            flask.url_for('auth_login', next=flask.request.url))
+
     repo = progit.lib.get_project(SESSION, repo, user=username)
 
     if not repo:
