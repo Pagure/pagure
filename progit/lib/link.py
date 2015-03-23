@@ -16,10 +16,10 @@ import progit.exceptions
 
 
 FIXES = [
-    re.compile('fixe?[sd]?:?\s?#(\d+)', re.I),
-    re.compile('.*\s+fixe?[sd]?:?\s?#(\d+)', re.I),
-    re.compile('fixe?[sd]?:?\s?https?://.*/(\w+)/issue/(\d+)', re.I),
-    re.compile('.*\s+fixe?[sd]?:?\s?https?://.*/(\w+)/issue/(\d+)', re.I),
+    re.compile('fixe?[sd]?:?\s*?#(\d+)', re.I),
+    re.compile('.*\s*fixe?[sd]?:?\s*?#(\d+)', re.I),
+    re.compile('fixe?[sd]?:?\s*?https?://.*/(\w+)/issue/(\d+)', re.I),
+    re.compile('.*\s*?fixe?[sd]?:?\s*?https?://.*/(\w+)/issue/(\d+)', re.I),
 ]
 
 RELATES = [
