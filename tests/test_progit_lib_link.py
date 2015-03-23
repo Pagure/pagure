@@ -158,8 +158,8 @@ class ProgitLibLinktests(tests.Modeltests):
             else:
                 self.assertEqual(link, [])
 
-    def test_regex(self):
-        ''' Test the regex present in progit.lib.link. '''
+    def test_relates_regex(self):
+        ''' Test the relates regex present in progit.lib.link. '''
         text = 'relates  to   http://localhost/fork/pingou/test/issue/1'
         for index, regex in enumerate(progit.lib.link.RELATES):
             if index == 2:
