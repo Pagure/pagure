@@ -70,19 +70,23 @@ def generate_revision_change_log(new_commits_list):
         for issue in progit.lib.link.get_relation(
                 progit.SESSION, get_repo_name(), get_username(),
                 line, 'fixes')
-            fixes_commit(commitid, issue, project)
+            fixes_commit(commitid, issue, progit.APP.config.get('APP_URL'))
 
         for issue in progit.lib.link.get_relates_link(
                 progit.SESSION, get_repo_name(), get_username(),
                 line, 'relates')
-            relates_commit(commitid, issue, project)
+            relates_commit(commitid, issue, progit.APP.config.get('APP_URL'))
 
 
-def relates_commit(commitid, issue, project=None):
+def relates_commit(commitid, issue, app_url=None):
     ''' Add a comment to an issue that this commit relates to it. '''
 
+    url = '../%s' % commitid[:8]
+    if app_url:
+        url = '%s/%s/%s' % (app_url, issue.project.name, commitid[:8])
+
     comment = ''' Commit [%s](../%s) relates to this ticket''' % (
-        commitid[:8], commitid[:8])
+        commitid[:8], url)
 
     try:
         message = progit.lib.add_issue_comment(
@@ -100,12 +104,16 @@ def relates_commit(commitid, issue, project=None):
         progit.APP.logger.exception(err)
 
 
-def fixes_commit(commitid, issue, project=None):
+def fixes_commit(commitid, issue, app_url=None):
     ''' Add a comment to an issue that this commit fixes it and update
     the status if the commit is in the master branch. '''
 
+    url = '../%s' % commitid[:8]
+    if app_url:
+        url = '%s/%s/%s' % (app_url, issue.project.name, commitid[:8])
+
     comment = ''' Commit [%s](../%s) fixes this ticket''' % (
-        commitid[:8], commitid[:8])
+        commitid[:8], url)
 
     try:
         message = progit.lib.add_issue_comment(
