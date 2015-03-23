@@ -296,6 +296,10 @@ def new_project():
 def user_settings():
     """ Update the user settings.
     """
+    if admin_session_timedout():
+        return flask.redirect(
+            flask.url_for('auth_login', next=flask.request.url))
+
     user = progit.lib.search_user(
         SESSION, username=flask.g.fas_user.username)
     if not user:
