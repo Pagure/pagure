@@ -68,7 +68,7 @@ LOG = APP.logger
 
 
 def authenticated():
-    return hasattr(flask.g, 'fas_user') and flask.g.fas_user
+    return hasattr(flask.g, 'fas_user') and flask.g.fas_user is not None
 
 
 def admin_session_timedout():
