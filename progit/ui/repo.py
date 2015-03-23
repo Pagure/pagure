@@ -36,7 +36,7 @@ import progit.forms
 import progit
 import progit.ui.plugins
 from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
-                    is_repo_admin)
+                    is_repo_admin, admin_session_timedout)
 
 
 @APP.route('/<repo>')
@@ -590,6 +590,10 @@ def view_forks(repo, username=None):
 def view_settings(repo, username=None):
     """ Presents the settings of the project.
     """
+    if admin_session_timedout():
+        return flask.redirect(
+            flask.url_for('auth_login', next=flask.request.url))
+
     repo = progit.lib.get_project(SESSION, repo, user=username)
 
     if not repo:
