@@ -19,6 +19,7 @@ if 'PROGIT_CONFIG' not in os.environ \
 
 import progit
 import progit.exceptions
+import progit.lib.link
 
 
 def read_git_output(args, input=None, keepends=False, **kw):
