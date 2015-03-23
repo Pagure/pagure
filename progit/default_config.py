@@ -12,8 +12,8 @@ import os
 from datetime import timedelta
 
 
-# Set the time after which the session expires
-PERMANENT_SESSION_LIFETIME = timedelta(hours=1)
+# Set the time after which the admin session expires
+ADMIN_SESSION_LIFETIME = timedelta(minutes=1)
 
 # secret key used to generate unique csrf token
 SECRET_KEY = '<insert here your own key>'
