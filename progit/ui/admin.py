@@ -15,7 +15,7 @@ import flask
 import progit.forms
 from progit import (APP, SESSION, LOG, cla_required, authenticated,
                     generate_gitolite_acls, generate_authorized_key_file,
-                    is_admin)
+                    is_admin, admin_session_timedout)
 
 
 def admin_required(function):
@@ -24,12 +24,13 @@ def admin_required(function):
     @wraps(function)
     def decorated_function(*args, **kwargs):
         """ Decorated function, actually does the work. """
-        if not authenticated():
+        if admin_session_timedout():
             return flask.redirect(
                 flask.url_for('auth_login', next=flask.request.url))
         elif not is_admin():
             flask.flash('Access restricted', 'error')
             return flask.redirect(flask.url_for('.index'))
+
         return function(*args, **kwargs)
     return decorated_function
 
