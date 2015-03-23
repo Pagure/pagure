@@ -349,7 +349,7 @@ class Issue(BASE):
         ''' Return a unique reprensetation of the issue as string that
         can be used when sending emails.
         '''
-        return '%s-ticket-%s@progit' % (self.project.name, self.id)
+        return '%s-ticket-%s@progit' % (self.project.name, self.uid)
 
     @property
     def tags_text(self):
