@@ -167,6 +167,13 @@ class ProgitLibLinktests(tests.Modeltests):
             else:
                 self.assertEqual(regex.match(text), None)
 
+        text = 'relates http://209.132.184.222/fork/pingou/test/issue/1'
+        for index, regex in enumerate(progit.lib.link.RELATES):
+            if index == 2:
+                self.assertNotEqual(regex.match(text), None)
+            else:
+                self.assertEqual(regex.match(text), None)
+
         text = 'This relates  to  #5'
         for index, regex in enumerate(progit.lib.link.RELATES):
             if index == 0:
