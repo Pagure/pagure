@@ -84,6 +84,8 @@ def relates_commit(commitid, issue, app_url=None):
 
     url = '../%s' % commitid[:8]
     if app_url:
+        if app_url.endswith('/'):
+            app_url = app_url[:-1]
         url = '%s/%s/%s' % (app_url, issue.project.name, commitid[:8])
 
     comment = ''' Commit [%s](%s) relates to this ticket''' % (
@@ -111,6 +113,8 @@ def fixes_commit(commitid, issue, app_url=None):
 
     url = '../%s' % commitid[:8]
     if app_url:
+        if app_url.endswith('/'):
+            app_url = app_url[:-1]
         url = '%s/%s/%s' % (app_url, issue.project.name, commitid[:8])
 
     comment = ''' Commit [%s](%s) fixes this ticket''' % (
