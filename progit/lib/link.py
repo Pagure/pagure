@@ -23,11 +23,10 @@ FIXES = [
 ]
 
 RELATES = [
-    re.compile('.*\s+relate[sd]?:?\s?(?:to)?\s?#(\d+)', re.I),
-    re.compile('.*\s+relate[sd]?:?\s?#(\d+)', re.I),
+    re.compile('.*\s*relate[sd]?:?\s*?(?:to)?\s*?#(\d+)', re.I),
+    re.compile('.*\s*relate[sd]?:?\s?#(\d+)', re.I),
     re.compile(
-        '.*\s+relate[sd]?:?\s?(?:to)?\s?https?://.*/(\w+)/issue/(\d+)', re.I),
-    re.compile('.*\s+relate[sd]?:?\s?(?:to)?\s?https?://.*/(\w+)/issue/(\d+)', re.I),
+        '.*\s*relate[sd]?:?\s*?(?:to)?\s*?https?://.*/(\w+)/issue/(\d+)', re.I),
 ]
 
 
