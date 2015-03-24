@@ -81,6 +81,8 @@ New comment:
     )
     mail_to = set([cmt.user.emails[0].email for cmt in comment.issue.comments])
     mail_to.add(comment.issue.project.user.emails[0].email)
+    if comment.user and comment.user.emails:
+        mail_to.add(comment.user.emails[0].email)
     if comment.issue.assignee and comment.issue.assignee.emails:
         mail_to.add(comment.issue.assignee.emails[0].email)
     send_email(
