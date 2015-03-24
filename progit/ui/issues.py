@@ -65,6 +65,8 @@ def update_issue(repo, issueid, username=None):
     form = progit.forms.UpdateIssueForm(status=status)
 
     if form.validate_on_submit():
+        repo_admin =  is_repo_admin(repo)
+
         comment = form.comment.data
         try:
             depends = [
@@ -104,13 +106,14 @@ def update_issue(repo, issueid, username=None):
                 if message:
                     flask.flash(message)
 
-            # Adjust (add/remove) tags
-            messages = progit.lib.update_tags_issue(
-                SESSION, issue, tags,
-                username=flask.g.fas_user.username,
-                ticketfolder=APP.config['TICKETS_FOLDER'])
-            for message in messages:
-                flask.flash(message)
+            if repo_admin:
+                # Adjust (add/remove) tags
+                messages = progit.lib.update_tags_issue(
+                    SESSION, issue, tags,
+                    username=flask.g.fas_user.username,
+                    ticketfolder=APP.config['TICKETS_FOLDER'])
+                for message in messages:
+                    flask.flash(message)
 
             # Assign or update assignee of the ticket
             message = progit.lib.add_issue_assignee(
@@ -123,17 +126,18 @@ def update_issue(repo, issueid, username=None):
                 SESSION.commit()
                 flask.flash(message)
 
-            # Update status
-            if new_status in status:
-                message = progit.lib.edit_issue(
-                    SESSION,
-                    issue=issue,
-                    status=new_status,
-                    ticketfolder=APP.config['TICKETS_FOLDER'],
-                )
-                SESSION.commit()
-                if message:
-                    flask.flash(message)
+            if repo_admin:
+                # Update status
+                if new_status in status:
+                    message = progit.lib.edit_issue(
+                        SESSION,
+                        issue=issue,
+                        status=new_status,
+                        ticketfolder=APP.config['TICKETS_FOLDER'],
+                    )
+                    SESSION.commit()
+                    if message:
+                        flask.flash(message)
 
             # Update ticket this one depends on
             messages = progit.lib.update_dependency_issue(
