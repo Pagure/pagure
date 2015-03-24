@@ -24,7 +24,7 @@ def _clean_emails(emails, user):
     # Remove the user doing the action from the list of person to email
     if user and user.emails:
         for email in user.emails:
-            if email in emails:
+            if email.email in emails:
                 emails.remove(email.email)
     return emails
 
