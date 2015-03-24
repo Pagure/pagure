@@ -82,14 +82,14 @@ class ProgitFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<h2>New issue</h2>' in output.data)
             self.assertEqual(output.data.count(
-                '<td class="errors">This field is required.</td>'), 2)
+                'This field is required.'), 2)
 
             data['title'] = 'Test issue'
             output = self.app.post('/test/new_issue', data=data)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<h2>New issue</h2>' in output.data)
             self.assertEqual(output.data.count(
-                '<td class="errors">This field is required.</td>'), 1)
+                'This field is required.'), 1)
 
             data['issue_content'] = 'We really should improve on this issue'
             data['status'] = 'Open'
