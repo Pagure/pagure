@@ -194,12 +194,12 @@ def view_repo_branch(repo, branchname, username=None):
     )
 
 
-@APP.route('/<repo>/log')
-@APP.route('/<repo>/log/<branchname>')
-@APP.route('/fork/<username>/<repo>/log')
-@APP.route('/fork/<username>/<repo>/log/<branchname>')
-def view_log(repo, branchname=None, username=None):
-    """ Displays the logs of the specified repo.
+@APP.route('/<repo>/commits')
+@APP.route('/<repo>/commits/<branchname>')
+@APP.route('/fork/<username>/<repo>/commits')
+@APP.route('/fork/<username>/<repo>/commits/<branchname>')
+def view_commits(repo, branchname=None, username=None):
+    """ Displays the commits of the specified repo.
     """
     repo = progit.lib.get_project(SESSION, repo, user=username)
 

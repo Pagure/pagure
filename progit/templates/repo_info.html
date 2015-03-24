@@ -39,8 +39,8 @@
                     username=username, repo=repo.name, branchname=branch) }}">
           {{ branch }}
         </a>
-        (<a href="{{ url_for('view_log', username=username,
-                   repo=repo.name, branchname=branch) }}">logs</a>)
+        (<a href="{{ url_for('view_commits', username=username,
+                   repo=repo.name, branchname=branch) }}">commits</a>)
 
       </li>
       {% endfor %}
@@ -93,7 +93,7 @@
   {% endif %}
 
   <section class="commit_list">
-    {% if origin == 'view_log' or origin == 'view_fork_log' %}
+    {% if origin == 'view_commits' %}
     <h3>Commits list</h3>
     {% else %}
     <h3>Last 10 commits</h3>
