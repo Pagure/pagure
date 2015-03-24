@@ -111,7 +111,7 @@ class PagureRequestHook(BaseHook):
 
         # Install the hook itself
         shutil.copyfile(
-            os.path.join(hook_files, 'pagure_hook_requets.py'),
+            os.path.join(hook_files, 'pagure_hook_requests.py'),
             os.path.join(repopath, 'hooks', 'post-receive.pagure')
         )
         os.chmod(
