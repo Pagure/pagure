@@ -181,7 +181,7 @@ def edit_tag(repo, tag, username=None):
     if not is_repo_admin(repo):
         flask.abort(
             403,
-            'You are not allowed to add users to this project')
+            'You are not allowed to edt tags of this project')
 
     form = progit.forms.AddIssueTagForm()
     if form.validate_on_submit():
@@ -228,7 +228,7 @@ def remove_tag(repo, username=None):
     if not is_repo_admin(repo):
         flask.abort(
             403,
-            'You are not allowed to change the users for this project')
+            'You are not allowed to remove tags of this project')
 
     form = progit.forms.AddIssueTagForm()
     if form.validate_on_submit():
