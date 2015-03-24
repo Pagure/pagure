@@ -25,7 +25,8 @@ import progit.forms
 import progit.ui.filters
 from progit import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
                     generate_gitolite_acls, generate_gitolite_key,
-                    generate_authorized_key_file, authenticated)
+                    generate_authorized_key_file, authenticated,
+                    admin_session_timedout)
 
 
 # Application
