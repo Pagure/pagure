@@ -15,6 +15,35 @@ import progit
 
 from email.mime.text import MIMEText
 
+def _get_emails_for_issue(issue):
+    ''' Return the list of emails to send notification to when notifying
+    about the specified issue.
+    '''
+    emails = set()
+    # Add project creator/owner
+    if issue.project.user.emails:
+        emails.add(issue.project.user.emails[0].email)
+
+    # Add project maintainers
+    for user in issue.project.users:
+        if user.emails:
+            emails.add(user.emails[0].email)
+
+    # Add people that commented on the ticket
+    for comment in issue.comments:
+        if comment.user.emails:
+            emails.add(comment.user.emails[0].email)
+
+    # Add the person that opened the issue
+    if issue.user.emails:
+        emails.add(issue.user.emails[0].email)
+
+    # Add the person assigned to the ticket
+    if issue.assignee and issue.assignee.emails:
+        emails.add(issue.assignee.emails[0].email)
+
+    return emails
+
 
 def send_email(text, subject, to_mail, from_mail=None, mail_id=None,
                in_reply_to=None):  # pragma: no cover
@@ -79,12 +108,10 @@ New comment:
             comment.issue.id,
         ),
     )
-    mail_to = set([cmt.user.emails[0].email for cmt in comment.issue.comments])
-    mail_to.add(comment.issue.project.user.emails[0].email)
+    mail_to = _get_emails_for_issue(comment.issue)
     if comment.user and comment.user.emails:
         mail_to.add(comment.user.emails[0].email)
-    if comment.issue.assignee and comment.issue.assignee.emails:
-        mail_to.add(comment.issue.assignee.emails[0].email)
+
     send_email(
         text,
         'Update to issue `%s`' % comment.issue.title,
@@ -117,16 +144,7 @@ New issue:
             issue.id,
         ),
     )
-    mail_to = set([cmt.user.emails[0].email for cmt in issue.comments])
-    mail_to.add(issue.project.user.emails[0].email)
-    # I will keeps this here as things might change in the future, but
-    # basically we should never enter this `if` as currently an issue cannot
-    # be created assigned to someone, it is always a 2 steps process.
-    if issue.assignee:
-        mail_to.add(issue.assignee.emails[0].email)
-    for prouser in issue.project.users:
-        if prouser.emails:
-            mail_to.add(prouser.emails[0].email)
+    mail_to = _get_emails_for_issue(comment.issue)
 
     send_email(
         text,
@@ -157,10 +175,7 @@ The issue: `%s` of project: `%s` has been %s by %s.
             issue.id,
         ),
     )
-    mail_to = set([cmt.user.emails[0].email for cmt in issue.comments])
-    mail_to.add(issue.project.user.emails[0].email)
-    if issue.assignee and issue.assignee.emails:
-        mail_to.add(issue.assignee.emails[0].email)
+    mail_to = _get_emails_for_issue(comment.issue)
     if new_assignee and new_assignee.emails:
         mail_to.add(new_assignee.emails[0].email)
 
