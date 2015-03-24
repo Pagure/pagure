@@ -15,6 +15,20 @@ import progit
 
 from email.mime.text import MIMEText
 
+
+def _clean_emails(emails, user):
+    ''' Remove the email of the user doing the action if it is in the list.
+
+    This avoids receiving emails about action you do.
+    '''
+    # Remove the user doing the action from the list of person to email
+    if user and user.emails:
+        for email in user.emails:
+            if email in emails:
+                emails.remove(email.email)
+    return emails
+
+
 def _get_emails_for_issue(issue):
     ''' Return the list of emails to send notification to when notifying
     about the specified issue.
@@ -85,7 +99,7 @@ def send_email(text, subject, to_mail, from_mail=None, mail_id=None,
     return msg
 
 
-def notify_new_comment(comment):
+def notify_new_comment(comment, user=None):
     ''' Notify the people following an issue that a new comment was added
     to the issue.
     '''
@@ -112,6 +126,8 @@ New comment:
     if comment.user and comment.user.emails:
         mail_to.add(comment.user.emails[0].email)
 
+    mail_to = _clean_emails(mail_to, user)
+
     send_email(
         text,
         'Update to issue `%s`' % comment.issue.title,
@@ -120,7 +136,7 @@ New comment:
     )
 
 
-def notify_new_issue(issue):
+def notify_new_issue(issue, user=None):
     ''' Notify the people following a project that a new issue was added
     to it.
     '''
@@ -145,6 +161,7 @@ New issue:
         ),
     )
     mail_to = _get_emails_for_issue(issue)
+    mail_to = _clean_emails(mail_to, user)
 
     send_email(
         text,
@@ -154,7 +171,7 @@ New issue:
     )
 
 
-def notify_assigned_issue(issue, new_assignee, username):
+def notify_assigned_issue(issue, new_assignee, username, user=None):
     ''' Notify the people following an issue that the assignee changed.
     '''
     action = 'reset'
@@ -178,6 +195,8 @@ The issue: `%s` of project: `%s` has been %s by %s.
     mail_to = _get_emails_for_issue(issue)
     if new_assignee and new_assignee.emails:
         mail_to.add(new_assignee.emails[0].email)
+
+    mail_to = _clean_emails(mail_to, user)
 
     send_email(
         text,
