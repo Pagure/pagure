@@ -23,32 +23,32 @@ from mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import progit.lib
+import pagure.lib
 import tests
 
 
-class ProgitFlaskAdmintests(tests.Modeltests):
-    """ Tests for flask admin controller of progit """
+class PagureFlaskAdmintests(tests.Modeltests):
+    """ Tests for flask admin controller of pagure """
 
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
-        super(ProgitFlaskAdmintests, self).setUp()
+        super(PagureFlaskAdmintests, self).setUp()
 
-        progit.APP.config['TESTING'] = True
-        progit.SESSION = self.session
-        progit.ui.SESSION = self.session
-        progit.ui.app.SESSION = self.session
-        progit.ui.repo.SESSION = self.session
-        progit.ui.admin.SESSION = self.session
+        pagure.APP.config['TESTING'] = True
+        pagure.SESSION = self.session
+        pagure.ui.SESSION = self.session
+        pagure.ui.app.SESSION = self.session
+        pagure.ui.repo.SESSION = self.session
+        pagure.ui.admin.SESSION = self.session
 
-        progit.APP.config['GIT_FOLDER'] = tests.HERE
-        progit.APP.config['FORK_FOLDER'] = os.path.join(
+        pagure.APP.config['GIT_FOLDER'] = tests.HERE
+        pagure.APP.config['FORK_FOLDER'] = os.path.join(
             tests.HERE, 'forks')
-        progit.APP.config['TICKETS_FOLDER'] = os.path.join(
+        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
             tests.HERE, 'tickets')
-        progit.APP.config['DOCS_FOLDER'] = os.path.join(
+        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
             tests.HERE, 'docs')
-        self.app = progit.APP.test_client()
+        self.app = pagure.APP.test_client()
 
     def test_admin_index(self):
         """ Test the admin_index endpoint. """
@@ -57,7 +57,7 @@ class ProgitFlaskAdmintests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.get('/admin', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
@@ -65,8 +65,8 @@ class ProgitFlaskAdmintests(tests.Modeltests):
 
         user = tests.FakeUser(
             username='pingou',
-            groups=progit.APP.config['ADMIN_GROUP'])
-        with tests.user_set(progit.APP, user):
+            groups=pagure.APP.config['ADMIN_GROUP'])
+        with tests.user_set(pagure.APP, user):
             output = self.app.get('/admin', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<h2>Admin section</h2>' in output.data)
@@ -74,7 +74,7 @@ class ProgitFlaskAdmintests(tests.Modeltests):
             self.assertTrue(
                 'Re-generate ssh authorized_key file' in output.data)
 
-    @patch('progit.lib.git.write_gitolite_acls')
+    @patch('pagure.lib.git.write_gitolite_acls')
     def test_admin_generate_acl(self, wga):
         """ Test the admin_generate_acl endpoint. """
         wga.return_value = True
@@ -86,7 +86,7 @@ class ProgitFlaskAdmintests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.post('/admin/gitolite', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
@@ -94,8 +94,8 @@ class ProgitFlaskAdmintests(tests.Modeltests):
 
         user = tests.FakeUser(
             username='pingou',
-            groups=progit.APP.config['ADMIN_GROUP'])
-        with tests.user_set(progit.APP, user):
+            groups=pagure.APP.config['ADMIN_GROUP'])
+        with tests.user_set(pagure.APP, user):
             output = self.app.post('/admin/gitolite', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<h2>Admin section</h2>' in output.data)
@@ -122,7 +122,7 @@ class ProgitFlaskAdmintests(tests.Modeltests):
                 '<li class="message">Gitolite ACLs updated</li>'
                 in output.data)
 
-    @patch('progit.generate_authorized_key_file')
+    @patch('pagure.generate_authorized_key_file')
     def test_admin_refresh_ssh(self, gakf):
         """ Test the admin_refresh_ssh endpoint. """
         gakf.return_value = True
@@ -134,7 +134,7 @@ class ProgitFlaskAdmintests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.post('/admin/ssh', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
@@ -142,8 +142,8 @@ class ProgitFlaskAdmintests(tests.Modeltests):
 
         user = tests.FakeUser(
             username='pingou',
-            groups=progit.APP.config['ADMIN_GROUP'])
-        with tests.user_set(progit.APP, user):
+            groups=pagure.APP.config['ADMIN_GROUP'])
+        with tests.user_set(pagure.APP, user):
             output = self.app.post('/admin/ssh', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<h2>Admin section</h2>' in output.data)
@@ -171,5 +171,5 @@ class ProgitFlaskAdmintests(tests.Modeltests):
 
 
 if __name__ == '__main__':
-    SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskAdmintests)
+    SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskAdmintests)
     unittest.TextTestRunner(verbosity=2).run(SUITE)

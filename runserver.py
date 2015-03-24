@@ -7,7 +7,7 @@ import pkg_resources
 import sys
 from werkzeug.contrib.profiler import ProfilerMiddleware
 
-from progit import APP
+from pagure import APP
 APP.debug = True
 
 if '--profile' in sys.argv:

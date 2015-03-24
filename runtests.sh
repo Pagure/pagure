@@ -1,3 +1,3 @@
 #!/bin/bash
 
-PYTHONPATH=progit ./nosetests --with-coverage --cover-erase --cover-package=progit $*
+PYTHONPATH=pagure ./nosetests --with-coverage --cover-erase --cover-package=pagure $*

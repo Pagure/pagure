@@ -5,19 +5,19 @@ SECRET_KEY='<The web application secret key>'
 ### url to the database server:
 #DB_URL=mysql://user:pass@host/db_name
 #DB_URL=postgres://user:pass@host/db_name
-DB_URL = 'sqlite:////var/tmp/progit_dev.sqlite'
+DB_URL = 'sqlite:////var/tmp/pagure_dev.sqlite'
 
-### The FAS group in which the admin of progit are
+### The FAS group in which the admin of pagure are
 ADMIN_GROUP = ['sysadmin-main', 'sysadmin-cvs']
 
 ### The email address to which the flask.log will send the errors (tracebacks)
 EMAIL_ERROR = 'pingou@pingoured.fr'
 
 ### The URL at which the project is available.
-APP_URL = 'https://fedorahosted.org/progit/'
+APP_URL = 'https://fedorahosted.org/pagure/'
 
 ### The URL to use to clone git repositories.
-GIT_URL = 'git@progit.fedorahosted.org'
+GIT_URL = 'git@pagure.fedorahosted.org'
 
 ### Folder containing to the git repos
 GIT_FOLDER = os.path.join(
@@ -69,7 +69,7 @@ GL_BINDIR = None
 #SMTP_SERVER = 'localhost'
 
 ### Email used to sent emails
-#FROM_EMAIL = 'progit@fedoraproject.org'
+#FROM_EMAIL = 'pagure@fedoraproject.org'
 
 ### the number of items (packages, packagers..) to display on the search
 ### pages

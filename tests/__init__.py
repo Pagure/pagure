@@ -32,9 +32,9 @@ from sqlalchemy.orm import scoped_session
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import progit
-import progit.lib
-import progit.lib.model
+import pagure
+import pagure.lib
+import pagure.lib.model
 
 
 DB_PATH = 'sqlite:///:memory:'
@@ -53,7 +53,7 @@ if os.environ.get('BUILD_ID'):
         pass
 
 # Remove the log handlers for the tests
-progit.LOG.handlers = []
+pagure.LOG.handlers = []
 
 
 @contextmanager
@@ -80,7 +80,7 @@ class Modeltests(unittest.TestCase):
         """ Constructor. """
         unittest.TestCase.__init__(self, method_name)
         self.session = None
-        self.path = tempfile.mkdtemp(prefix='progit-tests')
+        self.path = tempfile.mkdtemp(prefix='pagure-tests')
         self.gitrepo = None
         self.gitrepos = None
 
@@ -99,31 +99,31 @@ class Modeltests(unittest.TestCase):
                 shutil.rmtree(folder)
             os.mkdir(folder)
 
-        self.session = progit.lib.model.create_tables(DB_PATH)
+        self.session = pagure.lib.model.create_tables(DB_PATH)
 
         # Create a couple of users
-        item = progit.lib.model.User(
+        item = pagure.lib.model.User(
             user='pingou',
             fullname='PY C',
             password='foo',
         )
         self.session.add(item)
-        item = progit.lib.model.UserEmail(
+        item = pagure.lib.model.UserEmail(
             user_id=1,
             email='bar@pingou.com')
         self.session.add(item)
-        item = progit.lib.model.UserEmail(
+        item = pagure.lib.model.UserEmail(
             user_id=1,
             email='foo@pingou.com')
         self.session.add(item)
 
-        item = progit.lib.model.User(
+        item = pagure.lib.model.User(
             user='foo',
             fullname='foo bar',
             password='foo',
         )
         self.session.add(item)
-        item = progit.lib.model.UserEmail(
+        item = pagure.lib.model.UserEmail(
             user_id=2,
             email='foo@bar.com')
         self.session.add(item)
@@ -146,7 +146,7 @@ class Modeltests(unittest.TestCase):
             os.unlink(DB_PATH)
         if DB_PATH.startswith('postgres'):
             if 'localhost' in DB_PATH:
-                progit.lib.model.drop_tables(DB_PATH, self.session.bind)
+                pagure.lib.model.drop_tables(DB_PATH, self.session.bind)
             else:
                 db_name = DB_PATH.rsplit('/', 1)[1]
                 requests.get('%s/clean/%s' % (FAITOUT_URL, db_name))
@@ -194,14 +194,14 @@ class FakeUser(object):
 
 def create_projects(session):
     """ Create some projects in the database. """
-    item = progit.lib.model.Project(
+    item = pagure.lib.model.Project(
         user_id=1,  # pingou
         name='test',
         description='test project #1',
     )
     session.add(item)
 
-    item = progit.lib.model.Project(
+    item = pagure.lib.model.Project(
         user_id=1,  # pingou
         name='test2',
         description='test project #2',
@@ -304,21 +304,20 @@ def add_readme_git_repo(folder):
         os.makedirs(folder)
     repo = pygit2.init_repository(folder)
 
-    content = """ProGit
+    content = """Pagure
 ======
 
 :Author: Pierre-Yves Chibon <pingou@pingoured.fr>
 
 
-ProGit is a light-weight git-centered forge based on pygit2.
+Pagure is a light-weight git-centered forge based on pygit2.
 
-Currently, ProGit offers a decent web-interface for git repositories, a
-simplistic ticket system (that needs improvements) and possibilities to create
-new projects, fork existing ones and create/merge pull-requests across or
-within projects.
+Currently, Pagure offers a web-interface for git repositories, a ticket
+system and possibilities to create new projects, fork existing ones and
+create/merge pull-requests across or within projects.
 
 
-Homepage: https://github.com/pypingou/ProGit
+Homepage: https://github.com/pypingou/pagure
 
 Dev instance: http://209.132.184.222/ (/!\\ May change unexpectedly, it's a dev instance ;-))
 """

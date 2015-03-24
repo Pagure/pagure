@@ -9,7 +9,7 @@ __requires__ = ['SQLAlchemy >= 0.8', 'jinja2 >= 2.4']
 import pkg_resources
 
 from setuptools import setup
-from progit import __version__
+from pagure import __version__
 
 
 def get_requirements(requirements_file='requirements.txt'):
@@ -31,7 +31,7 @@ def get_requirements(requirements_file='requirements.txt'):
 
 
 setup(
-    name='progit',
+    name='pagure',
     description='A light-weight git-centered forge based on pygit2..',
     version=__version__,
     author='Pierre-Yves Chibon',
@@ -39,9 +39,9 @@ setup(
     maintainer='Pierre-Yves Chibon',
     maintainer_email='pingou@pingoured.fr',
     license='GPLv2+',
-    download_url='https://fedorahosted.org/releases/p/r/progit/',
-    url='https://fedorahosted.org/progit/',
-    packages=['progit'],
+    download_url='https://fedorahosted.org/releases/p/r/pagure/',
+    url='https://fedorahosted.org/pagure/',
+    packages=['pagure'],
     include_package_data=True,
     install_requires=get_requirements(),
 )

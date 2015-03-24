@@ -23,28 +23,28 @@ from mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import progit.lib.link
+import pagure.lib.link
 import tests
 
 COMMENTS = [
     'Did you see #1?',
     'This is a duplicate of #2',
     'This is a fixes #3',
-    'Might be worth looking at https://fedorahosted.org/progit/tests2/issue/4',
+    'Might be worth looking at https://fedorahosted.org/pagure/tests2/issue/4',
     'This relates to #5',
-    'Could this be related to https://fedorahosted.org/progit/tests2/issue/6',
+    'Could this be related to https://fedorahosted.org/pagure/tests2/issue/6',
 ]
 
 
-class ProgitLibLinktests(tests.Modeltests):
-    """ Tests for progit.lib.link """
+class PagureLibLinktests(tests.Modeltests):
+    """ Tests for pagure.lib.link """
 
     def test_get_relation_relates(self):
-        """ Test the get_relation function of progit.lib.link with relates.
+        """ Test the get_relation function of pagure.lib.link with relates.
         """
 
         self.assertEqual(
-            progit.lib.link.get_relation(
+            pagure.lib.link.get_relation(
                 self.session,
                 'test',
                 None,
@@ -56,13 +56,13 @@ class ProgitLibLinktests(tests.Modeltests):
 
         tests.create_projects(self.session)
 
-        link = progit.lib.link.get_relation(
+        link = pagure.lib.link.get_relation(
             self.session, 'test', None, COMMENTS[4], 'relates')
         self.assertEqual(link, [])
 
         # Create the issue
-        repo = progit.lib.get_project(self.session, 'test')
-        progit.lib.new_issue(
+        repo = pagure.lib.get_project(self.session, 'test')
+        pagure.lib.new_issue(
             self.session,
             repo,
             title='foo',
@@ -74,7 +74,7 @@ class ProgitLibLinktests(tests.Modeltests):
         self.session.commit()
 
         for idx, comment in enumerate(COMMENTS):
-            link = progit.lib.link.get_relation(
+            link = pagure.lib.link.get_relation(
                 self.session, 'test', None, comment, 'relates')
             if idx == 4:
                 self.assertEqual(
@@ -83,13 +83,13 @@ class ProgitLibLinktests(tests.Modeltests):
             else:
                 self.assertEqual(link, [])
 
-        link = progit.lib.link.get_relation(
+        link = pagure.lib.link.get_relation(
             self.session, 'test', None, COMMENTS[5], 'relates')
         self.assertEqual(link, [])
 
         # Create the issue
-        repo = progit.lib.get_project(self.session, 'test')
-        progit.lib.new_issue(
+        repo = pagure.lib.get_project(self.session, 'test')
+        pagure.lib.new_issue(
             self.session,
             repo,
             title='another foo',
@@ -101,7 +101,7 @@ class ProgitLibLinktests(tests.Modeltests):
         self.session.commit()
 
         for idx, comment in enumerate(COMMENTS):
-            link = progit.lib.link.get_relation(
+            link = pagure.lib.link.get_relation(
                 self.session, 'test', None, comment, 'relates')
             if idx == 4:
                 self.assertEqual(
@@ -115,11 +115,11 @@ class ProgitLibLinktests(tests.Modeltests):
                 self.assertEqual(link, [])
 
     def test_get_relation_fixes(self):
-        """ Test the get_relation function of progit.lib.link with fixes.
+        """ Test the get_relation function of pagure.lib.link with fixes.
         """
 
         self.assertEqual(
-            progit.lib.link.get_relation(
+            pagure.lib.link.get_relation(
                 self.session,
                 'test',
                 None,
@@ -131,13 +131,13 @@ class ProgitLibLinktests(tests.Modeltests):
 
         tests.create_projects(self.session)
 
-        link = progit.lib.link.get_relation(
+        link = pagure.lib.link.get_relation(
             self.session, 'test', None, COMMENTS[2], 'fixes')
         self.assertEqual(link, [])
 
         # Create the issue
-        repo = progit.lib.get_project(self.session, 'test')
-        progit.lib.new_issue(
+        repo = pagure.lib.get_project(self.session, 'test')
+        pagure.lib.new_issue(
             self.session,
             repo,
             title='issue 3',
@@ -149,7 +149,7 @@ class ProgitLibLinktests(tests.Modeltests):
         self.session.commit()
 
         for idx, comment in enumerate(COMMENTS):
-            link = progit.lib.link.get_relation(
+            link = pagure.lib.link.get_relation(
                 self.session, 'test', None, comment, 'fixes')
             if idx == 2:
                 self.assertEqual(
@@ -159,62 +159,62 @@ class ProgitLibLinktests(tests.Modeltests):
                 self.assertEqual(link, [])
 
     def test_relates_regex(self):
-        ''' Test the relates regex present in progit.lib.link. '''
+        ''' Test the relates regex present in pagure.lib.link. '''
         text = 'relates  to   http://localhost/fork/pingou/test/issue/1'
-        for index, regex in enumerate(progit.lib.link.RELATES):
+        for index, regex in enumerate(pagure.lib.link.RELATES):
             if index == 2:
                 self.assertNotEqual(regex.match(text), None)
             else:
                 self.assertEqual(regex.match(text), None)
 
         text = 'relates http://209.132.184.222/fork/pingou/test/issue/1'
-        for index, regex in enumerate(progit.lib.link.RELATES):
+        for index, regex in enumerate(pagure.lib.link.RELATES):
             if index == 2:
                 self.assertNotEqual(regex.match(text), None)
             else:
                 self.assertEqual(regex.match(text), None)
 
         text = 'This relates  to  #5'
-        for index, regex in enumerate(progit.lib.link.RELATES):
+        for index, regex in enumerate(pagure.lib.link.RELATES):
             if index == 0:
                 self.assertNotEqual(regex.match(text), None)
             else:
                 self.assertEqual(regex.match(text), None)
 
         text = 'Could this be related to  '\
-            ' https://fedorahosted.org/progit/tests2/issue/6'
-        for index, regex in enumerate(progit.lib.link.RELATES):
+            ' https://fedorahosted.org/pagure/tests2/issue/6'
+        for index, regex in enumerate(pagure.lib.link.RELATES):
             if index == 2:
                 self.assertNotEqual(regex.match(text), None)
             else:
                 self.assertEqual(regex.match(text), None)
 
     def test_fixes_regex(self):
-        ''' Test the fixes regex present in progit.lib.link. '''
+        ''' Test the fixes regex present in pagure.lib.link. '''
         text = 'fixes     http://localhost/fork/pingou/test/issue/1'
-        for index, regex in enumerate(progit.lib.link.FIXES):
+        for index, regex in enumerate(pagure.lib.link.FIXES):
             if index in [2, 3]:
                 self.assertNotEqual(regex.match(text), None)
             else:
                 self.assertEqual(regex.match(text), None)
 
         text = 'fix http://209.132.184.222/fork/pingou/test/issue/1'
-        for index, regex in enumerate(progit.lib.link.FIXES):
+        for index, regex in enumerate(pagure.lib.link.FIXES):
             if index in [2, 3]:
                 self.assertNotEqual(regex.match(text), None)
             else:
                 self.assertEqual(regex.match(text), None)
 
         text = 'This fixed  #5'
-        for index, regex in enumerate(progit.lib.link.FIXES):
+        for index, regex in enumerate(pagure.lib.link.FIXES):
             if index == 1:
                 self.assertNotEqual(regex.match(text), None)
             else:
                 self.assertEqual(regex.match(text), None)
 
         text = 'Could this be fixes  '\
-            ' https://fedorahosted.org/progit/tests2/issue/6'
-        for index, regex in enumerate(progit.lib.link.FIXES):
+            ' https://fedorahosted.org/pagure/tests2/issue/6'
+        for index, regex in enumerate(pagure.lib.link.FIXES):
             if index == 3:
                 self.assertNotEqual(regex.match(text), None)
             else:
@@ -222,5 +222,5 @@ class ProgitLibLinktests(tests.Modeltests):
 
 
 if __name__ == '__main__':
-    SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibLinktests)
+    SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibLinktests)
     unittest.TextTestRunner(verbosity=2).run(SUITE)

@@ -23,31 +23,31 @@ from mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import progit.lib
+import pagure.lib
 import tests
 
 
-class ProgitFlaskDocstests(tests.Modeltests):
-    """ Tests for flask docs of progit """
+class PagureFlaskDocstests(tests.Modeltests):
+    """ Tests for flask docs of pagure """
 
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
-        super(ProgitFlaskDocstests, self).setUp()
+        super(PagureFlaskDocstests, self).setUp()
 
-        progit.APP.config['TESTING'] = True
-        progit.SESSION = self.session
-        progit.ui.SESSION = self.session
-        progit.ui.app.SESSION = self.session
-        progit.ui.docs.SESSION = self.session
+        pagure.APP.config['TESTING'] = True
+        pagure.SESSION = self.session
+        pagure.ui.SESSION = self.session
+        pagure.ui.app.SESSION = self.session
+        pagure.ui.docs.SESSION = self.session
 
-        progit.APP.config['GIT_FOLDER'] = tests.HERE
-        progit.APP.config['FORK_FOLDER'] = os.path.join(
+        pagure.APP.config['GIT_FOLDER'] = tests.HERE
+        pagure.APP.config['FORK_FOLDER'] = os.path.join(
             tests.HERE, 'forks')
-        progit.APP.config['TICKETS_FOLDER'] = os.path.join(
+        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
             tests.HERE, 'tickets')
-        progit.APP.config['DOCS_FOLDER'] = os.path.join(
+        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
             tests.HERE, 'docs')
-        self.app = progit.APP.test_client()
+        self.app = pagure.APP.test_client()
 
     def test_view_docs_no_project(self):
         """ Test the view_docs endpoint with no project. """
@@ -72,7 +72,7 @@ class ProgitFlaskDocstests(tests.Modeltests):
         docs.
         """
         tests.create_projects(self.session)
-        repo = progit.lib.get_project(self.session, 'test')
+        repo = pagure.lib.get_project(self.session, 'test')
         tests.create_projects_git(os.path.join(tests.HERE, 'docs'))
 
         output = self.app.get('/test/docs')
@@ -80,7 +80,7 @@ class ProgitFlaskDocstests(tests.Modeltests):
         self.assertTrue('<h2>Docs</h2>' in output.data)
         self.assertTrue('<p>This repo is brand new!</p>' in output.data)
         self.assertTrue(
-            'git clone git@progit.fedorahosted.org:docs/test.git'
+            'git clone git@pagure.fedorahosted.org:docs/test.git'
             in output.data)
 
         repo.project_docs = False
@@ -101,7 +101,7 @@ class ProgitFlaskDocstests(tests.Modeltests):
         self.assertTrue('<h2>Docs</h2>' in output.data)
         self.assertTrue('<p>This repo is brand new!</p>' in output.data)
         self.assertTrue(
-            'git clone git@progit.fedorahosted.org:docs/test.git'
+            'git clone git@pagure.fedorahosted.org:docs/test.git'
             in output.data)
 
         # forked doc repo
@@ -197,5 +197,5 @@ class ProgitFlaskDocstests(tests.Modeltests):
 
 
 if __name__ == '__main__':
-    SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskDocstests)
+    SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskDocstests)
     unittest.TextTestRunner(verbosity=2).run(SUITE)

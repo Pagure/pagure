@@ -1,14 +1,14 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
-Name:           progit
+Name:           pagure
 Version:        0.0
 Release:        1.20141008%{?dist}
 Summary:        A git-centered forge
 
 License:        GPLv2+
-URL:            http://fedorahosted.org/progit/
-Source0:        https://fedorahosted.org/releases/p/r/progit/%{name}-%{version}.tar.gz
+URL:            http://fedorahosted.org/pagure/
+Source0:        https://fedorahosted.org/releases/p/r/pagure/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
@@ -59,12 +59,11 @@ Requires:  python-wtforms
 Requires:  mod_wsgi
 
 %description
-ProGit is a light-weight git-centered forge based on pygit2.
+Pagure is a light-weight git-centered forge based on pygit2.
 
-Currently, ProGit offers a decent web-interface for git repositories, a
-simplistic ticket system (that needs improvements) and possibilities to
-create new projects, fork existing ones and create/merge pull-requests
-across or within projects.
+Currently, Pagure offers a web-interface for git repositories, a ticket
+system and possibilities to create new projects, fork existing ones and
+create/merge pull-requests across or within projects.
 
 %prep
 %setup -q
@@ -80,28 +79,28 @@ rm -rf $RPM_BUILD_ROOT
 
 # Install apache configuration file
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/
-install -m 644 files/progit.conf $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/progit.conf
+install -m 644 files/pagure.conf $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/pagure.conf
 
 # Install configuration file
-mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/progit
-install -m 644 files/progit.cfg.sample $RPM_BUILD_ROOT/%{_sysconfdir}/progit/progit.cfg
+mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/pagure
+install -m 644 files/pagure.cfg.sample $RPM_BUILD_ROOT/%{_sysconfdir}/pagure/pagure.cfg
 
 # Install WSGI file
-mkdir -p $RPM_BUILD_ROOT/%{_datadir}/progit
-install -m 644 files/progit.wsgi $RPM_BUILD_ROOT/%{_datadir}/progit/progit.wsgi
+mkdir -p $RPM_BUILD_ROOT/%{_datadir}/pagure
+install -m 644 files/pagure.wsgi $RPM_BUILD_ROOT/%{_datadir}/pagure/pagure.wsgi
 
 # Install the createdb script
-install -m 644 createdb.py $RPM_BUILD_ROOT/%{_datadir}/progit/progit_createdb.py
+install -m 644 createdb.py $RPM_BUILD_ROOT/%{_datadir}/pagure/pagure_createdb.py
 
 
 %files
 %doc README.rst LICENSE
-%config(noreplace) %{_sysconfdir}/httpd/conf.d/progit.conf
-%config(noreplace) %{_sysconfdir}/progit/progit.cfg
-%dir %{_sysconfdir}/progit/
-%{_datadir}/progit/
-%{python_sitelib}/progit/
-%{python_sitelib}/progit*.egg-info
+%config(noreplace) %{_sysconfdir}/httpd/conf.d/pagure.conf
+%config(noreplace) %{_sysconfdir}/pagure/pagure.cfg
+%dir %{_sysconfdir}/pagure/
+%{_datadir}/pagure/
+%{python_sitelib}/pagure/
+%{python_sitelib}/pagure*.egg-info
 
 
 %changelog

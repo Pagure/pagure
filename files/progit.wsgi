@@ -9,14 +9,14 @@
 
 #import os
 ## Set the environment variable pointing to the configuration file
-#os.environ['PROGIT_CONFIG'] = '/etc/progit/progit.cfg'
+#os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
-## The following is only needed if you did not install progit
+## The following is only needed if you did not install pagure
 ## as a python module (for example if you run it from a git clone).
 #import sys
-#sys.path.insert(0, '/path/to/progit/')
+#sys.path.insert(0, '/path/to/pagure/')
 
 
 ## The most import line to make the wsgi working
-#from progit import APP as application
+#from pagure import APP as application
 #application.debug = True

@@ -1,0 +1,54 @@
+{% extends "master.html" %}
+{% from "_formhelper.html" import render_field_in_row %}
+
+{% block title %}Users{% endblock %}
+{%block tag %}admin{% endblock %}
+
+{% block header %}
+<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css"
+  rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<h2>
+  <a href="{{ url_for('admin_groups') }}"> Pagure Groups </a> >
+  {{ group.group_name }}
+</h2>
+
+<section class="add_users">
+  <h4>Add an user to this group</h4>
+  <form action="{{ url_for('.admin_group', group=group.group_name)
+    }}" method="post">
+    <input id="username" name="username" title="User name"/>
+    {{ form.csrf_token }}
+  <input type="submit" class="submit positive button" value="Add">
+  </form>
+</section>
+
+<section class="list_users">
+{% if users %}
+<ul>
+    {% for user in users %}
+    <li>userid: {{ user.id }} :
+      <a href="{{ url_for('view_user', username=user.user) }}">
+         {{ user.user }}
+      </a> <form class="icon" method="POST"
+        action="{{ url_for('admin_group_user_delete',
+            group=group.group_name, user=user.user) }}">
+        {{ conf_form.csrf_token }}
+        <button
+          onclick="return confirm('Are you sure to remove user `{{
+            user.user}}` of group `{{group.group_name}}`?');"
+          title="Remove user from group">
+          <span class="icon icon-trash blue"></span>
+        </button>
+      </form>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No users found in this group</p>
+{% endif %}
+</section>
+
+{% endblock %}

@@ -22,21 +22,21 @@ from mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import progit.lib
+import pagure.lib
 import tests
 
 
-class ProgitFlaskApitests(tests.Modeltests):
-    """ Tests for flask API controller of progit """
+class PagureFlaskApitests(tests.Modeltests):
+    """ Tests for flask API controller of pagure """
 
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
-        super(ProgitFlaskApitests, self).setUp()
+        super(PagureFlaskApitests, self).setUp()
 
-        progit.APP.config['TESTING'] = True
-        progit.SESSION = self.session
-        progit.api.SESSION = self.session
-        self.app = progit.APP.test_client()
+        pagure.APP.config['TESTING'] = True
+        pagure.SESSION = self.session
+        pagure.api.SESSION = self.session
+        self.app = pagure.APP.test_client()
 
     def test_api_version(self):
         """ Test the api_version function.  """
@@ -44,7 +44,7 @@ class ProgitFlaskApitests(tests.Modeltests):
         output = self.app.get('/api/0/version')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
-        self.assertEqual(data['version'], progit.__api_version__)
+        self.assertEqual(data['version'], pagure.__api_version__)
         self.assertEqual(data.keys(), ['version'])
 
     def test_api_users(self):
@@ -80,7 +80,7 @@ class ProgitFlaskApitests(tests.Modeltests):
         self.assertEqual(data['tags'], [])
 
         # Add an issue and tag it so that we can list them
-        item = progit.lib.model.Issue(
+        item = pagure.lib.model.Issue(
             id=1,
             uid='foobar',
             project_id=1,
@@ -90,12 +90,12 @@ class ProgitFlaskApitests(tests.Modeltests):
         )
         self.session.add(item)
         self.session.commit()
-        item = progit.lib.model.Tag(
+        item = pagure.lib.model.Tag(
             tag='tag1',
         )
         self.session.add(item)
         self.session.commit()
-        item = progit.lib.model.TagIssue(
+        item = pagure.lib.model.TagIssue(
             tag='tag1',
             issue_uid='foobar',
         )
@@ -122,5 +122,5 @@ class ProgitFlaskApitests(tests.Modeltests):
 
 
 if __name__ == '__main__':
-    SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskApitests)
+    SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskApitests)
     unittest.TextTestRunner(verbosity=2).run(SUITE)

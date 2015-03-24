@@ -23,35 +23,35 @@ from mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import progit.lib
+import pagure.lib
 import tests
 
 
-class ProgitFlaskIssuestests(tests.Modeltests):
-    """ Tests for flask issues controller of progit """
+class PagureFlaskIssuestests(tests.Modeltests):
+    """ Tests for flask issues controller of pagure """
 
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
-        super(ProgitFlaskIssuestests, self).setUp()
+        super(PagureFlaskIssuestests, self).setUp()
 
-        progit.APP.config['TESTING'] = True
-        progit.SESSION = self.session
-        progit.ui.SESSION = self.session
-        progit.ui.app.SESSION = self.session
-        progit.ui.issues.SESSION = self.session
-        progit.ui.repo.SESSION = self.session
+        pagure.APP.config['TESTING'] = True
+        pagure.SESSION = self.session
+        pagure.ui.SESSION = self.session
+        pagure.ui.app.SESSION = self.session
+        pagure.ui.issues.SESSION = self.session
+        pagure.ui.repo.SESSION = self.session
 
-        progit.APP.config['GIT_FOLDER'] = tests.HERE
-        progit.APP.config['FORK_FOLDER'] = os.path.join(
+        pagure.APP.config['GIT_FOLDER'] = tests.HERE
+        pagure.APP.config['FORK_FOLDER'] = os.path.join(
             tests.HERE, 'forks')
-        progit.APP.config['TICKETS_FOLDER'] = os.path.join(
+        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
             tests.HERE, 'tickets')
-        progit.APP.config['DOCS_FOLDER'] = os.path.join(
+        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
             tests.HERE, 'docs')
-        self.app = progit.APP.test_client()
+        self.app = pagure.APP.test_client()
 
-    @patch('progit.lib.git.update_git')
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_new_issue(self, p_send_email, p_ugt):
         """ Test the new_issue endpoint. """
         p_send_email.return_value = True
@@ -61,7 +61,7 @@ class ProgitFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.get('/foo/new_issue')
             self.assertEqual(output.status_code, 404)
 
@@ -111,7 +111,7 @@ class ProgitFlaskIssuestests(tests.Modeltests):
                 in output.data)
 
         user.username = 'pingou'
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.post(
                 '/test/new_issue', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
@@ -120,8 +120,8 @@ class ProgitFlaskIssuestests(tests.Modeltests):
             self.assertTrue('<p>test project #1</p>' in output.data)
             self.assertTrue('<h2>\n    Issues (1)\n  </h2>' in output.data)
 
-    @patch('progit.lib.git.update_git')
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_view_issues(self, p_send_email, p_ugt):
         """ Test the view_issues endpoint. """
         p_send_email.return_value = True
@@ -138,8 +138,8 @@ class ProgitFlaskIssuestests(tests.Modeltests):
         self.assertTrue('<h2>\n    Issues (0)\n  </h2>' in output.data)
 
         # Create issues to play with
-        repo = progit.lib.get_project(self.session, 'test')
-        msg = progit.lib.new_issue(
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -171,7 +171,7 @@ class ProgitFlaskIssuestests(tests.Modeltests):
             '<h2>\n    Closed\n    Issues (0)\n  </h2>' in output.data)
 
         # Project w/o issue tracker
-        repo = progit.lib.get_project(self.session, 'test')
+        repo = pagure.lib.get_project(self.session, 'test')
         repo.issue_tracker = False
         self.session.add(repo)
         self.session.commit()
@@ -179,8 +179,8 @@ class ProgitFlaskIssuestests(tests.Modeltests):
         output = self.app.get('/test/issues')
         self.assertEqual(output.status_code, 404)
 
-    @patch('progit.lib.git.update_git')
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_view_issue(self, p_send_email, p_ugt):
         """ Test the view_issue endpoint. """
         p_send_email.return_value = True
@@ -195,8 +195,8 @@ class ProgitFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # Create issues to play with
-        repo = progit.lib.get_project(self.session, 'test')
-        msg = progit.lib.new_issue(
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -216,7 +216,7 @@ class ProgitFlaskIssuestests(tests.Modeltests):
             in output.data)
 
         user = tests.FakeUser()
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
@@ -225,7 +225,7 @@ class ProgitFlaskIssuestests(tests.Modeltests):
                 in output.data)
 
         user.username = 'pingou'
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
@@ -234,8 +234,8 @@ class ProgitFlaskIssuestests(tests.Modeltests):
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
         # Create private issue
-        repo = progit.lib.get_project(self.session, 'test')
-        msg = progit.lib.new_issue(
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -253,19 +253,19 @@ class ProgitFlaskIssuestests(tests.Modeltests):
 
         # Wrong user
         user = tests.FakeUser()
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/2')
             self.assertEqual(output.status_code, 403)
 
         # reporter
         user.username = 'pingou'
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/2')
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
 
         # Project w/o issue tracker
-        repo = progit.lib.get_project(self.session, 'test')
+        repo = pagure.lib.get_project(self.session, 'test')
         repo.issue_tracker = False
         self.session.add(repo)
         self.session.commit()
@@ -273,8 +273,8 @@ class ProgitFlaskIssuestests(tests.Modeltests):
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 404)
 
-    @patch('progit.lib.git.update_git')
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_update_issue(self, p_send_email, p_ugt):
         """ Test the update_issue endpoint. """
         p_send_email.return_value = True
@@ -289,8 +289,8 @@ class ProgitFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         # Create issues to play with
-        repo = progit.lib.get_project(self.session, 'test')
-        msg = progit.lib.new_issue(
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -303,7 +303,7 @@ class ProgitFlaskIssuestests(tests.Modeltests):
 
         user = tests.FakeUser()
         user.username = 'pingou'
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
@@ -432,8 +432,8 @@ class ProgitFlaskIssuestests(tests.Modeltests):
                 in output.data)
 
         # Create another issue with a dependency
-        repo = progit.lib.get_project(self.session, 'test')
-        msg = progit.lib.new_issue(
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -444,17 +444,17 @@ class ProgitFlaskIssuestests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Issue created')
         # Reset the status of the first issue
-        parent_issue = progit.lib.search_issues(
+        parent_issue = pagure.lib.search_issues(
             self.session, repo, issueid=2)
         parent_issue.status = 'Open'
         # Add the dependency relationship
         self.session.add(parent_issue)
-        issue = progit.lib.search_issues(self.session, repo, issueid=2)
+        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
         issue.parents.append(parent_issue)
         self.session.add(issue)
         self.session.commit()
 
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
 
             data['csrf_token'] = csrf_token
             output = self.app.post(
@@ -469,8 +469,8 @@ class ProgitFlaskIssuestests(tests.Modeltests):
                 in output.data)
 
         # Create private issue
-        repo = progit.lib.get_project(self.session, 'test')
-        msg = progit.lib.new_issue(
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -484,23 +484,23 @@ class ProgitFlaskIssuestests(tests.Modeltests):
 
         # Wrong user
         user = tests.FakeUser()
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.post(
                 '/test/issue/3/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 403)
 
         # Project w/o issue tracker
-        repo = progit.lib.get_project(self.session, 'test')
+        repo = pagure.lib.get_project(self.session, 'test')
         repo.issue_tracker = False
         self.session.add(repo)
         self.session.commit()
 
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/1/update')
             self.assertEqual(output.status_code, 302)
 
-    @patch('progit.lib.git.update_git')
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_edit_issue(self, p_send_email, p_ugt):
         """ Test the edit_issue endpoint. """
         p_send_email.return_value = True
@@ -510,7 +510,7 @@ class ProgitFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.get('/foo/issue/1/edit')
             self.assertEqual(output.status_code, 404)
 
@@ -520,13 +520,13 @@ class ProgitFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 403)
 
         user.username = 'pingou'
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/1/edit')
             self.assertEqual(output.status_code, 404)
 
         # Create issues to play with
-        repo = progit.lib.get_project(self.session, 'test')
-        msg = progit.lib.new_issue(
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -538,12 +538,12 @@ class ProgitFlaskIssuestests(tests.Modeltests):
         self.assertEqual(msg, 'Issue created')
 
         user = tests.FakeUser()
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/1/edit')
             self.assertEqual(output.status_code, 403)
 
         user.username = 'pingou'
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/1/edit')
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<h2>Edit issue #1</h2>' in output.data)
@@ -587,18 +587,18 @@ class ProgitFlaskIssuestests(tests.Modeltests):
                 '<p>We should work on this!</p>'), 1)
 
         # Project w/o issue tracker
-        repo = progit.lib.get_project(self.session, 'test')
+        repo = pagure.lib.get_project(self.session, 'test')
         repo.issue_tracker = False
         self.session.add(repo)
         self.session.commit()
 
         user.username = 'pingou'
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.post('/test/issue/1/edit', data=data)
             self.assertEqual(output.status_code, 404)
 
-    @patch('progit.lib.git.update_git')
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_edit_tag(self, p_send_email, p_ugt):
         """ Test the edit_tag endpoint. """
         p_send_email.return_value = True
@@ -608,7 +608,7 @@ class ProgitFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.get('/foo/tag/foo/edit')
             self.assertEqual(output.status_code, 404)
 
@@ -618,8 +618,8 @@ class ProgitFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 403)
 
         # Create issues to play with
-        repo = progit.lib.get_project(self.session, 'test')
-        msg = progit.lib.new_issue(
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -631,8 +631,8 @@ class ProgitFlaskIssuestests(tests.Modeltests):
         self.assertEqual(msg, 'Issue created')
 
         # Add a tag to the issue
-        issue = progit.lib.search_issues(self.session, repo, issueid=1)
-        msg = progit.lib.add_issue_tag(
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        msg = pagure.lib.add_issue_tag(
             session=self.session,
             issue=issue,
             tag='tag1',
@@ -642,12 +642,12 @@ class ProgitFlaskIssuestests(tests.Modeltests):
         self.assertEqual(msg, 'Tag added')
 
         # Before edit, list tags
-        tags = progit.lib.get_tags_of_project(self.session, repo)
+        tags = pagure.lib.get_tags_of_project(self.session, repo)
         self.assertEqual([tag.tag for tag in tags], ['tag1'])
 
         # Edit tag
         user.username = 'pingou'
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/tag/tag1/edit')
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<h2>Edit tag: tag1</h2>' in output.data)
@@ -677,11 +677,11 @@ class ProgitFlaskIssuestests(tests.Modeltests):
                 in output.data)
 
         # After edit, list tags
-        tags = progit.lib.get_tags_of_project(self.session, repo)
+        tags = pagure.lib.get_tags_of_project(self.session, repo)
         self.assertEqual([tag.tag for tag in tags], ['tag2'])
 
-    @patch('progit.lib.git.update_git')
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_remove_tag(self, p_send_email, p_ugt):
         """ Test the remove_tag endpoint. """
         p_send_email.return_value = True
@@ -691,7 +691,7 @@ class ProgitFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.post('/foo/droptag/')
             self.assertEqual(output.status_code, 404)
 
@@ -701,8 +701,8 @@ class ProgitFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 403)
 
         # Create issues to play with
-        repo = progit.lib.get_project(self.session, 'test')
-        msg = progit.lib.new_issue(
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -714,8 +714,8 @@ class ProgitFlaskIssuestests(tests.Modeltests):
         self.assertEqual(msg, 'Issue created')
 
         # Add a tag to the issue
-        issue = progit.lib.search_issues(self.session, repo, issueid=1)
-        msg = progit.lib.add_issue_tag(
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        msg = pagure.lib.add_issue_tag(
             session=self.session,
             issue=issue,
             tag='tag1',
@@ -725,12 +725,12 @@ class ProgitFlaskIssuestests(tests.Modeltests):
         self.assertEqual(msg, 'Tag added')
 
         # Before edit, list tags
-        tags = progit.lib.get_tags_of_project(self.session, repo)
+        tags = pagure.lib.get_tags_of_project(self.session, repo)
         self.assertEqual([tag.tag for tag in tags], ['tag1'])
 
         # Edit tag
         user.username = 'pingou'
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.post(
                 '/test/droptag/', data={}, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
@@ -760,5 +760,5 @@ class ProgitFlaskIssuestests(tests.Modeltests):
 
 
 if __name__ == '__main__':
-    SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskIssuestests)
+    SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskIssuestests)
     unittest.TextTestRunner(verbosity=2).run(SUITE)

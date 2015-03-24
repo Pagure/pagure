@@ -23,31 +23,31 @@ from mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import progit.lib
+import pagure.lib
 import tests
 
 
-class ProgitFlaskRepotests(tests.Modeltests):
-    """ Tests for flask app controller of progit """
+class PagureFlaskRepotests(tests.Modeltests):
+    """ Tests for flask app controller of pagure """
 
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
-        super(ProgitFlaskRepotests, self).setUp()
+        super(PagureFlaskRepotests, self).setUp()
 
-        progit.APP.config['TESTING'] = True
-        progit.SESSION = self.session
-        progit.ui.SESSION = self.session
-        progit.ui.app.SESSION = self.session
-        progit.ui.repo.SESSION = self.session
+        pagure.APP.config['TESTING'] = True
+        pagure.SESSION = self.session
+        pagure.ui.SESSION = self.session
+        pagure.ui.app.SESSION = self.session
+        pagure.ui.repo.SESSION = self.session
 
-        progit.APP.config['GIT_FOLDER'] = tests.HERE
-        progit.APP.config['FORK_FOLDER'] = os.path.join(
+        pagure.APP.config['GIT_FOLDER'] = tests.HERE
+        pagure.APP.config['FORK_FOLDER'] = os.path.join(
             tests.HERE, 'forks')
-        progit.APP.config['TICKETS_FOLDER'] = os.path.join(
+        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
             tests.HERE, 'tickets')
-        progit.APP.config['DOCS_FOLDER'] = os.path.join(
+        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
             tests.HERE, 'docs')
-        self.app = progit.APP.test_client()
+        self.app = pagure.APP.test_client()
 
     def test_add_user(self):
         """ Test the add_user endpoint. """
@@ -56,7 +56,7 @@ class ProgitFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.get('/foo/adduser')
             self.assertEqual(output.status_code, 404)
 
@@ -66,7 +66,7 @@ class ProgitFlaskRepotests(tests.Modeltests):
             self.assertEqual(output.status_code, 403)
 
         user.username = 'pingou'
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/adduser')
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<h2>Add user</h2>' in output.data)
@@ -110,7 +110,7 @@ class ProgitFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.post('/foo/dropuser/1')
             self.assertEqual(output.status_code, 404)
 
@@ -120,7 +120,7 @@ class ProgitFlaskRepotests(tests.Modeltests):
             self.assertEqual(output.status_code, 403)
 
         user.username = 'pingou'
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.post('/test/settings')
 
             csrf_token = output.data.split(
@@ -138,8 +138,8 @@ class ProgitFlaskRepotests(tests.Modeltests):
                 'loose it right</li>' in output.data)
 
         # Add an user to a project
-        repo = progit.lib.get_project(self.session, 'test')
-        msg = progit.lib.add_user_to_project(
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.add_user_to_project(
             session=self.session,
             project=repo,
             user='foo',
@@ -147,7 +147,7 @@ class ProgitFlaskRepotests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'User added')
 
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.post('/test/dropuser/2', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<header class="repo">' in output.data)
@@ -172,7 +172,7 @@ class ProgitFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.post('/foo/updatedesc')
             self.assertEqual(output.status_code, 404)
 
@@ -182,7 +182,7 @@ class ProgitFlaskRepotests(tests.Modeltests):
             self.assertEqual(output.status_code, 403)
 
         user.username = 'pingou'
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.post('/test/updatedesc', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<header class="repo">' in output.data)
@@ -212,7 +212,7 @@ class ProgitFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.get('/foo/settings')
             self.assertEqual(output.status_code, 404)
 
@@ -223,7 +223,7 @@ class ProgitFlaskRepotests(tests.Modeltests):
             self.assertEqual(output.status_code, 403)
 
         user.username = 'pingou'
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/settings', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<header class="repo">' in output.data)
@@ -271,7 +271,7 @@ class ProgitFlaskRepotests(tests.Modeltests):
             self.assertTrue('<header class="repo">' in output.data)
             self.assertTrue('<p>test project #1</p>' in output.data)
             self.assertTrue(
-                '<title>Overview - test - ProGit</title>' in output.data)
+                '<title>Overview - test - Pagure</title>' in output.data)
             self.assertTrue(
                 '<li class="message">Edited successfully settings of '
                 'repo: test</li>' in output.data)
@@ -335,7 +335,7 @@ class ProgitFlaskRepotests(tests.Modeltests):
             output.data.count('<span class="commitid">'), 3)
 
         # Turn that repo into a fork
-        repo = progit.lib.get_project(self.session, 'test')
+        repo = pagure.lib.get_project(self.session, 'test')
         repo.parent_id = 2
         self.session.add(repo)
         self.session.commit()
@@ -359,7 +359,7 @@ class ProgitFlaskRepotests(tests.Modeltests):
             output.data.count('<span class="commitid">'), 3)
 
         # Add a fork of a fork
-        item = progit.lib.model.Project(
+        item = pagure.lib.model.Project(
             user_id=1,  # pingou
             name='test3',
             description='test project #3',
@@ -415,7 +415,7 @@ class ProgitFlaskRepotests(tests.Modeltests):
             output.data.count('<span class="commitid">'), 3)
 
         # Turn that repo into a fork
-        repo = progit.lib.get_project(self.session, 'test')
+        repo = pagure.lib.get_project(self.session, 'test')
         repo.parent_id = 2
         self.session.add(repo)
         self.session.commit()
@@ -439,7 +439,7 @@ class ProgitFlaskRepotests(tests.Modeltests):
             output.data.count('<span class="commitid">'), 3)
 
         # Add a fork of a fork
-        item = progit.lib.model.Project(
+        item = pagure.lib.model.Project(
             user_id=1,  # pingou
             name='test3',
             description='test project #3',
@@ -496,7 +496,7 @@ class ProgitFlaskRepotests(tests.Modeltests):
             output.data.count('<span class="commitid">'), 3)
 
         # Turn that repo into a fork
-        repo = progit.lib.get_project(self.session, 'test')
+        repo = pagure.lib.get_project(self.session, 'test')
         repo.parent_id = 2
         self.session.add(repo)
         self.session.commit()
@@ -520,7 +520,7 @@ class ProgitFlaskRepotests(tests.Modeltests):
             output.data.count('<span class="commitid">'), 3)
 
         # Add a fork of a fork
-        item = progit.lib.model.Project(
+        item = pagure.lib.model.Project(
             user_id=1,  # pingou
             name='test3',
             description='test project #3',
@@ -634,7 +634,7 @@ class ProgitFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # Add a fork of a fork
-        item = progit.lib.model.Project(
+        item = pagure.lib.model.Project(
             user_id=1,  # pingou
             name='test3',
             description='test project #3',
@@ -735,7 +735,7 @@ class ProgitFlaskRepotests(tests.Modeltests):
             'diff --git a/test_binary b/test_binary\n'))
 
         # Add a fork of a fork
-        item = progit.lib.model.Project(
+        item = pagure.lib.model.Project(
             user_id=1,  # pingou
             name='test3',
             description='test project #3',
@@ -785,7 +785,7 @@ class ProgitFlaskRepotests(tests.Modeltests):
         self.assertTrue('<th>Author</th>' in output.data)
         self.assertTrue('<th>Committer</th>' in output.data)
         self.assertTrue(
-            '<span style="color: #00A000">+ ProGit</span>' in output.data)
+            '<span style="color: #00A000">+ Pagure</span>' in output.data)
         self.assertTrue(
             '<span style="color: #00A000">+ ======</span>' in output.data)
 
@@ -808,7 +808,7 @@ class ProgitFlaskRepotests(tests.Modeltests):
             '@@ -0,0 +1,3 @@</span>' in output.data)
 
         # Add a fork of a fork
-        item = progit.lib.model.Project(
+        item = pagure.lib.model.Project(
             user_id=1,  # pingou
             name='test3',
             description='test project #3',
@@ -835,7 +835,7 @@ class ProgitFlaskRepotests(tests.Modeltests):
         self.assertTrue('<th>Author</th>' in output.data)
         self.assertTrue('<th>Committer</th>' in output.data)
         self.assertTrue(
-            '<span style="color: #00A000">+ ProGit</span>' in output.data)
+            '<span style="color: #00A000">+ Pagure</span>' in output.data)
         self.assertTrue(
             '<span style="color: #00A000">+ ======</span>' in output.data)
 
@@ -866,25 +866,24 @@ class ProgitFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertTrue('''diff --git a/README.rst b/README.rst
 new file mode 100644
-index 0000000..10d2e1c
+index 0000000..fb7093d
 --- /dev/null
 +++ b/README.rst
-@@ -0,0 +1,17 @@
-+ProGit
+@@ -0,0 +1,16 @@
++Pagure
 +======
 +
 +:Author: Pierre-Yves Chibon <pingou@pingoured.fr>
 +
 +
-+ProGit is a light-weight git-centered forge based on pygit2.
++Pagure is a light-weight git-centered forge based on pygit2.
 +
-+Currently, ProGit offers a decent web-interface for git repositories, a
-+simplistic ticket system (that needs improvements) and possibilities to create
-+new projects, fork existing ones and create/merge pull-requests across or
-+within projects.
++Currently, Pagure offers a web-interface for git repositories, a ticket
++system and possibilities to create new projects, fork existing ones and
++create/merge pull-requests across or within projects.
 +
 +
-+Homepage: https://github.com/pypingou/ProGit
++Homepage: https://github.com/pypingou/pagure
 +
 +Dev instance: http://209.132.184.222/ (/!\ May change unexpectedly, it's a dev instance ;-))
 ''' in output.data)
@@ -915,7 +914,7 @@ index 0000000..11980b1
 ''' in output.data)
 
         # Add a fork of a fork
-        item = progit.lib.model.Project(
+        item = pagure.lib.model.Project(
             user_id=1,  # pingou
             name='test3',
             description='test project #3',
@@ -940,25 +939,24 @@ index 0000000..11980b1
         self.assertEqual(output.status_code, 200)
         self.assertTrue('''diff --git a/README.rst b/README.rst
 new file mode 100644
-index 0000000..10d2e1c
+index 0000000..fb7093d
 --- /dev/null
 +++ b/README.rst
-@@ -0,0 +1,17 @@
-+ProGit
+@@ -0,0 +1,16 @@
++Pagure
 +======
 +
 +:Author: Pierre-Yves Chibon <pingou@pingoured.fr>
 +
 +
-+ProGit is a light-weight git-centered forge based on pygit2.
++Pagure is a light-weight git-centered forge based on pygit2.
 +
-+Currently, ProGit offers a decent web-interface for git repositories, a
-+simplistic ticket system (that needs improvements) and possibilities to create
-+new projects, fork existing ones and create/merge pull-requests across or
-+within projects.
++Currently, Pagure offers a web-interface for git repositories, a ticket
++system and possibilities to create new projects, fork existing ones and
++create/merge pull-requests across or within projects.
 +
 +
-+Homepage: https://github.com/pypingou/ProGit
++Homepage: https://github.com/pypingou/pagure
 +
 +Dev instance: http://209.132.184.222/ (/!\ May change unexpectedly, it's a dev instance ;-))
 ''' in output.data)
@@ -1008,7 +1006,7 @@ index 0000000..10d2e1c
             'No content found in this repository' in output.data)
 
         # Add a fork of a fork
-        item = progit.lib.model.Project(
+        item = pagure.lib.model.Project(
             user_id=1,  # pingou
             name='test3',
             description='test project #3',
@@ -1040,7 +1038,7 @@ index 0000000..10d2e1c
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.post('/foo/delete')
             # No project registered in the DB
             self.assertEqual(output.status_code, 404)
@@ -1052,7 +1050,7 @@ index 0000000..10d2e1c
             self.assertEqual(output.status_code, 403)
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
@@ -1062,7 +1060,7 @@ index 0000000..10d2e1c
             self.assertTrue('<h2>Forks (0)</h2>' in output.data)
 
             # Only git repo
-            item = progit.lib.model.Project(
+            item = pagure.lib.model.Project(
                 user_id=1,  # pingou
                 name='test',
                 description='test project #1',
@@ -1079,7 +1077,7 @@ index 0000000..10d2e1c
             self.assertTrue('<h2>Forks (0)</h2>' in output.data)
 
             # Only git and doc repo
-            item = progit.lib.model.Project(
+            item = pagure.lib.model.Project(
                 user_id=1,  # pingou
                 name='test',
                 description='test project #1',
@@ -1095,7 +1093,7 @@ index 0000000..10d2e1c
                 'system</li>' in output.data)
 
             # All repo there
-            item = progit.lib.model.Project(
+            item = pagure.lib.model.Project(
                 user_id=1,  # pingou
                 name='test',
                 description='test project #1',
@@ -1111,7 +1109,7 @@ index 0000000..10d2e1c
             self.assertTrue('<h2>Forks (0)</h2>' in output.data)
 
             # Add a fork of a fork
-            item = progit.lib.model.Project(
+            item = pagure.lib.model.Project(
                 user_id=1,  # pingou
                 name='test3',
                 description='test project #3',
@@ -1134,5 +1132,5 @@ index 0000000..10d2e1c
 
 
 if __name__ == '__main__':
-    SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskRepotests)
+    SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskRepotests)
     unittest.TextTestRunner(verbosity=2).run(SUITE)

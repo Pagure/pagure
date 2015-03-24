@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>{% block title %}{% endblock %} - Pagure</title>
+    <link rel="shortcut icon" type="image/vnd.microsoft.icon"
+        href="{{ url_for('static', filename='favicon.ico')}}"/>
+    <link rel="stylesheet" type="text/css" media="screen"
+        href="{{ url_for('static', filename='koji.css') }}"/>
+    <link rel="stylesheet" type="text/css" media="screen"
+        href="{{ url_for('static', filename='pagure.css') }}"/>
+    <link type="text/css" rel="stylesheet"
+        href="{{ url_for('static',
+            filename='jquery-ui-1.11.2.custom.css')}}" />
+    {% block header %}{% endblock %}
+  </head>
+  <body id="{% block tag %}{% endblock %}">
+
+    <div id="wrap">
+      <div id="innerwrap">
+
+        <!-- HEADER -->
+        <div id="header">
+          <img src="{{ url_for('static', filename='pagure-logo.png') }}"
+            alt="pagure Logo" id="kojiLogo"/>
+        </div><!-- end header -->
+
+        <!-- MAIN NAVIGATION -->
+        <div id="mainNav">
+          <h4 class="hide">Main Site Links:</h4>
+          <ul>
+            <li id="homeTab"><a href="{{url_for('index')}}">Home</a></li>
+            <li id="usersTab">
+              <a href="{{ url_for('view_users') }}">Users</a>
+            </li>
+            {% if admin %}
+            <li id="adminTab">
+              <a href="{{ url_for('admin_index') }}">Admin</a>
+            </li>
+            {% endif %}
+            <li id="new_project" class="right">
+              <a href="{{url_for('new_project')}}">
+                New project
+              </a>
+            </li>
+          </ul>
+        </div><!-- end mainNav -->
+
+        <span id="loginInfo">
+          {% if g.fas_user %}
+            <span class="text">logged in as </span>
+            <a href="{{ url_for('user_settings') }}">
+                {{ g.fas_user.username }}</a> |
+            <a href="{{ url_for('auth_logout') }}?next={{request.url}}">log out</a>
+          {% else %}
+        <a href="{{ url_for('auth_login') }}?next={{request.url}}">login</a>
+          {% endif %}
+        </span>
+
+        <div id="content">
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if category, messages %}
+                <ul id="flashes">
+                    {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+
+        </div>
+
+        <p id="footer">
+          Copyright &copy; 2014-2015 Red Hat
+          <a href="https://fedorahosted.org/pagure/">pagure</a>
+          -- {{version}}
+        </p>
+
+      </div>
+    </div>
+
+    {% block jscripts %}
+    <script type="text/javascript"
+        src="{{ url_for('static',
+            filename='jquery-1.10.2.js') }}">
+    </script>
+    <script type="text/javascript"
+        src="{{ url_for('static',
+            filename='jquery-ui-1.11.2.custom.min.js') }}">
+    </script>
+    {% endblock %}
+</body>
+</html>

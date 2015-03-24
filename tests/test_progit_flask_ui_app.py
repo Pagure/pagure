@@ -22,33 +22,33 @@ from mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import progit.lib
+import pagure.lib
 import tests
 
 
-class ProgitFlaskApptests(tests.Modeltests):
-    """ Tests for flask app controller of progit """
+class PagureFlaskApptests(tests.Modeltests):
+    """ Tests for flask app controller of pagure """
 
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
-        super(ProgitFlaskApptests, self).setUp()
+        super(PagureFlaskApptests, self).setUp()
 
-        progit.APP.config['TESTING'] = True
-        progit.SESSION = self.session
-        progit.ui.SESSION = self.session
-        progit.ui.app.SESSION = self.session
-        progit.ui.repo.SESSION = self.session
+        pagure.APP.config['TESTING'] = True
+        pagure.SESSION = self.session
+        pagure.ui.SESSION = self.session
+        pagure.ui.app.SESSION = self.session
+        pagure.ui.repo.SESSION = self.session
 
-        progit.APP.config['GIT_FOLDER'] = tests.HERE
-        progit.APP.config['FORK_FOLDER'] = os.path.join(
+        pagure.APP.config['GIT_FOLDER'] = tests.HERE
+        pagure.APP.config['FORK_FOLDER'] = os.path.join(
             tests.HERE, 'forks')
-        progit.APP.config['TICKETS_FOLDER'] = os.path.join(
+        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
             tests.HERE, 'tickets')
-        progit.APP.config['DOCS_FOLDER'] = os.path.join(
+        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
             tests.HERE, 'docs')
-        progit.APP.config['REQUESTS_FOLDER'] = os.path.join(
+        pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
             tests.HERE, 'requests')
-        self.app = progit.APP.test_client()
+        self.app = pagure.APP.test_client()
 
     def test_index(self):
         """ Test the index endpoint. """
@@ -64,7 +64,7 @@ class ProgitFlaskApptests(tests.Modeltests):
         self.assertTrue('<h2>All Projects (2)</h2>' in output.data)
 
         # Add a 3rd project with a long description
-        item = progit.lib.model.Project(
+        item = pagure.lib.model.Project(
             user_id=2,  # foo
             name='test3',
             description='test project #3 with a very long description',
@@ -73,7 +73,7 @@ class ProgitFlaskApptests(tests.Modeltests):
         self.session.commit()
 
         user = tests.FakeUser()
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.get('/?repopage=abc&forkpage=def')
             self.assertTrue(
                 '<section class="project_list" id="repos">' in output.data)
@@ -108,7 +108,7 @@ class ProgitFlaskApptests(tests.Modeltests):
 
         tests.create_projects(self.session)
         self.gitrepos = tests.create_projects_git(
-            progit.APP.config['GIT_FOLDER'])
+            pagure.APP.config['GIT_FOLDER'])
 
         output = self.app.get('/user/pingou?repopage=abc&forkpage=def')
         self.assertEqual(output.status_code, 200)
@@ -122,7 +122,7 @@ class ProgitFlaskApptests(tests.Modeltests):
     def test_new_project(self):
         """ Test the new_project endpoint. """
         # Before
-        projects = progit.lib.search_projects(self.session)
+        projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 0)
         self.assertFalse(os.path.exists(
             os.path.join(tests.HERE, 'project#1.git')))
@@ -134,7 +134,7 @@ class ProgitFlaskApptests(tests.Modeltests):
             os.path.join(tests.HERE, 'requests', 'project#1.git')))
 
         user = tests.FakeUser()
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<h2>New project</h2>' in output.data)
@@ -170,7 +170,7 @@ class ProgitFlaskApptests(tests.Modeltests):
                 in output.data)
 
         user.username = 'foo'
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             data['csrf_token'] =  csrf_token
             output = self.app.post('/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
@@ -180,7 +180,7 @@ class ProgitFlaskApptests(tests.Modeltests):
                 in output.data)
 
         # After
-        projects = progit.lib.search_projects(self.session)
+        projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 1)
         self.assertTrue(os.path.exists(
             os.path.join(tests.HERE, 'project#1.git')))
@@ -196,13 +196,13 @@ class ProgitFlaskApptests(tests.Modeltests):
         self.test_new_project()
 
         user = tests.FakeUser()
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 404)
             self.assertTrue('<h2>Page not found (404)</h2>' in output.data)
 
         user.username = 'foo'
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
             self.assertTrue("<h2>foo's settings</h2>" in output.data)
@@ -250,7 +250,7 @@ class ProgitFlaskApptests(tests.Modeltests):
 
         user = tests.FakeUser()
         user.username = 'foo'
-        with tests.user_set(progit.APP, user):
+        with tests.user_set(pagure.APP, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
             self.assertTrue("<h2>foo's settings</h2>" in output.data)
@@ -274,5 +274,5 @@ class ProgitFlaskApptests(tests.Modeltests):
 
 
 if __name__ == '__main__':
-    SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitFlaskApptests)
+    SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskApptests)
     unittest.TextTestRunner(verbosity=2).run(SUITE)

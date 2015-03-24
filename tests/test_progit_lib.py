@@ -21,23 +21,23 @@ from mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import progit.lib
+import pagure.lib
 import tests
 
 
-class ProgitLibtests(tests.Modeltests):
-    """ Tests for progit.lib """
+class PagureLibtests(tests.Modeltests):
+    """ Tests for pagure.lib """
 
     def test_get_next_id(self):
-        """ Test the get_next_id function of progit.lib. """
+        """ Test the get_next_id function of pagure.lib. """
         tests.create_projects(self.session)
-        self.assertEqual(1, progit.lib.get_next_id(self.session, 1))
+        self.assertEqual(1, pagure.lib.get_next_id(self.session, 1))
 
     def test_search_user_all(self):
-        """ Test the search_user of progit.lib. """
+        """ Test the search_user of pagure.lib. """
 
         # Retrieve all users
-        items = progit.lib.search_user(self.session)
+        items = pagure.lib.search_user(self.session)
         self.assertEqual(2, len(items))
         self.assertEqual(1, items[0].id)
         self.assertEqual('pingou', items[0].user)
@@ -49,45 +49,45 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual([], items[1].groups)
 
     def test_search_user_username(self):
-        """ Test the search_user of progit.lib. """
+        """ Test the search_user of pagure.lib. """
 
         # Retrieve user by username
-        item = progit.lib.search_user(self.session, username='foo')
+        item = pagure.lib.search_user(self.session, username='foo')
         self.assertEqual('foo', item.user)
         self.assertEqual('foo', item.username)
         self.assertEqual([], item.groups)
 
-        item = progit.lib.search_user(self.session, username='bar')
+        item = pagure.lib.search_user(self.session, username='bar')
         self.assertEqual(None, item)
 
     def test_search_user_email(self):
-        """ Test the search_user of progit.lib. """
+        """ Test the search_user of pagure.lib. """
 
         # Retrieve user by email
-        item = progit.lib.search_user(self.session, email='foo@foo.com')
+        item = pagure.lib.search_user(self.session, email='foo@foo.com')
         self.assertEqual(None, item)
 
-        item = progit.lib.search_user(self.session, email='foo@bar.com')
+        item = pagure.lib.search_user(self.session, email='foo@bar.com')
         self.assertEqual('foo', item.user)
         self.assertEqual('foo', item.username)
         self.assertEqual([], item.groups)
         self.assertEqual(
             ['foo@bar.com'], [email.email for email in item.emails])
 
-        item = progit.lib.search_user(self.session, email='foo@pingou.com')
+        item = pagure.lib.search_user(self.session, email='foo@pingou.com')
         self.assertEqual('pingou', item.user)
         self.assertEqual(
             ['bar@pingou.com', 'foo@pingou.com'],
             [email.email for email in item.emails])
 
     def test_search_user_token(self):
-        """ Test the search_user of progit.lib. """
+        """ Test the search_user of pagure.lib. """
 
         # Retrieve user by token
-        item = progit.lib.search_user(self.session, token='aaa')
+        item = pagure.lib.search_user(self.session, token='aaa')
         self.assertEqual(None, item)
 
-        item = progit.lib.model.User(
+        item = pagure.lib.model.User(
             user='pingou2',
             fullname='PY C',
             token='aaabbb',
@@ -95,18 +95,18 @@ class ProgitLibtests(tests.Modeltests):
         self.session.add(item)
         self.session.commit()
 
-        item = progit.lib.search_user(self.session, token='aaabbb')
+        item = pagure.lib.search_user(self.session, token='aaabbb')
         self.assertEqual('pingou2', item.user)
         self.assertEqual('PY C', item.fullname)
 
     def test_search_user_pattern(self):
-        """ Test the search_user of progit.lib. """
+        """ Test the search_user of pagure.lib. """
 
         # Retrieve user by pattern
-        item = progit.lib.search_user(self.session, pattern='a*')
+        item = pagure.lib.search_user(self.session, pattern='a*')
         self.assertEqual([], item)
 
-        item = progit.lib.model.User(
+        item = pagure.lib.model.User(
             user='pingou2',
             fullname='PY C',
             token='aaabbb',
@@ -114,7 +114,7 @@ class ProgitLibtests(tests.Modeltests):
         self.session.add(item)
         self.session.commit()
 
-        items = progit.lib.search_user(self.session, pattern='p*')
+        items = pagure.lib.search_user(self.session, pattern='p*')
         self.assertEqual(2, len(items))
         self.assertEqual(1, items[0].id)
         self.assertEqual('pingou', items[0].user)
@@ -130,24 +130,24 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(
             [], [email.email for email in items[1].emails])
 
-    @patch('progit.lib.git.update_git')
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_new_issue(self, p_send_email, p_ugt):
-        """ Test the new_issue of progit.lib. """
+        """ Test the new_issue of pagure.lib. """
         p_send_email.return_value = True
         p_ugt.return_value = True
 
         tests.create_projects(self.session)
-        repo = progit.lib.get_project(self.session, 'test')
+        repo = pagure.lib.get_project(self.session, 'test')
 
         # Before
-        issues = progit.lib.search_issues(self.session, repo)
+        issues = pagure.lib.search_issues(self.session, repo)
         self.assertEqual(len(issues), 0)
 
         # See where it fails
         self.assertRaises(
-            progit.exceptions.ProgitException,
-            progit.lib.new_issue,
+            pagure.exceptions.PagureException,
+            pagure.lib.new_issue,
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -157,8 +157,8 @@ class ProgitLibtests(tests.Modeltests):
         )
 
         # Add an extra user to project `foo`
-        repo = progit.lib.get_project(self.session, 'test')
-        msg = progit.lib.add_user_to_project(
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.add_user_to_project(
             session=self.session,
             project=repo,
             user='foo',
@@ -167,7 +167,7 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(msg, 'User added')
 
         # Create issues to play with
-        msg = progit.lib.new_issue(
+        msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -178,7 +178,7 @@ class ProgitLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Issue created')
 
-        msg = progit.lib.new_issue(
+        msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #2',
@@ -191,29 +191,29 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(msg, 'Issue created')
 
         # After
-        issues = progit.lib.search_issues(self.session, repo)
+        issues = pagure.lib.search_issues(self.session, repo)
         self.assertEqual(len(issues), 2)
 
-    @patch('progit.lib.git.update_git')
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_edit_issue(self, p_send_email, p_ugt):
-        """ Test the edit_issue of progit.lib. """
+        """ Test the edit_issue of pagure.lib. """
         p_send_email.return_value = True
         p_ugt.return_value = True
 
         self.test_new_issue()
-        repo = progit.lib.get_project(self.session, 'test')
-        issue = progit.lib.search_issues(self.session, repo, issueid=2)
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
 
         # Edit the issue
-        msg = progit.lib.edit_issue(
+        msg = pagure.lib.edit_issue(
             session=self.session,
             issue=issue,
             ticketfolder=None)
         self.session.commit()
         self.assertEqual(msg, None)
 
-        msg = progit.lib.edit_issue(
+        msg = pagure.lib.edit_issue(
             session=self.session,
             issue=issue,
             ticketfolder=None,
@@ -224,7 +224,7 @@ class ProgitLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, None)
 
-        msg = progit.lib.edit_issue(
+        msg = pagure.lib.edit_issue(
             session=self.session,
             issue=issue,
             ticketfolder=None,
@@ -236,17 +236,17 @@ class ProgitLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Edited successfully issue #2')
 
-    @patch('progit.lib.git.update_git')
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_add_issue_dependency(self, p_send_email, p_ugt):
-        """ Test the add_issue_dependency of progit.lib. """
+        """ Test the add_issue_dependency of pagure.lib. """
         p_send_email.return_value = True
         p_ugt.return_value = True
 
         self.test_new_issue()
-        repo = progit.lib.get_project(self.session, 'test')
-        issue = progit.lib.search_issues(self.session, repo, issueid=1)
-        issue_blocked = progit.lib.search_issues(
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        issue_blocked = pagure.lib.search_issues(
             self.session, repo, issueid=2)
 
         # Before
@@ -256,15 +256,15 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(issue_blocked.children, [])
 
         self.assertRaises(
-            progit.exceptions.ProgitException,
-            progit.lib.add_issue_dependency,
+            pagure.exceptions.PagureException,
+            pagure.lib.add_issue_dependency,
             session=self.session,
             issue=issue,
             issue_blocked=issue,
             user='pingou',
             ticketfolder=None)
 
-        msg = progit.lib.add_issue_dependency(
+        msg = pagure.lib.add_issue_dependency(
             session=self.session,
             issue=issue,
             issue_blocked=issue_blocked,
@@ -284,19 +284,19 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(len(issue_blocked.children), 1)
         self.assertEqual(issue_blocked.children[0].id, 1)
 
-    @patch('progit.lib.git.update_git')
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_add_issue_tag(self, p_send_email, p_ugt):
-        """ Test the add_issue_tag of progit.lib. """
+        """ Test the add_issue_tag of pagure.lib. """
         p_send_email.return_value = True
         p_ugt.return_value = True
 
         self.test_edit_issue()
-        repo = progit.lib.get_project(self.session, 'test')
-        issue = progit.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 
         # Add a tag to the issue
-        msg = progit.lib.add_issue_tag(
+        msg = pagure.lib.add_issue_tag(
             session=self.session,
             issue=issue,
             tag='tag1',
@@ -307,41 +307,41 @@ class ProgitLibtests(tests.Modeltests):
 
         # Try a second time
         self.assertRaises(
-            progit.exceptions.ProgitException,
-            progit.lib.add_issue_tag,
+            pagure.exceptions.PagureException,
+            pagure.lib.add_issue_tag,
             session=self.session,
             issue=issue,
             tag='tag1',
             user='pingou',
             ticketfolder=None)
 
-        issues = progit.lib.search_issues(self.session, repo, tags='tag1')
+        issues = pagure.lib.search_issues(self.session, repo, tags='tag1')
         self.assertEqual(len(issues), 1)
         self.assertEqual(issues[0].id, 1)
         self.assertEqual(issues[0].project_id, 1)
         self.assertEqual(issues[0].status, 'Open')
         self.assertEqual([tag.tag for tag in issues[0].tags], ['tag1'])
 
-    @patch('progit.lib.git.update_git')
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_remove_tags(self, p_send_email, p_ugt):
-        """ Test the remove_tags of progit.lib. """
+        """ Test the remove_tags of pagure.lib. """
         p_send_email.return_value = True
         p_ugt.return_value = True
 
         self.test_add_issue_tag()
-        repo = progit.lib.get_project(self.session, 'test')
-        issue = progit.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 
         self.assertRaises(
-            progit.exceptions.ProgitException,
-            progit.lib.remove_tags,
+            pagure.exceptions.PagureException,
+            pagure.lib.remove_tags,
             session=self.session,
             project=repo,
             tags='foo',
             ticketfolder=None)
 
-        msgs = progit.lib.remove_tags(
+        msgs = pagure.lib.remove_tags(
             session=self.session,
             project=repo,
             tags='tag1',
@@ -349,18 +349,18 @@ class ProgitLibtests(tests.Modeltests):
 
         self.assertEqual(msgs, [u'Removed tag: tag1'])
 
-    @patch('progit.lib.git.update_git')
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_remove_tags_issue(self, p_send_email, p_ugt):
-        """ Test the remove_tags_issue of progit.lib. """
+        """ Test the remove_tags_issue of pagure.lib. """
         p_send_email.return_value = True
         p_ugt.return_value = True
 
         self.test_add_issue_tag()
-        repo = progit.lib.get_project(self.session, 'test')
-        issue = progit.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 
-        msgs = progit.lib.remove_tags_issue(
+        msgs = pagure.lib.remove_tags_issue(
             session=self.session,
             issue=issue,
             tags='tag1',
@@ -368,20 +368,20 @@ class ProgitLibtests(tests.Modeltests):
 
         self.assertEqual(msgs, [u'Removed tag: tag1'])
 
-    @patch('progit.lib.git.update_git')
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_edit_issue_tags(self, p_send_email, p_ugt):
-        """ Test the edit_issue_tags of progit.lib. """
+        """ Test the edit_issue_tags of pagure.lib. """
         p_send_email.return_value = True
         p_ugt.return_value = True
 
         self.test_add_issue_tag()
-        repo = progit.lib.get_project(self.session, 'test')
-        issue = progit.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 
         self.assertRaises(
-            progit.exceptions.ProgitException,
-            progit.lib.edit_issue_tags,
+            pagure.exceptions.PagureException,
+            pagure.lib.edit_issue_tags,
             session=self.session,
             project=repo,
             old_tag='foo',
@@ -389,7 +389,7 @@ class ProgitLibtests(tests.Modeltests):
             ticketfolder=None,
         )
 
-        msgs = progit.lib.edit_issue_tags(
+        msgs = pagure.lib.edit_issue_tags(
             session=self.session,
             project=repo,
             old_tag='tag1',
@@ -400,8 +400,8 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(msgs, ['Edited tag: tag1 to tag2'])
 
         self.assertRaises(
-            progit.exceptions.ProgitException,
-            progit.lib.edit_issue_tags,
+            pagure.exceptions.PagureException,
+            pagure.lib.edit_issue_tags,
             session=self.session,
             project=repo,
             old_tag='tag2',
@@ -409,18 +409,18 @@ class ProgitLibtests(tests.Modeltests):
             ticketfolder=None,
         )
 
-    @patch('progit.lib.git.update_git')
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_search_issues(self, p_send_email, p_ugt):
-        """ Test the search_issues of progit.lib. """
+        """ Test the search_issues of pagure.lib. """
         p_send_email.return_value = True
         p_ugt.return_value = True
 
         self.test_edit_issue()
-        repo = progit.lib.get_project(self.session, 'test')
+        repo = pagure.lib.get_project(self.session, 'test')
 
         # All issues
-        issues = progit.lib.search_issues(self.session, repo)
+        issues = pagure.lib.search_issues(self.session, repo)
         self.assertEqual(len(issues), 2)
         self.assertEqual(issues[0].id, 1)
         self.assertEqual(issues[0].project_id, 1)
@@ -432,7 +432,7 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(issues[1].tags, [])
 
         # Issues by status
-        issues = progit.lib.search_issues(
+        issues = pagure.lib.search_issues(
             self.session, repo, status='Invalid')
         self.assertEqual(len(issues), 1)
         self.assertEqual(issues[0].id, 2)
@@ -441,7 +441,7 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(issues[0].tags, [])
 
         # Issues closed
-        issues = progit.lib.search_issues(
+        issues = pagure.lib.search_issues(
             self.session, repo, closed=True)
         self.assertEqual(len(issues), 1)
         self.assertEqual(issues[0].id, 2)
@@ -450,19 +450,19 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(issues[0].tags, [])
 
         # Issues by tag
-        issues = progit.lib.search_issues(self.session, repo, tags='foo')
+        issues = pagure.lib.search_issues(self.session, repo, tags='foo')
         self.assertEqual(len(issues), 0)
-        issues = progit.lib.search_issues(self.session, repo, tags='!foo')
+        issues = pagure.lib.search_issues(self.session, repo, tags='!foo')
         self.assertEqual(len(issues), 2)
 
         # Issue by id
-        issue = progit.lib.search_issues(self.session, repo, issueid=1)
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.title, 'Test issue')
         self.assertEqual(issue.user.user, 'pingou')
         self.assertEqual(issue.tags, [])
 
         # Issues by authors
-        issues = progit.lib.search_issues(self.session, repo, author='foo')
+        issues = pagure.lib.search_issues(self.session, repo, author='foo')
         self.assertEqual(len(issues), 1)
         self.assertEqual(issues[0].id, 2)
         self.assertEqual(issues[0].project_id, 1)
@@ -470,34 +470,34 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(issues[0].tags, [])
 
         # Issues by assignee
-        issues = progit.lib.search_issues(self.session, repo, assignee='foo')
+        issues = pagure.lib.search_issues(self.session, repo, assignee='foo')
         self.assertEqual(len(issues), 0)
-        issues = progit.lib.search_issues(self.session, repo, assignee='!foo')
+        issues = pagure.lib.search_issues(self.session, repo, assignee='!foo')
         self.assertEqual(len(issues), 2)
 
-        issues = progit.lib.search_issues(self.session, repo, private='foo')
+        issues = pagure.lib.search_issues(self.session, repo, private='foo')
         self.assertEqual(len(issues), 2)
 
-    @patch('progit.lib.git.update_git')
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_add_issue_assignee(self, p_send_email, p_ugt):
-        """ Test the add_issue_assignee of progit.lib. """
+        """ Test the add_issue_assignee of pagure.lib. """
         p_send_email.return_value = True
         p_ugt.return_value = True
 
         self.test_new_issue()
-        repo = progit.lib.get_project(self.session, 'test')
-        issue = progit.lib.search_issues(self.session, repo, issueid=2)
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
 
         # Before
-        issues = progit.lib.search_issues(
+        issues = pagure.lib.search_issues(
             self.session, repo, assignee='pingou')
         self.assertEqual(len(issues), 0)
 
         # Test when it fails
         self.assertRaises(
-            progit.exceptions.ProgitException,
-            progit.lib.add_issue_assignee,
+            pagure.exceptions.PagureException,
+            pagure.lib.add_issue_assignee,
             session=self.session,
             issue=issue,
             assignee='foo@foobar.com',
@@ -506,8 +506,8 @@ class ProgitLibtests(tests.Modeltests):
         )
 
         self.assertRaises(
-            progit.exceptions.ProgitException,
-            progit.lib.add_issue_assignee,
+            pagure.exceptions.PagureException,
+            pagure.lib.add_issue_assignee,
             session=self.session,
             issue=issue,
             assignee='foo@bar.com',
@@ -516,7 +516,7 @@ class ProgitLibtests(tests.Modeltests):
         )
 
         # Set the assignee by its email
-        msg = progit.lib.add_issue_assignee(
+        msg = pagure.lib.add_issue_assignee(
             session=self.session,
             issue=issue,
             assignee='foo@bar.com',
@@ -526,7 +526,7 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(msg, 'Issue assigned')
 
         # Change the assignee to someone else by its username
-        msg = progit.lib.add_issue_assignee(
+        msg = pagure.lib.add_issue_assignee(
             session=self.session,
             issue=issue,
             assignee='pingou',
@@ -536,7 +536,7 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(msg, 'Issue assigned')
 
         # After  -- Searches by assignee
-        issues = progit.lib.search_issues(
+        issues = pagure.lib.search_issues(
             self.session, repo, assignee='pingou')
         self.assertEqual(len(issues), 1)
         self.assertEqual(issues[0].id, 2)
@@ -544,7 +544,7 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(issues[0].status, 'Open')
         self.assertEqual(issues[0].tags, [])
 
-        issues = progit.lib.search_issues(
+        issues = pagure.lib.search_issues(
             self.session, repo, assignee=True)
         self.assertEqual(len(issues), 1)
         self.assertEqual(issues[0].id, 2)
@@ -553,7 +553,7 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(issues[0].status, 'Open')
         self.assertEqual(issues[0].tags, [])
 
-        issues = progit.lib.search_issues(
+        issues = pagure.lib.search_issues(
             self.session, repo, assignee=False)
         self.assertEqual(len(issues), 1)
         self.assertEqual(issues[0].id, 1)
@@ -563,7 +563,7 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(issues[0].tags, [])
 
         # Reset the assignee to no-one
-        msg = progit.lib.add_issue_assignee(
+        msg = pagure.lib.add_issue_assignee(
             session=self.session,
             issue=issue,
             assignee=None,
@@ -572,33 +572,33 @@ class ProgitLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Assignee reset')
 
-        issues = progit.lib.search_issues(
+        issues = pagure.lib.search_issues(
             self.session, repo, assignee=False)
         self.assertEqual(len(issues), 2)
         self.assertEqual(issues[0].id, 1)
         self.assertEqual(issues[1].id, 2)
 
-        issues = progit.lib.search_issues(
+        issues = pagure.lib.search_issues(
             self.session, repo, assignee=True)
         self.assertEqual(len(issues), 0)
 
-    @patch('progit.lib.git.update_git')
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_add_issue_comment(self, p_send_email, p_ugt):
-        """ Test the add_issue_comment of progit.lib. """
+        """ Test the add_issue_comment of pagure.lib. """
         p_send_email.return_value = True
         p_ugt.return_value = True
 
         tests.create_projects(self.session)
         self.test_new_issue()
-        repo = progit.lib.get_project(self.session, 'test')
+        repo = pagure.lib.get_project(self.session, 'test')
 
         # Before
-        issue = progit.lib.search_issues(self.session, repo, issueid=1)
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 0)
 
         # Set the assignee by its email
-        msg = progit.lib.add_issue_assignee(
+        msg = pagure.lib.add_issue_assignee(
             session=self.session,
             issue=issue,
             assignee='foo@bar.com',
@@ -608,7 +608,7 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(msg, 'Issue assigned')
 
         # Add a comment to that issue
-        msg = progit.lib.add_issue_comment(
+        msg = pagure.lib.add_issue_comment(
             session=self.session,
             issue=issue,
             comment='Hey look a comment!',
@@ -619,32 +619,32 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(msg, 'Comment added')
 
         # After
-        issue = progit.lib.search_issues(self.session, repo, issueid=1)
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 1)
         self.assertEqual(issue.comments[0].comment, 'Hey look a comment!')
         self.assertEqual(issue.comments[0].user.user, 'foo')
 
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.notify.send_email')
     def test_add_user_to_project(self, p_send_email):
-        """ Test the add_user_to_project of progit.lib. """
+        """ Test the add_user_to_project of pagure.lib. """
         p_send_email.return_value = True
 
         tests.create_projects(self.session)
 
         # Before
-        repo = progit.lib.get_project(self.session, 'test')
+        repo = pagure.lib.get_project(self.session, 'test')
         self.assertEqual(len(repo.users), 0)
 
         # Add an user to a project
         self.assertRaises(
-            progit.exceptions.ProgitException,
-            progit.lib.add_user_to_project,
+            pagure.exceptions.PagureException,
+            pagure.lib.add_user_to_project,
             session=self.session,
             project=repo,
             user='foobar',
         )
 
-        msg = progit.lib.add_user_to_project(
+        msg = pagure.lib.add_user_to_project(
             session=self.session,
             project=repo,
             user='foo',
@@ -653,12 +653,12 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(msg, 'User added')
 
         # After
-        repo = progit.lib.get_project(self.session, 'test')
+        repo = pagure.lib.get_project(self.session, 'test')
         self.assertEqual(len(repo.users), 1)
         self.assertEqual(repo.users[0].user, 'foo')
 
     def test_new_project(self):
-        """ Test the new_project of progit.lib. """
+        """ Test the new_project of pagure.lib. """
         gitfolder = os.path.join(self.path, 'repos')
         docfolder = os.path.join(self.path, 'docs')
         ticketfolder = os.path.join(self.path, 'tickets')
@@ -670,7 +670,7 @@ class ProgitLibtests(tests.Modeltests):
         os.mkdir(requestfolder)
 
         # Create a new project
-        msg = progit.lib.new_project(
+        msg = pagure.lib.new_project(
             session=self.session,
             user='pingou',
             name='testproject',
@@ -684,7 +684,7 @@ class ProgitLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Project "testproject" created')
 
-        repo = progit.lib.get_project(self.session, 'testproject')
+        repo = pagure.lib.get_project(self.session, 'testproject')
         self.assertEqual(repo.path, 'testproject.git')
 
         gitrepo = os.path.join(gitfolder, repo.path)
@@ -699,8 +699,8 @@ class ProgitLibtests(tests.Modeltests):
 
         # Try re-creating it but all repos are existing
         self.assertRaises(
-            progit.exceptions.ProgitException,
-            progit.lib.new_project,
+            pagure.exceptions.PagureException,
+            pagure.lib.new_project,
             session=self.session,
             user='pingou',
             name='testproject',
@@ -721,8 +721,8 @@ class ProgitLibtests(tests.Modeltests):
         # Drop the main git repo and try again
         shutil.rmtree(gitrepo)
         self.assertRaises(
-            progit.exceptions.ProgitException,
-            progit.lib.new_project,
+            pagure.exceptions.PagureException,
+            pagure.lib.new_project,
             session=self.session,
             user='pingou',
             name='testproject',
@@ -743,8 +743,8 @@ class ProgitLibtests(tests.Modeltests):
         # Drop the doc repo and try again
         shutil.rmtree(docrepo)
         self.assertRaises(
-            progit.exceptions.ProgitException,
-            progit.lib.new_project,
+            pagure.exceptions.PagureException,
+            pagure.lib.new_project,
             session=self.session,
             user='pingou',
             name='testproject',
@@ -764,8 +764,8 @@ class ProgitLibtests(tests.Modeltests):
         # Drop the request repo and try again
         shutil.rmtree(ticketrepo)
         self.assertRaises(
-            progit.exceptions.ProgitException,
-            progit.lib.new_project,
+            pagure.exceptions.PagureException,
+            pagure.lib.new_project,
             session=self.session,
             user='pingou',
             name='testproject',
@@ -783,16 +783,16 @@ class ProgitLibtests(tests.Modeltests):
         self.assertTrue(os.path.exists(requestrepo))
 
     def test_update_project_settings(self):
-        """ Test the update_project_settings of progit.lib. """
+        """ Test the update_project_settings of pagure.lib. """
 
         tests.create_projects(self.session)
 
         # Before
-        repo = progit.lib.get_project(self.session, 'test2')
+        repo = pagure.lib.get_project(self.session, 'test2')
         self.assertTrue(repo.issue_tracker)
         self.assertTrue(repo.project_docs)
 
-        msg = progit.lib.update_project_settings(
+        msg = pagure.lib.update_project_settings(
             session=self.session,
             repo=repo,
             issue_tracker=True,
@@ -800,7 +800,7 @@ class ProgitLibtests(tests.Modeltests):
         )
         self.assertEqual(msg, 'No settings to change')
 
-        msg = progit.lib.update_project_settings(
+        msg = pagure.lib.update_project_settings(
             session=self.session,
             repo=repo,
             issue_tracker=False,
@@ -809,44 +809,44 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(msg, 'Edited successfully settings of repo: test2')
 
         # After
-        repo = progit.lib.get_project(self.session, 'test2')
+        repo = pagure.lib.get_project(self.session, 'test2')
         self.assertFalse(repo.issue_tracker)
         self.assertFalse(repo.project_docs)
 
     def test_search_projects(self):
-        """ Test the search_projects of progit.lib. """
+        """ Test the search_projects of pagure.lib. """
         tests.create_projects(self.session)
 
-        projects = progit.lib.search_projects(self.session)
+        projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 2)
         self.assertEqual(projects[0].id, 1)
         self.assertEqual(projects[1].id, 2)
 
-        projects = progit.lib.search_projects(self.session, username='foo')
+        projects = pagure.lib.search_projects(self.session, username='foo')
         self.assertEqual(len(projects), 0)
 
-        projects = progit.lib.search_projects(self.session, username='pingou')
+        projects = pagure.lib.search_projects(self.session, username='pingou')
         self.assertEqual(len(projects), 2)
         self.assertEqual(projects[0].id, 1)
         self.assertEqual(projects[1].id, 2)
 
-        projects = progit.lib.search_projects(self.session, start=1)
+        projects = pagure.lib.search_projects(self.session, start=1)
         self.assertEqual(len(projects), 1)
         self.assertEqual(projects[0].id, 2)
 
-        projects = progit.lib.search_projects(self.session, limit=1)
+        projects = pagure.lib.search_projects(self.session, limit=1)
         self.assertEqual(len(projects), 1)
         self.assertEqual(projects[0].id, 1)
 
-        projects = progit.lib.search_projects(self.session, count=True)
+        projects = pagure.lib.search_projects(self.session, count=True)
         self.assertEqual(projects, 2)
 
     def test_search_project_forked(self):
-        """ Test the search_project for forked projects in progit.lib. """
+        """ Test the search_project for forked projects in pagure.lib. """
         tests.create_projects(self.session)
 
         # Create two forked repo
-        item = progit.lib.model.Project(
+        item = pagure.lib.model.Project(
             user_id=2,  # foo
             name='test',
             description='test project #1',
@@ -854,7 +854,7 @@ class ProgitLibtests(tests.Modeltests):
         )
         self.session.add(item)
 
-        item = progit.lib.model.Project(
+        item = pagure.lib.model.Project(
             user_id=2,  # foo
             name='test2',
             description='test project #2',
@@ -863,46 +863,46 @@ class ProgitLibtests(tests.Modeltests):
         self.session.add(item)
 
         # Since we have two forks, let's search them
-        projects = progit.lib.search_projects(self.session, fork=True)
+        projects = pagure.lib.search_projects(self.session, fork=True)
         self.assertEqual(len(projects), 2)
-        projects = progit.lib.search_projects(self.session, fork=False)
+        projects = pagure.lib.search_projects(self.session, fork=False)
         self.assertEqual(len(projects), 2)
 
     def test_get_tags_of_project(self):
-        """ Test the get_tags_of_project of progit.lib. """
+        """ Test the get_tags_of_project of pagure.lib. """
 
         self.test_add_issue_tag()
-        repo = progit.lib.get_project(self.session, 'test')
+        repo = pagure.lib.get_project(self.session, 'test')
 
-        tags = progit.lib.get_tags_of_project(self.session, repo)
+        tags = pagure.lib.get_tags_of_project(self.session, repo)
         self.assertEqual([tag.tag for tag in tags], ['tag1'])
 
-        tags = progit.lib.get_tags_of_project(
+        tags = pagure.lib.get_tags_of_project(
             self.session, repo, pattern='T*')
         self.assertEqual([tag.tag for tag in tags], ['tag1'])
 
-        repo = progit.lib.get_project(self.session, 'test2')
+        repo = pagure.lib.get_project(self.session, 'test2')
 
-        tags = progit.lib.get_tags_of_project(self.session, repo)
+        tags = pagure.lib.get_tags_of_project(self.session, repo)
         self.assertEqual([tag.tag for tag in tags], [])
 
     def test_get_issue_statuses(self):
-        """ Test the get_issue_statuses of progit.lib. """
-        statuses = progit.lib.get_issue_statuses(self.session)
+        """ Test the get_issue_statuses of pagure.lib. """
+        statuses = pagure.lib.get_issue_statuses(self.session)
         self.assertEqual(
             statuses, ['Open', 'Invalid', 'Insufficient data', 'Fixed'])
 
     def test_set_up_user(self):
-        """ Test the set_up_user of progit.lib. """
+        """ Test the set_up_user of pagure.lib. """
 
-        items = progit.lib.search_user(self.session)
+        items = pagure.lib.search_user(self.session)
         self.assertEqual(2, len(items))
         self.assertEqual(1, items[0].id)
         self.assertEqual('pingou', items[0].user)
         self.assertEqual(2, items[1].id)
         self.assertEqual('foo', items[1].user)
 
-        progit.lib.set_up_user(
+        pagure.lib.set_up_user(
             session=self.session,
             username='skvidal',
             fullname='Seth',
@@ -910,7 +910,7 @@ class ProgitLibtests(tests.Modeltests):
         )
         self.session.commit()
 
-        items = progit.lib.search_user(self.session)
+        items = pagure.lib.search_user(self.session)
         self.assertEqual(3, len(items))
         self.assertEqual(1, items[0].id)
         self.assertEqual('pingou', items[0].user)
@@ -923,7 +923,7 @@ class ProgitLibtests(tests.Modeltests):
             ['skvidal@fp.o'], [email.email for email in items[2].emails])
 
         # Add the user a second time
-        progit.lib.set_up_user(
+        pagure.lib.set_up_user(
             session=self.session,
             username='skvidal',
             fullname='Seth V',
@@ -931,7 +931,7 @@ class ProgitLibtests(tests.Modeltests):
         )
         self.session.commit()
         # Nothing changed
-        items = progit.lib.search_user(self.session)
+        items = pagure.lib.search_user(self.session)
         self.assertEqual(3, len(items))
         self.assertEqual('skvidal', items[2].user)
         self.assertEqual('Seth V', items[2].fullname)
@@ -939,7 +939,7 @@ class ProgitLibtests(tests.Modeltests):
             ['skvidal@fp.o'], [email.email for email in items[2].emails])
 
         # Add the user a third time with a different email
-        progit.lib.set_up_user(
+        pagure.lib.set_up_user(
             session=self.session,
             username='skvidal',
             fullname='Seth',
@@ -947,7 +947,7 @@ class ProgitLibtests(tests.Modeltests):
         )
         self.session.commit()
         # Email added
-        items = progit.lib.search_user(self.session)
+        items = pagure.lib.search_user(self.session)
         self.assertEqual(3, len(items))
         self.assertEqual('skvidal', items[2].user)
         self.assertEqual(
@@ -955,24 +955,24 @@ class ProgitLibtests(tests.Modeltests):
             [email.email for email in items[2].emails])
 
     def test_update_user_ssh(self):
-        """ Test the update_user_ssh of progit.lib. """
+        """ Test the update_user_ssh of pagure.lib. """
 
         # Before
-        user = progit.lib.search_user(self.session, username='foo')
+        user = pagure.lib.search_user(self.session, username='foo')
         self.assertEqual(user.public_ssh_key, None)
 
-        msg = progit.lib.update_user_ssh(self.session, user, 'blah')
+        msg = pagure.lib.update_user_ssh(self.session, user, 'blah')
         self.assertEqual(msg, 'Public ssh key updated')
 
-        msg = progit.lib.update_user_ssh(self.session, user, 'blah')
+        msg = pagure.lib.update_user_ssh(self.session, user, 'blah')
         self.assertEqual(msg, 'Nothing to update')
 
-        msg = progit.lib.update_user_ssh(self.session, 'foo', None)
+        msg = pagure.lib.update_user_ssh(self.session, 'foo', None)
         self.assertEqual(msg, 'Public ssh key updated')
 
     def test_avatar_url(self):
-        """ Test the avatar_url of progit.lib. """
-        output = progit.lib.avatar_url('pingou')
+        """ Test the avatar_url of pagure.lib. """
+        output = pagure.lib.avatar_url('pingou')
         self.assertEqual(
             output,
             'https://seccdn.libravatar.org/avatar/'
@@ -980,7 +980,7 @@ class ProgitLibtests(tests.Modeltests):
             '?s=64&d=retro')
 
     def test_fork_project(self):
-        """ Test the fork_project of progit.lib. """
+        """ Test the fork_project of pagure.lib. """
         gitfolder = os.path.join(self.path, 'repos')
         docfolder = os.path.join(self.path, 'docs')
         ticketfolder = os.path.join(self.path, 'tickets')
@@ -991,11 +991,11 @@ class ProgitLibtests(tests.Modeltests):
         os.mkdir(docfolder)
         os.mkdir(ticketfolder)
 
-        projects = progit.lib.search_projects(self.session)
+        projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 0)
 
         # Create a new project
-        msg = progit.lib.new_project(
+        msg = pagure.lib.new_project(
             session=self.session,
             user='pingou',
             name='testproject',
@@ -1009,10 +1009,10 @@ class ProgitLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Project "testproject" created')
 
-        projects = progit.lib.search_projects(self.session)
+        projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 1)
 
-        repo = progit.lib.get_project(self.session, 'testproject')
+        repo = pagure.lib.get_project(self.session, 'testproject')
         gitrepo = os.path.join(gitfolder, repo.path)
         docrepo = os.path.join(docfolder, repo.path)
         ticketrepo = os.path.join(ticketfolder, repo.path)
@@ -1027,8 +1027,8 @@ class ProgitLibtests(tests.Modeltests):
 
         # Cannot fail your own project
         self.assertRaises(
-            progit.exceptions.ProgitException,
-            progit.lib.fork_project,
+            pagure.exceptions.PagureException,
+            pagure.lib.fork_project,
             session=self.session,
             user='pingou',
             repo=repo,
@@ -1044,8 +1044,8 @@ class ProgitLibtests(tests.Modeltests):
         grepo = '%s.git' % os.path.join(forkfolder, 'foo', 'testproject')
         os.makedirs(grepo)
         self.assertRaises(
-            progit.exceptions.ProgitException,
-            progit.lib.fork_project,
+            pagure.exceptions.PagureException,
+            pagure.lib.fork_project,
             session=self.session,
             user='foo',
             repo=repo,
@@ -1062,8 +1062,8 @@ class ProgitLibtests(tests.Modeltests):
         grepo = '%s.git' % os.path.join(docfolder, 'foo', 'testproject')
         os.makedirs(grepo)
         self.assertRaises(
-            progit.exceptions.ProgitException,
-            progit.lib.fork_project,
+            pagure.exceptions.PagureException,
+            pagure.lib.fork_project,
             session=self.session,
             user='foo',
             repo=repo,
@@ -1080,8 +1080,8 @@ class ProgitLibtests(tests.Modeltests):
         grepo = '%s.git' % os.path.join(ticketfolder, 'foo', 'testproject')
         os.makedirs(grepo)
         self.assertRaises(
-            progit.exceptions.ProgitException,
-            progit.lib.fork_project,
+            pagure.exceptions.PagureException,
+            pagure.lib.fork_project,
             session=self.session,
             user='foo',
             repo=repo,
@@ -1098,8 +1098,8 @@ class ProgitLibtests(tests.Modeltests):
         grepo = '%s.git' % os.path.join(requestfolder, 'foo', 'testproject')
         os.makedirs(grepo)
         self.assertRaises(
-            progit.exceptions.ProgitException,
-            progit.lib.fork_project,
+            pagure.exceptions.PagureException,
+            pagure.lib.fork_project,
             session=self.session,
             user='foo',
             repo=repo,
@@ -1112,12 +1112,12 @@ class ProgitLibtests(tests.Modeltests):
         self.session.rollback()
         shutil.rmtree(grepo)
 
-        projects = progit.lib.search_projects(self.session)
+        projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 1)
 
         # Fork worked
 
-        msg = progit.lib.fork_project(
+        msg = pagure.lib.fork_project(
             session=self.session,
             user='foo',
             repo=repo,
@@ -1131,15 +1131,15 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(
             msg, 'Repo "testproject" cloned to "foo/testproject"')
 
-        projects = progit.lib.search_projects(self.session)
+        projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 2)
 
         # Fork a fork
 
-        repo = progit.lib.get_project(
+        repo = pagure.lib.get_project(
             self.session, 'testproject', user='foo')
 
-        msg = progit.lib.fork_project(
+        msg = pagure.lib.fork_project(
             session=self.session,
             user='pingou',
             repo=repo,
@@ -1153,15 +1153,15 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(
             msg, 'Repo "testproject" cloned to "pingou/testproject"')
 
-        projects = progit.lib.search_projects(self.session)
+        projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 3)
 
     def test_new_pull_request(self):
-        """ test new_pull_request of progit.lib. """
+        """ test new_pull_request of pagure.lib. """
         tests.create_projects(self.session)
 
         # Create a forked repo
-        item = progit.lib.model.Project(
+        item = pagure.lib.model.Project(
             user_id=1,  # pingou
             name='test',
             description='test project #1',
@@ -1171,8 +1171,8 @@ class ProgitLibtests(tests.Modeltests):
         self.session.add(item)
 
         # Add an extra user to project `foo`
-        repo = progit.lib.get_project(self.session, 'test')
-        msg = progit.lib.add_user_to_project(
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.add_user_to_project(
             session=self.session,
             project=repo,
             user='foo',
@@ -1180,11 +1180,11 @@ class ProgitLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'User added')
 
-        repo = progit.lib.get_project(self.session, 'test')
-        forked_repo = progit.lib.get_project(
+        repo = pagure.lib.get_project(self.session, 'test')
+        forked_repo = pagure.lib.get_project(
             self.session, 'test', user='pingou')
 
-        msg = progit.lib.new_pull_request(
+        msg = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
             branch_from='master',
@@ -1197,13 +1197,13 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(msg, 'Request created')
 
     def test_add_pull_request_comment(self):
-        """ Test add_pull_request_comment of progit.lib. """
+        """ Test add_pull_request_comment of pagure.lib. """
 
         self.test_new_pull_request()
 
-        request = progit.lib.search_pull_requests(self.session, requestid=1)
+        request = pagure.lib.search_pull_requests(self.session, requestid=1)
 
-        msg = progit.lib.add_pull_request_comment(
+        msg = pagure.lib.add_pull_request_comment(
             session=self.session,
             request=request,
             commit='commithash',
@@ -1216,43 +1216,43 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(msg, 'Comment added')
 
     def test_search_pull_requests(self):
-        """ Test search_pull_requests of progit.lib. """
+        """ Test search_pull_requests of pagure.lib. """
 
         self.test_new_pull_request()
 
-        prs = progit.lib.search_pull_requests(
+        prs = pagure.lib.search_pull_requests(
             session=self.session
         )
         self.assertEqual(len(prs), 1)
 
-        prs = progit.lib.search_pull_requests(
+        prs = pagure.lib.search_pull_requests(
             session=self.session,
             project_id=1
         )
         self.assertEqual(len(prs), 1)
 
-        prs = progit.lib.search_pull_requests(
+        prs = pagure.lib.search_pull_requests(
             session=self.session,
             project_id_from=3
         )
         self.assertEqual(len(prs), 1)
 
-        prs = progit.lib.search_pull_requests(
+        prs = pagure.lib.search_pull_requests(
             session=self.session,
             status=False
         )
         self.assertEqual(len(prs), 0)
 
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.notify.send_email')
     def test_close_pull_request(self, send_email):
-        """ Test close_pull_request of progit.lib. """
+        """ Test close_pull_request of pagure.lib. """
         send_email.return_value = True
 
         self.test_new_pull_request()
 
-        request = progit.lib.search_pull_requests(self.session, requestid=1)
+        request = pagure.lib.search_pull_requests(self.session, requestid=1)
 
-        progit.lib.close_pull_request(
+        pagure.lib.close_pull_request(
             session=self.session,
             request=request,
             user=tests.FakeUser(),
@@ -1261,7 +1261,7 @@ class ProgitLibtests(tests.Modeltests):
         )
         self.session.commit()
 
-        prs = progit.lib.search_pull_requests(
+        prs = pagure.lib.search_pull_requests(
             session=self.session,
             status=False
         )
@@ -1269,7 +1269,7 @@ class ProgitLibtests(tests.Modeltests):
 
         # Does not change much, just the notification sent
 
-        progit.lib.close_pull_request(
+        pagure.lib.close_pull_request(
             session=self.session,
             request=request,
             user=tests.FakeUser(),
@@ -1278,23 +1278,23 @@ class ProgitLibtests(tests.Modeltests):
         )
         self.session.commit()
 
-        prs = progit.lib.search_pull_requests(
+        prs = pagure.lib.search_pull_requests(
             session=self.session,
             status=False
         )
         self.assertEqual(len(prs), 1)
 
-    @patch('progit.lib.git.update_git')
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_remove_issue_dependency(self, p_send_email, p_ugt):
-        """ Test remove_issue_dependency of progit.lib. """
+        """ Test remove_issue_dependency of pagure.lib. """
         p_send_email.return_value = True
         p_ugt.return_value = True
 
         self.test_add_issue_dependency()
-        repo = progit.lib.get_project(self.session, 'test')
-        issue = progit.lib.search_issues(self.session, repo, issueid=1)
-        issue_blocked = progit.lib.search_issues(
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        issue_blocked = pagure.lib.search_issues(
             self.session, repo, issueid=2)
 
         # Before
@@ -1309,8 +1309,8 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(issue_blocked.children[0].id, 1)
 
         self.assertRaises(
-            progit.exceptions.ProgitException,
-            progit.lib.remove_issue_dependency,
+            pagure.exceptions.PagureException,
+            pagure.lib.remove_issue_dependency,
             session=self.session,
             issue=issue,
             issue_blocked=issue,
@@ -1318,7 +1318,7 @@ class ProgitLibtests(tests.Modeltests):
             ticketfolder=None)
 
         # Wrong order of issues
-        msg = progit.lib.remove_issue_dependency(
+        msg = pagure.lib.remove_issue_dependency(
             session=self.session,
             issue=issue,
             issue_blocked=issue_blocked,
@@ -1328,7 +1328,7 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(msg, None)
 
         # Drop deps
-        msg = progit.lib.remove_issue_dependency(
+        msg = pagure.lib.remove_issue_dependency(
             session=self.session,
             issue=issue_blocked,
             issue_blocked=issue,
@@ -1343,64 +1343,64 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(issue_blocked.parents, [])
         self.assertEqual(issue_blocked.children, [])
 
-    @patch('progit.lib.git.update_git')
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_get_issue_comment(self, p_send_email, p_ugt):
-        """ Test the get_issue_comment of progit.lib. """
+        """ Test the get_issue_comment of pagure.lib. """
         p_send_email.return_value = True
         p_ugt.return_value = True
 
         self.test_add_issue_comment()
 
-        repo = progit.lib.get_project(self.session, 'test')
-        issue = progit.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 
         self.assertEqual(
-            progit.lib.get_issue_comment(self.session, issue.uid, 10),
+            pagure.lib.get_issue_comment(self.session, issue.uid, 10),
             None
         )
 
-        comment = progit.lib.get_issue_comment(self.session, issue.uid, 1)
+        comment = pagure.lib.get_issue_comment(self.session, issue.uid, 1)
         self.assertEqual(comment.comment, 'Hey look a comment!')
 
-    @patch('progit.lib.git.update_git')
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_get_issue_by_uid(self, p_send_email, p_ugt):
-        """ Test the get_issue_by_uid of progit.lib. """
+        """ Test the get_issue_by_uid of pagure.lib. """
         p_send_email.return_value = True
         p_ugt.return_value = True
 
         self.test_new_issue()
 
-        repo = progit.lib.get_project(self.session, 'test')
-        issue = progit.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 
         self.assertEqual(
-            progit.lib.get_issue_by_uid(self.session, 'foobar'),
+            pagure.lib.get_issue_by_uid(self.session, 'foobar'),
             None
         )
 
-        new_issue = progit.lib.get_issue_by_uid(self.session, issue.uid)
+        new_issue = pagure.lib.get_issue_by_uid(self.session, issue.uid)
         self.assertEqual(issue, new_issue)
 
-    @patch('progit.lib.git.update_git')
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_update_tags_issue(self, p_send_email, p_ugt):
-        """ Test the update_tags_issue of progit.lib. """
+        """ Test the update_tags_issue of pagure.lib. """
         p_send_email.return_value = True
         p_ugt.return_value = True
 
         self.test_new_issue()
-        repo = progit.lib.get_project(self.session, 'test')
-        issue = progit.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 
         # before
         self.assertEqual(issue.tags_text, [])
 
-        messages = progit.lib.update_tags_issue(
+        messages = pagure.lib.update_tags_issue(
             self.session, issue, 'tag', 'pingou', ticketfolder=None)
         self.assertEqual(messages, ['Tag added'])
-        messages = progit.lib.update_tags_issue(
+        messages = pagure.lib.update_tags_issue(
             self.session, issue, ['tag2', 'tag3'], 'pingou',
             ticketfolder=None)
         self.assertEqual(
@@ -1409,19 +1409,19 @@ class ProgitLibtests(tests.Modeltests):
         # after
         self.assertEqual(issue.tags_text, ['tag2', 'tag3'])
 
-    @patch('progit.lib.git.update_git')
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_update_dependency_issue(self, p_send_email, p_ugt):
-        """ Test the update_dependency_issue of progit.lib. """
+        """ Test the update_dependency_issue of pagure.lib. """
         p_send_email.return_value = True
         p_ugt.return_value = True
 
         self.test_new_issue()
-        repo = progit.lib.get_project(self.session, 'test')
-        issue = progit.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 
         # Create issues to play with
-        msg = progit.lib.new_issue(
+        msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #3',
@@ -1438,10 +1438,10 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(issue.depends_text, [])
         self.assertEqual(issue.blocks_text, [])
 
-        messages = progit.lib.update_dependency_issue(
+        messages = pagure.lib.update_dependency_issue(
             self.session, repo, issue, '2', 'pingou', ticketfolder=None)
         self.assertEqual(messages, ['Dependency added'])
-        messages = progit.lib.update_dependency_issue(
+        messages = pagure.lib.update_dependency_issue(
             self.session, repo, issue, ['3', '4', 5], 'pingou',
             ticketfolder=None)
         self.assertEqual(
@@ -1452,19 +1452,19 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(issue.depends_text, [3])
         self.assertEqual(issue.blocks_text, [])
 
-    @patch('progit.lib.git.update_git')
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_update_blocked_issue(self, p_send_email, p_ugt):
-        """ Test the update_blocked_issue of progit.lib. """
+        """ Test the update_blocked_issue of pagure.lib. """
         p_send_email.return_value = True
         p_ugt.return_value = True
 
         self.test_new_issue()
-        repo = progit.lib.get_project(self.session, 'test')
-        issue = progit.lib.search_issues(self.session, repo, issueid=1)
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 
         # Create issues to play with
-        msg = progit.lib.new_issue(
+        msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue #3',
@@ -1481,10 +1481,10 @@ class ProgitLibtests(tests.Modeltests):
         self.assertEqual(issue.depends_text, [])
         self.assertEqual(issue.blocks_text, [])
 
-        messages = progit.lib.update_blocked_issue(
+        messages = pagure.lib.update_blocked_issue(
             self.session, repo, issue, '2', 'pingou', ticketfolder=None)
         self.assertEqual(messages, ['Dependency added'])
-        messages = progit.lib.update_blocked_issue(
+        messages = pagure.lib.update_blocked_issue(
             self.session, repo, issue, ['3', '4', 5], 'pingou',
             ticketfolder=None)
         self.assertEqual(
@@ -1497,5 +1497,5 @@ class ProgitLibtests(tests.Modeltests):
 
 
 if __name__ == '__main__':
-    SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibtests)
+    SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibtests)
     unittest.TextTestRunner(verbosity=2).run(SUITE)

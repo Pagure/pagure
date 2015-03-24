@@ -23,43 +23,43 @@ from mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import progit.lib
+import pagure.lib
 import tests
 
 
-class ProgitFlaskPluginProgitTicketHooktests(tests.Modeltests):
-    """ Tests for progit_hook plugin of progit """
+class PagureFlaskPluginPagureTicketHooktests(tests.Modeltests):
+    """ Tests for pagure_hook plugin of pagure """
 
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
-        super(ProgitFlaskPluginProgitTicketHooktests, self).setUp()
+        super(PagureFlaskPluginPagureTicketHooktests, self).setUp()
 
-        progit.APP.config['TESTING'] = True
-        progit.SESSION = self.session
-        progit.ui.SESSION = self.session
-        progit.ui.app.SESSION = self.session
-        progit.ui.plugins.SESSION = self.session
+        pagure.APP.config['TESTING'] = True
+        pagure.SESSION = self.session
+        pagure.ui.SESSION = self.session
+        pagure.ui.app.SESSION = self.session
+        pagure.ui.plugins.SESSION = self.session
 
-        progit.APP.config['GIT_FOLDER'] = tests.HERE
-        progit.APP.config['FORK_FOLDER'] = os.path.join(
+        pagure.APP.config['GIT_FOLDER'] = tests.HERE
+        pagure.APP.config['FORK_FOLDER'] = os.path.join(
             tests.HERE, 'forks')
-        progit.APP.config['TICKETS_FOLDER'] = os.path.join(
+        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
             tests.HERE, 'tickets')
-        progit.APP.config['DOCS_FOLDER'] = os.path.join(
+        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
             tests.HERE, 'docs')
-        self.app = progit.APP.test_client()
+        self.app = pagure.APP.test_client()
 
-    def test_plugin_progit_ticket(self):
-        """ Test the progit_ticket plugin on/off endpoint. """
+    def test_plugin_pagure_ticket(self):
+        """ Test the pagure_ticket plugin on/off endpoint. """
 
         tests.create_projects(self.session)
 
         user = tests.FakeUser(username='pingou')
-        with tests.user_set(progit.APP, user):
-            output = self.app.get('/test/settings/progit tickets')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/settings/pagure tickets')
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
-            self.assertTrue('<h3>progit tickets</h3>' in output.data)
+            self.assertTrue('<h3>pagure tickets</h3>' in output.data)
             self.assertTrue(
                 '<input id="active" name="active" type="checkbox" value="y">'
                 in output.data)
@@ -69,27 +69,27 @@ class ProgitFlaskPluginProgitTicketHooktests(tests.Modeltests):
 
             data = {}
 
-            output = self.app.post('/test/settings/progit tickets', data=data)
+            output = self.app.post('/test/settings/pagure tickets', data=data)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
-            self.assertTrue('<h3>progit tickets</h3>' in output.data)
+            self.assertTrue('<h3>pagure tickets</h3>' in output.data)
             self.assertTrue(
                 '<input id="active" name="active" type="checkbox" value="y">'
                 in output.data)
 
             data['csrf_token'] = csrf_token
             # No git found
-            output = self.app.post('/test/settings/progit tickets', data=data)
+            output = self.app.post('/test/settings/pagure tickets', data=data)
             self.assertEqual(output.status_code, 404)
 
              # Create both the tickets repo
             tests.create_projects_git(os.path.join(tests.HERE, 'tickets'))
 
             # With the git repo
-            output = self.app.post('/test/settings/progit tickets', data=data)
+            output = self.app.post('/test/settings/pagure tickets', data=data)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
-            self.assertTrue('<h3>progit tickets</h3>' in output.data)
+            self.assertTrue('<h3>pagure tickets</h3>' in output.data)
             self.assertTrue(
                 '<li class="message">Hook inactived</li>' in output.data)
             self.assertTrue(
@@ -98,7 +98,7 @@ class ProgitFlaskPluginProgitTicketHooktests(tests.Modeltests):
 
             self.assertFalse(os.path.exists(os.path.join(
                 tests.HERE, 'tickets', 'test.git', 'hooks',
-                'post-receive.progit')))
+                'post-receive.pagure')))
 
             # Activate hook
             data = {
@@ -106,10 +106,10 @@ class ProgitFlaskPluginProgitTicketHooktests(tests.Modeltests):
                 'active': 'y',
             }
 
-            output = self.app.post('/test/settings/progit tickets', data=data)
+            output = self.app.post('/test/settings/pagure tickets', data=data)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
-            self.assertTrue('<h3>progit tickets</h3>' in output.data)
+            self.assertTrue('<h3>pagure tickets</h3>' in output.data)
             self.assertTrue(
                 '<li class="message">Hook activated</li>' in output.data)
             self.assertTrue(
@@ -118,13 +118,13 @@ class ProgitFlaskPluginProgitTicketHooktests(tests.Modeltests):
 
             self.assertTrue(os.path.exists(os.path.join(
                 tests.HERE, 'tickets', 'test.git', 'hooks',
-                'post-receive.progit')))
+                'post-receive.pagure')))
 
             # De-Activate hook
             data = {'csrf_token': csrf_token}
-            output = self.app.post('/test/settings/progit tickets', data=data)
+            output = self.app.post('/test/settings/pagure tickets', data=data)
             self.assertTrue('<p>test project #1</p>' in output.data)
-            self.assertTrue('<h3>progit tickets</h3>' in output.data)
+            self.assertTrue('<h3>pagure tickets</h3>' in output.data)
             self.assertTrue(
                 '<li class="message">Hook inactived</li>' in output.data)
             self.assertTrue(
@@ -133,10 +133,10 @@ class ProgitFlaskPluginProgitTicketHooktests(tests.Modeltests):
 
             self.assertFalse(os.path.exists(os.path.join(
                 tests.HERE, 'tickets', 'test.git', 'hooks',
-                'post-receive.progit')))
+                'post-receive.pagure')))
 
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
-        ProgitFlaskPluginProgitTicketHooktests)
+        PagureFlaskPluginPagureTicketHooktests)
     unittest.TextTestRunner(verbosity=2).run(SUITE)

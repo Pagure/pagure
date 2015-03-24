@@ -23,20 +23,20 @@ from mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-import progit.lib.git
+import pagure.lib.git
 import tests
 
 
-class ProgitLibGittests(tests.Modeltests):
-    """ Tests for progit.lib.git """
+class PagureLibGittests(tests.Modeltests):
+    """ Tests for pagure.lib.git """
 
     def test_write_gitolite_acls(self):
-        """ Test the write_gitolite_acls function of progit.lib.git. """
+        """ Test the write_gitolite_acls function of pagure.lib.git. """
         tests.create_projects(self.session)
 
-        repo = progit.lib.get_project(self.session, 'test')
+        repo = pagure.lib.get_project(self.session, 'test')
         # Add an user to a project
-        msg = progit.lib.add_user_to_project(
+        msg = pagure.lib.add_user_to_project(
             session=self.session,
             project=repo,
             user='foo',
@@ -44,7 +44,7 @@ class ProgitLibGittests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'User added')
         # Add a forked project
-        item = progit.lib.model.Project(
+        item = pagure.lib.model.Project(
             user_id=1,  # pingou
             name='test3',
             description='test project #2',
@@ -55,7 +55,7 @@ class ProgitLibGittests(tests.Modeltests):
 
         outputconf = os.path.join(tests.HERE, 'test_gitolite.conf')
 
-        progit.lib.git.write_gitolite_acls(self.session, outputconf)
+        pagure.lib.git.write_gitolite_acls(self.session, outputconf)
 
         self.assertTrue(os.path.exists(outputconf))
 
@@ -108,7 +108,7 @@ repo tickets/pingou/test3
         self.assertFalse(os.path.exists(outputconf))
 
     def test_commit_to_patch(self):
-        """ Test the commit_to_patch function of progit.lib.git. """
+        """ Test the commit_to_patch function of pagure.lib.git. """
         # Create a git repo to play with
         self.gitrepo = os.path.join(tests.HERE, 'test_repo.git')
         os.makedirs(self.gitrepo)
@@ -166,7 +166,7 @@ repo tickets/pingou/test3
         second_commit = repo.revparse_single('HEAD')
 
         # Generate a patch for 2 commits
-        patch = progit.lib.git.commit_to_patch(
+        patch = pagure.lib.git.commit_to_patch(
             repo, [first_commit, second_commit])
         exp = """Mon Sep 17 00:00:00 2001
 From: Alice Author <alice@authors.tld>
@@ -219,7 +219,7 @@ index 9f44358..2a552bb 100644
         self.assertEqual(patch, exp)
 
         # Generate a patch for a single commit
-        patch = progit.lib.git.commit_to_patch(repo, second_commit)
+        patch = pagure.lib.git.commit_to_patch(repo, second_commit)
         exp = """Mon Sep 17 00:00:00 2001
 From: Alice Author <alice@authors.tld>
 Subject: Add baz and boose to the sources
@@ -253,13 +253,13 @@ index 9f44358..2a552bb 100644
         patch = '\n'.join(npatch)
         self.assertEqual(patch, exp)
 
-    @patch('progit.lib.notify.send_email')
+    @patch('pagure.lib.notify.send_email')
     def test_update_git(self, email_f):
-        """ Test the update_git of progit.lib.git. """
+        """ Test the update_git of pagure.lib.git. """
         email_f.return_value = True
 
         # Create project
-        item = progit.lib.model.Project(
+        item = pagure.lib.model.Project(
             user_id=1,  # pingou
             name='test_ticket_repo',
             description='test project for ticket',
@@ -272,9 +272,9 @@ index 9f44358..2a552bb 100644
         os.makedirs(self.gitrepo)
         repo_obj = pygit2.init_repository(self.gitrepo, bare=True)
 
-        repo = progit.lib.get_project(self.session, 'test_ticket_repo')
+        repo = pagure.lib.get_project(self.session, 'test_ticket_repo')
         # Create an issue to play with
-        msg = progit.lib.new_issue(
+        msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
@@ -283,16 +283,16 @@ index 9f44358..2a552bb 100644
             ticketfolder=tests.HERE
         )
         self.assertEqual(msg, 'Issue created')
-        issue = progit.lib.search_issues(self.session, repo, issueid=1)
-        progit.lib.git.update_git(issue, repo, tests.HERE)
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        pagure.lib.git.update_git(issue, repo, tests.HERE)
 
         repo = pygit2.Repository(self.gitrepo)
         commit = repo.revparse_single('HEAD')
 
         # Use patch to validate the repo
-        patch = progit.lib.git.commit_to_patch(repo, commit)
+        patch = pagure.lib.git.commit_to_patch(repo, commit)
         exp = """Mon Sep 17 00:00:00 2001
-From: progit <progit>
+From: pagure <pagure>
 Subject: Updated ticket <hash>: Test issue
 
 
@@ -336,7 +336,7 @@ index 0000000..60f7480
         self.assertEqual(patch, exp)
 
         # Test again after adding a comment
-        msg = progit.lib.add_issue_comment(
+        msg = pagure.lib.add_issue_comment(
             session=self.session,
             issue=issue,
             comment='Hey look a comment!',
@@ -349,9 +349,9 @@ index 0000000..60f7480
         # Use patch to validate the repo
         repo = pygit2.Repository(self.gitrepo)
         commit = repo.revparse_single('HEAD')
-        patch = progit.lib.git.commit_to_patch(repo, commit)
+        patch = pagure.lib.git.commit_to_patch(repo, commit)
         exp = """Mon Sep 17 00:00:00 2001
-From: progit <progit>
+From: pagure <pagure>
 Subject: Updated ticket <hash>: Test issue
 
 
@@ -403,10 +403,10 @@ index 458821a..77674a8
         self.assertEqual(patch, exp)
 
     def test_update_ticket_from_git(self):
-        """ Test the update_ticket_from_git method from progit.lib.git. """
+        """ Test the update_ticket_from_git method from pagure.lib.git. """
         tests.create_projects(self.session)
 
-        repo = progit.lib.get_project(self.session, 'test')
+        repo = pagure.lib.get_project(self.session, 'test')
 
         # Before
         self.assertEqual(len(repo.issues), 0)
@@ -420,8 +420,8 @@ index 458821a..77674a8
         }
 
         self.assertRaises(
-            progit.exceptions.ProgitException,
-            progit.lib.git.update_ticket_from_git,
+            pagure.exceptions.PagureException,
+            pagure.lib.git.update_ticket_from_git,
             self.session,
             reponame='foobar',
             username=None,
@@ -429,7 +429,7 @@ index 458821a..77674a8
             json_data=data
         )
 
-        progit.lib.git.update_ticket_from_git(
+        pagure.lib.git.update_ticket_from_git(
             self.session, reponame='test', username=None,
             issue_uid='foobar', json_data=data
         )
@@ -444,7 +444,7 @@ index 458821a..77674a8
         self.assertEqual(repo.issues[0].blocks_text, [])
 
         data["title"] = "fake issue for tests"
-        progit.lib.git.update_ticket_from_git(
+        pagure.lib.git.update_ticket_from_git(
             self.session, reponame='test', username=None,
             issue_uid='foobar', json_data=data
         )
@@ -459,7 +459,7 @@ index 458821a..77674a8
         self.assertEqual(repo.issues[0].blocks_text, [])
 
         data = {
-            "status": "Open", "title": "Rename progit", "private": False,
+            "status": "Open", "title": "Rename pagure", "private": False,
             "content": "This is too much of a conflict with the book",
             "user": {
                 "fullname": "Pierre-YvesChibon", "name": "pingou",
@@ -503,7 +503,7 @@ index 458821a..77674a8
             ]
         }
 
-        progit.lib.git.update_ticket_from_git(
+        pagure.lib.git.update_ticket_from_git(
             self.session, reponame='test', username=None,
             issue_uid='foobar2', json_data=data
         )
@@ -516,15 +516,15 @@ index 458821a..77674a8
         self.assertEqual(repo.issues[0].blocks_text, [])
         # New one
         self.assertEqual(repo.issues[1].uid, 'foobar2')
-        self.assertEqual(repo.issues[1].title, 'Rename progit')
+        self.assertEqual(repo.issues[1].title, 'Rename pagure')
         self.assertEqual(repo.issues[1].depends_text, [])
         self.assertEqual(repo.issues[1].blocks_text, [1])
 
     def test_update_request_from_git(self):
-        """ Test the update_request_from_git method from progit.lib.git. """
+        """ Test the update_request_from_git method from pagure.lib.git. """
         tests.create_projects(self.session)
 
-        repo = progit.lib.get_project(self.session, 'test')
+        repo = pagure.lib.get_project(self.session, 'test')
 
         # Before
         self.assertEqual(len(repo.requests), 0)
@@ -641,8 +641,8 @@ index 458821a..77674a8
         }
 
         self.assertRaises(
-            progit.exceptions.ProgitException,
-            progit.lib.git.update_request_from_git,
+            pagure.exceptions.PagureException,
+            pagure.lib.git.update_request_from_git,
             self.session,
             reponame='foobar',
             username=None,
@@ -655,7 +655,7 @@ index 458821a..77674a8
             requestfolder=os.path.join(tests.HERE, 'requests')
         )
 
-        progit.lib.git.update_request_from_git(
+        pagure.lib.git.update_request_from_git(
             self.session,
             reponame='test',
             username=None,
@@ -740,7 +740,7 @@ index 458821a..77674a8
             "date_created": "1426843745"
         }
 
-        progit.lib.git.update_request_from_git(
+        pagure.lib.git.update_request_from_git(
             self.session,
             reponame='test',
             username=None,
@@ -770,5 +770,5 @@ index 458821a..77674a8
 
 
 if __name__ == '__main__':
-    SUITE = unittest.TestLoader().loadTestsFromTestCase(ProgitLibGittests)
+    SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibGittests)
     unittest.TextTestRunner(verbosity=2).run(SUITE)

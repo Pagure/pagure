@@ -1,4 +1,4 @@
 include LICENSE README.rst requirements.txt
 include createdb.py
-recursive-include progit *
+recursive-include pagure *
 recursive-include files *
