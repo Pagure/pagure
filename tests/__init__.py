@@ -185,7 +185,7 @@ class FakeUser(object):
         ]
         self.dic = {}
         self.dic['timezone'] = 'Europe/Paris'
-        self.dic['login_time'] = datetime.utcnow()
+        self.login_time = datetime.utcnow()
         self.cla_done = cla_done
 
     def __getitem__(self, key):
