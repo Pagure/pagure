@@ -28,10 +28,27 @@
 
     <table>
       {{ render_field_in_row(form.title) }}
-      {{ render_field_in_row(form.issue_content) }}
       {{ render_field_in_row(form.status) }}
       {{ render_field_in_row(form.private) }}
     </table>
+    <div id="tabs">
+      <ul>
+        <li><a href="#new_comment">Comment</a></li>
+        <li><a href="#preview">Preview</a></li>
+      </ul>
+      <div id="new_comment">
+        <div>
+          <textarea id="issue_content" name="issue_content" placeholder="Report your issue/request here"></textarea>
+        </div>
+      </div>
+      <div id="preview">
+      </div>
+    </div>
+    <p>
+      (supports the <a href="http://daringfireball.net/projects/markdown/syntax"
+                      target="_blank">Markdown syntax</a>)
+    </p>
+
     <p class="buttons indent">
       {% if not type or type == 'new' %}
       <input type="submit" class="submit positive button" value="Create">
@@ -44,4 +61,38 @@
   </form>
 </section>
 
+{% endblock %}
+
+{% block jscripts %}
+{{ super() }}
+<script type="text/javascript">
+$(function() {
+  $( "#tabs" ).tabs();
+
+  $( "#tabs" ).on('tabsactivate',
+    function(event, ui) {
+      if (ui.newPanel.selector == '#preview') {
+        var _text = $( "#issue_content" ).val();
+        var _url = "{{ url_for('markdown_preview') }}";
+          $.ajax({
+              url: _url ,
+              type: 'POST',
+              data: {
+                content: _text,
+                csrf_token: "{{ form.csrf_token.current_token }}",
+              },
+              dataType: 'html',
+              success: function(res) {
+                  $( "#preview" ).html(res);
+              },
+              error: function() {
+                  alert('Unable to generate preview!');
+              }
+          });
+          return false;
+      }
+    }
+  );
+});
+</script>
 {% endblock %}
