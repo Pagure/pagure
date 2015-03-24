@@ -755,11 +755,9 @@ def search_issues(
 
     '''
     query = session.query(
-        model.Issue
+        sqlalchemy.distinct(model.Issue.id)
     ).filter(
         model.Issue.project_id == repo.id
-    ).order_by(
-        model.Issue.id
     )
 
     if issueid is not None:
@@ -845,16 +843,25 @@ def search_issues(
             model.Issue.private == False
         )
     elif isinstance(private, basestring):
+        user2 = aliased(model.User)
         query = query.filter(
             sqlalchemy.or_(
                 model.Issue.private == False,
                 sqlalchemy.and_(
                     model.Issue.private == True,
-                    model.Issue.user_id == model.User.id,
-                    model.User.user == private,
+                    model.Issue.user_id == user2.id,
+                    user2.user == private,
                 )
             )
         )
+
+    query = session.query(
+        model.Issue
+    ).filter(
+        model.Issue.id.in_(query.subquery())
+    ).order_by(
+        model.Issue.id
+    )
 
     if issueid is not None:
         output = query.first()
@@ -979,6 +986,7 @@ def get_issue_comment(session, issue_uid, comment_id):
     )
 
     return query.first()
+
 
 def get_request_comment(session, request_uid, comment_id):
     ''' Return a specific comment of a specified issue.
