@@ -732,3 +732,11 @@ ul.changes {
 #more_gits {
     cursor: pointer;
 }
+
+#tabs {
+    width: 550px;
+}
+
+#tabs textarea {
+    width: 500px;
+}
