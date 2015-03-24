@@ -466,19 +466,19 @@ class ProgitFlaskRepotests(tests.Modeltests):
 
     def test_view_log(self):
         """ Test the view_log endpoint. """
-        output = self.app.get('/foo/log')
+        output = self.app.get('/foo/commits')
         # No project registered in the DB
         self.assertEqual(output.status_code, 404)
 
         tests.create_projects(self.session)
 
-        output = self.app.get('/test/log')
+        output = self.app.get('/test/commits')
         # No git repo associated
         self.assertEqual(output.status_code, 404)
 
         tests.create_projects_git(tests.HERE)
 
-        output = self.app.get('/test/log')
+        output = self.app.get('/test/commits')
         self.assertEqual(output.status_code, 200)
         self.assertTrue('<p>This repo is brand new!</p>' in output.data)
         self.assertTrue('<p>test project #1</p>' in output.data)
@@ -487,7 +487,7 @@ class ProgitFlaskRepotests(tests.Modeltests):
         tests.add_content_git_repo(os.path.join(tests.HERE, 'test.git'))
         tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
 
-        output = self.app.get('/test/log')
+        output = self.app.get('/test/commits')
         self.assertEqual(output.status_code, 200)
         self.assertFalse('<p>This repo is brand new!</p>' in output.data)
         self.assertFalse('Forked from' in output.data)
@@ -502,7 +502,7 @@ class ProgitFlaskRepotests(tests.Modeltests):
         self.session.commit()
 
         # View the repo in the UI
-        output = self.app.get('/test/log')
+        output = self.app.get('/test/commits')
         self.assertEqual(output.status_code, 404)
 
         # Add some content to the git repo
@@ -511,7 +511,7 @@ class ProgitFlaskRepotests(tests.Modeltests):
         tests.add_readme_git_repo(
             os.path.join(tests.HERE, 'forks', 'pingou', 'test.git'))
 
-        output = self.app.get('/fork/pingou/test/log?page=abc')
+        output = self.app.get('/fork/pingou/test/commits?page=abc')
         self.assertEqual(output.status_code, 200)
         self.assertFalse('<p>This repo is brand new!</p>' in output.data)
         self.assertTrue('<p>test project #1</p>' in output.data)
@@ -537,10 +537,10 @@ class ProgitFlaskRepotests(tests.Modeltests):
             os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'),
             ncommits=10)
 
-        output = self.app.get('/fork/pingou/test3/log/fobranch')
+        output = self.app.get('/fork/pingou/test3/commits/fobranch')
         self.assertEqual(output.status_code, 404)
 
-        output = self.app.get('/fork/pingou/test3/log')
+        output = self.app.get('/fork/pingou/test3/commits')
         self.assertEqual(output.status_code, 200)
         self.assertFalse('<p>This repo is brand new!</p>' in output.data)
         self.assertTrue('<p>test project #3</p>' in output.data)
