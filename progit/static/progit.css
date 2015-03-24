@@ -725,7 +725,8 @@ ul.changes {
     background-color: #0066cc;
 }
 
-#preview img {
+#preview img,
+.comment_body img {
     width: 50%;
 }
 
