@@ -515,10 +515,6 @@ def upload_issue(repo, issueid, username=None):
     if not repo.issue_tracker:
         flask.abort(404, 'No issue tracker found for this project')
 
-    if not is_repo_admin(repo):
-        flask.abort(
-            403, 'You are not allowed to edit issues for this project')
-
     issue = progit.lib.search_issues(SESSION, repo, issueid=issueid)
 
     if issue is None or issue.project != repo:
