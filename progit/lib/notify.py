@@ -144,7 +144,7 @@ New issue:
             issue.id,
         ),
     )
-    mail_to = _get_emails_for_issue(comment.issue)
+    mail_to = _get_emails_for_issue(issue)
 
     send_email(
         text,
@@ -175,7 +175,7 @@ The issue: `%s` of project: `%s` has been %s by %s.
             issue.id,
         ),
     )
-    mail_to = _get_emails_for_issue(comment.issue)
+    mail_to = _get_emails_for_issue(issue)
     if new_assignee and new_assignee.emails:
         mail_to.add(new_assignee.emails[0].email)
 
