@@ -272,7 +272,7 @@ def view_commits(repo, branchname=None, username=None):
                 break
             diff_commits.append(commit.oid.hex)
 
-    origin = 'view_log'
+    origin = 'view_commits'
 
     return flask.render_template(
         'repo_info.html',

@@ -464,8 +464,8 @@ class ProgitFlaskRepotests(tests.Modeltests):
         self.assertEqual(
             output.data.count('<span class="commitid">'), 10)
 
-    def test_view_log(self):
-        """ Test the view_log endpoint. """
+    def test_view_commits(self):
+        """ Test the view_commits endpoint. """
         output = self.app.get('/foo/commits')
         # No project registered in the DB
         self.assertEqual(output.status_code, 404)
