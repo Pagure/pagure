@@ -158,7 +158,7 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
         issue, repo=issue.project, repofolder=ticketfolder)
 
     if notify:
-        progit.lib.notify.notify_new_comment(issue_comment)
+        progit.lib.notify.notify_new_comment(issue_comment, user=user_obj)
 
     return 'Comment added'
 
@@ -194,6 +194,8 @@ def add_issue_tag(session, issue, tag, user, ticketfolder):
 
 def add_issue_assignee(session, issue, assignee, user, ticketfolder):
     ''' Add an assignee to an issue, in other words, assigned an issue. '''
+    user_obj = __get_user(session, user)
+
     if assignee is None and issue.assignee != None:
         issue.assignee_id = None
         session.add(issue)
@@ -201,23 +203,24 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
         progit.lib.git.update_git(
             issue, repo=issue.project, repofolder=ticketfolder)
 
-        progit.lib.notify.notify_assigned_issue(issue, None, user)
+        progit.lib.notify.notify_assigned_issue(issue, None, user_obj)
         return 'Assignee reset'
     elif assignee is None and issue.assignee == None:
         return
 
-    user_obj = __get_user(session, user)
     # Validate the assignee
-    user_obj = __get_user(session, assignee)
+    assignee_obj = __get_user(session, assignee)
 
-    if issue.assignee_id != user_obj.id:
-        issue.assignee_id = user_obj.id
+    if issue.assignee_id != assignee_obj.id:
+        issue.assignee_id = assignee_obj.id
         session.add(issue)
         session.flush()
         progit.lib.git.update_git(
             issue, repo=issue.project, repofolder=ticketfolder)
 
-        progit.lib.notify.notify_assigned_issue(issue, user_obj, user)
+        print user_obj, assignee_obj
+        progit.lib.notify.notify_assigned_issue(
+            issue, assignee_obj, user_obj)
 
         return 'Issue assigned'
 
@@ -492,7 +495,7 @@ def new_issue(session, repo, title, content, user, ticketfolder,
         issue, repo=repo, repofolder=ticketfolder)
 
     if notify:
-        progit.lib.notify.notify_new_issue(issue)
+        progit.lib.notify.notify_new_issue(issue, user=user_obj)
 
     return 'Issue created'
 
