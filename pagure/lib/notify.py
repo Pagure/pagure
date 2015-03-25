@@ -10,10 +10,25 @@ pagure notifications.
 """
 
 import smtplib
+import warnings
 
 import pagure
 
 from email.mime.text import MIMEText
+
+
+def fedmsg_publish(*args, **kwargs):  # pragma: no cover
+    ''' Try to publish a message on the fedmsg bus. '''
+    ## We catch Exception if we want :-p
+    # pylint: disable=W0703
+    ## Ignore message about fedmsg import
+    # pylint: disable=F0401
+    kwargs['modname'] = 'pagure'
+    try:
+        import fedmsg
+        fedmsg.publish(*args, **kwargs)
+    except Exception, err:
+        warnings.warn(str(err))
 
 
 def _clean_emails(emails, user):
