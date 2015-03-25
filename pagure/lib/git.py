@@ -319,6 +319,7 @@ def update_ticket_from_git(
             session,
             issue=issue,
             ticketfolder=None,
+            user=user.username,
             title=json_data.get('title'),
             content=json_data.get('content'),
             status=json_data.get('status'),
@@ -359,6 +360,7 @@ def update_ticket_from_git(
                 notify=False,
             )
     session.commit()
+
 
 def update_request_from_git(
         session, reponame, username, request_uid, json_data,
