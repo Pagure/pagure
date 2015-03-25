@@ -142,7 +142,8 @@ class PagureFlaskRepotests(tests.Modeltests):
         msg = pagure.lib.add_user_to_project(
             session=self.session,
             project=repo,
-            user='foo',
+            new_user='foo',
+            user='pingou',
         )
         self.session.commit()
         self.assertEqual(msg, 'User added')

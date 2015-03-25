@@ -161,7 +161,8 @@ class PagureLibtests(tests.Modeltests):
         msg = pagure.lib.add_user_to_project(
             session=self.session,
             project=repo,
-            user='foo',
+            new_user='foo',
+            user='pingou'
         )
         self.session.commit()
         self.assertEqual(msg, 'User added')
@@ -209,6 +210,7 @@ class PagureLibtests(tests.Modeltests):
         msg = pagure.lib.edit_issue(
             session=self.session,
             issue=issue,
+            user='pingou',
             ticketfolder=None)
         self.session.commit()
         self.assertEqual(msg, None)
@@ -216,6 +218,7 @@ class PagureLibtests(tests.Modeltests):
         msg = pagure.lib.edit_issue(
             session=self.session,
             issue=issue,
+            user='pingou',
             ticketfolder=None,
             title='Test issue #2',
             content='We should work on this for the second time',
@@ -227,6 +230,7 @@ class PagureLibtests(tests.Modeltests):
         msg = pagure.lib.edit_issue(
             session=self.session,
             issue=issue,
+            user='pingou',
             ticketfolder=None,
             title='Foo issue #2',
             content='We should work on this period',
@@ -339,12 +343,14 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             project=repo,
             tags='foo',
+            user='pingou',
             ticketfolder=None)
 
         msgs = pagure.lib.remove_tags(
             session=self.session,
             project=repo,
             tags='tag1',
+            user='pingou',
             ticketfolder=None)
 
         self.assertEqual(msgs, [u'Removed tag: tag1'])
@@ -364,6 +370,7 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             issue=issue,
             tags='tag1',
+            user='pingou',
             ticketfolder=None)
 
         self.assertEqual(msgs, [u'Removed tag: tag1'])
@@ -386,6 +393,7 @@ class PagureLibtests(tests.Modeltests):
             project=repo,
             old_tag='foo',
             new_tag='bar',
+            user='pingou',
             ticketfolder=None,
         )
 
@@ -394,6 +402,7 @@ class PagureLibtests(tests.Modeltests):
             project=repo,
             old_tag='tag1',
             new_tag='tag2',
+            user='pingou',
             ticketfolder=None,
         )
         self.session.commit()
@@ -406,6 +415,7 @@ class PagureLibtests(tests.Modeltests):
             project=repo,
             old_tag='tag2',
             new_tag='tag2',
+            user='pingou',
             ticketfolder=None,
         )
 
@@ -641,13 +651,15 @@ class PagureLibtests(tests.Modeltests):
             pagure.lib.add_user_to_project,
             session=self.session,
             project=repo,
-            user='foobar',
+            new_user='foobar',
+            user='pingou',
         )
 
         msg = pagure.lib.add_user_to_project(
             session=self.session,
             project=repo,
-            user='foo',
+            new_user='foo',
+            user='pingou',
         )
         self.session.commit()
         self.assertEqual(msg, 'User added')
@@ -796,7 +808,8 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             repo=repo,
             issue_tracker=True,
-            project_docs=True
+            project_docs=True,
+            user='pingou',
         )
         self.assertEqual(msg, 'No settings to change')
 
@@ -804,7 +817,8 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             repo=repo,
             issue_tracker=False,
-            project_docs=False
+            project_docs=False,
+            user='pingou',
         )
         self.assertEqual(msg, 'Edited successfully settings of repo: test2')
 
@@ -1175,7 +1189,8 @@ class PagureLibtests(tests.Modeltests):
         msg = pagure.lib.add_user_to_project(
             session=self.session,
             project=repo,
-            user='foo',
+            new_user='foo',
+            user='pingou',
         )
         self.session.commit()
         self.assertEqual(msg, 'User added')
@@ -1255,7 +1270,7 @@ class PagureLibtests(tests.Modeltests):
         pagure.lib.close_pull_request(
             session=self.session,
             request=request,
-            user=tests.FakeUser(),
+            user='pingou',
             requestfolder=None,
             merged=True,
         )
@@ -1272,7 +1287,7 @@ class PagureLibtests(tests.Modeltests):
         pagure.lib.close_pull_request(
             session=self.session,
             request=request,
-            user=tests.FakeUser(),
+            user='pingou',
             requestfolder=None,
             merged=False,
         )
