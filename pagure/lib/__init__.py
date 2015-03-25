@@ -538,10 +538,12 @@ def new_pull_request(session, repo_from, branch_from,
     return 'Request created'
 
 
-def edit_issue(session, issue, ticketfolder,
+def edit_issue(session, issue, ticketfolder, user,
                title=None, content=None, status=None, private=False):
     ''' Edit the specified issue.
     '''
+    user_obj = __get_user(session, user)
+
     if status == 'Fixed' and issue.parents:
         for parent in issue.parents:
             if parent.status == 'Open':
