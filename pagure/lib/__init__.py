@@ -966,14 +966,16 @@ def search_pull_requests(
 def close_pull_request(session, request, user, requestfolder, merged=True):
     ''' Close the provided pull-request.
     '''
+    user_obj = __get_user(session, user)
+
     request.status = False
     session.add(request)
     session.flush()
 
     if merged == True:
-        pagure.lib.notify.notify_merge_pull_request(request, user)
+        pagure.lib.notify.notify_merge_pull_request(request, user_obj)
     else:
-        pagure.lib.notify.notify_cancelled_pull_request(request, user)
+        pagure.lib.notify.notify_cancelled_pull_request(request, user_obj)
 
     pagure.lib.git.update_git(
         request, repo=request.repo, repofolder=requestfolder)
