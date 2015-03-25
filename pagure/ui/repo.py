@@ -805,7 +805,10 @@ def add_user(repo, username=None):
     if form.validate_on_submit():
         try:
             msg = pagure.lib.add_user_to_project(
-                SESSION, repo, form.user.data)
+                SESSION, repo,
+                new_user=form.user.data,
+                user=flask.g.fas_user.username,
+            )
             SESSION.commit()
             pagure.generate_gitolite_acls()
             flask.flash(msg)
