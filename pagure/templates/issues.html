@@ -78,7 +78,7 @@
     <tfoot>
     </tfoot>
     <tbody>
-    {% for issue in issues %}
+    {% for issue in issues|sort(True,attribute='id') %}
         <tr>
             <td>#{{ issue.id }}</td>
             <td>
