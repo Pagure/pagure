@@ -381,13 +381,14 @@ def edit_issue_tags(session, project, old_tag, new_tag, ticketfolder, user):
     return msgs
 
 
-def add_user_to_project(session, project, user):
+def add_user_to_project(session, project, new_user, user):
     ''' Add a specified user to a specified project. '''
+    new_user_obj = __get_user(session, new_user)
     user_obj = __get_user(session, user)
 
     project_user = model.ProjectUser(
         project_id=project.id,
-        user_id=user_obj.id,
+        user_id=new_user_obj.id,
     )
     session.add(project_user)
     # Make sure we won't have SQLAlchemy error before we create the repo
