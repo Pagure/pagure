@@ -316,16 +316,19 @@ def remove_tags(session, project, tags, ticketfolder, user):
     return msgs
 
 
-def remove_tags_issue(session, issue, tags, ticketfolder):
+def remove_tags_issue(session, issue, tags, ticketfolder, user):
     ''' Removes the specified tag(s) of a issue. '''
+    user_obj = __get_user(session, user)
 
     if isinstance(tags, basestring):
         tags = [tags]
 
     msgs = []
+    removed_tags = []
     for issue_tag in issue.tags:
         if issue_tag.tag in tags:
             tag = issue_tag.tag
+            removed_tags.append(tag)
             session.delete(issue_tag)
             msgs.append('Removed tag: %s' % tag)
 
