@@ -218,7 +218,6 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
         pagure.lib.git.update_git(
             issue, repo=issue.project, repofolder=ticketfolder)
 
-        print user_obj, assignee_obj
         pagure.lib.notify.notify_assigned_issue(
             issue, assignee_obj, user_obj)
 
