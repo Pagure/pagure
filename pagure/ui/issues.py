@@ -133,6 +133,7 @@ def update_issue(repo, issueid, username=None):
                         SESSION,
                         issue=issue,
                         status=new_status,
+                        user=flask.g.fas_user.username,
                         ticketfolder=APP.config['TICKETS_FOLDER'],
                     )
                     SESSION.commit()
