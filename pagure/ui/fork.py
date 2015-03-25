@@ -438,7 +438,7 @@ def merge_request_pull(repo, requestid, username=None):
 
     # Update status
     pagure.lib.close_pull_request(
-        SESSION, request, flask.g.fas_user,
+        SESSION, request, flask.g.fas_user.username,
         requestfolder=APP.config['REQUESTS_FOLDER'],
     )
     try:
@@ -482,7 +482,7 @@ def cancel_request_pull(repo, requestid, username=None):
                 'You are not allowed to cancel pull-request for this project')
 
         pagure.lib.close_pull_request(
-            SESSION, request, flask.g.fas_user,
+            SESSION, request, flask.g.fas_user.username,
             requestfolder=APP.config['REQUESTS_FOLDER'],
             merged=False)
         try:
