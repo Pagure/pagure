@@ -367,7 +367,7 @@ class Issue(BASE):
         return [issue.id for issue in self.parents]
 
     def to_json(self):
-        ''' Returns a JSON representation of the issue.
+        ''' Returns a dictionary representation of the issue.
 
         '''
         output = {
@@ -404,7 +404,7 @@ class Issue(BASE):
 
         output['comments'] = comments
 
-        return json.dumps(output)
+        return output
 
 
 class IssueToIssue(BASE):
@@ -573,8 +573,7 @@ class PullRequest(BASE):
         return '%s-pull-request-%s@pagure' % (self.repo.name, self.id)
 
     def to_json(self):
-        ''' Returns a JSON representation of the pull-request using the
-        JSON module
+        ''' Returns a dictionnary representation of the pull-request.
 
         '''
         output = {
@@ -616,7 +615,7 @@ class PullRequest(BASE):
 
         output['comments'] = comments
 
-        return json.dumps(output)
+        return output
 
 
 class PullRequestComment(BASE):
