@@ -190,6 +190,7 @@ def edit_tag(repo, tag, username=None):
 
         msgs = pagure.lib.edit_issue_tags(
             SESSION, repo, tag, new_tag,
+            user=flask.g.fas_user.username,
             ticketfolder=APP.config['TICKETS_FOLDER']
         )
 
