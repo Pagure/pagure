@@ -620,6 +620,7 @@ def view_settings(repo, username=None):
                 repo=repo,
                 issue_tracker=issue_tracker,
                 project_docs=project_docs,
+                user=flask.g.fas_user.username,
             )
             SESSION.commit()
             flask.flash(message)
