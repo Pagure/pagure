@@ -287,8 +287,9 @@ def remove_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
         return 'Dependency removed'
 
 
-def remove_tags(session, project, tags, ticketfolder):
+def remove_tags(session, project, tags, ticketfolder, user):
     ''' Removes the specified tag of a project. '''
+    user_obj = __get_user(session, user)
 
     if not isinstance(tags, list):
         tags = [tags]
@@ -297,6 +298,7 @@ def remove_tags(session, project, tags, ticketfolder):
     issues.extend(search_issues(session, project, closed=True, tags=tags))
 
     msgs = []
+    removed_tags = []
     if not issues:
         raise pagure.exceptions.PagureException(
             'No issue found with the tags: %s' % ', '.join(tags))
@@ -305,6 +307,7 @@ def remove_tags(session, project, tags, ticketfolder):
             for issue_tag in issue.tags:
                 if issue_tag.tag in tags:
                     tag = issue_tag.tag
+                    removed_tags.append(tag)
                     session.delete(issue_tag)
                     msgs.append('Removed tag: %s' % tag)
             pagure.lib.git.update_git(
