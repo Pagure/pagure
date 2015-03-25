@@ -473,6 +473,7 @@ def edit_issue(repo, issueid, username=None):
                 title=title,
                 content=content,
                 status=status,
+                user=flask.g.fas_user.username,
                 ticketfolder=APP.config['TICKETS_FOLDER'],
                 private=private,
             )
