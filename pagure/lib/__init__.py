@@ -160,6 +160,14 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
     if notify:
         pagure.lib.notify.notify_new_comment(issue_comment, user=user_obj)
 
+    pagure.lib.notify.fedmsg_publish(
+        'issue.comment.added',
+        dict(
+            issue=issue.to_json(),
+            agent=user_obj.username,
+        )
+    )
+
     return 'Comment added'
 
 
@@ -189,6 +197,14 @@ def add_issue_tag(session, issue, tag, user, ticketfolder):
     pagure.lib.git.update_git(
         issue, repo=issue.project, repofolder=ticketfolder)
 
+    pagure.lib.notify.fedmsg_publish(
+        'issue.tag.added',
+        dict(
+            issue=issue.to_json(),
+            agent=user_obj.username,
+        )
+    )
+
     return 'Tag added'
 
 
@@ -204,6 +220,14 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
             issue, repo=issue.project, repofolder=ticketfolder)
 
         pagure.lib.notify.notify_assigned_issue(issue, None, user_obj)
+        pagure.lib.notify.fedmsg_publish(
+            'issue.assigned.reset',
+            dict(
+                issue=issue.to_json(),
+                agent=user_obj.username,
+            )
+        )
+
         return 'Assignee reset'
     elif assignee is None and issue.assignee == None:
         return
@@ -220,6 +244,14 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
 
         pagure.lib.notify.notify_assigned_issue(
             issue, assignee_obj, user_obj)
+
+        pagure.lib.notify.fedmsg_publish(
+            'issue.assigned.added',
+            dict(
+                issue=issue.to_json(),
+                agent=user_obj.username,
+            )
+        )
 
         return 'Issue assigned'
 
@@ -253,6 +285,14 @@ def add_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
         #pagure.lib.notify.notify_assigned_issue(issue, user_obj)
         #pagure.lib.notify.notify_assigned_issue(issue_blocked, user_obj)
 
+        pagure.lib.notify.fedmsg_publish(
+            'issue.dependency.added',
+            dict(
+                issue=issue.to_json(),
+                agent=user_obj.username,
+            )
+        )
+
         return 'Dependency added'
 
 
@@ -284,6 +324,14 @@ def remove_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
         #pagure.lib.notify.notify_assigned_issue(issue, user_obj)
         #pagure.lib.notify.notify_assigned_issue(issue_blocked, user_obj)
 
+        pagure.lib.notify.fedmsg_publish(
+            'issue.removed.added',
+            dict(
+                issue=issue.to_json(),
+                agent=user_obj.username,
+            )
+        )
+
         return 'Dependency removed'
 
 
@@ -313,6 +361,15 @@ def remove_tags(session, project, tags, ticketfolder, user):
             pagure.lib.git.update_git(
                 issue, repo=issue.project, repofolder=ticketfolder)
 
+    pagure.lib.notify.fedmsg_publish(
+        'project.tag.removed',
+        dict(
+            issue=project.to_json(),
+            tags=removed_tags,
+            agent=user_obj.username,
+        )
+    )
+
     return msgs
 
 
@@ -334,6 +391,15 @@ def remove_tags_issue(session, issue, tags, ticketfolder, user):
 
     pagure.lib.git.update_git(
         issue, repo=issue.project, repofolder=ticketfolder)
+
+    pagure.lib.notify.fedmsg_publish(
+        'issue.tag.removed',
+        dict(
+            issue=issue.to_json(),
+            tags=removed_tags,
+            agent=user_obj.username,
+        )
+    )
 
     return msgs
 
@@ -377,6 +443,15 @@ def edit_issue_tags(session, project, old_tag, new_tag, ticketfolder, user):
                 msgs.append('Edited tag: %s to %s' % (old_tag, new_tag))
             pagure.lib.git.update_git(
                 issue, repo=issue.project, repofolder=ticketfolder)
+            pagure.lib.notify.fedmsg_publish(
+                'project.tag.edited',
+                dict(
+                    project=project.to_json(),
+                    old_tag=old_tag,
+                    new_tag=new_tag,
+                    agent=user_obj.username,
+                )
+            )
 
     return msgs
 
@@ -393,6 +468,15 @@ def add_user_to_project(session, project, new_user, user):
     session.add(project_user)
     # Make sure we won't have SQLAlchemy error before we create the repo
     session.flush()
+
+    pagure.lib.notify.fedmsg_publish(
+        'project.user.added',
+        dict(
+            project=project.to_json(),
+            new_user=new_user_obj.username,
+            agent=user_obj.username,
+        )
+    )
 
     return 'User added'
 
@@ -416,6 +500,14 @@ def add_pull_request_comment(session, request, commit, filename, row,
 
     pagure.lib.git.update_git(
         request, repo=request.repo, repofolder=requestfolder)
+
+    pagure.lib.notify.fedmsg_publish(
+        'pull-request.comment.added',
+        dict(
+            pullrequest=request.to_json(),
+            agent=user_obj.username,
+        )
+    )
 
     return 'Comment added'
 
@@ -472,6 +564,14 @@ def new_project(session, user, name,
         )
     pygit2.init_repository(requestrepo, bare=True)
 
+    pagure.lib.notify.fedmsg_publish(
+        'project.new',
+        dict(
+            project=project.to_json(),
+            agent=user_obj.username,
+        )
+    )
+
     return 'Project "%s" created' % name
 
 
@@ -504,6 +604,14 @@ def new_issue(session, repo, title, content, user, ticketfolder,
     if notify:
         pagure.lib.notify.notify_new_issue(issue, user=user_obj)
 
+    pagure.lib.notify.fedmsg_publish(
+        'issue.new',
+        dict(
+            issue=issue.to_json(),
+            agent=user_obj.username,
+        )
+    )
+
     return 'Issue created'
 
 
@@ -534,6 +642,14 @@ def new_pull_request(session, repo_from, branch_from,
 
     if notify:
         pagure.lib.notify.notify_new_pull_request(request)
+
+    pagure.lib.notify.fedmsg_publish(
+        'pull-request.new',
+        dict(
+            pullrequest=request.to_json(),
+            agent=user_obj.username,
+        )
+    )
 
     return 'Request created'
 
@@ -568,6 +684,15 @@ def edit_issue(session, issue, ticketfolder, user,
     pagure.lib.git.update_git(
         issue, repo=issue.project, repofolder=ticketfolder)
 
+    pagure.lib.notify.fedmsg_publish(
+        'issue.edit',
+        dict(
+            issue=issue.to_json(),
+            fields=edit,
+            agent=user_obj.username,
+        )
+    )
+
     if edit:
         session.add(issue)
         session.flush()
@@ -592,6 +717,15 @@ def update_project_settings(
     else:
         session.add(repo)
         session.flush()
+        pagure.lib.notify.fedmsg_publish(
+            'project.edit',
+            dict(
+                project=repo.to_json(),
+                fields=update,
+                agent=user_obj.username,
+            )
+        )
+
         return 'Edited successfully settings of repo: %s' % repo.fullname
 
 
@@ -652,6 +786,14 @@ def fork_project(session, user, repo, gitfolder,
             'The requests repo "%s" already exists' % project.path
         )
     pygit2.init_repository(requestrepo, bare=True)
+
+    pagure.lib.notify.fedmsg_publish(
+        'project.forked',
+        dict(
+            project=project.to_json(),
+            agent=user_obj.username,
+        )
+    )
 
     return 'Repo "%s" cloned to "%s/%s"' % (repo.name, user, repo.name)
 
@@ -979,6 +1121,15 @@ def close_pull_request(session, request, user, requestfolder, merged=True):
 
     pagure.lib.git.update_git(
         request, repo=request.repo, repofolder=requestfolder)
+
+    pagure.lib.notify.fedmsg_publish(
+        'pull-request.closed',
+        dict(
+            pullrequest=request.to_json(),
+            merged=merged,
+            agent=user_obj.username,
+        )
+    )
 
 
 def get_issue_statuses(session):
