@@ -1157,6 +1157,7 @@ def update_tags_issue(session, issue, tags, username, ticketfolder):
                 session,
                 issue=issue,
                 tags=torm,
+                user=username,
                 ticketfolder=ticketfolder,
             )
         )
