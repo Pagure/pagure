@@ -338,8 +338,9 @@ def remove_tags_issue(session, issue, tags, ticketfolder, user):
     return msgs
 
 
-def edit_issue_tags(session, project, old_tag, new_tag, ticketfolder):
+def edit_issue_tags(session, project, old_tag, new_tag, ticketfolder, user):
     ''' Removes the specified tag of a project. '''
+    user_obj = __get_user(session, user)
 
     if old_tag == new_tag:
         raise pagure.exceptions.PagureException(
