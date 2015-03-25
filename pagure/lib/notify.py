@@ -74,6 +74,9 @@ def send_email(text, subject, to_mail, from_mail=None, mail_id=None,
         this value
 
     '''
+    if not to_mail:
+        return
+
     msg = MIMEText(text.encode('utf-8'), 'plain', 'utf-8')
     msg['Subject'] = '[Pagure] %s' % subject
     if not from_mail:
