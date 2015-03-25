@@ -94,11 +94,15 @@ def send_email(text, subject, to_mail, from_mail=None, mail_id=None,
     # Send the message via our own SMTP server, but don't include the
     # envelope header.
     smtp = smtplib.SMTP(pagure.APP.config['SMTP_SERVER'])
-    smtp.sendmail(
-        from_email,
-        to_mail.split(','),
-        msg.as_string())
-    smtp.quit()
+    try:
+        smtp.sendmail(
+            from_email,
+            to_mail.split(','),
+            msg.as_string())
+    except smtplib.SMTPException as err:
+        pagure.LOG.exception(err)
+    finally:
+        smtp.quit()
     return msg
 
 
