@@ -912,7 +912,7 @@ def search_issues(
 
     '''
     query = session.query(
-        sqlalchemy.distinct(model.Issue.id)
+        sqlalchemy.distinct(model.Issue.uid)
     ).filter(
         model.Issue.project_id == repo.id
     )
@@ -1015,7 +1015,9 @@ def search_issues(
     query = session.query(
         model.Issue
     ).filter(
-        model.Issue.id.in_(query.subquery())
+        model.Issue.uid.in_(query.subquery())
+    ).filter(
+        model.Issue.project_id == repo.id
     ).order_by(
         model.Issue.id
     )
