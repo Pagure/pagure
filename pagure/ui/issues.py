@@ -239,6 +239,7 @@ def remove_tag(repo, username=None):
 
         msgs = pagure.lib.remove_tags(
             SESSION, repo, tags,
+            user=flask.g.fas_user.username,
             ticketfolder=APP.config['TICKETS_FOLDER']
         )
 
