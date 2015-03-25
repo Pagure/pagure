@@ -574,8 +574,11 @@ def edit_issue(session, issue, ticketfolder, user,
         return 'Edited successfully issue #%s' % issue.id
 
 
-def update_project_settings(session, repo, issue_tracker, project_docs):
+def update_project_settings(
+        session, repo, issue_tracker, project_docs, user):
     ''' Update the settings of a project. '''
+    user_obj = __get_user(session, user)
+
     update = []
     if issue_tracker != repo.issue_tracker:
         repo.issue_tracker = issue_tracker
