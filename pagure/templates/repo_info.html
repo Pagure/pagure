@@ -6,6 +6,26 @@
 
 {% block repo %}
 
+  <section class="admin_list">
+    <h3>Admins</h3>
+    <ul>
+      <li>
+        <a href="{{ url_for('view_user', username=repo.user.user)}}">
+          {{ repo.user.user | avatar(32) | safe }}
+          {{ repo.user.fullname }} ({{ repo.user.user }})  -  creator
+        </a>
+      </li>
+      {% for user in repo.users %}
+      <li>
+        <a href="{{ url_for('view_user', username=user.user)}}">
+          {{ user.user | avatar(32) | safe }}
+          {{ user.fullname }} ({{ user.user }})
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+
 {% if repo_obj and repo_obj.is_empty %}
 
   <section class="repo_info">
@@ -30,25 +50,6 @@
     </section>
 
 {% else %}
-  <section class="admin_list">
-    <h3>Admins</h3>
-    <ul>
-      <li>
-        <a href="{{ url_for('view_user', username=repo.user.user)}}">
-          {{ repo.user.user | avatar(32) | safe }}
-          {{ repo.user.fullname }} ({{ repo.user.user }})  -  creator
-        </a>
-      </li>
-      {% for user in repo.users %}
-      <li>
-        <a href="{{ url_for('view_user', username=user.user)}}">
-          {{ user.user | avatar(32) | safe }}
-          {{ user.fullname }} ({{ user.user }})
-        </a>
-      </li>
-      {% endfor %}
-    </ul>
-  </section>
 
   <section class="branch_list">
     <h3>Branches</h3>
