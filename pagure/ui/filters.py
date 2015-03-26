@@ -147,7 +147,7 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
                             'user': comment.user.user,
                             'date': comment.date_created.strftime(
                                 '%b %d %Y %H:%M:%S'),
-                            'comment': comment.comment,
+                            'comment': markdown_filter(comment.comment),
                         }
                     )
                 )
