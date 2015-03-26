@@ -347,3 +347,45 @@ def markdown_preview():
         return pagure.ui.filters.markdown_filter(flask.request.form['content'])
     else:
         flask.abort(400, 'Invalid request')
+
+
+@APP.route('/settings/dropemail', methods=['POST'])
+@cla_required
+def remove_user_email():
+    """ Remove the specified email from the logged in user.
+    """
+    if admin_session_timedout():
+        return flask.redirect(
+            flask.url_for('auth_login', next=flask.request.url))
+
+    user = pagure.lib.search_user(
+        SESSION, username=flask.g.fas_user.username)
+    if not user:
+        flask.abort(404, 'User not found')
+
+    form = pagure.forms.UserEmailForm()
+    if form.validate_on_submit():
+        email = form.email.data
+        useremails = [mail.email for mail in user.emails]
+
+        if email not in useremails:
+            flask.flash(
+                'You do not have the email: %s, nothing to remove' % email,
+                'error')
+            return flask.redirect(
+                flask.url_for('.user_settings')
+            )
+
+        for mail in user.emails:
+            if mail.email == email:
+                user.emails.remove(mail)
+                break
+        try:
+            SESSION.commit()
+            flask.flash('Email removed')
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash('Email could not be removed', 'error')
+
+    return flask.redirect(flask.url_for('.user_settings'))
