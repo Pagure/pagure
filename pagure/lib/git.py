@@ -435,6 +435,7 @@ def update_request_from_git(
                 comment=comment['comment'],
                 user=user.username,
                 requestfolder=None,
+                notify=False,
             )
     session.commit()
 
