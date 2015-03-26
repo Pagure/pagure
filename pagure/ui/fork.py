@@ -619,7 +619,7 @@ def new_request_pull(repo,  branch_to, branch_from, username=None):
             'view_repo', username=username, repo=repo.name))
 
     form = pagure.forms.RequestPullForm()
-    if form.validate_on_submit():
+    if form.validate_on_submit() and is_repo_admin(repo):
         try:
             if orig_commit:
                 orig_commit = orig_commit.oid.hex
