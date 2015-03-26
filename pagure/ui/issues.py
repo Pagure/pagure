@@ -363,7 +363,7 @@ def new_issue(repo, username=None):
         private = form.private.data
 
         try:
-            message = pagure.lib.new_issue(
+            issue = pagure.lib.new_issue(
                 SESSION,
                 repo=repo,
                 title=title,
@@ -373,7 +373,33 @@ def new_issue(repo, username=None):
                 ticketfolder=APP.config['TICKETS_FOLDER'],
             )
             SESSION.commit()
-            flask.flash(message)
+            # If there is a file attached, attach it.
+            filestream = flask.request.files['filestream']
+            if filestream and '<!!image>' in issue.content:
+                new_filename = pagure.lib.git.add_file_to_git(
+                    repo=repo,
+                    issue=issue,
+                    ticketfolder=APP.config['TICKETS_FOLDER'],
+                    user=flask.g.fas_user,
+                    filename=filestream.filename,
+                    filestream=filestream.stream,
+                )
+                # Replace the <!!image> tag in the comment with the link
+                # to the actual image
+                filelocation = flask.url_for(
+                    'view_issue_raw_file',
+                    repo=repo.name,
+                    username=username,
+                    filename=new_filename,
+                )
+                new_filename = new_filename.split('-', 1)[1]
+                url = '[![%s](%s)](%s)' % (
+                    new_filename, filelocation, filelocation)
+                issue.content = issue.content.replace('<!!image>', url)
+                SESSION.add(issue)
+                SESSION.commit()
+
+            flask.flash('Issue created')
             return flask.redirect(flask.url_for(
                 'view_issues', username=username, repo=repo.name))
         except pagure.exceptions.PagureException, err:
