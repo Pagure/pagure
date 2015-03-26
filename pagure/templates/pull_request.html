@@ -97,6 +97,11 @@
     <tr>
       <th>From</th>
       <td>
+        <a href="{{ url_for('view_repo_branch',
+          username=pull_request.repo_from.user.user if pull_request.repo_from.is_fork,
+          repo=pull_request.repo_from.name,
+          branchname=pull_request.repo_from.branch_from)
+        }}">
         {{ pull_request.repo_from.fullname }} ({{ pull_request.branch_from }})
       </td>
     </tr>
