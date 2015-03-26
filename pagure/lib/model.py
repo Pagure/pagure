@@ -634,7 +634,7 @@ class PullRequestComment(BASE):
         nullable=False)
     commit_id = sa.Column(
         sa.String(40),
-        nullable=False,
+        nullable=True,
         index=True)
     user_id = sa.Column(
         sa.Integer,
