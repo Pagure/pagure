@@ -152,7 +152,7 @@ New comment:
 
     send_email(
         text,
-        'Update to issue `%s`' % comment.issue.title,
+        'Update to issue #%s `%s`' % (comment.issue.id, comment.issue.title),
         ','.join(mail_to),
         in_reply_to=comment.issue.mail_id,
     )
