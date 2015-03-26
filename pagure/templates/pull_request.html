@@ -149,7 +149,7 @@
 {% autoescape false %}
     {{ patch | patch_to_diff | html_diff | format_loc(
             filename=patch.new_file_path,
-            commit=patch.new_id,
+            commit=patch.new_id or patch.new_oid,
             prequest=pull_request,
             index=loop.index)}}
 {% endautoescape %}
