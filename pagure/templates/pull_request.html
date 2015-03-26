@@ -82,6 +82,32 @@
 </section>
 {% endif %}
 
+<section class="pr_info">
+  <table>
+    <tr>
+      <th>By</th>
+      <td>
+        <a href="{{ url_for('view_user', username=pull_request.user.user) }}">
+        {{ pull_request.user.user | avatar(16) | safe }}
+        {{ pull_request.user.fullname }} ({{ pull_request.user.user }})
+      </a>
+      </td>
+    </tr>
+    <tr>
+      <th>From</th>
+      <td>
+        {{ pull_request.repo_from.fullname }} ({{ pull_request.branch_from }})
+      </td>
+    </tr>
+    <tr>
+      <th>Created</th>
+      <td title="{{ pull_request.date_created.strftime('%b %d %Y %H:%M:%S') }}">
+        {{ pull_request.date_created |humanize }}
+      </td>
+    </tr>
+  </table>
+</section>
+
 <section class="commit_list">
   <ul>
     {% for commit in diff_commits %}
