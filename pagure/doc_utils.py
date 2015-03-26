@@ -17,6 +17,11 @@ import markdown
 
 def modify_rst(rst, view_file_url=None):
     """ Downgrade some of our rst directives if docutils is too old. """
+    if view_file_url:
+        rst = rst.replace(
+            '.. image:: ',
+            '.. image:: %s' % view_file_url
+        )
 
     # We catch Exception if we want :-p
     # pylint: disable=W0703
@@ -38,8 +43,6 @@ def modify_rst(rst, view_file_url=None):
     substitutions = {  # pragma: no cover
         '.. code-block:: javascript': '::',
     }
-    if view_file_url:
-        substitutions['.. image:: '] = '.. image:: %s' % view_file_url
 
     for old, new in substitutions.items():  # pragma: no cover
         rst = rst.replace(old, new)
