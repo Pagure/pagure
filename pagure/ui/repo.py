@@ -74,7 +74,7 @@ def view_repo(repo, username=None):
                 content, ext,
                 view_file_url=flask.url_for(
                     'view_file', username=username,
-                    repo=repo.name, identifier=branchname, filename=''))
+                    repo=repo.name, identifier='master', filename=''))
 
     diff_commits = []
     if repo.is_fork:
