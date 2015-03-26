@@ -448,7 +448,7 @@ table.list .assigned {
     color: #aaa;
 }
 
-.issue_comment, .add_comment, .project_list {
+.issue_comment. .request_comment, .add_comment, .project_list {
     background-color: #fff;
     border-radius: 10px;
     margin-bottom: 1em;
@@ -456,19 +456,25 @@ table.list .assigned {
 }
 
 .issue_comment > div,
-.issue_comment > form > div {
+.issue_comment > form > div,
+.request_comment > div,
+.request_comment > form > div {
     padding: .2em .5em;
 }
-.issue_comment > p {
+.issue_comment > p.
+request_comment > p {
     padding: .5em;
 }
 
-.issue_comment p {
+.issue_comment p,
+request_comment p {
     margin: .5em 0 1em;
 }
 
 .issue_comment > header,
 .issue_comment > form > header,
+.request_comment > header,
+.request_comment > form > header,
 .file_content > header,
 .commit_diff > header
 {

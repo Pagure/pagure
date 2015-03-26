@@ -1,5 +1,5 @@
 {% extends "repo_master.html" %}
-{% from "_formhelper.html" import render_field_in_row %}
+{% from "_formhelper.html" import render_field_in_row, show_comment %}
 
 {% block title %}Pull request #{{ requestid }} - {{ repo.name }}{% endblock %}
 {%block tag %}home{% endblock %}
@@ -158,6 +158,52 @@
 
 </section>
 
+{% if pull_request and pull_request.comments%}
+<section class="request_comment">
+{% for comment in pull_request.discussion %}
+  {% if not comment.commit_id %}
+    {{ show_comment(comment.user, comment.date_created, comment.comment,
+        loop.index) }}
+  {% endif %}
+{% endfor %}
+</section>
+{% endif %}
+
+<section class="request_comment add_comment">
+{% if authenticated and mergeform and pull_request %}
+  <form action="{{ url_for(
+      'pull_request_add_comment', username=username, repo=repo.name,
+      requestid=requestid) }}"
+      method="post">
+    {{ mergeform.csrf_token }}
+    <header>
+      <label for="comment">Add new comment</label>
+      (supports the <a href="http://daringfireball.net/projects/markdown/syntax"
+        target="_blank">Markdown syntax</a>)
+    </header>
+    <div id="tabs">
+      <ul>
+        <li><a href="#edit">Comment</a></li>
+        <li><a href="#preview">Preview</a></li>
+      </ul>
+      <div id="edit">
+        <div>
+          <textarea id="comment" name="comment" placeholder="Enter your comment here"></textarea>
+        </div>
+      </div>
+      <div id="preview">
+      </div>
+      <div>
+        <input type="submit" class="submit positive button" value="Comment">
+        <input type="button" value="Clear" id="clear_comment" />
+      </div>
+    </div>
+  </form>
+{% else %}
+  <p><a href="{{ url_for('auth_login', next=request.url) }}">Login</a> to comment on this ticket.</p>
+{% endif %}
+</section>
+
 
 {% endblock %}
 
@@ -221,6 +267,46 @@
       } else {
         next_row.prev().find('.pr_comment_form').parent().remove();
       }
+    }
+  );
+
+  $( "#tabs" ).tabs();
+
+  $( "#tabs" ).on('tabsactivate',
+    function(event, ui) {
+      if (ui.newPanel.selector == '#preview') {
+        var _text = $( "#comment" ).val();
+        var _url = "{{ url_for('markdown_preview') }}";
+          $.ajax({
+              url: _url ,
+              type: 'POST',
+              data: {
+                content: _text,
+                csrf_token: "{{ mergeform.csrf_token.current_token }}",
+              },
+              dataType: 'html',
+              success: function(res) {
+                  $( "#preview" ).html(res);
+              },
+              error: function() {
+                  alert('Unable to generate preview!');
+              }
+          });
+          return false;
+      }
+    }
+  );
+
+  $( ".reply" ).click(
+    function() {
+        var _section = $(this).parent().parent().parent();
+        var _comment = _section.find('.comment_body');
+        var _text = _comment.text().split("\n");
+        var _output = new Array();
+        for (cnt = 0; cnt < _text.length - 1; cnt ++) {
+            _output[cnt] = '> ' + jQuery.trim(_text[cnt + 1]);
+        }
+        $( "#comment" ).val(_output.join("\n"));
     }
   );
 {% endif %}
