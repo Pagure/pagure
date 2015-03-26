@@ -340,3 +340,49 @@ Cancelled pull-request:
         ','.join(mail_to),
         mail_id=request.mail_id,
     )
+
+
+def notify_pull_request_comment(comment, user):
+    ''' Notify the people following a pull-request that a new comment was
+    added to it.
+    '''
+    text = """
+Project: %s
+
+%s commented on the pull-request: `%s` that you are following.
+
+New comment:
+
+``
+%s
+``
+
+%s
+""" % (
+        comment.pull_request.repo.name,
+        comment.user.user,
+        comment.pull_request.title,
+        comment.comment,
+        '%s/%s/request-pull/%s' % (
+            pagure.APP.config['APP_URL'],
+            comment.pull_request.repo.name,
+            comment.pull_request.id,
+        ),
+    )
+    mail_to = set([
+        cmt.user.emails[0].email
+        for cmt in comment.pull_request.comments])
+    mail_to.add(comment.pull_request.repo.user.emails[0].email)
+    for prouser in comment.pull_request.repo.users:
+        if prouser.emails:
+            mail_to.add(prouser.emails[0].email)
+
+    mail_to = _clean_emails(mail_to, user)
+
+    send_email(
+        text,
+        'Update to pull-Request #%s `%s`' % (
+            comment.pull_request.id, comment.pull_request.title),
+        ','.join(mail_to),
+        mail_id=comment.pull_request.mail_id,
+    )
