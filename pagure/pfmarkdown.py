@@ -48,7 +48,8 @@ def inject():
                 return text
 
             el = markdown.util.etree.Element("a")
-            el.set('href', _user_url(name))
+            url = flask.url_for('view_user', username=name)
+            el.set('href', url)
             el.text = text
             return el
 
@@ -114,14 +115,6 @@ def inject():
     markdown.build_inlinepatterns = extended_builder
 
 
-def _user_url(name):
-    return flask.url_for('view_user', username=name)
-
-
-def _issue_url(user, repo, idx):
-    return flask.url_for('view_issue', username=user, repo=repo, issueid=idx)
-
-
 def _issue_exists(user, repo, idx):
     repo_obj = pagure.lib.get_project(
         pagure.SESSION, name=repo, user=user)
@@ -138,6 +131,7 @@ def _issue_exists(user, repo, idx):
 
 def _issue_anchor_tag(user, repo, idx, text):
     el = markdown.util.etree.Element("a")
-    el.set('href', _issue_url(user, repo, idx))
+    url = flask.url_for('view_issue', username=user, repo=repo, issueid=idx)
+    el.set('href', url)
     el.text = text
     return el
