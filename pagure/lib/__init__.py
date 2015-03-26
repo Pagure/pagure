@@ -482,7 +482,7 @@ def add_user_to_project(session, project, new_user, user):
 
 
 def add_pull_request_comment(session, request, commit, filename, row,
-                             comment, user, requestfolder):
+                             comment, user, requestfolder, notify=True):
     ''' Add a comment to a pull-request. '''
     user_obj = __get_user(session, user)
 
@@ -500,6 +500,9 @@ def add_pull_request_comment(session, request, commit, filename, row,
 
     pagure.lib.git.update_git(
         request, repo=request.repo, repofolder=requestfolder)
+
+    if notify:
+        pagure.lib.notify.notify_pull_request_comment(pr_comment, user_obj)
 
     pagure.lib.notify.fedmsg_publish(
         'pull-request.comment.added',
