@@ -612,7 +612,7 @@ def new_issue(session, repo, title, content, user, ticketfolder,
         )
     )
 
-    return 'Issue created'
+    return issue
 
 
 def new_pull_request(session, repo_from, branch_from,
