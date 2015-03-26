@@ -248,11 +248,11 @@ def request_pull_patch(repo, requestid, username=None):
 @APP.route('/<repo>/request-pull/<int:requestid>/comment/',
            methods=['POST'])
 @APP.route('/<repo>/request-pull/<int:requestid>/comment/<commit>/'
-           '<filename>/<row>', methods=('GET', 'POST'))
+           '<path:filename>/<row>', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/request-pull/<int:requestid>/comment/',
            methods=['POST'])
 @APP.route('/fork/<username>/<repo>/request-pull/<int:requestid>/comment/'
-           '<commit>/<filename>/<row>', methods=('GET', 'POST'))
+           '<commit>/<path:filename>/<row>', methods=('GET', 'POST'))
 def pull_request_add_comment(
         repo, requestid, commit=None,
         filename=None, row=None, username=None):
