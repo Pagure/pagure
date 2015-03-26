@@ -245,12 +245,17 @@ def request_pull_patch(repo, requestid, username=None):
     return flask.Response(patch, content_type="text/plain;charset=UTF-8")
 
 
+@APP.route('/<repo>/request-pull/<int:requestid>/comment/',
+           methods=['POST'])
 @APP.route('/<repo>/request-pull/<int:requestid>/comment/<commit>/'
            '<filename>/<row>', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/request-pull/<int:requestid>/comment/',
+           methods=['POST'])
 @APP.route('/fork/<username>/<repo>/request-pull/<int:requestid>/comment/'
            '<commit>/<filename>/<row>', methods=('GET', 'POST'))
-def pull_request_add_comment(repo, requestid, commit, filename, row,
-                             username=None):
+def pull_request_add_comment(
+        repo, requestid, commit=None,
+        filename=None, row=None, username=None):
     """ Add a comment to a commit in a pull-request.
     """
     repo = pagure.lib.get_project(SESSION, repo, user=username)
