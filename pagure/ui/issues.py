@@ -376,7 +376,7 @@ def new_issue(repo, username=None):
             )
             SESSION.commit()
             # If there is a file attached, attach it.
-            filestream = flask.request.files['filestream']
+            filestream = flask.request.files.get('filestream')
             if filestream and '<!!image>' in issue.content:
                 new_filename = pagure.lib.git.add_file_to_git(
                     repo=repo,
