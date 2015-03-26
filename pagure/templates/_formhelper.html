@@ -60,3 +60,27 @@
 {% endfor %}
 {% endif %}
 {% endmacro %}
+
+
+{% macro show_comment(user, date, content, id) %}
+  <section class="issue_comment">
+    <header id="comment-{{ id }}">
+      {{ user.user | avatar(16) | safe }}
+      <a href="{{ url_for('view_user', username=user.user)}}">
+        {{ user.user }}
+      </a> - <span title="{{ date }}">{{ date | humanize}}</span>
+      <a class="headerlink" title="Permalink to this headline"
+        href="#comment-{{ id }}">¶</a>
+      <aside class="issue_action">
+        <a class="reply" title="Reply to this comment - loose formating">
+          reply
+        </a>
+      </aside>
+    </header>
+    <div class="comment_body">
+      {% autoescape false %}
+        {{ content | crossref | markdown }}
+      {% endautoescape %}
+    </div>
+  </section>
+{% endmacro %}
