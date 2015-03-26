@@ -73,7 +73,7 @@ def view_repo(repo, username=None):
             readme = pagure.doc_utils.convert_readme(
                 content, ext,
                 view_file_url=flask.url_for(
-                    'view_file', username=username,
+                    'view_raw_file', username=username,
                     repo=repo.name, identifier='master', filename=''))
 
     diff_commits = []
