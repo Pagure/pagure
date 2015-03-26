@@ -80,7 +80,7 @@
     <tbody>
     {% for issue in issues %}
         <tr>
-            <td>#{{ issue.id }}</td>
+            <td sorttable_customkey={{issue.id}}>#{{ issue.id }}</td>
             <td>
                 <a href="{{ url_for('view_issue', username=username,
                     repo=repo.name, issueid=issue.id) }}">
