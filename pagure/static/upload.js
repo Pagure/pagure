@@ -104,8 +104,8 @@ function doUpload(csrf_token, files) {
   });
 }
 
-function initDropbox(csrf_token) {
-  var $dropbox = $("#comment");
+function initDropbox(csrf_token, id, upload=true) {
+  var $dropbox = $(id);
 
   // On drag enter...
   $dropbox.on("dragenter", function(e) {
@@ -131,7 +131,9 @@ function initDropbox(csrf_token) {
     // Get the files.
     var files = e.originalEvent.dataTransfer.files;
 
-    doUpload(csrf_token, files);
+    if (upload == true) {
+        doUpload(csrf_token, files);
+    };
 });
 
   // If the files are dropped outside of the drop zone, the browser will
