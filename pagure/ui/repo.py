@@ -70,7 +70,11 @@ def view_repo(repo, username=None):
         name, ext = os.path.splitext(i.name)
         if name == 'README':
             content = repo_obj[i.oid].data
-            readme = pagure.doc_utils.convert_readme(content, ext)
+            readme = pagure.doc_utils.convert_readme(
+                content, ext,
+                view_file_url=flask.url_for(
+                    'view_file', username=username,
+                    repo=repo.name, identifier=branchname, filename=''))
 
     diff_commits = []
     if repo.is_fork:

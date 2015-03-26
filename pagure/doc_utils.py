@@ -15,7 +15,7 @@ import markupsafe
 import markdown
 
 
-def modify_rst(rst):
+def modify_rst(rst, view_file_url=None):
     """ Downgrade some of our rst directives if docutils is too old. """
 
     # We catch Exception if we want :-p
@@ -38,6 +38,9 @@ def modify_rst(rst):
     substitutions = {  # pragma: no cover
         '.. code-block:: javascript': '::',
     }
+    if view_file_url:
+        substitutions['.. image:: '] = '.. image:: %s' % view_file_url
+
     for old, new in substitutions.items():  # pragma: no cover
         rst = rst.replace(old, new)
 
@@ -58,9 +61,9 @@ def modify_html(html):
     return html
 
 
-def convert_doc(rst_string):
+def convert_doc(rst_string, view_file_url=None):
     """ Utility to load an RST file and turn it into fancy HTML. """
-    rst = modify_rst(rst_string)
+    rst = modify_rst(rst_string, view_file_url)
 
     overrides = {'report_level': 'quiet'}
     html = docutils.core.publish_parts(
@@ -76,13 +79,13 @@ def convert_doc(rst_string):
     return html_string
 
 
-def convert_readme(content, ext):
+def convert_readme(content, ext, view_file_url=None):
     ''' Convert the provided content according to the extension of the file
     provided.
     '''
     output = content
     if ext and ext in ['.rst']:
-        output = convert_doc(content)
+        output = convert_doc(content, view_file_url)
     elif ext and ext in ['.mk']:
         output = markdown.markdown(content)
     return output
