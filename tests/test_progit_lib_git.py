@@ -283,7 +283,7 @@ index 9f44358..2a552bb 100644
             user='pingou',
             ticketfolder=tests.HERE
         )
-        self.assertEqual(msg, 'Issue created')
+        self.assertEqual(msg.title, 'Test issue')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         pagure.lib.git.update_git(issue, repo, tests.HERE)
 

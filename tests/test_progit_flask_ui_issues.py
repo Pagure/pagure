@@ -148,7 +148,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             ticketfolder=None
         )
         self.session.commit()
-        self.assertEqual(msg, 'Issue created')
+        self.assertEqual(msg.title, 'Test issue')
 
         # Whole list
         output = self.app.get('/test/issues')
@@ -205,7 +205,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             ticketfolder=None
         )
         self.session.commit()
-        self.assertEqual(msg, 'Issue created')
+        self.assertEqual(msg.title, 'Test issue')
 
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 200)
@@ -245,7 +245,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             private=True,
         )
         self.session.commit()
-        self.assertEqual(msg, 'Issue created')
+        self.assertEqual(msg.title, 'Test issue')
 
         # Not logged in
         output = self.app.get('/test/issue/2')
@@ -299,7 +299,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             ticketfolder=None
         )
         self.session.commit()
-        self.assertEqual(msg, 'Issue created')
+        self.assertEqual(msg.title, 'Test issue')
 
         user = tests.FakeUser()
         user.username = 'pingou'
@@ -442,7 +442,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             ticketfolder=None
         )
         self.session.commit()
-        self.assertEqual(msg, 'Issue created')
+        self.assertEqual(msg.title, 'Test issue')
+
         # Reset the status of the first issue
         parent_issue = pagure.lib.search_issues(
             self.session, repo, issueid=2)
@@ -480,7 +481,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             private=True,
         )
         self.session.commit()
-        self.assertEqual(msg, 'Issue created')
+        self.assertEqual(msg.title, 'Test issue')
 
         # Wrong user
         user = tests.FakeUser()
@@ -535,7 +536,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             ticketfolder=None
         )
         self.session.commit()
-        self.assertEqual(msg, 'Issue created')
+        self.assertEqual(msg.title, 'Test issue')
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
@@ -628,7 +629,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             ticketfolder=None
         )
         self.session.commit()
-        self.assertEqual(msg, 'Issue created')
+        self.assertEqual(msg.title, 'Test issue')
 
         # Add a tag to the issue
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
@@ -711,7 +712,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             ticketfolder=None
         )
         self.session.commit()
-        self.assertEqual(msg, 'Issue created')
+        self.assertEqual(msg.title, 'Test issue')
 
         # Add a tag to the issue
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)

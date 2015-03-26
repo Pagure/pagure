@@ -55,7 +55,7 @@ class PagureLibModeltests(tests.Modeltests):
             user='pingou',
             ticketfolder=None
         )
-        self.assertEqual(msg, 'Issue created')
+        self.assertEqual(msg.title, 'Test issue')
 
         issues = pagure.lib.search_issues(self.session, repo)
         self.assertEqual(len(issues), 1)

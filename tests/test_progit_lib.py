@@ -177,7 +177,7 @@ class PagureLibtests(tests.Modeltests):
             ticketfolder=None
         )
         self.session.commit()
-        self.assertEqual(msg, 'Issue created')
+        self.assertEqual(msg.title, 'Test issue')
 
         msg = pagure.lib.new_issue(
             session=self.session,
@@ -189,7 +189,7 @@ class PagureLibtests(tests.Modeltests):
             ticketfolder=None
         )
         self.session.commit()
-        self.assertEqual(msg, 'Issue created')
+        self.assertEqual(msg.title, 'Test issue #2')
 
         # After
         issues = pagure.lib.search_issues(self.session, repo)
@@ -1446,7 +1446,7 @@ class PagureLibtests(tests.Modeltests):
             private=True,
         )
         self.session.commit()
-        self.assertEqual(msg, 'Issue created')
+        self.assertEqual(msg.title, 'Test issue #3')
 
         # before
         self.assertEqual(issue.tags_text, [])
@@ -1489,7 +1489,7 @@ class PagureLibtests(tests.Modeltests):
             private=True,
         )
         self.session.commit()
-        self.assertEqual(msg, 'Issue created')
+        self.assertEqual(msg.title, 'Test issue #3')
 
         # before
         self.assertEqual(issue.tags_text, [])
