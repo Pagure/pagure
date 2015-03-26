@@ -176,7 +176,7 @@
 {% if authenticated and form %}
 $(document).ready(function() {
   // Set up the drag/drop zone.
-  initDropbox("{{ form.csrf_token.current_token }}");
+  initDropbox("{{ form.csrf_token.current_token }}", "#comment");
 
   // Set up the handler for the file input box.
   $("#file-picker").on("change", function() {
