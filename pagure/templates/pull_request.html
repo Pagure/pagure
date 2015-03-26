@@ -225,8 +225,8 @@
       </div>
     </div>
   </form>
-{% else %}
-  <p><a href="{{ url_for('auth_login', next=request.url) }}">Login</a> to comment on this ticket.</p>
+{% elif pull_request %}
+  <p><a href="{{ url_for('auth_login', next=request.url) }}">Login</a> to comment.</p>
 {% endif %}
 </section>
 
