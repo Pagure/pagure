@@ -234,3 +234,19 @@ def patch_to_diff(patch):
         for line in hunk.lines:
             content = content + ' '.join(line)
     return content
+
+
+@APP.template_filter('author2user')
+def author_to_user(author, size=16):
+    """ Template filter transforming a pygit2 Author object into a text
+    either with just the username or linking to the user in pagure.
+    """
+    user = pagure.lib.search_user(SESSION, email=author.email)
+    output = author.name
+    if user:
+        output = "%s <a href='%s'>%s</a>" % (
+            avatar(user.user, size),
+            flask.url_for('view_user', username=user.username),
+            author.name,
+        )
+    return output

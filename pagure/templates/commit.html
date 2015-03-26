@@ -37,14 +37,14 @@
   <tr>
     <th>Author</th>
     <td>
-      {{ commit.author.name }} {{ '<' + commit.author.email + '>' }}
+      {{ commit.author | author2user |safe }}
       - {{ commit.commit_time | format_ts}}
     </td>
   </tr>
   <tr>
     <th>Committer</th>
     <td>
-      {{ commit.committer.name }} {{ '<' + commit.committer.email + '>' }}
+      {{ commit.committer | author2user |safe }}
       - {{ commit.commit_time | format_ts }}
     </td>
   </tr>
