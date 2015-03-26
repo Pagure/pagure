@@ -250,3 +250,13 @@ def author_to_user(author, size=16):
             author.name,
         )
     return output
+
+
+@APP.template_filter('author2avatar')
+def author_to_user(author, size=32):
+    """ Template filter transforming a pygit2 Author object into a text
+    either with just the username or linking to the user in pagure.
+    """
+    user = pagure.lib.search_user(SESSION, email=author.email)
+    output = user.user if user else author.name
+    return avatar(output, size)

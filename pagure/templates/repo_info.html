@@ -134,6 +134,7 @@
     <ul>
       {% for commit in last_commits %}
       <li>
+        {{ commit.author | author2avatar(20) | safe }}
         <a href="{{ url_for('view_commit', username=username,
                 repo=repo.name, commitid=commit.hex) }}">
             <span class="commitid">{{ commit.hex|short }}</span>
