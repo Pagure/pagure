@@ -79,7 +79,7 @@
     </header>
     <div class="comment_body">
       {% autoescape false %}
-        {{ content | crossref | markdown }}
+        {{ content | markdown }}
       {% endautoescape %}
     </div>
   </section>

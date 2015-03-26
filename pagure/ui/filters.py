@@ -189,36 +189,6 @@ def shorted_commit(cid):
     return cid[:APP.config['SHORT_LENGTH']]
 
 
-@APP.template_filter('crossref')
-def crossref_filter(text):
-    """ Template filter adding a link when the provided text references
-    another issue or pull-request.
-    """
-    regex = re.compile('.*\s#(\d+)', re.I)
-    if text:
-        if regex.match(text):
-
-            url = flask.request.url
-            username = None
-            if 'fork/' in flask.request.url:
-                username, project = url.split('fork/')[1].split('/', 2)[:2]
-            else:
-                project = url.split(
-                    flask.request.url_root)[1].split('/', 1)[0]
-
-            issueid = regex.match(text).group(1)
-            text = text.replace('#%s' % issueid, '[#%s](%s)' % (
-                issueid, flask.url_for(
-                    'view_issue', username=username, repo=project,
-                    issueid=issueid)
-                )
-            )
-
-        return text
-    else:
-        return ''
-
-
 @APP.template_filter('markdown')
 def markdown_filter(text):
     """ Template filter converting a string into html content using the
