@@ -553,7 +553,9 @@ class PullRequest(BASE):
 
     repo = relation(
         'Project', foreign_keys=[project_id], remote_side=[Project.id],
-        backref='requests', cascade="delete, delete-orphan",
+        backref=backref(
+            'requests', cascade="delete, delete-orphan",
+        ),
         single_parent=True)
     repo_from = relation(
         'Project', foreign_keys=[project_id_from], remote_side=[Project.id])
