@@ -59,20 +59,10 @@ def inject():
             idx = markdown.util.AtomicString(m.group(4))
             text = '%s/%s#%s' % (user, repo, idx)
 
-            repo_obj = pagure.lib.get_project(
-                pagure.SESSION, name=repo, user=user)
-            if not repo_obj:
+            if not _issue_exists(user, repo, idx):
                 return text
 
-            issue_obj = pagure.lib.search_issues(
-                pagure.SESSION, repo=repo_obj, issueid=idx)
-            if not issue_obj:
-                return text
-
-            el = markdown.util.etree.Element("a")
-            el.set('href', _issue_url(user, repo, idx))
-            el.text = text
-            return el
+            return _issue_anchor_tag(user, repo, idx, text)
 
     class ExplicitMainIssuePattern(markdown.inlinepatterns.Pattern):
         def handleMatch(self, m):
@@ -80,24 +70,15 @@ def inject():
             idx = markdown.util.AtomicString(m.group(3))
             text = ' %s#%s' % (repo, idx)
 
-            repo_obj = pagure.lib.get_project(
-                pagure.SESSION, name=repo)
-            if not repo_obj:
+            if not _issue_exists(None, repo, idx):
                 return text
 
-            issue_obj = pagure.lib.search_issues(
-                pagure.SESSION, repo=repo_obj, issueid=idx)
-            if not issue_obj:
-                return text
-
-            el = markdown.util.etree.Element("a")
-            el.set('href', _issue_url(None, repo, idx))
-            el.text = text
-            return el
+            return _issue_anchor_tag(None, repo, idx, text)
 
     class ImplicitIssuePattern(markdown.inlinepatterns.Pattern):
         def handleMatch(self, m):
             idx = markdown.util.AtomicString(m.group(2))
+            text = ' #%s' % idx
 
             root = flask.request.url_root
             url = flask.request.url
@@ -107,22 +88,10 @@ def inject():
             else:
                 repo = url.split(root)[1].split('/', 1)[0]
 
-            text = ' #%s' % idx
-
-            repo_obj = pagure.lib.get_project(
-                pagure.SESSION, name=repo, user=user)
-            if not repo_obj:
+            if not _issue_exists(user, repo, idx):
                 return text
 
-            issue_obj = pagure.lib.search_issues(
-                pagure.SESSION, repo=repo_obj, issueid=idx)
-            if not issue_obj:
-                return text
-
-            el = markdown.util.etree.Element("a")
-            el.set('href', _issue_url(user, repo, idx))
-            el.text = text
-            return el
+            return _issue_anchor_tag(user, repo, idx, text)
 
     MENTION_RE = r'[^|\w]@(\w+)'
     EXPLICIT_FORK_ISSUE_RE = r'(\w+)/(\w+)#([0-9]+)'
@@ -151,3 +120,24 @@ def _user_url(name):
 
 def _issue_url(user, repo, idx):
     return flask.url_for('view_issue', username=user, repo=repo, issueid=idx)
+
+
+def _issue_exists(user, repo, idx):
+    repo_obj = pagure.lib.get_project(
+        pagure.SESSION, name=repo, user=user)
+    if not repo_obj:
+        return False
+
+    issue_obj = pagure.lib.search_issues(
+        pagure.SESSION, repo=repo_obj, issueid=idx)
+    if not issue_obj:
+        return False
+
+    return True
+
+
+def _issue_anchor_tag(user, repo, idx, text):
+    el = markdown.util.etree.Element("a")
+    el.set('href', _issue_url(user, repo, idx))
+    el.text = text
+    return el
