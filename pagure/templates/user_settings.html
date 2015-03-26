@@ -52,18 +52,22 @@
         {% endif %}
         {% endfor %}
       </tr>
+    </table>
+
+    <form action="{{ url_for('user_settings') }}" method="post">
+    <table>
       <tr>
-        <form action="{{ url_for('user_settings') }}" method="post">
           {{ render_field_in_cell(form.ssh_key) }}
-        </form>
       </tr>
+    </table>
     </table>
     <p class="buttons indent">
       <input type="submit" class="submit positive button" value="Update">
       <input type="button" value="Cancel" class="button" onclick="history.back();">
       {{ form.csrf_token }}
-
     </p>
+    </form>
+
     <aside>
         <div id="profile_button">
             <a href="{{ url_for('view_user', username=user.user) }}">Public profile page</a>
