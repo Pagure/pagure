@@ -173,3 +173,10 @@ class UploadFileForm(wtf.Form):
     filestream = wtforms.FileField(
         'File',
         [wtforms.validators.Required()])
+
+
+class UserEmailForm(wtf.Form):
+    ''' Form to edit the description of a project. '''
+    email = wtforms.TextField(
+        'email', [wtforms.validators.Required()]
+    )
