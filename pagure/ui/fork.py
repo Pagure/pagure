@@ -561,11 +561,6 @@ def new_request_pull(repo,  branch_to, branch_from, username=None):
     if not repo:
         flask.abort(404)
 
-    if not is_repo_admin(repo):
-        flask.abort(
-            403,
-            'You are not allowed to create pull-requests for this project')
-
     repopath = pagure.get_repo_path(repo)
     repo_obj = pygit2.Repository(repopath)
 
@@ -666,6 +661,9 @@ def new_request_pull(repo,  branch_to, branch_from, username=None):
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')
+
+    if not is_repo_admin(repo):
+        form = None
 
     return flask.render_template(
         'pull_request.html',
