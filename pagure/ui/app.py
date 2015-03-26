@@ -363,6 +363,13 @@ def remove_user_email():
     if not user:
         flask.abort(404, 'User not found')
 
+    if len(user.emails) == 1:
+        flask.flash(
+            'You must always have at least one email', 'error')
+        return flask.redirect(
+            flask.url_for('.user_settings')
+        )
+
     form = pagure.forms.UserEmailForm()
     if form.validate_on_submit():
         email = form.email.data
