@@ -168,8 +168,12 @@ class UserEmail(BASE):
         index=True)
     email = sa.Column(sa.Text, nullable=False, unique=True)
 
-    user = relation('User', foreign_keys=[user_id],
-                    remote_side=[User.id], backref='emails')
+    user = relation(
+        'User', foreign_keys=[user_id], remote_side=[User.id],
+        backref=backref(
+            'emails', cascade="delete, delete-orphan", single_parent=True
+        )
+    )
 
 
 class Project(BASE):
