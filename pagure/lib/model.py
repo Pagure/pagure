@@ -572,6 +572,13 @@ class PullRequest(BASE):
         '''
         return '%s-pull-request-%s@pagure' % (self.repo.name, self.id)
 
+    @property
+    def discussion(self):
+        ''' Return the list of comments related to the pull-request itself,
+        ie: not related to a specific commit.
+        '''
+        return [comment for comment in self.comments if not comment.commit_id]
+
     def to_json(self):
         ''' Returns a dictionnary representation of the pull-request.
 
