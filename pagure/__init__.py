@@ -343,6 +343,10 @@ def get_repo_path(repo):
     return repopath
 
 
+# Install our markdown modifications
+import pagure.pfmarkdown
+pagure.pfmarkdown.inject()
+
 # Import the application
 import pagure.ui.app
 import pagure.ui.admin
