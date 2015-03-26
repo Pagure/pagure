@@ -23,6 +23,9 @@ import flask
 import markdown.inlinepatterns
 import markdown.util
 
+import pagure
+import pagure.lib
+
 
 def inject():
     """ Hack out python-markdown to do the autolinking that we want. """
@@ -38,34 +41,62 @@ def inject():
     # Second, build some Pattern objects for @mentions, #bugs, etc...
     class MentionPattern(markdown.inlinepatterns.Pattern):
         def handleMatch(self, m):
-            el = markdown.util.etree.Element("a")
             name = markdown.util.AtomicString(m.group(2))
+            text = ' @%s' % name
+            user = pagure.lib.search_user(pagure.SESSION, username=name)
+            if not user:
+                return text
+
+            el = markdown.util.etree.Element("a")
             el.set('href', _user_url(name))
-            el.text = ' @%s' % name
+            el.text = text
             return el
 
     class ExplicitForkIssuePattern(markdown.inlinepatterns.Pattern):
         def handleMatch(self, m):
-            el = markdown.util.etree.Element("a")
             user = markdown.util.AtomicString(m.group(2))
             repo = markdown.util.AtomicString(m.group(3))
             idx = markdown.util.AtomicString(m.group(4))
+            text = '%s/%s#%s' % (user, repo, idx)
+
+            repo_obj = pagure.lib.get_project(
+                pagure.SESSION, name=repo, user=user)
+            if not repo_obj:
+                return text
+
+            issue_obj = pagure.lib.search_issues(
+                pagure.SESSION, repo=repo_obj, issueid=idx)
+            if not issue_obj:
+                return text
+
+            el = markdown.util.etree.Element("a")
             el.set('href', _issue_url(user, repo, idx))
-            el.text = '%s/%s#%s' % (user, repo, idx)
+            el.text = text
             return el
 
     class ExplicitMainIssuePattern(markdown.inlinepatterns.Pattern):
         def handleMatch(self, m):
-            el = markdown.util.etree.Element("a")
             repo = markdown.util.AtomicString(m.group(2))
             idx = markdown.util.AtomicString(m.group(3))
+            text = ' %s#%s' % (repo, idx)
+
+            repo_obj = pagure.lib.get_project(
+                pagure.SESSION, name=repo)
+            if not repo_obj:
+                return text
+
+            issue_obj = pagure.lib.search_issues(
+                pagure.SESSION, repo=repo_obj, issueid=idx)
+            if not issue_obj:
+                return text
+
+            el = markdown.util.etree.Element("a")
             el.set('href', _issue_url(None, repo, idx))
-            el.text = ' %s#%s' % (repo, idx)
+            el.text = text
             return el
 
     class ImplicitIssuePattern(markdown.inlinepatterns.Pattern):
         def handleMatch(self, m):
-            el = markdown.util.etree.Element("a")
             idx = markdown.util.AtomicString(m.group(2))
 
             root = flask.request.url_root
@@ -76,8 +107,21 @@ def inject():
             else:
                 repo = url.split(root)[1].split('/', 1)[0]
 
+            text = ' #%s' % idx
+
+            repo_obj = pagure.lib.get_project(
+                pagure.SESSION, name=repo, user=user)
+            if not repo_obj:
+                return text
+
+            issue_obj = pagure.lib.search_issues(
+                pagure.SESSION, repo=repo_obj, issueid=idx)
+            if not issue_obj:
+                return text
+
+            el = markdown.util.etree.Element("a")
             el.set('href', _issue_url(user, repo, idx))
-            el.text = ' #%s' % idx
+            el.text = text
             return el
 
     MENTION_RE = r'[^|\w]@(\w+)'
