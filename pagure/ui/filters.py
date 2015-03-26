@@ -74,7 +74,8 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
     comments = {}
     if prequest and not isinstance(prequest, flask.wrappers.Request):
         for com in prequest.comments:
-            if commit and com.commit_id == commit:
+            if commit and com.commit_id == commit \
+                    and com.filename == filename:
                 if com.line in comments:
                     comments[com.line].append(com)
                 else:
