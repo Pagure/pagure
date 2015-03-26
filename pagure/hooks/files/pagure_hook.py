@@ -154,6 +154,7 @@ def fixes_commit(commitid, issue, app_url=None):
                 pagure.SESSION,
                 issue,
                 ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
+                user=get_pusher(commitid),
                 status='Fixed')
             pagure.SESSION.commit()
         except pagure.exceptions.PagureException as err:
