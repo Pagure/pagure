@@ -747,3 +747,8 @@ ul.changes {
 #tabs textarea {
     width: 500px;
 }
+
+.admin_list {
+    float: right;
+    padding-right: 5em;
+}
