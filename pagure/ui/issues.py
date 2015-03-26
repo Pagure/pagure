@@ -19,6 +19,8 @@ from pygments.lexers import guess_lexer
 from pygments.lexers.text import DiffLexer
 from pygments.formatters import HtmlFormatter
 
+import chardet
+import kitchen.text.converters as ktc
 import mimetypes
 
 import pagure.doc_utils
