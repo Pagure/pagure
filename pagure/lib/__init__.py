@@ -1302,7 +1302,7 @@ def avatar_url(username, size=64, default='retro'):
         return avatar_url_from_openid(openid, size, default)
     except Exception as err:
         pagure.LOG.debug('openid %s', openid)
-        pagure.LOG.exception(err)
+        pagure.LOG.debug(err)
         return ''
 
 
