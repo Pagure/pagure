@@ -401,14 +401,12 @@ def remove_tags_issue(session, issue, tags, ticketfolder, user):
     if isinstance(tags, basestring):
         tags = [tags]
 
-    msgs = []
     removed_tags = []
     for issue_tag in issue.tags:
         if issue_tag.tag in tags:
             tag = issue_tag.tag
             removed_tags.append(tag)
             session.delete(issue_tag)
-            msgs.append('Removed tag: %s' % tag)
 
     pagure.lib.git.update_git(
         issue, repo=issue.project, repofolder=ticketfolder)
@@ -422,7 +420,7 @@ def remove_tags_issue(session, issue, tags, ticketfolder, user):
         )
     )
 
-    return msgs
+    return 'Removed tag: %s' % ', '.join(removed_tags)
 
 
 def edit_issue_tags(session, project, old_tag, new_tag, ticketfolder, user):
