@@ -81,11 +81,11 @@ class PagureHook(BaseHook):
         repo_obj = pygit2.Repository(repopath)
 
         # Install the hook itself
-        shutil.copyfile(
-            os.path.join(hook_files, 'pagure_hook.py'),
-            os.path.join(repopath, 'hooks', 'post-receive.pagure')
-        )
-        os.chmod(os.path.join(repopath, 'hooks', 'post-receive.pagure'), 0755)
+        hook_path = os.path.join(repopath, 'hooks', 'post-receive.pagure')
+        hook_file = os.path.join(hook_files, 'pagure_hook.py')
+
+        shutil.copyfile(hook_file, hook_path)
+        os.chmod(hook_path, 0755)
 
     @classmethod
     def remove(cls, project):
