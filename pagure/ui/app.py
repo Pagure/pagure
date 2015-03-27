@@ -396,3 +396,49 @@ def remove_user_email():
             flask.flash('Email could not be removed', 'error')
 
     return flask.redirect(flask.url_for('.user_settings'))
+
+
+@APP.route('/settings/email/add', methods=['GET', 'POST'])
+@cla_required
+def add_user_email():
+    """ Add a new email for the logged in user.
+    """
+    if admin_session_timedout():
+        return flask.redirect(
+            flask.url_for('auth_login', next=flask.request.url))
+
+    user = pagure.lib.search_user(
+        SESSION, username=flask.g.fas_user.username)
+    if not user:
+        flask.abort(404, 'User not found')
+
+    form = pagure.forms.UserEmailForm()
+    if form.validate_on_submit():
+        email = form.email.data
+        useremails = [mail.email for mail in user.emails]
+
+        if email in useremails:
+            flask.flash(
+                'The email: %s is already associated to you' % email,
+                'error')
+            return flask.redirect(
+                flask.url_for('.user_settings')
+            )
+
+        try:
+            pagure.lib.add_user_pending_email(SESSION, user, email)
+            SESSION.commit()
+            flask.flash('Email pending validation')
+            return flask.redirect(flask.url_for('.user_settings'))
+        except pagure.exceptions.PagureException, err:
+            flask.flash(str(err), 'error')
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash('Email could not be added', 'error')
+
+    return flask.render_template(
+        'user_emails.html',
+        user=user,
+        form=form,
+    )
