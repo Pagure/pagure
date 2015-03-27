@@ -74,18 +74,29 @@ class PagureHook(BaseHook):
             should be installed
 
         '''
-        repopath = get_repo_path(project)
+        repopaths = [get_repo_path(project)]
+        for folder in [
+                APP.config.get('DOCS_FOLDER'),
+                APP.config.get('REQUESTS_FOLDER')]:
+            repopaths.append(
+                os.path.join(folder, project.path)
+            )
 
         hook_files = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), 'files')
-        repo_obj = pygit2.Repository(repopath)
-
-        # Install the hook itself
-        hook_path = os.path.join(repopath, 'hooks', 'post-receive.pagure')
         hook_file = os.path.join(hook_files, 'pagure_hook.py')
 
-        shutil.copyfile(hook_file, hook_path)
-        os.chmod(hook_path, 0755)
+        for repopath in repopaths:
+            print repopath
+            # Init the git repo in case
+            repo_obj = pygit2.Repository(repopath)
+
+            # Install the hook itself
+            hook_path = os.path.join(
+                repopath, 'hooks', 'post-receive.pagure')
+            shutil.copyfile(hook_file, hook_path)
+            os.chmod(hook_path, 0755)
+
 
     @classmethod
     def remove(cls, project):
@@ -95,8 +106,16 @@ class PagureHook(BaseHook):
             should be installed
 
         '''
-        repopath = get_repo_path(project)
+        repopaths = [get_repo_path(project)]
+        for folder in [
+                APP.config.get('DOCS_FOLDER'),
+                APP.config.get('REQUESTS_FOLDER')]:
+            repopaths.append(
+                os.path.join(folder, project.path)
+            )
 
-        hook_path = os.path.join(repopath, 'hooks', 'post-receive.pagure')
-        if os.path.exists(hook_path):
-            os.unlink(hook_path)
+        for repopath in repopaths:
+            hook_path = os.path.join(
+                repopath, 'hooks', 'post-receive.pagure')
+            if os.path.exists(hook_path):
+                os.unlink(hook_path)
