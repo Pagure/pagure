@@ -1503,3 +1503,35 @@ def add_user_pending_email(session, userobj, email):
     session.flush()
 
     pagure.lib.notify.notify_new_email(tmpemail, user=userobj)
+
+
+def search_pending_email(session, email=None, token=None):
+    ''' Searches the database for the pending email matching the given
+    criterias.
+
+    :arg session: the session to use to connect to the database.
+    :kwarg email: the email to look for
+    :type email: string or None
+    :kwarg token: the token of the pending email to look for
+    :type token: string or None
+    :return: A single UserEmailPending object
+    :rtype: UserEmailPending
+
+    '''
+    query = session.query(
+        model.UserEmailPending
+    )
+
+    if email is not None:
+        query = query.filter(
+            model.UserEmailPending.email == email
+        )
+
+    if token is not None:
+        query = query.filter(
+            model.UserEmailPending.token == token
+        )
+
+    output = query.first()
+
+    return output
