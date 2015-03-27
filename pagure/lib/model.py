@@ -392,8 +392,8 @@ class Issue(BASE):
             'user': self.user.to_json(),
             'private': self.private,
             'tags': self.tags_text,
-            'depends': ','.join([str(item) for item in self.depends_text]),
-            'blocks': ','.join([str(item) for item in self.blocks_text]),
+            'depends': [str(item) for item in self.depends_text],
+            'blocks': [str(item) for item in self.blocks_text],
             'assignee': self.assignee.to_json() if self.assignee else None,
         }
 
