@@ -347,7 +347,7 @@ def remove_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
 
         if not issue.private:
             pagure.lib.notify.fedmsg_publish(
-                'issue.removed.added',
+                'issue.dependency.removed',
                 dict(
                     issue=issue.to_json(),
                     agent=user_obj.username,
