@@ -707,7 +707,7 @@ def edit_issue(session, issue, ticketfolder, user,
     pagure.lib.git.update_git(
         issue, repo=issue.project, repofolder=ticketfolder)
 
-    if not issue.private:
+    if not issue.private and edit:
         pagure.lib.notify.fedmsg_publish(
             'issue.edit',
             dict(
