@@ -83,6 +83,8 @@ class PagureFlaskPluginPagureHooktests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects_git(tests.HERE)
+            tests.create_projects_git(os.path.join(tests.HERE, 'docs'))
+            tests.create_projects_git(os.path.join(tests.HERE, 'requests'))
 
             # With the git repo
             output = self.app.post('/test/settings/pagure', data=data)
