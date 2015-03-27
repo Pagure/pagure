@@ -222,13 +222,14 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
             issue, repo=issue.project, repofolder=ticketfolder)
 
         pagure.lib.notify.notify_assigned_issue(issue, None, user_obj)
-        pagure.lib.notify.fedmsg_publish(
-            'issue.assigned.reset',
-            dict(
-                issue=issue.to_json(),
-                agent=user_obj.username,
+        if not issue.private:
+            pagure.lib.notify.fedmsg_publish(
+                'issue.assigned.reset',
+                dict(
+                    issue=issue.to_json(),
+                    agent=user_obj.username,
+                )
             )
-        )
 
         return 'Assignee reset'
     elif assignee is None and issue.assignee == None:
@@ -247,13 +248,14 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
         pagure.lib.notify.notify_assigned_issue(
             issue, assignee_obj, user_obj)
 
-        pagure.lib.notify.fedmsg_publish(
-            'issue.assigned.added',
-            dict(
-                issue=issue.to_json(),
-                agent=user_obj.username,
+        if not issue.private:
+            pagure.lib.notify.fedmsg_publish(
+                'issue.assigned.added',
+                dict(
+                    issue=issue.to_json(),
+                    agent=user_obj.username,
+                )
             )
-        )
 
         return 'Issue assigned'
 
