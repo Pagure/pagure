@@ -82,7 +82,7 @@ class PagureFlaskPluginPagureTicketHooktests(tests.Modeltests):
             output = self.app.post('/test/settings/pagure tickets', data=data)
             self.assertEqual(output.status_code, 404)
 
-             # Create both the tickets repo
+            # Create both the tickets repo
             tests.create_projects_git(os.path.join(tests.HERE, 'tickets'))
 
             # With the git repo
@@ -118,7 +118,7 @@ class PagureFlaskPluginPagureTicketHooktests(tests.Modeltests):
 
             self.assertTrue(os.path.exists(os.path.join(
                 tests.HERE, 'tickets', 'test.git', 'hooks',
-                'post-receive.pagure')))
+                'post-receive.pagure-ticket')))
 
             # De-Activate hook
             data = {'csrf_token': csrf_token}
@@ -133,7 +133,7 @@ class PagureFlaskPluginPagureTicketHooktests(tests.Modeltests):
 
             self.assertFalse(os.path.exists(os.path.join(
                 tests.HERE, 'tickets', 'test.git', 'hooks',
-                'post-receive.pagure')))
+                'post-receive.pagure-ticket')))
 
 
 if __name__ == '__main__':
