@@ -117,7 +117,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
                 '<li class="message">Issue created</li>' in output.data)
-            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
             self.assertTrue('<h2>\n    Issues (1)\n  </h2>' in output.data)
 
     @patch('pagure.lib.git.update_git')
@@ -153,20 +155,26 @@ class PagureFlaskIssuestests(tests.Modeltests):
         # Whole list
         output = self.app.get('/test/issues')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue('<p>test project #1</p>' in output.data)
+        self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
         self.assertTrue('<h2>\n    Issues (1)\n  </h2>' in output.data)
 
         # Status = closed
         output = self.app.get('/test/issues?status=cloSED')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue('<p>test project #1</p>' in output.data)
+        self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
         self.assertTrue(
             '<h2>\n    Closed\n    Issues (0)\n  </h2>' in output.data)
 
         # Status = fixed
         output = self.app.get('/test/issues?status=fixed')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue('<p>test project #1</p>' in output.data)
+        self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
         self.assertTrue(
             '<h2>\n    Closed\n    Issues (0)\n  </h2>' in output.data)
 
@@ -209,7 +217,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue('<p>test project #1</p>' in output.data)
+        self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
         self.assertTrue(
             '<p><a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1'
             '">Login</a> to comment on this ticket.</p>'
@@ -219,7 +229,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
             self.assertFalse(
                 '<p><a href="/login/">Login</a> to comment on this ticket.</p>'
                 in output.data)
@@ -228,7 +240,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -262,7 +276,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/2')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
 
         # Project w/o issue tracker
         repo = pagure.lib.get_project(self.session, 'test')
@@ -306,7 +322,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -318,7 +336,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
             self.assertFalse(
                 '<option selected value="Fixed">Fixed</option>'
                 in output.data)
@@ -327,7 +347,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
             self.assertFalse(
                 '<option selected value="Fixed">Fixed</option>'
                 in output.data)
@@ -336,7 +358,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
             self.assertTrue(
                 '<li class="message">Edited successfully issue #1</li>'
                 in output.data)
@@ -353,7 +377,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
             self.assertTrue(
                 '<li class="message">Comment added</li>' in output.data)
             self.assertFalse(
@@ -375,9 +401,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<p>test project #1</p>' in output.data)
             self.assertTrue(
-                '<li class="message">Tag added</li>' in output.data)
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
+            self.assertTrue(
+                '<li class="message">Tag added: tag#2</li>' in output.data)
             self.assertFalse(
                 'li class="message">No changes to edit</li>' in output.data)
             self.assertTrue(
@@ -397,7 +425,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
             self.assertTrue(
                 '<li class="error">No user &#34;ralph&#34; found</li>'
                 in output.data)
@@ -418,7 +448,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
             self.assertTrue(
                 '<li class="message">Issue assigned</li>' in output.data)
             self.assertTrue(
@@ -461,7 +493,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/2/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
             self.assertTrue(
                 '<li class="error">You cannot close a ticket that has ticket '
                 'depending that are still open.</li>' in output.data)
@@ -636,11 +670,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
         msg = pagure.lib.add_issue_tag(
             session=self.session,
             issue=issue,
-            tag='tag1',
+            tags='tag1',
             user='pingou',
             ticketfolder=None)
         self.session.commit()
-        self.assertEqual(msg, 'Tag added')
+        self.assertEqual(msg, 'Tag added: tag1')
 
         # Before edit, list tags
         tags = pagure.lib.get_tags_of_project(self.session, repo)
@@ -672,7 +706,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/tag/tag1/edit', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
             self.assertTrue(
                 '<li class="message">Edited tag: tag1 to tag2</li>'
                 in output.data)
@@ -719,11 +755,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
         msg = pagure.lib.add_issue_tag(
             session=self.session,
             issue=issue,
-            tag='tag1',
+            tags='tag1',
             user='pingou',
             ticketfolder=None)
         self.session.commit()
-        self.assertEqual(msg, 'Tag added')
+        self.assertEqual(msg, 'Tag added: tag1')
 
         # Before edit, list tags
         tags = pagure.lib.get_tags_of_project(self.session, repo)

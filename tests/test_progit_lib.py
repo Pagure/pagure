@@ -303,21 +303,21 @@ class PagureLibtests(tests.Modeltests):
         msg = pagure.lib.add_issue_tag(
             session=self.session,
             issue=issue,
-            tag='tag1',
+            tags='tag1',
             user='pingou',
             ticketfolder=None)
         self.session.commit()
-        self.assertEqual(msg, 'Tag added')
+        self.assertEqual(msg, 'Tag added: tag1')
 
         # Try a second time
-        self.assertRaises(
-            pagure.exceptions.PagureException,
-            pagure.lib.add_issue_tag,
+        msg = pagure.lib.add_issue_tag(
             session=self.session,
             issue=issue,
-            tag='tag1',
+            tags='tag1',
             user='pingou',
             ticketfolder=None)
+        self.session.commit()
+        self.assertEqual(msg, 'Nothing to add')
 
         issues = pagure.lib.search_issues(self.session, repo, tags='tag1')
         self.assertEqual(len(issues), 1)
@@ -373,7 +373,7 @@ class PagureLibtests(tests.Modeltests):
             user='pingou',
             ticketfolder=None)
 
-        self.assertEqual(msgs, [u'Removed tag: tag1'])
+        self.assertEqual(msgs, 'Removed tag: tag1')
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -1414,12 +1414,12 @@ class PagureLibtests(tests.Modeltests):
 
         messages = pagure.lib.update_tags_issue(
             self.session, issue, 'tag', 'pingou', ticketfolder=None)
-        self.assertEqual(messages, ['Tag added'])
+        self.assertEqual(messages, ['Tag added: tag'])
         messages = pagure.lib.update_tags_issue(
             self.session, issue, ['tag2', 'tag3'], 'pingou',
             ticketfolder=None)
         self.assertEqual(
-            messages, ['Tag added', 'Tag added', 'Removed tag: tag'])
+            messages, ['Tag added: tag2, tag3', 'Removed tag: tag'])
 
         # after
         self.assertEqual(issue.tags_text, ['tag2', 'tag3'])
