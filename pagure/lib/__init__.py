@@ -165,6 +165,7 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
             'issue.comment.added',
             dict(
                 issue=issue.to_json(),
+                project=issue.project.to_json(),
                 agent=user_obj.username,
             )
         )
@@ -242,6 +243,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
                 'issue.assigned.reset',
                 dict(
                     issue=issue.to_json(),
+                    project=issue.project.to_json(),
                     agent=user_obj.username,
                 )
             )
@@ -268,6 +270,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
                 'issue.assigned.added',
                 dict(
                     issue=issue.to_json(),
+                    project=issue.project.to_json(),
                     agent=user_obj.username,
                 )
             )
@@ -309,6 +312,7 @@ def add_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
                 'issue.dependency.added',
                 dict(
                     issue=issue.to_json(),
+                    project=issue.project.to_json(),
                     added_dependency=issue_blocked.id,
                     agent=user_obj.username,
                 )
@@ -350,6 +354,7 @@ def remove_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
                 'issue.dependency.removed',
                 dict(
                     issue=issue.to_json(),
+                    project=issue.project.to_json(),
                     removed_dependency=child.id,
                     agent=user_obj.username,
                 )
@@ -417,6 +422,7 @@ def remove_tags_issue(session, issue, tags, ticketfolder, user):
         'issue.tag.removed',
         dict(
             issue=issue.to_json(),
+            project=issue.project.to_json(),
             tags=removed_tags,
             agent=user_obj.username,
         )
@@ -639,6 +645,7 @@ def new_issue(session, repo, title, content, user, ticketfolder,
             'issue.new',
             dict(
                 issue=issue.to_json(),
+                project=issue.project.to_json(),
                 agent=user_obj.username,
             )
         )
@@ -720,6 +727,7 @@ def edit_issue(session, issue, ticketfolder, user,
             'issue.edit',
             dict(
                 issue=issue.to_json(),
+                project=issue.project.to_json(),
                 fields=edit,
                 agent=user_obj.username,
             )
