@@ -1298,7 +1298,12 @@ def update_user_ssh(session, user, ssh_key):
 
 def avatar_url(username, size=64, default='retro'):
     openid = "http://%s.id.fedoraproject.org/" % username
-    return avatar_url_from_openid(openid, size, default)
+    try:
+        return avatar_url_from_openid(openid, size, default)
+    except Exception as err:
+        pagure.LOG.debug('openid {0}', openid)
+        pagure.LOG.exception(err)
+        return ''
 
 
 def avatar_url_from_openid(openid, size=64, default='retro', dns=False):
