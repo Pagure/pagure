@@ -370,7 +370,7 @@ def remove_tags(session, project, tags, ticketfolder, user):
     pagure.lib.notify.fedmsg_publish(
         'project.tag.removed',
         dict(
-            issue=project.to_json(),
+            project=project.to_json(),
             tags=removed_tags,
             agent=user_obj.username,
         )
