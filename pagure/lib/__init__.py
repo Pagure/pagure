@@ -172,28 +172,38 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
     return 'Comment added'
 
 
-def add_issue_tag(session, issue, tag, user, ticketfolder):
+def add_issue_tag(session, issue, tags, user, ticketfolder):
     ''' Add a tag to an issue. '''
     user_obj = __get_user(session, user)
 
-    for tag_issue in issue.tags:
-        if tag_issue.tag == tag:
-            raise pagure.exceptions.PagureException(
-                'Tag already present: %s' % tag)
+    if isinstance(tags, basestring):
+        tags = [tags]
 
-    tagobj = get_tag(session, tag)
-    if not tagobj:
-        tagobj = model.Tag(tag=tag)
-        session.add(tagobj)
+    msgs = []
+    added_tags = []
+    for issue_tag in tags:
+        known = False
+        for tag_issue in issue.tags:
+            if tag_issue.tag == issue_tag:
+                known = True
+
+        if known:
+            continue
+
+        tagobj = get_tag(session, issue_tag)
+        if not tagobj:
+            tagobj = model.Tag(tag=issue_tag)
+            session.add(tagobj)
+            session.flush()
+
+        issue_tag = model.TagIssue(
+            issue_uid=issue.uid,
+            tag=tagobj.tag,
+        )
+        session.add(issue_tag)
+        # Make sure we won't have SQLAlchemy error before we create the repo
         session.flush()
-
-    issue_tag = model.TagIssue(
-        issue_uid=issue.uid,
-        tag=tagobj.tag,
-    )
-    session.add(issue_tag)
-    # Make sure we won't have SQLAlchemy error before we create the repo
-    session.flush()
+        added_tags.append(tagobj.tag)
 
     pagure.lib.git.update_git(
         issue, repo=issue.project, repofolder=ticketfolder)
@@ -203,11 +213,16 @@ def add_issue_tag(session, issue, tag, user, ticketfolder):
             'issue.tag.added',
             dict(
                 issue=issue.to_json(),
+                project=issue.project.to_json(),
+                tags=added_tags,
                 agent=user_obj.username,
             )
         )
 
-    return 'Tag added'
+    if added_tags:
+        return 'Tag added: %s' % ', '.join(added_tags)
+    else:
+        return 'Nothing to add'
 
 
 def add_issue_assignee(session, issue, assignee, user, ticketfolder):
