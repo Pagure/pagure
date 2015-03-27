@@ -395,16 +395,16 @@ def notify_new_email(email, user):
     ''' Ask the user to confirm to the email belong to them.
     '''
 
-    url = pagure.APP.config.get('APPLICATION_URL', flask.request.url_root)
+    root_url = pagure.APP.config.get('APPLICATION_URL', flask.request.url_root)
 
     url = urlparse.urljoin(
-        url or flask.request.url_root,
+        root_url or flask.request.url_root,
         flask.url_for('confirm_email', token=email.token),
     )
 
     text = """Dear %(username)s,
 
-You have registered a new email on pagure at %(url)s.
+You have registered a new email on pagure at %(root_url)s.
 
 To finish your validate this registration, please click on the following
 link or copy/paste it in your browser, this link will remain valid only 2 days:
@@ -414,7 +414,7 @@ The email will not be activated until you finish this step.
 
 Sincerely,
 Your pagure admin.
-""" % ({'username': user.username, 'url': url})
+""" % ({'username': user.username, 'url': url, 'root_url': root_url})
 
     send_email(
         text,
