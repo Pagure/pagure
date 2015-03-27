@@ -37,35 +37,21 @@
         <td> {{ user.fullname }} </td>
       </tr>
       <tr>
-        <th rowspan="{{ user.emails | length }}">Emails</th>
+        <th>Emails</th>
         {% for email in user.emails %}
-        {% if loop.first %}
           {{ render_email(email, form) }}
-        {% elif loop.last %}
       </tr>
       <tr>
-          {{ render_email(email, form) }}
-        {% else %}
-      </tr>
-      <tr>
-          {{ render_email(email, form) }}
-        {% endif %}
+        <td></td>
         {% endfor %}
       </tr>
       <tr>
-        <th rowspan="{{ user.emails_pending | length }}">Emails pending</th>
+        <th>Emails pending</th>
         {% for email in user.emails_pending %}
-        {% if loop.first %}
           <td>{{ email.email }}</td>
-        {% elif loop.last %}
       </tr>
       <tr>
-          <td>{{ email.email }}</td>
-        {% else %}
-      </tr>
-      <tr>
-          <td>{{ email.email }}</td>
-        {% endif %}
+        <td></td>
         {% endfor %}
       </tr>
     </table>
