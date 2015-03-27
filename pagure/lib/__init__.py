@@ -467,10 +467,6 @@ def edit_issue_tags(session, project, old_tag, new_tag, ticketfolder, user):
                 session.add(issue_tag)
                 session.flush()
 
-        tagobj = get_tag(session, old_tag)
-        if tagobj:
-            session.delete(tagobj)
-
         msgs.append('Edited tag: %s to %s' % (old_tag, new_tag))
         pagure.lib.git.update_git(
             issue, repo=issue.project, repofolder=ticketfolder)
