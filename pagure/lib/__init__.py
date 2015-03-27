@@ -350,6 +350,7 @@ def remove_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
                 'issue.dependency.removed',
                 dict(
                     issue=issue.to_json(),
+                    removed_dependency=child.id,
                     agent=user_obj.username,
                 )
             )
