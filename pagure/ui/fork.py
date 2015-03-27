@@ -43,8 +43,8 @@ def _get_parent_repo_path(repo):
     return parentpath
 
 
-@APP.route('/<repo>/request-pulls')
-@APP.route('/fork/<username>/<repo>/request-pulls')
+@APP.route('/<repo>/pull-requests')
+@APP.route('/fork/<username>/<repo>/pull-requests')
 def request_pulls(repo, username=None):
     """ Request pulling the changes from the fork into the project.
     """
@@ -72,8 +72,8 @@ def request_pulls(repo, username=None):
     )
 
 
-@APP.route('/<repo>/request-pull/<int:requestid>')
-@APP.route('/fork/<username>/<repo>/request-pull/<int:requestid>')
+@APP.route('/<repo>/pull-request/<int:requestid>')
+@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>')
 def request_pull(repo, requestid, username=None):
     """ Request pulling the changes from the fork into the project.
     """
@@ -176,8 +176,8 @@ def request_pull(repo, requestid, username=None):
     )
 
 
-@APP.route('/<repo>/request-pull/<int:requestid>.patch')
-@APP.route('/fork/<username>/<repo>/request-pull/<int:requestid>.patch')
+@APP.route('/<repo>/pull-request/<int:requestid>.patch')
+@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>.patch')
 def request_pull_patch(repo, requestid, username=None):
     """ Returns the commits from the specified pull-request as patches.
     """
@@ -245,13 +245,13 @@ def request_pull_patch(repo, requestid, username=None):
     return flask.Response(patch, content_type="text/plain;charset=UTF-8")
 
 
-@APP.route('/<repo>/request-pull/<int:requestid>/comment/',
+@APP.route('/<repo>/pull-request/<int:requestid>/comment/',
            methods=['POST'])
-@APP.route('/<repo>/request-pull/<int:requestid>/comment/<commit>/'
+@APP.route('/<repo>/pull-request/<int:requestid>/comment/<commit>/'
            '<path:filename>/<row>', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/request-pull/<int:requestid>/comment/',
+@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/comment/',
            methods=['POST'])
-@APP.route('/fork/<username>/<repo>/request-pull/<int:requestid>/comment/'
+@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/comment/'
            '<commit>/<path:filename>/<row>', methods=('GET', 'POST'))
 def pull_request_add_comment(
         repo, requestid, commit=None,
@@ -314,8 +314,8 @@ def pull_request_add_comment(
     )
 
 
-@APP.route('/<repo>/request-pull/<int:requestid>/merge', methods=['POST'])
-@APP.route('/fork/<username>/<repo>/request-pull/<int:requestid>/merge',
+@APP.route('/<repo>/pull-request/<int:requestid>/merge', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/merge',
            methods=['POST'])
 def merge_request_pull(repo, requestid, username=None):
     """ Request pulling the changes from the fork into the project.
@@ -459,9 +459,9 @@ def merge_request_pull(repo, requestid, username=None):
     return flask.redirect(flask.url_for('view_repo', repo=repo.name))
 
 
-@APP.route('/<repo>/request-pull/cancel/<int:requestid>',
+@APP.route('/<repo>/pull-request/cancel/<int:requestid>',
            methods=['POST'])
-@APP.route('/fork/<username>/<repo>/request-pull/cancel/<int:requestid>',
+@APP.route('/fork/<username>/<repo>/pull-request/cancel/<int:requestid>',
            methods=['POST'])
 def cancel_request_pull(repo, requestid, username=None):
     """ Cancel request pulling request.
