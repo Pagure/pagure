@@ -1317,19 +1317,19 @@ def update_tags_issue(session, issue, tags, username, ticketfolder):
     toadd = set(tags) - set(issue.tags_text)
     torm = set(issue.tags_text) - set(tags)
     messages = []
-    for tag in toadd:
+    if toadd:
         messages.append(
             add_issue_tag(
                 session,
                 issue=issue,
-                tag=tag,
+                tags=toadd,
                 user=username,
                 ticketfolder=ticketfolder,
             )
         )
 
     if torm:
-        messages.extend(
+        messages.append(
             remove_tags_issue(
                 session,
                 issue=issue,
