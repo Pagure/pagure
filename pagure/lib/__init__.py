@@ -694,14 +694,15 @@ def edit_issue(session, issue, ticketfolder, user,
     pagure.lib.git.update_git(
         issue, repo=issue.project, repofolder=ticketfolder)
 
-    pagure.lib.notify.fedmsg_publish(
-        'issue.edit',
-        dict(
-            issue=issue.to_json(),
-            fields=edit,
-            agent=user_obj.username,
+    if not issue.private:
+        pagure.lib.notify.fedmsg_publish(
+            'issue.edit',
+            dict(
+                issue=issue.to_json(),
+                fields=edit,
+                agent=user_obj.username,
+            )
         )
-    )
 
     if edit:
         session.add(issue)
