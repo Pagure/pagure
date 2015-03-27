@@ -289,13 +289,14 @@ def add_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
         #pagure.lib.notify.notify_assigned_issue(issue, user_obj)
         #pagure.lib.notify.notify_assigned_issue(issue_blocked, user_obj)
 
-        pagure.lib.notify.fedmsg_publish(
-            'issue.dependency.added',
-            dict(
-                issue=issue.to_json(),
-                agent=user_obj.username,
+        if not issue.private:
+            pagure.lib.notify.fedmsg_publish(
+                'issue.dependency.added',
+                dict(
+                    issue=issue.to_json(),
+                    agent=user_obj.username,
+                )
             )
-        )
 
         return 'Dependency added'
 
@@ -328,13 +329,14 @@ def remove_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
         #pagure.lib.notify.notify_assigned_issue(issue, user_obj)
         #pagure.lib.notify.notify_assigned_issue(issue_blocked, user_obj)
 
-        pagure.lib.notify.fedmsg_publish(
-            'issue.removed.added',
-            dict(
-                issue=issue.to_json(),
-                agent=user_obj.username,
+        if not issue.private:
+            pagure.lib.notify.fedmsg_publish(
+                'issue.removed.added',
+                dict(
+                    issue=issue.to_json(),
+                    agent=user_obj.username,
+                )
             )
-        )
 
         return 'Dependency removed'
 
