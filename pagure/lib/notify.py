@@ -9,9 +9,11 @@
 pagure notifications.
 """
 
+import urlparse
 import smtplib
 import warnings
 
+import flask
 import pagure
 
 from email.mime.text import MIMEText
@@ -385,4 +387,37 @@ New comment:
             comment.pull_request.id, comment.pull_request.title),
         ','.join(mail_to),
         mail_id=comment.pull_request.mail_id,
+    )
+
+
+
+def notify_new_email(email, user):
+    ''' Ask the user to confirm to the email belong to them.
+    '''
+
+    url = pagure.APP.config.get('APPLICATION_URL', flask.request.url_root)
+
+    url = urlparse.urljoin(
+        url or flask.request.url_root,
+        flask.url_for('confirm_email', token=email.token),
+    )
+
+    text = """Dear %(username)s,
+
+You have registered a new email on pagure at %(url)s.
+
+To finish your validate this registration, please click on the following
+link or copy/paste it in your browser, this link will remain valid only 2 days:
+  %(url)s
+
+The email will not be activated until you finish this step.
+
+Sincerely,
+Your pagure admin.
+""" % ({'username': user.username, 'url': url})
+
+    send_email(
+        text,
+        'Confirm new email',
+        email.email,
     )
