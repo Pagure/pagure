@@ -596,7 +596,7 @@ class PullRequest(BASE):
             'uid': self.uid,
             'title': self.title,
             'branch': self.branch,
-            'repo': self.repo.to_json(),
+            'project': self.repo.to_json(),
             'branch_from': self.branch_from,
             'repo_from': self.repo_from.to_json(),
             'date_created': self.date_created.strftime('%s'),
