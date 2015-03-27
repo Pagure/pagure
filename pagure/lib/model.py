@@ -185,6 +185,36 @@ class UserEmail(BASE):
     )
 
 
+class UserEmailPending(BASE):
+    """ Stores email information about the users.
+
+    Table -- user_emails_pending
+    """
+
+    __tablename__ = 'user_emails_pending'
+    id = sa.Column(sa.Integer, primary_key=True)
+    user_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey('users.id', onupdate='CASCADE'),
+        nullable=False,
+        index=True)
+    email = sa.Column(sa.Text, nullable=False, unique=True)
+    token = sa.Column(sa.String(50), nullable=True)
+    created = sa.Column(
+        sa.DateTime,
+        nullable=False,
+        default=sa.func.now())
+
+    user = relation(
+        'User', foreign_keys=[user_id], remote_side=[User.id],
+        backref=backref(
+            'emails_pending',
+            cascade="delete, delete-orphan",
+            single_parent=True
+        )
+    )
+
+
 class Project(BASE):
     """ Stores the projects.
 
