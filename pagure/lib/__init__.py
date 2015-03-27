@@ -607,13 +607,14 @@ def new_issue(session, repo, title, content, user, ticketfolder,
     if notify:
         pagure.lib.notify.notify_new_issue(issue, user=user_obj)
 
-    pagure.lib.notify.fedmsg_publish(
-        'issue.new',
-        dict(
-            issue=issue.to_json(),
-            agent=user_obj.username,
+    if not private:
+        pagure.lib.notify.fedmsg_publish(
+            'issue.new',
+            dict(
+                issue=issue.to_json(),
+                agent=user_obj.username,
+            )
         )
-    )
 
     return issue
 
