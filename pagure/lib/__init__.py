@@ -1269,6 +1269,13 @@ def set_up_user(session, username, fullname, user_email):
         session.add(user)
         session.flush()
 
+    add_email_to_user(session, user, user_email)
+
+    return user
+
+
+def add_email_to_user(session, user, user_email):
+    ''' Add the provided email to the specified user. '''
     emails = [email.email for email in user.emails]
     if user_email not in emails:
         useremail = model.UserEmail(
@@ -1276,8 +1283,6 @@ def set_up_user(session, username, fullname, user_email):
             email=user_email)
         session.add(useremail)
         session.flush()
-
-    return user
 
 
 def update_user_ssh(session, user, ssh_key):
