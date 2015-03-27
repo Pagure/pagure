@@ -46,7 +46,15 @@
         {% endfor %}
       </tr>
       <tr>
-        <th>Emails pending</th>
+        <td></td>
+        <td>
+          <a href="{{ url_for('add_user_email') }}">
+                Add another email address
+          </a>
+        </td>
+      </tr>
+      <tr>
+        <th title="Email pending validation">Emails pending</th>
         {% for email in user.emails_pending %}
           <td>{{ email.email }}</td>
       </tr>
