@@ -198,13 +198,14 @@ def add_issue_tag(session, issue, tag, user, ticketfolder):
     pagure.lib.git.update_git(
         issue, repo=issue.project, repofolder=ticketfolder)
 
-    pagure.lib.notify.fedmsg_publish(
-        'issue.tag.added',
-        dict(
-            issue=issue.to_json(),
-            agent=user_obj.username,
+    if not issue.private:
+        pagure.lib.notify.fedmsg_publish(
+            'issue.tag.added',
+            dict(
+                issue=issue.to_json(),
+                agent=user_obj.username,
+            )
         )
-    )
 
     return 'Tag added'
 
