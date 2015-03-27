@@ -160,13 +160,14 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
     if notify:
         pagure.lib.notify.notify_new_comment(issue_comment, user=user_obj)
 
-    pagure.lib.notify.fedmsg_publish(
-        'issue.comment.added',
-        dict(
-            issue=issue.to_json(),
-            agent=user_obj.username,
+    if not issue.private:
+        pagure.lib.notify.fedmsg_publish(
+            'issue.comment.added',
+            dict(
+                issue=issue.to_json(),
+                agent=user_obj.username,
+            )
         )
-    )
 
     return 'Comment added'
 
