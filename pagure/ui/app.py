@@ -442,3 +442,28 @@ def add_user_email():
         user=user,
         form=form,
     )
+
+
+@APP.route('/settings/email/confirm/<token>')
+def confirm_email(token):
+    """ Confirm a new email.
+    """
+    email = pagure.lib.search_pending_email(SESSION, token=token)
+    if not email:
+        flask.flash('No email associated with this token.', 'error')
+    else:
+        try:
+            pagure.lib.add_email_to_user(SESSION, email.user, email.email)
+            SESSION.delete(email)
+            SESSION.commit()
+            flask.flash('Email validated')
+        except pagure.exceptions.PagureException, err:
+            flask.flash(str(err), 'error')
+        except SQLAlchemyError, err:  # pragma: no cover
+            SESSION.rollback()
+            flask.flash(
+                'Could not set the account as active in the db, '
+                'please report this error to an admin', 'error')
+            APP.logger.exception(err)
+
+    return flask.redirect(flask.url_for('.user_settings'))
