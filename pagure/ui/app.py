@@ -349,7 +349,7 @@ def markdown_preview():
         flask.abort(400, 'Invalid request')
 
 
-@APP.route('/settings/dropemail', methods=['POST'])
+@APP.route('/settings/email/drop', methods=['POST'])
 @cla_required
 def remove_user_email():
     """ Remove the specified email from the logged in user.
