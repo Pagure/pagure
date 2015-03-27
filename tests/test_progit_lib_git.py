@@ -305,7 +305,7 @@ index 0000000..60f7480
 --- /dev/null
 +++ b/456
 @@ -0,0 +1 @@
-+{"status": "Open", "blocks": "", "tags": [], "title": "Test issue", "private": false, "content": "We should work on this", "assignee": null, "depends": "", "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "comments": []}
++{"status": "Open", "blocks": [], "tags": [], "title": "Test issue", "private": false, "content": "We should work on this", "assignee": null, "depends": [], "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "comments": []}
 \ No newline at end of file
 
 """
@@ -364,9 +364,9 @@ index 458821a..77674a8
 --- a/123
 +++ b/456
 @@ -1 +1 @@
--{"status": "Open", "blocks": "", "tags": [], "title": "Test issue", "private": false, "content": "We should work on this", "assignee": null, "depends": "", "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "comments": []}
+-{"status": "Open", "blocks": [], "tags": [], "title": "Test issue", "private": false, "content": "We should work on this", "assignee": null, "depends": [], "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "comments": []}
 \ No newline at end of file
-+{"status": "Open", "blocks": "", "tags": [], "title": "Test issue", "private": false, "content": "We should work on this", "assignee": null, "depends": "", "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "comments": [{"comment": "Hey look a comment!", "date_created": null, "id": 1, "parent": null, "user": {"fullname": "foo bar", "name": "foo", "emails": ["foo@bar.com"]}}]}
++{"status": "Open", "blocks": [], "tags": [], "title": "Test issue", "private": false, "content": "We should work on this", "assignee": null, "depends": [], "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "comments": [{"comment": "Hey look a comment!", "date_created": null, "id": 1, "parent": null, "user": {"fullname": "foo bar", "name": "foo", "emails": ["foo@bar.com"]}}]}
 \ No newline at end of file
 
 """
