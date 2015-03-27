@@ -47,23 +47,30 @@ class BaseHook(object):
         ''' Install the generic post-receive hook that allow us to call
         multiple post-receive hooks as set per plugin.
         '''
-        repopath = get_repo_path(project)
+        repopaths = [get_repo_path(project)]
+        for folder in [
+                APP.config.get('DOCS_FOLDER'),
+                APP.config.get('REQUESTS_FOLDER')]:
+            repopaths.append(
+                os.path.join(folder, project.path)
+            )
 
         hook_files = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), 'files')
 
-        # Make sure the hooks folder exists
-        hookfolder = os.path.join(repopath, 'hooks')
-        if not os.path.exists(hookfolder):
-            os.makedirs(hookfolder)
+        for repopath in repopaths:
+            # Make sure the hooks folder exists
+            hookfolder = os.path.join(repopath, 'hooks')
+            if not os.path.exists(hookfolder):
+                os.makedirs(hookfolder)
 
-        # Install the main post-receive file
-        postreceive = os.path.join(hookfolder, 'post-receive')
-        if not os.path.exists(postreceive):
-            shutil.copyfile(
-                os.path.join(hook_files, 'post-receive'),
-                postreceive)
-            os.chmod(postreceive, 0755)
+            # Install the main post-receive file
+            postreceive = os.path.join(hookfolder, 'post-receive')
+            if not os.path.exists(postreceive):
+                shutil.copyfile(
+                    os.path.join(hook_files, 'post-receive'),
+                    postreceive)
+                os.chmod(postreceive, 0755)
 
     @classmethod
     def install(cls, project, dbobj):  # pragma: no cover
