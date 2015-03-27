@@ -52,6 +52,22 @@
         {% endif %}
         {% endfor %}
       </tr>
+      <tr>
+        <th rowspan="{{ user.emails_pending | length }}">Emails pending</th>
+        {% for email in user.emails_pending %}
+        {% if loop.first %}
+          <td>{{ email.email }}</td>
+        {% elif loop.last %}
+      </tr>
+      <tr>
+          <td>{{ email.email }}</td>
+        {% else %}
+      </tr>
+      <tr>
+          <td>{{ email.email }}</td>
+        {% endif %}
+        {% endfor %}
+      </tr>
     </table>
 
     <form action="{{ url_for('user_settings') }}" method="post">
