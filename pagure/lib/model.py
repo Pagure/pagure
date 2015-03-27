@@ -152,6 +152,15 @@ class User(BASE):
 
         return 'User: %s - name %s' % (self.id, self.user)
 
+    def to_json(self):
+        ''' Return a representation of the User in a dictionnary. '''
+        output = {
+                'name': self.user,
+                'fullname': self.fullname,
+                'emails': [email.email for email in self.emails],
+            }
+        return output
+
 
 class UserEmail(BASE):
     """ Stores email information about the users.
@@ -380,15 +389,12 @@ class Issue(BASE):
             'content': self.content,
             'status': self.status,
             'date_created': self.date_created.strftime('%s'),
-            'user': {
-                'name': self.user.user,
-                'fullname': self.user.fullname,
-                'emails': [email.email for email in self.user.emails],
-            },
+            'user': self.user.to_json(),
             'private': self.private,
-            'tags': ','.join(self.tags_text),
+            'tags': self.tags_text,
             'depends': ','.join([str(item) for item in self.depends_text]),
             'blocks': ','.join([str(item) for item in self.blocks_text]),
+            'assignee': self.assignee.to_json() if self.assignee else None,
         }
 
         comments = []
@@ -398,11 +404,7 @@ class Issue(BASE):
                 'comment': comment.comment,
                 'parent': comment.parent_id,
                 'date_created': comment.date_created.strftime('%s'),
-                'user': {
-                    'name': comment.user.user,
-                    'fullname': comment.user.fullname,
-                    'emails': [email.email for email in comment.user.emails],
-                }
+                'user': comment.user.to_json(),
             }
             comments.append(cmt)
 
@@ -598,11 +600,7 @@ class PullRequest(BASE):
             'branch_from': self.branch_from,
             'repo_from': self.repo_from.to_json(),
             'date_created': self.date_created.strftime('%s'),
-            'user': {
-                'name': self.user.user,
-                'fullname': self.user.fullname,
-                'emails': [email.email for email in self.user.emails],
-            },
+            'user': self.user.to_json(),
             'status': self.status,
             'commit_start': self.commit_start,
             'commit_stop': self.commit_stop,
@@ -618,11 +616,7 @@ class PullRequest(BASE):
                 'comment': comment.comment,
                 'parent': comment.parent_id,
                 'date_created': comment.date_created.strftime('%s'),
-                'user': {
-                    'name': comment.user.user,
-                    'fullname': comment.user.fullname,
-                    'emails': [email.email for email in comment.user.emails],
-                }
+                'user': comment.user.to_json(),
             }
             comments.append(cmt)
 
