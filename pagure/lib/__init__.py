@@ -446,33 +446,43 @@ def edit_issue_tags(session, project, old_tag, new_tag, ticketfolder, user):
         if not tagobj:
             tagobj = model.Tag(tag=new_tag)
             session.add(tagobj)
+            session.flush()
 
-        for issue in issues:
+        for issue in set(issues):
             add = True
             # Drop the old tag
             for issue_tag in issue.tags:
                 if issue_tag.tag == old_tag:
-                    session.delete(issue_tag)
+                    issue.tags.remove(issue_tag)
+                if issue_tag.tag == new_tag:
+                    add = False
+            session.flush()
 
+            # Add the new one
             if add:
-                # Add the new one
                 issue_tag = model.TagIssue(
                     issue_uid=issue.uid,
-                    tag=new_tag
+                    tag=tagobj.tag
                 )
                 session.add(issue_tag)
-                msgs.append('Edited tag: %s to %s' % (old_tag, new_tag))
-            pagure.lib.git.update_git(
-                issue, repo=issue.project, repofolder=ticketfolder)
-            pagure.lib.notify.fedmsg_publish(
-                'project.tag.edited',
-                dict(
-                    project=project.to_json(),
-                    old_tag=old_tag,
-                    new_tag=new_tag,
-                    agent=user_obj.username,
-                )
+                session.flush()
+
+        tagobj = get_tag(session, old_tag)
+        if tagobj:
+            session.delete(tagobj)
+
+        msgs.append('Edited tag: %s to %s' % (old_tag, new_tag))
+        pagure.lib.git.update_git(
+            issue, repo=issue.project, repofolder=ticketfolder)
+        pagure.lib.notify.fedmsg_publish(
+            'project.tag.edited',
+            dict(
+                project=project.to_json(),
+                old_tag=old_tag,
+                new_tag=new_tag,
+                agent=user_obj.username,
             )
+        )
 
     return msgs
 
