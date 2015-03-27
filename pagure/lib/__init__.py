@@ -29,6 +29,7 @@ import pygit2
 
 import pagure.exceptions
 import pagure.lib.git
+import pagure.lib.login
 import pagure.lib.notify
 from pagure.lib import model
 
@@ -1482,3 +1483,23 @@ def update_blocked_issue(
 
     session.commit()
     return messages
+
+
+def add_user_pending_email(session, userobj, email):
+    ''' Add the provided user to the specified user.
+    '''
+    other_user = search_user(session, email=email)
+    if other_user and other_user != userobj:
+        raise pagure.exceptions.PagureException(
+            'Someone else has already registered this email'
+        )
+
+    tmpemail = pagure.lib.model.UserEmailPending(
+        user_id=userobj.id,
+        token=pagure.lib.login.id_generator(40),
+        email=email
+    )
+    session.add(tmpemail)
+    session.flush()
+
+    pagure.lib.notify.notify_new_email(tmpemail, user=userobj)
