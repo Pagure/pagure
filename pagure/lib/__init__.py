@@ -309,6 +309,7 @@ def add_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
                 'issue.dependency.added',
                 dict(
                     issue=issue.to_json(),
+                    added_dependency=issue_blocked.id,
                     agent=user_obj.username,
                 )
             )
