@@ -109,13 +109,13 @@ class PagureTicketHook(BaseHook):
         repo_obj = pygit2.Repository(repopath)
 
         # Install the hook itself
+        hook_path = os.path.join(
+            repopath, 'hooks', 'post-receive.pagure-ticket')
         shutil.copyfile(
             os.path.join(hook_files, 'pagure_hook_tickets.py'),
-            os.path.join(repopath, 'hooks', 'post-receive.pagure')
+            hook_path
         )
-        os.chmod(
-            os.path.join(repopath, 'hooks', 'post-receive.pagure'),
-            0755)
+        os.chmod(hook_path, 0755)
 
     @classmethod
     def remove(cls, project):
@@ -130,6 +130,6 @@ class PagureTicketHook(BaseHook):
             flask.abort(404, 'No git repo found')
 
         hook_path = os.path.join(
-            repopath, 'hooks', 'post-receive.pagure')
+            repopath, 'hooks', 'post-receive.pagure-ticket')
         if os.path.exists(hook_path):
             os.unlink(hook_path)
