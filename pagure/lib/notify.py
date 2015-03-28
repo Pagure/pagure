@@ -156,6 +156,7 @@ New comment:
         text,
         'Update to issue #%s `%s`' % (comment.issue.id, comment.issue.title),
         ','.join(mail_to),
+        mail_id=comment.mail_id,
         in_reply_to=comment.issue.mail_id,
     )
 
@@ -386,9 +387,9 @@ New comment:
         'Update to pull-Request #%s `%s`' % (
             comment.pull_request.id, comment.pull_request.title),
         ','.join(mail_to),
-        mail_id=comment.pull_request.mail_id,
+        mail_id=comment.mail_id,
+        in_reply_to=comment.pull_request.mail_id,
     )
-
 
 
 def notify_new_email(email, user):
