@@ -714,6 +714,14 @@ class PullRequestComment(BASE):
         foreign_keys=[pull_request_uid],
         remote_side=[PullRequest.uid])
 
+    @property
+    def mail_id(self):
+        ''' Return a unique reprensetation of the issue as string that
+        can be used when sending emails.
+        '''
+        return '%s-pull-request-%s-%s@pagure' % (
+            self.pull_request.project.name, self.pull_request.uid, self.id)
+
 
 # ##########################################################
 # These classes are only used if you're using the `local`
