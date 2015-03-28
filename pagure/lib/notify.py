@@ -230,7 +230,6 @@ The issue: `%s` of project: `%s` has been %s by %s.
         text,
         'Issue `%s` assigned' % issue.title,
         ','.join(mail_to),
-        mail_id=issue.mail_id,
         mail_id='%s/assigned/%s' % (issue.mail_id, uid),
         in_reply_to=issue.mail_id,
     )
