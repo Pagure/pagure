@@ -9,8 +9,10 @@
 pagure notifications.
 """
 
+import datetime
 import urlparse
 import smtplib
+import time
 import warnings
 
 import flask
@@ -223,11 +225,14 @@ The issue: `%s` of project: `%s` has been %s by %s.
 
     mail_to = _clean_emails(mail_to, user)
 
+    uid = time.mktime(datetime.datetime.now().timetuple())
     send_email(
         text,
         'Issue `%s` assigned' % issue.title,
         ','.join(mail_to),
         mail_id=issue.mail_id,
+        mail_id='%s/assigned/%s' % (issue.mail_id, uid),
+        in_reply_to=issue.mail_id,
     )
 
 
@@ -299,11 +304,13 @@ Merged pull-request:
         if prouser.emails:
             mail_to.add(prouser.emails[0].email)
 
+    uid = time.mktime(datetime.datetime.now().timetuple())
     send_email(
         text,
         'Pull-Request #%s `%s`' % (request.id, request.title),
         ','.join(mail_to),
-        mail_id=request.mail_id,
+        mail_id='%s/close/%s' % (request.mail_id, uid),
+        in_reply_to=request.mail_id,
     )
 
 
@@ -337,11 +344,13 @@ Cancelled pull-request:
         if prouser.emails:
             mail_to.add(prouser.emails[0].email)
 
+    uid = time.mktime(datetime.datetime.now().timetuple())
     send_email(
         text,
         'Pull-Request #%s `%s`' % (request.id, request.title),
         ','.join(mail_to),
-        mail_id=request.mail_id,
+        mail_id='%s/close/%s' % (request.mail_id, uid),
+        in_reply_to=request.mail_id,
     )
 
 
