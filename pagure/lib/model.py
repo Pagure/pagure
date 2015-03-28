@@ -500,6 +500,14 @@ class IssueComment(BASE):
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id], backref='comment_issues')
 
+    @property
+    def mail_id(self):
+        ''' Return a unique reprensetation of the issue as string that
+        can be used when sending emails.
+        '''
+        return '%s-ticket-%s-%s@pagure' % (
+            self.issue.project.name, self.issue.uid, self.id)
+
 
 class Tag(BASE):
     """ Stores the tags.
