@@ -58,10 +58,7 @@ def get_email_body(emailobj):
     return body
 
 
-
-
-
-class myMilter(Milter.Base):
+class PagureMilter(Milter.Base):
 
     def __init__(self):  # A new instance with each new connection.
         self.id = Milter.uniqueID()  # Integer incremented with each call.
@@ -222,20 +219,16 @@ def background():
 def main():
     bt = Thread(target=background)
     bt.start()
-    socketname = "/var/run/paguresock"
+    socketname = "/var/run/pagure/paguresock"
     timeout = 600
     # Register to have the Milter factory create instances of your class:
-    Milter.factory = myMilter
-    flags = Milter.CHGBODY + Milter.CHGHDRS + Milter.ADDHDRS
-    flags += Milter.ADDRCPT
-    flags += Milter.DELRCPT
-    Milter.set_flags(flags)       # tell Sendmail which features we use
-    print "%s milter startup" % time.strftime('%Y%b%d %H:%M:%S')
+    Milter.factory = PagureMilter
+    print "%s pagure milter startup" % time.strftime('%Y%b%d %H:%M:%S')
     sys.stdout.flush()
-    Milter.runmilter("pythonfilter",socketname,timeout)
+    Milter.runmilter("paguremilter", socketname, timeout)
     logq.put(None)
     bt.join()
-    print "%s bms milter shutdown" % time.strftime('%Y%b%d %H:%M:%S')
+    print "%s pagure milter shutdown" % time.strftime('%Y%b%d %H:%M:%S')
 
 if __name__ == "__main__":
     main()
