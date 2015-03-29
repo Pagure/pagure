@@ -61,7 +61,7 @@ def view_repo(repo, username=None):
                 repo_obj.head.target, pygit2.GIT_SORT_TIME):
             last_commits.append(commit)
             cnt += 1
-            if cnt == 10:
+            if cnt == 3:
                 break
         tree = sorted(last_commits[0].tree, key=lambda x: x.filemode)
 
