@@ -611,19 +611,21 @@ def view_settings(repo, username=None):
     plugins = pagure.ui.plugins.get_plugin_names()
     tags = pagure.lib.get_tags_of_project(SESSION, repo)
 
-    form = pagure.forms.ProjectSettingsForm()
+    form = pagure.forms.ConfirmationForm()
     tag_form = pagure.forms.AddIssueTagForm()
 
     if form.validate_on_submit():
-        issue_tracker = form.issue_tracker.data
-        project_docs = form.project_docs.data
+        settings = {}
+        for key in flask.request.form:
+            if key == 'csrf_token':
+                continue
+            settings[key] = flask.request.form[key]
 
         try:
             message = pagure.lib.update_project_settings(
                 SESSION,
                 repo=repo,
-                issue_tracker=issue_tracker,
-                project_docs=project_docs,
+                settings=settings,
                 user=flask.g.fas_user.username,
             )
             SESSION.commit()
@@ -633,8 +635,6 @@ def view_settings(repo, username=None):
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')
-    elif flask.request.method == 'GET':
-        form = pagure.forms.ProjectSettingsForm(project=repo)
 
     return flask.render_template(
         'settings.html',
