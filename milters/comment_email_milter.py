@@ -100,7 +100,11 @@ class PagureMilter(Milter.Base):
         self.fp.seek(0)
         msg = email.message_from_file(self.fp)
 
-        msg_id = msg['In-Reply-To']
+        msg_id = msg.get('In-Reply-To', None)
+        if msg_id is None:
+            self.log('No In-Reply-To, keep going')
+            return Milter.CONTINUE
+
         self.log('msg-ig', msg_id)
         self.log('To', msg['to'])
         self.log('From', msg['From'])
