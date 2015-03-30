@@ -54,7 +54,7 @@
                    repo=repo.name) }}">Tree</a>
       </li>
 
-      {% if repo.issue_tracker %}
+      {% if repo.settings.get('issue_tracker', True) %}
       <li {% if select == 'issues' %}class="selected" {% endif %}>
           <a href="{{ url_for('view_issues', username=username,
                      repo=repo.name) }}">Issues</a>

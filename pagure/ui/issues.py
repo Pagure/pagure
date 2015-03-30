@@ -48,7 +48,7 @@ def update_issue(repo, issueid, username=None):
     if repo is None:
         flask.abort(404, 'Project not found')
 
-    if not repo.issue_tracker:
+    if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
 
     issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
@@ -276,7 +276,7 @@ def view_issues(repo, username=None):
     if repo is None:
         flask.abort(404, 'Project not found')
 
-    if not repo.issue_tracker:
+    if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
 
     # Hide private tickets
@@ -357,6 +357,9 @@ def new_issue(repo, username=None):
     if repo is None:
         flask.abort(404, 'Project not found')
 
+    if not repo.settings.get('issue_tracker', True):
+        flask.abort(404, 'No issue tracker found for this project')
+
     status = pagure.lib.get_issue_statuses(SESSION)
     form = pagure.forms.IssueForm(status=status)
     if form.validate_on_submit():
@@ -430,7 +433,7 @@ def view_issue(repo, issueid, username=None):
     if repo is None:
         flask.abort(404, 'Project not found')
 
-    if not repo.issue_tracker:
+    if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
 
     issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
@@ -474,7 +477,7 @@ def edit_issue(repo, issueid, username=None):
     if repo is None:
         flask.abort(404, 'Project not found')
 
-    if not repo.issue_tracker:
+    if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
 
     if not is_repo_admin(repo):
@@ -544,7 +547,7 @@ def upload_issue(repo, issueid, username=None):
     if repo is None:
         flask.abort(404, 'Project not found')
 
-    if not repo.issue_tracker:
+    if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
 
     issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
@@ -588,6 +591,9 @@ def view_issue_raw_file(repo, filename=None, username=None):
 
     if not repo:
         flask.abort(404, 'Project not found')
+
+    if not repo.settings.get('issue_tracker', True):
+        flask.abort(404, 'No issue tracker found for this project')
 
     reponame = os.path.join(APP.config['TICKETS_FOLDER'], repo.path)
 
