@@ -178,3 +178,10 @@ class ProjectCommentForm(wtf.Form):
         'Email',
         [wtforms.validators.Required()]
     )
+
+
+class CommentForm(wtf.Form):
+    ''' Form to upload a file. '''
+    comment = wtforms.FileField(
+        'Comment',
+        [wtforms.validators.Required()])
