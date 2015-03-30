@@ -38,6 +38,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         pagure.SESSION = self.session
         pagure.ui.SESSION = self.session
         pagure.ui.app.SESSION = self.session
+        pagure.ui.filters.SESSION = self.session
         pagure.ui.repo.SESSION = self.session
 
         pagure.APP.config['GIT_FOLDER'] = tests.HERE
