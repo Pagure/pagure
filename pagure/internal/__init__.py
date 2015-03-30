@@ -115,7 +115,6 @@ def ticket_add_comment():
         flask.abort(
             403, 'This issue is private and you are not allowed to view it')
 
-    status = pagure.lib.get_issue_statuses(SESSION)
     form = pagure.forms.CommentForm(csrf_enabled=False)
 
     if not form.validate_on_submit():
