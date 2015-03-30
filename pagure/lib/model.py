@@ -231,6 +231,7 @@ class Project(BASE):
         index=True)
     name = sa.Column(sa.String(32), nullable=False, index=True)
     description = sa.Column(sa.Text, nullable=True)
+    _settings = sa.Column(sa.Text, nullable=True)
     parent_id = sa.Column(
         sa.Integer,
         sa.ForeignKey('projects.id', onupdate='CASCADE'),
@@ -276,6 +277,24 @@ class Project(BASE):
         if self.parent_id:
             str_name = "%s/%s" % (self.user.user, str_name)
         return str_name
+
+    @property
+    def settings(self):
+        """ Return the dict stored as string in the database as an actual
+        dict object.
+        """
+        if self._settings:
+            return json.loads(self._settings)
+        else:
+            return {
+                'issue_tracker': True,
+                'project_documentation': True,
+                'pull_requests': True,
+            }
+
+    def save_settings(self, settings):
+        ''' Ensures the settings are properly saved. '''
+        self._settings = json.dumps(settings)
 
     def to_json(self):
         ''' Return a representation of the project as JSON.
