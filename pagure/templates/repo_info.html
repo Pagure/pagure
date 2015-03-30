@@ -117,7 +117,7 @@
     {% if origin == 'view_commits' %}
     <h3>Commits list</h3>
     {% else %}
-    <h3>Last 3 commits</h3>
+    <h3>Last {{ last_commits | length }} commits</h3>
     {% endif %}
     {% if diff_commits and authenticated %}
     <span id="request_pull">
