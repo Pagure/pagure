@@ -77,7 +77,7 @@ def pull_request_add_comment():
             row=row,
             comment=comment,
             user=useremail,
-            requestfolder=APP.config['REQUESTS_FOLDER'],
+            requestfolder=pagure.APP.config['REQUESTS_FOLDER'],
         )
         pagure.SESSION.commit()
     except SQLAlchemyError, err:  # pragma: no cover
@@ -129,7 +129,7 @@ def ticket_add_comment():
             issue=issue,
             comment=comment,
             user=useremail,
-            ticketfolder=APP.config['TICKETS_FOLDER'],
+            ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
             notify=True)
         pagure.SESSION.commit()
     except SQLAlchemyError, err:  # pragma: no cover
