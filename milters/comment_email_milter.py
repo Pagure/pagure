@@ -169,9 +169,9 @@ class PagureMilter(Milter.Base):
 
         if url.endswith('/'):
             url = url[:-1]
-        if url.startswith('/'):
-            url = url[1:]
-        url = 'http://localhost/%s/pv/ticket/comment/' % url
+        if not url.startswith('/'):
+            url = '/' + url
+        url = 'http://localhost%s/pv/ticket/comment/' % url
         req = requests.put(url, data=data)
 
         return Milter.ACCEPT
@@ -207,9 +207,9 @@ class PagureMilter(Milter.Base):
 
         if url.endswith('/'):
             url = url[:-1]
-        if url.startswith('/'):
-            url = url[1:]
-        url = 'http://localhost/%s/pv/pull-request/comment/' % url
+        if not url.startswith('/'):
+            url = '/' + url
+        url = 'http://localhost%s/pv/pull-request/comment/' % url
         req = requests.put(url, data=data)
 
         return Milter.ACCEPT
