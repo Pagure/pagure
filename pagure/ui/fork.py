@@ -55,6 +55,9 @@ def request_pulls(repo, username=None):
     if not repo:
         flask.abort(404, 'Project not found')
 
+    if not repo.settings.get('pull_requests', True):
+        flask.abort(404, 'No pull-requests found for this project')
+
     if status is False or str(status).lower() == 'closed':
         requests = pagure.lib.search_pull_requests(
             SESSION, project_id=repo.id, status=False)
@@ -82,6 +85,9 @@ def request_pull(repo, requestid, username=None):
 
     if not repo:
         flask.abort(404, 'Project not found')
+
+    if not repo.settings.get('pull_requests', True):
+        flask.abort(404, 'No pull-requests found for this project')
 
     request = pagure.lib.search_pull_requests(
         SESSION, project_id=repo.id, requestid=requestid)
@@ -187,6 +193,9 @@ def request_pull_patch(repo, requestid, username=None):
     if not repo:
         flask.abort(404, 'Project not found')
 
+    if not repo.settings.get('pull_requests', True):
+        flask.abort(404, 'No pull-requests found for this project')
+
     request = pagure.lib.search_pull_requests(
         SESSION, project_id=repo.id, requestid=requestid)
 
@@ -263,6 +272,9 @@ def pull_request_add_comment(
     if not repo:
         flask.abort(404, 'Project not found')
 
+    if not repo.settings.get('pull_requests', True):
+        flask.abort(404, 'No pull-requests found for this project')
+
     request = pagure.lib.search_pull_requests(
         SESSION, project_id=repo.id, requestid=requestid)
     repo = request.repo_from
@@ -330,6 +342,9 @@ def merge_request_pull(repo, requestid, username=None):
 
     if not repo:
         flask.abort(404, 'Project not found')
+
+    if not repo.settings.get('pull_requests', True):
+        flask.abort(404, 'No pull-requests found for this project')
 
     request = pagure.lib.search_pull_requests(
         SESSION, project_id=repo.id, requestid=requestid)
@@ -475,6 +490,9 @@ def cancel_request_pull(repo, requestid, username=None):
         if not repo:
             flask.abort(404, 'Project not found')
 
+        if not repo.settings.get('pull_requests', True):
+            flask.abort(404, 'No pull-requests found for this project')
+
         request = pagure.lib.search_pull_requests(
             SESSION, project_id=repo.id, requestid=requestid)
 
@@ -560,6 +578,9 @@ def new_request_pull(repo,  branch_to, branch_from, username=None):
 
     if not repo:
         flask.abort(404)
+
+    if not repo.settings.get('pull_requests', True):
+        flask.abort(404, 'No pull-requests found for this project')
 
     repopath = pagure.get_repo_path(repo)
     repo_obj = pygit2.Repository(repopath)
