@@ -303,6 +303,7 @@ class Project(BASE):
             'name': self.name,
             'description': self.description,
             'parent': self.parent.to_json() if self.parent else None,
+            'settings': self.settings,
             'date_created': self.date_created.strftime('%s'),
             'user': {
                 'name': self.user.user,
