@@ -358,6 +358,8 @@ import pagure.ui.repo
 
 import pagure.api
 APP.register_blueprint(pagure.api.API)
+import pagure.internal
+APP.register_blueprint(pagure.internal.PV)
 
 
 # Only import the login controller if the app is set up for local login
