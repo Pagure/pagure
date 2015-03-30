@@ -12,13 +12,10 @@ import StringIO
 import sys
 import time
 from socket import AF_INET, AF_INET6
+from multiprocessing import Process as Thread, Queue
 
 import Milter
-if True:
-    from multiprocessing import Process as Thread, Queue
-else:
-    from threading import Thread
-    from Queue import Queue
+import requests
 
 from Milter.utils import parse_addr
 from sqlalchemy.exc import SQLAlchemyError
@@ -160,20 +157,18 @@ class PagureMilter(Milter.Base):
             self.log('No related ticket found, let it go')
             return Milter.CONTINUE
 
-        try:
-            message = pagure.lib.add_issue_comment(
-                pagure.SESSION,
-                issue=issue,
-                comment=get_email_body(emailobj),
-                user=clean_item(emailobj['From']),
-                ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
-            )
-            pagure.SESSION.commit()
-        except pagure.exceptions.PagureException, err:
-            self.log(str(err))
-        except SQLAlchemyError, err:  # pragma: no cover
-            pagure.SESSION.rollback()
-            self.log(str(err))
+        data = {
+            'username': issue.project.user.username,
+            'project': issue.project.name,
+            'objid': issue.id,
+            'comment': get_email_body(emailobj),
+            'useremail': clean_item(emailobj['From']),
+        }
+        url = pagure.APP.config.get('APP_URL')
+        if url.endswith('/'):
+            url = url[:-1]
+        url += '/pv/ticket/comment/'
+        req = requests.put(url, data=data)
 
         return Milter.ACCEPT
 
@@ -197,23 +192,18 @@ class PagureMilter(Milter.Base):
             self.log('No related pull-request found, let it go')
             return Milter.CONTINUE
 
-        try:
-            message = pagure.lib.add_pull_request_comment(
-                pagure.SESSION,
-                request=request,
-                commit=None,
-                filename=None,
-                row=None,
-                comment=get_email_body(emailobj),
-                user=clean_item(emailobj['From']),
-                requestfolder=pagure.APP.config['REQUESTS_FOLDER'],
-            )
-            pagure.SESSION.commit()
-        except pagure.exceptions.PagureException, err:
-            self.log(str(err))
-        except SQLAlchemyError, err:  # pragma: no cover
-            pagure.SESSION.rollback()
-            self.log(str(err))
+        data = {
+            'username': request.repo.user.username,
+            'project': request.repo.name,
+            'objid': request.id,
+            'comment': get_email_body(emailobj),
+            'useremail': clean_item(emailobj['From']),
+        }
+        url = pagure.APP.config.get('APP_URL')
+        if url.endswith('/'):
+            url = url[:-1]
+        url += '/pv/pull-request/comment/'
+        req = requests.put(url, data=data)
 
         return Milter.ACCEPT
 
