@@ -405,6 +405,99 @@ index 458821a..77674a8
         #print patch
         self.assertEqual(patch, exp)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_update_git_requests(self, email_f):
+        """ Test the update_git of pagure.lib.git for pull-requests. """
+        email_f.return_value = True
+
+        # Create project
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test_ticket_repo',
+            description='test project for ticket',
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        # Create repo
+        self.gitrepo = os.path.join(tests.HERE, 'test_ticket_repo.git')
+        os.makedirs(self.gitrepo)
+        repo_obj = pygit2.init_repository(self.gitrepo, bare=True)
+
+        repo = pagure.lib.get_project(self.session, 'test_ticket_repo')
+        # Create an issue to play with
+        msg = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=repo,
+            branch_from='feature',
+            repo_to=repo,
+            branch_to='master',
+            title='test PR',
+            user='pingou',
+            requestfolder=tests.HERE,
+            requestuid='foobar',
+            requestid=None,
+            status=True,
+            notify=True
+        )
+
+        self.assertEqual(msg, 'Request created')
+        request = repo.requests[0]
+        self.assertEqual(request.title, 'test PR')
+        pagure.lib.git.update_git(request, request.repo, tests.HERE)
+
+        repo = pygit2.Repository(self.gitrepo)
+        commit = repo.revparse_single('HEAD')
+
+        # Use patch to validate the repo
+        patch = pagure.lib.git.commit_to_patch(repo, commit)
+        exp = """Mon Sep 17 00:00:00 2001
+From: pagure <pagure>
+Subject: Updated ticket <hash>: test PR
+
+
+---
+
+diff --git a/123 b/456
+new file mode 100644
+index 0000000..60f7480
+--- /dev/null
++++ b/456
+@@ -0,0 +1 @@
++{"status": true, "branch_from": "feature", "uid": "foobar", "title": "test PR", "comments": [], "project": {"description": "test project for ticket", "parent": null, "settings": {"issue_tracker": true, "project_documentation": true, "pull_requests": true}, "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "name": "test_ticket_repo"}, "commit_stop": null, "repo_from": {"description": "test project for ticket", "parent": null, "settings": {"issue_tracker": true, "project_documentation": true, "pull_requests": true}, "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "name": "test_ticket_repo"}, "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "branch": "master", "date_created": null, "commit_start": null, "id": 1}
+\ No newline at end of file
+
+"""
+        npatch = []
+        for row in patch.split('\n'):
+            if row.startswith('Date:'):
+                continue
+            elif row.startswith('From '):
+                row = row.split(' ', 2)[2]
+            elif row.startswith('diff --git '):
+                row = row.split(' ')
+                row[2] = 'a/123'
+                row[3] = 'b/456'
+                row = ' '.join(row)
+            elif 'Updated ticket' in row:
+                row = row.split()
+                row[3] = '<hash>:'
+                row = ' '.join(row)
+            elif 'date_created' in row:
+                data = json.loads(row[1:])
+                data['project']['date_created'] = None
+                data['repo_from']['date_created'] = None
+                data['date_created'] = None
+                row = '+' + json.dumps(data)
+            elif row.startswith('index 00'):
+                row = 'index 0000000..60f7480'
+            elif row.startswith('+++ b/'):
+                row = '+++ b/456'
+            npatch.append(row)
+        patch = '\n'.join(npatch)
+        #print patch
+        self.assertEqual(patch, exp)
+
     def test_update_ticket_from_git(self):
         """ Test the update_ticket_from_git method from pagure.lib.git. """
         tests.create_projects(self.session)
