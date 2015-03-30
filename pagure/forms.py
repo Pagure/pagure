@@ -162,14 +162,6 @@ class UserEmailForm(wtf.Form):
 
 class ProjectCommentForm(wtf.Form):
     ''' Form to represent project. '''
-    project = wtforms.TextField(
-        'Project',
-        [wtforms.validators.Required()]
-    )
-    username = wtforms.TextField(
-        'Username',
-        [wtforms.validators.Optional()]
-    )
     objid = wtforms.TextField(
         'Ticket/Request id',
         [wtforms.validators.Required()]
