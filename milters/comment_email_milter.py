@@ -149,19 +149,8 @@ class PagureMilter(Milter.Base):
         self.log('uid', uid)
         self.log('parent_id', parent_id)
 
-        issue = pagure.lib.get_issue_by_uid(
-            pagure.SESSION,
-            issue_uid = uid
-        )
-
-        if not issue:
-            self.log('No related ticket found, let it go')
-            return Milter.CONTINUE
-
         data = {
-            'username': issue.project.user.username,
-            'project': issue.project.name,
-            'objid': issue.id,
+            'objid': uid,
             'comment': get_email_body(emailobj),
             'useremail': clean_item(emailobj['From']),
         }
@@ -175,8 +164,9 @@ class PagureMilter(Milter.Base):
             url = ''
         url = 'http://localhost%s/pv/ticket/comment/' % url
         req = requests.put(url, data=data)
-
-        return Milter.ACCEPT
+        if req.status_code == 200:
+            return Milter.ACCEPT
+        return Milter.CONTINUE
 
     def handle_request_email(self, emailobj, msg_id):
         ''' Add the email as a comment on a request. '''
@@ -189,19 +179,8 @@ class PagureMilter(Milter.Base):
         self.log('uid', uid)
         self.log('parent_id', parent_id)
 
-        request = pagure.lib.get_request_by_uid(
-            pagure.SESSION,
-            request_uid=uid
-        )
-
-        if not request:
-            self.log('No related pull-request found, let it go')
-            return Milter.CONTINUE
-
         data = {
-            'username': request.repo.user.username,
-            'project': request.repo.name,
-            'objid': request.id,
+            'objid': uid,
             'comment': get_email_body(emailobj),
             'useremail': clean_item(emailobj['From']),
         }
