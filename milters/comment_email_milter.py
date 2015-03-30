@@ -8,6 +8,7 @@
 import base64
 import email
 import os
+import urlparse
 import StringIO
 import sys
 import time
@@ -164,10 +165,13 @@ class PagureMilter(Milter.Base):
             'comment': get_email_body(emailobj),
             'useremail': clean_item(emailobj['From']),
         }
-        url = pagure.APP.config.get('APP_URL')
+        url = urlparse.urlparse(pagure.APP.config.get('APP_URL')).path
+
         if url.endswith('/'):
             url = url[:-1]
-        url += '/pv/ticket/comment/'
+        if url.startswith('/'):
+            url = url[1:]
+        url = 'http://localhost/%s/pv/ticket/comment/' % url
         req = requests.put(url, data=data)
 
         return Milter.ACCEPT
@@ -199,10 +203,13 @@ class PagureMilter(Milter.Base):
             'comment': get_email_body(emailobj),
             'useremail': clean_item(emailobj['From']),
         }
-        url = pagure.APP.config.get('APP_URL')
+        url = urlparse.urlparse(pagure.APP.config.get('APP_URL')).path
+
         if url.endswith('/'):
             url = url[:-1]
-        url += '/pv/pull-request/comment/'
+        if url.startswith('/'):
+            url = url[1:]
+        url = 'http://localhost/%s/pv/pull-request/comment/' % url
         req = requests.put(url, data=data)
 
         return Milter.ACCEPT
