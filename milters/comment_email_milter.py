@@ -108,6 +108,13 @@ class PagureMilter(Milter.Base):
         self.fp.write(chunk)
         return Milter.CONTINUE
 
+    @Milter.noreply
+    def envrcpt(self, to, *str):
+        rcptinfo = to, Milter.dictfromlist(str)
+        print rcptinfo
+
+        return Milter.CONTINUE
+
     def eom(self):
         self.fp.seek(0)
         msg = email.message_from_file(self.fp)
