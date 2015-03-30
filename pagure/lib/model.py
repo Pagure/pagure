@@ -236,8 +236,6 @@ class Project(BASE):
         sa.Integer,
         sa.ForeignKey('projects.id', onupdate='CASCADE'),
         nullable=True)
-    issue_tracker = sa.Column(sa.Boolean, nullable=False, default=True)
-    project_docs = sa.Column(sa.Boolean, nullable=False, default=True)
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
@@ -305,8 +303,6 @@ class Project(BASE):
             'name': self.name,
             'description': self.description,
             'parent': self.parent.to_json() if self.parent else None,
-            'issue_tracker': self.issue_tracker,
-            'project_docs': self.project_docs,
             'date_created': self.date_created.strftime('%s'),
             'user': {
                 'name': self.user.user,
