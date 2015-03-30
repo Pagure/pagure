@@ -14,7 +14,7 @@ import flask
 
 from functools import wraps
 
-PV = flask.Blueprint('internal_ns', __name__, url_prefix='/pv/')
+PV = flask.Blueprint('internal_ns', __name__, url_prefix='/pv')
 
 import pagure
 import pagure.forms
