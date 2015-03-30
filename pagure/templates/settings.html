@@ -40,8 +40,15 @@
   <form action="{{ url_for('.view_settings',
                   username=username, repo=repo.name) }}" method="post">
   <table>
-    {{ render_field_in_row(form.issue_tracker) }}
-    {{ render_field_in_row(form.project_docs) }}
+    {% for key in repo.settings | sort %}
+    <tr>
+      <td><label for="{{ key }}">Activate {{ key | replace('_', ' ') }}</label></td>
+      <td>
+        <input id="{{ key }}" type="checkbox" value="y" name="{{ key }}" {%
+         if repo.settings[key] -%}checked=""{%- endif -%}>
+      </td>
+    </tr>
+    {% endfor %}
   </table>
   <p class="buttons indent">
       <input type="submit" class="submit positive button" value="Update">
