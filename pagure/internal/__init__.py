@@ -42,7 +42,7 @@ def localonly(function):
 def pull_request_add_comment():
     """ Add a comment to a pull-request.
     """
-    pform = pagure.forms.ProjectCommentForm(csrf_token=False)
+    pform = pagure.forms.ProjectCommentForm(csrf_enabled=False)
     if not pform.validate_on_submit():
         flask.abort(400, 'Invalid request')
 
@@ -57,7 +57,7 @@ def pull_request_add_comment():
     if not request:
         flask.abort(404, 'Pull-request not found')
 
-    form = pagure.forms.AddPullRequestCommentForm(csrf_token=False)
+    form = pagure.forms.AddPullRequestCommentForm(csrf_enabled=False)
 
     if not form.validate_on_submit():
         flask.abort(400, 'Invalid request')
@@ -92,7 +92,7 @@ def pull_request_add_comment():
 def ticket_add_comment():
     """ Add a comment to a pull-request.
     """
-    pform = pagure.forms.ProjectCommentForm(csrf_token=False)
+    pform = pagure.forms.ProjectCommentForm(csrf_enabled=False)
     if not pform.validate_on_submit():
         flask.abort(400, 'Invalid request')
 
@@ -115,7 +115,7 @@ def ticket_add_comment():
             403, 'This issue is private and you are not allowed to view it')
 
     status = pagure.lib.get_issue_statuses(SESSION)
-    form = pagure.forms.CommentForm(csrf_token=False)
+    form = pagure.forms.CommentForm(csrf_enabled=False)
 
     if not form.validate_on_submit():
         flask.abort(400, 'Invalid request')
