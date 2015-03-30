@@ -98,7 +98,7 @@ def send_email(text, subject, to_mail, from_mail=None, mail_id=None,
 
     msg = MIMEText(text.encode('utf-8'), 'plain', 'utf-8')
     msg['Subject'] = '[Pagure] %s' % subject
-    from_email = pagure.APP.config('FROM_EMAIL', 'pagure@fedoraproject.org')
+    from_email = pagure.APP.config.get('FROM_EMAIL', 'pagure@fedoraproject.org')
     msg['From'] = from_email
     msg['Bcc'] = to_mail.replace(',', ', ')
 
