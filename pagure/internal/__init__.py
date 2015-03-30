@@ -45,22 +45,13 @@ def pull_request_add_comment():
     if not pform.validate_on_submit():
         flask.abort(400, 'Invalid request')
 
-    username = pform.username.data
-    project = pform.project.data
-    requestid = pform.objid.data
+    objid = pform.objid.data
     useremail = pform.useremail.data
 
-    repo = pagure.lib.get_project(SESSION, project, user=username)
-
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    if not repo.settings.get('pull_requests', True):
-        flask.abort(404, 'No pull-requests found for this project')
-
-    request = pagure.lib.search_pull_requests(
-        SESSION, project_id=repo.id, requestid=requestid)
-    repo = request.repo_from
+    request = pagure.lib.get_request_by_uid(
+        pagure.SESSION,
+        request_uid=objid,
+    )
 
     if not request:
         flask.abort(404, 'Pull-request not found')
@@ -104,25 +95,18 @@ def ticket_add_comment():
     if not pform.validate_on_submit():
         flask.abort(400, 'Invalid request')
 
-    username = pform.username.data
-    project = pform.project.data
-    requestid = pform.objid.data
+    objid = pform.objid.data
     useremail = pform.useremail.data
 
-    repo = pagure.lib.get_project(SESSION, project, user=username)
+    issue = pagure.lib.get_issue_by_uid(
+        pagure.SESSION,
+        issue_uid=objid
+    )
 
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    if not repo.settings.get('issue_tracker', True):
-        flask.abort(404, 'No issue tracker found for this project')
-
-    issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
-
-    if issue is None or issue.project != repo:
+    if issue is None:
         flask.abort(404, 'Issue not found')
 
-    if issue.private and not is_repo_admin(repo) \
+    if issue.private and not is_repo_admin(issue.project) \
             and (
                 not authenticated() or
                 not issue.user.user == flask.g.fas_user.username):
