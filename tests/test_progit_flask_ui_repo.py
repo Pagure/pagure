@@ -233,11 +233,11 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<ul id="flashes">\n                </ul>' in output.data)
             # Both checkbox checked before
             self.assertTrue(
-                '<input checked id="project_docs" name="project_docs" '
-                'type="checkbox" value="y">' in output.data)
+                '<input id="project_documentation" type="checkbox" value="y" '
+                'name="project_documentation" checked="">' in output.data)
             self.assertTrue(
-                '<input checked id="issue_tracker" name="issue_tracker" '
-                'type="checkbox" value="y">' in output.data)
+                '<input id="issue_tracker" type="checkbox" value="y" '
+                'name="issue_tracker" checked="">' in output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -259,11 +259,11 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertTrue(
                 '<ul id="flashes">\n                </ul>' in output.data)
             self.assertTrue(
-                '<input checked id="project_docs" name="project_docs" '
-                'type="checkbox" value="y">' in output.data)
+                '<input id="project_documentation" type="checkbox" value="y" '
+                'name="project_documentation" checked="">' in output.data)
             self.assertTrue(
-                '<input checked id="issue_tracker" name="issue_tracker" '
-                'type="checkbox" value="y">' in output.data)
+                '<input id="issue_tracker" type="checkbox" value="y" '
+                'name="issue_tracker" checked="">' in output.data)
 
             data = {'csrf_token': csrf_token}
             output = self.app.post(
@@ -285,11 +285,11 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertTrue(
                 '<ul id="flashes">\n                </ul>' in output.data)
             self.assertTrue(
-                '<input id="project_docs" name="project_docs" '
-                'type="checkbox" value="y">' in output.data)
+                '<input id="project_documentation" type="checkbox" value="y" '
+                'name="project_documentation" >' in output.data)
             self.assertTrue(
-                '<input id="issue_tracker" name="issue_tracker" '
-                'type="checkbox" value="y">' in output.data)
+                '<input id="issue_tracker" type="checkbox" value="y" '
+                'name="issue_tracker" >' in output.data)
 
     def test_view_forks(self):
         """ Test the view_forks endpoint. """

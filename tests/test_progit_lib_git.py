@@ -538,7 +538,11 @@ index 458821a..77674a8
             "uid": "d4182a2ac2d541d884742d3037c26e56",
             "repo": {
                 "parent": None,
-                "issue_tracker": True,
+                "settings": {
+                    "issue_tracker": True,
+                    "project_documentation": True,
+                    "pull_requests": True,
+                },
                 "name": "test",
                 "date_created": "1426500194",
                 "user": {
@@ -546,7 +550,6 @@ index 458821a..77674a8
                     "name": "fake",
                     "emails": ["fake@fedoraproject.org"]
                 },
-                "project_docs": True,
                 "id": 1,
                 "description": "test project"
             },
@@ -611,7 +614,6 @@ index 458821a..77674a8
             "repo_from": {
                 "parent": {
                     "parent": None,
-                    "issue_tracker": True,
                     "name": "test",
                     "date_created": "1426500194",
                     "user": {
@@ -621,11 +623,19 @@ index 458821a..77674a8
                             "py@pingoured.fr"
                         ]
                     },
-                    "project_docs": True,
+                    "settings": {
+                        "issue_tracker": True,
+                        "project_documentation": True,
+                        "pull_requests": True,
+                    },
                     "id": 1,
                     "description": "test project"
                 },
-                "issue_tracker": True,
+                "settings": {
+                    "issue_tracker": True,
+                    "project_documentation": True,
+                    "pull_requests": True,
+                },
                 "name": "test",
                 "date_created": "1426843440",
                 "user": {
@@ -635,7 +645,6 @@ index 458821a..77674a8
                         "pingou@fedoraproject.org"
                     ]
                 },
-                "project_docs": True,
                 "id": 6,
                 "description": "test project"
             },
@@ -685,7 +694,6 @@ index 458821a..77674a8
             "uid": "d4182a2ac2d541d884742d3037c26e57",
             "repo": {
                 "parent": None,
-                "issue_tracker": True,
                 "name": "test",
                 "date_created": "1426500194",
                 "user": {
@@ -693,7 +701,11 @@ index 458821a..77674a8
                     "name": "fake",
                     "emails": ["fake@fedoraproject.org"]
                 },
-                "project_docs": True,
+                "settings": {
+                    "issue_tracker": True,
+                    "project_documentation": True,
+                    "pull_requests": True,
+                },
                 "id": 1,
                 "description": "test project"
             },
@@ -711,7 +723,6 @@ index 458821a..77674a8
             "repo_from": {
                 "parent": {
                     "parent": None,
-                    "issue_tracker": True,
                     "name": "test",
                     "date_created": "1426500194",
                     "user": {
@@ -721,11 +732,19 @@ index 458821a..77674a8
                             "py@pingoured.fr"
                         ]
                     },
-                    "project_docs": True,
+                    "settings": {
+                        "issue_tracker": True,
+                        "project_documentation": True,
+                        "pull_requests": True,
+                    },
                     "id": 1,
                     "description": "test project"
                 },
-                "issue_tracker": True,
+                "settings": {
+                    "issue_tracker": True,
+                    "project_documentation": True,
+                    "pull_requests": True,
+                },
                 "name": "test",
                 "date_created": "1426843440",
                 "user": {

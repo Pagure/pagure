@@ -83,7 +83,7 @@ class PagureFlaskDocstests(tests.Modeltests):
             'git clone git@pagure.fedorahosted.org:docs/test.git'
             in output.data)
 
-        repo.project_docs = False
+        repo.save_settings({'project_documentation': False})
         self.session.add(repo)
         self.session.commit()
 

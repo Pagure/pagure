@@ -801,14 +801,17 @@ class PagureLibtests(tests.Modeltests):
 
         # Before
         repo = pagure.lib.get_project(self.session, 'test2')
-        self.assertTrue(repo.issue_tracker)
-        self.assertTrue(repo.project_docs)
+        self.assertTrue(repo.settings['issue_tracker'])
+        self.assertTrue(repo.settings['project_documentation'])
 
         msg = pagure.lib.update_project_settings(
             session=self.session,
             repo=repo,
-            issue_tracker=True,
-            project_docs=True,
+            settings={
+                'issue_tracker': True,
+                'project_documentation': True,
+                'pull_requests': True
+            },
             user='pingou',
         )
         self.assertEqual(msg, 'No settings to change')
@@ -816,16 +819,19 @@ class PagureLibtests(tests.Modeltests):
         msg = pagure.lib.update_project_settings(
             session=self.session,
             repo=repo,
-            issue_tracker=False,
-            project_docs=False,
+            settings={
+                'issue_tracker': False,
+                'project_documentation': False,
+            },
             user='pingou',
         )
         self.assertEqual(msg, 'Edited successfully settings of repo: test2')
 
         # After
         repo = pagure.lib.get_project(self.session, 'test2')
-        self.assertFalse(repo.issue_tracker)
-        self.assertFalse(repo.project_docs)
+        self.assertFalse(repo.settings['issue_tracker'])
+        self.assertFalse(repo.settings['project_documentation'])
+        self.assertFalse(repo.settings['pull_requests'])
 
     def test_search_projects(self):
         """ Test the search_projects of pagure.lib. """
