@@ -13,6 +13,7 @@ Internal endpoints.
 import flask
 
 from functools import wraps
+from sqlalchemy.exc import SQLAlchemyError
 
 PV = flask.Blueprint('internal_ns', __name__, url_prefix='/pv')
 
