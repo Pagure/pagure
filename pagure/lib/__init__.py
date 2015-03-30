@@ -740,22 +740,25 @@ def edit_issue(session, issue, ticketfolder, user,
         return 'Edited successfully issue #%s' % issue.id
 
 
-def update_project_settings(
-        session, repo, issue_tracker, project_docs, user):
+def update_project_settings(session, repo, settings, user):
     ''' Update the settings of a project. '''
     user_obj = __get_user(session, user)
 
     update = []
-    if issue_tracker != repo.issue_tracker:
-        repo.issue_tracker = issue_tracker
-        update.append('issue_tracker')
-    if project_docs != repo.project_docs:
-        repo.project_docs = project_docs
-        update.append('project_docs')
+    new_settings = repo.settings
+    for key in new_settings:
+        if key in settings:
+            if new_settings[key] != settings[key]:
+                update.append(key)
+                new_settings[key] = settings[key]
+        else:
+            update.append(key)
+            new_settings[key] = False
 
     if not update:
         return 'No settings to change'
     else:
+        repo.save_settings(new_settings)
         session.add(repo)
         session.flush()
         pagure.lib.notify.fedmsg_publish(
