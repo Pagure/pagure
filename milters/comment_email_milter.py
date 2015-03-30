@@ -179,7 +179,6 @@ class PagureMilter(Milter.Base):
 
     def handle_request_email(self, emailobj, msg_id):
         ''' Add the email as a comment on a request. '''
-        msg_id = msg['In-Reply-To']
         uid  = msg_id.split('-pull-request-')[-1].split('@')[0]
         parent_id = None
         if '-' in uid:
