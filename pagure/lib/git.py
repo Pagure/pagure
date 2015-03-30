@@ -115,6 +115,14 @@ def write_gitolite_acls(session, configfile):
                 config.append('  RW+ = %s' % user.user)
         config.append('')
 
+        config.append('repo requests/%s' % project.fullname)
+        config.append('  R   = @all')
+        config.append('  RW+ = %s' % project.user.user)
+        for user in project.users:
+            if user != project.user:
+                config.append('  RW+ = %s' % user.user)
+        config.append('')
+
     with open(configfile, 'w') as stream:
         for row in config:
             stream.write(row + '\n')
