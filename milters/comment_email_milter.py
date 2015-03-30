@@ -89,16 +89,20 @@ class PagureMilter(Milter.Base):
 
     @Milter.noreply
     def header(self, name, hval):
-        self.fp.write("%s: %s\n" % (name, hval))     # add header to buffer
+        ''' Headers '''
+        # add header to buffer
+        self.fp.write("%s: %s\n" % (name, hval))
         return Milter.CONTINUE
 
     @Milter.noreply
     def eoh(self):
-        self.fp.write("\n")                         # terminate headers
+        ''' End of Headers '''
+        self.fp.write("\n")
         return Milter.CONTINUE
 
     @Milter.noreply
     def body(self, chunk):
+        ''' Body '''
         self.fp.write(chunk)
         return Milter.CONTINUE
 
@@ -110,6 +114,7 @@ class PagureMilter(Milter.Base):
         return Milter.CONTINUE
 
     def eom(self):
+        ''' End of Message '''
         self.fp.seek(0)
         msg = email.message_from_file(self.fp)
 
