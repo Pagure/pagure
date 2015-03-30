@@ -18,6 +18,8 @@ BuildRequires:  python-nose
 
 BuildRequires:  python-alembic
 BuildRequires:  python-arrow
+BuildRequires:  python-blinker
+BuildRequires:  python-chardet
 BuildRequires:  python-docutils
 BuildRequires:  python-flask
 BuildRequires:  python-flask-wtf
@@ -43,6 +45,8 @@ Requires:  python-sqlalchemy > 0.8
 
 Requires:  python-alembic
 Requires:  python-arrow
+Requires:  python-blinker
+Requires:  python-chardet
 Requires:  python-docutils
 Requires:  python-flask
 Requires:  python-flask-wtf
