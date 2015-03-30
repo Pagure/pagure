@@ -171,6 +171,8 @@ class PagureMilter(Milter.Base):
             url = url[:-1]
         if not url.startswith('/'):
             url = '/' + url
+        if url == '/':
+            url = ''
         url = 'http://localhost%s/pv/ticket/comment/' % url
         req = requests.put(url, data=data)
 
@@ -209,6 +211,8 @@ class PagureMilter(Milter.Base):
             url = url[:-1]
         if not url.startswith('/'):
             url = '/' + url
+        if url == '/':
+            url = ''
         url = 'http://localhost%s/pv/pull-request/comment/' % url
         req = requests.put(url, data=data)
 
