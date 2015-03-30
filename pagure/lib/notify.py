@@ -77,7 +77,7 @@ def _get_emails_for_issue(issue):
 
     # Drop the email used by pagure when sending
     emails = _clean_emails(
-        mail_to, pagure.APP.config.get(pagure.APP.config.get(
+        emails, pagure.APP.config.get(pagure.APP.config.get(
             'FROM_EMAIL', 'pagure@fedoraproject.org'))
     )
 
