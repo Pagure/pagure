@@ -58,6 +58,18 @@ def get_email_body(emailobj):
     return body
 
 
+def clean_item(item):
+    ''' For an item provided as <item> return the content, if there are no
+    <> then return the string.
+    '''
+    if '<' in item:
+        item = item.split('<')[1]
+    if '>' in item:
+        item = item.split('>')[0]
+
+    return item
+
+
 class PagureMilter(Milter.Base):
 
     def __init__(self):  # A new instance with each new connection.
@@ -109,9 +121,7 @@ class PagureMilter(Milter.Base):
         self.log('To', msg['to'])
         self.log('From', msg['From'])
 
-        for key in ['<', '>']:
-            if key in msg_id:
-                msg_id = msg_id.replace(key, '')
+        msg_id = clean_item(msg_id)
 
         if msg_id and '-ticket-' in msg_id:
             return self.handle_ticket_email(msg, msg_id)
@@ -149,7 +159,7 @@ class PagureMilter(Milter.Base):
                 pagure.SESSION,
                 issue=issue,
                 comment=get_email_body(emailobj),
-                user=emailobj['From'],
+                user=clean_item(emailobj['From']),
                 ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
             )
             pagure.SESSION.commit()
@@ -187,7 +197,7 @@ class PagureMilter(Milter.Base):
                 pagure.SESSION,
                 request=request,
                 comment=get_email_body(emailobj),
-                user=emailobj['From'],
+                user=clean_item(emailobj['From']),
                 requestfolder=pagure.APP.config['REQUESTS_FOLDER'],
             )
             pagure.SESSION.commit()
@@ -210,7 +220,6 @@ def background():
         for i in msg: print i,
         print
 
-## ===
 
 def main():
     bt = Thread(target=background)
@@ -225,6 +234,7 @@ def main():
     logq.put(None)
     bt.join()
     print "%s pagure milter shutdown" % time.strftime('%Y%b%d %H:%M:%S')
+
 
 if __name__ == "__main__":
     main()
