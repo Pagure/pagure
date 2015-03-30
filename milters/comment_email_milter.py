@@ -190,7 +190,7 @@ class PagureMilter(Milter.Base):
 
         request = pagure.lib.get_request_by_uid(
             pagure.SESSION,
-            request_uid = uid
+            request_uid=uid
         )
 
         if not request:
@@ -201,6 +201,9 @@ class PagureMilter(Milter.Base):
             message = pagure.lib.add_pull_request_comment(
                 pagure.SESSION,
                 request=request,
+                commit=None,
+                filename=None,
+                row=None,
                 comment=get_email_body(emailobj),
                 user=clean_item(emailobj['From']),
                 requestfolder=pagure.APP.config['REQUESTS_FOLDER'],
