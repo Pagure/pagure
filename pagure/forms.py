@@ -118,28 +118,6 @@ class AddPullRequestCommentForm(wtf.Form):
     )
 
 
-class ProjectSettingsForm(wtf.Form):
-    ''' Form to update the settings of a project. '''
-    issue_tracker = wtforms.BooleanField(
-        'Activate issue tracker',
-        [wtforms.validators.optional()],
-    )
-    project_docs = wtforms.BooleanField(
-        'Activate project documentation',
-        [wtforms.validators.optional()],
-    )
-
-    def __init__(self, *args, **kwargs):
-        """ Calls the default constructor with the normal argument but
-        uses the list of collection provided to fill the choices of the
-        drop-down list.
-        """
-        super(ProjectSettingsForm, self).__init__(*args, **kwargs)
-        if 'project' in kwargs:
-            self.issue_tracker.data = kwargs['project'].issue_tracker
-            self.project_docs.data = kwargs['project'].project_docs
-
-
 class UserSettingsForm(wtf.Form):
     ''' Form to create or edit project. '''
     ssh_key = wtforms.TextAreaField(
