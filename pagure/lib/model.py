@@ -632,7 +632,7 @@ class PullRequest(BASE):
         ''' Return a unique reprensetation of the issue as string that
         can be used when sending emails.
         '''
-        return '%s-pull-request-%s@pagure' % (self.repo.name, self.id)
+        return '%s-pull-request-%s@pagure' % (self.repo.name, self.uid)
 
     @property
     def discussion(self):
