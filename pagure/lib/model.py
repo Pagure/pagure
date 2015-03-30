@@ -720,7 +720,7 @@ class PullRequestComment(BASE):
         can be used when sending emails.
         '''
         return '%s-pull-request-%s-%s@pagure' % (
-            self.pull_request.project.name, self.pull_request.uid, self.id)
+            self.pull_request.repo.name, self.pull_request.uid, self.id)
 
 
 # ##########################################################
