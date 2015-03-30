@@ -383,7 +383,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertTrue('<p>test project #3</p>' in output.data)
         self.assertTrue('Forked from' in output.data)
         self.assertEqual(
-            output.data.count('<span class="commitid">'), 10)
+            output.data.count('<span class="commitid">'), 3)
 
     def test_view_repo_branch(self):
         """ Test the view_repo_branch endpoint. """
