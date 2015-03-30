@@ -19,7 +19,6 @@ import Milter
 import requests
 
 from Milter.utils import parse_addr
-from sqlalchemy.exc import SQLAlchemyError
 
 logq = Queue(maxsize=4)
 
