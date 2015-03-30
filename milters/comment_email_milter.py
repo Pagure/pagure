@@ -88,12 +88,6 @@ class PagureMilter(Milter.Base):
         return Milter.CONTINUE
 
     @Milter.noreply
-    def connect(self, IPname, family, hostaddr):
-        self.log("connected")
-
-        return Milter.CONTINUE
-
-    @Milter.noreply
     def header(self, name, hval):
         self.fp.write("%s: %s\n" % (name, hval))     # add header to buffer
         return Milter.CONTINUE
