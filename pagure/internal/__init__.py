@@ -29,7 +29,8 @@ def localonly(function):
     def decorated_function(*args, **kwargs):
         ''' Wrapped function actually checking if the request is local.
         '''
-        if flask.request.remote_addr not in ['127.0.0.1', 'localhost']:
+        if flask.request.remote_addr not in [
+                '127.0.0.1', 'localhost', '::1']:
             flask.abort(403)
         else:
             return function(*args, **kwargs)
