@@ -1,0 +1,16 @@
+@import url("cloud.css");
+@import url("http://fonts.googleapis.com/css?family=Comfortaa");
+
+.pagure-logo span {
+    background: url("pagure.png") no-repeat scroll 50% 0 transparent;
+    display: block;
+    width: 134px;
+    height: 64px;
+    margin-bottom: 10px;
+  }
+
+h1.pagure-logo {
+    font-family: 'Comfortaa', sans-serif;
+    margin-top: -10px;
+    margin-bottom: 12px;
+}
