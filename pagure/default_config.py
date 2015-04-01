@@ -113,10 +113,11 @@ PAGURE_AUTH = 'fas'
 # be set to True in production.
 # Default: ``True``.
 SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_NAME = 'pagure'
 
 # The name of the cookie used to store the session id.
 # Default: ``pagure``.
-SESSION_COOKIE_PATH = 'pagure'
+#SESSION_COOKIE_PATH = 'pagure'
 
 # If not specified the application will rely on the root_url when sending
 # emails, otherwise it will use this URL
