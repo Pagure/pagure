@@ -270,6 +270,7 @@ def get_project_from_json(
             name=name,
             description=jsondata.get('description'),
             parent_id=parent.id if parent else None,
+            blacklist=pagure.APP.config.get('BLACKLISTED_PROJECTS', []),
             gitfolder=forkfolder if parent else gitfolder,
             docfolder=docfolder,
             ticketfolder=ticketfolder,
