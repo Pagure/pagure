@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014 - Copyright Red Hat Inc
+ (c) 2014-2015 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -112,11 +112,11 @@ PAGURE_AUTH = 'fas'
 # This may be set to False when testing your application but should always
 # be set to True in production.
 # Default: ``True``.
-PAGURE_COOKIE_REQUIRES_HTTPS = False
+SESSION_COOKIE_SECURE = False
 
 # The name of the cookie used to store the session id.
-# Default: ``.MirrorManager``.
-PAGURE_COOKIE_NAME = 'pagure'
+# Default: ``pagure``.
+SESSION_COOKIE_PATH = 'pagure'
 
 # If not specified the application will rely on the root_url when sending
 # emails, otherwise it will use this URL
@@ -131,9 +131,6 @@ CHECK_SESSION_IP = True
 
 # Lenght for short commits ids or file hex
 SHORT_LENGTH = 6
-
-# Make browsers send session cookie only via HTTPS
-SESSION_COOKIE_SECURE = False
 
 # Used by SESSION_COOKIE_PATH
 APPLICATION_ROOT = '/'

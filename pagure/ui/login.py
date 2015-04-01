@@ -486,7 +486,7 @@ def logout():
 def _check_session_cookie():
     """ Set the user into flask.g if the user is logged in.
     """
-    cookie_name = APP.config.get('PAGURE_COOKIE_NAME', 'pagure')
+    cookie_name = APP.config.get('SESSION_COOKIE_NAME', 'pagure')
     session_id = None
     user = None
 
@@ -521,8 +521,8 @@ def _check_session_cookie():
 
 def _send_session_cookie(response):
     """ Set the session cookie if the user is authenticated. """
-    cookie_name = APP.config.get('PAGURE_COOKIE_NAME', 'pagure')
-    secure = APP.config.get('PAGURE_COOKIE_REQUIRES_HTTPS', True)
+    cookie_name = APP.config.get('SESSION_COOKIE_NAME', 'pagure')
+    secure = APP.config.get('SESSION_COOKIE_SECURE', True)
 
     response.set_cookie(
         key=cookie_name,

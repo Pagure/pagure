@@ -1,4 +1,11 @@
 
+### Set the time after which the admin session expires
+# There are two sessions on pagure, login that holds for 31 days and
+# the session defined here after which an user has to re-login.
+# This session is used when accessing all administrative parts of pagure
+# (ie: changing a project's or a user's settings)
+ADMIN_SESSION_LIFETIME = timedelta(minutes=20)
+
 ### Secret key for the Flask application
 SECRET_KEY='<The web application secret key>'
 
@@ -8,16 +15,23 @@ SECRET_KEY='<The web application secret key>'
 DB_URL = 'sqlite:////var/tmp/pagure_dev.sqlite'
 
 ### The FAS group in which the admin of pagure are
-ADMIN_GROUP = ['sysadmin-main', 'sysadmin-cvs']
+ADMIN_GROUP = ['sysadmin-main']
 
 ### The email address to which the flask.log will send the errors (tracebacks)
 EMAIL_ERROR = 'pingou@pingoured.fr'
 
+### Default SMTP server to use for sending emails
+SMTP_SERVER = 'localhost'
+
+### Email used to sent emails
+FROM_EMAIL = 'pagure@pagure.io'
+
 ### The URL at which the project is available.
-APP_URL = 'https://fedorahosted.org/pagure/'
+APP_URL = 'https://pagure.io/'
 
 ### The URL to use to clone git repositories.
-GIT_URL = 'git@pagure.fedorahosted.org'
+GIT_URL_SSH = 'git@pagure.io'
+GIT_URL_GIT = 'git://pagure.io'
 
 ### Folder containing to the git repos
 GIT_FOLDER = os.path.join(
@@ -38,6 +52,12 @@ DOCS_FOLDER = os.path.join(
     os.path.abspath(os.path.dirname(__file__)),
     '..',
     'docs'
+)
+### Folder containing the pull-requests repos
+REQUESTS_FOLDER = os.path.join(
+    os.path.abspath(os.path.dirname(__file__)),
+    '..',
+    'requests'
 )
 
 ### Configuration file for gitolite
@@ -62,15 +82,49 @@ GL_RC = None
 GL_BINDIR = None
 
 
-
 # Optional configuration
 
-### Default SMTP server to use for sending emails
-#SMTP_SERVER = 'localhost'
+### Number of items displayed per page
+# Used when listing items
+ITEM_PER_PAGE = 50
 
-### Email used to sent emails
-#FROM_EMAIL = 'pagure@fedoraproject.org'
+### Maximum size of the uploaded content
+# Used to limit the size of file attached to a ticket for example
+MAX_CONTENT_LENGTH = 4 * 1024 * 1024  # 4 megabytes
 
-### the number of items (packages, packagers..) to display on the search
-### pages
-ITEMS_PER_PAGE = 50
+### Lenght for short commits ids or file hex
+SHORT_LENGTH = 6
+
+### List of blacklisted project names that can conflicts for pagure's URLs
+### or other
+BLACKLISTED_PROJECTS = ['static', 'pv']
+
+
+# Authentication related configuration option
+
+### Switch the authentication method
+# Specify which authentication method to use, defaults to `fas` can be or
+# `local`
+# Default: ``fas``.
+PAGURE_AUTH = 'fas'
+
+# When this is set to True, the session cookie will only be returned to the
+# server via ssl (https). If you connect to the server via plain http, the
+# cookie will not be sent. This prevents sniffing of the cookie contents.
+# This may be set to False when testing your application but should always
+# be set to True in production.
+# Default: ``True``.
+SESSION_COOKIE_SECURE = False
+
+# The name of the cookie used to store the session id.
+# Default: ``.pagure``.
+SESSION_COOKIE_NAME = 'pagure'
+
+# Boolean specifying wether to check the user's IP address when retrieving
+# its session. This make things more secure (thus is on by default) but
+# under certain setup it might not work (for example is there are proxies
+# in front of the application).
+CHECK_SESSION_IP = True
+
+# Used by SESSION_COOKIE_PATH
+APPLICATION_ROOT = '/'
