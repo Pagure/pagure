@@ -88,6 +88,7 @@ def _build_url(*args):
     ''' Build a URL from a given list of arguments. '''
     items = []
     for idx, arg in enumerate(args):
+        arg = str(arg)
         if arg.startswith('/'):
             arg = arg[1:]
         if arg.endswith('/') and not idx + 1 == len(args):
