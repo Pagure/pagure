@@ -271,6 +271,7 @@ def new_project():
                 name=name,
                 description=description,
                 user=flask.g.fas_user.username,
+                blacklist=APP.config['BLACKLISTED_PROJECTS'],
                 gitfolder=APP.config['GIT_FOLDER'],
                 docfolder=APP.config['DOCS_FOLDER'],
                 ticketfolder=APP.config['TICKETS_FOLDER'],

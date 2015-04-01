@@ -137,3 +137,6 @@ SESSION_COOKIE_SECURE = False
 
 # Used by SESSION_COOKIE_PATH
 APPLICATION_ROOT = '/'
+
+# List of blacklisted project names
+BLACKLISTED_PROJECTS = ['static', 'pv']

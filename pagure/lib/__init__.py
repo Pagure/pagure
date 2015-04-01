@@ -549,11 +549,17 @@ def add_pull_request_comment(session, request, commit, filename, row,
     return 'Comment added'
 
 
-def new_project(session, user, name,
+def new_project(session, user, name, blacklist,
                 gitfolder, docfolder, ticketfolder, requestfolder,
                 description=None, parent_id=None):
     ''' Create a new project based on the information provided.
     '''
+    if name in blacklist:
+        raise pagure.exceptions.RepoExistsException(
+            'No project "%s" are allowed to be created due to potential '
+            'conflicts in URLs with pagure itself' % name
+        )
+
     gitrepo = os.path.join(gitfolder, '%s.git' % name)
     if os.path.exists(gitrepo):
         raise pagure.exceptions.RepoExistsException(
