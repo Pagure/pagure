@@ -124,6 +124,10 @@ class PagureMilter(Milter.Base):
         self.log('To', msg['to'])
         self.log('From', msg['From'])
 
+        if msg['From'] and msg['From'] == pagure.APP.config.get('FROM_EMAIL'):
+            self.log("Let's not process the email we send")
+            return Milter.CONTINUE
+
         msg_id = clean_item(msg_id)
 
         if msg_id and '-ticket-' in msg_id:
