@@ -9,8 +9,8 @@
         href="{{ url_for('static', filename='toggle.css') }}"/>
 {% endblock %}
 
-{% from "render_repo.html" import render_repos %}
-{% from "render_repo.html" import repos_switch %}
+{% from "_render_repo.html" import render_repos %}
+{% from "_render_repo.html" import repos_switch %}
 
 {% block content %}
     {% if username %}
