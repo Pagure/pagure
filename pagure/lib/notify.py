@@ -84,6 +84,19 @@ def _get_emails_for_issue(issue):
     return emails
 
 
+def _build_url(*args):
+    ''' Build a URL from a given list of arguments. '''
+    items = []
+    for idx, arg in enumerate(args):
+        if arg.startswith('/'):
+            arg = arg[1:]
+        if arg.endswith('/') and not idx + 1 == len(args):
+            arg = arg[:-1]
+        items.append(arg)
+
+    return '/'.join(items)
+
+
 def send_email(text, subject, to_mail, from_mail=None, mail_id=None,
                in_reply_to=None):  # pragma: no cover
     ''' Send an email with the specified information.
