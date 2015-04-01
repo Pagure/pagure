@@ -160,9 +160,10 @@ New comment:
 """ % (
         comment.user.user,
         comment.comment,
-        '%s/%s/issue/%s' % (
+        _build_url(
             pagure.APP.config['APP_URL'],
             comment.issue.project.name,
+            'issue',
             comment.issue.id,
         ),
     )
@@ -199,9 +200,10 @@ New issue:
         issue.user.user,
         issue.project.name,
         issue.content,
-        '%s/%s/issue/%s' % (
+        _build_url(
             pagure.APP.config['APP_URL'],
             issue.project.name,
+            'issue',
             issue.id,
         ),
     )
@@ -231,9 +233,10 @@ The issue: `%s` of project: `%s` has been %s by %s.
         issue.project.name,
         action,
         user.username,
-        '%s/%s/issue/%s' % (
+        _build_url(
             pagure.APP.config['APP_URL'],
             issue.project.name,
+            'issue',
             issue.id,
         ),
     )
@@ -271,9 +274,10 @@ New pull-request:
         request.user.user,
         request.repo.name,
         request.title,
-        '%s/%s/request-pull/%s' % (
+        _build_url(
             pagure.APP.config['APP_URL'],
             request.repo.name,
+            'pull-request',
             request.id,
         ),
     )
@@ -309,9 +313,10 @@ Merged pull-request:
         user.username,
         request.repo.name,
         request.title,
-        '%s/%s/request-pull/%s' % (
+        _build_url(
             pagure.APP.config['APP_URL'],
             request.repo.name,
+            'pull-request',
             request.id,
         ),
     )
@@ -349,9 +354,10 @@ Cancelled pull-request:
         user.username,
         request.repo.name,
         request.title,
-        '%s/%s/request-pull/%s' % (
+        _build_url(
             pagure.APP.config['APP_URL'],
             request.repo.name,
+            'pull-request',
             request.id,
         ),
     )
@@ -392,9 +398,10 @@ New comment:
         comment.user.user,
         comment.pull_request.title,
         comment.comment,
-        '%s/%s/request-pull/%s' % (
+        _build_url(
             pagure.APP.config['APP_URL'],
             comment.pull_request.repo.name,
+            'pull-request',
             comment.pull_request.id,
         ),
     )
