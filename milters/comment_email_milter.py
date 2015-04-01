@@ -32,8 +32,6 @@ sys.path.insert(0, os.path.expanduser('/srv/progit'))
 
 
 import pagure
-import pagure.exceptions
-import pagure.lib
 
 
 def get_email_body(emailobj):
