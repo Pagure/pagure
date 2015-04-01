@@ -2,3 +2,6 @@ include LICENSE README.rst requirements.txt
 include createdb.py
 recursive-include pagure *
 recursive-include files *
+recursive-include milters *
+recursive-include tests *
+recursive-include doc *
