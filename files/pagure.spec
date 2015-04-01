@@ -62,12 +62,31 @@ Requires:  python-straight-plugin
 Requires:  python-wtforms
 Requires:  mod_wsgi
 
+# No dependency of the app per say, but required to make it working.
+Requires:  gitolite
+
+
 %description
 Pagure is a light-weight git-centered forge based on pygit2.
 
 Currently, Pagure offers a web-interface for git repositories, a ticket
 system and possibilities to create new projects, fork existing ones and
 create/merge pull-requests across or within projects.
+
+%package milters
+Summary: Milter to integrate pagure with emails
+BuildArch: noarch
+BuildRequires: python-pymilter
+Requires: python-pymilter
+# It would work with sendmail but we configure things (like the tempfile)
+# to work with postfix
+Requires:  postfix
+
+
+%description milters
+Milters (Mail filters) allowing the integration of pagure and emails.
+This is useful for example to allow commenting on a ticket by email.
+
 
 %prep
 %setup -q
@@ -97,6 +116,16 @@ install -m 644 files/pagure.wsgi $RPM_BUILD_ROOT/%{_datadir}/pagure/pagure.wsgi
 install -m 644 createdb.py $RPM_BUILD_ROOT/%{_datadir}/pagure/pagure_createdb.py
 
 
+# Install the milter files
+mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/run/pagure
+mkdir -p $RPM_BUILD_ROOT/%{_tmpfilesdir}
+mkdir -p $RPM_BUILD_ROOT/%{_unitdir}
+install -m 0644 milters/milter_tempfile.conf \
+    $RPM_BUILD_ROOT/%{_tmpfilesdir}/%{name}-milter.conf
+install -m 644 milters/pagure_milter.service \
+    $RPM_BUILD_ROOT/%{_unitdir}/pagure_milter.service
+
+
 %files
 %doc README.rst LICENSE
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/pagure.conf
@@ -105,6 +134,12 @@ install -m 644 createdb.py $RPM_BUILD_ROOT/%{_datadir}/pagure/pagure_createdb.py
 %{_datadir}/pagure/
 %{python_sitelib}/pagure/
 %{python_sitelib}/pagure*.egg-info
+
+
+%files milters
+%attr(755,postfix,postfix) %dir %{_localstatedir}/run/pagure
+%{_tmpfilesdir}/%{name}-milter.conf
+%{_unitdir}/pagure_milter.service
 
 
 %changelog
