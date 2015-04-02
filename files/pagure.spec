@@ -3,7 +3,7 @@
 
 Name:           pagure
 Version:        0.0
-Release:        1.20141008%{?dist}
+Release:        1.20150402%{?dist}
 Summary:        A git-centered forge
 
 License:        GPLv2+
@@ -143,5 +143,8 @@ install -m 644 milters/pagure_milter.service \
 
 
 %changelog
+* Thu Apr 02 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.0-1.20150402
+- Cut a RPM for testing on Thu Apr 2nd 2015
+
 * Wed Oct 08 2014 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.0-1.20141008
 - Initial packaging work for Fedora
