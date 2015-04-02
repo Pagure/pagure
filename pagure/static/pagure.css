@@ -399,6 +399,18 @@ table.list tbody td > a
     width: 5em;
 }
 
+.admin_list {
+    float: right;
+    width: 40%;
+    padding-right: 5em;
+    max-height: 200px;
+    overflow: auto;
+}
+
+.branch_list {
+    width: 50%;
+}
+
 .commit_list li > a > span.commitdate
 {
     color: #4d4d4d;
@@ -750,11 +762,6 @@ ul.changes {
 
 #tabs textarea {
     width: 500px;
-}
-
-.admin_list {
-    float: right;
-    padding-right: 5em;
 }
 
 table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after {
