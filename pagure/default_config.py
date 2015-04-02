@@ -119,10 +119,6 @@ SESSION_COOKIE_NAME = 'pagure'
 # Default: ``pagure``.
 #SESSION_COOKIE_PATH = 'pagure'
 
-# If not specified the application will rely on the root_url when sending
-# emails, otherwise it will use this URL
-# Default: ``None``.
-APPLICATION_URL = None
 
 # Boolean specifying wether to check the user's IP address when retrieving
 # its session. This make things more secure (thus is on by default) but

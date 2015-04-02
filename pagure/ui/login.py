@@ -402,7 +402,7 @@ def send_confirmation_email(user):
     if not user.emails:
         return
 
-    url = APP.config.get('APPLICATION_URL', flask.request.url_root)
+    url = APP.config.get('APP_URL', flask.request.url_root)
 
     url = urlparse.urljoin(
         url or flask.request.url_root,
@@ -441,7 +441,7 @@ def send_lostpassword_email(user):
     if not user.emails:
         return
 
-    url = APP.config.get('APPLICATION_URL', flask.request.url_root)
+    url = APP.config.get('APP_URL', flask.request.url_root)
 
     url = urlparse.urljoin(
         url or flask.request.url_root,

@@ -430,7 +430,7 @@ def notify_new_email(email, user):
     ''' Ask the user to confirm to the email belong to them.
     '''
 
-    root_url = pagure.APP.config.get('APPLICATION_URL', flask.request.url_root)
+    root_url = pagure.APP.config.get('APP_URL', flask.request.url_root)
 
     url = urlparse.urljoin(
         root_url or flask.request.url_root,
