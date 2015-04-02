@@ -495,6 +495,13 @@ def add_user_to_project(session, project, new_user, user):
     new_user_obj = __get_user(session, new_user)
     user_obj = __get_user(session, user)
 
+    users = set([user.user for user in project.users])
+    users.add(project.user.user)
+    if new_user in users:
+        raise pagure.exceptions.PagureException(
+            'This user is already listed on this project.'
+        )
+
     project_user = model.ProjectUser(
         project_id=project.id,
         user_id=new_user_obj.id,
