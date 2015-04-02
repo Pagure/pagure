@@ -77,6 +77,7 @@ create/merge pull-requests across or within projects.
 Summary: Milter to integrate pagure with emails
 BuildArch: noarch
 BuildRequires: python-pymilter
+BuildRequires: systemd-devel
 Requires: python-pymilter
 # It would work with sendmail but we configure things (like the tempfile)
 # to work with postfix
