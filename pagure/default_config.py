@@ -115,11 +115,6 @@ PAGURE_AUTH = 'fas'
 SESSION_COOKIE_SECURE = False
 SESSION_COOKIE_NAME = 'pagure'
 
-# The name of the cookie used to store the session id.
-# Default: ``pagure``.
-#SESSION_COOKIE_PATH = 'pagure'
-
-
 # Boolean specifying wether to check the user's IP address when retrieving
 # its session. This make things more secure (thus is on by default) but
 # under certain setup it might not work (for example is there are proxies
