@@ -323,6 +323,10 @@ pre {
     font-size: 1.3em;
 }
 
+.tree_list {
+    clear: both;
+}
+
 .tree_list li.folder {
     list-style-image: url(images/folder.png);
 }
@@ -393,6 +397,22 @@ table.list tbody td > a
     color: #4d4d4d;
     display: inline-block;
     width: 5em;
+}
+
+.admin_list {
+    float: right;
+    width: 40%;
+    padding-right: 5em;
+    max-height: 200px;
+    overflow: auto;
+}
+
+.admin_list li {
+    list-style-type: none;
+}
+
+.branch_list {
+    width: 50%;
 }
 
 .commit_list li > a > span.commitdate
@@ -746,11 +766,6 @@ ul.changes {
 
 #tabs textarea {
     width: 500px;
-}
-
-.admin_list {
-    float: right;
-    padding-right: 5em;
 }
 
 table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after {
