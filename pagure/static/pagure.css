@@ -407,6 +407,10 @@ table.list tbody td > a
     overflow: auto;
 }
 
+.admin_list li {
+    list-style-type: none;
+}
+
 .branch_list {
     width: 50%;
 }
