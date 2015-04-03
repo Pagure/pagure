@@ -102,6 +102,8 @@ def request_pull(repo, requestid, username=None):
     parentpath = _get_parent_repo_path(repo_from)
     orig_repo = pygit2.Repository(parentpath)
 
+    diff_commits = []
+    diff = None
     # Closed pull-request
     if request.status is False:
         commitid = request.commit_stop
@@ -113,8 +115,6 @@ def request_pull(repo, requestid, username=None):
         branch = repo_obj.lookup_branch(request.branch_from)
         commitid = branch.get_object().hex
 
-        diff_commits = []
-        diff = None
         if not repo_obj.is_empty and not orig_repo.is_empty:
             orig_commit = orig_repo[
                 orig_repo.lookup_branch(request.branch).get_object().hex]
