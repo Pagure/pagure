@@ -79,6 +79,7 @@ BuildArch: noarch
 BuildRequires: python-pymilter
 BuildRequires: systemd-devel
 Requires: python-pymilter
+Requires: systemd
 # It would work with sendmail but we configure things (like the tempfile)
 # to work with postfix
 Requires:  postfix
