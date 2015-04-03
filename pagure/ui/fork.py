@@ -110,7 +110,6 @@ def request_pull(repo, requestid, username=None):
             if commit.oid.hex == request.commit_start:
                 break
     else:
-
         branch = repo_obj.lookup_branch(request.branch_from)
         commitid = branch.get_object().hex
 
@@ -159,12 +158,12 @@ def request_pull(repo, requestid, username=None):
             orig_commit = None
             repo_commit = repo_obj[request.stop_id]
             diff = repo_commit.tree.diff_to_tree(swap=True)
-    else:
-        flask.flash(
-            'Fork is empty, there are no commits to request pulling',
-            'error')
-        return flask.redirect(flask.url_for(
-            'view_repo', username=username, repo=repo.name))
+        else:
+            flask.flash(
+                'Fork is empty, there are no commits to request pulling',
+                'error')
+            return flask.redirect(flask.url_for(
+                'view_repo', username=username, repo=repo.name))
 
     form = pagure.forms.ConfirmationForm()
 
