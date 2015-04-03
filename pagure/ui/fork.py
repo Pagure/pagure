@@ -102,24 +102,24 @@ def request_pull(repo, requestid, username=None):
     parentpath = _get_parent_repo_path(repo_from)
     orig_repo = pygit2.Repository(parentpath)
 
-    branch = repo_obj.lookup_branch(request.branch_from)
-    commitid = branch.get_object().hex
+    # Closed pull-request
+    if request.status is False:
+        commitid = request.commit_stop
+        for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
+            diff_commits.append(commit)
+            if commit.oid.hex == request.commit_start:
+                break
+    else:
 
-    diff_commits = []
-    diff = None
-    if not repo_obj.is_empty and not orig_repo.is_empty:
-        orig_commit = orig_repo[
-            orig_repo.lookup_branch(request.branch).get_object().hex]
+        branch = repo_obj.lookup_branch(request.branch_from)
+        commitid = branch.get_object().hex
 
-        # Closed pull-request
-        if request.status is False:
-            commitid = request.commit_stop
-            for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
-                diff_commits.append(commit)
-                if commit.oid.hex == request.commit_start:
-                    break
-        # Pull-request open
-        else:
+        diff_commits = []
+        diff = None
+        if not repo_obj.is_empty and not orig_repo.is_empty:
+            orig_commit = orig_repo[
+                orig_repo.lookup_branch(request.branch).get_object().hex]
+            # Pull-request open
             master_commits = [
                 commit.oid.hex
                 for commit in orig_repo.walk(
@@ -148,17 +148,17 @@ def request_pull(repo, requestid, username=None):
                         'Could not update this pull-request in the database',
                         'error')
 
-        if diff_commits:
-            first_commit = repo_obj[diff_commits[-1].oid.hex]
-            diff = repo_obj.diff(
-                repo_obj.revparse_single(first_commit.parents[0].oid.hex),
-                repo_obj.revparse_single(diff_commits[0].oid.hex)
-            )
+            if diff_commits:
+                first_commit = repo_obj[diff_commits[-1].oid.hex]
+                diff = repo_obj.diff(
+                    repo_obj.revparse_single(first_commit.parents[0].oid.hex),
+                    repo_obj.revparse_single(diff_commits[0].oid.hex)
+                )
 
-    elif orig_repo.is_empty:
-        orig_commit = None
-        repo_commit = repo_obj[request.stop_id]
-        diff = repo_commit.tree.diff_to_tree(swap=True)
+        elif orig_repo.is_empty:
+            orig_commit = None
+            repo_commit = repo_obj[request.stop_id]
+            diff = repo_commit.tree.diff_to_tree(swap=True)
     else:
         flask.flash(
             'Fork is empty, there are no commits to request pulling',
