@@ -631,7 +631,7 @@ header.repo.forked > p {
     display: inline-block;
 }
 
-#fork_button, #settings_button, #profile_button {
+#request_pull,#fork_button, #settings_button, #profile_button {
     border-radius: 10px;
 }
 
@@ -645,6 +645,11 @@ header.repo.forked > p {
     padding-bottom: .61em;
 }
 
+#request_pull {
+    background-color: rgb(54, 97, 190);
+    padding: 6px;
+}  
+  
 #fork_button a {
     background-image: url(images/fork_button.png);
 }
@@ -657,6 +662,11 @@ header.repo.forked > p {
     background-image: url(images/profile_button.png);
 }
 
+#request_pull:hover a{
+    background-color: rgb(84, 138, 255);
+}
+
+#request_pull a,
 #fork_button:hover a,
 #settings_button:hover a,
 #profile_button:hover a {
