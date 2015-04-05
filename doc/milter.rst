@@ -25,3 +25,38 @@ default, should go to ``/usr/share/pagure/comment_email_milter.py``.
 If you are using the RPM, install ``pagure-milters`` should provide and install
 all the files correctly.
 
+
+Activate the milter
+-------------------
+
+Make sure the milter is running and will be automaticall started at boot by
+running the commands:
+
+To start the milter:
+
+::
+
+    systemctl start pagure_milter
+
+To ensure the milter is always started at boot time:
+
+::
+
+    systemctl enable pagure_milter
+
+
+Activate the milter in postfix
+------------------------------
+
+To actually activate the milter in postfix is in fact really easy, all it takes
+is two lines in the ``main.cf`` file of postfix:
+
+::
+
+    non_smtpd_milters = unix:/var/run/pagure/paguresock
+    smtpd_milters = unix:/var/run/pagure/paguresock
+
+These two lines are pointing to the unix socket used by postfix to communicate
+with the milter. This socket is defined in the milter file itself, in the
+sources: ``milters/comment_email_milter.py``.
+
