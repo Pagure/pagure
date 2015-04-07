@@ -367,3 +367,10 @@ if APP.config.get('PAGURE_AUTH', None) == 'local':
     import pagure.ui.login as login
     APP.before_request(login._check_session_cookie)
     APP.after_request(login._send_session_cookie)
+
+
+# pylint: disable=W0613
+@APP.teardown_request
+def shutdown_session(exception=None):
+    """ Remove the DB session at the end of each request. """
+    SESSION.remove()
