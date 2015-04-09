@@ -104,7 +104,8 @@ function doUpload(csrf_token, files) {
   });
 }
 
-function initDropbox(csrf_token, id, upload=true) {
+function initDropbox(csrf_token, id, upload) {
+  upload = typeof upload !== 'undefined' ? a : true;
   var $dropbox = $(id);
 
   // On drag enter...
