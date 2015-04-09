@@ -662,7 +662,7 @@ header.repo.forked > p {
     background-image: url(images/profile_button.png);
 }
 
-#request_pull:hover a{
+#request_pull:hover {
     background-color: rgb(84, 138, 255);
 }
 
