@@ -46,7 +46,7 @@ Create the folder that will receive the different git repositories:
 
 ::
 
-    mkdir {repos,docs,forks,tickets}
+    mkdir {repos,docs,forks,tickets,requests}
 
 
 Run the server:
