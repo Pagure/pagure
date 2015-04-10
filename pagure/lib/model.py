@@ -114,6 +114,7 @@ class User(BASE):
     user = sa.Column(sa.String(32), nullable=False, unique=True, index=True)
     fullname = sa.Column(sa.Text, nullable=False, index=True)
     public_ssh_key = sa.Column(sa.Text, nullable=True)
+    default_email = sa.Column(sa.Text, nullable=False)
 
     password = sa.Column(sa.Text, nullable=True)
     token = sa.Column(sa.String(50), nullable=True)
