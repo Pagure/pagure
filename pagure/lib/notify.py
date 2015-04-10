@@ -59,21 +59,21 @@ def _get_emails_for_issue(issue):
 
     # Add project maintainers
     for user in issue.project.users:
-        if user.emails:
-            emails.add(user.emails[0].email)
+        if user.default_email:
+            emails.add(user.default_email)
 
     # Add people that commented on the ticket
     for comment in issue.comments:
-        if comment.user.emails:
-            emails.add(comment.user.emails[0].email)
+        if comment.user.default_email:
+            emails.add(comment.user.default_email)
 
     # Add the person that opened the issue
-    if issue.user.emails:
-        emails.add(issue.user.emails[0].email)
+    if issue.user.default_email:
+        emails.add(issue.user.default_email)
 
     # Add the person assigned to the ticket
-    if issue.assignee and issue.assignee.emails:
-        emails.add(issue.assignee.emails[0].email)
+    if issue.assignee and issue.assignee.default_email:
+        emails.add(issue.assignee.default_email)
 
     # Drop the email used by pagure when sending
     emails = _clean_emails(
@@ -169,8 +169,8 @@ New comment:
         ),
     )
     mail_to = _get_emails_for_issue(comment.issue)
-    if comment.user and comment.user.emails:
-        mail_to.add(comment.user.emails[0].email)
+    if comment.user and comment.user.default_email:
+        mail_to.add(comment.user.default_email)
 
     mail_to = _clean_emails(mail_to, user)
 
@@ -242,8 +242,8 @@ The issue: `%s` of project: `%s` has been %s by %s.
         ),
     )
     mail_to = _get_emails_for_issue(issue)
-    if new_assignee and new_assignee.emails:
-        mail_to.add(new_assignee.emails[0].email)
+    if new_assignee and new_assignee.default_email:
+        mail_to.add(new_assignee.default_email)
 
     mail_to = _clean_emails(mail_to, user)
 
@@ -282,11 +282,11 @@ New pull-request:
             request.id,
         ),
     )
-    mail_to = set([cmt.user.emails[0].email for cmt in request.comments])
-    mail_to.add(request.repo.user.emails[0].email)
+    mail_to = set([cmt.user.default_email for cmt in request.comments])
+    mail_to.add(request.repo.user.default_email)
     for prouser in request.repo.users:
-        if prouser.emails:
-            mail_to.add(prouser.emails[0].email)
+        if prouser.default_email:
+            mail_to.add(prouser.default_email)
 
     send_email(
         text,
@@ -321,11 +321,11 @@ Merged pull-request:
             request.id,
         ),
     )
-    mail_to = set([cmt.user.emails[0].email for cmt in request.comments])
-    mail_to.add(request.repo.user.emails[0].email)
+    mail_to = set([cmt.user.default_email for cmt in request.comments])
+    mail_to.add(request.repo.user.default_email)
     for prouser in request.repo.users:
-        if prouser.emails:
-            mail_to.add(prouser.emails[0].email)
+        if prouser.default_email:
+            mail_to.add(prouser.default_email)
 
     uid = time.mktime(datetime.datetime.now().timetuple())
     send_email(
@@ -362,11 +362,11 @@ Cancelled pull-request:
             request.id,
         ),
     )
-    mail_to = set([cmt.user.emails[0].email for cmt in request.comments])
-    mail_to.add(request.repo.user.emails[0].email)
+    mail_to = set([cmt.user.default_email for cmt in request.comments])
+    mail_to.add(request.repo.user.default_email)
     for prouser in request.repo.users:
-        if prouser.emails:
-            mail_to.add(prouser.emails[0].email)
+        if prouser.default_email:
+            mail_to.add(prouser.default_email)
 
     uid = time.mktime(datetime.datetime.now().timetuple())
     send_email(
@@ -407,12 +407,12 @@ New comment:
         ),
     )
     mail_to = set([
-        cmt.user.emails[0].email
+        cmt.user.default_email
         for cmt in comment.pull_request.comments])
-    mail_to.add(comment.pull_request.repo.user.emails[0].email)
+    mail_to.add(comment.pull_request.repo.user.default_email)
     for prouser in comment.pull_request.repo.users:
-        if prouser.emails:
-            mail_to.add(prouser.emails[0].email)
+        if prouser.default_email:
+            mail_to.add(prouser.default_email)
 
     mail_to = _clean_emails(mail_to, user)
 
