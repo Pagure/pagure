@@ -1277,7 +1277,9 @@ def set_up_user(session, username, fullname, user_email):
     if not user:
         user = model.User(
             user=username,
-            fullname=fullname)
+            fullname=fullname,
+            default_email=user_email
+        )
         session.add(user)
         session.flush()
 
