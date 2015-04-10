@@ -279,7 +279,8 @@ header h1 span {
     background: #fff;
 }
 
-.del_icon {
+.del_icon,
+.star_icon {
     display: inline;
 }
 
@@ -648,8 +649,8 @@ header.repo.forked > p {
 #request_pull {
     background-color: rgb(54, 97, 190);
     padding: 6px;
-}  
-  
+}
+
 #fork_button a {
     background-image: url(images/fork_button.png);
 }

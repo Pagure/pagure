@@ -22,6 +22,19 @@
       <span class="icon icon-trash blue"></span>
     </button>
   </form>
+  {% if email.email == user.default_email %}
+  (default)
+  {% else %}
+  <form class="icon star_icon" method="POST"
+    action="{{ url_for('set_default_email') }}">
+    <input type="hidden" value="{{ email.email }}" name="email" />
+    {{ form.csrf_token }}
+    <button
+      title="Set default email address">
+      <span class="icon icon-star blue"></span>
+    </button>
+  </form>
+  {% endif %}
 </td>
 {% endmacro %}
 
