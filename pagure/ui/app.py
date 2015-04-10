@@ -445,6 +445,46 @@ def add_user_email():
     )
 
 
+@APP.route('/settings/email/default', methods=['POST'])
+@cla_required
+def set_default_email():
+    """ Set the default email address of the user.
+    """
+    if admin_session_timedout():
+        return flask.redirect(
+            flask.url_for('auth_login', next=flask.request.url))
+
+    user = pagure.lib.search_user(
+        SESSION, username=flask.g.fas_user.username)
+    if not user:
+        flask.abort(404, 'User not found')
+
+    form = pagure.forms.UserEmailForm()
+    if form.validate_on_submit():
+        email = form.email.data
+        useremails = [mail.email for mail in user.emails]
+
+        if email not in useremails:
+            flask.flash(
+                'You do not have the email: %s, nothing to set' % email,
+                'error')
+            return flask.redirect(
+                flask.url_for('.user_settings')
+            )
+
+        user.default_email = email
+
+        try:
+            SESSION.commit()
+            flask.flash('Default email set')
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash('Default email could not be set', 'error')
+
+    return flask.redirect(flask.url_for('.user_settings'))
+
+
 @APP.route('/settings/email/confirm/<token>')
 def confirm_email(token):
     """ Confirm a new email.
