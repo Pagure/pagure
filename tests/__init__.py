@@ -106,6 +106,7 @@ class Modeltests(unittest.TestCase):
             user='pingou',
             fullname='PY C',
             password='foo',
+            default_email='bar@pingou.com',
         )
         self.session.add(item)
         item = pagure.lib.model.UserEmail(
@@ -121,6 +122,7 @@ class Modeltests(unittest.TestCase):
             user='foo',
             fullname='foo bar',
             password='foo',
+            default_email='foo@bar.com',
         )
         self.session.add(item)
         item = pagure.lib.model.UserEmail(

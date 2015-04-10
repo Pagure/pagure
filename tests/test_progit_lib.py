@@ -91,6 +91,7 @@ class PagureLibtests(tests.Modeltests):
             user='pingou2',
             fullname='PY C',
             token='aaabbb',
+            default_email='bar@pingou.com',
         )
         self.session.add(item)
         self.session.commit()
@@ -110,6 +111,7 @@ class PagureLibtests(tests.Modeltests):
             user='pingou2',
             fullname='PY C',
             token='aaabbb',
+            default_email='bar@pingou.com',
         )
         self.session.add(item)
         self.session.commit()
