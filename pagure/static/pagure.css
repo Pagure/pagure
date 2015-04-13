@@ -292,6 +292,7 @@ header h1 span {
     padding: 0;
     padding-left: 0.5em;
     text-decoration: none;
+    cursor: pointer;
 }
 
 .icon_button {
