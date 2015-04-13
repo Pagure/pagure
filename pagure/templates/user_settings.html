@@ -19,11 +19,11 @@
     <button
       onclick="return confirm('Do you really want to remove the email: {{ email.email }}?');"
       title="Remove email">
-      <span class="icon icon-trash blue"></span>
+      <span class="icon icon-remove blue"></span>
     </button>
   </form>
   {% if email.email == user.default_email %}
-  (<span class="icon-star blue" title="default email"></span>)
+  (<span class="icon-home blue" title="default email"></span>)
   {% else %}
   <form class="icon star_icon" method="POST"
     action="{{ url_for('set_default_email') }}">
@@ -31,7 +31,7 @@
     {{ form.csrf_token }}
     <button
       title="Set default email address">
-      <span class="icon icon-tag blue"></span>
+      (<span class="icon icon-ok blue"></span>)
     </button>
   </form>
   {% endif %}
