@@ -145,6 +145,8 @@
 
 <section class="request_diff">
 
+<form action="{{ url_for('.pull_request_drop_comment', username=username,
+    repo=repo.name, requestid=requestid) }}" method="post" class="icon">
 
 {% if diff %}
 {% for patch in diff %}
@@ -195,16 +197,22 @@
 {% endautoescape %}
 {% endfor %}
 {% endif %}
-
+{{ mergeform.csrf_token }}
+</form>
 </section>
 
 {% if pull_request and pull_request.comments%}
 <section class="request_comment">
+<form action="{{ url_for('.pull_request_drop_comment', username=username,
+    repo=repo.name, requestid=requestid) }}" method="post">
+
 {% for comment in pull_request.discussion %}
   {% if not comment.commit_id %}
     {{ show_comment(comment, loop.index, repo, username, requestid, form) }}
   {% endif %}
 {% endfor %}
+{{ mergeform.csrf_token }}
+</form>
 </section>
 {% endif %}
 
