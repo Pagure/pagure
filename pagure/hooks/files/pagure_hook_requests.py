@@ -22,6 +22,7 @@ sys.path.insert(0, os.path.expanduser('~/repos/gitrepo/pagure'))
 
 import pagure.lib.git
 
+
 def read_git_output(args, input=None, keepends=False, **kw):
     """Read the output of a Git command."""
 

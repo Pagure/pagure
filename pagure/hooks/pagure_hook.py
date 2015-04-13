@@ -97,7 +97,6 @@ class PagureHook(BaseHook):
             shutil.copyfile(hook_file, hook_path)
             os.chmod(hook_path, 0755)
 
-
     @classmethod
     def remove(cls, project):
         ''' Method called to remove the hook of a project.

@@ -64,7 +64,7 @@ def pull_request_add_comment():
         flask.abort(400, 'Invalid request')
 
     commit = form.commit.data or None
-    filename= form.filename.data or None
+    filename = form.filename.data or None
     row = form.row.data or None
     comment = form.comment.data
 

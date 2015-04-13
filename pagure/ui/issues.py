@@ -67,7 +67,7 @@ def update_issue(repo, issueid, username=None):
     form = pagure.forms.UpdateIssueForm(status=status)
 
     if form.validate_on_submit():
-        repo_admin =  is_repo_admin(repo)
+        repo_admin = is_repo_admin(repo)
 
         if flask.request.form.get('drop_comment'):
             commentid = flask.request.form.get('drop_comment')
@@ -78,11 +78,12 @@ def update_issue(repo, issueid, username=None):
                 flask.abort(404, 'Comment not found')
 
             if (flask.g.fas_user.username != comment.user.username
-                    and comment.parent.status == True) \
+                    and comment.parent.status is True) \
                     or not is_repo_admin(repo):
                 flask.abort(
                     403,
-                    'You are not allowed to remove this comment from this issue')
+                    'You are not allowed to remove this comment from '
+                    'this issue')
 
             SESSION.delete(comment)
             try:
@@ -626,7 +627,6 @@ def view_issue_raw_file(repo, filename=None, username=None):
 
     if repo_obj.is_empty:
         flask.abort(404, 'Empty repo cannot have a file')
-
 
     branch = repo_obj.lookup_branch('master')
     commit = branch.get_object()

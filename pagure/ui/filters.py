@@ -132,21 +132,21 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
         output.append('</tr>')
 
         tpl_delete = '<button type="submit" name="drop_comment" ' \
-                    'value="%(commentid)s"' \
-                    'onclick="return confirm(\'Do you really want to remove' \
-                    ' this comment?\');"' \
-                    'title="Remove comment">' \
-                    '<span class="icon icon-remove blue"></span>' \
-                    '</button>'
+            'value="%(commentid)s"' \
+            'onclick="return confirm(\'Do you really want to remove' \
+            ' this comment?\');"' \
+            'title="Remove comment">' \
+            '<span class="icon icon-remove blue"></span>' \
+            '</button>'
 
         if cnt - 1 in comments:
             for comment in comments[cnt - 1]:
 
                 templ_delete = ''
                 if authenticated() and \
-                    ((comment.parent.status == True
-                    and comment.user.user == flask.g.fas_user.username)
-                    or is_repo_admin(comment.parent.repo)):
+                    ((comment.parent.status is True
+                     and comment.user.user == flask.g.fas_user.username)
+                     or is_repo_admin(comment.parent.repo)):
                     templ_delete = tpl_delete % ({'commentid': comment.id})
 
                 output.append(

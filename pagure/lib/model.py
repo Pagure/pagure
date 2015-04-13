@@ -156,10 +156,10 @@ class User(BASE):
     def to_json(self):
         ''' Return a representation of the User in a dictionnary. '''
         output = {
-                'name': self.user,
-                'fullname': self.fullname,
-                'emails': [email.email for email in self.emails],
-            }
+            'name': self.user,
+            'fullname': self.fullname,
+            'emails': [email.email for email in self.emails],
+        }
         return output
 
 

@@ -31,7 +31,6 @@ from pagure import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
                     is_repo_admin, generate_gitolite_acls)
 
 
-
 def _get_parent_repo_path(repo):
     """ Return the path of the parent git repository corresponding to the
     provided Repository object from the DB.
@@ -356,7 +355,7 @@ def pull_request_drop_comment(repo, requestid, username=None):
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
 
-       if flask.request.form.get('drop_comment'):
+        if flask.request.form.get('drop_comment'):
             commentid = flask.request.form.get('drop_comment')
 
             comment = pagure.lib.get_request_comment(
@@ -365,11 +364,12 @@ def pull_request_drop_comment(repo, requestid, username=None):
                 flask.abort(404, 'Comment not found')
 
             if (flask.g.fas_user.username != comment.user.username
-                    and comment.parent.status == True) \
+                    and comment.parent.status is True) \
                     or not is_repo_admin(repo):
                 flask.abort(
                     403,
-                    'You are not allowed to remove this comment from this issue')
+                    'You are not allowed to remove this comment from '
+                    'this issue')
 
             SESSION.delete(comment)
             try:

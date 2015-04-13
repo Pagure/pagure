@@ -248,14 +248,12 @@ def get_project_from_json(
     """
     project = None
 
-
     user = get_user_from_json(session, jsondata)
     name = jsondata.get('name')
     project_user = None
     if jsondata.get('parent'):
         project_user = user.username
     project = pagure.lib.get_project(session, name, user=project_user)
-
 
     if not project:
         parent = None
@@ -421,7 +419,7 @@ def update_request_from_git(
             user=user.username,
             requestuid=json_data.get('uid'),
             requestid=json_data.get('id'),
-            status= json_data.get('status'),
+            status=json_data.get('status'),
             requestfolder=None,
             notify=False,
         )

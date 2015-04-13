@@ -23,9 +23,9 @@ from email.mime.text import MIMEText
 
 def fedmsg_publish(*args, **kwargs):  # pragma: no cover
     ''' Try to publish a message on the fedmsg bus. '''
-    ## We catch Exception if we want :-p
+    # We catch Exception if we want :-p
     # pylint: disable=W0703
-    ## Ignore message about fedmsg import
+    # Ignore message about fedmsg import
     # pylint: disable=F0401
     kwargs['modname'] = 'pagure'
     try:
@@ -118,7 +118,8 @@ def send_email(text, subject, to_mail, from_mail=None, mail_id=None,
 
     msg = MIMEText(text.encode('utf-8'), 'plain', 'utf-8')
     msg['Subject'] = '[Pagure] %s' % subject
-    from_email = pagure.APP.config.get('FROM_EMAIL', 'pagure@fedoraproject.org')
+    from_email = pagure.APP.config.get(
+        'FROM_EMAIL', 'pagure@fedoraproject.org')
     msg['From'] = from_email
     msg['Bcc'] = to_mail.replace(',', ', ')
 

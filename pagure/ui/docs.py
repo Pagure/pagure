@@ -32,7 +32,7 @@ def __get_tree(repo_obj, tree, filepath, index=0, extended=False):
     given tree.
     '''
     filename = filepath[index]
-    if isinstance(tree, pygit2.Blob): # pragma: no cover
+    if isinstance(tree, pygit2.Blob):  # pragma: no cover
         # If we were given a blob, then let's just return it
         return (tree, None)
     cnt = 0

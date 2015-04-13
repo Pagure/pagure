@@ -231,7 +231,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
     ''' Add an assignee to an issue, in other words, assigned an issue. '''
     user_obj = __get_user(session, user)
 
-    if assignee is None and issue.assignee != None:
+    if assignee is None and issue.assignee is not None:
         issue.assignee_id = None
         session.add(issue)
         session.commit()
@@ -250,7 +250,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
             )
 
         return 'Assignee reset'
-    elif assignee is None and issue.assignee == None:
+    elif assignee is None and issue.assignee is None:
         return
 
     # Validate the assignee
@@ -1008,9 +1008,9 @@ def search_issues(
             sub = session.query(
                 model.Issue.uid
             ).filter(
-                    model.Issue.uid == model.TagIssue.issue_uid
+                model.Issue.uid == model.TagIssue.issue_uid
             ).filter(
-                    model.TagIssue.tag.in_(notags)
+                model.TagIssue.tag.in_(notags)
             )
 
             query = query.filter(
@@ -1175,7 +1175,7 @@ def close_pull_request(session, request, user, requestfolder, merged=True):
     session.add(request)
     session.flush()
 
-    if merged == True:
+    if merged is True:
         pagure.lib.notify.notify_merge_pull_request(request, user_obj)
     else:
         pagure.lib.notify.notify_cancelled_pull_request(request, user_obj)
