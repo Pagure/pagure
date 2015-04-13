@@ -261,6 +261,7 @@ def request_pull_patch(repo, requestid, username=None):
            methods=['POST'])
 @APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/comment/'
            '<commit>/<path:filename>/<row>', methods=('GET', 'POST'))
+@cla_required
 def pull_request_add_comment(
         repo, requestid, commit=None,
         filename=None, row=None, username=None):
