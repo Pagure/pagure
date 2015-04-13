@@ -112,6 +112,11 @@ def request_pull(repo, requestid, username=None):
             diff_commits.append(commit)
             if commit.oid.hex == request.commit_start:
                 break
+
+        diff = repo_obj.diff(
+            repo_obj.revparse_single(diff_commits[-1].parents[0].oid.hex),
+            repo_obj.revparse_single(diff_commits[0].oid.hex)
+        )
     else:
         branch = repo_obj.lookup_branch(request.branch_from)
         commitid = branch.get_object().hex
