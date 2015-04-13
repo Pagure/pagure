@@ -475,6 +475,7 @@ def merge_request_pull(repo, requestid, username=None):
             branch_ref.target = merge.fastforward_oid
         elif merge is None and mergecode is not None:
             branch_ref.set_target(repo_commit.oid.hex)
+
         ori_remote.push(refname)
         flask.flash('Changes merged!')
 
@@ -490,7 +491,13 @@ def merge_request_pull(repo, requestid, username=None):
                 repo=repo.name,
                 username=username,
                 requestid=requestid))
-        new_repo.lookup_reference('HEAD').get_object()
+        new_repo.create_commit(
+            'refs/heads/master',
+            repo_commit.author,
+            repo_commit.committer,
+            'Merge #%s `%s`' % (request.id, request.title),
+            tree,
+            [head.hex, repo_commit.oid.hex])
         ori_remote.push(refname)
         flask.flash('Changes merged!')
 
