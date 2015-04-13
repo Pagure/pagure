@@ -149,14 +149,12 @@ def notify_new_comment(comment, user=None):
     to the issue.
     '''
     text = """
-%s added a new comment to an issue you are following.
-
-New comment:
-
+%s added a new comment to an issue you are following:
 ``
 %s
 ``
 
+To reply, visit the link below or just reply to this email
 %s
 """ % (
         comment.user.user,
@@ -188,14 +186,12 @@ def notify_new_issue(issue, user=None):
     to it.
     '''
     text = """
-%s reported a new issue against the project: `%s` that you are following.
-
-New issue:
-
+%s reported a new issue against the project: `%s` that you are following:
 ``
 %s
 ``
 
+To reply, visit the link below or just reply to this email
 %s
 """ % (
         issue.user.user,
@@ -262,14 +258,12 @@ def notify_new_pull_request(request):
     added to it.
     '''
     text = """
-%s opened a new pull-request against the project: `%s` that you are following.
-
-New pull-request:
-
+%s opened a new pull-request against the project: `%s` that you are following:
 ``
 %s
 ``
 
+To reply, visit the link below or just reply to this email
 %s
 """ % (
         request.user.user,
@@ -383,19 +377,14 @@ def notify_pull_request_comment(comment, user):
     added to it.
     '''
     text = """
-Project: %s
-
-%s commented on the pull-request: `%s` that you are following.
-
-New comment:
-
+%s commented on the pull-request: `%s` that you are following:
 ``
 %s
 ``
 
+To reply, visit the link below or just reply to this email
 %s
 """ % (
-        comment.pull_request.repo.name,
         comment.user.user,
         comment.pull_request.title,
         comment.comment,
@@ -418,8 +407,10 @@ New comment:
 
     send_email(
         text,
-        'Update to pull-Request #%s `%s`' % (
-            comment.pull_request.id, comment.pull_request.title),
+        'Update to %s pull-Request #%s `%s`' % (
+            comment.pull_request.repo.name,
+            comment.pull_request.id,
+            comment.pull_request.title),
         ','.join(mail_to),
         mail_id=comment.mail_id,
         in_reply_to=comment.pull_request.mail_id,
