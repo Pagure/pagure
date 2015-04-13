@@ -9,6 +9,22 @@ h4 {
     margin: 0.8em 0 0.4em;
 }
 
+input {
+    font-size: 100%;
+}
+
+textarea {
+    font-size: 100%;
+}
+
+button {
+    font-size: 100%;
+}
+
+select {
+    font-size: 100%;
+}
+
 textarea {
     border: 1px #ccc solid;
     background: rgba(255, 255, 255, 0.5);
