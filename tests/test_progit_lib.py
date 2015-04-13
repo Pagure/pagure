@@ -1184,8 +1184,11 @@ class PagureLibtests(tests.Modeltests):
         projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 3)
 
-    def test_new_pull_request(self):
+    @patch('pagure.lib.notify.send_email')
+    def test_new_pull_request(self, mockemail):
         """ test new_pull_request of pagure.lib. """
+        mockemail.return_value = True
+
         tests.create_projects(self.session)
 
         # Create a forked repo
@@ -1225,8 +1228,10 @@ class PagureLibtests(tests.Modeltests):
         )
         self.assertEqual(msg, 'Request created')
 
-    def test_add_pull_request_comment(self):
+    @patch('pagure.lib.notify.send_email')
+    def test_add_pull_request_comment(self, mockemail):
         """ Test add_pull_request_comment of pagure.lib. """
+        mockemail.return_value = True
 
         self.test_new_pull_request()
 
