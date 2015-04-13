@@ -57,13 +57,16 @@ def view_repo(repo, username=None):
     last_commits = []
     tree = []
     if not repo_obj.is_empty:
-        for commit in repo_obj.walk(
-                repo_obj.head.target, pygit2.GIT_SORT_TIME):
-            last_commits.append(commit)
-            cnt += 1
-            if cnt == 3:
-                break
-        tree = sorted(last_commits[0].tree, key=lambda x: x.filemode)
+        try:
+            for commit in repo_obj.walk(
+                    repo_obj.head.target, pygit2.GIT_SORT_TIME):
+                last_commits.append(commit)
+                cnt += 1
+                if cnt == 3:
+                    break
+            tree = sorted(last_commits[0].tree, key=lambda x: x.filemode)
+        except pygit2.GitError:
+            pass
 
     readme = None
     for i in tree:
