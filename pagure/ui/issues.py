@@ -69,6 +69,30 @@ def update_issue(repo, issueid, username=None):
     if form.validate_on_submit():
         repo_admin =  is_repo_admin(repo)
 
+        if flask.request.form.get('drop_comment'):
+            commentid = flask.request.form.get('drop_comment')
+
+            comment = pagure.lib.get_issue_comment(
+                SESSION, issue.uid, commentid)
+            if comment is None or comment.issue.project != repo:
+                flask.abort(404, 'Comment not found')
+
+            if flask.g.fas_user.username != comment.user.username \
+                    or not is_repo_admin(repo):
+                flask.abort(
+                    403,
+                    'You are not allowed to remove this comment from this issue')
+
+            SESSION.delete(comment)
+            try:
+                SESSION.commit()
+                flask.flash('Comment removed')
+            except SQLAlchemyError, err:  # pragma: no cover
+                SESSION.rollback()
+                LOG.error(err)
+                flask.flash(
+                    'Could not remove the comment: %s' % commentid, 'error')
+
         comment = form.comment.data
         try:
             depends = [
@@ -644,63 +668,3 @@ def view_issue_raw_file(repo, filename=None, username=None):
         headers['Content-Encoding'] = encoding
 
     return (data, 200, headers)
-
-
-
-@APP.route(
-    '/<repo>/issue/<int:issueid>/comment/<int:commentid>/drop',
-    methods=['GET', 'POST'])
-@APP.route(
-    '/fork/<username>/<repo>/issue/<int:issueid>/comment/<int:commentid>/drop',
-    methods=['GET', 'POST'])
-@cla_required
-def remove_comment(repo, issueid, commentid, username=None):
-    """ Remove the specified comment of an issue.
-    """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    if not repo.settings.get('issue_tracker', True):
-        flask.abort(404, 'No issue tracker found for this project')
-
-    issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
-
-    if issue is None or issue.project != repo:
-        flask.abort(404, 'Issue not found')
-
-    comment = pagure.lib.get_issue_comment(
-        SESSION, issue.uid, commentid)
-    if comment is None or comment.issue.project != repo:
-        flask.abort(404, 'Comment not found')
-
-    if flask.g.fas_user.username != comment.user.username \
-            or not is_repo_admin(repo):
-        flask.abort(
-            403,
-            'You are not allowed to remove this comment from this issue')
-
-    form = pagure.forms.ConfirmationForm()
-    # Since we are using GET here we can't use the traditional way to
-    # validate the CSRF token so we use this one instead.
-    # Using POST would be best but we cannot nest forms in html and
-    # the whole page in a single form to allow editing multiple fields at
-    # once, so we go around this here.
-    # It is kind of ugly as it relies on GET request so we should look into
-    # fixing this in the future.
-    if form.validate_csrf_data(flask.request.args.get('csrf_token')):
-
-        SESSION.delete(comment)
-        try:
-            SESSION.commit()
-            flask.flash('Comment removed')
-        except SQLAlchemyError, err:  # pragma: no cover
-            SESSION.rollback()
-            LOG.error(err)
-            flask.flash(
-                'Could not remove the comment: %s' % commentid, 'error')
-
-    return flask.redirect(flask.url_for(
-        '.view_issue', repo=repo.name, issueid=issueid, username=username)
-    )

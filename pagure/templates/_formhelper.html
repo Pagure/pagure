@@ -77,13 +77,11 @@
         </a>
         {% if id != 0 and g.fas_user and (
             g.fas_user.username == comment.user.username or repo_admin) %}
-        <a href="{{ url_for('remove_comment', repo=repo.name,
-                             issueid=issueid, commentid=comment.id,
-                             username=username, csrf_token=form.csrf_token.current_token) }}"
+        <button type="submit" name="drop_comment" value="{{ comment.id }}"
             onclick="return confirm('Do you really want to remove this comment');"
             title="Remove comment">
             <span class="icon icon-remove blue"></span>
-        </a>
+        </button>
         {% endif %}
       </aside>
     </header>
