@@ -476,7 +476,7 @@ def set_default_email():
 
         try:
             SESSION.commit()
-            flask.flash('Default email set')
+            flask.flash('Default email set to: %s' % email)
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             APP.logger.exception(err)
