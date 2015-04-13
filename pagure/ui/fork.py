@@ -61,9 +61,13 @@ def request_pulls(repo, username=None):
     if status is False or str(status).lower() == 'closed':
         requests = pagure.lib.search_pull_requests(
             SESSION, project_id=repo.id, status=False)
+        oth_requests = pagure.lib.search_pull_requests(
+            SESSION, project_id=repo.id, status=True, count=True)
     else:
         requests = pagure.lib.search_pull_requests(
             SESSION, project_id=repo.id, status=status)
+        oth_requests = pagure.lib.search_pull_requests(
+            SESSION, project_id=repo.id, status=False, count=True)
 
     return flask.render_template(
         'requests.html',
@@ -71,6 +75,7 @@ def request_pulls(repo, username=None):
         repo=repo,
         username=username,
         requests=requests,
+        oth_requests=oth_requests,
         status=status,
     )
 
