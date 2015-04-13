@@ -326,6 +326,60 @@ def pull_request_add_comment(
     )
 
 
+@APP.route('/<repo>/pull-request/<int:requestid>/comment/drop',
+           methods=['POST'])
+@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/comment/drop',
+           methods=['POST'])
+@cla_required
+def pull_request_drop_comment(repo, requestid, username=None):
+    """ Delete a comment of a pull-request.
+    """
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    if not repo.settings.get('pull_requests', True):
+        flask.abort(404, 'No pull-requests found for this project')
+
+    request = pagure.lib.search_pull_requests(
+        SESSION, project_id=repo.id, requestid=requestid)
+
+    if not request:
+        flask.abort(404, 'Pull-request not found')
+
+    form = pagure.forms.ConfirmationForm()
+    if form.validate_on_submit():
+
+       if flask.request.form.get('drop_comment'):
+            commentid = flask.request.form.get('drop_comment')
+
+            comment = pagure.lib.get_request_comment(
+                SESSION, request.uid, commentid)
+            if comment is None or comment.pull_request.repo != repo:
+                flask.abort(404, 'Comment not found')
+
+            if flask.g.fas_user.username != comment.user.username \
+                    or not is_repo_admin(repo):
+                flask.abort(
+                    403,
+                    'You are not allowed to remove this comment from this issue')
+
+            SESSION.delete(comment)
+            try:
+                SESSION.commit()
+                flask.flash('Comment removed')
+            except SQLAlchemyError, err:  # pragma: no cover
+                SESSION.rollback()
+                LOG.error(err)
+                flask.flash(
+                    'Could not remove the comment: %s' % commentid, 'error')
+
+    return flask.redirect(flask.url_for(
+        'request_pull', username=username,
+        repo=repo.name, requestid=requestid))
+
+
 @APP.route('/<repo>/pull-request/<int:requestid>/merge', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/merge',
            methods=['POST'])
