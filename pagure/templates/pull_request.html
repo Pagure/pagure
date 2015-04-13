@@ -198,8 +198,7 @@
 <section class="request_comment">
 {% for comment in pull_request.discussion %}
   {% if not comment.commit_id %}
-    {{ show_comment(comment.user, comment.date_created, comment.comment,
-        loop.index) }}
+    {{ show_comment(comment, loop.index, repo, username, requestid, form) }}
   {% endif %}
 {% endfor %}
 </section>
