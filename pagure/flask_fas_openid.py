@@ -19,31 +19,24 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with python-fedora; if not, see <http://www.gnu.org/licenses/>
 
-'''
+"""
 FAS-OpenID authentication plugin for the flask web framework
 
 .. moduleauthor:: Patrick Uiterwijk <puiterwijk@fedoraproject.org>
 
 ..versionadded:: 0.3.33
-'''
+"""
 import datetime
 from functools import wraps
 
 from bunch import Bunch
 import flask
-try:
-    from flask import _app_ctx_stack as stack
-except ImportError:  # pragma: no cover
-    from flask import _request_ctx_stack as stack
 
-import openid
 from openid.consumer import consumer
 from openid.fetchers import setDefaultFetcher, Urllib2Fetcher
 from openid.extensions import pape, sreg
 from openid_cla import cla
 from openid_teams import teams
-
-from fedora import __version__
 
 
 class FASJSONEncoder(flask.json.JSONEncoder):  # pragma: no cover
@@ -72,8 +65,10 @@ class FASJSONEncoder(flask.json.JSONEncoder):  # pragma: no cover
 
 
 class FAS(object):  # pragma: no cover
+    """ The Flask plugin. """
 
     def __init__(self, app=None):
+        """ Constructor. """
         self.postlogin_func = None
         self.app = app
         if self.app is not None:
@@ -92,6 +87,7 @@ class FAS(object):  # pragma: no cover
             self.app.json_encoder = FASJSONEncoder
 
     def _init_app(self, app):
+        """ Constructor for the flask application. """
         app.config.setdefault('FAS_OPENID_ENDPOINT',
                               'http://id.fedoraproject.org/')
         app.config.setdefault('FAS_OPENID_CHECK_CERT', True)
@@ -101,18 +97,22 @@ class FAS(object):  # pragma: no cover
 
         @app.route('/_flask_fas_openid_handler/', methods=['GET', 'POST'])
         def flask_fas_openid_handler():
+            """ Add endpoint handling the openid requests. """
             return self._handle_openid_request()
 
         app.before_request(self._check_session)
 
-    def postlogin(self, f):
+    def postlogin(self, func):
         """Marks a function as post login handler. This decorator calls your
         function after the login has been performed.
         """
-        self.postlogin_func = f
-        return f
+        self.postlogin_func = func
+        return func
 
+    # pylint: disable=R0911
     def _handle_openid_request(self):
+        """ Code actually handling the openid requests. """
+
         return_url = flask.session.get('FLASK_FAS_OPENID_RETURN_URL', None)
         cancel_url = flask.session.get('FLASK_FAS_OPENID_CANCEL_URL', None)
         base_url = self.normalize_url(flask.request.base_url)
@@ -128,7 +128,6 @@ class FAS(object):  # pragma: no cover
             return 'OpenID request was cancelled'
         elif info.status == consumer.SUCCESS:
             sreg_resp = sreg.SRegResponse.fromSuccessResponse(info)
-            pape_resp = pape.Response.fromSuccessResponse(info)
             teams_resp = teams.TeamsResponse.fromSuccessResponse(info)
             cla_resp = cla.CLAResponse.fromSuccessResponse(info)
             user = {'fullname': '', 'username': '', 'email': '',
@@ -156,7 +155,9 @@ class FAS(object):  # pragma: no cover
         else:
             return 'Strange state: %s' % info.status
 
+    # pylint: disable=R0201
     def _check_session(self):
+        """ Retrieve the session and move it to g if there is one. """
         if 'FLASK_FAS_OPENID_USER' not in flask.session \
                 or flask.session['FLASK_FAS_OPENID_USER'] is None:
             flask.g.fas_user = None
@@ -173,8 +174,8 @@ class FAS(object):  # pragma: no cover
             flask.g.fas_user.groups = frozenset(flask.g.fas_user.groups)
         flask.g.fas_session_id = 0
 
-    def login(self, username=None, password=None, return_url=None,
-              cancel_url=None, groups=['_FAS_ALL_GROUPS_']):
+    # pylint: disable=R0913
+    def login(self, return_url=None, cancel_url=None, groups=None):
         """Tries to log in a user.
 
         Sets the user information on :attr:`flask.g.fas_user`.
@@ -191,13 +192,16 @@ class FAS(object):  # pragma: no cover
         :returns: True if the user was succesfully authenticated.
         :raises: Might raise an redirect to the OpenID endpoint
         """
-        if return_url is None and return_func is None:
+        if groups is None:
+            groups = ['_FAS_ALL_GROUPS_']
+
+        if return_url is None:
             return_url = flask.request.args.get('next', flask.request.url)
         session = {}
         oidconsumer = consumer.Consumer(session, None)
         try:
             request = oidconsumer.begin(self.app.config['FAS_OPENID_ENDPOINT'])
-        except consumer.DiscoveryFailure, exc:
+        except consumer.DiscoveryFailure:
             # VERY strange, as this means it could not discover an OpenID
             # endpoint at FAS_OPENID_ENDPOINT
             return 'discoveryfailure'
@@ -231,16 +235,16 @@ class FAS(object):  # pragma: no cover
                 form_tag_attrs={'id': 'openid_message'}, immediate=False)
 
     def logout(self):
-        '''Logout the user associated with this session
-        '''
+        """Logout the user associated with this session
+        """
         flask.session['FLASK_FAS_OPENID_USER'] = None
         flask.g.fas_session_id = None
         flask.g.fas_user = None
         flask.session.modified = True
 
     def normalize_url(self, url):
-        ''' Replace the scheme prefix of a url with our preferred scheme.
-        '''
+        """ Replace the scheme prefix of a url with our preferred scheme.
+        """
         scheme = self.app.config['PREFERRED_URL_SCHEME']
         scheme_index = url.index('://')
         return scheme + url[scheme_index:]
@@ -258,6 +262,7 @@ def fas_login_required(function):  # pragma: no cover
     """
     @wraps(function)
     def decorated_function(*args, **kwargs):
+        ''' Function actually doing the checks '''
         if flask.g.fas_user is None:
             return flask.redirect(flask.url_for('auth_login',
                                                 next=flask.request.url))
@@ -273,6 +278,7 @@ def cla_plus_one_required(function):  # pragma: no cover
     """
     @wraps(function)
     def decorated_function(*args, **kwargs):
+        ''' Function actually doing the checks '''
         if flask.g.fas_user is None or not flask.g.fas_user.cla_done \
                 or len(flask.g.fas_user.groups) < 1:
             # FAS-OpenID does not return cla_ groups

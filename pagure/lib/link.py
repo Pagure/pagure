@@ -10,23 +10,22 @@
 
 
 import re
-import os
 
 import pagure.exceptions
 
 
 FIXES = [
-    re.compile('fixe?[sd]?:?\s*?#(\d+)', re.I),
-    re.compile('.*\s*fixe?[sd]?:?\s*?#(\d+)', re.I),
-    re.compile('fixe?[sd]?:?\s*?https?://.*/(\w+)/issue/(\d+)', re.I),
-    re.compile('.*\s*?fixe?[sd]?:?\s*?https?://.*/(\w+)/issue/(\d+)', re.I),
+    re.compile(r'fixe?[sd]?:?\s*?#(\d+)', re.I),
+    re.compile(r'.*\s*fixe?[sd]?:?\s*?#(\d+)', re.I),
+    re.compile(r'fixe?[sd]?:?\s*?https?://.*/(\w+)/issue/(\d+)', re.I),
+    re.compile(r'.*\s*?fixe?[sd]?:?\s*?https?://.*/(\w+)/issue/(\d+)', re.I),
 ]
 
 RELATES = [
-    re.compile('.*\s*relate[sd]?:?\s*?(?:to)?\s*?#(\d+)', re.I),
-    re.compile('.*\s*relate[sd]?:?\s?#(\d+)', re.I),
+    re.compile(r'.*\s*relate[sd]?:?\s*?(?:to)?\s*?#(\d+)', re.I),
+    re.compile(r'.*\s*relate[sd]?:?\s?#(\d+)', re.I),
     re.compile(
-        '.*\s*relate[sd]?:?\s*?(?:to)?\s*?https?://.*/(\w+)/issue/(\d+)',
+        r'.*\s*relate[sd]?:?\s*?(?:to)?\s*?https?://.*/(\w+)/issue/(\d+)',
         re.I),
 ]
 

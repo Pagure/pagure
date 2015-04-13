@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014 - Copyright Red Hat Inc
+ (c) 2014-2015 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -10,21 +10,14 @@
 
 import flask
 import os
-from math import ceil
 
 import pygit2
-from sqlalchemy.exc import SQLAlchemyError
-from pygments import highlight
-from pygments.lexers import guess_lexer
-from pygments.lexers.text import DiffLexer
-from pygments.formatters import HtmlFormatter
-
 
 import pagure.doc_utils
 import pagure.exceptions
 import pagure.lib
 import pagure.forms
-from pagure import APP, SESSION, LOG, cla_required
+from pagure import APP, SESSION
 
 
 def __get_tree(repo_obj, tree, filepath, index=0, extended=False):
@@ -34,20 +27,19 @@ def __get_tree(repo_obj, tree, filepath, index=0, extended=False):
     filename = filepath[index]
     if isinstance(tree, pygit2.Blob):  # pragma: no cover
         # If we were given a blob, then let's just return it
-        return (tree, None)
-    cnt = 0
+        return (tree, None, None)
 
-    for el in tree:
-        if el.name == filename or el.name.startswith('index'):
+    for element in tree:
+        if element.name == filename or element.name.startswith('index'):
             # If we have a folder we must go one level deeper
-            if el.filemode == 16384:
+            if element.filemode == 16384:
                 if (index + 1) == len(filepath):
                     filepath.append('')
                 return __get_tree(
-                    repo_obj, repo_obj[el.oid], filepath, index=index + 1,
-                    extended=True)
+                    repo_obj, repo_obj[element.oid], filepath,
+                    index=index + 1, extended=True)
             else:
-                return (el, tree, False)
+                return (element, tree, False)
 
     if filename == '':
         return (None, tree, extended)
@@ -56,7 +48,7 @@ def __get_tree(repo_obj, tree, filepath, index=0, extended=False):
             'File %s not found' % ('/'.join(filepath),))
 
 
-def __get_tree_and_content(repo_obj, commit, path, startswith):
+def __get_tree_and_content(repo_obj, commit, path):
     ''' Return the tree and the content of the specified file. '''
 
     (blob_or_tree, tree_obj, extended) = __get_tree(
@@ -70,7 +62,7 @@ def __get_tree_and_content(repo_obj, commit, path, startswith):
         flask.abort(404, 'File not found')
 
     if isinstance(blob_or_tree, pygit2.TreeEntry):  # Returned a file
-        name, ext = os.path.splitext(blob_or_tree.name)
+        ext = os.path.splitext(blob_or_tree.name)[1]
         blob_obj = repo_obj[blob_or_tree.oid]
         content = pagure.doc_utils.convert_readme(blob_obj.data, ext)
 
@@ -92,7 +84,6 @@ def __get_tree_and_content(repo_obj, commit, path, startswith):
 def view_docs(repo, username=None, branchname=None, filename=None):
     """ Display the documentation
     """
-    status = flask.request.args.get('status', None)
 
     repo = pagure.lib.get_project(SESSION, repo, user=username)
 
@@ -124,17 +115,15 @@ def view_docs(repo, username=None, branchname=None, filename=None):
 
     content = None
     tree = None
-    startswith = False
     if not filename:
         path = ['']
-        startswith = True
     else:
         path = [it for it in filename.split('/') if it]
 
     if commit:
         try:
             (tree, content, extended) = __get_tree_and_content(
-                repo_obj, commit, path, startswith=True)
+                repo_obj, commit, path)
             if extended:
                 filename += '/'
         except pagure.exceptions.FileNotFoundException as err:

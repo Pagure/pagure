@@ -98,16 +98,14 @@ def _build_url(*args):
     return '/'.join(items)
 
 
-def send_email(text, subject, to_mail, from_mail=None, mail_id=None,
-               in_reply_to=None):  # pragma: no cover
+def send_email(text, subject, to_mail,
+               mail_id=None, in_reply_to=None):  # pragma: no cover
     ''' Send an email with the specified information.
 
     :arg text: the content of the email to send
     :arg subject: the subject of the email
     :arg to_mail: a string representing a list of recipient separated by a
         coma
-    :kwarg from_mail: the email address the email is sent from.
-        Defaults to nobody@pagure
     :kwarg mail_id: if defined, the header `mail-id` is set with this value
     :kwarg in_reply_to: if defined, the header `In-Reply-To` is set with
         this value
@@ -157,16 +155,13 @@ def notify_new_comment(comment, user=None):
 
 To reply, visit the link below or just reply to this email
 %s
-""" % (
-        comment.user.user,
-        comment.comment,
-        _build_url(
-            pagure.APP.config['APP_URL'],
-            comment.issue.project.name,
-            'issue',
-            comment.issue.id,
-        ),
-    )
+""" % (comment.user.user,
+       comment.comment,
+       _build_url(
+           pagure.APP.config['APP_URL'],
+           comment.issue.project.name,
+           'issue',
+           comment.issue.id))
     mail_to = _get_emails_for_issue(comment.issue)
     if comment.user and comment.user.default_email:
         mail_to.add(comment.user.default_email)
@@ -194,17 +189,14 @@ def notify_new_issue(issue, user=None):
 
 To reply, visit the link below or just reply to this email
 %s
-""" % (
-        issue.user.user,
-        issue.project.name,
-        issue.content,
-        _build_url(
-            pagure.APP.config['APP_URL'],
-            issue.project.name,
-            'issue',
-            issue.id,
-        ),
-    )
+""" % (issue.user.user,
+       issue.project.name,
+       issue.content,
+       _build_url(
+           pagure.APP.config['APP_URL'],
+           issue.project.name,
+           'issue',
+           issue.id))
     mail_to = _get_emails_for_issue(issue)
     mail_to = _clean_emails(mail_to, user)
 
@@ -226,18 +218,15 @@ def notify_assigned_issue(issue, new_assignee, user):
 The issue: `%s` of project: `%s` has been %s by %s.
 
 %s
-""" % (
-        issue.title,
-        issue.project.name,
-        action,
-        user.username,
-        _build_url(
-            pagure.APP.config['APP_URL'],
-            issue.project.name,
-            'issue',
-            issue.id,
-        ),
-    )
+""" % (issue.title,
+       issue.project.name,
+       action,
+       user.username,
+       _build_url(
+           pagure.APP.config['APP_URL'],
+           issue.project.name,
+           'issue',
+           issue.id))
     mail_to = _get_emails_for_issue(issue)
     if new_assignee and new_assignee.default_email:
         mail_to.add(new_assignee.default_email)
@@ -266,17 +255,14 @@ def notify_new_pull_request(request):
 
 To reply, visit the link below or just reply to this email
 %s
-""" % (
-        request.user.user,
-        request.repo.name,
-        request.title,
-        _build_url(
-            pagure.APP.config['APP_URL'],
-            request.repo.name,
-            'pull-request',
-            request.id,
-        ),
-    )
+""" % (request.user.user,
+       request.repo.name,
+       request.title,
+       _build_url(
+           pagure.APP.config['APP_URL'],
+           request.repo.name,
+           'pull-request',
+           request.id))
     mail_to = set([cmt.user.default_email for cmt in request.comments])
     mail_to.add(request.repo.user.default_email)
     for prouser in request.repo.users:
@@ -305,17 +291,14 @@ Merged pull-request:
 ``
 
 %s
-""" % (
-        user.username,
-        request.repo.name,
-        request.title,
-        _build_url(
-            pagure.APP.config['APP_URL'],
-            request.repo.name,
-            'pull-request',
-            request.id,
-        ),
-    )
+""" % (user.username,
+       request.repo.name,
+       request.title,
+       _build_url(
+           pagure.APP.config['APP_URL'],
+           request.repo.name,
+           'pull-request',
+           request.id))
     mail_to = set([cmt.user.default_email for cmt in request.comments])
     mail_to.add(request.repo.user.default_email)
     for prouser in request.repo.users:
@@ -346,17 +329,14 @@ Cancelled pull-request:
 ``
 
 %s
-""" % (
-        user.username,
-        request.repo.name,
-        request.title,
-        _build_url(
-            pagure.APP.config['APP_URL'],
-            request.repo.name,
-            'pull-request',
-            request.id,
-        ),
-    )
+""" % (user.username,
+       request.repo.name,
+       request.title,
+       _build_url(
+           pagure.APP.config['APP_URL'],
+           request.repo.name,
+           'pull-request',
+           request.id))
     mail_to = set([cmt.user.default_email for cmt in request.comments])
     mail_to.add(request.repo.user.default_email)
     for prouser in request.repo.users:
@@ -385,17 +365,14 @@ def notify_pull_request_comment(comment, user):
 
 To reply, visit the link below or just reply to this email
 %s
-""" % (
-        comment.user.user,
-        comment.pull_request.title,
-        comment.comment,
-        _build_url(
-            pagure.APP.config['APP_URL'],
-            comment.pull_request.repo.name,
-            'pull-request',
-            comment.pull_request.id,
-        ),
-    )
+""" % (comment.user.user,
+       comment.pull_request.title,
+       comment.comment,
+       _build_url(
+           pagure.APP.config['APP_URL'],
+           comment.pull_request.repo.name,
+           'pull-request',
+           comment.pull_request.id))
     mail_to = set([
         cmt.user.default_email
         for cmt in comment.pull_request.comments])

@@ -68,6 +68,8 @@ LOG = APP.logger
 
 
 def authenticated():
+    ''' Utility function checking if the current user is logged in or not.
+    '''
     return hasattr(flask.g, 'fas_user') and flask.g.fas_user is not None
 
 
@@ -81,8 +83,8 @@ def admin_session_timedout():
     if not authenticated():
         return True
     if (datetime.datetime.utcnow() - flask.g.fas_user.login_time) > \
-            APP.config.get(
-                'ADMIN_SESSION_LIFETIME', datetime.timedelta(minutes=15)):
+            APP.config.get('ADMIN_SESSION_LIFETIME',
+                           datetime.timedelta(minutes=15)):
         timedout = True
         FAS.logout()
     return timedout
@@ -142,7 +144,7 @@ def generate_gitolite_acls():
         cmd = 'GL_RC=%s GL_BINDIR=%s gl-compile-conf' % (
             APP.config.get('GL_RC'), APP.config.get('GL_BINDIR')
         )
-        output = subprocess.Popen(
+        subprocess.Popen(
             cmd,
             shell=True,
             stdout=subprocess.PIPE,
@@ -319,13 +321,13 @@ def __get_file_in_tree(repo_obj, tree, filepath):
     filename = filepath[0]
     if isinstance(tree, pygit2.Blob):
         return
-    for el in tree:
-        if el.name == filename:
+    for entry in tree:
+        if entry.name == filename:
             if len(filepath) == 1:
-                return repo_obj[el.oid]
+                return repo_obj[entry.oid]
             else:
                 return __get_file_in_tree(
-                    repo_obj, repo_obj[el.oid], filepath[1:])
+                    repo_obj, repo_obj[entry.oid], filepath[1:])
 
 
 def get_repo_path(repo):

@@ -33,6 +33,8 @@ import pagure.lib.login
 import pagure.lib.notify
 from pagure.lib import model
 
+# pylint: disable=R0913
+
 
 def __get_user(session, key):
     """ Searches for a user in the database for a given username or email.
@@ -71,19 +73,19 @@ def get_next_id(session, projectid):
     """ Returns the next identifier of a project ticket or pull-request
     based on the identifier already in the database.
     """
-    q1 = session.query(
+    query1 = session.query(
         func.max(model.Issue.id)
     ).filter(
         model.Issue.project_id == projectid
     )
 
-    q2 = session.query(
+    query2 = session.query(
         func.max(model.PullRequest.id)
     ).filter(
         model.PullRequest.project_id == projectid
     )
 
-    nid = max([el[0] for el in q1.union(q2).all()]) or 0
+    nid = max([el[0] for el in query1.union(query2).all()]) or 0
 
     return nid + 1
 
@@ -181,7 +183,6 @@ def add_issue_tag(session, issue, tags, user, ticketfolder):
     if isinstance(tags, basestring):
         tags = [tags]
 
-    msgs = []
     added_tags = []
     for issue_tag in tags:
         known = False
@@ -332,8 +333,10 @@ def remove_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
         )
 
     if issue_blocked in issue.children:
+        child_del = []
         for child in issue.children:
             if child.uid == issue_blocked.uid:
+                child_del.append(child.id)
                 issue.children.remove(child)
 
         # Make sure we won't have SQLAlchemy error before we create the repo
@@ -356,7 +359,7 @@ def remove_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
                 dict(
                     issue=issue.to_json(),
                     project=issue.project.to_json(),
-                    removed_dependency=child.id,
+                    removed_dependency=child_del,
                     agent=user_obj.username,
                 )
             )
@@ -474,9 +477,11 @@ def edit_issue_tags(session, project, old_tag, new_tag, ticketfolder, user):
                 session.add(issue_tag)
                 session.flush()
 
+            # Update the git version
+            pagure.lib.git.update_git(
+                issue, repo=issue.project, repofolder=ticketfolder)
+
         msgs.append('Edited tag: %s to %s' % (old_tag, new_tag))
-        pagure.lib.git.update_git(
-            issue, repo=issue.project, repofolder=ticketfolder)
         pagure.lib.notify.fedmsg_publish(
             'project.tag.edited',
             dict(
@@ -1323,6 +1328,7 @@ def update_user_ssh(session, user, ssh_key):
 
 
 def avatar_url(username, size=64, default='retro'):
+    ''' Return the URL to be used for the avatar. '''
     openid = "http://%s.id.fedoraproject.org/" % username
     try:
         return avatar_url_from_openid(openid, size, default)
@@ -1350,8 +1356,9 @@ def avatar_url_from_openid(openid, size=64, default='retro', dns=False):
         import urllib
         import hashlib
         query = urllib.urlencode({'s': size, 'd': default})
-        hash = hashlib.sha256(openid).hexdigest()
-        return "https://seccdn.libravatar.org/avatar/%s?%s" % (hash, query)
+        hashhex = hashlib.sha256(openid).hexdigest()
+        return "https://seccdn.libravatar.org/avatar/%s?%s" % (
+            hashhex, query)
 
 
 def update_tags_issue(session, issue, tags, username, ticketfolder):

@@ -21,8 +21,10 @@ import pagure.lib
 import pagure.lib.login
 import pagure.lib.model as model
 import pagure.lib.notify
-from pagure import APP, SESSION, is_admin
+from pagure import APP, SESSION
 from pagure.ui.admin import admin_required
+
+# pylint: disable=E1101
 
 
 @APP.route('/user/new', methods=['GET', 'POST'])
@@ -294,7 +296,7 @@ def admin_group(group):
     group_obj = pagure.lib.login.get_group(SESSION, group)
 
     if not group_obj:
-        flask.flash('No group `%s` found' % groupname, 'error')
+        flask.flash('No group `%s` found' % group, 'error')
         return flask.redirect(flask.url_for('.admin_groups'))
 
     # Add new user to the group if asked
@@ -348,7 +350,7 @@ def admin_group_user_delete(user, group):
         group_obj = pagure.lib.login.get_group(SESSION, group)
 
         if not group_obj:
-            flask.flash('No group `%s` found' % groupname, 'error')
+            flask.flash('No group `%s` found' % group, 'error')
             return flask.redirect(flask.url_for('.admin_groups'))
 
         user = pagure.lib.search_user(SESSION, username=user)
@@ -378,7 +380,7 @@ def admin_group_delete(group):
         group_obj = pagure.lib.login.get_group(SESSION, group)
 
         if not group_obj:
-            flask.flash('No group `%s` found' % groupname, 'error')
+            flask.flash('No group `%s` found' % group, 'error')
             return flask.redirect(flask.url_for('.admin_groups'))
 
         SESSION.delete(group_obj)
@@ -421,11 +423,7 @@ You account will not be activated until you finish this step.
 
 Sincerely,
 Your pagure admin.
-""" % (
-        {
-            'username': user.username,
-            'url': url,
-        })
+""" % ({'username': user.username, 'url': url})
 
     pagure.notify.send_email(
         text=message,
@@ -460,12 +458,8 @@ If you did not request this change, please inform an admin immediately!
 
 Sincerely,
 Your pagure admin.
-""" % (
-        {
-            'username': user.username,
-            'url': url,
-            'ip': flask.request.remote_addr,
-        })
+""" % ({'username': user.username, 'url': url,
+        'ip': flask.request.remote_addr})
 
     pagure.notify.send_email(
         text=message,

@@ -13,12 +13,8 @@ import datetime
 import hashlib
 import json
 import os
-import random
 import shutil
-import string
 import tempfile
-import time
-import uuid
 
 import pygit2
 import werkzeug
@@ -28,6 +24,8 @@ import pagure.exceptions
 import pagure.lib
 import pagure.lib.notify
 from pagure.lib import model
+
+# pylint: disable=R0913,E1101,R0914
 
 
 def commit_to_patch(repo_obj, commits):
@@ -58,27 +56,23 @@ def commit_to_patch(repo_obj, commits):
         if len(commits) > 1:
             subject = '[PATCH %s/%s] %s' % (cnt + 1, len(commits), subject)
 
-        patch += """From %(commit)s Mon Sep 17 00:00:00 2001
-From: %(author_name)s <%(author_email)s>
-Date: %(date)s
-Subject: %(subject)s
+        patch += """From {commit} Mon Sep 17 00:00:00 2001
+From: {author_name} <{author_email}>
+Date: {date}
+Subject: {subject}
 
-%(msg)s
+{msg}
 ---
 
-%(patch)s
-""" % (
-            {
-                'commit': commit.oid.hex,
-                'author_name': commit.author.name,
-                'author_email': commit.author.email,
-                'date': datetime.datetime.utcfromtimestamp(
-                    commit.commit_time).strftime('%b %d %Y %H:%M:%S +0000'),
-                'subject': subject,
-                'msg': message,
-                'patch': diff.patch,
-            }
-        )
+{patch}
+""".format(commit=commit.oid.hex,
+           author_name=commit.author.name,
+           author_email=commit.author.email,
+           date=datetime.datetime.utcfromtimestamp(
+               commit.commit_time).strftime('%b %d %Y %H:%M:%S +0000'),
+           subject=subject,
+           msg=message,
+           patch=diff.patch)
     return patch
 
 
@@ -142,7 +136,6 @@ def update_git(obj, repo, repofolder, objtype='ticket'):
 
     # Get the fork
     repopath = os.path.join(repofolder, repo.path)
-    ticket_repo = pygit2.Repository(repopath)
 
     # Clone the repo into a temp folder
     newpath = tempfile.mkdtemp()
@@ -192,7 +185,7 @@ def update_git(obj, repo, repofolder, objtype='ticket'):
     author = pygit2.Signature(name='pagure', email='pagure')
 
     # Actually commit
-    sha = new_repo.create_commit(
+    new_repo.create_commit(
         'refs/heads/master',
         author,
         author,
@@ -470,7 +463,6 @@ def add_file_to_git(repo, issue, ticketfolder, user, filename, filestream):
 
     # Get the fork
     repopath = os.path.join(ticketfolder, repo.path)
-    ticket_repo = pygit2.Repository(repopath)
 
     # Clone the repo into a temp folder
     newpath = tempfile.mkdtemp()
@@ -532,7 +524,7 @@ def add_file_to_git(repo, issue, ticketfolder, user, filename, filestream):
     )
 
     # Actually commit
-    sha = new_repo.create_commit(
+    new_repo.create_commit(
         'refs/heads/master',
         author,
         author,

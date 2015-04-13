@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014 - Copyright Red Hat Inc
+ (c) 2014-2015 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -13,9 +13,11 @@ from functools import wraps
 import flask
 
 import pagure.forms
-from pagure import (APP, SESSION, LOG, cla_required, authenticated,
+from pagure import (APP,
                     generate_gitolite_acls, generate_authorized_key_file,
                     is_admin, admin_session_timedout)
+
+# pylint: disable=E1101
 
 
 def admin_required(function):

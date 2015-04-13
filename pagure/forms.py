@@ -10,6 +10,7 @@
 
 from flask.ext import wtf
 import wtforms
+# pylint: disable=R0903,W0232,E1002
 
 
 class ProjectForm(wtf.Form):
@@ -143,6 +144,7 @@ class DescriptionForm(wtf.Form):
 
 
 class ConfirmationForm(wtf.Form):
+    ''' Simple form used just for CSRF protection. '''
     pass
 
 

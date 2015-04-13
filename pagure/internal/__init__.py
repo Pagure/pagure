@@ -21,6 +21,10 @@ import pagure
 import pagure.forms
 import pagure.lib
 import pagure.ui.fork
+from pagure import is_repo_admin, authenticated
+
+
+# pylint: disable=E1101
 
 
 def localonly(function):
@@ -82,10 +86,10 @@ def pull_request_add_comment():
         pagure.SESSION.commit()
     except SQLAlchemyError, err:  # pragma: no cover
         pagure.SESSION.rollback()
-        APP.logger.exception(err)
+        pagure.APP.logger.exception(err)
         flask.abort(400, 'Error when saving the request to the database')
 
-    return flask.jsonify({'message': 'Comment added'})
+    return flask.jsonify({'message': message})
 
 
 @PV.route('/ticket/comment/', methods=['PUT'])
@@ -109,9 +113,8 @@ def ticket_add_comment():
         flask.abort(404, 'Issue not found')
 
     if issue.private and not is_repo_admin(issue.project) \
-            and (
-                not authenticated() or
-                not issue.user.user == flask.g.fas_user.username):
+            and (not authenticated() or
+                 not issue.user.user == flask.g.fas_user.username):
         flask.abort(
             403, 'This issue is private and you are not allowed to view it')
 
@@ -133,7 +136,7 @@ def ticket_add_comment():
         pagure.SESSION.commit()
     except SQLAlchemyError, err:  # pragma: no cover
         pagure.SESSION.rollback()
-        APP.logger.exception(err)
+        pagure.APP.logger.exception(err)
         flask.abort(400, 'Error when saving the request to the database')
 
-    return flask.jsonify({'message': 'Comment added'})
+    return flask.jsonify({'message': message})

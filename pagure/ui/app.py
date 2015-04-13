@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014 - Copyright Red Hat Inc
+ (c) 2014-2015 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -14,22 +14,19 @@ from math import ceil
 
 import pygit2
 from sqlalchemy.exc import SQLAlchemyError
-from pygments import highlight
-from pygments.lexers import guess_lexer
-from pygments.lexers.text import DiffLexer
-from pygments.formatters import HtmlFormatter
 
 import pagure.exceptions
 import pagure.lib
 import pagure.forms
 import pagure.ui.filters
-from pagure import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
+from pagure import (APP, SESSION, cla_required,
                     generate_gitolite_acls, generate_gitolite_key,
                     generate_authorized_key_file, authenticated,
                     admin_session_timedout)
 
 
 # Application
+# pylint: disable=E1101
 
 
 @APP.route('/')

@@ -28,6 +28,8 @@ BASE = declarative_base()
 
 ERROR_LOG = logging.getLogger('pagure.model')
 
+# pylint: disable=C0103,R0903,W0232,E1101
+
 
 def create_tables(db_url, alembic_ini=None, debug=False):
     """ Create the tables in the database using the information from the
@@ -86,7 +88,7 @@ def create_default_status(session):
         session.add(ticket_stat)
         try:
             session.flush()
-        except SQLAlchemyError, err:  # pragma: no cover
+        except SQLAlchemyError:  # pragma: no cover
             ERROR_LOG.debug('Status %s could not be added', ticket_stat)
 
     session.commit()
@@ -729,8 +731,7 @@ class PullRequestComment(BASE):
                     remote_side=[User.id],
                     backref=backref(
                         'pull_request_comments',
-                        order_by="PullRequestComment.date_created")
-                    )
+                        order_by="PullRequestComment.date_created"))
     pull_request = relation(
         'PullRequest', backref='comments',
         foreign_keys=[pull_request_uid],
@@ -757,6 +758,9 @@ class PullRequestComment(BASE):
 
 
 class PagureUserVisit(BASE):
+    """
+    Table storing the visits of the user.
+    """
 
     __tablename__ = 'pagure_user_visit'
 

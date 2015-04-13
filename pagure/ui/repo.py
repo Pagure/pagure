@@ -21,7 +21,6 @@ from PIL import Image
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import guess_lexer_for_filename
-from pygments.lexers.text import DiffLexer
 from pygments.lexers.special import TextLexer
 from pygments.util import ClassNotFound
 from sqlalchemy.exc import SQLAlchemyError
@@ -37,6 +36,8 @@ import pagure
 import pagure.ui.plugins
 from pagure import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
                     is_repo_admin, admin_session_timedout)
+
+# pylint: disable=E1101
 
 
 @APP.route('/<repo>')
@@ -95,8 +96,6 @@ def view_repo(repo, username=None):
     orig_repo = pygit2.Repository(parentname)
 
     if not repo_obj.is_empty and not orig_repo.is_empty:
-        orig_commit = orig_repo[
-            orig_repo.lookup_branch('master').get_object().hex]
 
         master_commits = [
             commit.oid.hex
@@ -132,6 +131,8 @@ def view_repo(repo, username=None):
 @APP.route('/<repo>/branch/<branchname>')
 @APP.route('/fork/<username>/<repo>/branch/<branchname>')
 def view_repo_branch(repo, branchname, username=None):
+    ''' Returns the list of branches in the repo. '''
+
     repo = pagure.lib.get_project(SESSION, repo, user=username)
 
     if not repo:
@@ -170,8 +171,6 @@ def view_repo_branch(repo, branchname, username=None):
     orig_repo = pygit2.Repository(parentname)
 
     if not repo_obj.is_empty and not orig_repo.is_empty:
-        orig_commit = orig_repo[
-            orig_repo.lookup_branch('master').get_object().hex]
 
         master_commits = [
             commit.oid.hex
@@ -261,8 +260,6 @@ def view_commits(repo, branchname=None, username=None):
     orig_repo = pygit2.Repository(parentname)
 
     if not repo_obj.is_empty and not orig_repo.is_empty:
-        orig_commit = orig_repo[
-            orig_repo.lookup_branch('master').get_object().hex]
 
         master_commits = [
             commit.oid.hex

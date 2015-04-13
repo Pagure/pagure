@@ -10,14 +10,9 @@
 
 import flask
 import os
-from math import ceil
 
 import pygit2
 from sqlalchemy.exc import SQLAlchemyError
-from pygments import highlight
-from pygments.lexers import guess_lexer
-from pygments.lexers.text import DiffLexer
-from pygments.formatters import HtmlFormatter
 
 import chardet
 import kitchen.text.converters as ktc
@@ -29,6 +24,8 @@ import pagure.forms
 from pagure import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
                     is_repo_admin, authenticated)
 
+
+# pylint: disable=E1101
 
 # URLs
 
@@ -57,9 +54,8 @@ def update_issue(repo, issueid, username=None):
         flask.abort(404, 'Issue not found')
 
     if issue.private and not is_repo_admin(repo) \
-            and (
-                not authenticated() or
-                not issue.user.user == flask.g.fas_user.username):
+            and (not authenticated() or
+                 not issue.user.user == flask.g.fas_user.username):
         flask.abort(
             403, 'This issue is private and you are not allowed to view it')
 
@@ -232,8 +228,7 @@ def edit_tag(repo, tag, username=None):
             flask.flash('Could not edit tag: %s' % tag, 'error')
 
         return flask.redirect(flask.url_for(
-            '.view_settings', repo=repo.name, username=username)
-        )
+            '.view_settings', repo=repo.name, username=username))
 
     return flask.render_template(
         'edit_tag.html',
@@ -468,9 +463,8 @@ def view_issue(repo, issueid, username=None):
         flask.abort(404, 'Issue not found')
 
     if issue.private and not is_repo_admin(repo) \
-            and (
-                not authenticated() or
-                not issue.user.user == flask.g.fas_user.username):
+            and (not authenticated() or
+                 not issue.user.user == flask.g.fas_user.username):
         flask.abort(
             403, 'This issue is private and you are not allowed to view it')
 
@@ -645,7 +639,7 @@ def view_issue_raw_file(repo, filename=None, username=None):
         if commit.parents:
             diff = commit.tree.diff_to_tree()
 
-            parent = repo_obj.revparse_single('%s^' % identifier)
+            parent = repo_obj.revparse_single('%s^' % commit.oid)
             diff = repo_obj.diff(parent, commit)
         else:
             # First commit in the repo

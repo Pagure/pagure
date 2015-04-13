@@ -27,6 +27,12 @@ import pagure
 import pagure.lib
 
 
+MENTION_RE = r'[^|\w]@(\w+)'
+EXPLICIT_FORK_ISSUE_RE = r'(\w+)/(\w+)#([0-9]+)'
+EXPLICIT_MAIN_ISSUE_RE = r'[^|\w](?<!\/)(\w+)#([0-9]+)'
+IMPLICIT_ISSUE_RE = r'[^|\w](?<!\w)#([0-9]+)'
+
+
 def inject():
     """ Hack out python-markdown to do the autolinking that we want. """
 
@@ -40,21 +46,27 @@ def inject():
 
     # Second, build some Pattern objects for @mentions, #bugs, etc...
     class MentionPattern(markdown.inlinepatterns.Pattern):
+        """ @user pattern class. """
+
         def handleMatch(self, m):
+            """ When the pattern matches, update the text. """
             name = markdown.util.AtomicString(m.group(2))
             text = ' @%s' % name
             user = pagure.lib.search_user(pagure.SESSION, username=name)
             if not user:
                 return text
 
-            el = markdown.util.etree.Element("a")
+            element = markdown.util.etree.Element("a")
             url = flask.url_for('view_user', username=name)
-            el.set('href', url)
-            el.text = text
-            return el
+            element.set('href', url)
+            element.text = text
+            return element
 
     class ExplicitForkIssuePattern(markdown.inlinepatterns.Pattern):
+        """ Explicit fork issue pattern. """
+
         def handleMatch(self, m):
+            """ When the pattern matches, update the text. """
             user = markdown.util.AtomicString(m.group(2))
             repo = markdown.util.AtomicString(m.group(3))
             idx = markdown.util.AtomicString(m.group(4))
@@ -66,7 +78,9 @@ def inject():
             return _issue_anchor_tag(user, repo, idx, text)
 
     class ExplicitMainIssuePattern(markdown.inlinepatterns.Pattern):
+        """ Explicit issue pattern (for non-fork project). """
         def handleMatch(self, m):
+            """ When the pattern matches, update the text. """
             repo = markdown.util.AtomicString(m.group(2))
             idx = markdown.util.AtomicString(m.group(3))
             text = ' %s#%s' % (repo, idx)
@@ -77,7 +91,9 @@ def inject():
             return _issue_anchor_tag(None, repo, idx, text)
 
     class ImplicitIssuePattern(markdown.inlinepatterns.Pattern):
+        """ Implicit issue pattern. """
         def handleMatch(self, m):
+            """ When the pattern matches, update the text. """
             idx = markdown.util.AtomicString(m.group(2))
             text = ' #%s' % idx
 
@@ -94,28 +110,27 @@ def inject():
 
             return _issue_anchor_tag(user, repo, idx, text)
 
-    MENTION_RE = r'[^|\w]@(\w+)'
-    EXPLICIT_FORK_ISSUE_RE = r'(\w+)/(\w+)#([0-9]+)'
-    EXPLICIT_MAIN_ISSUE_RE = r'[^|\w](?<!\/)(\w+)#([0-9]+)'
-    IMPLICIT_ISSUE_RE = r'[^|\w](?<!\w)#([0-9]+)'
-
     # Lastly, monkey-patch the build_inlinepatterns func to insert our patterns
     original_builder = markdown.build_inlinepatterns
 
-    def extended_builder(m, **kwargs):
-        patterns = original_builder(m, **kwargs)
-        patterns['mention'] = MentionPattern(MENTION_RE, m)
+    def extended_builder(func, **kwargs):
+        """ Extends the original builder with our owns. """
+        patterns = original_builder(func, **kwargs)
+        patterns['mention'] = MentionPattern(
+            MENTION_RE, func)
         patterns['explicit_fork_issue'] = ExplicitForkIssuePattern(
-            EXPLICIT_FORK_ISSUE_RE, m)
+            EXPLICIT_FORK_ISSUE_RE, func)
         patterns['explicit_main_issue'] = ExplicitMainIssuePattern(
-            EXPLICIT_MAIN_ISSUE_RE, m)
-        patterns['implicit_issue'] = ImplicitIssuePattern(IMPLICIT_ISSUE_RE, m)
+            EXPLICIT_MAIN_ISSUE_RE, func)
+        patterns['implicit_issue'] = ImplicitIssuePattern(
+            IMPLICIT_ISSUE_RE, func)
         return patterns
 
     markdown.build_inlinepatterns = extended_builder
 
 
 def _issue_exists(user, repo, idx):
+    """ Utility method checking if a given issue exists. """
     repo_obj = pagure.lib.get_project(
         pagure.SESSION, name=repo, user=user)
     if not repo_obj:
@@ -130,8 +145,9 @@ def _issue_exists(user, repo, idx):
 
 
 def _issue_anchor_tag(user, repo, idx, text):
-    el = markdown.util.etree.Element("a")
+    """ Utility method generating the link to an issue. """
+    element = markdown.util.etree.Element("a")
     url = flask.url_for('view_issue', username=user, repo=repo, issueid=idx)
-    el.set('href', url)
-    el.text = text
-    return el
+    element.set('href', url)
+    element.text = text
+    return element

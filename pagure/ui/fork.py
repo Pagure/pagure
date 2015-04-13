@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014 - Copyright Red Hat Inc
+ (c) 2014-2015 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -12,23 +12,20 @@ import flask
 import os
 import shutil
 import tempfile
-from math import ceil
 
 import pygit2
 from sqlalchemy.exc import SQLAlchemyError
-from pygments import highlight
-from pygments.lexers import guess_lexer
-from pygments.lexers.text import DiffLexer
-from pygments.formatters import HtmlFormatter
-
 
 import pagure.doc_utils
 import pagure.lib
 import pagure.lib.git
 import pagure.forms
 import pagure
-from pagure import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
+from pagure import (APP, SESSION, LOG, cla_required,
                     is_repo_admin, generate_gitolite_acls)
+
+
+# pylint: disable=E1101
 
 
 def _get_parent_repo_path(repo):
@@ -120,8 +117,6 @@ def request_pull(repo, requestid, username=None):
         commitid = branch.get_object().hex
 
         if not repo_obj.is_empty and not orig_repo.is_empty:
-            orig_commit = orig_repo[
-                orig_repo.lookup_branch(request.branch).get_object().hex]
             # Pull-request open
             master_commits = [
                 commit.oid.hex
@@ -159,7 +154,6 @@ def request_pull(repo, requestid, username=None):
                 )
 
         elif orig_repo.is_empty:
-            orig_commit = None
             repo_commit = repo_obj[request.stop_id]
             diff = repo_commit.tree.diff_to_tree(swap=True)
         else:
@@ -217,8 +211,6 @@ def request_pull_patch(repo, requestid, username=None):
 
     diff_commits = []
     if not repo_obj.is_empty and not orig_repo.is_empty:
-        orig_commit = orig_repo[
-            orig_repo.lookup_branch(request.branch).get_object().hex]
 
         # Closed pull-request
         if request.status is False:
@@ -241,9 +233,7 @@ def request_pull_patch(repo, requestid, username=None):
                 diff_commits.append(commit)
 
     elif orig_repo.is_empty:
-        orig_commit = None
-        repo_commit = repo_obj[request.stop_id]
-        diff = repo_commit.tree.diff_to_tree(swap=True)
+        diff_commits.append(repo_obj[request.stop_id])
     else:
         flask.flash(
             'Fork is empty, there are no commits to request pulling',
@@ -432,7 +422,6 @@ def merge_request_pull(repo, requestid, username=None):
 
     # Get the original repo
     parentpath = pagure.get_repo_path(request.repo)
-    orig_repo = pygit2.Repository(parentpath)
 
     # Clone the original repo into a temp folder
     newpath = tempfile.mkdtemp()
@@ -451,7 +440,7 @@ def merge_request_pull(repo, requestid, username=None):
 
     merge = new_repo.merge(repo_commit.oid)
     if merge is None:
-        mergecode, prefcode = new_repo.merge_analysis(repo_commit.oid)
+        mergecode = new_repo.merge_analysis(repo_commit.oid)[0]
 
     try:
         branch_ref = new_repo.lookup_reference(
@@ -465,10 +454,11 @@ def merge_request_pull(repo, requestid, username=None):
             (merge is not None and merge.is_uptodate)
             or
             (merge is None and
-             mergecode & pygit2.GIT_MERGE_ANALYSIS_UP_TO_DATE
-             )):
+             mergecode & pygit2.GIT_MERGE_ANALYSIS_UP_TO_DATE)):
         flask.flash('Nothing to do, changes were already merged', 'error')
-        pagure.lib.close_pull_request(SESSION, request, flask.g.fas_user)
+        pagure.lib.close_pull_request(
+            SESSION, request, flask.g.fas_user,
+            requestfolder=APP.config['REQUESTS_FOLDER'])
         try:
             SESSION.commit()
         except SQLAlchemyError as err:
@@ -480,22 +470,18 @@ def merge_request_pull(repo, requestid, username=None):
             (merge is not None and merge.is_fastforward)
             or
             (merge is None and
-             mergecode & pygit2.GIT_MERGE_ANALYSIS_FASTFORWARD
-             )):
+             mergecode & pygit2.GIT_MERGE_ANALYSIS_FASTFORWARD)):
         if merge is not None:
             branch_ref.target = merge.fastforward_oid
-            sha = merge.fastforward_oid
         elif merge is None and mergecode is not None:
-            print repo_commit.oid
             branch_ref.set_target(repo_commit.oid.hex)
-            sha = branch_ref.target
         ori_remote.push(refname)
         flask.flash('Changes merged!')
 
     else:
         new_repo.index.write()
         try:
-            tree = new_repo.index.write_tree()
+            new_repo.index.write_tree()
         except pygit2.GitError:
             shutil.rmtree(newpath)
             flask.flash('Merge conflicts!', 'error')
@@ -504,15 +490,7 @@ def merge_request_pull(repo, requestid, username=None):
                 repo=repo.name,
                 username=username,
                 requestid=requestid))
-        head = new_repo.lookup_reference('HEAD').get_object()
-        commit = new_repo[head.oid]
-        sha = new_repo.create_commit(
-            'refs/heads/master',
-            repo_commit.author,
-            repo_commit.committer,
-            'Merge #%s `%s`' % (request.id, request.title),
-            tree,
-            [head.hex, repo_commit.oid.hex])
+        new_repo.lookup_reference('HEAD').get_object()
         ori_remote.push(refname)
         flask.flash('Changes merged!')
 
@@ -631,7 +609,7 @@ def fork_project(repo, username=None):
 @APP.route('/fork/<username>/<repo>/diff/<branch_to>..<branch_from>',
            methods=('GET', 'POST'))
 @cla_required
-def new_request_pull(repo,  branch_to, branch_from, username=None):
+def new_request_pull(repo, branch_to, branch_from, username=None):
     """ Request pulling the changes from the fork into the project.
     """
     repo = pagure.lib.get_project(SESSION, repo, user=username)

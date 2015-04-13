@@ -9,11 +9,7 @@
 """
 
 import flask
-import os
-import sys
-from math import ceil
 
-import pygit2
 from sqlalchemy.exc import SQLAlchemyError
 from straight.plugin import load
 from pagure.hooks import BaseHook
@@ -21,8 +17,10 @@ from pagure.hooks import BaseHook
 import pagure.exceptions
 import pagure.lib
 import pagure.forms
-from pagure import APP, SESSION, LOG, cla_required, is_repo_admin
+from pagure import APP, SESSION, cla_required, is_repo_admin
 from pagure.lib.model import BASE
+
+# pylint: disable=E1101
 
 
 def get_plugin_names():

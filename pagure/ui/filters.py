@@ -10,27 +10,19 @@
 
 import datetime
 import textwrap
-import os
-import re
-from math import ceil
 
 import flask
 import arrow
 import markdown
-import pygit2
 
-from sqlalchemy.exc import SQLAlchemyError
 from pygments import highlight
-from pygments.lexers import guess_lexer
 from pygments.lexers.text import DiffLexer
 from pygments.formatters import HtmlFormatter
 
 import pagure.exceptions
 import pagure.lib
 import pagure.forms
-from pagure import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
-                    generate_gitolite_acls, generate_gitolite_key,
-                    generate_authorized_key_file, authenticated)
+from pagure import (APP, SESSION, authenticated, is_repo_admin)
 
 
 # Jinja filters
@@ -55,8 +47,8 @@ def humanize_date(date):
 def format_ts(string):
     """ Template filter transforming a timestamp to a date
     """
-    dt = datetime.datetime.fromtimestamp(int(string))
-    return dt.strftime('%b %d %Y %H:%M:%S')
+    dattime = datetime.datetime.fromtimestamp(int(string))
+    return dattime.strftime('%b %d %Y %H:%M:%S')
 
 
 @APP.template_filter('format_loc')
@@ -143,10 +135,10 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
             for comment in comments[cnt - 1]:
 
                 templ_delete = ''
-                if authenticated() and \
-                    ((comment.parent.status is True
-                     and comment.user.user == flask.g.fas_user.username)
-                     or is_repo_admin(comment.parent.repo)):
+                if authenticated() and (
+                        (comment.parent.status is True
+                         and comment.user.user == flask.g.fas_user.username)
+                        or is_repo_admin(comment.parent.repo)):
                     templ_delete = tpl_delete % ({'commentid': comment.id})
 
                 output.append(
@@ -272,9 +264,8 @@ def author_to_user(author, size=16):
 
 
 @APP.template_filter('author2avatar')
-def author_to_user(author, size=32):
-    """ Template filter transforming a pygit2 Author object into a text
-    either with just the username or linking to the user in pagure.
+def author_to_avatar(author, size=32):
+    """ Template filter transforming a pygit2 Author object into an avatar.
     """
     user = pagure.lib.search_user(SESSION, email=author.email)
     output = user.user if user else author.name
