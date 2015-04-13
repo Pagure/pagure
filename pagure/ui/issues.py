@@ -77,7 +77,8 @@ def update_issue(repo, issueid, username=None):
             if comment is None or comment.issue.project != repo:
                 flask.abort(404, 'Comment not found')
 
-            if flask.g.fas_user.username != comment.user.username \
+            if (flask.g.fas_user.username != comment.user.username
+                    and comment.parent.status == True) \
                     or not is_repo_admin(repo):
                 flask.abort(
                     403,
