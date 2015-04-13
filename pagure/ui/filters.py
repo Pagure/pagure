@@ -144,8 +144,9 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
 
                 templ_delete = ''
                 if authenticated() and \
-                    (comment.user.user == flask.g.fas_user.username or
-                    is_repo_admin(comment.pull_request.repo)):
+                    ((comment.parent.status == True
+                    and comment.user.user == flask.g.fas_user.username)
+                    or is_repo_admin(comment.parent.repo)):
                     templ_delete = tpl_delete % ({'commentid': comment.id})
 
                 output.append(

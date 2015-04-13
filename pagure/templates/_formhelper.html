@@ -62,7 +62,7 @@
 {% endmacro %}
 
 
-{% macro show_comment(comment, id, repo, username, issueid, form) %}
+{% macro show_comment(comment, id, repo, username, issueid, form, repo_admin) %}
   <section class="issue_comment">
     <header id="comment-{{ id }}">
       {{ comment.user.user | avatar(16) | safe }}
@@ -76,9 +76,10 @@
           reply
         </a>
         {% if id != 0 and g.fas_user and (
-            g.fas_user.username == comment.user.username or repo_admin) %}
+            (comment.parent.status == True and g.fas_user.username == comment.user.username)
+            or repo_admin) %}
         <button type="submit" name="drop_comment" value="{{ comment.id }}"
-            onclick="return confirm('Do you really want to remove this comment');"
+            onclick="return confirm('Do you really want to remove this comment?');"
             title="Remove comment">
             <span class="icon icon-remove blue"></span>
         </button>

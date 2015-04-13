@@ -99,7 +99,7 @@
 
 {% if issue.comments %}
   {% for comment in issue.comments %}
-    {{ show_comment(comment, loop.index, repo, username, issueid, form) }}
+    {{ show_comment(comment, loop.index, repo, username, issueid, form, repo_admin) }}
   {% endfor %}
 {% endif %}
 

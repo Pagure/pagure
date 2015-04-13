@@ -208,7 +208,7 @@
 
 {% for comment in pull_request.discussion %}
   {% if not comment.commit_id %}
-    {{ show_comment(comment, loop.index, repo, username, requestid, form) }}
+    {{ show_comment(comment, loop.index, repo, username, requestid, form, repo_admin) }}
   {% endif %}
 {% endfor %}
 {{ mergeform.csrf_token }}
