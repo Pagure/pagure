@@ -525,6 +525,11 @@ class IssueComment(BASE):
         return '%s-ticket-%s-%s@pagure' % (
             self.issue.project.name, self.issue.uid, self.id)
 
+    @property
+    def parent(self):
+        ''' Return the parent, in this case the issue object. '''
+        return self.issue
+
 
 class Tag(BASE):
     """ Stores the tags.
@@ -738,6 +743,11 @@ class PullRequestComment(BASE):
         '''
         return '%s-pull-request-%s-%s@pagure' % (
             self.pull_request.repo.name, self.pull_request.uid, self.id)
+
+    @property
+    def parent(self):
+        ''' Return the parent, in this case the pull_request object. '''
+        return self.pull_request
 
 
 # ##########################################################
