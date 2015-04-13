@@ -285,7 +285,7 @@ header h1 span {
 }
 
 /* Stealed this from flask-admin */
-form.icon button {
+.icon button {
     background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
     border: medium none;
     line-height: normal;
