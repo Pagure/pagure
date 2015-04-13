@@ -91,4 +91,6 @@ def convert_readme(content, ext, view_file_url=None):
         output = convert_doc(content, view_file_url)
     elif ext and ext in ['.mk']:
         output = markdown.markdown(content)
+    elif not ext or (ext and ext in ['.text', '.txt']):
+        output = '<pre>%s</pre' % content
     return output
