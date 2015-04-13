@@ -171,8 +171,8 @@ class PagureFlaskDocstests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertTrue('<h2>Docs</h2>' in output.data)
         self.assertTrue(
-            '  <section class="docs_content">\n    row1\nrow2\n'
-            'row3\n  </section>' in output.data)
+            '  <section class="docs_content">\n    <pre>row1\nrow2\n'
+            'row3</pre>\n  </section>' in output.data)
 
         output = self.app.get('/test/docs/master/folder1')
         self.assertEqual(output.status_code, 200)
