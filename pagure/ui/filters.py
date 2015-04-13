@@ -131,13 +131,30 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
         output.append('<td class="cell2"><pre>%s</pre></td>' % line)
         output.append('</tr>')
 
+        tpl_delete = '<button type="submit" name="drop_comment" ' \
+                    'value="%(commentid)s"' \
+                    'onclick="return confirm(\'Do you really want to remove' \
+                    ' this comment?\');"' \
+                    'title="Remove comment">' \
+                    '<span class="icon icon-remove blue"></span>' \
+                    '</button>'
+
         if cnt - 1 in comments:
             for comment in comments[cnt - 1]:
+
+                templ_delete = ''
+                if authenticated() and \
+                    (comment.user.user == flask.g.fas_user.username or
+                    is_repo_admin(comment.pull_request.repo)):
+                    templ_delete = tpl_delete % ({'commentid': comment.id})
+
                 output.append(
                     '<tr><td></td>'
                     '<td colspan="2"><table style="width:100%%"><tr>'
                     '<td><a href="%(url)s">%(user)s</a></td>'
-                    '<td class="right">%(date)s</td>'
+                    '<td class="right">'
+                    '%(date)s%(templ_delete)s'
+                    '</td>'
                     '</tr>'
                     '<tr><td colspan="2" class="pr_comment">%(comment)s'
                     '</td></tr>'
@@ -145,6 +162,7 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
                         {
                             'url': flask.url_for(
                                 'view_user', username=comment.user.user),
+                            'templ_delete': templ_delete,
                             'user': comment.user.user,
                             'date': comment.date_created.strftime(
                                 '%b %d %Y %H:%M:%S'),
