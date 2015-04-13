@@ -618,7 +618,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.data.count(
                 '<option selected value="Open">Open</option>'), 1)
             self.assertEqual(output.data.count(
-                '<div class="comment_body">\n        '
+                '<div class="comment_body">\n      '
                 '<p>We should work on this!</p>'), 1)
 
         # Project w/o issue tracker

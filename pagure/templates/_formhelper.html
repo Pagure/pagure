@@ -62,24 +62,38 @@
 {% endmacro %}
 
 
-{% macro show_comment(user, date, content, id) %}
+{% macro show_comment(comment, id, repo, username, issueid, form) %}
   <section class="issue_comment">
     <header id="comment-{{ id }}">
-      {{ user.user | avatar(16) | safe }}
-      <a href="{{ url_for('view_user', username=user.user)}}">
-        {{ user.user }}
-      </a> - <span title="{{ date }}">{{ date | humanize}}</span>
+      {{ comment.user.user | avatar(16) | safe }}
+      <a href="{{ url_for('view_user', username=comment.user.user)}}">
+        {{ comment.user.user }}
+      </a> - <span title="{{ date }}">{{ comment.date_created | humanize}}</span>
       <a class="headerlink" title="Permalink to this headline"
         href="#comment-{{ id }}">¶</a>
       <aside class="issue_action">
         <a class="reply" title="Reply to this comment - loose formating">
           reply
         </a>
+        {% if id != 0 and g.fas_user and (
+            g.fas_user.username == comment.user.username or repo_admin) %}
+        <a href="{{ url_for('remove_comment', repo=repo.name,
+                             issueid=issueid, commentid=comment.id,
+                             username=username, csrf_token=form.csrf_token.current_token) }}"
+            onclick="return confirm('Do you really want to remove this comment');"
+            title="Remove comment">
+            <span class="icon icon-remove blue"></span>
+        </a>
+        {% endif %}
       </aside>
     </header>
     <div class="comment_body">
       {% autoescape false %}
-        {{ content | markdown }}
+      {% if id == 0 %}
+      {{ comment.content | markdown }}
+      {% else %}
+      {{ comment.comment | markdown }}
+      {% endif %}
       {% endautoescape %}
     </div>
   </section>

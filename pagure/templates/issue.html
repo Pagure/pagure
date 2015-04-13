@@ -4,6 +4,11 @@
 {% block title %}Issue #{{ issueid }} - {{ repo.name }}{% endblock %}
 {%block tag %}home{% endblock %}
 
+{% block header %}
+<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css"
+  rel="stylesheet">
+{% endblock %}
+
 {% block repo %}
 
 {% if authenticated and form %}
@@ -90,12 +95,11 @@
     {% endif %}
 </section>
 
-{{ show_comment(issue.user, issue.date_created, issue.content, 0) }}
+{{ show_comment(issue, 0, repo, username, issueid, form) }}
 
 {% if issue.comments %}
   {% for comment in issue.comments %}
-    {{ show_comment(comment.user, comment.date_created, comment.comment,
-        loop.index) }}
+    {{ show_comment(comment, loop.index, repo, username, issueid, form) }}
   {% endfor %}
 {% endif %}
 
