@@ -1126,7 +1126,7 @@ def get_tag(session, tag):
 
 def search_pull_requests(
         session, requestid=None, project_id=None, project_id_from=None,
-        status=None):
+        status=None, count=False):
     ''' Retrieve the specified issue
     '''
 
@@ -1158,6 +1158,8 @@ def search_pull_requests(
 
     if requestid:
         output = query.first()
+    elif count:
+        output = query.count()
     else:
         output = query.all()
 
