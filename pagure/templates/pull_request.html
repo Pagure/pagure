@@ -7,6 +7,8 @@
 {% block header %}
 <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css"
   rel="stylesheet">
+<link href="{{ url_for('static', filename='emoji/emojione.sprites.css') }}"
+  rel="stylesheet" />
 {% endblock %}
 
 {% block repo %}
@@ -257,8 +259,20 @@
 
 {% block jscripts %}
 {{ super() }}
+<script type="text/javascript"
+    src="{{ url_for('static', filename='emoji/jquery.textcomplete.min.js') }}">
+</script>
+<script type="text/javascript"
+    src="{{ url_for('static', filename='emoji/emojione.min.js') }}">
+</script>
+
 <script type="text/javascript">
- $(function(){
+
+ $(document).ready(function() {
+
+  var folder = '{{url_for("static", filename="emoji/png/") }}';
+  var json_url = '{{ url_for("static", filename="emoji/emoji_strategy.json") }}';
+
   $( "#branch_select" ).change(
     function() {
       var sel = $('#branch_select');
@@ -269,12 +283,15 @@
       window.location.href = final_url;
     }
   );
+
 {% if pull_request %}
 {# These lines are only for existing pull-requests, not new ones #}
+
+  emoji_complete(json_url, folder);
+
   $('#cancel_pr').click(function(){
     return window.confirm("Are you sure you want to close this requested pull?");
   });
- });
 
   function comment() {
     $( ".cancel" ).click(
@@ -284,7 +301,6 @@
     );
   };
 
- $(function(){
   $( ".code_table tr" ).hover(
     function() {
       $( this ).find( "img" ).show().width(13);
@@ -311,6 +327,7 @@
           next_row.before(
             '<tr><td></td><td colspan="2" class="pr_comment_form">' + data + '</td></tr>' );
           comment();
+          emoji_complete(json_url, folder);
         });
       } else {
         next_row.prev().find('.pr_comment_form').parent().remove();
@@ -378,6 +395,17 @@
 
   $(window.onload=highlight_comment());
   $(window).on('hashchange', highlight_comment);
+
+  $(".comment_body").each(function(ind, obj) {
+    var source = $(obj).html();
+    var preview = emojione.toImage(source);
+    $(obj).html(preview);
+  });
+  $(".pr_comment").each(function(ind, obj) {
+    var source = $(obj).html();
+    var preview = emojione.toImage(source);
+    $(obj).html(preview);
+  });
 
 {% endif %}
 
