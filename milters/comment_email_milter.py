@@ -113,7 +113,7 @@ class PagureMilter(Milter.Base):
         self.fp = None
 
     def envfrom(self, mailfrom, *str):
-        LOG.debug("mail from: %s  -  %s", mailfrom, *str)
+        LOG.debug("mail from: %s  -  %s", mailfrom, str)
         self.fromparms = Milter.dictfromlist(str)
         # NOTE: self.fp is only an *internal* copy of message data.  You
         # must use addheader, chgheader, replacebody to change the message
