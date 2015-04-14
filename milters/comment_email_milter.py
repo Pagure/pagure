@@ -8,8 +8,6 @@
 import base64
 import email
 import hashlib
-import logging
-import logging.handlers
 import os
 import urlparse
 import StringIO
@@ -23,45 +21,7 @@ import requests
 
 from Milter.utils import parse_addr
 
-try:
-    # Python2.7 and later
-    from logging.config import dictConfig
-except ImportError:
-    # For Python2.6, we rely on a third party module.
-    from logutils.dictconfig import dictConfig
-
-
 logq = Queue(maxsize=4)
-# Set-up the logger
-bare_format = "[%(asctime)s][%(name)10s %(levelname)7s] %(message)s"
-
-config_logging=dict(
-    version=1,
-    formatters=dict(
-        bare={
-            "datefmt": "%Y-%m-%d %H:%M:%S",
-        "format": bare_format
-        },
-    ),
-    handlers=dict(
-        console={
-            "class": "logging.StreamHandler",
-            "formatter": "bare",
-            "level": "INFO",
-            "stream": "ext://sys.stdout",
-        },
-    ),
-    loggers=dict(
-        pagure_milter={
-        "level": "DEBUG",
-        "propagate": False,
-        "handlers": ["console"],
-        },
-    ),
-)
-
-dictConfig(config_logging)
-LOG = logging.getLogger("pagure_milter")
 
 
 if 'PAGURE_CONFIG' not in os.environ \
@@ -112,6 +72,10 @@ class PagureMilter(Milter.Base):
         self.id = Milter.uniqueID()  # Integer incremented with each call.
         self.fp = None
 
+    def log(self, message):
+        print(message)
+        sys.stdout.flush()
+
     def envfrom(self, mailfrom, *str):
         LOG.debug("mail from: %s  -  %s", mailfrom, str)
         self.fromparms = Milter.dictfromlist(str)
@@ -156,12 +120,12 @@ class PagureMilter(Milter.Base):
 
         msg_id = msg.get('In-Reply-To', None)
         if msg_id is None:
-            LOG.debug('No In-Reply-To, keep going')
+            self.log('No In-Reply-To, keep going')
             return Milter.CONTINUE
 
-        LOG.debug('msg-ig %s', msg_id)
-        LOG.debug('To %s', msg['to'])
-        LOG.debug('From %s', msg['From'])
+        self.log('msg-ig %s' % msg_id)
+        self.log('To %s' % msg['to'])
+        self.log('From %s' % msg['From'])
 
         # Ensure the user replied to his/her own notification, not that
         # they are trying to forge their ID into someone else's
@@ -169,13 +133,13 @@ class PagureMilter(Milter.Base):
         m = hashlib.sha512('%s%s%s' % (msg_id, salt, msg['From']))
         tohash= msg['to'].split('@')[0].split('+')[-1]
         if m.hexdigest() != tohash:
-            LOG.debug('hash: %s', m.hexdigest())
-            LOG.debug('to:   %s', msg['to'])
-            LOG.debug('Hash does not correspond to the destination')
+            self.log('hash: %s' % m.hexdigest())
+            self.log('tohash:   %s' % msg['tohash'])
+            self.log('Hash does not correspond to the destination')
             return Milter.CONTINUE
 
         if msg['From'] and msg['From'] == pagure.APP.config.get('FROM_EMAIL'):
-            LOG.debug("Let's not process the email we send")
+            self.log("Let's not process the email we send")
             return Milter.CONTINUE
 
         msg_id = clean_item(msg_id)
@@ -185,7 +149,7 @@ class PagureMilter(Milter.Base):
         elif msg_id and '-pull-request-' in msg_id:
             return self.handle_request_email(msg, msg_id)
         else:
-            LOG.debug('Not a pagure ticket or pull-request email, let it go')
+            self.log('Not a pagure ticket or pull-request email, let it go')
             return Milter.CONTINUE
 
 
@@ -197,8 +161,8 @@ class PagureMilter(Milter.Base):
             uid, parent_id = uid.rsplit('-', 1)
         if '/' in uid:
             uid = uid.split('/')[0]
-        LOG.debug('uid %s', uid)
-        LOG.debug('parent_id %s', parent_id)
+        self.log('uid %s' % uid)
+        self.log('parent_id %s' % parent_id)
 
         data = {
             'objid': uid,
@@ -227,8 +191,8 @@ class PagureMilter(Milter.Base):
             uid, parent_id = uid.rsplit('-', 1)
         if '/' in uid:
             uid = uid.split('/')[0]
-        LOG.debug('uid %s', uid)
-        LOG.debug('parent_id %s', parent_id)
+        self.log('uid %s' % uid)
+        self.log('parent_id %s' % parent_id)
 
         data = {
             'objid': uid,
