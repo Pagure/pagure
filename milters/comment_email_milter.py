@@ -127,7 +127,8 @@ class PagureMilter(Milter.Base):
         # they are trying to forge their ID into someone else's
         salt = pagure.APP.config.get('SALT_EMAIL')
         m = hashlib.sha512('%s%s%s' % (msg_id, salt, msg['From']))
-        if m.hexdigest() != msg['to']:
+        tohash= msg['to'].split('@')[0].split('+')[-1]
+        if m.hexdigest() != tohash:
             self.log('hash: %s' % m.hexdigest())
             self.log('to:   %s' % msg['to'])
             self.log('Hash does not correspond to the destination')
