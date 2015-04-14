@@ -836,3 +836,50 @@ def add_user(repo, username=None):
         username=username,
         repo=repo,
     )
+
+
+
+@APP.route('/<repo>/regenerate/', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/regenerate', methods=['POST'])
+@cla_required
+def regenerate_git(repo, username=None):
+    """ Regenerate the specified git repo with the content in the project.
+    """
+    if admin_session_timedout():
+        return flask.redirect(
+            flask.url_for('auth_login', next=flask.request.url))
+
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    if not is_repo_admin(repo):
+
+        flask.abort(403, 'You are not allowed to regenerate the git repos')
+    regenerate = flask.request.form.get('regenerate')
+    if not regenerate or regenerate.lower() not in ['tickets', 'requests']:
+        flask.abort(400, 'You can only regenerate tickest or requests repos')
+
+    form = pagure.forms.ConfirmationForm()
+    if form.validate_on_submit():
+        print regenerate.lower()
+        if regenerate.lower() == 'requests':
+            for request in repo.requests:
+                pagure.lib.git.update_git(
+                    request, repo=repo,
+                    repofolder=APP.config['REQUESTS_FOLDER'])
+            flask.flash('Requests git repo updated')
+        elif regenerate.lower() == 'tickets':
+            for ticket in repo.issues:
+                # Do not store private issues in the git
+                if ticket.private:
+                    continue
+                pagure.lib.git.update_git(
+                    ticket, repo=repo,
+                    repofolder=APP.config['TICKETS_FOLDER'])
+            flask.flash('Tickets git repo updated')
+
+    return flask.redirect(
+        flask.url_for('.view_settings', repo=repo.name, username=username)
+    )
