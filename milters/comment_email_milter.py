@@ -180,7 +180,9 @@ class PagureMilter(Milter.Base):
         url = 'http://localhost%s/pv/ticket/comment/' % url
         req = requests.put(url, data=data)
         if req.status_code == 200:
+            self.log('Comment added')
             return Milter.ACCEPT
+        self.log('Could not add the comment to pagure')
         return Milter.CONTINUE
 
     def handle_request_email(self, emailobj, msg_id):
