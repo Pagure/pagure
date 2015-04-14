@@ -121,16 +121,20 @@ def run_as_post_receive_hook():
 
     for filename in file_list:
         print 'To load: %s' % filename
+        json_data = None
         data = ''.join(read_git_lines(['show', 'HEAD:%s' % filename]))
         if data:
-            data = json.loads(data)
-        if data:
+            try:
+                json_data = json.loads(data)
+            except:
+                pass
+        if json_data:
             pagure.lib.git.update_ticket_from_git(
                 pagure.SESSION,
                 reponame=reponame,
                 username=username,
                 issue_uid=filename,
-                json_data=data)
+                json_data=json_data)
 
 
 def main(args):
