@@ -8,6 +8,7 @@
 import base64
 import email
 import hashlib
+import logging
 import os
 import urlparse
 import StringIO
@@ -22,6 +23,13 @@ import requests
 from Milter.utils import parse_addr
 
 logq = Queue(maxsize=4)
+# Create logger
+LOG = logging.getLogger('pagure_milter')
+LOG.setLevel(logging.DEBUG)
+# Set the handler
+HANDLER = logging.SysLogHandler()
+HANDLER.setLevel(logging.DEBUG)
+LOG.addHandler(HANDLER)
 
 
 if 'PAGURE_CONFIG' not in os.environ \
@@ -73,7 +81,7 @@ class PagureMilter(Milter.Base):
         self.fp = None
 
     def envfrom(self, mailfrom, *str):
-        self.log("mail from:", mailfrom, *str)
+        LOG.debug("mail from: %s  -  %s", mailfrom, *str)
         self.fromparms = Milter.dictfromlist(str)
         # NOTE: self.fp is only an *internal* copy of message data.  You
         # must use addheader, chgheader, replacebody to change the message
@@ -116,12 +124,12 @@ class PagureMilter(Milter.Base):
 
         msg_id = msg.get('In-Reply-To', None)
         if msg_id is None:
-            self.log('No In-Reply-To, keep going')
+            LOG.debug('No In-Reply-To, keep going')
             return Milter.CONTINUE
 
-        self.log('msg-ig', msg_id)
-        self.log('To', msg['to'])
-        self.log('From', msg['From'])
+        LOG.debug('msg-ig %s', msg_id)
+        LOG.debug('To %s', msg['to'])
+        LOG.debug('From %s', msg['From'])
 
         # Ensure the user replied to his/her own notification, not that
         # they are trying to forge their ID into someone else's
@@ -129,13 +137,13 @@ class PagureMilter(Milter.Base):
         m = hashlib.sha512('%s%s%s' % (msg_id, salt, msg['From']))
         tohash= msg['to'].split('@')[0].split('+')[-1]
         if m.hexdigest() != tohash:
-            self.log('hash: %s' % m.hexdigest())
-            self.log('to:   %s' % msg['to'])
-            self.log('Hash does not correspond to the destination')
+            LOG.debug('hash: %s', m.hexdigest())
+            LOG.debug('to:   %s', msg['to'])
+            LOG.debug('Hash does not correspond to the destination')
             return Milter.CONTINUE
 
         if msg['From'] and msg['From'] == pagure.APP.config.get('FROM_EMAIL'):
-            self.log("Let's not process the email we send")
+            LOG.debug("Let's not process the email we send")
             return Milter.CONTINUE
 
         msg_id = clean_item(msg_id)
@@ -145,11 +153,9 @@ class PagureMilter(Milter.Base):
         elif msg_id and '-pull-request-' in msg_id:
             return self.handle_request_email(msg, msg_id)
         else:
-            self.log('Not a pagure ticket or pull-request email, let it go')
+            LOG.debug('Not a pagure ticket or pull-request email, let it go')
             return Milter.CONTINUE
 
-    def log(self,*msg):
-        logq.put((msg, self.id,time.time()))
 
     def handle_ticket_email(self, emailobj, msg_id):
         ''' Add the email as a comment on a ticket. '''
@@ -159,8 +165,8 @@ class PagureMilter(Milter.Base):
             uid, parent_id = uid.rsplit('-', 1)
         if '/' in uid:
             uid = uid.split('/')[0]
-        self.log('uid', uid)
-        self.log('parent_id', parent_id)
+        LOG.debug('uid %s', uid)
+        LOG.debug('parent_id %s', parent_id)
 
         data = {
             'objid': uid,
@@ -189,8 +195,8 @@ class PagureMilter(Milter.Base):
             uid, parent_id = uid.rsplit('-', 1)
         if '/' in uid:
             uid = uid.split('/')[0]
-        self.log('uid', uid)
-        self.log('parent_id', parent_id)
+        LOG.debug('uid %s', uid)
+        LOG.debug('parent_id %s', parent_id)
 
         data = {
             'objid': uid,
