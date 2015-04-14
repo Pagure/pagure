@@ -788,6 +788,10 @@ ul.changes {
     width: 50%;
 }
 
+#preview img.emojione {
+    width: initial;
+}
+
 #more_gits {
     cursor: pointer;
 }
