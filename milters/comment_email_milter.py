@@ -23,14 +23,45 @@ import requests
 
 from Milter.utils import parse_addr
 
+try:
+    # Python2.7 and later
+    from logging.config import dictConfig
+except ImportError:
+    # For Python2.6, we rely on a third party module.
+    from logutils.dictconfig import dictConfig
+
+
 logq = Queue(maxsize=4)
-# Create logger
-LOG = logging.getLogger('pagure_milter')
-LOG.setLevel(logging.DEBUG)
-# Set the handler
-HANDLER = logging.handlers.SysLogHandler()
-HANDLER.setLevel(logging.DEBUG)
-LOG.addHandler(HANDLER)
+# Set-up the logger
+config = dict(
+    logging=dict(
+        version=1,
+        formatters=dict(
+            bare={
+                "datefmt": "%Y-%m-%d %H:%M:%S",
+            "format": bare_format
+            },
+        ),
+        handlers=dict(
+            console={
+                "class": "logging.StreamHandler",
+                "formatter": "bare",
+                "level": "INFO",
+                "stream": "ext://sys.stdout",
+            },
+        ),
+        loggers=dict(
+            pagure_milter={
+            "level": "DEBUG",
+            "propagate": False,
+            "handlers": ["console"],
+            },
+        ),
+    ),
+)
+
+dictConfig(config)
+LOG = logging.getLogger("pagure_milter")
 
 
 if 'PAGURE_CONFIG' not in os.environ \
