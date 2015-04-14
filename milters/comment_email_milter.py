@@ -9,6 +9,7 @@ import base64
 import email
 import hashlib
 import logging
+import logging.handlers
 import os
 import urlparse
 import StringIO
@@ -27,7 +28,7 @@ logq = Queue(maxsize=4)
 LOG = logging.getLogger('pagure_milter')
 LOG.setLevel(logging.DEBUG)
 # Set the handler
-HANDLER = logging.SysLogHandler()
+HANDLER = logging.handlers.SysLogHandler()
 HANDLER.setLevel(logging.DEBUG)
 LOG.addHandler(HANDLER)
 
