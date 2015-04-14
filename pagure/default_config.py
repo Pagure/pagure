@@ -28,11 +28,11 @@ ADMIN_GROUP = 'sysadmin-main'
 EMAIL_ERROR = 'pingou@pingoured.fr'
 
 # The URL at which the project is available.
-APP_URL = 'https://fedorahosted.org/pagure/'
+APP_URL = 'https://pagure.org/'
 
 # The URL to use to clone the git repositories.
-GIT_URL_SSH = 'git@pagure.fedorahosted.org'
-GIT_URL_GIT = 'git://pagure.fedorahosted.org'
+GIT_URL_SSH = 'git@pagure.org'
+GIT_URL_GIT = 'git://pagure.org'
 
 
 # Number of items displayed per page
@@ -99,7 +99,9 @@ GL_BINDIR = None
 SMTP_SERVER = 'localhost'
 
 # Email used to sent emails
-FROM_EMAIL = 'pagure@fedoraproject.org'
+FROM_EMAIL = 'pagure@pagure.org'
+DOMAIN_EMAIL_NOTIFICATIONS = 'pagure.org'
+SALT_EMAIL = '<secret key to be changed>'
 
 # Specify which authentication method to use, defaults to `fas` can be or
 # `local`

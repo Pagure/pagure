@@ -7,6 +7,7 @@
 
 import base64
 import email
+import hashlib
 import os
 import urlparse
 import StringIO
@@ -121,6 +122,16 @@ class PagureMilter(Milter.Base):
         self.log('msg-ig', msg_id)
         self.log('To', msg['to'])
         self.log('From', msg['From'])
+
+        # Ensure the user replied to his/her own notification, not that
+        # they are trying to forge their ID into someone else's
+        salt = pagure.APP.config.get('SALT_EMAIL')
+        m = hashlib.sha512('%s%s%s' % (msg_id, salt, msg['From']))
+        if m.hexdigest() != msg['to']:
+            self.log('hash: %s' % m.hexdigest())
+            self.log('to:   %s' % msg['to'])
+            self.log('Hash does not correspond to the destination')
+            return Milter.CONTINUE
 
         if msg['From'] and msg['From'] == pagure.APP.config.get('FROM_EMAIL'):
             self.log("Let's not process the email we send")

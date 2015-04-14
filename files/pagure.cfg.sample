@@ -23,8 +23,10 @@ EMAIL_ERROR = 'pingou@pingoured.fr'
 ### Default SMTP server to use for sending emails
 SMTP_SERVER = 'localhost'
 
-### Email used to sent emails
+### Information used to sent notifications
 FROM_EMAIL = 'pagure@pagure.io'
+DOMAIN_EMAIL_NOTIFICATIONS = 'pagure.io'
+SALT_EMAIL = '<secret key to be changed>'
 
 ### The URL at which the project is available.
 APP_URL = 'https://pagure.io/'

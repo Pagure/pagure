@@ -10,6 +10,7 @@ pagure notifications.
 """
 
 import datetime
+import hashlib
 import urlparse
 import smtplib
 import time
@@ -119,7 +120,6 @@ def send_email(text, subject, to_mail,
     from_email = pagure.APP.config.get(
         'FROM_EMAIL', 'pagure@fedoraproject.org')
     msg['From'] = from_email
-    msg['Bcc'] = to_mail.replace(',', ', ')
 
     if mail_id:
         msg['mail-id'] = mail_id
@@ -131,15 +131,22 @@ def send_email(text, subject, to_mail,
     # Send the message via our own SMTP server, but don't include the
     # envelope header.
     smtp = smtplib.SMTP(pagure.APP.config['SMTP_SERVER'])
-    try:
-        smtp.sendmail(
-            from_email,
-            to_mail.split(','),
-            msg.as_string())
-    except smtplib.SMTPException as err:
-        pagure.LOG.exception(err)
-    finally:
-        smtp.quit()
+    for mailto in to_mail.split(','):
+        lcl_msg = msg
+        lcl_msg['To'] = mailto
+        salt = pagure.APP.config.get('SALT_EMAIL')
+        m = hashlib.sha512('<%s>%s%s' % (mail_id, salt, mailto))
+        lcl_msg['Reply-To'] = 'reply+%s@%s' % (
+            m.hexdigest(), pagure.APP.config['DOMAIN_EMAIL_NOTIFICATIONS'])
+        try:
+            smtp.sendmail(
+                from_email,
+                [mailto],
+                msg.as_string())
+        except smtplib.SMTPException as err:
+            pagure.LOG.exception(err)
+        finally:
+            smtp.quit()
     return msg
 
 
