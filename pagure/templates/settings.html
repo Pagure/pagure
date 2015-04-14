@@ -56,6 +56,30 @@
       {{ form.csrf_token }}
     </p>
   </form>
+
+  <h3>Re-generate git repos</h3>
+  <form action="{{ url_for('.regenerate_git',
+                  username=username, repo=repo.name) }}" method="post"
+        class="icon">
+    <input name="regenerate" value="tickets" type="hidden"/>
+    <button class="" type="submit"
+      title="Regenerate tickets git repo">
+      <span class="icon icon-refresh blue"></span>
+      Regenerate the git repo for issues
+    </button>
+    {{ form.csrf_token }}
+  </form>
+  <form action="{{ url_for('.regenerate_git',
+                  username=username, repo=repo.name) }}" method="post"
+        class="icon">
+    <input name="regenerate" value="requests" type="hidden"/>
+    <button class="icon_button" type="submit"
+      title="Regenerate requests git repo">
+      <span class="icon icon-refresh blue"></span>
+      Regenerate the git repo for requests
+    </button>
+    {{ form.csrf_token }}
+  </form>
 </section>
 
 <section class="users">
