@@ -33,34 +33,34 @@ except ImportError:
 
 logq = Queue(maxsize=4)
 # Set-up the logger
-config = dict(
-    logging=dict(
-        version=1,
-        formatters=dict(
-            bare={
-                "datefmt": "%Y-%m-%d %H:%M:%S",
-            "format": bare_format
-            },
-        ),
-        handlers=dict(
-            console={
-                "class": "logging.StreamHandler",
-                "formatter": "bare",
-                "level": "INFO",
-                "stream": "ext://sys.stdout",
-            },
-        ),
-        loggers=dict(
-            pagure_milter={
-            "level": "DEBUG",
-            "propagate": False,
-            "handlers": ["console"],
-            },
-        ),
+bare_format = "[%(asctime)s][%(name)10s %(levelname)7s] %(message)s"
+
+config_logging=dict(
+    version=1,
+    formatters=dict(
+        bare={
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        "format": bare_format
+        },
+    ),
+    handlers=dict(
+        console={
+            "class": "logging.StreamHandler",
+            "formatter": "bare",
+            "level": "INFO",
+            "stream": "ext://sys.stdout",
+        },
+    ),
+    loggers=dict(
+        pagure_milter={
+        "level": "DEBUG",
+        "propagate": False,
+        "handlers": ["console"],
+        },
     ),
 )
 
-dictConfig(config)
+dictConfig(config_logging)
 LOG = logging.getLogger("pagure_milter")
 
 
