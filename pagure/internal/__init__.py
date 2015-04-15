@@ -207,6 +207,7 @@ def mergeable_request_pull():
         shutil.rmtree(newpath)
         return flask.jsonify({
             'code': 'NO_CHANGE',
+            'short_code': 'No changes',
             'message': 'Nothing to change, git is up to date'})
     elif (
             (merge is not None and merge.is_fastforward)
@@ -217,6 +218,7 @@ def mergeable_request_pull():
         shutil.rmtree(newpath)
         return flask.jsonify({
             'code': 'FFORWARD',
+            'short_code': 'Ok',
             'message': 'The pull-request can be merged and fast-forwarded'})
 
     else:
@@ -227,9 +229,11 @@ def mergeable_request_pull():
             shutil.rmtree(newpath)
             return flask.jsonify({
                 'code': 'CONFLICTS',
+                'short_code': 'Conflicts',
                 'message': 'The pull-request cannot be merged due to conflicts'})
 
         shutil.rmtree(newpath)
         return flask.jsonify({
             'code': 'MERGE',
+            'short_code': 'With merge',
             'message': 'The pull-request can be merged with a merge commit'})
