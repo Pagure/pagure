@@ -1179,7 +1179,7 @@ def get_tag(session, tag):
 
 def search_pull_requests(
         session, requestid=None, project_id=None, project_id_from=None,
-        status=None, count=False):
+        status=None, author=None, assignee=None, count=False):
     ''' Retrieve the specified issue
     '''
 
@@ -1207,6 +1207,43 @@ def search_pull_requests(
     if status is not None:
         query = query.filter(
             model.PullRequest.status == status
+        )
+
+    if assignee is not None:
+        if str(assignee).lower() not in ['false', '0', 'true', '1']:
+            user2 = aliased(model.User)
+            if assignee.startswith('!'):
+                sub = session.query(
+                    model.PullRequest.uid
+                ).filter(
+                    model.PullRequest.assignee_id == user2.id
+                ).filter(
+                    user2.user == assignee[1:]
+                )
+
+                query = query.filter(
+                    ~model.PullRequest.uid.in_(sub)
+                )
+            else:
+                query = query.filter(
+                    model.PullRequest.assignee_id == user2.id
+                ).filter(
+                    user2.user == assignee
+                )
+        elif str(assignee).lower() in ['true', '1']:
+            query = query.filter(
+                model.PullRequest.assignee_id != None
+            )
+        else:
+            query = query.filter(
+                model.PullRequest.assignee_id == None
+            )
+
+    if author is not None:
+        query = query.filter(
+            model.PullRequest.user_id == model.User.id
+        ).filter(
+            model.User.user == author
         )
 
     if requestid:
