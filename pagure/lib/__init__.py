@@ -279,6 +279,54 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
 
         return 'Issue assigned'
 
+def add_pull_request_assignee(session, request, assignee, user, requestfolder):
+    ''' Add an assignee to a request, in other words, assigned an issue. '''
+    user_obj = __get_user(session, user)
+
+    if assignee is None and request.assignee is not None:
+        request.assignee_id = None
+        session.add(request)
+        session.commit()
+        pagure.lib.git.update_git(
+            request, repo=request.project, repofolder=requestfolder)
+
+        pagure.lib.notify.notify_assigned_request(request, None, user_obj)
+        pagure.lib.notify.fedmsg_publish(
+            'request.assigned.reset',
+            dict(
+                request=request.to_json(),
+                project=request.project.to_json(),
+                agent=user_obj.username,
+            )
+        )
+
+        return 'Request reset'
+    elif assignee is None and request.assignee is None:
+        return
+
+    # Validate the assignee
+    assignee_obj = __get_user(session, assignee)
+
+    if request.assignee_id != assignee_obj.id:
+        request.assignee_id = assignee_obj.id
+        session.add(request)
+        session.flush()
+        pagure.lib.git.update_git(
+            request, repo=request.project, repofolder=requestfolder)
+
+        pagure.lib.notify.notify_assigned_request(
+            request, assignee_obj, user_obj)
+
+        pagure.lib.notify.fedmsg_publish(
+            'request.assigned.added',
+            dict(
+                request=request.to_json(),
+                project=request.project.to_json(),
+                agent=user_obj.username,
+            )
+        )
+
+        return 'Request assigned'
 
 def add_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
     ''' Add a dependency between two issues. '''
