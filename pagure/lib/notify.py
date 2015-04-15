@@ -250,6 +250,41 @@ The issue: `%s` of project: `%s` has been %s by %s.
     )
 
 
+def notify_assigned_request(request, new_assignee, user):
+    ''' Notify the people following a pull-request that the assignee changed.
+    '''
+    action = 'reset'
+    if new_assignee:
+        action = 'assigned to `%s`' % new_assignee.user
+    text = """
+The pull-request: `%s` of project: `%s` has been %s by %s.
+
+%s
+""" % (request.title,
+       request.project.name,
+       action,
+       user.username,
+       _build_url(
+           pagure.APP.config['APP_URL'],
+           request.project.name,
+           'pull-request',
+           request.id))
+    mail_to = _get_emails_for_issue(request)
+    if new_assignee and new_assignee.default_email:
+        mail_to.add(new_assignee.default_email)
+
+    mail_to = _clean_emails(mail_to, user)
+
+    uid = time.mktime(datetime.datetime.now().timetuple())
+    send_email(
+        text,
+        'Pull-request `%s` assigned' % request.title,
+        ','.join(mail_to),
+        mail_id='%s/assigned/%s' % (request.mail_id, uid),
+        in_reply_to=request.mail_id,
+    )
+
+
 def notify_new_pull_request(request):
     ''' Notify the people following a project that a new pull-request was
     added to it.
