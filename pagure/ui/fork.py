@@ -447,6 +447,16 @@ def merge_request_pull(repo, requestid, username=None):
                 'request_pull', username=username,
                 repo=repo.name, requestid=requestid))
 
+    threshold = repo.settings.get('Minimum_score_to_merge_pull-request', -1)
+    if threshold > 0 and int(request.score) < int(threshold):
+        print request.score, threshold
+        flask.flash(
+            'This request does not have the minimum review score necessary '
+            'to be merged', 'error')
+        return flask.redirect(flask.url_for(
+            'request_pull', username=username,
+            repo=repo.name, requestid=requestid))
+
     error_output = flask.url_for(
         'request_pull', repo=repo.name, requestid=requestid)
     if username:

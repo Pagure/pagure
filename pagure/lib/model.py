@@ -289,6 +289,7 @@ class Project(BASE):
             'project_documentation': True,
             'pull_requests': True,
             'Only_assignee_can_merge_pull-request': False,
+            'Minimum_score_to_merge_pull-request': -1,
         }
 
         if self._settings:
