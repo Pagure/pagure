@@ -427,6 +427,27 @@
     $(obj).html(preview);
   });
 
+  $(function(){
+    $.ajax({
+      url: '{{ url_for("internal_ns.mergeable_request_pull") }}' ,
+      type: 'POST',
+      data: {
+        requestid: "{{ pull_request.uid }}",
+        csrf_token: "{{ mergeform.csrf_token.current_token }}",
+      },
+      dataType: 'json',
+      success: function(res) {
+        var _obj = $('.header .buttons');
+        _obj.prepend($('<li><span class="'+res.code+'" title="'
+          +res.message+'"></span></li>'));
+      },
+      error: function() {
+        alert('Unable to generate preview!');
+      }
+    });
+    return false;
+  });
+
 {% endif %}
 
  });

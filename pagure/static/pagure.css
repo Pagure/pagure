@@ -811,3 +811,24 @@ ul.changes {
 table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after {
     content: " \25B4\25BE"
 }
+
+
+span.NO_CHANGE {
+  padding-left: 20px;
+  background: url(/static/grey.png) 0 50% no-repeat;
+}
+
+span.FFORWARD {
+  padding-left: 20px;
+  background: url(/static/green.png) 0 50% no-repeat;
+}
+
+span.MERGE {
+  padding-left: 20px;
+  background: url(/static/orange.png) 0 50% no-repeat;
+}
+
+span.CONFLICTS {
+  padding-left: 20px;
+  background: url(/static/red.png) 0 50% no-repeat;
+}
