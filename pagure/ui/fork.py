@@ -573,6 +573,51 @@ def cancel_request_pull(repo, requestid, username=None):
     return flask.redirect(flask.url_for('view_repo', repo=repo.name))
 
 
+@APP.route('/<repo>/pull-request/<int:requestid>/assign', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/assign',
+           methods=['GET', 'POST'])
+@cla_required
+def set_assignee_requests(repo, requestid, username=None):
+    ''' Assign a pull-request. '''
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+
+    if repo is None:
+        flask.abort(404, 'Project not found')
+
+    if not repo.settings.get('pull_requests', True):
+        flask.abort(404, 'No pull-request allowed on this project')
+
+    request = pagure.lib.search_pull_requests(
+            SESSION, project_id=repo.id, requestid=requestid)
+
+    if not request:
+        flask.abort(404, 'Pull-request not found')
+
+    form = pagure.forms.AddUserForm()
+    if form.validate_on_submit():
+        try:
+            # Assign or update assignee of the ticket
+            message = pagure.lib.add_pull_request_assignee(
+                SESSION,
+                request=request,
+                assignee=form.user.data or None,
+                user=flask.g.fas_user.username,
+                requestfolder=APP.config['REQUESTS_FOLDER'],)
+            if message:
+                SESSION.commit()
+                flask.flash(message)
+        except pagure.exceptions.PagureException, err:
+            SESSION.rollback()
+            flask.flash(err.message, 'error')
+        except SQLAlchemyError, err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash(str(err), 'error')
+
+    return flask.redirect(flask.url_for(
+        'request_pull', username=username, repo=repo.name, requestid=requestid))
+
+
 # Specific actions
 
 
