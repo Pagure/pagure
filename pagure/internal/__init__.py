@@ -10,7 +10,11 @@ Internal endpoints.
 
 """
 
+import shutil
+import tempfile
+
 import flask
+import pygit2
 
 from functools import wraps
 from sqlalchemy.exc import SQLAlchemyError
@@ -140,3 +144,92 @@ def ticket_add_comment():
         flask.abort(400, 'Error when saving the request to the database')
 
     return flask.jsonify({'message': message})
+
+
+
+@PV.route('/pull-request/merge', methods=['POST'])
+def mergeable_request_pull():
+    """ Returns if the specified pull-request can be merged or not.
+    """
+
+    form = pagure.forms.ConfirmationForm()
+    if not form.validate_on_submit():
+        flask.abort(400, 'Invalid input submitted')
+
+    requestid = flask.request.form.get('requestid')
+
+    request = pagure.lib.get_request_by_uid(
+        pagure.SESSION, request_uid=requestid)
+
+    if not request:
+        flask.abort(404, 'Pull-request not found')
+
+    # Get the fork
+    repopath = pagure.get_repo_path(request.project_from)
+    fork_obj = pygit2.Repository(repopath)
+
+    # Get the original repo
+    parentpath = pagure.get_repo_path(request.project)
+
+    # Clone the original repo into a temp folder
+    newpath = tempfile.mkdtemp(prefix='pagure-pr-check')
+    new_repo = pygit2.clone_repository(parentpath, newpath)
+
+    repo_commit = fork_obj[
+        fork_obj.lookup_branch(request.branch_from).get_object().hex]
+
+    ori_remote = new_repo.remotes[0]
+    # Add the fork as remote repo
+    reponame = '%s_%s' % (request.user.user, request.project.name)
+    remote = new_repo.create_remote(reponame, repopath)
+
+    # Fetch the commits
+    remote.fetch()
+
+    merge = new_repo.merge(repo_commit.oid)
+    if merge is None:
+        mergecode = new_repo.merge_analysis(repo_commit.oid)[0]
+
+    try:
+        branch_ref = new_repo.lookup_reference(
+            request.branch).resolve()
+    except ValueError:
+        branch_ref = new_repo.lookup_reference(
+            'refs/heads/%s' % request.branch).resolve()
+
+    refname = '%s:%s' % (branch_ref.name, branch_ref.name)
+    if (
+            (merge is not None and merge.is_uptodate)
+            or
+            (merge is None and
+             mergecode & pygit2.GIT_MERGE_ANALYSIS_UP_TO_DATE)):
+
+        shutil.rmtree(newpath)
+        return flask.jsonify({
+            'code': 'NO_CHANGE',
+            'message': 'Nothing to change, git is up to date'})
+    elif (
+            (merge is not None and merge.is_fastforward)
+            or
+            (merge is None and
+             mergecode & pygit2.GIT_MERGE_ANALYSIS_FASTFORWARD)):
+
+        shutil.rmtree(newpath)
+        return flask.jsonify({
+            'code': 'FFORWARD',
+            'message': 'The pull-request can be merged and fast-forwarded'})
+
+    else:
+        tree = None
+        try:
+            tree = new_repo.index.write_tree()
+        except pygit2.GitError:
+            shutil.rmtree(newpath)
+            return flask.jsonify({
+                'code': 'CONFLICTS',
+                'message': 'The pull-request cannot be merged due to conflicts'})
+
+        shutil.rmtree(newpath)
+        return flask.jsonify({
+            'code': 'MERGE',
+            'message': 'The pull-request can be merged with a merge commit'})
