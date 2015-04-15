@@ -473,7 +473,7 @@ def merge_request_pull(repo, requestid, username=None):
     parentpath = pagure.get_repo_path(request.project)
 
     # Clone the original repo into a temp folder
-    newpath = tempfile.mkdtemp()
+    newpath = tempfile.mkdtemp(prefix='pagure-pr-merge')
     new_repo = pygit2.clone_repository(parentpath, newpath)
 
     repo_commit = fork_obj[
