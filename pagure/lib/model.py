@@ -284,14 +284,21 @@ class Project(BASE):
         """ Return the dict stored as string in the database as an actual
         dict object.
         """
+        default = {
+            'issue_tracker': True,
+            'project_documentation': True,
+            'pull_requests': True,
+        }
+
         if self._settings:
-            return json.loads(self._settings)
+            current = json.loads(self._settings)
+            # Update the current dict with the new keys
+            for key in default:
+                if key not in current:
+                    current[key] = default[key]
+            return current
         else:
-            return {
-                'issue_tracker': True,
-                'project_documentation': True,
-                'pull_requests': True,
-            }
+            return default
 
     def save_settings(self, settings):
         ''' Ensures the settings are properly saved. '''
