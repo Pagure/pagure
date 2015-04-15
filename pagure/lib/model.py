@@ -666,6 +666,29 @@ class PullRequest(BASE):
         '''
         return [comment for comment in self.comments if not comment.commit_id]
 
+    @property
+    def score(self):
+        ''' Return the review score of the pull-request by checking the
+        number of +1, -1, :thumbup: and :thumbdown: in the comment of the
+        pull-request.
+        This includes only the main comments not the inline ones.
+
+        An user can only give one +1 and one -1.
+        '''
+        positive = set()
+        negative = set()
+        for comment in self.discussion:
+            for word in [' +1 ', ':thumbsup:']:
+                if word in comment.comment:
+                    positive.add(comment.user_id)
+                    break
+            for word in [' -1 ', ':thumbsdown:']:
+                if word in comment.comment:
+                    negative.add(comment.user_id)
+                    break
+
+        return len(positive) - len(negative)
+
     def to_json(self):
         ''' Returns a dictionnary representation of the pull-request.
 
