@@ -610,7 +610,7 @@ def cancel_request_pull(repo, requestid, username=None):
 
 @APP.route('/<repo>/pull-request/<int:requestid>/assign', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/assign',
-           methods=['GET', 'POST'])
+           methods=['POST'])
 @cla_required
 def set_assignee_requests(repo, requestid, username=None):
     ''' Assign a pull-request. '''
@@ -627,6 +627,9 @@ def set_assignee_requests(repo, requestid, username=None):
 
     if not request:
         flask.abort(404, 'Pull-request not found')
+
+    if not request.status:
+        flask.abort(403, 'Pull-request closed')
 
     form = pagure.forms.AddUserForm()
     if form.validate_on_submit():

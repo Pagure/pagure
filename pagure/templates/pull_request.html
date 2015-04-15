@@ -121,7 +121,7 @@
     <tr>
       <td>Assignee</td>
       <td>
-        {% if authenticated and mergeform %}
+        {% if authenticated and mergeform and pull_request.status == True %}
         <form method="POST" action="{{ url_for('.set_assignee_requests',
             username=username, repo=repo.name, requestid=requestid) }}">
           <input value="{{ pull_request.assignee.username or '' }}"
