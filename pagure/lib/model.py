@@ -301,7 +301,8 @@ class Project(BASE):
         else:
             return default
 
-    def save_settings(self, settings):
+    @settings.setter
+    def settings(self, settings):
         ''' Ensures the settings are properly saved. '''
         self._settings = json.dumps(settings)
 
