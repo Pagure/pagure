@@ -132,7 +132,6 @@ def send_email(text, subject, to_mail,
     # envelope header.
     smtp = smtplib.SMTP(pagure.APP.config['SMTP_SERVER'])
     for mailto in to_mail.split(','):
-        smtp.connect()
         lcl_msg = msg
         lcl_msg['To'] = mailto
         salt = pagure.APP.config.get('SALT_EMAIL')
@@ -146,8 +145,7 @@ def send_email(text, subject, to_mail,
                 msg.as_string())
         except smtplib.SMTPException as err:
             pagure.LOG.exception(err)
-        finally:
-            smtp.quit()
+    smtp.quit()
     return msg
 
 
