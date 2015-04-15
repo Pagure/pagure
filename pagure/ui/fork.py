@@ -520,9 +520,9 @@ def merge_request_pull(repo, requestid, username=None):
         flask.flash('Changes merged!')
 
     else:
-        new_repo.index.write()
+        tree = None
         try:
-            new_repo.index.write_tree()
+            tree = new_repo.index.write_tree()
         except pygit2.GitError:
             shutil.rmtree(newpath)
             flask.flash('Merge conflicts!', 'error')
@@ -531,6 +531,7 @@ def merge_request_pull(repo, requestid, username=None):
                 repo=repo.name,
                 username=username,
                 requestid=requestid))
+        head = new_repo.lookup_reference('HEAD').get_object()
         new_repo.create_commit(
             'refs/heads/master',
             repo_commit.author,
