@@ -17,6 +17,10 @@ input {
     font-size: 75%;
 }
 
+.issue_action select {
+    font-size: 75%;
+}
+
 textarea {
     font-size: 100%;
 }
@@ -26,7 +30,7 @@ button {
 }
 
 select {
-    font-size: 75%;
+    font-size: 100%;
 }
 
 textarea {
