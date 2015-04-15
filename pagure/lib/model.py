@@ -288,7 +288,7 @@ class Project(BASE):
             'issue_tracker': True,
             'project_documentation': True,
             'pull_requests': True,
-            'Only_assignee_can_close_pull-request': False,
+            'Only_assignee_can_merge_pull-request': False,
         }
 
         if self._settings:

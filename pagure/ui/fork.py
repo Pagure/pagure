@@ -434,7 +434,7 @@ def merge_request_pull(repo, requestid, username=None):
             403,
             'You are not allowed to merge pull-request for this project')
 
-    if repo.settings.get('Only_assignee_can_close_pull-request', False):
+    if repo.settings.get('Only_assignee_can_merge_pull-request', False):
         if not request.assignee:
             flask.flash(
                 'This request must be assigned to be merged', 'error')
