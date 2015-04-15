@@ -164,8 +164,10 @@
 
 <section class="request_diff">
 
+{% if authenticated and pull_request %}
 <form action="{{ url_for('.pull_request_drop_comment', username=username,
     repo=repo.name, requestid=requestid) }}" method="post" class="icon">
+{% endif %}
 
 {% if diff %}
 {% for patch in diff %}
@@ -216,8 +218,10 @@
 {% endautoescape %}
 {% endfor %}
 {% endif %}
+{% if authenticated and pull_request %}
 {{ mergeform.csrf_token }}
 </form>
+{% endif %}
 </section>
 
 {% if pull_request and pull_request.comments%}
