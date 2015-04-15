@@ -817,7 +817,8 @@ class PagureLibtests(tests.Modeltests):
             settings={
                 'issue_tracker': True,
                 'project_documentation': True,
-                'pull_requests': True
+                'pull_requests': True,
+                'Only_assignee_can_close_pull': False,
             },
             user='pingou',
         )
