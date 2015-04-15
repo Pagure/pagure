@@ -119,7 +119,7 @@
       </td>
     </tr>
     <tr>
-      <td>Assignee</td>
+      <th>Assignee</th>
       <td>
         {% if authenticated and mergeform and pull_request.status == True %}
         <form method="POST" action="{{ url_for('.set_assignee_requests',
