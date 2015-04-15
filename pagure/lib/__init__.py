@@ -824,7 +824,7 @@ def update_project_settings(session, repo, settings, user):
     if not update:
         return 'No settings to change'
     else:
-        repo.save_settings(new_settings)
+        repo.settings = new_settings
         session.add(repo)
         session.flush()
         pagure.lib.notify.fedmsg_publish(

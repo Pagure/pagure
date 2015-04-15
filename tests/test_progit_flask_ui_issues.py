@@ -180,7 +180,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         # Project w/o issue tracker
         repo = pagure.lib.get_project(self.session, 'test')
-        repo.save_settings({'issue_tracker': False})
+        repo.settings = {'issue_tracker': False}
         self.session.add(repo)
         self.session.commit()
 
@@ -282,7 +282,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         # Project w/o issue tracker
         repo = pagure.lib.get_project(self.session, 'test')
-        repo.save_settings({'issue_tracker': False})
+        repo.settings = {'issue_tracker': False}
         self.session.add(repo)
         self.session.commit()
 
@@ -526,7 +526,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         # Project w/o issue tracker
         repo = pagure.lib.get_project(self.session, 'test')
-        repo.save_settings({'issue_tracker': False})
+        repo.settings = {'issue_tracker': False}
         self.session.add(repo)
         self.session.commit()
 
@@ -623,7 +623,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         # Project w/o issue tracker
         repo = pagure.lib.get_project(self.session, 'test')
-        repo.save_settings({'issue_tracker': False})
+        repo.settings = {'issue_tracker': False}
         self.session.add(repo)
         self.session.commit()
 

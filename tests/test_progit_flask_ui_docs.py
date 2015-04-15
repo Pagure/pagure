@@ -82,7 +82,7 @@ class PagureFlaskDocstests(tests.Modeltests):
         self.assertTrue(
             'git clone git@pagure.org:docs/test.git' in output.data)
 
-        repo.save_settings({'project_documentation': False})
+        repo.settings = {'project_documentation': False}
         self.session.add(repo)
         self.session.commit()
 
