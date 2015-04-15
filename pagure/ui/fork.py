@@ -45,6 +45,8 @@ def request_pulls(repo, username=None):
     """ Request pulling the changes from the fork into the project.
     """
     status = flask.request.args.get('status', True)
+    assignee = flask.request.args.get('assignee', None)
+    author = flask.request.args.get('author', None)
 
     repo = pagure.lib.get_project(SESSION, repo, user=username)
 
@@ -56,14 +58,32 @@ def request_pulls(repo, username=None):
 
     if status is False or str(status).lower() == 'closed':
         requests = pagure.lib.search_pull_requests(
-            SESSION, project_id=repo.id, status=False)
+            SESSION,
+            project_id=repo.id,
+            status=False,
+            assignee=assignee,
+            author=author)
         oth_requests = pagure.lib.search_pull_requests(
-            SESSION, project_id=repo.id, status=True, count=True)
+            SESSION,
+            project_id=repo.id,
+            status=True,
+            assignee=assignee,
+            author=author,
+            count=True)
     else:
         requests = pagure.lib.search_pull_requests(
-            SESSION, project_id=repo.id, status=status)
+            SESSION,
+            project_id=repo.id,
+            assignee=assignee,
+            author=author,
+            status=status)
         oth_requests = pagure.lib.search_pull_requests(
-            SESSION, project_id=repo.id, status=False, count=True)
+            SESSION,
+            project_id=repo.id,
+            status=False,
+            assignee=assignee,
+            author=author,
+            count=True)
 
     return flask.render_template(
         'requests.html',
@@ -73,6 +93,8 @@ def request_pulls(repo, username=None):
         requests=requests,
         oth_requests=oth_requests,
         status=status,
+        assignee=assignee,
+        author=author,
     )
 
 

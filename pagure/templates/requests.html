@@ -22,6 +22,13 @@
                  repo=repo.name) }}">
       ({{ oth_requests }} Open)</a>
   {% endif %}
+
+  <aside id="issue_action">
+      <a class="btn_reset" href="{{ url_for('request_pulls', username=username,
+                 repo=repo.name) }}">
+        <button>Reset all filters</button>
+      </a>
+    </aside>
 </div>
 
 <table class="list requests">
@@ -31,6 +38,10 @@
             <th>Title</th>
             <th class="open_by">Opened by</th>
             <th class="open_date">Opened on</th>
+            <th class="assigned">
+              Assigned to (<a href="{{ url_for('request_pulls', username=username,
+                repo=repo.name, author=author, status=status) }}">reset</a>)
+            </th>
         </tr>
     </thead>
     <tfoot>
@@ -40,21 +51,36 @@
         <tr>
             <td>#{{ request.id }}</td>
             <td>
-                <a href="{{ url_for('request_pull', username=username,
-                    repo=repo.name, requestid=request.id) }}">
-                    {{ request.title }}
-                </a>
+              <a href="{{ url_for('request_pull', username=username,
+                  repo=repo.name, requestid=request.id) }}">
+                {{ request.title }}
+              </a>
             </td>
             <td>
-                <a href="{{ url_for('view_user', username=request.user.user) }}">
-                    {{ request.user.user | avatar(16) | safe }}
-                    {{ request.user.user }}
-                </a>
+              <a href="{{ url_for('request_pulls', username=username,
+                  repo=repo.name, author=request.user.user,
+                  tags=tags, assignee=assignee, status=status) }}"
+                  title="Filter requests by reporter">
+                {{ request.user.user | avatar(16) | safe }}
+                {{ request.user.user }}
+              </a>
             </td>
             <td>
                 {{ request.date_created.strftime('%Y-%m-%d %H:%M') }}
             </td>
-
+            <td>
+              {% if request.assignee %}
+              <a href="{{ url_for('request_pulls', username=username,
+                repo=repo.name, assignee=request.assignee.username,
+                author=author, status=status) }}"
+                title="Filter issues by assignee">
+                {{ request.assignee.user | avatar(16) | safe }}
+                {{ request.assignee.user }}
+              </a>
+              {% else %}
+              <a href="{{ url_for('request_pulls', username=username,
+                repo=repo.name, author=author, status=status) }}">(unassigned)</a>
+              {% endif %}
             </td>
         </tr>
     {% else %}
