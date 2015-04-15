@@ -427,6 +427,7 @@
     $(obj).html(preview);
   });
 
+  {% if pull_request.status == True %}
   $(function(){
     $.ajax({
       url: '{{ url_for("internal_ns.mergeable_request_pull") }}' ,
@@ -447,6 +448,7 @@
     });
     return false;
   });
+  {% endif %}
 
 {% endif %}
 
