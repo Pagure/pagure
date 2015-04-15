@@ -44,8 +44,13 @@
     <tr>
       <td><label for="{{ key }}">Activate {{ key | replace('_', ' ') }}</label></td>
       <td>
+        {% if repo.settings[key] in [True, False, 'y'] %}
         <input id="{{ key }}" type="checkbox" value="y" name="{{ key }}" {%
-         if repo.settings[key] -%}checked=""{%- endif -%}>
+         if repo.settings[key] -%}checked=""{%- endif -%}/>
+        {% else %}
+        <input id="{{ key }}" type="text" value="{{ repo.settings[key] }}"
+         name="{{ key }}" />
+        {% endif %}
       </td>
     </tr>
     {% endfor %}
