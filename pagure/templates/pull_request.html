@@ -104,11 +104,11 @@
       <th>From</th>
       <td>
         <a href="{{ url_for('view_repo_branch',
-          username=pull_request.repo_from.user.user if pull_request.repo_from.is_fork,
-          repo=pull_request.repo_from.name,
+          username=pull_request.project_from.user.user if pull_request.project_from.is_fork,
+          repo=pull_request.project_from.name,
           branchname=pull_request.branch_from)
         }}">
-          {{ pull_request.repo_from.fullname }} ({{ pull_request.branch_from }})
+          {{ pull_request.project_from.fullname }} ({{ pull_request.branch_from }})
         </a>
       </td>
     </tr>
@@ -126,9 +126,9 @@
   <ul>
     {% for commit in diff_commits %}
     <li>
-    {% if pull_request and pull_request.status and pull_request.repo_from.is_fork %}
-      <a href="{{ url_for('view_commit', username=pull_request.repo_from.user.user,
-                  repo=pull_request.repo_from.name, commitid=commit.oid.hex)}}">
+    {% if pull_request and pull_request.status and pull_request.project_from.is_fork %}
+      <a href="{{ url_for('view_commit', username=pull_request.project_from.user.user,
+                  repo=pull_request.project_from.name, commitid=commit.oid.hex)}}">
     {% else %}
       <a href="{{ url_for('view_commit', username=username,
                   repo=repo.name, commitid=commit.oid.hex)}}">
@@ -170,8 +170,8 @@
         <a class="button view" href="{{
             url_for(
                 'view_file',
-                username=pull_request.repo_from.user.username,
-                repo=pull_request.repo_from.name,
+                username=pull_request.project_from.user.username,
+                repo=pull_request.project_from.name,
                 identifier=pull_request.branch_from,
                 filename=patch.new_file_path) }}"
         {% else %}

@@ -138,7 +138,7 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
                 if authenticated() and (
                         (comment.parent.status is True
                          and comment.user.user == flask.g.fas_user.username)
-                        or is_repo_admin(comment.parent.repo)):
+                        or is_repo_admin(comment.parent.project)):
                     templ_delete = tpl_delete % ({'commentid': comment.id})
 
                 output.append(

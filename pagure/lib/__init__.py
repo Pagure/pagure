@@ -545,7 +545,7 @@ def add_pull_request_comment(session, request, commit, filename, row,
     session.flush()
 
     pagure.lib.git.update_git(
-        request, repo=request.repo, repofolder=requestfolder)
+        request, repo=request.project, repofolder=requestfolder)
 
     if notify:
         pagure.lib.notify.notify_pull_request_comment(pr_comment, user_obj)
@@ -695,7 +695,7 @@ def new_pull_request(session, repo_from, branch_from,
     session.flush()
 
     pagure.lib.git.update_git(
-        request, repo=request.repo, repofolder=requestfolder)
+        request, repo=request.project, repofolder=requestfolder)
 
     if notify:
         pagure.lib.notify.notify_new_pull_request(request)
@@ -1186,7 +1186,7 @@ def close_pull_request(session, request, user, requestfolder, merged=True):
         pagure.lib.notify.notify_cancelled_pull_request(request, user_obj)
 
     pagure.lib.git.update_git(
-        request, repo=request.repo, repofolder=requestfolder)
+        request, repo=request.project, repofolder=requestfolder)
 
     pagure.lib.notify.fedmsg_publish(
         'pull-request.closed',

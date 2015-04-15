@@ -457,7 +457,7 @@ index 458821a..77674a8
         self.assertEqual(msg, 'Request created')
         request = repo.requests[0]
         self.assertEqual(request.title, 'test PR')
-        pagure.lib.git.update_git(request, request.repo, tests.HERE)
+        pagure.lib.git.update_git(request, request.project, tests.HERE)
 
         repo = pygit2.Repository(self.gitrepo)
         commit = repo.revparse_single('HEAD')

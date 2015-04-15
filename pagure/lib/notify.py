@@ -263,16 +263,16 @@ def notify_new_pull_request(request):
 To reply, visit the link below or just reply to this email
 %s
 """ % (request.user.user,
-       request.repo.name,
+       request.project.name,
        request.title,
        _build_url(
            pagure.APP.config['APP_URL'],
-           request.repo.name,
+           request.project.name,
            'pull-request',
            request.id))
     mail_to = set([cmt.user.default_email for cmt in request.comments])
-    mail_to.add(request.repo.user.default_email)
-    for prouser in request.repo.users:
+    mail_to.add(request.project.user.default_email)
+    for prouser in request.project.users:
         if prouser.default_email:
             mail_to.add(prouser.default_email)
 
@@ -299,16 +299,16 @@ Merged pull-request:
 
 %s
 """ % (user.username,
-       request.repo.name,
+       request.project.name,
        request.title,
        _build_url(
            pagure.APP.config['APP_URL'],
-           request.repo.name,
+           request.project.name,
            'pull-request',
            request.id))
     mail_to = set([cmt.user.default_email for cmt in request.comments])
-    mail_to.add(request.repo.user.default_email)
-    for prouser in request.repo.users:
+    mail_to.add(request.project.user.default_email)
+    for prouser in request.project.users:
         if prouser.default_email:
             mail_to.add(prouser.default_email)
 
@@ -337,16 +337,16 @@ Cancelled pull-request:
 
 %s
 """ % (user.username,
-       request.repo.name,
+       request.project.name,
        request.title,
        _build_url(
            pagure.APP.config['APP_URL'],
-           request.repo.name,
+           request.project.name,
            'pull-request',
            request.id))
     mail_to = set([cmt.user.default_email for cmt in request.comments])
-    mail_to.add(request.repo.user.default_email)
-    for prouser in request.repo.users:
+    mail_to.add(request.project.user.default_email)
+    for prouser in request.project.users:
         if prouser.default_email:
             mail_to.add(prouser.default_email)
 
@@ -377,14 +377,14 @@ To reply, visit the link below or just reply to this email
        comment.comment,
        _build_url(
            pagure.APP.config['APP_URL'],
-           comment.pull_request.repo.name,
+           comment.pull_request.project.name,
            'pull-request',
            comment.pull_request.id))
     mail_to = set([
         cmt.user.default_email
         for cmt in comment.pull_request.comments])
-    mail_to.add(comment.pull_request.repo.user.default_email)
-    for prouser in comment.pull_request.repo.users:
+    mail_to.add(comment.pull_request.project.user.default_email)
+    for prouser in comment.pull_request.project.users:
         if prouser.default_email:
             mail_to.add(prouser.default_email)
 
@@ -393,7 +393,7 @@ To reply, visit the link below or just reply to this email
     send_email(
         text,
         'Update to %s pull-Request #%s `%s`' % (
-            comment.pull_request.repo.name,
+            comment.pull_request.project.name,
             comment.pull_request.id,
             comment.pull_request.title),
         ','.join(mail_to),

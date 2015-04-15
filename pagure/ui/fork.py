@@ -96,7 +96,7 @@ def request_pull(repo, requestid, username=None):
     if not request:
         flask.abort(404, 'Pull-request not found')
 
-    repo_from = request.repo_from
+    repo_from = request.project_from
     repopath = pagure.get_repo_path(repo_from)
     repo_obj = pygit2.Repository(repopath)
 
@@ -142,7 +142,7 @@ def request_pull(repo, requestid, username=None):
                 try:
                     SESSION.commit()
                     pagure.lib.git.update_git(
-                        request, repo=request.repo,
+                        request, repo=request.project,
                         repofolder=APP.config['REQUESTS_FOLDER'])
                 except SQLAlchemyError as err:
                     SESSION.rollback()
@@ -177,7 +177,7 @@ def request_pull(repo, requestid, username=None):
         repo=repo,
         username=username,
         pull_request=request,
-        repo_admin=is_repo_admin(request.repo),
+        repo_admin=is_repo_admin(request.project),
         diff_commits=diff_commits,
         diff=diff,
         mergeform=form,
@@ -204,7 +204,7 @@ def request_pull_patch(repo, requestid, username=None):
     if not request:
         flask.abort(404, 'Pull-request not found')
 
-    repo_from = request.repo_from
+    repo_from = request.project_from
     repopath = pagure.get_repo_path(repo_from)
     repo_obj = pygit2.Repository(repopath)
 
@@ -276,7 +276,7 @@ def pull_request_add_comment(
 
     request = pagure.lib.search_pull_requests(
         SESSION, project_id=repo.id, requestid=requestid)
-    repo = request.repo_from
+    repo = request.project_from
 
     if not request:
         flask.abort(404, 'Pull-request not found')
@@ -355,7 +355,7 @@ def pull_request_drop_comment(repo, requestid, username=None):
 
             comment = pagure.lib.get_request_comment(
                 SESSION, request.uid, commentid)
-            if comment is None or comment.pull_request.repo != repo:
+            if comment is None or comment.pull_request.project != repo:
                 flask.abort(404, 'Comment not found')
 
             if (flask.g.fas_user.username != comment.user.username
@@ -422,11 +422,11 @@ def merge_request_pull(repo, requestid, username=None):
             username=username)
 
     # Get the fork
-    repopath = pagure.get_repo_path(request.repo_from)
+    repopath = pagure.get_repo_path(request.project_from)
     fork_obj = pygit2.Repository(repopath)
 
     # Get the original repo
-    parentpath = pagure.get_repo_path(request.repo)
+    parentpath = pagure.get_repo_path(request.project)
 
     # Clone the original repo into a temp folder
     newpath = tempfile.mkdtemp()

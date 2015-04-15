@@ -619,20 +619,20 @@ class PullRequest(BASE):
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
 
-    repo = relation(
+    project = relation(
         'Project', foreign_keys=[project_id], remote_side=[Project.id],
         backref=backref(
             'requests', cascade="delete, delete-orphan",
         ),
         single_parent=True)
-    repo_from = relation(
+    project_from = relation(
         'Project', foreign_keys=[project_id_from], remote_side=[Project.id])
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id], backref='pull_requests')
 
     def __repr__(self):
         return 'PullRequest(%s, project:%s, user:%s, title:%s)' % (
-            self.id, self.repo.name, self.user.user, self.title
+            self.id, self.project.name, self.user.user, self.title
         )
 
     @property
@@ -640,7 +640,7 @@ class PullRequest(BASE):
         ''' Return a unique reprensetation of the issue as string that
         can be used when sending emails.
         '''
-        return '%s-pull-request-%s@pagure' % (self.repo.name, self.uid)
+        return '%s-pull-request-%s@pagure' % (self.project.name, self.uid)
 
     @property
     def discussion(self):
@@ -658,9 +658,9 @@ class PullRequest(BASE):
             'uid': self.uid,
             'title': self.title,
             'branch': self.branch,
-            'project': self.repo.to_json(),
+            'project': self.project.to_json(),
             'branch_from': self.branch_from,
-            'repo_from': self.repo_from.to_json(),
+            'repo_from': self.project_from.to_json(),
             'date_created': self.date_created.strftime('%s'),
             'user': self.user.to_json(),
             'status': self.status,
@@ -743,7 +743,7 @@ class PullRequestComment(BASE):
         can be used when sending emails.
         '''
         return '%s-pull-request-%s-%s@pagure' % (
-            self.pull_request.repo.name, self.pull_request.uid, self.id)
+            self.pull_request.project.name, self.pull_request.uid, self.id)
 
     @property
     def parent(self):
