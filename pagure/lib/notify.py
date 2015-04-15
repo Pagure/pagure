@@ -130,8 +130,8 @@ def send_email(text, subject, to_mail,
 
     # Send the message via our own SMTP server, but don't include the
     # envelope header.
-    smtp = smtplib.SMTP(pagure.APP.config['SMTP_SERVER'])
     for mailto in to_mail.split(','):
+        smtp = smtplib.SMTP(pagure.APP.config['SMTP_SERVER'])
         lcl_msg = msg
         lcl_msg['To'] = mailto
         salt = pagure.APP.config.get('SALT_EMAIL')
