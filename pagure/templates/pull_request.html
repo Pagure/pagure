@@ -439,7 +439,7 @@
       success: function(res) {
         var _obj = $('.header .buttons');
         _obj.prepend($('<li><span class="'+res.code+'" title="'
-          +res.message+'"></span></li>'));
+          +res.message+'">'+res.short_code+'</span></li>'));
       },
       error: function() {
         alert('Unable to generate preview!');
