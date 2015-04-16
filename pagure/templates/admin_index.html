@@ -23,6 +23,19 @@
     {{ form.csrf_token }}
     </form>
   </li>
+  <li>
+    <form action="{{ url_for('admin_generate_hook_token') }}" method="post">
+    <input type="submit" class="submit positive button"
+        value="Re-generate hook-token for every projects">
+    {{ form.csrf_token }}
+    </form>
+    <p>
+      This action can be used in case you need to change the hook-token for
+      *all* the projects hosted on this pagure instance. This can be due to
+      security reason. Beware that using it will break every web-hook
+      consumer of every project hosted.
+    </p>
+  </li>
 {% if config['PAGURE_AUTH'] == 'local' %}
   <li>
     <a href="{{ url_for('admin_groups') }}">
