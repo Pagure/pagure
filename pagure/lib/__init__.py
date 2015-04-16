@@ -164,9 +164,10 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
         pagure.lib.notify.notify_new_comment(issue_comment, user=user_obj)
 
     if not issue.private:
-        pagure.lib.notify.fedmsg_publish(
-            'issue.comment.added',
-            dict(
+        pagure.lib.notify.log(
+            issue.project,
+            topic='issue.comment.added',
+            msg=dict(
                 issue=issue.to_json(),
                 project=issue.project.to_json(),
                 agent=user_obj.username,
@@ -212,9 +213,10 @@ def add_issue_tag(session, issue, tags, user, ticketfolder):
         issue, repo=issue.project, repofolder=ticketfolder)
 
     if not issue.private:
-        pagure.lib.notify.fedmsg_publish(
-            'issue.tag.added',
-            dict(
+        pagure.lib.notify.log(
+            issue.project,
+            topic='issue.tag.added',
+            msg=dict(
                 issue=issue.to_json(),
                 project=issue.project.to_json(),
                 tags=added_tags,
@@ -241,9 +243,10 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
 
         pagure.lib.notify.notify_assigned_issue(issue, None, user_obj)
         if not issue.private:
-            pagure.lib.notify.fedmsg_publish(
-                'issue.assigned.reset',
-                dict(
+            pagure.lib.notify.log(
+                issue.project,
+                topic='issue.assigned.reset',
+                msg=dict(
                     issue=issue.to_json(),
                     project=issue.project.to_json(),
                     agent=user_obj.username,
@@ -268,9 +271,10 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
             issue, assignee_obj, user_obj)
 
         if not issue.private:
-            pagure.lib.notify.fedmsg_publish(
-                'issue.assigned.added',
-                dict(
+            pagure.lib.notify.log(
+                issue.project,
+                topic='issue.assigned.added',
+                msg=dict(
                     issue=issue.to_json(),
                     project=issue.project.to_json(),
                     agent=user_obj.username,
@@ -291,9 +295,10 @@ def add_pull_request_assignee(session, request, assignee, user, requestfolder):
             request, repo=request.project, repofolder=requestfolder)
 
         pagure.lib.notify.notify_assigned_request(request, None, user_obj)
-        pagure.lib.notify.fedmsg_publish(
-            'request.assigned.reset',
-            dict(
+        pagure.lib.notify.log(
+            request.project,
+            topic='request.assigned.reset',
+            msg=dict(
                 request=request.to_json(),
                 project=request.project.to_json(),
                 agent=user_obj.username,
@@ -317,9 +322,10 @@ def add_pull_request_assignee(session, request, assignee, user, requestfolder):
         pagure.lib.notify.notify_assigned_request(
             request, assignee_obj, user_obj)
 
-        pagure.lib.notify.fedmsg_publish(
-            'request.assigned.added',
-            dict(
+        pagure.lib.notify.log(
+            request.project,
+            topic='request.assigned.added',
+            msg=dict(
                 request=request.to_json(),
                 project=request.project.to_json(),
                 agent=user_obj.username,
@@ -358,9 +364,10 @@ def add_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
         #pagure.lib.notify.notify_assigned_issue(issue_blocked, user_obj)
 
         if not issue.private:
-            pagure.lib.notify.fedmsg_publish(
-                'issue.dependency.added',
-                dict(
+            pagure.lib.notify.log(
+                issue.project,
+                topic='issue.dependency.added',
+                msg=dict(
                     issue=issue.to_json(),
                     project=issue.project.to_json(),
                     added_dependency=issue_blocked.id,
@@ -402,9 +409,10 @@ def remove_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
         #pagure.lib.notify.notify_assigned_issue(issue_blocked, user_obj)
 
         if not issue.private:
-            pagure.lib.notify.fedmsg_publish(
-                'issue.dependency.removed',
-                dict(
+            pagure.lib.notify.log(
+                issue.project,
+                topic='issue.dependency.removed',
+                msg=dict(
                     issue=issue.to_json(),
                     project=issue.project.to_json(),
                     removed_dependency=child_del,
@@ -441,9 +449,10 @@ def remove_tags(session, project, tags, ticketfolder, user):
             pagure.lib.git.update_git(
                 issue, repo=issue.project, repofolder=ticketfolder)
 
-    pagure.lib.notify.fedmsg_publish(
-        'project.tag.removed',
-        dict(
+    pagure.lib.notify.log(
+        project,
+        topic='project.tag.removed',
+        msg=dict(
             project=project.to_json(),
             tags=removed_tags,
             agent=user_obj.username,
@@ -470,9 +479,10 @@ def remove_tags_issue(session, issue, tags, ticketfolder, user):
     pagure.lib.git.update_git(
         issue, repo=issue.project, repofolder=ticketfolder)
 
-    pagure.lib.notify.fedmsg_publish(
-        'issue.tag.removed',
-        dict(
+    pagure.lib.notify.log(
+        issue.project,
+        topic='issue.tag.removed',
+        msg=dict(
             issue=issue.to_json(),
             project=issue.project.to_json(),
             tags=removed_tags,
@@ -530,9 +540,10 @@ def edit_issue_tags(session, project, old_tag, new_tag, ticketfolder, user):
                 issue, repo=issue.project, repofolder=ticketfolder)
 
         msgs.append('Edited tag: %s to %s' % (old_tag, new_tag))
-        pagure.lib.notify.fedmsg_publish(
-            'project.tag.edited',
-            dict(
+        pagure.lib.notify.log(
+            project,
+            topic='project.tag.edited',
+            msg=dict(
                 project=project.to_json(),
                 old_tag=old_tag,
                 new_tag=new_tag,
@@ -563,9 +574,10 @@ def add_user_to_project(session, project, new_user, user):
     # Make sure we won't have SQLAlchemy error before we create the repo
     session.flush()
 
-    pagure.lib.notify.fedmsg_publish(
-        'project.user.added',
-        dict(
+    pagure.lib.notify.log(
+        project,
+        topic='project.user.added',
+        msg=dict(
             project=project.to_json(),
             new_user=new_user_obj.username,
             agent=user_obj.username,
@@ -598,9 +610,10 @@ def add_pull_request_comment(session, request, commit, filename, row,
     if notify:
         pagure.lib.notify.notify_pull_request_comment(pr_comment, user_obj)
 
-    pagure.lib.notify.fedmsg_publish(
-        'pull-request.comment.added',
-        dict(
+    pagure.lib.notify.log(
+        request.project,
+        topic='pull-request.comment.added',
+        msg=dict(
             pullrequest=request.to_json(),
             agent=user_obj.username,
         )
@@ -667,9 +680,10 @@ def new_project(session, user, name, blacklist,
         )
     pygit2.init_repository(requestrepo, bare=True)
 
-    pagure.lib.notify.fedmsg_publish(
-        'project.new',
-        dict(
+    pagure.lib.notify.log(
+        project,
+        topic='project.new',
+        msg=dict(
             project=project.to_json(),
             agent=user_obj.username,
         )
@@ -708,9 +722,10 @@ def new_issue(session, repo, title, content, user, ticketfolder,
         pagure.lib.notify.notify_new_issue(issue, user=user_obj)
 
     if not private:
-        pagure.lib.notify.fedmsg_publish(
-            'issue.new',
-            dict(
+        pagure.lib.notify.log(
+            issue.project,
+            topic='issue.new',
+            msg=dict(
                 issue=issue.to_json(),
                 project=issue.project.to_json(),
                 agent=user_obj.username,
@@ -748,9 +763,10 @@ def new_pull_request(session, repo_from, branch_from,
     if notify:
         pagure.lib.notify.notify_new_pull_request(request)
 
-    pagure.lib.notify.fedmsg_publish(
-        'pull-request.new',
-        dict(
+    pagure.lib.notify.log(
+        request.project,
+        topic='pull-request.new',
+        msg=dict(
             pullrequest=request.to_json(),
             agent=user_obj.username,
         )
@@ -790,9 +806,10 @@ def edit_issue(session, issue, ticketfolder, user,
         issue, repo=issue.project, repofolder=ticketfolder)
 
     if not issue.private and edit:
-        pagure.lib.notify.fedmsg_publish(
-            'issue.edit',
-            dict(
+        pagure.lib.notify.log(
+            issue.project,
+            topic='issue.edit',
+            msg=dict(
                 issue=issue.to_json(),
                 project=issue.project.to_json(),
                 fields=edit,
@@ -829,9 +846,10 @@ def update_project_settings(session, repo, settings, user):
         repo.settings = new_settings
         session.add(repo)
         session.flush()
-        pagure.lib.notify.fedmsg_publish(
-            'project.edit',
-            dict(
+        pagure.lib.notify.log(
+            repo,
+            topic='project.edit',
+            msg=dict(
                 project=repo.to_json(),
                 fields=update,
                 agent=user_obj.username,
@@ -899,9 +917,10 @@ def fork_project(session, user, repo, gitfolder,
         )
     pygit2.init_repository(requestrepo, bare=True)
 
-    pagure.lib.notify.fedmsg_publish(
-        'project.forked',
-        dict(
+    pagure.lib.notify.log(
+        project,
+        topic='project.forked',
+        msg=dict(
             project=project.to_json(),
             agent=user_obj.username,
         )
@@ -1275,9 +1294,10 @@ def close_pull_request(session, request, user, requestfolder, merged=True):
     pagure.lib.git.update_git(
         request, repo=request.project, repofolder=requestfolder)
 
-    pagure.lib.notify.fedmsg_publish(
-        'pull-request.closed',
-        dict(
+    pagure.lib.notify.log(
+        request.project,
+        topic='pull-request.closed',
+        msg=dict(
             pullrequest=request.to_json(),
             merged=merged,
             agent=user_obj.username,

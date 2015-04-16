@@ -36,6 +36,16 @@ def fedmsg_publish(*args, **kwargs):  # pragma: no cover
         warnings.warn(str(err))
 
 
+def log(project, topic, msg):
+    ''' This is the place where we send notifications to user about actions
+    occuring in pagure.
+    '''
+    # Send fedmsg notification (if fedmsg is there and set-up)
+    fedmsg_publish(topic, msg)
+
+    # Send web-hooks notification
+
+
 def _clean_emails(emails, user):
     ''' Remove the email of the user doing the action if it is in the list.
 
