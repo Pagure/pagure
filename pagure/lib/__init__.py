@@ -835,6 +835,8 @@ def update_project_settings(session, repo, settings, user):
                 update.append(key)
                 if key == 'Minimum_score_to_merge_pull-request':
                     settings[key] = settings[key] or -1
+                elif key == 'Web-hooks':
+                    settings[key] = settings[key] or None
                 new_settings[key] = settings[key]
         else:
             update.append(key)
