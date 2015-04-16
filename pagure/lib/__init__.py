@@ -1672,3 +1672,14 @@ def search_pending_email(session, email=None, token=None):
     output = query.first()
 
     return output
+
+
+def generate_hook_token(session):
+    ''' For each project in the database, re-generate a unique hook_token.
+
+    '''
+
+    for project in search_projects(session):
+        project.hook_token = pagure.lib.login.id_generator(40)
+        session.add(project)
+    session.commit()
