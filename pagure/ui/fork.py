@@ -747,6 +747,7 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
     commitid = branch.get_object().hex
 
     diff_commits = []
+    diff = None
     if not repo_obj.is_empty and not orig_repo.is_empty:
         orig_commit = orig_repo[
             orig_repo.lookup_branch(branch_to).get_object().hex]
@@ -765,11 +766,12 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
                 break
             diff_commits.append(commit)
 
-        first_commit = repo_obj[diff_commits[-1].oid.hex]
-        diff = repo_obj.diff(
-            repo_obj.revparse_single(first_commit.parents[0].oid.hex),
-            repo_obj.revparse_single(diff_commits[0].oid.hex)
-        )
+        if diff_commits:
+            first_commit = repo_obj[diff_commits[-1].oid.hex]
+            diff = repo_obj.diff(
+                repo_obj.revparse_single(first_commit.parents[0].oid.hex),
+                repo_obj.revparse_single(diff_commits[0].oid.hex)
+            )
 
     elif orig_repo.is_empty:
         orig_commit = None
