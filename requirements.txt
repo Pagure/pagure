@@ -12,9 +12,11 @@ psutil
 pygit2 >= 0.20.1
 pygments
 python-fedora
+python-kitchen
 python-openid
 python-openid-cla
 python-openid-teams
+six
 sqlalchemy >= 0.8
 straight.plugin==1.4.0-post-1
 wtforms
