@@ -632,6 +632,8 @@ def view_settings(repo, username=None):
             flask.flash(message)
             return flask.redirect(flask.url_for(
                 'view_repo', username=username, repo=repo.name))
+        except pagure.exceptions.PagureException, err:
+            flask.flash(str(err), 'error')
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')
