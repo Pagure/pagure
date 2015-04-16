@@ -26,6 +26,21 @@
     </form>
   </div>
 
+  <div>
+    <h3>Private web-hook key</h3>
+    <p>
+      Each message sent to the web-hook are signed via hmac and SHA1 using
+      this private key.
+    </p>
+    <p>
+      This key is private to your project, make sure to store in a safe place
+      and do not share it.
+    </p>
+    <pre>
+        {{ repo.hook_token }}
+    </pre>
+  </div>
+
   <h3>Delete project</h3>
   <form action="{{ url_for('.delete_repo',
                   username=username, repo=repo.name) }}" method="post">
