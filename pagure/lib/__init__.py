@@ -645,7 +645,8 @@ def new_project(session, user, name, blacklist,
         name=name,
         description=description,
         user_id=user_obj.id,
-        parent_id=parent_id
+        parent_id=parent_id,
+        hook_token=pagure.lib.login.id_generator(40)
     )
     session.add(project)
     # Make sure we won't have SQLAlchemy error before we create the repo
