@@ -11,15 +11,24 @@ pagure notifications.
 
 import datetime
 import hashlib
+import hmac
+import json
 import urlparse
 import smtplib
+import six
 import time
+import uuid
 import warnings
 
 import flask
+import requests
 import pagure
 
 from email.mime.text import MIMEText
+from kitchen.text.converters import to_bytes
+
+
+_i = 0
 
 
 def fedmsg_publish(*args, **kwargs):  # pragma: no cover
@@ -44,6 +53,39 @@ def log(project, topic, msg):
     fedmsg_publish(topic, msg)
 
     # Send web-hooks notification
+    if project.settings.get('Web-hooks'):
+        global _i
+        _i += 1
+        year = datetime.datetime.now().year
+        if isinstance(topic, six.text_type):
+            topic = to_bytes(topic, encoding='utf8', nonstring="passthru")
+        msg = dict(
+            topic=topic.decode('utf-8'),
+            msg=msg,
+            timestamp=int(time.time()),
+            msg_id=str(year) + '-' + str(uuid.uuid4()),
+            i=_i,
+        )
+
+        content = json.dumps(msg)
+        hashhex = hmac.new(
+            project.hook_token, content, hashlib.sha1).hexdigest()
+        headers = {
+            'X-Pagure-Topic': topic,
+            'X-Pagure-Signature': hashhex
+        }
+        for url in project.settings.get('Web-hooks').split('\n'):
+            url = url.strip()
+            try:
+                req = requests.post(url, headers=headers, data={'payload': msg})
+                if not req:
+                    raise pagure.exceptions.PagureException(
+                        'An error occured while querying: %s - '
+                        'Error code: %s' % (url, req.status_code))
+            except (requests.exceptions.RequestException, Exception) as err:
+                raise pagure.exceptions.PagureException(
+                    'An error occured while querying: %s - Error: %s' % (
+                        url, err))
 
 
 def _clean_emails(emails, user):
