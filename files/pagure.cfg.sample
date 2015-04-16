@@ -101,6 +101,11 @@ SHORT_LENGTH = 6
 ### or other
 BLACKLISTED_PROJECTS = ['static', 'pv']
 
+### IP addresses allowed to access the internal endpoints
+### These endpoints are used by the milter and are security sensitive, thus
+### the IP filter
+IP_ALLOWED_INTERNAL = ['127.0.0.1', 'localhost', '::1']
+
 
 # Authentication related configuration option
 

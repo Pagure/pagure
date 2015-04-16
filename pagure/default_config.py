@@ -41,6 +41,9 @@ ITEM_PER_PAGE = 50
 # Maximum size of the uploaded content
 MAX_CONTENT_LENGTH = 4 * 1024 * 1024  # 4 megabytes
 
+# IP addresses allowed to access the internal endpoints
+IP_ALLOWED_INTERNAL = ['127.0.0.1', 'localhost', '::1']
+
 # Folder containing to the git repos
 GIT_FOLDER = os.path.join(
     os.path.abspath(os.path.dirname(__file__)),

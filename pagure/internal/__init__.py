@@ -38,8 +38,9 @@ def localonly(function):
     def decorated_function(*args, **kwargs):
         ''' Wrapped function actually checking if the request is local.
         '''
-        if flask.request.remote_addr not in [
-                '127.0.0.1', 'localhost', '::1']:
+        ip_allowed = pagure.APP.config.get(
+            'IP_ALLOWED_INTERNAL', ['127.0.0.1', 'localhost', '::1'])
+        if flask.request.remote_addr not in ip_allowed:
             flask.abort(403)
         else:
             return function(*args, **kwargs)
