@@ -160,6 +160,7 @@ class User(BASE):
         output = {
             'name': self.user,
             'fullname': self.fullname,
+            'default_email': self.default_email,
             'emails': [email.email for email in self.emails],
         }
         return output
