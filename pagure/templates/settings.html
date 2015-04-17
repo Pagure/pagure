@@ -39,17 +39,20 @@
     <pre>
         {{ repo.hook_token }}
     </pre>
-  </div>
-
-  <h3>Delete project</h3>
-  <form action="{{ url_for('.delete_repo',
-                  username=username, repo=repo.name) }}" method="post">
-    <button class="delete_icon" type="submit"
-      onclick="return confirm('Are you sure to delete this project/fork? \nThis is final and cannot be un-done.');"
-      title="Delete the project/forl">
-      Delete
+    <form action="{{ url_for('.new_repo_hook_token',
+                  username=username, repo=repo.name) }}"
+        method="post" class="icon">
+    <button class="icon_button" type="submit"
+      onclick="return confirm('Are you sure to generate a new token for '
+        + 'this project/fork? \nThis will break all web hook in place and '
+        + 'cannot be un-done.');"
+      title="Generate a new hook token">
+      <span class="icon icon-refresh blue"></span>
+      Re-generate
     </button>
   </form>
+  </div>
+
 
   <h3>Project's options</h3>
   <form action="{{ url_for('.view_settings',
@@ -186,6 +189,22 @@
     </li>
   {% endfor %}
   </ul>
+</section>
+
+
+<section class="delete">
+  <form action="{{ url_for('.delete_repo',
+                  username=username, repo=repo.name) }}"
+        method="post" class="icon">
+    <button class="icon_button" type="submit"
+      onclick="return confirm('Are you sure to delete this project/fork? \nThis is final and cannot be un-done.');"
+      title="Delete the project/fork">
+      <h3>
+        <span class="icon icon-trash blue"></span>
+        Delete project
+      </h3>
+    </button>
+  </form>
 </section>
 
 {% endblock %}
