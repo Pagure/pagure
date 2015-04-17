@@ -214,6 +214,7 @@ def get_user_from_json(session, jsondata):
     username = jsondata.get('user', {}).get('name')
     fullname = jsondata.get('user', {}).get('fullname')
     useremails = jsondata.get('user', {}).get('emails')
+    default_email = jsondata.get('user', {}).get('default_email')
     user = pagure.lib.search_user(session, username=username)
     if not user:
         for email in useremails:
@@ -226,7 +227,8 @@ def get_user_from_json(session, jsondata):
             session=session,
             username=username,
             fullname=fullname or username,
-            user_email=useremails[0],
+            default_email=default_email,
+            emails=useremails,
         )
         session.commit()
 

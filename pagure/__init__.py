@@ -235,7 +235,7 @@ def set_user(return_url):
             session=SESSION,
             username=flask.g.fas_user.username,
             fullname=flask.g.fas_user.fullname,
-            user_email=flask.g.fas_user.email,
+            default_email=flask.g.fas_user.email,
         )
         SESSION.commit()
     except SQLAlchemyError, err:

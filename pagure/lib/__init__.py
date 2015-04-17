@@ -1389,14 +1389,14 @@ def get_request_by_uid(session, request_uid):
     return query.first()
 
 
-def set_up_user(session, username, fullname, user_email):
+def set_up_user(session, username, fullname, default_email, emails=None):
     ''' Set up a new user into the database or update its information. '''
     user = search_user(session, username=username)
     if not user:
         user = model.User(
             user=username,
             fullname=fullname,
-            default_email=user_email
+            default_email=default_email
         )
         session.add(user)
         session.flush()
@@ -1406,7 +1406,13 @@ def set_up_user(session, username, fullname, user_email):
         session.add(user)
         session.flush()
 
-    add_email_to_user(session, user, user_email)
+    if emails:
+        emails = set(emails)
+    else:
+        emails = set()
+    emails.add(default_email)
+    for email in emails:
+        add_email_to_user(session, user, email)
 
     return user
 
