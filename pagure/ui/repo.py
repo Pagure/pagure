@@ -738,6 +738,38 @@ def delete_repo(repo, username=None):
         flask.url_for('view_user', username=flask.g.fas_user.username))
 
 
+@APP.route('/<repo>/hook_token', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/hook_token', methods=['POST'])
+@cla_required
+def new_repo_hook_token(repo, username=None):
+    """ Re-generate a hook token for the present project.
+    """
+    if admin_session_timedout():
+        return flask.redirect(
+            flask.url_for('auth_login', next=flask.request.url))
+
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    if not is_repo_admin(repo):
+        flask.abort(
+            403,
+            'You are not allowed to change the settings for this project')
+
+    try:
+        repo.hook_token = pagure.lib.login.id_generator(40)
+        SESSION.commit()
+    except SQLAlchemyError, err:  # pragma: no cover
+        SESSION.rollback()
+        APP.logger.exception(err)
+        flask.flash('Could not generate a new token for this project', 'error')
+
+    return flask.redirect(
+        flask.url_for('view_settings', repo=repo.name, username=username))
+
+
 @APP.route('/<repo>/dropuser/<userid>', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/dropuser/<userid>', methods=['POST'])
 @cla_required
