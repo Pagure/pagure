@@ -320,7 +320,7 @@ index 0000000..60f7480
 --- /dev/null
 +++ b/456
 @@ -0,0 +1 @@
-+{"status": "Open", "blocks": [], "tags": [], "title": "Test issue", "private": false, "content": "We should work on this", "assignee": null, "depends": [], "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "comments": []}
++{"status": "Open", "blocks": [], "tags": [], "title": "Test issue", "private": false, "content": "We should work on this", "assignee": null, "depends": [], "user": {"fullname": "PY C", "default_email": "bar@pingou.com", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "comments": []}
 \ No newline at end of file
 
 """
@@ -379,9 +379,9 @@ index 458821a..77674a8
 --- a/123
 +++ b/456
 @@ -1 +1 @@
--{"status": "Open", "blocks": [], "tags": [], "title": "Test issue", "private": false, "content": "We should work on this", "assignee": null, "depends": [], "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "comments": []}
+-{"status": "Open", "blocks": [], "tags": [], "title": "Test issue", "private": false, "content": "We should work on this", "assignee": null, "depends": [], "user": {"fullname": "PY C", "default_email": "bar@pingou.com", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "comments": []}
 \ No newline at end of file
-+{"status": "Open", "blocks": [], "tags": [], "title": "Test issue", "private": false, "content": "We should work on this", "assignee": null, "depends": [], "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "comments": [{"comment": "Hey look a comment!", "date_created": null, "id": 1, "parent": null, "user": {"fullname": "foo bar", "name": "foo", "emails": ["foo@bar.com"]}}]}
++{"status": "Open", "blocks": [], "tags": [], "title": "Test issue", "private": false, "content": "We should work on this", "assignee": null, "depends": [], "user": {"fullname": "PY C", "default_email": "bar@pingou.com", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "comments": [{"comment": "Hey look a comment!", "date_created": null, "id": 1, "parent": null, "user": {"fullname": "foo bar", "default_email": "foo@bar.com", "name": "foo", "emails": ["foo@bar.com"]}}]}
 \ No newline at end of file
 
 """
@@ -480,7 +480,7 @@ index 0000000..60f7480
 --- /dev/null
 +++ b/456
 @@ -0,0 +1 @@
-+{"status": true, "branch_from": "feature", "uid": "foobar", "title": "test PR", "comments": [], "project": {"description": "test project for ticket", "parent": null, "settings": {"Minimum_score_to_merge_pull-request": -1, "Web-hooks": null, "project_documentation": true, "pull_requests": true, "Only_assignee_can_merge_pull-request": false, "issue_tracker": true}, "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "name": "test_ticket_repo"}, "commit_stop": null, "repo_from": {"description": "test project for ticket", "parent": null, "settings": {"Minimum_score_to_merge_pull-request": -1, "Web-hooks": null, "project_documentation": true, "pull_requests": true, "Only_assignee_can_merge_pull-request": false, "issue_tracker": true}, "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "name": "test_ticket_repo"}, "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "branch": "master", "date_created": null, "commit_start": null, "id": 1}
++{"status": true, "branch_from": "feature", "uid": "foobar", "title": "test PR", "comments": [], "project": {"description": "test project for ticket", "parent": null, "settings": {"Minimum_score_to_merge_pull-request": -1, "Web-hooks": null, "project_documentation": true, "pull_requests": true, "Only_assignee_can_merge_pull-request": false, "issue_tracker": true}, "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "name": "test_ticket_repo"}, "commit_stop": null, "repo_from": {"description": "test project for ticket", "parent": null, "settings": {"Minimum_score_to_merge_pull-request": -1, "Web-hooks": null, "project_documentation": true, "pull_requests": true, "Only_assignee_can_merge_pull-request": false, "issue_tracker": true}, "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "name": "test_ticket_repo"}, "user": {"fullname": "PY C", "default_email": "bar@pingou.com", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "branch": "master", "date_created": null, "commit_start": null, "id": 1}
 \ No newline at end of file
 
 """
@@ -574,7 +574,9 @@ index 0000000..60f7480
             "status": "Open", "title": "Rename pagure", "private": False,
             "content": "This is too much of a conflict with the book",
             "user": {
-                "fullname": "Pierre-YvesChibon", "name": "pingou",
+                "fullname": "Pierre-YvesChibon",
+                "name": "pingou",
+                "default_email": "pingou@fedoraproject.org",
                 "emails": ["pingou@fedoraproject.org"]
             },
             "id": 20,
@@ -594,6 +596,7 @@ index 0000000..60f7480
                     "user": {
                         "fullname": "Pierre-YvesChibon",
                         "name": "pingou",
+                        "default_email": "pingou@fedoraproject.org",
                         "emails": ["pingou@fedoraproject.org"]
                     }
                 },
@@ -609,6 +612,7 @@ index 0000000..60f7480
                     "user": {
                         "fullname": "Ralph Bean",
                         "name": "ralph",
+                        "default_email": "ralph@fedoraproject.org",
                         "emails": ["ralph@fedoraproject.org"]
                     }
                 }
@@ -657,6 +661,7 @@ index 0000000..60f7480
                 "user": {
                     "fullname": "fake user",
                     "name": "fake",
+                    "default_email": "fake@fedoraproject.org",
                     "emails": ["fake@fedoraproject.org"]
                 },
                 "id": 1,
@@ -666,6 +671,7 @@ index 0000000..60f7480
             "user": {
                 "fullname": "Pierre-YvesChibon",
                 "name": "pingou",
+                "default_email": "pingou@fedoraproject.org",
                 "emails": ["pingou@fedoraproject.org"]
             },
             "id": 7,
@@ -675,6 +681,7 @@ index 0000000..60f7480
                     "user": {
                         "fullname": "Pierre-YvesChibon",
                         "name": "pingou",
+                        "default_email": "pingou@fedoraproject.org",
                         "emails": ["pingou@fedoraproject.org"]
                     },
                     "parent": None,
@@ -689,6 +696,7 @@ index 0000000..60f7480
                     "user": {
                         "fullname": "Pierre-YvesChibon",
                         "name": "pingou",
+                        "default_email": "pingou@fedoraproject.org",
                         "emails": [
                             "pingou@fedoraproject.org"
                         ]
@@ -705,6 +713,7 @@ index 0000000..60f7480
                     "user": {
                         "fullname": "Pierre-YvesChibon",
                         "name": "pingou",
+                        "default_email": "pingou@fedoraproject.org",
                         "emails": [
                             "pingou@fedoraproject.org"
                         ]
@@ -728,8 +737,9 @@ index 0000000..60f7480
                     "user": {
                         "fullname": "fake user",
                         "name": "fake",
+                        "default_email": "fake@fedoraproject.org",
                         "emails": [
-                            "py@pingoured.fr"
+                            "fake@fedoraproject.org"
                         ]
                     },
                     "settings": {
@@ -750,6 +760,7 @@ index 0000000..60f7480
                 "user": {
                     "fullname": "Pierre-YvesChibon",
                     "name": "pingou",
+                    "default_email": "pingou@fedoraproject.org",
                     "emails": [
                         "pingou@fedoraproject.org"
                     ]
@@ -808,6 +819,7 @@ index 0000000..60f7480
                 "user": {
                     "fullname": "fake user",
                     "name": "fake",
+                    "default_email": "fake@fedoraproject.org",
                     "emails": ["fake@fedoraproject.org"]
                 },
                 "settings": {
@@ -822,6 +834,7 @@ index 0000000..60f7480
             "user": {
                 "fullname": "Pierre-YvesChibon",
                 "name": "pingou",
+                "default_email": "pingou@fedoraproject.org",
                 "emails": ["pingou@fedoraproject.org"]
             },
             "id": 4,
@@ -837,8 +850,9 @@ index 0000000..60f7480
                     "user": {
                         "fullname": "fake user",
                         "name": "fake",
+                        "default_email": "fake@fedoraproject.org",
                         "emails": [
-                            "py@pingoured.fr"
+                            "fake@fedoraproject.org"
                         ]
                     },
                     "settings": {
@@ -859,6 +873,7 @@ index 0000000..60f7480
                 "user": {
                     "fullname": "Pierre-YvesChibon",
                     "name": "pingou",
+                    "default_email": "pingou@fedoraproject.org",
                     "emails": [
                         "pingou@fedoraproject.org"
                     ]

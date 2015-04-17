@@ -941,7 +941,7 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             username='skvidal',
             fullname='Seth',
-            user_email='skvidal@fp.o'
+            default_email='skvidal@fp.o'
         )
         self.session.commit()
 
@@ -962,7 +962,7 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             username='skvidal',
             fullname='Seth V',
-            user_email='skvidal@fp.o'
+            default_email='skvidal@fp.o'
         )
         self.session.commit()
         # Nothing changed
@@ -978,7 +978,7 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             username='skvidal',
             fullname='Seth',
-            user_email='svidal@fp.o'
+            default_email='svidal@fp.o'
         )
         self.session.commit()
         # Email added
