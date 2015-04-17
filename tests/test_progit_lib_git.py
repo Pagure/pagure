@@ -49,7 +49,8 @@ class PagureLibGittests(tests.Modeltests):
             user_id=1,  # pingou
             name='test3',
             description='test project #2',
-            parent_id=1
+            parent_id=1,
+            hook_token='aaabbbvvv',
         )
         self.session.add(item)
         self.session.commit()
@@ -277,6 +278,7 @@ index 9f44358..2a552bb 100644
             user_id=1,  # pingou
             name='test_ticket_repo',
             description='test project for ticket',
+            hook_token='aaabbbwww',
         )
         self.session.add(item)
         self.session.commit()
@@ -428,6 +430,7 @@ index 458821a..77674a8
             user_id=1,  # pingou
             name='test_ticket_repo',
             description='test project for ticket',
+            hook_token='aaabbbxxx',
         )
         self.session.add(item)
         self.session.commit()
@@ -477,7 +480,7 @@ index 0000000..60f7480
 --- /dev/null
 +++ b/456
 @@ -0,0 +1 @@
-+{"status": true, "branch_from": "feature", "uid": "foobar", "title": "test PR", "comments": [], "project": {"description": "test project for ticket", "parent": null, "settings": {"issue_tracker": true, "project_documentation": true, "pull_requests": true}, "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "name": "test_ticket_repo"}, "commit_stop": null, "repo_from": {"description": "test project for ticket", "parent": null, "settings": {"issue_tracker": true, "project_documentation": true, "pull_requests": true}, "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "name": "test_ticket_repo"}, "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "branch": "master", "date_created": null, "commit_start": null, "id": 1}
++{"status": true, "branch_from": "feature", "uid": "foobar", "title": "test PR", "comments": [], "project": {"description": "test project for ticket", "parent": null, "settings": {"Minimum_score_to_merge_pull-request": -1, "Web-hooks": null, "project_documentation": true, "pull_requests": true, "Only_assignee_can_merge_pull-request": false, "issue_tracker": true}, "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "name": "test_ticket_repo"}, "commit_stop": null, "repo_from": {"description": "test project for ticket", "parent": null, "settings": {"Minimum_score_to_merge_pull-request": -1, "Web-hooks": null, "project_documentation": true, "pull_requests": true, "Only_assignee_can_merge_pull-request": false, "issue_tracker": true}, "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "name": "test_ticket_repo"}, "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "branch": "master", "date_created": null, "commit_start": null, "id": 1}
 \ No newline at end of file
 
 """

@@ -77,6 +77,7 @@ class PagureLibModeltests(tests.Modeltests):
             name='test',
             description='test project #1',
             parent_id=1,
+            hook_token='aaabbbyyy',
         )
         self.session.commit()
         self.session.add(item)

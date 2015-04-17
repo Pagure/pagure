@@ -235,10 +235,10 @@ class PagureFlaskRepotests(tests.Modeltests):
             # Both checkbox checked before
             self.assertTrue(
                 '<input id="project_documentation" type="checkbox" value="y" '
-                'name="project_documentation" checked="">' in output.data)
+                'name="project_documentation" checked=""/>' in output.data)
             self.assertTrue(
                 '<input id="issue_tracker" type="checkbox" value="y" '
-                'name="issue_tracker" checked="">' in output.data)
+                'name="issue_tracker" checked=""/>' in output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -261,10 +261,10 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<ul id="flashes">\n                </ul>' in output.data)
             self.assertTrue(
                 '<input id="project_documentation" type="checkbox" value="y" '
-                'name="project_documentation" checked="">' in output.data)
+                'name="project_documentation" checked=""/>' in output.data)
             self.assertTrue(
                 '<input id="issue_tracker" type="checkbox" value="y" '
-                'name="issue_tracker" checked="">' in output.data)
+                'name="issue_tracker" checked=""/>' in output.data)
 
             data = {'csrf_token': csrf_token}
             output = self.app.post(
@@ -287,10 +287,10 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<ul id="flashes">\n                </ul>' in output.data)
             self.assertTrue(
                 '<input id="project_documentation" type="checkbox" value="y" '
-                'name="project_documentation" >' in output.data)
+                'name="project_documentation" />' in output.data)
             self.assertTrue(
                 '<input id="issue_tracker" type="checkbox" value="y" '
-                'name="issue_tracker" >' in output.data)
+                'name="issue_tracker" />' in output.data)
 
     def test_view_forks(self):
         """ Test the view_forks endpoint. """
@@ -366,6 +366,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             name='test3',
             description='test project #3',
             parent_id=1,
+            hook_token='aaabbbmmm',
         )
         self.session.add(item)
         self.session.commit()
@@ -446,6 +447,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             name='test3',
             description='test project #3',
             parent_id=1,
+            hook_token='aaabbbnnn',
         )
         self.session.add(item)
         self.session.commit()
@@ -527,6 +529,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             name='test3',
             description='test project #3',
             parent_id=1,
+            hook_token='aaabbbooo',
         )
         self.session.add(item)
         self.session.commit()
@@ -641,6 +644,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             name='test3',
             description='test project #3',
             parent_id=1,
+            hook_token='aaabbbppp',
         )
         self.session.add(item)
         self.session.commit()
@@ -742,6 +746,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             name='test3',
             description='test project #3',
             parent_id=1,
+            hook_token='aaabbbqqq',
         )
         self.session.add(item)
         self.session.commit()
@@ -815,6 +820,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             name='test3',
             description='test project #3',
             parent_id=1,
+            hook_token='aaabbbkkk',
         )
         self.session.add(item)
         self.session.commit()
@@ -921,6 +927,7 @@ index 0000000..11980b1
             name='test3',
             description='test project #3',
             parent_id=1,
+            hook_token='aaabbblll',
         )
         self.session.add(item)
         self.session.commit()
@@ -1013,6 +1020,7 @@ index 0000000..fb7093d
             name='test3',
             description='test project #3',
             parent_id=1,
+            hook_token='aaabbbfff',
         )
         self.session.add(item)
         self.session.commit()
@@ -1066,6 +1074,7 @@ index 0000000..fb7093d
                 user_id=1,  # pingou
                 name='test',
                 description='test project #1',
+                hook_token='aaabbbggg',
             )
             self.session.add(item)
             self.session.commit()
@@ -1083,6 +1092,7 @@ index 0000000..fb7093d
                 user_id=1,  # pingou
                 name='test',
                 description='test project #1',
+                hook_token='aaabbbhhh',
             )
             self.session.add(item)
             self.session.commit()
@@ -1099,6 +1109,7 @@ index 0000000..fb7093d
                 user_id=1,  # pingou
                 name='test',
                 description='test project #1',
+                hook_token='aaabbbiii',
             )
             self.session.add(item)
             self.session.commit()
@@ -1116,6 +1127,7 @@ index 0000000..fb7093d
                 name='test3',
                 description='test project #3',
                 parent_id=1,
+                hook_token='aaabbbjjj',
             )
             self.session.add(item)
             self.session.commit()

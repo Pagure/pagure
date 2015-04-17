@@ -200,6 +200,7 @@ def create_projects(session):
         user_id=1,  # pingou
         name='test',
         description='test project #1',
+        hook_token='aaabbbccc',
     )
     session.add(item)
 
@@ -207,6 +208,7 @@ def create_projects(session):
         user_id=1,  # pingou
         name='test2',
         description='test project #2',
+        hook_token='aaabbbddd',
     )
     session.add(item)
 

@@ -68,6 +68,7 @@ class PagureFlaskApptests(tests.Modeltests):
             user_id=2,  # foo
             name='test3',
             description='test project #3 with a very long description',
+            hook_token='aaabbbeee',
         )
         self.session.add(item)
         self.session.commit()

@@ -601,7 +601,6 @@ class PagureLibtests(tests.Modeltests):
         p_send_email.return_value = True
         p_ugt.return_value = True
 
-        tests.create_projects(self.session)
         self.test_new_issue()
         repo = pagure.lib.get_project(self.session, 'test')
 
@@ -818,7 +817,9 @@ class PagureLibtests(tests.Modeltests):
                 'issue_tracker': True,
                 'project_documentation': True,
                 'pull_requests': True,
-                'Only_assignee_can_close_pull': False,
+                'Only_assignee_can_merge_pull-request': False,
+                'Minimum_score_to_merge_pull-request': -1,
+                'Web-hooks': None,
             },
             user='pingou',
         )
@@ -830,6 +831,10 @@ class PagureLibtests(tests.Modeltests):
             settings={
                 'issue_tracker': False,
                 'project_documentation': False,
+                'pull_requests': False,
+                'Only_assignee_can_merge_pull-request': False,
+                'Minimum_score_to_merge_pull-request': -1,
+                'Web-hooks': None,
             },
             user='pingou',
         )
@@ -879,6 +884,7 @@ class PagureLibtests(tests.Modeltests):
             name='test',
             description='test project #1',
             parent_id=1,
+            hook_token='aaabbbttt',
         )
         self.session.add(item)
 
@@ -887,6 +893,7 @@ class PagureLibtests(tests.Modeltests):
             name='test2',
             description='test project #2',
             parent_id=2,
+            hook_token='aaabbbuuu',
         )
         self.session.add(item)
 
@@ -1033,7 +1040,7 @@ class PagureLibtests(tests.Modeltests):
             ticketfolder=ticketfolder,
             requestfolder=requestfolder,
             description='description for testproject',
-            parent_id=None
+            parent_id=None,
         )
         self.session.commit()
         self.assertEqual(msg, 'Project "testproject" created')
@@ -1198,6 +1205,7 @@ class PagureLibtests(tests.Modeltests):
             name='test',
             description='test project #1',
             parent_id=1,
+            hook_token='aaabbbrrr',
         )
         self.session.commit()
         self.session.add(item)
@@ -1227,6 +1235,7 @@ class PagureLibtests(tests.Modeltests):
             user='pingou',
             requestfolder=None,
         )
+        self.session.commit()
         self.assertEqual(msg, 'Request created')
 
     @patch('pagure.lib.notify.send_email')
