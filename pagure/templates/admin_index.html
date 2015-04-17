@@ -24,7 +24,11 @@
     </form>
   </li>
   <li>
-    <form action="{{ url_for('admin_generate_hook_token') }}" method="post">
+    <form action="{{ url_for('admin_generate_hook_token') }}"
+        method="post"
+        onsubmit="return confirm('Are you sure to re-generate the hook-token'
+            + ' of every projects? This will break every web-hook in place '
+            + 'and cannot be un-done.');">
     <input type="submit" class="submit positive button"
         value="Re-generate hook-token for every projects">
     {{ form.csrf_token }}
