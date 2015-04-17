@@ -885,7 +885,8 @@ def fork_project(session, user, repo, gitfolder,
         name=repo.name,
         description=repo.description,
         user_id=user_obj.id,
-        parent_id=repo.id
+        parent_id=repo.id,
+        hook_token=pagure.lib.login.id_generator(40)
     )
     session.add(project)
     # Make sure we won't have SQLAlchemy error before we create the repo
