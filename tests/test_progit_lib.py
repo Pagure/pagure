@@ -1738,6 +1738,57 @@ class PagureLibtests(tests.Modeltests):
         for proj in projects:
             self.assertNotIn(proj.hook_token, ['aaabbbccc', 'aaabbbddd'])
 
+    @patch('pagure.lib.notify.send_email')
+    def test_pull_request_score(self, mockemail):
+        """ Test PullRequest.score of pagure.lib.model. """
+        mockemail.return_value = True
+
+        self.test_new_pull_request()
+
+        request = pagure.lib.search_pull_requests(self.session, requestid=1)
+
+        msg = pagure.lib.add_pull_request_comment(
+            session=self.session,
+            request=request,
+            commit=None,
+            filename=None,
+            row=None,
+            comment='This looks great :thumbsup:',
+            user='foo',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Comment added')
+
+        msg = pagure.lib.add_pull_request_comment(
+            session=self.session,
+            request=request,
+            commit=None,
+            filename=None,
+            row=None,
+            comment='I disagree -1',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Comment added')
+
+        msg = pagure.lib.add_pull_request_comment(
+            session=self.session,
+            request=request,
+            commit=None,
+            filename=None,
+            row=None,
+            comment='NM this looks great now +1000',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Comment added')
+
+        self.assertEqual(len(request.discussion), 3)
+        self.assertEqual(request.score, 1)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibtests)
