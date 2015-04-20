@@ -101,7 +101,9 @@ class PagureTicketHook(BaseHook):
 
         '''
         repopath = os.path.join(APP.config['TICKETS_FOLDER'], project.path)
-        if not os.path.exists(repopath):
+        if not os.path.exists(repopath):  # pragma: no cover
+            # We cannot test this as un-existing repo should be catched
+            # at the set_up() stage
             flask.abort(404, 'No git repo found')
 
         hook_files = os.path.join(
