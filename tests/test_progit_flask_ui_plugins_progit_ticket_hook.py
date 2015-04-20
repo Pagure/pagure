@@ -135,6 +135,16 @@ class PagureFlaskPluginPagureTicketHooktests(tests.Modeltests):
                 tests.HERE, 'tickets', 'test.git', 'hooks',
                 'post-receive.pagure-ticket')))
 
+            # Try re-activate hook w/o the git repo
+            data = {
+                'csrf_token': csrf_token,
+                'active': 'y',
+            }
+            shutil.rmtree(os.path.join(tests.HERE, 'tickets', 'test.git'))
+
+            output = self.app.post('/test/settings/pagure tickets', data=data)
+            self.assertEqual(output.status_code, 404)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
