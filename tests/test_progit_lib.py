@@ -884,9 +884,9 @@ class PagureLibtests(tests.Modeltests):
                 'issue_tracker': False,
                 'project_documentation': False,
                 'pull_requests': False,
-                'Only_assignee_can_merge_pull-request': False,
-                'Minimum_score_to_merge_pull-request': -1,
-                'Web-hooks': None,
+                'Only_assignee_can_merge_pull-request': None,
+                'Minimum_score_to_merge_pull-request': None,
+                'Web-hooks': '',
             },
             user='pingou',
         )
