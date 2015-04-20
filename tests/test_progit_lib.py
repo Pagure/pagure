@@ -1720,6 +1720,21 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(pend.email, 'foo@fp.o')
         self.assertEqual(pend.token, 'abcdef')
 
+    def test_generate_hook_token(self):
+        """ Test generate_hook_token of pagure.lib. """
+
+        tests.create_projects(self.session)
+
+        projects = pagure.lib.search_projects(self.session)
+        for proj in projects:
+            self.assertIn(proj.hook_token, ['aaabbbccc', 'aaabbbddd'])
+
+        pagure.lib.generate_hook_token(self.session)
+
+        projects = pagure.lib.search_projects(self.session)
+        for proj in projects:
+            self.assertNotIn(proj.hook_token, ['aaabbbccc', 'aaabbbddd'])
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibtests)
