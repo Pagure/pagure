@@ -813,6 +813,92 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
+    def test_upload_issue(self, p_send_email, p_ugt):
+        """ Test the upload_issue endpoint. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(tests.HERE, 'tickets'), bare=True)
+
+        # Create issues to play with
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/issue/1')
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            output = self.app.post('/foo/issue/1/upload')
+            self.assertEqual(output.status_code, 404)
+
+            output = self.app.post('/test/issue/100/upload')
+            self.assertEqual(output.status_code, 404)
+
+            # Invalid upload
+            data = {
+                'enctype': 'multipart/form-data',
+            }
+            output = self.app.post(
+                '/test/issue/1/upload', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            json_data = json.loads(output.data)
+            exp = {'output': 'notok'}
+            self.assertDictEqual(json_data, exp)
+
+            # Attach a file to a ticket
+            stream = open(os.path.join(tests.HERE, 'placebo.png'), 'rb')
+            data = {
+                'csrf_token': csrf_token,
+                'filestream': stream,
+                'enctype': 'multipart/form-data',
+            }
+            output = self.app.post(
+                '/test/issue/1/upload', data=data, follow_redirects=True)
+            stream.close()
+            self.assertEqual(output.status_code, 200)
+            json_data = json.loads(output.data)
+            exp = {
+                'output': 'ok',
+                'filelocation': '/test/issue/raw/files/8a06845923010b27bfd8'
+                                'e7e75acff7badc40d1021b4994e01f5e11ca40bc3a'
+                                'be-home_pierrey_repos_gitrepo_pagure_tests'
+                                '_placebo.png',
+                'filename': 'home_pierrey_repos_gitrepo_pagure_tests_placebo'
+                    '.png'
+            }
+            self.assertDictEqual(json_data, exp)
+
+        # Project w/o issue tracker
+        repo = pagure.lib.get_project(self.session, 'test')
+        repo.settings = {'issue_tracker': False}
+        self.session.add(repo)
+        self.session.commit()
+
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/test/issue/1/upload')
+            self.assertEqual(output.status_code, 404)
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_edit_issue(self, p_send_email, p_ugt):
         """ Test the edit_issue endpoint. """
         p_send_email.return_value = True
