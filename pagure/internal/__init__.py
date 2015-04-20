@@ -117,9 +117,14 @@ def ticket_add_comment():
     if issue is None:
         flask.abort(404, 'Issue not found')
 
-    if issue.private and not is_repo_admin(issue.project) \
-            and (not authenticated() or
-                 not issue.user.user == flask.g.fas_user.username):
+    user_obj = pagure.lib.search_user(SESSION, email=useremail)
+    admin = False
+    if user_obj:
+        admin = user_obj == issue.project.user.user or (
+            user_obj in [user.user for user in issue.project.users])
+
+    if issue.private and user_obj and not admin \
+            and not issue.user.user == user_obj.username:
         flask.abort(
             403, 'This issue is private and you are not allowed to view it')
 
