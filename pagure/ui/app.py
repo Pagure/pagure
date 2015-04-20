@@ -486,6 +486,10 @@ def set_default_email():
 def confirm_email(token):
     """ Confirm a new email.
     """
+    if admin_session_timedout():
+        return flask.redirect(
+            flask.url_for('auth_login', next=flask.request.url))
+
     email = pagure.lib.search_pending_email(SESSION, token=token)
     if not email:
         flask.flash('No email associated with this token.', 'error')
@@ -495,8 +499,6 @@ def confirm_email(token):
             SESSION.delete(email)
             SESSION.commit()
             flask.flash('Email validated')
-        except pagure.exceptions.PagureException, err:
-            flask.flash(str(err), 'error')
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(
