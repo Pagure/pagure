@@ -192,6 +192,90 @@ class PagureFlaskInternaltests(tests.Modeltests):
         output = self.app.put('/pv/ticket/comment/', data=data)
         self.assertEqual(output.status_code, 403)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_private_ticket_add_comment(self, send_email):
+        """ Test the ticket_add_comment function on a private ticket.  """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+
+        # Create issues to play with
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this, really',
+            user='pingou',
+            private=True,
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        issue = repo.issues[0]
+        self.assertEqual(len(issue.comments), 0)
+
+        data = {
+            'objid': 'foo',
+        }
+
+        # Wrong http request
+        output = self.app.post('/pv/ticket/comment/', data=data)
+        self.assertEqual(output.status_code, 405)
+
+        # Invalid request
+        output = self.app.put('/pv/ticket/comment/', data=data)
+        self.assertEqual(output.status_code, 400)
+
+        data = {
+            'objid': 'foo',
+            'useremail': 'foo@pingou.com',
+        }
+
+        # Invalid objid
+        output = self.app.put('/pv/ticket/comment/', data=data)
+        self.assertEqual(output.status_code, 404)
+
+        data = {
+            'objid': issue.uid,
+            'useremail': 'foo@bar.com',
+        }
+
+        # Valid objid, un-allowed user for this (private) ticket
+        output = self.app.put('/pv/ticket/comment/', data=data)
+        self.assertEqual(output.status_code, 403)
+
+        data = {
+            'objid': issue.uid,
+            'useremail': 'foo@pingou.com',
+        }
+
+        # Valid objid, un-allowed user for this (private) ticket
+        output = self.app.put('/pv/ticket/comment/', data=data)
+        self.assertEqual(output.status_code, 400)
+
+        data = {
+            'objid': issue.uid,
+            'useremail': 'foo@pingou.com',
+            'comment': 'Looks good to me!',
+        }
+
+        # Add comment
+        output = self.app.put('/pv/ticket/comment/', data=data)
+        self.assertEqual(output.status_code, 200)
+        js_data = json.loads(output.data)
+        self.assertDictEqual(js_data, {'message': 'Comment added'})
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = repo.issues[0]
+        self.assertEqual(len(issue.comments), 1)
+
+        # Check the @localonly
+        pagure.APP.config['IP_ALLOWED_INTERNAL'].remove(None)
+        output = self.app.put('/pv/ticket/comment/', data=data)
+        self.assertEqual(output.status_code, 403)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
