@@ -422,6 +422,30 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msgs, ['Edited tag: tag1 to tag2'])
 
+        # Add a new tag
+        msg = pagure.lib.add_issue_tag(
+            session=self.session,
+            issue=issue,
+            tags='tag3',
+            user='pingou',
+            ticketfolder=None)
+        self.session.commit()
+        self.assertEqual(msg, 'Tag added: tag3')
+        self.assertEqual([tag.tag for tag in issue.tags], ['tag2', 'tag3'])
+
+        # Rename an existing tag into another existing one
+        msgs = pagure.lib.edit_issue_tags(
+            session=self.session,
+            project=repo,
+            old_tag='tag2',
+            new_tag='tag3',
+            user='pingou',
+            ticketfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(msgs, ['Edited tag: tag2 to tag3'])
+        self.assertEqual([tag.tag for tag in issue.tags], ['tag3'])
+
         self.assertRaises(
             pagure.exceptions.PagureException,
             pagure.lib.edit_issue_tags,
