@@ -333,6 +333,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'status': 'fixed'
             }
 
+            # Invalid repo
+            output = self.app.post('/bar/issue/1/update', data=data)
+            self.assertEqual(output.status_code, 404)
+
+            # Non-existing issue
+            output = self.app.post('/test/issue/100/update', data=data)
+            self.assertEqual(output.status_code, 404)
+
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
@@ -533,6 +541,105 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/1/update')
             self.assertEqual(output.status_code, 302)
+
+            # Repo not set-up for issue tracker
+            output = self.app.post('/test/issue/1/update', data=data)
+            self.assertEqual(output.status_code, 404)
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_update_issue_drop_comment(self, p_send_email, p_ugt):
+        """ Test droping comment via the update_issue endpoint. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+
+        # Create issues to play with
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/issue/1')
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            # Add new comment
+            data = {
+                'csrf_token': csrf_token,
+                'comment': 'Woohoo a second comment !',
+            }
+            output = self.app.post(
+                '/test/issue/1/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
+            self.assertTrue(
+                '<li class="message">Comment added</li>' in output.data)
+            self.assertTrue(
+                '<p>Woohoo a second comment !</p>' in output.data)
+            self.assertEqual(
+                output.data.count('<div class="comment_body">'), 2)
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(len(issue.comments), 1)
+
+        data = {
+            'csrf_token': csrf_token,
+            'drop_comment': 1,
+        }
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            # Wrong issue id
+            output = self.app.post(
+                '/test/issue/3/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+            # Wrong user
+            output = self.app.post(
+                '/test/issue/1/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 403)
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            # Drop the new comment
+            output = self.app.post(
+                '/test/issue/1/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
+            self.assertTrue(
+                '<li class="message">Comment removed</li>' in output.data)
+
+            # Drop non-existant comment
+            output = self.app.post(
+                '/test/issue/1/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(len(issue.comments), 0)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
