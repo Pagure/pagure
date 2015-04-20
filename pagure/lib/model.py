@@ -685,11 +685,11 @@ class PullRequest(BASE):
         positive = set()
         negative = set()
         for comment in self.discussion:
-            for word in [' +1 ', ':thumbsup:']:
+            for word in ['+1', ':thumbsup:']:
                 if word in comment.comment:
                     positive.add(comment.user_id)
                     break
-            for word in [' -1 ', ':thumbsdown:']:
+            for word in ['-1', ':thumbsdown:']:
                 if word in comment.comment:
                     negative.add(comment.user_id)
                     break
