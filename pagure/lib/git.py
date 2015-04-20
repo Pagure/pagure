@@ -430,8 +430,16 @@ def update_request_from_git(
     request = pagure.lib.get_request_by_uid(
         session, request_uid=request_uid)
 
+    # Update start and stop commits
     request.commit_start = json_data.get('commit_start')
     request.commit_stop = json_data.get('commit_stop')
+
+    # Update assignee
+    assignee = get_user_from_json(session, json_data, key='assignee')
+    if assignee:
+        pagure.lib.add_pull_request_assignee(
+            session, issue, assignee.username,
+            user=user.user, ticketfolder=None)
 
     for comment in json_data['comments']:
         user = get_user_from_json(session, comment)
