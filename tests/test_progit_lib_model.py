@@ -115,6 +115,27 @@ class PagureLibModeltests(tests.Modeltests):
 
         self.assertEqual(str(item), 'Group: 1 - name admin')
 
+    def test_tagissue__repr__(self):
+        """ Test the TagIssue.__repr__ function of pagure.lib.model. """
+        self.test_issue__repr__()
+        repo = pagure.lib.get_project(self.session, 'test')
+        issues = pagure.lib.search_issues(self.session, repo)
+        self.assertEqual(len(issues), 1)
+
+        item = pagure.lib.model.Tag(tag='foo')
+        self.session.add(item)
+        self.session.commit()
+
+        item = pagure.lib.model.TagIssue(
+            issue_uid=issues[0].uid,
+            tag='foo',
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        self.assertEqual(str(item), 'TagIssue(issue:1, tag:foo)')
+
+
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibModeltests)
     unittest.TextTestRunner(verbosity=2).run(SUITE)
