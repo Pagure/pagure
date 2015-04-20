@@ -627,24 +627,14 @@ def view_issue_raw_file(repo, filename=None, username=None):
 
     mimetype = None
     encoding = None
-    if filename:
-        content = __get_file_in_tree(
-            repo_obj, commit.tree, filename.split('/'))
-        if not content or isinstance(content, pygit2.Tree):
-            flask.abort(404, 'File not found')
 
-        mimetype, encoding = mimetypes.guess_type(filename)
-        data = repo_obj[content.oid].data
-    else:
-        if commit.parents:
-            diff = commit.tree.diff_to_tree()
+    content = __get_file_in_tree(
+        repo_obj, commit.tree, filename.split('/'))
+    if not content or isinstance(content, pygit2.Tree):
+        flask.abort(404, 'File not found')
 
-            parent = repo_obj.revparse_single('%s^' % commit.oid)
-            diff = repo_obj.diff(parent, commit)
-        else:
-            # First commit in the repo
-            diff = commit.tree.diff_to_tree(swap=True)
-        data = diff.patch
+    mimetype, encoding = mimetypes.guess_type(filename)
+    data = repo_obj[content.oid].data
 
     if not mimetype and data[:2] == '#!':
         mimetype = 'text/plain'
