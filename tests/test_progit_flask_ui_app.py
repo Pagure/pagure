@@ -468,6 +468,76 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post('/settings/email/add', data=data)
             self.assertEqual(output.status_code, 302)
 
+    @patch('pagure.lib.notify.send_email')
+    @patch('pagure.ui.app.admin_session_timedout')
+    def test_set_default_email(self, ast, send_email):
+        """ Test the set_default_email endpoint. """
+        send_email.return_value = True
+        ast.return_value = False
+        self.test_new_project()
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/settings/email/default')
+            self.assertEqual(output.status_code, 404)
+            self.assertTrue('<h2>Page not found (404)</h2>' in output.data)
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/settings/')
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue("<h2>pingou's settings</h2>" in output.data)
+            self.assertTrue(
+                '<textarea id="ssh_key" name="ssh_key"></textarea>'
+                in output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+                'email': 'foo@pingou.com',
+            }
+
+            output = self.app.post(
+                '/settings/email/default', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue("<h2>pingou's settings</h2>" in output.data)
+            self.assertEqual(output.data.count('foo@pingou.com'), 4)
+
+            # Set invalid default email
+            data = {
+                'csrf_token':  csrf_token,
+                'email': 'foobar@pingou.com',
+            }
+
+            output = self.app.post(
+                '/settings/email/default', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue("<h2>pingou's settings</h2>" in output.data)
+            self.assertEqual(output.data.count('foo@pingou.com'), 4)
+            self.assertIn(
+                '<li class="error">You do not have the email: foobar@pingou'
+                '.com, nothing to set</li>', output.data)
+
+            # Set default email
+            data = {
+                'csrf_token':  csrf_token,
+                'email': 'foo@pingou.com',
+            }
+
+            output = self.app.post(
+                '/settings/email/default', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue("<h2>pingou's settings</h2>" in output.data)
+            self.assertEqual(output.data.count('foo@pingou.com'), 4)
+            self.assertIn(
+                '<li class="message">Default email set to: foo@pingou.com</li>',
+                output.data)
+
+            ast.return_value = True
+            output = self.app.post('/settings/email/default', data=data)
+            self.assertEqual(output.status_code, 302)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskApptests)
