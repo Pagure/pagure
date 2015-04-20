@@ -438,7 +438,7 @@ def update_request_from_git(
     assignee = get_user_from_json(session, json_data, key='assignee')
     if assignee:
         pagure.lib.add_pull_request_assignee(
-            session, issue, assignee.username,
+            session, request, assignee.username,
             user=user.user, ticketfolder=None)
 
     for comment in json_data['comments']:
