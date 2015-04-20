@@ -519,11 +519,15 @@ def edit_issue_tags(session, project, old_tag, new_tag, ticketfolder, user):
         for issue in set(issues):
             add = True
             # Drop the old tag
-            for issue_tag in issue.tags:
+            cnt = 0
+            while cnt < len(issue.tags):
+                issue_tag = issue.tags[cnt]
                 if issue_tag.tag == old_tag:
                     issue.tags.remove(issue_tag)
+                    cnt -= 1
                 if issue_tag.tag == new_tag:
                     add = False
+                cnt += 1
             session.flush()
 
             # Add the new one
