@@ -339,7 +339,6 @@ def update_ticket_from_git(
     # Update assignee
     assignee = get_user_from_json(session, json_data, key='assignee')
     if assignee:
-        print assignee
         pagure.lib.add_issue_assignee(
             session, issue, assignee.username,
             user=user.user, ticketfolder=None)
@@ -407,7 +406,7 @@ def update_request_from_git(
         )
 
         repo_to = get_project_from_json(
-            session, json_data.get('repo'),
+            session, json_data.get('project'),
             gitfolder, forkfolder, docfolder, ticketfolder, requestfolder
         )
 
