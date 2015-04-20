@@ -339,7 +339,7 @@ def update_ticket_from_git(
     # Update assignee
     assignee = json_data.get('assignee', None)
     pagure.lib.add_issue_assignee(
-        session, issue, assignee, user=user.username, ticketfolder=None)
+        session, issue, assignee, user=user.user, ticketfolder=None)
 
     # Update depends
     depends = json_data.get('depends', [])
