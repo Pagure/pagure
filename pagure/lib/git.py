@@ -205,16 +205,16 @@ def update_git(obj, repo, repofolder, objtype='ticket'):
     shutil.rmtree(newpath)
 
 
-def get_user_from_json(session, jsondata):
+def get_user_from_json(session, jsondata, key='user'):
     """ From the given json blob, retrieve the user info and search for it
     in the db and create the user if it does not already exist.
     """
     user = None
 
-    username = jsondata.get('user', {}).get('name')
-    fullname = jsondata.get('user', {}).get('fullname')
-    useremails = jsondata.get('user', {}).get('emails')
-    default_email = jsondata.get('user', {}).get('default_email')
+    username = jsondata.get(key, {}).get('name')
+    fullname = jsondata.get(key, {}).get('fullname')
+    useremails = jsondata.get(key, {}).get('emails')
+    default_email = jsondata.get(key, {}).get('default_email')
     user = pagure.lib.search_user(session, username=username)
     if not user:
         for email in useremails:
@@ -337,8 +337,9 @@ def update_ticket_from_git(
         session, issue, tags, username=user.user, ticketfolder=None)
 
     # Update assignee
-    assignee = get_user_from_json(session, json_data.get('assignee', {}))
+    assignee = get_user_from_json(session, json_data, key='assignee')
     if assignee:
+        print assignee
         pagure.lib.add_issue_assignee(
             session, issue, assignee.username,
             user=user.user, ticketfolder=None)
