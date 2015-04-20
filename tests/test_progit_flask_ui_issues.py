@@ -897,6 +897,82 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post('/test/issue/1/upload')
             self.assertEqual(output.status_code, 404)
 
+    def test_view_issue_raw_file_empty(self):
+        """ Test the view_issue_raw_file endpoint. """
+        # Create the project and git repos
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(tests.HERE, 'tickets'), bare=True)
+
+        # Create issues to play with
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        url = '/issue/raw/files/8a06845923010b27bfd8'\
+            'e7e75acff7badc40d1021b4994e01f5e11ca40bc3a'\
+            'be-home_pierrey_repos_gitrepo_pagure_tests'\
+            '_placebo.png'
+
+        output = self.app.get('/foo' + url)
+        self.assertEqual(output.status_code, 404)
+
+        output = self.app.get('/test' + url)
+        self.assertEqual(output.status_code, 404)
+
+        # Project w/o issue tracker
+        repo = pagure.lib.get_project(self.session, 'test')
+        repo.settings = {'issue_tracker': False}
+        self.session.add(repo)
+        self.session.commit()
+
+        output = self.app.get('/test' + url)
+        self.assertEqual(output.status_code, 404)
+
+    def test_view_issue_raw_file(self):
+        """ Test the view_issue_raw_file endpoint. """
+        # Create the issue and upload to it
+        self.test_upload_issue()
+
+        # Project w/ issue tracker
+        repo = pagure.lib.get_project(self.session, 'test')
+        repo.settings = {'issue_tracker': True}
+        self.session.add(repo)
+        self.session.commit()
+
+        url = '/issue/raw/files/8a06845923010b27bfd8'\
+            'e7e75acff7badc40d1021b4994e01f5e11ca40bc3a'\
+            'be-home_pierrey_repos_gitrepo_pagure_tests'\
+            '_placebo.png'
+
+        output = self.app.get('/foo' + url)
+        self.assertEqual(output.status_code, 404)
+
+        output = self.app.get('/test/issue/raw/files/test.png')
+        self.assertEqual(output.status_code, 404)
+
+        # Access file by name
+        output = self.app.get('/test' + url)
+        self.assertEqual(output.status_code, 200)
+
+        # Project w/o issue tracker
+        repo = pagure.lib.get_project(self.session, 'test')
+        repo.settings = {'issue_tracker': False}
+        self.session.add(repo)
+        self.session.commit()
+
+        output = self.app.get('/test' + url)
+        self.assertEqual(output.status_code, 404)
+
+
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
     def test_edit_issue(self, p_send_email, p_ugt):
