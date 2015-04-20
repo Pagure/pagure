@@ -1312,6 +1312,8 @@ class PagureLibtests(tests.Modeltests):
         )
         self.assertEqual(msg, 'Comment added')
 
+        self.assertEqual(len(request.discussion), 0)
+
     def test_search_pull_requests(self):
         """ Test search_pull_requests of pagure.lib. """
 
