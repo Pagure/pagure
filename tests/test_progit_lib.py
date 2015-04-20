@@ -718,6 +718,22 @@ class PagureLibtests(tests.Modeltests):
         os.mkdir(ticketfolder)
         os.mkdir(requestfolder)
 
+        # Try creating a blacklisted project
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.new_project,
+            session=self.session,
+            user='pingou',
+            name='static',
+            blacklist=['static'],
+            gitfolder=gitfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
+            description='description for static',
+            parent_id=None,
+        )
+
         # Create a new project
         msg = pagure.lib.new_project(
             session=self.session,
