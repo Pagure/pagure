@@ -707,7 +707,7 @@ class PullRequest(BASE):
             'repo_from': self.project_from.to_json(),
             'date_created': self.date_created.strftime('%s'),
             'user': self.user.to_json(),
-            'assignee': self.assignee.to_json(),
+            'assignee': self.assignee.to_json() if self.assignee else None,
             'status': self.status,
             'commit_start': self.commit_start,
             'commit_stop': self.commit_stop,
