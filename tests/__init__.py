@@ -181,6 +181,7 @@ class FakeUser(object):
         self.groups = groups
         self.username = username
         self.name = username
+        self.email = 'foo@bar.com'
         self.approved_memberships = [
             FakeGroup('packager'),
             FakeGroup('design-team')
