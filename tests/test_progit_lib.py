@@ -1339,6 +1339,53 @@ class PagureLibtests(tests.Modeltests):
         )
         self.assertEqual(len(prs), 0)
 
+        # All non-assigned PR
+        prs = pagure.lib.search_pull_requests(
+            session=self.session,
+            assignee=False
+        )
+        self.assertEqual(len(prs), 1)
+
+        prs[0].assignee_id = 1
+        self.session.add(prs[0])
+        self.session.commit()
+
+        # All the PR assigned
+        prs = pagure.lib.search_pull_requests(
+            session=self.session,
+            assignee=True
+        )
+        self.assertEqual(len(prs), 1)
+
+        # Basically the same as above but then for a specific user
+        prs = pagure.lib.search_pull_requests(
+            session=self.session,
+            assignee='pingou'
+        )
+        self.assertEqual(len(prs), 1)
+
+        # All PR except those assigned to pingou
+        prs = pagure.lib.search_pull_requests(
+            session=self.session,
+            assignee='!pingou'
+        )
+        self.assertEqual(len(prs), 0)
+
+        # All PR created by the specified author
+        prs = pagure.lib.search_pull_requests(
+            session=self.session,
+            author='pingou'
+        )
+        self.assertEqual(len(prs), 1)
+
+        # Count the PR instead of listing them
+        prs = pagure.lib.search_pull_requests(
+            session=self.session,
+            author='pingou',
+            count=True
+        )
+        self.assertEqual(prs, 1)
+
     @patch('pagure.lib.notify.send_email')
     def test_close_pull_request(self, send_email):
         """ Test close_pull_request of pagure.lib. """
