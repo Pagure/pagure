@@ -22,6 +22,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
 import pagure.lib
+import pagure.lib.model
 import tests
 
 
@@ -1686,6 +1687,38 @@ class PagureLibtests(tests.Modeltests):
             requestfolder=None,
         )
         self.assertEqual(msg, None)
+
+    def test_search_pending_email(self):
+        """ Test search_pending_email of pagure.lib. """
+
+        self.assertEqual(
+            pagure.lib.search_pending_email(self.session), None)
+
+        user = pagure.lib.search_user(self.session, username='pingou')
+
+        email_pend = pagure.lib.model.UserEmailPending(
+            user_id=user.id,
+            email='foo@fp.o',
+            token='abcdef',
+        )
+        self.session.add(email_pend)
+        self.session.commit()
+
+        self.assertNotEqual(
+            pagure.lib.search_pending_email(self.session), None)
+        self.assertNotEqual(
+            pagure.lib.search_pending_email(self.session, token='abcdef'),
+            None)
+
+        pend = pagure.lib.search_pending_email(self.session, token='abcdef')
+        self.assertEqual(pend.user.username, 'pingou')
+        self.assertEqual(pend.email, 'foo@fp.o')
+        self.assertEqual(pend.token, 'abcdef')
+
+        pend = pagure.lib.search_pending_email(self.session, email='foo@fp.o')
+        self.assertEqual(pend.user.username, 'pingou')
+        self.assertEqual(pend.email, 'foo@fp.o')
+        self.assertEqual(pend.token, 'abcdef')
 
 
 if __name__ == '__main__':
