@@ -169,6 +169,52 @@ class PagureFlaskAdmintests(tests.Modeltests):
                 '<li class="message">Authorized file updated</li>'
                 in output.data)
 
+    def test_admin_generate_hook_token(self):
+        """ Test the admin_generate_hook_token endpoint. """
+
+        output = self.app.get('/admin/hook_token')
+        self.assertEqual(output.status_code, 404)
+
+        output = self.app.post('/admin/hook_token')
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/admin/hook_token', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue(
+                '<li class="error">Access restricted</li>' in output.data)
+
+        user = tests.FakeUser(
+            username='pingou',
+            groups=pagure.APP.config['ADMIN_GROUP'])
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/admin/hook_token', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>Admin section</h2>' in output.data)
+            self.assertTrue('Re-generate gitolite ACLs file' in output.data)
+            self.assertTrue(
+                'Re-generate ssh authorized_key file' in output.data)
+            self.assertTrue(
+                'Re-generate hook-token for every projects' in output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            data = {'csrf_token': csrf_token}
+
+            output = self.app.post(
+                '/admin/hook_token', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>Admin section</h2>' in output.data)
+            self.assertTrue('Re-generate gitolite ACLs file' in output.data)
+            self.assertTrue(
+                'Re-generate ssh authorized_key file' in output.data)
+            self.assertTrue(
+                'Re-generate hook-token for every projects' in output.data)
+            self.assertTrue(
+                '<li class="message">Hook token all re-generated</li>'
+                in output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskAdmintests)
