@@ -26,6 +26,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 
 import pagure.lib
 import pagure.hooks
+import pagure.ui.plugins
 import tests
 
 
@@ -61,8 +62,20 @@ class PagureFlaskPluginstests(tests.Modeltests):
             tests.HERE, 'docs')
         self.app = pagure.APP.test_client()
 
-    def test_index(self):
-        """ Test the index endpoint. """
+    def test_get_plugin_names(self):
+        """ Test the get_plugin_names function. """
+        names = pagure.ui.plugins.get_plugin_names()
+        self.assertEqual(
+            sorted(names),
+            ['IRC', 'Mail', 'pagure', 'pagure requests', 'pagure tickets'])
+
+    def test_get_plugin(self):
+        """ Test the get_plugin function. """
+        name = pagure.ui.plugins.get_plugin('Mail')
+        self.assertEqual(str(name), "<class 'pagure.hooks.mail.Mail'>")
+
+    def test_view_plugin_page(self):
+        """ Test the view_plugin_page endpoint. """
 
         output = self.app.get('/foo/settings/Mail')
         self.assertEqual(output.status_code, 302)
@@ -73,9 +86,45 @@ class PagureFlaskPluginstests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
+            tests.create_projects_git(tests.HERE)
 
             output = self.app.get('/test/settings/Mail')
             self.assertEqual(output.status_code, 403)
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/settings/Mail')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<section class="settings">\n  <h3>Mail</h3>', output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+                'active': True,
+                'mail_to': 'pingou@fp.org',
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post('/test/settings/Mail', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<section class="settings">\n  <h3>Mail</h3>', output.data)
+            self.assertIn(
+                '<li class="message">Hook activated</li>', output.data)
+
+            data = {
+                'mail_to': '',
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post('/test/settings/Mail', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<section class="settings">\n  <h3>Mail</h3>', output.data)
+            self.assertIn(
+                '<li class="message">Hook inactived</li>', output.data)
 
     def test_RequiredIf(self):
         """ Test the behavior of the RequiredIf validator. """
