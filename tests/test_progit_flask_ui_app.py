@@ -371,6 +371,103 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post('/settings/email/drop', data=data)
             self.assertEqual(output.status_code, 302)
 
+    @patch('pagure.lib.notify.send_email')
+    @patch('pagure.ui.app.admin_session_timedout')
+    def test_add_user_email(self, ast, send_email):
+        """ Test the add_user_email endpoint. """
+        send_email.return_value = True
+        ast.return_value = False
+        self.test_new_project()
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/settings/email/add')
+            self.assertEqual(output.status_code, 404)
+            self.assertTrue('<h2>Page not found (404)</h2>' in output.data)
+
+        user.username = 'foo'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/settings/email/add')
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>Add new email</h2>' in output.data)
+            self.assertTrue(
+                '<input id="email" name="email" type="text" value="">'
+                in output.data)
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/settings/email/add')
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue("<h2>Add new email</h2>" in output.data)
+            self.assertTrue(
+                '<input id="email" name="email" type="text" value="">'
+                in output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+                'email': 'foo@pingou.com',
+            }
+
+            output = self.app.post(
+                '/settings/email/add', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue("<h2>Add new email</h2>" in output.data)
+            self.assertEqual(output.data.count('foo@pingou.com'), 1)
+
+            # New email
+            data = {
+                'csrf_token':  csrf_token,
+                'email': 'foobar@pingou.com',
+            }
+
+            output = self.app.post(
+                '/settings/email/add', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>pingou\'s settings</h2>' in output.data)
+            self.assertIn(
+                '<li class="message">Email pending validation</li>',
+                output.data)
+            self.assertEqual(output.data.count('foo@pingou.com'), 4)
+            self.assertEqual(output.data.count('bar@pingou.com'), 4)
+            self.assertEqual(output.data.count('foobar@pingou.com'), 1)
+
+            # User already has this email
+            data = {
+                'csrf_token':  csrf_token,
+                'email': 'foo@pingou.com',
+            }
+
+            output = self.app.post(
+                '/settings/email/add', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>pingou\'s settings</h2>' in output.data)
+            self.assertIn(
+                '<li class="error">The email: foo@pingou.com is already '
+                'associated to you</li>', output.data)
+            self.assertEqual(output.data.count('foo@pingou.com'), 5)
+            self.assertEqual(output.data.count('bar@pingou.com'), 4)
+            self.assertEqual(output.data.count('foobar@pingou.com'), 1)
+
+            # Email registered by someone else
+            data = {
+                'csrf_token':  csrf_token,
+                'email': 'foo@bar.com',
+            }
+
+            output = self.app.post(
+                '/settings/email/add', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue("<h2>Add new email</h2>" in output.data)
+            self.assertIn(
+                '<li class="error">Someone else has already registered this '
+                'email</li>', output.data)
+
+            ast.return_value = True
+            output = self.app.post('/settings/email/add', data=data)
+            self.assertEqual(output.status_code, 302)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskApptests)
