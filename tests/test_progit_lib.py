@@ -169,6 +169,18 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'User added')
 
+        # Try adding again this extra user to project `foo`
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.add_user_to_project,
+            session=self.session,
+            project=repo,
+            new_user='foo',
+            user='pingou'
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User added')
+
         # Create issues to play with
         msg = pagure.lib.new_issue(
             session=self.session,
