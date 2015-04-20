@@ -430,6 +430,9 @@ def update_request_from_git(
     request = pagure.lib.get_request_by_uid(
         session, request_uid=request_uid)
 
+    request.commit_start = json_data.get('commit_start')
+    request.commit_stop = json_data.get('commit_stop')
+
     for comment in json_data['comments']:
         user = get_user_from_json(session, comment)
         commentobj = pagure.lib.get_request_comment(
