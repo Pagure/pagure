@@ -1539,6 +1539,55 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(issue.depends_text, [])
         self.assertEqual(issue.blocks_text, [3])
 
+    @patch('pagure.lib.notify.send_email')
+    def test_add_pull_request_assignee(self, mockemail):
+        """ Test add_pull_request_assignee of pagure.lib. """
+        mockemail.return_value = True
+
+        self.test_new_pull_request()
+
+        request = pagure.lib.search_pull_requests(self.session, requestid=1)
+
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.add_pull_request_assignee,
+            session=self.session,
+            request=request,
+            assignee='bar',
+            user='foo',
+            requestfolder=None,
+        )
+
+        # Assign
+        msg = pagure.lib.add_pull_request_assignee(
+            session=self.session,
+            request=request,
+            assignee='pingou',
+            user='foo',
+            requestfolder=None,
+        )
+        self.assertEqual(msg, 'Request assigned')
+
+        # Reset
+        msg = pagure.lib.add_pull_request_assignee(
+            session=self.session,
+            request=request,
+            assignee=None,
+            user='foo',
+            requestfolder=None,
+        )
+        self.assertEqual(msg, 'Request reset')
+
+        # Try resetting again
+        msg = pagure.lib.add_pull_request_assignee(
+            session=self.session,
+            request=request,
+            assignee=None,
+            user='foo',
+            requestfolder=None,
+        )
+        self.assertEqual(msg, None)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibtests)
