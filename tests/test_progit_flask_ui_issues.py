@@ -136,6 +136,72 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
+    def test_new_issue_w_file(self, p_send_email, p_ugt):
+        """ Test the new_issue endpoint with a file. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(tests.HERE, 'tickets'), bare=True)
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/new_issue')
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>New issue</h2>' in output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            stream = open(os.path.join(tests.HERE, 'placebo.png'), 'r')
+            data = {
+                'title': 'Test issue',
+                'issue_content': 'We really should improve on this issue\n'
+                    '<!!image>',
+                'status': 'Open',
+                'filestream': stream,
+                'enctype': 'multipart/form-data',
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post(
+                '/test/new_issue', data=data, follow_redirects=True)
+            stream.close()
+
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue(
+                '<li class="message">Issue created</li>' in output.data)
+            self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
+            self.assertTrue('<h2>\n    Issues (1)\n  </h2>' in output.data)
+
+        # Project w/o issue tracker
+        repo = pagure.lib.get_project(self.session, 'test')
+        repo.settings = {'issue_tracker': False}
+        self.session.add(repo)
+        self.session.commit()
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            stream = open(os.path.join(tests.HERE, 'placebo.png'), 'r')
+            data = {
+                'title': 'Test issue',
+                'issue_content': 'We really should improve on this issue',
+                'status': 'Open',
+                'filestream': stream,
+                'enctype': 'multipart/form-data',
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post(
+                '/test/new_issue', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_view_issues(self, p_send_email, p_ugt):
         """ Test the view_issues endpoint. """
         p_send_email.return_value = True
