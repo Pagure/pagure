@@ -48,8 +48,6 @@ class PagureFlaskInternaltests(tests.Modeltests):
         tests.create_projects(self.session)
 
         repo = pagure.lib.get_project(self.session, 'test')
-        forked_repo = pagure.lib.get_project(
-            self.session, 'test', user='pingou')
 
         msg = pagure.lib.new_pull_request(
             session=self.session,
