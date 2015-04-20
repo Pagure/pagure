@@ -122,6 +122,18 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 in output.data)
             self.assertTrue('<h2>\n    Issues (1)\n  </h2>' in output.data)
 
+        # Project w/o issue tracker
+        repo = pagure.lib.get_project(self.session, 'test')
+        repo.settings = {'issue_tracker': False}
+        self.session.add(repo)
+        self.session.commit()
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post(
+                '/test/new_issue', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
     def test_view_issues(self, p_send_email, p_ugt):
