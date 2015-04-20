@@ -216,7 +216,7 @@ def create_projects(session):
     session.commit()
 
 
-def create_projects_git(folder):
+def create_projects_git(folder, bare=False):
     """ Create some projects in the database. """
     repos = []
     for project in ['test.git', 'test2.git']:
@@ -224,7 +224,7 @@ def create_projects_git(folder):
         repos.append(repo_path)
         if not os.path.exists(repo_path):
             os.makedirs(repo_path)
-        pygit2.init_repository(repo_path)
+        pygit2.init_repository(repo_path, bare=bare)
 
     return repos
 
