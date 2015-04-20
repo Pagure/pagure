@@ -45,22 +45,13 @@ def get_plugin(plugin_name):
 
 
 @APP.route('/<repo>/settings/<plugin>', methods=('GET', 'POST'))
+@APP.route('/<repo>/settings/<plugin>/<int:full>', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/settings/<plugin>',
            methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/settings/<plugin>/<int:full>',
+           methods=('GET', 'POST'))
 @cla_required
-def view_plugin(repo, plugin, username=None):
-    """ Presents the settings of the project.
-    """
-    return view_plugin_page(repo, plugin, username=username, full=True)
-
-
-@APP.route(
-    '/<repo>/settings/<plugin>/<int:full>', methods=('GET', 'POST'))
-@APP.route(
-    '/fork/<username>/<repo>/settings/<plugin>/<int:full>',
-    methods=('GET', 'POST'))
-@cla_required
-def view_plugin_page(repo, plugin, full, username=None):
+def view_plugin(repo, plugin, full=True, username=None):
     """ Presents the settings of the project.
     """
     repo = pagure.lib.get_project(SESSION, repo, user=username)
