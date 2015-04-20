@@ -480,7 +480,7 @@ index 0000000..60f7480
 --- /dev/null
 +++ b/456
 @@ -0,0 +1 @@
-+{"status": true, "branch_from": "feature", "uid": "foobar", "title": "test PR", "comments": [], "project": {"description": "test project for ticket", "parent": null, "settings": {"Minimum_score_to_merge_pull-request": -1, "Web-hooks": null, "project_documentation": true, "pull_requests": true, "Only_assignee_can_merge_pull-request": false, "issue_tracker": true}, "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "name": "test_ticket_repo"}, "commit_stop": null, "repo_from": {"description": "test project for ticket", "parent": null, "settings": {"Minimum_score_to_merge_pull-request": -1, "Web-hooks": null, "project_documentation": true, "pull_requests": true, "Only_assignee_can_merge_pull-request": false, "issue_tracker": true}, "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "name": "test_ticket_repo"}, "user": {"fullname": "PY C", "default_email": "bar@pingou.com", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "branch": "master", "date_created": null, "commit_start": null, "id": 1}
++{"status": true, "branch_from": "feature", "uid": "foobar", "commit_stop": null, "title": "test PR", "comments": [], "project": {"description": "test project for ticket", "parent": null, "settings": {"Minimum_score_to_merge_pull-request": -1, "Web-hooks": null, "project_documentation": true, "pull_requests": true, "Only_assignee_can_merge_pull-request": false, "issue_tracker": true}, "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "name": "test_ticket_repo"}, "assignee": null, "repo_from": {"description": "test project for ticket", "parent": null, "settings": {"Minimum_score_to_merge_pull-request": -1, "Web-hooks": null, "project_documentation": true, "pull_requests": true, "Only_assignee_can_merge_pull-request": false, "issue_tracker": true}, "user": {"fullname": "PY C", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "name": "test_ticket_repo"}, "user": {"fullname": "PY C", "default_email": "bar@pingou.com", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "branch": "master", "date_created": null, "commit_start": null, "id": 1}
 \ No newline at end of file
 
 """
@@ -649,7 +649,7 @@ index 0000000..60f7480
         data = {
             "status": True,
             "uid": "d4182a2ac2d541d884742d3037c26e56",
-            "repo": {
+            "project": {
                 "parent": None,
                 "settings": {
                     "issue_tracker": True,
@@ -812,7 +812,7 @@ index 0000000..60f7480
         data = {
             "status": True,
             "uid": "d4182a2ac2d541d884742d3037c26e57",
-            "repo": {
+            "project": {
                 "parent": None,
                 "name": "test",
                 "date_created": "1426500194",
