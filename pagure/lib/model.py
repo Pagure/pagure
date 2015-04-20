@@ -586,6 +586,9 @@ class TagIssue(BASE):
             'tags', cascade="delete, delete-orphan", single_parent=True)
         )
 
+    def __repr__(self):
+        return 'TagIssue(issue:%s, tag:%s)' % (self.issue.id, self.tag)
+
 
 class PullRequest(BASE):
     """ Stores the pull requests created on a project.
