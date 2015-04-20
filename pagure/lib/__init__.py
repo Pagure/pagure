@@ -283,6 +283,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
 
         return 'Issue assigned'
 
+
 def add_pull_request_assignee(session, request, assignee, user, requestfolder):
     ''' Add an assignee to a request, in other words, assigned an issue. '''
     user_obj = __get_user(session, user)
@@ -333,6 +334,7 @@ def add_pull_request_assignee(session, request, assignee, user, requestfolder):
         )
 
         return 'Request assigned'
+
 
 def add_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
     ''' Add a dependency between two issues. '''
