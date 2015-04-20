@@ -538,6 +538,56 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post('/settings/email/default', data=data)
             self.assertEqual(output.status_code, 302)
 
+    @patch('pagure.ui.app.admin_session_timedout')
+    def test_confirm_email(self, ast):
+        """ Test the confirm_email endpoint. """
+        output = self.app.get('/settings/email/confirm/foobar')
+        self.assertEqual(output.status_code, 302)
+
+        ast.return_value = False
+
+        # Add a pending email to pingou
+        userobj = pagure.lib.search_user(self.session, username='pingou')
+
+        self.assertEqual(len(userobj.emails), 2)
+
+        email_pend = pagure.lib.model.UserEmailPending(
+            user_id=userobj.id,
+            email='foo@fp.o',
+            token='abcdef',
+        )
+        self.session.add(email_pend)
+        self.session.commit()
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            # Wrong token
+            output = self.app.get(
+                '/settings/email/confirm/foobar', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                "<h2>pingou's settings</h2>", output.data)
+            self.assertIn(
+                '<li class="error">No email associated with this token.</li>',
+                output.data)
+
+            # Confirm email
+            output = self.app.get(
+                '/settings/email/confirm/abcdef', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                "<h2>pingou's settings</h2>", output.data)
+            self.assertIn(
+                '<li class="message">Email validated</li>', output.data)
+
+        userobj = pagure.lib.search_user(self.session, username='pingou')
+        self.assertEqual(len(userobj.emails), 3)
+
+        ast.return_value = True
+        output = self.app.get('/settings/email/confirm/foobar')
+        self.assertEqual(output.status_code, 302)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskApptests)
