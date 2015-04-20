@@ -192,8 +192,10 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertTrue(os.path.exists(
             os.path.join(tests.HERE, 'requests', 'project#1.git')))
 
-    def test_user_settings(self):
+    @patch('pagure.ui.app.admin_session_timedout')
+    def test_user_settings(self, ast):
         """ Test the user_settings endpoint. """
+        ast.return_value = False
         self.test_new_project()
 
         user = tests.FakeUser()
@@ -237,6 +239,10 @@ class PagureFlaskApptests(tests.Modeltests):
                 '<section class="project_list" id="repos">' in output.data)
             self.assertTrue(
                 '<section class="project_list" id="forks">' in output.data)
+
+            ast.return_value = True
+            output = self.app.get('/settings/')
+            self.assertEqual(output.status_code, 302)
 
     def test_markdown_preview(self):
         """ Test the markdown_preview endpoint. """
