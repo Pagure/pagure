@@ -1205,6 +1205,81 @@ index 0000000..2a552bb
                 '<li class="message">Repo &#34;test&#34; cloned to '
                 '&#34;foo/test&#34;</li>', output.data)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_new_request_pull(self, send_email):
+        """ Test the new_request_pull endpoint. """
+        send_email.return_value = True
+
+        self.test_fork_project()
+
+        tests.create_projects_git(
+            os.path.join(tests.HERE, 'requests'), bare=True)
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        fork = pagure.lib.get_project(self.session, 'test', user='foo')
+
+        self.set_up_git_repo(
+            new_project=fork, branch_from='feature', mtype='FF')
+
+        user = tests.FakeUser()
+        user.username = 'foo'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/foo/diff/master..feature')
+            self.assertEqual(output.status_code, 404)
+
+            output = self.app.get('/test/diff/master..foo')
+            self.assertEqual(output.status_code, 400)
+
+            output = self.app.get('/test/diff/foo..master')
+            self.assertEqual(output.status_code, 400)
+
+            output = self.app.get('/test/diff/feature..master')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Pull request # - test - Pagure</title>',
+                output.data)
+            self.assertIn(
+                '<p class="error"> No commits found </p>', output.data)
+
+            output = self.app.get('/test/diff/master..feature')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Pull request # - test - Pagure</title>',
+                output.data)
+            self.assertNotIn(
+                '<input type="submit" class="submit positive button" '
+                'value="Create">', output.data)
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/diff/master..feature')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Pull request # - test - Pagure</title>',
+                output.data)
+            self.assertIn(
+                '<input type="submit" class="submit positive button" '
+                'value="Create">', output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+
+            data = {
+                'csrf_token': csrf_token,
+                'title': 'foo bar PR',
+            }
+
+            output = self.app.post(
+                '/test/diff/master..feature', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Pull requests - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<li class="message">Request created</li>', output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskForktests)
