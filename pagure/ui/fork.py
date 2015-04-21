@@ -413,7 +413,8 @@ def merge_request_pull(repo, requestid, username=None):
     form = pagure.forms.ConfirmationForm()
     if not form.validate_on_submit():
         flask.flash('Invalid input submitted', 'error')
-        return flask.redirect(flask.url_for('view_repo', repo=repo.name))
+        return flask.redirect(flask.url_for(
+            'request_pull', repo=repo, requestid=requestid, username=username))
 
     repo = pagure.lib.get_project(SESSION, repo, user=username)
 
