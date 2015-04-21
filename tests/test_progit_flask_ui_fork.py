@@ -1150,6 +1150,60 @@ index 0000000..2a552bb
                 follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_fork_project(self, send_email):
+        """ Test the fork_project endpoint. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        for folder in ['docs', 'tickets', 'requets', 'repos']:
+            tests.create_projects_git(
+                os.path.join(tests.HERE, folder), bare=True)
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/do_fork/test')
+            self.assertEqual(output.status_code, 400)
+
+            output = self.app.get('/new/')
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>New project</h2>' in output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post(
+                '/do_fork/foo', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+            output = self.app.post(
+                '/do_fork/test', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li class="error">You may not fork your own repo</li>',
+                output.data)
+
+        user.username = 'foo'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/do_fork/test')
+            self.assertEqual(output.status_code, 400)
+
+            data = {
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post(
+                '/do_fork/test', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li class="message">Repo &#34;test&#34; cloned to '
+                '&#34;foo/test&#34;</li>', output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskForktests)
