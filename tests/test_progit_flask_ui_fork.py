@@ -458,6 +458,22 @@ class PagureFlaskForktests(tests.Modeltests):
                 '<li class="error">Nothing to do, changes were already '
                 'merged</li>', output.data)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_request_pull_close(self, send_email):
+        """ Test the request_pull endpoint with a closed PR. """
+        send_email.return_value = True
+
+        self.test_merge_request_pull_FF()
+
+        output = self.app.get('/test/pull-request/1')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(
+            '<title>Pull request #1 - test - Pagure</title>', output.data)
+        self.assertIn(
+            '<span class="error">Merged</span>', output.data)
+        self.assertIn(
+            'title="View file as of 2a552b">View</a>', output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskForktests)
