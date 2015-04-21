@@ -52,7 +52,8 @@ class PagureFlaskForktests(tests.Modeltests):
             tests.HERE, 'requests')
         self.app = pagure.APP.test_client()
 
-    def set_up_git_repo(self, new_project=None, branch_from='feature'):
+    def set_up_git_repo(
+            self, new_project=None, branch_from='feature', mtype='FF'):
         """ Set up the git repo and create the corresponding PullRequest
         object.
         """
@@ -94,6 +95,58 @@ class PagureFlaskForktests(tests.Modeltests):
 
         first_commit = repo.revparse_single('HEAD')
 
+        if mtype == 'merge':
+            with open(os.path.join(newpath, '.gitignore'), 'w') as stream:
+                stream.write('*~')
+            clone_repo.index.add('.gitignore')
+            clone_repo.index.write()
+
+            # Commits the files added
+            tree = clone_repo.index.write_tree()
+            author = pygit2.Signature(
+                'Alice Author', 'alice@authors.tld')
+            committer = pygit2.Signature(
+                'Cecil Committer', 'cecil@committers.tld')
+            clone_repo.create_commit(
+                'refs/heads/master',
+                author,
+                committer,
+                'Add .gitignore file for testing',
+                # binary string representing the tree object ID
+                tree,
+                # list of binary strings representing parents of the new commit
+                [first_commit.oid.hex]
+            )
+            refname = 'refs/heads/master:refs/heads/master'
+            ori_remote = clone_repo.remotes[0]
+            ori_remote.push(refname)
+
+        if mtype == 'conflicts':
+            with open(os.path.join(newpath, 'sources'), 'w') as stream:
+                stream.write('foo\n bar\nbaz')
+            clone_repo.index.add('sources')
+            clone_repo.index.write()
+
+            # Commits the files added
+            tree = clone_repo.index.write_tree()
+            author = pygit2.Signature(
+                'Alice Author', 'alice@authors.tld')
+            committer = pygit2.Signature(
+                'Cecil Committer', 'cecil@committers.tld')
+            clone_repo.create_commit(
+                'refs/heads/master',
+                author,
+                committer,
+                'Add sources conflicting',
+                # binary string representing the tree object ID
+                tree,
+                # list of binary strings representing parents of the new commit
+                [first_commit.oid.hex]
+            )
+            refname = 'refs/heads/master:refs/heads/master'
+            ori_remote = clone_repo.remotes[0]
+            ori_remote.push(refname)
+
         # Set the second repo
 
         new_gitrepo = newpath
@@ -106,31 +159,30 @@ class PagureFlaskForktests(tests.Modeltests):
 
         repo = pygit2.Repository(new_gitrepo)
 
-        # Edit the sources file again
-        with open(os.path.join(new_gitrepo, 'sources'), 'w') as stream:
-            stream.write('foo\n bar\nbaz\n boose')
-        repo.index.add('sources')
-        repo.index.write()
+        if mtype != 'nochanges':
+            # Edit the sources file again
+            with open(os.path.join(new_gitrepo, 'sources'), 'w') as stream:
+                stream.write('foo\n bar\nbaz\n boose')
+            repo.index.add('sources')
+            repo.index.write()
 
-        # Commits the files added
-        tree = repo.index.write_tree()
-        author = pygit2.Signature(
-            'Alice Author', 'alice@authors.tld')
-        committer = pygit2.Signature(
-            'Cecil Committer', 'cecil@committers.tld')
-        repo.create_commit(
-            'refs/heads/%s' % branch_from,
-            author,
-            committer,
-            'A commit on branch %s' % branch_from,
-            tree,
-            [first_commit.oid.hex]
-        )
-        refname = 'refs/heads/%s:refs/heads/%s' % (branch_from, branch_from)
-        ori_remote = clone_repo.remotes[0]
-        ori_remote.push(refname)
-
-        second_commit = repo.revparse_single('HEAD')
+            # Commits the files added
+            tree = repo.index.write_tree()
+            author = pygit2.Signature(
+                'Alice Author', 'alice@authors.tld')
+            committer = pygit2.Signature(
+                'Cecil Committer', 'cecil@committers.tld')
+            repo.create_commit(
+                'refs/heads/%s' % branch_from,
+                author,
+                committer,
+                'A commit on branch %s' % branch_from,
+                tree,
+                [first_commit.oid.hex]
+            )
+            refname = 'refs/heads/%s:refs/heads/%s' % (branch_from, branch_from)
+            ori_remote = clone_repo.remotes[0]
+            ori_remote.push(refname)
 
         # Create a PR for these changes
         project = pagure.lib.get_project(self.session, 'test')
