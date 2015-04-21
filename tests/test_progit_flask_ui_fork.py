@@ -61,15 +61,14 @@ class PagureFlaskForktests(tests.Modeltests):
 
         # Create a git repo to play with
         gitrepo = os.path.join(tests.HERE, 'repos', 'test.git')
-        self.assertFalse(os.path.exists(gitrepo))
-        os.makedirs(gitrepo)
         repo = pygit2.init_repository(gitrepo, bare=True)
 
         newpath = tempfile.mkdtemp(prefix='pagure-fork-test')
-        clone_repo = pygit2.clone_repository(gitrepo, newpath)
+        repopath = os.path.join(newpath, 'test')
+        clone_repo = pygit2.clone_repository(gitrepo, repopath)
 
         # Create a file in that git repo
-        with open(os.path.join(newpath, 'sources'), 'w') as stream:
+        with open(os.path.join(repopath, 'sources'), 'w') as stream:
             stream.write('foo\n bar')
         clone_repo.index.add('sources')
         clone_repo.index.write()
@@ -97,7 +96,7 @@ class PagureFlaskForktests(tests.Modeltests):
         first_commit = repo.revparse_single('HEAD')
 
         if mtype == 'merge':
-            with open(os.path.join(newpath, '.gitignore'), 'w') as stream:
+            with open(os.path.join(repopath, '.gitignore'), 'w') as stream:
                 stream.write('*~')
             clone_repo.index.add('.gitignore')
             clone_repo.index.write()
@@ -123,7 +122,7 @@ class PagureFlaskForktests(tests.Modeltests):
             ori_remote.push(refname)
 
         if mtype == 'conflicts':
-            with open(os.path.join(newpath, 'sources'), 'w') as stream:
+            with open(os.path.join(repopath, 'sources'), 'w') as stream:
                 stream.write('foo\n bar\nbaz')
             clone_repo.index.add('sources')
             clone_repo.index.write()
@@ -150,10 +149,10 @@ class PagureFlaskForktests(tests.Modeltests):
 
         # Set the second repo
 
-        new_gitrepo = newpath
+        new_gitrepo = repopath
         if new_project:
             # Create a new git repo to play with
-            new_gitrepo = new_project.path
+            new_gitrepo = os.path.join(newpath, new_project.fullname)
             if not os.path.exists(new_gitrepo):
                 os.makedirs(new_gitrepo)
                 new_repo = pygit2.clone_repository(gitrepo, new_gitrepo)
@@ -181,8 +180,8 @@ class PagureFlaskForktests(tests.Modeltests):
                 tree,
                 [first_commit.oid.hex]
             )
-            refname = 'refs/heads/%s:refs/heads/%s' % (branch_from, branch_from)
-            ori_remote = clone_repo.remotes[0]
+            refname = 'refs/heads/%s' % (branch_from)
+            ori_remote = repo.remotes[0]
             ori_remote.push(refname)
 
         # Create a PR for these changes
