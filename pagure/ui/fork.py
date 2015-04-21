@@ -507,7 +507,7 @@ def merge_request_pull(repo, requestid, username=None):
             requestfolder=APP.config['REQUESTS_FOLDER'])
         try:
             SESSION.commit()
-        except SQLAlchemyError as err:
+        except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             APP.logger.exception(err)
             flask.flash('Could not close this pull-request', 'error')
@@ -518,6 +518,7 @@ def merge_request_pull(repo, requestid, username=None):
             (merge is None and
              mergecode & pygit2.GIT_MERGE_ANALYSIS_FASTFORWARD)):
         if merge is not None:
+            # This is depending on the pygit2 version
             branch_ref.target = merge.fastforward_oid
         elif merge is None and mergecode is not None:
             branch_ref.set_target(repo_commit.oid.hex)
@@ -555,7 +556,7 @@ def merge_request_pull(repo, requestid, username=None):
     )
     try:
         SESSION.commit()
-    except SQLAlchemyError as err:
+    except SQLAlchemyError as err:  # pragma: no cover
         SESSION.rollback()
         APP.logger.exception(err)
         flask.flash(
