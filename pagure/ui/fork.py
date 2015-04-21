@@ -819,7 +819,7 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
                 repo_obj.revparse_single(diff_commits[0].oid.hex)
             )
 
-    elif orig_repo.is_empty:
+    elif orig_repo.is_empty and not repo_obj.is_empty:
         orig_commit = None
         repo_commit = repo_obj[repo_obj.head.target]
         diff = repo_commit.tree.diff_to_tree(swap=True)
