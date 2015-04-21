@@ -622,21 +622,21 @@ def cancel_request_pull(repo, requestid, username=None):
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
 
-        repo = pagure.lib.get_project(SESSION, repo, user=username)
+        repo_obj = pagure.lib.get_project(SESSION, repo, user=username)
 
-        if not repo:
+        if not repo_obj:
             flask.abort(404, 'Project not found')
 
-        if not repo.settings.get('pull_requests', True):
+        if not repo_obj.settings.get('pull_requests', True):
             flask.abort(404, 'No pull-requests found for this project')
 
         request = pagure.lib.search_pull_requests(
-            SESSION, project_id=repo.id, requestid=requestid)
+            SESSION, project_id=repo_obj.id, requestid=requestid)
 
         if not request:
             flask.abort(404, 'Pull-request not found')
 
-        if not is_repo_admin(repo):
+        if not is_repo_admin(repo_obj):
             flask.abort(
                 403,
                 'You are not allowed to cancel pull-request for this project')
@@ -648,7 +648,7 @@ def cancel_request_pull(repo, requestid, username=None):
         try:
             SESSION.commit()
             flask.flash('Request pull canceled!')
-        except SQLAlchemyError as err:
+        except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             APP.logger.exception(err)
             flask.flash(
@@ -657,7 +657,7 @@ def cancel_request_pull(repo, requestid, username=None):
     else:
         flask.flash('Invalid input submitted', 'error')
 
-    return flask.redirect(flask.url_for('view_repo', repo=repo.name))
+    return flask.redirect(flask.url_for('view_repo', repo=repo))
 
 
 @APP.route('/<repo>/pull-request/<int:requestid>/assign', methods=['POST'])
