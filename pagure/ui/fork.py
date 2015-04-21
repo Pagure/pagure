@@ -141,8 +141,10 @@ def request_pull(repo, requestid, username=None):
                 repo_obj.revparse_single(diff_commits[0].oid.hex)
             )
     else:
+        commitid = None
         branch = repo_obj.lookup_branch(request.branch_from)
-        commitid = branch.get_object().hex
+        if branch:
+            commitid = branch.get_object().hex
 
         if not repo_obj.is_empty and not orig_repo.is_empty:
             # Pull-request open
