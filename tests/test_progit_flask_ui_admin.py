@@ -106,7 +106,6 @@ class PagureFlaskAdmintests(tests.Modeltests):
                 '<li class="message">Gitolite ACLs updated</li>'
                 in output.data)
 
-
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
