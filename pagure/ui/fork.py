@@ -790,7 +790,9 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
             'Branch %s could not be found in the target repo' % branch_to)
 
     branch = repo_obj.lookup_branch(branch_from)
-    commitid = branch.get_object().hex
+    commitid = None
+    if branch:
+        commitid = branch.get_object().hex
 
     diff_commits = []
     diff = None
