@@ -666,9 +666,9 @@ class PagureFlaskInternaltests(tests.Modeltests):
             self.assertDictEqual(js_data, exp)
 
     @patch('pagure.lib.notify.send_email')
-    def test_mergeable_request_pull_merge(self, send_email):
-        """ Test the mergeable_request_pull endpoint when the changes can
-        be merged with a merge commit.
+    def test_mergeable_request_pull_conflicts(self, send_email):
+        """ Test the mergeable_request_pull endpoint when the changes cannot
+        be merged due to conflicts.
         """
         send_email.return_value = True
 
