@@ -281,7 +281,7 @@ def request_pull_patch(repo, requestid, username=None):
                     break
                 diff_commits.append(commit)
 
-    elif orig_repo.is_empty:
+    elif orig_repo.is_empty and not repo_obj.is_empt:
         diff_commits.append(repo_obj[request.stop_id])
     else:
         flask.flash(
