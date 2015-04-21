@@ -739,6 +739,63 @@ index 9f44358..2a552bb 100644
         output = self.app.get('/test/pull-request/1.patch')
         self.assertEqual(output.status_code, 404)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_request_pull_patch_empty_fork(self, send_email):
+        """ Test the request_pull_patch endpoint from an empty fork. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        item = pagure.lib.model.Project(
+            user_id=2,  # foo
+            name='test',
+            description='test project #1',
+            hook_token='aaabbb',
+            parent_id=1,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        tests.create_projects_git(
+            os.path.join(tests.HERE, 'requests'), bare=True)
+        tests.create_projects_git(
+            os.path.join(tests.HERE, 'forks', 'foo'), bare=True)
+
+        # Create a git repo to play with
+        gitrepo = os.path.join(tests.HERE, 'repos', 'test.git')
+        self.assertFalse(os.path.exists(gitrepo))
+        os.makedirs(gitrepo)
+        repo = pygit2.init_repository(gitrepo, bare=True)
+
+        # Create a fork of this repo
+        newpath = tempfile.mkdtemp(prefix='pagure-fork-test')
+        gitrepo = os.path.join(tests.HERE, 'forks', 'foo', 'test.git')
+        new_repo = pygit2.clone_repository(gitrepo, newpath)
+
+        # Create a PR for these "changes" (there are none, both repos are
+        # empty)
+        project = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=item,
+            branch_from='feature',
+            repo_to=project,
+            branch_to='master',
+            title='PR from the feature branch',
+            user='pingou',
+            requestfolder=None,
+
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Request created')
+
+        output = self.app.get('/test/pull-request/1.patch', follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(
+            '<title>Overview - test - Pagure</title>', output.data)
+        self.assertIn(
+            '<li class="error">Fork is empty, there are no commits to '
+            'request pulling</li>', output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskForktests)
