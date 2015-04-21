@@ -853,7 +853,7 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
             try:
                 SESSION.commit()
                 flask.flash(message)
-            except SQLAlchemyError as err:
+            except SQLAlchemyError as err:  # pragma: no cover
                 SESSION.rollback()
                 APP.logger.exception(err)
                 flask.flash(
@@ -868,7 +868,10 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
                     'request_pulls', username=parent.user, repo=parent.name)
 
             return flask.redirect(url)
-        except pagure.exceptions.PagureException, err:
+        except pagure.exceptions.PagureException, err:  # pragma: no cover
+            # There could be a PagureException thrown if the flask.g.fas_user
+            # wasn't in the DB but then it shouldn't be recognized as a
+            # repo admin and thus, if we ever are here, we are in trouble.
             flask.flash(str(err), 'error')
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
