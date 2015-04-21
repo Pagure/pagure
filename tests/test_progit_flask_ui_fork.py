@@ -630,6 +630,42 @@ class PagureFlaskForktests(tests.Modeltests):
             '<li class="error">Fork is empty, there are no commits to '
             'request pulling</li>', output.data)
 
+    def test_request_pulls(self):
+        """ Test the request_pulls endpoint. """
+        # No such project
+        output = self.app.get('/test/pull-requests')
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+
+        output = self.app.get('/test/pull-requests')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('Pull-requests (0)', output.data)
+        self.assertIn('(0 Closed)</a>', output.data)
+
+        self.set_up_git_repo(new_project=None, branch_from='feature')
+
+        output = self.app.get('/test/pull-requests')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('Pull-requests (1)', output.data)
+        self.assertIn('(0 Closed)</a>', output.data)
+
+        output = self.app.get('/test/pull-requests?status=closed')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('Closed Pull-requests (0)', output.data)
+        self.assertIn('(1 Open)</a>', output.data)
+
+        # Project w/o pull-request
+        repo = pagure.lib.get_project(self.session, 'test')
+        settings = repo.settings
+        settings['pull_requests'] = False
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        output = self.app.get('/test/pull-requests')
+        self.assertEqual(output.status_code, 404)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskForktests)
