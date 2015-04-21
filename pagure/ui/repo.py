@@ -887,15 +887,14 @@ def regenerate_git(repo, username=None):
         flask.abort(404, 'Project not found')
 
     if not is_repo_admin(repo):
-
         flask.abort(403, 'You are not allowed to regenerate the git repos')
+
     regenerate = flask.request.form.get('regenerate')
     if not regenerate or regenerate.lower() not in ['tickets', 'requests']:
         flask.abort(400, 'You can only regenerate tickest or requests repos')
 
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
-        print regenerate.lower()
         if regenerate.lower() == 'requests':
             for request in repo.requests:
                 pagure.lib.git.update_git(
