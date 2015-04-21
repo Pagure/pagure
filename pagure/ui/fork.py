@@ -256,7 +256,9 @@ def request_pull_patch(repo, requestid, username=None):
     orig_repo = pygit2.Repository(parentpath)
 
     branch = repo_obj.lookup_branch(request.branch_from)
-    commitid = branch.get_object().hex
+    commitid = None
+    if branch:
+        commitid = branch.get_object().hex
 
     diff_commits = []
     if not repo_obj.is_empty and not orig_repo.is_empty:
