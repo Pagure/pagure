@@ -778,13 +778,13 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
     orig_repo = pygit2.Repository(parentpath)
 
     frombranch = repo_obj.lookup_branch(branch_from)
-    if not frombranch:
+    if not frombranch and not repo_obj.is_empty :
         flask.abort(
             400,
             'Branch %s does not exist' % branch_from)
 
     branch = orig_repo.lookup_branch(branch_to)
-    if not branch:
+    if not branch and not orig_repo.is_empty:
         flask.abort(
             400,
             'Branch %s could not be found in the target repo' % branch_to)
