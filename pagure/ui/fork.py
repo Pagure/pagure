@@ -711,13 +711,17 @@ def set_assignee_requests(repo, requestid, username=None):
 # Specific actions
 
 
-@APP.route('/do_fork/<repo>')
-@APP.route('/do_fork/<username>/<repo>')
+@APP.route('/do_fork/<repo>', methods=['POST'])
+@APP.route('/do_fork/<username>/<repo>', methods=['POST'])
 @cla_required
 def fork_project(repo, username=None):
     """ Fork the project specified into the user's namespace
     """
     repo = pagure.lib.get_project(SESSION, repo, user=username)
+
+    form = pagure.forms.ConfirmationForm()
+    if not form.validate_on_submit():
+        flask.abort(400)
 
     if repo is None:
         flask.abort(404)
