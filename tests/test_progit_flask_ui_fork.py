@@ -740,6 +740,50 @@ index 9f44358..2a552bb 100644
         self.assertEqual(output.status_code, 404)
 
     @patch('pagure.lib.notify.send_email')
+    def test_request_pull_patch_close(self, send_email):
+        """ Test the request_pull_patch endpoint with a closed PR. """
+        send_email.return_value = True
+
+        self.test_merge_request_pull_FF()
+
+        output = self.app.get('/test/pull-request/1.patch')
+        self.assertEqual(output.status_code, 200)
+
+        npatch = []
+        for row in output.data.split('\n'):
+            if row.startswith('Date:'):
+                continue
+            if row.startswith('From '):
+                row = row.split(' ', 2)[2]
+            npatch.append(row)
+
+        exp = """Mon Sep 17 00:00:00 2001
+From: Alice Author <alice@authors.tld>
+Subject: A commit on branch feature
+
+
+---
+
+diff --git a/sources b/sources
+index 9f44358..2a552bb 100644
+--- a/sources
++++ b/sources
+@@ -1,2 +1,4 @@
+ foo
+- bar
+\ No newline at end of file
++ bar
++baz
++ boose
+\ No newline at end of file
+
+"""
+
+        patch = '\n'.join(npatch)
+        #print patch
+        self.assertEqual(patch, exp)
+
+    @patch('pagure.lib.notify.send_email')
     def test_request_pull_patch_empty_repo(self, send_email):
         """ Test the request_pull_patch endpoint against an empty repo. """
         send_email.return_value = True
