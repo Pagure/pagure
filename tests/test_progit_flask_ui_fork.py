@@ -37,6 +37,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
         pagure.APP.config['TESTING'] = True
         pagure.SESSION = self.session
+        pagure.lib.SESSION = self.session
         pagure.ui.SESSION = self.session
         pagure.ui.app.SESSION = self.session
         pagure.ui.fork.SESSION = self.session
@@ -1031,6 +1032,123 @@ index 0000000..2a552bb
             self.assertIn(
                 '<li class="message">Request pull canceled!</li>',
                 output.data)
+
+    @patch('pagure.lib.notify.send_email')
+    def test_set_assignee_requests(self, send_email):
+        """ Test the set_assignee_requests endpoint. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(tests.HERE, 'requests'), bare=True)
+        self.set_up_git_repo(new_project=None, branch_from='feature')
+
+        # No such project
+        user = tests.FakeUser()
+        user.username = 'foo'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/foo/pull-request/1/assign')
+            self.assertEqual(output.status_code, 404)
+
+            output = self.app.post('/test/pull-request/100/assign')
+            self.assertEqual(output.status_code, 404)
+
+            # Invalid input
+            output = self.app.post(
+                '/test/pull-request/1/assign', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Pull request #1 - test - Pagure</title>',
+                output.data)
+            self.assertIn(
+                '<h3>Title: PR from the feature branch</h3>', output.data)
+            self.assertNotIn(
+                '<li class="message">Request assigned</li>', output.data)
+
+            output = self.app.get('/test/pull-request/1')
+            self.assertEqual(output.status_code, 200)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+                'user': 'pingou',
+            }
+
+            # No CSRF
+            output = self.app.post(
+                '/test/pull-request/1/assign', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Pull request #1 - test - Pagure</title>',
+                output.data)
+            self.assertIn(
+                '<h3>Title: PR from the feature branch</h3>', output.data)
+            self.assertNotIn(
+                '<li class="message">Request assigned</li>', output.data)
+
+            # Invalid assignee
+            data = {
+                'csrf_token': csrf_token,
+                'user': 'bar',
+            }
+
+            output = self.app.post(
+                '/test/pull-request/1/assign', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Pull request #1 - test - Pagure</title>',
+                output.data)
+            self.assertIn(
+                '<h3>Title: PR from the feature branch</h3>', output.data)
+            self.assertIn(
+                '<li class="error">No user &#34;bar&#34; found</li>',
+                output.data)
+
+            # Assign the PR
+            data = {
+                'csrf_token': csrf_token,
+                'user': 'pingou',
+            }
+
+            output = self.app.post(
+                '/test/pull-request/1/assign', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Pull request #1 - test - Pagure</title>',
+                output.data)
+            self.assertIn(
+                '<h3>Title: PR from the feature branch</h3>', output.data)
+            self.assertIn(
+                '<li class="message">Request assigned</li>', output.data)
+
+            # Pull-Request closed
+            repo = pagure.lib.get_project(self.session, 'test')
+            req = repo.requests[0]
+            req.status = False
+            self.session.add(req)
+            self.session.commit()
+
+            output = self.app.post(
+                '/test/pull-request/1/assign', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 403)
+
+            # Project w/o pull-request
+            repo = pagure.lib.get_project(self.session, 'test')
+            settings = repo.settings
+            settings['pull_requests'] = False
+            repo.settings = settings
+            self.session.add(repo)
+            self.session.commit()
+
+            output = self.app.post(
+                '/test/pull-request/1/assign', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
 
 
 if __name__ == '__main__':
