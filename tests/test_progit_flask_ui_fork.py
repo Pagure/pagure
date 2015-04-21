@@ -952,6 +952,86 @@ index 0000000..2a552bb
             '<li class="error">Fork is empty, there are no commits to '
             'request pulling</li>', output.data)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_cancel_request_pull(self, send_email):
+        """ Test the cancel_request_pull endpoint. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(tests.HERE, 'requests'), bare=True)
+        self.set_up_git_repo(
+            new_project=None, branch_from='feature', mtype='merge')
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/test/pull-request/cancel/1')
+            self.assertEqual(output.status_code, 302)
+
+            output = self.app.post(
+                '/test/pull-request/cancel/1', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Overview - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<li class="error">Invalid input submitted</li>', output.data)
+
+            output = self.app.get('/test/pull-request/1')
+            self.assertEqual(output.status_code, 200)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+                'csrf_token': csrf_token,
+            }
+
+            # Invalid project
+            output = self.app.post(
+                '/foo/pull-request/cancel/1', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+            # Invalid PR id
+            output = self.app.post(
+                '/test/pull-request/cancel/100', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+            # Invalid user for this project
+            output = self.app.post(
+                '/test/pull-request/cancel/1', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 403)
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            # Project w/o pull-request
+            repo = pagure.lib.get_project(self.session, 'test')
+            settings = repo.settings
+            settings['pull_requests'] = False
+            repo.settings = settings
+            self.session.add(repo)
+            self.session.commit()
+
+            output = self.app.post(
+                '/test/pull-request/cancel/1', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+            # Project w/o pull-request
+            repo = pagure.lib.get_project(self.session, 'test')
+            settings = repo.settings
+            settings['pull_requests'] = True
+            repo.settings = settings
+            self.session.add(repo)
+            self.session.commit()
+
+            output = self.app.post(
+                '/test/pull-request/cancel/1', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Overview - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<li class="message">Request pull canceled!</li>',
+                output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskForktests)
