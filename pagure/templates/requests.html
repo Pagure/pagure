@@ -8,12 +8,11 @@
 
 <div class="inline">
   <h2>
-    {% if status and status in [False, 'Closed'] %}
-    Closed
-    {% endif %}
+    {% if status and (status == False or status|lower == 'closed') %}
+    Closed {% endif -%}
     Pull-requests ({{ requests|count }})
   </h2>
-  {% if status and status not in [False, 'Closed'] %}
+  {% if status and not (status == False or status|lower == 'closed') %}
     <a href="{{ url_for('request_pulls', username=username,
                repo=repo.name) }}?status=Closed">
       ({{ oth_requests }} Closed)</a>
