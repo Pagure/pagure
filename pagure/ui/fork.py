@@ -183,7 +183,7 @@ def request_pull(repo, requestid, username=None):
                     repo_obj.revparse_single(diff_commits[0].oid.hex)
                 )
 
-        elif orig_repo.is_empty:
+        elif orig_repo.is_empty and not repo_obj.is_empty:
             for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
                 diff_commits.append(commit)
             if request.status and diff_commits:
