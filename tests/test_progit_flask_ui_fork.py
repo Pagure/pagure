@@ -199,6 +199,8 @@ class PagureFlaskForktests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Request created')
 
+        shutil.rmtree(newpath)
+
     @patch('pagure.lib.notify.send_email')
     def test_request_pull(self, send_email):
         """ Test the request_pull endpoint. """
