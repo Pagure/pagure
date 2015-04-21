@@ -666,6 +666,79 @@ class PagureFlaskForktests(tests.Modeltests):
         output = self.app.get('/test/pull-requests')
         self.assertEqual(output.status_code, 404)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_request_pull_patch(self, send_email):
+        """ Test the request_pull_patch endpoint. """
+        send_email.return_value = True
+
+        output = self.app.get('/test/pull-request/1.patch')
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(tests.HERE, 'requests'), bare=True)
+        self.set_up_git_repo(
+            new_project=None, branch_from='feature', mtype='merge')
+
+        output = self.app.get('/test/pull-request/100.patch')
+        self.assertEqual(output.status_code, 404)
+
+        output = self.app.get('/test/pull-request/1.patch')
+        self.assertEqual(output.status_code, 200)
+
+        npatch = []
+        for row in output.data.split('\n'):
+            if row.startswith('Date:'):
+                continue
+            if row.startswith('From '):
+                row = row.split(' ', 2)[2]
+            npatch.append(row)
+
+        exp = """Mon Sep 17 00:00:00 2001
+From: Alice Author <alice@authors.tld>
+Subject: A commit on branch feature
+
+
+---
+
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..e4e5f6c
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1 @@
++*~
+\ No newline at end of file
+diff --git a/sources b/sources
+index 9f44358..2a552bb 100644
+--- a/sources
++++ b/sources
+@@ -1,2 +1,4 @@
+ foo
+- bar
+\ No newline at end of file
++ bar
++baz
++ boose
+\ No newline at end of file
+
+"""
+
+        patch = '\n'.join(npatch)
+        #print patch
+        self.assertEqual(patch, exp)
+
+        # Project w/o pull-request
+        repo = pagure.lib.get_project(self.session, 'test')
+        settings = repo.settings
+        settings['pull_requests'] = False
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        output = self.app.get('/test/pull-request/1.patch')
+        self.assertEqual(output.status_code, 404)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskForktests)
