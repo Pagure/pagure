@@ -424,6 +424,40 @@ class PagureFlaskForktests(tests.Modeltests):
             self.assertIn(
                 '<li class="error">Merge conflicts!</li>', output.data)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_merge_request_pull_nochange(self, send_email):
+        """ Test the merge_request_pull endpoint. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(tests.HERE, 'requests'), bare=True)
+        self.set_up_git_repo(
+            new_project=None, branch_from='master', mtype='nochanges')
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/pull-request/1')
+            self.assertEqual(output.status_code, 200)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+                'csrf_token': csrf_token,
+            }
+
+            # Nothing to merge
+            output = self.app.post(
+                '/test/pull-request/1/merge', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Pull request #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<li class="error">Nothing to do, changes were already '
+                'merged</li>', output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskForktests)
