@@ -286,6 +286,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
 
 def add_pull_request_assignee(session, request, assignee, user, requestfolder):
     ''' Add an assignee to a request, in other words, assigned an issue. '''
+    __get_user(session, assignee)
     user_obj = __get_user(session, user)
 
     if assignee is None and request.assignee is not None:
