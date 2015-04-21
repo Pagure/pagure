@@ -740,6 +740,115 @@ index 9f44358..2a552bb 100644
         self.assertEqual(output.status_code, 404)
 
     @patch('pagure.lib.notify.send_email')
+    def test_request_pull_patch_empty_repo(self, send_email):
+        """ Test the request_pull_patch endpoint against an empty repo. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        item = pagure.lib.model.Project(
+            user_id=2,  # foo
+            name='test',
+            description='test project #1',
+            hook_token='aaabbb',
+            parent_id=1,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        tests.create_projects_git(
+            os.path.join(tests.HERE, 'requests'), bare=True)
+        tests.create_projects_git(
+            os.path.join(tests.HERE, 'forks', 'foo'), bare=True)
+
+        # Create a git repo to play with
+        gitrepo = os.path.join(tests.HERE, 'repos', 'test.git')
+        self.assertFalse(os.path.exists(gitrepo))
+        os.makedirs(gitrepo)
+        repo = pygit2.init_repository(gitrepo, bare=True)
+
+        # Create a fork of this repo
+        newpath = tempfile.mkdtemp(prefix='pagure-fork-test')
+        gitrepo = os.path.join(tests.HERE, 'forks', 'foo', 'test.git')
+        new_repo = pygit2.clone_repository(gitrepo, newpath)
+
+        # Edit the sources file again
+        with open(os.path.join(newpath, 'sources'), 'w') as stream:
+            stream.write('foo\n bar\nbaz\n boose')
+        new_repo.index.add('sources')
+        new_repo.index.write()
+
+        # Commits the files added
+        tree = new_repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        new_repo.create_commit(
+            'refs/heads/feature',
+            author,
+            committer,
+            'A commit on branch feature',
+            tree,
+            []
+        )
+        refname = 'refs/heads/feature:refs/heads/feature'
+        ori_remote = new_repo.remotes[0]
+        ori_remote.push(refname)
+
+        # Create a PR for these "changes" (there are none, both repos are
+        # empty)
+        project = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=item,
+            branch_from='feature',
+            repo_to=project,
+            branch_to='master',
+            title='PR from the feature branch',
+            user='pingou',
+            requestfolder=None,
+
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Request created')
+
+        output = self.app.get('/test/pull-request/1.patch', follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+
+        npatch = []
+        for row in output.data.split('\n'):
+            if row.startswith('Date:'):
+                continue
+            if row.startswith('From '):
+                row = row.split(' ', 2)[2]
+            npatch.append(row)
+
+        exp = """Mon Sep 17 00:00:00 2001
+From: Alice Author <alice@authors.tld>
+Subject: A commit on branch feature
+
+
+---
+
+diff --git a/sources b/sources
+new file mode 100644
+index 0000000..2a552bb
+--- /dev/null
++++ b/sources
+@@ -0,0 +1,4 @@
++foo
++ bar
++baz
++ boose
+\ No newline at end of file
+
+"""
+
+        patch = '\n'.join(npatch)
+        #print patch
+        self.assertEqual(patch, exp)
+
+    @patch('pagure.lib.notify.send_email')
     def test_request_pull_patch_empty_fork(self, send_email):
         """ Test the request_pull_patch endpoint from an empty fork. """
         send_email.return_value = True
