@@ -497,7 +497,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
     @patch('pagure.lib.notify.send_email')
     def test_request_pull_empty_repo(self, send_email):
-        """ Test the request_pull endpoint with PR disabled. """
+        """ Test the request_pull endpoint against an empty repo. """
         send_email.return_value = True
 
         tests.create_projects(self.session)
