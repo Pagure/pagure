@@ -182,7 +182,26 @@ def request_pull(repo, requestid, username=None):
                 )
 
         elif orig_repo.is_empty:
-            repo_commit = repo_obj[request.stop_id]
+            for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
+                diff_commits.append(commit)
+            if request.status and diff_commits:
+                first_commit = repo_obj[diff_commits[-1].oid.hex]
+                request.commit_start = first_commit.oid.hex
+                request.commit_stop = diff_commits[0].oid.hex
+                SESSION.add(request)
+                try:
+                    SESSION.commit()
+                    pagure.lib.git.update_git(
+                        request, repo=request.project,
+                        repofolder=APP.config['REQUESTS_FOLDER'])
+                except SQLAlchemyError as err: # pragma: no cover
+                    SESSION.rollback()
+                    APP.logger.exception(err)
+                    flask.flash(
+                        'Could not update this pull-request in the database',
+                        'error')
+
+            repo_commit = repo_obj[request.commit_stop]
             diff = repo_commit.tree.diff_to_tree(swap=True)
         else:
             flask.flash(
