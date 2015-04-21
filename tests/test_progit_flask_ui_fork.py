@@ -42,9 +42,8 @@ class PagureFlaskForktests(tests.Modeltests):
         pagure.ui.fork.SESSION = self.session
         pagure.ui.repo.SESSION = self.session
 
-        pagure.APP.config['GIT_FOLDER'] = tests.HERE
-        pagure.APP.config['FORK_FOLDER'] = os.path.join(
-            tests.HERE, 'forks')
+        pagure.APP.config['GIT_FOLDER'] = os.path.join(tests.HERE, 'repos')
+        pagure.APP.config['FORK_FOLDER'] = os.path.join(tests.HERE, 'forks')
         pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
             tests.HERE, 'tickets')
         pagure.APP.config['DOCS_FOLDER'] = os.path.join(
@@ -59,7 +58,7 @@ class PagureFlaskForktests(tests.Modeltests):
         """
 
         # Create a git repo to play with
-        gitrepo = os.path.join(tests.HERE, 'test.git')
+        gitrepo = os.path.join(tests.HERE, 'repos', 'test.git')
         self.assertFalse(os.path.exists(gitrepo))
         os.makedirs(gitrepo)
         repo = pygit2.init_repository(gitrepo, bare=True)
