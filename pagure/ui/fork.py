@@ -449,6 +449,7 @@ def pull_request_drop_comment(repo, requestid, username=None):
 @APP.route('/<repo>/pull-request/<int:requestid>/merge', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/merge',
            methods=['POST'])
+@cla_required
 def merge_request_pull(repo, requestid, username=None):
     """ Request pulling the changes from the fork into the project.
     """
@@ -613,6 +614,7 @@ def merge_request_pull(repo, requestid, username=None):
            methods=['POST'])
 @APP.route('/fork/<username>/<repo>/pull-request/cancel/<int:requestid>',
            methods=['POST'])
+@cla_required
 def cancel_request_pull(repo, requestid, username=None):
     """ Cancel request pulling request.
     """
