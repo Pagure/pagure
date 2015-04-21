@@ -458,13 +458,8 @@ def merge_request_pull(repo, requestid, username=None):
             repo=repo.name, requestid=requestid))
 
     error_output = flask.url_for(
-        'request_pull', repo=repo.name, requestid=requestid)
-    if username:
-        error_output = flask.url_for(
-            'fork_request_pull',
-            repo=repo.name,
-            requestid=requestid,
-            username=username)
+        'request_pull', repo=repo.name, requestid=requestid,
+        username=username)
 
     # Get the fork
     repopath = pagure.get_repo_path(request.project_from)
