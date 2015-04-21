@@ -231,7 +231,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
     @patch('pagure.lib.notify.send_email')
     def test_merge_request_pull_FF(self, send_email):
-        """ Test the merge_request_pull endpoint. """
+        """ Test the merge_request_pull endpoint with a FF PR. """
         send_email.return_value = True
 
         self.test_request_pull()
