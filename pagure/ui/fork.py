@@ -503,7 +503,7 @@ def merge_request_pull(repo, requestid, username=None):
              mergecode & pygit2.GIT_MERGE_ANALYSIS_UP_TO_DATE)):
         flask.flash('Nothing to do, changes were already merged', 'error')
         pagure.lib.close_pull_request(
-            SESSION, request, flask.g.fas_user,
+            SESSION, request, flask.g.fas_user.username,
             requestfolder=APP.config['REQUESTS_FOLDER'])
         try:
             SESSION.commit()
