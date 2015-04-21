@@ -1264,9 +1264,6 @@ index 0000000..2a552bb
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
-        user.username = 'pingou'
-        with tests.user_set(pagure.APP, user):
-
             data = {
                 'csrf_token': csrf_token,
                 'title': 'foo bar PR',
