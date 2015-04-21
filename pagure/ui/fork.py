@@ -166,7 +166,7 @@ def request_pull(repo, requestid, username=None):
                     pagure.lib.git.update_git(
                         request, repo=request.project,
                         repofolder=APP.config['REQUESTS_FOLDER'])
-                except SQLAlchemyError as err:
+                except SQLAlchemyError as err: # pragma: no cover
                     SESSION.rollback()
                     APP.logger.exception(err)
                     flask.flash(
