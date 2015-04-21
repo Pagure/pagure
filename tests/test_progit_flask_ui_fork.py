@@ -474,6 +474,27 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertIn(
             'title="View file as of 2a552b">View</a>', output.data)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_request_pull_disabled(self, send_email):
+        """ Test the request_pull endpoint with PR disabled. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(tests.HERE, 'requests'), bare=True)
+        self.set_up_git_repo(new_project=None, branch_from='feature')
+
+        # Project w/o pull-request
+        repo = pagure.lib.get_project(self.session, 'test')
+        settings = repo.settings
+        settings['pull_requests'] = False
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        output = self.app.get('/test/pull-request/1')
+        self.assertEqual(output.status_code, 404)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskForktests)
