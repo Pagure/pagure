@@ -630,8 +630,11 @@ class PagureFlaskForktests(tests.Modeltests):
             '<li class="error">Fork is empty, there are no commits to '
             'request pulling</li>', output.data)
 
-    def test_request_pulls(self):
+    @patch('pagure.lib.notify.send_email')
+    def test_request_pulls(self, send_email):
         """ Test the request_pulls endpoint. """
+        send_email.return_value = True
+
         # No such project
         output = self.app.get('/test/pull-requests')
         self.assertEqual(output.status_code, 404)
