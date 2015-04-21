@@ -178,6 +178,134 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertIn(
             'title="View file as of 2a552b">View</a>', output.data)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_merge_request_pull_FF(self, send_email):
+        """ Test the merge_request_pull endpoint. """
+        send_email.return_value = True
+
+        self.test_request_pull()
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/pull-request/1')
+            self.assertEqual(output.status_code, 200)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            # No CSRF
+            output = self.app.post(
+                '/test/pull-request/1/merge', data={}, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Pull request #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                'title="View file as of 2a552b">View</a>', output.data)
+
+            # Wrong project
+            data = {
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/foobar/pull-request/100/merge', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+            # Wrong project
+            data = {
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/pull-request/1/merge', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 403)
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+
+            # Wrong request id
+            data = {
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/pull-request/100/merge', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+            # Project w/o pull-request
+            repo = pagure.lib.get_project(self.session, 'test')
+            settings = repo.settings
+            settings['pull_requests'] = False
+            repo.settings = settings
+            self.session.add(repo)
+            self.session.commit()
+
+            # Pull-request disabled
+            output = self.app.post(
+                '/test/pull-request/1/merge', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+            # Project w pull-request but only assignee can merge
+            settings['pull_requests'] = True
+            settings['Only_assignee_can_merge_pull-request'] = True
+            repo.settings = settings
+            self.session.add(repo)
+            self.session.commit()
+
+            output = self.app.post(
+                '/test/pull-request/1/merge', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Pull request #1 - test - Pagure</title>',
+                output.data)
+            self.assertIn(
+                '<li class="error">This request must be assigned to be merged</li>',
+                output.data)
+
+            # PR assigned but not to this user
+            repo = pagure.lib.get_project(self.session, 'test')
+            req = repo.requests[0]
+            req.assignee_id = 2
+            self.session.add(req)
+            self.session.commit()
+
+            output = self.app.post(
+                '/test/pull-request/1/merge', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Pull request #1 - test - Pagure</title>',
+                output.data)
+            self.assertIn(
+                '<li class="error">Only the assignee can merge this review</li>',
+                output.data)
+
+            # Project w/ minimal PR score
+            settings['Only_assignee_can_merge_pull-request'] = False
+            settings['Minimum_score_to_merge_pull-request'] = 2
+            repo.settings = settings
+            self.session.add(repo)
+            self.session.commit()
+
+            output = self.app.post(
+                '/test/pull-request/1/merge', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Pull request #1 - test - Pagure</title>',
+                output.data)
+            self.assertIn(
+                '<li class="error">This request does not have the minimum '
+                'review score necessary to be merged</li>', output.data)
+
+            # Merge
+            settings['Minimum_score_to_merge_pull-request'] = -1
+            repo.settings = settings
+            self.session.add(repo)
+            self.session.commit()
+            output = self.app.post(
+                '/test/pull-request/1/merge', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Overview - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<li class="message">Changes merged!</li>', output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskForktests)
