@@ -823,7 +823,12 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
 
     elif orig_repo.is_empty and not repo_obj.is_empty:
         orig_commit = None
-        repo_commit = repo_obj[repo_obj.head.target]
+        if 'master' in repo_obj.listall_branches():
+            repo_commit = repo_obj[repo_obj.head.target]
+        else:
+            branch = repo_obj.lookup_branch(branch_from)
+            repo_commit = branch.get_object()
+
         diff = repo_commit.tree.diff_to_tree(swap=True)
     else:
         flask.flash(
