@@ -1354,6 +1354,39 @@ index 0000000..2a552bb
                 '<li class="error">Fork is empty, there are no commits to '
                 'request pulling</li>', output.data)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_new_request_pull_empty_fork(self, send_email):
+        """ Test the new_request_pull endpoint against an empty repo. """
+        send_email.return_value = True
+
+        self.test_fork_project()
+
+        tests.create_projects_git(
+            os.path.join(tests.HERE, 'requests'), bare=True)
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        fork = pagure.lib.get_project(self.session, 'test', user='foo')
+
+        # Create a git repo to play with
+        gitrepo = os.path.join(tests.HERE, 'repos', 'test.git')
+        repo = pygit2.init_repository(gitrepo, bare=True)
+
+        # Create a fork of this repo
+        newpath = tempfile.mkdtemp(prefix='pagure-fork-test')
+        gitrepo = os.path.join(tests.HERE, 'forks', 'foo', 'test.git')
+        new_repo = pygit2.clone_repository(gitrepo, newpath)
+
+        user = tests.FakeUser()
+        user.username = 'foo'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get(
+                '/fork/foo/test/diff/master..master', follow_redirects=True)
+            self.assertIn(
+                '<title>Overview - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<li class="error">Fork is empty, there are no commits to '
+                'request pulling</li>', output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskForktests)
