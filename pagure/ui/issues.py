@@ -484,6 +484,7 @@ def view_issue(repo, issueid, username=None):
         repo_admin=is_repo_admin(repo),
     )
 
+
 @APP.route('/<repo>/issue/<int:issueid>/drop', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/issue/<int:issueid>/drop',
            methods=['POST'])
