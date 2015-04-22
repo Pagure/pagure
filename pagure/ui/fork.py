@@ -317,11 +317,11 @@ def request_pull_patch(repo, requestid, username=None):
     return flask.Response(patch, content_type="text/plain;charset=UTF-8")
 
 
-@APP.route('/<repo>/pull-request/<int:requestid>/comment/',
+@APP.route('/<repo>/pull-request/<int:requestid>/comment',
            methods=['POST'])
 @APP.route('/<repo>/pull-request/<int:requestid>/comment/<commit>/'
            '<path:filename>/<row>', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/comment/',
+@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/comment',
            methods=['POST'])
 @APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/comment/'
            '<commit>/<path:filename>/<row>', methods=('GET', 'POST'))
