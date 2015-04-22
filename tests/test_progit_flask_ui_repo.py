@@ -51,8 +51,10 @@ class PagureFlaskRepotests(tests.Modeltests):
             tests.HERE, 'docs')
         self.app = pagure.APP.test_client()
 
-    def test_add_user(self):
+    @patch('pagure.ui.repo.admin_session_timedout')
+    def test_add_user(self, ast):
         """ Test the add_user endpoint. """
+        ast.return_value = False
 
         output = self.app.get('/foo/adduser')
         self.assertEqual(output.status_code, 302)
@@ -66,6 +68,11 @@ class PagureFlaskRepotests(tests.Modeltests):
 
             output = self.app.get('/test/adduser')
             self.assertEqual(output.status_code, 403)
+
+            ast.return_value = True
+            output = self.app.get('/test/adduser')
+            self.assertEqual(output.status_code, 302)
+            ast.return_value = False
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
