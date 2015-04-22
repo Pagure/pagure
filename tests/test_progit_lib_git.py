@@ -420,6 +420,35 @@ index 458821a..77674a8
         #print patch
         self.assertEqual(patch, exp)
 
+    def test_clean_git(self):
+        """ Test the clean_git method of pagure.lib.git. """
+        self.test_update_git()
+
+        gitpath = os.path.join(tests.HERE, 'test_ticket_repo.git')
+        gitrepo = pygit2.init_repository(gitpath, bare=True)
+
+        # Get the uid of the ticket created
+        commit = gitrepo.revparse_single('HEAD')
+        patch = pagure.lib.git.commit_to_patch(gitrepo, commit)
+        hash_file = None
+        for row in patch.split('\n'):
+            if row.startswith('+++ b/'):
+                hash_file = row.split('+++ b/')[-1]
+                break
+
+        # The only file in git is the one of that ticket
+        files = [entry.name for entry in commit.tree]
+        self.assertEqual(files, [hash_file])
+
+        repo = pagure.lib.get_project(self.session, 'test_ticket_repo')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        pagure.lib.git.clean_git(issue, repo, tests.HERE, objtype='ticket')
+
+        # No more files in the git repo
+        commit = gitrepo.revparse_single('HEAD')
+        files = [entry.name for entry in commit.tree]
+        self.assertEqual(files, [])
+
     @patch('pagure.lib.notify.send_email')
     def test_update_git_requests(self, email_f):
         """ Test the update_git of pagure.lib.git for pull-requests. """
