@@ -1140,8 +1140,11 @@ index 0000000..fb7093d
         self.assertFalse(
             'No content found in this repository' in output.data)
 
-    def test_delete_repo(self):
+    @patch('pagure.ui.repo.admin_session_timedout')
+    def test_delete_repo(self, ast):
         """ Test the delete_repo endpoint. """
+        ast.return_value = False
+
         output = self.app.post('/foo/delete')
         # User not logged in
         self.assertEqual(output.status_code, 302)
@@ -1160,6 +1163,11 @@ index 0000000..fb7093d
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
+            ast.return_value = True
+            output = self.app.post('/test/delete')
+            self.assertEqual(output.status_code, 302)
+
+            ast.return_value = False
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
