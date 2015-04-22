@@ -484,6 +484,46 @@ def view_issue(repo, issueid, username=None):
         repo_admin=is_repo_admin(repo),
     )
 
+@APP.route('/<repo>/issue/<int:issueid>', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/issue/<int:issueid>', methods=['POST'])
+def delete_issue(repo, issueid, username=None):
+    """ Delete the specified issue
+    """
+
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+
+    if repo is None:
+        flask.abort(404, 'Project not found')
+
+    if not repo.settings.get('issue_tracker', True):
+        flask.abort(404, 'No issue tracker found for this project')
+
+    issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
+
+    if issue is None or issue.project != repo:
+        flask.abort(404, 'Issue not found')
+
+    form = pagure.forms.ConfirmationForm()
+    if form.validate_on_submit():
+        try:
+            SESSION.delete(issue)
+            SESSION.commit()
+        except SQLAlchemyError, err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash('Could not delete the issue', 'error')
+
+    return flask.render_template(
+        'issue.html',
+        select='issues',
+        repo=repo,
+        username=username,
+        issue=issue,
+        issueid=issueid,
+        form=form,
+        repo_admin=is_repo_admin(repo),
+    )
+
 
 @APP.route('/<repo>/issue/<int:issueid>/edit', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/issue/<int:issueid>/edit',
