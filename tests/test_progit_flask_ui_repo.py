@@ -1147,10 +1147,12 @@ index 0000000..fb7093d
         self.assertFalse(
             'No content found in this repository' in output.data)
 
+    @patch('pagure.lib.notify.send_email')
     @patch('pagure.ui.repo.admin_session_timedout')
-    def test_delete_repo(self, ast):
+    def test_delete_repo(self, ast, send_email):
         """ Test the delete_repo endpoint. """
         ast.return_value = False
+        send_email.return_value = True
 
         output = self.app.post('/foo/delete')
         # User not logged in
