@@ -1387,6 +1387,57 @@ index 0000000..2a552bb
                 '<li class="error">Fork is empty, there are no commits to '
                 'request pulling</li>', output.data)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_pull_request_add_comment(self, send_email):
+        """ Test the pull_request_add_comment endpoint. """
+        send_email.return_value = True
+
+        self.test_request_pull()
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/foo/pull-request/1/comment')
+            self.assertEqual(output.status_code, 404)
+
+            output = self.app.post('/test/pull-request/100/comment')
+            self.assertEqual(output.status_code, 404)
+
+            output = self.app.post('/test/pull-request/1/comment')
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue(
+                output.data.startswith('<section class="add_comment">'))
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+                'csrf_token': csrf_token,
+                'comment': 'This look alright but we can do better',
+            }
+            output = self.app.post(
+                '/test/pull-request/1/comment', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Pull request #1 - test - Pagure</title>',
+                output.data)
+            self.assertIn(
+                '<li class="message">Comment added</li>', output.data)
+
+            # Project w/o pull-request
+            repo = pagure.lib.get_project(self.session, 'test')
+            settings = repo.settings
+            settings['pull_requests'] = False
+            repo.settings = settings
+            self.session.add(repo)
+            self.session.commit()
+
+            output = self.app.post(
+                '/test/pull-request/1/comment', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskForktests)
