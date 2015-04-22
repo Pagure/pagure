@@ -1222,7 +1222,90 @@ index 0000000..fb7093d
             self.session.commit()
             tests.create_projects_git(tests.HERE)
             tests.create_projects_git(os.path.join(tests.HERE, 'docs'))
-            tests.create_projects_git(os.path.join(tests.HERE, 'tickets'))
+            tests.create_projects_git(
+                os.path.join(tests.HERE, 'tickets'), bare=True)
+            tests.create_projects_git(
+                os.path.join(tests.HERE, 'requests'), bare=True)
+
+            # add issues
+            repo = pagure.lib.get_project(self.session, 'test')
+            msg = pagure.lib.new_issue(
+                session=self.session,
+                repo=repo,
+                title='Test issue',
+                content='We should work on this',
+                user='pingou',
+                ticketfolder=os.path.join(tests.HERE, 'tickets')
+            )
+            self.session.commit()
+            self.assertEqual(msg.title, 'Test issue')
+
+            msg = pagure.lib.new_issue(
+                session=self.session,
+                repo=repo,
+                title='Test issue #2',
+                content='We should work on this, really',
+                user='pingou',
+                ticketfolder=os.path.join(tests.HERE, 'tickets')
+            )
+            self.session.commit()
+            self.assertEqual(msg.title, 'Test issue #2')
+
+            # Add a comment to an issue
+            issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+            msg = pagure.lib.add_issue_comment(
+                session=self.session,
+                issue=issue,
+                comment='Hey look a comment!',
+                user='foo',
+                ticketfolder=None
+            )
+            self.session.commit()
+            self.assertEqual(msg, 'Comment added')
+
+            # add pull-requests
+            msg = pagure.lib.new_pull_request(
+                session=self.session,
+                repo_from=repo,
+                branch_from='feature',
+                repo_to=repo,
+                branch_to='master',
+                title='test pull-request',
+                user='pingou',
+                requestfolder=os.path.join(tests.HERE, 'requests'),
+            )
+            self.session.commit()
+            self.assertEqual(msg, 'Request created')
+
+            msg = pagure.lib.new_pull_request(
+                session=self.session,
+                repo_from=repo,
+                branch_from='feature2',
+                repo_to=repo,
+                branch_to='master',
+                title='test pull-request',
+                user='pingou',
+                requestfolder=os.path.join(tests.HERE, 'requests'),
+            )
+            self.session.commit()
+            self.assertEqual(msg, 'Request created')
+
+            # Add comment on a pull-request
+            request = pagure.lib.search_pull_requests(
+                self.session, requestid=3)
+
+            msg = pagure.lib.add_pull_request_comment(
+                session=self.session,
+                request=request,
+                commit='commithash',
+                filename='file',
+                row=None,
+                comment='This is awesome, I got to remember it!',
+                user='foo',
+                requestfolder=None,
+            )
+            self.assertEqual(msg, 'Comment added')
+
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<h2>Projects (1)</h2>' in output.data)
