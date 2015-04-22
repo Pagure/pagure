@@ -205,6 +205,76 @@ def update_git(obj, repo, repofolder, objtype='ticket'):
     shutil.rmtree(newpath)
 
 
+def clean_git(obj, repo, repofolder, objtype='ticket'):
+    """ Update the given issue remove it from its git.
+
+    """
+
+    if not repofolder:
+        return
+
+    # Get the fork
+    repopath = os.path.join(repofolder, repo.path)
+
+    # Clone the repo into a temp folder
+    newpath = tempfile.mkdtemp()
+    new_repo = pygit2.clone_repository(repopath, newpath)
+
+    file_path = os.path.join(newpath, obj.uid)
+
+    # Get the current index
+    index = new_repo.index
+
+    # Are we adding files
+    added = False
+    if not os.path.exists(file_path):
+        shutil.rmtree(newpath)
+        return
+
+    # Remove the file
+    os.unlink(file_path)
+
+    diff = new_repo.diff()
+    files = [patch.new_file_path for patch in diff]
+
+    # Add the changes to the index
+    index.remove(obj.uid)
+
+    # See if there is a parent to this commit
+    parent = None
+    try:
+        parent = new_repo.head.get_object().oid
+    except pygit2.GitError:
+        pass
+
+    parents = []
+    if parent:
+        parents.append(parent)
+
+    # Author/commiter will always be this one
+    author = pygit2.Signature(name='pagure', email='pagure')
+
+    # Actually commit
+    new_repo.create_commit(
+        'refs/heads/master',
+        author,
+        author,
+        'Removed %s %s: %s' % (objtype, obj.uid, obj.title),
+        new_repo.index.write_tree(),
+        parents)
+    index.write()
+
+    # Push to origin
+    ori_remote = new_repo.remotes[0]
+    master_ref = new_repo.lookup_reference('HEAD').resolve()
+    refname = '%s:%s' % (master_ref.name, master_ref.name)
+
+    ori_remote.push(refname)
+
+    # Remove the clone
+    shutil.rmtree(newpath)
+
+
 def get_user_from_json(session, jsondata, key='user'):
     """ From the given json blob, retrieve the user info and search for it
     in the db and create the user if it does not already exist.
