@@ -776,8 +776,15 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # Add some content to the git repo
-        tests.add_content_git_repo(os.path.join(tests.HERE, 'test.git'))
         tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
+
+        # View first commit
+        output = self.app.get('/test/raw/master')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue(':Author: Pierre-Yves Chibon' in output.data)
+
+        # Add some more content to the repo
+        tests.add_content_git_repo(os.path.join(tests.HERE, 'test.git'))
         tests.add_binary_git_repo(
             os.path.join(tests.HERE, 'test.git'), 'test.jpg')
         tests.add_binary_git_repo(
