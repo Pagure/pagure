@@ -270,13 +270,14 @@ def view_commits(repo, branchname=None, username=None):
                     pygit2.GIT_SORT_TIME)
             ]
 
-        repo_commit = repo_obj[branch.get_object().hex]
+        if branch:
+            repo_commit = repo_obj[branch.get_object().hex]
 
-        for commit in repo_obj.walk(
-                repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
-            if commit.oid.hex in master_commits:
-                break
-            diff_commits.append(commit.oid.hex)
+            for commit in repo_obj.walk(
+                    repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
+                if commit.oid.hex in master_commits:
+                    break
+                diff_commits.append(commit.oid.hex)
 
     origin = 'view_commits'
 
