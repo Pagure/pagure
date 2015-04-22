@@ -176,7 +176,7 @@ def view_repo_branch(repo, branchname, username=None):
             master_commits = [
                 commit.oid.hex
                 for commit in orig_repo.walk(
-                    .get_object().hex,
+                    master_branch.get_object().hex,
                     pygit2.GIT_SORT_TIME)
             ]
 
