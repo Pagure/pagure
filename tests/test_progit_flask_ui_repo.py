@@ -301,6 +301,37 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<input id="issue_tracker" type="checkbox" value="y" '
                 'name="issue_tracker" />' in output.data)
 
+
+            data = {
+                'csrf_token': csrf_token,
+                'project_documentation': 'y',
+                'issue_tracker': 'y',
+            }
+            output = self.app.post(
+                '/test/settings', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<header class="repo">' in output.data)
+            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertTrue(
+                '<title>Overview - test - Pagure</title>' in output.data)
+            self.assertTrue(
+                '<li class="message">Edited successfully settings of '
+                'repo: test</li>' in output.data)
+
+            # Both checkbox are again checked
+            output = self.app.get('/test/settings', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<header class="repo">' in output.data)
+            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertTrue(
+                '<ul id="flashes">\n                </ul>' in output.data)
+            self.assertTrue(
+                '<input id="project_documentation" type="checkbox" value="y" '
+                'name="project_documentation" checked=""/>' in output.data)
+            self.assertTrue(
+                '<input id="issue_tracker" type="checkbox" value="y" '
+                'name="issue_tracker" checked=""/>' in output.data)
+
     def test_view_forks(self):
         """ Test the view_forks endpoint. """
 
