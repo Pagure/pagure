@@ -209,8 +209,11 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<li class="message">Description updated</li>'
                 in output.data)
 
-    def test_view_settings(self):
+    @patch('pagure.ui.repo.admin_session_timedout')
+    def test_view_settings(self, ast):
         """ Test the view_settings endpoint. """
+        ast.return_value = False
+
         output = self.app.get('/foo/settings')
         self.assertEqual(output.status_code, 302)
 
@@ -227,7 +230,12 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
-            output = self.app.get('/test/settings', follow_redirects=True)
+            ast.return_value = True
+            output = self.app.get('/test/settings')
+            self.assertEqual(output.status_code, 302)
+
+            ast.return_value = False
+            output = self.app.get('/test/settings')
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<header class="repo">' in output.data)
             self.assertTrue('<h2>Settings</h2>' in output.data)
