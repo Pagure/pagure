@@ -1438,6 +1438,85 @@ index 0000000..2a552bb
                 follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_pull_request_drop_comment(self, send_email):
+        """ Test the pull_request_drop_comment endpoint. """
+        send_email.return_value = True
+
+        self.test_pull_request_add_comment()
+        # Project w/ pull-request
+        repo = pagure.lib.get_project(self.session, 'test')
+        settings = repo.settings
+        settings['pull_requests'] = True
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        user = tests.FakeUser()
+        user.username = 'foo'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/foo/pull-request/1/comment/drop')
+            self.assertEqual(output.status_code, 404)
+
+            output = self.app.post('/test/pull-request/100/comment/drop')
+            self.assertEqual(output.status_code, 404)
+
+            output = self.app.post(
+                '/test/pull-request/1/comment/drop', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Pull request #1 - test - Pagure</title>',
+                output.data)
+            self.assertIn('href="#comment-1">¶</a>', output.data)
+            self.assertIn(
+                '<p>This look alright but we can do better</p>',
+                output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            # Invalid comment id
+            data = {
+                'csrf_token': csrf_token,
+                'drop_comment': '10',
+            }
+            output = self.app.post(
+                '/test/pull-request/1/comment/drop', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+            data['drop_comment'] = '1'
+            output = self.app.post(
+                '/test/pull-request/1/comment/drop', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 403)
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            # Drop comment
+            output = self.app.post(
+                '/test/pull-request/1/comment/drop', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Pull request #1 - test - Pagure</title>',
+                output.data)
+            self.assertIn(
+                '<li class="message">Comment removed</li>', output.data)
+
+            # Project w/o pull-request
+            repo = pagure.lib.get_project(self.session, 'test')
+            settings = repo.settings
+            settings['pull_requests'] = False
+            repo.settings = settings
+            self.session.add(repo)
+            self.session.commit()
+
+            output = self.app.post(
+                '/test/pull-request/1/comment/drop', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskForktests)
