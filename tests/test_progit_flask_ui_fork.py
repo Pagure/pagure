@@ -1157,7 +1157,7 @@ index 0000000..2a552bb
         send_email.return_value = True
 
         tests.create_projects(self.session)
-        for folder in ['docs', 'tickets', 'requets', 'repos']:
+        for folder in ['docs', 'tickets', 'requests', 'repos']:
             tests.create_projects_git(
                 os.path.join(tests.HERE, folder), bare=True)
 
