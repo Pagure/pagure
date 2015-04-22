@@ -543,6 +543,7 @@ def view_tree(repo, identifier=None, username=None):
     branchname = None
     content = None
     output_type = None
+    commit = None
     if not repo_obj.is_empty:
         if identifier in repo_obj.listall_branches():
             branchname = identifier
@@ -554,10 +555,12 @@ def view_tree(repo, identifier=None, username=None):
                 branchname = identifier
             except (ValueError, TypeError):
                 # If it's not a commit id then it's part of the filename
-                commit = repo_obj[repo_obj.head.target]
-                branchname = 'master'
+                if 'master' in repo_obj.listall_branches():
+                    commit = repo_obj[repo_obj.head.target]
+                    branchname = 'master'
 
-        content = sorted(commit.tree, key=lambda x: x.filemode)
+        if commit:
+            content = sorted(commit.tree, key=lambda x: x.filemode)
         output_type = 'tree'
 
     return flask.render_template(
