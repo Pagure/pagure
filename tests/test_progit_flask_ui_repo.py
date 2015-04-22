@@ -1402,6 +1402,64 @@ index 0000000..fb7093d
         repo = pagure.lib.get_project(self.session, 'test')
         self.assertNotEqual(repo.hook_token, 'aaabbbccc')
 
+    @patch('pagure.ui.repo.admin_session_timedout')
+    @patch('pagure.lib.git.update_git')
+    def test_regenerate_git(self, upgit, ast):
+        """ Test the regenerate_git endpoint. """
+        ast.return_value = False
+        upgit.return_value = True
+        tests.create_projects(self.session)
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/new/')
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>New project</h2>' in output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            output = self.app.post('/foo/regenerate')
+            self.assertEqual(output.status_code, 404)
+
+            output = self.app.post('/test/regenerate')
+            self.assertEqual(output.status_code, 403)
+
+            ast.return_value = True
+            output = self.app.post('/test/regenerate')
+            self.assertEqual(output.status_code, 302)
+            ast.return_value = False
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/test/regenerate')
+            self.assertEqual(output.status_code, 400)
+
+            data = {'csrf_token': csrf_token}
+
+            output = self.app.post('/test/regenerate', data=data)
+            self.assertEqual(output.status_code, 400)
+
+            data['regenerate'] = 'ticket'
+            output = self.app.post('/test/regenerate', data=data)
+            self.assertEqual(output.status_code, 400)
+
+            data['regenerate'] = 'tickets'
+            output = self.app.post(
+                '/test/regenerate', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li class="message">Tickets git repo updated</li>',
+                output.data)
+
+            data['regenerate'] = 'requests'
+            output = self.app.post(
+                '/test/regenerate', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li class="message">Requests git repo updated</li>',
+                output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskRepotests)
