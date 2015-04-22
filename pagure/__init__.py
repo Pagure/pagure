@@ -90,7 +90,7 @@ def admin_session_timedout():
     return timedout
 
 
-def is_safe_url(target):
+def is_safe_url(target):  # pragma: no cover
     """ Checks that the target url is safe and sending to the current
     website not some other malicious one.
     """
@@ -153,7 +153,7 @@ def generate_gitolite_acls():
         )
 
 
-def generate_gitolite_key(user, key):
+def generate_gitolite_key(user, key):  # pragma: no cover
     """ Generate the gitolite ssh key file for the specified user
     """
     gitolite_keydir = APP.config.get('GITOLITE_KEYDIR', None)
@@ -163,7 +163,7 @@ def generate_gitolite_key(user, key):
             stream.write(key + '\n')
 
 
-def generate_authorized_key_file():
+def generate_authorized_key_file():  # pragma: no cover
     """ Regenerate the `authorized_keys` file used by gitolite.
     """
     gitolite_home = APP.config.get('GITOLITE_HOME', None)
@@ -249,25 +249,25 @@ def set_user(return_url):
 
 
 @APP.errorhandler(404)
-def not_found(error):
+def not_found(error):  # pragma: no cover
     """404 Not Found page"""
     return flask.render_template('not_found.html'), 404
 
 
 @APP.errorhandler(500)
-def fatal_error(error):
+def fatal_error(error):  # pragma: no cover
     """500 Fatal Error page"""
     return flask.render_template('fatal_error.html'), 500
 
 
 @APP.errorhandler(401)
-def unauthorized(error):
+def unauthorized(error):  # pragma: no cover
     """401 Unauthorized page"""
     return flask.render_template('unauthorized.html'), 401
 
 
 @APP.route('/login/', methods=('GET', 'POST'))
-def auth_login():
+def auth_login():  # pragma: no cover
     """ Method to log into the application using FAS OpenID. """
     return_point = flask.url_for('index')
     if 'next' in flask.request.args:
@@ -295,7 +295,7 @@ def auth_login():
 
 
 @APP.route('/logout/')
-def auth_logout():
+def auth_logout():  # pragma: no cover
     """ Method to log out from the application. """
     return_point = flask.url_for('index')
     if 'next' in flask.request.args:
