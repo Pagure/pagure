@@ -1334,6 +1334,58 @@ index 0000000..fb7093d
             self.assertTrue('<h2>Projects (1)</h2>' in output.data)
             self.assertTrue('<h2>Forks (0)</h2>' in output.data)
 
+    @patch('pagure.ui.repo.admin_session_timedout')
+    def test_new_repo_hook_token(self, ast):
+        """ Test the new_repo_hook_token endpoint. """
+        ast.return_value = False
+        tests.create_projects(self.session)
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        self.assertEqual(repo.hook_token, 'aaabbbccc')
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/new/')
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>New project</h2>' in output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            output = self.app.post('/foo/hook_token')
+            self.assertEqual(output.status_code, 404)
+
+            output = self.app.post('/test/hook_token')
+            self.assertEqual(output.status_code, 403)
+
+            ast.return_value = True
+            output = self.app.post('/test/hook_token')
+            self.assertEqual(output.status_code, 302)
+            ast.return_value = False
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        self.assertEqual(repo.hook_token, 'aaabbbccc')
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/test/hook_token')
+            self.assertEqual(output.status_code, 400)
+
+            data = {'csrf_token': csrf_token}
+
+            repo = pagure.lib.get_project(self.session, 'test')
+            self.assertEqual(repo.hook_token, 'aaabbbccc')
+
+            output = self.app.post(
+                '/test/hook_token', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li class="message">New hook token generated</li>',
+                output.data)
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        self.assertNotEqual(repo.hook_token, 'aaabbbccc')
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskRepotests)
