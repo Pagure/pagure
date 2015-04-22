@@ -87,9 +87,6 @@ def view_repo(repo, username=None):
         if repo.parent.is_fork:
             parentname = os.path.join(
                 APP.config['FORK_FOLDER'], repo.parent.path)
-    elif repo.parent:
-        parentname = os.path.join(
-            APP.config['GIT_FOLDER'], repo.parent.path)
     else:
         parentname = os.path.join(APP.config['GIT_FOLDER'], repo.path)
 
@@ -165,9 +162,6 @@ def view_repo_branch(repo, branchname, username=None):
         if repo.parent.is_fork:
             parentname = os.path.join(
                 APP.config['FORK_FOLDER'], repo.parent.path)
-    elif repo.parent:
-        parentname = os.path.join(
-            APP.config['GIT_FOLDER'], repo.parent.path)
     else:
         parentname = os.path.join(APP.config['GIT_FOLDER'], repo.path)
 
@@ -254,9 +248,6 @@ def view_commits(repo, branchname=None, username=None):
         if repo.parent.is_fork:
             parentname = os.path.join(
                 APP.config['FORK_FOLDER'], repo.parent.path)
-    elif repo.parent:
-        parentname = os.path.join(
-            APP.config['GIT_FOLDER'], repo.parent.path)
     else:
         parentname = os.path.join(APP.config['GIT_FOLDER'], repo.path)
 
