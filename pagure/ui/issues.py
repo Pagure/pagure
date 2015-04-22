@@ -484,8 +484,9 @@ def view_issue(repo, issueid, username=None):
         repo_admin=is_repo_admin(repo),
     )
 
-@APP.route('/<repo>/issue/<int:issueid>', methods=['POST'])
-@APP.route('/fork/<username>/<repo>/issue/<int:issueid>', methods=['POST'])
+@APP.route('/<repo>/issue/<int:issueid>/drop', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/drop',
+           methods=['POST'])
 def delete_issue(repo, issueid, username=None):
     """ Delete the specified issue
     """
@@ -503,26 +504,30 @@ def delete_issue(repo, issueid, username=None):
     if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
 
+    if not is_repo_admin(repo):
+        flask.abort(
+            403,
+            'You are not allowed to remove tickets of this project')
+
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
         try:
-            SESSION.delete(issue)
+            pagure.lib.drop_issue(
+                SESSION, issue,
+                user=flask.g.fas_user.username,
+                ticketfolder=APP.config['TICKETS_FOLDER'],
+            )
             SESSION.commit()
+            flask.flash('Issue deleted')
+            return flask.redirect(flask.url_for(
+                'view_issues', username=username, repo=repo.name))
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
             APP.logger.exception(err)
             flask.flash('Could not delete the issue', 'error')
 
-    return flask.render_template(
-        'issue.html',
-        select='issues',
-        repo=repo,
-        username=username,
-        issue=issue,
-        issueid=issueid,
-        form=form,
-        repo_admin=is_repo_admin(repo),
-    )
+    return flask.redirect(flask.url_for(
+        'view_issue', username=username, repo=repo.name, issueid=issueid))
 
 
 @APP.route('/<repo>/issue/<int:issueid>/edit', methods=('GET', 'POST'))
