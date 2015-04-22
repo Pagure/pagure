@@ -259,12 +259,16 @@ def view_commits(repo, branchname=None, username=None):
 
     if not repo_obj.is_empty and not orig_repo.is_empty:
 
-        master_commits = [
-            commit.oid.hex
-            for commit in orig_repo.walk(
-                orig_repo.lookup_branch('master').get_object().hex,
-                pygit2.GIT_SORT_TIME)
-        ]
+        master_branch = orig_repo.lookup_branch('master')
+        master_commits = []
+
+        if master_branch:
+            master_commits = [
+                commit.oid.hex
+                for commit in orig_repo.walk(
+                    master_branch.get_object().hex,
+                    pygit2.GIT_SORT_TIME)
+            ]
 
         repo_commit = repo_obj[branch.get_object().hex]
 
