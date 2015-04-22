@@ -361,8 +361,6 @@ def update_ticket_from_git(
         and used to update the data in the database.
 
     """
-    print json.dumps(json_data, sort_keys=True,
-                     indent=4, separators=(',', ': '))
 
     repo = pagure.lib.get_project(session, reponame, user=username)
     if not repo:
@@ -459,8 +457,6 @@ def update_request_from_git(
         and used to update the data in the database.
 
     """
-    print json.dumps(json_data, sort_keys=True,
-                     indent=4, separators=(',', ': '))
 
     repo = pagure.lib.get_project(session, reponame, user=username)
     if not repo:
