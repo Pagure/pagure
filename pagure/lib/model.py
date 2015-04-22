@@ -527,7 +527,10 @@ class IssueComment(BASE):
 
     issue = relation(
         'Issue', foreign_keys=[issue_uid], remote_side=[Issue.uid],
-        backref=backref('comments', order_by="IssueComment.date_created")
+        backref=backref(
+            'comments', cascade="delete, delete-orphan",
+            order_by="IssueComment.date_created"
+        ),
     )
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id], backref='comment_issues')
@@ -781,7 +784,10 @@ class PullRequestComment(BASE):
                         'pull_request_comments',
                         order_by="PullRequestComment.date_created"))
     pull_request = relation(
-        'PullRequest', backref='comments',
+        'PullRequest',
+        backref=backref(
+            'comments', cascade="delete, delete-orphan",
+        ),
         foreign_keys=[pull_request_uid],
         remote_side=[PullRequest.uid])
 

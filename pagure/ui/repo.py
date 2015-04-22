@@ -700,8 +700,6 @@ def delete_repo(repo, username=None):
                 SESSION.delete(comment)
             SESSION.commit()
             SESSION.delete(issue)
-        for preq in repo.requests:
-            SESSION.delete(preq)
         SESSION.delete(repo)
         SESSION.commit()
     except SQLAlchemyError, err:  # pragma: no cover
