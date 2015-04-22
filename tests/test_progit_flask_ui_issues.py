@@ -1038,7 +1038,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
         output = self.app.get('/test' + url)
         self.assertEqual(output.status_code, 404)
 
-
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
     def test_edit_issue(self, p_send_email, p_ugt):
@@ -1299,6 +1298,85 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue('<h2>Settings</h2>' in output.data)
             self.assertTrue(
                 '<li class="message">Removed tag: tag1</li>' in output.data)
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_delete_issue(self, p_send_email, p_ugt):
+        """ Test the delete_issue endpoint. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(tests.HERE)
+        tests.create_projects_git(os.path.join(tests.HERE, 'tickets'))
+
+        # Create issues to play with
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post(
+                '/foo/issue/1/drop', follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+            output = self.app.post(
+                '/test/issue/100/drop', follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+            output = self.app.post(
+                '/test/issue/1/drop', follow_redirects=True)
+            self.assertEqual(output.status_code, 403)
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post(
+                '/test/issue/1/drop', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+            }
+
+            # No CSRF token
+            output = self.app.post(
+                '/test/issue/1/drop', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+
+            data['csrf_token'] = csrf_token
+            output = self.app.post(
+                '/test/issue/1/drop', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Issues - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<li class="message">Issue deleted</li>', output.data)
+
+        # Project w/o issue tracker
+        repo = pagure.lib.get_project(self.session, 'test')
+        repo.settings = {'issue_tracker': False}
+        self.session.add(repo)
+        self.session.commit()
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/test/issue/1/drop', data=data)
+            self.assertEqual(output.status_code, 404)
 
 
 if __name__ == '__main__':
