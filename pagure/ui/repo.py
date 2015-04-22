@@ -97,21 +97,24 @@ def view_repo(repo, username=None):
 
     if not repo_obj.is_empty and not orig_repo.is_empty:
 
-        master_commits = [
-            commit.oid.hex
-            for commit in orig_repo.walk(
-                orig_repo.lookup_branch('master').get_object().hex,
-                pygit2.GIT_SORT_TIME)
-        ]
+        orig_branch = orig_repo.lookup_branch('master')
+        branch = repo_obj.lookup_branch('master')
+        if orig_branch and branch:
 
-        repo_commit = repo_obj[
-            repo_obj.lookup_branch('master').get_object().hex]
+            master_commits = [
+                commit.oid.hex
+                for commit in orig_repo.walk(
+                    orig_branch.get_object().hex,
+                    pygit2.GIT_SORT_TIME)
+            ]
 
-        for commit in repo_obj.walk(
-                repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
-            if commit.oid.hex in master_commits:
-                break
-            diff_commits.append(commit.oid.hex)
+            repo_commit = repo_obj[branch.get_object().hex]
+
+            for commit in repo_obj.walk(
+                    repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
+                if commit.oid.hex in master_commits:
+                    break
+                diff_commits.append(commit.oid.hex)
 
     return flask.render_template(
         'repo_info.html',
