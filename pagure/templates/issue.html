@@ -12,6 +12,20 @@
 {% endblock %}
 
 {% block repo %}
+{% if authenticated and repo_admin %}
+<aside class="delete_ticket">
+<form method="post" class="icon" action="{{ url_for('.delete_issue',
+                    username=username, repo=repo.name, issueid=issueid) }}">
+  <button class="icon_button" type="submit"
+      onclick="return confirm('Are you sure to delete this ticket? \nThis is final and cannot be un-done.');"
+      title="Delete this ticket">
+    <span class="icon icon-trash blue"></span>
+    Delete issue
+  </button>
+  {{ form.csrf_token }}
+</form>
+</aside>
+{% endif %}
 
 {% if authenticated and form %}
   <form action="{{ url_for('update_issue', username=username,

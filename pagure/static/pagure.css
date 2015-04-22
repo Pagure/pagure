@@ -538,9 +538,11 @@ request_comment p {
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ededed', endColorstr='#fff',GradientType=0 ); /* IE6-9 */
 }
 
-.issue_action {
+.issue_action,
+.delete_ticket {
     float: right;
     text-align: right;
+    clear: both;
 }
 
 .issue_action div {
