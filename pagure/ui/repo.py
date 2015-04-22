@@ -748,9 +748,14 @@ def new_repo_hook_token(repo, username=None):
             403,
             'You are not allowed to change the settings for this project')
 
+    form = pagure.forms.ConfirmationForm()
+    if not form.validate_on_submit():
+        flask.abort(400, 'Invalid request')
+
     try:
         repo.hook_token = pagure.lib.login.id_generator(40)
         SESSION.commit()
+        flask.flash('New hook token generated')
     except SQLAlchemyError, err:  # pragma: no cover
         SESSION.rollback()
         APP.logger.exception(err)
