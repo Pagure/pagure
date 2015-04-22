@@ -15,6 +15,7 @@ import json
 import unittest
 import shutil
 import sys
+import tempfile
 import os
 
 import pygit2
@@ -386,6 +387,50 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertTrue('Forked from' in output.data)
         self.assertEqual(
             output.data.count('<span class="commitid">'), 3)
+
+    def test_view_repo_empty(self):
+        """ Test the view_repo endpoint on a repo w/o master branch. """
+
+        tests.create_projects(self.session)
+        # Create a git repo to play with
+        gitrepo = os.path.join(tests.HERE, 'test.git')
+        pygit2.init_repository(gitrepo, bare=True)
+
+        # Create a fork of this repo
+        newpath = tempfile.mkdtemp(prefix='pagure-viewrepo-test')
+        new_repo = pygit2.clone_repository(gitrepo, newpath)
+
+        # Edit the sources file again
+        with open(os.path.join(newpath, 'sources'), 'w') as stream:
+            stream.write('foo\n bar\nbaz\n boose')
+        new_repo.index.add('sources')
+        new_repo.index.write()
+
+        # Commits the files added
+        tree = new_repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        new_repo.create_commit(
+            'refs/heads/feature',
+            author,
+            committer,
+            'A commit on branch feature',
+            tree,
+            []
+        )
+        refname = 'refs/heads/feature'
+        ori_remote = new_repo.remotes[0]
+        ori_remote.push(refname)
+
+        output = self.app.get('/test')
+        self.assertEqual(output.status_code, 200)
+        self.assertFalse('<p>This repo is brand new!</p>' in output.data)
+        self.assertFalse('Forked from' in output.data)
+        self.assertTrue('<p>test project #1</p>' in output.data)
+        self.assertEqual(
+            output.data.count('<span class="commitid">'), 0)
 
     def test_view_repo_branch(self):
         """ Test the view_repo_branch endpoint. """
