@@ -867,8 +867,7 @@ def add_user(repo, username=None):
     )
 
 
-
-@APP.route('/<repo>/regenerate/', methods=['POST'])
+@APP.route('/<repo>/regenerate', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/regenerate', methods=['POST'])
 @cla_required
 def regenerate_git(repo, username=None):
