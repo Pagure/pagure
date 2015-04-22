@@ -743,6 +743,33 @@ def new_issue(session, repo, title, content, user, ticketfolder,
     return issue
 
 
+def drop_issue(session, issue, user, ticketfolder):
+    ''' Delete a specified issue. '''
+    user_obj = __get_user(session, user)
+
+    private = issue.private
+    session.delete(issue)
+
+    # Make sure we won't have SQLAlchemy error before we create the issue
+    session.flush()
+
+    pagure.lib.git.clean_git(
+        issue, repo=issue.project, repofolder=ticketfolder)
+
+    if not private:
+        pagure.lib.notify.log(
+            issue.project,
+            topic='issue.drop',
+            msg=dict(
+                issue=issue.to_json(),
+                project=issue.project.to_json(),
+                agent=user_obj.username,
+            )
+        )
+
+    return issue
+
+
 def new_pull_request(session, repo_from, branch_from,
                      repo_to, branch_to, title, user,
                      requestfolder, requestuid=None, requestid=None,
