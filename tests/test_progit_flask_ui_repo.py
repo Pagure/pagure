@@ -105,8 +105,10 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertTrue(
                 '<li class="message">User added</li>' in output.data)
 
-    def test_remove_user(self):
+    @patch('pagure.ui.repo.admin_session_timedout')
+    def test_remove_user(self, ast):
         """ Test the remove_user endpoint. """
+        ast.return_value = False
 
         output = self.app.post('/foo/dropuser/1')
         self.assertEqual(output.status_code, 302)
@@ -120,6 +122,11 @@ class PagureFlaskRepotests(tests.Modeltests):
 
             output = self.app.post('/test/dropuser/1')
             self.assertEqual(output.status_code, 403)
+
+            ast.return_value = True
+            output = self.app.post('/test/dropuser/1')
+            self.assertEqual(output.status_code, 302)
+            ast.return_value = False
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
