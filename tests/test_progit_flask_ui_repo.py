@@ -583,6 +583,14 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(
             output.data.count('<span class="commitid">'), 3)
 
+        output = self.app.get('/test/commits/master')
+        self.assertEqual(output.status_code, 200)
+        self.assertFalse('<p>This repo is brand new!</p>' in output.data)
+        self.assertFalse('Forked from' in output.data)
+        self.assertTrue('<p>test project #1</p>' in output.data)
+        self.assertEqual(
+            output.data.count('<span class="commitid">'), 3)
+
         # Turn that repo into a fork
         repo = pagure.lib.get_project(self.session, 'test')
         repo.parent_id = 2
