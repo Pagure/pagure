@@ -341,10 +341,11 @@ def pull_request_add_comment(
 
     request = pagure.lib.search_pull_requests(
         SESSION, project_id=repo.id, requestid=requestid)
-    repo = request.project_from
 
     if not request:
         flask.abort(404, 'Pull-request not found')
+
+    repo = request.project_from
 
     form = pagure.forms.AddPullRequestCommentForm()
     form.commit.data = commit
