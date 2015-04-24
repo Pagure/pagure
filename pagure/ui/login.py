@@ -263,21 +263,25 @@ def admin_groups():
     """ List of the groups present in the system
     """
     # Add new group if asked
-    form = forms.NewGroupForm()
-    if form.validate_on_submit():
+    grp_types = [
+        grp.grp_type
+        for grp in pagure.lib.get_group_types(SESSION)
+    ]
+    form = forms.NewGroupForm(grp_types=grp_types)
 
+    if form.validate_on_submit():
         grp = model.PagureGroup()
         form.populate_obj(obj=grp)
         SESSION.add(grp)
         try:
             SESSION.flush()
+            flask.flash('Group `%s` created.' % grp.group_name)
         except SQLAlchemyError as err:
             SESSION.rollback()
             flask.flash('Could not create group.')
             APP.logger.debug('Could not create group.')
             APP.logger.exception(err)
 
-        flask.flash('Group `%s` created.' % grp.group_name)
         SESSION.commit()
 
     groups = pagure.lib.login.get_groups(SESSION)
