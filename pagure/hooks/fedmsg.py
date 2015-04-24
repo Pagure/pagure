@@ -75,11 +75,16 @@ class Fedmsg(BaseHook):
 
         '''
         repopath = get_repo_path(project)
+        if not os.path.exists(repopath):
+            flask.abort(404, 'No git repo found')
 
         hook_files = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), 'files')
-        repo_obj = pygit2.Repository(repopath)
 
+        # Make sure the hooks folder exists
+        hookfolder = os.path.join(repopath, 'hooks')
+        if not os.path.exists(hookfolder):
+            os.makedirs(hookfolder)
 
         # Install the hook itself
         os.symlink(
