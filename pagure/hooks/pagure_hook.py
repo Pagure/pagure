@@ -94,7 +94,7 @@ class PagureHook(BaseHook):
             # Install the hook itself
             hook_path = os.path.join(
                 repopath, 'hooks', 'post-receive.pagure')
-            shutil.copyfile(hook_file, hook_path)
+            os.symlink(hook_file, hook_path)
             os.chmod(hook_path, 0755)
 
     @classmethod

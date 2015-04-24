@@ -87,7 +87,7 @@ class PagureTicketHook(BaseHook):
         # Install the main post-receive file
         postreceive = os.path.join(hookfolder, 'post-receive')
         if not os.path.exists(postreceive):
-            shutil.copyfile(
+            os.symlink(
                 os.path.join(hook_files, 'post-receive'),
                 postreceive)
             os.chmod(postreceive, 0755)

@@ -95,7 +95,7 @@ class Mail(BaseHook):
             'multimailhook.environment', '', 'gitolite')
 
         # Install the hook itself
-        shutil.copyfile(
+        os.symlink(
             os.path.join(hook_files, 'git_multimail.py'),
             os.path.join(repopath, 'hooks', 'post-receive.mail')
         )
