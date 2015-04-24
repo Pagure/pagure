@@ -87,7 +87,6 @@ class PagureHook(BaseHook):
         hook_file = os.path.join(hook_files, 'pagure_hook.py')
 
         for repopath in repopaths:
-            print repopath
             # Init the git repo in case
             repo_obj = pygit2.Repository(repopath)
 
