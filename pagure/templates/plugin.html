@@ -1,6 +1,7 @@
+{% from "_formhelper.html" import render_field_in_row %}
+
 {% if full %}
 {% extends "repo_master.html" %}
-{% from "_formhelper.html" import render_field_in_row %}
 
 {% block title %}{{ select.capitalize() }} {{ plugin.name }} - {{ repo.name }}{% endblock %}
 {%block tag %}home{% endblock %}
