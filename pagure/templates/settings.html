@@ -144,15 +144,13 @@
 {% if plugins %}
 <section class="hooks">
   <h2>Hooks</h2>
-  <ul>
-  {% for plugin in plugins %}
-    <li>
-      <a href="{{ url_for('.view_plugin', repo=repo.name, username=username,
-        plugin=plugin) }}">{{ plugin }}
-      </a>
-    </li>
-  {% endfor %}
-  </ul>
+  <div id="accordion">
+    {% for plugin in plugins %}
+      <h3 class="plugin_title" data-plugin="{{ plugin }}">{{ plugin }}</h3>
+      <div id="body_{{ plugin }}"></div>
+    {% endfor %}
+    </ul>
+  </div>
 </section>
 {% endif %}
 
@@ -212,4 +210,32 @@
 
 {% block jscripts %}
 {{ super() }}
+<script>
+  $(function() {
+    $( "#accordion" ).accordion({
+      collapsible: true,
+      active: false,
+      heightStyle: 'content',
+      activate: function( event, ui ) {
+        var _plugin = ui.newHeader.attr('data-plugin');
+        if (!_plugin) {
+          return false;
+        }
+        var _url = "{{ url_for('.view_plugin', repo=repo.name, username=username, plugin='') }}";
+        _url += _plugin + '/0';
+        console.log(_url);
+        $.ajax({
+            url: _url ,
+            type: 'GET',
+            dataType: 'html',
+            success: function(res) {
+                ui.newPanel.html(res);
+            },
+        });
+        return false;
+
+      }
+    });
+  });
+</script>
 {% endblock %}
