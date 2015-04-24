@@ -22,43 +22,6 @@ import pagure.lib.git
 abspath = os.path.abspath(os.environ['GIT_DIR'])
 
 
-def read_output(cmd, input=None, keepends=False, **kw):
-    if input:
-        stdin = subprocess.PIPE
-    else:
-        stdin = None
-    p = subprocess.Popen(
-        cmd,
-        stdin=stdin,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        cwd=abspath,
-        **kw)
-    (out, err) = p.communicate(input)
-    retcode = p.wait()
-    if retcode:
-        print 'ERROR: %s =-- %s' % (cmd, retcode)
-        print out
-        print err
-    if not keepends:
-        out = out.rstrip('\n\r')
-    return out
-
-
-def read_git_output(args, input=None, keepends=False, **kw):
-    """Read the output of a Git command."""
-
-    return read_output(['git'] + args, input=input, keepends=keepends, **kw)
-
-
-def read_git_lines(args, keepends=False, **kw):
-    """Return the lines output by Git command.
-
-    Return as single lines, with newlines stripped off."""
-
-    return read_git_output(args, keepends=True, **kw).splitlines(keepends)
-
-
 def get_repo_name():
     ''' Return the name of the git repo based on its path.
     '''
@@ -76,27 +39,6 @@ def get_username():
     return username
 
 
-def get_revs_between(torev, fromrev):
-    """ Yield revisions between HEAD and BASE. """
-
-    cmd = ['rev-list', '%s...%s' % (torev, fromrev)]
-    return read_git_lines(cmd)
-
-
-def get_pusher(commit):
-    ''' Return the name of the person that pushed the commit. '''
-    user = read_git_lines(
-        ['log', '-1', '--pretty=format:"%an"', commit])[0].replace('"', '')
-    return user
-
-
-def get_pusher_email(commit):
-    ''' Return the email of the person that pushed the commit. '''
-    user = read_git_lines(
-        ['log', '-1', '--pretty=format:"%ae"', commit])[0].replace('"', '')
-    return user
-
-
 print "Emitting a message to the fedmsg bus."
 config = fedmsg.config.load_config([], None)
 config['active'] = True
@@ -106,7 +48,7 @@ fedmsg.init(name='relay_inbound', cert_prefix='scm', **config)
 
 def build_stats(commit):
     cmd = ['diff-tree', '--numstat', '%s' % (commit)]
-    output = read_git_lines(cmd)
+    output = pagure.lib.git.read_git_lines(cmd)
 
     files = {}
     total = {}
@@ -134,19 +76,19 @@ seen = []
 # Read in all the rev information git-receive-pack hands us.
 for line in sys.stdin.readlines():
     (oldrev, newrev, refname) = line.strip().split(' ', 2)
-    revs = get_revs_between(oldrev, newrev)
+    revs = pagure.lib.git.get_revs_between(oldrev, newrev)
 
     def _build_commit(rev):
         files, total = build_stats(rev)
 
-        summary = read_git_lines(
+        summary = pagure.lib.git.read_git_lines(
             ['log', '-1', rev, "--pretty='%s'"])[0].replace("'", '')
-        message = read_git_lines(
+        message = pagure.lib.git.read_git_lines(
             ['log', '-1', rev, "--pretty='%B'"])[0].replace("'", '')
 
         return dict(
-            name=get_pusher(rev),
-            email=get_pusher_email(rev),
+            name=pagure.lib.git.get_pusher(rev),
+            email=pagure.lib.git.get_pusher_email(rev),
             summary=summary,
             message=message,
             stats=dict(
@@ -155,8 +97,8 @@ for line in sys.stdin.readlines():
             ),
             rev=unicode(rev),
             path=abspath,
-            username=get_username(),
-            repo=get_repo_name(),
+            username=pagure.lib.git.get_username(),
+            repo=pagure.lib.git.get_repo_name(),
             branch=refname,
             agent=os.getlogin(),
         )

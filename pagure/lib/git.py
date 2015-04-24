@@ -14,6 +14,7 @@ import hashlib
 import json
 import os
 import shutil
+import subprocess
 import tempfile
 
 import pygit2
@@ -633,3 +634,63 @@ def add_file_to_git(repo, issue, ticketfolder, user, filename, filestream):
     shutil.rmtree(newpath)
 
     return os.path.join('files', filename)
+
+
+def read_output(cmd, input=None, keepends=False, **kw):
+    if input:
+        stdin = subprocess.PIPE
+    else:
+        stdin = None
+    p = subprocess.Popen(
+        cmd,
+        stdin=stdin,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        cwd=abspath,
+        **kw)
+    (out, err) = p.communicate(input)
+    retcode = p.wait()
+    if retcode:
+        print 'ERROR: %s =-- %s' % (cmd, retcode)
+        print out
+        print err
+    if not keepends:
+        out = out.rstrip('\n\r')
+    return out
+
+
+def read_git_output(args, input=None, keepends=False, **kw):
+    """Read the output of a Git command."""
+
+    return read_output(['git'] + args, input=input, keepends=keepends, **kw)
+
+
+def read_git_lines(args, keepends=False, **kw):
+    """Return the lines output by Git command.
+
+    Return as single lines, with newlines stripped off."""
+
+    return read_git_output(args, keepends=True, **kw).splitlines(keepends)
+
+
+def get_revs_between(torev, fromrev):
+    """ Yield revisions between HEAD and BASE. """
+
+    cmd = ['rev-list', '%s...%s' % (torev, fromrev)]
+    if set(fromrev) == set('0'):
+        cmd = ['rev-list', '%s' % torev]
+    return pagure.lib.git.read_git_lines(cmd)
+
+
+def get_pusher(commit):
+    ''' Return the name of the person that pushed the commit. '''
+    user = pagure.lib.git.read_git_lines(
+        ['log', '-1', '--pretty=format:"%an"', commit])[0].replace('"', '')
+    return user
+
+
+def get_pusher_email(commit):
+    ''' Return the email of the person that pushed the commit. '''
+    user = pagure.lib.git.read_git_lines(
+        ['log', '-1', '--pretty=format:"%ae"', commit])[0].replace('"', '')
+    return user

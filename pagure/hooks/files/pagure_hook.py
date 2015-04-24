@@ -23,42 +23,11 @@ import pagure.exceptions
 import pagure.lib.link
 
 
-def read_git_output(args, input=None, keepends=False, **kw):
-    """Read the output of a Git command."""
-
-    return read_output(['git'] + args, input=input, keepends=keepends, **kw)
-
-
-def read_git_lines(args, keepends=False, **kw):
-    """Return the lines output by Git command.
-
-    Return as single lines, with newlines stripped off."""
-
-    return read_git_output(args, keepends=True, **kw).splitlines(keepends)
-
-
-def read_output(cmd, input=None, keepends=False, **kw):
-    if input:
-        stdin = subprocess.PIPE
-    else:
-        stdin = None
-    p = subprocess.Popen(
-        cmd, stdin=stdin, stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kw
-        )
-    (out, err) = p.communicate(input)
-    retcode = p.wait()
-    if retcode:
-        print 'ERROR: %s =-- %s' % (cmd, retcode)
-    if not keepends:
-        out = out.rstrip('\n\r')
-    return out
-
-
 def generate_revision_change_log(new_commits_list):
 
     print 'Detailed log of new commits:\n\n'
     commitid = None
-    for line in read_git_lines(
+    for line in pagure.lib.git.read_git_lines(
             ['log', '--no-walk']
             + new_commits_list
             + ['--'],
@@ -70,13 +39,19 @@ def generate_revision_change_log(new_commits_list):
 
         print '*', line
         for issue in pagure.lib.link.get_relation(
-                pagure.SESSION, get_repo_name(), get_username(),
-                line, 'fixes'):
+                pagure.SESSION,
+                pagure.lib.git.get_repo_name(),
+                pagure.lib.git.get_username(),
+                line,
+                'fixes'):
             fixes_commit(commitid, issue, pagure.APP.config.get('APP_URL'))
 
         for issue in pagure.lib.link.get_relation(
-                pagure.SESSION, get_repo_name(), get_username(),
-                line, 'relates'):
+                pagure.SESSION,
+                pagure.lib.git.get_repo_name(),
+                pagure.lib.git.get_username(),
+                line,
+                'relates'):
             relates_commit(commitid, issue, pagure.APP.config.get('APP_URL'))
 
 
@@ -143,7 +118,7 @@ def fixes_commit(commitid, issue, app_url=None):
         pagure.APP.logger.exception(err)
 
     branches = [
-        item.replace('* ', '') for item in read_git_lines(
+        item.replace('* ', '') for item in pagure.lib.git.read_git_lines(
             ['branch', '--contains', commitid],
             keepends=False)
     ]
@@ -164,43 +139,6 @@ def fixes_commit(commitid, issue, app_url=None):
             pagure.APP.logger.exception(err)
 
 
-def get_commits_id(fromrev, torev):
-    ''' Retrieve the list commit between two revisions and return the list
-    of their identifier.
-    '''
-    cmd = ['rev-list', '%s...%s' % (torev, fromrev)]
-    return read_git_lines(cmd)
-
-
-def get_repo_name():
-    ''' Return the name of the git repo based on its path.
-    '''
-    repo = os.path.basename(os.getcwd()).split('.git')[0]
-    return repo
-
-
-def get_username():
-    ''' Return the username of the git repo based on its path.
-    '''
-    username = None
-    repo = os.path.abspath(os.path.join(os.getcwd(), '..'))
-    if pagure.APP.config['FORK_FOLDER'] in repo:
-        username = repo.split(pagure.APP.config['FORK_FOLDER'])[1]
-    return username
-
-
-def get_pusher(commit):
-    ''' Return the name of the person that pushed the commit. '''
-    user = None
-    output = read_git_lines(
-        ['show', '--pretty=format:"%ae"', commit], keepends=False)
-    if output:
-        user = output[0].replace('"', '')
-    if not user:
-        user = os.environ.get('GL_USER', os.environ.get('USER', None))
-    return user
-
-
 def run_as_post_receive_hook():
 
     changes = []
@@ -215,10 +153,11 @@ def run_as_post_receive_hook():
         print '  -- Ref name'
         print refname
 
-        generate_revision_change_log(get_commits_id(oldrev, newrev))
+        generate_revision_change_log(
+            pagure.lib.git.get_revs_between(oldrev, newrev))
 
-    print 'repo:', get_repo_name()
-    print 'user:', get_username()
+    print 'repo:', pagure.lib.git.get_repo_name()
+    print 'user:', pagure.lib.git.get_username()
 
 
 def main(args):
