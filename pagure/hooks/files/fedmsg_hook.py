@@ -2,17 +2,25 @@
 
 import getpass
 import os
-import subprocess as sp
+import subprocess
 import sys
 
 from collections import defaultdict
 
-import pygit2
-
 import fedmsg
 import fedmsg.config
 
+sys.path.insert(0, os.path.expanduser('~/repos/gitrepo/pagure'))
+
+if 'PAGURE_CONFIG' not in os.environ \
+        and os.path.exists('/etc/pagure/pagure.cfg'):
+    print 'Using configuration file `/etc/pagure/pagure.cfg`'
+    os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
+
+import pagure.lib.git
+
 abspath = os.path.abspath(os.environ['GIT_DIR'])
+
 
 def read_output(cmd, input=None, keepends=False, **kw):
     if input:
@@ -20,12 +28,18 @@ def read_output(cmd, input=None, keepends=False, **kw):
     else:
         stdin = None
     p = subprocess.Popen(
-        cmd, stdin=stdin, stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kw
-        )
+        cmd,
+        stdin=stdin,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        cwd=abspath,
+        **kw)
     (out, err) = p.communicate(input)
     retcode = p.wait()
     if retcode:
         print 'ERROR: %s =-- %s' % (cmd, retcode)
+        print out
+        print err
     if not keepends:
         out = out.rstrip('\n\r')
     return out
@@ -49,7 +63,7 @@ def get_repo_name():
     ''' Return the name of the git repo based on its path.
     '''
     repo_name = '.'.join(abspath.split(os.path.sep)[-1].split('.')[:-1])
-    return repo
+    return repo_name
 
 
 def get_username():
@@ -62,22 +76,26 @@ def get_username():
     return username
 
 
-def revs_between(head, base):
+def get_revs_between(torev, fromrev):
     """ Yield revisions between HEAD and BASE. """
 
-    # pygit2 can't do a rev-list yet, so we have to shell out.. silly.
-    cmd = '/usr/bin/git rev-list %s...%s' % (head.id, base.id)
-    proc = sp.Popen(cmd.split(), stdout=sp.PIPE, stderr=sp.PIPE, cwd=abspath)
-    stdout, stderr = proc.communicate()
-    if proc.returncode != 0:
-        raise IOError('git rev-list failed: %r, err: %r' % (stdout, stderr))
-
-    for line in stdout.strip().split('\n'):
-        yield line.strip()
+    cmd = ['rev-list', '%s...%s' % (torev, fromrev)]
+    return read_git_lines(cmd)
 
 
+def get_pusher(commit):
+    ''' Return the name of the person that pushed the commit. '''
+    user = read_git_lines(
+        ['log', '-1', '--pretty=format:"%an"', commit])[0].replace('"', '')
+    return user
 
-repo = pygit2.Repository(abspath)
+
+def get_pusher_email(commit):
+    ''' Return the email of the person that pushed the commit. '''
+    user = read_git_lines(
+        ['log', '-1', '--pretty=format:"%ae"', commit])[0].replace('"', '')
+    return user
+
 
 print "Emitting a message to the fedmsg bus."
 config = fedmsg.config.load_config([], None)
@@ -87,19 +105,19 @@ fedmsg.init(name='relay_inbound', cert_prefix='scm', **config)
 
 
 def build_stats(commit):
-    files = defaultdict(lambda: defaultdict(int))
+    cmd = ['diff-tree', '--numstat', '%s' % (commit)]
+    output = read_git_lines(cmd)
 
-    # Calculate diffs against all parent commits
-    diffs = [repo.diff(parent, commit) for parent in commit.parents]
-    # Unless this is the first commit, with no parents.
-    diffs = diffs or [commit.tree.diff_to_tree(swap=True)]
-
-    for diff in diffs:
-        for patch in diff:
-            path = patch.new_file_path
-            files[path]['additions'] += patch.additions
-            files[path]['deletions'] += patch.deletions
-            files[path]['lines'] += patch.additions + patch.deletions
+    files = {}
+    total = {}
+    for line in output[1:]:
+        additions, deletions, path = line.split('\t')
+        path = path.strip()
+        files[path] = {
+            'additions': int(additions.strip()),
+            'deletions': int(deletions.strip()),
+            'lines': int(additions.strip()) + int(deletions.strip()),
+        }
 
     total = defaultdict(int)
     for name, stats in files.items():
@@ -114,39 +132,23 @@ def build_stats(commit):
 seen = []
 
 # Read in all the rev information git-receive-pack hands us.
-lines = [line.split() for line in sys.stdin.readlines()]
-for line in lines:
-    base, head, branch = line
-    branch = '/'.join(branch.split('/')[2:])
-
-    try:
-        head = repo.revparse_single(head)
-    except KeyError:
-        # This means they are deleting this branch.. and we don't have a fedmsg
-        # for that (yet?).  It is disallowed by dist-git in Fedora anyways.
-        continue
-
-    try:
-        base = repo.revparse_single(base)
-        revs = revs_between(head, base)
-    except KeyError:
-        revs = [head.id]
+for line in sys.stdin.readlines():
+    (oldrev, newrev, refname) = line.strip().split(' ', 2)
+    revs = get_revs_between(oldrev, newrev)
 
     def _build_commit(rev):
-        commit = repo.revparse_single(unicode(rev))
+        files, total = build_stats(rev)
 
-        # Tags are a little funny, and vary between versions of pygit2, so we'll
-        # just ignore them as far as fedmsg is concerned.
-        if isinstance(commit, pygit2.Tag):
-            return None
-
-        files, total = build_stats(commit)
+        summary = read_git_lines(
+            ['log', '-1', rev, "--pretty='%s'"])[0].replace("'", '')
+        message = read_git_lines(
+            ['log', '-1', rev, "--pretty='%B'"])[0].replace("'", '')
 
         return dict(
-            name=commit.author.name,
-            email=commit.author.email,
-            summary=commit.message.split('\n')[0],
-            message=commit.message,
+            name=get_pusher(rev),
+            email=get_pusher_email(rev),
+            summary=summary,
+            message=message,
             stats=dict(
                 files=files,
                 total=total,
@@ -155,7 +157,7 @@ for line in lines:
             path=abspath,
             username=get_username(),
             repo=get_repo_name(),
-            branch=branch,
+            branch=refname,
             agent=os.getlogin(),
         )
 
@@ -166,11 +168,12 @@ for line in lines:
         if commit is None:
             continue
 
-        # Keep track of whether or not we have already published this commit on
-        # another branch or not.  It is conceivable that someone could make a
-        # commit to a number of branches, and push them all at the same time.
-        # Make a note in the fedmsg payload so we can try to reduce spam at a
-        # later stage.
+        # Keep track of whether or not we have already published this commit
+        # on another branch or not.  It is conceivable that someone could
+        # make a commit to a number of branches, and push them all at the
+        # same time.
+        # Make a note in the fedmsg payload so we can try to reduce spam at
+        # a later stage.
         if commit['rev'] in seen:
             commit['seen'] = True
         else:
