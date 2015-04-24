@@ -421,7 +421,7 @@ class Config(object):
         try:
             return self._split(read_git_output(
                 ['config', '--get-all', '--null', '%s.%s' % (
-                    elf.section, name)],
+                    self.section, name)],
                 env=self.env, keepends=True,
                 ))
         except CommandError, e:
