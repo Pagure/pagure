@@ -30,6 +30,13 @@ import tests
 class PagureLibGittests(tests.Modeltests):
     """ Tests for pagure.lib.git """
 
+    def setUp(self):
+        """ Set up the environnment, ran before every tests. """
+        super(PagureLibGittests, self).setUp()
+
+        pagure.APP.config['FORK_FOLDER'] = os.path.join(tests.HERE, 'forks')
+
+
     def test_write_gitolite_acls(self):
         """ Test the write_gitolite_acls function of pagure.lib.git. """
         tests.create_projects(self.session)
@@ -1025,6 +1032,26 @@ index 0000000..60f7480
 
         repo_name = pagure.lib.git.get_repo_name('foo.test.git')
         self.assertEqual(repo_name, 'foo.test')
+
+    def test_get_username(self):
+        """ Test the get_username method of pagure.lib.git. """
+        gitrepo = os.path.join(tests.HERE, 'test_ticket_repo.git')
+        repo_name = pagure.lib.git.get_username(gitrepo)
+        self.assertEqual(repo_name, None)
+
+        repo_name = pagure.lib.git.get_username('foo/bar/baz/test.git')
+        self.assertEqual(repo_name, None)
+
+        repo_name = pagure.lib.git.get_username('foo.test.git')
+        self.assertEqual(repo_name, None)
+
+        repo_name = pagure.lib.git.get_username(
+            os.path.join(tests.HERE, 'forks', 'pingou', 'foo.test.git'))
+        self.assertEqual(repo_name, 'pingou')
+
+        repo_name = pagure.lib.git.get_username(
+            os.path.join(tests.HERE, 'forks', 'pingou/', 'foo.test.git'))
+        self.assertEqual(repo_name, 'pingou')
 
 
 if __name__ == '__main__':
