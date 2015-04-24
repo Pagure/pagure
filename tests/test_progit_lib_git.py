@@ -943,6 +943,29 @@ index 0000000..60f7480
         self.assertEqual(repo.requests[1].title, 'test request #2')
         self.assertEqual(len(repo.requests[1].comments), 0)
 
+    def test_read_git_lines(self):
+        """ Test the read_git_lines method of pagure.lib.git. """
+        self.test_update_git()
+
+        gitrepo = os.path.join(tests.HERE, 'test_ticket_repo.git')
+        output = pagure.lib.git.read_git_lines(
+            ['log', '-1', "--pretty='%s'"], gitrepo)
+        self.assertEqual(len(output), 1)
+        self.assertTrue(
+            output[0].startswith("'Updated ticket ")
+        )
+        self.assertTrue(
+            output[0].endswith(": Test issue'")
+        )
+
+        # Keeping the new line symbol
+        output = pagure.lib.git.read_git_lines(
+            ['log', '-1', "--pretty='%s'"], gitrepo, keepends=True)
+        self.assertEqual(len(output), 1)
+        self.assertTrue(
+            output[0].endswith(": Test issue'\n")
+        )
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibGittests)
