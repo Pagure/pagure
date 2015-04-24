@@ -112,8 +112,8 @@ def do_login():
             return flask.redirect(flask.url_for('auth_login'))
         else:
             visit_key = pagure.lib.login.id_generator(40)
-            expiry = datetime.datetime.now() + APP.config.get(
-                'PERMANENT_SESSION_LIFETIME')
+            now = datetime.datetime.utcnow()
+            expiry = now + datetime.timedelta(days=30)
             session = model.PagureUserVisit(
                 user_id=user_obj.id,
                 user_ip=flask.request.remote_addr,
@@ -491,13 +491,13 @@ def _check_session_cookie():
         session = pagure.lib.login.get_session_by_visitkey(SESSION, sessionid)
         if session and session.user:
             now = datetime.datetime.now()
-            new_expiry = now + APP.config.get('PERMANENT_SESSION_LIFETIME')
             if now > session.expiry:
                 flask.flash('Session timed-out', 'error')
             elif APP.config.get('CHECK_SESSION_IP', True) \
                     and session.user_ip != flask.request.remote_addr:
                 flask.flash('Session expired', 'error')
             else:
+                new_expiry = now + datetime.timedelta(days=30)
                 session_id = session.visit_key
                 user = session.user
 
