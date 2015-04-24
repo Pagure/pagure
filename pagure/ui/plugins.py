@@ -104,20 +104,22 @@ def view_plugin(repo, plugin, username=None, full=True):
                 username=username,
                 plugin=plugin,
                 form=form,
-                fields=fields,
-            )
+                fields=fields)
 
         if form.active.data:
             # Set up the main script if necessary
             plugin.set_up(repo)
             # Install the plugin itself
             plugin.install(repo, dbobj)
-            flask.flash('Hook activated')
+            flask.flash('Hook %s activated' % plugin.name)
         else:
             plugin.remove(repo)
-            flask.flash('Hook inactived')
+            flask.flash('Hook %s inactived' % plugin.name)
 
         SESSION.commit()
+
+        return flask.redirect(flask.url_for(
+            'view_settings', repo=repo.name, username=username))
 
     return flask.render_template(
         'plugin.html',
@@ -127,5 +129,4 @@ def view_plugin(repo, plugin, username=None, full=True):
         username=username,
         plugin=plugin,
         form=form,
-        fields=fields,
-    )
+        fields=fields)
