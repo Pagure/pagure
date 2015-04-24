@@ -1724,3 +1724,21 @@ def generate_hook_token(session):
         project.hook_token = pagure.lib.login.id_generator(40)
         session.add(project)
     session.commit()
+
+
+def get_group_types(session, grp_type=None):
+    ''' Return the list of type a group can have.
+
+    '''
+    query = session.query(
+        model.PagureGroupType
+    ).order_by(
+        model.PagureGroupType.grp_type
+    )
+
+    if grp_type:
+        query = query.filter(
+            model.PagureGroupType.grp_type == grp_type
+        )
+
+    return query.all()
