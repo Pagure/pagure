@@ -717,6 +717,4 @@ def get_username(abspath):
         username = repo.split(pagure.APP.config['FORK_FOLDER'])[1]
         if username.startswith('/'):
             username = username[1:]
-        if username.endswith('/'):
-            username = username[:-1]
     return username

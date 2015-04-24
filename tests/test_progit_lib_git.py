@@ -1049,10 +1049,6 @@ index 0000000..60f7480
             os.path.join(tests.HERE, 'forks', 'pingou', 'foo.test.git'))
         self.assertEqual(repo_name, 'pingou')
 
-        repo_name = pagure.lib.git.get_username(
-            os.path.join(tests.HERE, 'forks', 'pingou/', 'foo.test.git'))
-        self.assertEqual(repo_name, 'pingou')
-
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibGittests)
