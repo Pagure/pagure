@@ -40,16 +40,16 @@ def generate_revision_change_log(new_commits_list):
         print '*', line
         for issue in pagure.lib.link.get_relation(
                 pagure.SESSION,
-                pagure.lib.git.get_repo_name(),
-                pagure.lib.git.get_username(),
+                pagure.lib.git.get_repo_name(abspath),
+                pagure.lib.git.get_username(abspath),
                 line,
                 'fixes'):
             fixes_commit(commitid, issue, pagure.APP.config.get('APP_URL'))
 
         for issue in pagure.lib.link.get_relation(
                 pagure.SESSION,
-                pagure.lib.git.get_repo_name(),
-                pagure.lib.git.get_username(),
+                pagure.lib.git.get_repo_name(abspath),
+                pagure.lib.git.get_username(abspath),
                 line,
                 'relates'):
             relates_commit(commitid, issue, pagure.APP.config.get('APP_URL'))
