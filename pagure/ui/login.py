@@ -487,8 +487,9 @@ def _check_session_cookie():
     user = None
 
     if cookie_name and cookie_name in flask.request.cookies:
-        sessionid = flask.request.cookies[cookie_name]
-        session = pagure.lib.login.get_session_by_visitkey(SESSION, sessionid)
+        sessionid = flask.request.cookies.get(cookie_name)
+        session = pagure.lib.login.get_session_by_visitkey(
+            SESSION, sessionid)
         if session and session.user:
             now = datetime.datetime.now()
             if now > session.expiry:
