@@ -94,7 +94,7 @@ class PagureHook(BaseHook):
             # Install the hook itself
             hook_path = os.path.join(
                 repopath, 'hooks', 'post-receive.pagure')
-            hook_file = os.path.join(hook_files, 'git_multimail.py')
+            hook_file = os.path.join(hook_files, 'pagure_hook.py')
             if not os.path.exists(hook_path):
                 os.symlink(hook_file, hook_path)
 
