@@ -966,6 +966,26 @@ index 0000000..60f7480
             output[0].endswith(": Test issue'\n")
         )
 
+    def test_get_revs_between(self):
+        """ Test the get_revs_between method of pagure.lib.git. """
+
+        self.test_update_git()
+
+        gitrepo = os.path.join(tests.HERE, 'test_ticket_repo.git')
+        output = pagure.lib.git.read_git_lines(
+            ['log', '-3', "--pretty='%H'"], gitrepo)
+        self.assertEqual(len(output), 2)
+        to_hash = output[0].replace("'", '')
+        from_hash = output[1].replace("'", '')
+
+        output1 = pagure.lib.git.get_revs_between(
+            to_hash, from_hash, gitrepo)
+        self.assertEqual(output1, [to_hash])
+
+        output2 = pagure.lib.git.get_revs_between(
+            from_hash, to_hash, gitrepo)
+        self.assertEqual(output2, [to_hash])
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibGittests)
