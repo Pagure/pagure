@@ -111,11 +111,11 @@ class PagureTicketHook(BaseHook):
         # Install the hook itself
         hook_path = os.path.join(
             repopath, 'hooks', 'post-receive.pagure-ticket')
-        shutil.copyfile(
-            os.path.join(hook_files, 'pagure_hook_tickets.py'),
-            hook_path
-        )
-        os.chmod(hook_path, 0755)
+        if not os.path.exists(hook_path):
+            os.symlink(
+                os.path.join(hook_files, 'pagure_hook_tickets.py'),
+                hook_path
+            )
 
     @classmethod
     def remove(cls, project):

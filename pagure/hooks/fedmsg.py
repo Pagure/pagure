@@ -87,11 +87,11 @@ class Fedmsg(BaseHook):
             os.makedirs(hookfolder)
 
         # Install the hook itself
-        hook_file = os.path.join(hook_files, 'fedmsg_hook.py')
+        hook_file = os.path.join(repopath, 'hooks', 'post-receive.fedmsg')
         if not os.path.exists(hook_file):
             os.symlink(
-                hook_file,
-                os.path.join(repopath, 'hooks', 'post-receive.fedmsg')
+                os.path.join(hook_files, 'fedmsg_hook.py'),
+                hook_file
             )
 
     @classmethod

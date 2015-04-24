@@ -112,10 +112,11 @@ class PagureRequestHook(BaseHook):
         # Install the hook itself
         hook_path = os.path.join(
             repopath, 'hooks', 'post-receive.pagure-requests')
-        os.symlink(
-            os.path.join(hook_files, 'pagure_hook_requests.py'),
-            hook_path
-        )
+        if not os.path.exists(hook_path):
+            os.symlink(
+                os.path.join(hook_files, 'pagure_hook_requests.py'),
+                hook_path
+            )
 
     @classmethod
     def remove(cls, project):

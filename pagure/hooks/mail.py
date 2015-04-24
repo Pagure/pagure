@@ -95,11 +95,11 @@ class Mail(BaseHook):
             'multimailhook.environment', '', 'gitolite')
 
         # Install the hook itself
-        hook_file = os.path.join(hook_files, 'git_multimail.py')
+        hook_file = os.path.join(repopath, 'hooks', 'post-receive.mail')
         if not os.path.exists(hook_file):
             os.symlink(
-                hook_file,
-                os.path.join(repopath, 'hooks', 'post-receive.mail')
+                os.path.join(hook_files, 'git_multimail.py'),
+                hook_file
             )
 
     @classmethod
