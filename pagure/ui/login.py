@@ -267,6 +267,9 @@ def admin_groups():
         grp.grp_type
         for grp in pagure.lib.get_group_types(SESSION)
     ]
+    # Make sure the admin type is always the last one
+    grp_types.remove('admin')
+    grp_types.append('admin')
     form = forms.NewGroupForm(grp_types=grp_types)
 
     if form.validate_on_submit():
