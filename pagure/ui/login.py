@@ -125,6 +125,7 @@ def do_login():
                 SESSION.commit()
                 flask.g.fas_user = user_obj
                 flask.g.fas_session_id = visit_key
+                flask.g.fas_user.login_time = now
                 flask.flash('Welcome %s' % user_obj.username)
             except SQLAlchemyError, err:  # pragma: no cover
                 flask.flash(
@@ -501,6 +502,7 @@ def _check_session_cookie():
                 new_expiry = now + datetime.timedelta(days=30)
                 session_id = session.visit_key
                 user = session.user
+                login_time = session.created
 
                 session.expiry = new_expiry
                 SESSION.add(session)
@@ -514,6 +516,7 @@ def _check_session_cookie():
 
     flask.g.fas_session_id = session_id
     flask.g.fas_user = user
+    flask.g.fas_user.login_time = login_time
 
 
 def _send_session_cookie(response):
