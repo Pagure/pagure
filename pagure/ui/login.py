@@ -255,6 +255,7 @@ def reset_password(token):
 # Admin endpoint specific to local login
 #
 
+
 @APP.route('/admin/groups', methods=['GET', 'POST'])
 @admin_required
 def admin_groups():
@@ -481,6 +482,7 @@ def _check_session_cookie():
     """ Set the user into flask.g if the user is logged in.
     """
     cookie_name = APP.config.get('SESSION_COOKIE_NAME', 'pagure')
+    cookie_name = '%s_local_cookie' % cookie_name
     session_id = None
     user = None
 
@@ -519,7 +521,7 @@ def _send_session_cookie(response):
     secure = APP.config.get('SESSION_COOKIE_SECURE', True)
 
     response.set_cookie(
-        key=cookie_name,
+        key='%s_local_cookie' % cookie_name,
         value=flask.g.fas_session_id or '',
         secure=secure,
         httponly=True,
