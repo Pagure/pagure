@@ -87,10 +87,12 @@ class Fedmsg(BaseHook):
             os.makedirs(hookfolder)
 
         # Install the hook itself
-        os.symlink(
-            os.path.join(hook_files, 'fedmsg_hook.py'),
-            os.path.join(repopath, 'hooks', 'post-receive.fedmsg')
-        )
+        hook_file = os.path.join(hook_files, 'fedmsg_hook.py')
+        if not os.path.exists(hook_file):
+            os.symlink(
+                hook_file,
+                os.path.join(repopath, 'hooks', 'post-receive.fedmsg')
+            )
 
     @classmethod
     def remove(cls, project):

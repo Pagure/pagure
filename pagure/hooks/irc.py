@@ -122,10 +122,12 @@ class Hook(BaseHook):
         # repo_obj.config.set_multivar()
 
         # Install the hook itself
-        #os.symlink(
-            #os.path.join(hook_files, 'git_irc.py'),
-            #os.path.join(repopath, 'hooks', 'post-receive.irc')
-        #)
+        #hook_file = os.path.join(hook_files, 'git_irc.py')
+        #if not os.path.exists(hook_file):
+            #os.symlink(
+                #hook_file,
+                #os.path.join(repopath, 'hooks', 'post-receive.irc')
+            #)
 
     @classmethod
     def remove(cls, project):
