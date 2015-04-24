@@ -986,6 +986,20 @@ index 0000000..60f7480
             from_hash, to_hash, gitrepo)
         self.assertEqual(output2, [to_hash])
 
+    def test_get_pusher(self):
+        """ Test the get_pusher method of pagure.lib.git. """
+
+        self.test_update_git()
+
+        gitrepo = os.path.join(tests.HERE, 'test_ticket_repo.git')
+        output = pagure.lib.git.read_git_lines(
+            ['log', '-3', "--pretty='%H'"], gitrepo)
+        self.assertEqual(len(output), 2)
+        for githash in output:
+            githash = githash.replace("'", '')
+            output = pagure.lib.git.get_pusher(githash, gitrepo)
+            self.assertEqual(output, 'pagure')
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibGittests)
