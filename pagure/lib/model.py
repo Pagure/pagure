@@ -72,10 +72,7 @@ def create_tables(db_url, alembic_ini=None, debug=False):
 
     scopedsession = scoped_session(sessionmaker(bind=engine))
     # Insert the default data into the db
-    try:
-        create_default_status(scopedsession)
-    except SQLAlchemyError:  # pragma: no cover
-        pass
+    create_default_status(scopedsession)
     return scopedsession
 
 
@@ -87,11 +84,19 @@ def create_default_status(session):
         ticket_stat = StatusIssue(status=status)
         session.add(ticket_stat)
         try:
-            session.flush()
+            session.commit()
         except SQLAlchemyError:  # pragma: no cover
+            session.rollback()
             ERROR_LOG.debug('Status %s could not be added', ticket_stat)
 
-    session.commit()
+    for grptype in ['user', 'admin']:
+        grp_type = PagureGroupType(grp_type=grptype)
+        session.add(grp_type)
+        try:
+            session.commit()
+        except SQLAlchemyError:  # pragma: no cover
+            session.rollback()
+            ERROR_LOG.debug('Type %s could not be added', grptype)
 
 
 class StatusIssue(BASE):
@@ -829,6 +834,25 @@ class PagureUserVisit(BASE):
     expiry = sa.Column(sa.DateTime)
 
 
+class PagureGroupType(BASE):
+    """
+    A list of the type a group can have definition.
+    """
+
+    # names like "Group", "Order" and "User" are reserved words in SQL
+    # so we set the name to something safe for SQL
+    __tablename__ = 'pagure_group_type'
+
+    grp_type = sa.Column(sa.String(16), primary_key=True)
+    created = sa.Column(
+        sa.DateTime, nullable=False, default=datetime.datetime.utcnow)
+
+    def __repr__(self):
+        ''' Return a string representation of this object. '''
+
+        return 'GroupType: %s' % (self.grp_type)
+
+
 class PagureGroup(BASE):
     """
     An ultra-simple group definition.
@@ -840,6 +864,11 @@ class PagureGroup(BASE):
 
     id = sa.Column(sa.Integer, primary_key=True)
     group_name = sa.Column(sa.String(16), nullable=False, unique=True)
+    grp_type = sa.Column(
+        sa.String(16),
+        sa.ForeignKey('pagure_group_type.grp_type'),
+        default='user',
+        nullable=False)
     created = sa.Column(
         sa.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
