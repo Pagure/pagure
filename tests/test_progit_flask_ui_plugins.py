@@ -108,24 +108,28 @@ class PagureFlaskPluginstests(tests.Modeltests):
                 'csrf_token': csrf_token,
             }
 
-            output = self.app.post('/test/settings/Mail', data=data)
+            output = self.app.post(
+                '/test/settings/Mail', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<section class="settings">\n  <h3>Mail</h3>', output.data)
+                '<section class="settings">\n  <h2>Settings</h2>',
+                output.data)
             self.assertIn(
-                '<li class="message">Hook activated</li>', output.data)
+                '<li class="message">Hook Mail activated</li>', output.data)
 
             data = {
                 'mail_to': '',
                 'csrf_token': csrf_token,
             }
 
-            output = self.app.post('/test/settings/Mail', data=data)
+            output = self.app.post(
+                '/test/settings/Mail', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<section class="settings">\n  <h3>Mail</h3>', output.data)
+                '<section class="settings">\n  <h2>Settings</h2>',
+                output.data)
             self.assertIn(
-                '<li class="message">Hook inactived</li>', output.data)
+                '<li class="message">Hook Mail inactived</li>', output.data)
 
     def test_RequiredIf(self):
         """ Test the behavior of the RequiredIf validator. """

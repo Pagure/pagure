@@ -88,15 +88,19 @@ class PagureFlaskPluginFedmsgtests(tests.Modeltests):
             tests.create_projects_git(tests.HERE)
 
             # With the git repo
-            output = self.app.post('/test/settings/Fedmsg', data=data)
+            output = self.app.post(
+                '/test/settings/Fedmsg', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertIn(
+                '<li class="message">Hook Fedmsg inactived</li>',
+                output.data)
+            output = self.app.get('/test/settings/Fedmsg', data=data)
             self.assertTrue('<p>test project #1</p>' in output.data)
-            self.assertTrue('<h3>Fedmsg</h3>' in output.data)
-            self.assertTrue(
-                '<li class="message">Hook inactived</li>' in output.data)
-            self.assertTrue(
-                '<input id="active" name="active" type="checkbox" value="y">'
-                in output.data)
+            self.assertIn('<h3>Fedmsg</h3>', output.data)
+            self.assertIn(
+                '<input id="active" name="active" type="checkbox" value="y">',
+                output.data)
 
             self.assertFalse(os.path.exists(os.path.join(
                 tests.HERE, 'test.git', 'hooks', 'post-receive.fedmsg')))
@@ -107,11 +111,17 @@ class PagureFlaskPluginFedmsgtests(tests.Modeltests):
                 'active': 'y',
             }
 
-            output = self.app.post('/test/settings/Fedmsg', data=data)
+            output = self.app.post(
+                '/test/settings/Fedmsg', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertIn(
+                '<li class="message">Hook Fedmsg activated</li>',
+                output.data)
+            output = self.app.get('/test/settings/Fedmsg', data=data)
+            self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
             self.assertTrue('<h3>Fedmsg</h3>' in output.data)
-            self.assertTrue(
-                '<li class="message">Hook activated</li>' in output.data)
             self.assertTrue(
                 '<input checked id="active" name="active" type="checkbox" '
                 'value="y">' in output.data)
@@ -121,11 +131,17 @@ class PagureFlaskPluginFedmsgtests(tests.Modeltests):
 
             # De-Activate hook
             data = {'csrf_token': csrf_token}
-            output = self.app.post('/test/settings/Fedmsg', data=data)
+            output = self.app.post(
+                '/test/settings/Fedmsg', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertIn(
+                '<li class="message">Hook Fedmsg inactived</li>',
+                output.data)
+            output = self.app.get('/test/settings/Fedmsg', data=data)
+            self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
             self.assertTrue('<h3>Fedmsg</h3>' in output.data)
-            self.assertTrue(
-                '<li class="message">Hook inactived</li>' in output.data)
             self.assertTrue(
                 '<input id="active" name="active" type="checkbox" '
                 'value="y">' in output.data)

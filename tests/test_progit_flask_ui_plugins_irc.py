@@ -88,12 +88,17 @@ class PagureFlaskPluginIRCtests(tests.Modeltests):
             tests.create_projects_git(tests.HERE)
 
             # With the git repo
-            output = self.app.post('/test/settings/IRC', data=data)
+            output = self.app.post(
+                '/test/settings/IRC', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertTrue(
+                '<li class="message">Hook IRC inactived</li>' in output.data)
+
+            output = self.app.get('/test/settings/IRC')
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
             self.assertTrue('<h3>IRC</h3>' in output.data)
-            self.assertTrue(
-                '<li class="message">Hook inactived</li>' in output.data)
             self.assertTrue(
                 '<input id="active" name="active" type="checkbox" value="y">'
                 in output.data)
@@ -110,11 +115,17 @@ class PagureFlaskPluginIRCtests(tests.Modeltests):
                 'room': '#fedora-apps',
             }
 
-            output = self.app.post('/test/settings/IRC', data=data)
+            output = self.app.post(
+                '/test/settings/IRC', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertTrue(
+                '<li class="message">Hook IRC activated</li>' in output.data)
+
+            output = self.app.get('/test/settings/IRC')
+            self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
             self.assertTrue('<h3>IRC</h3>' in output.data)
-            self.assertTrue(
-                '<li class="message">Hook activated</li>' in output.data)
             self.assertTrue(
                 '<input checked id="active" name="active" type="checkbox" '
                 'value="y">' in output.data)
@@ -125,11 +136,16 @@ class PagureFlaskPluginIRCtests(tests.Modeltests):
 
             # De-Activate hook
             data = {'csrf_token': csrf_token}
-            output = self.app.post('/test/settings/IRC', data=data)
+            output = self.app.post('/test/settings/IRC', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertTrue(
+                '<li class="message">Hook IRC inactived</li>' in output.data)
+
+            output = self.app.get('/test/settings/IRC')
+            self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
             self.assertTrue('<h3>IRC</h3>' in output.data)
-            self.assertTrue(
-                '<li class="message">Hook inactived</li>' in output.data)
             self.assertTrue(
                 '<input id="active" name="active" type="checkbox" '
                 'value="y">' in output.data)

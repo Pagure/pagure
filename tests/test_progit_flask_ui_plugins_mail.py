@@ -91,12 +91,17 @@ class PagureFlaskPluginMailtests(tests.Modeltests):
             tests.create_projects_git(tests.HERE)
 
             # With the git repo
-            output = self.app.post('/test/settings/Mail', data=data)
+            output = self.app.post(
+                '/test/settings/Mail', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertTrue(
+                '<li class="message">Hook Mail inactived</li>' in output.data)
+
+            output = self.app.get('/test/settings/Mail')
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
             self.assertTrue('<h3>Mail</h3>' in output.data)
-            self.assertTrue(
-                '<li class="message">Hook inactived</li>' in output.data)
             self.assertTrue(
                 '<td><label for="mail_to">Mail to</label></td>'
                 in output.data)
@@ -110,7 +115,9 @@ class PagureFlaskPluginMailtests(tests.Modeltests):
             # Missing the required mail_to
             data = {'csrf_token': csrf_token, 'active': 'y'}
 
-            output = self.app.post('/test/settings/Mail', data=data)
+            output = self.app.post(
+                '/test/settings/Mail', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
             self.assertTrue('<h3>Mail</h3>' in output.data)
             self.assertFalse(
@@ -133,11 +140,16 @@ class PagureFlaskPluginMailtests(tests.Modeltests):
                 'mail_to': 'foo@bar'
             }
 
-            output = self.app.post('/test/settings/Mail', data=data)
+            output = self.app.post(
+                '/test/settings/Mail', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertTrue(
+                '<li class="message">Hook Mail activated</li>' in output.data)
+
+            output = self.app.get('/test/settings/Mail')
             self.assertTrue('<p>test project #1</p>' in output.data)
             self.assertTrue('<h3>Mail</h3>' in output.data)
-            self.assertTrue(
-                '<li class="message">Hook activated</li>' in output.data)
             self.assertTrue(
                 '<td><label for="mail_to">Mail to</label></td>'
                 in output.data)
@@ -150,11 +162,16 @@ class PagureFlaskPluginMailtests(tests.Modeltests):
 
             # De-Activate hook
             data = {'csrf_token': csrf_token}
-            output = self.app.post('/test/settings/Mail', data=data)
+            output = self.app.post(
+                '/test/settings/Mail', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertTrue(
+                '<li class="message">Hook Mail inactived</li>' in output.data)
+
+            output = self.app.get('/test/settings/Mail')
             self.assertTrue('<p>test project #1</p>' in output.data)
             self.assertTrue('<h3>Mail</h3>' in output.data)
-            self.assertTrue(
-                '<li class="message">Hook inactived</li>' in output.data)
             self.assertTrue(
                 '<td><label for="mail_to">Mail to</label></td>'
                 in output.data)
