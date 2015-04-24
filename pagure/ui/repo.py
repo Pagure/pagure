@@ -386,10 +386,10 @@ def view_file(repo, identifier, filename, username=None):
 
 
 @APP.route('/<repo>/raw/<identifier>', defaults={'filename': None})
-@APP.route('/<repo>/raw/<identifier>/<path:filename>')
+@APP.route('/<repo>/raw/<identifier>/f/<path:filename>')
 @APP.route('/fork/<username>/<repo>/raw/<identifier>',
            defaults={'filename': None})
-@APP.route('/fork/<username>/<repo>/raw/<identifier>/<path:filename>')
+@APP.route('/fork/<username>/<repo>/raw/<identifier>/f/<path:filename>')
 def view_raw_file(repo, identifier, filename=None, username=None):
     """ Displays the raw content of a file of a commit for the specified repo.
     """
@@ -525,9 +525,9 @@ def view_commit_patch(repo, commitid, username=None):
 
 
 @APP.route('/<repo>/tree/')
-@APP.route('/<repo>/tree/<identifier>')
+@APP.route('/<repo>/tree/<path:identifier>')
 @APP.route('/fork/<username>/<repo>/tree/')
-@APP.route('/fork/<username>/<repo>/tree/<identifier>')
+@APP.route('/fork/<username>/<repo>/tree/<path:identifier>')
 def view_tree(repo, identifier=None, username=None):
     """ Render the tree of the repo
     """
