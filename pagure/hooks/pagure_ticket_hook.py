@@ -90,7 +90,6 @@ class PagureTicketHook(BaseHook):
             os.symlink(
                 os.path.join(hook_files, 'post-receive'),
                 postreceive)
-            os.chmod(postreceive, 0755)
 
     @classmethod
     def install(cls, project, dbobj):

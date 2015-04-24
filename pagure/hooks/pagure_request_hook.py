@@ -91,7 +91,6 @@ class PagureRequestHook(BaseHook):
             os.symlink(
                 os.path.join(hook_files, 'post-receive'),
                 postreceive)
-            os.chmod(postreceive, 0755)
 
     @classmethod
     def install(cls, project, dbobj):
@@ -114,11 +113,10 @@ class PagureRequestHook(BaseHook):
         # Install the hook itself
         hook_path = os.path.join(
             repopath, 'hooks', 'post-receive.pagure-requests')
-        shutil.copyfile(
+        os.symlink(
             os.path.join(hook_files, 'pagure_hook_requests.py'),
             hook_path
         )
-        os.chmod(hook_path, 0755)
 
     @classmethod
     def remove(cls, project):

@@ -99,9 +99,6 @@ class Mail(BaseHook):
             os.path.join(hook_files, 'git_multimail.py'),
             os.path.join(repopath, 'hooks', 'post-receive.mail')
         )
-        os.chmod(
-            os.path.join(repopath, 'hooks', 'post-receive.mail'),
-            0755)
 
     @classmethod
     def remove(cls, project):

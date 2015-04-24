@@ -91,9 +91,6 @@ class Fedmsg(BaseHook):
             os.path.join(hook_files, 'fedmsg_hook.py'),
             os.path.join(repopath, 'hooks', 'post-receive.fedmsg')
         )
-        os.chmod(
-            os.path.join(repopath, 'hooks', 'post-receive.fedmsg'),
-            0755)
 
     @classmethod
     def remove(cls, project):

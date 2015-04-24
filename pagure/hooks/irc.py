@@ -122,11 +122,10 @@ class Hook(BaseHook):
         # repo_obj.config.set_multivar()
 
         # Install the hook itself
-        #shutil.copyfile(
+        #os.symlink(
             #os.path.join(hook_files, 'git_irc.py'),
             #os.path.join(repopath, 'hooks', 'post-receive.irc')
         #)
-        #os.chmod(os.path.join(repopath, 'hooks', 'post-receive.irc'), 0755)
 
     @classmethod
     def remove(cls, project):

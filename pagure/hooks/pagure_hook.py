@@ -95,7 +95,6 @@ class PagureHook(BaseHook):
             hook_path = os.path.join(
                 repopath, 'hooks', 'post-receive.pagure')
             os.symlink(hook_file, hook_path)
-            os.chmod(hook_path, 0755)
 
     @classmethod
     def remove(cls, project):
