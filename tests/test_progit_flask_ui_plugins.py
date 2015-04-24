@@ -67,7 +67,8 @@ class PagureFlaskPluginstests(tests.Modeltests):
         names = pagure.ui.plugins.get_plugin_names()
         self.assertEqual(
             sorted(names),
-            ['IRC', 'Mail', 'pagure', 'pagure requests', 'pagure tickets'])
+            ['Fedmsg', 'IRC', 'Mail', 'pagure', 'pagure requests',
+             'pagure tickets'])
 
     def test_get_plugin(self):
         """ Test the get_plugin function. """
