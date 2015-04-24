@@ -128,8 +128,8 @@ def view_repo(repo, username=None):
     )
 
 
-@APP.route('/<repo>/branch/<branchname>')
-@APP.route('/fork/<username>/<repo>/branch/<branchname>')
+@APP.route('/<repo>/branch/<path:branchname>')
+@APP.route('/fork/<username>/<repo>/branch/<path:branchname>')
 def view_repo_branch(repo, branchname, username=None):
     ''' Returns the list of branches in the repo. '''
 
@@ -202,9 +202,9 @@ def view_repo_branch(repo, branchname, username=None):
 
 
 @APP.route('/<repo>/commits')
-@APP.route('/<repo>/commits/<branchname>')
+@APP.route('/<repo>/commits/<path:branchname>')
 @APP.route('/fork/<username>/<repo>/commits')
-@APP.route('/fork/<username>/<repo>/commits/<branchname>')
+@APP.route('/fork/<username>/<repo>/commits/<path:branchname>')
 def view_commits(repo, branchname=None, username=None):
     """ Displays the commits of the specified repo.
     """
