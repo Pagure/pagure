@@ -82,9 +82,12 @@
     <ul class="right">
       {% if g.fas_user and g.fas_user.username != repo.user.user %}
       <li id="fork_button" {% if select == '' %}class="selected" {% endif %}>
-        <a href="{{ url_for(
+        <form method="POST" name="fork_project"
+          action="{{ url_for(
             'fork_project', repo=repo.name, username=username) }}">
-        Fork</a>
+          <a onclick="fork_project.submit();" id="fork_project">Fork</a>
+          {{ forkbuttonform.csrf_token }}
+        </form>
       </li>
       {% endif %}
       {% if g.fas_user and g.fas_user.username == repo.user.user %}

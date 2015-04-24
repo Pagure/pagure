@@ -32,6 +32,7 @@ from sqlalchemy.exc import SQLAlchemyError
 import pagure.lib
 import pagure.mail_logging
 import pagure.doc_utils
+import pagure.forms
 import pagure.login_forms
 
 from pygments import highlight
@@ -213,10 +214,15 @@ def inject_variables():
     """
     user_admin = is_admin()
 
+    forkbuttonform = None
+    if authenticated():
+        forkbuttonform = pagure.forms.ConfirmationForm()
+
     return dict(
         version=__version__,
         admin=user_admin,
         authenticated=authenticated(),
+        forkbuttonform=forkbuttonform,
     )
 
 
