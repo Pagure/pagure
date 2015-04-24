@@ -425,7 +425,7 @@ Sincerely,
 Your pagure admin.
 """ % ({'username': user.username, 'url': url})
 
-    pagure.notify.send_email(
+    pagure.lib.notify.send_email(
         text=message,
         subject='[Pagure] Confirm your user account',
         to_mail=user.emails[0].email,
@@ -461,7 +461,7 @@ Your pagure admin.
 """ % ({'username': user.username, 'url': url,
         'ip': flask.request.remote_addr})
 
-    pagure.notify.send_email(
+    pagure.lib.notify.send_email(
         text=message,
         subject='[Pagure] Confirm your password change',
         to_mail=user.emails[0].email,
