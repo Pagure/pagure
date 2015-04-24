@@ -31,7 +31,7 @@ fedmsg.init(name='relay_inbound', cert_prefix='scm', **config)
 
 def build_stats(commit):
     cmd = ['diff-tree', '--numstat', '%s' % (commit)]
-    output = pagure.lib.git.read_git_lines(cmd)
+    output = pagure.lib.git.read_git_lines(cmd, abspath)
 
     files = {}
     total = {}
