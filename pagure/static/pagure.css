@@ -717,6 +717,10 @@ header.repo.forked > p {
     display: inline-block;
 }
 
+#fork_project {
+    cursor: pointer;
+}
+
 .header > h3,
 .commit_diff > header h3 {
     display: inline-block;
