@@ -1,5 +1,5 @@
 {% extends "master.html" %}
-{% from "_formhelper.html" import render_field_in_row %}
+{% from "_formhelper.html" import render_field %}
 
 {% block title %}Groups{% endblock %}
 {%block tag %}admin{% endblock %}
@@ -16,6 +16,7 @@
   <h4>Create a new group</h4>
   <form action="{{ url_for('admin_groups') }}" method="post">
     <input id="group_name" name="group_name" title="group name"/>
+    {{ form.grp_type()|safe }}
     {{ form.csrf_token }}
   <input type="submit" class="submit positive button" value="Create">
   </form>
