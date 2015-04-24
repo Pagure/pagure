@@ -23,15 +23,15 @@ import pagure.exceptions
 import pagure.lib.link
 
 
+abspath = os.path.abspath(os.environ['GIT_DIR'])
+
+
 def generate_revision_change_log(new_commits_list):
 
     print 'Detailed log of new commits:\n\n'
     commitid = None
     for line in pagure.lib.git.read_git_lines(
-            ['log', '--no-walk']
-            + new_commits_list
-            + ['--'],
-            keepends=False,):
+            ['log', '--no-walk'] + new_commits_list + ['--'], abspath):
         if line.startswith('commit'):
             commitid = line.split('commit ')[-1]
 
@@ -75,7 +75,7 @@ def relates_commit(commitid, issue, app_url=None):
             pagure.SESSION,
             issue=issue,
             comment=comment,
-            user=get_pusher(commitid),
+            user=pagure.lib.git.get_pusher(commitid, abspath),
             ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
         )
         pagure.SESSION.commit()
@@ -107,7 +107,7 @@ def fixes_commit(commitid, issue, app_url=None):
             pagure.SESSION,
             issue=issue,
             comment=comment,
-            user=get_pusher(commitid),
+            user=pagure.lib.git.get_pusher(commitid, abspath),
             ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
         )
         pagure.SESSION.commit()
@@ -118,9 +118,9 @@ def fixes_commit(commitid, issue, app_url=None):
         pagure.APP.logger.exception(err)
 
     branches = [
-        item.replace('* ', '') for item in pagure.lib.git.read_git_lines(
-            ['branch', '--contains', commitid],
-            keepends=False)
+        item.replace('* ', '')
+        for item in pagure.lib.git.read_git_lines(
+            ['branch', '--contains', commitid], abspath)
     ]
 
     if 'master' in branches:
@@ -129,7 +129,7 @@ def fixes_commit(commitid, issue, app_url=None):
                 pagure.SESSION,
                 issue,
                 ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
-                user=get_pusher(commitid),
+                user=pagure.lib.git.get_pusher(commitid, abspath),
                 status='Fixed')
             pagure.SESSION.commit()
         except pagure.exceptions.PagureException as err:
@@ -154,10 +154,10 @@ def run_as_post_receive_hook():
         print refname
 
         generate_revision_change_log(
-            pagure.lib.git.get_revs_between(oldrev, newrev))
+            pagure.lib.git.get_revs_between(oldrev, newrev, abspath))
 
-    print 'repo:', pagure.lib.git.get_repo_name()
-    print 'user:', pagure.lib.git.get_username()
+    print 'repo:', pagure.lib.git.get_repo_name(abspath)
+    print 'user:', pagure.lib.git.get_username(abspath)
 
 
 def main(args):

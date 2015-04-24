@@ -636,7 +636,7 @@ def add_file_to_git(repo, issue, ticketfolder, user, filename, filestream):
     return os.path.join('files', filename)
 
 
-def read_output(cmd, input=None, keepends=False, **kw):
+def read_output(cmd, abspath, input=None, keepends=False, **kw):
     if input:
         stdin = subprocess.PIPE
     else:
@@ -659,38 +659,60 @@ def read_output(cmd, input=None, keepends=False, **kw):
     return out
 
 
-def read_git_output(args, input=None, keepends=False, **kw):
+def read_git_output(args, abspath, input=None, keepends=False, **kw):
     """Read the output of a Git command."""
 
-    return read_output(['git'] + args, input=input, keepends=keepends, **kw)
+    return read_output(
+        ['git'] + args, abspath, input=input, keepends=keepends, **kw)
 
 
-def read_git_lines(args, keepends=False, **kw):
+def read_git_lines(args, abspath, keepends=False, **kw):
     """Return the lines output by Git command.
 
     Return as single lines, with newlines stripped off."""
 
-    return read_git_output(args, keepends=True, **kw).splitlines(keepends)
+    return read_git_output(
+        args, abspath, keepends=keepends, **kw
+    ).splitlines(keepends)
 
 
-def get_revs_between(torev, fromrev):
+def get_revs_between(torev, fromrev, abspath):
     """ Yield revisions between HEAD and BASE. """
 
     cmd = ['rev-list', '%s...%s' % (torev, fromrev)]
     if set(fromrev) == set('0'):
         cmd = ['rev-list', '%s' % torev]
-    return pagure.lib.git.read_git_lines(cmd)
+    return pagure.lib.git.read_git_lines(cmd, abspath)
 
 
-def get_pusher(commit):
+def get_pusher(commit, abspath):
     ''' Return the name of the person that pushed the commit. '''
     user = pagure.lib.git.read_git_lines(
-        ['log', '-1', '--pretty=format:"%an"', commit])[0].replace('"', '')
+        ['log', '-1', '--pretty=format:"%an"', commit],
+        abspath)[0].replace('"', '')
     return user
 
 
-def get_pusher_email(commit):
+def get_pusher_email(commit, abspath):
     ''' Return the email of the person that pushed the commit. '''
     user = pagure.lib.git.read_git_lines(
-        ['log', '-1', '--pretty=format:"%ae"', commit])[0].replace('"', '')
+        ['log', '-1', '--pretty=format:"%ae"', commit],
+        abspath)[0].replace('"', '')
     return user
+
+
+def get_repo_name(abspath):
+    ''' Return the name of the git repo based on its path.
+    '''
+    repo_name = '.'.join(abspath.split(os.path.sep)[-1].split('.')[:-1])
+    return repo_name
+
+
+def get_username(abspath):
+    ''' Return the username of the git repo based on its path.
+    '''
+    username = None
+    repo = os.path.abspath(os.path.join(abspath, '..'))
+    if pagure.APP.config['FORK_FOLDER'] in repo:
+        username = repo.split(pagure.APP.config['FORK_FOLDER'])[1]
+    return username

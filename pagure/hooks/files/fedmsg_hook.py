@@ -22,23 +22,6 @@ import pagure.lib.git
 abspath = os.path.abspath(os.environ['GIT_DIR'])
 
 
-def get_repo_name():
-    ''' Return the name of the git repo based on its path.
-    '''
-    repo_name = '.'.join(abspath.split(os.path.sep)[-1].split('.')[:-1])
-    return repo_name
-
-
-def get_username():
-    ''' Return the username of the git repo based on its path.
-    '''
-    username = None
-    repo = os.path.abspath(os.path.join(abspath, '..'))
-    if pagure.APP.config['FORK_FOLDER'] in repo:
-        username = repo.split(pagure.APP.config['FORK_FOLDER'])[1]
-    return username
-
-
 print "Emitting a message to the fedmsg bus."
 config = fedmsg.config.load_config([], None)
 config['active'] = True
@@ -76,19 +59,21 @@ seen = []
 # Read in all the rev information git-receive-pack hands us.
 for line in sys.stdin.readlines():
     (oldrev, newrev, refname) = line.strip().split(' ', 2)
-    revs = pagure.lib.git.get_revs_between(oldrev, newrev)
+    revs = pagure.lib.git.get_revs_between(oldrev, newrev, abspath)
 
     def _build_commit(rev):
         files, total = build_stats(rev)
 
         summary = pagure.lib.git.read_git_lines(
-            ['log', '-1', rev, "--pretty='%s'"])[0].replace("'", '')
+            ['log', '-1', rev, "--pretty='%s'"],
+            abspath)[0].replace("'", '')
         message = pagure.lib.git.read_git_lines(
-            ['log', '-1', rev, "--pretty='%B'"])[0].replace("'", '')
+            ['log', '-1', rev, "--pretty='%B'"],
+            abspath)[0].replace("'", '')
 
         return dict(
-            name=pagure.lib.git.get_pusher(rev),
-            email=pagure.lib.git.get_pusher_email(rev),
+            name=pagure.lib.git.get_pusher(rev, abspath),
+            email=pagure.lib.git.get_pusher_email(rev, abspath),
             summary=summary,
             message=message,
             stats=dict(
@@ -97,8 +82,8 @@ for line in sys.stdin.readlines():
             ),
             rev=unicode(rev),
             path=abspath,
-            username=pagure.lib.git.get_username(),
-            repo=pagure.lib.git.get_repo_name(),
+            username=pagure.lib.git.get_username(abspath),
+            repo=pagure.lib.git.get_repo_name(abspath),
             branch=refname,
             agent=os.getlogin(),
         )

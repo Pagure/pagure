@@ -23,6 +23,9 @@ sys.path.insert(0, os.path.expanduser('~/repos/gitrepo/pagure'))
 import pagure.lib.git
 
 
+abspath = os.path.abspath(os.environ['GIT_DIR'])
+
+
 def get_files_to_load(new_commits_list):
 
     print 'Files changed by new commits:\n'
@@ -31,7 +34,7 @@ def get_files_to_load(new_commits_list):
     for commit in new_commits_list:
         filenames = pagure.lib.git.read_git_lines(
             ['diff-tree', '--no-commit-id', '--name-only', '-r', commit],
-            keepends=False)
+            abspath)
         for line in filenames:
             if line.strip():
                 file_list.append(line.strip())
@@ -54,17 +57,19 @@ def run_as_post_receive_hook():
         print refname
 
         tmp = set(get_files_to_load(
-            pagure.lib.git.get_revs_between(oldrev, newrev)))
+            pagure.lib.git.get_revs_between(oldrev, newrev, abspath)))
         file_list = file_list.union(tmp)
 
-    reponame = pagure.lib.git.get_repo_name()
-    username = pagure.lib.git.get_username()
+    reponame = pagure.lib.git.get_repo_name(abspath)
+    username = pagure.lib.git.get_username(abspath)
     print 'repo:', reponame, username
 
     for filename in file_list:
         print 'To load: %s' % filename
         json_data = None
-        data = ''.join(read_git_lines(['show', 'HEAD:%s' % filename]))
+        data = ''.join(
+            pagure.lib.git.read_git_lines(
+                ['show', 'HEAD:%s' % filename], abspath))
         if data:
             try:
                 json_data = json.loads(data)
