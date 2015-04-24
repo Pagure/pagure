@@ -51,7 +51,7 @@ def get_plugin(plugin_name):
 @APP.route('/fork/<username>/<repo>/settings/<plugin>/<int:full>',
            methods=('GET', 'POST'))
 @cla_required
-def view_plugin(repo, plugin, full=True, username=None):
+def view_plugin(repo, plugin, username=None, full=True):
     """ Presents the settings of the project.
     """
     repo = pagure.lib.get_project(SESSION, repo, user=username)
