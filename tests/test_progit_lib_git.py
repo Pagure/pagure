@@ -1014,6 +1014,18 @@ index 0000000..60f7480
             output = pagure.lib.git.get_pusher_email(githash, gitrepo)
             self.assertEqual(output, 'pagure')
 
+    def test_get_repo_name(self):
+        """ Test the get_repo_name method of pagure.lib.git. """
+        gitrepo = os.path.join(tests.HERE, 'test_ticket_repo.git')
+        repo_name = pagure.lib.git.get_repo_name(gitrepo)
+        self.assertEqual(repo_name, 'test_ticket_repo')
+
+        repo_name = pagure.lib.git.get_repo_name('foo/bar/baz/test.git')
+        self.assertEqual(repo_name, 'test')
+
+        repo_name = pagure.lib.git.get_repo_name('foo.test.git')
+        self.assertEqual(repo_name, 'foo.test')
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibGittests)
