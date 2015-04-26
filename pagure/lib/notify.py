@@ -69,7 +69,7 @@ def log(project, topic, msg):
 
         content = json.dumps(msg)
         hashhex = hmac.new(
-            project.hook_token, content, hashlib.sha1).hexdigest()
+            str(project.hook_token), content, hashlib.sha1).hexdigest()
         headers = {
             'X-Pagure-Topic': topic,
             'X-Pagure-Signature': hashhex
