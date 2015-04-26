@@ -808,12 +808,12 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # View in a branch
-        output = self.app.get('/test/raw/master/sources')
+        output = self.app.get('/test/raw/master/f/sources')
         self.assertEqual(output.status_code, 200)
         self.assertTrue('foo\n bar' in output.data)
 
         # View what's supposed to be an image
-        output = self.app.get('/test/raw/master/test.jpg')
+        output = self.app.get('/test/raw/master/f/test.jpg')
         self.assertEqual(output.status_code, 200)
         self.assertTrue(output.data.startswith('<89>PNG^M'))
 
@@ -821,28 +821,28 @@ class PagureFlaskRepotests(tests.Modeltests):
         repo = pygit2.init_repository(os.path.join(tests.HERE, 'test.git'))
         commit = repo.revparse_single('HEAD')
 
-        output = self.app.get('/test/raw/%s/test.jpg' % commit.oid.hex)
+        output = self.app.get('/test/raw/%s/f/test.jpg' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
         self.assertTrue(output.data.startswith('<89>PNG^M'))
 
         # View by image name -- somehow we support this
-        output = self.app.get('/test/raw/sources/test.jpg')
+        output = self.app.get('/test/raw/sources/f/test.jpg')
         self.assertEqual(output.status_code, 200)
         self.assertTrue(output.data.startswith('<89>PNG^M'))
 
         # View binary file
-        output = self.app.get('/test/raw/sources/test_binary')
+        output = self.app.get('/test/raw/sources/f/test_binary')
         self.assertEqual(output.status_code, 200)
         self.assertTrue(output.data.startswith('<89>PNG^M'))
 
         # View folder
-        output = self.app.get('/test/raw/master/folder1')
+        output = self.app.get('/test/raw/master/f/folder1')
         self.assertEqual(output.status_code, 404)
 
         # View by image name -- with a non-existant file
-        output = self.app.get('/test/raw/sources/testfoo.jpg')
+        output = self.app.get('/test/raw/sources/f/testfoo.jpg')
         self.assertEqual(output.status_code, 404)
-        output = self.app.get('/test/raw/master/folder1/testfoo.jpg')
+        output = self.app.get('/test/raw/master/f/folder1/testfoo.jpg')
         self.assertEqual(output.status_code, 404)
 
         output = self.app.get('/test/raw/master/')
@@ -872,7 +872,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'),
             ncommits=10)
 
-        output = self.app.get('/fork/pingou/test3/raw/master/sources')
+        output = self.app.get('/fork/pingou/test3/raw/master/f/sources')
         self.assertEqual(output.status_code, 200)
         self.assertTrue('foo\n bar' in output.data)
 
