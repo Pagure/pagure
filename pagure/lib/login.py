@@ -42,38 +42,6 @@ def get_session_by_visitkey(session, sessionid):
     return query.first()
 
 
-def get_groups(session):
-    ''' Return the list of groups present in the database.
-
-    :arg session: the session with which to connect to the database.
-
-    '''
-    query = session.query(
-        model.PagureGroup
-    ).order_by(
-        model.PagureGroup.group_name
-    )
-
-    return query.all()
-
-
-def get_group(session, group):
-    ''' Return a specific group for the specified group name.
-
-    :arg session: the session with which to connect to the database.
-
-    '''
-    query = session.query(
-        model.PagureGroup
-    ).filter(
-        model.PagureGroup.group_name == group
-    ).order_by(
-        model.PagureGroup.group_name
-    )
-
-    return query.first()
-
-
 def get_users_by_group(session, group):
     ''' Return the list of users for a specified group.
 
@@ -93,21 +61,3 @@ def get_users_by_group(session, group):
     )
 
     return query.all()
-
-
-def get_user_group(session, userid, groupid):
-    ''' Return a specific user_group for the specified group and user
-    identifiers.
-
-    :arg session: the session with which to connect to the database.
-
-    '''
-    query = session.query(
-        model.PagureUserGroup
-    ).filter(
-        model.PagureUserGroup.user_id == userid
-    ).filter(
-        model.PagureUserGroup.group_id == groupid
-    )
-
-    return query.first()

@@ -1774,3 +1774,38 @@ def search_groups(session, pattern=None, grp_name=None, grp_type=None):
         return query.first()
     else:
         return query.all()
+
+
+def get_group(session, group):
+    ''' Return a specific group for the specified group name.
+
+    :arg session: the session with which to connect to the database.
+
+    '''
+    query = session.query(
+        model.PagureGroup
+    ).filter(
+        model.PagureGroup.group_name == group
+    ).order_by(
+        model.PagureGroup.group_name
+    )
+
+    return query.first()
+
+
+def get_user_group(session, userid, groupid):
+    ''' Return a specific user_group for the specified group and user
+    identifiers.
+
+    :arg session: the session with which to connect to the database.
+
+    '''
+    query = session.query(
+        model.PagureUserGroup
+    ).filter(
+        model.PagureUserGroup.user_id == userid
+    ).filter(
+        model.PagureUserGroup.group_id == groupid
+    )
+
+    return query.first()
