@@ -13,6 +13,7 @@ from functools import wraps
 import flask
 
 import pagure.forms
+import pagure.lib
 from pagure import (APP, SESSION,
                     generate_gitolite_acls, generate_authorized_key_file,
                     is_admin, admin_session_timedout)
@@ -135,7 +136,7 @@ def admin_groups():
 def admin_group(group):
     """ List of the users in a certain group
     """
-    group_obj = pagure.lib.login.get_group(SESSION, group)
+    group_obj = pagure.lib.search_groups(SESSION, grp_name=group)
 
     if not group_obj:
         flask.flash('No group `%s` found' % group, 'error')
@@ -189,7 +190,7 @@ def admin_group_user_delete(user, group):
     # Add new user to the group if asked
     form = forms.ConfirmationForm()
     if form.validate_on_submit():
-        group_obj = pagure.lib.login.get_group(SESSION, group)
+        group_obj = pagure.lib.search_groups(SESSION, grp_name=group)
 
         if not group_obj:
             flask.flash('No group `%s` found' % group, 'error')
@@ -200,7 +201,7 @@ def admin_group_user_delete(user, group):
             flask.flash('No user `%s` found' % user, 'error')
             return flask.redirect(flask.url_for('.admin_groups'))
 
-        user_grp = pagure.lib.login.get_user_group(
+        user_grp = pagure.lib.get_user_group(
             SESSION, user.id, group_obj.id)
         SESSION.delete(user_grp)
 
@@ -219,7 +220,7 @@ def admin_group_delete(group):
     # Add new user to the group if asked
     form = forms.ConfirmationForm()
     if form.validate_on_submit():
-        group_obj = pagure.lib.login.get_group(SESSION, group)
+        group_obj = pagure.lib.search_groups(SESSION, grp_name=group)
 
         if not group_obj:
             flask.flash('No group `%s` found' % group, 'error')
