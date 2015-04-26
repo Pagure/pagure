@@ -79,3 +79,37 @@ def view_group(group):
         group=group,
         form=form,
     )
+
+
+@pagure.APP.route('/group/<group>/<user>/delete', methods=['POST'])
+@pagure.cla_required
+def group_user_delete(user, group):
+    """ Delete an user from a certain group
+    """
+    # Add new user to the group if asked
+    form = pagure.forms.ConfirmationForm()
+    if form.validate_on_submit():
+        group_obj = pagure.lib.search_groups(SESSION, grp_name=group)
+
+        if not group_obj:
+            flask.flash('No group `%s` found' % group, 'error')
+            return flask.redirect(flask.url_for('.view_group', group=group))
+
+        user = pagure.lib.search_user(SESSION, username=user)
+        if not user:
+            flask.flash('No user `%s` found' % user, 'error')
+            return flask.redirect(flask.url_for('.view_group', group=group))
+
+        if user == group_obj.creator:
+            flask.flash('The creator of a group cannot be removed', 'error')
+            return flask.redirect(flask.url_for('.view_group', group=group))
+
+        user_grp = pagure.lib.get_user_group(
+            SESSION, user.id, group_obj.id)
+        SESSION.delete(user_grp)
+
+        SESSION.commit()
+        flask.flash(
+            'User `%s` removed from the group `%s`' % (user.user, group))
+
+    return flask.redirect(flask.url_for('.view_group', group=group))
