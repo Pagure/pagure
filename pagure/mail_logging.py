@@ -30,6 +30,8 @@ import os
 import socket
 import traceback
 
+import flask
+
 psutil = None
 try:
     import psutil
@@ -77,6 +79,23 @@ class ContextInjector(logging.Filter):  # pragma: no cover
             record.proc_name = current_process.name
             record.command_line = " ".join(current_process.cmdline)
         record.callstack = self.format_callstack()
+
+        record.url = '-'
+        record.args = '-'
+        record.form = '-'
+        try:
+            record.url = flask.request.url
+        except RuntimeError:
+            pass
+        try:
+            record.args = flask.request.args
+        except RuntimeError:
+            pass
+        try:
+            record.form = flask.request.form
+        except RuntimeError:
+            pass
+
         return True
 
     @staticmethod
@@ -126,6 +145,12 @@ Location:           %(pathname)s:%(lineno)d
 Module:             %(module)s
 Function:           %(funcName)s
 Time:               %(asctime)s
+
+
+URL:    %(url)s
+args:   %(args)s
+form:   %(form)s
+
 
 Message:
 --------
