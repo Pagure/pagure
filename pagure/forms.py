@@ -135,6 +135,14 @@ class AddUserForm(wtf.Form):
     )
 
 
+class AddGroupForm(wtf.Form):
+    ''' Form to add a group to a project. '''
+    group = wtforms.TextField(
+        'Group <span class="error">*</span>',
+        [wtforms.validators.Required()]
+    )
+
+
 class DescriptionForm(wtf.Form):
     ''' Form to edit the description of a project. '''
     description = wtforms.TextField(
