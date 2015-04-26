@@ -1812,9 +1812,13 @@ def search_groups(session, pattern=None, grp_name=None, grp_type=None):
         return query.all()
 
 
-def add_user_to_group(session, new_user, group, user):
+def add_user_to_group(session, username, group, user):
     ''' Add the specified user to the given group.
     '''
+    new_user = search_user(session, username=username)
+    if not new_user:
+        raise PagureException('No user `%s` found' % username)
+
     for guser in group.users:
         if guser.username == new_user.username:
             return 'User `%s` already in the group, nothing to change.' % (
