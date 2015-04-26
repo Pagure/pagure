@@ -39,6 +39,8 @@ class PagureFlaskInternaltests(tests.Modeltests):
             pagure.APP.config['IP_ALLOWED_INTERNAL'] + [None]))
         pagure.SESSION = self.session
         pagure.internal.SESSION = self.session
+        pagure.ui.repo.SESSION = self.session
+
         pagure.APP.config['GIT_FOLDER'] = tests.HERE
         pagure.APP.config['FORK_FOLDER'] = os.path.join(
             tests.HERE, 'forks')
