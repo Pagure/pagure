@@ -37,6 +37,7 @@
 <p>{{ groups_length }} groups.</p>
 
 <section class="user_list">
+  {% if groups %}
   <ul>
     {% for group in groups %}
     <li>
@@ -46,6 +47,9 @@
     </li>
     {% endfor %}
   </ul>
+  {% else %}
+  <p>No groups have been created on this pagure instance yet</p>
+  {% endif %}
 </section>
 
 {% endblock %}
