@@ -57,7 +57,7 @@
       </a>
       {% if user != group.creator %}
        <form class="icon" method="POST" style="display: inline-block"
-        action="{{ url_for('admin_group_user_delete',
+        action="{{ url_for('group_user_delete',
             group=group.group_name, user=user.user) }}">
         {{ form.csrf_token }}
         <button
