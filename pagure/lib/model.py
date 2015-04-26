@@ -810,30 +810,6 @@ class PullRequestComment(BASE):
         return self.pull_request
 
 
-# ##########################################################
-# These classes are only used if you're using the `local`
-#                  authentication method
-# ##########################################################
-
-
-class PagureUserVisit(BASE):
-    """
-    Table storing the visits of the user.
-    """
-
-    __tablename__ = 'pagure_user_visit'
-
-    id = sa.Column(sa.Integer, primary_key=True)
-    user_id = sa.Column(
-        sa.Integer, sa.ForeignKey('users.id'), nullable=False)
-    visit_key = sa.Column(
-        sa.String(40), nullable=False, unique=True, index=True)
-    user_ip = sa.Column(sa.String(50), nullable=False)
-    created = sa.Column(
-        sa.DateTime, nullable=False, default=datetime.datetime.utcnow)
-    expiry = sa.Column(sa.DateTime)
-
-
 class PagureGroupType(BASE):
     """
     A list of the type a group can have definition.
@@ -876,6 +852,50 @@ class PagureGroup(BASE):
         ''' Return a string representation of this object. '''
 
         return 'Group: %s - name %s' % (self.id, self.group_name)
+
+
+class ProjectGroup(BASE):
+    """
+    Association table linking the projects table to the pagure_group table.
+    This allow linking projects to groups.
+    """
+
+    __tablename__ = 'projects_groups'
+
+    project_id = sa.Column(
+        sa.Integer, sa.ForeignKey('projects.id'), primary_key=True)
+    group_id = sa.Column(
+        sa.Integer, sa.ForeignKey('pagure_group.id'), primary_key=True)
+
+    # Constraints
+    __table_args__ = (
+        sa.UniqueConstraint(
+            'project_id', 'group_id'),
+    )
+
+
+# ##########################################################
+# These classes are only used if you're using the `local`
+#                  authentication method
+# ##########################################################
+
+
+class PagureUserVisit(BASE):
+    """
+    Table storing the visits of the user.
+    """
+
+    __tablename__ = 'pagure_user_visit'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    user_id = sa.Column(
+        sa.Integer, sa.ForeignKey('users.id'), nullable=False)
+    visit_key = sa.Column(
+        sa.String(40), nullable=False, unique=True, index=True)
+    user_ip = sa.Column(sa.String(50), nullable=False)
+    created = sa.Column(
+        sa.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    expiry = sa.Column(sa.DateTime)
 
 
 class PagureUserGroup(BASE):
