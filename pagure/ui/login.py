@@ -344,6 +344,7 @@ def _check_session_cookie():
     cookie_name = '%s_local_cookie' % cookie_name
     session_id = None
     user = None
+    login_time = None
 
     if cookie_name and cookie_name in flask.request.cookies:
         sessionid = flask.request.cookies.get(cookie_name)
@@ -374,7 +375,8 @@ def _check_session_cookie():
 
     flask.g.fas_session_id = session_id
     flask.g.fas_user = user
-    flask.g.fas_user.login_time = login_time
+    if user:
+        flask.g.fas_user.login_time = login_time
 
 
 def _send_session_cookie(response):
