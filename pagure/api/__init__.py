@@ -132,3 +132,43 @@ def api_project_tags(repo, username=None):
             ]
         }
     )
+
+
+
+@API.route('/groups/')
+@API.route('/groups')
+def api_groups():
+    '''
+    List groups
+    -----------
+    Returns the list of all groups present on this pagure instance
+    This can then be used as input for autocompletion in some forms/fields.
+
+    ::
+
+        /api/groups
+
+    Accepts GET queries only.
+
+    Sample response:
+
+    ::
+
+        {
+          "groups": ["group1", "group2"]
+        }
+
+    '''
+    pattern = flask.request.args.get('pattern', None)
+    if pattern is not None and not pattern.endswith('*'):
+        pattern += '*'
+
+    return flask.jsonify(
+        {
+            'groups': [
+                group.group_name
+                for group in pagure.lib.search_groups(
+                    SESSION, pattern=pattern)
+            ]
+        }
+    )
