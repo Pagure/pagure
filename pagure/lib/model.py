@@ -865,7 +865,7 @@ class PagureGroup(BASE):
         'User',
         foreign_keys=[user_id],
         remote_side=[User.id],
-        backref=backref('groups')
+        backref=backref('groups_created')
     )
 
     def __repr__(self):
