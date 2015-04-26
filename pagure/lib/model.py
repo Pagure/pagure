@@ -262,6 +262,14 @@ class Project(BASE):
         backref='co_projects'
     )
 
+    groups = relation(
+        "PagureGroup",
+        secondary="projects_groups",
+        primaryjoin="projects.c.id==projects_groups.c.project_id",
+        secondaryjoin="pagure_group.c.id==projects_groups.c.group_id",
+        backref="projects",
+    )
+
     @property
     def path(self):
         ''' Return the name of the git repo on the filesystem. '''
