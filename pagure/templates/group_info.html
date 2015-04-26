@@ -12,7 +12,22 @@
 {% endblock %}
 
 {% block content %}
+<div class="inline">
     <h2>Group: {{ group.group_name }}</h2>
+    <aside id="issue_action">
+      <form class="icon" method="POST" style="display: inline-block"
+        action="{{ url_for('group_delete',
+            group=group.group_name) }}">
+        {{ form.csrf_token }}
+        <button
+          onclick="return confirm('Are you sure you want to delete the group `{{group.group_name}}`?');"
+          title="Delete group">
+          <span class="icon icon-trash blue"></span>
+          Delete group
+        </button>
+      </form>
+    </aside>
+</div>
 
 
 <table>
