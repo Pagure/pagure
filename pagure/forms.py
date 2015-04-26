@@ -187,3 +187,27 @@ class CommentForm(wtf.Form):
     comment = wtforms.FileField(
         'Comment',
         [wtforms.validators.Required()])
+
+
+class NewGroupForm(wtf.Form):
+    """ Form to ask for a password change. """
+    group_name = wtforms.TextField(
+        'Group name  <span class="error">*</span>',
+        [wtforms.validators.Required(), wtforms.validators.Length(max=16)]
+    )
+    grp_type = wtforms.SelectField(
+        'Group type',
+        [wtforms.validators.Required()],
+        choices=[(item, item) for item in []]
+    )
+
+    def __init__(self, *args, **kwargs):
+        """ Calls the default constructor with the normal argument but
+        uses the list of collection provided to fill the choices of the
+        drop-down list.
+        """
+        super(NewGroupForm, self).__init__(*args, **kwargs)
+        if 'grp_types' in kwargs:
+            self.grp_type.choices = [
+                (grptype, grptype) for grptype in kwargs['grp_types']
+            ]
