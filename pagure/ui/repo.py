@@ -879,6 +879,58 @@ def add_user(repo, username=None):
     )
 
 
+@APP.route('/<repo>/addgroup', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/addgroup', methods=('GET', 'POST'))
+@cla_required
+def add_group(repo, username=None):
+    """ Add the specified group from the project.
+    """
+    if admin_session_timedout():
+        return flask.redirect(
+            flask.url_for('auth_login', next=flask.request.url))
+
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    if not is_repo_admin(repo):
+        flask.abort(
+            403,
+            'You are not allowed to add groups to this project')
+
+    form = pagure.forms.AddGroupForm()
+
+    if form.validate_on_submit():
+        try:
+            msg = pagure.lib.add_group_to_project(
+                SESSION, repo,
+                new_group=form.group.data,
+                user=flask.g.fas_user.username,
+            )
+            SESSION.commit()
+            pagure.generate_gitolite_acls()
+            flask.flash(msg)
+            return flask.redirect(
+                flask.url_for(
+                    '.view_settings', repo=repo.name, username=username)
+            )
+        except pagure.exceptions.PagureException as msg:
+            SESSION.rollback()
+            flask.flash(msg, 'error')
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash('Group could not be added', 'error')
+
+    return flask.render_template(
+        'add_group.html',
+        form=form,
+        username=username,
+        repo=repo,
+    )
+
+
 @APP.route('/<repo>/regenerate', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/regenerate', methods=['POST'])
 @cla_required
