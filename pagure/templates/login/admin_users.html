@@ -19,7 +19,7 @@
   <h4>Add an user to this group</h4>
   <form action="{{ url_for('.admin_group', group=group.group_name)
     }}" method="post">
-    <input id="username" name="username" title="User name"/>
+    <input id="username" name="user" title="User name"/>
     {{ form.csrf_token }}
   <input type="submit" class="submit positive button" value="Add">
   </form>
