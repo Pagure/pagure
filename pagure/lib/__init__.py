@@ -594,6 +594,42 @@ def add_user_to_project(session, project, new_user, user):
     return 'User added'
 
 
+def add_group_to_project(session, project, new_group, user):
+    ''' Add a specified group to a specified project. '''
+    group_obj = get_groups(session, grp_name=new_group)
+
+    if not group_obj:
+        raise pagure.exceptions.PagureException(
+            'No group %s found.' % new_group
+        )
+
+    groups = set([group.group_name for group in project.groups])
+    if new_group in groups:
+        raise pagure.exceptions.PagureException(
+            'This group is already associated to this project.'
+        )
+
+    project_group = model.ProjectGroup(
+        project_id=project.id,
+        group_id=group_obj.id,
+    )
+    session.add(project_group)
+    # Make sure we won't have SQLAlchemy error before we create the repo
+    session.flush()
+
+    pagure.lib.notify.log(
+        project,
+        topic='project.group.added',
+        msg=dict(
+            project=project.to_json(),
+            new_group=group_obj.group_name,
+            agent=user,
+        )
+    )
+
+    return 'Group added'
+
+
 def add_pull_request_comment(session, request, commit, filename, row,
                              comment, user, requestfolder, notify=True):
     ''' Add a comment to a pull-request. '''
