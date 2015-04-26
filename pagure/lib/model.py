@@ -853,8 +853,20 @@ class PagureGroup(BASE):
         sa.ForeignKey('pagure_group_type.grp_type'),
         default='user',
         nullable=False)
+    user_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey('users.id', onupdate='CASCADE'),
+        nullable=False,
+        index=True)
     created = sa.Column(
         sa.DateTime, nullable=False, default=datetime.datetime.utcnow)
+
+    creator = relation(
+        'User',
+        foreign_keys=[user_id],
+        remote_side=[User.id],
+        backref=backref('groups')
+    )
 
     def __repr__(self):
         ''' Return a string representation of this object. '''
