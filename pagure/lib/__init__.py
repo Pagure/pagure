@@ -1812,21 +1812,21 @@ def search_groups(session, pattern=None, grp_name=None, grp_type=None):
         return query.all()
 
 
-def add_user_to_group(session, username, group, user):
+def add_user_to_group(session, new_user, group, user):
     ''' Add the specified user to the given group.
     '''
     for guser in group.users:
-        if guser.username == username:
+        if guser.username == new_user.username:
             return 'User `%s` already in the group, nothing to change.' % (
-                username)
+                new_user.username)
 
     grp = model.PagureUserGroup(
         group_id=group.id,
-        user_id=user.id
+        user_id=new_user.id
     )
     session.add(grp)
     session.flush()
-    return 'User `%s` added.' % username
+    return 'User `%s` added.' % new_user.username
 
 
 def get_group(session, group):
