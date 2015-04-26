@@ -162,11 +162,11 @@ def admin_group(group):
             SESSION.rollback()
             flask.flash(
                 'Could not add user `%s` to group `%s`.' % (
-                    user.user, group_obj.group),
+                    user.user, group_obj.group_name),
                 'error')
             APP.logger.debug(
                 'Could not add user `%s` to group `%s`.' % (
-                    user.user, group_obj.group))
+                    user.user, group_obj.group_name))
             APP.logger.exception(err)
 
         flask.flash('User `%s` added.' % user.user)
