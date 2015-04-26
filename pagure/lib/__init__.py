@@ -1742,3 +1742,35 @@ def get_group_types(session, grp_type=None):
         )
 
     return query.all()
+
+
+def search_groups(session, pattern=None, grp_name=None, grp_type=None):
+    ''' Return the groups based on the criteria specified.
+
+    '''
+    query = session.query(
+        model.PagureGroup
+    ).order_by(
+        model.PagureGroup.grp_type
+    )
+
+    if pattern:
+        pattern = pattern.replace('*', '%')
+        query = query.filter(
+            model.PagureGroup.group_name.like(pattern)
+        )
+
+    if grp_name:
+        query = query.filter(
+            model.PagureGroup.group_name == grp_name
+        )
+
+    if grp_type:
+        query = query.filter(
+            model.PagureGroup.grp_type == grp_type
+        )
+
+    if grp_name:
+        return query.first()
+    else:
+        return query.all()
