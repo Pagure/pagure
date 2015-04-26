@@ -33,6 +33,9 @@
             <li id="usersTab">
               <a href="{{ url_for('view_users') }}">Users</a>
             </li>
+            <li id="groupsTab">
+              <a href="{{ url_for('group_lists') }}">Groups</a>
+            </li>
             {% if admin %}
             <li id="adminTab">
               <a href="{{ url_for('admin_index') }}">Admin</a>
