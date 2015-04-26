@@ -68,6 +68,7 @@ def user_set(APP, user):
 
     def handler(sender, **kwargs):
         g.fas_user = user
+        g.fas_session_id = b'123'
 
     with appcontext_pushed.connected_to(handler, APP):
         yield
