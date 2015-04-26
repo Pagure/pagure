@@ -386,7 +386,7 @@ def _send_session_cookie(response):
 
     response.set_cookie(
         key='%s_local_cookie' % cookie_name,
-        value=flask.g.fas_session_id or '',
+        value=flask.g.get('fas_session_id') or '',
         secure=secure,
         httponly=True,
     )
