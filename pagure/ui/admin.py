@@ -172,14 +172,11 @@ def admin_group(group):
         flask.flash('User `%s` added.' % user.user)
         SESSION.commit()
 
-    users = pagure.lib.login.get_users_by_group(SESSION, group)
-
     return flask.render_template(
         'login/admin_users.html',
         form=form,
         conf_form=pagure.forms.ConfirmationForm(),
         group=group_obj,
-        users=users,
     )
 
 
