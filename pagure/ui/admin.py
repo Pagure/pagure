@@ -100,7 +100,7 @@ def admin_groups():
     # Make sure the admin type is always the last one
     grp_types.remove('admin')
     grp_types.append('admin')
-    form = forms.NewGroupForm(grp_types=grp_types)
+    form = pagure.forms.NewGroupForm(grp_types=grp_types)
     user = pagure.lib.search_user(SESSION, username=flask.g.fas_user.username)
     if not user:
         return flask.abort(403)
@@ -121,13 +121,13 @@ def admin_groups():
 
         SESSION.commit()
 
-    groups = pagure.lib.login.get_groups(SESSION)
+    groups = pagure.lib.search_groups(SESSION)
 
     return flask.render_template(
         'login/admin_groups.html',
         groups=groups,
         form=form,
-        conf_form=forms.ConfirmationForm(),
+        conf_form=pagure.forms.ConfirmationForm(),
     )
 
 
@@ -143,7 +143,7 @@ def admin_group(group):
         return flask.redirect(flask.url_for('.admin_groups'))
 
     # Add new user to the group if asked
-    form = forms.LostPasswordForm()
+    form = pagure.forms.AddUserForm()
     if form.validate_on_submit():
         user = pagure.lib.search_user(SESSION, username=form.username.data)
         if not user:
@@ -176,7 +176,7 @@ def admin_group(group):
     return flask.render_template(
         'login/admin_users.html',
         form=form,
-        conf_form=forms.ConfirmationForm(),
+        conf_form=pagure.forms.ConfirmationForm(),
         group=group_obj,
         users=users,
     )
@@ -188,7 +188,7 @@ def admin_group_user_delete(user, group):
     """ Delete an user from a certain group
     """
     # Add new user to the group if asked
-    form = forms.ConfirmationForm()
+    form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
         group_obj = pagure.lib.search_groups(SESSION, grp_name=group)
 
@@ -218,7 +218,7 @@ def admin_group_delete(group):
     """ Delete a certain group
     """
     # Add new user to the group if asked
-    form = forms.ConfirmationForm()
+    form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
         group_obj = pagure.lib.search_groups(SESSION, grp_name=group)
 
