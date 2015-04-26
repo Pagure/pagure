@@ -40,13 +40,11 @@
       consumer of every project hosted.
     </p>
   </li>
-{% if config['PAGURE_AUTH'] == 'local' %}
   <li>
     <a href="{{ url_for('admin_groups') }}">
      Groups/Users management
     </a>
   </li>
-{% endif %}
 </ul>
 
 {% endblock %}
