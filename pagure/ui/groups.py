@@ -113,3 +113,26 @@ def group_user_delete(user, group):
             'User `%s` removed from the group `%s`' % (user.user, group))
 
     return flask.redirect(flask.url_for('.view_group', group=group))
+
+
+@pagure.APP.route('/group/<group>/delete', methods=['POST'])
+@pagure.cla_required
+def group_delete(group):
+    """ Delete a certain group
+    """
+    # Add new user to the group if asked
+    form = pagure.forms.ConfirmationForm()
+    if form.validate_on_submit():
+        group_obj = pagure.lib.search_groups(SESSION, grp_name=group)
+
+        if not group_obj:
+            flask.flash('No group `%s` found' % group, 'error')
+            return flask.redirect(flask.url_for('.admin_groups'))
+
+        SESSION.delete(group_obj)
+
+        SESSION.commit()
+        flask.flash(
+            'Group `%s` has been deleted' % (group))
+
+    return flask.redirect(flask.url_for('.admin_groups'))
