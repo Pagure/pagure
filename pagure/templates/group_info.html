@@ -5,8 +5,10 @@
 
 
 {% block header %}
-    <link rel="stylesheet" type="text/css" media="screen"
-        href="{{ url_for('static', filename='toggle.css') }}"/>
+<link rel="stylesheet" type="text/css" media="screen"
+    href="{{ url_for('static', filename='toggle.css') }}"/>
+<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css"
+    rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -35,6 +37,19 @@
         {{ user.user | avatar(32) | safe }}
         {{ user.fullname }} ({{ user.user }})
       </a>
+      {% if user != group.creator %}
+       <form class="icon" method="POST" style="display: inline-block"
+        action="{{ url_for('admin_group_user_delete',
+            group=group.group_name, user=user.user) }}">
+        {{ form.csrf_token }}
+        <button
+          onclick="return confirm('Are you sure to remove user `{{
+            user.user}}` from the group `{{group.group_name}}`?');"
+          title="Remove user from group">
+          <span class="icon icon-trash blue"></span>
+        </button>
+      </form>
+      {% endif %}
     </li>
     {% endfor %}
   </ul>
