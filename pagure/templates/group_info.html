@@ -15,6 +15,24 @@
     <h2>Group: {{ group.group_name }}</h2>
 
 
+<table>
+  <tr>
+    <th>Created</th>
+    <td title="{{ group.created.strftime('%b %d %Y %H:%M:%S') }}">
+        {{ group.created |humanize }}
+    </td>
+  </tr>
+  <tr>
+    <th>By</th>
+    <td>
+      <a href="{{ url_for('view_user', username=group.creator.user)}}">
+        {{ group.creator.user | avatar(24) | safe }}
+        {{ group.creator.fullname }} ({{ group.creator.user }})
+      </a>
+    </td>
+  </tr>
+</table>
+
 <h3>Members</h3>
 
 {% if authenticated and group.group_name in g.fas_user.groups %}
