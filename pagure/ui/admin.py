@@ -146,9 +146,9 @@ def admin_group(group):
     # Add new user to the group if asked
     form = pagure.forms.AddUserForm()
     if form.validate_on_submit():
-        user = pagure.lib.search_user(SESSION, username=form.username.data)
+        user = pagure.lib.search_user(SESSION, username=form.user.data)
         if not user:
-            flask.flash('No user `%s` found' % form.username.data, 'error')
+            flask.flash('No user `%s` found' % form.user.data, 'error')
             return flask.redirect(flask.url_for('.admin_group', group=group))
 
         grp = pagure.lib.model.PagureUserGroup(
