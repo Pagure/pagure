@@ -51,10 +51,6 @@ def view_group(group):
             return flask.redirect(flask.url_for('.view_group', group=group))
 
         username = form.user.data
-        user = pagure.lib.search_user(pagure.SESSION, username=username)
-        if not user:
-            flask.flash('No user `%s` found' % username, 'error')
-            return flask.redirect(flask.url_for('.view_group', group=group))
 
         try:
             msg = pagure.lib.add_user_to_group(
@@ -62,6 +58,10 @@ def view_group(group):
                 flask.g.fas_user.username)
             pagure.SESSION.commit()
             flask.flash(msg)
+        except pagure.exceptions.PagureException, err:
+            SESSION.rollback()
+            flask.flash(err.message, 'error')
+            return flask.redirect(flask.url_for('.view_group', group=group))
         except SQLAlchemyError as err:
             pagure.SESSION.rollback()
             flask.flash(
