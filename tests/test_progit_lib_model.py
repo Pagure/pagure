@@ -109,6 +109,7 @@ class PagureLibModeltests(tests.Modeltests):
         """ Test the PagureGroup.__repr__ function of pagure.lib.model. """
         item = pagure.lib.model.PagureGroup(
             group_name='admin',
+            user_id=1,
         )
         self.session.add(item)
         self.session.commit()
