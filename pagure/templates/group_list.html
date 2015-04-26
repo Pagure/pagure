@@ -1,0 +1,51 @@
+{% extends "master.html" %}
+
+{% block title %}Groups{% endblock %}
+{%block tag %}groups{% endblock %}
+
+
+{% block content %}
+
+<h2>Groups</h2>
+
+{% if total_page and total_page > 1 %}
+<table>
+    <tr>
+        <td>
+        {% if page > 1%}
+            <a href="{{ url_for('view_groups') }}?page={{page - 1}}">
+                &lt; Previous
+            </a>
+        {% else %}
+            &lt; Previous
+        {% endif %}
+        </td>
+        <td>{{ page }} / {{ total_page }}</td>
+        <td>
+            {% if page < total_page %}
+            <a href="{{ url_for('view_groups') }}?page={{page + 1}}">
+                Next &gt;
+            </a>
+            {% else %}
+            Next >
+            {% endif %}
+        </td>
+    </tr>
+</table>
+{% endif %}
+
+<p>{{ groups_length }} groups.</p>
+
+<section class="user_list">
+  <ul>
+    {% for group in groups %}
+    <li>
+      <a href="{{ url_for('view_group', group=group.group_name)}}">
+        {{ group.group_name }}
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+
+{% endblock %}

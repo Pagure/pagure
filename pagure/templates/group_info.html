@@ -1,0 +1,43 @@
+{% extends "master.html" %}
+
+{% block title %}Group {{ group.name }}{% endblock %}
+{%block tag %}groups{% endblock %}
+
+
+{% block header %}
+    <link rel="stylesheet" type="text/css" media="screen"
+        href="{{ url_for('static', filename='toggle.css') }}"/>
+{% endblock %}
+
+{% block content %}
+    <h2>Group: {{ group.group_name }}</h2>
+
+
+<h3>Members</h3>
+
+{% if authenticated and group.group_name in g.fas_user.groups %}
+<section class="add_users">
+  <h4>Add an user to this group</h4>
+  <form action="{{ url_for('.view_group', group=group.group_name)
+    }}" method="post">
+    <input id="user" name="user" title="User name"/>
+    {{ form.csrf_token }}
+  <input type="submit" class="submit positive button" value="Add">
+  </form>
+</section>
+{% endif %}
+
+<section class="user_list">
+  <ul>
+    {% for user in group.users %}
+    <li>
+      <a href="{{ url_for('view_user', username=user.user)}}">
+        {{ user.user | avatar(32) | safe }}
+        {{ user.fullname }} ({{ user.user }})
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+
+{% endblock %}
