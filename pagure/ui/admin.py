@@ -107,7 +107,7 @@ def admin_groups():
         return flask.abort(403)
 
     if form.validate_on_submit():
-        grp = model.PagureGroup()
+        grp = pagure.lib.model.PagureGroup()
         form.populate_obj(obj=grp)
         grp.user_id = user.id
         SESSION.add(grp)
@@ -151,7 +151,7 @@ def admin_group(group):
             flask.flash('No user `%s` found' % form.username.data, 'error')
             return flask.redirect(flask.url_for('.admin_group', group=group))
 
-        grp = model.PagureUserGroup(
+        grp = pagure.lib.model.PagureUserGroup(
             group_id=group_obj.id,
             user_id=user.id
         )
