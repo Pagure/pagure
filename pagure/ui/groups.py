@@ -46,7 +46,8 @@ def view_group(group):
     form = pagure.forms.AddUserForm()
     if pagure.authenticated() and form.validate_on_submit():
 
-        if not group.group_name in flask.g.fas_user.groups:
+        if not group.group_name in flask.g.fas_user.groups and \
+                not pagure.is_admin():
             flask.flash('Action restricted', 'error')
             return flask.redirect(
                 flask.url_for('.view_group', group=group.group_name))
