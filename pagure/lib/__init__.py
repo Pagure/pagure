@@ -1930,3 +1930,15 @@ def get_user_group(session, userid, groupid):
     )
 
     return query.first()
+
+
+def is_group_member(session, user, groupname):
+    """ Return whether the user is a member of the specified group. """
+    if not user:
+        return False
+
+    user = search_user(session, username=user)
+    if not user:
+        return False
+
+    return groupname in user.groups
