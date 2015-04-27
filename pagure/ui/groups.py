@@ -20,8 +20,6 @@ import pagure.lib
 
 # pylint: disable=E1101
 
-# URLs
-
 @pagure.APP.route('/groups')
 def group_lists():
     ''' List all the groups associated with all the projects. '''
@@ -143,7 +141,6 @@ def group_user_delete(user, group):
 def group_delete(group):
     """ Delete a certain group
     """
-    # Add new user to the group if asked
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
         group_obj = pagure.lib.search_groups(
