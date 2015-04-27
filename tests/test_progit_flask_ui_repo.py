@@ -113,6 +113,78 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<li class="message">User added</li>' in output.data)
 
     @patch('pagure.ui.repo.admin_session_timedout')
+    def test_add_group_project(self, ast):
+        """ Test the add_group_project endpoint. """
+        ast.return_value = False
+
+        output = self.app.get('/foo/addgroup')
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/foo/addgroup')
+            self.assertEqual(output.status_code, 404)
+
+            tests.create_projects(self.session)
+
+            output = self.app.get('/test/addgroup')
+            self.assertEqual(output.status_code, 403)
+
+            ast.return_value = True
+            output = self.app.get('/test/addgroup')
+            self.assertEqual(output.status_code, 302)
+            ast.return_value = False
+
+        msg = pagure.lib.add_group(
+            self.session,
+            group_name='foo',
+            group_type='bar',
+            user='pingou',
+            is_admin=False,
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User `pingou` added to the group `foo`.')
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/addgroup')
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>Add group</h2>' in output.data)
+            self.assertTrue(
+                '<ul id="flashes">\n                </ul>' in output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+                'group': 'ralph',
+            }
+
+            output = self.app.post('/test/addgroup', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>Add group</h2>' in output.data)
+            self.assertTrue(
+                '<ul id="flashes">\n                </ul>' in output.data)
+
+            data['csrf_token'] = csrf_token
+            output = self.app.post('/test/addgroup', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<h2>Add group</h2>' in output.data)
+            self.assertTrue(
+                '<li class="error">No group ralph found.</li>'
+                in output.data)
+
+            data['group'] = 'foo'
+            output = self.app.post(
+                '/test/addgroup', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<header class="repo">' in output.data)
+            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertTrue(
+                '<li class="message">Group added</li>' in output.data)
+
+
+    @patch('pagure.ui.repo.admin_session_timedout')
     def test_remove_user(self, ast):
         """ Test the remove_user endpoint. """
         ast.return_value = False
