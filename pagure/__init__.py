@@ -255,7 +255,7 @@ def set_user(return_url):
 
 
 @APP.errorhandler(404)
-def not_found(error):  # pragma: no cover
+def not_found(error):
     """404 Not Found page"""
     return flask.render_template('not_found.html'), 404
 
