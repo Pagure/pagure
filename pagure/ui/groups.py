@@ -157,6 +157,16 @@ def group_delete(group):
             flask.flash('No group `%s` found' % group, 'error')
             return flask.redirect(flask.url_for('.group_lists'))
 
+        user = pagure.lib.search_user(
+            pagure.SESSION, username=flask.g.fas_user.username)
+        if not user:
+            flask.abort(404, 'User not found')
+
+        if group not in user.groups:
+            flask.flash(
+                'You are not allowed to delete the group %s' % group, 'error')
+            return flask.redirect(flask.url_for('.group_lists'))
+
         pagure.SESSION.delete(group_obj)
 
         pagure.SESSION.commit()
