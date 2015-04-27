@@ -1881,6 +1881,17 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'User `foo` added to the group `foo`.')
 
+        msg = pagure.lib.add_user_to_group(
+            self.session,
+            username='foo',
+            group=group,
+            user='pingou',
+            is_admin=False,
+        )
+        self.session.commit()
+        self.assertEqual(
+            msg, 'User `foo` already in the group, nothing to change.')
+
     def test_is_group_member(self):
         """ Test the is_group_member method of pagure.lib. """
         self.test_add_group()
