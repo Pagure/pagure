@@ -1831,6 +1831,55 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(len(groups), 1)
         self.assertEqual(groups[0].group_name, 'foo')
 
+    def test_add_user_to_group(self):
+        """ Test the add_user_to_group method of pagure.lib. """
+        self.test_add_group()
+        group = pagure.lib.search_groups(self.session, group_name='foo')
+        self.assertNotEqual(group, None)
+        self.assertEqual(group.group_name, 'foo')
+
+        # Invalid new user
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.add_user_to_group,
+            self.session,
+            username='foobar',
+            group=group,
+            user='foo',
+            is_admin=False,
+        )
+
+        # Invalid user
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.add_user_to_group,
+            self.session,
+            username='foo',
+            group=group,
+            user='foobar',
+            is_admin=False,
+        )
+
+        # User not allowed
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.add_user_to_group,
+            self.session,
+            username='foo',
+            group=group,
+            user='foo',
+            is_admin=False,
+        )
+
+        msg = pagure.lib.add_user_to_group(
+            self.session,
+            username='foo',
+            group=group,
+            user='pingou',
+            is_admin=False,
+        )
+        self.assertEqual(msg, 'User `foo` added to the group `foo`.')
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibtests)
