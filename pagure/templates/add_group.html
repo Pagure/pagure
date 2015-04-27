@@ -13,7 +13,10 @@
     <form action="{{ url_for('.add_group') }}" method="post">
 
     <table>
-      {{ render_field_in_row(form.group) }}
+      {{ render_field_in_row(form.group_name) }}
+      {%- if admin %}
+      {{ render_field_in_row(form.group_type) }}
+      {%- endif %}
     </table>
     <p class="buttons indent">
       <input type="submit" class="submit positive button" value="Add">
