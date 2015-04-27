@@ -129,7 +129,7 @@ def group_user_delete(user, group):
             flask.flash(err.message, 'error')
             return flask.redirect(
                 flask.url_for('.view_group', group=group))
-        except SQLAlchemyError as err:
+        except SQLAlchemyError as err:  # pragma: no cover
             pagure.SESSION.rollback()
             flask.flash(
                 'Could not remove user `%s` from the group `%s`.' % (
