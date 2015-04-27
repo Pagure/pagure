@@ -603,6 +603,17 @@ def add_group_to_project(session, project, new_group, user):
             'No group %s found.' % new_group
         )
 
+    user_obj = search_user(session, username=user)
+    if not user_obj:
+        raise pagure.exceptions.PagureException(
+            'No user %s found.' % user
+        )
+
+    if user_obj not in project.users and user_obj != project.user:
+        raise pagure.exceptions.PagureException(
+            'You are not allowed to add a group of users to this project'
+        )
+
     groups = set([group.group_name for group in project.groups])
     if new_group in groups:
         raise pagure.exceptions.PagureException(
