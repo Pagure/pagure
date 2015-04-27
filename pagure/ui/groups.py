@@ -75,6 +75,7 @@ def view_group(group):
                 is_admin=pagure.is_admin(),
             )
             pagure.SESSION.commit()
+            pagure.generate_gitolite_acls()
             flask.flash(msg)
         except pagure.exceptions.PagureException, err:
             SESSION.rollback()
@@ -122,6 +123,7 @@ def group_user_delete(user, group):
                 is_admin=pagure.is_admin()
             )
             pagure.SESSION.commit()
+            pagure.generate_gitolite_acls()
             flask.flash(
                 'User `%s` removed from the group `%s`' % (user, group))
         except pagure.exceptions.PagureException, err:
@@ -170,6 +172,7 @@ def group_delete(group):
         pagure.SESSION.delete(group_obj)
 
         pagure.SESSION.commit()
+        pagure.generate_gitolite_acls()
         flask.flash(
             'Group `%s` has been deleted' % (group))
 
