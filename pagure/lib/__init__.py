@@ -1885,16 +1885,22 @@ def add_group(session, group_name, group_type, user, is_admin):
         raise pagure.exceptions.PagureException(
             'Invalide type for this group')
 
+    username = user
     user = search_user(session, username=user)
+    if not user:
+        raise pagure.exceptions.PagureException(
+            'Could not find user %s' % username)
 
     grp = pagure.lib.model.PagureGroup(
         group_name=group_name,
         group_type=group_type,
         user_id=user.id,
     )
-    pagure.SESSION.add(grp)
+    session.add(grp)
+    session.flush()
 
-    return add_user_to_group(session, user.username, grp, user.username)
+    return add_user_to_group(
+        session, user.username, grp, user.username, is_admin)
 
 
 def get_group(session, group):
