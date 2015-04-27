@@ -67,7 +67,7 @@ def view_group(group):
                 username=username,
                 group=group,
                 user=flask.g.fas_user.username,
-                admin=pagure.is_admin(),
+                is_admin=pagure.is_admin(),
             )
             pagure.SESSION.commit()
             flask.flash(msg)
