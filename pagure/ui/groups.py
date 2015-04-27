@@ -78,7 +78,7 @@ def view_group(group):
             pagure.generate_gitolite_acls()
             flask.flash(msg)
         except pagure.exceptions.PagureException, err:
-            SESSION.rollback()
+            pagure.SESSION.rollback()
             flask.flash(err.message, 'error')
             return flask.redirect(
                 flask.url_for('.view_group', group=group.group_name))
