@@ -1881,6 +1881,22 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'User `foo` added to the group `foo`.')
 
+    def test_is_group_member(self):
+        """ Test the is_group_member method of pagure.lib. """
+        self.test_add_group()
+
+        self.assertFalse(
+            pagure.lib.is_group_member(self.session, None, 'foo'))
+
+        self.assertFalse(
+            pagure.lib.is_group_member(self.session, 'bar', 'foo'))
+
+        self.assertFalse(
+            pagure.lib.is_group_member(self.session, 'foo', 'foo'))
+
+        self.assertTrue(
+            pagure.lib.is_group_member(self.session, 'pingou', 'foo'))
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibtests)
