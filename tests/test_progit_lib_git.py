@@ -71,7 +71,8 @@ class PagureLibGittests(tests.Modeltests):
         with open(outputconf) as stream:
             data = stream.read()
 
-        exp = """repo test
+        exp = """
+repo test
   R   = @all
   RW+ = pingou
   RW+ = foo
