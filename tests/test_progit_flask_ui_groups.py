@@ -269,6 +269,93 @@ class PagureFlaskGroupstests(tests.Modeltests):
             self.assertIn('<h2>Group: test admin group</h2>', output.data)
             self.assertEqual(output.data.count('<a href="/user/'), 3)
 
+    def test_group_user_delete(self):
+        """ Test the group_user_delete endpoint. """
+        output = self.app.post('/group/foo/bar/delete')
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post(
+                '/group/foo/bar/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+        self.test_add_group()
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post(
+                '/group/test group/bar/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<h2>Group: test group</h2>', output.data)
+            self.assertEqual(output.data.count('<a href="/user/'), 2)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {'csrf_token': csrf_token}
+
+            output = self.app.post(
+                '/group/test group/bar/delete', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li class="error">No user `bar` found</li>', output.data)
+            self.assertIn('<h2>Group: test group</h2>', output.data)
+            self.assertEqual(output.data.count('<a href="/user/'), 2)
+
+            output = self.app.post(
+                '/group/test group/foo/delete', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li class="error">Could not find user username</li>',
+                output.data)
+            self.assertIn('<h2>Group: test group</h2>', output.data)
+            self.assertEqual(output.data.count('<a href="/user/'), 2)
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            # User not in the group
+            output = self.app.post(
+                '/group/test group/foo/delete', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li class="error">User `foo` could not be found in the '
+                'group `test group`</li>', output.data)
+            self.assertIn('<h2>Group: test group</h2>', output.data)
+            self.assertEqual(output.data.count('<a href="/user/'), 2)
+
+            # Cannot delete creator
+            output = self.app.post(
+                '/group/test group/foo/delete', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li class="error">User `foo` could not be found in the '
+                'group `test group`</li>', output.data)
+            self.assertIn('<h2>Group: test group</h2>', output.data)
+            self.assertEqual(output.data.count('<a href="/user/'), 2)
+
+            # Add user foo
+            data = {
+                'user': 'foo',
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post('/group/test group', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li class="message">User `foo` added to the group `test '
+                'group`.</li>', output.data)
+            self.assertIn('<h2>Group: test group</h2>', output.data)
+            self.assertEqual(output.data.count('<a href="/user/'), 3)
+
+            output = self.app.post(
+                '/group/test group/foo/delete', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li class="message">User `foo` removed from the group '
+                '`test group`</li>', output.data)
+            self.assertIn('<h2>Group: test group</h2>', output.data)
+            self.assertEqual(output.data.count('<a href="/user/'), 2)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
