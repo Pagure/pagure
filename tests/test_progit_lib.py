@@ -2102,6 +2102,63 @@ class PagureLibtests(tests.Modeltests):
         group = pagure.lib.search_groups(self.session, group_name='foo')
         self.assertEqual(len(group.users), 1)
 
+    def test_add_group_to_project(self):
+        """ Test the add_group_to_project method of pagure.lib. """
+        tests.create_projects(self.session)
+        self.test_add_group()
+
+        project = pagure.lib.get_project(self.session, 'test2')
+
+        # Group does not exist
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.add_group_to_project,
+            session=self.session,
+            project=project,
+            new_group='bar',
+            user='foo',
+        )
+
+        # User does not exist
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.add_group_to_project,
+            session=self.session,
+            project=project,
+            new_group='foo',
+            user='bar',
+        )
+
+        # User not allowed
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.add_group_to_project,
+            session=self.session,
+            project=project,
+            new_group='foo',
+            user='foo',
+        )
+
+        # All good
+        msg = pagure.lib.add_group_to_project(
+            session=self.session,
+            project=project,
+            new_group='foo',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Group added')
+
+        # Group already associated with the project
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.add_group_to_project,
+            session=self.session,
+            project=project,
+            new_group='foo',
+            user='pingou',
+        )
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibtests)
