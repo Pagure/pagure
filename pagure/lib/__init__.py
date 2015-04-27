@@ -1898,6 +1898,11 @@ def add_group(session, group_name, group_type, user, is_admin):
         raise pagure.exceptions.PagureException(
             'Could not find user %s' % username)
 
+    group = search_groups(session, group_name=group_name)
+    if group:
+        raise pagure.exceptions.PagureException(
+            'There is already a group named %s' % group_name)
+
     grp = pagure.lib.model.PagureGroup(
         group_name=group_name,
         group_type=group_type,
