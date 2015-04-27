@@ -1796,7 +1796,7 @@ def search_groups(session, pattern=None, group_name=None, group_type=None):
             model.PagureGroup.group_name.like(pattern)
         )
 
-    if grp_name:
+    if group_name:
         query = query.filter(
             model.PagureGroup.group_name == group_name
         )

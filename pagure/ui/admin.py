@@ -137,7 +137,7 @@ def admin_groups():
 def admin_group(group):
     """ List of the users in a certain group
     """
-    group_obj = pagure.lib.search_groups(SESSION, grp_name=group)
+    group_obj = pagure.lib.search_groups(SESSION, group_name=group)
 
     if not group_obj:
         flask.flash('No group `%s` found' % group, 'error')
@@ -188,7 +188,7 @@ def admin_group_user_delete(user, group):
     # Add new user to the group if asked
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
-        group_obj = pagure.lib.search_groups(SESSION, grp_name=group)
+        group_obj = pagure.lib.search_groups(SESSION, group_name=group)
 
         if not group_obj:
             flask.flash('No group `%s` found' % group, 'error')
@@ -218,7 +218,7 @@ def admin_group_delete(group):
     # Add new user to the group if asked
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
-        group_obj = pagure.lib.search_groups(SESSION, grp_name=group)
+        group_obj = pagure.lib.search_groups(SESSION, group_name=group)
 
         if not group_obj:
             flask.flash('No group `%s` found' % group, 'error')
