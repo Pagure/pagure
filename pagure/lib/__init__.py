@@ -1820,8 +1820,14 @@ def add_user_to_group(session, username, group, user, is_admin):
         raise pagure.exceptions.PagureException(
             'No user `%s` found' % username)
 
+    action_user = user
     user = search_user(session, username=user)
-    if not group.group_name in user.groups and not is_admin:
+    if not user:
+        raise pagure.exceptions.PagureException(
+            'No user `%s` found' % action_user)
+
+    if not group.group_name in user.groups and not is_admin\
+            and user.username != group.creator.username:
         raise pagure.exceptions.PagureException(
             'You are not allowed to add user to this group')
 
@@ -1836,7 +1842,8 @@ def add_user_to_group(session, username, group, user, is_admin):
     )
     session.add(grp)
     session.flush()
-    return 'User `%s` added to the group `%s`.' % (new_user.username, group)
+    return 'User `%s` added to the group `%s`.' % (
+        new_user.username, group.group_name)
 
 
 def delete_user_of_group(session, username, groupname, user, is_admin):
