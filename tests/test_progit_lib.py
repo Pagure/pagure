@@ -1805,6 +1805,9 @@ class PagureLibtests(tests.Modeltests):
             user='pingou',
             is_admin=True,
         )
+        groups = pagure.lib.search_groups(self.session)
+        self.assertEqual(len(groups), 0)
+        self.assertEqual(groups, [])
 
         # Invalid user
         self.assertRaises(
@@ -1816,6 +1819,9 @@ class PagureLibtests(tests.Modeltests):
             user='test',
             is_admin=False,
         )
+        groups = pagure.lib.search_groups(self.session)
+        self.assertEqual(len(groups), 0)
+        self.assertEqual(groups, [])
 
         msg = pagure.lib.add_group(
             self.session,
@@ -1830,6 +1836,17 @@ class PagureLibtests(tests.Modeltests):
         groups = pagure.lib.search_groups(self.session)
         self.assertEqual(len(groups), 1)
         self.assertEqual(groups[0].group_name, 'foo')
+
+        # Group with this name already exists
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.add_group,
+            self.session,
+            group_name='foo',
+            group_type='bar',
+            user='pingou',
+            is_admin=False,
+        )
 
     def test_add_user_to_group(self):
         """ Test the add_user_to_group method of pagure.lib. """
