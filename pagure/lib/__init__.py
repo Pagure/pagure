@@ -1910,23 +1910,6 @@ def add_group(session, group_name, group_type, user, is_admin):
         session, user.username, grp, user.username, is_admin)
 
 
-def get_group(session, group):
-    ''' Return a specific group for the specified group name.
-
-    :arg session: the session with which to connect to the database.
-
-    '''
-    query = session.query(
-        model.PagureGroup
-    ).filter(
-        model.PagureGroup.group_name == group
-    ).order_by(
-        model.PagureGroup.group_name
-    )
-
-    return query.first()
-
-
 def get_user_group(session, userid, groupid):
     ''' Return a specific user_group for the specified group and user
     identifiers.
