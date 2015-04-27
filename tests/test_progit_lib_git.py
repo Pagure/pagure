@@ -36,7 +36,6 @@ class PagureLibGittests(tests.Modeltests):
 
         pagure.APP.config['FORK_FOLDER'] = os.path.join(tests.HERE, 'forks')
 
-
     def test_write_gitolite_acls(self):
         """ Test the write_gitolite_acls function of pagure.lib.git. """
         tests.create_projects(self.session)
@@ -126,6 +125,126 @@ repo requests/pingou/test3
 
 """
         self.assertEqual(data, exp)
+
+        os.unlink(outputconf)
+        self.assertFalse(os.path.exists(outputconf))
+
+    def test_write_gitolite_acls_groups(self):
+        """ Test the write_gitolite_acls function of pagure.lib.git with
+        groups.
+        """
+        tests.create_projects(self.session)
+
+        repo = pagure.lib.get_project(self.session, 'test')
+
+        msg = pagure.lib.add_group(
+            self.session,
+            group_name='sysadmin',
+            group_type='user',
+            user='pingou',
+            is_admin=False,
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User `pingou` added to the group `sysadmin`.')
+
+        msg = pagure.lib.add_group_to_project(
+            session=self.session,
+            project=repo,
+            new_group='sysadmin',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Group added')
+
+        # Add an user to a project
+        msg = pagure.lib.add_user_to_project(
+            session=self.session,
+            project=repo,
+            new_user='foo',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User added')
+        # Add a forked project
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test2',
+            description='test project #2',
+            parent_id=1,
+            hook_token='aaabbbvvv',
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        outputconf = os.path.join(tests.HERE, 'test_gitolite.conf')
+
+        pagure.lib.git.write_gitolite_acls(self.session, outputconf)
+
+        self.assertTrue(os.path.exists(outputconf))
+
+        with open(outputconf) as stream:
+            data = stream.read()
+
+        exp = """@sysadmin   = pingou
+
+repo test
+  R   = @all
+  RW+ = @sysadmin
+  RW+ = pingou
+  RW+ = foo
+
+repo docs/test
+  R   = @all
+  RW+ = @sysadmin
+  RW+ = pingou
+  RW+ = foo
+
+repo tickets/test
+  R   = @all
+  RW+ = @sysadmin
+  RW+ = pingou
+  RW+ = foo
+
+repo requests/test
+  R   = @all
+  RW+ = @sysadmin
+  RW+ = pingou
+  RW+ = foo
+
+repo test2
+  R   = @all
+  RW+ = pingou
+
+repo docs/test2
+  R   = @all
+  RW+ = pingou
+
+repo tickets/test2
+  R   = @all
+  RW+ = pingou
+
+repo requests/test2
+  R   = @all
+  RW+ = pingou
+
+repo forks/pingou/test2
+  R   = @all
+  RW+ = pingou
+
+repo docs/pingou/test2
+  R   = @all
+  RW+ = pingou
+
+repo tickets/pingou/test2
+  R   = @all
+  RW+ = pingou
+
+repo requests/pingou/test2
+  R   = @all
+  RW+ = pingou
+
+"""
+        self.assertEqual(data.split('\n'), exp.split('\n'))
 
         os.unlink(outputconf)
         self.assertFalse(os.path.exists(outputconf))
