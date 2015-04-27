@@ -1923,6 +1923,20 @@ class PagureLibtests(tests.Modeltests):
         item = pagure.lib.get_user_group(self.session, 2, 1)
         self.assertEqual(item, None)
 
+    def test_get_group_types(self):
+        """ Test the get_group_types method of pagure.lib. """
+
+        self.test_add_group()
+
+        groups = pagure.lib.get_group_types(self.session, 'user')
+        self.assertEqual(len(groups), 1)
+        self.assertEqual(groups[0].group_type, 'user')
+
+        groups = pagure.lib.get_group_types(self.session)
+        self.assertEqual(len(groups), 2)
+        self.assertEqual(groups[0].group_type, 'admin')
+        self.assertEqual(groups[1].group_type, 'user')
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibtests)
