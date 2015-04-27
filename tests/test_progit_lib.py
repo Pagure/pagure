@@ -1824,7 +1824,7 @@ class PagureLibtests(tests.Modeltests):
             user='pingou',
             is_admin=False,
         )
-
+        self.session.commit()
         self.assertEqual(msg, 'User `pingou` added to the group `foo`.')
 
         groups = pagure.lib.search_groups(self.session)
@@ -1878,6 +1878,7 @@ class PagureLibtests(tests.Modeltests):
             user='pingou',
             is_admin=False,
         )
+        self.session.commit()
         self.assertEqual(msg, 'User `foo` added to the group `foo`.')
 
 
