@@ -136,3 +136,40 @@ def group_delete(group):
             'Group `%s` has been deleted' % (group))
 
     return flask.redirect(flask.url_for('.group_lists'))
+
+
+@pagure.APP.route('/group/add', methods=['GET', 'POST'])
+@pagure.cla_required
+def add_group():
+    """ Endpoint to create groups
+    """
+    user = pagure.lib.search_user(
+        pagure.SESSION, username=flask.g.fas_user.username)
+    if not user:  # pragma: no cover
+        return flask.abort(403)
+
+    form = pagure.forms.AddGroupForm()
+
+    if form.validate_on_submit():
+        grp = pagure.lib.model.PagureGroup(
+            group_name=form.group.data,
+            group_type='user',
+            user_id=user.id,
+        )
+        pagure.SESSION.add(grp)
+        try:
+            pagure.SESSION.flush()
+            flask.flash('Group `%s` created.' % grp.group_name)
+            return flask.redirect(flask.url_for('.group_lists'))
+        except SQLAlchemyError as err:
+            pagure.SESSION.rollback()
+            flask.flash('Could not create group.')
+            pagure.APP.logger.debug('Could not create group.')
+            pagure.APP.logger.exception(err)
+
+        pagure.SESSION.commit()
+
+    return flask.render_template(
+        'add_group.html',
+        form=form,
+    )
