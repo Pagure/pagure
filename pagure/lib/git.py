@@ -82,7 +82,13 @@ def write_gitolite_acls(session, configfile):
     on the forge.
     '''
     config = []
+    groups = {}
     for project in session.query(model.Project).all():
+        for group in project.groups:
+            if group.group_name not in groups:
+                groups[group.group_name] = [
+                    user.username for user in group.users]
+
         if project.parent_id:
             config.append('repo forks/%s' % project.fullname)
         else:
@@ -119,6 +125,10 @@ def write_gitolite_acls(session, configfile):
         config.append('')
 
     with open(configfile, 'w') as stream:
+        for key, users in groups.iteritems():
+            stream.write('@%s   = %s \n' %(key, ' '.join(users)))
+        stream.write('\n')
+
         for row in config:
             stream.write(row + '\n')
 
