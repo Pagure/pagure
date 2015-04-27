@@ -596,7 +596,7 @@ def add_user_to_project(session, project, new_user, user):
 
 def add_group_to_project(session, project, new_group, user):
     ''' Add a specified group to a specified project. '''
-    group_obj = get_groups(session, grp_name=new_group)
+    group_obj = search_groups(session, group_name=new_group)
 
     if not group_obj:
         raise pagure.exceptions.PagureException(
@@ -1836,7 +1836,7 @@ def add_user_to_group(session, username, group, user, is_admin):
     )
     session.add(grp)
     session.flush()
-    return 'User `%s` added.' % new_user.username
+    return 'User `%s` added to the group `%s`.' % (new_user.username, group)
 
 
 def delete_user_of_group(session, username, groupname, user, is_admin):
