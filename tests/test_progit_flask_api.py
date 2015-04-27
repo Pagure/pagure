@@ -120,6 +120,37 @@ class PagureFlaskApitests(tests.Modeltests):
         self.assertEqual(data.keys(), ['tags'])
         self.assertEqual(data['tags'], [])
 
+    def test_api_groups(self):
+        """ Test the api_groups function.  """
+
+        # Add a couple of groups so that we can list them
+        item = pagure.lib.model.PagureGroup(
+            group_name='group1',
+            group_type='user',
+            user_id=1,  # pingou
+        )
+        self.session.add(item)
+
+        item = pagure.lib.model.PagureGroup(
+            group_name='rel-eng',
+            group_type='user',
+            user_id=1,  # pingou
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        output = self.app.get('/api/0/groups')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertEqual(data['groups'], ['group1', 'rel-eng'])
+        self.assertEqual(data.keys(), ['groups'])
+
+        output = self.app.get('/api/0/groups?pattern=re')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertEqual(data['groups'], ['rel-eng'])
+        self.assertEqual(data.keys(), ['groups'])
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskApitests)
