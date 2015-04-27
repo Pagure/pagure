@@ -56,6 +56,91 @@ class PagureFlaskGroupstests(tests.Modeltests):
         self.assertIn('<h2>Groups</h2>', output.data)
         self.assertIn('<p>0 groups.</p>', output.data)
 
+    def test_add_group(self):
+        """ Test the add_group endpoint. """
+        output = self.app.get('/group/add')
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/group/add')
+            self.assertEqual(output.status_code, 403)
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/group/add')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<h2>Create group</h2>', output.data)
+            self.assertNotIn(
+                '<option value="admin">admin</option>', output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+            }
+
+            # Insufficient input
+            output = self.app.post('/group/add', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<h2>Create group</h2>', output.data)
+            self.assertEqual(output.data.count(
+                'This field is required.'), 1)
+
+            data = {
+                'group_name': 'test group',
+            }
+
+            # Missing CSRF
+            output = self.app.post('/group/add', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<h2>Create group</h2>', output.data)
+            self.assertEqual(output.data.count(
+                'This field is required.'), 0)
+
+            data['csrf_token'] = csrf_token
+
+            # All good
+            output = self.app.post(
+                '/group/add', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li class="message">User `pingou` added to the group '
+                '`test group`.</li>', output.data)
+            self.assertIn(
+                '<li class="message">Group `test group` created.</li>',
+                output.data)
+            self.assertIn('<h2>Groups</h2>', output.data)
+            self.assertIn('<p>1 groups.</p>', output.data)
+
+        user = tests.FakeUser(
+            username='pingou',
+            groups=pagure.APP.config['ADMIN_GROUP'])
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/group/add')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<h2>Create group</h2>', output.data)
+            self.assertIn('<option value="admin">admin</option>', output.data)
+
+            data = {
+                'group_name': 'test admin group',
+                'group_type': 'admin',
+                'csrf_token': csrf_token,
+            }
+
+            # All good
+            output = self.app.post(
+                '/group/add', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li class="message">User `pingou` added to the group '
+                '`test admin group`.</li>', output.data)
+            self.assertIn(
+                '<li class="message">Group `test admin group` created.</li>',
+                output.data)
+            self.assertIn('<h2>Groups</h2>', output.data)
+            self.assertIn('<p>2 groups.</p>', output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
