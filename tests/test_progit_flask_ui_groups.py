@@ -141,6 +141,69 @@ class PagureFlaskGroupstests(tests.Modeltests):
             self.assertIn('<h2>Groups</h2>', output.data)
             self.assertIn('<p>2 groups.</p>', output.data)
 
+    def test_group_delete(self):
+        """ Test the group_delete endpoint. """
+        output = self.app.post('/group/foo/delete')
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/group/foo/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<p>No groups have been created on this pagure instance '
+                'yet</p>', output.data)
+            self.assertIn('<p>0 groups.</p>', output.data)
+
+        self.test_add_group()
+
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/group/foo/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<p>1 groups.</p>', output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+        user.username = 'foo'
+        with tests.user_set(pagure.APP, user):
+
+            data = {
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/group/bar/delete', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li class="error">No group `bar` found</li>', output.data)
+            self.assertIn('<p>1 groups.</p>', output.data)
+
+            output = self.app.post(
+                '/group/test group/delete', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li class="error">You are not allowed to delete the group '
+                'test group</li>', output.data)
+            self.assertIn('<p>1 groups.</p>', output.data)
+
+        user.username = 'bar'
+        with tests.user_set(pagure.APP, user):
+
+            output = self.app.post(
+                '/group/test group/delete', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+
+            output = self.app.post(
+                '/group/test group/delete', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li class="message">Group `test group` has been deleted'
+                '</li>', output.data)
+            self.assertIn('<p>0 groups.</p>', output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
