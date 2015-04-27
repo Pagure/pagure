@@ -90,7 +90,7 @@ def create_default_status(session):
             ERROR_LOG.debug('Status %s could not be added', ticket_stat)
 
     for grptype in ['user', 'admin']:
-        grp_type = PagureGroupType(grp_type=grptype)
+        grp_type = PagureGroupType(group_type=grptype)
         session.add(grp_type)
         try:
             session.commit()
@@ -827,14 +827,14 @@ class PagureGroupType(BASE):
     # so we set the name to something safe for SQL
     __tablename__ = 'pagure_group_type'
 
-    grp_type = sa.Column(sa.String(16), primary_key=True)
+    group_type = sa.Column(sa.String(16), primary_key=True)
     created = sa.Column(
         sa.DateTime, nullable=False, default=datetime.datetime.utcnow)
 
     def __repr__(self):
         ''' Return a string representation of this object. '''
 
-        return 'GroupType: %s' % (self.grp_type)
+        return 'GroupType: %s' % (self.group_type)
 
 
 class PagureGroup(BASE):
@@ -848,9 +848,9 @@ class PagureGroup(BASE):
 
     id = sa.Column(sa.Integer, primary_key=True)
     group_name = sa.Column(sa.String(16), nullable=False, unique=True)
-    grp_type = sa.Column(
+    group_type = sa.Column(
         sa.String(16),
-        sa.ForeignKey('pagure_group_type.grp_type'),
+        sa.ForeignKey('pagure_group_type.group_type'),
         default='user',
         nullable=False)
     user_id = sa.Column(

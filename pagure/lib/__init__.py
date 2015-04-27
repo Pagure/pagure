@@ -1762,32 +1762,32 @@ def generate_hook_token(session):
     session.commit()
 
 
-def get_group_types(session, grp_type=None):
+def get_group_types(session, group_type=None):
     ''' Return the list of type a group can have.
 
     '''
     query = session.query(
         model.PagureGroupType
     ).order_by(
-        model.PagureGroupType.grp_type
+        model.PagureGroupType.group_type
     )
 
-    if grp_type:
+    if group_type:
         query = query.filter(
-            model.PagureGroupType.grp_type == grp_type
+            model.PagureGroupType.group_type == group_type
         )
 
     return query.all()
 
 
-def search_groups(session, pattern=None, grp_name=None, grp_type=None):
+def search_groups(session, pattern=None, group_name=None, group_type=None):
     ''' Return the groups based on the criteria specified.
 
     '''
     query = session.query(
         model.PagureGroup
     ).order_by(
-        model.PagureGroup.grp_type
+        model.PagureGroup.group_type
     )
 
     if pattern:
@@ -1798,15 +1798,15 @@ def search_groups(session, pattern=None, grp_name=None, grp_type=None):
 
     if grp_name:
         query = query.filter(
-            model.PagureGroup.group_name == grp_name
+            model.PagureGroup.group_name == group_name
         )
 
-    if grp_type:
+    if group_type:
         query = query.filter(
-            model.PagureGroup.grp_type == grp_type
+            model.PagureGroup.group_type == group_type
         )
 
-    if grp_name:
+    if group_name:
         return query.first()
     else:
         return query.all()

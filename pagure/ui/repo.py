@@ -882,7 +882,7 @@ def add_user(repo, username=None):
 @APP.route('/<repo>/addgroup', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/addgroup', methods=('GET', 'POST'))
 @cla_required
-def add_group(repo, username=None):
+def add_group_project(repo, username=None):
     """ Add the specified group from the project.
     """
     if admin_session_timedout():
@@ -924,7 +924,7 @@ def add_group(repo, username=None):
             flask.flash('Group could not be added', 'error')
 
     return flask.render_template(
-        'add_group.html',
+        'add_group_project.html',
         form=form,
         username=username,
         repo=repo,

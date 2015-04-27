@@ -195,7 +195,7 @@ class NewGroupForm(wtf.Form):
         'Group name  <span class="error">*</span>',
         [wtforms.validators.Required(), wtforms.validators.Length(max=16)]
     )
-    grp_type = wtforms.SelectField(
+    group_type = wtforms.SelectField(
         'Group type',
         [wtforms.validators.Required()],
         choices=[(item, item) for item in []]
@@ -207,7 +207,7 @@ class NewGroupForm(wtf.Form):
         drop-down list.
         """
         super(NewGroupForm, self).__init__(*args, **kwargs)
-        if 'grp_types' in kwargs:
-            self.grp_type.choices = [
-                (grptype, grptype) for grptype in kwargs['grp_types']
+        if 'group_types' in kwargs:
+            self.group_type.choices = [
+                (grptype, grptype) for grptype in kwargs['group_types']
             ]

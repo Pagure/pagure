@@ -94,14 +94,14 @@ def admin_groups():
     """ List of the groups present in the system
     """
     # Add new group if asked
-    grp_types = [
-        grp.grp_type
+    group_types = [
+        grp.group_type
         for grp in pagure.lib.get_group_types(SESSION)
     ]
     # Make sure the admin type is always the last one
-    grp_types.remove('admin')
-    grp_types.append('admin')
-    form = pagure.forms.NewGroupForm(grp_types=grp_types)
+    group_types.remove('admin')
+    group_types.append('admin')
+    form = pagure.forms.NewGroupForm(group_types=group_types)
     user = pagure.lib.search_user(SESSION, username=flask.g.fas_user.username)
     if not user:
         return flask.abort(403)
