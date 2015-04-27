@@ -98,8 +98,9 @@ def write_gitolite_acls(session, configfile):
 
             config.append('repo %s%s' % (repos, project.fullname))
             config.append('  R   = @all')
-            for group in project.groups:
-                config.append('  RW+ = @%s' % group.group_name)
+            if project.groups:
+                config.append('  RW+ = @%s' % ' @'.join([
+                    group.group_name for group in project.groups]))
             config.append('  RW+ = %s' % project.user.user)
             for user in project.users:
                 if user != project.user:
