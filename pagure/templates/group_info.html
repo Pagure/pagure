@@ -14,6 +14,7 @@
 {% block content %}
 <div class="inline">
     <h2>Group: {{ group.group_name }}</h2>
+    {% if authenticated and (member or admin) %}
     <aside id="issue_action">
       <form class="icon" method="POST" style="display: inline-block"
         action="{{ url_for('group_delete',
@@ -27,6 +28,7 @@
         </button>
       </form>
     </aside>
+    {% endif %}
 </div>
 
 
