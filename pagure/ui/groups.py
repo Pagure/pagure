@@ -104,7 +104,7 @@ def group_user_delete(user, group):
     if form.validate_on_submit():
 
         try:
-            msg = pagure.lib.delete_user_of_group(
+            pagure.lib.delete_user_of_group(
                 pagure.SESSION,
                 username=user,
                 groupname=group,
@@ -112,7 +112,8 @@ def group_user_delete(user, group):
                 is_admin=pagure.is_admin()
             )
             pagure.SESSION.commit()
-            flask.flash(msg)
+            flask.flash(
+                'User `%s` removed from the group `%s`' % (user, group))
         except pagure.exceptions.PagureException, err:
             pagure.SESSION.rollback()
             flask.flash(err.message, 'error')
