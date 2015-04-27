@@ -1897,6 +1897,21 @@ class PagureLibtests(tests.Modeltests):
         self.assertTrue(
             pagure.lib.is_group_member(self.session, 'pingou', 'foo'))
 
+    def test_get_user_group(self):
+        """ Test the get_user_group method of pagure.lib. """
+
+        self.test_add_group()
+
+        item = pagure.lib.get_user_group(self.session, 1, 1)
+        self.assertEqual(item.user_id, 1)
+        self.assertEqual(item.group_id, 1)
+
+        item = pagure.lib.get_user_group(self.session, 1, 2)
+        self.assertEqual(item, None)
+
+        item = pagure.lib.get_user_group(self.session, 2, 1)
+        self.assertEqual(item, None)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibtests)
