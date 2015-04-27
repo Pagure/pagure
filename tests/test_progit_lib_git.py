@@ -137,6 +137,7 @@ repo requests/pingou/test3
 
         repo = pagure.lib.get_project(self.session, 'test')
 
+        # Add a couple of groups
         msg = pagure.lib.add_group(
             self.session,
             group_name='sysadmin',
@@ -146,11 +147,29 @@ repo requests/pingou/test3
         )
         self.session.commit()
         self.assertEqual(msg, 'User `pingou` added to the group `sysadmin`.')
+        msg = pagure.lib.add_group(
+            self.session,
+            group_name='devs',
+            group_type='user',
+            user='pingou',
+            is_admin=False,
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User `pingou` added to the group `devs`.')
 
+        # Associate these groups to a project
         msg = pagure.lib.add_group_to_project(
             session=self.session,
             project=repo,
             new_group='sysadmin',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Group added')
+        msg = pagure.lib.add_group_to_project(
+            session=self.session,
+            project=repo,
+            new_group='devs',
             user='pingou',
         )
         self.session.commit()
@@ -186,28 +205,29 @@ repo requests/pingou/test3
             data = stream.read()
 
         exp = """@sysadmin   = pingou
+@devs   = pingou
 
 repo test
   R   = @all
-  RW+ = @sysadmin
+  RW+ = @sysadmin @devs
   RW+ = pingou
   RW+ = foo
 
 repo docs/test
   R   = @all
-  RW+ = @sysadmin
+  RW+ = @sysadmin @devs
   RW+ = pingou
   RW+ = foo
 
 repo tickets/test
   R   = @all
-  RW+ = @sysadmin
+  RW+ = @sysadmin @devs
   RW+ = pingou
   RW+ = foo
 
 repo requests/test
   R   = @all
-  RW+ = @sysadmin
+  RW+ = @sysadmin @devs
   RW+ = pingou
   RW+ = foo
 
