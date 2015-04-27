@@ -1860,7 +1860,12 @@ def delete_user_of_group(session, username, groupname, user, is_admin):
         raise pagure.exceptions.PagureException(
             'No user `%s` found' % username)
 
+    action_user = user
     user = search_user(session, username=user)
+    if not user:
+        raise pagure.exceptions.PagureException(
+            'Could not find user %s' % action_user)
+
     if not group_obj.group_name in user.groups and not is_admin:
         raise pagure.exceptions.PagureException(
             'You are not allowed to remove user from this group')
@@ -1870,6 +1875,11 @@ def delete_user_of_group(session, username, groupname, user, is_admin):
             'The creator of a group cannot be removed')
 
     user_grp = get_user_group(session, drop_user.id, group_obj.id)
+    if not user_grp:
+        raise pagure.exceptions.PagureException(
+            'User `%s` could not be found in the group `%s`' % (
+            username, groupname))
+
     session.delete(user_grp)
     session.flush()
 
