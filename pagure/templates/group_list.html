@@ -34,7 +34,21 @@
 </table>
 {% endif %}
 
-<p>{{ groups_length }} groups.</p>
+{% if authenticated %}
+<section class="add_users">
+  <h4>Create a group</h4>
+  <form action="{{ url_for('.add_group') }}" method="post">
+    <input id="group_name" name="group_name" title="Group name" />
+    {%- if admin %}
+    {{ form.group_type()|safe }}
+    {%- endif %}
+    {{ form.csrf_token }}
+  <input type="submit" class="submit positive button" value="Add">
+  </form>
+</section>
+{% endif %}
+
+<p>{{ groups | length }} groups.</p>
 
 <section class="user_list">
   {% if groups %}
