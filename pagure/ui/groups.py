@@ -27,9 +27,22 @@ def group_lists():
     ''' List all the groups associated with all the projects. '''
     groups = pagure.lib.search_groups(pagure.SESSION, group_type='user')
 
+    group_types = ['user']
+    if pagure.is_admin():
+        group_types = [
+            grp.group_type
+            for grp in pagure.lib.get_group_types(pagure.SESSION)
+        ]
+        # Make sure the admin type is always the last one
+        group_types.remove('admin')
+        group_types.append('admin')
+
+    form = pagure.forms.NewGroupForm(group_types=group_types)
+
     return flask.render_template(
         'group_list.html',
         groups=groups,
+        form=form,
     )
 
 
@@ -92,13 +105,14 @@ def group_user_delete(user, group):
     # Add new user to the group if asked
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
-        group_obj = pagure.lib.search_groups(SESSION, grp_name=group)
+        group_obj = pagure.lib.search_groups(
+            pagure.SESSION, group_name=group)
 
         if not group_obj:
             flask.flash('No group `%s` found' % group, 'error')
             return flask.redirect(flask.url_for('.view_group', group=group))
 
-        user = pagure.lib.search_user(SESSION, username=user)
+        user = pagure.lib.search_user(pagure.SESSION, username=user)
         if not user:
             flask.flash('No user `%s` found' % user, 'error')
             return flask.redirect(flask.url_for('.view_group', group=group))
@@ -108,10 +122,10 @@ def group_user_delete(user, group):
             return flask.redirect(flask.url_for('.view_group', group=group))
 
         user_grp = pagure.lib.get_user_group(
-            SESSION, user.id, group_obj.id)
-        SESSION.delete(user_grp)
+            pagure.SESSION, user.id, group_obj.id)
+        pagure.SESSION.delete(user_grp)
 
-        SESSION.commit()
+        pagure.SESSION.commit()
         flask.flash(
             'User `%s` removed from the group `%s`' % (user.user, group))
 
@@ -126,7 +140,8 @@ def group_delete(group):
     # Add new user to the group if asked
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
-        group_obj = pagure.lib.search_groups(pagure.SESSION, grp_name=group)
+        group_obj = pagure.lib.search_groups(
+            pagure.SESSION, group_name=group)
 
         if not group_obj:
             flask.flash('No group `%s` found' % group, 'error')
@@ -151,26 +166,41 @@ def add_group():
     if not user:  # pragma: no cover
         return flask.abort(403)
 
-    form = pagure.forms.AddGroupForm()
+    group_types = ['user']
+    if pagure.is_admin():
+        group_types = [
+            grp.group_type
+            for grp in pagure.lib.get_group_types(pagure.SESSION)
+        ]
+        # Make sure the admin type is always the last one
+        group_types.remove('admin')
+        group_types.append('admin')
+
+    form = pagure.forms.NewGroupForm(group_types=group_types)
+
+    if not pagure.is_admin():
+        form.group_type.data = 'user'
 
     if form.validate_on_submit():
         grp = pagure.lib.model.PagureGroup(
-            group_name=form.group.data,
-            group_type='user',
+            group_name=form.group_name.data,
+            group_type=form.group_type.data,
             user_id=user.id,
         )
         pagure.SESSION.add(grp)
+
+        msg = pagure.lib.add_user_to_group(
+            pagure.SESSION, user.username, grp, user.username)
         try:
-            pagure.SESSION.flush()
+            pagure.SESSION.commit()
             flask.flash('Group `%s` created.' % grp.group_name)
+            flask.flash(msg)
             return flask.redirect(flask.url_for('.group_lists'))
         except SQLAlchemyError as err:
             pagure.SESSION.rollback()
             flask.flash('Could not create group.')
             pagure.APP.logger.debug('Could not create group.')
             pagure.APP.logger.exception(err)
-
-        pagure.SESSION.commit()
 
     return flask.render_template(
         'add_group.html',
