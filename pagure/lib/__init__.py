@@ -1812,12 +1812,18 @@ def search_groups(session, pattern=None, group_name=None, group_type=None):
         return query.all()
 
 
-def add_user_to_group(session, username, group, user):
+def add_user_to_group(session, username, group, user, is_admin):
     ''' Add the specified user to the given group.
     '''
     new_user = search_user(session, username=username)
     if not new_user:
-        raise PagureException('No user `%s` found' % username)
+        raise pagure.exceptions.PagureException(
+            'No user `%s` found' % username)
+
+    user = search_user(session, username=user)
+    if not group.group_name in user.groups and not is_admin:
+        raise pagure.exceptions.PagureException(
+            'You are not allowed to add user to this group')
 
     for guser in group.users:
         if guser.username == new_user.username:
@@ -1831,6 +1837,64 @@ def add_user_to_group(session, username, group, user):
     session.add(grp)
     session.flush()
     return 'User `%s` added.' % new_user.username
+
+
+def delete_user_of_group(session, username, groupname, user, is_admin):
+    ''' Removes the specified user from the given group.
+    '''
+    group_obj = search_groups(session, group_name=groupname)
+
+    if not group_obj:
+        raise pagure.exceptions.PagureException(
+            'No group `%s` found' % groupname)
+
+    drop_user = search_user(session, username=username)
+    if not drop_user:
+        raise pagure.exceptions.PagureException(
+            'No user `%s` found' % username)
+
+    user = search_user(session, username=user)
+    if not group_obj.group_name in user.groups and not is_admin:
+        raise pagure.exceptions.PagureException(
+            'You are not allowed to remove user from this group')
+
+    if drop_user.username == group_obj.creator.username:
+        raise pagure.exceptions.PagureException(
+            'The creator of a group cannot be removed')
+
+    user_grp = get_user_group(session, drop_user.id, group_obj.id)
+    session.delete(user_grp)
+    session.flush()
+
+
+def add_group(session, group_name, group_type, user, is_admin):
+    ''' Creates a new group with the given information.
+    '''
+
+    group_types = ['user']
+    if is_admin:
+        group_types = [
+            grp.group_type
+            for grp in get_group_types(session)
+        ]
+
+    if not is_admin:
+        group_type = 'user'
+
+    if group_type not in group_types:
+        raise pagure.exceptions.PagureException(
+            'Invalide type for this group')
+
+    user = search_user(session, username=user)
+
+    grp = pagure.lib.model.PagureGroup(
+        group_name=group_name,
+        group_type=group_type,
+        user_id=user.id,
+    )
+    pagure.SESSION.add(grp)
+
+    return add_user_to_group(session, user.username, grp, user.username)
 
 
 def get_group(session, group):

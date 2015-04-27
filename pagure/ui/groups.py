@@ -59,18 +59,16 @@ def view_group(group):
     form = pagure.forms.AddUserForm()
     if pagure.authenticated() and form.validate_on_submit():
 
-        if not group.group_name in flask.g.fas_user.groups and \
-                not pagure.is_admin():
-            flask.flash('Action restricted', 'error')
-            return flask.redirect(
-                flask.url_for('.view_group', group=group.group_name))
-
         username = form.user.data
 
         try:
             msg = pagure.lib.add_user_to_group(
-                pagure.SESSION, username, group,
-                flask.g.fas_user.username)
+                pagure.SESSION,
+                username=username,
+                group=group,
+                user=flask.g.fas_user.username,
+                admin=pagure.is_admin(),
+            )
             pagure.SESSION.commit()
             flask.flash(msg)
         except pagure.exceptions.PagureException, err:
@@ -102,32 +100,34 @@ def view_group(group):
 def group_user_delete(user, group):
     """ Delete an user from a certain group
     """
-    # Add new user to the group if asked
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
-        group_obj = pagure.lib.search_groups(
-            pagure.SESSION, group_name=group)
 
-        if not group_obj:
-            flask.flash('No group `%s` found' % group, 'error')
-            return flask.redirect(flask.url_for('.view_group', group=group))
-
-        user = pagure.lib.search_user(pagure.SESSION, username=user)
-        if not user:
-            flask.flash('No user `%s` found' % user, 'error')
-            return flask.redirect(flask.url_for('.view_group', group=group))
-
-        if user == group_obj.creator:
-            flask.flash('The creator of a group cannot be removed', 'error')
-            return flask.redirect(flask.url_for('.view_group', group=group))
-
-        user_grp = pagure.lib.get_user_group(
-            pagure.SESSION, user.id, group_obj.id)
-        pagure.SESSION.delete(user_grp)
-
-        pagure.SESSION.commit()
-        flask.flash(
-            'User `%s` removed from the group `%s`' % (user.user, group))
+        try:
+            msg = pagure.lib.delete_user_of_group(
+                pagure.SESSION,
+                username=user,
+                groupname=group,
+                user=flask.g.fas_user.username,
+                is_admin=pagure.is_admin()
+            )
+            pagure.SESSION.commit()
+            flask.flash(msg)
+        except pagure.exceptions.PagureException, err:
+            pagure.SESSION.rollback()
+            flask.flash(err.message, 'error')
+            return flask.redirect(
+                flask.url_for('.view_group', group=group))
+        except SQLAlchemyError as err:
+            pagure.SESSION.rollback()
+            flask.flash(
+                'Could not remove user `%s` from the group `%s`.' % (
+                    user.user, group),
+                'error')
+            pagure.APP.logger.debug(
+                'Could not remove user `%s` from the group `%s`.' % (
+                    user.user, group))
+            pagure.APP.logger.exception(err)
 
     return flask.redirect(flask.url_for('.view_group', group=group))
 
@@ -182,16 +182,15 @@ def add_group():
         form.group_type.data = 'user'
 
     if form.validate_on_submit():
-        grp = pagure.lib.model.PagureGroup(
-            group_name=form.group_name.data,
-            group_type=form.group_type.data,
-            user_id=user.id,
-        )
-        pagure.SESSION.add(grp)
 
-        msg = pagure.lib.add_user_to_group(
-            pagure.SESSION, user.username, grp, user.username)
         try:
+            msg = pagure.lib.add_group(
+                session=pagure.SESSION,
+                group_name=form.group_name.data,
+                group_type=form.group_type.data,
+                user=flask.g.fas_user.username,
+                is_admin=pagure.is_admin(),
+            )
             pagure.SESSION.commit()
             flask.flash('Group `%s` created.' % grp.group_name)
             flask.flash(msg)
