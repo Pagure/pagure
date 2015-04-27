@@ -194,15 +194,16 @@ def add_group():
     if form.validate_on_submit():
 
         try:
+            group_name = form.group_name.data
             msg = pagure.lib.add_group(
                 session=pagure.SESSION,
-                group_name=form.group_name.data,
+                group_name=group_name,
                 group_type=form.group_type.data,
                 user=flask.g.fas_user.username,
                 is_admin=pagure.is_admin(),
             )
             pagure.SESSION.commit()
-            flask.flash('Group `%s` created.' % grp.group_name)
+            flask.flash('Group `%s` created.' % group_name)
             flask.flash(msg)
             return flask.redirect(flask.url_for('.group_lists'))
         except SQLAlchemyError as err:
