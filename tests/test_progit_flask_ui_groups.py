@@ -204,6 +204,71 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 '</li>', output.data)
             self.assertIn('<p>0 groups.</p>', output.data)
 
+    def test_view_group(self):
+        """ Test the view_group endpoint. """
+        output = self.app.get('/group/foo')
+        self.assertEqual(output.status_code, 404)
+
+        self.test_add_group()
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/group/test group')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<h2>Group: test group</h2>', output.data)
+
+            output = self.app.get('/group/test admin group')
+            self.assertEqual(output.status_code, 404)
+
+        user = tests.FakeUser(
+            username='pingou',
+            groups=pagure.APP.config['ADMIN_GROUP'])
+        with tests.user_set(pagure.APP, user):
+            # Admin can see group of type admins
+            output = self.app.get('/group/test admin group')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<h2>Group: test admin group</h2>', output.data)
+            self.assertEqual(output.data.count('<a href="/user/'), 2)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            # No CSRF
+            data = {
+                'user': 'bar'
+            }
+
+            output = self.app.post('/group/test admin group', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<h2>Group: test admin group</h2>', output.data)
+            self.assertEqual(output.data.count('<a href="/user/'), 2)
+
+            # Invalid user
+            data = {
+                'user': 'bar',
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/group/test admin group', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li class="error">No user `bar` found</li>', output.data)
+            self.assertIn('<h2>Group: test admin group</h2>', output.data)
+            self.assertEqual(output.data.count('<a href="/user/'), 2)
+
+            # All good
+            data = {
+                'user': 'foo',
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post('/group/test admin group', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li class="message">User `foo` added to the group `test '
+                'admin group`.</li>', output.data)
+            self.assertIn('<h2>Group: test admin group</h2>', output.data)
+            self.assertEqual(output.data.count('<a href="/user/'), 3)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
