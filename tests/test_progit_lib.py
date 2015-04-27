@@ -1954,6 +1954,51 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(groups[0].group_type, 'admin')
         self.assertEqual(groups[1].group_type, 'user')
 
+    def test_search_groups(self):
+        """ Test the search_groups method of pagure.lib. """
+
+        self.assertEqual(pagure.lib.search_groups(self.session), [])
+
+        msg = pagure.lib.add_group(
+            self.session,
+            group_name='foo',
+            group_type='bar',
+            user='pingou',
+            is_admin=False,
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User `pingou` added to the group `foo`.')
+
+        groups = pagure.lib.search_groups(self.session)
+        self.assertEqual(len(groups), 1)
+        self.assertEqual(groups[0].group_name, 'foo')
+
+        msg = pagure.lib.add_group(
+            self.session,
+            group_name='bar',
+            group_type='admin',
+            user='pingou',
+            is_admin=True,
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User `pingou` added to the group `bar`.')
+
+        groups = pagure.lib.search_groups(self.session)
+        self.assertEqual(len(groups), 2)
+        self.assertEqual(groups[0].group_name, 'bar')
+        self.assertEqual(groups[1].group_name, 'foo')
+
+        groups = pagure.lib.search_groups(self.session, group_type='user')
+        self.assertEqual(len(groups), 1)
+        self.assertEqual(groups[0].group_name, 'foo')
+
+        groups = pagure.lib.search_groups(self.session, group_type='admin')
+        self.assertEqual(len(groups), 1)
+        self.assertEqual(groups[0].group_name, 'bar')
+
+        groups = pagure.lib.search_groups(self.session, group_name='foo')
+        self.assertEqual(groups.group_name, 'foo')
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibtests)
