@@ -1999,6 +1999,109 @@ class PagureLibtests(tests.Modeltests):
         groups = pagure.lib.search_groups(self.session, group_name='foo')
         self.assertEqual(groups.group_name, 'foo')
 
+    def test_delete_user_of_group(self):
+        """ Test the delete_user_of_group method of pagure.lib. """
+        self.test_add_user_to_group()
+
+        groups = pagure.lib.search_groups(self.session)
+        self.assertEqual(len(groups), 1)
+        self.assertEqual(groups[0].group_name, 'foo')
+
+        # Invalid username
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.delete_user_of_group,
+            self.session,
+            username='bar',
+            groupname='foo',
+            user='pingou',
+            is_admin=False,
+        )
+
+        # Invalid groupname
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.delete_user_of_group,
+            self.session,
+            username='foo',
+            groupname='bar',
+            user='pingou',
+            is_admin=False,
+        )
+
+        # Invalid user
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.delete_user_of_group,
+            self.session,
+            username='foo',
+            groupname='foo',
+            user='test',
+            is_admin=False,
+        )
+
+        # User not in the group
+        item = pagure.lib.model.User(
+            user='bar',
+            fullname='bar',
+            password='foo',
+            default_email='bar@bar.com',
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(
+            user_id=3,
+            email='bar@bar.com')
+        self.session.add(item)
+        self.session.commit()
+
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.delete_user_of_group,
+            self.session,
+            username='bar',
+            groupname='foo',
+            user='pingou',
+            is_admin=False,
+        )
+
+        # User is not allowed to remove the username
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.delete_user_of_group,
+            self.session,
+            username='foo',
+            groupname='foo',
+            user='bar',
+            is_admin=False,
+        )
+
+        # Username is the creator of the group
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.delete_user_of_group,
+            self.session,
+            username='pingou',
+            groupname='foo',
+            user='pingou',
+            is_admin=False,
+        )
+
+        # All good
+        group = pagure.lib.search_groups(self.session, group_name='foo')
+        self.assertEqual(len(group.users), 2)
+
+        pagure.lib.delete_user_of_group(
+            self.session,
+            username='foo',
+            groupname='foo',
+            user='pingou',
+            is_admin=False,
+        )
+        self.session.commit()
+
+        group = pagure.lib.search_groups(self.session, group_name='foo')
+        self.assertEqual(len(group.users), 1)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibtests)
