@@ -81,7 +81,7 @@ def view_group(group):
             flask.flash(err.message, 'error')
             return flask.redirect(
                 flask.url_for('.view_group', group=group.group_name))
-        except SQLAlchemyError as err:
+        except SQLAlchemyError as err:  # pragma: no cover
             pagure.SESSION.rollback()
             flask.flash(
                 'Could not add user `%s` to group `%s`.' % (
@@ -216,7 +216,7 @@ def add_group():
             flask.flash('Group `%s` created.' % group_name)
             flask.flash(msg)
             return flask.redirect(flask.url_for('.group_lists'))
-        except SQLAlchemyError as err:
+        except SQLAlchemyError as err:  # pragma: no cover
             pagure.SESSION.rollback()
             flask.flash('Could not create group.')
             pagure.APP.logger.debug('Could not create group.')
