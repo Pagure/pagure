@@ -429,6 +429,8 @@ index 458821a..77674a8
 
     def test_clean_git(self):
         """ Test the clean_git method of pagure.lib.git. """
+        pagure.lib.git.clean_git(None, None, None)
+
         self.test_update_git()
 
         gitpath = os.path.join(tests.HERE, 'test_ticket_repo.git')
