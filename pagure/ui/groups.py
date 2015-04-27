@@ -48,7 +48,8 @@ def view_group(group):
 
         if not group.group_name in flask.g.fas_user.groups:
             flask.flash('Action restricted', 'error')
-            return flask.redirect(flask.url_for('.view_group', group=group))
+            return flask.redirect(
+                flask.url_for('.view_group', group=group.group_name))
 
         username = form.user.data
 
@@ -61,7 +62,8 @@ def view_group(group):
         except pagure.exceptions.PagureException, err:
             SESSION.rollback()
             flask.flash(err.message, 'error')
-            return flask.redirect(flask.url_for('.view_group', group=group))
+            return flask.redirect(
+                flask.url_for('.view_group', group=group.group_name))
         except SQLAlchemyError as err:
             pagure.SESSION.rollback()
             flask.flash(
