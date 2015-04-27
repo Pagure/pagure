@@ -23,7 +23,10 @@ import pagure.lib
 @pagure.APP.route('/groups')
 def group_lists():
     ''' List all the groups associated with all the projects. '''
-    groups = pagure.lib.search_groups(pagure.SESSION, group_type='user')
+    group_type = 'user'
+    if pagure.is_admin():
+        group_type = None
+    groups = pagure.lib.search_groups(pagure.SESSION, group_type=group_type)
 
     group_types = ['user']
     if pagure.is_admin():
@@ -47,8 +50,12 @@ def group_lists():
 @pagure.APP.route('/group/<group>', methods=['GET', 'POST'])
 def view_group(group):
     ''' Displays information about this group. '''
+
+    group_type = 'user'
+    if pagure.is_admin():
+        group_type = None
     group = pagure.lib.search_groups(
-        pagure.SESSION, group_name=group, group_type='user')
+        pagure.SESSION, group_name=group, group_type=group_type)
 
     if not group:
         flask.abort(404, 'Group not found')
