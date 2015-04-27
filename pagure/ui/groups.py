@@ -87,11 +87,16 @@ def view_group(group):
                     user.user, group.group_name))
             pagure.APP.logger.exception(err)
 
+    member = False
+    if pagure.authenticated():
+        member=pagure.lib.is_group_member(
+            pagure.SESSION, flask.g.fas_user.username, group.group_name)
 
     return flask.render_template(
         'group_info.html',
         group=group,
         form=form,
+        member=member,
     )
 
 

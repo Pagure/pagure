@@ -50,7 +50,7 @@
 
 <h3>Members</h3>
 
-{% if authenticated and group.group_name in g.fas_user.groups %}
+{% if authenticated and (member or admin) %}
 <section class="add_users">
   <h4>Add an user to this group</h4>
   <form action="{{ url_for('.view_group', group=group.group_name)
