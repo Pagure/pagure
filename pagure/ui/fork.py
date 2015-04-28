@@ -756,9 +756,9 @@ def fork_project(repo, username=None):
     return flask.redirect(flask.url_for('view_repo', repo=repo.name))
 
 
-@APP.route('/<repo>/diff/<branch_to>..<branch_from>',
+@APP.route('/<repo>/diff/<path:branch_to>..<path:branch_from>',
            methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/diff/<branch_to>..<branch_from>',
+@APP.route('/fork/<username>/<repo>/diff/<path:branch_to>..<path:branch_from>',
            methods=('GET', 'POST'))
 @cla_required
 def new_request_pull(repo, branch_to, branch_from, username=None):

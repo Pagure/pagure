@@ -297,8 +297,8 @@ def view_commits(repo, branchname=None, username=None):
     )
 
 
-@APP.route('/<repo>/blob/<identifier>/f/<path:filename>')
-@APP.route('/fork/<username>/<repo>/blob/<identifier>/f/<path:filename>')
+@APP.route('/<repo>/blob/<path:identifier>/f/<path:filename>')
+@APP.route('/fork/<username>/<repo>/blob/<path:identifier>/f/<path:filename>')
 def view_file(repo, identifier, filename, username=None):
     """ Displays the content of a file or a tree for the specified repo.
     """
@@ -387,11 +387,11 @@ def view_file(repo, identifier, filename, username=None):
     )
 
 
-@APP.route('/<repo>/raw/<identifier>', defaults={'filename': None})
-@APP.route('/<repo>/raw/<identifier>/f/<path:filename>')
-@APP.route('/fork/<username>/<repo>/raw/<identifier>',
+@APP.route('/<repo>/raw/<path:identifier>', defaults={'filename': None})
+@APP.route('/<repo>/raw/<path:identifier>/f/<path:filename>')
+@APP.route('/fork/<username>/<repo>/raw/<path:identifier>',
            defaults={'filename': None})
-@APP.route('/fork/<username>/<repo>/raw/<identifier>/f/<path:filename>')
+@APP.route('/fork/<username>/<repo>/raw/<path:identifier>/f/<path:filename>')
 def view_raw_file(repo, identifier, filename=None, username=None):
     """ Displays the raw content of a file of a commit for the specified repo.
     """
