@@ -278,6 +278,36 @@ class PagureFlaskNoMasterBranchtests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn('No content found in this repository', output.data)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_new_request_pull(self, send_email):
+        """ Test the new_request_pull endpoint when the git repo has no
+        master branch.
+        """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        # Non-existant git repo
+        output = self.app.get('/test/diff/master..feature')
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/diff/master..feature')
+            self.assertEqual(output.status_code, 404)
+
+        self.set_up_git_repo()
+
+        output = self.app.get('/test/diff/master..feature')
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/diff/master..feature')
+            self.assertEqual(output.status_code, 400)
+            self.assertIn(
+                '<p>Branch master could not be found in the target repo</p>',
+                output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
