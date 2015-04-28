@@ -433,8 +433,11 @@ def view_raw_file(repo, identifier, filename=None, username=None):
         if commit.parents:
             diff = commit.tree.diff_to_tree()
 
-            parent = repo_obj.revparse_single('%s^' % identifier)
-            diff = repo_obj.diff(parent, commit)
+            try:
+                parent = repo_obj.revparse_single('%s^' % identifier)
+                diff = repo_obj.diff(parent, commit)
+            except (KeyError, ValueError):
+                flask.abort(404, 'Identifier not found')
         else:
             # First commit in the repo
             diff = commit.tree.diff_to_tree(swap=True)
