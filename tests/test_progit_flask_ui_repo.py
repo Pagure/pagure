@@ -876,7 +876,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         tests.add_binary_git_repo(
             os.path.join(tests.HERE, 'test.git'), 'test_binary')
 
-        output = self.app.get('/test/raw/master/foofile')
+        output = self.app.get('/test/raw/master/f/foofile')
         self.assertEqual(output.status_code, 404)
 
         # View in a branch
@@ -917,8 +917,13 @@ class PagureFlaskRepotests(tests.Modeltests):
         output = self.app.get('/test/raw/master/f/folder1/testfoo.jpg')
         self.assertEqual(output.status_code, 404)
 
-        output = self.app.get('/test/raw/master/')
+        output = self.app.get('/test/raw/master/f/')
         self.assertEqual(output.status_code, 404)
+
+        output = self.app.get('/test/raw/master')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue(output.data.startswith(
+            'diff --git a/test_binary b/test_binary\n'))
 
         output = self.app.get('/test/raw/%s' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
