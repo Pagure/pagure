@@ -576,6 +576,8 @@ class PagureFlaskForktests(tests.Modeltests):
             '<title>Pull request #1 - test - Pagure</title>', output.data)
         self.assertTrue(output.data.count('<span class="commitid">'), 1)
 
+        shutil.rmtree(newpath)
+
     @patch('pagure.lib.notify.send_email')
     def test_request_pull_empty_fork(self, send_email):
         """ Test the request_pull endpoint from an empty fork. """
@@ -632,6 +634,8 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertIn(
             '<li class="error">Fork is empty, there are no commits to '
             'request pulling</li>', output.data)
+
+        shutil.rmtree(newpath)
 
     @patch('pagure.lib.notify.send_email')
     def test_request_pulls(self, send_email):
@@ -898,6 +902,8 @@ index 0000000..2a552bb
         #print patch
         self.assertEqual(patch, exp)
 
+        shutil.rmtree(newpath)
+
     @patch('pagure.lib.notify.send_email')
     def test_request_pull_patch_empty_fork(self, send_email):
         """ Test the request_pull_patch endpoint from an empty fork. """
@@ -954,6 +960,8 @@ index 0000000..2a552bb
         self.assertIn(
             '<li class="error">Fork is empty, there are no commits to '
             'request pulling</li>', output.data)
+
+        shutil.rmtree(newpath)
 
     @patch('pagure.lib.notify.send_email')
     def test_cancel_request_pull(self, send_email):
@@ -1355,6 +1363,8 @@ index 0000000..2a552bb
                 '<li class="error">Fork is empty, there are no commits to '
                 'request pulling</li>', output.data)
 
+        shutil.rmtree(newpath)
+
     @patch('pagure.lib.notify.send_email')
     def test_new_request_pull_empty_fork(self, send_email):
         """ Test the new_request_pull endpoint against an empty repo. """
@@ -1387,6 +1397,8 @@ index 0000000..2a552bb
             self.assertIn(
                 '<li class="error">Fork is empty, there are no commits to '
                 'request pulling</li>', output.data)
+
+        shutil.rmtree(newpath)
 
     @patch('pagure.lib.notify.send_email')
     def test_pull_request_add_comment(self, send_email):
