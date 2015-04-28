@@ -1,4 +1,5 @@
 {% extends "master.html" %}
+{% from "_render_repo.html" import render_repos %}
 
 {% block title %}Group {{ group.name }}{% endblock %}
 {%block tag %}groups{% endblock %}
@@ -88,6 +89,12 @@
     </li>
     {% endfor %}
   </ul>
+</section>
+
+<section class="project_list">
+  {{ render_repos(
+      group.projects, 1, 0,
+      "Group's Projects", group.projects | length, 'grouprepos', None) }}
 </section>
 
 {% endblock %}
