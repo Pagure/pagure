@@ -1,0 +1,49 @@
+{% extends "repo_master.html" %}
+{% from "_formhelper.html" import render_field_in_row %}
+
+{% block title %}Add user - {{ repo.name }}{% endblock %}
+{%block tag %}groups{% endblock %}
+
+
+{% block repo %}
+
+<h2>Add group</h2>
+
+<section class="new_group">
+    <form action="{{ url_for('.add_group_project',
+                     username=username, repo=repo.name) }}" method="post">
+
+    <table>
+      {{ render_field_in_row(form.group) }}
+    </table>
+    <p class="buttons indent">
+      <input type="submit" class="submit positive button" value="Add">
+      <input type="button" value="Cancel" class="button" onclick="history.back();">
+      {{ form.csrf_token }}
+    </p>
+  </form>
+</section>
+
+{% endblock %}
+
+{% block jscripts %}
+{{ super() }}
+<script type="text/javascript">
+  $(function() {
+    $('#group').autocomplete({
+      source: function( request, response ) {
+        $.getJSON(
+          "{{ url_for('api_ns.api_groups') }}", {
+            pattern: request.term
+          },
+          function( data ) {
+            response( data.groups );
+          }
+        );
+      },
+      minLength: 2,
+      delay: 200,
+    });
+  });
+</script>
+{% endblock %}
