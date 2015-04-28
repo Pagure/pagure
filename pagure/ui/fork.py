@@ -898,10 +898,7 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
         diff_commits=diff_commits,
         diff=diff,
         form=form,
-        branches=[
-            branch.replace('refs/heads/', '')
-            for branch in sorted(orig_repo.listall_references())
-        ],
+        branches=sorted(orig_repo.listall_branches()),
         branch_to=branch_to,
         branch_from=branch_from,
     )
