@@ -323,6 +323,8 @@ def view_file(repo, identifier, filename, username=None):
             commit = repo_obj.get(identifier)
             branchname = identifier
         except ValueError:
+            if 'master' not in repo_obj.listall_branches():
+                flask.abort(404, 'Branch no found')
             # If it's not a commit id then it's part of the filename
             commit = repo_obj[repo_obj.head.target]
             branchname = 'master'
