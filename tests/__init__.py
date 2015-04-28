@@ -139,10 +139,7 @@ class Modeltests(unittest.TestCase):
         self.session.close()
 
         # Clear temp directory
-        if sys.exc_info() == (None, None, None):
-            shutil.rmtree(self.path)
-        else:
-            print('FAILED TESTS AT %s' % self.path)
+        shutil.rmtree(self.path)
 
         # Clear DB
         if os.path.exists(DB_PATH):
