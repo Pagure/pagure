@@ -245,6 +245,39 @@ class PagureFlaskNoMasterBranchtests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertEqual('foo\n bar', output.data)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_view_tree(self, send_email):
+        """ Test the view_tree endpoint when the git repo has no
+        master branch.
+        """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        # Non-existant git repo
+        output = self.app.get('/test/tree/')
+        self.assertEqual(output.status_code, 404)
+        output = self.app.get('/test/tree/master')
+        self.assertEqual(output.status_code, 404)
+
+        self.set_up_git_repo()
+
+        # With git repo
+        output = self.app.get('/test/tree/master')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('No content found in this repository', output.data)
+        output = self.app.get('/test/tree/master/sources')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('No content found in this repository', output.data)
+
+        output = self.app.get('/test/tree/feature')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<a href="/test/blob/feature/f/sources">', output.data)
+        self.assertIn('<span class="filehex">9f4435</span>', output.data)
+
+        output = self.app.get('/test/tree/feature/sources')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('No content found in this repository', output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
