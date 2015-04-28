@@ -290,6 +290,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
             self.assertIn('<h2>Group: test group</h2>', output.data)
             self.assertEqual(output.data.count('<a href="/user/'), 2)
 
+            output = self.app.get('/new/')
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
