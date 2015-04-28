@@ -60,6 +60,7 @@ seen = []
 for line in sys.stdin.readlines():
     (oldrev, newrev, refname) = line.strip().split(' ', 2)
     revs = pagure.lib.git.get_revs_between(oldrev, newrev, abspath)
+    project = pagure.lib.git.get_repo_name(abspath)
 
     def _build_commit(rev):
         files, total = build_stats(rev)
@@ -83,7 +84,7 @@ for line in sys.stdin.readlines():
             rev=unicode(rev),
             path=abspath,
             username=pagure.lib.git.get_username(abspath),
-            repo=pagure.lib.git.get_repo_name(abspath),
+            repo=project,
             branch=refname,
             agent=os.getlogin(),
         )
@@ -107,8 +108,8 @@ for line in sys.stdin.readlines():
             commit['seen'] = False
             seen.append(commit['rev'])
 
-        fedmsg.publish(
-            topic="receive",
+        pagure.lib.notify.log(
+            project=project,
+            topic="git.receive",
             msg=dict(commit=commit),
-            modname="git",
         )
