@@ -23,6 +23,13 @@
         </a>
       </li>
       {% endfor %}
+      {% for group in repo.groups %}
+      <li>
+        <a href="{{ url_for('view_group', group=group.group_name)}}">
+          @{{ group.group_name }}
+        </a>
+      </li>
+      {% endfor %}
     </ul>
   </section>
 
