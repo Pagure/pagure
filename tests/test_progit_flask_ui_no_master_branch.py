@@ -214,6 +214,37 @@ class PagureFlaskNoMasterBranchtests(tests.Modeltests):
         self.assertIn(
             '<td class="cell2"><pre>foo</pre></td>', output.data)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_view_raw_file(self, send_email):
+        """ Test the view_raw_file endpoint when the git repo has no
+        master branch.
+        """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        # Non-existant git repo
+        output = self.app.get('/test/raw/master')
+        self.assertEqual(output.status_code, 404)
+        output = self.app.get('/test/raw/master/f/sources')
+        self.assertEqual(output.status_code, 404)
+
+        self.set_up_git_repo()
+
+        # With git repo
+        output = self.app.get('/test/raw/master')
+        self.assertEqual(output.status_code, 404)
+        output = self.app.get('/test/raw/master/f/sources')
+        self.assertEqual(output.status_code, 404)
+
+        output = self.app.get('/test/raw/feature')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('diff --git a/sources b/sources', output.data)
+        self.assertIn('+foo\n+ bar', output.data)
+
+        output = self.app.get('/test/raw/feature/f/sources')
+        self.assertEqual(output.status_code, 200)
+        self.assertEqual('foo\n bar', output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
