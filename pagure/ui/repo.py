@@ -201,8 +201,10 @@ def view_repo_branch(repo, branchname, username=None):
     )
 
 
+@APP.route('/<repo>/commits/')
 @APP.route('/<repo>/commits')
 @APP.route('/<repo>/commits/<path:branchname>')
+@APP.route('/fork/<username>/<repo>/commits/')
 @APP.route('/fork/<username>/<repo>/commits')
 @APP.route('/fork/<username>/<repo>/commits/<path:branchname>')
 def view_commits(repo, branchname=None, username=None):
