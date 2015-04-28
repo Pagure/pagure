@@ -190,6 +190,45 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
 
         shutil.rmtree(newpath)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_reload_ticket(self, send_email):
+        """ Test reloading a ticket from a JSON blob. """
+        send_email.return_value = True
+        ticket_json = os.path.join(tests.HERE, 'test_ticket.json')
+        self.assertTrue(os.path.exists(ticket_json))
+
+        tests.create_projects(self.session)
+
+        jsondata = None
+        with open(ticket_json) as stream:
+            jsondata = json.load(stream)
+        self.assertNotEqual(jsondata, None)
+
+        pagure.lib.git.update_ticket_from_git(
+            self.session,
+            reponame='test',
+            username=None,
+            issue_uid='foobar',
+            json_data=jsondata,
+        )
+
+        # Post loading
+        repo = pagure.lib.get_project(self.session, 'test')
+        self.assertEqual(len(repo.issues), 1)
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+
+        # Check after re-loading
+        self.assertEqual(len(issue.comments), 2)
+        self.assertEqual(len(issue.tags), 2)
+        self.assertEqual(issue.tags_text, ['future', 'feature'])
+        self.assertEqual(issue.assignee.username, 'pingou')
+        self.assertEqual(issue.children, [])
+        self.assertEqual(issue.parents, [])
+
+        self.assertTrue(os.path.exists(ticket_json))
+        os.unlink(ticket_json)
+        self.assertFalse(os.path.exists(ticket_json))
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
