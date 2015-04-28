@@ -103,7 +103,7 @@ class PagureFlaskNoMasterBranchtests(tests.Modeltests):
         committer = pygit2.Signature(
             'Cecil Committer', 'cecil@committers.tld')
         clone_repo.create_commit(
-            'refs/heads/master',
+            'refs/heads/feature',
             author,
             committer,
             'Add .gitignore file for testing',
@@ -156,7 +156,7 @@ class PagureFlaskNoMasterBranchtests(tests.Modeltests):
         # With git repo
         output = self.app.get('/test/branch/feature')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<h3>Last 1 commits</h3>', output.data)
+        self.assertIn('<h3>Last 2 commits</h3>', output.data)
         self.assertTrue(output.data.count('<a href="/test/branch/'), 1)
 
     @patch('pagure.lib.notify.send_email')
@@ -184,6 +184,7 @@ class PagureFlaskNoMasterBranchtests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn('<h3>Commits list</h3>', output.data)
         self.assertIn('Add sources file for testing', output.data)
+        self.assertIn('Add .gitignore file for testing', output.data)
         self.assertNotIn(
             '<h3>Commits list</h3>\n    <ul>\n    </ul>', output.data)
         self.assertTrue(output.data.count('<a href="/test/branch/'), 1)
@@ -238,8 +239,8 @@ class PagureFlaskNoMasterBranchtests(tests.Modeltests):
 
         output = self.app.get('/test/raw/feature')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('diff --git a/sources b/sources', output.data)
-        self.assertIn('+foo\n+ bar', output.data)
+        self.assertIn('diff --git a/.gitignore b/.gitignore', output.data)
+        self.assertIn('+*~', output.data)
 
         output = self.app.get('/test/raw/feature/f/sources')
         self.assertEqual(output.status_code, 200)
