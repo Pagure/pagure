@@ -183,10 +183,12 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
 
         self.assertEqual(len(os.listdir(newpath)), 4)
 
-        jsondata = None
-        with open(os.path.join(newpath, fileid)) as stream:
-            jsondata = json.load(stream)
-        self.assertNotEqual(jsondata, None)
+        ticket_json = os.path.join(tests.HERE, 'test_ticket.json')
+        self.assertFalse(os.path.exists(ticket_json))
+        shutil.copyfile(os.path.join(newpath, fileid), ticket_json)
+        self.assertTrue(os.path.exists(ticket_json))
+
+        shutil.rmtree(newpath)
 
 
 if __name__ == '__main__':
