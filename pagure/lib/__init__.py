@@ -186,6 +186,7 @@ def add_issue_tag(session, issue, tags, user, ticketfolder):
 
     added_tags = []
     for issue_tag in tags:
+        issue_tag = issue_tag.strip()
         known = False
         for tag_issue in issue.tags:
             if tag_issue.tag == issue_tag:
