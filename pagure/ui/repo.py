@@ -297,8 +297,8 @@ def view_commits(repo, branchname=None, username=None):
     )
 
 
-@APP.route('/<repo>/blob/<identifier>/<path:filename>')
-@APP.route('/fork/<username>/<repo>/blob/<identifier>/<path:filename>')
+@APP.route('/<repo>/blob/<identifier>/f/<path:filename>')
+@APP.route('/fork/<username>/<repo>/blob/<identifier>/f/<path:filename>')
 def view_file(repo, identifier, filename, username=None):
     """ Displays the content of a file or a tree for the specified repo.
     """
