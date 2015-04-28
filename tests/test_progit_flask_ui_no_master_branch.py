@@ -188,6 +188,32 @@ class PagureFlaskNoMasterBranchtests(tests.Modeltests):
             '<h3>Commits list</h3>\n    <ul>\n    </ul>', output.data)
         self.assertTrue(output.data.count('<a href="/test/branch/'), 1)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_view_file(self, send_email):
+        """ Test the view_file endpoint when the git repo has no
+        master branch.
+        """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        # Non-existant git repo
+        output = self.app.get('/test/blob/master/f/sources')
+        self.assertEqual(output.status_code, 404)
+
+        self.set_up_git_repo()
+
+        # With git repo
+        output = self.app.get('/test/blob/master/f/sources')
+        self.assertEqual(output.status_code, 404)
+
+        output = self.app.get('/test/blob/feature/f/sources')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(
+            '<a href="/test/tree/feature">feature</a>/sources</h2>',
+            output.data)
+        self.assertIn(
+            '<td class="cell2"><pre>foo</pre></td>', output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
