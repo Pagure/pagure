@@ -133,7 +133,7 @@ def update_git(obj, repo, repofolder, objtype='ticket'):
     repopath = os.path.join(repofolder, repo.path)
 
     # Clone the repo into a temp folder
-    newpath = tempfile.mkdtemp()
+    newpath = tempfile.mkdtemp(prefix='pagure-')
     new_repo = pygit2.clone_repository(repopath, newpath)
 
     file_path = os.path.join(newpath, obj.uid)
