@@ -30,7 +30,7 @@
 
 
 {% macro render_repos(list, total, page, title, count, id, username=None) %}
-<section class="project_list" id="{{ id }}">
+    <section class="project_list" id="{{ id }}">
         <header>
             {% set title_lvl = 3 if username else 2 %}
             <h{{ title_lvl }}>{{ title }} ({{ count }})</h{{ title_lvl }}>
