@@ -75,7 +75,7 @@ def relates_commit(commitid, issue, app_url=None):
             pagure.SESSION,
             issue=issue,
             comment=comment,
-            user=pagure.lib.git.get_pusher(commitid, abspath),
+            user=pagure.lib.git.get_pusher_email(commitid, abspath),
             ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
         )
         pagure.SESSION.commit()
@@ -107,7 +107,7 @@ def fixes_commit(commitid, issue, app_url=None):
             pagure.SESSION,
             issue=issue,
             comment=comment,
-            user=pagure.lib.git.get_pusher(commitid, abspath),
+            user=pagure.lib.git.get_pusher_email(commitid, abspath),
             ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
         )
         pagure.SESSION.commit()
@@ -129,7 +129,7 @@ def fixes_commit(commitid, issue, app_url=None):
                 pagure.SESSION,
                 issue,
                 ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
-                user=pagure.lib.git.get_pusher(commitid, abspath),
+                user=pagure.lib.git.get_pusher_email(commitid, abspath),
                 status='Fixed')
             pagure.SESSION.commit()
         except pagure.exceptions.PagureException as err:
