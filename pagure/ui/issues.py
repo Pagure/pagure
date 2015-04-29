@@ -682,6 +682,9 @@ def view_issue_raw_file(repo, filename=None, username=None):
     mimetype, encoding = mimetypes.guess_type(filename)
     data = repo_obj[content.oid].data
 
+    if not data:
+        flask.abort(404, 'No content found')
+
     if not mimetype and data[:2] == '#!':
         mimetype = 'text/plain'
 
