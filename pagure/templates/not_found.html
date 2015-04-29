@@ -6,7 +6,7 @@
 
 {% block content %}
     <h2>Page not found (404)</h2>
-    {% if error.description %}
+    {% if error and error.description %}
     <p>With the message:</p>
     <pre>{{ error.description }}</pre>
     {% else %}
