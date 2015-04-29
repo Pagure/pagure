@@ -73,7 +73,7 @@ Subject: {subject}
                commit.commit_time).strftime('%b %d %Y %H:%M:%S +0000'),
            subject=subject,
            msg=message,
-           patch=diff.patch)
+           patch=diff.patch.encode('utf8'))
     return patch
 
 
