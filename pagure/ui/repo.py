@@ -449,7 +449,7 @@ def view_raw_file(repo, identifier, filename=None, username=None):
         mimetype = 'text/plain'
 
     if not mimetype:
-        if '\0' in data:
+        if data and '\0' in data:
             mimetype = 'application/octet-stream'
         else:
             mimetype = 'text/plain'
