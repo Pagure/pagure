@@ -257,19 +257,19 @@ def set_user(return_url):
 @APP.errorhandler(404)
 def not_found(error):
     """404 Not Found page"""
-    return flask.render_template('not_found.html'), 404
+    return flask.render_template('not_found.html', error=error), 404
 
 
 @APP.errorhandler(500)
 def fatal_error(error):  # pragma: no cover
     """500 Fatal Error page"""
-    return flask.render_template('fatal_error.html'), 500
+    return flask.render_template('fatal_error.html', error=error), 500
 
 
 @APP.errorhandler(401)
 def unauthorized(error):  # pragma: no cover
     """401 Unauthorized page"""
-    return flask.render_template('unauthorized.html'), 401
+    return flask.render_template('unauthorized.html', error=error), 401
 
 
 @APP.route('/login/', methods=('GET', 'POST'))
