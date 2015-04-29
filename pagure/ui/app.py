@@ -175,6 +175,8 @@ def view_user(username):
     """ Front page of a specific user.
     """
     user = pagure.lib.search_user(SESSION, username=username)
+    if not user:
+        flask.abort(404, 'No user `%s` found' % username)
 
     repopage = flask.request.args.get('repopage', 1)
     try:
