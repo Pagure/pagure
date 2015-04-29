@@ -445,7 +445,7 @@ def view_raw_file(repo, identifier, filename=None, username=None):
             diff = commit.tree.diff_to_tree(swap=True)
         data = diff.patch
 
-    if not mimetype and data[:2] == '#!':
+    if not mimetype and data and data[:2] == '#!':
         mimetype = 'text/plain'
 
     if not mimetype:
