@@ -33,6 +33,29 @@
     {{ render_repos(
             forks, total_page_forks, forkpage,
             'Forks', forks_length, 'forks') }}
+    <section class="project_list" id="group_list">
+        <header>
+            <h2>Groups ({{ user.groups | length }})</h2>
+        </header>
+        {% for group in user.groups %}
+            {% if loop.index == 1 %}
+        <div class="project_row">
+            {% endif %}
+            <a class="project_link logo_link"
+                href="{{ url_for('view_group', group=group) }}"
+                style="background-image: url({{ url_for('static', filename='placebo.png') }})">
+                <span class="repo_name">{{ group }}</span>
+            </a>
+            {% if loop.last %}
+        </div>
+            {% elif loop.index is divisibleby(3) or loop.last %}
+        </div>
+        <div class="project_row">
+            {% endif %}
+        {% else %}
+        <p>No group found</p>
+        {% endfor %}
+    </section>
 {% endblock %}
 
 {% block jscripts %}
