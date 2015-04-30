@@ -427,7 +427,8 @@ def new_issue(repo, username=None):
 
             flask.flash('Issue created')
             return flask.redirect(flask.url_for(
-                'view_issues', username=username, repo=repo.name))
+                '.view_issue', username=username, repo=repo.name,
+                issueid=issue.id))
         except pagure.exceptions.PagureException, err:
             flask.flash(str(err), 'error')
         except SQLAlchemyError, err:  # pragma: no cover
