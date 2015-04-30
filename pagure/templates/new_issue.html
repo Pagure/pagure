@@ -41,7 +41,10 @@
       </ul>
       <div id="new_comment">
         <div>
-          <textarea id="issue_content" name="issue_content" placeholder="Report your issue/request here"></textarea>
+          <textarea id="issue_content" name="issue_content"
+            placeholder="Report your issue/request here">
+          {%- if issue %}{{ issue.content }}{% endif -%}
+          </textarea>
           {% if form.issue_content.errors %}
           <p class="errors">
             {% for error in form.issue_content.errors %}
