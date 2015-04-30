@@ -36,7 +36,7 @@
 
 <h2>
     <span class="issueid">#{{ issueid }}</span> {{ issue.title }}
-    {% if authenticated and (repo_admin or g.fas_user.username == issue.user.name) %}
+    {% if authenticated and (repo_admin or g.fas_user.username == issue.user.username) %}
     -  <a href="{{ url_for('edit_issue', username=username,
                   repo=repo.name, issueid=issueid) }}">
         Edit</a>
