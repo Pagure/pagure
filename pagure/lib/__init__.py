@@ -110,6 +110,8 @@ def search_user(session, username=None, email=None, token=None, pattern=None):
     '''
     query = session.query(
         model.User
+    ).order_by(
+        model.User.user
     )
 
     if username is not None:
