@@ -546,14 +546,15 @@ def edit_issue(repo, issueid, username=None):
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
 
-    if not is_repo_admin(repo):
-        flask.abort(
-            403, 'You are not allowed to edit issues for this project')
-
     issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
 
     if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
+
+    if not (is_repo_admin(repo)
+            or flask.g.fas_user.username == issue.user.username):
+        flask.abort(
+            403, 'You are not allowed to edit issues for this project')
 
     status = pagure.lib.get_issue_statuses(SESSION)
     form = pagure.forms.IssueForm(status=status)
