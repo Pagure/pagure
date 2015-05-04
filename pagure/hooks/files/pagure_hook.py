@@ -153,6 +153,11 @@ def run_as_post_receive_hook():
         print '  -- Ref name'
         print refname
 
+        if set(newrev) = set(['0']):
+            print "Deleting a reference/branch, so we won't run the "\
+                "pagure hook"
+            return
+
         generate_revision_change_log(
             pagure.lib.git.get_revs_between(oldrev, newrev, abspath))
 
