@@ -10,6 +10,7 @@ flask-wtf
 kitchen
 markdown
 munch
+Pillow
 psutil
 pygit2 >= 0.20.1
 pygments
