@@ -66,8 +66,8 @@
                 repo=repo.name, identifier=branchname,
                 filename=filename + '/' + entry.name if filename else entry.name) }}">
         {{ entry.name }}
-        </a>
         <span class="filehex">{{ entry.hex|short }}</span>
+        </a>
     </li>
     {% endfor %}
   </ul>
