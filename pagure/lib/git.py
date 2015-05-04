@@ -57,7 +57,7 @@ def commit_to_patch(repo_obj, commits):
         if len(commits) > 1:
             subject = '[PATCH %s/%s] %s' % (cnt + 1, len(commits), subject)
 
-        patch += """From {commit} Mon Sep 17 00:00:00 2001
+        patch += u"""From {commit} Mon Sep 17 00:00:00 2001
 From: {author_name} <{author_email}>
 Date: {date}
 Subject: {subject}
@@ -73,7 +73,7 @@ Subject: {subject}
                commit.commit_time).strftime('%b %d %Y %H:%M:%S +0000'),
            subject=subject,
            msg=message,
-           patch=diff.patch.encode('utf-8'))
+           patch=diff.patch)
     return patch
 
 
