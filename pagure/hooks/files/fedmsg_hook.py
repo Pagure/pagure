@@ -60,7 +60,7 @@ seen = []
 for line in sys.stdin.readlines():
     (oldrev, newrev, refname) = line.strip().split(' ', 2)
 
-    if set(newrev) = set(['0']):
+    if set(newrev) == set(['0']):
             print "Deleting a reference/branch, so we won't run the "\
                 "pagure hook"
             return
