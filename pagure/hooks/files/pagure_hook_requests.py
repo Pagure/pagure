@@ -56,6 +56,11 @@ def run_as_post_receive_hook():
         print '  -- Ref name'
         print refname
 
+        if set(newrev) = set(['0']):
+            print "Deleting a reference/branch, so we won't run the "\
+                "pagure hook"
+            return
+
         tmp = set(get_files_to_load(
             pagure.lib.git.get_revs_between(oldrev, newrev, abspath)))
         file_list = file_list.union(tmp)
