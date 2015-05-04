@@ -2,13 +2,13 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.0
-Release:        1.20150402%{?dist}
+Version:        0.1
+Release:        1%{?dist}
 Summary:        A git-centered forge
 
 License:        GPLv2+
 URL:            http://fedorahosted.org/pagure/
-Source0:        https://fedorahosted.org/releases/p/r/pagure/%{name}-%{version}.tar.gz
+Source0:        https://fedorahosted.org/releases/p/a/pagure/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
@@ -145,6 +145,9 @@ install -m 644 milters/pagure_milter.service \
 
 
 %changelog
+* Mon May 04 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1-1
+- First official release: 0.1
+
 * Thu Apr 02 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.0-1.20150402
 - Cut a RPM for testing on Thu Apr 2nd 2015
 
