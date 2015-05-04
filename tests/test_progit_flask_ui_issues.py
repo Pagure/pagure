@@ -120,7 +120,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue(
                 '<p>test project<a href="/test/issue/1"> #1</a></p>'
                 in output.data)
-            self.assertTrue('<h2>\n    Issues (1)\n  </h2>' in output.data)
+            self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
 
         # Project w/o issue tracker
         repo = pagure.lib.get_project(self.session, 'test')
@@ -176,7 +178,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue(
                 '<p>test project<a href="/test/issue/1"> #1</a></p>'
                 in output.data)
-            self.assertTrue('<h2>\n    Issues (1)\n  </h2>' in output.data)
+            self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
 
         # Project w/o issue tracker
         repo = pagure.lib.get_project(self.session, 'test')
