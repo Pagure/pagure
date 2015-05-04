@@ -7,13 +7,13 @@ chardet
 docutils
 flask
 flask-wtf
+kitchen
 markdown
 munch
 psutil
 pygit2 >= 0.20.1
 pygments
 python-fedora
-python-kitchen
 python-openid
 python-openid-cla
 python-openid-teams
