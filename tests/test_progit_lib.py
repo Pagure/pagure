@@ -40,13 +40,13 @@ class PagureLibtests(tests.Modeltests):
         # Retrieve all users
         items = pagure.lib.search_user(self.session)
         self.assertEqual(2, len(items))
-        self.assertEqual(1, items[0].id)
-        self.assertEqual('pingou', items[0].user)
-        self.assertEqual('pingou', items[0].username)
-        self.assertEqual([], items[0].groups)
-        self.assertEqual(2, items[1].id)
-        self.assertEqual('foo', items[1].user)
-        self.assertEqual('foo', items[1].username)
+        self.assertEqual(2, items[0].id)
+        self.assertEqual('foo', items[0].user)
+        self.assertEqual('foo', items[0].username)
+        self.assertEqual([], items[1].groups)
+        self.assertEqual(1, items[1].id)
+        self.assertEqual('pingou', items[1].user)
+        self.assertEqual('pingou', items[1].username)
         self.assertEqual([], items[1].groups)
 
     def test_search_user_username(self):
@@ -985,10 +985,10 @@ class PagureLibtests(tests.Modeltests):
 
         items = pagure.lib.search_user(self.session)
         self.assertEqual(2, len(items))
-        self.assertEqual(1, items[0].id)
-        self.assertEqual('pingou', items[0].user)
-        self.assertEqual(2, items[1].id)
-        self.assertEqual('foo', items[1].user)
+        self.assertEqual(2, items[0].id)
+        self.assertEqual('foo', items[0].user)
+        self.assertEqual(1, items[1].id)
+        self.assertEqual('pingou', items[1].user)
 
         pagure.lib.set_up_user(
             session=self.session,
@@ -1000,10 +1000,10 @@ class PagureLibtests(tests.Modeltests):
 
         items = pagure.lib.search_user(self.session)
         self.assertEqual(3, len(items))
-        self.assertEqual(1, items[0].id)
-        self.assertEqual('pingou', items[0].user)
-        self.assertEqual(2, items[1].id)
-        self.assertEqual('foo', items[1].user)
+        self.assertEqual(2, items[0].id)
+        self.assertEqual('foo', items[0].user)
+        self.assertEqual(1, items[1].id)
+        self.assertEqual('pingou', items[1].user)
         self.assertEqual(3, items[2].id)
         self.assertEqual('skvidal', items[2].user)
         self.assertEqual('Seth', items[2].fullname)
