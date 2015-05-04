@@ -33,6 +33,7 @@ BuildRequires:  python-openid-cla
 BuildRequires:  python-openid-teams
 BuildRequires:  python-straight-plugin
 BuildRequires:  python-wtforms
+BuildRequires:  python-munch
 
 # EPEL6
 %if ( 0%{?rhel} && 0%{?rhel} == 6 )
@@ -60,6 +61,7 @@ Requires:  python-openid-cla
 Requires:  python-openid-teams
 Requires:  python-straight-plugin
 Requires:  python-wtforms
+Requires:  python-munch
 Requires:  mod_wsgi
 
 # No dependency of the app per say, but required to make it working.
