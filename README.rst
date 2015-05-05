@@ -31,6 +31,11 @@ Get it running
     mkdir {repos,docs,forks,tickets}
 
 
+* Create the inital database scheme::
+
+    python createdb.py
+
+
 * Run it::
 
     ./runserver.py
