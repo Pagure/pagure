@@ -52,7 +52,7 @@ class PagureTable(BASE):
 class PagureForm(wtf.Form):
     ''' Form to configure the pagure hook. '''
     active = wtforms.BooleanField(
-        'Acive',
+        'Active',
         [wtforms.validators.Optional()]
     )
 
