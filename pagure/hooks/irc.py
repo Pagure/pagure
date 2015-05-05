@@ -79,7 +79,7 @@ class IrcForm(wtf.Form):
     )
 
     active = wtforms.BooleanField(
-        'Acive',
+        'Active',
         [wtforms.validators.Optional()]
     )
     join = wtforms.BooleanField(
