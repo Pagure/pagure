@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1
+Version:        0.1.1
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -147,6 +147,20 @@ install -m 644 milters/pagure_milter.service \
 
 
 %changelog
+* Wed May 06 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.1-1
+- Update to 0.1.1
+- Port to python-munch and list it in the dependencies
+- Fix exporting patch when they contain unicode characters or accent
+- After creating an issue, user is brought back to the new issue page
+- Fix unit-tests
+- Stop the pagure hook if the user is deleting a branch (no need to run through
+  all the commits of that branch)
+- Fix the requirements.txt file (Sayan Chowdhury)
+- Fix the tree page to show the commit sha on its proper line (Sayan Chowdhury)
+- Fix typo in the form of some of the plugin (Sayan Chowdhury)
+- Improve the README (Sayan Chowdhury)
+- Fix highlighting the commits tab when accessing it (Sayan Chowdhury)
+
 * Mon May 04 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1-1
 - First official release: 0.1
 
