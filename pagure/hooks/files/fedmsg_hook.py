@@ -63,7 +63,7 @@ for line in sys.stdin.readlines():
     if set(newrev) == set(['0']):
             print "Deleting a reference/branch, so we won't run the "\
                 "pagure hook"
-            return
+            break
 
     revs = pagure.lib.git.get_revs_between(oldrev, newrev, abspath)
     project = pagure.lib.git.get_repo_name(abspath)
