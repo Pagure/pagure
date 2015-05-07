@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.1
+Version:        0.1.2
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -147,6 +147,10 @@ install -m 644 milters/pagure_milter.service \
 
 
 %changelog
+* Thu May 07 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.2-1
+- Update to 0.1.2
+- Fix bug in the fedmsg hook file (Thanks Zbigniew Jędrzejewski-Szmek)
+
 * Wed May 06 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.1-1
 - Update to 0.1.1
 - Port to python-munch and list it in the dependencies
