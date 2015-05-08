@@ -945,6 +945,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/1/upload', data=data, follow_redirects=True)
             stream.close()
             self.assertEqual(output.status_code, 200)
+            print output.data
             json_data = json.loads(output.data)
 
             folder = os.getcwd()[1:].replace('/', '_')
