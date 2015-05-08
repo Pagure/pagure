@@ -948,7 +948,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             print output.data
             json_data = json.loads(output.data)
 
-            folder = os.getcwd()[1:].replace('/', '_')
+            folder = os.path.dirname(
+                os.path.abspath(__file__))[1:].replace('/', '_')
             exp = {
                 'output': 'ok',
                 'filelocation': '/test/issue/raw/files/8a06845923010b27bfd8'
@@ -1022,7 +1023,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         url = '/issue/raw/files/8a06845923010b27bfd8'\
             'e7e75acff7badc40d1021b4994e01f5e11ca40bc3a'\
-            'be-%s_placebo.png' % os.getcwd()[1:].replace('/', '_')
+            'be-%s_placebo.png' % os.path.dirname(
+                os.path.abspath(__file__))[1:].replace('/', '_')
 
         output = self.app.get('/foo' + url)
         self.assertEqual(output.status_code, 404)
