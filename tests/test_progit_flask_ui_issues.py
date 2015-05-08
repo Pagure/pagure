@@ -946,16 +946,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
             stream.close()
             self.assertEqual(output.status_code, 200)
             json_data = json.loads(output.data)
-            json_data['filename'] = json_data['filename'].split('pagure_')[1]
-            json_data['filelocation'] = '/test/issue/raw/files/'\
-                '8a06845923010b27bfd8e7e75acff7badc40d1021b4994e01f5e11ca4'\
-                '0bc3abe-' + json_data['filelocation'].split('pagure_')[1]
+
+            folder = os.getcwd()[1:].replace('/', '_')
             exp = {
                 'output': 'ok',
                 'filelocation': '/test/issue/raw/files/8a06845923010b27bfd8'
                                 'e7e75acff7badc40d1021b4994e01f5e11ca40bc3a'
-                                'be-tests_placebo.png',
-                'filename': 'tests_placebo.png'
+                                'be-%s_placebo.png' % folder,
+                'filename': '%s_placebo.png' % folder,
             }
             self.assertDictEqual(json_data, exp)
 
@@ -1022,8 +1020,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         url = '/issue/raw/files/8a06845923010b27bfd8'\
             'e7e75acff7badc40d1021b4994e01f5e11ca40bc3a'\
-            'be-home_pierrey_repos_gitrepo_pagure_tests'\
-            '_placebo.png'
+            'be-%s_placebo.png' % os.getcwd()[1:].replace('/', '_')
 
         output = self.app.get('/foo' + url)
         self.assertEqual(output.status_code, 404)
