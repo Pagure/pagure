@@ -39,6 +39,7 @@ class PagureFlaskPluginPagureHooktests(tests.Modeltests):
         pagure.ui.SESSION = self.session
         pagure.ui.app.SESSION = self.session
         pagure.ui.plugins.SESSION = self.session
+        pagure.ui.repo.SESSION = self.session
 
         pagure.APP.config['GIT_FOLDER'] = tests.HERE
         pagure.APP.config['FORK_FOLDER'] = os.path.join(
@@ -52,7 +53,7 @@ class PagureFlaskPluginPagureHooktests(tests.Modeltests):
         self.app = pagure.APP.test_client()
 
     def test_plugin_mail(self):
-        """ Test the mail plugin on/off endpoint. """
+        """ Test the pagure hook plugin on/off endpoint. """
 
         tests.create_projects(self.session)
 

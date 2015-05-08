@@ -39,6 +39,7 @@ class PagureFlaskDocstests(tests.Modeltests):
         pagure.ui.SESSION = self.session
         pagure.ui.app.SESSION = self.session
         pagure.ui.docs.SESSION = self.session
+        pagure.ui.repo.SESSION = self.session
 
         pagure.APP.config['GIT_FOLDER'] = tests.HERE
         pagure.APP.config['FORK_FOLDER'] = os.path.join(
