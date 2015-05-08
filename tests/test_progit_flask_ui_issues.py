@@ -956,6 +956,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                                 'be-%s_placebo.png' % folder,
                 'filename': '%s_placebo.png' % folder,
             }
+            print exp
             self.assertDictEqual(json_data, exp)
 
         # Project w/o issue tracker
