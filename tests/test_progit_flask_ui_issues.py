@@ -946,6 +946,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             stream.close()
             self.assertEqual(output.status_code, 200)
             json_data = json.loads(output.data)
+            print output.data
             exp = {
                 'output': 'ok',
                 'filelocation': '/test/issue/raw/files/8a06845923010b27bfd8'
