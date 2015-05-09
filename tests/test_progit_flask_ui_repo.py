@@ -1404,12 +1404,17 @@ index 0000000..fb7093d
             self.assertTrue('<h2>Projects (1)</h2>' in output.data)
             self.assertTrue('<h2>Forks (0)</h2>' in output.data)
 
+            repo = pagure.lib.get_project(self.session, 'test')
+            self.assertEqual(repo, None)
+            repo = pagure.lib.get_project(self.session, 'test2')
+            self.assertNotEqual(repo, None)
+
             # Add a fork of a fork
             item = pagure.lib.model.Project(
                 user_id=1,  # pingou
                 name='test3',
                 description='test project #3',
-                parent_id=1,
+                parent_id=2,
                 hook_token='aaabbbjjj',
             )
             self.session.add(item)
