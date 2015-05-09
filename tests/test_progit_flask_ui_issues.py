@@ -945,7 +945,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/1/upload', data=data, follow_redirects=True)
             stream.close()
             self.assertEqual(output.status_code, 200)
-            print output.data
             json_data = json.loads(output.data)
 
             folder = os.path.dirname(
@@ -957,7 +956,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
                                 'be-%s_placebo.png' % folder,
                 'filename': '%s_placebo.png' % folder,
             }
-            print exp
             self.assertDictEqual(json_data, exp)
 
         # Project w/o issue tracker
