@@ -46,7 +46,7 @@ def check_api_acls(acls):
     if 'Authorization' in flask.request.headers:
         authorization = flask.request.headers['Authorization']
         if 'token' in authorization:
-            token_str = authorization.split('token')[1].strip()
+            token_str = authorization.split('token', 1)[1].strip()
 
     token_auth = False
     if token_str:
