@@ -227,6 +227,35 @@ def create_projects_git(folder, bare=False):
     return repos
 
 
+def create_tokens(session, user_id=1):
+    """ Create some tokens for the project in the database. """
+    item = pagure.lib.model.Token(
+        id='aaabbbcccddd',
+        user_id=user_id,
+        project_id=1,
+        expiration=datetime.utcnow() + timedelta(days=30)
+    )
+    session.add(item)
+
+    item = pagure.lib.model.Token(
+        id='foo_token',
+        user_id=user_id,
+        project_id=1,
+        expiration=datetime.utcnow() + timedelta(days=30)
+    )
+    session.add(item)
+
+    item = pagure.lib.model.Token(
+        id='expired_token',
+        user_id=user_id,
+        project_id=1,
+        expiration=datetime.utcnow() - timedelta(days=1)
+    )
+    session.add(item)
+
+    session.commit()
+
+
 def add_content_git_repo(folder):
     """ Create some content for the specified git repo. """
     if not os.path.exists(folder):
