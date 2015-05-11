@@ -959,6 +959,14 @@ class Token(BASE):
 
         return 'ACL: %s - name %s' % (self.id, self.name)
 
+    @property
+    def expired(self):
+        ''' Returns wether a token has expired or not. '''
+        if datetime.datetime.utcnow().date >= self.expiration.date():
+            return True
+        else:
+            return False
+
 
 class TokenAcl(BASE):
     """
