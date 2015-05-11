@@ -3,7 +3,7 @@
 
 Name:           pagure
 Version:        0.1.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A git-centered forge
 
 License:        GPLv2+
@@ -64,7 +64,7 @@ Requires:  python-wtforms
 Requires:  python-munch
 Requires:  mod_wsgi
 
-# No dependency of the app per say, but required to make it working.
+# No dependency of the app per se, but required to make it working.
 Requires:  gitolite
 
 
@@ -76,15 +76,17 @@ system and possibilities to create new projects, fork existing ones and
 create/merge pull-requests across or within projects.
 
 %package milters
-Summary: Milter to integrate pagure with emails
-BuildArch: noarch
-BuildRequires: python-pymilter
-BuildRequires: systemd-devel
-Requires: python-pymilter
-Requires: systemd
+Summary:            Milter to integrate pagure with emails
+BuildArch:          noarch
+BuildRequires:      python-pymilter
+BuildRequires:      systemd-devel
+Requires:           python-pymilter
+Requires(post):     systemd
+Requires(preun):    systemd
+Requires(postun):   systemd
 # It would work with sendmail but we configure things (like the tempfile)
 # to work with postfix
-Requires:  postfix
+Requires:           postfix
 
 
 %description milters
@@ -97,12 +99,11 @@ This is useful for example to allow commenting on a ticket by email.
 
 
 %build
-%{__python} setup.py build
+%{__python2} setup.py build
 
 
 %install
-rm -rf $RPM_BUILD_ROOT
-%{__python} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
+%{__python2} setup.py install -O1 --skip-build --root $RPM_BUILD_ROOT
 
 # Install apache configuration file
 mkdir -p $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/
@@ -130,8 +131,19 @@ install -m 644 milters/pagure_milter.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_milter.service
 
 
+%post milters
+%systemd_post pagure_milter.service
+
+%preun milters
+%systemd_preun pagure_milter.service
+
+%postun milters
+%systemd_postun_with_restart pagure_milter.service
+
+
 %files
-%doc README.rst LICENSE
+%doc README.rst
+%license LICENSE
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/pagure.conf
 %config(noreplace) %{_sysconfdir}/pagure/pagure.cfg
 %dir %{_sysconfdir}/pagure/
@@ -141,12 +153,20 @@ install -m 644 milters/pagure_milter.service \
 
 
 %files milters
+%license LICENSE
 %attr(755,postfix,postfix) %dir %{_localstatedir}/run/pagure
 %{_tmpfilesdir}/%{name}-milter.conf
 %{_unitdir}/pagure_milter.service
 
 
 %changelog
+* Sat May 09 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.2-2
+- Fix the Requires on the milter subpackage (adding: post, preun and postun)
+- Add systemd scriptlet to restart the service gracefully
+- Use versioned python macro (py2)
+- Ship the license in the milter subpackage as well
+- Use the %%license macro
+
 * Thu May 07 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.2-1
 - Update to 0.1.2
 - Fix bug in the fedmsg hook file (Thanks Zbigniew Jędrzejewski-Szmek)
