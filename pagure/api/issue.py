@@ -95,6 +95,10 @@ def new_issue(repo, username=None):
             output['error_code'] = 3
             output['error'] = API_ERROR_CODE[3]
             httpcode = 400
+    else:
+        output['error_code'] = 4
+        output['error'] = API_ERROR_CODE[4]
+        httpcode = 400
 
     jsonout = flask.jsonify(output)
     jsonout.status_code = httpcode
