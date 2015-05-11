@@ -31,46 +31,55 @@ API_ERROR_CODE = {
 }
 
 
-def api_login_required(f, acls=None):
+def api_login_required(acls=None):
     ''' Decorator used to indicate that authentication is required for some
     API endpoint.
     '''
-    flask.g.user = None
-    flask.g.token = None
 
-    @functools.wraps(f)
-    def decorated_function(*args, **kwargs):
-        print args, kwargs
-        token = None
-        token_str = None
-        apt_login = None
-        if 'Authorization' in flask.request.headers:
-            authorization = flask.request.headers['Authorization']
-            if 'token' in authorization:
-                token_str = authorization.split('token')[1]
+    def decorator(fn):
+        ''' The decorator of the function '''
 
-        token_auth = False
-        if token_str:
-            token = pagure.lib.get_api_token(SESSION, token_str)
-            if token and not token.expired:
-                token_auth = True
-                flask.g.user = token.user
-                flask.g.token = token
-                print token.acls
-                print 'Add check for token ACLs'
+        def decorated_function(*args, **kwargs):
+            ''' Actually does the job with the arguments provided. '''
 
-        if not token_auth:
-            output = {
-                "output": "notok",
-                "error": "Login invalid/expired. "
-                         "Please visit %s get or renew your API token." % (
-                         APP.config['APP_URL']),
-            }
-            jsonout = flask.jsonify(output)
-            jsonout.status_code = 401
-            return jsonout
-        return f(*args, **kwargs)
-    return decorated_function
+            flask.g.token = None
+            flask.g.user = None
+            #print args, kwargs
+            token = None
+            token_str = None
+            apt_login = None
+            if 'Authorization' in flask.request.headers:
+                authorization = flask.request.headers['Authorization']
+                if 'token' in authorization:
+                    token_str = authorization.split('token')[1].strip()
+
+            token_auth = False
+            if token_str:
+                token = pagure.lib.get_api_token(SESSION, token_str)
+                #print token
+                if token and not token.expired:
+                    if acls and set(token.acls_list).intersection(set(acls)):
+                        token_auth = True
+                        flask.g.user = token.user
+                        flask.g.token = token
+                        print 'Add check for token ACLs'
+
+            if not token_auth:
+                output = {
+                    "output": "notok",
+                    "error": "Invalid or expired token. "
+                             "Please visit %s get or renew your API token." % (
+                             APP.config['APP_URL']),
+                }
+                jsonout = flask.jsonify(output)
+                jsonout.status_code = 401
+                return jsonout
+
+            return fn(*args, **kwargs)
+
+        return functools.wraps(fn)(decorated_function)
+
+    return decorator
 
 
 from pagure.api import issue
