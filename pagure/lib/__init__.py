@@ -2024,3 +2024,16 @@ def is_group_member(session, user, groupname):
         return False
 
     return groupname in user.groups
+
+
+def get_api_token(session, token_str):
+    """ Return the Token object corresponding to the provided token string
+    if there is any, returns None otherwise.
+    """
+    query = session.query(
+        model.Token
+    ).filter(
+        model.Token.id == token_str
+    )
+
+    return query.first()
