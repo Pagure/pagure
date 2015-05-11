@@ -52,7 +52,7 @@ class PagureFlaskApiAuthtests(tests.Modeltests):
             {
               "error": "Invalid or expired token. Please visit " \
                   "https://pagure.org/ get or renew your API token.",
-              "output": "notok"
+              "error_code": 5,
             }
         )
 
@@ -66,7 +66,7 @@ class PagureFlaskApiAuthtests(tests.Modeltests):
             {
               "error": "Invalid or expired token. Please visit " \
                   "https://pagure.org/ get or renew your API token.",
-              "output": "notok"
+              "error_code": 5,
             }
         )
 
@@ -84,7 +84,7 @@ class PagureFlaskApiAuthtests(tests.Modeltests):
             {
               "error": "Invalid or expired token. Please visit " \
                   "https://pagure.org/ get or renew your API token.",
-              "output": "notok"
+              "error_code": 5,
             }
         )
 
@@ -98,7 +98,7 @@ class PagureFlaskApiAuthtests(tests.Modeltests):
             {
               "error": "Invalid or expired token. Please visit " \
                   "https://pagure.org/ get or renew your API token.",
-              "output": "notok"
+              "error_code": 5,
             }
         )
 
@@ -116,7 +116,7 @@ class PagureFlaskApiAuthtests(tests.Modeltests):
             {
               "error": "Invalid or expired token. Please visit " \
                   "https://pagure.org/ get or renew your API token.",
-              "output": "notok"
+              "error_code": 5,
             }
         )
 
@@ -130,7 +130,7 @@ class PagureFlaskApiAuthtests(tests.Modeltests):
             {
               "error": "Invalid or expired token. Please visit " \
                   "https://pagure.org/ get or renew your API token.",
-              "output": "notok"
+              "error_code": 5,
             }
         )
 
@@ -150,7 +150,7 @@ class PagureFlaskApiAuthtests(tests.Modeltests):
             {
               "error": "Invalid or expired token. Please visit " \
                   "https://pagure.org/ get or renew your API token.",
-              "output": "notok"
+              "error_code": 5,
             }
         )
 
