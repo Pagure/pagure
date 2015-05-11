@@ -12,12 +12,6 @@ API namespace version 0.
 
 import functools
 
-
-try:
-    import fedmsg
-except ImportError:
-    fedmsg = None
-
 import flask
 
 API = flask.Blueprint('api_ns', __name__, url_prefix='/api/0')
@@ -63,7 +57,7 @@ def check_api_acls(acls):
         if token and not token.expired:
             if acls and set(token.acls_list).intersection(set(acls)):
                 token_auth = True
-                flask.g.user = token.user
+                flask.g.fas_user = token.user
                 flask.g.token = token
                 print 'Add check for token ACLs'
 
@@ -126,17 +120,7 @@ def api_method(function):
                 )
             response.status_code = e.status_code
         else:
-            if fedmsg is None:
-                encoder = flask.jsonify
-            else:
-                if flask.request.is_xhr:
-                    encoder = fedmsg.encoding.dumps
-                else:
-                    encoder = fedmsg.encoding.pretty_dumps
-
-            response = flask.Response(
-                encoder(result), mimetype='application/json')
-            response.status_code = 200
+            response = result
 
         return response
 
