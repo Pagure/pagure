@@ -40,6 +40,13 @@ def new_issue(repo, username=None):
         jsonout.status_code = 404
         return jsonout
 
+    if repo != flask.g.token.project:
+        output['error_code'] = 5
+        output['error'] = API_ERROR_CODE[5]
+        jsonout = flask.jsonify(output)
+        jsonout.status_code = 404
+        return jsonout
+
     status = pagure.lib.get_issue_statuses(SESSION)
     form = pagure.forms.IssueForm(status=status, csrf_token=False)
     if form.validate_on_submit():
