@@ -70,6 +70,38 @@ class PagureFlaskApiAuthtests(tests.Modeltests):
             }
         )
 
+    def test_auth_noacl(self):
+        """ Test the authentication when the token does not have any ACL.
+        """
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session)
+
+        output = self.app.post('/api/0/test/new_issue')
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid or expired token. Please visit " \
+                  "https://pagure.org/ get or renew your API token.",
+              "output": "notok"
+            }
+        )
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        output = self.app.post('/api/0/test/new_issue', headers=headers)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid or expired token. Please visit " \
+                  "https://pagure.org/ get or renew your API token.",
+              "output": "notok"
+            }
+        )
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
