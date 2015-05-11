@@ -983,7 +983,7 @@ class TokenAcl(BASE):
     __tablename__ = 'tokens_acls'
 
     token_id = sa.Column(
-        sa.Integer, sa.ForeignKey('tokens.id'), primary_key=True)
+        sa.String(64), sa.ForeignKey('tokens.id'), primary_key=True)
     acl_id = sa.Column(
         sa.Integer, sa.ForeignKey('acls.id'), primary_key=True)
 
