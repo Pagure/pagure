@@ -36,6 +36,8 @@ class PagureFlaskApiAuthtests(tests.Modeltests):
         pagure.APP.config['TESTING'] = True
         pagure.SESSION = self.session
         pagure.api.SESSION = self.session
+        pagure.api.issue.SESSION = self.session
+        pagure.lib.SESSION = self.session
         self.app = pagure.APP.test_client()
 
     def test_auth_no_data(self):
