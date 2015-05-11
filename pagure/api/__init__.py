@@ -34,6 +34,10 @@ API_ERROR_CODE = {
 
 
 def check_api_acls(acls):
+    ''' Checks if the user provided an API token with its request and if
+    this token allows the user to access the endpoint desired.
+    '''
+
     flask.g.token = None
     flask.g.user = None
     token = None
