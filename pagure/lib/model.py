@@ -962,7 +962,7 @@ class Token(BASE):
     @property
     def expired(self):
         ''' Returns wether a token has expired or not. '''
-        if datetime.datetime.utcnow().date >= self.expiration.date():
+        if datetime.datetime.utcnow().date() >= self.expiration.date():
             return True
         else:
             return False
