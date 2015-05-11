@@ -28,6 +28,7 @@ API_ERROR_CODE = {
     2: 'No issue tracker found for this project',
     3: 'An error occured at the database level and prevent the action from '
         'reaching completion',
+    4: 'Invalid or incomplete input submited',
 }
 
 
