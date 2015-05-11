@@ -946,6 +946,14 @@ class Token(BASE):
         secondaryjoin="acls.c.id==tokens_acls.c.acl_id",
     )
 
+    user = relation(
+        'User',
+        backref=backref(
+            'tokens', cascade="delete, delete-orphan",
+        ),
+        foreign_keys=[user_id],
+        remote_side=[User.id])
+
     def __repr__(self):
         ''' Return a string representation of this object. '''
 
