@@ -957,7 +957,7 @@ class Token(BASE):
     def __repr__(self):
         ''' Return a string representation of this object. '''
 
-        return 'ACL: %s - name %s' % (self.id, self.name)
+        return 'Token: %s - name %s' % (self.id, self.expiration)
 
     @property
     def expired(self):
