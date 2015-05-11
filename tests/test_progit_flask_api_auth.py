@@ -50,7 +50,7 @@ class PagureFlaskApiAuthtests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Login invalid/expired. Please visit " \
+              "error": "Invalid or expired token. Please visit " \
                   "https://pagure.org/ get or renew your API token.",
               "output": "notok"
             }
@@ -64,7 +64,7 @@ class PagureFlaskApiAuthtests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Login invalid/expired. Please visit " \
+              "error": "Invalid or expired token. Please visit " \
                   "https://pagure.org/ get or renew your API token.",
               "output": "notok"
             }
