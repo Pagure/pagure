@@ -18,7 +18,7 @@ from pagure.api import API, api_login_required, API_ERROR_CODE
 
 @API.route('/<repo>/new_issue', methods=['POST'])
 @API.route('/fork/<username>/<repo>/new_issue', methods=['POST'])
-@api_login_required
+@api_login_required(acls=['create_issue'])
 def new_issue(repo, username=None):
     """ Create a new issue
     """
