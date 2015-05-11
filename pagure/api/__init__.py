@@ -29,8 +29,9 @@ API_ERROR_CODE = {
     3: 'An error occured at the database level and prevent the action from '
         'reaching completion',
     4: 'Invalid or incomplete input submited',
+    5: 'Invalid or expired token. Please visit %s get or renew your '
+        'API token.' % APP.config['APP_URL']
 }
-
 
 
 def check_api_acls(acls):
@@ -61,10 +62,8 @@ def check_api_acls(acls):
 
     if not token_auth:
         output = {
-            "output": "notok",
-            "error": "Invalid or expired token. "
-                     "Please visit %s get or renew your API token." % (
-                     APP.config['APP_URL']),
+            'error_code': 5,
+            'error': API_ERROR_CODE[5],
         }
         jsonout = flask.jsonify(output)
         jsonout.status_code = 401
