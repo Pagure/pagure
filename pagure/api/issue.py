@@ -11,14 +11,16 @@
 import flask
 
 import pagure
+import pagure.exceptions
 import pagure.lib
 from pagure import APP, SESSION
-from pagure.api import API, api_login_required, API_ERROR_CODE
+from pagure.api import API, api_method, api_login_required, API_ERROR_CODE
 
 
 @API.route('/<repo>/new_issue', methods=['POST'])
 @API.route('/fork/<username>/<repo>/new_issue', methods=['POST'])
 @api_login_required(acls=['create_issue'])
+@api_method
 def new_issue(repo, username=None):
     """ Create a new issue
     """
@@ -27,25 +29,14 @@ def new_issue(repo, username=None):
     output = {}
 
     if repo is None:
-        output['error_code'] = 1
-        output['error'] = API_ERROR_CODE[1]
-        jsonout = flask.jsonify(output)
-        jsonout.status_code = 404
-        return jsonout
+        raise pagure.exceptions.APIError(404, error_code=1)
 
     if not repo.settings.get('issue_tracker', True):
-        output['error_code'] = 2
-        output['error'] = API_ERROR_CODE[2]
-        jsonout = flask.jsonify(output)
-        jsonout.status_code = 404
-        return jsonout
+        raise pagure.exceptions.APIError(404, error_code=2)
+
 
     if repo != flask.g.token.project:
-        output['error_code'] = 5
-        output['error'] = API_ERROR_CODE[5]
-        jsonout = flask.jsonify(output)
-        jsonout.status_code = 404
-        return jsonout
+        raise pagure.exceptions.APIError(401, error_code=5)
 
     status = pagure.lib.get_issue_statuses(SESSION)
     form = pagure.forms.IssueForm(status=status, csrf_token=False)
@@ -94,18 +85,13 @@ def new_issue(repo, username=None):
             output['message'] = 'issue created'
             output['message'] = 'issue created'
         except pagure.exceptions.PagureException, err:
-            output['error_code'] = 0
-            output['error'] = str(err)
-            httpcode = 400
+            raise pagure.exceptions.APIError(
+                400, error_code=0, error=str(err))
         except SQLAlchemyError, err:  # pragma: no cover
-            SESSION.rollback()
-            output['error_code'] = 3
-            output['error'] = API_ERROR_CODE[3]
-            httpcode = 400
+            raise pagure.exceptions.APIError(400, error_code=3)
+
     else:
-        output['error_code'] = 4
-        output['error'] = API_ERROR_CODE[4]
-        httpcode = 400
+        raise pagure.exceptions.APIError(400, error_code=4)
 
     jsonout = flask.jsonify(output)
     jsonout.status_code = httpcode
