@@ -32,6 +32,12 @@ API_ERROR_CODE = {
 
 
 def api_login_required(f, acls=None):
+    ''' Decorator used to indicate that authentication is required for some
+    API endpoint.
+    '''
+    flask.g.user = None
+    flask.g.token = None
+
     @functools.wraps(f)
     def decorated_function(*args, **kwargs):
         print args, kwargs
@@ -49,6 +55,7 @@ def api_login_required(f, acls=None):
             if token and not token.expired:
                 token_auth = True
                 flask.g.user = token.user
+                flask.g.token = token
                 print token.acls
                 print 'Add check for token ACLs'
 
