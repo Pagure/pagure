@@ -22,6 +22,15 @@ import pagure
 import pagure.lib
 
 
+API_ERROR_CODE = {
+    0: 'Variable message describing the issue',
+    1: 'Project not found',
+    2: 'No issue tracker found for this project',
+    3: 'An error occured at the database level and prevent the action from '
+        'reaching completion',
+}
+
+
 def api_login_required(f, acls=None):
     @functools.wraps(f)
     def decorated_function(*args, **kwargs):
