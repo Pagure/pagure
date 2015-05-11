@@ -893,6 +893,84 @@ class ProjectGroup(BASE):
             'project_id', 'group_id'),
     )
 
+#
+# Class and tables specific for the API/token access
+#
+
+class ACL(BASE):
+    """
+    Table listing all the rights a token can be given
+    """
+
+    __tablename__ = 'acls'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    name = sa.Column(sa.String(32), unique=True, nullable=False)
+    description = sa.Column(sa.Text(), nullable=False)
+    created = sa.Column(
+        sa.DateTime, nullable=False, default=datetime.datetime.utcnow)
+
+    def __repr__(self):
+        ''' Return a string representation of this object. '''
+
+        return 'ACL: %s - name %s' % (self.id, self.name)
+
+
+class Token(BASE):
+    """
+    Table listing all the tokens per user and per project
+    """
+
+    __tablename__ = 'tokens'
+
+    id = sa.Column(sa.String(64), primary_key=True)
+    user_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey('users.id', onupdate='CASCADE'),
+        nullable=False,
+        index=True)
+    project_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey('projects.id', onupdate='CASCADE'),
+        nullable=False,
+        index=True)
+    expiration = sa.Column(
+        sa.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    created = sa.Column(
+        sa.DateTime, nullable=False, default=datetime.datetime.utcnow)
+
+    acls = relation(
+        "ACL",
+        secondary="tokens_acls",
+        primaryjoin="tokens.c.id==tokens_acls.c.token_id",
+        secondaryjoin="acls.c.id==tokens_acls.c.acl_id",
+    )
+
+    def __repr__(self):
+        ''' Return a string representation of this object. '''
+
+        return 'ACL: %s - name %s' % (self.id, self.name)
+
+
+class TokenAcl(BASE):
+    """
+    Association table linking the tokens table to the acls table.
+    This allow linking token to acl.
+    """
+
+    __tablename__ = 'tokens_acls'
+
+    token_id = sa.Column(
+        sa.Integer, sa.ForeignKey('tokens.id'), primary_key=True)
+    acl_id = sa.Column(
+        sa.Integer, sa.ForeignKey('acls.id'), primary_key=True)
+
+    # Constraints
+    __table_args__ = (
+        sa.UniqueConstraint(
+            'token_id', 'acl_id'),
+    )
+
 
 # ##########################################################
 # These classes are only used if you're using the `local`
