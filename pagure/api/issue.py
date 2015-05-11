@@ -10,6 +10,8 @@
 
 import flask
 
+from sqlalchemy.exc import SQLAlchemyError
+
 import pagure
 import pagure.exceptions
 import pagure.lib
@@ -39,7 +41,7 @@ def new_issue(repo, username=None):
         raise pagure.exceptions.APIError(401, error_code=5)
 
     status = pagure.lib.get_issue_statuses(SESSION)
-    form = pagure.forms.IssueForm(status=status, csrf_token=False)
+    form = pagure.forms.IssueForm(status=status, csrf_enabled=False)
     if form.validate_on_submit():
         title = form.title.data
         content = form.issue_content.data
