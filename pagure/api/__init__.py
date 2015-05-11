@@ -171,7 +171,6 @@ def api_project_tags(repo, username=None):
     )
 
 
-
 @API.route('/groups/')
 @API.route('/groups')
 def api_groups():
