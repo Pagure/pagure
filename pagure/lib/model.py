@@ -954,6 +954,14 @@ class Token(BASE):
         foreign_keys=[user_id],
         remote_side=[User.id])
 
+    project = relation(
+        'Project',
+        backref=backref(
+            'tokens', cascade="delete, delete-orphan",
+        ),
+        foreign_keys=[project_id],
+        remote_side=[Project.id])
+
     def __repr__(self):
         ''' Return a string representation of this object. '''
 
