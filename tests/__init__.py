@@ -268,6 +268,18 @@ def create_acls(session):
     session.commit()
 
 
+def create_tokens_acl(session):
+    """ Create some acls for the tokens. """
+    for aclid in range(3):
+        item = pagure.lib.model.TokenAcl(
+            token_id='aaabbbcccddd',
+            acl_id=aclid,
+        )
+        session.add(item)
+
+    session.commit()
+
+
 def add_content_git_repo(folder):
     """ Create some content for the specified git repo. """
     if not os.path.exists(folder):
