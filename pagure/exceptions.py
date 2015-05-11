@@ -28,3 +28,12 @@ class FileNotFoundException(PagureException):
     exists.
     '''
     pass
+
+
+class APIError(PagureException):
+    ''' Exception raised by the API when something goes wrong. '''
+
+    def __init__(self, status_code, error_code, error=None):
+        self.status_code = status_code
+        self.error_code = error_code
+        self.error = error
