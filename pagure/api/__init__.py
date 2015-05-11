@@ -10,6 +10,8 @@ API namespace version 0.
 
 """
 
+import functools
+
 import flask
 
 API = flask.Blueprint('api_ns', __name__, url_prefix='/api/0')
@@ -18,6 +20,41 @@ API = flask.Blueprint('api_ns', __name__, url_prefix='/api/0')
 from pagure import __api_version__, APP, SESSION
 import pagure
 import pagure.lib
+
+
+def api_login_required(f, acls=None):
+    @functools.wraps(f)
+    def decorated_function(*args, **kwargs):
+        print args, kwargs
+        token = None
+        token_str = None
+        apt_login = None
+        if 'Authorization' in flask.request.headers:
+            authorization = flask.request.headers['Authorization']
+            if 'token' in authorization:
+                token_str = authorization.split('token')[1]
+
+        token_auth = False
+        if token_str:
+            token = pagure.lib.get_api_token(SESSION, token_str)
+            if token and not token.expired:
+                token_auth = True
+                flask.g.user = token.user
+                print token.acls
+                print 'Add check for token ACLs'
+
+        if not token_auth:
+            output = {
+                "output": "notok",
+                "error": "Login invalid/expired. "
+                         "Please visit %s get or renew your API token." % (
+                         APP.config['APP_URL']),
+            }
+            jsonout = flask.jsonify(output)
+            jsonout.status_code = 401
+            return jsonout
+        return f(*args, **kwargs)
+    return decorated_function
 
 
 @API.route('/version/')
