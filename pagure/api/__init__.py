@@ -12,14 +12,16 @@ API namespace version 0.
 
 import functools
 
+import fedmsg
 import flask
 
 API = flask.Blueprint('api_ns', __name__, url_prefix='/api/0')
 
 
-from pagure import __api_version__, APP, SESSION
 import pagure
 import pagure.lib
+from pagure import __api_version__, APP, SESSION
+from pagure.exceptions import APIError
 
 
 API_ERROR_CODE = {
@@ -90,6 +92,47 @@ def api_login_required(acls=None):
         return decorated_function
 
     return decorator
+
+
+def api_method(function):
+    ''' Runs an API endpoint and catch all the APIException thrown. '''
+
+    @functools.wraps(function)
+    def wrapper(*args, **kwargs):
+        try:
+            result = function(*args, **kwargs)
+        except APIError as e:
+            if e.error_code in [3]:
+                APP.log.exception(e)
+
+            if e.error_code in [0]:
+                response = flask.jsonify(
+                    {
+                        'error': e.error,
+                        'error_code': e.error_code
+                    }
+                )
+            else:
+                response = flask.jsonify(
+                    {
+                        'error': API_ERROR_CODE[e.error_code],
+                        'error_code': e.error_code
+                    }
+                )
+            response.status_code = e.status_code
+        else:
+            if flask.request.is_xhr:
+                encoder = fedmsg.encoding.dumps
+            else:
+                encoder = fedmsg.encoding.pretty_dumps
+
+            response = flask.Response(
+                encoder(result), mimetype='application/json')
+            response.status_code = 200
+
+        return response
+
+    return wrapper
 
 
 from pagure.api import issue
