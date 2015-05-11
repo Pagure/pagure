@@ -66,6 +66,9 @@ def api_login_required(f, acls=None):
     return decorated_function
 
 
+from pagure.api import issue
+
+
 @API.route('/version/')
 @API.route('/version')
 def api_version():

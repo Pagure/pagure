@@ -389,8 +389,10 @@ import pagure.ui.issues
 import pagure.ui.plugins
 import pagure.ui.repo
 
-import pagure.api
-APP.register_blueprint(pagure.api.API)
+from pagure.api import API
+from pagure.api import issue
+APP.register_blueprint(API)
+
 import pagure.internal
 APP.register_blueprint(pagure.internal.PV)
 
