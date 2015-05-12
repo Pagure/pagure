@@ -38,12 +38,17 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         pagure.api.SESSION = self.session
         pagure.api.issue.SESSION = self.session
         pagure.lib.SESSION = self.session
+
+        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
+            tests.HERE, 'tickets')
+
         self.app = pagure.APP.test_client()
 
     def test_api_new_issue(self):
         """ Test the token based authentication.
         """
         tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(tests.HERE, 'tickets'))
         tests.create_tokens(self.session)
         tests.create_acls(self.session)
         tests.create_tokens_acl(self.session)
