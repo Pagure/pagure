@@ -36,6 +36,11 @@ API_ERROR_CODE = {
     7: 'You are not allowed to view this issue',
     8: 'Pull-Request have been deactivated for this project',
     9: 'Pull-Request not found',
+    10: 'You are not allowed to merge pull-request for this project',
+    11: 'This request does not have the minimum review score necessary to '
+        'be merged',
+    12: 'Only the assignee can merge this review',
+    13: 'This request must be assigned to be merged',
 }
 
 
