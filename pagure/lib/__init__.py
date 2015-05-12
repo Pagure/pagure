@@ -2050,3 +2050,36 @@ def get_acls(session):
     )
 
     return query.all()
+
+
+def add_token_to_user(session, project, acls, username):
+    """ Create a new token for the specified user on the specified project
+    with the given ACLs.
+    """
+    acls_obj = session.query(
+        model.ACL
+    ).filter(
+        model.ACL.name.in_(acls)
+    ).all()
+
+    user = search_user(session, username=username)
+
+    token = pagure.lib.model.Token(
+        id=pagure.lib.login.id_generator(64),
+        user_id=user.id,
+        project_id=project.id,
+        expiration=datetime.datetime.utcnow() + datetime.timedelta(days=60)
+    )
+    session.add(token)
+    session.flush()
+
+    for acl in acls_obj:
+        item = pagure.lib.model.TokenAcl(
+            token_id=token.id,
+            acl_id=acl.id,
+        )
+        session.add(item)
+
+    session.commit()
+
+    return 'Token created'
