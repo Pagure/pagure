@@ -1,0 +1,36 @@
+{% extends "master.html" %}
+{% from "_formhelper.html" import render_field_in_row %}
+
+{% block title %}Create token{% endblock %}
+{%block tag %}home{% endblock %}
+
+
+{% block content %}
+
+<h2>Create a new token</h2>
+
+<section class="new_token">
+    <form action="{{
+        url_for('.add_token', username=username, repo=repo.name)
+    }}" method="post">
+
+    <table>
+      {% for acl in acls %}
+      <tr>
+          <td>
+            <input type="checkbox" name="acls" value="{{ acl.name }}">
+          </td>
+          <td>{{ acl.description }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    <p class="buttons indent">
+      <input type="submit" class="submit positive button" value="Add">
+      <input type="button" value="Cancel" class="button"
+       onclick="history.back();">
+      {{ form.csrf_token }}
+    </p>
+  </form>
+</section>
+
+{% endblock %}

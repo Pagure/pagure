@@ -986,3 +986,51 @@ def regenerate_git(repo, username=None):
     return flask.redirect(
         flask.url_for('.view_settings', repo=repo.name, username=username)
     )
+
+
+@APP.route('/<repo>/token/new', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/token/new', methods=('GET', 'POST'))
+@cla_required
+def add_token(repo, username=None):
+    """ Add a token to a specified project.
+    """
+    if admin_session_timedout():
+        return flask.redirect(
+            flask.url_for('auth_login', next=flask.request.url))
+
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    acls = pagure.lib.get_acls(SESSION)
+    form = pagure.forms.NewTokenForm(acls=acls)
+
+    print flask.request.form
+    if form.validate_on_submit():
+        print form.acls.data
+        try:
+            msg = pagure.lib.add_token_to_user(
+                SESSION,
+                repo,
+                acls=form.acls.data,
+                username=flask.g.fas_user.username,
+            )
+            SESSION.commit()
+            flask.flash(msg)
+            return flask.redirect(
+                flask.url_for(
+                    '.view_settings', repo=repo.name, username=username)
+            )
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash('User could not be added', 'error')
+
+    return flask.render_template(
+        'add_token.html',
+        form=form,
+        acls=acls,
+        username=username,
+        repo=repo,
+    )
