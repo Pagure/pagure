@@ -236,6 +236,51 @@ class PagureFlaskApiForktests(tests.Modeltests):
             }
         )
 
+        # Invalid PR
+        output = self.app.post(
+            '/api/0/test/pull-request/2/close', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'error': 'Pull-Request not found', 'error_code': 9}
+        )
+
+        # Create a token for foo for this project
+        item = pagure.lib.model.Token(
+            id='foobar_token',
+            user_id=2,
+            project_id=1,
+            expiration=datetime.datetime.utcnow() + datetime.timedelta(
+                days=30)
+        )
+        self.session.add(item)
+        self.session.commit()
+        item = pagure.lib.model.TokenAcl(
+            token_id='foobar_token',
+            acl_id=6,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        headers = {'Authorization': 'token foobar_token'}
+
+        # User not admin
+        output = self.app.post(
+            '/api/0/test/pull-request/1/close', headers=headers)
+        self.assertEqual(output.status_code, 403)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                'error': 'You are not allowed to merge/close pull-request '
+                    'for this project',
+                'error_code': 10
+            }
+        )
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
         # Close PR
         output = self.app.post(
             '/api/0/test/pull-request/1/close', headers=headers)
@@ -301,7 +346,52 @@ class PagureFlaskApiForktests(tests.Modeltests):
             }
         )
 
-        # Close PR
+        # Invalid PR
+        output = self.app.post(
+            '/api/0/test/pull-request/2/merge', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'error': 'Pull-Request not found', 'error_code': 9}
+        )
+
+        # Create a token for foo for this project
+        item = pagure.lib.model.Token(
+            id='foobar_token',
+            user_id=2,
+            project_id=1,
+            expiration=datetime.datetime.utcnow() + datetime.timedelta(
+                days=30)
+        )
+        self.session.add(item)
+        self.session.commit()
+        item = pagure.lib.model.TokenAcl(
+            token_id='foobar_token',
+            acl_id=2,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        headers = {'Authorization': 'token foobar_token'}
+
+        # User not admin
+        output = self.app.post(
+            '/api/0/test/pull-request/1/merge', headers=headers)
+        self.assertEqual(output.status_code, 403)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                'error': 'You are not allowed to merge/close pull-request '
+                    'for this project',
+                'error_code': 10
+            }
+        )
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Merge PR
         output = self.app.post(
             '/api/0/test/pull-request/1/merge', headers=headers)
         self.assertEqual(output.status_code, 200)
