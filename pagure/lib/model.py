@@ -31,7 +31,7 @@ ERROR_LOG = logging.getLogger('pagure.model')
 # pylint: disable=C0103,R0903,W0232,E1101
 
 
-def create_tables(db_url, alembic_ini=None, debug=False):
+def create_tables(db_url, alembic_ini=None, acls=None, debug=False):
     """ Create the tables in the database using the information from the
     url obtained.
 
@@ -72,11 +72,11 @@ def create_tables(db_url, alembic_ini=None, debug=False):
 
     scopedsession = scoped_session(sessionmaker(bind=engine))
     # Insert the default data into the db
-    create_default_status(scopedsession)
+    create_default_status(scopedsession, acls=acls)
     return scopedsession
 
 
-def create_default_status(session):
+def create_default_status(session, acls=None):
     """ Insert the defaults status in the status tables.
     """
 
@@ -97,6 +97,18 @@ def create_default_status(session):
         except SQLAlchemyError:  # pragma: no cover
             session.rollback()
             ERROR_LOG.debug('Type %s could not be added', grptype)
+
+    for acl in acls or {}:
+        item = ACL(
+            name=acl,
+            description=acls[acl]
+        )
+        session.add(item)
+        try:
+            session.commit()
+        except SQLAlchemyError:  # pragma: no cover
+            session.rollback()
+            ERROR_LOG.debug('ACL %s could not be added', acl)
 
 
 class StatusIssue(BASE):
