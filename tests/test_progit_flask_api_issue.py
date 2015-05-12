@@ -111,6 +111,53 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             {'message': 'issue created'}
         )
 
+    def test_api_view_issue(self):
+        """ Test the api_view_issue method of the flask api. """
+        self.test_api_new_issue()
+
+        # Valid token, wrong project
+        output = self.app.get('/api/0/test2/issue/1')
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Issue not found",
+              "error_code": 6
+            }
+        )
+
+        # No input
+        output = self.app.get('/api/0/test/issue/1')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        data['date_created'] = '1431414800'
+        self.assertDictEqual(
+            data,
+            {
+              "assignee": None,
+              "blocks": [],
+              "comments": [],
+              "content": "This issue needs attention",
+              "date_created": "1431414800",
+              "depends": [],
+              "id": 1,
+              "private": False,
+              "status": "Open",
+              "tags": [],
+              "title": "test issue",
+              "user": {
+                "default_email": "bar@pingou.com",
+                "emails": [
+                  "bar@pingou.com",
+                  "foo@pingou.com"
+                ],
+                "fullname": "PY C",
+                "name": "pingou"
+              }
+            }
+        )
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
