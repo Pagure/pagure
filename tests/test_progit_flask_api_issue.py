@@ -11,6 +11,7 @@
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
+import datetime
 import unittest
 import shutil
 import sys
@@ -81,6 +82,19 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = {
             'title': 'test issue',
         }
+
+        # Invalid repo
+        output = self.app.post(
+            '/api/0/foo/new_issue', data=data, headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Project not found",
+              "error_code": 1
+            }
+        )
 
         # Incomplete request
         output = self.app.post(
@@ -253,6 +267,18 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
 
         headers = {'Authorization': 'token aaabbbcccddd'}
 
+        # Invalid project
+        output = self.app.post('/api/0/foo/issue/1/status', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Project not found",
+              "error_code": 1
+            }
+        )
+
         # Valid token, wrong project
         output = self.app.post('/api/0/test2/issue/1/status', headers=headers)
         self.assertEqual(output.status_code, 401)
@@ -292,13 +318,43 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #1')
 
+        # Create another project
+        item = pagure.lib.model.Project(
+            user_id=2,  # pingou
+            name='foo',
+            description='test project #3',
+            hook_token='aaabbbdddeee',
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        # Create a token for pingou for this project
+        item = pagure.lib.model.Token(
+            id='pingou_foo',
+            user_id=1,
+            project_id=3,
+            expiration=datetime.datetime.utcnow() + datetime.timedelta(
+                days=30)
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        # Give `change_status_issue` to this token
+        item = pagure.lib.model.TokenAcl(
+            token_id='pingou_foo',
+            acl_id=4,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        repo = pagure.lib.get_project(self.session, 'foo')
         # Create private issue
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
             title='Test issue',
             content='We should work on this',
-            user='pingou',
+            user='foo',
             ticketfolder=None,
             private=True,
         )
@@ -363,6 +419,21 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {'message': 'Edited successfully issue #1'}
+        )
+
+        headers = {'Authorization': 'token pingou_foo'}
+
+        # Un-authorized issue
+        output = self.app.post(
+            '/api/0/foo/issue/1/status', data=data, headers=headers)
+        self.assertEqual(output.status_code, 403)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "You are not allowed to view this issue",
+              "error_code": 7
+            }
         )
 
 
