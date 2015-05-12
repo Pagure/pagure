@@ -59,7 +59,6 @@ def check_api_acls(acls):
                 token_auth = True
                 flask.g.fas_user = token.user
                 flask.g.token = token
-                print 'Add check for token ACLs'
 
     if not token_auth:
         output = {
