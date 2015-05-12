@@ -502,111 +502,16 @@ def merge_request_pull(repo, requestid, username=None):
             'request_pull', username=username,
             repo=repo.name, requestid=requestid))
 
-    error_output = flask.url_for(
-        'request_pull', repo=repo.name, requestid=requestid,
-        username=username)
-
-    # Get the fork
-    repopath = pagure.get_repo_path(request.project_from)
-    fork_obj = pygit2.Repository(repopath)
-
-    # Get the original repo
-    parentpath = pagure.get_repo_path(request.project)
-
-    # Clone the original repo into a temp folder
-    newpath = tempfile.mkdtemp(prefix='pagure-pr-merge')
-    new_repo = pygit2.clone_repository(parentpath, newpath)
-
-    repo_commit = fork_obj[
-        fork_obj.lookup_branch(request.branch_from).get_object().hex]
-
-    ori_remote = new_repo.remotes[0]
-    # Add the fork as remote repo
-    reponame = '%s_%s' % (request.user.user, repo.name)
-    remote = new_repo.create_remote(reponame, repopath)
-
-    # Fetch the commits
-    remote.fetch()
-
-    merge = new_repo.merge(repo_commit.oid)
-    if merge is None:
-        mergecode = new_repo.merge_analysis(repo_commit.oid)[0]
-
     try:
-        branch_ref = new_repo.lookup_reference(
-            request.branch).resolve()
-    except ValueError:
-        branch_ref = new_repo.lookup_reference(
-            'refs/heads/%s' % request.branch).resolve()
-
-    refname = '%s:%s' % (branch_ref.name, branch_ref.name)
-    if (
-            (merge is not None and merge.is_uptodate)
-            or
-            (merge is None and
-             mergecode & pygit2.GIT_MERGE_ANALYSIS_UP_TO_DATE)):
-        flask.flash('Nothing to do, changes were already merged', 'error')
-        pagure.lib.close_pull_request(
-            SESSION, request, flask.g.fas_user.username,
-            requestfolder=APP.config['REQUESTS_FOLDER'])
-        try:
-            SESSION.commit()
-        except SQLAlchemyError as err:  # pragma: no cover
-            SESSION.rollback()
-            APP.logger.exception(err)
-            flask.flash('Could not close this pull-request', 'error')
-        return flask.redirect(error_output)
-    elif (
-            (merge is not None and merge.is_fastforward)
-            or
-            (merge is None and
-             mergecode & pygit2.GIT_MERGE_ANALYSIS_FASTFORWARD)):
-        if merge is not None:
-            # This is depending on the pygit2 version
-            branch_ref.target = merge.fastforward_oid
-        elif merge is None and mergecode is not None:
-            branch_ref.set_target(repo_commit.oid.hex)
-
-        ori_remote.push(refname)
-        flask.flash('Changes merged!')
-
-    else:
-        tree = None
-        try:
-            tree = new_repo.index.write_tree()
-        except pygit2.GitError:
-            shutil.rmtree(newpath)
-            flask.flash('Merge conflicts!', 'error')
-            return flask.redirect(flask.url_for(
-                'request_pull',
-                repo=repo.name,
-                username=username,
-                requestid=requestid))
-        head = new_repo.lookup_reference('HEAD').get_object()
-        new_repo.create_commit(
-            'refs/heads/master',
-            repo_commit.author,
-            repo_commit.committer,
-            'Merge #%s `%s`' % (request.id, request.title),
-            tree,
-            [head.hex, repo_commit.oid.hex])
-        ori_remote.push(refname)
-        flask.flash('Changes merged!')
-
-    # Update status
-    pagure.lib.close_pull_request(
-        SESSION, request, flask.g.fas_user.username,
-        requestfolder=APP.config['REQUESTS_FOLDER'],
-    )
-    try:
-        SESSION.commit()
-    except SQLAlchemyError as err:  # pragma: no cover
-        SESSION.rollback()
-        APP.logger.exception(err)
-        flask.flash(
-            'Could not update this pull-request in the database',
-            'error')
-    shutil.rmtree(newpath)
+        message = pagure.lib.git.merge_pull_request(
+            SESSION, repo, request, flask.g.fas_user.username,
+            APP.config['REQUESTS_FOLDER'])
+        flask.flash(message)
+    except pagure.exceptions.PagureException as err:
+        flask.flash(str(err), 'error')
+        return flask.redirect(flask.url_for(
+            'request_pull', repo=repo.name, requestid=requestid,
+            username=username))
 
     return flask.redirect(flask.url_for('view_repo', repo=repo.name))
 

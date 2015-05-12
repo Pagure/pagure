@@ -732,3 +732,108 @@ def get_username(abspath):
         if username.startswith('/'):
             username = username[1:]
     return username
+
+
+def merge_pull_request(session, repo, request, username, request_folder):
+    ''' Merge the specified pull-request.
+    '''
+    # Get the fork
+    repopath = pagure.get_repo_path(request.project_from)
+    fork_obj = pygit2.Repository(repopath)
+
+    # Get the original repo
+    parentpath = pagure.get_repo_path(request.project)
+
+    # Clone the original repo into a temp folder
+    newpath = tempfile.mkdtemp(prefix='pagure-pr-merge')
+    new_repo = pygit2.clone_repository(parentpath, newpath)
+
+    repo_commit = fork_obj[
+        fork_obj.lookup_branch(request.branch_from).get_object().hex]
+
+    ori_remote = new_repo.remotes[0]
+    # Add the fork as remote repo
+    reponame = '%s_%s' % (request.user.user, repo.name)
+    remote = new_repo.create_remote(reponame, repopath)
+
+    # Fetch the commits
+    remote.fetch()
+
+    merge = new_repo.merge(repo_commit.oid)
+    if merge is None:
+        mergecode = new_repo.merge_analysis(repo_commit.oid)[0]
+
+    try:
+        branch_ref = new_repo.lookup_reference(
+            request.branch).resolve()
+    except ValueError:
+        branch_ref = new_repo.lookup_reference(
+            'refs/heads/%s' % request.branch).resolve()
+
+    refname = '%s:%s' % (branch_ref.name, branch_ref.name)
+    if (
+            (merge is not None and merge.is_uptodate)
+            or
+            (merge is None and
+             mergecode & pygit2.GIT_MERGE_ANALYSIS_UP_TO_DATE)):
+        pagure.lib.close_pull_request(
+            session, request, username,
+            requestfolder=request_folder)
+        try:
+            session.commit()
+        except SQLAlchemyError as err:  # pragma: no cover
+            session.rollback()
+            APP.logger.exception(err)
+            shutil.rmtree(newpath)
+            raise pagure.exceptions.PagureException(
+                'Could not close this pull-request')
+        raise pagure.exceptions.PagureException(
+            'Nothing to do, changes were already merged')
+
+    elif (
+            (merge is not None and merge.is_fastforward)
+            or
+            (merge is None and
+             mergecode & pygit2.GIT_MERGE_ANALYSIS_FASTFORWARD)):
+        if merge is not None:
+            # This is depending on the pygit2 version
+            branch_ref.target = merge.fastforward_oid
+        elif merge is None and mergecode is not None:
+            branch_ref.set_target(repo_commit.oid.hex)
+
+        ori_remote.push(refname)
+
+    else:
+        tree = None
+        try:
+            tree = new_repo.index.write_tree()
+        except pygit2.GitError:
+            shutil.rmtree(newpath)
+            raise pagure.exceptions.PagureException('Merge conflicts!')
+
+        head = new_repo.lookup_reference('HEAD').get_object()
+        new_repo.create_commit(
+            'refs/heads/master',
+            repo_commit.author,
+            repo_commit.committer,
+            'Merge #%s `%s`' % (request.id, request.title),
+            tree,
+            [head.hex, repo_commit.oid.hex])
+        ori_remote.push(refname)
+
+    # Update status
+    pagure.lib.close_pull_request(
+        session, request, username,
+        requestfolder=request_folder,
+    )
+    try:
+        session.commit()
+    except SQLAlchemyError as err:  # pragma: no cover
+        session.rollback()
+        APP.logger.exception(err)
+        shutil.rmtree(newpath)
+        raise pagure.exceptions.PagureException(
+            'Could not update this pull-request in the database')
+    shutil.rmtree(newpath)
+
+    return 'Changes merged!'
