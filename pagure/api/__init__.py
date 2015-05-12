@@ -34,6 +34,8 @@ API_ERROR_CODE = {
         'API token.' % APP.config['APP_URL'],
     6: 'Issue not found',
     7: 'You are not allowed to view this issue',
+    8: 'Pull-Request have been deactivated for this project',
+    9: 'Pull-Request not found',
 }
 
 
