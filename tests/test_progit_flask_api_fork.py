@@ -184,6 +184,68 @@ class PagureFlaskApiForktests(tests.Modeltests):
         data2['date_created'] = '1431414800'
         self.assertDictEqual(data, data2)
 
+    def test_api_pull_request_close(self):
+        """ Test the api_pull_request_close method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session)
+        tests.create_acls(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Create the pull-request to close
+        repo = pagure.lib.get_project(self.session, 'test')
+        forked_repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Request created')
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Invalid project
+        output = self.app.post(
+            '/api/0/foo/pull-request/1/close', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Project not found",
+              "error_code": 1
+            }
+        )
+
+        # Valid token, wrong project
+        output = self.app.post(
+            '/api/0/test2/pull-request/1/close', headers=headers)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid or expired token. Please visit " \
+                  "https://pagure.org/ get or renew your API token.",
+              "error_code": 5
+            }
+        )
+
+        # Close PR
+        output = self.app.post(
+            '/api/0/test/pull-request/1/close', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {"message": "Request pull canceled!"}
+        )
+
     def test_api_pull_request_add_comment(self):
         """ Test the api_pull_request_add_comment method of the flask api. """
         tests.create_projects(self.session)
