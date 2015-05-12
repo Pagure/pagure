@@ -37,7 +37,7 @@ API_ERROR_CODE = {
 }
 
 
-def check_api_acls(acls):
+def check_api_acls(acls, optional=False):
     ''' Checks if the user provided an API token with its request and if
     this token allows the user to access the endpoint desired.
     '''
@@ -55,9 +55,12 @@ def check_api_acls(acls):
     token_auth = False
     if token_str:
         token = pagure.lib.get_api_token(SESSION, token_str)
-        #print token
         if token and not token.expired:
             if acls and set(token.acls_list).intersection(set(acls)):
+                token_auth = True
+                flask.g.fas_user = token.user
+                flask.g.token = token
+            elif not acls and optional:
                 token_auth = True
                 flask.g.fas_user = token.user
                 flask.g.token = token
