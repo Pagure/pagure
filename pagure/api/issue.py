@@ -23,7 +23,7 @@ from pagure.api import (
 
 @API.route('/<repo>/new_issue', methods=['POST'])
 @API.route('/fork/<username>/<repo>/new_issue', methods=['POST'])
-@api_login_required(acls=['create_issue'])
+@api_login_required(acls=['issue_create'])
 @api_method
 def api_new_issue(repo, username=None):
     """ Create a new issue
@@ -133,7 +133,7 @@ def api_view_issue(repo, issueid, username=None):
 
 @API.route('/<repo>/issue/<int:issueid>/status', methods=['POST'])
 @API.route('/fork/<username>/<repo>/<int:issueid>/status', methods=['POST'])
-@api_login_required(acls=['change_status_issue'])
+@api_login_required(acls=['issue_change_status'])
 @api_method
 def api_change_status_issue(repo, issueid, username=None):
     """ Change the status of an issue
@@ -195,7 +195,7 @@ def api_change_status_issue(repo, issueid, username=None):
 
 @API.route('/<repo>/issue/<int:issueid>/comment', methods=['POST'])
 @API.route('/fork/<username>/<repo>/<int:issueid>/comment', methods=['POST'])
-@api_login_required(acls=['comment_issue'])
+@api_login_required(acls=['issue_comment'])
 @api_method
 def api_comment_issue(repo, issueid, username=None):
     """ Add a comment to an issue
