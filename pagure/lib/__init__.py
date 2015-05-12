@@ -2037,3 +2037,16 @@ def get_api_token(session, token_str):
     )
 
     return query.first()
+
+
+def get_acls(session):
+    """ Returns all the possible ACLs a token can have according to the
+    database.
+    """
+    query = session.query(
+        model.ACL
+    ).order_by(
+        model.ACL.name
+    )
+
+    return query.all()
