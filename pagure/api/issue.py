@@ -191,3 +191,64 @@ def api_change_status_issue(repo, issueid, username=None):
     jsonout = flask.jsonify(output)
     jsonout.status_code = httpcode
     return jsonout
+
+
+@API.route('/<repo>/issue/<int:issueid>/comment', methods=['POST'])
+@API.route('/fork/<username>/<repo>/<int:issueid>/comment', methods=['POST'])
+@api_login_required(acls=['comment_issue'])
+@api_method
+def api_comment_issue(repo, issueid, username=None):
+    """ Add a comment to an issue
+    """
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    httpcode = 200
+    output = {}
+
+    if repo is None:
+        raise pagure.exceptions.APIError(404, error_code=1)
+
+    if not repo.settings.get('issue_tracker', True):
+        raise pagure.exceptions.APIError(404, error_code=2)
+
+    if repo.fullname != flask.g.token.project.fullname:
+        raise pagure.exceptions.APIError(401, error_code=5)
+
+    issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
+
+    if issue is None or issue.project != repo:
+        raise pagure.exceptions.APIError(404, error_code=6)
+
+    if issue.private and not is_repo_admin(repo) \
+            and (not authenticated() or
+                 not issue.user.user == flask.g.fas_user.username):
+        raise pagure.exceptions.APIError(403, error_code=7)
+
+    form = pagure.forms.CommentForm(csrf_enabled=False)
+    if form.validate_on_submit():
+        comment = form.comment.data
+        try:
+            # New comment
+            message = pagure.lib.add_issue_comment(
+                SESSION,
+                issue=issue,
+                comment=comment,
+                user=flask.g.fas_user.username,
+                ticketfolder=APP.config['TICKETS_FOLDER'],
+            )
+            SESSION.commit()
+            if message:
+                output['message'] = message
+            else:
+                output['message'] = 'No changes'
+        except pagure.exceptions.PagureException, err:
+            raise pagure.exceptions.APIError(
+                400, error_code=0, error=str(err))
+        except SQLAlchemyError, err:  # pragma: no cover
+            raise pagure.exceptions.APIError(400, error_code=3)
+
+    else:
+        raise pagure.exceptions.APIError(400, error_code=4)
+
+    jsonout = flask.jsonify(output)
+    jsonout.status_code = httpcode
+    return jsonout
