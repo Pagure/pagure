@@ -243,6 +243,128 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             }
         )
 
+    def test_api_change_status_issue(self):
+        """ Test the api_change_status_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(tests.HERE, 'tickets'))
+        tests.create_tokens(self.session)
+        tests.create_acls(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Valid token, wrong project
+        output = self.app.post('/api/0/test2/issue/1/status', headers=headers)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid or expired token. Please visit " \
+                  "https://pagure.org/ get or renew your API token.",
+              "error_code": 5
+            }
+        )
+
+        # No input
+        output = self.app.post('/api/0/test/issue/1/status', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Issue not found",
+              "error_code": 6
+            }
+        )
+
+        # Create normal issue
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #1',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None,
+            private=False,
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #1')
+
+        # Create private issue
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None,
+            private=True,
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        # Check status before
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(issue.status, 'Open')
+
+        data = {
+            'title': 'test issue',
+        }
+
+        # Incomplete request
+        output = self.app.post(
+            '/api/0/test/issue/1/status', data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid or incomplete input submited",
+              "error_code": 4
+            }
+        )
+
+        # No change
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(issue.status, 'Open')
+
+        data = {
+            'status': 'Open',
+        }
+
+        # Valid request but no change
+        output = self.app.post(
+            '/api/0/test/issue/1/status', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'No changes'}
+        )
+
+        # No change
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(issue.status, 'Open')
+
+        data = {
+            'status': 'Fixed',
+        }
+
+        # Valid request
+        output = self.app.post(
+            '/api/0/test/issue/1/status', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'Edited successfully issue #1'}
+        )
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
