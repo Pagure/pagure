@@ -87,9 +87,6 @@ def api_new_issue(repo, username=None):
 
             output['message'] = 'issue created'
             output['message'] = 'issue created'
-        except pagure.exceptions.PagureException, err:
-            raise pagure.exceptions.APIError(
-                400, error_code=0, error=str(err))
         except SQLAlchemyError, err:  # pragma: no cover
             raise pagure.exceptions.APIError(400, error_code=3)
 
@@ -128,7 +125,6 @@ def api_view_issue(repo, issueid, username=None):
             and (not authenticated() or
                  not issue.user.user == flask.g.fas_user.username):
         raise pagure.exceptions.APIError(403, error_code=7)
-
 
     jsonout = flask.jsonify(issue.to_json())
     jsonout.status_code = httpcode
