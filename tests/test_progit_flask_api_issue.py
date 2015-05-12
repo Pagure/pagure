@@ -44,8 +44,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.app = pagure.APP.test_client()
 
     def test_api_new_issue(self):
-        """ Test the token based authentication.
-        """
+        """ Test the api_new_issue method of the flask api. """
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(tests.HERE, 'tickets'))
         tests.create_tokens(self.session)
