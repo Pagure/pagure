@@ -31,7 +31,9 @@ API_ERROR_CODE = {
         'reaching completion',
     4: 'Invalid or incomplete input submited',
     5: 'Invalid or expired token. Please visit %s get or renew your '
-        'API token.' % APP.config['APP_URL']
+        'API token.' % APP.config['APP_URL'],
+    6: 'Issue not found',
+    7: 'You are not allowed to view this issue',
 }
 
 

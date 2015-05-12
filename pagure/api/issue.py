@@ -36,7 +36,6 @@ def api_new_issue(repo, username=None):
     if not repo.settings.get('issue_tracker', True):
         raise pagure.exceptions.APIError(404, error_code=2)
 
-
     if repo != flask.g.token.project:
         raise pagure.exceptions.APIError(401, error_code=5)
 
@@ -96,5 +95,38 @@ def api_new_issue(repo, username=None):
         raise pagure.exceptions.APIError(400, error_code=4)
 
     jsonout = flask.jsonify(output)
+    jsonout.status_code = httpcode
+    return jsonout
+
+
+@API.route('/<repo>/issue/<int:issueid>')
+@API.route('/fork/<username>/<repo>/issue/<int:issueid>')
+@api_method
+def api_view_issue(repo, issueid, username=None):
+    """ List all issues associated to a repo
+    """
+
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    httpcode = 200
+    output = {}
+
+    if repo is None:
+        raise pagure.exceptions.APIError(404, error_code=1)
+
+    if not repo.settings.get('issue_tracker', True):
+        raise pagure.exceptions.APIError(404, error_code=2)
+
+    issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
+
+    if issue is None or issue.project != repo:
+        raise pagure.exceptions.APIError(404, error_code=6)
+
+    if issue.private and not is_repo_admin(repo) \
+            and (not authenticated() or
+                 not issue.user.user == flask.g.fas_user.username):
+        raise pagure.exceptions.APIError(403, error_code=7)
+
+
+    jsonout = flask.jsonify(issue.to_json())
     jsonout.status_code = httpcode
     return jsonout
