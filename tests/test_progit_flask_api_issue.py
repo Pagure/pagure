@@ -115,7 +115,19 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         """ Test the api_view_issue method of the flask api. """
         self.test_api_new_issue()
 
-        # Valid token, wrong project
+        # Invalid repo
+        output = self.app.get('/api/0/foo/issue/1')
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Project not found",
+              "error_code": 1
+            }
+        )
+
+        # Invalid issue for this repo
         output = self.app.get('/api/0/test2/issue/1')
         self.assertEqual(output.status_code, 404)
         data = json.loads(output.data)
@@ -127,7 +139,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             }
         )
 
-        # No input
+        # Valid issue
         output = self.app.get('/api/0/test/issue/1')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
@@ -146,6 +158,79 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "status": "Open",
               "tags": [],
               "title": "test issue",
+              "user": {
+                "default_email": "bar@pingou.com",
+                "emails": [
+                  "bar@pingou.com",
+                  "foo@pingou.com"
+                ],
+                "fullname": "PY C",
+                "name": "pingou"
+              }
+            }
+        )
+
+        # Create private issue
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None,
+            private=True,
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        # Access private issue un-authenticated
+        output = self.app.get('/api/0/test/issue/2')
+        self.assertEqual(output.status_code, 403)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "You are not allowed to view this issue",
+              "error_code": 7
+            }
+        )
+
+        headers = {'Authorization': 'token aaabbbccc'}
+
+        # Access private issue authenticated but wrong token
+        output = self.app.get('/api/0/test/issue/2', headers=headers)
+        self.assertEqual(output.status_code, 403)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "You are not allowed to view this issue",
+              "error_code": 7
+            }
+        )
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Access private issue authenticated correctly
+        output = self.app.get('/api/0/test/issue/2', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        data['date_created'] = '1431414800'
+        self.assertDictEqual(
+            data,
+            {
+              "assignee": None,
+              "blocks": [],
+              "comments": [],
+              "content": "We should work on this",
+              "date_created": "1431414800",
+              "depends": [],
+              "id": 2,
+              "private": True,
+              "status": "Open",
+              "tags": [],
+              "title": "Test issue",
               "user": {
                 "default_email": "bar@pingou.com",
                 "emails": [
