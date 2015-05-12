@@ -152,6 +152,7 @@ def api_method(function):
 
 
 from pagure.api import issue
+from pagure.api import fork
 
 
 @API.route('/version/')

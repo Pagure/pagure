@@ -391,6 +391,7 @@ import pagure.ui.repo
 
 from pagure.api import API
 from pagure.api import issue
+from pagure.api import fork
 APP.register_blueprint(API)
 
 import pagure.internal
