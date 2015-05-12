@@ -21,6 +21,34 @@ from pagure.api import (
 )
 
 
+@API.route('/<repo>/pull-request/<int:requestid>')
+@API.route('/fork/<username>/<repo>/pull-request/<int:requestid>')
+@api_method
+def api_pull_request_view(repo, requestid, username=None):
+    """ List all issues associated to a repo
+    """
+
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    httpcode = 200
+    output = {}
+
+    if repo is None:
+        raise pagure.exceptions.APIError(404, error_code=1)
+
+    if not repo.settings.get('pull_requests', True):
+        raise pagure.exceptions.APIError(404, error_code=8)
+
+    request = pagure.lib.search_pull_requests(
+        SESSION, project_id=repo.id, requestid=requestid)
+
+    if not request:
+        raise pagure.exceptions.APIError(404, error_code=9)
+
+    jsonout = flask.jsonify(request.to_json())
+    jsonout.status_code = httpcode
+    return jsonout
+
+
 @API.route('/<repo>/pull-request/<int:requestid>/comment',
            methods=['POST'])
 @API.route('/fork/<username>/<repo>/pull-request/<int:requestid>/comment',
