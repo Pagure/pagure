@@ -15,8 +15,10 @@ from sqlalchemy.exc import SQLAlchemyError
 import pagure
 import pagure.exceptions
 import pagure.lib
-from pagure import APP, SESSION
-from pagure.api import API, api_method, api_login_required, API_ERROR_CODE
+from pagure import APP, SESSION, is_repo_admin, authenticated
+from pagure.api import (
+    API, api_method, api_login_required, api_login_optional, API_ERROR_CODE
+)
 
 
 @API.route('/<repo>/new_issue', methods=['POST'])
@@ -101,6 +103,7 @@ def api_new_issue(repo, username=None):
 
 @API.route('/<repo>/issue/<int:issueid>')
 @API.route('/fork/<username>/<repo>/issue/<int:issueid>')
+@api_login_optional()
 @api_method
 def api_view_issue(repo, issueid, username=None):
     """ List all issues associated to a repo
