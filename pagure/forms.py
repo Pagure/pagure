@@ -72,6 +72,26 @@ class AddIssueTagForm(wtf.Form):
     )
 
 
+class StatusForm(wtf.Form):
+    ''' Form to add/change the status of an issue. '''
+    status = wtforms.SelectField(
+        'Status',
+        [wtforms.validators.Required()],
+        choices=[(item, item) for item in []]
+    )
+
+    def __init__(self, *args, **kwargs):
+        """ Calls the default constructor with the normal argument but
+        uses the list of collection provided to fill the choices of the
+        drop-down list.
+        """
+        super(StatusForm, self).__init__(*args, **kwargs)
+        if 'status' in kwargs:
+            self.status.choices = [
+                (status, status) for status in kwargs['status']
+            ]
+
+
 class UpdateIssueForm(wtf.Form):
     ''' Form to add a comment to an issue. '''
     tag = wtforms.TextField(
