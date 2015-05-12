@@ -92,6 +92,26 @@ class StatusForm(wtf.Form):
             ]
 
 
+class NewTokenForm(wtf.Form):
+    ''' Form to add/change the status of an issue. '''
+    acls = wtforms.SelectMultipleField(
+        'ACLs',
+        [wtforms.validators.Required()],
+        choices=[(item, item) for item in []]
+    )
+
+    def __init__(self, *args, **kwargs):
+        """ Calls the default constructor with the normal argument but
+        uses the list of collection provided to fill the choices of the
+        drop-down list.
+        """
+        super(NewTokenForm, self).__init__(*args, **kwargs)
+        if 'acls' in kwargs:
+            self.acls.choices = [
+                (acl.name, acl.name) for acl in kwargs['acls']
+            ]
+
+
 class UpdateIssueForm(wtf.Form):
     ''' Form to add a comment to an issue. '''
     tag = wtforms.TextField(
