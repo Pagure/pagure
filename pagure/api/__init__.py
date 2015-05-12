@@ -97,6 +97,26 @@ def api_login_required(acls=None):
     return decorator
 
 
+def api_login_optional(acls=None):
+    ''' Decorator used to indicate that authentication is optional for some
+    API endpoint.
+    '''
+
+    def decorator(fn):
+        ''' The decorator of the function '''
+
+        @functools.wraps(fn)
+        def decorated_function(*args, **kwargs):
+            ''' Actually does the job with the arguments provided. '''
+
+            check_api_acls(acls, optional=True)
+            return fn(*args, **kwargs)
+
+        return decorated_function
+
+    return decorator
+
+
 def api_method(function):
     ''' Runs an API endpoint and catch all the APIException thrown. '''
 
