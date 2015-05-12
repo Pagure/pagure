@@ -273,7 +273,7 @@ def create_acls(session):
 
 def create_tokens_acl(session):
     """ Create some acls for the tokens. """
-    for aclid in range(5):
+    for aclid in range(6):
         item = pagure.lib.model.TokenAcl(
             token_id='aaabbbcccddd',
             acl_id=aclid + 1,
