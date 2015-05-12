@@ -729,7 +729,7 @@ header.repo.forked > p {
     display: inline-block;
 }
 
-#fork_project {
+#fork_project, .clickable {
     cursor: pointer;
 }
 

@@ -81,7 +81,8 @@
           valid until: {{ token.expiration.date() }}
         </td>
         <td>
-          <a onclick="show_acls({{ token.acls_list |safe }})">ACLs</a>
+          <a class="clickable"
+            onclick="show_acls({{ token.acls_list |safe }})">ACLs</a>
         </td>
       </tr>
       {% endif %}
