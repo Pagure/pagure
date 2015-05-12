@@ -236,10 +236,7 @@ def api_comment_issue(repo, issueid, username=None):
                 ticketfolder=APP.config['TICKETS_FOLDER'],
             )
             SESSION.commit()
-            if message:
-                output['message'] = message
-            else:
-                output['message'] = 'No changes'
+            output['message'] = message
         except SQLAlchemyError, err:  # pragma: no cover
             raise pagure.exceptions.APIError(400, error_code=3)
 
