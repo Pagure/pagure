@@ -54,10 +54,9 @@ def api_pull_request_view(repo, requestid, username=None):
            methods=['POST'])
 @api_login_required(acls=['pull_request_merge'])
 @api_method
-def api_pull_request_merge(repo, issueid, username=None):
+def api_pull_request_merge(repo, requestid, username=None):
     """ Merge a pull-request
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
     httpcode = 200
     output = {}
 
@@ -111,10 +110,9 @@ def api_pull_request_merge(repo, issueid, username=None):
            methods=['POST'])
 @api_login_required(acls=['pull_request_close'])
 @api_method
-def api_pull_request_close(repo, issueid, username=None):
+def api_pull_request_close(repo, requestid, username=None):
     """ Close a pull-request without merging it
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
     httpcode = 200
     output = {}
 
