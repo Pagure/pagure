@@ -49,6 +49,63 @@ def api_pull_request_view(repo, requestid, username=None):
     return jsonout
 
 
+@API.route('/<repo>/pull-request/<int:requestid>/merge', methods=['POST'])
+@API.route('/fork/<username>/<repo>/pull-request/<int:requestid>/merge',
+           methods=['POST'])
+@api_login_required(acls=['pull_request_merge'])
+@api_method
+def api_pull_request_merge(repo, issueid, username=None):
+    """ Merge a pull-request
+    """
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    httpcode = 200
+    output = {}
+
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+
+    if repo is None:
+        raise pagure.exceptions.APIError(404, error_code=1)
+
+    if not repo.settings.get('pull_requests', True):
+        raise pagure.exceptions.APIError(404, error_code=8)
+
+    if repo != flask.g.token.project:
+        raise pagure.exceptions.APIError(401, error_code=5)
+
+    request = pagure.lib.search_pull_requests(
+        SESSION, project_id=repo.id, requestid=requestid)
+
+    if not request:
+        raise pagure.exceptions.APIError(404, error_code=9)
+
+    if not is_repo_admin(repo):
+        raise pagure.exceptions.APIError(403, error_code=10)
+
+    if repo.settings.get('Only_assignee_can_merge_pull-request', False):
+        if not request.assignee:
+            raise pagure.exceptions.APIError(403, error_code=13)
+
+        if request.assignee.username != flask.g.fas_user.username:
+            raise pagure.exceptions.APIError(403, error_code=12)
+
+    threshold = repo.settings.get('Minimum_score_to_merge_pull-request', -1)
+    if threshold > 0 and int(request.score) < int(threshold):
+        raise pagure.exceptions.APIError(403, error_code=11)
+
+    try:
+        message = pagure.lib.git.merge_pull_request(
+            SESSION, repo, request, flask.g.fas_user.username,
+            APP.config['REQUESTS_FOLDER'])
+        output['message'] = message
+    except pagure.exceptions.PagureException as err:
+        raise pagure.exceptions.APIError(
+                400, error_code=0, error=str(err))
+
+    jsonout = flask.jsonify(output)
+    jsonout.status_code = httpcode
+    return jsonout
+
+
 @API.route('/<repo>/pull-request/<int:requestid>/close', methods=['POST'])
 @API.route('/fork/<username>/<repo>/pull-request/<int:requestid>/close',
            methods=['POST'])
