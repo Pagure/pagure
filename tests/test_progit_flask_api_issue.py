@@ -39,8 +39,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         pagure.api.issue.SESSION = self.session
         pagure.lib.SESSION = self.session
 
-        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            tests.HERE, 'tickets')
+        pagure.APP.config['TICKETS_FOLDER'] = None
 
         self.app = pagure.APP.test_client()
 
