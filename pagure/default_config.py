@@ -137,3 +137,12 @@ APPLICATION_ROOT = '/'
 
 # List of blacklisted project names
 BLACKLISTED_PROJECTS = ['static', 'pv']
+
+ACLS = {
+    'issue_create': 'Create a new ticket against this project',
+    'issue_change_status': 'Change the status of a ticket of this project',
+    'issue_comment': 'Comment on a ticket of this project',
+    'pull_request_merge': 'Merge a pull-request of this project',
+    'pull_request_close': 'Close a pull-request of this project',
+    'pull_request_comment': 'Comment on a pull-request of this project',
+}
