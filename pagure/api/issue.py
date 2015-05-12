@@ -240,9 +240,6 @@ def api_comment_issue(repo, issueid, username=None):
                 output['message'] = message
             else:
                 output['message'] = 'No changes'
-        except pagure.exceptions.PagureException, err:
-            raise pagure.exceptions.APIError(
-                400, error_code=0, error=str(err))
         except SQLAlchemyError, err:  # pragma: no cover
             raise pagure.exceptions.APIError(400, error_code=3)
 
