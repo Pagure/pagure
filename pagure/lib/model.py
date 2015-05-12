@@ -962,6 +962,7 @@ class Token(BASE):
         'User',
         backref=backref(
             'tokens', cascade="delete, delete-orphan",
+            order_by="Token.created"
         ),
         foreign_keys=[user_id],
         remote_side=[User.id])
