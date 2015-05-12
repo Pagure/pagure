@@ -991,7 +991,7 @@ class Token(BASE):
     def acls_list(self):
         ''' Return a list containing the name of each ACLs this token has.
         '''
-        return [acl.name for acl in self.acls]
+        return sorted([str(acl.name) for acl in self.acls])
 
 
 class TokenAcl(BASE):
