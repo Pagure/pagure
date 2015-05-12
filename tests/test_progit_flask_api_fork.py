@@ -184,6 +184,117 @@ class PagureFlaskApiForktests(tests.Modeltests):
         data2['date_created'] = '1431414800'
         self.assertDictEqual(data, data2)
 
+    def test_api_pull_request_add_comment(self):
+        """ Test the api_pull_request_add_comment method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session)
+        tests.create_acls(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Invalid project
+        output = self.app.post(
+            '/api/0/foo/pull-request/1/comment', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Project not found",
+              "error_code": 1
+            }
+        )
+
+        # Valid token, wrong project
+        output = self.app.post(
+            '/api/0/test2/pull-request/1/comment', headers=headers)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid or expired token. Please visit " \
+                  "https://pagure.org/ get or renew your API token.",
+              "error_code": 5
+            }
+        )
+
+        # No input
+        output = self.app.post(
+            '/api/0/test/pull-request/1/comment', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Pull-Request not found",
+              "error_code": 9
+            }
+        )
+
+        # Create a pull-request
+        repo = pagure.lib.get_project(self.session, 'test')
+        forked_repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Request created')
+
+        # Check comments before
+        request = pagure.lib.search_pull_requests(
+            self.session, project_id=1, requestid=1)
+        self.assertEqual(len(request.comments), 0)
+
+        data = {
+            'title': 'test issue',
+        }
+
+        # Incomplete request
+        output = self.app.post(
+            '/api/0/test/pull-request/1/comment', data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid or incomplete input submited",
+              "error_code": 4
+            }
+        )
+
+        # No change
+        request = pagure.lib.search_pull_requests(
+            self.session, project_id=1, requestid=1)
+        self.assertEqual(len(request.comments), 0)
+
+        data = {
+            'comment': 'This is a very interesting question',
+        }
+
+        # Valid request
+        output = self.app.post(
+            '/api/0/test/pull-request/1/comment', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'Comment added'}
+        )
+
+        # One comment added
+        request = pagure.lib.search_pull_requests(
+            self.session, project_id=1, requestid=1)
+        self.assertEqual(len(request.comments), 1)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
