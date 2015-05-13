@@ -316,3 +316,32 @@ def api_groups():
             ]
         }
     )
+
+
+@API.route('/error_codes/')
+@API.route('/error_codes')
+def api_error_codes():
+    '''
+    Error codes
+    ------------
+    Returns the dictionary (hash) of all the error codes present in the API
+
+    ::
+
+        /api/error_codes
+
+    Accepts GET queries only.
+
+    Sample response:
+
+    ::
+
+        {
+          ENOCODE: 'Variable message describing the issue',
+          ENOPROJECT: 'Project not found',
+        }
+
+    '''
+    errors = {val.name: val.value for val in APIERROR.__members__.values()}
+
+    return flask.jsonify(errors)
