@@ -63,7 +63,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             {
               "error": "Invalid or expired token. Please visit " \
                   "https://pagure.org/ get or renew your API token.",
-              "error_code": 5
+              "error_code": "EINVALIDTOK",
             }
         )
 
@@ -75,7 +75,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             data,
             {
               "error": "Invalid or incomplete input submited",
-              "error_code": 4
+              "error_code": "EINVALIDREQ",
             }
         )
 
@@ -92,7 +92,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             data,
             {
               "error": "Project not found",
-              "error_code": 1
+              "error_code": "ENOPROJECT",
             }
         )
 
@@ -105,7 +105,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             data,
             {
               "error": "Invalid or incomplete input submited",
-              "error_code": 4
+              "error_code": "EINVALIDREQ",
             }
         )
 
@@ -137,7 +137,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             data,
             {
               "error": "Project not found",
-              "error_code": 1
+              "error_code": "ENOPROJECT",
             }
         )
 
@@ -149,7 +149,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             data,
             {
               "error": "Issue not found",
-              "error_code": 6
+              "error_code": "ENOISSUE",
             }
         )
 
@@ -206,7 +206,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             data,
             {
               "error": "You are not allowed to view this issue",
-              "error_code": 7
+              "error_code": "EISSUEREST",
             }
         )
 
@@ -220,7 +220,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             data,
             {
               "error": "You are not allowed to view this issue",
-              "error_code": 7
+              "error_code": "EISSUEREST",
             }
         )
 
@@ -275,7 +275,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             data,
             {
               "error": "Project not found",
-              "error_code": 1
+              "error_code": "ENOPROJECT",
             }
         )
 
@@ -288,7 +288,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             {
               "error": "Invalid or expired token. Please visit " \
                   "https://pagure.org/ get or renew your API token.",
-              "error_code": 5
+              "error_code": "EINVALIDTOK",
             }
         )
 
@@ -300,7 +300,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             data,
             {
               "error": "Issue not found",
-              "error_code": 6
+              "error_code": "ENOISSUE",
             }
         )
 
@@ -379,7 +379,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             data,
             {
               "error": "Invalid or incomplete input submited",
-              "error_code": 4
+              "error_code": "EINVALIDREQ",
             }
         )
 
@@ -432,7 +432,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             data,
             {
               "error": "You are not allowed to view this issue",
-              "error_code": 7
+              "error_code": "EISSUEREST",
             }
         )
 
@@ -453,7 +453,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             data,
             {
               "error": "Project not found",
-              "error_code": 1
+              "error_code": "ENOPROJECT",
             }
         )
 
@@ -466,7 +466,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             {
               "error": "Invalid or expired token. Please visit " \
                   "https://pagure.org/ get or renew your API token.",
-              "error_code": 5
+              "error_code": "EINVALIDTOK",
             }
         )
 
@@ -478,7 +478,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             data,
             {
               "error": "Issue not found",
-              "error_code": 6
+              "error_code": "ENOISSUE",
             }
         )
 
@@ -514,7 +514,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             data,
             {
               "error": "Invalid or incomplete input submited",
-              "error_code": 4
+              "error_code": "EINVALIDREQ",
             }
         )
 
@@ -604,7 +604,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             data,
             {
               "error": "You are not allowed to view this issue",
-              "error_code": 7
+              "error_code": "EISSUEREST",
             }
         )
 

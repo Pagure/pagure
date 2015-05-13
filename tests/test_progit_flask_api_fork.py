@@ -75,7 +75,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             data,
             {
               "error": "Project not found",
-              "error_code": 1
+              "error_code": "ENOPROJECT",
             }
         )
 
@@ -87,7 +87,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             data,
             {
               "error": "Pull-Request not found",
-              "error_code": 9
+              "error_code": "ENOREQ",
             }
         )
 
@@ -218,7 +218,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             data,
             {
               "error": "Project not found",
-              "error_code": 1
+              "error_code": "ENOPROJECT",
             }
         )
 
@@ -232,7 +232,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             {
               "error": "Invalid or expired token. Please visit " \
                   "https://pagure.org/ get or renew your API token.",
-              "error_code": 5
+              "error_code": "EINVALIDTOK",
             }
         )
 
@@ -243,7 +243,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         data = json.loads(output.data)
         self.assertDictEqual(
             data,
-            {'error': 'Pull-Request not found', 'error_code': 9}
+            {'error': 'Pull-Request not found', 'error_code': "ENOREQ"}
         )
 
         # Create a token for foo for this project
@@ -275,7 +275,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             {
                 'error': 'You are not allowed to merge/close pull-request '
                     'for this project',
-                'error_code': 10
+                'error_code': "ENOPRCLOSE",
             }
         )
 
@@ -328,7 +328,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             data,
             {
               "error": "Project not found",
-              "error_code": 1
+              "error_code": "ENOPROJECT",
             }
         )
 
@@ -342,7 +342,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             {
               "error": "Invalid or expired token. Please visit " \
                   "https://pagure.org/ get or renew your API token.",
-              "error_code": 5
+              "error_code": "EINVALIDTOK",
             }
         )
 
@@ -353,7 +353,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         data = json.loads(output.data)
         self.assertDictEqual(
             data,
-            {'error': 'Pull-Request not found', 'error_code': 9}
+            {'error': 'Pull-Request not found', 'error_code': "ENOREQ"}
         )
 
         # Create a token for foo for this project
@@ -385,7 +385,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             {
                 'error': 'You are not allowed to merge/close pull-request '
                     'for this project',
-                'error_code': 10
+                'error_code': "ENOPRCLOSE",
             }
         )
 
@@ -419,7 +419,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             data,
             {
               "error": "Project not found",
-              "error_code": 1
+              "error_code": "ENOPROJECT",
             }
         )
 
@@ -433,7 +433,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             {
               "error": "Invalid or expired token. Please visit " \
                   "https://pagure.org/ get or renew your API token.",
-              "error_code": 5
+              "error_code": "EINVALIDTOK",
             }
         )
 
@@ -446,7 +446,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             data,
             {
               "error": "Pull-Request not found",
-              "error_code": 9
+              "error_code": "ENOREQ",
             }
         )
 
@@ -484,7 +484,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             data,
             {
               "error": "Invalid or incomplete input submited",
-              "error_code": 4
+              "error_code": "EINVALIDREQ",
             }
         )
 
