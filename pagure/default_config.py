@@ -89,6 +89,9 @@ GITOLITE_CONFIG = os.path.join(
 # Home folder of the gitolite user -- Folder where to run gl-compile-conf from
 GITOLITE_HOME = None
 
+# Version of gitolite used: 2 or 3?
+GITOLITE_VERSION = 2
+
 # Folder containing all the public ssh keys for gitolite
 GITOLITE_KEYDIR = None
 
