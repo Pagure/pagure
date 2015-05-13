@@ -52,7 +52,7 @@ class PagureFlaskApiAuthtests(tests.Modeltests):
             {
               "error": "Invalid or expired token. Please visit " \
                   "https://pagure.org/ get or renew your API token.",
-              "error_code": 5,
+              "error_code": "EINVALIDTOK",
             }
         )
 
@@ -66,7 +66,7 @@ class PagureFlaskApiAuthtests(tests.Modeltests):
             {
               "error": "Invalid or expired token. Please visit " \
                   "https://pagure.org/ get or renew your API token.",
-              "error_code": 5,
+              "error_code": "EINVALIDTOK",
             }
         )
 
@@ -84,7 +84,7 @@ class PagureFlaskApiAuthtests(tests.Modeltests):
             {
               "error": "Invalid or expired token. Please visit " \
                   "https://pagure.org/ get or renew your API token.",
-              "error_code": 5,
+              "error_code": "EINVALIDTOK",
             }
         )
 
@@ -98,7 +98,7 @@ class PagureFlaskApiAuthtests(tests.Modeltests):
             {
               "error": "Invalid or expired token. Please visit " \
                   "https://pagure.org/ get or renew your API token.",
-              "error_code": 5,
+              "error_code": "EINVALIDTOK",
             }
         )
 
@@ -116,7 +116,7 @@ class PagureFlaskApiAuthtests(tests.Modeltests):
             {
               "error": "Invalid or expired token. Please visit " \
                   "https://pagure.org/ get or renew your API token.",
-              "error_code": 5,
+              "error_code": "EINVALIDTOK",
             }
         )
 
@@ -130,7 +130,7 @@ class PagureFlaskApiAuthtests(tests.Modeltests):
             {
               "error": "Invalid or expired token. Please visit " \
                   "https://pagure.org/ get or renew your API token.",
-              "error_code": 5,
+              "error_code": "EINVALIDTOK",
             }
         )
 
@@ -150,7 +150,7 @@ class PagureFlaskApiAuthtests(tests.Modeltests):
             {
               "error": "Invalid or expired token. Please visit " \
                   "https://pagure.org/ get or renew your API token.",
-              "error_code": 5,
+              "error_code": "EINVALIDTOK",
             }
         )
 
@@ -163,7 +163,7 @@ class PagureFlaskApiAuthtests(tests.Modeltests):
             data,
             {
               "error": "Invalid or incomplete input submited",
-              "error_code": 4
+              "error_code": "EINVALIDREQ",
             }
         )
 
