@@ -193,11 +193,11 @@ def generate_authorized_key_file():  # pragma: no cover
                         'no-agent-forwarding,no-pty %s' % (
                             user.user, user.public_ssh_key)
                 else:
-                    row = 'command="HOME=/srv/git '\
+                    row = 'command="HOME=%s '\
                         '/usr/share/gitolite3/gitolite-shell %s",' \
                         'no-port-forwarding,no-X11-forwarding,'\
                         'no-agent-forwarding,no-pty %s' % (
-                            user.user, user.public_ssh_key)
+                            gitolite_home, user.user, user.public_ssh_key)
                 stream.write(row + '\n')
             stream.write('# gitolite end\n')
 
