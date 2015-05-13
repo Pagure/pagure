@@ -13,6 +13,7 @@ from functools import wraps
 import flask
 from sqlalchemy.exc import SQLAlchemyError
 
+import pagure.exceptions
 import pagure.forms
 import pagure.lib
 from pagure import (APP, SESSION,
@@ -60,8 +61,11 @@ def admin_generate_acl():
     """ Regenerate the gitolite ACL file. """
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
-        generate_gitolite_acls()
-        flask.flash('Gitolite ACLs updated')
+        try:
+            generate_gitolite_acls()
+            flask.flash('Gitolite ACLs updated')
+        except pagure.exceptions.PagureException, err:
+            flask.flash(str(err), 'error')
     return flask.redirect(flask.url_for('admin_index'))
 
 
@@ -71,8 +75,11 @@ def admin_refresh_ssh():
     """ Regenerate the gitolite ACL file. """
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
-        generate_authorized_key_file()
-        flask.flash('Authorized file updated')
+        try:
+            generate_authorized_key_file()
+            flask.flash('Authorized file updated')
+        except pagure.exceptions.PagureException, err:
+            flask.flash(str(err), 'error')
     return flask.redirect(flask.url_for('admin_index'))
 
 
