@@ -65,7 +65,7 @@ Requires:  python-munch
 Requires:  mod_wsgi
 
 # No dependency of the app per se, but required to make it working.
-Requires:  gitolite
+Requires:  gitolite3
 
 
 %description

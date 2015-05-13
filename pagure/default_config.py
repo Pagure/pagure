@@ -90,7 +90,7 @@ GITOLITE_CONFIG = os.path.join(
 GITOLITE_HOME = None
 
 # Version of gitolite used: 2 or 3?
-GITOLITE_VERSION = 2
+GITOLITE_VERSION = 3
 
 # Folder containing all the public ssh keys for gitolite
 GITOLITE_KEYDIR = None
