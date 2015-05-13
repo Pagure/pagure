@@ -340,18 +340,29 @@ def get_project_from_json(
                 session, jsondata.get('parent'),
                 gitfolder, forkfolder, docfolder, ticketfolder, requestfolder)
 
-        pagure.lib.new_project(
-            session,
-            user=user.username,
-            name=name,
-            description=jsondata.get('description'),
-            parent_id=parent.id if parent else None,
-            blacklist=pagure.APP.config.get('BLACKLISTED_PROJECTS', []),
-            gitfolder=forkfolder if parent else gitfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder,
-        )
+            pagure.lib.fork_project(
+                session=session,
+                repo=parent,
+                gitfolder=pagure.APP.config['GIT_FOLDER'],
+                forkfolder=pagure.APP.config['FORK_FOLDER'],
+                docfolder=pagure.APP.config['DOCS_FOLDER'],
+                ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
+                requestfolder=pagure.APP.config['REQUESTS_FOLDER'],
+                user=user.username)
+
+        else:
+            pagure.lib.new_project(
+                session,
+                user=user.username,
+                name=name,
+                description=jsondata.get('description'),
+                parent_id=parent.id if parent else None,
+                blacklist=pagure.APP.config.get('BLACKLISTED_PROJECTS', []),
+                gitfolder=forkfolder if parent else gitfolder,
+                docfolder=docfolder,
+                ticketfolder=ticketfolder,
+                requestfolder=requestfolder,
+            )
 
         session.commit()
         project = pagure.lib.get_project(session, name, user=user.username)
