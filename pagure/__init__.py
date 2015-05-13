@@ -141,17 +141,30 @@ def generate_gitolite_acls():
         SESSION, APP.config['GITOLITE_CONFIG'])
 
     gitolite_folder = APP.config.get('GITOLITE_HOME', None)
+    gitolite_version = APP.config.get('GITOLITE_VERSION', 2)
     if gitolite_folder:
-        cmd = 'GL_RC=%s GL_BINDIR=%s gl-compile-conf' % (
-            APP.config.get('GL_RC'), APP.config.get('GL_BINDIR')
-        )
-        subprocess.Popen(
-            cmd,
-            shell=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            cwd=gitolite_folder
-        )
+        if gitolite_version < 3:
+            cmd = 'GL_RC=%s GL_BINDIR=%s gl-compile-conf' % (
+                APP.config.get('GL_RC'), APP.config.get('GL_BINDIR')
+            )
+            subprocess.Popen(
+                cmd,
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                cwd=gitolite_folder
+            )
+        else:
+            cmd = 'GL_RC=%s GL_BINDIR=%s gitolite compile && gitolite trigger POST_COMPILE' % (
+                APP.config.get('GL_RC'), APP.config.get('GL_BINDIR')
+            )
+            subprocess.Popen(
+                cmd,
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                cwd=gitolite_folder
+            )
 
 
 def generate_gitolite_key(user, key):  # pragma: no cover
