@@ -109,6 +109,10 @@ BLACKLISTED_PROJECTS = ['static', 'pv']
 ### the IP filter
 IP_ALLOWED_INTERNAL = ['127.0.0.1', 'localhost', '::1']
 
+### Temp folder to be used to make the clones to work around bug in libgit2:
+## refs: https://github.com/libgit2/libgit2/issues/2965
+## and   https://github.com/libgit2/libgit2/issues/2797
+TMP_FOLDER = '/tmp'
 
 # Authentication related configuration option
 
