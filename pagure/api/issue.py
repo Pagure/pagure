@@ -17,7 +17,7 @@ import pagure.exceptions
 import pagure.lib
 from pagure import APP, SESSION, is_repo_admin, authenticated
 from pagure.api import (
-    API, api_method, api_login_required, api_login_optional, API_ERROR_CODE
+    API, api_method, api_login_required, api_login_optional, APIERROR
 )
 
 
@@ -33,13 +33,13 @@ def api_new_issue(repo, username=None):
     output = {}
 
     if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=1)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
     if not repo.settings.get('issue_tracker', True):
-        raise pagure.exceptions.APIError(404, error_code=2)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOTRACKER)
 
     if repo != flask.g.token.project:
-        raise pagure.exceptions.APIError(401, error_code=5)
+        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
     status = pagure.lib.get_issue_statuses(SESSION)
     form = pagure.forms.IssueForm(status=status, csrf_enabled=False)
@@ -88,10 +88,10 @@ def api_new_issue(repo, username=None):
             output['message'] = 'issue created'
             output['message'] = 'issue created'
         except SQLAlchemyError, err:  # pragma: no cover
-            raise pagure.exceptions.APIError(400, error_code=3)
+            raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
-        raise pagure.exceptions.APIError(400, error_code=4)
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
 
     jsonout = flask.jsonify(output)
     jsonout.status_code = httpcode
@@ -111,20 +111,20 @@ def api_view_issue(repo, issueid, username=None):
     output = {}
 
     if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=1)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
     if not repo.settings.get('issue_tracker', True):
-        raise pagure.exceptions.APIError(404, error_code=2)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOTRACKER)
 
     issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
 
     if issue is None or issue.project != repo:
-        raise pagure.exceptions.APIError(404, error_code=6)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOISSUE)
 
     if issue.private and not is_repo_admin(repo) \
             and (not authenticated() or
                  not issue.user.user == flask.g.fas_user.username):
-        raise pagure.exceptions.APIError(403, error_code=7)
+        raise pagure.exceptions.APIError(403, error_code=APIERROR.EISSUEREST)
 
     jsonout = flask.jsonify(issue.to_json())
     jsonout.status_code = httpcode
@@ -143,23 +143,23 @@ def api_change_status_issue(repo, issueid, username=None):
     output = {}
 
     if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=1)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
     if not repo.settings.get('issue_tracker', True):
-        raise pagure.exceptions.APIError(404, error_code=2)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOTRACKER)
 
     if repo != flask.g.token.project:
-        raise pagure.exceptions.APIError(401, error_code=5)
+        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
     issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
 
     if issue is None or issue.project != repo:
-        raise pagure.exceptions.APIError(404, error_code=6)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOISSUE)
 
     if issue.private and not is_repo_admin(repo) \
             and (not authenticated() or
                  not issue.user.user == flask.g.fas_user.username):
-        raise pagure.exceptions.APIError(403, error_code=7)
+        raise pagure.exceptions.APIError(403, error_code=APIERROR.EISSUEREST)
 
     status = pagure.lib.get_issue_statuses(SESSION)
     form = pagure.forms.StatusForm(status=status, csrf_enabled=False)
@@ -181,12 +181,12 @@ def api_change_status_issue(repo, issueid, username=None):
                 output['message'] = 'No changes'
         except pagure.exceptions.PagureException, err:
             raise pagure.exceptions.APIError(
-                400, error_code=0, error=str(err))
+                400, error_code=APIERROR.ENOCODE, error=str(err))
         except SQLAlchemyError, err:  # pragma: no cover
-            raise pagure.exceptions.APIError(400, error_code=3)
+            raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
-        raise pagure.exceptions.APIError(400, error_code=4)
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
 
     jsonout = flask.jsonify(output)
     jsonout.status_code = httpcode
@@ -205,23 +205,23 @@ def api_comment_issue(repo, issueid, username=None):
     output = {}
 
     if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=1)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
     if not repo.settings.get('issue_tracker', True):
-        raise pagure.exceptions.APIError(404, error_code=2)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOTRACKER)
 
     if repo.fullname != flask.g.token.project.fullname:
-        raise pagure.exceptions.APIError(401, error_code=5)
+        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
     issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
 
     if issue is None or issue.project != repo:
-        raise pagure.exceptions.APIError(404, error_code=6)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOISSUE)
 
     if issue.private and not is_repo_admin(repo) \
             and (not authenticated() or
                  not issue.user.user == flask.g.fas_user.username):
-        raise pagure.exceptions.APIError(403, error_code=7)
+        raise pagure.exceptions.APIError(403, error_code=APIERROR.EISSUEREST)
 
     form = pagure.forms.CommentForm(csrf_enabled=False)
     if form.validate_on_submit():
@@ -238,10 +238,10 @@ def api_comment_issue(repo, issueid, username=None):
             SESSION.commit()
             output['message'] = message
         except SQLAlchemyError, err:  # pragma: no cover
-            raise pagure.exceptions.APIError(400, error_code=3)
+            raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
-        raise pagure.exceptions.APIError(400, error_code=4)
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
 
     jsonout = flask.jsonify(output)
     jsonout.status_code = httpcode

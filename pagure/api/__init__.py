@@ -13,6 +13,7 @@ API namespace version 0.
 import functools
 
 import flask
+import enum
 
 API = flask.Blueprint('api_ns', __name__, url_prefix='/api/0')
 
@@ -23,25 +24,27 @@ from pagure import __api_version__, APP, SESSION
 from pagure.exceptions import APIError
 
 
-API_ERROR_CODE = {
-    0: 'Variable message describing the issue',
-    1: 'Project not found',
-    2: 'No issue tracker found for this project',
-    3: 'An error occured at the database level and prevent the action from '
-        'reaching completion',
-    4: 'Invalid or incomplete input submited',
-    5: 'Invalid or expired token. Please visit %s get or renew your '
-        'API token.' % APP.config['APP_URL'],
-    6: 'Issue not found',
-    7: 'You are not allowed to view this issue',
-    8: 'Pull-Request have been deactivated for this project',
-    9: 'Pull-Request not found',
-    10: 'You are not allowed to merge/close pull-request for this project',
-    11: 'This request does not have the minimum review score necessary to '
-        'be merged',
-    12: 'Only the assignee can merge this review',
-    13: 'This request must be assigned to be merged',
-}
+class APIERROR(enum.Enum):
+    """ Clast listing as Enum all the possible error thrown by the API.
+    """
+    ENOCODE = 'Variable message describing the issue'
+    ENOPROJECT = 'Project not found'
+    ENOTRACKER = 'No issue tracker found for this project'
+    EDBERROR = 'An error occured at the database level and prevent the ' \
+        'action from reaching completion'
+    EINVALIDREQ = 'Invalid or incomplete input submited'
+    EINVALIDTOK = 'Invalid or expired token. Please visit %s get or '\
+        'renew your API token.' % APP.config['APP_URL']
+    ENOISSUE = 'Issue not found'
+    EISSUEREST = 'You are not allowed to view this issue'
+    ENOPR = 'Pull-Request have been deactivated for this project'
+    ENOREQ = 'Pull-Request not found'
+    ENOPRCLOSE = 'You are not allowed to merge/close pull-request for '\
+        'this project'
+    EPRSCORE = 'This request does not have the minimum review score '\
+        'necessary to be merged'
+    ENOASSIG = 'Only the assignee can merge this review'
+    ENOTASSIG = 'This request must be assigned to be merged'
 
 
 def check_api_acls(acls, optional=False):
@@ -74,8 +77,8 @@ def check_api_acls(acls, optional=False):
 
     if not token_auth:
         output = {
-            'error_code': 5,
-            'error': API_ERROR_CODE[5],
+            'error_code': APIERROR.EINVALIDTOK.name,
+            'error': APIERROR.EINVALIDTOK.value,
         }
         jsonout = flask.jsonify(output)
         jsonout.status_code = 401
@@ -145,8 +148,8 @@ def api_method(function):
             else:
                 response = flask.jsonify(
                     {
-                        'error': API_ERROR_CODE[e.error_code],
-                        'error_code': e.error_code
+                        'error': e.error_code.value,
+                        'error_code': e.error_code.name,
                     }
                 )
             response.status_code = e.status_code

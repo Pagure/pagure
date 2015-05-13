@@ -17,7 +17,7 @@ import pagure.exceptions
 import pagure.lib
 from pagure import APP, SESSION, is_repo_admin, authenticated
 from pagure.api import (
-    API, api_method, api_login_required, api_login_optional, API_ERROR_CODE
+    API, api_method, api_login_required, api_login_optional, APIERROR
 )
 
 
@@ -33,16 +33,16 @@ def api_pull_request_view(repo, requestid, username=None):
     output = {}
 
     if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=1)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
     if not repo.settings.get('pull_requests', True):
-        raise pagure.exceptions.APIError(404, error_code=8)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPR)
 
     request = pagure.lib.search_pull_requests(
         SESSION, project_id=repo.id, requestid=requestid)
 
     if not request:
-        raise pagure.exceptions.APIError(404, error_code=9)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
 
     jsonout = flask.jsonify(request.to_json())
     jsonout.status_code = httpcode
@@ -63,33 +63,33 @@ def api_pull_request_merge(repo, requestid, username=None):
     repo = pagure.lib.get_project(SESSION, repo, user=username)
 
     if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=1)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
     if not repo.settings.get('pull_requests', True):
-        raise pagure.exceptions.APIError(404, error_code=8)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPR)
 
     if repo != flask.g.token.project:
-        raise pagure.exceptions.APIError(401, error_code=5)
+        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
     request = pagure.lib.search_pull_requests(
         SESSION, project_id=repo.id, requestid=requestid)
 
     if not request:
-        raise pagure.exceptions.APIError(404, error_code=9)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
 
     if not is_repo_admin(repo):
-        raise pagure.exceptions.APIError(403, error_code=10)
+        raise pagure.exceptions.APIError(403, error_code=APIERROR.ENOPRCLOSE)
 
     if repo.settings.get('Only_assignee_can_merge_pull-request', False):
         if not request.assignee:
-            raise pagure.exceptions.APIError(403, error_code=13)
+            raise pagure.exceptions.APIError(403, error_code=APIERROR.ENOTASSIG)
 
         if request.assignee.username != flask.g.fas_user.username:
-            raise pagure.exceptions.APIError(403, error_code=12)
+            raise pagure.exceptions.APIError(403, error_code=APIERROR.ENOASSIG)
 
     threshold = repo.settings.get('Minimum_score_to_merge_pull-request', -1)
     if threshold > 0 and int(request.score) < int(threshold):
-        raise pagure.exceptions.APIError(403, error_code=11)
+        raise pagure.exceptions.APIError(403, error_code=APIERROR.EPRSCORE)
 
     try:
         message = pagure.lib.git.merge_pull_request(
@@ -98,7 +98,7 @@ def api_pull_request_merge(repo, requestid, username=None):
         output['message'] = message
     except pagure.exceptions.PagureException as err:
         raise pagure.exceptions.APIError(
-                400, error_code=0, error=str(err))
+                400, error_code=APIERROR.ENOCODE, error=str(err))
 
     jsonout = flask.jsonify(output)
     jsonout.status_code = httpcode
@@ -119,22 +119,22 @@ def api_pull_request_close(repo, requestid, username=None):
     repo = pagure.lib.get_project(SESSION, repo, user=username)
 
     if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=1)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
     if not repo.settings.get('pull_requests', True):
-        raise pagure.exceptions.APIError(404, error_code=8)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPR)
 
     if repo != flask.g.token.project:
-        raise pagure.exceptions.APIError(401, error_code=5)
+        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
     request = pagure.lib.search_pull_requests(
         SESSION, project_id=repo.id, requestid=requestid)
 
     if not request:
-        raise pagure.exceptions.APIError(404, error_code=9)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
 
     if not is_repo_admin(repo):
-        raise pagure.exceptions.APIError(403, error_code=10)
+        raise pagure.exceptions.APIError(403, error_code=APIERROR.ENOPRCLOSE)
 
     pagure.lib.close_pull_request(
         SESSION, request, flask.g.fas_user.username,
@@ -146,7 +146,7 @@ def api_pull_request_close(repo, requestid, username=None):
     except SQLAlchemyError as err:  # pragma: no cover
         SESSION.rollback()
         APP.logger.exception(err)
-        raise pagure.exceptions.APIError(400, error_code=3)
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     jsonout = flask.jsonify(output)
     jsonout.status_code = httpcode
@@ -167,19 +167,19 @@ def api_pull_request_add_comment(repo, requestid, username=None):
     output = {}
 
     if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=1)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
     if not repo.settings.get('pull_requests', True):
-        raise pagure.exceptions.APIError(404, error_code=8)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPR)
 
     if repo.fullname != flask.g.token.project.fullname:
-        raise pagure.exceptions.APIError(401, error_code=5)
+        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
     request = pagure.lib.search_pull_requests(
         SESSION, project_id=repo.id, requestid=requestid)
 
     if not request:
-        raise pagure.exceptions.APIError(404, error_code=9)
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
 
     form = pagure.forms.AddPullRequestCommentForm(csrf_enabled=False)
     if form.validate_on_submit():
@@ -202,10 +202,10 @@ def api_pull_request_add_comment(repo, requestid, username=None):
             SESSION.commit()
             output['message'] = message
         except SQLAlchemyError, err:  # pragma: no cover
-            raise pagure.exceptions.APIError(400, error_code=3)
+            raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
-        raise pagure.exceptions.APIError(400, error_code=4)
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
 
     jsonout = flask.jsonify(output)
     jsonout.status_code = httpcode
