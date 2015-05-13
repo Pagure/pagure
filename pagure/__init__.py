@@ -141,7 +141,7 @@ def generate_gitolite_acls():
         SESSION, APP.config['GITOLITE_CONFIG'])
 
     gitolite_folder = APP.config.get('GITOLITE_HOME', None)
-    gitolite_version = APP.config.get('GITOLITE_VERSION', 2)
+    gitolite_version = APP.config.get('GITOLITE_VERSION', 3)
     if gitolite_folder:
         if gitolite_version < 3:
             cmd = 'GL_RC=%s GL_BINDIR=%s gl-compile-conf' % (
@@ -183,7 +183,7 @@ def generate_authorized_key_file():  # pragma: no cover
             gitolite_home, '.ssh', 'authorized_keys')
         with open(authorized_file, 'w') as stream:
             stream.write('# gitolite start\n')
-            gitolite_version = APP.config.get('GITOLITE_VERSION', 2)
+            gitolite_version = APP.config.get('GITOLITE_VERSION', 3)
             for user in users:
                 if not user.public_ssh_key:
                     continue
