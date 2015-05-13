@@ -143,15 +143,19 @@ def generate_gitolite_acls():
     gitolite_folder = APP.config.get('GITOLITE_HOME', None)
     gitolite_version = APP.config.get('GITOLITE_VERSION', 3)
     if gitolite_folder:
-        if gitolite_version < 3:
+        if gitolite_version == 3:
             cmd = 'GL_RC=%s GL_BINDIR=%s gl-compile-conf' % (
                 APP.config.get('GL_RC'), APP.config.get('GL_BINDIR')
             )
-        else:
+        elif gitolite_version == 2:
             cmd = 'HOME=%s gitolite compile && HOME=%s gitolite trigger '\
             'POST_COMPILE' % (
                 APP.config.get('GITOLITE_HOME'),
                 APP.config.get('GITOLITE_HOME')
+            )
+        else:
+            raise pagure.exceptions.PagureException(
+                'Non-supported gitolite version "%s"' % gitolite_version
             )
         proc = subprocess.Popen(
             cmd,
@@ -187,17 +191,21 @@ def generate_authorized_key_file():  # pragma: no cover
             for user in users:
                 if not user.public_ssh_key:
                     continue
-                if gitolite_version < 3:
+                if gitolite_version == 3:
                     row = 'command="/usr/bin/gl-auth-command %s",' \
                         'no-port-forwarding,no-X11-forwarding,'\
                         'no-agent-forwarding,no-pty %s' % (
                             user.user, user.public_ssh_key)
-                else:
+                elif gitolite_version == 2:
                     row = 'command="HOME=%s '\
                         '/usr/share/gitolite3/gitolite-shell %s",' \
                         'no-port-forwarding,no-X11-forwarding,'\
                         'no-agent-forwarding,no-pty %s' % (
                             gitolite_home, user.user, user.public_ssh_key)
+                else:
+                    raise pagure.exceptions.PagureException(
+                        'Non-supported gitolite version "%s"' % gitolite_version
+                    )
                 stream.write(row + '\n')
             stream.write('# gitolite end\n')
 
