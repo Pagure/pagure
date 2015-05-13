@@ -2,8 +2,8 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.2
-Release:        2%{?dist}
+Version:        0.1.3
+Release:        1%{?dist}
 Summary:        A git-centered forge
 
 License:        GPLv2+
@@ -160,6 +160,11 @@ install -m 644 milters/pagure_milter.service \
 
 
 %changelog
+* Wed May 13 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.3-1
+- Update to 0.1.3
+- Add support for gitolite3
+- Fix unit-tests suite to work on jenkins
+
 * Sat May 09 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.2-2
 - Fix the Requires on the milter subpackage (adding: post, preun and postun)
 - Add systemd scriptlet to restart the service gracefully
