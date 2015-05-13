@@ -276,10 +276,25 @@ def get_user_from_json(session, jsondata, key='user'):
     """
     user = None
 
-    username = jsondata.get(key, {}).get('name')
-    fullname = jsondata.get(key, {}).get('fullname')
-    useremails = jsondata.get(key, {}).get('emails')
-    default_email = jsondata.get(key, {}).get('default_email')
+    username = jsondata.get(key, None)
+    if username:
+        username = username.get('name')
+    fullname = jsondata.get(key, {})
+
+    if fullname:
+        fullname = fullname.get('fullname')
+
+    useremails = jsondata.get(key, {})
+    if useremails:
+        useremails = useremails.get('emails')
+
+    default_email = jsondata.get(key, {})
+    if default_email:
+        default_email = default_email.get('name')
+
+    if not default_email and useremails:
+        default_email = useremails[0]
+
     if not username and not useremails:
         return
 
