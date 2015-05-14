@@ -178,6 +178,8 @@ def mergeable_request_pull():
     parentpath = pagure.get_repo_path(request.project)
 
     # Clone the original repo into a temp folder
+    tempfile.tempdir = pagure.APP.config.get(
+        'TMP_FOLDER', tempfile.gettempdir())
     newpath = tempfile.mkdtemp(prefix='pagure-pr-check')
     new_repo = pygit2.clone_repository(parentpath, newpath)
 
