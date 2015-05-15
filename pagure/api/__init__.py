@@ -175,7 +175,7 @@ def api_version():
 
     ::
 
-        /api/version
+        /api/0/version
 
     Accepts GET queries only.
 
@@ -202,7 +202,7 @@ def api_users():
 
     ::
 
-        /api/users
+        /api/0/users
 
     Accepts GET queries only.
 
@@ -238,13 +238,14 @@ def api_project_tags(repo, username=None):
     '''
     List all the tags of a project
     ------------------------------
-    Returns the list of all tags of the specified project.
+    Returns the list of all tags assigned to the tickets of the specified
+    project.
 
     ::
 
-        /api/<repo>/tags
+        /api/0/<repo>/tags
 
-        /api/fork/<username>/<repo>/tags
+        /api/0/fork/<username>/<repo>/tags
 
     Accepts GET queries only.
 
@@ -290,7 +291,7 @@ def api_groups():
 
     ::
 
-        /api/groups
+        /api/0/groups
 
     Accepts GET queries only.
 
@@ -328,7 +329,7 @@ def api_error_codes():
 
     ::
 
-        /api/error_codes
+        /api/0/error_codes
 
     Accepts GET queries only.
 
