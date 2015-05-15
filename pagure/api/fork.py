@@ -131,7 +131,28 @@ def api_pull_request_merge(repo, requestid, username=None):
 @api_login_required(acls=['pull_request_close'])
 @api_method
 def api_pull_request_close(repo, requestid, username=None):
-    """ Close a pull-request without merging it
+    """
+    Close a pull-request
+    --------------------
+    This endpoint can be used to instruct pagure to close a pull-request
+    without merging it
+
+    ::
+
+        /api/0/<repo>/pull-request/<request id>/close
+
+        /api/0/fork/<username>/<repo>/pull-request/<request id>/close
+
+    Accepts POST queries only.
+
+    Sample response:
+
+    ::
+
+        {
+          "message": "Request pull canceled!"
+        }
+
     """
     httpcode = 200
     output = {}
