@@ -55,7 +55,27 @@ def api_pull_request_view(repo, requestid, username=None):
 @api_login_required(acls=['pull_request_merge'])
 @api_method
 def api_pull_request_merge(repo, requestid, username=None):
-    """ Merge a pull-request
+    """
+    Merge a pull-request
+    --------------------
+    This endpoint can be used to instruct pagure to merge a pull-request
+
+    ::
+
+        /api/0/<repo>/pull-request/<request id>/merge
+
+        /api/0/fork/<username>/<repo>/pull-request/<request id>/merge
+
+    Accepts POST queries only.
+
+    Sample response:
+
+    ::
+
+        {
+          "message": "Changes merged!"
+        }
+
     """
     httpcode = 200
     output = {}
