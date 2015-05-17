@@ -287,7 +287,33 @@ def api_pull_request_close(repo, requestid, username=None):
 @api_login_required(acls=['pull_request_comment'])
 @api_method
 def api_pull_request_add_comment(repo, requestid, username=None):
-    """ Add a comment to an pull-request
+    """
+    Comment on a pull-request
+    --------------------
+    This endpoint can be used to comment on a pull-request
+
+    ::
+
+        /api/0/<repo>/pull-request/<request id>/comment
+
+        /api/0/fork/<username>/<repo>/pull-request/<request id>/comment
+
+    Accepts POST queries only.
+
+    :arg comment: The comment to add to the pull-request
+    :kwarg commit: The hash of the commit you wish to comment on
+    :kwarg filename: The name of the file you wish to comment on
+    :kwarg row: Used in combination with filename to comment on a specific
+        row of a file of the pull-request
+
+    Sample response:
+
+    ::
+
+        {
+          "message": "Comment added"
+        }
+
     """
     repo = pagure.lib.get_project(SESSION, repo, user=username)
     httpcode = 200
