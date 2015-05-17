@@ -25,7 +25,93 @@ from pagure.api import (
 @API.route('/fork/<username>/<repo>/pull-request/<int:requestid>')
 @api_method
 def api_pull_request_view(repo, requestid, username=None):
-    """ List all issues associated to a repo
+    """
+    Request a pull-request
+    --------------------
+    This endpoint can be used to retrieve information about a specific
+    pull-request
+
+    ::
+
+        /api/0/<repo>/pull-request/<request id>
+
+        /api/0/fork/<username>/<repo>/pull-request/<request id>
+
+    Accepts GET queries only.
+
+    Sample response:
+
+    ::
+
+        {
+          "assignee": null,
+          "branch": "master",
+          "branch_from": "master",
+          "comments": [],
+          "commit_start": null,
+          "commit_stop": null,
+          "date_created": "1431414800",
+          "id": 1,
+          "project": {
+            "date_created": "1431414800",
+            "description": "test project #1",
+            "id": 1,
+            "name": "test",
+            "parent": null,
+            "settings": {
+              "Minimum_score_to_merge_pull-request": -1,
+              "Only_assignee_can_merge_pull-request": false,
+              "Web-hooks": null,
+              "issue_tracker": true,
+              "project_documentation": true,
+              "pull_requests": true
+            },
+            "user": {
+              "emails": [
+                "bar@pingou.com",
+                "foo@pingou.com"
+              ],
+              "fullname": "PY C",
+              "name": "pingou"
+            }
+          },
+          "repo_from": {
+            "date_created": "1431414800",
+            "description": "test project #1",
+            "id": 1,
+            "name": "test",
+            "parent": null,
+            "settings": {
+              "Minimum_score_to_merge_pull-request": -1,
+              "Only_assignee_can_merge_pull-request": false,
+              "Web-hooks": null,
+              "issue_tracker": true,
+              "project_documentation": true,
+              "pull_requests": true
+            },
+            "user": {
+              "emails": [
+                "bar@pingou.com",
+                "foo@pingou.com"
+              ],
+              "fullname": "PY C",
+              "name": "pingou"
+            }
+          },
+          "status": true,
+          "title": "test pull-request",
+          "uid": "1431414800",
+          "user": {
+            "default_email": "bar@pingou.com",
+            "emails": [
+              "bar@pingou.com",
+              "foo@pingou.com"
+            ],
+            "fullname": "PY C",
+            "name": "pingou"
+          }
+        }
+
     """
 
     repo = pagure.lib.get_project(SESSION, repo, user=username)
