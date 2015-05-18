@@ -11,6 +11,12 @@
 ## Set the environment variable pointing to the configuration file
 #os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
+## Set the environment variable if the tmp folder needs to be moved
+## Might be necessary to work around bug in libgit2:
+## refs: https://github.com/libgit2/libgit2/issues/2965
+## and   https://github.com/libgit2/libgit2/issues/2797
+#os.environ['TEMP'] = '/var/tmp/'
+
 ## The following is only needed if you did not install pagure
 ## as a python module (for example if you run it from a git clone).
 #import sys
