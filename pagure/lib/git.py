@@ -278,7 +278,7 @@ def get_user_from_json(session, jsondata, key='user'):
 
     username = fullname = useremails = default_email = None
 
-    data = json.data.get(key, None)
+    data = jsondata.get(key, None)
 
     if data:
         username = data.get('name')
