@@ -133,8 +133,6 @@ def update_git(obj, repo, repofolder, objtype='ticket'):
     repopath = os.path.join(repofolder, repo.path)
 
     # Clone the repo into a temp folder
-    tempfile.tempdir = pagure.APP.config.get(
-        'TMP_FOLDER', tempfile.gettempdir())
     newpath = tempfile.mkdtemp(prefix='pagure-')
     new_repo = pygit2.clone_repository(repopath, newpath)
 
@@ -214,8 +212,6 @@ def clean_git(obj, repo, repofolder, objtype='ticket'):
     repopath = os.path.join(repofolder, repo.path)
 
     # Clone the repo into a temp folder
-    tempfile.tempdir = pagure.APP.config.get(
-        'TMP_FOLDER', tempfile.gettempdir())
     newpath = tempfile.mkdtemp(prefix='pagure-')
     new_repo = pygit2.clone_repository(repopath, newpath)
 
@@ -573,8 +569,6 @@ def add_file_to_git(repo, issue, ticketfolder, user, filename, filestream):
     repopath = os.path.join(ticketfolder, repo.path)
 
     # Clone the repo into a temp folder
-    tempfile.tempdir = pagure.APP.config.get(
-        'TMP_FOLDER', tempfile.gettempdir())
     newpath = tempfile.mkdtemp(prefix='pagure-')
     new_repo = pygit2.clone_repository(repopath, newpath)
 
