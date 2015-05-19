@@ -161,7 +161,7 @@ install -m 644 milters/comment_email_milter.py \
 %dir %{_datadir}/pagure/
 %{_tmpfilesdir}/%{name}-milter.conf
 %{_unitdir}/pagure_milter.service
-%{_datadir}/pagure/comment_email_milter.py
+%{_datadir}/pagure/comment_email_milter.py*
 
 
 %changelog
