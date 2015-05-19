@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.3
+Version:        0.1.4
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -165,6 +165,16 @@ install -m 644 milters/comment_email_milter.py \
 
 
 %changelog
+* Tue May 19 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.4-1
+- Update to 0.1.4
+- Fix loading requests and tickets from git (allows syncing projects between
+  pagure instances)
+- Add to the template .wsgi file a way to re-locate the tmp folder to work
+  around a bug in libgit2
+- Fix unit-tests suite
+- Adjust the spec file to install all the files required for the milters
+- Fix the `View` button on the pull-request pages
+
 * Wed May 13 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.3-1
 - Update to 0.1.3
 - Add support for gitolite3
