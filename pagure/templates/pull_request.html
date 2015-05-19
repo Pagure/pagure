@@ -188,7 +188,8 @@
         <a class="button view" href="{{
             url_for(
                 'view_file',
-                username=pull_request.project_from.user.username if pull_request.project_from.is_fork else None,
+                username=pull_request.project_from.user.username
+                    if pull_request.project_from.is_fork else None,
                 repo=pull_request.project_from.name,
                 identifier=pull_request.branch_from,
                 filename=patch.new_file_path) }}"
