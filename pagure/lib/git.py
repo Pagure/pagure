@@ -330,7 +330,6 @@ def get_project_from_json(
     if not project:
         parent = None
         if jsondata.get('parent'):
-            print jsondata
             parent = get_project_from_json(
                 session, jsondata.get('parent'),
                 gitfolder, forkfolder, docfolder, ticketfolder, requestfolder)
