@@ -117,7 +117,7 @@ def ticket_add_comment():
     if issue is None:
         flask.abort(404, 'Issue not found')
 
-    user_obj = pagure.lib.search_user(SESSION, email=useremail)
+    user_obj = pagure.lib.search_user(pagure.SESSION, email=useremail)
     admin = False
     if user_obj:
         admin = user_obj == issue.project.user.user or (
