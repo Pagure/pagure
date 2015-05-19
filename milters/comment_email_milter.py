@@ -134,7 +134,7 @@ class PagureMilter(Milter.Base):
         tohash= msg['to'].split('@')[0].split('+')[-1]
         if m.hexdigest() != tohash:
             self.log('hash: %s' % m.hexdigest())
-            self.log('tohash:   %s' % msg['tohash'])
+            self.log('tohash:   %s' % tohash)
             self.log('Hash does not correspond to the destination')
             return Milter.CONTINUE
 
