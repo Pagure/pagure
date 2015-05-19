@@ -129,6 +129,8 @@ install -m 0644 milters/milter_tempfile.conf \
     $RPM_BUILD_ROOT/%{_tmpfilesdir}/%{name}-milter.conf
 install -m 644 milters/pagure_milter.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_milter.service
+install -m 644 milters/comment_email_milter.py \
+    $RPM_BUILD_ROOT/%{_datadir}/pagure/comment_email_milter.py
 
 
 %post milters
@@ -147,7 +149,8 @@ install -m 644 milters/pagure_milter.service \
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/pagure.conf
 %config(noreplace) %{_sysconfdir}/pagure/pagure.cfg
 %dir %{_sysconfdir}/pagure/
-%{_datadir}/pagure/
+%dir %{_datadir}/pagure/
+%{_datadir}/pagure/pagure*
 %{python_sitelib}/pagure/
 %{python_sitelib}/pagure*.egg-info
 
@@ -155,8 +158,10 @@ install -m 644 milters/pagure_milter.service \
 %files milters
 %license LICENSE
 %attr(755,postfix,postfix) %dir %{_localstatedir}/run/pagure
+%dir %{_datadir}/pagure/
 %{_tmpfilesdir}/%{name}-milter.conf
 %{_unitdir}/pagure_milter.service
+%{_datadir}/pagure/comment_email_milter.py
 
 
 %changelog
