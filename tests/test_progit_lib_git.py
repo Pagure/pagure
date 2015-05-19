@@ -34,7 +34,17 @@ class PagureLibGittests(tests.Modeltests):
         """ Set up the environnment, ran before every tests. """
         super(PagureLibGittests, self).setUp()
 
-        pagure.APP.config['FORK_FOLDER'] = os.path.join(tests.HERE, 'forks')
+        pagure.lib.git.SESSION = self.session
+        pagure.APP.config['GIT_FOLDER'] = os.path.join(
+            tests.HERE, 'repos')
+        pagure.APP.config['FORK_FOLDER'] = os.path.join(
+            tests.HERE, 'forks')
+        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
+            tests.HERE, 'tickets')
+        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
+            tests.HERE, 'docs')
+        pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
+            tests.HERE, 'requests')
 
     def test_write_gitolite_acls(self):
         """ Test the write_gitolite_acls function of pagure.lib.git. """
@@ -817,6 +827,7 @@ index 0000000..60f7480
     def test_update_request_from_git(self):
         """ Test the update_request_from_git method from pagure.lib.git. """
         tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(tests.HERE, 'repos'))
 
         repo = pagure.lib.get_project(self.session, 'test')
 
