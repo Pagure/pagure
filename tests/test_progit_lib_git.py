@@ -848,10 +848,12 @@ index 0000000..60f7480
                 "name": "test",
                 "date_created": "1426500194",
                 "user": {
-                    "fullname": "fake user",
-                    "name": "fake",
-                    "default_email": "fake@fedoraproject.org",
-                    "emails": ["fake@fedoraproject.org"]
+                    "fullname": "Pierre-YvesChibon",
+                    "name": "pingou",
+                    "default_email": "pingou@fedoraproject.org",
+                    "emails": [
+                        "pingou@fedoraproject.org"
+                    ]
                 },
                 "id": 1,
                 "description": "test project"
@@ -924,11 +926,11 @@ index 0000000..60f7480
                     "name": "test",
                     "date_created": "1426500194",
                     "user": {
-                        "fullname": "fake user",
-                        "name": "fake",
-                        "default_email": "fake@fedoraproject.org",
+                        "fullname": "Pierre-YvesChibon",
+                        "name": "pingou",
+                        "default_email": "pingou@fedoraproject.org",
                         "emails": [
-                            "fake@fedoraproject.org"
+                            "pingou@fedoraproject.org"
                         ]
                     },
                     "settings": {
@@ -947,11 +949,11 @@ index 0000000..60f7480
                 "name": "test",
                 "date_created": "1426843440",
                 "user": {
-                    "fullname": "Pierre-YvesChibon",
-                    "name": "pingou",
-                    "default_email": "pingou@fedoraproject.org",
+                    "fullname": "fake user",
+                    "name": "fake",
+                    "default_email": "fake@fedoraproject.org",
                     "emails": [
-                        "pingou@fedoraproject.org"
+                        "fake@fedoraproject.org"
                     ]
                 },
                 "id": 6,
@@ -1006,10 +1008,12 @@ index 0000000..60f7480
                 "name": "test",
                 "date_created": "1426500194",
                 "user": {
-                    "fullname": "fake user",
-                    "name": "fake",
-                    "default_email": "fake@fedoraproject.org",
-                    "emails": ["fake@fedoraproject.org"]
+                    "fullname": "Pierre-YvesChibon",
+                    "name": "pingou",
+                    "default_email": "pingou@fedoraproject.org",
+                    "emails": [
+                        "pingou@fedoraproject.org"
+                    ]
                 },
                 "settings": {
                     "issue_tracker": True,
@@ -1037,11 +1041,11 @@ index 0000000..60f7480
                     "name": "test",
                     "date_created": "1426500194",
                     "user": {
-                        "fullname": "fake user",
-                        "name": "fake",
-                        "default_email": "fake@fedoraproject.org",
+                        "fullname": "Pierre-YvesChibon",
+                        "name": "pingou",
+                        "default_email": "pingou@fedoraproject.org",
                         "emails": [
-                            "fake@fedoraproject.org"
+                            "pingou@fedoraproject.org"
                         ]
                     },
                     "settings": {
@@ -1060,11 +1064,11 @@ index 0000000..60f7480
                 "name": "test",
                 "date_created": "1426843440",
                 "user": {
-                    "fullname": "Pierre-YvesChibon",
-                    "name": "pingou",
-                    "default_email": "pingou@fedoraproject.org",
+                    "fullname": "fake user",
+                    "name": "fake",
+                    "default_email": "fake@fedoraproject.org",
                     "emails": [
-                        "pingou@fedoraproject.org"
+                        "fake@fedoraproject.org"
                     ]
                 },
                 "project_docs": True,
