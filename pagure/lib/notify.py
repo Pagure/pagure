@@ -194,7 +194,7 @@ def send_email(text, subject, to_mail,
             smtp.sendmail(
                 from_email,
                 [mailto],
-                msg.as_string())
+                lcl_msg.as_string())
         except smtplib.SMTPException as err:
             pagure.LOG.exception(err)
     smtp.quit()
