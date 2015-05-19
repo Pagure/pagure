@@ -169,15 +169,11 @@ class PagureMilter(Milter.Base):
             'comment': get_email_body(emailobj),
             'useremail': clean_item(emailobj['From']),
         }
-        url = urlparse.urlparse(pagure.APP.config.get('APP_URL')).path
+        url = pagure.APP.config.get('APP_URL')
 
         if url.endswith('/'):
             url = url[:-1]
-        if not url.startswith('/'):
-            url = '/' + url
-        if url == '/':
-            url = ''
-        url = 'http://localhost%s/pv/ticket/comment/' % url
+        url = '%s/pv/ticket/comment/' % url
         req = requests.put(url, data=data)
         if req.status_code == 200:
             self.log('Comment added')
@@ -201,15 +197,11 @@ class PagureMilter(Milter.Base):
             'comment': get_email_body(emailobj),
             'useremail': clean_item(emailobj['From']),
         }
-        url = urlparse.urlparse(pagure.APP.config.get('APP_URL')).path
+        url = pagure.APP.config.get('APP_URL')
 
         if url.endswith('/'):
             url = url[:-1]
-        if not url.startswith('/'):
-            url = '/' + url
-        if url == '/':
-            url = ''
-        url = 'http://localhost%s/pv/pull-request/comment/' % url
+        url = '%s/pv/pull-request/comment/' % url
         req = requests.put(url, data=data)
 
         return Milter.ACCEPT
