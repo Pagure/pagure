@@ -14,7 +14,6 @@ from sqlalchemy.exc import SQLAlchemyError
 
 if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
-    print 'Using configuration file `/etc/pagure/pagure.cfg`'
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
 
@@ -143,15 +142,17 @@ def run_as_post_receive_hook():
 
     changes = []
     for line in sys.stdin:
-        print line
+        if pagure.APP.config.get('HOOK_DEBUG', False):
+            print line
         (oldrev, newrev, refname) = line.strip().split(' ', 2)
 
-        print '  -- Old rev'
-        print oldrev
-        print '  -- New rev'
-        print newrev
-        print '  -- Ref name'
-        print refname
+        if pagure.APP.config.get('HOOK_DEBUG', False):
+            print '  -- Old rev'
+            print oldrev
+            print '  -- New rev'
+            print newrev
+            print '  -- Ref name'
+            print refname
 
         if set(newrev) == set(['0']):
             print "Deleting a reference/branch, so we won't run the "\
@@ -161,8 +162,9 @@ def run_as_post_receive_hook():
         generate_revision_change_log(
             pagure.lib.git.get_revs_between(oldrev, newrev, abspath))
 
-    print 'repo:', pagure.lib.git.get_repo_name(abspath)
-    print 'user:', pagure.lib.git.get_username(abspath)
+    if pagure.APP.config.get('HOOK_DEBUG', False):
+        print 'repo:', pagure.lib.git.get_repo_name(abspath)
+        print 'user:', pagure.lib.git.get_username(abspath)
 
 
 def main(args):

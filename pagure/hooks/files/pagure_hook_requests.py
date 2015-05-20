@@ -15,10 +15,8 @@ import subprocess
 # We need to access the database
 if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
-    print 'Using configuration file `/etc/pagure/pagure.cfg`'
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
-sys.path.insert(0, os.path.expanduser('~/repos/gitrepo/pagure'))
 
 import pagure.lib.git
 
@@ -46,15 +44,17 @@ def run_as_post_receive_hook():
 
     file_list = set()
     for line in sys.stdin:
-        print line
+        if pagure.APP.config.get('HOOK_DEBUG', False):
+            print line
         (oldrev, newrev, refname) = line.strip().split(' ', 2)
 
-        print '  -- Old rev'
-        print oldrev
-        print '  -- New rev'
-        print newrev
-        print '  -- Ref name'
-        print refname
+        if pagure.APP.config.get('HOOK_DEBUG', False):
+            print '  -- Old rev'
+            print oldrev
+            print '  -- New rev'
+            print newrev
+            print '  -- Ref name'
+            print refname
 
         if set(newrev) == set(['0']):
             print "Deleting a reference/branch, so we won't run the "\

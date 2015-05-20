@@ -10,12 +10,11 @@ from collections import defaultdict
 import fedmsg
 import fedmsg.config
 
-sys.path.insert(0, os.path.expanduser('~/repos/gitrepo/pagure'))
 
 if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
-    print 'Using configuration file `/etc/pagure/pagure.cfg`'
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
+
 
 import pagure.lib.git
 
