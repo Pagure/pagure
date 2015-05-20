@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.5
+Version:        0.1.6
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -165,6 +165,11 @@ install -m 644 milters/comment_email_milter.py \
 
 
 %changelog
+* Wed May 20 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.6-1
+- Update to 0.1.6
+- Fix sending notification emails to multiple users, avoid sending private into
+  to all of them
+
 * Tue May 19 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.5-1
 - Update to 0.1.5
 - Bug fix on the milter and the internal API endpoint
