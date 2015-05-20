@@ -167,34 +167,33 @@ def send_email(text, subject, to_mail,
     if not to_mail:
         return
 
-    msg = MIMEText(text.encode('utf-8'), 'plain', 'utf-8')
-    msg['Subject'] = '[Pagure] %s' % subject
-    from_email = pagure.APP.config.get(
-        'FROM_EMAIL', 'pagure@fedoraproject.org')
-    msg['From'] = from_email
-
-    if mail_id:
-        msg['mail-id'] = mail_id
-        msg['Message-Id'] = '<%s>' % mail_id
-
-    if in_reply_to:
-        msg['In-Reply-To'] = '<%s>' % in_reply_to
-
-    # Send the message via our own SMTP server, but don't include the
-    # envelope header.
     smtp = smtplib.SMTP(pagure.APP.config['SMTP_SERVER'])
     for mailto in to_mail.split(','):
-        lcl_msg = msg
-        lcl_msg['To'] = mailto
+        msg = MIMEText(text.encode('utf-8'), 'plain', 'utf-8')
+        msg['Subject'] = '[Pagure] %s' % subject
+        from_email = pagure.APP.config.get(
+            'FROM_EMAIL', 'pagure@fedoraproject.org')
+        msg['From'] = from_email
+
+        if mail_id:
+            msg['mail-id'] = mail_id
+            msg['Message-Id'] = '<%s>' % mail_id
+
+        if in_reply_to:
+            msg['In-Reply-To'] = '<%s>' % in_reply_to
+
+        # Send the message via our own SMTP server, but don't include the
+        # envelope header.
+        msg['To'] = mailto
         salt = pagure.APP.config.get('SALT_EMAIL')
         m = hashlib.sha512('<%s>%s%s' % (mail_id, salt, mailto))
-        lcl_msg['Reply-To'] = 'reply+%s@%s' % (
+        msg['Reply-To'] = 'reply+%s@%s' % (
             m.hexdigest(), pagure.APP.config['DOMAIN_EMAIL_NOTIFICATIONS'])
         try:
             smtp.sendmail(
                 from_email,
                 [mailto],
-                lcl_msg.as_string())
+                msg.as_string())
         except smtplib.SMTPException as err:
             pagure.LOG.exception(err)
     smtp.quit()
