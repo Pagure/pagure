@@ -26,10 +26,7 @@ logq = Queue(maxsize=4)
 
 if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
-    print 'Using configuration file `/etc/pagure/pagure.cfg`'
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
-
-sys.path.insert(0, os.path.expanduser('/srv/progit'))
 
 
 import pagure
