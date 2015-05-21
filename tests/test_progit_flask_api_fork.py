@@ -487,6 +487,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         # Valid request
         output = self.app.post(
             '/api/0/test/pull-request/1/comment', data=data, headers=headers)
+        print output.data
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         self.assertDictEqual(
