@@ -172,14 +172,16 @@ class User(BASE):
 
         return 'User: %s - name %s' % (self.id, self.user)
 
-    def to_json(self):
+    def to_json(self, public=False):
         ''' Return a representation of the User in a dictionnary. '''
         output = {
             'name': self.user,
             'fullname': self.fullname,
-            'default_email': self.default_email,
-            'emails': [email.email for email in self.emails],
         }
+        if not public:
+            output['default_email'] = self.default_email
+            output['emails'] = [email.email for email in self.emails]
+
         return output
 
 
@@ -335,7 +337,7 @@ class Project(BASE):
         ''' Ensures the settings are properly saved. '''
         self._settings = json.dumps(settings)
 
-    def to_json(self):
+    def to_json(self, public=False):
         ''' Return a representation of the project as JSON.
         '''
 
@@ -346,11 +348,7 @@ class Project(BASE):
             'parent': self.parent.to_json() if self.parent else None,
             'settings': self.settings,
             'date_created': self.date_created.strftime('%s'),
-            'user': {
-                'name': self.user.user,
-                'fullname': self.user.fullname,
-                'emails': [email.email for email in self.user.emails],
-            },
+            'user': self.user.to_json(public=public),
         }
 
         return output
@@ -466,7 +464,7 @@ class Issue(BASE):
         ''' Return the list of issue this issue blocks on in simple text. '''
         return [issue.id for issue in self.parents]
 
-    def to_json(self):
+    def to_json(self, public=False):
         ''' Returns a dictionary representation of the issue.
 
         '''
@@ -476,12 +474,13 @@ class Issue(BASE):
             'content': self.content,
             'status': self.status,
             'date_created': self.date_created.strftime('%s'),
-            'user': self.user.to_json(),
+            'user': self.user.to_json(public=public),
             'private': self.private,
             'tags': self.tags_text,
             'depends': [str(item) for item in self.depends_text],
             'blocks': [str(item) for item in self.blocks_text],
-            'assignee': self.assignee.to_json() if self.assignee else None,
+            'assignee': self.assignee.to_json(public=public) \
+                if self.assignee else None,
         }
 
         comments = []
@@ -724,7 +723,7 @@ class PullRequest(BASE):
 
         return len(positive) - len(negative)
 
-    def to_json(self):
+    def to_json(self, public=False):
         ''' Returns a dictionnary representation of the pull-request.
 
         '''
@@ -733,11 +732,11 @@ class PullRequest(BASE):
             'uid': self.uid,
             'title': self.title,
             'branch': self.branch,
-            'project': self.project.to_json(),
+            'project': self.project.to_json(public=public),
             'branch_from': self.branch_from,
-            'repo_from': self.project_from.to_json(),
+            'repo_from': self.project_from.to_json(public=public),
             'date_created': self.date_created.strftime('%s'),
-            'user': self.user.to_json(),
+            'user': self.user.to_json(public=public),
             'assignee': self.assignee.to_json() if self.assignee else None,
             'status': self.status,
             'commit_start': self.commit_start,
@@ -754,7 +753,7 @@ class PullRequest(BASE):
                 'comment': comment.comment,
                 'parent': comment.parent_id,
                 'date_created': comment.date_created.strftime('%s'),
-                'user': comment.user.to_json(),
+                'user': comment.user.to_json(public=public),
             }
             comments.append(cmt)
 
