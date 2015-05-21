@@ -173,11 +173,6 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "tags": [],
               "title": "test issue",
               "user": {
-                "default_email": "bar@pingou.com",
-                "emails": [
-                  "bar@pingou.com",
-                  "foo@pingou.com"
-                ],
                 "fullname": "PY C",
                 "name": "pingou"
               }
@@ -246,11 +241,6 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "tags": [],
               "title": "Test issue",
               "user": {
-                "default_email": "bar@pingou.com",
-                "emails": [
-                  "bar@pingou.com",
-                  "foo@pingou.com"
-                ],
                 "fullname": "PY C",
                 "name": "pingou"
               }

@@ -125,10 +125,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
                   "pull_requests": True
                 },
                 "user": {
-                  "emails": [
-                    "bar@pingou.com",
-                    "foo@pingou.com"
-                  ],
                   "fullname": "PY C",
                   "name": "pingou"
                 }
@@ -148,10 +144,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
                   "pull_requests": True
                 },
                 "user": {
-                  "emails": [
-                    "bar@pingou.com",
-                    "foo@pingou.com"
-                  ],
                   "fullname": "PY C",
                   "name": "pingou"
                 }
@@ -160,11 +152,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
               "title": "test pull-request",
               "uid": "1431414800",
               "user": {
-                "default_email": "bar@pingou.com",
-                "emails": [
-                  "bar@pingou.com",
-                  "foo@pingou.com"
-                ],
                 "fullname": "PY C",
                 "name": "pingou"
               }
