@@ -45,6 +45,7 @@ class APIERROR(enum.Enum):
         'necessary to be merged'
     ENOASSIG = 'Only the assignee can merge this review'
     ENOTASSIG = 'This request must be assigned to be merged'
+    ENOUSER = 'No such user found'
 
 
 def check_api_acls(acls, optional=False):
