@@ -126,7 +126,7 @@ def api_view_issue(repo, issueid, username=None):
                  not issue.user.user == flask.g.fas_user.username):
         raise pagure.exceptions.APIError(403, error_code=APIERROR.EISSUEREST)
 
-    jsonout = flask.jsonify(issue.to_json())
+    jsonout = flask.jsonify(issue.to_json(public=True))
     jsonout.status_code = httpcode
     return jsonout
 

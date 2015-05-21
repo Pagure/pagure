@@ -67,10 +67,6 @@ def api_pull_request_view(repo, requestid, username=None):
               "pull_requests": true
             },
             "user": {
-              "emails": [
-                "bar@pingou.com",
-                "foo@pingou.com"
-              ],
               "fullname": "PY C",
               "name": "pingou"
             }
@@ -90,10 +86,6 @@ def api_pull_request_view(repo, requestid, username=None):
               "pull_requests": true
             },
             "user": {
-              "emails": [
-                "bar@pingou.com",
-                "foo@pingou.com"
-              ],
               "fullname": "PY C",
               "name": "pingou"
             }
@@ -102,11 +94,6 @@ def api_pull_request_view(repo, requestid, username=None):
           "title": "test pull-request",
           "uid": "1431414800",
           "user": {
-            "default_email": "bar@pingou.com",
-            "emails": [
-              "bar@pingou.com",
-              "foo@pingou.com"
-            ],
             "fullname": "PY C",
             "name": "pingou"
           }
@@ -130,7 +117,7 @@ def api_pull_request_view(repo, requestid, username=None):
     if not request:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
 
-    jsonout = flask.jsonify(request.to_json())
+    jsonout = flask.jsonify(request.to_json(public=True))
     jsonout.status_code = httpcode
     return jsonout
 
