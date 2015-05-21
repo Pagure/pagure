@@ -324,9 +324,9 @@ def api_pull_request_add_comment(repo, requestid, username=None):
     form = pagure.forms.AddPullRequestCommentForm(csrf_enabled=False)
     if form.validate_on_submit():
         comment = form.comment.data
-        commit = form.commit.data
-        filename = form.filename.data
-        row = form.row.data
+        commit = form.commit.data or None
+        filename = form.filename.data or None
+        row = form.row.data or None
         try:
             # New comment
             message = pagure.lib.add_pull_request_comment(
