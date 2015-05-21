@@ -87,6 +87,14 @@ GL_RC = None
 GL_BINDIR = None
 
 
+# SSH Information
+
+### The ssh certificates of the git server to be provided to the user
+### /!\ format is important
+# SSH_CERTS = {'RSA': {'fingerprint': '<foo>', 'pubkey': '<bar>'}}
+
+
+
 # Optional configuration
 
 ### Number of items displayed per page

@@ -497,3 +497,13 @@ def confirm_email(token):
             APP.logger.exception(err)
 
     return flask.redirect(flask.url_for('.user_settings'))
+
+
+@APP.route('/ssh_info')
+def ssh_hostkey():
+    """ Endpoint returning information about the SSH hostkey and fingerprint
+    of the current pagure instance.
+    """
+    return flask.render_template(
+        'doc_ssh_keys.html',
+    )
