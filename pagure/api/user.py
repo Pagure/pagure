@@ -48,7 +48,7 @@ def api_view_user(username):
               "date_created": "1426595173",
               "description": "",
               "id": 5,
-              "name": "progit",
+              "name": "pagure",
               "parent": null,
               "settings": {
                 "Minimum_score_to_merge_pull-request": -1,
