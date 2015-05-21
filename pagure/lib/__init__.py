@@ -1161,23 +1161,35 @@ def search_issues(
                 ytags.append(tag)
 
         if ytags:
-            query = query.filter(
+            q2 = session.query(
+                sqlalchemy.distinct(model.Issue.uid)
+            ).filter(
+                model.Issue.project_id == repo.id
+            ).filter(
                 model.Issue.uid == model.TagIssue.issue_uid
             ).filter(
                 model.TagIssue.tag.in_(ytags)
             )
         if notags:
-            sub = session.query(
-                model.Issue.uid
+            q3 = session.query(
+                sqlalchemy.distinct(model.Issue.uid)
+            ).filter(
+                model.Issue.project_id == repo.id
             ).filter(
                 model.Issue.uid == model.TagIssue.issue_uid
             ).filter(
                 model.TagIssue.tag.in_(notags)
             )
+        # Adjust the main query based on the parameters specified
+        if ytags and not notags:
+            query = query.filter(model.Issue.uid.in_(q2))
+        elif not ytags and notags:
+            query = query.filter(~model.Issue.uid.in_(q3))
+        elif ytags and notags:
+            final_set = set(q2.all()) - set(q3.all())
+            if final_set:
+                query = query.filter(model.Issue.uid.in_(list(final_set)))
 
-            query = query.filter(
-                ~model.Issue.uid.in_(sub)
-            )
     if assignee is not None:
         if str(assignee).lower() not in ['false', '0', 'true', '1']:
             user2 = aliased(model.User)
