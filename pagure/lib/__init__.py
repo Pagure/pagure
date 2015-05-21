@@ -1023,17 +1023,54 @@ def search_projects(
     '''List existing projects
     '''
     projects = session.query(
-        model.Project
-    ).order_by(
-        model.Project.date_created
+        sqlalchemy.distinct(model.Project.id)
     )
 
     if username is not None:
         projects = projects.filter(
-            model.User.user == username
-        ).filter(
-            model.User.id == model.Project.user_id
+            # User created the project
+            sqlalchemy.and_(
+                model.User.user == username,
+                model.User.id == model.Project.user_id,
+            )
         )
+        q2 = session.query(
+            model.Project.id
+        ).filter(
+            # User got commit right
+            sqlalchemy.and_(
+                model.User.user == username,
+                model.User.id == model.ProjectUser.user_id,
+                model.ProjectUser.project_id == model.Project.id
+            )
+        )
+        q3 = session.query(
+            model.Project.id
+        ).filter(
+            # User created a group that has commit right
+            sqlalchemy.and_(
+                model.User.user == username,
+                model.PagureGroup.user_id == model.User.id,
+                model.PagureGroup.group_type == 'user',
+                model.PagureGroup.id == model.ProjectGroup.group_id,
+                model.Project.id == model.ProjectGroup.project_id,
+            )
+        )
+        q4 = session.query(
+            model.Project.id
+        ).filter(
+            # User is part of a group that has commit right
+            sqlalchemy.and_(
+                model.User.user == username,
+                model.PagureUserGroup.user_id == model.User.id,
+                model.PagureUserGroup.group_id == model.PagureGroup.id,
+                model.PagureGroup.group_type == 'user',
+                model.PagureGroup.id == model.ProjectGroup.group_id,
+                model.Project.id == model.ProjectGroup.project_id,
+            )
+        )
+
+        projects = projects.union(q2).union(q3).union(q4)
 
     if fork is not None:
         if fork is True:
@@ -1045,16 +1082,24 @@ def search_projects(
                 model.Project.parent_id == None
             )
 
+    query = session.query(
+        model.Project
+    ).filter(
+        model.Project.id.in_(projects.subquery())
+    ).order_by(
+        model.Project.date_created
+    )
+
     if start is not None:
-        projects = projects.offset(start)
+        query = query.offset(start)
 
     if limit is not None:
-        projects = projects.limit(limit)
+        query = query.limit(limit)
 
     if count:
-        return projects.count()
+        return query.count()
     else:
-        return projects.all()
+        return query.all()
 
 
 def get_project(session, name, user=None):
@@ -1161,23 +1206,35 @@ def search_issues(
                 ytags.append(tag)
 
         if ytags:
-            query = query.filter(
+            q2 = session.query(
+                sqlalchemy.distinct(model.Issue.uid)
+            ).filter(
+                model.Issue.project_id == repo.id
+            ).filter(
                 model.Issue.uid == model.TagIssue.issue_uid
             ).filter(
                 model.TagIssue.tag.in_(ytags)
             )
         if notags:
-            sub = session.query(
-                model.Issue.uid
+            q3 = session.query(
+                sqlalchemy.distinct(model.Issue.uid)
+            ).filter(
+                model.Issue.project_id == repo.id
             ).filter(
                 model.Issue.uid == model.TagIssue.issue_uid
             ).filter(
                 model.TagIssue.tag.in_(notags)
             )
+        # Adjust the main query based on the parameters specified
+        if ytags and not notags:
+            query = query.filter(model.Issue.uid.in_(q2))
+        elif not ytags and notags:
+            query = query.filter(~model.Issue.uid.in_(q3))
+        elif ytags and notags:
+            final_set = set(q2.all()) - set(q3.all())
+            if final_set:
+                query = query.filter(model.Issue.uid.in_(list(final_set)))
 
-            query = query.filter(
-                ~model.Issue.uid.in_(sub)
-            )
     if assignee is not None:
         if str(assignee).lower() not in ['false', '0', 'true', '1']:
             user2 = aliased(model.User)

@@ -209,31 +209,13 @@ def view_user(username):
     total_page_repos = int(ceil(repos_length / float(limit)))
     total_page_forks = int(ceil(forks_length / float(limit)))
 
-    repos_obj = [
-        pygit2.Repository(
-            os.path.join(APP.config['GIT_FOLDER'], repo.path))
-        for repo in repos
-        if os.path.exists(
-            os.path.join(APP.config['GIT_FOLDER'], repo.path))
-        ]
-
-    forks_obj = [
-        pygit2.Repository(
-            os.path.join(APP.config['FORK_FOLDER'], repo.path))
-        for repo in forks
-        if os.path.exists(
-            os.path.join(APP.config['FORK_FOLDER'], repo.path))
-        ]
-
     return flask.render_template(
         'user_info.html',
         username=username,
         user=user,
         repos=repos,
-        repos_obj=repos_obj,
         total_page_repos=total_page_repos,
         forks=forks,
-        forks_obj=forks_obj,
         total_page_forks=total_page_forks,
         repopage=repopage,
         forkpage=forkpage,
