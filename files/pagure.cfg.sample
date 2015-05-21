@@ -91,7 +91,7 @@ GL_BINDIR = None
 
 ### The ssh certificates of the git server to be provided to the user
 ### /!\ format is important
-# SSH_CERTS = {'RSA': {'fingerprint': '<foo>', 'pubkey': '<bar>'}}
+# SSH_KEYS = {'RSA': {'fingerprint': '<foo>', 'pubkey': '<bar>'}}
 
 
 
