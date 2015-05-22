@@ -18,10 +18,10 @@ instance:
 
 {% for cert in config.get('SSH_KEYS') %}
 <h4>{{ cert }} Fingerprint</h4>
-<pr>{{ config['SSH_KEYS'][cert]['fingerprint'] }}</pr>
+<pre>{{ config['SSH_KEYS'][cert]['fingerprint'] }}</pre>
 
 <h4>{{ cert }} Hostkey</h4>
-<pr>{{ config['SSH_KEYS'][cert]['pubkey'] }}</pr>
+<pre>{{ config['SSH_KEYS'][cert]['pubkey'] }}</pre>
 {% endfor %}
 
 {% else %}

@@ -13,6 +13,14 @@ input {
     font-size: 100%;
 }
 
+pre {
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap: break-word;
+}
+
 .issue_action input[type="submit"] {
     font-size: 75%;
 }
