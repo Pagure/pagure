@@ -26,7 +26,32 @@ from pagure.api import (
 @api_login_required(acls=['issue_create'])
 @api_method
 def api_new_issue(repo, username=None):
-    """ Create a new issue
+    """
+    Create a new issue
+    ------------------
+    This endpoint can be used to open an issue on a project
+
+    ::
+
+        /api/0/<repo>/new_issue
+
+        /api/0/fork/<username>/<repo>/new_issue
+
+    Accepts POST queries only.
+
+    :arg title: The title of the issue/ticket to create
+    :arg content: The content of the issue to create (ie the description of
+        the problem)
+    :arg private: A boolean specifying whether this issue is private or not
+
+    Sample response:
+
+    ::
+
+        {
+          "message": "Issue created"
+        }
+
     """
     repo = pagure.lib.get_project(SESSION, repo, user=username)
     httpcode = 200
