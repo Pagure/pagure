@@ -258,7 +258,6 @@ def api_view_issues(repo, username=None):
     if is_repo_admin(repo):
         private = None
 
-    oth_issues = None
     if status is not None:
         if status.lower() == 'closed':
             issues = pagure.lib.search_issues(
@@ -270,16 +269,6 @@ def api_view_issues(repo, username=None):
                 author=author,
                 private=private,
             )
-            oth_issues = pagure.lib.search_issues(
-                SESSION,
-                repo,
-                status='Open',
-                tags=tags,
-                assignee=assignee,
-                author=author,
-                private=private,
-                count=True,
-            )
         else:
             issues = pagure.lib.search_issues(
                 SESSION,
@@ -290,14 +279,10 @@ def api_view_issues(repo, username=None):
                 author=author,
                 private=private,
             )
-
     else:
         issues = pagure.lib.search_issues(
             SESSION, repo, status='Open', tags=tags, assignee=assignee,
             author=author, private=private)
-        oth_issues = pagure.lib.search_issues(
-            SESSION, repo, closed=True, tags=tags, assignee=assignee,
-            author=author, private=private, count=True)
 
     jsonout = flask.jsonify({
         'issues': [issue.to_json(public=True) for issue in issues],
