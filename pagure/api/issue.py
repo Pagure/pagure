@@ -279,7 +279,29 @@ def api_change_status_issue(repo, issueid, username=None):
 @api_login_required(acls=['issue_comment'])
 @api_method
 def api_comment_issue(repo, issueid, username=None):
-    """ Add a comment to an issue
+    """
+    Comment to an issue
+    -------------------
+    This endpoint can be used to add a comment to an issue
+
+    ::
+
+        /api/0/<repo>/issue/<issue id>/comment
+
+        /api/0/fork/<username>/<repo>/issue/<issue id>/comment
+
+    Accepts POST queries only.
+
+    :arg comment: The comment to add to the specified issue
+
+    Sample response:
+
+    ::
+
+        {
+          "message": "Comment added"
+        }
+
     """
     repo = pagure.lib.get_project(SESSION, repo, user=username)
     httpcode = 200
