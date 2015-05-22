@@ -27,7 +27,7 @@ from pagure.api import (
 def api_view_user(username):
     """
     User information
-    ================
+    ----------------
     Use this endpoint to retrieve information about a specific user.
 
     ::
