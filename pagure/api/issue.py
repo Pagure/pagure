@@ -127,7 +127,42 @@ def api_new_issue(repo, username=None):
 @api_login_optional()
 @api_method
 def api_view_issue(repo, issueid, username=None):
-    """ List all issues associated to a repo
+    """
+    Issue information
+    -----------------
+    This endpoint can be used to retrieve information about a specific
+    issue/ticket
+
+    ::
+
+        /api/0/<repo>/issue/<issue id>
+
+        /api/0/fork/<username>/<repo>/issue/<issue id>
+
+    Accepts GET queries only.
+
+    Sample response:
+
+    ::
+
+        {
+          "assignee": null,
+          "blocks": [],
+          "comments": [],
+          "content": "This issue needs attention",
+          "date_created": "1431414800",
+          "depends": [],
+          "id": 1,
+          "private": false,
+          "status": "Open",
+          "tags": [],
+          "title": "test issue",
+          "user": {
+            "fullname": "PY C",
+            "name": "pingou"
+          }
+        }
+
     """
 
     repo = pagure.lib.get_project(SESSION, repo, user=username)
