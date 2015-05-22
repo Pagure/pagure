@@ -26,8 +26,8 @@ from pagure.api import (
 @api_method
 def api_pull_request_view(repo, requestid, username=None):
     """
-    Request a pull-request
-    --------------------
+    Pull-request information
+    ------------------------
     This endpoint can be used to retrieve information about a specific
     pull-request
 
