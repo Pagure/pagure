@@ -21,6 +21,133 @@ from pagure.api import (
 )
 
 
+@API.route('/<repo>/pull-requests')
+@API.route('/fork/<username>/<repo>/pull-requests')
+@api_method
+def api_pull_request_views(repo, username=None):
+    """
+    List project's Pull-Requests
+    ----------------------------
+    This endpoint can be used to retrieve the pull-requests of the specified
+    project
+
+    ::
+
+        /api/0/<repo>/pull-requests
+
+        /api/0/fork/<username>/<repo>/pull-requests
+
+    Accepts GET queries only.
+
+    :kwarg status: The status of the pull-requests to return, default to
+        'True' (ie: opened pull-requests)
+    :kwarg assignee: Filters the pull-requests returned by the user they
+        are assigned to
+    :kwarg author: Filters the pull-requests returned by the user that
+        opened the pull-request
+
+    Sample response:
+
+    ::
+
+        {
+          "assignee": null,
+          "branch": "master",
+          "branch_from": "master",
+          "comments": [],
+          "commit_start": null,
+          "commit_stop": null,
+          "date_created": "1431414800",
+          "id": 1,
+          "project": {
+            "date_created": "1431414800",
+            "description": "test project #1",
+            "id": 1,
+            "name": "test",
+            "parent": null,
+            "settings": {
+              "Minimum_score_to_merge_pull-request": -1,
+              "Only_assignee_can_merge_pull-request": false,
+              "Web-hooks": null,
+              "issue_tracker": true,
+              "project_documentation": true,
+              "pull_requests": true
+            },
+            "user": {
+              "fullname": "PY C",
+              "name": "pingou"
+            }
+          },
+          "repo_from": {
+            "date_created": "1431414800",
+            "description": "test project #1",
+            "id": 1,
+            "name": "test",
+            "parent": null,
+            "settings": {
+              "Minimum_score_to_merge_pull-request": -1,
+              "Only_assignee_can_merge_pull-request": false,
+              "Web-hooks": null,
+              "issue_tracker": true,
+              "project_documentation": true,
+              "pull_requests": true
+            },
+            "user": {
+              "fullname": "PY C",
+              "name": "pingou"
+            }
+          },
+          "status": true,
+          "title": "test pull-request",
+          "uid": "1431414800",
+          "user": {
+            "fullname": "PY C",
+            "name": "pingou"
+          }
+        }
+
+    """
+
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    httpcode = 200
+    output = {}
+
+    if repo is None:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    if not repo.settings.get('pull_requests', True):
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPR)
+
+    status = flask.request.args.get('status', True)
+    assignee = flask.request.args.get('assignee', None)
+    author = flask.request.args.get('author', None)
+
+    requests = []
+    if status is False or str(status).lower() == 'closed':
+        requests = pagure.lib.search_pull_requests(
+            SESSION,
+            project_id=repo.id,
+            status=False,
+            assignee=assignee,
+            author=author)
+    else:
+        requests = pagure.lib.search_pull_requests(
+            SESSION,
+            project_id=repo.id,
+            assignee=assignee,
+            author=author,
+            status=status)
+
+    jsonout = flask.jsonify({
+        'requests': [request.to_json(public=True) for request in requests],
+        'status': status,
+        'assignee': assignee,
+        'author': author,
+    })
+    jsonout.status_code = httpcode
+    return jsonout
+
+
 @API.route('/<repo>/pull-request/<int:requestid>')
 @API.route('/fork/<username>/<repo>/pull-request/<int:requestid>')
 @api_method
