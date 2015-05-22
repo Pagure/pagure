@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.6
+Version:        0.1.7
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -165,6 +165,16 @@ install -m 644 milters/comment_email_milter.py \
 
 
 %changelog
+* Fri May 22 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.7-1
+- Update to 0.1.7
+- Drop debugging code on the milter and the hooks
+- Adjust the search_issues method to support filter for some tags, excluding
+  some others (for example ?tags=easfix&tags=!0.2)
+- Support groups when searching an user's projects (ie: finding the projects an
+  user has access to via the group their are in)
+- Do not load the git repo from the FS when loading an user's page
+- Present and document the SSH keys in a dedicated documentation page
+
 * Wed May 20 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.6-1
 - Update to 0.1.6
 - Fix sending notification emails to multiple users, avoid sending private into
