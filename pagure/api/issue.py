@@ -122,6 +122,195 @@ def api_new_issue(repo, username=None):
     return jsonout
 
 
+@API.route('/<repo>/issues')
+@API.route('/fork/<username>/<repo>/issues')
+@api_login_optional()
+@api_method
+def api_view_issues(repo, username=None):
+    """
+    List project's issues
+    ---------------------
+    This endpoint can be used to retrieve the list of all issues of the
+    specified project
+
+    ::
+
+        /api/0/<repo>/issues
+
+        /api/0/fork/<username>/<repo>/issues
+
+    Accepts GET queries only.
+
+    Sample response:
+
+    ::
+
+        {
+          "assignee": null,
+          "author": null,
+          "issues": [
+            {
+              "assignee": null,
+              "blocks": [],
+              "comments": [
+                {
+                  "comment": "bing",
+                  "date_created": "1427441560",
+                  "id": 379,
+                  "parent": null,
+                  "user": {
+                    "fullname": "PY.C",
+                    "name": "pingou"
+                  }
+                }
+              ],
+              "content": "bar",
+              "date_created": "1427441555",
+              "depends": [],
+              "id": 1,
+              "private": false,
+              "status": "Open",
+              "tags": [],
+              "title": "foo",
+              "user": {
+                "fullname": "PY.C",
+                "name": "pingou"
+              }
+            },
+            {
+              "assignee": null,
+              "blocks": [],
+              "comments": [],
+              "content": "report",
+              "date_created": "1427442076",
+              "depends": [],
+              "id": 2,
+              "private": false,
+              "status": "Open",
+              "tags": [],
+              "title": "bug",
+              "user": {
+                "fullname": "PY.C",
+                "name": "pingou"
+              }
+            }
+          ],
+          "status": null,
+          "tags": []
+        }
+
+        Second example:
+
+        {
+          "assignee": null,
+          "author": null,
+          "issues": [
+            {
+              "assignee": null,
+              "blocks": [],
+              "comments": [],
+              "content": "asd",
+              "date_created": "1427442217",
+              "depends": [],
+              "id": 4,
+              "private": false,
+              "status": "Fixed",
+              "tags": [
+                "0.1"
+              ],
+              "title": "bug",
+              "user": {
+                "fullname": "PY.C",
+                "name": "pingou"
+              }
+            }
+          ],
+          "status": "Closed",
+          "tags": [
+            "0.1"
+          ]
+        }
+
+    """
+
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    httpcode = 200
+    output = {}
+
+    if repo is None:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    if not repo.settings.get('issue_tracker', True):
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOTRACKER)
+
+    status = flask.request.args.get('status', None)
+    tags = flask.request.args.getlist('tags')
+    tags = [tag.strip() for tag in tags if tag.strip()]
+    assignee = flask.request.args.get('assignee', None)
+    author = flask.request.args.get('author', None)
+
+    # Hide private tickets
+    private = False
+    # If user is authenticated, show him/her his/her private tickets
+    if authenticated():
+        private = flask.g.fas_user.username
+    # If user is repo admin, show all tickets included the private ones
+    if is_repo_admin(repo):
+        private = None
+
+    oth_issues = None
+    if status is not None:
+        if status.lower() == 'closed':
+            issues = pagure.lib.search_issues(
+                SESSION,
+                repo,
+                closed=True,
+                tags=tags,
+                assignee=assignee,
+                author=author,
+                private=private,
+            )
+            oth_issues = pagure.lib.search_issues(
+                SESSION,
+                repo,
+                status='Open',
+                tags=tags,
+                assignee=assignee,
+                author=author,
+                private=private,
+                count=True,
+            )
+        else:
+            issues = pagure.lib.search_issues(
+                SESSION,
+                repo,
+                status=status,
+                tags=tags,
+                assignee=assignee,
+                author=author,
+                private=private,
+            )
+
+    else:
+        issues = pagure.lib.search_issues(
+            SESSION, repo, status='Open', tags=tags, assignee=assignee,
+            author=author, private=private)
+        oth_issues = pagure.lib.search_issues(
+            SESSION, repo, closed=True, tags=tags, assignee=assignee,
+            author=author, private=private, count=True)
+
+    jsonout = flask.jsonify({
+        'issues': [issue.to_json(public=True) for issue in issues],
+        'status': status,
+        'tags': tags,
+        'assignee': assignee,
+        'author': author,
+    })
+    jsonout.status_code = httpcode
+    return jsonout
+
+
+
 @API.route('/<repo>/issue/<int:issueid>')
 @API.route('/fork/<username>/<repo>/issue/<int:issueid>')
 @api_login_optional()
