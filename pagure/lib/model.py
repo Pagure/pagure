@@ -490,7 +490,7 @@ class Issue(BASE):
                 'comment': comment.comment,
                 'parent': comment.parent_id,
                 'date_created': comment.date_created.strftime('%s'),
-                'user': comment.user.to_json(),
+                'user': comment.user.to_json(public=public),
             }
             comments.append(cmt)
 
