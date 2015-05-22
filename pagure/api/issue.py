@@ -141,6 +141,17 @@ def api_view_issues(repo, username=None):
 
     Accepts GET queries only.
 
+    :kwarg status: The status of the issues to return, default to 'Open'
+    :kwarg tags: One or more tags to filter the issues returned.
+        If you want to wish to filter for issues not having a specific tag
+        you can mark the tag with an exclamation mark in front of it, for
+        example to get all the issues not tagged as ``easyfix`` you can
+        filter using the tag ``!easyfix``
+    :kwarg assignee: Filters the issues returned by the user they are
+        assigned to
+    :kwarg author: Filters the issues returned by the user that opened the
+        issue
+
     Sample response:
 
     ::
