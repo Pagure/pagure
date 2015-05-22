@@ -85,8 +85,7 @@ def api_new_issue(repo, username=None):
                 SESSION.add(issue)
                 SESSION.commit()
 
-            output['message'] = 'issue created'
-            output['message'] = 'issue created'
+            output['message'] = 'Issue created'
         except SQLAlchemyError, err:  # pragma: no cover
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 

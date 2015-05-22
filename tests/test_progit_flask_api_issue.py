@@ -122,7 +122,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = json.loads(output.data)
         self.assertDictEqual(
             data,
-            {'message': 'issue created'}
+            {'message': 'Issue created'}
         )
 
     def test_api_view_issue(self):
