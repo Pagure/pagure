@@ -195,7 +195,29 @@ def api_view_issue(repo, issueid, username=None):
 @api_login_required(acls=['issue_change_status'])
 @api_method
 def api_change_status_issue(repo, issueid, username=None):
-    """ Change the status of an issue
+    """
+    Change issue status
+    -------------------
+    This endpoint can be used to change the status of an issue
+
+    ::
+
+        /api/0/<repo>/issue/<issue id>/status
+
+        /api/0/fork/<username>/<repo>/issue/<issue id>/status
+
+    Accepts POST queries only.
+
+    :arg status: The new status of the specified issue
+
+    Sample response:
+
+    ::
+
+        {
+          "message": "Edited successfully issue #1"
+        }
+
     """
     repo = pagure.lib.get_project(SESSION, repo, user=username)
     httpcode = 200
