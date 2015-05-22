@@ -52,58 +52,65 @@ def api_pull_request_views(repo, username=None):
 
         {
           "assignee": null,
-          "branch": "master",
-          "branch_from": "master",
-          "comments": [],
-          "commit_start": null,
-          "commit_stop": null,
-          "date_created": "1431414800",
-          "id": 1,
-          "project": {
-            "date_created": "1431414800",
-            "description": "test project #1",
-            "id": 1,
-            "name": "test",
-            "parent": null,
-            "settings": {
-              "Minimum_score_to_merge_pull-request": -1,
-              "Only_assignee_can_merge_pull-request": false,
-              "Web-hooks": null,
-              "issue_tracker": true,
-              "project_documentation": true,
-              "pull_requests": true
-            },
-            "user": {
-              "fullname": "PY C",
-              "name": "pingou"
+          "author": null,
+          "requests": [
+            {
+              "assignee": null,
+              "branch": "master",
+              "branch_from": "master",
+              "comments": [],
+              "commit_start": null,
+              "commit_stop": null,
+              "date_created": "1431414800",
+              "id": 1,
+              "project": {
+                "date_created": "1431414800",
+                "description": "test project #1",
+                "id": 1,
+                "name": "test",
+                "parent": null,
+                "settings": {
+                  "Minimum_score_to_merge_pull-request": -1,
+                  "Only_assignee_can_merge_pull-request": false,
+                  "Web-hooks": None,
+                  "issue_tracker": true,
+                  "project_documentation": true,
+                  "pull_requests": true
+                },
+                "user": {
+                  "fullname": "PY C",
+                  "name": "pingou"
+                }
+              },
+              "repo_from": {
+                "date_created": "1431414800",
+                "description": "test project #1",
+                "id": 1,
+                "name": "test",
+                "parent": null,
+                "settings": {
+                  "Minimum_score_to_merge_pull-request": -1,
+                  "Only_assignee_can_merge_pull-request": false,
+                  "Web-hooks": null,
+                  "issue_tracker": true,
+                  "project_documentation": true,
+                  "pull_requests": true
+                },
+                "user": {
+                  "fullname": "PY C",
+                  "name": "pingou"
+                }
+              },
+              "status": true,
+              "title": "test pull-request",
+              "uid": "1431414800",
+              "user": {
+                "fullname": "PY C",
+                "name": "pingou"
+              }
             }
-          },
-          "repo_from": {
-            "date_created": "1431414800",
-            "description": "test project #1",
-            "id": 1,
-            "name": "test",
-            "parent": null,
-            "settings": {
-              "Minimum_score_to_merge_pull-request": -1,
-              "Only_assignee_can_merge_pull-request": false,
-              "Web-hooks": null,
-              "issue_tracker": true,
-              "project_documentation": true,
-              "pull_requests": true
-            },
-            "user": {
-              "fullname": "PY C",
-              "name": "pingou"
-            }
-          },
-          "status": true,
-          "title": "test pull-request",
-          "uid": "1431414800",
-          "user": {
-            "fullname": "PY C",
-            "name": "pingou"
-          }
+          ],
+          "status": true
         }
 
     """
