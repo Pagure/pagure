@@ -21,6 +21,7 @@ API = flask.Blueprint('api_ns', __name__, url_prefix='/api/0')
 import pagure
 import pagure.lib
 from pagure import __api_version__, APP, SESSION
+from pagure.doc_utils import load_doc
 from pagure.exceptions import APIError
 
 
@@ -165,6 +166,27 @@ def api_method(function):
 
 from pagure.api import issue
 from pagure.api import fork
+
+
+@API.route('/')
+def api():
+    ''' Display the api information page. '''
+    api_version_doc = load_doc(api_version)
+    api_users = load_doc(api_users)
+    api_project_tags = load_doc(api_project_tags)
+    api_groups = load_doc(api_groups)
+    api_error_codes = load_doc(api_error_codes)
+
+    return flask.render_template(
+        'api.html',
+        extras=[
+            api_version_doc,
+            api_users,
+            api_project_tags,
+            api_groups,
+            api_error_codes,
+        ],
+    )
 
 
 @API.route('/version/')
