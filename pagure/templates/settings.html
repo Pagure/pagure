@@ -67,8 +67,8 @@
         <input id="{{ key }}" type="checkbox" value="y" name="{{ key }}" {%
          if repo.settings[key] -%}checked=""{%- endif -%}/>
         {% else %}
-        <input id="{{ key }}" type="text" value="{{ repo.settings[key] }}"
-         name="{{ key }}" />
+        <input id="{{ key }}" type="text" {% if repo.settings[key]
+            %}value="{{ repo.settings[key] }}"{% endif %} name="{{ key }}" />
         {% endif %}
       </td>
     </tr>
