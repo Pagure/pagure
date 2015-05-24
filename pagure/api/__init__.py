@@ -168,27 +168,6 @@ from pagure.api import issue
 from pagure.api import fork
 
 
-@API.route('/')
-def api():
-    ''' Display the api information page. '''
-    api_version_doc = load_doc(api_version)
-    api_users = load_doc(api_users)
-    api_project_tags = load_doc(api_project_tags)
-    api_groups = load_doc(api_groups)
-    api_error_codes = load_doc(api_error_codes)
-
-    return flask.render_template(
-        'api.html',
-        extras=[
-            api_version_doc,
-            api_users,
-            api_project_tags,
-            api_groups,
-            api_error_codes,
-        ],
-    )
-
-
 @API.route('/version/')
 @API.route('/version')
 def api_version():
@@ -370,3 +349,24 @@ def api_error_codes():
     errors = {val.name: val.value for val in APIERROR.__members__.values()}
 
     return flask.jsonify(errors)
+
+
+@API.route('/')
+def api():
+    ''' Display the api information page. '''
+    api_version_doc = load_doc(api_version)
+    api_users_doc = load_doc(api_users)
+    api_project_tags_doc = load_doc(api_project_tags)
+    api_groups_doc = load_doc(api_groups)
+    api_error_codes_doc = load_doc(api_error_codes)
+
+    return flask.render_template(
+        'api.html',
+        extras=[
+            api_version_doc,
+            api_users_doc,
+            api_project_tags_doc,
+            api_groups_doc,
+            api_error_codes_doc,
+        ],
+    )
