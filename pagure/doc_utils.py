@@ -11,8 +11,10 @@
 
 import docutils
 import docutils.core
+import docutils.examples
 import markupsafe
 import markdown
+import textwrap
 
 
 def modify_rst(rst, view_file_url=None):
@@ -94,3 +96,18 @@ def convert_readme(content, ext, view_file_url=None):
     elif not ext or (ext and ext in ['.text', '.txt']):
         output = '<pre>%s</pre>' % content
     return output
+
+
+def load_doc(endpoint):
+    """ Utility to load an RST file and turn it into fancy HTML. """
+
+    rst = unicode(textwrap.dedent(endpoint.__doc__))
+
+    rst = modify_rst(rst)
+
+    api_docs = docutils.examples.html_body(rst)
+
+    api_docs = modify_html(api_docs)
+
+    api_docs = markupsafe.Markup(api_docs)
+    return api_docs
