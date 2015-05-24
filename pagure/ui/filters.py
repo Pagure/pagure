@@ -270,3 +270,23 @@ def author_to_avatar(author, size=32):
     user = pagure.lib.search_user(SESSION, email=author.email)
     output = user.user if user else author.name
     return avatar(output, size)
+
+
+@APP.template_filter('InsertDiv')
+def insert_div(content):
+    """ Template filter inserting an opening <div> and closing </div>
+    after the first title and then at the end of the content.
+    """
+    # This is quite a hack but simpler solution using .replace() didn't work
+    # for some reasons...
+    content = content.split('\n')
+    output = []
+    for row in content:
+        if row.startswith('<div class="document" id='):
+            continue
+        output.append(row)
+    output = "\n".join(output)
+    output = output.replace('</h1>', '</h1><div>')
+    output = output.replace('h1', 'h3')
+
+    return output
