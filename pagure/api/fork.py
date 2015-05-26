@@ -412,7 +412,7 @@ def api_pull_request_close(repo, requestid, username=None):
 def api_pull_request_add_comment(repo, requestid, username=None):
     """
     Comment on a pull-request
-    --------------------
+    -------------------------
     This endpoint can be used to comment on a pull-request
 
     ::
