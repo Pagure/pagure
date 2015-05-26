@@ -354,6 +354,15 @@ def api_error_codes():
 @API.route('/')
 def api():
     ''' Display the api information page. '''
+    api_new_issue_doc = load_doc(issue.api_new_issue)
+    api_view_issues_doc = load_doc(issue.api_view_issues)
+
+    api_pull_request_views_doc = load_doc(fork.api_pull_request_views)
+    api_pull_request_view_doc = load_doc(fork.api_pull_request_view)
+    api_pull_request_merge_doc = load_doc(fork.api_pull_request_merge)
+    api_pull_request_close_doc = load_doc(fork.api_pull_request_close)
+    api_pull_request_add_comment_doc = load_doc(fork.api_pull_request_add_comment)
+
     api_version_doc = load_doc(api_version)
     api_users_doc = load_doc(api_users)
     api_project_tags_doc = load_doc(api_project_tags)
@@ -362,11 +371,22 @@ def api():
 
     return flask.render_template(
         'api.html',
+        projects=[
+            api_new_issue_doc,
+            api_view_issues_doc,
+            api_pull_request_views_doc,
+            api_pull_request_view_doc,
+            api_pull_request_merge_doc,
+            api_pull_request_close_doc,
+            api_pull_request_add_comment_doc,
+        ],
+        users=[
+            api_users_doc,
+            api_groups_doc,
+        ],
         extras=[
             api_version_doc,
-            api_users_doc,
             api_project_tags_doc,
-            api_groups_doc,
             api_error_codes_doc,
         ],
     )
