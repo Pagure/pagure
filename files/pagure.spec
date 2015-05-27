@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.7
+Version:        0.1.8
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -165,6 +165,16 @@ install -m 644 milters/comment_email_milter.py \
 
 
 %changelog
+* Wed May 27 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.8-1
+- Update 0.1.8
+- Add the possibility to do Asynchronous in-line comment posting
+  (Patrick Uiterwijk)
+- Handle the situation where the branch asked is not found in the git repo
+- Handle the situation where we cannot find a desired commit
+- Do not display a value in the settings page if there are none
+- Rework the pull-request view to move the list of commits into a tab
+- Make email sending optional (Patrick Uiterwijk)
+
 * Fri May 22 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.7-1
 - Update to 0.1.7
 - Drop debugging code on the milter and the hooks
