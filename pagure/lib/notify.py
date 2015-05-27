@@ -167,6 +167,17 @@ def send_email(text, subject, to_mail,
     if not to_mail:
         return
 
+    if not pagure.APP.config.get('EMAIL_SEND', True):
+        print '******EMAIL******'
+        print 'To: %s' % to_mail
+        print 'Subject: %s' % subject
+        print 'in_reply_to: %s' % in_reply_to
+        print 'mail_id: %s' % mail_id
+        print 'Contents:'
+        print text
+        print '*****/EMAIL******'
+        return
+
     smtp = smtplib.SMTP(pagure.APP.config['SMTP_SERVER'])
     for mailto in to_mail.split(','):
         msg = MIMEText(text.encode('utf-8'), 'plain', 'utf-8')

@@ -24,6 +24,9 @@ DB_URL = 'sqlite:////var/tmp/pagure_dev.sqlite'
 # The FAS group in which the admin of pagure are
 ADMIN_GROUP = 'sysadmin-main'
 
+# Whether or not to send emails
+EMAIL_SEND = True
+
 # The email address to which the flask.log will send the errors (tracebacks)
 EMAIL_ERROR = 'pingou@pingoured.fr'
 
