@@ -850,3 +850,7 @@ span.CONFLICTS {
   padding-left: 20px;
   background: url(/static/red.png) 0 50% no-repeat;
 }
+
+.ui-widget-content {
+    color: #666!important;
+}
