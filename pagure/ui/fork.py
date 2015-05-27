@@ -345,6 +345,8 @@ def pull_request_add_comment(
     if not request:
         flask.abort(404, 'Pull-request not found')
 
+    is_js = flask.request.args.get('js', False)
+
     repo = request.project_from
 
     form = pagure.forms.AddPullRequestCommentForm()
@@ -373,11 +375,17 @@ def pull_request_add_comment(
             SESSION.rollback()
             APP.logger.exception(err)
             flask.flash(str(err), 'error')
+            if is_js:
+                return 'error'
 
+        if is_js:
+            return 'ok'
         return flask.redirect(flask.url_for(
             'request_pull', username=username,
             repo=repo.name, requestid=requestid))
 
+    if is_js:
+        return 'failed'
     return flask.render_template(
         'pull_request_comment.html',
         select='requests',

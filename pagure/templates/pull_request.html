@@ -455,5 +455,35 @@
 {% endif %}
 
  });
+
+{% if authenticated %}
+function try_async_comment(form) {
+  $.post( form.action + "?js=1", $(form).serialize() )
+    .done(function(data) {
+      if(data == 'ok') {
+        // We have submitted the comment correctly
+        var comment_fld = $(form).find("#comment")[0];
+        var comment = comment_fld.value;
+        var comment_view = "<tr><td></td><td colspan='2'><table style='width:100%'><tbody><tr><td>" +
+                           "<a href='/user/{{ g.fas_user.username }}'>{{ g.fas_user.username }}</a>" +
+                           "</td><td class='right'>Now</td></tr><tr>" +
+                           "<tr><td class='pr_comment' colspan='2'><p>" +
+                           comment + "</p></td></tr></tbody></td></tr>";
+        $(form).closest('tr').before($(comment_view)).remove();
+      } else {
+        // Make the browser submit the form sync
+        $(form).off('submit');
+        form.submit();
+      }
+    })
+    .fail(function() {
+      // Make the browser submit the form sync
+      $(form).off('submit');
+      form.submit();
+    })
+  return false;
+};
+{% endif %}
+
 </script>
 {% endblock %}
