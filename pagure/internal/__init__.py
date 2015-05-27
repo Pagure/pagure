@@ -181,8 +181,15 @@ def mergeable_request_pull():
     newpath = tempfile.mkdtemp(prefix='pagure-pr-check')
     new_repo = pygit2.clone_repository(parentpath, newpath)
 
-    repo_commit = fork_obj[
-        fork_obj.lookup_branch(request.branch_from).get_object().hex]
+    branch = fork_obj.lookup_branch(request.branch_from)
+    if not branch:
+        flask.abort(
+            400,
+            'Branch %s could not be found in the repo %s' % (
+                request.branch_from, request.project_from.fullname
+            ))
+
+    repo_commit = fork_obj[branch.get_object().hex]
 
     ori_remote = new_repo.remotes[0]
     # Add the fork as remote repo
