@@ -855,3 +855,15 @@ span.CONFLICTS {
 .ui-widget-content {
     color: #666!important;
 }
+
+.tabs .ui-widget-content a{
+    color: #0066CC!important;
+}
+
+.tabs .ui-state-hover a:hover{
+    color: white;
+}
+
+.tabs .ui-tabs-active a:hover{
+    color: #e59728!important;
+}
