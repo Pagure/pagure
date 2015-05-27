@@ -421,6 +421,9 @@ def view_raw_file(repo, identifier, filename=None, username=None):
             # If it's not a commit id then it's part of the filename
             commit = repo_obj[repo_obj.head.target]
 
+    if not commit:
+        flask.abort(400, 'Commit %s not found' % (identifier))
+
     mimetype = None
     encoding = None
     if filename:
