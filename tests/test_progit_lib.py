@@ -978,7 +978,8 @@ class PagureLibtests(tests.Modeltests):
         """ Test the get_issue_statuses of pagure.lib. """
         statuses = pagure.lib.get_issue_statuses(self.session)
         self.assertEqual(
-            statuses, ['Open', 'Invalid', 'Insufficient data', 'Fixed'])
+            sorted(statuses),
+            ['Fixed', 'Insufficient data', 'Invalid', 'Open'])
 
     def test_set_up_user(self):
         """ Test the set_up_user of pagure.lib. """
