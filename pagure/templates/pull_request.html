@@ -177,7 +177,7 @@
 
 {% if diff %}
 {% for patch in diff %}
-<div class="commit_diff">
+<section class="commit_diff">
 <header>
     <h3>{{ patch.new_file_path }}</h3>
     <ul class="buttons">
@@ -224,14 +224,17 @@
             index=loop.index)}}
 {% endautoescape %}
 {% endfor %}
+</section>
 {% endif %}
-</div>
+
 {% if authenticated and pull_request %}
 {{ mergeform.csrf_token }}
 </form>
 {% endif %}
+
 </div>
 </div>
+
 
 {% if pull_request and pull_request.comments%}
 <section class="request_comment">
