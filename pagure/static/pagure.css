@@ -544,6 +544,7 @@ request_comment p {
     background: -ms-linear-gradient(top, #ededed 0%,#fff 100%); /* IE10+ */
     background: linear-gradient(to bottom, #ededed 0%,#fff 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ededed', endColorstr='#fff',GradientType=0 ); /* IE6-9 */
+    font-family: Cantarell,sans-serif;
 }
 
 .issue_action,
