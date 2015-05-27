@@ -138,7 +138,13 @@
 </section>
 {% endif %}
 
-<section class="commit_list">
+<div class="tabs">
+  <ul>
+    <li><a href="#request_diff">Diff</a></li>
+    <li><a href="#commit_list">Commits</a></li>
+  </ul>
+
+<div class="commit_list" id="commit_list">
   <ul>
     {% for commit in diff_commits %}
     <li>
@@ -160,9 +166,9 @@
       <p class="error"> No commits found </p>
     {% endfor %}
   </ul>
-</section>
+</div>
 
-<section class="request_diff">
+<div class="request_diff" id="request_diff">
 
 {% if authenticated and pull_request %}
 <form action="{{ url_for('.pull_request_drop_comment', username=username,
@@ -171,7 +177,7 @@
 
 {% if diff %}
 {% for patch in diff %}
-<section class="commit_diff">
+<div class="commit_diff">
 <header>
     <h3>{{ patch.new_file_path }}</h3>
     <ul class="buttons">
@@ -219,11 +225,12 @@
 {% endautoescape %}
 {% endfor %}
 {% endif %}
+</div>
 {% if authenticated and pull_request %}
 {{ mergeform.csrf_token }}
 </form>
 {% endif %}
-</section>
+</div>
 
 {% if pull_request and pull_request.comments%}
 <section class="request_comment">
@@ -252,7 +259,7 @@
       (supports the <a href="http://daringfireball.net/projects/markdown/syntax"
         target="_blank">Markdown syntax</a>)
     </header>
-    <div id="tabs">
+    <div class="tabs" id="comment">
       <ul>
         <li><a href="#edit">Comment</a></li>
         <li><a href="#preview">Preview</a></li>
@@ -356,9 +363,9 @@
     }
   );
 
-  $( "#tabs" ).tabs();
+  $( ".tabs" ).tabs();
 
-  $( "#tabs" ).on('tabsactivate',
+  $( "#comment" ).on('tabsactivate',
     function(event, ui) {
       if (ui.newPanel.selector == '#preview') {
         var _text = $( "#comment" ).val();
