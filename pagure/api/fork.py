@@ -312,7 +312,8 @@ def api_pull_request_merge(repo, requestid, username=None):
 
     if repo.settings.get('Only_assignee_can_merge_pull-request', False):
         if not request.assignee:
-            raise pagure.exceptions.APIError(403, error_code=APIERROR.ENOTASSIG)
+            raise pagure.exceptions.APIError(
+                403, error_code=APIERROR.ENOTASSIGNED)
 
         if request.assignee.username != flask.g.fas_user.username:
             raise pagure.exceptions.APIError(403, error_code=APIERROR.ENOASSIG)

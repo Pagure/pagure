@@ -45,7 +45,7 @@ class APIERROR(enum.Enum):
     EPRSCORE = 'This request does not have the minimum review score '\
         'necessary to be merged'
     ENOASSIG = 'Only the assignee can merge this review'
-    ENOTASSIG = 'This request must be assigned to be merged'
+    ENOTASSIGNED = 'This request must be assigned to be merged'
     ENOUSER = 'No such user found'
 
 
