@@ -206,55 +206,28 @@ def request_pull_patch(repo, requestid, username=None):
         commitid = branch.get_object().hex
 
     diff_commits = []
-    if not repo_obj.is_empty and not orig_repo.is_empty:
-
-        # Closed pull-request
-        if request.status is False:
-            commitid = request.commit_stop
-            for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
-                diff_commits.append(commit)
-                if commit.oid.hex == request.commit_start:
-                    break
-        # Pull-request open
-        else:
-            master_commits = [
-                commit.oid.hex
-                for commit in orig_repo.walk(
-                    orig_repo.lookup_branch(request.branch).get_object().hex,
-                    pygit2.GIT_SORT_TIME)
-            ]
-            for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
-                if request.status and commit.oid.hex in master_commits:
-                    break
-                diff_commits.append(commit)
-
-    elif orig_repo.is_empty and not repo_obj.is_empty:
+    if request.status is False:
+        commitid = request.commit_stop
         for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
             diff_commits.append(commit)
-        if request.status and diff_commits:
-            first_commit = repo_obj[diff_commits[-1].oid.hex]
-            request.commit_start = first_commit.oid.hex
-            request.commit_stop = diff_commits[0].oid.hex
-            SESSION.add(request)
-            try:
-                SESSION.commit()
-                pagure.lib.git.update_git(
-                    request, repo=request.project,
-                    repofolder=APP.config['REQUESTS_FOLDER'])
-            except SQLAlchemyError as err:  # pragma: no cover
-                SESSION.rollback()
-                APP.logger.exception(err)
-                flask.flash(
-                    'Could not update this pull-request in the database',
-                    'error')
-
-        repo_commit = repo_obj[request.commit_stop]
+            if commit.oid.hex == request.commit_start:
+                break
     else:
-        flask.flash(
-            'Fork is empty, there are no commits to request pulling',
-            'error')
-        return flask.redirect(flask.url_for(
-            'view_repo', username=username, repo=repo.name))
+        try:
+            diff_commits, diff = pagure.lib.git.diff_pull_request(
+                SESSION, request, repo_obj, orig_repo,
+                requestfolder=APP.config['REQUESTS_FOLDER'],
+                with_diff=False)
+        except pagure.exceptions.PagureException as err:
+            flask.flash(err.message, 'error')
+            return flask.redirect(flask.url_for(
+                'view_repo', username=username, repo=repo.name))
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash(
+                'Could not update this pull-request in the database',
+                'error')
 
     diff_commits.reverse()
     patch = pagure.lib.git.commit_to_patch(repo_obj, diff_commits)
