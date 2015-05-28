@@ -116,7 +116,6 @@ def api_pull_request_views(repo, username=None):
     """
 
     repo = pagure.lib.get_project(SESSION, repo, user=username)
-    httpcode = 200
     output = {}
 
     if repo is None:
@@ -152,7 +151,6 @@ def api_pull_request_views(repo, username=None):
         'assignee': assignee,
         'author': author,
     })
-    jsonout.status_code = httpcode
     return jsonout
 
 
@@ -237,7 +235,6 @@ def api_pull_request_view(repo, requestid, username=None):
     """
 
     repo = pagure.lib.get_project(SESSION, repo, user=username)
-    httpcode = 200
     output = {}
 
     if repo is None:
@@ -254,7 +251,6 @@ def api_pull_request_view(repo, requestid, username=None):
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
 
     jsonout = flask.jsonify(request.to_json(public=True))
-    jsonout.status_code = httpcode
     return jsonout
 
 
@@ -286,7 +282,6 @@ def api_pull_request_merge(repo, requestid, username=None):
         }
 
     """
-    httpcode = 200
     output = {}
 
     repo = pagure.lib.get_project(SESSION, repo, user=username)
@@ -333,7 +328,6 @@ def api_pull_request_merge(repo, requestid, username=None):
                 400, error_code=APIERROR.ENOCODE, error=str(err))
 
     jsonout = flask.jsonify(output)
-    jsonout.status_code = httpcode
     return jsonout
 
 
@@ -366,7 +360,6 @@ def api_pull_request_close(repo, requestid, username=None):
         }
 
     """
-    httpcode = 200
     output = {}
 
     repo = pagure.lib.get_project(SESSION, repo, user=username)
@@ -403,7 +396,6 @@ def api_pull_request_close(repo, requestid, username=None):
         raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     jsonout = flask.jsonify(output)
-    jsonout.status_code = httpcode
     return jsonout
 
 
@@ -443,7 +435,6 @@ def api_pull_request_add_comment(repo, requestid, username=None):
 
     """
     repo = pagure.lib.get_project(SESSION, repo, user=username)
-    httpcode = 200
     output = {}
 
     if repo is None:
@@ -490,5 +481,4 @@ def api_pull_request_add_comment(repo, requestid, username=None):
         raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
 
     jsonout = flask.jsonify(output)
-    jsonout.status_code = httpcode
     return jsonout

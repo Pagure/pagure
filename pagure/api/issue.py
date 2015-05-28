@@ -54,7 +54,6 @@ def api_new_issue(repo, username=None):
 
     """
     repo = pagure.lib.get_project(SESSION, repo, user=username)
-    httpcode = 200
     output = {}
 
     if repo is None:
@@ -120,7 +119,6 @@ def api_new_issue(repo, username=None):
         raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
 
     jsonout = flask.jsonify(output)
-    jsonout.status_code = httpcode
     return jsonout
 
 
@@ -247,7 +245,6 @@ def api_view_issues(repo, username=None):
     """
 
     repo = pagure.lib.get_project(SESSION, repo, user=username)
-    httpcode = 200
     output = {}
 
     if repo is None:
@@ -305,7 +302,6 @@ def api_view_issues(repo, username=None):
         'assignee': assignee,
         'author': author,
     })
-    jsonout.status_code = httpcode
     return jsonout
 
 
@@ -354,7 +350,6 @@ def api_view_issue(repo, issueid, username=None):
     """
 
     repo = pagure.lib.get_project(SESSION, repo, user=username)
-    httpcode = 200
     output = {}
 
     if repo is None:
@@ -375,7 +370,6 @@ def api_view_issue(repo, issueid, username=None):
         raise pagure.exceptions.APIError(403, error_code=APIERROR.EISSUEREST)
 
     jsonout = flask.jsonify(issue.to_json(public=True))
-    jsonout.status_code = httpcode
     return jsonout
 
 
@@ -409,7 +403,6 @@ def api_change_status_issue(repo, issueid, username=None):
 
     """
     repo = pagure.lib.get_project(SESSION, repo, user=username)
-    httpcode = 200
     output = {}
 
     if repo is None:
@@ -461,7 +454,6 @@ def api_change_status_issue(repo, issueid, username=None):
         raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
 
     jsonout = flask.jsonify(output)
-    jsonout.status_code = httpcode
     return jsonout
 
 
@@ -495,7 +487,6 @@ def api_comment_issue(repo, issueid, username=None):
 
     """
     repo = pagure.lib.get_project(SESSION, repo, user=username)
-    httpcode = 200
     output = {}
 
     if repo is None:
@@ -540,5 +531,4 @@ def api_comment_issue(repo, issueid, username=None):
         raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
 
     jsonout = flask.jsonify(output)
-    jsonout.status_code = httpcode
     return jsonout
