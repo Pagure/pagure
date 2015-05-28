@@ -29,7 +29,7 @@ class APIERROR(enum.Enum):
     """
     ENOCODE = 'Variable message describing the issue'
     ENOPROJECT = 'Project not found'
-    ENOTRACKER = 'No issue tracker found for this project'
+    ETRACKERDISABLED = 'Issue tracker disabled for this project'
     EDBERROR = 'An error occured at the database level and prevent the ' \
         'action from reaching completion'
     EINVALIDREQ = 'Invalid or incomplete input submited'

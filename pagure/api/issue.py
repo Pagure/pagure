@@ -61,7 +61,8 @@ def api_new_issue(repo, username=None):
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
     if not repo.settings.get('issue_tracker', True):
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOTRACKER)
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.ETRACKERDISABLED)
 
     if repo != flask.g.token.project:
         raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
@@ -252,7 +253,8 @@ def api_view_issues(repo, username=None):
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
     if not repo.settings.get('issue_tracker', True):
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOTRACKER)
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.ETRACKERDISABLED)
 
     status = flask.request.args.get('status', None)
     tags = flask.request.args.getlist('tags')
@@ -358,7 +360,8 @@ def api_view_issue(repo, issueid, username=None):
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
     if not repo.settings.get('issue_tracker', True):
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOTRACKER)
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.ETRACKERDISABLED)
 
     issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
 
@@ -412,7 +415,8 @@ def api_change_status_issue(repo, issueid, username=None):
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
     if not repo.settings.get('issue_tracker', True):
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOTRACKER)
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.ETRACKERDISABLED)
 
     if repo != flask.g.token.project:
         raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
@@ -496,7 +500,8 @@ def api_comment_issue(repo, issueid, username=None):
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
     if not repo.settings.get('issue_tracker', True):
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOTRACKER)
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.ETRACKERDISABLED)
 
     if repo.fullname != flask.g.token.project.fullname:
         raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
