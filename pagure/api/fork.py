@@ -316,7 +316,8 @@ def api_pull_request_merge(repo, requestid, username=None):
                 403, error_code=APIERROR.ENOTASSIGNED)
 
         if request.assignee.username != flask.g.fas_user.username:
-            raise pagure.exceptions.APIError(403, error_code=APIERROR.ENOASSIG)
+            raise pagure.exceptions.APIError(
+                403, error_code=APIERROR.ENOTASSIGNEE)
 
     threshold = repo.settings.get('Minimum_score_to_merge_pull-request', -1)
     if threshold > 0 and int(request.score) < int(threshold):
