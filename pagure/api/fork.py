@@ -356,7 +356,7 @@ def api_pull_request_close(repo, requestid, username=None):
     ::
 
         {
-          "message": "Request pull canceled!"
+          "message": "Pull-request closed!"
         }
 
     """
@@ -389,7 +389,7 @@ def api_pull_request_close(repo, requestid, username=None):
         merged=False)
     try:
         SESSION.commit()
-        output['message'] = 'Request pull canceled!'
+        output['message'] = 'Pull-request closed!'
     except SQLAlchemyError as err:  # pragma: no cover
         SESSION.rollback()
         APP.logger.exception(err)
