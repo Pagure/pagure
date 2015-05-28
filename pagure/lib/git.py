@@ -838,7 +838,9 @@ def merge_pull_request(session, repo, request, username, request_folder):
     return 'Changes merged!'
 
 
-def diff_pull_request(session, request, repo_obj, orig_repo, requestfolder):
+def diff_pull_request(
+        session, request, repo_obj, orig_repo, requestfolder,
+        with_diff=True):
     """ Returns the diff and the list of commits between the two git repos
     mentionned in the given pull-request.
     """
@@ -864,7 +866,8 @@ def diff_pull_request(session, request, repo_obj, orig_repo, requestfolder):
             diff_commits.append(commit)
 
         if request.status and diff_commits:
-            request.commit_start = diff_commits[-1].oid.hex
+            first_commit = repo_obj[diff_commits[-1].oid.hex]
+            request.commit_start = first_commit.oid.hex
             request.commit_stop = diff_commits[0].oid.hex
             session.add(request)
             session.commit()
@@ -872,10 +875,9 @@ def diff_pull_request(session, request, repo_obj, orig_repo, requestfolder):
                 request, repo=request.project,
                 repofolder=requestfolder)
 
-        if diff_commits:
-            first_commit = repo_obj[diff_commits[-1].oid.hex]
+        if diff_commits and with_diff:
             diff = repo_obj.diff(
-                repo_obj.revparse_single(first_commit.parents[0].oid.hex),
+                repo_obj.revparse_single(diff_commits[-1].parents[0].oid.hex),
                 repo_obj.revparse_single(diff_commits[0].oid.hex)
             )
 
@@ -883,7 +885,8 @@ def diff_pull_request(session, request, repo_obj, orig_repo, requestfolder):
         for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
             diff_commits.append(commit)
         if request.status and diff_commits:
-            request.commit_start = diff_commits[-1].oid.hex
+            first_commit = repo_obj[diff_commits[-1].oid.hex]
+            request.commit_start = first_commit.oid.hex
             request.commit_stop = diff_commits[0].oid.hex
             session.add(request)
             session.commit()
@@ -892,7 +895,8 @@ def diff_pull_request(session, request, repo_obj, orig_repo, requestfolder):
                 repofolder=requestfolder)
 
         repo_commit = repo_obj[request.commit_stop]
-        diff = repo_commit.tree.diff_to_tree(swap=True)
+        if with_diff:
+            diff = repo_commit.tree.diff_to_tree(swap=True)
     else:
         raise pagure.exceptions.PagureException(
             'Fork is empty, there are no commits to request pulling')
