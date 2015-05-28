@@ -387,11 +387,11 @@ def api_pull_request_close(repo, requestid, username=None):
     if not is_repo_admin(repo):
         raise pagure.exceptions.APIError(403, error_code=APIERROR.ENOPRCLOSE)
 
-    pagure.lib.close_pull_request(
-        SESSION, request, flask.g.fas_user.username,
-        requestfolder=APP.config['REQUESTS_FOLDER'],
-        merged=False)
     try:
+        pagure.lib.close_pull_request(
+            SESSION, request, flask.g.fas_user.username,
+            requestfolder=APP.config['REQUESTS_FOLDER'],
+            merged=False)
         SESSION.commit()
         output['message'] = 'Pull-request closed!'
     except SQLAlchemyError as err:  # pragma: no cover
