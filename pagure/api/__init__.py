@@ -37,7 +37,8 @@ class APIERROR(enum.Enum):
         'renew your API token.' % APP.config['APP_URL']
     ENOISSUE = 'Issue not found'
     EISSUEREST = 'You are not allowed to view this issue'
-    ENOPR = 'Pull-Request have been deactivated for this project'
+    EPULLREQUESTSDISABLED = 'Pull-Request have been deactivated for this '\
+        'project'
     ENOREQ = 'Pull-Request not found'
     ENOPRCLOSE = 'You are not allowed to merge/close pull-request for '\
         'this project'
