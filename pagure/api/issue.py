@@ -113,6 +113,7 @@ def api_new_issue(repo, username=None):
 
             output['message'] = 'Issue created'
         except SQLAlchemyError, err:  # pragma: no cover
+            SESSION.rollback()
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
@@ -453,6 +454,7 @@ def api_change_status_issue(repo, issueid, username=None):
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.ENOCODE, error=str(err))
         except SQLAlchemyError, err:  # pragma: no cover
+            SESSION.rollback()
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
@@ -531,6 +533,7 @@ def api_comment_issue(repo, issueid, username=None):
             SESSION.commit()
             output['message'] = message
         except SQLAlchemyError, err:  # pragma: no cover
+            SESSION.rollback()
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
