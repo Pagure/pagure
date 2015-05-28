@@ -10,8 +10,6 @@
 
 import flask
 
-from sqlalchemy.exc import SQLAlchemyError
-
 import pagure
 import pagure.exceptions
 import pagure.lib
