@@ -83,7 +83,7 @@ def api_new_issue(repo, username=None):
                 user=flask.g.fas_user.username,
                 ticketfolder=APP.config['TICKETS_FOLDER'],
             )
-            SESSION.commit()
+            SESSION.flush()
             # If there is a file attached, attach it.
             filestream = flask.request.files.get('filestream')
             if filestream and '<!!image>' in issue.content:
@@ -108,8 +108,9 @@ def api_new_issue(repo, username=None):
                     new_filename, filelocation, filelocation)
                 issue.content = issue.content.replace('<!!image>', url)
                 SESSION.add(issue)
-                SESSION.commit()
+                SESSION.flush()
 
+            SESSION.commit()
             output['message'] = 'Issue created'
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
