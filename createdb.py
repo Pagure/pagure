@@ -10,4 +10,5 @@ from pagure.lib import model
 model.create_tables(
     APP.config['DB_URL'],
     APP.config.get('PATH_ALEMBIC_INI', None),
+    acls=APP.config.get('ACLS', {}),
     debug=True)

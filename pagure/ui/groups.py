@@ -95,7 +95,7 @@ def view_group(group):
 
     member = False
     if pagure.authenticated():
-        member=pagure.lib.is_group_member(
+        member = pagure.lib.is_group_member(
             pagure.SESSION, flask.g.fas_user.username, group.group_name)
 
     return flask.render_template(

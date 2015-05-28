@@ -1897,7 +1897,7 @@ def add_user_to_group(session, username, group, user, is_admin):
         raise pagure.exceptions.PagureException(
             'No user `%s` found' % action_user)
 
-    if not group.group_name in user.groups and not is_admin\
+    if group.group_name not in user.groups and not is_admin\
             and user.username != group.creator.username:
         raise pagure.exceptions.PagureException(
             'You are not allowed to add user to this group')
@@ -1937,7 +1937,7 @@ def delete_user_of_group(session, username, groupname, user, is_admin):
         raise pagure.exceptions.PagureException(
             'Could not find user %s' % action_user)
 
-    if not group_obj.group_name in user.groups and not is_admin:
+    if group_obj.group_name not in user.groups and not is_admin:
         raise pagure.exceptions.PagureException(
             'You are not allowed to remove user from this group')
 
@@ -1949,7 +1949,7 @@ def delete_user_of_group(session, username, groupname, user, is_admin):
     if not user_grp:
         raise pagure.exceptions.PagureException(
             'User `%s` could not be found in the group `%s`' % (
-            username, groupname))
+                username, groupname))
 
     session.delete(user_grp)
     session.flush()
@@ -2024,3 +2024,62 @@ def is_group_member(session, user, groupname):
         return False
 
     return groupname in user.groups
+
+
+def get_api_token(session, token_str):
+    """ Return the Token object corresponding to the provided token string
+    if there is any, returns None otherwise.
+    """
+    query = session.query(
+        model.Token
+    ).filter(
+        model.Token.id == token_str
+    )
+
+    return query.first()
+
+
+def get_acls(session):
+    """ Returns all the possible ACLs a token can have according to the
+    database.
+    """
+    query = session.query(
+        model.ACL
+    ).order_by(
+        model.ACL.name
+    )
+
+    return query.all()
+
+
+def add_token_to_user(session, project, acls, username):
+    """ Create a new token for the specified user on the specified project
+    with the given ACLs.
+    """
+    acls_obj = session.query(
+        model.ACL
+    ).filter(
+        model.ACL.name.in_(acls)
+    ).all()
+
+    user = search_user(session, username=username)
+
+    token = pagure.lib.model.Token(
+        id=pagure.lib.login.id_generator(64),
+        user_id=user.id,
+        project_id=project.id,
+        expiration=datetime.datetime.utcnow() + datetime.timedelta(days=60)
+    )
+    session.add(token)
+    session.flush()
+
+    for acl in acls_obj:
+        item = pagure.lib.model.TokenAcl(
+            token_id=token.id,
+            acl_id=acl.id,
+        )
+        session.add(item)
+
+    session.commit()
+
+    return 'Token created'

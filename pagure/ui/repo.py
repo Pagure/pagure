@@ -8,11 +8,12 @@
 
 """
 
-import flask
+import datetime
 import shutil
 import os
 from math import ceil
 
+import flask
 import pygit2
 import kitchen.text.converters as ktc
 
@@ -988,4 +989,93 @@ def regenerate_git(repo, username=None):
 
     return flask.redirect(
         flask.url_for('.view_settings', repo=repo.name, username=username)
+    )
+
+
+@APP.route('/<repo>/token/new', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/token/new', methods=('GET', 'POST'))
+@cla_required
+def add_token(repo, username=None):
+    """ Add a token to a specified project.
+    """
+    if admin_session_timedout():
+        return flask.redirect(
+            flask.url_for('auth_login', next=flask.request.url))
+
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    acls = pagure.lib.get_acls(SESSION)
+    form = pagure.forms.NewTokenForm(acls=acls)
+
+    if form.validate_on_submit():
+        try:
+            msg = pagure.lib.add_token_to_user(
+                SESSION,
+                repo,
+                acls=form.acls.data,
+                username=flask.g.fas_user.username,
+            )
+            SESSION.commit()
+            flask.flash(msg)
+            return flask.redirect(
+                flask.url_for(
+                    '.view_settings', repo=repo.name, username=username)
+            )
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash('User could not be added', 'error')
+
+    return flask.render_template(
+        'add_token.html',
+        form=form,
+        acls=acls,
+        username=username,
+        repo=repo,
+    )
+
+
+@APP.route('/<repo>/token/revoke/<token_id>', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/token/revoke/<token_id>',
+           methods=['POST'])
+@cla_required
+def revoke_api_token(repo, token_id, username=None):
+    """ Revokie a token to a specified project.
+    """
+    if admin_session_timedout():
+        return flask.redirect(
+            flask.url_for('auth_login', next=flask.request.url))
+
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    token = pagure.lib.get_api_token(SESSION, token_id)
+
+    if not token \
+            or token.project.fullname != repo.fullname \
+            or token.user.username != flask.g.fas_user.username:
+        flask.abort(404, 'Token not found')
+
+    form = pagure.forms.ConfirmationForm()
+
+    if form.validate_on_submit():
+        try:
+            token.expiration = datetime.datetime.utcnow()
+            SESSION.commit()
+            flask.flash('Token revoked')
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash(
+                'Token could not be revoked, please contact an admin',
+                'error')
+
+    return flask.redirect(
+        flask.url_for(
+            '.view_settings', repo=repo.name, username=username)
     )

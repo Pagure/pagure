@@ -5,6 +5,7 @@ arrow
 blinker
 chardet
 docutils
+enum34
 flask
 flask-wtf
 kitchen

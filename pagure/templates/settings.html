@@ -54,6 +54,71 @@
   </form>
   </div>
 
+  <div>
+    <h3>API key</h3>
+    <p>
+      API keys are tokens used to authenticate you on pagure. They can also
+      be used to grant access to 3rd party application to behave on this
+      project on your name.
+    </p>
+    <p>
+      These keys are valid for <span class="strong">60</span> days.
+    </p>
+    <p>
+      These keys are private to your project, make sure to store in a safe
+      place and do not share it.
+    </p>
+
+    {% if repo.tokens %}
+    <table>
+    {% for token in repo.tokens %}
+      {% if token.user.username == g.fas_user.username %}
+      <tr>
+        <td>
+          {{ token.id }}
+        </td>
+        <td>
+        {% if token.expired %}
+          <span class="error">Expired</span> since {{ token.expiration.date() }}
+        {% else %}
+          <span class="message">Valid</span> until: {{ token.expiration.date() }}
+        {% endif %}
+        </td>
+        <td>
+          <a class="clickable"
+            onclick="show_acls({{ token.acls_list |safe }})">ACLs</a>
+        </td>
+        <td>
+          <form action="{{ url_for('.revoke_api_token',
+                username=username, repo=repo.name, token_id=token.id) }}"
+            method="post" class="icon">
+            <button class="icon_button" type="submit"
+                onclick="return confirm('Are you sure to revoke this token ?'
+                    + '\nThis will break all application using it and '
+                    + 'cannot be un-done.');"
+                title="Revoke token">
+              <span class="icon icon-trash blue"></span>
+              Revoke
+            </button>
+            {{ form.csrf_token }}
+          </form>
+        </td>
+      </tr>
+      {% endif %}
+    {% endfor %}
+    </table>
+    {% endif %}
+
+    <a href="{{ url_for('.add_token', username=username, repo=repo.name) }}"
+        method="post" class="icon">
+    <button class="icon_button" type="submit"
+      title="Generate a new API token">
+      <span class="icon icon-plus blue"></span>
+      Get a new Key
+    </button>
+    </a>
+  </div>
+
 
   <h3>Project's options</h3>
   <form action="{{ url_for('.view_settings',
@@ -168,7 +233,6 @@
       <h3 class="plugin_title" data-plugin="{{ plugin }}">{{ plugin }}</h3>
       <div id="body_{{ plugin }}"></div>
     {% endfor %}
-    </ul>
   </div>
 </section>
 {% endif %}
@@ -230,6 +294,25 @@
 {% block jscripts %}
 {{ super() }}
 <script>
+  function show_acls(acls) {
+    var _txt = '<div title="ACLs details" id="show_meeting">'
+      + '<ul>';
+
+    for (i = 0; i < acls.length; i++) {
+        _txt += '<li>' + acls[i] + '</li>';
+    }
+
+    _txt += '</ul>' + '</div>';
+    var _elt = $(_txt);
+    var _height = $(window).height() * 0.8;
+    _elt.dialog({
+        height: 250,
+        width: 250,
+        modal: true,
+        cache: false,
+    });
+    }
+
   $(function() {
     $( "#accordion" ).accordion({
       collapsible: true,

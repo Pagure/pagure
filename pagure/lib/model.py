@@ -31,7 +31,7 @@ ERROR_LOG = logging.getLogger('pagure.model')
 # pylint: disable=C0103,R0903,W0232,E1101
 
 
-def create_tables(db_url, alembic_ini=None, debug=False):
+def create_tables(db_url, alembic_ini=None, acls=None, debug=False):
     """ Create the tables in the database using the information from the
     url obtained.
 
@@ -72,11 +72,11 @@ def create_tables(db_url, alembic_ini=None, debug=False):
 
     scopedsession = scoped_session(sessionmaker(bind=engine))
     # Insert the default data into the db
-    create_default_status(scopedsession)
+    create_default_status(scopedsession, acls=acls)
     return scopedsession
 
 
-def create_default_status(session):
+def create_default_status(session, acls=None):
     """ Insert the defaults status in the status tables.
     """
 
@@ -97,6 +97,18 @@ def create_default_status(session):
         except SQLAlchemyError:  # pragma: no cover
             session.rollback()
             ERROR_LOG.debug('Type %s could not be added', grptype)
+
+    for acl in acls or {}:
+        item = ACL(
+            name=acl,
+            description=acls[acl]
+        )
+        session.add(item)
+        try:
+            session.commit()
+        except SQLAlchemyError:  # pragma: no cover
+            session.rollback()
+            ERROR_LOG.debug('ACL %s could not be added', acl)
 
 
 class StatusIssue(BASE):
@@ -160,14 +172,16 @@ class User(BASE):
 
         return 'User: %s - name %s' % (self.id, self.user)
 
-    def to_json(self):
+    def to_json(self, public=False):
         ''' Return a representation of the User in a dictionnary. '''
         output = {
             'name': self.user,
             'fullname': self.fullname,
-            'default_email': self.default_email,
-            'emails': [email.email for email in self.emails],
         }
+        if not public:
+            output['default_email'] = self.default_email
+            output['emails'] = [email.email for email in self.emails]
+
         return output
 
 
@@ -323,7 +337,7 @@ class Project(BASE):
         ''' Ensures the settings are properly saved. '''
         self._settings = json.dumps(settings)
 
-    def to_json(self):
+    def to_json(self, public=False):
         ''' Return a representation of the project as JSON.
         '''
 
@@ -334,11 +348,7 @@ class Project(BASE):
             'parent': self.parent.to_json() if self.parent else None,
             'settings': self.settings,
             'date_created': self.date_created.strftime('%s'),
-            'user': {
-                'name': self.user.user,
-                'fullname': self.user.fullname,
-                'emails': [email.email for email in self.user.emails],
-            },
+            'user': self.user.to_json(public=public),
         }
 
         return output
@@ -454,7 +464,7 @@ class Issue(BASE):
         ''' Return the list of issue this issue blocks on in simple text. '''
         return [issue.id for issue in self.parents]
 
-    def to_json(self):
+    def to_json(self, public=False):
         ''' Returns a dictionary representation of the issue.
 
         '''
@@ -464,12 +474,13 @@ class Issue(BASE):
             'content': self.content,
             'status': self.status,
             'date_created': self.date_created.strftime('%s'),
-            'user': self.user.to_json(),
+            'user': self.user.to_json(public=public),
             'private': self.private,
             'tags': self.tags_text,
             'depends': [str(item) for item in self.depends_text],
             'blocks': [str(item) for item in self.blocks_text],
-            'assignee': self.assignee.to_json() if self.assignee else None,
+            'assignee': self.assignee.to_json(public=public)
+            if self.assignee else None,
         }
 
         comments = []
@@ -479,7 +490,7 @@ class Issue(BASE):
                 'comment': comment.comment,
                 'parent': comment.parent_id,
                 'date_created': comment.date_created.strftime('%s'),
-                'user': comment.user.to_json(),
+                'user': comment.user.to_json(public=public),
             }
             comments.append(cmt)
 
@@ -712,7 +723,7 @@ class PullRequest(BASE):
 
         return len(positive) - len(negative)
 
-    def to_json(self):
+    def to_json(self, public=False):
         ''' Returns a dictionnary representation of the pull-request.
 
         '''
@@ -721,11 +732,11 @@ class PullRequest(BASE):
             'uid': self.uid,
             'title': self.title,
             'branch': self.branch,
-            'project': self.project.to_json(),
+            'project': self.project.to_json(public=public),
             'branch_from': self.branch_from,
-            'repo_from': self.project_from.to_json(),
+            'repo_from': self.project_from.to_json(public=public),
             'date_created': self.date_created.strftime('%s'),
-            'user': self.user.to_json(),
+            'user': self.user.to_json(public=public),
             'assignee': self.assignee.to_json() if self.assignee else None,
             'status': self.status,
             'commit_start': self.commit_start,
@@ -742,7 +753,7 @@ class PullRequest(BASE):
                 'comment': comment.comment,
                 'parent': comment.parent_id,
                 'date_created': comment.date_created.strftime('%s'),
-                'user': comment.user.to_json(),
+                'user': comment.user.to_json(public=public),
             }
             comments.append(cmt)
 
@@ -891,6 +902,116 @@ class ProjectGroup(BASE):
     __table_args__ = (
         sa.UniqueConstraint(
             'project_id', 'group_id'),
+    )
+
+#
+# Class and tables specific for the API/token access
+#
+
+
+class ACL(BASE):
+    """
+    Table listing all the rights a token can be given
+    """
+
+    __tablename__ = 'acls'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    name = sa.Column(sa.String(32), unique=True, nullable=False)
+    description = sa.Column(sa.Text(), nullable=False)
+    created = sa.Column(
+        sa.DateTime, nullable=False, default=datetime.datetime.utcnow)
+
+    def __repr__(self):
+        ''' Return a string representation of this object. '''
+
+        return 'ACL: %s - name %s' % (self.id, self.name)
+
+
+class Token(BASE):
+    """
+    Table listing all the tokens per user and per project
+    """
+
+    __tablename__ = 'tokens'
+
+    id = sa.Column(sa.String(64), primary_key=True)
+    user_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey('users.id', onupdate='CASCADE'),
+        nullable=False,
+        index=True)
+    project_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey('projects.id', onupdate='CASCADE'),
+        nullable=False,
+        index=True)
+    expiration = sa.Column(
+        sa.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    created = sa.Column(
+        sa.DateTime, nullable=False, default=datetime.datetime.utcnow)
+
+    acls = relation(
+        "ACL",
+        secondary="tokens_acls",
+        primaryjoin="tokens.c.id==tokens_acls.c.token_id",
+        secondaryjoin="acls.c.id==tokens_acls.c.acl_id",
+    )
+
+    user = relation(
+        'User',
+        backref=backref(
+            'tokens', cascade="delete, delete-orphan",
+            order_by="Token.created"
+        ),
+        foreign_keys=[user_id],
+        remote_side=[User.id])
+
+    project = relation(
+        'Project',
+        backref=backref(
+            'tokens', cascade="delete, delete-orphan",
+        ),
+        foreign_keys=[project_id],
+        remote_side=[Project.id])
+
+    def __repr__(self):
+        ''' Return a string representation of this object. '''
+
+        return 'Token: %s - name %s' % (self.id, self.expiration)
+
+    @property
+    def expired(self):
+        ''' Returns wether a token has expired or not. '''
+        if datetime.datetime.utcnow().date() >= self.expiration.date():
+            return True
+        else:
+            return False
+
+    @property
+    def acls_list(self):
+        ''' Return a list containing the name of each ACLs this token has.
+        '''
+        return sorted([str(acl.name) for acl in self.acls])
+
+
+class TokenAcl(BASE):
+    """
+    Association table linking the tokens table to the acls table.
+    This allow linking token to acl.
+    """
+
+    __tablename__ = 'tokens_acls'
+
+    token_id = sa.Column(
+        sa.String(64), sa.ForeignKey('tokens.id'), primary_key=True)
+    acl_id = sa.Column(
+        sa.Integer, sa.ForeignKey('acls.id'), primary_key=True)
+
+    # Constraints
+    __table_args__ = (
+        sa.UniqueConstraint(
+            'token_id', 'acl_id'),
     )
 
 
