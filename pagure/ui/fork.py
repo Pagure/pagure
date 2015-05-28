@@ -16,11 +16,12 @@ import tempfile
 import pygit2
 from sqlalchemy.exc import SQLAlchemyError
 
+import pagure
 import pagure.doc_utils
+import pagure.exceptions
 import pagure.lib
 import pagure.lib.git
 import pagure.forms
-import pagure
 from pagure import (APP, SESSION, LOG, cla_required,
                     is_repo_admin, generate_gitolite_acls)
 
@@ -141,76 +142,20 @@ def request_pull(repo, requestid, username=None):
                 repo_obj.revparse_single(diff_commits[0].oid.hex)
             )
     else:
-        commitid = None
-        branch = repo_obj.lookup_branch(request.branch_from)
-        if branch:
-            commitid = branch.get_object().hex
-
-        if not repo_obj.is_empty and not orig_repo.is_empty:
-            # Pull-request open
-            master_commits = [
-                commit.oid.hex
-                for commit in orig_repo.walk(
-                    orig_repo.lookup_branch(request.branch).get_object().hex,
-                    pygit2.GIT_SORT_TIME)
-            ]
-            for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
-                if request.status and commit.oid.hex in master_commits:
-                    break
-                diff_commits.append(commit)
-
-            if request.status and diff_commits:
-                first_commit = repo_obj[diff_commits[-1].oid.hex]
-                request.commit_start = first_commit.oid.hex
-                request.commit_stop = diff_commits[0].oid.hex
-                SESSION.add(request)
-                try:
-                    SESSION.commit()
-                    pagure.lib.git.update_git(
-                        request, repo=request.project,
-                        repofolder=APP.config['REQUESTS_FOLDER'])
-                except SQLAlchemyError as err:  # pragma: no cover
-                    SESSION.rollback()
-                    APP.logger.exception(err)
-                    flask.flash(
-                        'Could not update this pull-request in the database',
-                        'error')
-
-            if diff_commits:
-                first_commit = repo_obj[diff_commits[-1].oid.hex]
-                diff = repo_obj.diff(
-                    repo_obj.revparse_single(first_commit.parents[0].oid.hex),
-                    repo_obj.revparse_single(diff_commits[0].oid.hex)
-                )
-
-        elif orig_repo.is_empty and not repo_obj.is_empty:
-            for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
-                diff_commits.append(commit)
-            if request.status and diff_commits:
-                first_commit = repo_obj[diff_commits[-1].oid.hex]
-                request.commit_start = first_commit.oid.hex
-                request.commit_stop = diff_commits[0].oid.hex
-                SESSION.add(request)
-                try:
-                    SESSION.commit()
-                    pagure.lib.git.update_git(
-                        request, repo=request.project,
-                        repofolder=APP.config['REQUESTS_FOLDER'])
-                except SQLAlchemyError as err:  # pragma: no cover
-                    SESSION.rollback()
-                    APP.logger.exception(err)
-                    flask.flash(
-                        'Could not update this pull-request in the database',
-                        'error')
-
-            repo_commit = repo_obj[request.commit_stop]
-            diff = repo_commit.tree.diff_to_tree(swap=True)
-        else:
-            flask.flash(
-                'Fork is empty, there are no commits to request pulling',
-                'error')
+        try:
+            diff_commits, diff = pagure.lib.git.diff_pull_request(
+                SESSION, request, repo_obj, orig_repo,
+                requestfolder=APP.config['REQUESTS_FOLDER'])
+        except pagure.exceptions.PagureException as err:
+            flask.flash(err.message, 'error')
             return flask.redirect(flask.url_for(
                 'view_repo', username=username, repo=repo.name))
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash(
+                'Could not update this pull-request in the database',
+                'error')
 
     form = pagure.forms.ConfirmationForm()
 

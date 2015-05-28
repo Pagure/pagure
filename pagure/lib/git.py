@@ -836,3 +836,65 @@ def merge_pull_request(session, repo, request, username, request_folder):
     shutil.rmtree(newpath)
 
     return 'Changes merged!'
+
+
+def diff_pull_request(session, request, repo_obj, orig_repo, requestfolder):
+    """ Returns the diff and the list of commits between the two git repos
+    mentionned in the given pull-request.
+    """
+
+    commitid = None
+    diff = None
+    diff_commits = []
+    branch = repo_obj.lookup_branch(request.branch_from)
+    if branch:
+        commitid = branch.get_object().hex
+
+    if not repo_obj.is_empty and not orig_repo.is_empty:
+        # Pull-request open
+        master_commits = [
+            commit.oid.hex
+            for commit in orig_repo.walk(
+                orig_repo.lookup_branch(request.branch).get_object().hex,
+                pygit2.GIT_SORT_TIME)
+        ]
+        for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
+            if request.status and commit.oid.hex in master_commits:
+                break
+            diff_commits.append(commit)
+
+        if request.status and diff_commits:
+            request.commit_start = diff_commits[-1].oid.hex
+            request.commit_stop = diff_commits[0].oid.hex
+            session.add(request)
+            session.commit()
+            pagure.lib.git.update_git(
+                request, repo=request.project,
+                repofolder=requestfolder)
+
+        if diff_commits:
+            first_commit = repo_obj[diff_commits[-1].oid.hex]
+            diff = repo_obj.diff(
+                repo_obj.revparse_single(first_commit.parents[0].oid.hex),
+                repo_obj.revparse_single(diff_commits[0].oid.hex)
+            )
+
+    elif orig_repo.is_empty and not repo_obj.is_empty:
+        for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
+            diff_commits.append(commit)
+        if request.status and diff_commits:
+            request.commit_start = diff_commits[-1].oid.hex
+            request.commit_stop = diff_commits[0].oid.hex
+            session.add(request)
+            session.commit()
+            pagure.lib.git.update_git(
+                request, repo=request.project,
+                repofolder=requestfolder)
+
+        repo_commit = repo_obj[request.commit_stop]
+        diff = repo_commit.tree.diff_to_tree(swap=True)
+    else:
+        raise pagure.exceptions.PagureException(
+            'Fork is empty, there are no commits to request pulling')
+
+    return (diff_commits, diff)
