@@ -19,7 +19,6 @@ from pagure.api import (
 )
 
 
-
 @API.route('/user/<username>')
 @api_method
 def api_view_user(username):

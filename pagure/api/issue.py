@@ -305,7 +305,6 @@ def api_view_issues(repo, username=None):
     return jsonout
 
 
-
 @API.route('/<repo>/issue/<int:issueid>')
 @API.route('/fork/<username>/<repo>/issue/<int:issueid>')
 @api_login_optional()

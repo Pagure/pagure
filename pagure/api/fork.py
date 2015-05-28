@@ -325,7 +325,7 @@ def api_pull_request_merge(repo, requestid, username=None):
         output['message'] = message
     except pagure.exceptions.PagureException as err:
         raise pagure.exceptions.APIError(
-                400, error_code=APIERROR.ENOCODE, error=str(err))
+            400, error_code=APIERROR.ENOCODE, error=str(err))
 
     jsonout = flask.jsonify(output)
     return jsonout

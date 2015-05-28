@@ -77,7 +77,11 @@ def log(project, topic, msg):
         for url in project.settings.get('Web-hooks').split('\n'):
             url = url.strip()
             try:
-                req = requests.post(url, headers=headers, data={'payload': msg})
+                req = requests.post(
+                    url,
+                    headers=headers,
+                    data={'payload': msg}
+                )
                 if not req:
                     raise pagure.exceptions.PagureException(
                         'An error occured while querying: %s - '

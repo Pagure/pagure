@@ -479,8 +479,8 @@ class Issue(BASE):
             'tags': self.tags_text,
             'depends': [str(item) for item in self.depends_text],
             'blocks': [str(item) for item in self.blocks_text],
-            'assignee': self.assignee.to_json(public=public) \
-                if self.assignee else None,
+            'assignee': self.assignee.to_json(public=public)
+            if self.assignee else None,
         }
 
         comments = []
@@ -907,6 +907,7 @@ class ProjectGroup(BASE):
 #
 # Class and tables specific for the API/token access
 #
+
 
 class ACL(BASE):
     """

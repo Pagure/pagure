@@ -152,7 +152,6 @@ def ticket_add_comment():
     return flask.jsonify({'message': message})
 
 
-
 @PV.route('/pull-request/merge', methods=['POST'])
 def mergeable_request_pull():
     """ Returns if the specified pull-request can be merged or not.
@@ -236,7 +235,8 @@ def mergeable_request_pull():
             return flask.jsonify({
                 'code': 'CONFLICTS',
                 'short_code': 'Conflicts',
-                'message': 'The pull-request cannot be merged due to conflicts'})
+                'message': 'The pull-request cannot be merged due to '
+                'conflicts'})
 
         shutil.rmtree(newpath)
         return flask.jsonify({

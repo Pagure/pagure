@@ -169,7 +169,7 @@ def request_pull(repo, requestid, username=None):
                     pagure.lib.git.update_git(
                         request, repo=request.project,
                         repofolder=APP.config['REQUESTS_FOLDER'])
-                except SQLAlchemyError as err: # pragma: no cover
+                except SQLAlchemyError as err:  # pragma: no cover
                     SESSION.rollback()
                     APP.logger.exception(err)
                     flask.flash(
@@ -196,7 +196,7 @@ def request_pull(repo, requestid, username=None):
                     pagure.lib.git.update_git(
                         request, repo=request.project,
                         repofolder=APP.config['REQUESTS_FOLDER'])
-                except SQLAlchemyError as err: # pragma: no cover
+                except SQLAlchemyError as err:  # pragma: no cover
                     SESSION.rollback()
                     APP.logger.exception(err)
                     flask.flash(
@@ -296,7 +296,7 @@ def request_pull_patch(repo, requestid, username=None):
                 pagure.lib.git.update_git(
                     request, repo=request.project,
                     repofolder=APP.config['REQUESTS_FOLDER'])
-            except SQLAlchemyError as err: # pragma: no cover
+            except SQLAlchemyError as err:  # pragma: no cover
                 SESSION.rollback()
                 APP.logger.exception(err)
                 flask.flash(
@@ -581,7 +581,7 @@ def set_assignee_requests(repo, requestid, username=None):
         flask.abort(404, 'No pull-request allowed on this project')
 
     request = pagure.lib.search_pull_requests(
-            SESSION, project_id=repo.id, requestid=requestid)
+        SESSION, project_id=repo.id, requestid=requestid)
 
     if not request:
         flask.abort(404, 'Pull-request not found')
@@ -611,7 +611,8 @@ def set_assignee_requests(repo, requestid, username=None):
             flask.flash(str(err), 'error')
 
     return flask.redirect(flask.url_for(
-        'request_pull', username=username, repo=repo.name, requestid=requestid))
+        'request_pull', username=username,
+        repo=repo.name, requestid=requestid))
 
 
 # Specific actions
@@ -684,7 +685,7 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
     orig_repo = pygit2.Repository(parentpath)
 
     frombranch = repo_obj.lookup_branch(branch_from)
-    if not frombranch and not repo_obj.is_empty :
+    if not frombranch and not repo_obj.is_empty:
         flask.abort(
             400,
             'Branch %s does not exist' % branch_from)

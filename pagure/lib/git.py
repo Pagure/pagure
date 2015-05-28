@@ -107,7 +107,6 @@ def write_gitolite_acls(session, configfile):
                     config.append('  RW+ = %s' % user.user)
             config.append('')
 
-
     with open(configfile, 'w') as stream:
         for key, users in groups.iteritems():
             stream.write('@%s   = %s\n' % (key, ' '.join(users)))

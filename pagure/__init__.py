@@ -149,10 +149,10 @@ def generate_gitolite_acls():
             )
         elif gitolite_version == 3:
             cmd = 'HOME=%s gitolite compile && HOME=%s gitolite trigger '\
-            'POST_COMPILE' % (
-                APP.config.get('GITOLITE_HOME'),
-                APP.config.get('GITOLITE_HOME')
-            )
+                'POST_COMPILE' % (
+                    APP.config.get('GITOLITE_HOME'),
+                    APP.config.get('GITOLITE_HOME')
+                )
         else:
             raise pagure.exceptions.PagureException(
                 'Non-supported gitolite version "%s"' % gitolite_version
@@ -204,8 +204,8 @@ def generate_authorized_key_file():  # pragma: no cover
                             gitolite_home, user.user, user.public_ssh_key)
                 else:
                     raise pagure.exceptions.PagureException(
-                        'Non-supported gitolite version "%s"' % gitolite_version
-                    )
+                        'Non-supported gitolite version "%s"' %
+                        gitolite_version)
                 stream.write(row + '\n')
             stream.write('# gitolite end\n')
 
