@@ -418,7 +418,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             data,
             {
               "error": "You are not allowed to view this issue",
-              "error_code": "EISSUEREST",
+              "error_code": "EISSUENOTALLOWED",
             }
         )
 
@@ -432,7 +432,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             data,
             {
               "error": "You are not allowed to view this issue",
-              "error_code": "EISSUEREST",
+              "error_code": "EISSUENOTALLOWED",
             }
         )
 
@@ -639,7 +639,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             data,
             {
               "error": "You are not allowed to view this issue",
-              "error_code": "EISSUEREST",
+              "error_code": "EISSUENOTALLOWED",
             }
         )
 
@@ -811,7 +811,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             data,
             {
               "error": "You are not allowed to view this issue",
-              "error_code": "EISSUEREST",
+              "error_code": "EISSUENOTALLOWED",
             }
         )
 

@@ -36,7 +36,7 @@ class APIERROR(enum.Enum):
     EINVALIDTOK = 'Invalid or expired token. Please visit %s to get or '\
         'renew your API token.' % APP.config['APP_URL']
     ENOISSUE = 'Issue not found'
-    EISSUEREST = 'You are not allowed to view this issue'
+    EISSUENOTALLOWED = 'You are not allowed to view this issue'
     EPULLREQUESTSDISABLED = 'Pull-Request have been deactivated for this '\
         'project'
     ENOREQ = 'Pull-Request not found'

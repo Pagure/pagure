@@ -366,7 +366,8 @@ def api_view_issue(repo, issueid, username=None):
     if issue.private and not is_repo_admin(repo) \
             and (not authenticated() or
                  not issue.user.user == flask.g.fas_user.username):
-        raise pagure.exceptions.APIError(403, error_code=APIERROR.EISSUEREST)
+        raise pagure.exceptions.APIError(
+            403, error_code=APIERROR.EISSUENOTALLOWED)
 
     jsonout = flask.jsonify(issue.to_json(public=True))
     return jsonout
@@ -422,7 +423,8 @@ def api_change_status_issue(repo, issueid, username=None):
     if issue.private and not is_repo_admin(repo) \
             and (not authenticated() or
                  not issue.user.user == flask.g.fas_user.username):
-        raise pagure.exceptions.APIError(403, error_code=APIERROR.EISSUEREST)
+        raise pagure.exceptions.APIError(
+            403, error_code=APIERROR.EISSUENOTALLOWED)
 
     status = pagure.lib.get_issue_statuses(SESSION)
     form = pagure.forms.StatusForm(status=status, csrf_enabled=False)
@@ -506,7 +508,8 @@ def api_comment_issue(repo, issueid, username=None):
     if issue.private and not is_repo_admin(repo) \
             and (not authenticated() or
                  not issue.user.user == flask.g.fas_user.username):
-        raise pagure.exceptions.APIError(403, error_code=APIERROR.EISSUEREST)
+        raise pagure.exceptions.APIError(
+            403, error_code=APIERROR.EISSUENOTALLOWED)
 
     form = pagure.forms.CommentForm(csrf_enabled=False)
     if form.validate_on_submit():
