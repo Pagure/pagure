@@ -158,8 +158,12 @@ def api_view_issues(repo, username=None):
     ::
 
         {
-          "assignee": null,
-          "author": null,
+          "args": {
+            "assignee": null,
+            "author": null,
+            "status": null,
+            "tags": []
+          },
           "issues": [
             {
               "assignee": null,
@@ -206,16 +210,20 @@ def api_view_issues(repo, username=None):
                 "name": "pingou"
               }
             }
-          ],
-          "status": null,
-          "tags": []
+          ]
         }
 
         Second example:
 
         {
-          "assignee": null,
-          "author": null,
+          "args": {
+            "assignee": null,
+            "author": null,
+            "status": "Closed",
+            "tags": [
+              "0.1"
+            ]
+          },
           "issues": [
             {
               "assignee": null,
@@ -236,10 +244,6 @@ def api_view_issues(repo, username=None):
                 "name": "pingou"
               }
             }
-          ],
-          "status": "Closed",
-          "tags": [
-            "0.1"
           ]
         }
 
@@ -298,10 +302,12 @@ def api_view_issues(repo, username=None):
 
     jsonout = flask.jsonify({
         'issues': [issue.to_json(public=True) for issue in issues],
-        'status': status,
-        'tags': tags,
-        'assignee': assignee,
-        'author': author,
+        'args': {
+            'status': status,
+            'tags': tags,
+            'assignee': assignee,
+            'author': author,
+        }
     })
     return jsonout
 

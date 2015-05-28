@@ -51,8 +51,11 @@ def api_pull_request_views(repo, username=None):
     ::
 
         {
-          "assignee": null,
-          "author": null,
+          "args": {
+            "assignee": null,
+            "author": null,
+            "status": true
+          },
           "requests": [
             {
               "assignee": null,
@@ -109,8 +112,7 @@ def api_pull_request_views(repo, username=None):
                 "name": "pingou"
               }
             }
-          ],
-          "status": true
+          ]
         }
 
     """
@@ -147,9 +149,11 @@ def api_pull_request_views(repo, username=None):
 
     jsonout = flask.jsonify({
         'requests': [request.to_json(public=True) for request in requests],
-        'status': status,
-        'assignee': assignee,
-        'author': author,
+        'args': {
+            'status': status,
+            'assignee': assignee,
+            'author': author,
+        }
     })
     return jsonout
 
