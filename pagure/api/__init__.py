@@ -137,10 +137,10 @@ def api_method(function):
         try:
             result = function(*args, **kwargs)
         except APIError as e:
-            if e.error_code in [3]:
+            if e.error_code in [APIERROR.EDBERROR]:
                 APP.logger.exception(e)
 
-            if e.error_code in [0]:
+            if e.error_code in [APIERROR.ENOCODE]:
                 response = flask.jsonify(
                     {
                         'error': e.error,
