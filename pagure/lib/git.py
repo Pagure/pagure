@@ -747,6 +747,11 @@ def merge_pull_request(session, repo, request, username, request_folder):
     newpath = tempfile.mkdtemp(prefix='pagure-pr-merge')
     new_repo = pygit2.clone_repository(parentpath, newpath)
 
+    # Update the start and stop commits in the DB, one last time
+    pagure.lib.git.diff_pull_request(
+        session, request, new_repo, fork_obj,
+        requestfolder=request_folder, with_diff=False)
+
     repo_commit = fork_obj[
         fork_obj.lookup_branch(request.branch_from).get_object().hex]
 
