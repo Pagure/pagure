@@ -149,8 +149,12 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "assignee": None,
-              "author": None,
+              "args": {
+                "assignee": None,
+                "author": None,
+                "status": None,
+                "tags": []
+              },
               "issues": [
                 {
                   "assignee": None,
@@ -169,9 +173,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                     "name": "pingou"
                   }
                 }
-              ],
-              "status": None,
-              "tags": []
+              ]
             }
         )
 
@@ -197,8 +199,12 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "assignee": None,
-              "author": None,
+              "args": {
+                "assignee": None,
+                "author": None,
+                "status": None,
+                "tags": []
+              },
               "issues": [
                 {
                   "assignee": None,
@@ -217,9 +223,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                     "name": "pingou"
                   }
                 }
-              ],
-              "status": None,
-              "tags": []
+              ]
             }
         )
         headers = {'Authorization': 'token aaabbbccc'}
@@ -232,8 +236,12 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "assignee": None,
-              "author": None,
+              "args": {
+                "assignee": None,
+                "author": None,
+                "status": None,
+                "tags": []
+              },
               "issues": [
                 {
                   "assignee": None,
@@ -252,9 +260,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                     "name": "pingou"
                   }
                 }
-              ],
-              "status": None,
-              "tags": []
+              ]
             }
         )
 
@@ -269,8 +275,12 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "assignee": None,
-              "author": None,
+              "args": {
+                "assignee": None,
+                "author": None,
+                "status": None,
+                "tags": []
+              },
               "issues": [
                 {
                   "assignee": None,
@@ -306,9 +316,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                     "name": "pingou"
                   }
                 }
-              ],
-              "status": None,
-              "tags": []
+              ]
             }
         )
 
@@ -319,11 +327,13 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "assignee": None,
-              "author": None,
-              "issues": [],
-              "status": "Closed",
-              "tags": []
+              "args": {
+                "assignee": None,
+                "author": None,
+                "status": "Closed",
+                "tags": []
+              },
+              "issues": []
             }
         )
 
@@ -334,11 +344,13 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "assignee": None,
-              "author": None,
-              "issues": [],
-              "status": "Invalid",
-              "tags": []
+              "args": {
+                "assignee": None,
+                "author": None,
+                "status": "Invalid",
+                "tags": []
+              },
+              "issues": []
             }
         )
 

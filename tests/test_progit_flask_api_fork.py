@@ -90,8 +90,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "assignee": None,
-              "author": None,
+              "args": {
+                "assignee": None,
+                "author": None,
+                "status": True
+              },
               "requests": [
                 {
                   "assignee": None,
@@ -148,8 +151,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                     "name": "pingou"
                   }
                 }
-              ],
-              "status": True
+              ]
             }
         )
 
@@ -396,7 +398,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         data = json.loads(output.data)
         self.assertDictEqual(
             data,
-            {"message": "Request pull canceled!"}
+            {"message": "Pull-request closed!"}
         )
 
     @patch('pagure.lib.git.merge_pull_request')
@@ -608,7 +610,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
         # Valid request
         output = self.app.post(
             '/api/0/test/pull-request/1/comment', data=data, headers=headers)
-        print output.data
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         self.assertDictEqual(
