@@ -474,6 +474,7 @@ def api_pull_request_add_comment(repo, requestid, username=None):
             SESSION.commit()
             output['message'] = message
         except SQLAlchemyError, err:  # pragma: no cover
+            APP.logger.exception(err)
             SESSION.rollback()
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
