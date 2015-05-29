@@ -54,7 +54,11 @@ def api_git_tags(repo, username=None):
 
     repopath = pagure.get_repo_path(repo)
     repo_obj = pygit2.Repository(repopath)
-    tags = [ tag for tag in repo_obj.listall_references()]
+    tags = [
+        tag.split('refs/tags/')[1]
+        for tag in repo_obj.listall_references()
+        if 'refs/tags/' in tag
+    ]
 
     jsonout = flask.jsonify({'tags': tags})
     return jsonout
