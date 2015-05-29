@@ -907,3 +907,17 @@ def diff_pull_request(
             'Fork is empty, there are no commits to request pulling')
 
     return (diff_commits, diff)
+
+
+def get_git_tags(project):
+    """ Returns the list of tags created in the git repositorie of the
+    specified project.
+    """
+    repopath = pagure.get_repo_path(project)
+    repo_obj = pygit2.Repository(repopath)
+    tags = [
+        tag.split('refs/tags/')[1]
+        for tag in repo_obj.listall_references()
+        if 'refs/tags/' in tag
+    ]
+    return tags

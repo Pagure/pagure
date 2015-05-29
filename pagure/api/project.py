@@ -10,8 +10,6 @@
 
 import flask
 
-import pygit2
-
 import pagure
 import pagure.exceptions
 import pagure.lib
@@ -52,13 +50,7 @@ def api_git_tags(repo, username=None):
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
-    repopath = pagure.get_repo_path(repo)
-    repo_obj = pygit2.Repository(repopath)
-    tags = [
-        tag.split('refs/tags/')[1]
-        for tag in repo_obj.listall_references()
-        if 'refs/tags/' in tag
-    ]
+    tags = pagure.lib.git.get_git_tags(repo)
 
     jsonout = flask.jsonify({'tags': tags})
     return jsonout
