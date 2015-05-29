@@ -355,6 +355,8 @@ def api_error_codes():
 @API.route('/')
 def api():
     ''' Display the api information page. '''
+    api_git_tags_doc = load_doc(project.api_git_tags)
+
     api_new_issue_doc = load_doc(issue.api_new_issue)
     api_view_issues_doc = load_doc(issue.api_view_issues)
 
@@ -373,6 +375,7 @@ def api():
     return flask.render_template(
         'api.html',
         projects=[
+            api_git_tags_doc,
             api_new_issue_doc,
             api_view_issues_doc,
             api_pull_request_views_doc,
