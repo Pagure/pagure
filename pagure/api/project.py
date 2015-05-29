@@ -42,7 +42,7 @@ def api_git_tags(repo, username=None):
     ::
 
         {
-          "tags": [],
+          "tags": ["2.5.4", "2.5.5"],
         }
 
     """
