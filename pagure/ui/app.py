@@ -130,6 +130,7 @@ def index():
 
 
 @APP.route('/users/')
+@APP.route('/users')
 def view_users():
     """ Present the list of users.
     """
@@ -158,6 +159,7 @@ def view_users():
     )
 
 
+@APP.route('/user/<username>/')
 @APP.route('/user/<username>')
 def view_user(username):
     """ Front page of a specific user.
@@ -225,6 +227,7 @@ def view_user(username):
 
 
 @APP.route('/new/', methods=('GET', 'POST'))
+@APP.route('/new', methods=('GET', 'POST'))
 @cla_required
 def new_project():
     """ Form to create a new project.
@@ -263,6 +266,7 @@ def new_project():
 
 
 @APP.route('/settings/', methods=('GET', 'POST'))
+@APP.route('/settings', methods=('GET', 'POST'))
 @cla_required
 def user_settings():
     """ Update the user settings.
@@ -368,6 +372,7 @@ def remove_user_email():
     return flask.redirect(flask.url_for('.user_settings'))
 
 
+@APP.route('/settings/email/add/', methods=['GET', 'POST'])
 @APP.route('/settings/email/add', methods=['GET', 'POST'])
 @cla_required
 def add_user_email():
@@ -454,6 +459,7 @@ def set_default_email():
     return flask.redirect(flask.url_for('.user_settings'))
 
 
+@APP.route('/settings/email/confirm/<token>/')
 @APP.route('/settings/email/confirm/<token>')
 def confirm_email(token):
     """ Confirm a new email.
@@ -481,6 +487,7 @@ def confirm_email(token):
     return flask.redirect(flask.url_for('.user_settings'))
 
 
+@APP.route('/ssh_info/')
 @APP.route('/ssh_info')
 def ssh_hostkey():
     """ Endpoint returning information about the SSH hostkey and fingerprint

@@ -29,7 +29,10 @@ from pagure import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
 
 # URLs
 
+@APP.route('/<repo>/issue/<int:issueid>/update/', methods=['GET', 'POST'])
 @APP.route('/<repo>/issue/<int:issueid>/update', methods=['GET', 'POST'])
+@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/update/',
+           methods=['GET', 'POST'])
 @APP.route('/fork/<username>/<repo>/issue/<int:issueid>/update',
            methods=['GET', 'POST'])
 @cla_required
@@ -192,7 +195,9 @@ def update_issue(repo, issueid, username=None):
         'view_issue', username=username, repo=repo.name, issueid=issueid))
 
 
+@APP.route('/<repo>/tag/<tag>/edit/', methods=('GET', 'POST'))
 @APP.route('/<repo>/tag/<tag>/edit', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/tag/<tag>/edit/', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/tag/<tag>/edit', methods=('GET', 'POST'))
 @cla_required
 def edit_tag(repo, tag, username=None):
@@ -281,7 +286,9 @@ def remove_tag(repo, username=None):
     )
 
 
+@APP.route('/<repo>/issues/')
 @APP.route('/<repo>/issues')
+@APP.route('/fork/<username>/<repo>/issues/')
 @APP.route('/fork/<username>/<repo>/issues')
 def view_issues(repo, username=None):
     """ List all issues associated to a repo
@@ -367,7 +374,9 @@ def view_issues(repo, username=None):
     )
 
 
+@APP.route('/<repo>/new_issue/', methods=('GET', 'POST'))
 @APP.route('/<repo>/new_issue', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/new_issue/', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/new_issue', methods=('GET', 'POST'))
 @cla_required
 def new_issue(repo, username=None):
@@ -444,7 +453,9 @@ def new_issue(repo, username=None):
     )
 
 
+@APP.route('/<repo>/issue/<int:issueid>/')
 @APP.route('/<repo>/issue/<int:issueid>')
+@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/')
 @APP.route('/fork/<username>/<repo>/issue/<int:issueid>')
 def view_issue(repo, issueid, username=None):
     """ List all issues associated to a repo
@@ -532,7 +543,10 @@ def delete_issue(repo, issueid, username=None):
         'view_issue', username=username, repo=repo.name, issueid=issueid))
 
 
+@APP.route('/<repo>/issue/<int:issueid>/edit/', methods=('GET', 'POST'))
 @APP.route('/<repo>/issue/<int:issueid>/edit', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/edit/',
+           methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/issue/<int:issueid>/edit',
            methods=('GET', 'POST'))
 @cla_required

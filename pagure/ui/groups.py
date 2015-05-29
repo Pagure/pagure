@@ -20,6 +20,7 @@ import pagure.lib
 
 # pylint: disable=E1101
 
+@pagure.APP.route('/groups/')
 @pagure.APP.route('/groups')
 def group_lists():
     ''' List all the groups associated with all the projects. '''
@@ -47,6 +48,7 @@ def group_lists():
     )
 
 
+@pagure.APP.route('/group/<group>/', methods=['GET', 'POST'])
 @pagure.APP.route('/group/<group>', methods=['GET', 'POST'])
 def view_group(group):
     ''' Displays information about this group. '''
@@ -179,6 +181,7 @@ def group_delete(group):
     return flask.redirect(flask.url_for('.group_lists'))
 
 
+@pagure.APP.route('/group/add/', methods=['GET', 'POST'])
 @pagure.APP.route('/group/add', methods=['GET', 'POST'])
 @pagure.cla_required
 def add_group():

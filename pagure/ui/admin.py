@@ -43,6 +43,7 @@ def admin_required(function):
 # Application
 
 
+@APP.route('/admin/')
 @APP.route('/admin')
 @admin_required
 def admin_index():

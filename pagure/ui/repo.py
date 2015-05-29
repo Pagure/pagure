@@ -41,7 +41,9 @@ from pagure import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
 # pylint: disable=E1101
 
 
+@APP.route('/<repo>/')
 @APP.route('/<repo>')
+@APP.route('/fork/<username>/<repo>/')
 @APP.route('/fork/<username>/<repo>')
 def view_repo(repo, username=None):
     """ Front page of a specific repo.
@@ -471,7 +473,9 @@ def view_raw_file(repo, identifier, filename=None, username=None):
     return (data, 200, headers)
 
 
+@APP.route('/<repo>/<commitid>/')
 @APP.route('/<repo>/<commitid>')
+@APP.route('/fork/<username>/<repo>/<commitid>/')
 @APP.route('/fork/<username>/<repo>/<commitid>')
 def view_commit(repo, commitid, username=None):
     """ Render a commit in a repo
@@ -541,8 +545,10 @@ def view_commit_patch(repo, commitid, username=None):
 
 
 @APP.route('/<repo>/tree/')
+@APP.route('/<repo>/tree')
 @APP.route('/<repo>/tree/<path:identifier>')
 @APP.route('/fork/<username>/<repo>/tree/')
+@APP.route('/fork/<username>/<repo>/tree')
 @APP.route('/fork/<username>/<repo>/tree/<path:identifier>')
 def view_tree(repo, identifier=None, username=None):
     """ Render the tree of the repo
@@ -592,7 +598,9 @@ def view_tree(repo, identifier=None, username=None):
     )
 
 
+@APP.route('/<repo>/forks/')
 @APP.route('/<repo>/forks')
+@APP.route('/fork/<username>/<repo>/forks/')
 @APP.route('/fork/<username>/<repo>/forks')
 def view_forks(repo, username=None):
     """ Presents all the forks of the project.
@@ -610,7 +618,9 @@ def view_forks(repo, username=None):
     )
 
 
+@APP.route('/<repo>/settings/', methods=('GET', 'POST'))
 @APP.route('/<repo>/settings', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/settings/', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/settings', methods=('GET', 'POST'))
 @cla_required
 def view_settings(repo, username=None):
@@ -843,7 +853,9 @@ def remove_user(repo, userid, username=None):
     )
 
 
+@APP.route('/<repo>/adduser/', methods=('GET', 'POST'))
 @APP.route('/<repo>/adduser', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/adduser/', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/adduser', methods=('GET', 'POST'))
 @cla_required
 def add_user(repo, username=None):
@@ -895,7 +907,9 @@ def add_user(repo, username=None):
     )
 
 
+@APP.route('/<repo>/addgroup/', methods=('GET', 'POST'))
 @APP.route('/<repo>/addgroup', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/addgroup/', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/addgroup', methods=('GET', 'POST'))
 @cla_required
 def add_group_project(repo, username=None):
@@ -992,7 +1006,9 @@ def regenerate_git(repo, username=None):
     )
 
 
+@APP.route('/<repo>/token/new/', methods=('GET', 'POST'))
 @APP.route('/<repo>/token/new', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/token/new/', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/token/new', methods=('GET', 'POST'))
 @cla_required
 def add_token(repo, username=None):

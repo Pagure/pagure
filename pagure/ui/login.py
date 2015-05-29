@@ -27,6 +27,7 @@ from pagure.ui.admin import admin_required
 # pylint: disable=E1101
 
 
+@APP.route('/user/new/', methods=['GET', 'POST'])
 @APP.route('/user/new', methods=['GET', 'POST'])
 def new_user():
     """ Create a new user.
@@ -139,6 +140,7 @@ def do_login():
     return flask.redirect(flask.url_for('auth_login'))
 
 
+@APP.route('/confirm/<token>/')
 @APP.route('/confirm/<token>')
 def confirm_user(token):
     """ Confirm a user account.
@@ -163,6 +165,7 @@ def confirm_user(token):
     return flask.redirect(flask.url_for('index'))
 
 
+@APP.route('/password/lost/', methods=['GET', 'POST'])
 @APP.route('/password/lost', methods=['GET', 'POST'])
 def lost_password():
     """ Method to allow a user to change his/her password assuming the email
@@ -208,6 +211,7 @@ def lost_password():
     )
 
 
+@APP.route('/password/reset/<token>/', methods=['GET', 'POST'])
 @APP.route('/password/reset/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     """ Method to allow a user to reset his/her password.

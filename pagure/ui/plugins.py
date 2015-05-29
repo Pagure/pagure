@@ -44,9 +44,15 @@ def get_plugin(plugin_name):
             return plugin
 
 
+@APP.route('/<repo>/settings/<plugin>/', methods=('GET', 'POST'))
 @APP.route('/<repo>/settings/<plugin>', methods=('GET', 'POST'))
+@APP.route('/<repo>/settings/<plugin>/<int:full>/', methods=('GET', 'POST'))
 @APP.route('/<repo>/settings/<plugin>/<int:full>', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/settings/<plugin>/',
+           methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/settings/<plugin>',
+           methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/settings/<plugin>/<int:full>/',
            methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/settings/<plugin>/<int:full>',
            methods=('GET', 'POST'))

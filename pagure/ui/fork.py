@@ -40,7 +40,9 @@ def _get_parent_repo_path(repo):
     return parentpath
 
 
+@APP.route('/<repo>/pull-requests/')
 @APP.route('/<repo>/pull-requests')
+@APP.route('/fork/<username>/<repo>/pull-requests/')
 @APP.route('/fork/<username>/<repo>/pull-requests')
 def request_pulls(repo, username=None):
     """ Request pulling the changes from the fork into the project.
@@ -99,7 +101,9 @@ def request_pulls(repo, username=None):
     )
 
 
+@APP.route('/<repo>/pull-request/<int:requestid>/')
 @APP.route('/<repo>/pull-request/<int:requestid>')
+@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/')
 @APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>')
 def request_pull(repo, requestid, username=None):
     """ Request pulling the changes from the fork into the project.
@@ -588,7 +592,11 @@ def fork_project(repo, username=None):
     return flask.redirect(flask.url_for('view_repo', repo=repo.name))
 
 
+@APP.route('/<repo>/diff/<path:branch_to>..<path:branch_from>/',
+           methods=('GET', 'POST'))
 @APP.route('/<repo>/diff/<path:branch_to>..<path:branch_from>',
+           methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/diff/<path:branch_to>..<path:branch_from>/',
            methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/diff/<path:branch_to>..<path:branch_from>',
            methods=('GET', 'POST'))

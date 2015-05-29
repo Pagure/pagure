@@ -73,10 +73,12 @@ def __get_tree_and_content(repo_obj, commit, path):
 # URLs
 
 
+@APP.route('/<repo>/docs/')
 @APP.route('/<repo>/docs')
 @APP.route('/<repo>/docs/<path:filename>')
 @APP.route('/<repo>/docs/<branchname>')
 @APP.route('/<repo>/docs/<branchname>/<path:filename>')
+@APP.route('/fork/<username>/<repo>/docs/')
 @APP.route('/fork/<username>/<repo>/docs')
 @APP.route('/fork/<username>/<repo>/docs/<path:filename>')
 @APP.route('/fork/<username>/<repo>/docs/<branchname>')
