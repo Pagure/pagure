@@ -316,6 +316,8 @@
     }
   );
 
+  $( ".tabs" ).tabs();
+
 {% if pull_request %}
 {# These lines are only for existing pull-requests, not new ones #}
 
@@ -366,8 +368,6 @@
       }
     }
   );
-
-  $( ".tabs" ).tabs();
 
   $( "#comment" ).on('tabsactivate',
     function(event, ui) {
