@@ -829,6 +829,57 @@ class PullRequestComment(BASE):
         return self.pull_request
 
 
+class PullRequestFlag(BASE):
+    """ Stores the flags attached to a pull-request.
+
+    Table -- pull_request_tags
+    """
+
+    __tablename__ = 'pull_request_tags'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    pull_request_uid = sa.Column(
+        sa.Text,
+        sa.ForeignKey(
+            'pull_requests.uid', ondelete='CASCADE', onupdate='CASCADE'),
+        nullable=False)
+    commit_id = sa.Column(
+        sa.String(40),
+        nullable=True,
+        index=True)
+    user_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey('users.id', onupdate='CASCADE'),
+        nullable=False,
+        index=True)
+    username = sa.Column(
+        sa.Text(),
+        nullable=False)
+    percent = sa.Column(
+        sa.Integer(),
+        nullable=False)
+    comment = sa.Column(
+        sa.Text(),
+        nullable=False)
+
+    date_created = sa.Column(sa.DateTime, nullable=False,
+                             default=datetime.datetime.utcnow)
+
+    user = relation('User', foreign_keys=[user_id],
+                    remote_side=[User.id],
+                    backref=backref(
+                        'pull_request_flags',
+                        order_by="PullRequestFlag.date_created"))
+
+    pull_request = relation(
+        'PullRequest',
+        backref=backref(
+            'flags', cascade="delete, delete-orphan",
+        ),
+        foreign_keys=[pull_request_uid],
+        remote_side=[PullRequest.uid])
+
+
 class PagureGroupType(BASE):
     """
     A list of the type a group can have definition.
