@@ -1177,7 +1177,7 @@ index 0000000..fb7093d
         output = self.app.get('/test/tree/')
         self.assertEqual(output.status_code, 200)
         self.assertTrue(
-            '<h2>\n    <a href="/test/tree/">None</a>/</h2>' in output.data)
+            '<h2>\n    <a href="/test/tree">None</a>/</h2>' in output.data)
         self.assertTrue(
             'No content found in this repository' in output.data)
 
