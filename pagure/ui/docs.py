@@ -55,7 +55,7 @@ def __get_tree_and_content(repo_obj, commit, path):
         repo_obj, commit.tree, path)
 
     if blob_or_tree is None:
-        return (tree_obj, None, extended)
+        return (tree_obj, None, False, extended)
 
     if not repo_obj[blob_or_tree.oid]:
         # Not tested and no idea how to test it, but better safe than sorry
