@@ -72,8 +72,10 @@
 
   {% if content %}
   <section class="docs_content">
-    {% if safe }}
+    {% if safe %}
     {{ content |safe }}
+    {% else %}
+    {{ content }}
     {% endif %}
   </section>
   {% endif %}
