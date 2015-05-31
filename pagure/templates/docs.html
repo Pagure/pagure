@@ -72,9 +72,9 @@
 
   {% if content %}
   <section class="docs_content">
-    {% autoescape false %}
-    {{ content }}
-    {% endautoescape %}
+    {% if safe }}
+    {{ content |safe }}
+    {% endif %}
   </section>
   {% endif %}
 

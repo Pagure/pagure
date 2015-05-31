@@ -64,10 +64,10 @@ def __get_tree_and_content(repo_obj, commit, path):
     if isinstance(blob_or_tree, pygit2.TreeEntry):  # Returned a file
         ext = os.path.splitext(blob_or_tree.name)[1]
         blob_obj = repo_obj[blob_or_tree.oid]
-        content = pagure.doc_utils.convert_readme(blob_obj.data, ext)
+        content, safe = pagure.doc_utils.convert_readme(blob_obj.data, ext)
 
     tree = sorted(tree_obj, key=lambda x: x.filemode)
-    return (tree, content, extended)
+    return (tree, content, safe, extended)
 
 
 # URLs
@@ -124,7 +124,7 @@ def view_docs(repo, username=None, branchname=None, filename=None):
 
     if commit:
         try:
-            (tree, content, extended) = __get_tree_and_content(
+            (tree, content, safe, extended) = __get_tree_and_content(
                 repo_obj, commit, path)
             if extended:
                 filename += '/'
@@ -141,4 +141,5 @@ def view_docs(repo, username=None, branchname=None, filename=None):
         filename=filename,
         tree=tree,
         content=content,
+        safe=safe,
     )

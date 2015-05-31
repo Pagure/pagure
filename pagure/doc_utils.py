@@ -89,13 +89,17 @@ def convert_readme(content, ext, view_file_url=None):
     provided.
     '''
     output = content
+    safe = False
     if ext and ext in ['.rst']:
+        safe = True
         output = convert_doc(content, view_file_url)
     elif ext and ext in ['.mk']:
         output = markdown.markdown(content)
+        safe = True
     elif not ext or (ext and ext in ['.text', '.txt']):
+        safe = True
         output = '<pre>%s</pre>' % content
-    return output
+    return output, safe
 
 
 def load_doc(endpoint):
