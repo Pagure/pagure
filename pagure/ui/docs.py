@@ -117,6 +117,7 @@ def view_docs(repo, username=None, branchname=None, filename=None):
 
     content = None
     tree = None
+    safe = False
     if not filename:
         path = ['']
     else:
