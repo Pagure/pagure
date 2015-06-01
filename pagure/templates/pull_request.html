@@ -136,6 +136,21 @@
     </tr>
   </table>
 </section>
+
+{% if pull_request.flags %}
+<section id="pr_flags">
+  <table>
+    {% for flag in pull_request.flags %}
+      <tr style="background-color: {{ flag.percent | toRGB }}">
+        <td>{{ flag.percent }}%</td>
+        <td>{{ flag.username }}</td>
+        <td>{{ flag.comment }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+</section>
+{% endif %}
+
 {% endif %}
 
 <div class="tabs">

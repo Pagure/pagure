@@ -867,3 +867,15 @@ span.CONFLICTS {
 .tabs .ui-tabs-active a:hover{
     color: #e59728!important;
 }
+
+#pr_flags table{
+    width: 100%;
+    border-spacing: 0;
+    border-collapse: collapse;
+    margin: 1em 0em 1em 0em;
+    color: black;
+}
+
+#pr_flags table tr{
+    margin-bottom: 1em;
+}
