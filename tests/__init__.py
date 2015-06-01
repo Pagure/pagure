@@ -261,6 +261,7 @@ def create_acls(session):
     for acl in [
             'issue_create', 'pull_request_merge', 'pull_request_comment',
             'issue_change_status', 'issue_comment', 'pull_request_close',
+            'pull_request_flag',
             ]:
         item = pagure.lib.model.ACL(
             name=acl,
@@ -273,7 +274,7 @@ def create_acls(session):
 
 def create_tokens_acl(session):
     """ Create some acls for the tokens. """
-    for aclid in range(6):
+    for aclid in range(7):
         item = pagure.lib.model.TokenAcl(
             token_id='aaabbbcccddd',
             acl_id=aclid + 1,
