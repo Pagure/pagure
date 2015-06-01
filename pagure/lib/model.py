@@ -861,6 +861,9 @@ class PullRequestFlag(BASE):
     comment = sa.Column(
         sa.Text(),
         nullable=False)
+    url = sa.Column(
+        sa.Text(),
+        nullable=False)
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
