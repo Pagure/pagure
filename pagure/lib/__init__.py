@@ -1563,6 +1563,27 @@ def get_request_by_uid(session, request_uid):
     return query.first()
 
 
+def get_pull_request_flag_by_uid(session, flag_uid):
+    ''' Return the flag corresponding to the specified unique identifier.
+
+    :arg session: the session to use to connect to the database.
+    :arg flag_uid: the unique identifier of a request. This identifier is
+        unique accross all flags on this pagure instance and should be
+        unique accross multiple pagure instances as well
+    :type request_uid: str or None
+
+    :return: A single Issue object.
+    :rtype: pagure.lib.model.PullRequestFlag
+
+    '''
+    query = session.query(
+        model.PullRequestFlag
+    ).filter(
+        model.PullRequestFlag.uid == flag_uid.strip() if flag_uid else None
+    )
+    return query.first()
+
+
 def set_up_user(session, username, fullname, default_email, emails=None):
     ''' Set up a new user into the database or update its information. '''
     user = search_user(session, username=username)
