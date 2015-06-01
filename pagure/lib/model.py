@@ -838,6 +838,7 @@ class PullRequestFlag(BASE):
     __tablename__ = 'pull_request_flags'
 
     id = sa.Column(sa.Integer, primary_key=True)
+    uid = sa.Column(sa.String(32), unique=True, nullable=False)
     pull_request_uid = sa.Column(
         sa.Text,
         sa.ForeignKey(
