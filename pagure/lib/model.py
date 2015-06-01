@@ -844,10 +844,6 @@ class PullRequestFlag(BASE):
         sa.ForeignKey(
             'pull_requests.uid', ondelete='CASCADE', onupdate='CASCADE'),
         nullable=False)
-    commit_id = sa.Column(
-        sa.String(40),
-        nullable=True,
-        index=True)
     user_id = sa.Column(
         sa.Integer,
         sa.ForeignKey('users.id', onupdate='CASCADE'),
