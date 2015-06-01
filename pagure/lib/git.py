@@ -770,9 +770,13 @@ def merge_pull_request(session, repo, request, username, request_folder):
     try:
         branch_ref = new_repo.lookup_reference(
             request.branch).resolve()
-    except ValueError:
-        branch_ref = new_repo.lookup_reference(
-            'refs/heads/%s' % request.branch).resolve()
+    except (ValueError, KeyError):
+        try:
+            branch_ref = new_repo.lookup_reference(
+                'refs/heads/%s' % request.branch).resolve()
+        except (ValueError, KeyError):
+            branch_ref = new_repo.lookup_reference(
+                'remote/origin/%s' % request.branch).resolve()
 
     refname = '%s:%s' % (branch_ref.name, branch_ref.name)
     if (
