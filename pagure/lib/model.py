@@ -698,7 +698,11 @@ class PullRequest(BASE):
         ''' Return the list of comments related to the pull-request itself,
         ie: not related to a specific commit.
         '''
-        return [comment for comment in self.comments if not comment.commit_id]
+        return [
+            comment
+            for comment in self.comments
+            if not comment.commit_id
+        ]
 
     @property
     def score(self):
