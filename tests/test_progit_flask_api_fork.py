@@ -511,8 +511,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
             {"message": "Changes merged!"}
         )
 
-    def test_api_pull_request_add_comment(self):
+    @patch('pagure.lib.notify.send_email')
+    def test_api_pull_request_add_comment(self, mockemail):
         """ Test the api_pull_request_add_comment method of the flask api. """
+        mockemail.return_value = True
+
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
         tests.create_acls(self.session)
