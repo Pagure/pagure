@@ -490,3 +490,107 @@ def api_pull_request_add_comment(repo, requestid, username=None):
 
     jsonout = flask.jsonify(output)
     return jsonout
+
+
+@API.route('/<repo>/pull-request/<int:requestid>/flag',
+           methods=['POST'])
+@API.route('/fork/<username>/<repo>/pull-request/<int:requestid>/flag',
+           methods=['POST'])
+@api_login_required(acls=['pull_request_flag'])
+@api_method
+def api_pull_request_add_flag(repo, requestid, username=None):
+    """
+    Flag a pull-request
+    -------------------
+    This endpoint can be used to add or edit flags on a pull-request
+
+    ::
+
+        /api/0/<repo>/pull-request/<request id>/flag
+
+        /api/0/fork/<username>/<repo>/pull-request/<request id>/flag
+
+    Accepts POST queries only.
+
+    :arg username: The name of the application as it should be presented to
+        the user on the pull-request page (for example: jenkins, travis-ci,
+        pep8bot...)
+    :arg percent: A percentage of completion compared to the goal, it can
+        be a percentage of coverage, a 0 vs 100 for fail vs pass.
+        The percentage also determine the background color of the flag on
+        the pull-request page.
+    :arg comment: Small information message summarizing the results presented
+        here.
+    :arg url: An URL to the link the flag to. This can be the URL of a
+        specific build or test, or the URL of the application itself, but
+        there must be one.
+    :kwarg uid: An unique identifier used to identify a flag on a pull-request
+        if you do not provide it, one will be automatically generated.
+        If you do provide it, sending a second request with the same UID will
+        update the flag instead of adding a new one.
+        Maximum length: ``32`` characters.
+    :kwarg commit: The hash of the commit you use
+
+    Sample response:
+
+    ::
+
+        {
+          "message": "Flag added"
+        }
+
+    """
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    output = {}
+
+    if repo is None:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    if not repo.settings.get('pull_requests', True):
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.EPULLREQUESTSDISABLED)
+
+    if repo.fullname != flask.g.token.project.fullname:
+        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
+
+    request = pagure.lib.search_pull_requests(
+        SESSION, project_id=repo.id, requestid=requestid)
+
+    if not request:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
+
+    form = pagure.forms.AddPullRequestFlagForm(csrf_enabled=False)
+    if form.validate_on_submit():
+        username = form.username.data
+        percent = form.percent.data
+        comment = form.comment.data.strip()
+        url = form.url.data.strip()
+        uid = form.uid.data.strip() if form.uid.data else None
+        try:
+            # New Flag
+            message = pagure.lib.add_pull_request_flag(
+                SESSION,
+                request=request,
+                username=username,
+                percent=percent,
+                comment=comment,
+                url=url,
+                uid=uid,
+                user=flask.g.fas_user.username,
+                requestfolder=APP.config['REQUESTS_FOLDER'],
+            )
+            SESSION.commit()
+            output['message'] = message
+        except pagure.exceptions.PagureException as err:
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.ENOCODE, error=str(err))
+        except SQLAlchemyError, err:  # pragma: no cover
+            APP.logger.exception(err)
+            SESSION.rollback()
+            raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
+
+    else:
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
+
+    jsonout = flask.jsonify(output)
+    return jsonout
