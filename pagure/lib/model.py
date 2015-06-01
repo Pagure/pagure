@@ -883,6 +883,23 @@ class PullRequestFlag(BASE):
         foreign_keys=[pull_request_uid],
         remote_side=[PullRequest.uid])
 
+    def to_json(self, public=False):
+        ''' Returns a dictionnary representation of the pull-request.
+
+        '''
+        output = {
+            'uid': self.uid,
+            'pull_request_uid': self.pull_request_uid,
+            'username': self.username,
+            'percent': self.percent,
+            'comment': self.comment,
+            'url': self.url,
+            'date_created': self.date_created.strftime('%s'),
+            'user': self.user.to_json(public=public),
+        }
+
+        return output
+
 
 class PagureGroupType(BASE):
     """

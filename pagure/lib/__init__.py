@@ -713,6 +713,7 @@ def add_pull_request_flag(session, request, username, percent, comment, url,
         topic='pull-request.flag.%s' % action,
         msg=dict(
             pullrequest=request.to_json(),
+            flag=pr_flag.to_json(),
             agent=user_obj.username,
         )
     )
