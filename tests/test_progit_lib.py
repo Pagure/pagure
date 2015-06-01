@@ -1318,6 +1318,32 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(len(request.comments), 1)
         self.assertEqual(request.score, 0)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_add_pull_request_flag(self, mockemail):
+        """ Test add_pull_request_flag of pagure.lib. """
+        mockemail.return_value = True
+
+        self.test_new_pull_request()
+
+        request = pagure.lib.search_pull_requests(self.session, requestid=1)
+        self.assertEqual(len(request.flags), 0)
+
+        msg = pagure.lib.add_pull_request_flag(
+            session=self.session,
+            request=request,
+            username="jenkins",
+            percent=100,
+            comment="Build passes",
+            url="http://jenkins.cloud.fedoraproject.org",
+            uid="jenkins_build_pagure_34",
+            user='foo',
+            requestfolder=None,
+        )
+        self.assertEqual(msg, 'Flag added')
+        self.session.commit()
+
+        self.assertEqual(len(request.flags), 1)
+
     def test_search_pull_requests(self):
         """ Test search_pull_requests of pagure.lib. """
 
