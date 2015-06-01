@@ -143,8 +143,11 @@
     {% for flag in pull_request.flags %}
       <tr style="background-color: {{ flag.percent | toRGB }}">
         <td>{{ flag.percent }}%</td>
-        <td>{{ flag.username }}</td>
+        <td><a href="{{ flag.url }}">{{ flag.username }}</a></td>
         <td>{{ flag.comment }}</td>
+        <td title="{{ flag.date_created }}" class="right">
+          {{ flag.date_created | humanize }}
+        </td>
       </tr>
     {% endfor %}
   </table>
