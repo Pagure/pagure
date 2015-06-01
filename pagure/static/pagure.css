@@ -860,6 +860,10 @@ span.CONFLICTS {
     color: #0066CC!important;
 }
 
+.tabs .ui-widget-content a:hover {
+    color: white!important;
+}
+
 .tabs .ui-state-hover a:hover{
     color: white;
 }
