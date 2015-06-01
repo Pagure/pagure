@@ -1312,8 +1312,10 @@ class PagureLibtests(tests.Modeltests):
             requestfolder=None,
         )
         self.assertEqual(msg, 'Comment added')
+        self.session.commit()
 
         self.assertEqual(len(request.discussion), 0)
+        self.assertEqual(len(request.comments), 1)
         self.assertEqual(request.score, 0)
 
     def test_search_pull_requests(self):
