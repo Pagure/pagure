@@ -290,3 +290,13 @@ def insert_div(content):
     output = output.replace('h1', 'h3')
 
     return output
+
+
+@APP.template_filter('noJS')
+def no_js(content):
+    """ Template filter replacing <script by &lt;script and </script> by
+    &lt;/script&gt;
+    """
+    content = content.replace('<script', '&lt;script')
+    content = content.replace('</script>', '&lt;/script&gt;')
+    return content
