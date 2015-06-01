@@ -364,7 +364,9 @@ def api():
     api_pull_request_view_doc = load_doc(fork.api_pull_request_view)
     api_pull_request_merge_doc = load_doc(fork.api_pull_request_merge)
     api_pull_request_close_doc = load_doc(fork.api_pull_request_close)
-    api_pull_request_add_comment_doc = load_doc(fork.api_pull_request_add_comment)
+    api_pull_request_add_comment_doc = load_doc(
+        fork.api_pull_request_add_comment)
+    api_pull_request_add_flag_doc = load_doc(fork.api_pull_request_add_flag)
 
     api_version_doc = load_doc(api_version)
     api_users_doc = load_doc(api_users)
@@ -383,6 +385,7 @@ def api():
             api_pull_request_merge_doc,
             api_pull_request_close_doc,
             api_pull_request_add_comment_doc,
+            api_pull_request_add_flag_doc,
         ],
         users=[
             api_users_doc,
