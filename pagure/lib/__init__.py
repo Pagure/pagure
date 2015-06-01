@@ -679,6 +679,39 @@ def add_pull_request_comment(session, request, commit, filename, row,
     return 'Comment added'
 
 
+def add_pull_request_flag(session, request, username, percent, comment, url,
+                          uid, user, requestfolder):
+    ''' Add a flag to a pull-request. '''
+    user_obj = __get_user(session, user)
+
+    pr_flag = model.PullRequestFlag(
+        pull_request_uid=request.uid,
+        uid=uid or uuid.uuid4().hex,
+        username=username,
+        percent=percent,
+        comment=comment,
+        url=url,
+        user_id=user_obj.id,
+    )
+    session.add(pr_flag)
+    # Make sure we won't have SQLAlchemy error before we create the repo
+    session.flush()
+
+    pagure.lib.git.update_git(
+        request, repo=request.project, repofolder=requestfolder)
+
+    pagure.lib.notify.log(
+        request.project,
+        topic='pull-request.flag.added',
+        msg=dict(
+            pullrequest=request.to_json(),
+            agent=user_obj.username,
+        )
+    )
+
+    return 'Flag added'
+
+
 def new_project(session, user, name, blacklist,
                 gitfolder, docfolder, ticketfolder, requestfolder,
                 description=None, parent_id=None):
