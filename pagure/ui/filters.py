@@ -300,3 +300,23 @@ def no_js(content):
     content = content.replace('<script', '&lt;script')
     content = content.replace('</script>', '&lt;/script&gt;')
     return content
+
+
+
+@APP.template_filter('toRGB')
+def int_to_rgb(percent):
+    """ Template filter converting a given percentage to a css RGB value.
+    """
+    output = "rgb(255, 0, 0);"
+    try:
+        percent = int(percent)
+        if percent < 50:
+            red = 255
+            green = (255.0/50) * percent
+        else:
+            green = 255
+            red = (255.0/50) * (100 - percent)
+        output = "rgb(%s, %s, 0);" % (int(red), int(green))
+    except ValueError:
+        pass
+    return output
