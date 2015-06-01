@@ -158,6 +158,19 @@ class AddPullRequestCommentForm(wtf.Form):
         [wtforms.validators.Required()]
     )
 
+class AddPullRequestFlagForm(wtf.Form):
+    ''' Form to add a flag to a pull-request. '''
+    username = wtforms.TextField(
+        'Username', [wtforms.validators.Required()])
+    percent = wtforms.TextField(
+        'Percentage of completion', [wtforms.validators.Required()])
+    comment = wtforms.TextAreaField(
+        'Comment', [wtforms.validators.Required()])
+    url = wtforms.TextField(
+        'URL', [wtforms.validators.Required()])
+    uid = wtforms.TextField(
+        'UID', [wtforms.validators.optional()])
+
 
 class UserSettingsForm(wtf.Form):
     ''' Form to create or edit project. '''
