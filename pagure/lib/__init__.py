@@ -156,7 +156,7 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
         user_id=user_obj.id,
     )
     session.add(issue_comment)
-    # Make sure we won't have SQLAlchemy error before we create the repo
+    # Make sure we won't have SQLAlchemy error before we continue
     session.commit()
 
     pagure.lib.git.update_git(
@@ -208,7 +208,7 @@ def add_issue_tag(session, issue, tags, user, ticketfolder):
             tag=tagobj.tag,
         )
         session.add(issue_tag)
-        # Make sure we won't have SQLAlchemy error before we create the repo
+        # Make sure we won't have SQLAlchemy error before we continue
         session.flush()
         added_tags.append(tagobj.tag)
 
@@ -355,7 +355,7 @@ def add_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
             child_issue_id=issue.uid
         )
         session.add(i2i)
-        # Make sure we won't have SQLAlchemy error before we create the repo
+        # Make sure we won't have SQLAlchemy error before we continue
         session.flush()
         pagure.lib.git.update_git(
             issue,
@@ -400,7 +400,7 @@ def remove_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
                 child_del.append(child.id)
                 issue.children.remove(child)
 
-        # Make sure we won't have SQLAlchemy error before we create the repo
+        # Make sure we won't have SQLAlchemy error before we continue
         session.flush()
         pagure.lib.git.update_git(
             issue,
@@ -581,7 +581,7 @@ def add_user_to_project(session, project, new_user, user):
         user_id=new_user_obj.id,
     )
     session.add(project_user)
-    # Make sure we won't have SQLAlchemy error before we create the repo
+    # Make sure we won't have SQLAlchemy error before we continue
     session.flush()
 
     pagure.lib.notify.log(
@@ -628,7 +628,7 @@ def add_group_to_project(session, project, new_group, user):
         group_id=group_obj.id,
     )
     session.add(project_group)
-    # Make sure we won't have SQLAlchemy error before we create the repo
+    # Make sure we won't have SQLAlchemy error before we continue
     session.flush()
 
     pagure.lib.notify.log(
@@ -658,7 +658,7 @@ def add_pull_request_comment(session, request, commit, filename, row,
         user_id=user_obj.id,
     )
     session.add(pr_comment)
-    # Make sure we won't have SQLAlchemy error before we create the repo
+    # Make sure we won't have SQLAlchemy error before we continue
     session.flush()
 
     pagure.lib.git.update_git(
@@ -702,7 +702,7 @@ def add_pull_request_flag(session, request, username, percent, comment, url,
             user_id=user_obj.id,
         )
     session.add(pr_flag)
-    # Make sure we won't have SQLAlchemy error before we create the repo
+    # Make sure we won't have SQLAlchemy error before we continue
     session.flush()
 
     pagure.lib.git.update_git(
