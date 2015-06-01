@@ -148,4 +148,5 @@ ACLS = {
     'pull_request_merge': 'Merge a pull-request of this project',
     'pull_request_close': 'Close a pull-request of this project',
     'pull_request_comment': 'Comment on a pull-request of this project',
+    'pull_request_flag': 'Flag a pull-request of this project',
 }
