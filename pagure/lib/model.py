@@ -832,10 +832,10 @@ class PullRequestComment(BASE):
 class PullRequestFlag(BASE):
     """ Stores the flags attached to a pull-request.
 
-    Table -- pull_request_tags
+    Table -- pull_request_flags
     """
 
-    __tablename__ = 'pull_request_tags'
+    __tablename__ = 'pull_request_flags'
 
     id = sa.Column(sa.Integer, primary_key=True)
     pull_request_uid = sa.Column(
