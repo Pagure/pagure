@@ -15,7 +15,7 @@ if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
-
+import pagure
 import pagure.lib.git
 
 abspath = os.path.abspath(os.environ['GIT_DIR'])
@@ -65,7 +65,11 @@ for line in sys.stdin.readlines():
             break
 
     revs = pagure.lib.git.get_revs_between(oldrev, newrev, abspath)
-    project = pagure.lib.git.get_repo_name(abspath)
+    project_name = pagure.lib.git.get_repo_name(abspath)
+    username = pagure.lib.git.get_username(abspath)
+    project = pagure.lib.get_project(pagure.SESSION, project_name, username)
+    if not project:
+        project = project_name
 
     def _build_commit(rev):
         files, total = build_stats(rev)
@@ -88,8 +92,9 @@ for line in sys.stdin.readlines():
             ),
             rev=unicode(rev),
             path=abspath,
-            username=pagure.lib.git.get_username(abspath),
-            repo=project,
+            username=username,
+            repo=project.to_json(public=True)
+                if not isinstance(project, basestring) else project,
             branch=refname,
             agent=os.getlogin(),
         )
