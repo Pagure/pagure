@@ -176,6 +176,9 @@ def ticket_add_comment():
 def mergeable_request_pull():
     """ Returns if the specified pull-request can be merged or not.
     """
+    force = flask.request.form.get('force', False)
+    if force is not False:
+        force = True
 
     form = pagure.forms.ConfirmationForm()
     if not form.validate_on_submit():
@@ -189,7 +192,7 @@ def mergeable_request_pull():
     if not request:
         flask.abort(404, 'Pull-request not found')
 
-    if request.merge_status:
+    if request.merge_status and not force:
         return flask.jsonify({
             'code': request.merge_status,
             'short_code': MERGE_OPTIONS[request.merge_status]['short_code'],
