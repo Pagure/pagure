@@ -5,3 +5,4 @@ recursive-include files *
 recursive-include milters *
 recursive-include tests *
 recursive-include doc *
+recursive-include alembic *
