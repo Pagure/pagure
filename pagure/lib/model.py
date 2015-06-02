@@ -345,7 +345,8 @@ class Project(BASE):
             'id': self.id,
             'name': self.name,
             'description': self.description,
-            'parent': self.parent.to_json() if self.parent else None,
+            'parent': self.parent.to_json(public=public)
+                if self.parent else None,
             'settings': self.settings,
             'date_created': self.date_created.strftime('%s'),
             'user': self.user.to_json(public=public),
@@ -741,7 +742,8 @@ class PullRequest(BASE):
             'repo_from': self.project_from.to_json(public=public),
             'date_created': self.date_created.strftime('%s'),
             'user': self.user.to_json(public=public),
-            'assignee': self.assignee.to_json() if self.assignee else None,
+            'assignee': self.assignee.to_json(public=public)
+                if self.assignee else None,
             'status': self.status,
             'commit_start': self.commit_start,
             'commit_stop': self.commit_stop,
