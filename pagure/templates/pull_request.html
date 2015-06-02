@@ -104,7 +104,8 @@
       <th>From</th>
       <td>
         <a href="{{ url_for('view_repo_branch',
-          username=pull_request.project_from.user.user if pull_request.project_from.is_fork,
+          username=pull_request.project_from.user.user
+            if pull_request.project_from.is_fork else None,
           repo=pull_request.project_from.name,
           branchname=pull_request.branch_from)
         }}">
