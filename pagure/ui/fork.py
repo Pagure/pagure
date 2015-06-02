@@ -688,7 +688,7 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
             if repo.parent:
                 parent = repo.parent
 
-            message = pagure.lib.new_pull_request(
+            request = pagure.lib.new_pull_request(
                 SESSION,
                 repo_to=parent,
                 branch_to=branch_to,
@@ -700,7 +700,7 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
             )
             try:
                 SESSION.commit()
-                flask.flash(message)
+                flask.flash('Request created')
             except SQLAlchemyError as err:  # pragma: no cover
                 SESSION.rollback()
                 APP.logger.exception(err)
@@ -710,10 +710,12 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
 
             if not parent.is_fork:
                 url = flask.url_for(
-                    'request_pulls', username=None, repo=parent.name)
+                    'request_pull', requestid=request.id,
+                    username=None, repo=parent.name)
             else:
                 url = flask.url_for(
-                    'request_pulls', username=parent.user, repo=parent.name)
+                    'request_pull', requestid=request.id,
+                    username=parent.user, repo=parent.name)
 
             return flask.redirect(url)
         except pagure.exceptions.PagureException, err:  # pragma: no cover

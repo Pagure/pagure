@@ -899,7 +899,7 @@ def new_pull_request(session, repo_from, branch_from,
         )
     )
 
-    return 'Request created'
+    return request
 
 
 def edit_issue(session, issue, ticketfolder, user,
