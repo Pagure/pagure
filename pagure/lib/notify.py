@@ -53,7 +53,8 @@ def log(project, topic, msg):
     fedmsg_publish(topic, msg)
 
     # Send web-hooks notification
-    if project.settings.get('Web-hooks'):  # pragma: no cover
+    if not isinstance(project, basestring) \
+            and project.settings.get('Web-hooks'):  # pragma: no cover
         global _i
         _i += 1
         year = datetime.datetime.now().year
