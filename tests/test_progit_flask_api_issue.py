@@ -228,6 +228,22 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         )
         headers = {'Authorization': 'token aaabbbccc'}
 
+        # Access issues authenticated but non-existing token
+        output = self.app.get('/api/0/test/issues', headers=headers)
+        self.assertEqual(output.status_code, 401)
+
+        # Create a new token for another user
+        item = pagure.lib.model.Token(
+            id='bar_token',
+            user_id=2,
+            project_id=1,
+            expiration=datetime.datetime.utcnow() + datetime.timedelta(
+                days=30)
+        )
+        self.session.add(item)
+
+        headers = {'Authorization': 'token bar_token'}
+
         # Access issues authenticated but wrong token
         output = self.app.get('/api/0/test/issues', headers=headers)
         self.assertEqual(output.status_code, 200)
@@ -435,6 +451,30 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         )
 
         headers = {'Authorization': 'token aaabbbccc'}
+
+        # Access private issue authenticated but non-existing token
+        output = self.app.get('/api/0/test/issue/2', headers=headers)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid or expired token. Please visit https://pagure.org/ to get or renew your API token.",
+              "error_code": "EINVALIDTOK"
+            }
+        )
+
+        # Create a new token for another user
+        item = pagure.lib.model.Token(
+            id='bar_token',
+            user_id=2,
+            project_id=1,
+            expiration=datetime.datetime.utcnow() + datetime.timedelta(
+                days=30)
+        )
+        self.session.add(item)
+
+        headers = {'Authorization': 'token bar_token'}
 
         # Access private issue authenticated but wrong token
         output = self.app.get('/api/0/test/issue/2', headers=headers)
