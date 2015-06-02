@@ -9,6 +9,7 @@ requests/
 dist/
 build/
 *.pyc
+*.pyo
 *.swp
 *.egg-info
 *.conf
