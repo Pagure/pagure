@@ -183,7 +183,6 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertTrue(
                 '<li class="message">Group added</li>' in output.data)
 
-
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_remove_user(self, ast):
         """ Test the remove_user endpoint. """
@@ -1543,6 +1542,39 @@ index 0000000..fb7093d
             self.assertIn(
                 '<li class="message">Requests git repo updated</li>',
                 output.data)
+
+    def test_view_tags(self):
+        """ Test the view_tags endpoint. """
+        output = self.app.get('/foo/tags')
+        # No project registered in the DB
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+
+        output = self.app.get('/test/tags')
+        # No git repo associated
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects_git(tests.HERE)
+
+        output = self.app.get('/test/tags')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('This project has not been tagged.', output.data)
+
+        # Add a README to the git repo - First commit
+        tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
+        repo = pygit2.init_repository(os.path.join(tests.HERE, 'test.git'))
+        first_commit = repo.revparse_single('HEAD')
+        tagger = pygit2.Signature('Alice Doe', 'adoe@example.com', 12347, 0)
+        repo.create_tag(
+            "0.0.1", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
+            "Release 0.0.1")
+
+        output = self.app.get('/test/tags')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('0.0.1', output.data)
+        self.assertIn('<span class="tagid">', output.data)
+        self.assertTrue(output.data.count('tagid'), 1)
 
 
 if __name__ == '__main__':
