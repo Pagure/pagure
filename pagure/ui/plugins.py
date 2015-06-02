@@ -78,6 +78,9 @@ def view_plugin(repo, plugin, username=None, full=True):
             403,
             'You are not allowed to change the settings for this project')
 
+    if plugin in APP.config.get('DISABLED_PLUGINS', []):
+        flask.abort(404, 'Plugin disabled')
+
     plugin = get_plugin(plugin)
     fields = []
     new = True
