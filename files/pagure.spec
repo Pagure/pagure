@@ -122,6 +122,12 @@ install -m 644 files/pagure.wsgi $RPM_BUILD_ROOT/%{_datadir}/pagure/pagure.wsgi
 # Install the createdb script
 install -m 644 createdb.py $RPM_BUILD_ROOT/%{_datadir}/pagure/pagure_createdb.py
 
+# Install the alembic configuration file
+install -m 644 files/alembic.ini $RPM_BUILD_ROOT/%{_sysconfdir}/pagure/alembic.ini
+
+# Install the alembic revisions
+cp alembic $RPM_BUILD_ROOT/%{_datadir}/pagure
+
 
 # Install the milter files
 mkdir -p $RPM_BUILD_ROOT/%{_localstatedir}/run/pagure
@@ -150,6 +156,7 @@ install -m 644 milters/comment_email_milter.py \
 %license LICENSE
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/pagure.conf
 %config(noreplace) %{_sysconfdir}/pagure/pagure.cfg
+%config(noreplace) %{_sysconfdir}/pagure/alembic.ini
 %dir %{_sysconfdir}/pagure/
 %dir %{_datadir}/pagure/
 %{_datadir}/pagure/pagure*
