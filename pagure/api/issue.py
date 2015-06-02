@@ -269,6 +269,9 @@ def api_view_issues(repo, username=None):
     private = False
     # If user is authenticated, show him/her his/her private tickets
     if authenticated():
+        if repo != flask.g.token.project:
+            raise pagure.exceptions.APIError(
+                401, error_code=APIERROR.EINVALIDTOK)
         private = flask.g.fas_user.username
     # If user is repo admin, show all tickets included the private ones
     if is_repo_admin(repo):
@@ -369,6 +372,11 @@ def api_view_issue(repo, issueid, username=None):
 
     if issue is None or issue.project != repo:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOISSUE)
+
+    if authenticated():
+        if repo != flask.g.token.project:
+            raise pagure.exceptions.APIError(
+                401, error_code=APIERROR.EINVALIDTOK)
 
     if issue.private and not is_repo_admin(repo) \
             and (not authenticated() or
