@@ -935,3 +935,17 @@ def get_git_tags(project):
         if 'refs/tags/' in tag
     ]
     return tags
+
+
+def get_git_tags_objects(project):
+    """ Returns the list of references of the tags created in the git
+    repositorie the specified project.
+    """
+    repopath = pagure.get_repo_path(project)
+    repo_obj = pygit2.Repository(repopath)
+    tags = [
+        repo_obj.lookup_reference(tag)
+        for tag in repo_obj.listall_references()
+        if 'refs/tags/' in tag
+    ]
+    return tags
