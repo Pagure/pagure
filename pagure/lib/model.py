@@ -663,6 +663,11 @@ class PullRequest(BASE):
         sa.ForeignKey('users.id', onupdate='CASCADE'),
         nullable=True,
         index=True)
+    merge_status = sa.Column(
+        sa.Enum(
+            'NO_CHANGE', 'FFORWARD', 'CONFLICTS', 'MERGE',
+            name='merge_status_enum'),
+        nullable=True)
 
     status = sa.Column(sa.Boolean, nullable=False, default=True)
 
