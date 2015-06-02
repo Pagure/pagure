@@ -733,6 +733,25 @@ def get_username(abspath):
     return username
 
 
+def get_branch_ref(repo, branchname):
+    ''' Return the reference to the specified branch or raises an exception.
+    '''
+    branch_ref = None
+    refs = repo.listall_references()
+    if branchname in refs:
+        branch_ref = repo.lookup_reference(branchname).resolve()
+    elif 'refs/heads/%s' % branchname in refs:
+        branch_ref = repo.lookup_reference(
+            'refs/heads/%s' % branchname).resolve()
+    elif 'refs/remotes/origin/%s' % branchname in refs:
+        branch_ref = repo.lookup_reference(
+            'refs/remotes/origin/%s' % branchname).resolve()
+    else:
+        raise pagure.exceptions.PagureException(
+            'No refs found for %s' % branchname)
+    return branch_ref
+
+
 def merge_pull_request(session, repo, request, username, request_folder):
     ''' Merge the specified pull-request.
     '''
@@ -767,19 +786,7 @@ def merge_pull_request(session, repo, request, username, request_folder):
     if merge is None:
         mergecode = new_repo.merge_analysis(repo_commit.oid)[0]
 
-    refs = new_repo.listall_references()
-    if request.branch in refs:
-        branch_ref = new_repo.lookup_reference(
-            request.branch).resolve()
-    elif 'refs/heads/%s' % request.branch in refs:
-        branch_ref = new_repo.lookup_reference(
-            'refs/heads/%s' % request.branch).resolve()
-    elif 'refs/remotes/origin/%s' % request.branch in refs:
-        branch_ref = new_repo.lookup_reference(
-            'refs/remotes/origin/%s' % request.branch).resolve()
-    else:
-        raise pagure.exceptions.PagureException(
-            'No refs found for %s' % request.branch)
+    branch_ref = get_branch_ref(new_repo, request.branch)
 
     refname = '%s:%s' % (branch_ref.name, branch_ref.name)
     if (

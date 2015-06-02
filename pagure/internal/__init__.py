@@ -24,6 +24,7 @@ PV = flask.Blueprint('internal_ns', __name__, url_prefix='/pv')
 import pagure
 import pagure.forms
 import pagure.lib
+import pagure.lib.git
 import pagure.ui.fork
 from pagure import is_repo_admin, authenticated
 
@@ -202,19 +203,7 @@ def mergeable_request_pull():
     if merge is None:
         mergecode = new_repo.merge_analysis(repo_commit.oid)[0]
 
-    refs = new_repo.listall_references()
-    if request.branch in refs:
-        branch_ref = new_repo.lookup_reference(
-            request.branch).resolve()
-    elif 'refs/heads/%s' % request.branch in refs:
-        branch_ref = new_repo.lookup_reference(
-            'refs/heads/%s' % request.branch).resolve()
-    elif 'refs/remotes/origin/%s' % request.branch in refs:
-        branch_ref = new_repo.lookup_reference(
-            'refs/remotes/origin/%s' % request.branch).resolve()
-    else:
-        raise pagure.exceptions.PagureException(
-            'No refs found for %s' % request.branch)
+    branch_ref = pagure.lib.git.get_branch_ref(new_repo, request.branch)
 
     refname = '%s:%s' % (branch_ref.name, branch_ref.name)
     if (
