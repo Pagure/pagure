@@ -1,0 +1,31 @@
+{% extends "repo_master.html" %}
+
+{% block title %}Tags - {{ repo.name }}{% endblock %}
+{%block tag %}home{% endblock %}
+
+
+{% block repo %}
+
+<h2>Tags</h2>
+
+<section class="tag_list">
+  {% if tags %}
+  <ul>
+    {% for tag in tags %}
+    <li>
+      <a href="{{ url_for('view_tree', username=username, repo=repo.name,
+                          identifier=tag.get_object().hex) }}">
+        {{ tag.shorthand }}
+      <span class="tagid">{{ tag.get_object().hex | short }}</span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>
+    This project has not been tagged.
+  </p>
+  {% endif %}
+</section>
+
+{% endblock %}

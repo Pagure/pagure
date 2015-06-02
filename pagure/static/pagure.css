@@ -370,7 +370,8 @@ pre {
 }
 
 .tree_list .view_commit,
-.tree_list .filehex
+.tree_list .filehex,
+.tag_list .tagid
 {
     float: right;
     text-align: right;
@@ -378,6 +379,7 @@ pre {
 
 .tree_list li:nth-child(odd),
 .commit_list li:nth-child(odd),
+.tag_list li:nth-child(odd),
 table.list tr:nth-child(odd) td
 {
     background-color: #ededed;
@@ -387,21 +389,25 @@ table.list tr:nth-child(odd) td
     padding-left: 25px;
 }
 
-.commit_list ul {
+.commit_list ul,
+.tag_list ul, {
     padding-left: 0;
 }
 
-.commit_list li {
+.commit_list li,
+.tag_list li {
     list-style-type: none;
 }
 
 .commit_list li,
-.tree_list li {
+.tree_list li,
+.tag_list li {
     padding:0 .5em;
 }
 
 .tree_list li:hover,
 .commit_list li:hover,
+.tag_list li:hover,
 table.list tr:hover td
 
 {
@@ -411,7 +417,9 @@ table.list tr:hover td
 
 .tree_list li:hover a,
 .commit_list li:hover a,
+.tag_list li:hover a,
 .commit_list li:hover > a > span.commitid,
+.tag_list li:hover > a > span.tagid,
 .commit_list li:hover > a > span.commitdate,
 .tree_list li:hover > a > span.filehex,
 table.list tr:hover td > a
@@ -420,12 +428,14 @@ table.list tr:hover td > a
 }
 .commit_list li > a:first-child,
 .tree_list li > a:first-child,
+.tag_list li > a:first-child,
 table.list tbody td > a
 {
     display: block;
 }
 
 .commit_list li > a > span.commitid,
+.tag_list li > a > span.tagid,
 .tree_list li > a > span.filehex
 {
     color: #4d4d4d;

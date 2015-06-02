@@ -620,6 +620,29 @@ def view_forks(repo, username=None):
     )
 
 
+@APP.route('/<repo>/tags/')
+@APP.route('/<repo>/tags')
+@APP.route('/fork/<username>/<repo>/tags/')
+@APP.route('/fork/<username>/<repo>/tags')
+def view_tags(repo, username=None):
+    """ Presents all the tags of the project.
+    """
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    tags = pagure.lib.git.get_git_tags_objects(repo)
+
+    return flask.render_template(
+        'tags.html',
+        select='tags',
+        username=username,
+        repo=repo,
+        tags=tags,
+    )
+
+
 @APP.route('/<repo>/settings/', methods=('GET', 'POST'))
 @APP.route('/<repo>/settings', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/settings/', methods=('GET', 'POST'))
