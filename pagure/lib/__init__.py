@@ -170,8 +170,8 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
             issue.project,
             topic='issue.comment.added',
             msg=dict(
-                issue=issue.to_json(),
-                project=issue.project.to_json(),
+                issue=issue.to_json(public=True),
+                project=issue.project.to_json(public=True),
                 agent=user_obj.username,
             )
         )
@@ -220,8 +220,8 @@ def add_issue_tag(session, issue, tags, user, ticketfolder):
             issue.project,
             topic='issue.tag.added',
             msg=dict(
-                issue=issue.to_json(),
-                project=issue.project.to_json(),
+                issue=issue.to_json(public=True),
+                project=issue.project.to_json(public=True),
                 tags=added_tags,
                 agent=user_obj.username,
             )
@@ -250,8 +250,8 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
                 issue.project,
                 topic='issue.assigned.reset',
                 msg=dict(
-                    issue=issue.to_json(),
-                    project=issue.project.to_json(),
+                    issue=issue.to_json(public=True),
+                    project=issue.project.to_json(public=True),
                     agent=user_obj.username,
                 )
             )
@@ -278,8 +278,8 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
                 issue.project,
                 topic='issue.assigned.added',
                 msg=dict(
-                    issue=issue.to_json(),
-                    project=issue.project.to_json(),
+                    issue=issue.to_json(public=True),
+                    project=issue.project.to_json(public=True),
                     agent=user_obj.username,
                 )
             )
@@ -304,8 +304,8 @@ def add_pull_request_assignee(session, request, assignee, user, requestfolder):
             request.project,
             topic='request.assigned.reset',
             msg=dict(
-                request=request.to_json(),
-                project=request.project.to_json(),
+                request=request.to_json(public=True),
+                project=request.project.to_json(public=True),
                 agent=user_obj.username,
             )
         )
@@ -331,8 +331,8 @@ def add_pull_request_assignee(session, request, assignee, user, requestfolder):
             request.project,
             topic='request.assigned.added',
             msg=dict(
-                request=request.to_json(),
-                project=request.project.to_json(),
+                request=request.to_json(public=True),
+                project=request.project.to_json(public=True),
                 agent=user_obj.username,
             )
         )
@@ -374,8 +374,8 @@ def add_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
                 issue.project,
                 topic='issue.dependency.added',
                 msg=dict(
-                    issue=issue.to_json(),
-                    project=issue.project.to_json(),
+                    issue=issue.to_json(public=True),
+                    project=issue.project.to_json(public=True),
                     added_dependency=issue_blocked.id,
                     agent=user_obj.username,
                 )
@@ -419,8 +419,8 @@ def remove_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
                 issue.project,
                 topic='issue.dependency.removed',
                 msg=dict(
-                    issue=issue.to_json(),
-                    project=issue.project.to_json(),
+                    issue=issue.to_json(public=True),
+                    project=issue.project.to_json(public=True),
                     removed_dependency=child_del,
                     agent=user_obj.username,
                 )
@@ -459,7 +459,7 @@ def remove_tags(session, project, tags, ticketfolder, user):
         project,
         topic='project.tag.removed',
         msg=dict(
-            project=project.to_json(),
+            project=project.to_json(public=True),
             tags=removed_tags,
             agent=user_obj.username,
         )
@@ -489,8 +489,8 @@ def remove_tags_issue(session, issue, tags, ticketfolder, user):
         issue.project,
         topic='issue.tag.removed',
         msg=dict(
-            issue=issue.to_json(),
-            project=issue.project.to_json(),
+            issue=issue.to_json(public=True),
+            project=issue.project.to_json(public=True),
             tags=removed_tags,
             agent=user_obj.username,
         )
@@ -554,7 +554,7 @@ def edit_issue_tags(session, project, old_tag, new_tag, ticketfolder, user):
             project,
             topic='project.tag.edited',
             msg=dict(
-                project=project.to_json(),
+                project=project.to_json(public=True),
                 old_tag=old_tag,
                 new_tag=new_tag,
                 agent=user_obj.username,
@@ -588,7 +588,7 @@ def add_user_to_project(session, project, new_user, user):
         project,
         topic='project.user.added',
         msg=dict(
-            project=project.to_json(),
+            project=project.to_json(public=True),
             new_user=new_user_obj.username,
             agent=user_obj.username,
         )
@@ -635,7 +635,7 @@ def add_group_to_project(session, project, new_group, user):
         project,
         topic='project.group.added',
         msg=dict(
-            project=project.to_json(),
+            project=project.to_json(public=True),
             new_group=group_obj.group_name,
             agent=user,
         )
@@ -671,7 +671,7 @@ def add_pull_request_comment(session, request, commit, filename, row,
         request.project,
         topic='pull-request.comment.added',
         msg=dict(
-            pullrequest=request.to_json(),
+            pullrequest=request.to_json(public=True),
             agent=user_obj.username,
         )
     )
@@ -712,8 +712,8 @@ def add_pull_request_flag(session, request, username, percent, comment, url,
         request.project,
         topic='pull-request.flag.%s' % action,
         msg=dict(
-            pullrequest=request.to_json(),
-            flag=pr_flag.to_json(),
+            pullrequest=request.to_json(public=True),
+            flag=pr_flag.to_json(public=True),
             agent=user_obj.username,
         )
     )
@@ -784,7 +784,7 @@ def new_project(session, user, name, blacklist,
         project,
         topic='project.new',
         msg=dict(
-            project=project.to_json(),
+            project=project.to_json(public=True),
             agent=user_obj.username,
         )
     )
@@ -826,8 +826,8 @@ def new_issue(session, repo, title, content, user, ticketfolder,
             issue.project,
             topic='issue.new',
             msg=dict(
-                issue=issue.to_json(),
-                project=issue.project.to_json(),
+                issue=issue.to_json(public=True),
+                project=issue.project.to_json(public=True),
                 agent=user_obj.username,
             )
         )
@@ -853,8 +853,8 @@ def drop_issue(session, issue, user, ticketfolder):
             issue.project,
             topic='issue.drop',
             msg=dict(
-                issue=issue.to_json(),
-                project=issue.project.to_json(),
+                issue=issue.to_json(public=True),
+                project=issue.project.to_json(public=True),
                 agent=user_obj.username,
             )
         )
@@ -894,7 +894,7 @@ def new_pull_request(session, repo_from, branch_from,
         request.project,
         topic='pull-request.new',
         msg=dict(
-            pullrequest=request.to_json(),
+            pullrequest=request.to_json(public=True),
             agent=user_obj.username,
         )
     )
@@ -937,8 +937,8 @@ def edit_issue(session, issue, ticketfolder, user,
             issue.project,
             topic='issue.edit',
             msg=dict(
-                issue=issue.to_json(),
-                project=issue.project.to_json(),
+                issue=issue.to_json(public=True),
+                project=issue.project.to_json(public=True),
                 fields=edit,
                 agent=user_obj.username,
             )
@@ -979,7 +979,7 @@ def update_project_settings(session, repo, settings, user):
             repo,
             topic='project.edit',
             msg=dict(
-                project=repo.to_json(),
+                project=repo.to_json(public=True),
                 fields=update,
                 agent=user_obj.username,
             )
@@ -1051,7 +1051,7 @@ def fork_project(session, user, repo, gitfolder,
         project,
         topic='project.forked',
         msg=dict(
-            project=project.to_json(),
+            project=project.to_json(public=True),
             agent=user_obj.username,
         )
     )
@@ -1485,7 +1485,7 @@ def close_pull_request(session, request, user, requestfolder, merged=True):
         request.project,
         topic='pull-request.closed',
         msg=dict(
-            pullrequest=request.to_json(),
+            pullrequest=request.to_json(public=True),
             merged=merged,
             agent=user_obj.username,
         )
