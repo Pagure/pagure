@@ -73,11 +73,12 @@ def view_repo(repo, username=None):
             pass
 
     readme = None
+    safe = False
     for i in tree:
         name, ext = os.path.splitext(i.name)
         if name == 'README':
             content = repo_obj[i.oid].data
-            readme = pagure.doc_utils.convert_readme(
+            readme, safe = pagure.doc_utils.convert_readme(
                 content, ext,
                 view_file_url=flask.url_for(
                     'view_raw_file', username=username,
@@ -123,6 +124,7 @@ def view_repo(repo, username=None):
         repo_obj=repo_obj,
         username=username,
         readme=readme,
+        safe=safe,
         branches=sorted(repo_obj.listall_branches()),
         branchname='master',
         last_commits=last_commits,
