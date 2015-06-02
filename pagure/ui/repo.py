@@ -642,7 +642,8 @@ def view_settings(repo, username=None):
             403,
             'You are not allowed to change the settings for this project')
 
-    plugins = pagure.ui.plugins.get_plugin_names()
+    plugins = pagure.ui.plugins.get_plugin_names(
+        APP.config.get('DISABLED_PLUGINS'))
     tags = pagure.lib.get_tags_of_project(SESSION, repo)
 
     form = pagure.forms.ConfirmationForm()
