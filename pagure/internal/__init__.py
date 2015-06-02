@@ -189,6 +189,12 @@ def mergeable_request_pull():
     if not request:
         flask.abort(404, 'Pull-request not found')
 
+    if request.merge_status:
+        return flask.jsonify({
+            'code': request.merge_status,
+            'short_code': MERGE_OPTIONS[request.merge_status]['short_code'],
+            'message': MERGE_OPTIONS[request.merge_status]['message']})
+
     # Get the fork
     repopath = pagure.get_repo_path(request.project_from)
     fork_obj = pygit2.Repository(repopath)
