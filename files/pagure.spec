@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.9
+Version:        0.1.10
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -167,6 +167,22 @@ install -m 644 milters/comment_email_milter.py \
 
 
 %changelog
+* Tue Jun 02 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.10-1
+- Update to 0.1.10
+- Add support for URL ending with a trailing slash where it makes sense (so
+  we support both with and without trailing slash)
+- Fix XSS issue by disabling <script> tags in the documentation pages
+- Expend the unit-test suite for the api.project controller
+- Add the possibility for 3rd party apps to 'flag' a pull-request with for
+  example the result of a build
+- Handle the situation where there are multiple branch of the same name in
+  the same repo
+- Fix the color of the link on hover when displayed within a tab view
+  (for example in the PR pages)
+- Redirect the user to the pull-request created after its the creation
+- Do not leak emails over fedmsg
+- Fix the fedmsg_hook plugin
+
 * Fri May 29 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.9-1
 - Update to 0.1.9
 - Initial API work
