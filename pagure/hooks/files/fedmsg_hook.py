@@ -25,7 +25,7 @@ print "Emitting a message to the fedmsg bus."
 config = fedmsg.config.load_config([], None)
 config['active'] = True
 config['endpoints']['relay_inbound'] = config['relay_inbound']
-fedmsg.init(name='relay_inbound', cert_prefix='scm', **config)
+fedmsg.init(name='relay_inbound', **config)
 
 
 def build_stats(commit):
