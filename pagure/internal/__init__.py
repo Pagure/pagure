@@ -29,6 +29,25 @@ import pagure.ui.fork
 from pagure import is_repo_admin, authenticated
 
 
+MERGE_OPTIONS = {
+    'NO_CHANGE': {
+        'short_code': 'No changes',
+        'message': 'Nothing to change, git is up to date'
+    },
+    'FFORWARD': {
+        'short_code': 'Ok',
+        'message': 'The pull-request can be merged and fast-forwarded'
+    },
+    'CONFLICTS': {
+        'short_code': 'Conflicts',
+        'message': 'The pull-request cannot be merged due to conflicts'
+    },
+    'MERGE': {
+        'short_code': 'With merge',
+        'message': 'The pull-request can be merged with a merge commit'
+    }
+}
+
 # pylint: disable=E1101
 
 
@@ -213,21 +232,16 @@ def mergeable_request_pull():
              mergecode & pygit2.GIT_MERGE_ANALYSIS_UP_TO_DATE)):
 
         shutil.rmtree(newpath)
-        return flask.jsonify({
-            'code': 'NO_CHANGE',
-            'short_code': 'No changes',
-            'message': 'Nothing to change, git is up to date'})
+        request.merge_status = 'NO_CHANGE'
+        pagure.SESSION.commit()
     elif (
             (merge is not None and merge.is_fastforward)
             or
             (merge is None and
              mergecode & pygit2.GIT_MERGE_ANALYSIS_FASTFORWARD)):
-
         shutil.rmtree(newpath)
-        return flask.jsonify({
-            'code': 'FFORWARD',
-            'short_code': 'Ok',
-            'message': 'The pull-request can be merged and fast-forwarded'})
+        request.merge_status = 'FFORWARD'
+        pagure.SESSION.commit()
 
     else:
         tree = None
@@ -235,14 +249,17 @@ def mergeable_request_pull():
             tree = new_repo.index.write_tree()
         except pygit2.GitError:
             shutil.rmtree(newpath)
+            request.merge_status = 'CONFLICTS'
+            pagure.SESSION.commit()
             return flask.jsonify({
                 'code': 'CONFLICTS',
-                'short_code': 'Conflicts',
-                'message': 'The pull-request cannot be merged due to '
-                'conflicts'})
+                'short_code': MERGE_OPTIONS['CONFLICTS']['short_code'],
+                'message': MERGE_OPTIONS['CONFLICTS']['message']})
 
         shutil.rmtree(newpath)
-        return flask.jsonify({
-            'code': 'MERGE',
-            'short_code': 'With merge',
-            'message': 'The pull-request can be merged with a merge commit'})
+        request.merge_status = 'MERGE'
+        pagure.SESSION.commit()
+    return flask.jsonify({
+        'code': request.merge_status,
+        'short_code': MERGE_OPTIONS[request.merge_status]['short_code'],
+        'message': MERGE_OPTIONS[request.merge_status]['message']})
