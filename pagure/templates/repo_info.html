@@ -161,7 +161,11 @@
 
   {% if readme %}
   <section class="readme">
-    {{ readme |safe }}
+    {% if safe %}
+      {{ readme | noJS |safe }}
+    {% else %}
+      {{ readme | noJS }}
+    {% endif %}
   </section>
   {% endif %}
 
