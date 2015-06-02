@@ -886,6 +886,10 @@ def diff_pull_request(
 
         if request.status and diff_commits:
             first_commit = repo_obj[diff_commits[-1].oid.hex]
+            # Check if we can still rely on the merge_status
+            if request.commit_start != first_commit.oid.hex or\
+                    request.commit_stop != diff_commits[0].oid.hex:
+                request.merge_status = None
             request.commit_start = first_commit.oid.hex
             request.commit_stop = diff_commits[0].oid.hex
             session.add(request)
@@ -905,6 +909,10 @@ def diff_pull_request(
             diff_commits.append(commit)
         if request.status and diff_commits:
             first_commit = repo_obj[diff_commits[-1].oid.hex]
+            # Check if we can still rely on the merge_status
+            if request.commit_start != first_commit.oid.hex or\
+                    request.commit_stop != diff_commits[0].oid.hex:
+                request.merge_status = None
             request.commit_start = first_commit.oid.hex
             request.commit_stop = diff_commits[0].oid.hex
             session.add(request)
