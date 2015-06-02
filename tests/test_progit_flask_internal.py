@@ -58,7 +58,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         repo = pagure.lib.get_project(self.session, 'test')
 
-        msg = pagure.lib.new_pull_request(
+        req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=repo,
             branch_from='feature',
@@ -69,7 +69,8 @@ class PagureFlaskInternaltests(tests.Modeltests):
             requestfolder=None,
         )
         self.session.commit()
-        self.assertEqual(msg, 'Request created')
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'PR from the feature branch')
 
         request = repo.requests[0]
         self.assertEqual(len(request.comments), 0)
@@ -353,7 +354,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         # Create a PR for these changes
         tests.create_projects(self.session)
         project = pagure.lib.get_project(self.session, 'test')
-        msg = pagure.lib.new_pull_request(
+        req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=project,
             branch_from='feature',
@@ -364,7 +365,8 @@ class PagureFlaskInternaltests(tests.Modeltests):
             requestfolder=None,
         )
         self.session.commit()
-        self.assertEqual(msg, 'Request created')
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'PR from the feature branch')
 
         # Check if the PR can be merged
         data = {
@@ -474,7 +476,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         # Create a PR for these changes
         tests.create_projects(self.session)
         project = pagure.lib.get_project(self.session, 'test')
-        msg = pagure.lib.new_pull_request(
+        req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=project,
             branch_from='master',
@@ -485,7 +487,8 @@ class PagureFlaskInternaltests(tests.Modeltests):
             requestfolder=None,
         )
         self.session.commit()
-        self.assertEqual(msg, 'Request created')
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'PR from the feature branch')
 
         # Check if the PR can be merged
         data = {
@@ -616,7 +619,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         # Create a PR for these changes
         tests.create_projects(self.session)
         project = pagure.lib.get_project(self.session, 'test')
-        msg = pagure.lib.new_pull_request(
+        req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=project,
             branch_from='feature',
@@ -627,7 +630,8 @@ class PagureFlaskInternaltests(tests.Modeltests):
             requestfolder=None,
         )
         self.session.commit()
-        self.assertEqual(msg, 'Request created')
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'PR from the feature branch')
 
         # Check if the PR can be merged
         data = {}
@@ -756,7 +760,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         # Create a PR for these changes
         tests.create_projects(self.session)
         project = pagure.lib.get_project(self.session, 'test')
-        msg = pagure.lib.new_pull_request(
+        req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=project,
             branch_from='feature',
@@ -767,7 +771,8 @@ class PagureFlaskInternaltests(tests.Modeltests):
             requestfolder=None,
         )
         self.session.commit()
-        self.assertEqual(msg, 'Request created')
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'PR from the feature branch')
 
         # Check if the PR can be merged
         data = {}

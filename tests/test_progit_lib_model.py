@@ -87,7 +87,7 @@ class PagureLibModeltests(tests.Modeltests):
             self.session, 'test', user='pingou')
 
         # Create an pull-request
-        msg = pagure.lib.new_pull_request(
+        req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
             branch_from='master',
@@ -97,7 +97,13 @@ class PagureLibModeltests(tests.Modeltests):
             user='pingou',
             requestfolder=None,
         )
-        self.assertEqual(msg, 'Request created')
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+
+        self.assertEqual(
+            str(req),
+            'PullRequest(1, project:test, user:pingou, '
+            'title:test pull-request)')
 
         request = pagure.lib.search_pull_requests(self.session, requestid=1)
         self.assertEqual(

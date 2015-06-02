@@ -1279,7 +1279,7 @@ class PagureLibtests(tests.Modeltests):
         forked_repo = pagure.lib.get_project(
             self.session, 'test', user='pingou')
 
-        msg = pagure.lib.new_pull_request(
+        req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
             branch_from='master',
@@ -1290,7 +1290,8 @@ class PagureLibtests(tests.Modeltests):
             requestfolder=None,
         )
         self.session.commit()
-        self.assertEqual(msg, 'Request created')
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
 
     @patch('pagure.lib.notify.send_email')
     def test_add_pull_request_comment(self, mockemail):

@@ -187,7 +187,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
         # Create a PR for these changes
         project = pagure.lib.get_project(self.session, 'test')
-        msg = pagure.lib.new_pull_request(
+        req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=project,
             branch_from=branch_from,
@@ -198,7 +198,8 @@ class PagureFlaskForktests(tests.Modeltests):
             requestfolder=None,
         )
         self.session.commit()
-        self.assertEqual(msg, 'Request created')
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'PR from the %s branch' % branch_from)
 
         shutil.rmtree(newpath)
 
@@ -556,7 +557,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
         # Create a PR for these changes
         project = pagure.lib.get_project(self.session, 'test')
-        msg = pagure.lib.new_pull_request(
+        req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=item,
             branch_from='feature',
@@ -568,7 +569,8 @@ class PagureFlaskForktests(tests.Modeltests):
 
         )
         self.session.commit()
-        self.assertEqual(msg, 'Request created')
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'PR from the feature branch')
 
         output = self.app.get('/test/pull-request/1')
         self.assertEqual(output.status_code, 200)
@@ -613,7 +615,7 @@ class PagureFlaskForktests(tests.Modeltests):
         # Create a PR for these "changes" (there are none, both repos are
         # empty)
         project = pagure.lib.get_project(self.session, 'test')
-        msg = pagure.lib.new_pull_request(
+        req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=item,
             branch_from='feature',
@@ -625,7 +627,8 @@ class PagureFlaskForktests(tests.Modeltests):
 
         )
         self.session.commit()
-        self.assertEqual(msg, 'Request created')
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'PR from the feature branch')
 
         output = self.app.get('/test/pull-request/1', follow_redirects=True)
         self.assertEqual(output.status_code, 200)
@@ -852,7 +855,7 @@ index 9f44358..2a552bb 100644
         # Create a PR for these "changes" (there are none, both repos are
         # empty)
         project = pagure.lib.get_project(self.session, 'test')
-        msg = pagure.lib.new_pull_request(
+        req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=item,
             branch_from='feature',
@@ -864,7 +867,8 @@ index 9f44358..2a552bb 100644
 
         )
         self.session.commit()
-        self.assertEqual(msg, 'Request created')
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'PR from the feature branch')
 
         output = self.app.get('/test/pull-request/1.patch', follow_redirects=True)
         self.assertEqual(output.status_code, 200)
@@ -939,7 +943,7 @@ index 0000000..2a552bb
         # Create a PR for these "changes" (there are none, both repos are
         # empty)
         project = pagure.lib.get_project(self.session, 'test')
-        msg = pagure.lib.new_pull_request(
+        req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=item,
             branch_from='feature',
@@ -951,7 +955,8 @@ index 0000000..2a552bb
 
         )
         self.session.commit()
-        self.assertEqual(msg, 'Request created')
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'PR from the feature branch')
 
         output = self.app.get('/test/pull-request/1.patch', follow_redirects=True)
         self.assertEqual(output.status_code, 200)
@@ -1282,7 +1287,8 @@ index 0000000..2a552bb
                 '/test/diff/master..feature', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Pull requests - test - Pagure</title>', output.data)
+                '<title>Pull request #2 - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<li class="message">Request created</li>', output.data)
 

@@ -1357,7 +1357,7 @@ index 0000000..fb7093d
             self.assertEqual(msg, 'Comment added')
 
             # add pull-requests
-            msg = pagure.lib.new_pull_request(
+            req = pagure.lib.new_pull_request(
                 session=self.session,
                 repo_from=repo,
                 branch_from='feature',
@@ -1368,9 +1368,10 @@ index 0000000..fb7093d
                 requestfolder=os.path.join(tests.HERE, 'requests'),
             )
             self.session.commit()
-            self.assertEqual(msg, 'Request created')
+            self.assertEqual(req.id, 3)
+            self.assertEqual(req.title, 'test pull-request')
 
-            msg = pagure.lib.new_pull_request(
+            req = pagure.lib.new_pull_request(
                 session=self.session,
                 repo_from=repo,
                 branch_from='feature2',
@@ -1381,7 +1382,8 @@ index 0000000..fb7093d
                 requestfolder=os.path.join(tests.HERE, 'requests'),
             )
             self.session.commit()
-            self.assertEqual(msg, 'Request created')
+            self.assertEqual(req.id, 4)
+            self.assertEqual(req.title, 'test pull-request')
 
             # Add comment on a pull-request
             request = pagure.lib.search_pull_requests(

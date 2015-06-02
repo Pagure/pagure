@@ -630,7 +630,7 @@ index 458821a..77674a8
 
         repo = pagure.lib.get_project(self.session, 'test_ticket_repo')
         # Create an issue to play with
-        msg = pagure.lib.new_pull_request(
+        req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=repo,
             branch_from='feature',
@@ -644,8 +644,9 @@ index 458821a..77674a8
             status=True,
             notify=True
         )
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test PR')
 
-        self.assertEqual(msg, 'Request created')
         request = repo.requests[0]
         self.assertEqual(request.title, 'test PR')
         pagure.lib.git.update_git(request, request.project, tests.HERE)
