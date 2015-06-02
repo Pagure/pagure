@@ -23,10 +23,18 @@ from pagure.lib.model import BASE
 # pylint: disable=E1101
 
 
-def get_plugin_names():
+def get_plugin_names(blacklist=None):
     ''' Return the list of plugins names. '''
     plugins = load('pagure.hooks', subclasses=BaseHook)
-    output = [plugin.name for plugin in plugins]
+    if not blacklist:
+        blacklist = []
+    elif not isinstance(blacklist, list):
+        blacklist = [blacklist]
+    output = [
+        plugin.name
+        for plugin in plugins
+        if plugin.name not in blacklist
+    ]
     return output
 
 
