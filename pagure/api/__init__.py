@@ -77,6 +77,8 @@ def check_api_acls(acls, optional=False):
                 token_auth = True
                 flask.g.fas_user = token.user
                 flask.g.token = token
+    elif optional:
+        return
 
     if not token_auth:
         output = {
@@ -122,7 +124,9 @@ def api_login_optional(acls=None):
         def decorated_function(*args, **kwargs):
             ''' Actually does the job with the arguments provided. '''
 
-            check_api_acls(acls, optional=True)
+            response = check_api_acls(acls, optional=True)
+            if response:
+                return response
             return fn(*args, **kwargs)
 
         return decorated_function
