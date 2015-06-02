@@ -93,8 +93,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             "0.0.1", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
             "Release 0.0.1")
 
-
-        # Close PR
+        # Check tags
         output = self.app.get('/api/0/test/git/tags')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
