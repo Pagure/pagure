@@ -734,7 +734,7 @@ class PullRequest(BASE):
 
         return len(positive) - len(negative)
 
-    def to_json(self, public=False):
+    def to_json(self, public=False, api=False):
         ''' Returns a dictionnary representation of the pull-request.
 
         '''
@@ -743,9 +743,9 @@ class PullRequest(BASE):
             'uid': self.uid,
             'title': self.title,
             'branch': self.branch,
-            'project': self.project.to_json(public=public),
+            'project': self.project.to_json(public=public, api=api),
             'branch_from': self.branch_from,
-            'repo_from': self.project_from.to_json(public=public),
+            'repo_from': self.project_from.to_json(public=public, api=api),
             'date_created': self.date_created.strftime('%s'),
             'user': self.user.to_json(public=public),
             'assignee': self.assignee.to_json(public=public)
