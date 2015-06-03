@@ -1196,6 +1196,8 @@ def edit_file(repo, branchname, filename, username=None):
             repo_obj, commit.tree, filename.split('/'))
         if not content or isinstance(content, pygit2.Tree):
             flask.abort(404, 'File not found')
+        if content.is_binary:
+            flask.abort(400, 'Cannot edit binary files')
         data = repo_obj[content.oid].data
     else:
         data = form.content.data
