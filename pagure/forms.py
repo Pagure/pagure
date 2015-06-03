@@ -264,3 +264,13 @@ class NewGroupForm(wtf.Form):
             self.group_type.choices = [
                 (grptype, grptype) for grptype in kwargs['group_types']
             ]
+
+
+class EditFileForm(wtf.Form):
+    """ Form used to edit a file. """
+    content = wtforms.TextAreaField(
+        'content', [wtforms.validators.Required()])
+    commit_title = wtforms.TextField(
+        'Title', [wtforms.validators.Required()])
+    commit_message = wtforms.TextAreaField(
+        'Commit message', [wtforms.validators.optional()])
