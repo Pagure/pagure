@@ -288,10 +288,13 @@ def add_content_git_repo(folder):
     """ Create some content for the specified git repo. """
     if not os.path.exists(folder):
         os.makedirs(folder)
-    repo = pygit2.init_repository(folder)
+    brepo = pygit2.init_repository(folder, bare=True)
+
+    newfolder = tempfile.mkdtemp(prefix='pagure-tests')
+    repo = pygit2.clone_repository(folder, newfolder)
 
     # Create a file in that git repo
-    with open(os.path.join(folder, 'sources'), 'w') as stream:
+    with open(os.path.join(newfolder, 'sources'), 'w') as stream:
         stream.write('foo\n bar')
     repo.index.add('sources')
     repo.index.write()
@@ -332,10 +335,10 @@ def add_content_git_repo(folder):
         parents = [commit.oid.hex]
 
     subfolder = os.path.join('folder1', 'folder2')
-    if not os.path.exists(os.path.join(folder, subfolder)):
-        os.makedirs(os.path.join(folder, subfolder))
+    if not os.path.exists(os.path.join(newfolder, subfolder)):
+        os.makedirs(os.path.join(newfolder, subfolder))
     # Create a file in that git repo
-    with open(os.path.join(folder, subfolder, 'file'), 'w') as stream:
+    with open(os.path.join(newfolder, subfolder, 'file'), 'w') as stream:
         stream.write('foo\n bar\nbaz')
     repo.index.add(os.path.join(subfolder, 'file'))
     repo.index.write()
@@ -357,12 +360,24 @@ def add_content_git_repo(folder):
         parents
     )
 
+    # Push to origin
+    ori_remote = repo.remotes[0]
+    master_ref = repo.lookup_reference('HEAD').resolve()
+    refname = '%s:%s' % (master_ref.name, master_ref.name)
+
+    ori_remote.push(refname)
+
+    shutil.rmtree(newfolder)
+
 
 def add_readme_git_repo(folder):
     """ Create a README file for the specified git repo. """
     if not os.path.exists(folder):
         os.makedirs(folder)
-    repo = pygit2.init_repository(folder)
+    brepo = pygit2.init_repository(folder, bare=True)
+
+    newfolder = tempfile.mkdtemp(prefix='pagure-tests')
+    repo = pygit2.clone_repository(folder, newfolder)
 
     content = """Pagure
 ======
@@ -392,7 +407,7 @@ Dev instance: http://209.132.184.222/ (/!\\ May change unexpectedly, it's a dev 
         parents = [commit.oid.hex]
 
     # Create a file in that git repo
-    with open(os.path.join(folder, 'README.rst'), 'w') as stream:
+    with open(os.path.join(newfolder, 'README.rst'), 'w') as stream:
         stream.write(content)
     repo.index.add('README.rst')
     repo.index.write()
@@ -414,16 +429,28 @@ Dev instance: http://209.132.184.222/ (/!\\ May change unexpectedly, it's a dev 
         parents
     )
 
+    # Push to origin
+    ori_remote = repo.remotes[0]
+    master_ref = repo.lookup_reference('HEAD').resolve()
+    refname = '%s:%s' % (master_ref.name, master_ref.name)
+
+    ori_remote.push(refname)
+
+    shutil.rmtree(newfolder)
+
 
 def add_commit_git_repo(folder, ncommits=10):
     """ Create some more commits for the specified git repo. """
     if not os.path.exists(folder):
         os.makedirs(folder)
-    repo = pygit2.init_repository(folder)
+    brepo = pygit2.init_repository(folder, bare=True)
+
+    newfolder = tempfile.mkdtemp(prefix='pagure-tests')
+    repo = pygit2.clone_repository(folder, newfolder)
 
     for index in range(ncommits):
         # Create a file in that git repo
-        with open(os.path.join(folder, 'sources'), 'a') as stream:
+        with open(os.path.join(newfolder, 'sources'), 'a') as stream:
             stream.write('Row %s\n' % index)
         repo.index.add('sources')
         repo.index.write()
@@ -454,12 +481,24 @@ def add_commit_git_repo(folder, ncommits=10):
             parents,
         )
 
+    # Push to origin
+    ori_remote = repo.remotes[0]
+    master_ref = repo.lookup_reference('HEAD').resolve()
+    refname = '%s:%s' % (master_ref.name, master_ref.name)
+
+    ori_remote.push(refname)
+
+    shutil.rmtree(newfolder)
+
 
 def add_binary_git_repo(folder, filename):
     """ Create a fake image file for the specified git repo. """
     if not os.path.exists(folder):
         os.makedirs(folder)
-    repo = pygit2.init_repository(folder)
+    brepo = pygit2.init_repository(folder, bare=True)
+
+    newfolder = tempfile.mkdtemp(prefix='pagure-tests')
+    repo = pygit2.clone_repository(folder, newfolder)
 
     content = """<89>PNG^M
 ^Z
@@ -487,7 +526,7 @@ C7Pí^DQeee<84>ÃaÜn·î<98><9e><9e>^^¶oß®<95>Ý¦M^^T©®®¦®®<8e>©©)�
         parents = [commit.oid.hex]
 
     # Create a file in that git repo
-    with open(os.path.join(folder, filename), 'w') as stream:
+    with open(os.path.join(newfolder, filename), 'w') as stream:
         stream.write(content)
     repo.index.add(filename)
     repo.index.write()
@@ -508,6 +547,15 @@ C7Pí^DQeee<84>ÃaÜn·î<98><9e><9e>^^¶oß®<95>Ý¦M^^T©®®¦®®<8e>©©)�
         # list of binary strings representing parents of the new commit
         parents
     )
+
+    # Push to origin
+    ori_remote = repo.remotes[0]
+    master_ref = repo.lookup_reference('HEAD').resolve()
+    refname = '%s:%s' % (master_ref.name, master_ref.name)
+
+    ori_remote.push(refname)
+
+    shutil.rmtree(newfolder)
 
 
 if __name__ == '__main__':

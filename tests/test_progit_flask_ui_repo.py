@@ -442,7 +442,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         # No git repo associated
         self.assertEqual(output.status_code, 404)
 
-        tests.create_projects_git(tests.HERE)
+        tests.create_projects_git(tests.HERE, bare=True)
 
         output = self.app.get('/test')
         self.assertEqual(output.status_code, 200)
@@ -569,7 +569,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         # No git repo associated
         self.assertEqual(output.status_code, 404)
 
-        tests.create_projects_git(tests.HERE)
+        tests.create_projects_git(tests.HERE, bare=True)
 
         output = self.app.get('/test/branch/master')
         self.assertEqual(output.status_code, 404)
@@ -649,7 +649,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         # No git repo associated
         self.assertEqual(output.status_code, 404)
 
-        tests.create_projects_git(tests.HERE)
+        tests.create_projects_git(tests.HERE, bare=True)
 
         output = self.app.get('/test/commits')
         self.assertEqual(output.status_code, 200)
@@ -742,7 +742,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         # No git repo associated
         self.assertEqual(output.status_code, 404)
 
-        tests.create_projects_git(tests.HERE)
+        tests.create_projects_git(tests.HERE, bare=True)
 
         output = self.app.get('/test/blob/foo/f/sources')
         self.assertEqual(output.status_code, 404)
@@ -776,7 +776,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             'Binary files cannot be rendered.<br/>' in output.data)
 
         # View by commit id
-        repo = pygit2.init_repository(os.path.join(tests.HERE, 'test.git'))
+        repo = pygit2.Repository(os.path.join(tests.HERE, 'test.git'))
         commit = repo.revparse_single('HEAD')
 
         output = self.app.get('/test/blob/%s/f/test.jpg' % commit.oid.hex)
@@ -855,7 +855,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         # No git repo associated
         self.assertEqual(output.status_code, 404)
 
-        tests.create_projects_git(tests.HERE)
+        tests.create_projects_git(tests.HERE, bare=True)
 
         output = self.app.get('/test/raw/foo/sources')
         self.assertEqual(output.status_code, 404)
@@ -889,7 +889,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertTrue(output.data.startswith('<89>PNG^M'))
 
         # View by commit id
-        repo = pygit2.init_repository(os.path.join(tests.HERE, 'test.git'))
+        repo = pygit2.Repository(os.path.join(tests.HERE, 'test.git'))
         commit = repo.revparse_single('HEAD')
 
         output = self.app.get('/test/raw/%s/f/test.jpg' % commit.oid.hex)
@@ -964,14 +964,14 @@ class PagureFlaskRepotests(tests.Modeltests):
         # No git repo associated
         self.assertEqual(output.status_code, 404)
 
-        tests.create_projects_git(tests.HERE)
+        tests.create_projects_git(tests.HERE, bare=True)
 
         output = self.app.get('/test/bar')
         self.assertEqual(output.status_code, 404)
 
         # Add a README to the git repo - First commit
         tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
-        repo = pygit2.init_repository(os.path.join(tests.HERE, 'test.git'))
+        repo = pygit2.Repository(os.path.join(tests.HERE, 'test.git'))
         commit = repo.revparse_single('HEAD')
 
         # View first commit
@@ -988,7 +988,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         # Add some content to the git repo
         tests.add_content_git_repo(os.path.join(tests.HERE, 'test.git'))
 
-        repo = pygit2.init_repository(os.path.join(tests.HERE, 'test.git'))
+        repo = pygit2.Repository(os.path.join(tests.HERE, 'test.git'))
         commit = repo.revparse_single('HEAD')
 
         # View another commit
@@ -1013,12 +1013,13 @@ class PagureFlaskRepotests(tests.Modeltests):
         )
         self.session.add(item)
         self.session.commit()
-        forkedgit = os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git')
+        forkedgit = os.path.join(
+            tests.HERE, 'forks', 'pingou', 'test3.git')
 
         tests.add_content_git_repo(forkedgit)
         tests.add_readme_git_repo(forkedgit)
 
-        repo = pygit2.init_repository(forkedgit)
+        repo = pygit2.Repository(forkedgit)
         commit = repo.revparse_single('HEAD')
 
         # Commit does not exist in anothe repo :)
@@ -1048,14 +1049,14 @@ class PagureFlaskRepotests(tests.Modeltests):
         # No git repo associated
         self.assertEqual(output.status_code, 404)
 
-        tests.create_projects_git(tests.HERE)
+        tests.create_projects_git(tests.HERE, bare=True)
 
         output = self.app.get('/test/bar.patch')
         self.assertEqual(output.status_code, 404)
 
         # Add a README to the git repo - First commit
         tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
-        repo = pygit2.init_repository(os.path.join(tests.HERE, 'test.git'))
+        repo = pygit2.Repository(os.path.join(tests.HERE, 'test.git'))
         commit = repo.revparse_single('HEAD')
 
         # View first commit
@@ -1089,7 +1090,7 @@ index 0000000..fb7093d
         # Add some content to the git repo
         tests.add_content_git_repo(os.path.join(tests.HERE, 'test.git'))
 
-        repo = pygit2.init_repository(os.path.join(tests.HERE, 'test.git'))
+        repo = pygit2.Repository(os.path.join(tests.HERE, 'test.git'))
         commit = repo.revparse_single('HEAD')
 
         # View another commit
@@ -1125,7 +1126,7 @@ index 0000000..11980b1
         tests.add_content_git_repo(forkedgit)
         tests.add_readme_git_repo(forkedgit)
 
-        repo = pygit2.init_repository(forkedgit)
+        repo = pygit2.Repository(forkedgit)
         commit = repo.revparse_single('HEAD')
 
         # Commit does not exist in anothe repo :)
@@ -1171,7 +1172,7 @@ index 0000000..fb7093d
         # No git repo associated
         self.assertEqual(output.status_code, 404)
 
-        tests.create_projects_git(tests.HERE)
+        tests.create_projects_git(tests.HERE, bare=True)
 
         output = self.app.get('/test/tree/')
         self.assertEqual(output.status_code, 200)
@@ -1182,7 +1183,7 @@ index 0000000..fb7093d
 
         # Add a README to the git repo - First commit
         tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
-        repo = pygit2.init_repository(os.path.join(tests.HERE, 'test.git'))
+        repo = pygit2.Repository(os.path.join(tests.HERE, 'test.git'))
         commit = repo.revparse_single('HEAD')
 
         # View first commit
@@ -1555,7 +1556,7 @@ index 0000000..fb7093d
         # No git repo associated
         self.assertEqual(output.status_code, 404)
 
-        tests.create_projects_git(tests.HERE)
+        tests.create_projects_git(tests.HERE, bare=True)
 
         output = self.app.get('/test/tags')
         self.assertEqual(output.status_code, 200)
@@ -1563,7 +1564,7 @@ index 0000000..fb7093d
 
         # Add a README to the git repo - First commit
         tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
-        repo = pygit2.init_repository(os.path.join(tests.HERE, 'test.git'))
+        repo = pygit2.Repository(os.path.join(tests.HERE, 'test.git'))
         first_commit = repo.revparse_single('HEAD')
         tagger = pygit2.Signature('Alice Doe', 'adoe@example.com', 12347, 0)
         repo.create_tag(
