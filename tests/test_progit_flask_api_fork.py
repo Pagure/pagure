@@ -112,14 +112,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
                     "id": 1,
                     "name": "test",
                     "parent": None,
-                    "settings": {
-                      "Minimum_score_to_merge_pull-request": -1,
-                      "Only_assignee_can_merge_pull-request": False,
-                      "Web-hooks": None,
-                      "issue_tracker": True,
-                      "project_documentation": True,
-                      "pull_requests": True
-                    },
                     "user": {
                       "fullname": "PY C",
                       "name": "pingou"
@@ -131,14 +123,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
                     "id": 1,
                     "name": "test",
                     "parent": None,
-                    "settings": {
-                      "Minimum_score_to_merge_pull-request": -1,
-                      "Only_assignee_can_merge_pull-request": False,
-                      "Web-hooks": None,
-                      "issue_tracker": True,
-                      "project_documentation": True,
-                      "pull_requests": True
-                    },
                     "user": {
                       "fullname": "PY C",
                       "name": "pingou"
@@ -241,14 +225,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
                 "id": 1,
                 "name": "test",
                 "parent": None,
-                "settings": {
-                  "Minimum_score_to_merge_pull-request": -1,
-                  "Only_assignee_can_merge_pull-request": False,
-                  "Web-hooks": None,
-                  "issue_tracker": True,
-                  "project_documentation": True,
-                  "pull_requests": True
-                },
                 "user": {
                   "fullname": "PY C",
                   "name": "pingou"
@@ -260,14 +236,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
                 "id": 1,
                 "name": "test",
                 "parent": None,
-                "settings": {
-                  "Minimum_score_to_merge_pull-request": -1,
-                  "Only_assignee_can_merge_pull-request": False,
-                  "Web-hooks": None,
-                  "issue_tracker": True,
-                  "project_documentation": True,
-                  "pull_requests": True
-                },
                 "user": {
                   "fullname": "PY C",
                   "name": "pingou"
