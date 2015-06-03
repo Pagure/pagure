@@ -72,14 +72,6 @@ def api_pull_request_views(repo, username=None):
                 "id": 1,
                 "name": "test",
                 "parent": null,
-                "settings": {
-                  "Minimum_score_to_merge_pull-request": -1,
-                  "Only_assignee_can_merge_pull-request": false,
-                  "Web-hooks": None,
-                  "issue_tracker": true,
-                  "project_documentation": true,
-                  "pull_requests": true
-                },
                 "user": {
                   "fullname": "PY C",
                   "name": "pingou"
@@ -91,14 +83,6 @@ def api_pull_request_views(repo, username=None):
                 "id": 1,
                 "name": "test",
                 "parent": null,
-                "settings": {
-                  "Minimum_score_to_merge_pull-request": -1,
-                  "Only_assignee_can_merge_pull-request": false,
-                  "Web-hooks": null,
-                  "issue_tracker": true,
-                  "project_documentation": true,
-                  "pull_requests": true
-                },
                 "user": {
                   "fullname": "PY C",
                   "name": "pingou"
@@ -148,7 +132,9 @@ def api_pull_request_views(repo, username=None):
             status=status)
 
     jsonout = flask.jsonify({
-        'requests': [request.to_json(public=True) for request in requests],
+        'requests': [
+            request.to_json(public=True, api=True)
+            for request in requests],
         'args': {
             'status': status,
             'assignee': assignee,
@@ -195,14 +181,6 @@ def api_pull_request_view(repo, requestid, username=None):
             "id": 1,
             "name": "test",
             "parent": null,
-            "settings": {
-              "Minimum_score_to_merge_pull-request": -1,
-              "Only_assignee_can_merge_pull-request": false,
-              "Web-hooks": null,
-              "issue_tracker": true,
-              "project_documentation": true,
-              "pull_requests": true
-            },
             "user": {
               "fullname": "PY C",
               "name": "pingou"
@@ -214,14 +192,6 @@ def api_pull_request_view(repo, requestid, username=None):
             "id": 1,
             "name": "test",
             "parent": null,
-            "settings": {
-              "Minimum_score_to_merge_pull-request": -1,
-              "Only_assignee_can_merge_pull-request": false,
-              "Web-hooks": null,
-              "issue_tracker": true,
-              "project_documentation": true,
-              "pull_requests": true
-            },
             "user": {
               "fullname": "PY C",
               "name": "pingou"
@@ -254,7 +224,7 @@ def api_pull_request_view(repo, requestid, username=None):
     if not request:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
 
-    jsonout = flask.jsonify(request.to_json(public=True))
+    jsonout = flask.jsonify(request.to_json(public=True, api=True))
     return jsonout
 
 
