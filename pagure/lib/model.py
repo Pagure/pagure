@@ -337,7 +337,7 @@ class Project(BASE):
         ''' Ensures the settings are properly saved. '''
         self._settings = json.dumps(settings)
 
-    def to_json(self, public=False):
+    def to_json(self, public=False, api=False):
         ''' Return a representation of the project as JSON.
         '''
 
@@ -345,12 +345,13 @@ class Project(BASE):
             'id': self.id,
             'name': self.name,
             'description': self.description,
-            'parent': self.parent.to_json(public=public)
+            'parent': self.parent.to_json(public=public, api=api)
                 if self.parent else None,
-            'settings': self.settings,
             'date_created': self.date_created.strftime('%s'),
             'user': self.user.to_json(public=public),
         }
+        if not api:
+            output['settings'] = self.settings
 
         return output
 
