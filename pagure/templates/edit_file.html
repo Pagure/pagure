@@ -1,0 +1,112 @@
+{% extends "repo_master.html" %}
+{% from "_formhelper.html" import render_field %}
+
+{% block title %}Edit - {{ repo.name }}{% endblock %}
+{%block tag %}home{% endblock %}
+
+
+{% block repo %}
+
+<h2>
+    <a href="{{ url_for('view_tree', username=username,
+                repo=repo.name, identifier=branchname)
+    }}">{{ branchname }}</a>/{%
+  for file in filename.split('/') %}
+    {% if loop.first %}
+    {% set path = file %}
+    {% else %}
+    {% set path = path + '/' + file %}
+    {% endif %}
+    {% if loop.index != loop.length %}<a
+    href="{{ url_for('view_file', username=username,
+            repo=repo.name, identifier=branchname,
+            filename=path)}}"
+      >{{ file }}</a>/{% else %}{{ file }}{% endif %}
+  {% endfor %}
+</h2>
+
+<form action="{{ url_for(
+      'edit_file', username=username, repo=repo.name,
+      branchname=branchname, filename=filename) }}"
+      method="post">
+{{ form.csrf_token }}
+
+<div id="lineNum"></div>
+<textarea cols="140" rows="{{
+    data.split('\n') | length + 1
+    if data.split('\n') | length < 30
+    else 30 }} " id="textareaCode" name="content">
+{{ data }}
+</textarea>
+
+<div id="commit">
+  <div>
+    <input type="text" id="commit_title" name="commit_title"
+        placeholder="Update {{ filename }}"
+        value="{{ form.commit_title.data if form.commit_title.data }}">
+    </input>
+  </div>
+  <div>
+    <textarea rows="5" cols="85" type="text" id="commit_message"
+        name="commit_message"
+        placeholder="An optional description of the change">
+    {{- form.commit_message.data if form.commit_message.data -}}
+    </textarea>
+  </div>
+  <div>
+    <input type="submit" class="submit positive button" value="Commit changes">
+    <input type="button" value="Clear" id="clear_comment" />
+  </div>
+</div>
+
+</form>
+
+{% endblock %}
+
+{% block jscripts %}
+{{ super() }}
+<script type="text/javascript">
+$( "#clear_comment").click(
+  function() {
+    $( "#commit_message" ).val("");
+  }
+);
+
+var lineObjOffsetTop = 0;
+
+function createTextAreaWithLines(id) {
+  var el = document.getElementById('lineNum');
+  var ta = document.getElementById(id);
+  el.appendChild(ta);
+  el.className='textAreaLine';
+  el.style.height = (ta.offsetHeight + 2) + 'px';
+  ta.style.position = 'absolute';
+  ta.style.left = '30px';
+  var lineObj = document.createElement('div');
+  el.insertBefore(lineObj,ta);
+  lineObj.className='lineNum';
+  var str = '';
+  var _len = ($('#textareaCode').val()).split(/\r*\n/).length;
+  for(var no=1; no < _len; no++){
+     if(str.length>0) {
+        str = str + '<br>';
+    }
+     str = str + no;
+  }
+
+  ta.onkeydown = function() { update_lines(lineObj,ta); };
+  ta.onmousedown = function() { update_lines(lineObj,ta); };
+  ta.onscroll = function() { update_lines(lineObj,ta); };
+  ta.onblur = function() { update_lines(lineObj,ta); };
+  ta.onfocus = function() { update_lines(lineObj,ta); };
+  ta.onmouseover = function() { update_lines(lineObj,ta); };
+  lineObj.innerHTML = str;
+}
+
+function update_lines(obj,ta) {
+  obj.style.top = (ta.scrollTop * -1 + lineObjOffsetTop) + 'px';
+}
+
+createTextAreaWithLines('textareaCode');
+</script>
+{% endblock %}

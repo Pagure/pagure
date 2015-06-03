@@ -1131,3 +1131,82 @@ def revoke_api_token(repo, token_id, username=None):
         flask.url_for(
             '.view_settings', repo=repo.name, username=username)
     )
+
+
+@APP.route(
+    '/<repo>/edit/<path:branchname>/f/<path:filename>',
+    methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<repo>/edit/<path:branchname>/f/<path:filename>',
+    methods=('GET', 'POST'))
+@cla_required
+def edit_file(repo, branchname, filename, username=None):
+    """ Edit a file online.
+    """
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    if not is_repo_admin(repo):
+        flask.abort(
+            403,
+            'You are not allowed to change the settings for this project')
+
+    reponame = pagure.get_repo_path(repo)
+
+    repo_obj = pygit2.Repository(reponame)
+
+    if repo_obj.is_empty:
+        flask.abort(404, 'Empty repo cannot have a file')
+
+    branch = None
+    if branchname in repo_obj.listall_branches():
+        branch = repo_obj.lookup_branch(branchname)
+        commit = branch.get_object()
+    else:
+        flask.abort(400, 'Invalid branch specified')
+
+    form = pagure.forms.EditFileForm()
+    if form.validate_on_submit():
+        try:
+            pagure.lib.git.update_file_in_git(
+                repo,
+                branch=branchname,
+                filename=filename,
+                content=form.content.data,
+                message='%s\n\n%s' % (
+                    form.commit_title.data.strip(),
+                    form.commit_message.data.strip()
+                ),
+                user=flask.g.fas_user
+            )
+
+            return flask.redirect(
+                flask.url_for(
+                    '.view_file', repo=repo.name, username=username,
+                    identifier=branchname, filename=filename)
+            )
+        except pagure.exceptions.PagureException as err:  # pragma: no cover
+            APP.logger.exception(err)
+            flask.flash('Commit could not be done', 'error')
+            data = form.content.data
+    elif flask.request.method == 'GET':
+        content = __get_file_in_tree(
+            repo_obj, commit.tree, filename.split('/'))
+        if not content or isinstance(content, pygit2.Tree):
+            flask.abort(404, 'File not found')
+        data = repo_obj[content.oid].data
+    else:
+        data = form.content.data
+
+    return flask.render_template(
+        'edit_file.html',
+        select='tree',
+        repo=repo,
+        username=username,
+        branchname=branchname,
+        data=data,
+        filename=filename,
+        form=form,
+    )

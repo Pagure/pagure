@@ -893,3 +893,25 @@ span.CONFLICTS {
 #pr_flags table tr{
     margin-bottom: 1em;
 }
+
+.textAreaLine {
+    width: 950px;
+    overflow: hidden;
+    position: relative;
+    text-indent: 1em;
+}
+
+.lineNum {
+    left: 0;
+    position: absolute;
+    text-align: right;
+    top: 0;
+    width: 27px;
+    font-size: 92.3%;
+    line-height: 100%;
+}
+
+#commit {
+    padding-top: 2em;
+    padding-left: 2em;
+}
