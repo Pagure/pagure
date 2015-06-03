@@ -649,6 +649,83 @@ def add_file_to_git(repo, issue, ticketfolder, user, filename, filestream):
     return os.path.join('files', filename)
 
 
+def update_file_in_git(repo, branch, filename, content, message, user):
+    ''' Udpate a specific file in the specified repository with the content
+    given and commit the change under the user's name.
+
+    :arg repo: the Project object from the database
+    :arg filename: the name of the file to save
+    :arg content: the new content of the file
+    :arg message: the message of the git commit
+    :arg user: the user object with its username and email
+
+    '''
+
+    # Get the fork
+    repopath = pagure.get_repo_path(repo)
+
+    # Clone the repo into a temp folder
+    newpath = tempfile.mkdtemp(prefix='pagure-')
+    new_repo = pygit2.clone_repository(repopath, newpath)
+
+    file_path = os.path.join(newpath, filename)
+
+    # Get the current index
+    index = new_repo.index
+
+    # Write down what changed
+    with open(file_path, 'w') as stream:
+        stream.write(content.replace('\r', ''))
+
+    # Retrieve the list of files that changed
+    diff = new_repo.diff()
+    files = [patch.new_file_path for patch in diff]
+
+    # Add the changes to the index
+    for filename in files:
+        index.add(filename)
+
+    # If not change, return
+    if not files and not added:
+        shutil.rmtree(newpath)
+        return
+
+    # See if there is a parent to this commit
+    branch_ref = get_branch_ref(new_repo, branch)
+    parent = branch_ref.get_object()
+
+    parents = []
+    if parent:
+        parents.append(parent.hex)
+
+    # Author/commiter will always be this one
+    author = pygit2.Signature(
+        name=user.username,
+        email=user.email
+    )
+
+    # Actually commit
+    new_repo.create_commit(
+        branch_ref.name,
+        author,
+        author,
+        message.strip(),
+        new_repo.index.write_tree(),
+        parents)
+    index.write()
+
+    # Push to origin
+    ori_remote = new_repo.remotes[0]
+    refname = '%s:refs/heads/%s' % (branch_ref.name, branch)
+
+    ori_remote.push(refname)
+
+    # Remove the clone
+    shutil.rmtree(newpath)
+
+    return os.path.join('files', filename)
+
+
 def read_output(cmd, abspath, input=None, keepends=False, **kw):
     if input:
         stdin = subprocess.PIPE
