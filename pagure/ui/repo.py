@@ -1049,6 +1049,11 @@ def add_token(repo, username=None):
     if not repo:
         flask.abort(404, 'Project not found')
 
+    if not is_repo_admin(repo):
+        flask.abort(
+            403,
+            'You are not allowed to change the settings for this project')
+
     acls = pagure.lib.get_acls(SESSION)
     form = pagure.forms.NewTokenForm(acls=acls)
 
@@ -1095,6 +1100,11 @@ def revoke_api_token(repo, token_id, username=None):
 
     if not repo:
         flask.abort(404, 'Project not found')
+
+    if not is_repo_admin(repo):
+        flask.abort(
+            403,
+            'You are not allowed to change the settings for this project')
 
     token = pagure.lib.get_api_token(SESSION, token_id)
 
