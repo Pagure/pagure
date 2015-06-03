@@ -1181,7 +1181,7 @@ def edit_file(repo, branchname, filename, username=None):
                 ),
                 user=flask.g.fas_user
             )
-
+            flask.flash('Changes committed')
             return flask.redirect(
                 flask.url_for(
                     '.view_file', repo=repo.name, username=username,
