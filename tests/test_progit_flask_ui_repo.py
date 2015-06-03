@@ -1577,6 +1577,130 @@ index 0000000..fb7093d
         self.assertIn('<span class="tagid">', output.data)
         self.assertTrue(output.data.count('tagid'), 1)
 
+    def test_edit_file(self):
+        """ Test the edit_file endpoint. """
+
+        output = self.app.get('/foo/edit/foo/f/sources')
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            # No project registered in the DB
+            output = self.app.get('/foo/edit/foo/f/sources')
+            self.assertEqual(output.status_code, 404)
+
+            tests.create_projects(self.session)
+
+            # No a repo admin
+            output = self.app.get('/test/edit/foo/f/sources')
+            self.assertEqual(output.status_code, 403)
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+
+            # No associated git repo
+            output = self.app.get('/test/edit/foo/f/sources')
+            self.assertEqual(output.status_code, 404)
+
+            tests.create_projects_git(tests.HERE, bare=True)
+
+            output = self.app.get('/test/edit/foo/f/sources')
+            self.assertEqual(output.status_code, 404)
+
+            # Add some content to the git repo
+            tests.add_content_git_repo(os.path.join(tests.HERE, 'test.git'))
+            tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
+            tests.add_binary_git_repo(
+                os.path.join(tests.HERE, 'test.git'), 'test.jpg')
+            tests.add_binary_git_repo(
+                os.path.join(tests.HERE, 'test.git'), 'test_binary')
+
+            output = self.app.get('/test/edit/master/foofile')
+            self.assertEqual(output.status_code, 404)
+
+            # Edit page
+            output = self.app.get('/test/edit/master/f/sources')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<a href="/test/tree/master">master</a>/sources</h2>',
+                output.data)
+            self.assertIn(
+                '<textarea cols="140" rows="3 " id="textareaCode" '
+                'name="content">', output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            # View what's supposed to be an image
+            output = self.app.get('/test/edit/master/f/test.jpg')
+            self.assertEqual(output.status_code, 400)
+            self.assertIn('<p>Cannot edit binary files</p>', output.data)
+
+            # Check file before the commit:
+            output = self.app.get('/test/raw/master/f/sources')
+            self.assertEqual(output.status_code, 200)
+            self.assertEqual(output.data, 'foo\n bar')
+
+            # No CSRF Token
+            data = {
+                'content': 'foo\n bar\n  baz',
+                'commit_title': 'test commit',
+                'commit_message': 'Online commits from the tests',
+            }
+            output = self.app.post('/test/edit/master/f/sources', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Edit - test - Pagure</title>', output.data)
+
+            # Check that nothing changed
+            output = self.app.get('/test/raw/master/f/sources')
+            self.assertEqual(output.status_code, 200)
+            self.assertEqual(output.data, 'foo\n bar')
+
+            # Works
+            data['csrf_token'] = csrf_token
+            output = self.app.post(
+                '/test/edit/master/f/sources', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Tree - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<li class="message">Changes committed</li>', output.data)
+
+            # Check file after the commit:
+            output = self.app.get('/test/raw/master/f/sources')
+            self.assertEqual(output.status_code, 200)
+            self.assertEqual(output.data, 'foo\n bar\n  baz')
+
+            # Add a fork of a fork
+            item = pagure.lib.model.Project(
+                user_id=1,  # pingou
+                name='test3',
+                description='test project #3',
+                parent_id=1,
+                hook_token='aaabbbppp',
+            )
+            self.session.add(item)
+            self.session.commit()
+
+            tests.add_content_git_repo(
+                os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'))
+            tests.add_readme_git_repo(
+                os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'))
+            tests.add_commit_git_repo(
+                os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'),
+                ncommits=10)
+
+            output = self.app.get('/fork/pingou/test3/edit/master/f/sources')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<a href="/fork/pingou/test3/tree/master">'
+                'master</a>/sources</h2>', output.data)
+            self.assertIn(
+                '<textarea cols="140" rows="13 " id="textareaCode" '
+                'name="content">', output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskRepotests)
