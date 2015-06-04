@@ -4,6 +4,7 @@ forks/
 tickets/
 docs/
 requests/
+releases/
 
 # Other python/editor specific files to ignore
 dist/
