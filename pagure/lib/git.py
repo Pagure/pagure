@@ -844,8 +844,26 @@ def merge_pull_request(session, repo, request, username, request_folder):
         session, request, new_repo, fork_obj,
         requestfolder=request_folder, with_diff=False)
 
-    repo_commit = fork_obj[
-        fork_obj.lookup_branch(request.branch_from).get_object().hex]
+    # Checkout the correct branch
+    branch_ref = get_branch_ref(new_repo, request.branch)
+    if not branch_ref:
+        shutil.rmtree(newpath)
+        raise pagure.exceptions.PagureException(
+            'Branch %s could not be found in the repo %s' % (
+                request.branch, request.project.fullname
+            ))
+
+    new_repo.checkout(branch_ref)
+
+    branch = get_branch_ref(fork_obj, request.branch_from)
+    if not branch:
+        shutil.rmtree(newpath)
+        raise pagure.exceptions.PagureException(
+            'Branch %s could not be found in the repo %s' % (
+                request.branch_from, request.project_from.fullname
+            ))
+
+    repo_commit = fork_obj[branch.get_object().hex]
 
     ori_remote = new_repo.remotes[0]
     # Add the fork as remote repo
@@ -859,9 +877,7 @@ def merge_pull_request(session, repo, request, username, request_folder):
     if merge is None:
         mergecode = new_repo.merge_analysis(repo_commit.oid)[0]
 
-    branch_ref = get_branch_ref(new_repo, request.branch)
-
-    refname = '%s:%s' % (branch_ref.name, branch_ref.name)
+    refname = '%s:refs/heads/%s' % (branch_ref.name, request.branch)
     if (
             (merge is not None and merge.is_uptodate)
             or
@@ -904,7 +920,7 @@ def merge_pull_request(session, repo, request, username, request_folder):
 
         head = new_repo.lookup_reference('HEAD').get_object()
         new_repo.create_commit(
-            'refs/heads/master',
+            'refs/heads/%s' % request.branch,
             repo_commit.author,
             repo_commit.committer,
             'Merge #%s `%s`' % (request.id, request.title),
