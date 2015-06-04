@@ -813,17 +813,13 @@ def get_username(abspath):
 def get_branch_ref(repo, branchname):
     ''' Return the reference to the specified branch or raises an exception.
     '''
-    branch_ref = None
-    refs = repo.listall_references()
-    if branchname in refs:
-        branch_ref = repo.lookup_reference(branchname).resolve()
-    elif 'refs/heads/%s' % branchname in refs:
-        branch_ref = repo.lookup_reference(
-            'refs/heads/%s' % branchname).resolve()
-    elif 'refs/remotes/origin/%s' % branchname in refs:
-        branch_ref = repo.lookup_reference(
-            'refs/remotes/origin/%s' % branchname).resolve()
-    else:
+    location = pygit2.GIT_BRANCH_LOCAL
+    if branchname not in repo.listall_branches():
+        branchname = 'origin/%s' % branchname
+        location = pygit2.GIT_BRANCH_REMOTE
+    branch_ref = repo.lookup_branch(branchname, location).resolve()
+
+    if not branch_ref:
         raise pagure.exceptions.PagureException(
             'No refs found for %s' % branchname)
     return branch_ref
