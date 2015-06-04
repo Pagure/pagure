@@ -666,7 +666,6 @@ def new_release(repo, username=None):
 
     if form.validate_on_submit():
         filestream = flask.request.files['filestream']
-        print filestream
         filename = werkzeug.secure_filename(filestream.filename)
         filestream.save(
             os.path.join(APP.config['UPLOAD_FOLDER_PATH'], filename))
