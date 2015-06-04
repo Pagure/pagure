@@ -209,6 +209,22 @@ def mergeable_request_pull():
     newpath = tempfile.mkdtemp(prefix='pagure-pr-check')
     new_repo = pygit2.clone_repository(parentpath, newpath)
 
+    # Checkout the correct branch
+    branchname = request.branch
+    location = pygit2.GIT_BRANCH_LOCAL
+    if branchname not in new_repo.listall_branches():
+        branchname = 'origin/%s' % request.branch
+        location = pygit2.GIT_BRANCH_REMOTE
+    branch_to = new_repo.lookup_branch(branchname, location)
+    if not branch_to:
+        shutil.rmtree(newpath)
+        flask.abort(
+            400,
+            'Branch %s could not be found in the repo %s' % (
+                request.branch, request.project.fullname
+            ))
+    new_repo.checkout(branch_to)
+
     branch = fork_obj.lookup_branch(request.branch_from)
     if not branch:
         flask.abort(
