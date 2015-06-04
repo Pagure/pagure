@@ -89,6 +89,11 @@ GITOLITE_CONFIG = os.path.join(
     'gitolite.conf'
 )
 
+# Configuration keys to specify where the upload folder is and what is its
+# name
+UPLOAD_FOLDER = 'releases/'
+UPLOAD_FOLDER_PATH = './' + UPLOAD_FOLDER
+
 # Home folder of the gitolite user -- Folder where to run gl-compile-conf from
 GITOLITE_HOME = None
 
@@ -139,7 +144,7 @@ SHORT_LENGTH = 6
 APPLICATION_ROOT = '/'
 
 # List of blacklisted project names
-BLACKLISTED_PROJECTS = ['static', 'pv']
+BLACKLISTED_PROJECTS = ['static', 'pv', 'releases']
 
 ACLS = {
     'issue_create': 'Create a new ticket against this project',
