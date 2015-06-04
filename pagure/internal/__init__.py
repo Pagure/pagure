@@ -248,9 +248,6 @@ def mergeable_request_pull():
     if merge is None:
         mergecode = new_repo.merge_analysis(repo_commit.oid)[0]
 
-    branch_ref = pagure.lib.git.get_branch_ref(new_repo, request.branch)
-
-    refname = '%s:%s' % (branch_ref.name, branch_ref.name)
     if (
             (merge is not None and merge.is_uptodate)
             or
