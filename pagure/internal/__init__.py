@@ -210,7 +210,7 @@ def mergeable_request_pull():
     new_repo = pygit2.clone_repository(parentpath, newpath)
 
     # Checkout the correct branch
-   branch_ref = pagure.lib.git.get_branch_ref(new_repo, request.branch)
+    branch_to = pagure.lib.git.get_branch_ref(new_repo, request.branch)
     if not branch_to:
         shutil.rmtree(newpath)
         flask.abort(
