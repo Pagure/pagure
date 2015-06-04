@@ -3,17 +3,38 @@
 {% block title %}Tags - {{ repo.name }}{% endblock %}
 {%block tag %}home{% endblock %}
 
+{% block header %}
+<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css"
+  rel="stylesheet">
+{% endblock %}
 
 {% block repo %}
 
 <h2>Tags</h2>
+
+<p>
+  If the developers have upload one or more tarball(s), you will be able to
+  find them in the <a href="{{ config['APP_URL'] + config['UPLOAD_FOLDER'] + repo.fullname }}">
+    release folder
+  </a>.
+</p>
+
+<p>
+  <a href="{{ url_for('.new_release', username=username, repo=repo.name) }}"
+      method="get" class="icon">
+  <button class="icon_button" type="submit" title="Upload a tarball">
+    <span class="icon icon-plus blue"></span>
+    Upload a new release
+  </button>
+  </a>
+</p>
 
 <section class="tag_list">
   {% if tags %}
   <ul>
     {% for tag in tags %}
     <li>
-      <a href="{{ url_for('view_tree', username=username, repo=repo.name,
+      <a href="{{ url_for('.view_tree', username=username, repo=repo.name,
                           identifier=tag.get_object().hex) }}">
         {{ tag.shorthand }}
       <span class="tagid">{{ tag.get_object().hex | short }}</span>
