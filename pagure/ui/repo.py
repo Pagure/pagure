@@ -667,9 +667,13 @@ def new_release(repo, username=None):
     if form.validate_on_submit():
         filestream = flask.request.files['filestream']
         filename = werkzeug.secure_filename(filestream.filename)
-        filestream.save(
-            os.path.join(APP.config['UPLOAD_FOLDER_PATH'], filename))
-        flask.flash('File uploaded')
+        try:
+            filestream.save(
+                os.path.join(APP.config['UPLOAD_FOLDER_PATH'], filename))
+            flask.flash('File uploaded')
+        except Exception as err:  # pragma: no cover
+            APP.logger.exception(err)
+            flask.flash('Upload failed', 'error')
         return flask.redirect(
             flask.url_for('view_tags', repo=repo.name, username=username))
 
