@@ -641,7 +641,7 @@ def view_tags(repo, username=None):
         username=username,
         repo=repo,
         tags=tags,
-        admin=is_repo_admin(repo),
+        repo_admin=is_repo_admin(repo),
     )
 
 

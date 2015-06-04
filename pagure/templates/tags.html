@@ -19,6 +19,7 @@
   </a>.
 </p>
 
+{% if repo_admin %}
 <p>
   <a href="{{ url_for('.new_release', username=username, repo=repo.name) }}"
       method="get" class="icon">
@@ -28,6 +29,7 @@
   </button>
   </a>
 </p>
+{% endif %}
 
 <section class="tag_list">
   {% if tags %}
