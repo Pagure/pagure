@@ -227,6 +227,7 @@ def mergeable_request_pull():
 
     branch = fork_obj.lookup_branch(request.branch_from)
     if not branch:
+        shutil.rmtree(newpath)
         flask.abort(
             400,
             'Branch %s could not be found in the repo %s' % (
