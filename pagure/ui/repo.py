@@ -16,6 +16,7 @@ from math import ceil
 import flask
 import pygit2
 import kitchen.text.converters as ktc
+import werkzeug
 
 from cStringIO import StringIO
 from PIL import Image
@@ -640,6 +641,45 @@ def view_tags(repo, username=None):
         username=username,
         repo=repo,
         tags=tags,
+        admin=is_repo_admin(repo),
+    )
+
+
+@APP.route('/<repo>/releases/new/', methods=('GET', 'POST'))
+@APP.route('/<repo>/releases/new', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/releases/new/', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/releases/new', methods=('GET', 'POST'))
+def new_release(repo, username=None):
+    """ Upload a new release.
+    """
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    if not is_repo_admin(repo):
+        flask.abort(
+            403,
+            'You are not allowed to change the settings for this project')
+
+    form = pagure.forms.UploadFileForm()
+
+    if form.validate_on_submit():
+        filestream = flask.request.files['filestream']
+        print filestream
+        filename = werkzeug.secure_filename(filestream.filename)
+        filestream.save(
+            os.path.join(APP.config['UPLOAD_FOLDER_PATH'], filename))
+        flask.flash('File uploaded')
+        return flask.redirect(
+            flask.url_for('view_tags', repo=repo.name, username=username))
+
+    return flask.render_template(
+        'new_release.html',
+        select='tags',
+        username=username,
+        repo=repo,
+        form=form,
     )
 
 

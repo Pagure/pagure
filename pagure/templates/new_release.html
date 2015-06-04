@@ -1,0 +1,33 @@
+{% extends "repo_master.html" %}
+
+{% block title %}New release - {{ repo.name }}{% endblock %}
+{%block tag %}home{% endblock %}
+
+
+{% block repo %}
+
+<h2>Upload a new release</h2>
+
+<p>
+  You can upload your tarball to pagure. This tarball can be as big as
+  {{ config['MAX_CONTENT_LENGTH'] / 1024 /1024 }}MB.
+</p>
+
+<form action="{{ url_for('new_release', username=username, repo=repo.name) }}"
+    method="post" enctype="multipart/form-data">
+{{ form.csrf_token }}
+<input id="file-picker" type="file" name="filestream" multiple>
+
+<div>
+  <input type="submit" class="submit positive button" value="Upload">
+</div>
+</form>
+
+<p>
+  After the upload the source will be available in the
+  <a href="{{ config['APP_URL'] + config['UPLOAD_FOLDER'] + repo.fullname }}">
+    release folder
+  </a>.
+</p>
+
+{% endblock %}
