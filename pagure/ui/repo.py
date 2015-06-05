@@ -669,7 +669,9 @@ def new_release(repo, username=None):
         filename = werkzeug.secure_filename(filestream.filename)
         try:
             filestream.save(
-                os.path.join(APP.config['UPLOAD_FOLDER_PATH'], filename))
+                os.path.join(APP.config['UPLOAD_FOLDER_PATH'],
+                werkzeug.secure_filename(repo.fullname),
+                filename))
             flask.flash('File uploaded')
         except Exception as err:  # pragma: no cover
             APP.logger.exception(err)
