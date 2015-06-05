@@ -44,8 +44,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
         self.app = pagure.APP.test_client()
 
-    def test_api_pull_request_views(self):
+    @patch('pagure.lib.notify.send_email')
+    def test_api_pull_request_views(self, send_email):
         """ Test the api_pull_request_views method of the flask api. """
+        send_email.return_value = True
+
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
         tests.create_acls(self.session)
@@ -152,8 +155,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
         data2['requests'][0]['uid'] = '1431414800'
         self.assertDictEqual(data, data2)
 
-    def test_api_pull_request_view(self):
+    @patch('pagure.lib.notify.send_email')
+    def test_api_pull_request_view(self, send_email):
         """ Test the api_pull_request_view method of the flask api. """
+        send_email.return_value = True
+
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
         tests.create_acls(self.session)
@@ -264,8 +270,11 @@ class PagureFlaskApiForktests(tests.Modeltests):
         data2['date_created'] = '1431414800'
         self.assertDictEqual(data, data2)
 
-    def test_api_pull_request_close(self):
+    @patch('pagure.lib.notify.send_email')
+    def test_api_pull_request_close(self, send_email):
         """ Test the api_pull_request_close method of the flask api. """
+        send_email.return_value = True
+
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
         tests.create_acls(self.session)
@@ -372,10 +381,12 @@ class PagureFlaskApiForktests(tests.Modeltests):
             {"message": "Pull-request closed!"}
         )
 
+    @patch('pagure.lib.notify.send_email')
     @patch('pagure.lib.git.merge_pull_request')
-    def test_api_pull_request_merge(self, mpr):
+    def test_api_pull_request_merge(self, mpr, send_email):
         """ Test the api_pull_request_merge method of the flask api. """
         mpr.return_value = 'Changes merged!'
+        send_email.return_value = True
 
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
