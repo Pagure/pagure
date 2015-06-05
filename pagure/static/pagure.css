@@ -874,6 +874,10 @@ span.CONFLICTS {
     color: white!important;
 }
 
+.tabs .ui-widget-content .button{
+    color: white!important;
+}
+
 .tabs .ui-state-hover a:hover{
     color: white;
 }
