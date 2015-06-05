@@ -605,6 +605,7 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
     """ Request pulling the changes from the fork into the project.
     """
     repo = pagure.lib.get_project(SESSION, repo, user=username)
+    branch_to = flask.request.values.get('branch_to', branch_to)
 
     if not repo:
         flask.abort(404)
