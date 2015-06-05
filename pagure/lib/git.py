@@ -825,7 +825,7 @@ def get_branch_ref(repo, branchname):
     return branch_ref
 
 
-def merge_pull_request(session, repo, request, username, request_folder):
+def merge_pull_request(session, request, username, request_folder):
     ''' Merge the specified pull-request.
     '''
     # Get the fork
@@ -867,7 +867,7 @@ def merge_pull_request(session, repo, request, username, request_folder):
 
     ori_remote = new_repo.remotes[0]
     # Add the fork as remote repo
-    reponame = '%s_%s' % (request.user.user, repo.name)
+    reponame = '%s_%s' % (request.user.user, request.project_from.name)
     remote = new_repo.create_remote(reponame, repopath)
 
     # Fetch the commits

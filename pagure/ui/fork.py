@@ -434,7 +434,7 @@ def merge_request_pull(repo, requestid, username=None):
 
     try:
         message = pagure.lib.git.merge_pull_request(
-            SESSION, repo, request, flask.g.fas_user.username,
+            SESSION, request, flask.g.fas_user.username,
             APP.config['REQUESTS_FOLDER'])
         flask.flash(message)
     except pagure.exceptions.PagureException as err:
