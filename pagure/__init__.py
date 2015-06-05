@@ -157,7 +157,7 @@ def generate_gitolite_acls():
             raise pagure.exceptions.PagureException(
                 'Non-supported gitolite version "%s"' % gitolite_version
             )
-        proc = subprocess.Popen(
+        subprocess.Popen(
             cmd,
             shell=True,
             stdout=subprocess.PIPE,

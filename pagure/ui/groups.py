@@ -9,7 +9,6 @@
 """
 
 import flask
-import os
 
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -88,11 +87,11 @@ def view_group(group):
             pagure.SESSION.rollback()
             flask.flash(
                 'Could not add user `%s` to group `%s`.' % (
-                    user.user, group.group_name),
+                    username, group.group_name),
                 'error')
             pagure.APP.logger.debug(
                 'Could not add user `%s` to group `%s`.' % (
-                    user.user, group.group_name))
+                    username, group.group_name))
             pagure.APP.logger.exception(err)
 
     member = False

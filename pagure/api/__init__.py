@@ -59,7 +59,6 @@ def check_api_acls(acls, optional=False):
     flask.g.user = None
     token = None
     token_str = None
-    apt_login = None
     if 'Authorization' in flask.request.headers:
         authorization = flask.request.headers['Authorization']
         if 'token' in authorization:
@@ -270,8 +269,8 @@ def api_project_tags(repo, username=None):
     if pattern is not None and not pattern.endswith('*'):
         pattern += '*'
 
-    project = pagure.lib.get_project(SESSION, repo, username)
-    if not project:
+    project_obj = pagure.lib.get_project(SESSION, repo, username)
+    if not project_obj:
         output = {'output': 'notok', 'error': 'Project not found'}
         jsonout = flask.jsonify(output)
         jsonout.status_code = 404
@@ -282,7 +281,7 @@ def api_project_tags(repo, username=None):
             'tags': [
                 tag.tag
                 for tag in pagure.lib.get_tags_of_project(
-                    SESSION, project, pattern=pattern)
+                    SESSION, project_obj, pattern=pattern)
             ]
         }
     )

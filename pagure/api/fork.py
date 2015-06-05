@@ -15,10 +15,8 @@ from sqlalchemy.exc import SQLAlchemyError
 import pagure
 import pagure.exceptions
 import pagure.lib
-from pagure import APP, SESSION, is_repo_admin, authenticated
-from pagure.api import (
-    API, api_method, api_login_required, api_login_optional, APIERROR
-)
+from pagure import APP, SESSION, is_repo_admin
+from pagure.api import API, api_method, api_login_required, APIERROR
 
 
 @API.route('/<repo>/pull-requests')
@@ -102,7 +100,6 @@ def api_pull_request_views(repo, username=None):
     """
 
     repo = pagure.lib.get_project(SESSION, repo, user=username)
-    output = {}
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
@@ -209,7 +206,6 @@ def api_pull_request_view(repo, requestid, username=None):
     """
 
     repo = pagure.lib.get_project(SESSION, repo, user=username)
-    output = {}
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)

@@ -20,6 +20,8 @@ import tempfile
 import pygit2
 import werkzeug
 
+from sqlalchemy.exc import SQLAlchemyError
+
 import pagure
 import pagure.exceptions
 import pagure.lib
@@ -220,7 +222,6 @@ def clean_git(obj, repo, repofolder, objtype='ticket'):
     index = new_repo.index
 
     # Are we adding files
-    added = False
     if not os.path.exists(file_path):
         shutil.rmtree(newpath)
         return
@@ -229,7 +230,6 @@ def clean_git(obj, repo, repofolder, objtype='ticket'):
     os.unlink(file_path)
 
     diff = new_repo.diff()
-    files = [patch.new_file_path for patch in diff]
 
     # Add the changes to the index
     index.remove(obj.uid)
@@ -522,7 +522,7 @@ def update_request_from_git(
     if assignee:
         pagure.lib.add_pull_request_assignee(
             session, request, assignee.username,
-            user=user.user, ticketfolder=None)
+            user=user.user, requestfolder=None)
 
     for comment in json_data['comments']:
         user = get_user_from_json(session, comment)
@@ -682,7 +682,9 @@ def update_file_in_git(repo, branch, filename, content, message, user):
     files = [patch.new_file_path for patch in diff]
 
     # Add the changes to the index
+    added = False
     for filename in files:
+        added = True
         index.add(filename)
 
     # If not change, return
@@ -727,6 +729,7 @@ def update_file_in_git(repo, branch, filename, content, message, user):
 
 
 def read_output(cmd, abspath, input=None, keepends=False, **kw):
+    """ Read the output from the given command to run """
     if input:
         stdin = subprocess.PIPE
     else:
@@ -893,7 +896,7 @@ def merge_pull_request(
                 session.commit()
             except SQLAlchemyError as err:  # pragma: no cover
                 session.rollback()
-                APP.logger.exception(err)
+                pagure.APP.logger.exception(err)
                 shutil.rmtree(newpath)
                 raise pagure.exceptions.PagureException(
                     'Could not close this pull-request')
@@ -960,7 +963,7 @@ def merge_pull_request(
         session.commit()
     except SQLAlchemyError as err:  # pragma: no cover
         session.rollback()
-        APP.logger.exception(err)
+        pagure.APP.logger.exception(err)
         shutil.rmtree(newpath)
         raise pagure.exceptions.PagureException(
             'Could not update this pull-request in the database')

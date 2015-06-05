@@ -10,8 +10,6 @@
 
 import flask
 import os
-import shutil
-import tempfile
 
 import pygit2
 from sqlalchemy.exc import SQLAlchemyError

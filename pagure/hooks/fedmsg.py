@@ -9,18 +9,16 @@
 """
 
 import os
-import shutil
 
 import sqlalchemy as sa
-import pygit2
 import wtforms
 from flask.ext import wtf
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
-from pagure.hooks import BaseHook, RequiredIf
+from pagure.hooks import BaseHook
 from pagure.lib.model import BASE, Project
-from pagure import SESSION, APP, get_repo_path
+from pagure import get_repo_path
 
 
 class FedmsgTable(BASE):

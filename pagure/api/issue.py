@@ -114,6 +114,7 @@ def api_new_issue(repo, username=None):
             output['message'] = 'Issue created'
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
+            APP.logger.exception(err)
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
@@ -250,7 +251,6 @@ def api_view_issues(repo, username=None):
     """
 
     repo = pagure.lib.get_project(SESSION, repo, user=username)
-    output = {}
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
@@ -359,7 +359,6 @@ def api_view_issue(repo, issueid, username=None):
     """
 
     repo = pagure.lib.get_project(SESSION, repo, user=username)
-    output = {}
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
@@ -542,6 +541,7 @@ def api_comment_issue(repo, issueid, username=None):
             output['message'] = message
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
+            APP.logger.exception(err)
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:

@@ -19,7 +19,7 @@ from sqlalchemy.orm import backref
 
 from pagure.hooks import BaseHook, RequiredIf
 from pagure.lib.model import BASE, Project
-from pagure import SESSION, APP, get_repo_path
+from pagure import get_repo_path
 
 
 class IrcTable(BASE):

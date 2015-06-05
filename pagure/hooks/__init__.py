@@ -16,24 +16,24 @@ from pagure import APP, get_repo_path
 
 
 class RequiredIf(wtforms.validators.Required):
-        """ Wtforms validator setting a field as required if another field
-        has a value.
-        """
+    """ Wtforms validator setting a field as required if another field
+    has a value.
+    """
 
-        def __init__(self, fields, *args, **kwargs):
-            if isinstance(fields, basestring):
-                fields = [fields]
-            self.fields = fields
-            super(RequiredIf, self).__init__(*args, **kwargs)
+    def __init__(self, fields, *args, **kwargs):
+        if isinstance(fields, basestring):
+            fields = [fields]
+        self.fields = fields
+        super(RequiredIf, self).__init__(*args, **kwargs)
 
-        def __call__(self, form, field):
-            for fieldname in self.fields:
-                nfield = form._fields.get(fieldname)
-                if nfield is None:
-                    raise Exception(
-                        'no field named "%s" in form' % fieldname)
-                if bool(nfield.data):
-                    super(RequiredIf, self).__call__(form, field)
+    def __call__(self, form, field):
+        for fieldname in self.fields:
+            nfield = form._fields.get(fieldname)
+            if nfield is None:
+                raise Exception(
+                    'no field named "%s" in form' % fieldname)
+            if bool(nfield.data):
+                super(RequiredIf, self).__call__(form, field)
 
 
 class BaseHook(object):

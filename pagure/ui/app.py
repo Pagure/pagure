@@ -9,10 +9,8 @@
 """
 
 import flask
-import os
 from math import ceil
 
-import pygit2
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.exceptions
@@ -60,8 +58,6 @@ def index():
     user_forks = None
     total_page_repos = None
     total_page_forks = None
-    repos_obj = None
-    forks_obj = None
     username = None
     user_repos_length = None
     user_forks_length = None

@@ -202,9 +202,10 @@ def send_email(text, subject, to_mail,
         # envelope header.
         msg['To'] = mailto
         salt = pagure.APP.config.get('SALT_EMAIL')
-        m = hashlib.sha512('<%s>%s%s' % (mail_id, salt, mailto))
+        mhash = hashlib.sha512('<%s>%s%s' % (mail_id, salt, mailto))
         msg['Reply-To'] = 'reply+%s@%s' % (
-            m.hexdigest(), pagure.APP.config['DOMAIN_EMAIL_NOTIFICATIONS'])
+            mhash.hexdigest(),
+            pagure.APP.config['DOMAIN_EMAIL_NOTIFICATIONS'])
         try:
             smtp.sendmail(
                 from_email,

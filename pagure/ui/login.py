@@ -22,7 +22,6 @@ import pagure.lib.login
 import pagure.lib.model as model
 import pagure.lib.notify
 from pagure import APP, SESSION
-from pagure.ui.admin import admin_required
 
 # pylint: disable=E1101
 

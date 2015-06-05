@@ -9,7 +9,6 @@
 """
 
 import os
-import shutil
 
 import flask
 import sqlalchemy as sa
@@ -21,7 +20,7 @@ from sqlalchemy.orm import backref
 
 from pagure.hooks import BaseHook
 from pagure.lib.model import BASE, Project
-from pagure import SESSION, APP
+from pagure import APP
 
 
 class PagureRequestsTable(BASE):
@@ -107,7 +106,7 @@ class PagureRequestHook(BaseHook):
 
         hook_files = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), 'files')
-        repo_obj = pygit2.Repository(repopath)
+        pygit2.Repository(repopath)
 
         # Install the hook itself
         hook_path = os.path.join(

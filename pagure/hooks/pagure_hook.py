@@ -9,7 +9,6 @@
 """
 
 import os
-import shutil
 
 import sqlalchemy as sa
 import pygit2
@@ -20,7 +19,7 @@ from sqlalchemy.orm import backref
 
 from pagure.hooks import BaseHook
 from pagure.lib.model import BASE, Project
-from pagure import SESSION, APP, get_repo_path
+from pagure import APP, get_repo_path
 
 
 class PagureTable(BASE):
@@ -88,7 +87,7 @@ class PagureHook(BaseHook):
 
         for repopath in repopaths:
             # Init the git repo in case
-            repo_obj = pygit2.Repository(repopath)
+            pygit2.Repository(repopath)
 
             # Install the hook itself
             hook_path = os.path.join(

@@ -13,10 +13,8 @@ import flask
 import pagure
 import pagure.exceptions
 import pagure.lib
-from pagure import APP, SESSION, is_repo_admin, authenticated
-from pagure.api import (
-    API, api_method, api_login_required, api_login_optional, APIERROR
-)
+from pagure import SESSION
+from pagure.api import API, api_method, APIERROR
 
 
 @API.route('/<repo>/git/tags')
@@ -45,7 +43,6 @@ def api_git_tags(repo, username=None):
 
     """
     repo = pagure.lib.get_project(SESSION, repo, user=username)
-    output = {}
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
