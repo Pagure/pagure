@@ -29,7 +29,7 @@
   <section class="file_content">
       <header>
     <ul class="buttons">
-        {% if output_type=='file' %}
+        {% if output_type=='file' and repo_admin %}
         <li><a class="button blob" href="{{ url_for('edit_file', username=username,
                     repo=repo.name, branchname=branchname,
                     filename=filename) }}" title="Edit file">Edit</a></li>

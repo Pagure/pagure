@@ -392,6 +392,7 @@ def view_file(repo, identifier, filename, username=None):
         filename=filename,
         content=content,
         output_type=output_type,
+        repo_admin=is_repo_admin(repo),
     )
 
 
