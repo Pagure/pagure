@@ -3,12 +3,12 @@ Contributors to pagure
 
 Pagure would be nothing without its contributors.
 
-On June 05, 2015 (release 0.1.12), the list looks as follow:
+On June 05, 2015 (release 0.1.13), the list looks as follow:
 
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  2536              Pierre-Yves Chibon <pingou@pingoured.fr>
+  2545              Pierre-Yves Chibon <pingou@pingoured.fr>
     59              Johan Cwiklinski <johan@x-tnd.be>
     13              Mathieu Bridon <bochecha@fedoraproject.org>
     12              Sayan Chowdhury <sayan.chowdhury2012@gmail.com>
