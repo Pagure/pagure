@@ -328,7 +328,7 @@
     function() {
       var sel = $('#branch_select');
       var final_url = "{{ url_for('.new_request_pull', username=username,
-        repo=repo.name, commitid=commitid, branch_from=branch_from,
+        repo=repo.name, branch_from=branch_from,
         branch_to='--') }}";
       final_url = final_url.replace('--', sel.val());
       window.location.href = final_url;
