@@ -645,10 +645,10 @@ def view_tags(repo, username=None):
     )
 
 
-@APP.route('/<repo>/releases/new/', methods=('GET', 'POST'))
-@APP.route('/<repo>/releases/new', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/releases/new/', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/releases/new', methods=('GET', 'POST'))
+@APP.route('/<repo>/upload/', methods=('GET', 'POST'))
+@APP.route('/<repo>/upload', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/upload/', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/upload', methods=('GET', 'POST'))
 def new_release(repo, username=None):
     """ Upload a new release.
     """
