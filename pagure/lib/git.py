@@ -825,7 +825,8 @@ def get_branch_ref(repo, branchname):
     return branch_ref
 
 
-def merge_pull_request(session, request, username, request_folder):
+def merge_pull_request(
+        session, request, username, request_folder, domerge=True):
     ''' Merge the specified pull-request.
     '''
     # Get the fork
@@ -848,7 +849,7 @@ def merge_pull_request(session, request, username, request_folder):
     branch_ref = get_branch_ref(new_repo, request.branch)
     if not branch_ref:
         shutil.rmtree(newpath)
-        raise pagure.exceptions.PagureException(
+        raise pagure.exceptions.BranchNotFoundException(
             'Branch %s could not be found in the repo %s' % (
                 request.branch, request.project.fullname
             ))
@@ -858,7 +859,7 @@ def merge_pull_request(session, request, username, request_folder):
     branch = get_branch_ref(fork_obj, request.branch_from)
     if not branch:
         shutil.rmtree(newpath)
-        raise pagure.exceptions.PagureException(
+        raise pagure.exceptions.BranchNotFoundException(
             'Branch %s could not be found in the repo %s' % (
                 request.branch_from, request.project_from.fullname
             ))
@@ -883,32 +884,44 @@ def merge_pull_request(session, request, username, request_folder):
             or
             (merge is None and
              mergecode & pygit2.GIT_MERGE_ANALYSIS_UP_TO_DATE)):
-        pagure.lib.close_pull_request(
-            session, request, username,
-            requestfolder=request_folder)
-        try:
-            session.commit()
-        except SQLAlchemyError as err:  # pragma: no cover
-            session.rollback()
-            APP.logger.exception(err)
-            shutil.rmtree(newpath)
+
+        if domerge:
+            pagure.lib.close_pull_request(
+                session, request, username,
+                requestfolder=request_folder)
+            try:
+                session.commit()
+            except SQLAlchemyError as err:  # pragma: no cover
+                session.rollback()
+                APP.logger.exception(err)
+                shutil.rmtree(newpath)
+                raise pagure.exceptions.PagureException(
+                    'Could not close this pull-request')
             raise pagure.exceptions.PagureException(
-                'Could not close this pull-request')
-        raise pagure.exceptions.PagureException(
-            'Nothing to do, changes were already merged')
+                'Nothing to do, changes were already merged')
+        else:
+            request.merge_status = 'NO_CHANGE'
+            session.commit()
+            return 'NO_CHANGE'
 
     elif (
             (merge is not None and merge.is_fastforward)
             or
             (merge is None and
              mergecode & pygit2.GIT_MERGE_ANALYSIS_FASTFORWARD)):
-        if merge is not None:
-            # This is depending on the pygit2 version
-            branch_ref.target = merge.fastforward_oid
-        elif merge is None and mergecode is not None:
-            branch_ref.set_target(repo_commit.oid.hex)
 
-        ori_remote.push(refname)
+        if domerge:
+            if merge is not None:
+                # This is depending on the pygit2 version
+                branch_ref.target = merge.fastforward_oid
+            elif merge is None and mergecode is not None:
+                branch_ref.set_target(repo_commit.oid.hex)
+
+            ori_remote.push(refname)
+        else:
+            request.merge_status = 'FFORWARD'
+            session.commit()
+            return 'FFORWARD'
 
     else:
         tree = None
@@ -916,7 +929,17 @@ def merge_pull_request(session, request, username, request_folder):
             tree = new_repo.index.write_tree()
         except pygit2.GitError:
             shutil.rmtree(newpath)
-            raise pagure.exceptions.PagureException('Merge conflicts!')
+            if domerge:
+                raise pagure.exceptions.PagureException('Merge conflicts!')
+            else:
+                request.merge_status = 'CONFLICTS'
+                session.commit()
+                return 'CONFLICTS'
+
+        if not domerge:
+            request.merge_status = 'MERGE'
+            session.commit()
+            return 'MERGE'
 
         head = new_repo.lookup_reference('HEAD').get_object()
         new_repo.create_commit(

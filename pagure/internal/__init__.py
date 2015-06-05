@@ -198,86 +198,17 @@ def mergeable_request_pull():
             'short_code': MERGE_OPTIONS[request.merge_status]['short_code'],
             'message': MERGE_OPTIONS[request.merge_status]['message']})
 
-    # Get the fork
-    repopath = pagure.get_repo_path(request.project_from)
-    fork_obj = pygit2.Repository(repopath)
+    try:
+        merge_status = pagure.lib.git.merge_pull_request(
+            session=pagure.SESSION,
+            request=request,
+            username=flask.g.fas_user.username,
+            request_folder=None,
+            domerge=False)
+    except pagure.exceptions.PagureException as err:
+        flask.abort(400, err.message)
 
-    # Get the original repo
-    parentpath = pagure.get_repo_path(request.project)
-
-    # Clone the original repo into a temp folder
-    newpath = tempfile.mkdtemp(prefix='pagure-pr-check')
-    new_repo = pygit2.clone_repository(parentpath, newpath)
-
-    # Checkout the correct branch
-    branch_to = pagure.lib.git.get_branch_ref(new_repo, request.branch)
-    if not branch_to:
-        shutil.rmtree(newpath)
-        flask.abort(
-            400,
-            'Branch %s could not be found in the repo %s' % (
-                request.branch, request.project.fullname
-            ))
-    new_repo.checkout(branch_to)
-
-    branch = pagure.lib.git.get_branch_ref(fork_obj, request.branch_from)
-    if not branch:
-        shutil.rmtree(newpath)
-        flask.abort(
-            400,
-            'Branch %s could not be found in the repo %s' % (
-                request.branch_from, request.project_from.fullname
-            ))
-
-    repo_commit = fork_obj[branch.get_object().hex]
-
-    ori_remote = new_repo.remotes[0]
-    # Add the fork as remote repo
-    reponame = '%s_%s' % (request.user.user, request.project.name)
-    remote = new_repo.create_remote(reponame, repopath)
-
-    # Fetch the commits
-    remote.fetch()
-
-    merge = new_repo.merge(repo_commit.oid)
-    if merge is None:
-        mergecode = new_repo.merge_analysis(repo_commit.oid)[0]
-
-    if (
-            (merge is not None and merge.is_uptodate)
-            or
-            (merge is None and
-             mergecode & pygit2.GIT_MERGE_ANALYSIS_UP_TO_DATE)):
-
-        shutil.rmtree(newpath)
-        request.merge_status = 'NO_CHANGE'
-        pagure.SESSION.commit()
-    elif (
-            (merge is not None and merge.is_fastforward)
-            or
-            (merge is None and
-             mergecode & pygit2.GIT_MERGE_ANALYSIS_FASTFORWARD)):
-        shutil.rmtree(newpath)
-        request.merge_status = 'FFORWARD'
-        pagure.SESSION.commit()
-
-    else:
-        tree = None
-        try:
-            tree = new_repo.index.write_tree()
-        except pygit2.GitError:
-            shutil.rmtree(newpath)
-            request.merge_status = 'CONFLICTS'
-            pagure.SESSION.commit()
-            return flask.jsonify({
-                'code': 'CONFLICTS',
-                'short_code': MERGE_OPTIONS['CONFLICTS']['short_code'],
-                'message': MERGE_OPTIONS['CONFLICTS']['message']})
-
-        shutil.rmtree(newpath)
-        request.merge_status = 'MERGE'
-        pagure.SESSION.commit()
     return flask.jsonify({
-        'code': request.merge_status,
-        'short_code': MERGE_OPTIONS[request.merge_status]['short_code'],
-        'message': MERGE_OPTIONS[request.merge_status]['message']})
+        'code': merge_status,
+        'short_code': MERGE_OPTIONS[merge_status]['short_code'],
+        'message': MERGE_OPTIONS[merge_status]['message']})
