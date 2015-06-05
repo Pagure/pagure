@@ -76,7 +76,7 @@
           reply
         </a>
         {% if id != 0 and g.fas_user and (
-            (comment.parent.status == True and g.fas_user.username == comment.user.username)
+            (comment.parent.status in [True, 'Open'] and g.fas_user.username == comment.user.username)
             or repo_admin) %}
         <button type="submit" name="drop_comment" value="{{ comment.id }}"
             onclick="return confirm('Do you really want to remove this comment?');"
