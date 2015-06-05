@@ -446,6 +446,9 @@ table.list tbody td > a
 .admin_list {
     float: right;
     width: 40%;
+}
+
+.admin_list ul{
     padding-right: 5em;
     max-height: 200px;
     overflow: auto;
@@ -457,6 +460,11 @@ table.list tbody td > a
 
 .branch_list {
     width: 50%;
+}
+
+.branch_list ul{
+    max-height: 200px;
+    overflow: auto;
 }
 
 .commit_list li > a > span.commitdate
