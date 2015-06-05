@@ -77,8 +77,8 @@ def update_issue(repo, issueid, username=None):
                 flask.abort(404, 'Comment not found')
 
             if (flask.g.fas_user.username != comment.user.username
-                    and comment.parent.status is True) \
-                    or not is_repo_admin(repo):
+                    or comment.parent.status != 'Open') \
+                    and not is_repo_admin(repo):
                 flask.abort(
                     403,
                     'You are not allowed to remove this comment from '
