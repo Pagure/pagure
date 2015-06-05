@@ -94,7 +94,7 @@ for line in sys.stdin.readlines():
             path=abspath,
             username=username,
             repo=project.to_json(public=True)
-                if not isinstance(project, basestring) else project,
+            if not isinstance(project, basestring) else project,
             branch=refname,
             agent=os.getlogin(),
         )

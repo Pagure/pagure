@@ -346,7 +346,7 @@ class Project(BASE):
             'name': self.name,
             'description': self.description,
             'parent': self.parent.to_json(public=public, api=api)
-                if self.parent else None,
+            if self.parent else None,
             'date_created': self.date_created.strftime('%s'),
             'user': self.user.to_json(public=public),
         }
@@ -749,7 +749,7 @@ class PullRequest(BASE):
             'date_created': self.date_created.strftime('%s'),
             'user': self.user.to_json(public=public),
             'assignee': self.assignee.to_json(public=public)
-                if self.assignee else None,
+            if self.assignee else None,
             'status': self.status,
             'commit_start': self.commit_start,
             'commit_stop': self.commit_stop,

@@ -302,7 +302,6 @@ def no_js(content):
     return content
 
 
-
 @APP.template_filter('toRGB')
 def int_to_rgb(percent):
     """ Template filter converting a given percentage to a css RGB value.

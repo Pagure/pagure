@@ -158,6 +158,7 @@ class AddPullRequestCommentForm(wtf.Form):
         [wtforms.validators.Required()]
     )
 
+
 class AddPullRequestFlagForm(wtf.Form):
     ''' Form to add a flag to a pull-request. '''
     username = wtforms.TextField(
