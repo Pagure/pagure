@@ -114,6 +114,19 @@
       </td>
     </tr>
     <tr>
+      <th>To</th>
+      <td>
+        <a href="{{ url_for('view_repo_branch',
+          username=pull_request.project.user.user
+            if pull_request.project.is_fork else None,
+          repo=pull_request.project.name,
+          branchname=pull_request.branch)
+        }}">
+          {{ pull_request.project.fullname }} ({{ pull_request.branch }})
+        </a>
+      </td>
+    </tr>
+    <tr>
       <th>Created</th>
       <td title="{{ pull_request.date_created.strftime('%b %d %Y %H:%M:%S') }}">
         {{ pull_request.date_created |humanize }}
