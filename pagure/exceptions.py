@@ -37,3 +37,10 @@ class APIError(PagureException):
         self.status_code = status_code
         self.error_code = error_code
         self.error = error
+
+
+class BranchNotFoundException(PagureException):
+    ''' Exception thrown when trying to use a branch that could not be
+    found in a repository.
+    '''
+    pass
