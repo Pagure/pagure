@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.10
+Version:        0.1.11
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -126,7 +126,7 @@ install -m 644 createdb.py $RPM_BUILD_ROOT/%{_datadir}/pagure/pagure_createdb.py
 install -m 644 files/alembic.ini $RPM_BUILD_ROOT/%{_sysconfdir}/pagure/alembic.ini
 
 # Install the alembic revisions
-cp alembic $RPM_BUILD_ROOT/%{_datadir}/pagure
+cp -r alembic $RPM_BUILD_ROOT/%{_datadir}/pagure
 
 
 # Install the milter files
@@ -160,6 +160,7 @@ install -m 644 milters/comment_email_milter.py \
 %dir %{_sysconfdir}/pagure/
 %dir %{_datadir}/pagure/
 %{_datadir}/pagure/pagure*
+%{_datadir}/pagure/alembic/
 %{python_sitelib}/pagure/
 %{python_sitelib}/pagure*.egg-info
 
@@ -174,6 +175,26 @@ install -m 644 milters/comment_email_milter.py \
 
 
 %changelog
+* Fri Jun 05 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.11-1
+- Update to 0.1.11
+- Another fix for the fedmsg_hook git hook
+- Adjust how we display the README page to avoid XSS there as well
+- Add the possibility to disable plugins via the configuration file
+- Present the git tags in the UI
+- As soon as the API user present a token, validate it or not, even if the
+  endpoint would work without token
+- Integrate alembic for DB scheme migration
+- Cache the PR's merge status into the DB
+- Only people with access to the project can add/remove API token
+- Make the unit-tests run on bare repos as in prod
+- First stab at online editing
+- Simplify the API output to drop the project's settings where it doesn't
+  make sense
+- First stag at allowing upstream to upload their release to pagure
+- Fix merging a PR into another branch than master
+- Reduce code duplication when checking if a PR can be merged or merging it
+- Code style clean-up
+
 * Tue Jun 02 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.10-1
 - Update to 0.1.10
 - Add support for URL ending with a trailing slash where it makes sense (so
