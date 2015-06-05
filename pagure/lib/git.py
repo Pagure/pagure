@@ -650,7 +650,7 @@ def add_file_to_git(repo, issue, ticketfolder, user, filename, filestream):
 
 
 def update_file_in_git(repo, branch, filename, content, message, user):
-    ''' Udpate a specific file in the specified repository with the content
+    ''' Update a specific file in the specified repository with the content
     given and commit the change under the user's name.
 
     :arg repo: the Project object from the database
