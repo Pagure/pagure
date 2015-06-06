@@ -1640,6 +1640,8 @@ def update_user_ssh(session, user, ssh_key):
 
     message = 'Nothing to update'
 
+    ssh_key = ssh_key.strip().replace('\n', '')
+
     if ssh_key != user.public_ssh_key:
         user.public_ssh_key = ssh_key
         session.add(user)
