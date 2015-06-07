@@ -1314,44 +1314,20 @@ index 0000000..2a552bb
         gitrepo = os.path.join(tests.HERE, 'forks', 'foo', 'test.git')
         new_repo = pygit2.clone_repository(gitrepo, newpath)
 
-        # Edit the sources file again
-        with open(os.path.join(newpath, 'sources'), 'w') as stream:
-            stream.write('foo\n bar\nbaz\n boose')
-        new_repo.index.add('sources')
-        new_repo.index.write()
-
-        # Commits the files added
-        tree = new_repo.index.write_tree()
-        author = pygit2.Signature(
-            'Alice Author', 'alice@authors.tld')
-        committer = pygit2.Signature(
-            'Cecil Committer', 'cecil@committers.tld')
-        new_repo.create_commit(
-            'refs/heads/feature',
-            author,
-            committer,
-            'A commit on branch feature',
-            tree,
-            []
-        )
-        refname = 'refs/heads/feature'
-        ori_remote = new_repo.remotes[0]
-        ori_remote.push(refname)
-
         user = tests.FakeUser()
         user.username = 'foo'
         with tests.user_set(pagure.APP, user):
-            output = self.app.get('/fork/foo/test/diff/master..feature')
+            output = self.app.get(
+                '/fork/foo/test/diff/master..feature',
+                follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Pull request # - test - Pagure</title>',
-                output.data)
+                '<title>Overview - test - Pagure</title>', output.data)
             self.assertIn(
-                '<p class="error"> No commits found </p>', output.data)
-            self.assertIn(
-                '<input type="submit" class="submit positive button" '
-                'value="Create">', output.data)
+                '<li class="error">Fork is empty, there are no commits to '
+                'request pulling</li>', output.data)
 
+            output = self.app.get('/test/new_issue')
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
