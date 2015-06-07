@@ -320,6 +320,7 @@ class Project(BASE):
             'Only_assignee_can_merge_pull-request': False,
             'Minimum_score_to_merge_pull-request': -1,
             'Web-hooks': None,
+            'Enforce_signed-off_commits_in_pull-request': False,
         }
 
         if self._settings:
