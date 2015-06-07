@@ -68,7 +68,9 @@
       {{ comment.user.user | avatar(16) | safe }}
       <a href="{{ url_for('view_user', username=comment.user.user)}}">
         {{ comment.user.user }}
-      </a> - <span title="{{ date }}">{{ comment.date_created | humanize}}</span>
+      </a> - <span title="{{
+        comment.date_created.strftime('%Y-%m-%d %H:%M:%S')
+        }}">{{ comment.date_created | humanize}}</span>
       <a class="headerlink" title="Permalink to this headline"
         href="#comment-{{ id }}">¶</a>
       <aside class="issue_action icon">
