@@ -671,6 +671,10 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
             branch = repo_obj.lookup_branch(branch_from)
             repo_commit = branch.get_object()
 
+        for commit in repo_obj.walk(
+                repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
+            diff_commits.append(commit)
+
         diff = repo_commit.tree.diff_to_tree(swap=True)
     else:
         flask.flash(
