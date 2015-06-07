@@ -844,9 +844,17 @@ def merge_pull_request(
     new_repo = pygit2.clone_repository(parentpath, newpath)
 
     # Update the start and stop commits in the DB, one last time
-    pagure.lib.git.diff_pull_request(
+    diff_commits = pagure.lib.git.diff_pull_request(
         session, request, new_repo, fork_obj,
-        requestfolder=request_folder, with_diff=False)
+        requestfolder=request_folder, with_diff=False)[0]
+
+    if request.project.settings.get(
+            'Enforce_signed-off_commits_in_pull-request', False):
+        for commit in diff_commits:
+            if not 'signed-off-by' in commit.message.lower():
+                raise pagure.exceptions.PagureException(
+                    'This repo enforces that all commits are '
+                    'signed off by their author. ')
 
     # Checkout the correct branch
     branch_ref = get_branch_ref(new_repo, request.branch)
