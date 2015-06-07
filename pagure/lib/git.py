@@ -844,8 +844,8 @@ def merge_pull_request(
     new_repo = pygit2.clone_repository(parentpath, newpath)
 
     # Update the start and stop commits in the DB, one last time
-    diff_commits = pagure.lib.git.diff_pull_request(
-        session, request, new_repo, fork_obj,
+    diff_commits = diff_pull_request(
+        session, request, pygit2.Repository(parentpath), fork_obj,
         requestfolder=request_folder, with_diff=False)[0]
 
     if request.project.settings.get(
