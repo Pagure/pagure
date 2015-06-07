@@ -686,6 +686,14 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
     form = pagure.forms.RequestPullForm()
     if form.validate_on_submit() and is_repo_admin(repo):
         try:
+            if repo.settings.get(
+                    'Enforce_signed-off_commits_in_pull-request', False):
+                for commit in diff_commits:
+                    if not 'signed-off-by' in commit.message.lower():
+                        raise pagure.exceptions.PagureException(
+                            'This repo enforces that all commits are '
+                            'signed off by their author. ')
+
             if orig_commit:
                 orig_commit = orig_commit.oid.hex
 
