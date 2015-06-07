@@ -2024,6 +2024,9 @@ def delete_user_of_group(session, username, groupname, user, is_admin):
 def add_group(session, group_name, group_type, user, is_admin):
     ''' Creates a new group with the given information.
     '''
+    if ' ' in group_name:
+        raise pagure.exceptions.PagureException(
+            'Spaces are not allowed in group names: %s' % group_name)
 
     group_types = ['user']
     if is_admin:
