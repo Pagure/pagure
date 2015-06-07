@@ -265,7 +265,8 @@ def view_commits(repo, branchname=None, username=None):
 
     orig_repo = pygit2.Repository(parentname)
 
-    if not repo_obj.is_empty and not orig_repo.is_empty:
+    if not repo_obj.is_empty and not orig_repo.is_empty \
+            and repo_obj.listall_branches() > 1:
 
         master_branch = orig_repo.lookup_branch('master')
         master_commits = []
