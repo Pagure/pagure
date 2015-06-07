@@ -221,6 +221,9 @@ def add_group():
             flask.flash('Group `%s` created.' % group_name)
             flask.flash(msg)
             return flask.redirect(flask.url_for('.group_lists'))
+        except pagure.exceptions.PagureException, err:
+            pagure.SESSION.rollback()
+            flask.flash(err.message, 'error')
         except SQLAlchemyError as err:  # pragma: no cover
             pagure.SESSION.rollback()
             flask.flash('Could not create group.')
