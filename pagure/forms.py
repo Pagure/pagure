@@ -275,3 +275,18 @@ class EditFileForm(wtf.Form):
         'Title', [wtforms.validators.Required()])
     commit_message = wtforms.TextAreaField(
         'Commit message', [wtforms.validators.optional()])
+    email = wtforms.SelectField(
+        'Email', [wtforms.validators.Required()],
+        choices=[(item, item) for item in []]
+    )
+
+    def __init__(self, *args, **kwargs):
+        """ Calls the default constructor with the normal argument but
+        uses the list of collection provided to fill the choices of the
+        drop-down list.
+        """
+        super(EditFileForm, self).__init__(*args, **kwargs)
+        if 'emails' in kwargs:
+            self.email.choices = [
+                (email.email, email.email) for email in kwargs['emails']
+            ]
