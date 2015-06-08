@@ -89,6 +89,15 @@ def create_default_status(session, acls=None):
             session.rollback()
             ERROR_LOG.debug('Status %s could not be added', ticket_stat)
 
+    for status in ['Open', 'Closed', 'Merged']:
+        pr_stat = StatusPullRequest(status=status)
+        session.add(pr_stat)
+        try:
+            session.commit()
+        except SQLAlchemyError:  # pragma: no cover
+            session.rollback()
+            ERROR_LOG.debug('Status %s could not be added', pr_stat)
+
     for grptype in ['user', 'admin']:
         grp_type = PagureGroupType(group_type=grptype)
         session.add(grp_type)
@@ -117,6 +126,17 @@ class StatusIssue(BASE):
     Table -- status_issue
     """
     __tablename__ = 'status_issue'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    status = sa.Column(sa.Text, nullable=False, unique=True)
+
+
+class StatusPullRequest(BASE):
+    """ Stores the status a pull-request can have.
+
+    Table -- status_issue
+    """
+    __tablename__ = 'status_pull_requests'
 
     id = sa.Column(sa.Integer, primary_key=True)
     status = sa.Column(sa.Text, nullable=False, unique=True)
@@ -672,7 +692,12 @@ class PullRequest(BASE):
             name='merge_status_enum'),
         nullable=True)
 
-    status = sa.Column(sa.Boolean, nullable=False, default=True)
+    status = sa.Column(
+        sa.Text,
+        sa.ForeignKey(
+            'status_pull_requests.status', onupdate='CASCADE'),
+        default='Open',
+        nullable=False)
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
