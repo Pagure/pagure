@@ -128,15 +128,11 @@
     {% endif %}
     {% if diff_commits and authenticated %}
     <span id="request_pull">
-        {% if branchname %}
         <a href="{{ url_for('new_request_pull',
             username=username, repo=repo.name,
-            branch_to='master', branch_from=branchname) }}">Request pull</a>
-        {% else %}
-            <a href="{{ url_for('new_request_pull',
-                username=username, repo=repo.name,
-                branch_to='master', branch_from='master') }}">Request pull</a>
-        {% endif %}
+            branch_to='master', branch_from=branchname or 'master') }}">
+          {% if repo_admin %}Request pull{% else %}Compare{% endif %}
+        </a>
     </span>
     {% endif %}
     <ul>

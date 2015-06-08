@@ -131,6 +131,7 @@ def view_repo(repo, username=None):
         last_commits=last_commits,
         tree=tree,
         diff_commits=diff_commits,
+        repo_admin=is_repo_admin(repo),
     )
 
 
@@ -204,6 +205,7 @@ def view_repo_branch(repo, branchname, username=None):
         last_commits=last_commits,
         tree=sorted(last_commits[0].tree, key=lambda x: x.filemode),
         diff_commits=diff_commits,
+        repo_admin=is_repo_admin(repo),
     )
 
 
@@ -303,6 +305,7 @@ def view_commits(repo, branchname=None, username=None):
         diff_commits=diff_commits,
         page=page,
         total_page=total_page,
+        repo_admin=is_repo_admin(repo),
     )
 
 
