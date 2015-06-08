@@ -774,11 +774,15 @@ def update_description(repo, username=None):
     form = pagure.forms.DescriptionForm()
 
     if form.validate_on_submit():
+        avatar_email = form.avatar_email.data \
+            if form.avatar_email.data and form.avatar_email.data.strip() \
+            else None
         try:
             repo.description = form.description.data
+            repo.avatar_email = avatar_email
             SESSION.add(repo)
             SESSION.commit()
-            flask.flash('Description updated')
+            flask.flash('Project updated')
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')

@@ -15,10 +15,27 @@
   <h2>Settings</h2>
 
   <div>
-    <h3>Update description</h3>
+    <h3>Update project</h3>
     <form action="{{ url_for('.update_description',
                     username=username, repo=repo.name) }}" method="post">
-      <input name="description" value="{{ repo.description }}" />
+      <table>
+        <tr>
+          <td>
+            <label for="description">Description</label>
+          </td>
+          <td>
+            <input name="description" value="{{ repo.description }}" /> <br />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="avatar">Avatar email</label>
+          </td>
+          <td>
+            <input name="avatar_email" value="{{ repo.avatar_email if repo.avatar_email else '' }}" />
+          </td>
+        </tr>
+      </table>
       <button type="submit" title="Update description">
         Update
       </button>
