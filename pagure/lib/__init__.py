@@ -866,7 +866,7 @@ def drop_issue(session, issue, user, ticketfolder):
 def new_pull_request(session, repo_from, branch_from,
                      repo_to, branch_to, title, user,
                      requestfolder, requestuid=None, requestid=None,
-                     status=True, notify=True):
+                     status='Open', notify=True):
     ''' Create a new pull request on the specified repo. '''
     user_obj = __get_user(session, user)
 
