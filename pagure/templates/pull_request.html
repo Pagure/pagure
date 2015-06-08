@@ -60,7 +60,7 @@
 </div>
 {% endif %}
 
-{% if form %}
+{% if form and repo_admin %}
 <section class="new_project">
   <form action="{{ url_for('.new_request_pull', username=username,
     repo=repo.name, commitid=commitid, branch_from=branch_from,

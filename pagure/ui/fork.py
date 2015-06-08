@@ -691,8 +691,10 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
         return flask.redirect(flask.url_for(
             'view_repo', username=username, repo=repo.name))
 
+    repo_admin=is_repo_admin(repo)
+
     form = pagure.forms.RequestPullForm()
-    if form.validate_on_submit() and is_repo_admin(repo):
+    if form.validate_on_submit() and repo_admin:
         try:
             if repo.settings.get(
                     'Enforce_signed-off_commits_in_pull-request', False):
@@ -764,4 +766,5 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
         branches=sorted(orig_repo.listall_branches()),
         branch_to=branch_to,
         branch_from=branch_from,
+        repo_admin=repo_admin,
     )
