@@ -203,6 +203,10 @@ class DescriptionForm(wtf.Form):
         'description <span class="error">*</span>',
         [wtforms.validators.Required()]
     )
+    avatar_email = wtforms.TextField(
+        'Avatar email',
+        [wtforms.validators.optional()]
+    )
 
 
 class ConfirmationForm(wtf.Form):
