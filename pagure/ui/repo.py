@@ -1202,6 +1202,9 @@ def edit_file(repo, branchname, filename, username=None):
             403,
             'You are not allowed to change the settings for this project')
 
+    user = pagure.lib.search_user(
+        SESSION, username=flask.g.fas_user.username)
+
     reponame = pagure.get_repo_path(repo)
 
     repo_obj = pygit2.Repository(reponame)
@@ -1216,7 +1219,7 @@ def edit_file(repo, branchname, filename, username=None):
     else:
         flask.abort(400, 'Invalid branch specified')
 
-    form = pagure.forms.EditFileForm()
+    form = pagure.forms.EditFileForm(emails=user.emails)
     if form.validate_on_submit():
         try:
             pagure.lib.git.update_file_in_git(
@@ -1228,7 +1231,8 @@ def edit_file(repo, branchname, filename, username=None):
                     form.commit_title.data.strip(),
                     form.commit_message.data.strip()
                 ),
-                user=flask.g.fas_user
+                user=flask.g.fas_user,
+                email=form.email.data,
             )
             flask.flash('Changes committed')
             return flask.redirect(
@@ -1260,4 +1264,5 @@ def edit_file(repo, branchname, filename, username=None):
         data=data,
         filename=filename,
         form=form,
+        user=user,
     )
