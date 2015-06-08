@@ -131,7 +131,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                       "name": "pingou"
                     }
                   },
-                  "status": True,
+                  "status": 'Open',
                   "title": "test pull-request",
                   "uid": "1431414800",
                   "user": {
@@ -247,7 +247,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                   "name": "pingou"
                 }
               },
-              "status": True,
+              "status": 'Open',
               "title": "test pull-request",
               "uid": "1431414800",
               "user": {
