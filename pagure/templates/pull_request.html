@@ -28,7 +28,7 @@
 <div class="header">
     <h3>Title: {{ pull_request.title }}</h3>
     <ul class="buttons">
-  {% if pull_request.status and repo_admin %}
+  {% if pull_request.status == 'Open' and repo_admin %}
       <li>
         <form action="{{ url_for('merge_request_pull', username=username,
             repo=repo.name, requestid=requestid) }}" method="POST">
@@ -43,7 +43,7 @@
           <input type="submit" value="Close" id="cancel_pr" class="button"/>
         </form>
       </li>
-  {% elif pull_request and pull_request.status != 'Open' %}
+  {% elif pull_request.status != 'Open' %}
     <li>
       <span class="error">{{ pull_request.status }}</span>
     </li>
