@@ -194,6 +194,14 @@ def avatar(packager, size=64):
     return output
 
 
+@APP.template_filter('avatar_url')
+def avatar_url(email, size=64):
+    """ Template filter sorting the given branches, Fedora first then EPEL,
+    then whatever is left.
+    """
+    return pagure.lib.avatar_url_from_openid(email, size)
+
+
 @APP.template_filter('short')
 def shorted_commit(cid):
     """Gets short version of the commit id"""
