@@ -1414,9 +1414,19 @@ def search_pull_requests(
         )
 
     if status is not None:
-        query = query.filter(
-            model.PullRequest.status == status
-        )
+        if isinstance(status, bool):
+            if status:
+                query = query.filter(
+                    model.PullRequest.status == 'Open'
+                )
+            else:
+                query = query.filter(
+                    model.PullRequest.status != 'Open'
+                )
+        else:
+            query = query.filter(
+                model.PullRequest.status == status
+            )
 
     if assignee is not None:
         if str(assignee).lower() not in ['false', '0', 'true', '1']:
