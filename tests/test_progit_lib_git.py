@@ -641,7 +641,7 @@ index 458821a..77674a8
             requestfolder=tests.HERE,
             requestuid='foobar',
             requestid=None,
-            status=True,
+            status='Open',
             notify=True
         )
         self.assertEqual(req.id, 1)
