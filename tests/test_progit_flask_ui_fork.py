@@ -663,9 +663,14 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertIn('Pull-requests (1)', output.data)
         self.assertIn('(0 Closed)</a>', output.data)
 
-        output = self.app.get('/test/pull-requests?status=closed')
+        output = self.app.get('/test/pull-requests?status=Closed')
         self.assertEqual(output.status_code, 200)
         self.assertIn('Closed Pull-requests (0)', output.data)
+        self.assertIn('(1 Open)</a>', output.data)
+
+        output = self.app.get('/test/pull-requests?status=0')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('Closed/Merged Pull-requests (0)', output.data)
         self.assertIn('(1 Open)</a>', output.data)
 
         # Project w/o pull-request
