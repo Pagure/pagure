@@ -1470,7 +1470,10 @@ def close_pull_request(session, request, user, requestfolder, merged=True):
     '''
     user_obj = __get_user(session, user)
 
-    request.status = False
+    if merged is True:
+        request.status = 'Merged'
+    else:
+        request.status = 'Closed'
     session.add(request)
     session.flush()
 
