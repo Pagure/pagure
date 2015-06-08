@@ -474,7 +474,7 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertIn(
             '<title>Pull request #1 - test - Pagure</title>', output.data)
         self.assertIn(
-            '<span class="error">Merged</span>', output.data)
+            '<span class="error">Merged by', output.data)
         self.assertIn(
             'title="View file as of 2a552b">View</a>', output.data)
 
