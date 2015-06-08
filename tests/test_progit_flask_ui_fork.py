@@ -1332,7 +1332,7 @@ index 0000000..2a552bb
                 '<li class="error">Fork is empty, there are no commits to '
                 'request pulling</li>', output.data)
 
-            output = self.app.get('/fork/foo/test/new_issue')
+            output = self.app.get('/test/new_issue')
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
