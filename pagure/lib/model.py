@@ -698,6 +698,10 @@ class PullRequest(BASE):
             'status_pull_requests.status', onupdate='CASCADE'),
         default='Open',
         nullable=False)
+    closed_by_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey('users.id', onupdate='CASCADE'),
+        nullable=False)
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
@@ -714,6 +718,8 @@ class PullRequest(BASE):
                     remote_side=[User.id], backref='pull_requests')
     assignee = relation('User', foreign_keys=[assignee_id],
                         remote_side=[User.id], backref='assigned_requests')
+    closed_by = relation('User', foreign_keys=[closed_by_id],
+                         remote_side=[User.id], backref='closed_requests')
 
     def __repr__(self):
         return 'PullRequest(%s, project:%s, user:%s, title:%s)' % (
