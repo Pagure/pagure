@@ -41,6 +41,17 @@
 
 <div id="commit">
   <div>
+      {{ user.username | avatar(24) | safe }}
+      {{ user.fullname }}
+      <select id="email" name="email">
+        {% for email in user.emails %}
+        <option value="{{ email.email }}" {%
+            if form.email.data == email.email %}selected{%
+            endif %}>{{ email.email }}</option>
+        {% endfor %}
+      </select>
+  </div>
+  <div>
     <input type="text" id="commit_title" name="commit_title"
         placeholder="Update {{ filename }}"
         value="{{ form.commit_title.data if form.commit_title.data }}">
