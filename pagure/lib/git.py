@@ -494,9 +494,9 @@ def update_request_from_git(
         )
 
         status = json_data.get('status')
-        if status == True:
+        if str(status).lower() == 'true':
             status = 'Open'
-        elif status is False:
+        elif str(status).lower() == 'false':
             status = 'Merged'
 
         # Create new request
