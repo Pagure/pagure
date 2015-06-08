@@ -57,17 +57,20 @@ def request_pulls(repo, username=None):
     if not repo.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-requests found for this project')
 
-    if status is False or str(status).lower() == 'closed':
+    if str(status).lower() in ['false', '0']:
+        status = False
+
+    if str(status).lower() in ['true', '1', 'open']:
         requests = pagure.lib.search_pull_requests(
             SESSION,
             project_id=repo.id,
-            status=False,
+            status=True,
             assignee=assignee,
             author=author)
         oth_requests = pagure.lib.search_pull_requests(
             SESSION,
             project_id=repo.id,
-            status=True,
+            status=False,
             assignee=assignee,
             author=author,
             count=True)
@@ -81,7 +84,7 @@ def request_pulls(repo, username=None):
         oth_requests = pagure.lib.search_pull_requests(
             SESSION,
             project_id=repo.id,
-            status=False,
+            status=True,
             assignee=assignee,
             author=author,
             count=True)
