@@ -10,8 +10,11 @@
         {% endif %}
         <a class="project_link logo_link"
             href="{{ url }}"
+            {% if repo.avatar_email %}
+            style="background-image: url({{ repo.avatar_email | avatar_url }})">
+            {% else %}
             style="background-image: url({{ url_for('static', filename='placebo.png') }})">
-            {# TODO: get project logo #}
+            {% endif %}
             <span class="repo_name">{{ repo.name }}</span>
             {% if repo.description %}
             <span class="repo_desc">{{ repo.description | wraps(20) }}</span>
