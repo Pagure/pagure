@@ -256,6 +256,7 @@ class Project(BASE):
     description = sa.Column(sa.Text, nullable=True)
     _settings = sa.Column(sa.Text, nullable=True)
     hook_token = sa.Column(sa.String(40), nullable=False, unique=True)
+    avatar_email = sa.Column(sa.Text, nullable=True)
     parent_id = sa.Column(
         sa.Integer,
         sa.ForeignKey('projects.id', onupdate='CASCADE'),
