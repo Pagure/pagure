@@ -45,7 +45,7 @@ def _get_parent_repo_path(repo):
 def request_pulls(repo, username=None):
     """ Request pulling the changes from the fork into the project.
     """
-    status = flask.request.args.get('status', True)
+    status = flask.request.args.get('status', 'Open')
     assignee = flask.request.args.get('assignee', None)
     author = flask.request.args.get('author', None)
 
@@ -131,7 +131,7 @@ def request_pull(repo, requestid, username=None):
     diff_commits = []
     diff = None
     # Closed pull-request
-    if request.status is False:
+    if request.status != 'Open':
         commitid = request.commit_stop
         for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
             diff_commits.append(commit)
@@ -208,7 +208,7 @@ def request_pull_patch(repo, requestid, username=None):
         commitid = branch.get_object().hex
 
     diff_commits = []
-    if request.status is False:
+    if request.status != 'Open':
         commitid = request.commit_stop
         for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
             diff_commits.append(commit)
@@ -514,7 +514,7 @@ def set_assignee_requests(repo, requestid, username=None):
     if not request:
         flask.abort(404, 'Pull-request not found')
 
-    if not request.status:
+    if request.status != 'Open':
         flask.abort(403, 'Pull-request closed')
 
     form = pagure.forms.AddUserForm()

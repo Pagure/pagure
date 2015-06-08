@@ -43,9 +43,9 @@
           <input type="submit" value="Close" id="cancel_pr" class="button"/>
         </form>
       </li>
-  {% elif pull_request and pull_request.status == False %}
+  {% elif pull_request and pull_request.status != 'Open' %}
     <li>
-      <span class="error">Merged</span>
+      <span class="error">{{ pull_request.status }}</span>
     </li>
   {% endif %}
       <li>
