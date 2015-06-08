@@ -43,6 +43,7 @@ class PagureFlaskForktests(tests.Modeltests):
         pagure.ui.filters.SESSION = self.session
         pagure.ui.fork.SESSION = self.session
         pagure.ui.repo.SESSION = self.session
+        pagure.ui.issues.SESSION = self.session
 
         pagure.APP.config['GIT_FOLDER'] = os.path.join(tests.HERE, 'repos')
         pagure.APP.config['FORK_FOLDER'] = os.path.join(tests.HERE, 'forks')
