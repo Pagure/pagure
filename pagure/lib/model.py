@@ -786,6 +786,8 @@ class PullRequest(BASE):
             'status': self.status,
             'commit_start': self.commit_start,
             'commit_stop': self.commit_stop,
+            'closed_by': self.closed_by.to_json(public=public)
+            if self.closed_by else None,
         }
 
         comments = []
