@@ -1657,8 +1657,21 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertEqual(output.data, 'foo\n bar')
 
-            # Works
+            # Missing email
             data['csrf_token'] = csrf_token
+            output = self.app.post('/test/edit/master/f/sources', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Edit - test - Pagure</title>', output.data)
+
+            # Invalid email
+            data['email'] = 'pingou@fp.o'
+            output = self.app.post('/test/edit/master/f/sources', data=data)
+            self.assertIn(
+                '<title>Edit - test - Pagure</title>', output.data)
+
+            # Works
+            data['email'] = 'bar@pingou.com'
             output = self.app.post(
                 '/test/edit/master/f/sources', data=data,
                 follow_redirects=True)
