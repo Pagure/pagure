@@ -493,6 +493,12 @@ def update_request_from_git(
             gitfolder, forkfolder, docfolder, ticketfolder, requestfolder
         )
 
+        status = json_data.get('status')
+        if status == True:
+            status = 'Open'
+        elif status is False:
+            status = 'Merged'
+
         # Create new request
         pagure.lib.new_pull_request(
             session,
@@ -504,7 +510,7 @@ def update_request_from_git(
             user=user.username,
             requestuid=json_data.get('uid'),
             requestid=json_data.get('id'),
-            status=json_data.get('status'),
+            status=status,
             requestfolder=None,
             notify=False,
         )
