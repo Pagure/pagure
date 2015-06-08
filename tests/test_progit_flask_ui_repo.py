@@ -290,8 +290,46 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<header class="repo">' in output.data)
             self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertIn(
+                '<input name="avatar_email" value="" />', output.data)
             self.assertTrue(
-                '<li class="message">Description updated</li>'
+                '<li class="message">Project updated</li>'
+                in output.data)
+
+            # Edit the avatar_email
+            data = {
+                'description': 'new description for test project #1',
+                'avatar_email': 'pingou@fp.o',
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/updatedesc', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<header class="repo">' in output.data)
+            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertIn(
+                '<input name="avatar_email" value="pingou@fp.o" />',
+                output.data)
+            self.assertTrue(
+                '<li class="message">Project updated</li>'
+                in output.data)
+
+            # Reset the avatar_email
+            data = {
+                'description': 'new description for test project #1',
+                'avatar_email': '',
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/updatedesc', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<header class="repo">' in output.data)
+            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertIn(
+                '<input name="avatar_email" value="" />',
+                output.data)
+            self.assertTrue(
+                '<li class="message">Project updated</li>'
                 in output.data)
 
     @patch('pagure.ui.repo.admin_session_timedout')
@@ -385,7 +423,6 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertTrue(
                 '<input id="issue_tracker" type="checkbox" value="y" '
                 'name="issue_tracker" />' in output.data)
-
 
             data = {
                 'csrf_token': csrf_token,
