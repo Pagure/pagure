@@ -1148,7 +1148,8 @@ index 0000000..2a552bb
             # Pull-Request closed
             repo = pagure.lib.get_project(self.session, 'test')
             req = repo.requests[0]
-            req.status = False
+            req.status = 'Closed'
+            req.closed_by_in = 1
             self.session.add(req)
             self.session.commit()
 
