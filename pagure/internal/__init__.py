@@ -205,6 +205,8 @@ def mergeable_request_pull():
             username=flask.g.fas_user.username,
             request_folder=None,
             domerge=False)
+    except pygit2.GitError as err:
+        flask.abort(400, err.message)
     except pagure.exceptions.PagureException as err:
         flask.abort(400, err.message)
 

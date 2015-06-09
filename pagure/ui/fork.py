@@ -438,6 +438,11 @@ def merge_request_pull(repo, requestid, username=None):
             SESSION, request, flask.g.fas_user.username,
             APP.config['REQUESTS_FOLDER'])
         flask.flash(message)
+    except pygit2.GitError as err:
+        flask.flash(str(err.message), 'error')
+        return flask.redirect(flask.url_for(
+            'request_pull', repo=repo.name, requestid=requestid,
+            username=username))
     except pagure.exceptions.PagureException as err:
         flask.flash(str(err), 'error')
         return flask.redirect(flask.url_for(
