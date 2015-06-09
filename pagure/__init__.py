@@ -25,6 +25,7 @@ from logging.handlers import SMTPHandler
 
 import flask
 import pygit2
+import redis
 from flask_fas_openid import FAS
 from functools import wraps
 from sqlalchemy.exc import SQLAlchemyError
@@ -53,6 +54,10 @@ if 'PAGURE_CONFIG' in os.environ:
 
 FAS = FAS(APP)
 SESSION = pagure.lib.create_session(APP.config['DB_URL'])
+REDIS = redis.StrictRedis(
+    host=APP.config['REDIS_HOST'],
+    port=APP.config['REDIS_PORT'],
+    db=APP.config['REDIS_DB'])
 
 if not APP.debug:
     APP.logger.addHandler(pagure.mail_logging.get_mail_handler(
