@@ -366,7 +366,8 @@ def add_pull_request_assignee(
         return 'Request assigned'
 
 
-def add_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
+def add_issue_dependency(
+        session, issue, issue_blocked, user, ticketfolder, redis=None):
     ''' Add a dependency between two issues. '''
     user_obj = __get_user(session, user)
 
@@ -407,10 +408,23 @@ def add_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
                 )
             )
 
+        if redis:
+            redis.publish(issue.uid, json.dumps({
+                'added_dependency': issue_blocked.id,
+                'issue_uid': issue.uid,
+                'type': 'children',
+            }))
+            redis.publish(issue_blocked.uid, json.dumps({
+                'added_dependency': issue.id,
+                'issue_uid': issue_blocked.uid,
+                'type': 'parent',
+            }))
+
         return 'Dependency added'
 
 
-def remove_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
+def remove_issue_dependency(
+        session, issue, issue_blocked, user, ticketfolder, redis=None):
     ''' Remove a dependency between two issues. '''
     user_obj = __get_user(session, user)
 
@@ -451,6 +465,18 @@ def remove_issue_dependency(session, issue, issue_blocked, user, ticketfolder):
                     agent=user_obj.username,
                 )
             )
+
+        if redis:
+            redis.publish(issue.uid, json.dumps({
+                'removed_dependency': child_del,
+                'issue_uid': issue.uid,
+                'type': 'children',
+            }))
+            redis.publish(issue_blocked.uid, json.dumps({
+                'removed_dependency': issue.id,
+                'issue_uid': issue_blocked.uid,
+                'type': 'parent',
+            }))
 
         return 'Dependency removed'
 
@@ -1776,7 +1802,7 @@ def update_tags_issue(session, issue, tags, username, ticketfolder, redis=None):
 
 
 def update_dependency_issue(
-        session, repo, issue, depends, username, ticketfolder):
+        session, repo, issue, depends, username, ticketfolder, redis=None):
     """ Update the dependency of a specified issue (adding or removing them)
 
     """
@@ -1803,6 +1829,7 @@ def update_dependency_issue(
                 issue_blocked=issue,
                 user=username,
                 ticketfolder=ticketfolder,
+                redis=redis,
             )
         )
 
@@ -1824,6 +1851,7 @@ def update_dependency_issue(
                 issue_blocked=issue_depend,
                 user=username,
                 ticketfolder=ticketfolder,
+                redis=redis,
             )
         )
 
@@ -1832,7 +1860,7 @@ def update_dependency_issue(
 
 
 def update_blocked_issue(
-        session, repo, issue, blocks, username, ticketfolder):
+        session, repo, issue, blocks, username, ticketfolder, redis=None):
     """ Update the upstream dependency of a specified issue (adding or
     removing them)
 
@@ -1860,6 +1888,7 @@ def update_blocked_issue(
                 issue_blocked=issue_block,
                 user=username,
                 ticketfolder=ticketfolder,
+                redis=redis,
             )
         )
         session.commit()
@@ -1883,6 +1912,7 @@ def update_blocked_issue(
                 issue_blocked=issue,
                 user=username,
                 ticketfolder=ticketfolder,
+                redis=redis,
             )
         )
 
