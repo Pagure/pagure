@@ -1729,7 +1729,7 @@ def avatar_url_from_openid(openid, size=64, default='retro', dns=False):
             hashhex, query)
 
 
-def update_tags_issue(session, issue, tags, username, ticketfolder):
+def update_tags_issue(session, issue, tags, username, ticketfolder, redis=None):
     """ Update the tags of a specified issue (adding or removing them).
 
     """
@@ -1747,6 +1747,7 @@ def update_tags_issue(session, issue, tags, username, ticketfolder):
                 tags=toadd,
                 user=username,
                 ticketfolder=ticketfolder,
+                redis=redis,
             )
         )
 
@@ -1758,6 +1759,7 @@ def update_tags_issue(session, issue, tags, username, ticketfolder):
                 tags=torm,
                 user=username,
                 ticketfolder=ticketfolder,
+                redis=redis,
             )
         )
     session.commit()
