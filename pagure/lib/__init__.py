@@ -8,6 +8,10 @@
 
 """
 
+try:
+    import simplejson as json
+except ImportError:
+    import json
 
 import datetime
 import markdown
@@ -147,7 +151,7 @@ def search_user(session, username=None, email=None, token=None, pattern=None):
 
 
 def add_issue_comment(session, issue, comment, user, ticketfolder,
-                      notify=True):
+                      notify=True, redis=None):
     ''' Add a comment to an issue. '''
     user_obj = __get_user(session, user)
 
@@ -176,6 +180,15 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
                 agent=user_obj.username,
             )
         )
+
+    if redis:
+        redis.publish(issue.uid, json.dumps({
+            'comment_id': len(issue.comments),
+            'comment_added': text2markdown(issue_comment.comment),
+            'comment_user': issue_comment.user.user,
+            'avatar_url': avatar_url(issue_comment.user.user, size=16),
+            'comment_date': issue_comment.date_created.strftime('%Y-%m-%d %H:%M'),
+        }))
 
     return 'Comment added'
 
