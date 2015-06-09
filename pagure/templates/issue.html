@@ -53,11 +53,13 @@
 
 <section id="tags">
     Tags:
+    <span id="taglist">
     {% for tag in issue.tags %}
     <a href="{{ url_for('view_issues', username=username,
-               repo=repo.name, tags=tag.tag) }}">
-        {{ tag.tag }}</a>{%- if not loop.last -%},{%- endif -%}
+               repo=repo.name, tags=tag.tag) }}">{{ tag.tag }}</a>
+        {%- if not loop.last -%},{%- endif -%}
     {% endfor %}
+    </span>
     {% if authenticated and repo_admin %}
       <input id="tag" type="text" value="{{ issue.tags_text | join(',') }}"
         placeholder="tag1, tag2" name="tag" title="comma separated list of tags">
@@ -66,11 +68,13 @@
 
 <section id="assigned">
     Assigned:
+    <span id="assigneduser">
     {% if issue.assignee %}
     <a href="{{ url_for('view_issues', username=username,
                repo=repo.name, assignee=issue.assignee.username) }}">
         {{ issue.assignee.username }}</a>
     {% endif %}
+    </span>
     {% if authenticated %}
         <input value="{{ issue.assignee.username or '' }}"
           name="assignee" id="assignee" placeholder="username" >
@@ -113,11 +117,13 @@
 
 {{ show_comment(issue, 0, repo, username, issueid, form) }}
 
+<section id="comments">
 {% if issue.comments %}
   {% for comment in issue.comments %}
     {{ show_comment(comment, loop.index, repo, username, issueid, form, repo_admin) }}
   {% endfor %}
 {% endif %}
+</section>
 
 <section class="issue_comment add_comment">
 {% if authenticated and form %}
@@ -234,14 +240,14 @@ $(function() {
 
   $( ".reply" ).click(
     function() {
-        var _section = $(this).parent().parent().parent();
-        var _comment = _section.find('.comment_body');
-        var _text = _comment.text().split("\n");
-        var _output = new Array();
-        for (cnt = 0; cnt < _text.length - 1; cnt ++) {
-            _output[cnt] = '> ' + jQuery.trim(_text[cnt + 1]);
-        }
-        $( "#comment" ).val(_output.join("\n"));
+      var _section = $(this).parent().parent().parent();
+      var _comment = _section.find('.comment_body');
+      var _text = _comment.text().split("\n");
+      var _output = new Array();
+      for (cnt = 0; cnt < _text.length - 1; cnt ++) {
+          _output[cnt] = '> ' + jQuery.trim(_text[cnt + 1]);
+      }
+      $( "#comment" ).val(_output.join("\n"));
     }
   );
 
@@ -317,6 +323,85 @@ $(function() {
   });
 
 });
+
+if (!!window.EventSource) {
+  var source = new EventSource('{{
+    url_for("stream_issue", username=username,
+            repo=repo.name, issueid=issueid) }}');
+} else {
+  // Result to xhr polling :(
+}
+source.addEventListener('message', function(e) {
+  console.log(e.data);
+  var data = $.parseJSON(e.data);
+  console.log(data);
+  if (data.added_tags){
+      console.log('adding ' + data.added_tags);
+      var field = $('#taglist');
+      var _data = field.html();
+      var _url ='<a href="{{ url_for('view_issues', username=username,
+                                     repo=repo.name, tags='--') }}">';
+      for (i=0; i<data.added_tags.length; i++ ){
+        tag = data.added_tags[i]
+        _data += ' ' + _url.replace('--', tag) + tag + '</a>';
+      }
+  }
+  if (data.removed_tags){
+      console.log('removing ' + data.removed_tags);
+      var field = $('#taglist');
+      var _data = field.html();
+      var _url ='<a href="{{ url_for('view_issues', username=username,
+                                     repo=repo.name, tags='--') }}">';
+      for (i=0; i<data.removed_tags.length; i++ ){
+        tag = data.removed_tags[i]
+        _data = _data.replace(_url.replace('--', tag) + tag + '</a>', '');
+      }
+      field.html(_data);
+  }
+  if (data.assigned){
+      console.log('assigning ' + data.assigned);
+      var field = $('#assigneduser');
+      var _data = field.html();
+      var _url ='<a href="{{ url_for('view_issues', username=username,
+               repo=repo.name, assignee='--') }}">';
+      _data = _url.replace('--', data.assigned.name) + data.assigned.name + '</a>';
+      field.html(_data);
+      field = $('#assignee');
+      field.val(data.assigned.name);
+  }
+  if (data.unassigned){
+      console.log('un-assigning ');
+      var field = $('#assigneduser');
+      field.html(' ');
+      field = $('#assignee');
+      field.val('');
+  }
+  if (data.comment_added){
+      console.log('Adding comment ' + data.comment_added);
+      var field = $('#comments');
+      var _data = '<section class="issue_comment"> \
+    <header id="comment-' + data.comment_id + '"> \
+      <img class="avatar circle" src="' + data.avatar_url + '"/> \
+      <a href="/user/' + data.comment_user + '"> \
+        ' + data.comment_user + '\
+      </a> - <span title="' + data.comment_date + '">seconds ago</span> \
+      <a class="headerlink" title="Permalink to this headline" \
+        href="#comment-' + data.comment_id + '">¶</a> \
+      <aside class="issue_action icon"> \
+        <a class="reply" title="Reply to this comment - loose formating"> \
+          reply \
+        </a> \
+      </aside> \
+    </header> \
+    <div class="comment_body"> \
+      <p>' + data.comment_added + '</p> \
+    </div> \
+  </section>';
+      field.html(field.html() + _data);
+  }
+
+}, false);
+
 </script>
 
 {% endblock %}
