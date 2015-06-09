@@ -193,7 +193,7 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
     return 'Comment added'
 
 
-def add_issue_tag(session, issue, tags, user, ticketfolder):
+def add_issue_tag(session, issue, tags, user, ticketfolder, redis=None):
     ''' Add a tag to an issue. '''
     user_obj = __get_user(session, user)
 
@@ -240,6 +240,9 @@ def add_issue_tag(session, issue, tags, user, ticketfolder):
                 agent=user_obj.username,
             )
         )
+
+    if redis:
+        redis.publish(issue.uid, json.dumps({'added_tags': added_tags}))
 
     if added_tags:
         return 'Tag added: %s' % ', '.join(added_tags)
