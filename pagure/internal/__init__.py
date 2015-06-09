@@ -112,7 +112,7 @@ def pull_request_add_comment():
     except SQLAlchemyError, err:  # pragma: no cover
         pagure.SESSION.rollback()
         pagure.APP.logger.exception(err)
-        flask.abort(400, 'Error when saving the request to the database')
+        flask.abort(500, 'Error when saving the request to the database')
 
     return flask.jsonify({'message': message})
 
@@ -167,7 +167,7 @@ def ticket_add_comment():
     except SQLAlchemyError, err:  # pragma: no cover
         pagure.SESSION.rollback()
         pagure.APP.logger.exception(err)
-        flask.abort(400, 'Error when saving the request to the database')
+        flask.abort(500, 'Error when saving the request to the database')
 
     return flask.jsonify({'message': message})
 
@@ -206,9 +206,9 @@ def mergeable_request_pull():
             request_folder=None,
             domerge=False)
     except pygit2.GitError as err:
-        flask.abort(400, err.message)
+        flask.abort(409, err.message)
     except pagure.exceptions.PagureException as err:
-        flask.abort(400, err.message)
+        flask.abort(500, err.message)
 
     return flask.jsonify({
         'code': merge_status,
