@@ -510,14 +510,7 @@ class Issue(BASE):
 
         comments = []
         for comment in self.comments:
-            cmt = {
-                'id': comment.id,
-                'comment': comment.comment,
-                'parent': comment.parent_id,
-                'date_created': comment.date_created.strftime('%s'),
-                'user': comment.user.to_json(public=public),
-            }
-            comments.append(cmt)
+            comments.append(comment.to_json(public=public))
 
         output['comments'] = comments
 
@@ -596,6 +589,19 @@ class IssueComment(BASE):
     def parent(self):
         ''' Return the parent, in this case the issue object. '''
         return self.issue
+
+    def to_json(self, public=False):
+        ''' Returns a dictionary representation of the issue.
+
+        '''
+        output = {
+                'id': self.id,
+                'comment': self.comment,
+                'parent': self.parent_id,
+                'date_created': self.date_created.strftime('%s'),
+                'user': self.user.to_json(public=public),
+            }
+        return output
 
 
 class Tag(BASE):
