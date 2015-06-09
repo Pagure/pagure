@@ -81,15 +81,17 @@
     {% endif %}
 </section>
 
-<section id="blocks">
+<section id="blocking">
     Blocking:
+    <span id="blockers">
     {% if issue.parents %}
     {% for ticket in issue.parents %}
         <a href="{{ url_for('view_issue', username=username,
-                  repo=repo.name, issueid=ticket.id) }}">
-        {{ ticket.id }}</a>{%- if not loop.last -%},{%- endif -%}
+                  repo=repo.name, issueid=ticket.id)
+        }}">{{ ticket.id }}</a>{%- if not loop.last -%},{%- endif -%}
     {% endfor %}
     {% endif %}
+    </span>
 
     {% if authenticated %}
         <input id="blocks" type="text"
@@ -98,15 +100,17 @@
     {% endif %}
 </section>
 
-<section id="depends">
+<section id="depending">
     Depends on:
+    <span id="dependencies">
     {% if issue.children %}
     {% for ticket in issue.children %}
         <a href="{{ url_for('view_issue', username=username,
-                  repo=repo.name, issueid=ticket.id) }}">
-        {{ ticket.id }}</a>{%- if not loop.last -%},{%- endif -%}
+                  repo=repo.name, issueid=ticket.id)
+          }}">{{ ticket.id }}</a>{%- if not loop.last -%},{%- endif -%}
     {% endfor %}
     {% endif %}
+    </span>
 
     {% if authenticated %}
         <input id="depends" type="text"
@@ -375,6 +379,49 @@ source.addEventListener('message', function(e) {
       field.html(' ');
       field = $('#assignee');
       field.val('');
+  }
+  if (data.added_dependency){
+      console.log('adding ' + data.added_dependency);
+      if (data.issue_uid == "{{ issue.uid }}"){
+        if (data.type == "children"){
+          var field = $('#blockers');
+          var field2 = $('#blocks');
+        } else {
+          var field = $('#dependencies');
+          var field2 = $('#depends');
+        }
+      }
+      var _data = field.html();
+      var _url ='<a href="{{ url_for('view_issue', username=username,
+                  repo=repo.name, issueid='-1') }}">';
+      dep = data.added_dependency;
+      _data += ' ' + _url.replace('/-1', '/' + dep) + dep + '</a>';
+      field.html(_data);
+      var _curval = field2.val();
+      if (_curval && _curval != ',') {
+        _curval += ',';
+      }
+      field2.val(_curval + dep);
+  }
+  if (data.removed_dependency){
+      console.log('Removing ' + data.removed_dependency);
+      if (data.issue_uid == "{{ issue.uid }}"){
+        if (data.type == "children"){
+          var field = $('#dependencies');
+          var field2 = $('#depends');
+        } else {
+          var field = $('#blockers');
+          var field2 = $('#blocks');
+        }
+      }
+      var _data = field.html();
+      var _url ='<a href="{{ url_for('view_issue', username=username,
+                  repo=repo.name, issueid='-1') }}">';
+      dep = data.removed_dependency;
+      _data = _data.replace(_url.replace('/-1', '/' + dep) + dep + '</a>', '');
+      _data = _data.replace(',,', ',');
+      field.html(_data);
+      field2.val(field2.val().replace(dep, ''));
   }
   if (data.comment_added){
       console.log('Adding comment ' + data.comment_added);
