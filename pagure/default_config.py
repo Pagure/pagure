@@ -50,7 +50,7 @@ IP_ALLOWED_INTERNAL = ['127.0.0.1', 'localhost', '::1']
 # Redis configuration
 REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
-REDIS_DB = 'pagure'
+REDIS_DB = 0
 
 # Folder containing to the git repos
 GIT_FOLDER = os.path.join(
