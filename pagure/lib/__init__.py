@@ -486,7 +486,7 @@ def remove_tags(session, project, tags, ticketfolder, user):
     return msgs
 
 
-def remove_tags_issue(session, issue, tags, ticketfolder, user):
+def remove_tags_issue(session, issue, tags, ticketfolder, user, redis=None):
     ''' Removes the specified tag(s) of a issue. '''
     user_obj = __get_user(session, user)
 
@@ -513,6 +513,9 @@ def remove_tags_issue(session, issue, tags, ticketfolder, user):
             agent=user_obj.username,
         )
     )
+
+    if redis:
+        redis.publish(issue.uid, json.dumps({'removed_tags': removed_tags}))
 
     return 'Removed tag: %s' % ', '.join(removed_tags)
 
