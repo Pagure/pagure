@@ -352,7 +352,14 @@
     }
   );
 
-  $( ".tabs" ).tabs();
+  $( ".tabs" ).tabs({
+      activate: function( event, ui ) {
+        var _title = ui.newPanel.attr('id');
+        if ($.inArray( _title, [ "request_diff", "commit_list" ] ) >= 0) {
+          window.location.hash = _title;
+        }
+      }
+  });
 
 {% if pull_request %}
 {# These lines are only for existing pull-requests, not new ones #}
