@@ -128,6 +128,7 @@ def update_issue(repo, issueid, username=None):
                     comment=comment,
                     user=flask.g.fas_user.username,
                     ticketfolder=APP.config['TICKETS_FOLDER'],
+                    redis=REDIS,
                 )
                 SESSION.commit()
                 if message:
@@ -138,7 +139,8 @@ def update_issue(repo, issueid, username=None):
                 messages = pagure.lib.update_tags_issue(
                     SESSION, issue, tags,
                     username=flask.g.fas_user.username,
-                    ticketfolder=APP.config['TICKETS_FOLDER'])
+                    ticketfolder=APP.config['TICKETS_FOLDER'],
+                    redis=REDIS)
                 for message in messages:
                     flask.flash(message)
 
@@ -148,7 +150,9 @@ def update_issue(repo, issueid, username=None):
                 issue=issue,
                 assignee=assignee or None,
                 user=flask.g.fas_user.username,
-                ticketfolder=APP.config['TICKETS_FOLDER'],)
+                ticketfolder=APP.config['TICKETS_FOLDER'],
+                redis=REDIS,
+            )
             if message:
                 SESSION.commit()
                 flask.flash(message)
