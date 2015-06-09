@@ -489,7 +489,7 @@ class Issue(BASE):
         ''' Return the list of issue this issue blocks on in simple text. '''
         return [issue.id for issue in self.parents]
 
-    def to_json(self, public=False):
+    def to_json(self, public=False, with_comments=True):
         ''' Returns a dictionary representation of the issue.
 
         '''
@@ -509,8 +509,9 @@ class Issue(BASE):
         }
 
         comments = []
-        for comment in self.comments:
-            comments.append(comment.to_json(public=public))
+        if with_comments:
+            for comment in self.comments:
+                comments.append(comment.to_json(public=public))
 
         output['comments'] = comments
 
