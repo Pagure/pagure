@@ -10,6 +10,7 @@
 
 
 import datetime
+import markdown
 import os
 import shutil
 import tempfile
@@ -2176,3 +2177,21 @@ def add_token_to_user(session, project, acls, username):
     session.commit()
 
     return 'Token created'
+
+def text2markdown(text):
+    """ Simple text to html converter using the markdown library.
+    """
+    if text:
+        # Hack to allow blockquotes to be marked by ~~~
+        ntext = []
+        indent = False
+        for line in text.split('\n'):
+            if line.startswith('~~~'):
+                indent = not indent
+                continue
+            if indent:
+                line = '    %s' % line
+            ntext.append(line)
+        return markdown.markdown('\n'.join(ntext))
+
+    return ''

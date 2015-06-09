@@ -15,7 +15,6 @@ import urlparse
 import arrow
 import bleach
 import flask
-import markdown
 
 from pygments import highlight
 from pygments.lexers.text import DiffLexer
@@ -215,20 +214,7 @@ def markdown_filter(text):
     """ Template filter converting a string into html content using the
     markdown library.
     """
-    if text:
-        # Hack to allow blockquotes to be marked by ~~~
-        ntext = []
-        indent = False
-        for line in text.split('\n'):
-            if line.startswith('~~~'):
-                indent = not indent
-                continue
-            if indent:
-                line = '    %s' % line
-            ntext.append(line)
-        return no_js(markdown.markdown('\n'.join(ntext)))
-
-    return ''
+    return no_js(pagure.lib.text2markdown(text))
 
 
 @APP.template_filter('html_diff')
