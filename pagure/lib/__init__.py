@@ -250,7 +250,8 @@ def add_issue_tag(session, issue, tags, user, ticketfolder, redis=None):
         return 'Nothing to add'
 
 
-def add_issue_assignee(session, issue, assignee, user, ticketfolder):
+def add_issue_assignee(session, issue, assignee, user, ticketfolder,
+                      redis=None):
     ''' Add an assignee to an issue, in other words, assigned an issue. '''
     user_obj = __get_user(session, user)
 
@@ -272,6 +273,9 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
                     agent=user_obj.username,
                 )
             )
+
+        if redis:
+            redis.publish(issue.uid, json.dumps({'unassigned': '-'}))
 
         return 'Assignee reset'
     elif assignee is None and issue.assignee is None:
@@ -300,6 +304,10 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
                     agent=user_obj.username,
                 )
             )
+
+        if redis:
+            redis.publish(issue.uid, json.dumps(
+                {'assigned': assignee_obj.to_json(public=True)}))
 
         return 'Issue assigned'
 
