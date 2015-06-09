@@ -175,7 +175,9 @@ def update_issue(repo, issueid, username=None):
             messages = pagure.lib.update_dependency_issue(
                 SESSION, repo, issue, depends,
                 username=flask.g.fas_user.username,
-                ticketfolder=APP.config['TICKETS_FOLDER'])
+                ticketfolder=APP.config['TICKETS_FOLDER'],
+                redis=REDIS,
+            )
             for message in messages:
                 flask.flash(message)
 
@@ -183,7 +185,9 @@ def update_issue(repo, issueid, username=None):
             messages = pagure.lib.update_blocked_issue(
                 SESSION, repo, issue, blocks,
                 username=flask.g.fas_user.username,
-                ticketfolder=APP.config['TICKETS_FOLDER'])
+                ticketfolder=APP.config['TICKETS_FOLDER'],
+                redis=REDIS,
+            )
             for message in messages:
                 flask.flash(message)
 
