@@ -329,11 +329,16 @@ $(function() {
 
 });
 
+var source = null;
 if (!!window.EventSource) {
-  var source = new EventSource('{{
+  source = new EventSource('{{
     url_for("stream_issue", username=username,
             repo=repo.name, issueid=issueid) }}');
 }
+
+window.onbeforeunload = function() {
+    source.close()
+};
 
 clean_entry= function(text, element){
   var _data = $.trim(text).split(',');
