@@ -54,10 +54,11 @@ if 'PAGURE_CONFIG' in os.environ:
 
 FAS = FAS(APP)
 SESSION = pagure.lib.create_session(APP.config['DB_URL'])
-REDIS = redis.StrictRedis(
+POOL = redis.ConnectionPool(
     host=APP.config['REDIS_HOST'],
     port=APP.config['REDIS_PORT'],
     db=APP.config['REDIS_DB'])
+REDIS = redis.StrictRedis(connection_pool=POOL)
 
 if not APP.debug:
     APP.logger.addHandler(pagure.mail_logging.get_mail_handler(
