@@ -166,6 +166,7 @@ def update_issue(repo, issueid, username=None):
                         status=new_status,
                         user=flask.g.fas_user.username,
                         ticketfolder=APP.config['TICKETS_FOLDER'],
+                        redis=REDIS,
                     )
                     SESSION.commit()
                     if message:
@@ -633,6 +634,7 @@ def edit_issue(repo, issueid, username=None):
                 user=flask.g.fas_user.username,
                 ticketfolder=APP.config['TICKETS_FOLDER'],
                 private=private,
+                redis=REDIS,
             )
             SESSION.commit()
             flask.flash(message)
