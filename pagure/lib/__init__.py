@@ -1003,7 +1003,7 @@ def edit_issue(session, issue, ticketfolder, user,
             )
         )
 
-    if redis:
+    if redis and edit:
         redis.publish(issue.uid, json.dumps({
             'fields': edit,
             'issue': issue.to_json(public=True, with_comments=False),
