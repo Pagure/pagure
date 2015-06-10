@@ -332,9 +332,22 @@ if (!!window.EventSource) {
   var source = new EventSource('{{
     url_for("stream_issue", username=username,
             repo=repo.name, issueid=issueid) }}');
-} else {
-  // Result to xhr polling :(
 }
+
+clean_entry= function(text, element){
+  var _data = $.trim(text).split(',');
+  var _out = []
+  var y=0;
+  for (i=0; i<_data.length; i++){
+    if ($.trim(_data[i]) == element) {
+      continue;
+    }
+    _out[y] = $.trim(_data[i]);
+    y+=1;
+  }
+  return _out;
+}
+
 source.addEventListener('message', function(e) {
   console.log(e.data);
   var data = $.parseJSON(e.data);
@@ -342,25 +355,37 @@ source.addEventListener('message', function(e) {
   if (data.added_tags){
       console.log('adding ' + data.added_tags);
       var field = $('#taglist');
+      var field2 = $('#tag');
       var _data = field.html();
       var _url ='<a href="{{ url_for('view_issues', username=username,
                                      repo=repo.name, tags='--') }}">';
       for (i=0; i<data.added_tags.length; i++ ){
         tag = data.added_tags[i]
-        _data += ' ' + _url.replace('--', tag) + tag + '</a>';
+        _data += ',' + _url.replace('--', tag) + tag + '</a>';
+        field.html(_data);
+        var _curval = field2.val();
+        if (_curval) {
+          _curval += ',';
+        }
+        field2.val(_curval + tag);
       }
   }
   if (data.removed_tags){
       console.log('removing ' + data.removed_tags);
       var field = $('#taglist');
+      var field2 = $('#tag');
       var _data = field.html();
+      var _data2 = field2.html();
       var _url ='<a href="{{ url_for('view_issues', username=username,
                                      repo=repo.name, tags='--') }}">';
       for (i=0; i<data.removed_tags.length; i++ ){
         tag = data.removed_tags[i]
-        _data = _data.replace(_url.replace('--', tag) + tag + '</a>', '');
+        var _turl = _url.replace('=--', '=' + tag) + tag + '</a>';
+        _data = clean_entry(_data, _turl).join();
+        _data2 = clean_entry(_data2, tag).join();
       }
       field.html(_data);
+      field2.val(_data2);
   }
   if (data.assigned){
       console.log('assigning ' + data.assigned);
@@ -395,7 +420,7 @@ source.addEventListener('message', function(e) {
       var _url ='<a href="{{ url_for('view_issue', username=username,
                   repo=repo.name, issueid='-1') }}">';
       dep = data.added_dependency;
-      _data += ' ' + _url.replace('/-1', '/' + dep) + dep + '</a>';
+      _data += ',' + _url.replace('/-1', '/' + dep) + dep + '</a>';
       field.html(_data);
       var _curval = field2.val();
       if (_curval && _curval != ',') {
@@ -414,14 +439,15 @@ source.addEventListener('message', function(e) {
           var field2 = $('#blocks');
         }
       }
-      var _data = field.html();
+      var dep = data.removed_dependency;
+      // Set links
+      var _data = $.trim(field.html()).split(',');
       var _url ='<a href="{{ url_for('view_issue', username=username,
                   repo=repo.name, issueid='-1') }}">';
-      dep = data.removed_dependency;
-      _data = _data.replace(_url.replace('/-1', '/' + dep) + dep + '</a>', '');
-      _data = _data.replace(',,', ',');
-      field.html(_data);
-      field2.val(field2.val().replace(dep, ''));
+      _url = _url.replace('/-1', '/' + dep) + dep + '</a>';
+      field.html(clean_entry(field.html(), _url).join());
+      // Set the value in the input field
+      field2.val(clean_entry(field2.val(), dep).join());
   }
   if (data.comment_added){
       console.log('Adding comment ' + data.comment_added);
