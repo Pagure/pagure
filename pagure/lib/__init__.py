@@ -961,7 +961,8 @@ def new_pull_request(session, repo_from, branch_from,
 
 
 def edit_issue(session, issue, ticketfolder, user,
-               title=None, content=None, status=None, private=False):
+               title=None, content=None, status=None, private=False,
+               redis=None):
     ''' Edit the specified issue.
     '''
     user_obj = __get_user(session, user)
@@ -1001,6 +1002,12 @@ def edit_issue(session, issue, ticketfolder, user,
                 agent=user_obj.username,
             )
         )
+
+    if redis:
+        redis.publish(issue.uid, json.dumps({
+            'fields': edit,
+            'issue': issue.to_json(public=True, with_comments=False),
+        }))
 
     if edit:
         session.add(issue)
