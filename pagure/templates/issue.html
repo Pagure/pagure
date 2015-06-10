@@ -35,7 +35,8 @@
 {% endif %}
 
 <h2>
-    <span class="issueid">#{{ issueid }}</span> {{ issue.title | noJS }}
+    <span class="issueid">#{{ issueid }}</span> <span id="issuetitle">{{
+        issue.title | noJS }}</span>
     {% if authenticated and (repo_admin or g.fas_user.username == issue.user.username) %}
     -  <a href="{{ url_for('edit_issue', username=username,
                   repo=repo.name, issueid=issueid) }}">
@@ -471,6 +472,22 @@ source.addEventListener('message', function(e) {
     </div> \
   </section>';
       field.html(field.html() + _data);
+  }
+  if (data.fields){
+    console.log('Adjusting issue ' + data.fields);
+    for (i=0; i<data.fields.length; i++){
+      var _f = data.fields[i];
+      if (_f == 'status') {
+        var field = $('#status');
+        field.val(data.issue.status);
+      } else if (_f == 'title'){
+        var field = $('#issuetitle');
+        field.html(data.issue.title);
+      } else if (_f == 'content'){
+        var field = $('#comment-0').parent().find('.comment_body');
+        field.html('<p>' + data.issue.content + '</p>');
+      }
+    }
   }
 
 }, false);
