@@ -1,0 +1,15 @@
+[Unit]
+Description=Pagure EventSource server (Allowing live refresh of the pages
+supporting it)
+After=network.target
+Documentation=https://pagure.io/pagure
+
+[Service]
+ExecStart=/usr/bin/python2 /usr/share/pagure/pagure-stream-server.py
+Type=simple
+User=git
+Group=git
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
