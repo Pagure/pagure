@@ -16,7 +16,7 @@
 
   <div>
     <h3>Update project</h3>
-    <form action="{{ url_for('.update_description',
+    <form action="{{ url_for('.update_project',
                     username=username, repo=repo.name) }}" method="post">
       <table>
         <tr>
@@ -25,6 +25,14 @@
           </td>
           <td>
             <input name="description" value="{{ repo.description }}" /> <br />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="url">Project's url</label>
+          </td>
+          <td>
+            <input name="url" value="{{ repo.url if repo.url else '' }}" />
           </td>
         </tr>
         <tr>
