@@ -13,15 +13,27 @@ import wtforms
 # pylint: disable=R0903,W0232,E1002
 
 
-class ProjectForm(wtf.Form):
+class ProjectFormSimplified(wtf.Form):
+    ''' Form to edit the description of a project. '''
+    description = wtforms.TextField(
+        'description <span class="error">*</span>',
+        [wtforms.validators.Required()]
+    )
+    url = wtforms.TextField(
+        'URL',
+        [wtforms.validators.optional()]
+    )
+    avatar_email = wtforms.TextField(
+        'Avatar email',
+        [wtforms.validators.optional()]
+    )
+
+
+class ProjectForm(ProjectFormSimplified):
     ''' Form to create or edit project. '''
     name = wtforms.TextField(
         'Project name <span class="error">*</span>',
         [wtforms.validators.Required()]
-    )
-    description = wtforms.TextField(
-        'description',
-        [wtforms.validators.optional()]
     )
 
 
@@ -210,18 +222,6 @@ class AddGroupForm(wtf.Form):
     group = wtforms.TextField(
         'Group <span class="error">*</span>',
         [wtforms.validators.Required()]
-    )
-
-
-class DescriptionForm(wtf.Form):
-    ''' Form to edit the description of a project. '''
-    description = wtforms.TextField(
-        'description <span class="error">*</span>',
-        [wtforms.validators.Required()]
-    )
-    avatar_email = wtforms.TextField(
-        'Avatar email',
-        [wtforms.validators.optional()]
     )
 
 
