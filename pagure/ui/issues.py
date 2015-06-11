@@ -506,43 +506,6 @@ def view_issue(repo, issueid, username=None):
     )
 
 
-if APP.config['REDIS_EVENTSOURCE']:
-    @APP.route('/<repo>/issue/<int:issueid>/stream')
-    @APP.route('/fork/<username>/<repo>/issue/<int:issueid>/stream')
-    def stream_issue(repo, issueid, username=None):
-        """ Streams the changes made to an issue live
-        """
-
-        repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-        if repo is None:
-            flask.abort(404, 'Project not found')
-
-        if not repo.settings.get('issue_tracker', True):
-            flask.abort(404, 'No issue tracker found for this project')
-
-        issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
-
-        if issue is None or issue.project != repo:
-            flask.abort(404, 'Issue not found')
-
-        if issue.private and not is_repo_admin(repo) \
-                and (not authenticated() or
-                     not issue.user.user == flask.g.fas_user.username):
-            flask.abort(
-                403, 'This issue is private and you are not allowed to view it')
-
-        pubsub = REDIS.pubsub()
-        pubsub.subscribe(issue.uid)
-        def event_stream(pubsub):
-            for message in pubsub.listen():
-                yield 'data: %s\n\n' % message['data']
-
-        return flask.Response(
-            event_stream(pubsub),
-            mimetype="text/event-stream")
-
-
 @APP.route('/<repo>/issue/<int:issueid>/drop', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/issue/<int:issueid>/drop',
            methods=['POST'])
