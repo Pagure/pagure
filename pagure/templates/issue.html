@@ -328,12 +328,10 @@ $(function() {
   });
 
 });
-{% if config['REDIS_EVENTSOURCE'] %}
+{% if config['EVENTSOURCE_SOURCE'] %}
 var source = null;
 if (!!window.EventSource) {
-  source = new EventSource('{{
-    url_for("stream_issue", username=username,
-            repo=repo.name, issueid=issueid) }}');
+  source = new EventSource('{{ config["EVENTSOURCE_SOURCE"] }}');
 }
 
 window.onbeforeunload = function() {
