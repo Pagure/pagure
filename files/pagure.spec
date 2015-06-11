@@ -71,7 +71,6 @@ Requires:  mod_wsgi
 # No dependency of the app per se, but required to make it working.
 Requires:  gitolite3
 
-
 %description
 Pagure is a light-weight git-centered forge based on pygit2.
 
@@ -96,6 +95,21 @@ Requires:           postfix
 %description milters
 Milters (Mail filters) allowing the integration of pagure and emails.
 This is useful for example to allow commenting on a ticket by email.
+
+
+%package ev
+Summary:   EventSource server for pagure
+BuildArch: noarch
+
+Requires:  python-redis
+Requires:  python-trollius
+Requires:  python-trollius-redis
+Requires(post): systemd
+Requires(preun): systemd
+Requires(postun): systemd
+%description ev
+Pagure comes with an eventsource server allowing live update of the pages
+supporting it. This packages provides it.
 
 
 %prep
@@ -142,14 +156,27 @@ install -m 644 milters/pagure_milter.service \
 install -m 644 milters/comment_email_milter.py \
     $RPM_BUILD_ROOT/%{_datadir}/pagure/comment_email_milter.py
 
+# Install the eventsource
+mkdir -p $RPM_BUILD_ROOT/%{_datadir}/pagure-ev
+install -m 644 ev-server/pagure-stream-server.py \
+    $RPM_BUILD_ROOT/%{_datadir}/pagure-ev/pagure-stream-server.py
+install -m 644 ev-server/pagure_ev.service \
+    $RPM_BUILD_ROOT/%{_unitdir}/pagure_ev.service
+
 
 %post milters
+%systemd_post pagure_milter.service
+%post ev
 %systemd_post pagure_milter.service
 
 %preun milters
 %systemd_preun pagure_milter.service
+%preun ev
+%systemd_preun pagure_milter.service
 
 %postun milters
+%systemd_postun_with_restart pagure_milter.service
+%postun ev
 %systemd_postun_with_restart pagure_milter.service
 
 
@@ -174,6 +201,12 @@ install -m 644 milters/comment_email_milter.py \
 %{_tmpfilesdir}/%{name}-milter.conf
 %{_unitdir}/pagure_milter.service
 %{_datadir}/pagure/comment_email_milter.py*
+
+
+%files
+%license LICENSE
+%{_datadir}/pagure-ev/
+%{_unitdir}/pagure_milter.service
 
 
 %changelog
