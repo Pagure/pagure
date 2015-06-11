@@ -758,10 +758,10 @@ def view_settings(repo, username=None):
     )
 
 
-@APP.route('/<repo>/updatedesc', methods=['POST'])
-@APP.route('/fork/<username>/<repo>/updatedesc', methods=['POST'])
+@APP.route('/<repo>/update', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/update', methods=['POST'])
 @cla_required
-def update_description(repo, username=None):
+def update_project(repo, username=None):
     """ Update the description of a project.
     """
     repo = pagure.lib.get_project(SESSION, repo, user=username)
@@ -774,15 +774,13 @@ def update_description(repo, username=None):
             403,
             'You are not allowed to change the settings for this project')
 
-    form = pagure.forms.DescriptionForm()
+    form = pagure.forms.ProjectFormSimplified()
 
     if form.validate_on_submit():
-        avatar_email = form.avatar_email.data \
-            if form.avatar_email.data and form.avatar_email.data.strip() \
-            else None
         try:
             repo.description = form.description.data
-            repo.avatar_email = avatar_email
+            repo.avatar_email = form.avatar_email.data.strip()
+            repo.url = form.url.data.strip()
             SESSION.add(repo)
             SESSION.commit()
             flask.flash('Project updated')
