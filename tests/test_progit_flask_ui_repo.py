@@ -254,24 +254,24 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertTrue(
                 '<li class="message">User removed</li>' in output.data)
 
-    def test_update_description(self):
-        """ Test the update_description endpoint. """
-        output = self.app.post('/foo/updatedesc')
+    def test_update_project(self):
+        """ Test the update_project endpoint. """
+        output = self.app.post('/foo/update')
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
-            output = self.app.post('/foo/updatedesc')
+            output = self.app.post('/foo/update')
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
 
-            output = self.app.post('/test/updatedesc')
+            output = self.app.post('/test/update')
             self.assertEqual(output.status_code, 403)
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
-            output = self.app.post('/test/updatedesc', follow_redirects=True)
+            output = self.app.post('/test/update', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<header class="repo">' in output.data)
             self.assertTrue('<h2>Settings</h2>' in output.data)
@@ -286,7 +286,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 'csrf_token': csrf_token,
             }
             output = self.app.post(
-                '/test/updatedesc', data=data, follow_redirects=True)
+                '/test/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<header class="repo">' in output.data)
             self.assertTrue('<h2>Settings</h2>' in output.data)
@@ -303,7 +303,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 'csrf_token': csrf_token,
             }
             output = self.app.post(
-                '/test/updatedesc', data=data, follow_redirects=True)
+                '/test/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<header class="repo">' in output.data)
             self.assertTrue('<h2>Settings</h2>' in output.data)
@@ -321,7 +321,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 'csrf_token': csrf_token,
             }
             output = self.app.post(
-                '/test/updatedesc', data=data, follow_redirects=True)
+                '/test/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<header class="repo">' in output.data)
             self.assertTrue('<h2>Settings</h2>' in output.data)
