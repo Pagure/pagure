@@ -48,7 +48,7 @@ MAX_CONTENT_LENGTH = 4 * 1024 * 1024  # 4 megabytes
 IP_ALLOWED_INTERNAL = ['127.0.0.1', 'localhost', '::1']
 
 # Redis configuration
-REDIS_EVENTSOURCE = True
+EVENTSOURCE_SOURCE = None
 REDIS_HOST = '0.0.0.0'
 REDIS_PORT = 6379
 REDIS_DB = 0
