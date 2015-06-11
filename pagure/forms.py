@@ -25,7 +25,23 @@ class ProjectForm(wtf.Form):
     )
 
 
-class IssueForm(wtf.Form):
+class IssueFormSimplied(wtf.Form):
+    ''' Form to create or edit an issue. '''
+    title = wtforms.TextField(
+        'Title<span class="error">*</span>',
+        [wtforms.validators.Required()]
+    )
+    issue_content = wtforms.TextAreaField(
+        'Content<span class="error">*</span>',
+        [wtforms.validators.Required()]
+    )
+    private = wtforms.BooleanField(
+        'Private',
+        [wtforms.validators.optional()],
+    )
+
+
+class IssueForm(IssueFormSimplied):
     ''' Form to create or edit an issue. '''
     title = wtforms.TextField(
         'Title<span class="error">*</span>',
