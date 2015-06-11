@@ -205,13 +205,14 @@ def generate_authorized_key_file():  # pragma: no cover
                     row = 'command="/usr/bin/gl-auth-command %s",' \
                         'no-port-forwarding,no-X11-forwarding,'\
                         'no-agent-forwarding,no-pty %s' % (
-                            user.user, user.public_ssh_key)
+                            user.user, user.public_ssh_key.strip())
                 elif gitolite_version == 3:
                     row = 'command="HOME=%s '\
                         '/usr/share/gitolite3/gitolite-shell %s",' \
                         'no-port-forwarding,no-X11-forwarding,'\
                         'no-agent-forwarding,no-pty %s' % (
-                            gitolite_home, user.user, user.public_ssh_key)
+                            gitolite_home, user.user,
+                            user.public_ssh_key.strip())
                 else:
                     raise pagure.exceptions.PagureException(
                         'Non-supported gitolite version "%s"' %
