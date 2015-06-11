@@ -156,6 +156,14 @@ header h1 span {
     margin: .5em;
 }
 
+#projectinfo {
+    display: inline-block;
+}
+
+#projectinfo p {
+    display: inline-block;
+}
+
 .project_list > header {
     border-radius: 10px 10px 0 0;
     padding: .5em;

@@ -12,8 +12,10 @@
         </a>
         {% if branchname %} ({{ branchname }}) {% endif %}
     </h2>
-    {% if repo.description %}{% autoescape false %}
-    {{ repo.description | markdown }}{% endautoescape %}{% else %}-{% endif %}
+    <span id="projectinfo">
+    {% if repo.description %}{{ repo.description | markdown |safe }}{% else %}-{% endif -%}
+    {%- if repo.url %} | <a class="inline" href="{{ repo.url }}">{{ repo.url }}</a>{% endif %}
+    </span>
 
     {% if repo.is_fork %}
     <aside id="parent">
