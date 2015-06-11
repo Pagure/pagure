@@ -144,7 +144,9 @@ SHORT_LENGTH = 6
 APPLICATION_ROOT = '/'
 
 # List of blacklisted project names
-BLACKLISTED_PROJECTS = ['static', 'pv', 'releases']
+BLACKLISTED_PROJECTS = [
+    'static', 'pv', 'releases', 'new', 'api', 'settings',
+    'logout', 'login', 'users', 'groups']
 
 ACLS = {
     'issue_create': 'Create a new ticket against this project',
