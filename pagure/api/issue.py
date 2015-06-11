@@ -15,7 +15,7 @@ from sqlalchemy.exc import SQLAlchemyError
 import pagure
 import pagure.exceptions
 import pagure.lib
-from pagure import APP, SESSION, is_repo_admin, authenticated
+from pagure import APP, SESSION, is_repo_admin, api_authenticated
 from pagure.api import (
     API, api_method, api_login_required, api_login_optional, APIERROR
 )
@@ -268,7 +268,7 @@ def api_view_issues(repo, username=None):
     # Hide private tickets
     private = False
     # If user is authenticated, show him/her his/her private tickets
-    if authenticated():
+    if api_authenticated():
         if repo != flask.g.token.project:
             raise pagure.exceptions.APIError(
                 401, error_code=APIERROR.EINVALIDTOK)
@@ -372,13 +372,13 @@ def api_view_issue(repo, issueid, username=None):
     if issue is None or issue.project != repo:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOISSUE)
 
-    if authenticated():
+    if api_authenticated():
         if repo != flask.g.token.project:
             raise pagure.exceptions.APIError(
                 401, error_code=APIERROR.EINVALIDTOK)
 
     if issue.private and not is_repo_admin(repo) \
-            and (not authenticated() or
+            and (not api_authenticated() or
                  not issue.user.user == flask.g.fas_user.username):
         raise pagure.exceptions.APIError(
             403, error_code=APIERROR.EISSUENOTALLOWED)
@@ -435,7 +435,7 @@ def api_change_status_issue(repo, issueid, username=None):
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOISSUE)
 
     if issue.private and not is_repo_admin(repo) \
-            and (not authenticated() or
+            and (not api_authenticated() or
                  not issue.user.user == flask.g.fas_user.username):
         raise pagure.exceptions.APIError(
             403, error_code=APIERROR.EISSUENOTALLOWED)
@@ -520,7 +520,7 @@ def api_comment_issue(repo, issueid, username=None):
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOISSUE)
 
     if issue.private and not is_repo_admin(repo) \
-            and (not authenticated() or
+            and (not api_authenticated() or
                  not issue.user.user == flask.g.fas_user.username):
         raise pagure.exceptions.APIError(
             403, error_code=APIERROR.EISSUENOTALLOWED)
