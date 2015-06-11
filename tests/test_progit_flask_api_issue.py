@@ -112,7 +112,6 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = {
             'title': 'test issue',
             'issue_content': 'This issue needs attention',
-            'status': 'Open',
         }
 
         # Valid request
