@@ -274,6 +274,7 @@ class Project(BASE):
         index=True)
     name = sa.Column(sa.String(32), nullable=False, index=True)
     description = sa.Column(sa.Text, nullable=True)
+    url = sa.Column(sa.Text, nullable=True)
     _settings = sa.Column(sa.Text, nullable=True)
     hook_token = sa.Column(sa.String(40), nullable=False, unique=True)
     avatar_email = sa.Column(sa.Text, nullable=True)
