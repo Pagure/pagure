@@ -232,12 +232,16 @@ def new_project():
     if form.validate_on_submit():
         name = form.name.data
         description = form.description.data
+        url = form.url.data
+        avatar_email = form.avatar_email.data
 
         try:
             message = pagure.lib.new_project(
                 SESSION,
                 name=name,
                 description=description,
+                url=url,
+                avatar_email=avatar_email,
                 user=flask.g.fas_user.username,
                 blacklist=APP.config['BLACKLISTED_PROJECTS'],
                 gitfolder=APP.config['GIT_FOLDER'],

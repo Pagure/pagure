@@ -724,7 +724,8 @@ def add_pull_request_flag(session, request, username, percent, comment, url,
 
 def new_project(session, user, name, blacklist,
                 gitfolder, docfolder, ticketfolder, requestfolder,
-                description=None, parent_id=None):
+                description=None, url=None,avatar_email=None,
+                parent_id=None):
     ''' Create a new project based on the information provided.
     '''
     if name in blacklist:
@@ -743,7 +744,9 @@ def new_project(session, user, name, blacklist,
 
     project = model.Project(
         name=name,
-        description=description,
+        description=description if description else None,
+        url=url if url else None,
+        avatar_email=avatar_email if avatar_email else None,
         user_id=user_obj.id,
         parent_id=parent_id,
         hook_token=pagure.lib.login.id_generator(40)
