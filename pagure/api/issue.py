@@ -40,7 +40,7 @@ def api_new_issue(repo, username=None):
     Accepts POST queries only.
 
     :arg title: The title of the issue/ticket to create
-    :arg content: The content of the issue to create (ie the description of
+    :arg issue_content: The content of the issue to create (ie the description of
         the problem)
     :arg private: A boolean specifying whether this issue is private or not
 
