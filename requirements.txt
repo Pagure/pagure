@@ -21,6 +21,7 @@ python-openid
 python-openid-cla
 python-openid-teams
 python-redis
+python-trollius-redis
 six
 sqlalchemy >= 0.8
 straight.plugin==1.4.0-post-1
