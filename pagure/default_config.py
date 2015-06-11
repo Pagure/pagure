@@ -49,7 +49,7 @@ IP_ALLOWED_INTERNAL = ['127.0.0.1', 'localhost', '::1']
 
 # Redis configuration
 REDIS_EVENTSOURCE = True
-REDIS_HOST = 'localhost'
+REDIS_HOST = '0.0.0.0'
 REDIS_PORT = 6379
 REDIS_DB = 0
 
