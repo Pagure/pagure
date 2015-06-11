@@ -74,6 +74,16 @@ def authenticated():
     return hasattr(flask.g, 'fas_user') and flask.g.fas_user is not None
 
 
+def api_authenticated():
+    ''' Utility function checking if the current user is logged in or not
+    in the API.
+    '''
+    return hasattr(flask.g, 'fas_user') \
+        and flask.g.fas_user is not None \
+        and hasattr(flask.g, 'token') \
+        and flask.g.token is not None
+
+
 def admin_session_timedout():
     ''' Check if the current user has been authenticated for more than what
     is allowed (defaults to 15 minutes).
