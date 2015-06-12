@@ -704,6 +704,8 @@ def view_settings(repo, username=None):
     """ Presents the settings of the project.
     """
     if admin_session_timedout():
+        if flask.request.method == 'POST':
+            flask.flash('Action canceled, try it again', 'error')
         return flask.redirect(
             flask.url_for('auth_login', next=flask.request.url))
 
@@ -958,6 +960,8 @@ def add_user(repo, username=None):
     """ Add the specified user from the project.
     """
     if admin_session_timedout():
+        if flask.request.method == 'POST':
+            flask.flash('Action canceled, try it again', 'error')
         return flask.redirect(
             flask.url_for('auth_login', next=flask.request.url))
 
@@ -1012,6 +1016,8 @@ def add_group_project(repo, username=None):
     """ Add the specified group from the project.
     """
     if admin_session_timedout():
+        if flask.request.method == 'POST':
+            flask.flash('Action canceled, try it again', 'error')
         return flask.redirect(
             flask.url_for('auth_login', next=flask.request.url))
 
@@ -1114,6 +1120,8 @@ def add_token(repo, username=None):
     """ Add a token to a specified project.
     """
     if admin_session_timedout():
+        if flask.request.method == 'POST':
+            flask.flash('Action canceled, try it again', 'error')
         return flask.redirect(
             flask.url_for('auth_login', next=flask.request.url))
 
