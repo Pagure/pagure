@@ -14,6 +14,9 @@ import wtforms
 # pylint: disable=R0903,W0232,E1002
 
 
+REGEX = '^[a-zA-Z0-9]+$'
+
+
 class ProjectFormSimplified(wtf.Form):
     ''' Form to edit the description of a project. '''
     description = wtforms.TextField(
@@ -36,7 +39,7 @@ class ProjectForm(ProjectFormSimplified):
         'Project name <span class="error">*</span>',
         [
             wtforms.validators.Required(),
-            wtforms.validators.Regexp('^[^\n:<>]+$', flags=re.IGNORECASE)
+            wtforms.validators.Regexp(REGEX, flags=re.IGNORECASE)
         ]
     )
 
@@ -47,7 +50,7 @@ class IssueFormSimplied(wtf.Form):
         'Title<span class="error">*</span>',
         [
             wtforms.validators.Required(),
-            wtforms.validators.Regexp('^[^\n:<>]+$', flags=re.IGNORECASE)
+            wtforms.validators.Regexp(REGEX, flags=re.IGNORECASE)
         ]
     )
     issue_content = wtforms.TextAreaField(
@@ -86,7 +89,7 @@ class RequestPullForm(wtf.Form):
         'Title<span class="error">*</span>',
         [
             wtforms.validators.Required(),
-            wtforms.validators.Regexp('^[^\n:<>]+$', flags=re.IGNORECASE)
+            wtforms.validators.Regexp(REGEX, flags=re.IGNORECASE)
         ]
     )
 
@@ -97,7 +100,7 @@ class AddIssueTagForm(wtf.Form):
         'tag',
         [
             wtforms.validators.Optional(),
-            wtforms.validators.Regexp('^[^\n:<>]+$', flags=re.IGNORECASE)
+            wtforms.validators.Regexp(REGEX, flags=re.IGNORECASE)
         ]
     )
 
@@ -148,7 +151,7 @@ class UpdateIssueForm(wtf.Form):
         'tag',
         [
             wtforms.validators.Optional(),
-            wtforms.validators.Regexp('^[^\n:<>]+$', flags=re.IGNORECASE)
+            wtforms.validators.Regexp(REGEX, flags=re.IGNORECASE)
         ]
     )
     depends = wtforms.TextField(
@@ -229,7 +232,7 @@ class AddGroupForm(wtf.Form):
         'Group <span class="error">*</span>',
         [
             wtforms.validators.Required(),
-            wtforms.validators.Regexp('^[^\n:<>]+$', flags=re.IGNORECASE)
+            wtforms.validators.Regexp(REGEX, flags=re.IGNORECASE)
         ]
     )
 
@@ -279,7 +282,7 @@ class NewGroupForm(wtf.Form):
         [
             wtforms.validators.Required(),
             wtforms.validators.Length(max=16),
-            wtforms.validators.Regexp('^[^\n:<>]+$', flags=re.IGNORECASE)
+            wtforms.validators.Regexp(REGEX, flags=re.IGNORECASE)
         ]
     )
     group_type = wtforms.SelectField(
