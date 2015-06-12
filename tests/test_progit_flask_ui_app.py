@@ -154,7 +154,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 '<td class="errors">This field is required.</td>'
                 in output.data)
 
-            data['name'] = 'project#1'
+            data['name'] = 'project-1'
             output = self.app.post('/new/', data=data)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<h2>New project</h2>' in output.data)
@@ -177,20 +177,20 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>Project #1</p>' in output.data)
             self.assertTrue(
-                '<li class="message">Project &#34;project#1&#34; created</li>'
+                '<li class="message">Project &#34;project-1&#34; created</li>'
                 in output.data)
 
         # After
         projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 1)
         self.assertTrue(os.path.exists(
-            os.path.join(tests.HERE, 'project#1.git')))
+            os.path.join(tests.HERE, 'project-1.git')))
         self.assertTrue(os.path.exists(
-            os.path.join(tests.HERE, 'tickets', 'project#1.git')))
+            os.path.join(tests.HERE, 'tickets', 'project-1.git')))
         self.assertTrue(os.path.exists(
-            os.path.join(tests.HERE, 'docs', 'project#1.git')))
+            os.path.join(tests.HERE, 'docs', 'project-1.git')))
         self.assertTrue(os.path.exists(
-            os.path.join(tests.HERE, 'requests', 'project#1.git')))
+            os.path.join(tests.HERE, 'requests', 'project-1.git')))
 
     @patch('pagure.ui.app.admin_session_timedout')
     def test_user_settings(self, ast):

@@ -486,7 +486,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             data = {
                 'csrf_token': csrf_token,
                 'status': 'Fixed',
-                'tag': 'tag#2',
+                'tag': 'tag2',
             }
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
@@ -495,7 +495,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<p>test project<a href="/test/issue/1"> #1</a></p>'
                 in output.data)
             self.assertTrue(
-                '<li class="message">Tag added: tag#2</li>' in output.data)
+                '<li class="message">Tag added: tag2</li>' in output.data)
             self.assertFalse(
                 'li class="message">No changes to edit</li>' in output.data)
             self.assertTrue(

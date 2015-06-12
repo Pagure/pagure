@@ -88,7 +88,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 'This field is required.'), 1)
 
             data = {
-                'group_name': 'test group',
+                'group_name': 'test_group',
             }
 
             # Missing CSRF
@@ -100,17 +100,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
 
             data['csrf_token'] = csrf_token
 
-            # Space in the group
-            output = self.app.post(
-                '/group/add', data=data)
-            self.assertEqual(output.status_code, 200)
-            self.assertIn('<h2>Create group</h2>', output.data)
-            self.assertIn(
-                '<li class="error">Spaces are not allowed in group names: '
-                'test group</li>' , output.data)
-
             # All good
-            data['group_name'] = 'test_group'
             output = self.app.post(
                 '/group/add', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
