@@ -14,7 +14,8 @@ import wtforms
 # pylint: disable=R0903,W0232,E1002
 
 
-REGEX = '^[a-zA-Z0-9]+$'
+REGEX = '^[a-zA-Z0-9-_]+$'
+REGEX2 = '^[a-zA-Z0-9 ]+$'
 
 
 class ProjectFormSimplified(wtf.Form):
@@ -50,7 +51,7 @@ class IssueFormSimplied(wtf.Form):
         'Title<span class="error">*</span>',
         [
             wtforms.validators.Required(),
-            wtforms.validators.Regexp(REGEX, flags=re.IGNORECASE)
+            wtforms.validators.Regexp(REGEX2, flags=re.IGNORECASE)
         ]
     )
     issue_content = wtforms.TextAreaField(
@@ -89,7 +90,7 @@ class RequestPullForm(wtf.Form):
         'Title<span class="error">*</span>',
         [
             wtforms.validators.Required(),
-            wtforms.validators.Regexp(REGEX, flags=re.IGNORECASE)
+            wtforms.validators.Regexp(REGEX2, flags=re.IGNORECASE)
         ]
     )
 
