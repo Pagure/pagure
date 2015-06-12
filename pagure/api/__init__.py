@@ -400,3 +400,12 @@ def api():
             api_error_codes_doc,
         ],
     )
+
+
+@APP.route('/api/')
+@APP.route('/api')
+def api_redirect():
+    ''' Redirects the user to the API documentation page.
+
+    '''
+    return flask.redirect(flask.url_for('api_ns.api'))
