@@ -15,7 +15,7 @@ import wtforms
 
 
 REGEX = '^[a-zA-Z0-9-_]+$'
-REGEX2 = '^[a-zA-Z0-9 ]+$'
+REGEX2 = '^[a-zA-Z0-9 #]+$'
 
 
 class ProjectFormSimplified(wtf.Form):
