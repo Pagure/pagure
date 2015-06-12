@@ -764,6 +764,13 @@ def view_settings(repo, username=None):
 def update_project(repo, username=None):
     """ Update the description of a project.
     """
+    if admin_session_timedout():
+        flask.flash('Action canceled, try it again', 'error')
+        url = flask.url_for(
+            'view_settings', username=username, repo=repo.name)
+        return flask.redirect(
+            flask.url_for('auth_login', next=url))
+
     repo = pagure.lib.get_project(SESSION, repo, user=username)
 
     if not repo:
@@ -799,8 +806,11 @@ def delete_repo(repo, username=None):
     """ Delete the present project.
     """
     if admin_session_timedout():
+        flask.flash('Action canceled, try it again', 'error')
+        url = flask.url_for(
+            'view_settings', username=username, repo=repo.name)
         return flask.redirect(
-            flask.url_for('auth_login', next=flask.request.url))
+            flask.url_for('auth_login', next=url))
 
     repo = pagure.lib.get_project(SESSION, repo, user=username)
 
@@ -853,8 +863,11 @@ def new_repo_hook_token(repo, username=None):
     """ Re-generate a hook token for the present project.
     """
     if admin_session_timedout():
+        flask.flash('Action canceled, try it again', 'error')
+        url = flask.url_for(
+            'view_settings', username=username, repo=repo.name)
         return flask.redirect(
-            flask.url_for('auth_login', next=flask.request.url))
+            flask.url_for('auth_login', next=url))
 
     repo = pagure.lib.get_project(SESSION, repo, user=username)
 
@@ -890,8 +903,11 @@ def remove_user(repo, userid, username=None):
     """ Remove the specified user from the project.
     """
     if admin_session_timedout():
+        flask.flash('Action canceled, try it again', 'error')
+        url = flask.url_for(
+            'view_settings', username=username, repo=repo.name)
         return flask.redirect(
-            flask.url_for('auth_login', next=flask.request.url))
+            flask.url_for('auth_login', next=url))
 
     repo = pagure.lib.get_project(SESSION, repo, user=username)
 
@@ -1048,8 +1064,11 @@ def regenerate_git(repo, username=None):
     """ Regenerate the specified git repo with the content in the project.
     """
     if admin_session_timedout():
+        flask.flash('Action canceled, try it again', 'error')
+        url = flask.url_for(
+            'view_settings', username=username, repo=repo.name)
         return flask.redirect(
-            flask.url_for('auth_login', next=flask.request.url))
+            flask.url_for('auth_login', next=url))
 
     repo = pagure.lib.get_project(SESSION, repo, user=username)
 
@@ -1147,8 +1166,11 @@ def revoke_api_token(repo, token_id, username=None):
     """ Revokie a token to a specified project.
     """
     if admin_session_timedout():
+        flask.flash('Action canceled, try it again', 'error')
+        url = flask.url_for(
+            'view_settings', username=username, repo=repo.name)
         return flask.redirect(
-            flask.url_for('auth_login', next=flask.request.url))
+            flask.url_for('auth_login', next=url))
 
     repo = pagure.lib.get_project(SESSION, repo, user=username)
 
