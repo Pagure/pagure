@@ -55,22 +55,10 @@ class IssueFormSimplied(wtf.Form):
 
 class IssueForm(IssueFormSimplied):
     ''' Form to create or edit an issue. '''
-    title = wtforms.TextField(
-        'Title<span class="error">*</span>',
-        [wtforms.validators.Required()]
-    )
-    issue_content = wtforms.TextAreaField(
-        'Content<span class="error">*</span>',
-        [wtforms.validators.Required()]
-    )
     status = wtforms.SelectField(
         'Status',
         [wtforms.validators.Required()],
         choices=[(item, item) for item in []]
-    )
-    private = wtforms.BooleanField(
-        'Private',
-        [wtforms.validators.optional()],
     )
 
     def __init__(self, *args, **kwargs):
