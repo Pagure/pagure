@@ -470,7 +470,7 @@ To reply, visit the link below or just reply to this email
            comment.pull_request.project.name,
            'pull-request',
            comment.pull_request.id))
-    mail_to = _get_emails_for_issue(request)
+    mail_to = _get_emails_for_issue(comment.pull_request)
     mail_to = _clean_emails(mail_to, user)
 
     send_email(
