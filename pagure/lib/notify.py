@@ -372,11 +372,7 @@ To reply, visit the link below or just reply to this email
            request.project.name,
            'pull-request',
            request.id))
-    mail_to = set([cmt.user.default_email for cmt in request.comments])
-    mail_to.add(request.project.user.default_email)
-    for prouser in request.project.users:
-        if prouser.default_email:
-            mail_to.add(prouser.default_email)
+    mail_to = _get_emails_for_issue(request)
 
     send_email(
         text,
@@ -408,11 +404,7 @@ Merged pull-request:
            request.project.name,
            'pull-request',
            request.id))
-    mail_to = set([cmt.user.default_email for cmt in request.comments])
-    mail_to.add(request.project.user.default_email)
-    for prouser in request.project.users:
-        if prouser.default_email:
-            mail_to.add(prouser.default_email)
+    mail_to = _get_emails_for_issue(request)
 
     uid = time.mktime(datetime.datetime.now().timetuple())
     send_email(
@@ -446,11 +438,7 @@ Cancelled pull-request:
            request.project.name,
            'pull-request',
            request.id))
-    mail_to = set([cmt.user.default_email for cmt in request.comments])
-    mail_to.add(request.project.user.default_email)
-    for prouser in request.project.users:
-        if prouser.default_email:
-            mail_to.add(prouser.default_email)
+    mail_to = _get_emails_for_issue(request)
 
     uid = time.mktime(datetime.datetime.now().timetuple())
     send_email(
@@ -482,14 +470,7 @@ To reply, visit the link below or just reply to this email
            comment.pull_request.project.name,
            'pull-request',
            comment.pull_request.id))
-    mail_to = set([
-        cmt.user.default_email
-        for cmt in comment.pull_request.comments])
-    mail_to.add(comment.pull_request.project.user.default_email)
-    for prouser in comment.pull_request.project.users:
-        if prouser.default_email:
-            mail_to.add(prouser.default_email)
-
+    mail_to = _get_emails_for_issue(request)
     mail_to = _clean_emails(mail_to, user)
 
     send_email(
