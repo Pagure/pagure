@@ -224,7 +224,7 @@ def markdown_filter(text):
             if indent:
                 line = '    %s' % line
             ntext.append(line)
-        return markdown.markdown('\n'.join(ntext))
+        return no_js(markdown.markdown('\n'.join(ntext)))
 
     return ''
 
