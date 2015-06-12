@@ -810,7 +810,7 @@ def delete_repo(repo, username=None):
     if admin_session_timedout():
         flask.flash('Action canceled, try it again', 'error')
         url = flask.url_for(
-            'view_settings', username=username, repo=repo.name)
+            'view_settings', username=username, repo=repo)
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
@@ -867,7 +867,7 @@ def new_repo_hook_token(repo, username=None):
     if admin_session_timedout():
         flask.flash('Action canceled, try it again', 'error')
         url = flask.url_for(
-            'view_settings', username=username, repo=repo.name)
+            'view_settings', username=username, repo=repo)
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
@@ -907,7 +907,7 @@ def remove_user(repo, userid, username=None):
     if admin_session_timedout():
         flask.flash('Action canceled, try it again', 'error')
         url = flask.url_for(
-            'view_settings', username=username, repo=repo.name)
+            'view_settings', username=username, repo=repo)
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
@@ -1072,7 +1072,7 @@ def regenerate_git(repo, username=None):
     if admin_session_timedout():
         flask.flash('Action canceled, try it again', 'error')
         url = flask.url_for(
-            'view_settings', username=username, repo=repo.name)
+            'view_settings', username=username, repo=repo)
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
@@ -1176,7 +1176,7 @@ def revoke_api_token(repo, token_id, username=None):
     if admin_session_timedout():
         flask.flash('Action canceled, try it again', 'error')
         url = flask.url_for(
-            'view_settings', username=username, repo=repo.name)
+            'view_settings', username=username, repo=repo)
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
