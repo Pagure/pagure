@@ -1122,8 +1122,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/1/edit', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
-                '<span class="issueid">#1</span> Test issue #1'
+                '<li class="message">Edited successfully issue #1</li>'
                 in output.data)
+            self.assertTrue(
+                '<span class="issueid">#1</span> <span id="issuetitle">'
+                'Test issue #1</span>' in output.data)
             self.assertEqual(output.data.count(
                 '<option selected value="Open">Open</option>'), 1)
             self.assertEqual(output.data.count(
