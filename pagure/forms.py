@@ -8,6 +8,7 @@
 
 """
 
+import re
 from flask.ext import wtf
 import wtforms
 # pylint: disable=R0903,W0232,E1002
@@ -33,7 +34,10 @@ class ProjectForm(ProjectFormSimplified):
     ''' Form to create or edit project. '''
     name = wtforms.TextField(
         'Project name <span class="error">*</span>',
-        [wtforms.validators.Required()]
+        [
+            wtforms.validators.Required(),
+            wtforms.validators.Regexp('^[^\n:<>]+$', flags=re.IGNORECASE)
+        ]
     )
 
 
@@ -41,7 +45,10 @@ class IssueFormSimplied(wtf.Form):
     ''' Form to create or edit an issue. '''
     title = wtforms.TextField(
         'Title<span class="error">*</span>',
-        [wtforms.validators.Required()]
+        [
+            wtforms.validators.Required(),
+            wtforms.validators.Regexp('^[^\n:<>]+$', flags=re.IGNORECASE)
+        ]
     )
     issue_content = wtforms.TextAreaField(
         'Content<span class="error">*</span>',
@@ -77,14 +84,21 @@ class RequestPullForm(wtf.Form):
     ''' Form to create a request pull. '''
     title = wtforms.TextField(
         'Title<span class="error">*</span>',
-        [wtforms.validators.Required()]
+        [
+            wtforms.validators.Required(),
+            wtforms.validators.Regexp('^[^\n:<>]+$', flags=re.IGNORECASE)
+        ]
     )
 
 
 class AddIssueTagForm(wtf.Form):
     ''' Form to add a comment to an issue. '''
     tag = wtforms.TextField(
-        'tag', [wtforms.validators.Optional()]
+        'tag',
+        [
+            wtforms.validators.Optional(),
+            wtforms.validators.Regexp('^[^\n:<>]+$', flags=re.IGNORECASE)
+        ]
     )
 
 
@@ -131,7 +145,11 @@ class NewTokenForm(wtf.Form):
 class UpdateIssueForm(wtf.Form):
     ''' Form to add a comment to an issue. '''
     tag = wtforms.TextField(
-        'tag', [wtforms.validators.Optional()]
+        'tag',
+        [
+            wtforms.validators.Optional(),
+            wtforms.validators.Regexp('^[^\n:<>]+$', flags=re.IGNORECASE)
+        ]
     )
     depends = wtforms.TextField(
         'dependency issue', [wtforms.validators.Optional()]
@@ -209,7 +227,10 @@ class AddGroupForm(wtf.Form):
     ''' Form to add a group to a project. '''
     group = wtforms.TextField(
         'Group <span class="error">*</span>',
-        [wtforms.validators.Required()]
+        [
+            wtforms.validators.Required(),
+            wtforms.validators.Regexp('^[^\n:<>]+$', flags=re.IGNORECASE)
+        ]
     )
 
 
@@ -255,7 +276,11 @@ class NewGroupForm(wtf.Form):
     """ Form to ask for a password change. """
     group_name = wtforms.TextField(
         'Group name  <span class="error">*</span>',
-        [wtforms.validators.Required(), wtforms.validators.Length(max=16)]
+        [
+            wtforms.validators.Required(),
+            wtforms.validators.Length(max=16),
+            wtforms.validators.Regexp('^[^\n:<>]+$', flags=re.IGNORECASE)
+        ]
     )
     group_type = wtforms.SelectField(
         'Group type',
