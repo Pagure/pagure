@@ -10,6 +10,7 @@
 
 import datetime
 import textwrap
+import urlparse
 
 import arrow
 import bleach
@@ -301,12 +302,32 @@ def insert_div(content):
     return output
 
 
+def filter_img_src(name, value):
+    ''' Filter in img html tags images coming from a different domain. '''
+    if name in ('alt', 'height', 'width', 'class'):
+        return True
+    if name == 'src':
+        p = urlparse.urlparse(value)
+        return (not p.netloc) \
+            or p.netloc == urlparse.urlparse(APP.config['APP_URL']).netloc
+    return False
+
+
 @APP.template_filter('noJS')
 def no_js(content):
     """ Template filter replacing <script by &lt;script and </script> by
     &lt;/script&gt;
     """
-    return bleach.clean(content)
+    return bleach.clean(
+        content,
+        tags=bleach.ALLOWED_TAGS + [
+            'p', 'br', 'div', 'h1', 'h2', 'h3', 'table', 'td', 'tr', 'th',
+            'col', 'tbody', 'pre', 'img'
+        ],
+        attributes={
+            'img': filter_img_src,
+        }
+    )
 
 
 @APP.template_filter('toRGB')
