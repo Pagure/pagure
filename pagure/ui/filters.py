@@ -318,15 +318,15 @@ def no_js(content):
     """ Template filter replacing <script by &lt;script and </script> by
     &lt;/script&gt;
     """
+    attrs = bleach.ALLOWED_ATTRIBUTES
+    attrs['img'] = filter_img_src
     return bleach.clean(
         content,
         tags=bleach.ALLOWED_TAGS + [
             'p', 'br', 'div', 'h1', 'h2', 'h3', 'table', 'td', 'tr', 'th',
-            'col', 'tbody', 'pre', 'img'
+            'col', 'tbody', 'pre', 'img',
         ],
-        attributes={
-            'img': filter_img_src,
-        }
+        attributes=attrs,
     )
 
 
