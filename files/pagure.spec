@@ -18,6 +18,7 @@ BuildRequires:  python-nose
 
 BuildRequires:  python-alembic
 BuildRequires:  python-arrow
+BuildRequires:  python-bleach
 BuildRequires:  python-blinker
 BuildRequires:  python-chardet
 BuildRequires:  python-docutils
@@ -47,6 +48,7 @@ Requires:  python-sqlalchemy > 0.8
 
 Requires:  python-alembic
 Requires:  python-arrow
+Requires:  python-bleach
 Requires:  python-blinker
 Requires:  python-chardet
 Requires:  python-docutils
