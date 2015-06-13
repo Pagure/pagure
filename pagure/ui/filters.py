@@ -11,8 +11,9 @@
 import datetime
 import textwrap
 
-import flask
 import arrow
+import bleach
+import flask
 import markdown
 
 from pygments import highlight
@@ -305,9 +306,7 @@ def no_js(content):
     """ Template filter replacing <script by &lt;script and </script> by
     &lt;/script&gt;
     """
-    content = content.replace('<script', '&lt;script')
-    content = content.replace('</script>', '&lt;/script&gt;')
-    return content
+    return bleach.clean(content)
 
 
 @APP.template_filter('toRGB')
