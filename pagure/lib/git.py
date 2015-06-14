@@ -99,7 +99,8 @@ def write_gitolite_acls(session, configfile):
                     repos = ''
 
             config.append('repo %s%s' % (repos, project.fullname))
-            config.append('  R   = @all')
+            if repos not in ['tickets/', 'requests/']:
+                config.append('  R   = @all')
             if project.groups:
                 config.append('  RW+ = @%s' % ' @'.join([
                     group.group_name for group in project.groups]))
