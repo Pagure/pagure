@@ -92,12 +92,10 @@ repo docs/test
   RW+ = foo
 
 repo tickets/test
-  R   = @all
   RW+ = pingou
   RW+ = foo
 
 repo requests/test
-  R   = @all
   RW+ = pingou
   RW+ = foo
 
@@ -110,11 +108,9 @@ repo docs/test2
   RW+ = pingou
 
 repo tickets/test2
-  R   = @all
   RW+ = pingou
 
 repo requests/test2
-  R   = @all
   RW+ = pingou
 
 repo forks/pingou/test3
@@ -126,11 +122,9 @@ repo docs/pingou/test3
   RW+ = pingou
 
 repo tickets/pingou/test3
-  R   = @all
   RW+ = pingou
 
 repo requests/pingou/test3
-  R   = @all
   RW+ = pingou
 
 """
@@ -230,13 +224,11 @@ repo docs/test
   RW+ = foo
 
 repo tickets/test
-  R   = @all
   RW+ = @sysadmin @devs
   RW+ = pingou
   RW+ = foo
 
 repo requests/test
-  R   = @all
   RW+ = @sysadmin @devs
   RW+ = pingou
   RW+ = foo
@@ -250,11 +242,9 @@ repo docs/test2
   RW+ = pingou
 
 repo tickets/test2
-  R   = @all
   RW+ = pingou
 
 repo requests/test2
-  R   = @all
   RW+ = pingou
 
 repo forks/pingou/test2
@@ -266,11 +256,9 @@ repo docs/pingou/test2
   RW+ = pingou
 
 repo tickets/pingou/test2
-  R   = @all
   RW+ = pingou
 
 repo requests/pingou/test2
-  R   = @all
   RW+ = pingou
 
 """
