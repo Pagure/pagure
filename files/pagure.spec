@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.13
+Version:        0.1.14
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -177,6 +177,53 @@ install -m 644 milters/comment_email_milter.py \
 
 
 %changelog
+* Fri Jun 12 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.14-1
+- Update to 0.1.14
+- Remove all new lines characters from the ssh key uploaded
+- Adjust the URL in the footer to point to https://pagure.io/pagure
+- Fix displaying the time of a comment
+- Forbid the use of spaces in group name
+- Do not get the list of not-merged commits if there is only 1 branch in the
+  repo
+- Display the error message if pagure.lib.add_group raises an exception
+- Add a new setting enforcing that all commits in a PR are signed-off by their
+  author
+- Enforce that all commits are signed-off by the author if the repo is
+  configured for this
+- Also check for the signed-off status before merging a pull-request
+- Adjust online-editing to allow specifying which email address to use in the
+  commit
+- Add an avatar_email field to projects
+- Change the PullRequest's status from a Boolean to a Text restricted at the DB
+  level (Allows to distinguish Open/Merged/Closed)
+- Show in the pull-request view who merged the pull-request
+- Specify who closed the pull-request in the API output
+- Catch GitError when merging and checking merge status of a PR
+- Hide the form to create pull-requests if the user is not an admin of the repo
+- Replace the Pull-Request button by a Compare button if the user it not a repo
+  admin
+- Set the title of the tab as URL hash to allow directly linking to it
+- Adjust the API to be able to distinguish API authentication and UI
+  authentication
+- Fix API documentation to create new issues
+- Drop the status from the requirements to open a new issue via the API
+- Expand the list of blacklisted project names
+- Have the code tags behave like pre tags (html tags)
+- Allow project to specify an URL and display it on their page
+- Strip the ssh keys when writing them to the authorized_keys file
+- Disable javascript in all the markdown fields
+- Validate early the input submitted in the forms (using more or less strict
+  regex)
+- If the session timed-out, redirect to the setting page after authentication
+  and inform the user that the action was canceled
+- Catch PagureException when adjusting the project's settings
+- Redirect the /api endpoint to the api documentation place
+- Fix how is retrieved the list of emails to send the notification to
+- Sanitize the html using bleach to avoid potential XSS exploit
+- Do not give READ access to everyone on the tickets and pull-requests repos to
+  avoid leaking private tickets
+- Adjust the unit-tests for all these changes
+
 * Fri Jun 05 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.13-1
 - Update to 0.1.13
 - Do not show the edit button if the user cannot edit the file
