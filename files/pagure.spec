@@ -167,17 +167,17 @@ install -m 644 ev-server/pagure_ev.service \
 %post milters
 %systemd_post pagure_milter.service
 %post ev
-%systemd_post pagure_milter.service
+%systemd_post pagure_ev.service
 
 %preun milters
 %systemd_preun pagure_milter.service
 %preun ev
-%systemd_preun pagure_milter.service
+%systemd_preun pagure_ev.service
 
 %postun milters
 %systemd_postun_with_restart pagure_milter.service
 %postun ev
-%systemd_postun_with_restart pagure_milter.service
+%systemd_postun_with_restart pagure_ev.service
 
 
 %files
@@ -206,7 +206,7 @@ install -m 644 ev-server/pagure_ev.service \
 %files
 %license LICENSE
 %{_datadir}/pagure-ev/
-%{_unitdir}/pagure_milter.service
+%{_unitdir}/pagure_ev.service
 
 
 %changelog
