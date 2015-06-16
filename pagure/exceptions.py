@@ -44,3 +44,9 @@ class BranchNotFoundException(PagureException):
     found in a repository.
     '''
     pass
+
+
+class PagureEvException(PagureException):
+    ''' Exceptions used in the pagure-stream-server.
+    '''
+    pass
