@@ -702,7 +702,8 @@ def add_group_to_project(session, project, new_group, user):
 
 
 def add_pull_request_comment(session, request, commit, filename, row,
-                             comment, user, requestfolder, notify=True):
+                             comment, user, requestfolder, notify=True,
+                             redis=None):
     ''' Add a comment to a pull-request. '''
     user_obj = __get_user(session, user)
 
@@ -723,6 +724,18 @@ def add_pull_request_comment(session, request, commit, filename, row,
 
     if notify:
         pagure.lib.notify.notify_pull_request_comment(pr_comment, user_obj)
+
+    if redis:
+        redis.publish(request.uid, json.dumps({
+            'request_id': len(request.comments),
+            'comment_added': text2markdown(pr_comment.comment),
+            'comment_user': pr_comment.user.user,
+            'avatar_url': avatar_url(pr_comment.user.user, size=16),
+            'comment_date': pr_comment.date_created.strftime('%Y-%m-%d %H:%M'),
+            'commit_id': commit,
+            'filename': filename,
+            'line': row,
+        }))
 
     pagure.lib.notify.log(
         request.project,
