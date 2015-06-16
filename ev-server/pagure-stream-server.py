@@ -38,9 +38,53 @@ if 'PAGURE_CONFIG' not in os.environ \
 
 import pagure
 import pagure.lib
+from pagure.exceptions import PagureEvException
 
 
 clients = {}
+
+
+def get_obj_from_path(path):
+    """ Return the Ticket or Request object based on the path provided.
+    """
+    username = None
+    if path.startswith('/fork'):
+        username, repo, obj, objid = path.split('/')[2:6]
+    else:
+        repo, obj, objid = path.split('/')[1:4]
+
+    repo = pagure.lib.get_project(pagure.SESSION, repo, user=username)
+
+    if repo is None:
+        raise PagureEvException("Project '%s' not found" % repo)
+
+    output = None
+    if obj == 'issue':
+        if not repo.settings.get('issue_tracker', True):
+            raise PagureEvException("No issue tracker found for this project")
+
+        output = pagure.lib.search_issues(
+            pagure.SESSION, repo, issueid=objid)
+
+        if output is None or output.project != repo:
+            raise PagureEvException("Issue '%s' not found" % objid)
+
+        if output.private:
+            # TODO: find a way to do auth
+            raise PagureEvException(
+                "This issue is private and you are not allowed to view it")
+    else:
+        if not repo.settings.get('pull_requests', True):
+            raise PagureEvException(
+                "No pull-request tracker found for this project")
+
+        output = pagure.lib.search_pull_requests(
+            pagure.SESSION, project_id=repo.id, requestid=objid)
+
+        if output is None or output.project != repo:
+            raise PagureEvException("Pull-Request '%s' not found" % objid)
+
+    return output
 
 
 @trollius.coroutine
@@ -74,32 +118,10 @@ def handle_client(client_reader, client_writer):
         "Access-Control-Allow-Origin: *\n\n"
     ).encode())
 
-    username = None
-    if url.path.startswith('/fork'):
-        username, repo, issue, issueid = url.path.split('/')[2:6]
-    else:
-        repo, issue, issueid = url.path.split('/')[1:4]
-
-    repo = pagure.lib.get_project(pagure.SESSION, repo, user=username)
-
-    if repo is None:
-        log.warning("Project '%s' not found" % repo)
-        return
-
-    if not repo.settings.get('issue_tracker', True):
-        log.warning("No issue tracker found for this project")
-        return
-
-    issue = pagure.lib.search_issues(pagure.SESSION, repo, issueid=issueid)
-
-    if issue is None or issue.project != repo:
-        log.warning("Issue '%s' not found" % issueid)
-        return
-
-    if issue.private:
-        # TODO: find a way to do auth
-        log.warning(
-            "This issue is private and you are not allowed to view it")
+    try:
+        obj = get_obj_from_path(url.path)
+    except PagureEvException as err:
+        log.warning(err.message)
         return
 
     try:
@@ -112,7 +134,7 @@ def handle_client(client_reader, client_writer):
         subscriber = yield trollius.From(connection.start_subscribe())
 
         # Subscribe to channel.
-        yield trollius.From(subscriber.subscribe([issue.uid]))
+        yield trollius.From(subscriber.subscribe([obj.uid]))
 
         # Inside a while loop, wait for incoming events.
         while True:
