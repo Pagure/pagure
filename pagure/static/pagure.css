@@ -936,7 +936,7 @@ span.CONFLICTS {
     line-height: 100%;
 }
 
-#commit {
+#commit_block {
     padding-top: 2em;
     padding-left: 2em;
 }
