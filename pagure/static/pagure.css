@@ -386,7 +386,7 @@ pre {
 }
 
 .filehex, .commitid {
-    font-family: courier new;
+    font-family: "courier new";
 }
 
 .tree_list li:nth-child(odd),
