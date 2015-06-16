@@ -273,13 +273,14 @@
 
 
 {% if pull_request and pull_request.comments%}
-<section class="request_comment">
+<section class="request_comment" id="request_comment">
 <form action="{{ url_for('.pull_request_drop_comment', username=username,
     repo=repo.name, requestid=requestid) }}" method="post">
 
 {% for comment in pull_request.discussion %}
   {% if not comment.commit_id %}
-    {{ show_comment(comment, loop.index, repo, username, requestid, form, repo_admin) }}
+    {{ show_comment(comment, loop.index, repo, username,
+                    requestid, form, repo_admin) }}
   {% endif %}
 {% endfor %}
 {{ mergeform.csrf_token }}
@@ -516,14 +517,7 @@ function try_async_comment(form) {
     .done(function(data) {
       if(data == 'ok') {
         // We have submitted the comment correctly
-        var comment_fld = $(form).find("#comment")[0];
-        var comment = comment_fld.value;
-        var comment_view = "<tr><td></td><td colspan='2'><table style='width:100%'><tbody><tr><td>" +
-                           "<a href='/user/{{ g.fas_user.username }}'>{{ g.fas_user.username }}</a>" +
-                           "</td><td class='right'>Now</td></tr><tr>" +
-                           "<tr><td class='pr_comment' colspan='2'><p>" +
-                           comment + "</p></td></tr></tbody></td></tr>";
-        $(form).closest('tr').before($(comment_view)).remove();
+        $(form).remove();
       } else {
         // Make the browser submit the form sync
         $(form).off('submit');
@@ -540,5 +534,31 @@ function try_async_comment(form) {
 {% endif %}
 
 </script>
+
+
+{% if config['EVENTSOURCE_SOURCE'] %}
+<script type="text/javascript"
+  src="{{ url_for('static', filename='request_ev.js') }}"></script>
+
+<script type="text/javascript">
+var source = null;
+if (!!window.EventSource) {
+  source = new EventSource('{{ config["EVENTSOURCE_SOURCE"]
+    + request.script_root + request.path }}');
+}
+
+window.onbeforeunload = function() {
+    source.close()
+};
+
+source.addEventListener('message', function(e) {
+  console.log(e.data);
+  var data = $.parseJSON(e.data);
+  process_event(data, "{{ request.uid }}");
+
+  }, false);
+</script>
+{% endif %}
+
 {% endblock %}
 
