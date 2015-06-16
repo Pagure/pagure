@@ -385,6 +385,10 @@ pre {
     text-align: right;
 }
 
+.filehex, .commitid {
+    font-family: courier new;
+}
+
 .tree_list li:nth-child(odd),
 .commit_list li:nth-child(odd),
 .tag_list li:nth-child(odd),
@@ -434,6 +438,7 @@ table.list tr:hover td > a
 {
     color:white;
 }
+
 .commit_list li > a:first-child,
 .tree_list li > a:first-child,
 .tag_list li > a:first-child,
