@@ -26,7 +26,7 @@
 
 {% if pull_request %}
 <div class="header">
-    <h3>Title: {{ pull_request.title | no_js }}</h3>
+    <h3>Title: {{ pull_request.title | noJS }}</h3>
     <ul class="buttons">
   {% if pull_request.status == 'Open' and repo_admin %}
       <li>
