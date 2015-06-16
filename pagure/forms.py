@@ -15,7 +15,7 @@ import wtforms
 
 
 STRICT_REGEX = '^[a-zA-Z0-9-_]+$'
-TAGS_REGEX = '^[a-zA-Z0-9-_,]+$'
+TAGS_REGEX = '^[a-zA-Z0-9-_, .]+$'
 
 
 class ProjectFormSimplified(wtf.Form):
@@ -146,7 +146,7 @@ class UpdateIssueForm(wtf.Form):
         'tag',
         [
             wtforms.validators.Optional(),
-            wtforms.validators.Regexp(STRICT_REGEX, flags=re.IGNORECASE)
+            wtforms.validators.Regexp(TAGS_REGEX, flags=re.IGNORECASE)
         ]
     )
     depends = wtforms.TextField(
