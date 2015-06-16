@@ -15,7 +15,6 @@ import wtforms
 
 
 STRICT_REGEX = '^[a-zA-Z0-9-_]+$'
-RELAXED_REGEX = "^[a-zA-Z0-9- #:,.|_'\/]+$"
 
 
 class ProjectFormSimplified(wtf.Form):
@@ -49,10 +48,7 @@ class IssueFormSimplied(wtf.Form):
     ''' Form to create or edit an issue. '''
     title = wtforms.TextField(
         'Title<span class="error">*</span>',
-        [
-            wtforms.validators.Required(),
-            wtforms.validators.Regexp(RELAXED_REGEX, flags=re.IGNORECASE)
-        ]
+        [wtforms.validators.Required()]
     )
     issue_content = wtforms.TextAreaField(
         'Content<span class="error">*</span>',
@@ -88,10 +84,7 @@ class RequestPullForm(wtf.Form):
     ''' Form to create a request pull. '''
     title = wtforms.TextField(
         'Title<span class="error">*</span>',
-        [
-            wtforms.validators.Required(),
-            wtforms.validators.Regexp(RELAXED_REGEX, flags=re.IGNORECASE)
-        ]
+        [wtforms.validators.Required()]
     )
 
 
@@ -327,3 +320,4 @@ class EditFileForm(wtf.Form):
             self.email.choices = [
                 (email.email, email.email) for email in kwargs['emails']
             ]
+
