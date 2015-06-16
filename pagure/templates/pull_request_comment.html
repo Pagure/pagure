@@ -3,7 +3,7 @@
   <form action="{{ url_for(
     'pull_request_add_comment', username=username, repo=repo.name,
     requestid=requestid, commit=commit, filename=filename, row=row) }}"
-    method="post" onsubmit="return try_async_comment(this)">
+    method="post" onsubmit="return try_async_comment(this, true)">
     <div>
       <textarea id="comment" name="comment" title="comment"></textarea>
     </div>

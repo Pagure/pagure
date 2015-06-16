@@ -293,7 +293,7 @@
   <form action="{{ url_for(
       'pull_request_add_comment', username=username, repo=repo.name,
       requestid=requestid) }}"
-      method="post">
+      method="post" onsubmit="return try_async_comment(this, false)">
     {{ mergeform.csrf_token }}
     <header>
       <label for="comment">Add new comment</label>
@@ -512,12 +512,15 @@
  });
 
 {% if authenticated %}
-function try_async_comment(form) {
+function try_async_comment(form, inline) {
   $.post( form.action + "?js=1", $(form).serialize() )
     .done(function(data) {
       if(data == 'ok') {
         // We have submitted the comment correctly
-        $(form).remove();
+        $('#comment').val('');
+        if (inline){
+            $(form).remove();
+        }
       } else {
         // Make the browser submit the form sync
         $(form).off('submit');
