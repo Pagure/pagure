@@ -20,7 +20,7 @@ import pagure.exceptions
 import pagure.lib
 import pagure.lib.git
 import pagure.forms
-from pagure import (APP, SESSION, LOG, cla_required,
+from pagure import (APP, REDIS, SESSION, LOG, cla_required,
                     is_repo_admin, generate_gitolite_acls)
 
 
@@ -291,6 +291,7 @@ def pull_request_add_comment(
                 comment=comment,
                 user=flask.g.fas_user.username,
                 requestfolder=APP.config['REQUESTS_FOLDER'],
+                redis=REDIS,
             )
             SESSION.commit()
             flask.flash(message)
