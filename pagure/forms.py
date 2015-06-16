@@ -15,7 +15,7 @@ import wtforms
 
 
 STRICT_REGEX = '^[a-zA-Z0-9-_]+$'
-RELAXED_REGEX = '^[a-zA-Z0-9 #]+$'
+RELAXED_REGEX = "^[a-zA-Z0-9- #:,.|_'\/]+$"
 
 
 class ProjectFormSimplified(wtf.Form):
