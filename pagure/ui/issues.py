@@ -38,6 +38,8 @@ from pagure import (APP,  SESSION, REDIS, LOG, __get_file_in_tree,
 @cla_required
 def update_issue(repo, issueid, username=None):
     ''' Add a comment to an issue. '''
+    is_js = flask.request.args.get('js', False)
+
     repo = pagure.lib.get_project(SESSION, repo, user=username)
 
     if flask.request.method == 'GET':
@@ -89,6 +91,7 @@ def update_issue(repo, issueid, username=None):
                 SESSION.commit()
                 flask.flash('Comment removed')
             except SQLAlchemyError, err:  # pragma: no cover
+                is_js = False
                 SESSION.rollback()
                 LOG.error(err)
                 flask.flash(
@@ -193,15 +196,20 @@ def update_issue(repo, issueid, username=None):
                 flask.flash(message)
 
         except pagure.exceptions.PagureException, err:
+            is_js = False
             SESSION.rollback()
             flask.flash(err.message, 'error')
         except SQLAlchemyError, err:  # pragma: no cover
+            is_js = False
             SESSION.rollback()
             APP.logger.exception(err)
             flask.flash(str(err), 'error')
 
-    return flask.redirect(flask.url_for(
-        'view_issue', username=username, repo=repo.name, issueid=issueid))
+    if is_js:
+        return 'ok'
+    else:
+        return flask.redirect(flask.url_for(
+            'view_issue', username=username, repo=repo.name, issueid=issueid))
 
 
 @APP.route('/<repo>/tag/<tag>/edit/', methods=('GET', 'POST'))
