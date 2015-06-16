@@ -56,7 +56,7 @@
             <td>
               <a href="{{ url_for('request_pull', username=username,
                   repo=repo.name, requestid=request.id) }}">
-                {{ request.title }}
+                {{ request.title | no_js }}
               </a>
             </td>
             <td>
@@ -94,3 +94,4 @@
     </tbody>
 </table>
 {% endblock %}
+
