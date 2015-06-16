@@ -9,7 +9,7 @@
 <div class="header">
 <h3>
     {{ splitted_message[0] }}
-    (<span class="commitid" title="{{ commitid }}">commit: {{ commitid|short }}
+    (commit: <span class="commitid" title="{{ commitid }}">{{ commitid|short }}
     </span> - <a href="{{ url_for('view_tree', username=username,
         repo=repo.name, identifier=commitid) }}">tree</a>)
     {% if splitted_message|length > 1 %}
@@ -53,7 +53,7 @@
     <td>
       {% for parent in commit.parents %}
         <a href="{{ url_for('view_commit', username=username,
-                  repo=repo.name, commitid=parent.oid.hex) }}">
+                  repo=repo.name, commitid=parent.oid.hex) }}" class="commitid">
           {{ parent.oid.hex }}
         </a> <br />
       {% endfor %}
