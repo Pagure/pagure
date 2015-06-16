@@ -30,6 +30,7 @@
 {% if authenticated and form %}
   <form action="{{ url_for('update_issue', username=username,
            repo=repo.name, issueid=issueid) }}" method="post"
+           onsubmit="return try_async_comment(this)"
            enctype="multipart/form-data">
   {{ form.csrf_token }}
 {% endif %}
@@ -205,8 +206,6 @@ $(document).ready(function() {
   $("#file-picker").on("change", function() {
     doUpload("{{ form.csrf_token.current_token }}", this.files);
   });
-
-
 });
 {% endif %}
 
@@ -355,6 +354,29 @@ source.addEventListener('message', function(e) {
   process_event(data, "{{ issue.uid }}", _issue_url, _issues_url);
 
   }, false);
+
+{% if authenticated and form %}
+function try_async_comment(form) {
+  $.post( form.action + "?js=1", $(form).serialize() )
+    .done(function(data) {
+      if(data == 'ok') {
+        {# The event-source server will automatically refresh the UI #}
+        $('#comment').val('');
+      } else {
+        // Make the browser submit the form sync
+        $(form).off('submit');
+        form.submit();
+      }
+    })
+    .fail(function() {
+      // Make the browser submit the form sync
+      $(form).off('submit');
+      form.submit();
+    })
+  return false;
+};
+{% endif %}
+
 </script>
 {% endif %}
 
