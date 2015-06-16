@@ -43,7 +43,8 @@ def update_issue(repo, issueid, username=None):
     repo = pagure.lib.get_project(SESSION, repo, user=username)
 
     if flask.request.method == 'GET':
-        flask.flash('Invalid method: GET', 'error')
+        if not is_js:
+            flask.flash('Invalid method: GET', 'error')
         return flask.redirect(flask.url_for(
             'view_issue', username=username, repo=repo.name, issueid=issueid))
 
@@ -89,13 +90,16 @@ def update_issue(repo, issueid, username=None):
             SESSION.delete(comment)
             try:
                 SESSION.commit()
-                flask.flash('Comment removed')
+                if not is_js:
+                    flask.flash('Comment removed')
             except SQLAlchemyError, err:  # pragma: no cover
                 is_js = False
                 SESSION.rollback()
                 LOG.error(err)
-                flask.flash(
-                    'Could not remove the comment: %s' % commentid, 'error')
+                if not is_js:
+                    flask.flash(
+                        'Could not remove the comment: %s' % commentid,
+                        'error')
 
         comment = form.comment.data
         depends = []
@@ -134,7 +138,7 @@ def update_issue(repo, issueid, username=None):
                     redis=REDIS,
                 )
                 SESSION.commit()
-                if message:
+                if message and not is_js:
                     flask.flash(message)
 
             if repo_admin:
@@ -144,8 +148,9 @@ def update_issue(repo, issueid, username=None):
                     username=flask.g.fas_user.username,
                     ticketfolder=APP.config['TICKETS_FOLDER'],
                     redis=REDIS)
-                for message in messages:
-                    flask.flash(message)
+                if not is_js:
+                    for message in messages:
+                        flask.flash(message)
 
             # Assign or update assignee of the ticket
             message = pagure.lib.add_issue_assignee(
@@ -156,7 +161,7 @@ def update_issue(repo, issueid, username=None):
                 ticketfolder=APP.config['TICKETS_FOLDER'],
                 redis=REDIS,
             )
-            if message:
+            if message and not is_js:
                 SESSION.commit()
                 flask.flash(message)
 
@@ -182,8 +187,9 @@ def update_issue(repo, issueid, username=None):
                 ticketfolder=APP.config['TICKETS_FOLDER'],
                 redis=REDIS,
             )
-            for message in messages:
-                flask.flash(message)
+            if not is_js:
+                for message in messages:
+                    flask.flash(message)
 
             # Update ticket(s) depending on this one
             messages = pagure.lib.update_blocked_issue(
@@ -192,18 +198,21 @@ def update_issue(repo, issueid, username=None):
                 ticketfolder=APP.config['TICKETS_FOLDER'],
                 redis=REDIS,
             )
-            for message in messages:
-                flask.flash(message)
+            if not is_js:
+                for message in messages:
+                    flask.flash(message)
 
         except pagure.exceptions.PagureException, err:
             is_js = False
             SESSION.rollback()
-            flask.flash(err.message, 'error')
+            if not is_js:
+                flask.flash(err.message, 'error')
         except SQLAlchemyError, err:  # pragma: no cover
             is_js = False
             SESSION.rollback()
             APP.logger.exception(err)
-            flask.flash(str(err), 'error')
+            if not is_js:
+                flask.flash(str(err), 'error')
 
     if is_js:
         return 'ok'
