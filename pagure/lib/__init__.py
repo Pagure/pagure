@@ -1022,7 +1022,14 @@ def fork_project(session, user, repo, gitfolder,
     # Make sure we won't have SQLAlchemy error before we create the repo
     session.flush()
 
-    pygit2.clone_repository(reponame, forkreponame, bare=True)
+    frepo = pygit2.clone_repository(reponame, forkreponame, bare=True)
+    # Clone all the branches as well
+    for branch in  frepo.listall_branches(pygit2.GIT_BRANCH_REMOTE):
+        if branch == 'origin/master':
+            continue
+        br = frepo.lookup_branch(branch, pygit2.GIT_BRANCH_REMOTE)
+        name = br.branch_name.replace(br.remote_name, '')[1:]
+        frepo.create_branch(name, frepo.get(br.target.hex))
 
     docrepo = os.path.join(docfolder, project.path)
     if os.path.exists(docrepo):
