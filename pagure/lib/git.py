@@ -656,7 +656,8 @@ def add_file_to_git(repo, issue, ticketfolder, user, filename, filestream):
     return os.path.join('files', filename)
 
 
-def update_file_in_git(repo, branch, filename, content, message, user, email):
+def update_file_in_git(
+        repo, branch, branchto, filename, content, message, user, email):
     ''' Update a specific file in the specified repository with the content
     given and commit the change under the user's name.
 
@@ -673,7 +674,8 @@ def update_file_in_git(repo, branch, filename, content, message, user, email):
 
     # Clone the repo into a temp folder
     newpath = tempfile.mkdtemp(prefix='pagure-')
-    new_repo = pygit2.clone_repository(repopath, newpath)
+    new_repo = pygit2.clone_repository(
+        repopath, newpath, checkout_branch=branch)
 
     file_path = os.path.join(newpath, filename)
 
@@ -703,6 +705,11 @@ def update_file_in_git(repo, branch, filename, content, message, user, email):
     branch_ref = get_branch_ref(new_repo, branch)
     parent = branch_ref.get_object()
 
+    # See if we need to create the branch
+    nbranch_ref = None
+    if branchto not in new_repo.listall_branches():
+        nbranch_ref = new_repo.create_branch(branchto, parent)
+
     parents = []
     if parent:
         parents.append(parent.hex)
@@ -715,7 +722,7 @@ def update_file_in_git(repo, branch, filename, content, message, user, email):
 
     # Actually commit
     new_repo.create_commit(
-        branch_ref.name,
+        nbranch_ref.name if nbranch_ref else branch_ref.name,
         author,
         author,
         message.strip(),
@@ -725,9 +732,16 @@ def update_file_in_git(repo, branch, filename, content, message, user, email):
 
     # Push to origin
     ori_remote = new_repo.remotes[0]
-    refname = '%s:refs/heads/%s' % (branch_ref.name, branch)
+    refname = '%s:refs/heads/%s' % (
+        nbranch_ref.name if nbranch_ref else branch_ref.name,
+        branchto)
 
-    ori_remote.push(refname)
+    try:
+        ori_remote.push(refname)
+    except pygit2.GitError as err:  # pragma: no cover
+        shutil.rmtree(newpath)
+        raise pagure.exceptions.PagureException(
+            'Commit could not be done: %s' % err)
 
     # Remove the clone
     shutil.rmtree(newpath)
