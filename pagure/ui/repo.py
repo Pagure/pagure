@@ -1277,8 +1277,8 @@ def edit_file(repo, branchname, filename, username=None):
             flask.flash('Changes committed')
             return flask.redirect(
                 flask.url_for(
-                    '.view_file', repo=repo.name, username=username,
-                    identifier=branchname, filename=filename)
+                    '.view_commits', repo=repo.name, username=username,
+                    branchname=form.branch.data)
             )
         except pagure.exceptions.PagureException as err:  # pragma: no cover
             APP.logger.exception(err)
