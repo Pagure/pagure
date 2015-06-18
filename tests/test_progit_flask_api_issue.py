@@ -676,7 +676,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = json.loads(output.data)
         self.assertDictEqual(
             data,
-            {'message': 'Edited successfully issue #1'}
+            {'message': 'Successfully edited issue #1'}
         )
 
         headers = {'Authorization': 'token pingou_foo'}

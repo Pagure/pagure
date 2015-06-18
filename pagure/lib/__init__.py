@@ -1013,7 +1013,7 @@ def edit_issue(session, issue, ticketfolder, user,
     if edit:
         session.add(issue)
         session.flush()
-        return 'Edited successfully issue #%s' % issue.id
+        return 'Successfully edited issue #%s' % issue.id
 
 
 def update_project_settings(session, repo, settings, user):

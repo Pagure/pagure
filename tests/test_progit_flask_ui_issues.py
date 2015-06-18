@@ -452,7 +452,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<p>test project<a href="/test/issue/1"> #1</a></p>'
                 in output.data)
             self.assertTrue(
-                '<li class="message">Edited successfully issue #1</li>'
+                '<li class="message">Successfully edited issue #1</li>'
                 in output.data)
             self.assertTrue(
                 '<option selected value="Fixed">Fixed</option>'
@@ -1122,7 +1122,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/1/edit', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
-                '<li class="message">Edited successfully issue #1</li>'
+                '<li class="message">Successfully edited issue #1</li>'
                 in output.data)
             self.assertTrue(
                 '<span class="issueid">#1</span> <span id="issuetitle">'
