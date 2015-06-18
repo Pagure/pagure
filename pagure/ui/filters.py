@@ -13,7 +13,6 @@ import textwrap
 import urlparse
 
 import arrow
-import bleach
 import flask
 
 from pygments import highlight
@@ -304,16 +303,7 @@ def no_js(content):
     """ Template filter replacing <script by &lt;script and </script> by
     &lt;/script&gt;
     """
-    attrs = bleach.ALLOWED_ATTRIBUTES
-    attrs['img'] = filter_img_src
-    return bleach.clean(
-        content,
-        tags=bleach.ALLOWED_TAGS + [
-            'p', 'br', 'div', 'h1', 'h2', 'h3', 'table', 'td', 'tr', 'th',
-            'col', 'tbody', 'pre', 'img', 'hr',
-        ],
-        attributes=attrs,
-    )
+    return pagure.lib.clean_input(content)
 
 
 @APP.template_filter('toRGB')

@@ -20,6 +20,7 @@ import shutil
 import tempfile
 import uuid
 
+import bleach
 import sqlalchemy
 import sqlalchemy.schema
 from datetime import timedelta
@@ -2261,3 +2262,18 @@ def text2markdown(text):
         return markdown.markdown('\n'.join(ntext))
 
     return ''
+
+def clean_input(text):
+    """ For a given html text, escape everything we do not want to support
+    to avoid potential security breach.
+    """
+    attrs = bleach.ALLOWED_ATTRIBUTES
+    attrs['img'] = filter_img_src
+    return bleach.clean(
+        text,
+        tags=bleach.ALLOWED_TAGS + [
+            'p', 'br', 'div', 'h1', 'h2', 'h3', 'table', 'td', 'tr', 'th',
+            'col', 'tbody', 'pre', 'img', 'hr',
+        ],
+        attributes=attrs,
+    )
