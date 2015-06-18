@@ -891,12 +891,16 @@ span.CONFLICTS {
     color: #0066CC!important;
 }
 
-.tabs .ui-widget-content a:hover {
+.tabs .commit_list a:hover {
     color: white!important;
 }
 
 .tabs .ui-widget-content .button{
     color: white!important;
+}
+
+.tabs .ui-widget-content .submit{
+    color: #444!important;
 }
 
 .tabs .ui-state-hover a:hover{
