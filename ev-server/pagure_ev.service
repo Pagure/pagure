@@ -1,7 +1,7 @@
 [Unit]
 Description=Pagure EventSource server (Allowing live refresh of the pages
 supporting it)
-After=network.target
+After=redis.target
 Documentation=https://pagure.io/pagure
 
 [Service]
