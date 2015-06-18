@@ -2259,7 +2259,7 @@ def text2markdown(text):
             if indent:
                 line = '    %s' % line
             ntext.append(line)
-        return markdown.markdown('\n'.join(ntext))
+        return clean_input(markdown.markdown('\n'.join(ntext)))
 
     return ''
 

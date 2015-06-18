@@ -213,7 +213,7 @@ def markdown_filter(text):
     """ Template filter converting a string into html content using the
     markdown library.
     """
-    return no_js(pagure.lib.text2markdown(text))
+    return pagure.lib.text2markdown(text)
 
 
 @APP.template_filter('html_diff')
