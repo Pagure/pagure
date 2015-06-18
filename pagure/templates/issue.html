@@ -357,7 +357,14 @@ source.addEventListener('message', function(e) {
 
 {% if authenticated and form %}
 function try_async_comment(form) {
-  $.post( form.action + "?js=1", $(form).serialize() )
+  var _url = form.action + "?js=1";
+  var _data = $(form).serialize();
+  var btn = $(document.activeElement);
+  if (btn[0].value){
+    _data += '&drop_comment=' + btn[0].value;
+    return true;
+  }
+  $.post( _url, _data )
     .done(function(data) {
       if(data == 'ok') {
         {# The event-source server will automatically refresh the UI #}
