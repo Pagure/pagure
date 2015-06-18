@@ -73,7 +73,7 @@ def get_obj_from_path(path):
             # TODO: find a way to do auth
             raise PagureEvException(
                 "This issue is private and you are not allowed to view it")
-    else:
+    elif obj == 'pull-request':
         if not repo.settings.get('pull_requests', True):
             raise PagureEvException(
                 "No pull-request tracker found for this project")
@@ -83,6 +83,9 @@ def get_obj_from_path(path):
 
         if output is None or output.project != repo:
             raise PagureEvException("Pull-Request '%s' not found" % objid)
+
+    else:
+        raise PagureEvException("Invalid object provided: '%s'" % obj)
 
     return output
 
