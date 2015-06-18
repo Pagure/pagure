@@ -1250,6 +1250,8 @@ def edit_file(repo, branchname, filename, username=None):
     if repo_obj.is_empty:
         flask.abort(404, 'Empty repo cannot have a file')
 
+    form = pagure.forms.EditFileForm(emails=user.emails)
+
     branch = None
     if branchname in repo_obj.listall_branches():
         branch = repo_obj.lookup_branch(branchname)
@@ -1257,12 +1259,12 @@ def edit_file(repo, branchname, filename, username=None):
     else:
         flask.abort(400, 'Invalid branch specified')
 
-    form = pagure.forms.EditFileForm(emails=user.emails)
     if form.validate_on_submit():
         try:
             pagure.lib.git.update_file_in_git(
                 repo,
                 branch=branchname,
+                branchto=form.branch.data,
                 filename=filename,
                 content=form.content.data,
                 message='%s\n\n%s' % (
@@ -1303,4 +1305,5 @@ def edit_file(repo, branchname, filename, username=None):
         filename=filename,
         form=form,
         user=user,
+        branches=repo_obj.listall_branches(),
     )
