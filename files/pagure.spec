@@ -157,9 +157,9 @@ install -m 644 milters/comment_email_milter.py \
     $RPM_BUILD_ROOT/%{_datadir}/pagure/comment_email_milter.py
 
 # Install the eventsource
-mkdir -p $RPM_BUILD_ROOT/%{_datadir}/pagure-ev
-install -m 644 ev-server/pagure-stream-server.py \
-    $RPM_BUILD_ROOT/%{_datadir}/pagure-ev/pagure-stream-server.py
+mkdir -p $RPM_BUILD_ROOT/%{_libexecdir}/pagure-ev
+install -m 755 ev-server/pagure-stream-server.py \
+    $RPM_BUILD_ROOT/%{_libexecdir}/pagure-ev/pagure-stream-server.py
 install -m 644 ev-server/pagure_ev.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_ev.service
 
@@ -205,7 +205,7 @@ install -m 644 ev-server/pagure_ev.service \
 
 %files
 %license LICENSE
-%{_datadir}/pagure-ev/
+%{_libexecdir}/pagure-ev/
 %{_unitdir}/pagure_ev.service
 
 
