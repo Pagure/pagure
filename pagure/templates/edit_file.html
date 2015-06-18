@@ -41,21 +41,49 @@
 
 <div id="commit_block">
   <div>
-      {{ user.username | avatar(24) | safe }}
-      {{ user.fullname }}
-      <select id="email" name="email">
-        {% for email in user.emails %}
-        <option value="{{ email.email }}" {%
-            if form.email.data == email.email %}selected{%
-            endif %}>{{ email.email }}</option>
-        {% endfor %}
-      </select>
+    <table>
+      <tr>
+        <td>
+          {{ user.username | avatar(24) | safe }}
+        </td>
+        <td>
+          {{ user.fullname }}
+        </td>
+        <td>
+          <select id="email" name="email">
+            {% for email in user.emails %}
+            <option value="{{ email.email }}" {%
+                if form.email.data == email.email %}selected{%
+                endif %}>{{ email.email }}</option>
+            {% endfor %}
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          Branch:
+        </td>
+        <td id="branch">
+          <select name="branch">
+            {% for branch in branches %}
+            <option value="{{ branch }}" {%
+                if form.branch.data or branchname == branch %}selected{%
+                endif %}>{{ branch }}</option>
+            {% endfor %}
+          </select>
+        </td>
+        <td>
+          <input type="radio" name="braction" value="existing" checked />Existing branch<br />
+          <input type="radio" name="braction" value="new" />New branch
+        </td>
+      </tr>
+    </table>
   </div>
   <div>
     <input type="text" id="commit_title" name="commit_title"
         placeholder="Update {{ filename }}"
-        value="{{ form.commit_title.data if form.commit_title.data }}">
-    </input>
+        value="{{ form.commit_title.data if form.commit_title.data }}" />
   </div>
   <div>
     <textarea rows="5" cols="85" type="text" id="commit_message"
@@ -82,6 +110,19 @@ $( "#clear_comment").click(
     $( "#commit_message" ).val("");
   }
 );
+
+var lbranch = $('#branch').html();
+
+$("input[name=braction]:radio").change(function (e) {
+  if ($(e.currentTarget).val() == 'new'){
+    console.log('new');
+    $('#branch').html('<input type="text" placeholder="Branch name" name="branch">');
+  } else {
+    console.log('not new');
+    $('#branch').html(lbranch);
+  }
+});
+
 
 var lineObjOffsetTop = 0;
 
