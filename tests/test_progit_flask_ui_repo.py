@@ -1709,12 +1709,13 @@ index 0000000..fb7093d
 
             # Works
             data['email'] = 'bar@pingou.com'
+            data['branch'] = 'master'
             output = self.app.post(
                 '/test/edit/master/f/sources', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Tree - test - Pagure</title>', output.data)
+                '<title>Logs - test - Pagure</title>', output.data)
             self.assertIn(
                 '<li class="message">Changes committed</li>', output.data)
 
