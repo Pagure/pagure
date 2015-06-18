@@ -81,7 +81,7 @@ def log(project, topic, msg):
                 req = requests.post(
                     url,
                     headers=headers,
-                    data={'payload': msg}
+                    data={'payload': flask.json.dumps(msg)}
                 )
                 if not req:
                     raise pagure.exceptions.PagureException(
