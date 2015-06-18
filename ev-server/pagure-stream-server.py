@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
- (c) 2014-2015 - Copyright Red Hat Inc
+ (c) 2015 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
