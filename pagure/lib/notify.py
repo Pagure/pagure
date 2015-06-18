@@ -75,13 +75,14 @@ def log(project, topic, msg):
             'X-Pagure-Topic': topic,
             'X-Pagure-Signature': hashhex
         }
+        msg = flask.json.dumps(msg)
         for url in project.settings.get('Web-hooks').split('\n'):
             url = url.strip()
             try:
                 req = requests.post(
                     url,
                     headers=headers,
-                    data={'payload': flask.json.dumps(msg)}
+                    data={'payload': msg}
                 )
                 if not req:
                     raise pagure.exceptions.PagureException(
