@@ -10,7 +10,6 @@
 
 import datetime
 import textwrap
-import urlparse
 
 import arrow
 import flask

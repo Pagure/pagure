@@ -18,6 +18,7 @@ import markdown
 import os
 import shutil
 import tempfile
+import urlparse
 import uuid
 
 import bleach
