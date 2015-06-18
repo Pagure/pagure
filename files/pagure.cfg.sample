@@ -124,7 +124,7 @@ IP_ALLOWED_INTERNAL = ['127.0.0.1', 'localhost', '::1']
 # By default it is off, ie: EVENTSOURCE_SOURCE is None, to turn it on, specify
 # here what the URL of the eventsource server is, for example:
 # https://ev.pagure.io or https://pagure.io:8080 or whatever you are using
-# (Note: the urls send to it start with a '/' so no need to add one yourself)
+# (Note: the urls sent to it start with a '/' so no need to add one yourself)
 EVENTSOURCE_SOURCE = None
 REDIS_HOST = '0.0.0.0'
 REDIS_PORT = 6379
