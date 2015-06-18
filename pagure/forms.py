@@ -310,6 +310,8 @@ class EditFileForm(wtf.Form):
         'Email', [wtforms.validators.Required()],
         choices=[(item, item) for item in []]
     )
+    branch = wtforms.TextField(
+        'Branch', [wtforms.validators.Required()])
 
     def __init__(self, *args, **kwargs):
         """ Calls the default constructor with the normal argument but
