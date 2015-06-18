@@ -324,7 +324,7 @@ def no_js(content):
         content,
         tags=bleach.ALLOWED_TAGS + [
             'p', 'br', 'div', 'h1', 'h2', 'h3', 'table', 'td', 'tr', 'th',
-            'col', 'tbody', 'pre', 'img',
+            'col', 'tbody', 'pre', 'img', 'hr',
         ],
         attributes=attrs,
     )
