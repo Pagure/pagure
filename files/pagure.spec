@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.15
+Version:        0.1.16
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -36,6 +36,7 @@ BuildRequires:  python-straight-plugin
 BuildRequires:  python-wtforms
 BuildRequires:  python-munch
 BuildRequires:  python-enum34
+BuildRequires:  python-redis
 
 # EPEL6
 %if ( 0%{?rhel} && 0%{?rhel} == 6 )
@@ -66,6 +67,7 @@ Requires:  python-openid-teams
 Requires:  python-straight-plugin
 Requires:  python-wtforms
 Requires:  python-munch
+Requires:  python-redis
 Requires:  mod_wsgi
 
 # No dependency of the app per se, but required to make it working.
@@ -203,13 +205,20 @@ install -m 644 ev-server/pagure_ev.service \
 %{_datadir}/pagure/comment_email_milter.py*
 
 
-%files
+%files ev
 %license LICENSE
 %{_libexecdir}/pagure-ev/
 %{_unitdir}/pagure_ev.service
 
 
 %changelog
+* Thu Jun 18 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.16-1
+- Update to 0.1.16
+- Clone all the remote branches when cloning a project
+- Allow online editing to a new branch or any of the existing ones
+- Allow the <hr /> html tags in markdown
+- Add eventsource support in the ticket and pull-request pages
+
 * Tue Jun 16 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.15-1
 - Update 0.1.15
 - Use a monospace font for the commit hash
