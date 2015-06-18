@@ -287,17 +287,6 @@ def insert_div(content):
     return output
 
 
-def filter_img_src(name, value):
-    ''' Filter in img html tags images coming from a different domain. '''
-    if name in ('alt', 'height', 'width', 'class'):
-        return True
-    if name == 'src':
-        p = urlparse.urlparse(value)
-        return (not p.netloc) \
-            or p.netloc == urlparse.urlparse(APP.config['APP_URL']).netloc
-    return False
-
-
 @APP.template_filter('noJS')
 def no_js(content):
     """ Template filter replacing <script by &lt;script and </script> by

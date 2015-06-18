@@ -2245,6 +2245,7 @@ def add_token_to_user(session, project, acls, username):
 
     return 'Token created'
 
+
 def text2markdown(text):
     """ Simple text to html converter using the markdown library.
     """
@@ -2262,6 +2263,18 @@ def text2markdown(text):
         return clean_input(markdown.markdown('\n'.join(ntext)))
 
     return ''
+
+
+def filter_img_src(name, value):
+    ''' Filter in img html tags images coming from a different domain. '''
+    if name in ('alt', 'height', 'width', 'class'):
+        return True
+    if name == 'src':
+        p = urlparse.urlparse(value)
+        return (not p.netloc) \
+            or p.netloc == urlparse.urlparse(APP.config['APP_URL']).netloc
+    return False
+
 
 def clean_input(text):
     """ For a given html text, escape everything we do not want to support
