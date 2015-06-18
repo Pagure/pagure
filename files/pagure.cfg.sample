@@ -117,6 +117,16 @@ BLACKLISTED_PROJECTS = ['static', 'pv']
 ### the IP filter
 IP_ALLOWED_INTERNAL = ['127.0.0.1', 'localhost', '::1']
 
+### EventSource/Redis configuration
+# The eventsource integration is what allows pagure to refresh the content
+# on your page when someone else comments on the ticket (and this without
+# asking you to reload the page.
+# By default it is off, ie: EVENTSOURCE_SOURCE is None
+EVENTSOURCE_SOURCE = None
+REDIS_HOST = '0.0.0.0'
+REDIS_PORT = 6379
+REDIS_DB = 0
+
 
 # Authentication related configuration option
 
