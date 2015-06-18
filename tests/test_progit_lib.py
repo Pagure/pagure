@@ -253,7 +253,7 @@ class PagureLibtests(tests.Modeltests):
             private=True
         )
         self.session.commit()
-        self.assertEqual(msg, 'Edited successfully issue #2')
+        self.assertEqual(msg, 'Successfully edited issue #2')
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
