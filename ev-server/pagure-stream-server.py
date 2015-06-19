@@ -48,10 +48,13 @@ def get_obj_from_path(path):
     """ Return the Ticket or Request object based on the path provided.
     """
     username = None
-    if path.startswith('/fork'):
-        username, repo, obj, objid = path.split('/')[2:6]
-    else:
-        repo, obj, objid = path.split('/')[1:4]
+    try:
+        if path.startswith('/fork'):
+            username, repo, obj, objid = path.split('/')[2:6]
+        else:
+            repo, obj, objid = path.split('/')[1:4]
+    except:
+        raise PagureEvException("Invalid URL: %s" % path)
 
     repo = pagure.lib.get_project(pagure.SESSION, repo, user=username)
 
