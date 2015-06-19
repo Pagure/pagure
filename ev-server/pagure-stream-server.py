@@ -164,7 +164,10 @@ def main():
     try:
         loop = trollius.get_event_loop()
         coro = trollius.start_server(
-            handle_client, host=None, port=8080, loop=loop)
+            handle_client,
+            host=None,
+            port=pagure.APP.config['EVENTSOURCE_PORT'],
+            loop=loop)
         server = loop.run_until_complete(coro)
         print('Serving on {}'.format(server.sockets[0].getsockname()))
         loop.run_forever()

@@ -52,6 +52,7 @@ EVENTSOURCE_SOURCE = None
 REDIS_HOST = '0.0.0.0'
 REDIS_PORT = 6379
 REDIS_DB = 0
+EVENTSOURCE_PORT = 8080
 
 # Folder containing to the git repos
 GIT_FOLDER = os.path.join(
