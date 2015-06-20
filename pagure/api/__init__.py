@@ -362,6 +362,7 @@ def api():
 
     api_new_issue_doc = load_doc(issue.api_new_issue)
     api_view_issues_doc = load_doc(issue.api_view_issues)
+    api_issue_add_comment_doc = load_doc(issue.api_comment_issue)
 
     api_pull_request_views_doc = load_doc(fork.api_pull_request_views)
     api_pull_request_view_doc = load_doc(fork.api_pull_request_view)
@@ -383,6 +384,7 @@ def api():
             api_git_tags_doc,
             api_new_issue_doc,
             api_view_issues_doc,
+            api_issue_add_comment_doc,
             api_pull_request_views_doc,
             api_pull_request_view_doc,
             api_pull_request_merge_doc,
