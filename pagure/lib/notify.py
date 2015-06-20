@@ -206,6 +206,7 @@ def send_email(text, subject, to_mail,
         if in_reply_to:
             msg['In-Reply-To'] = '<%s>' % in_reply_to
 
+        msg['X-pagure'] = pagure.APP.config['APP_URL']
         if procject_name is not None:
             msg['X-pagure-project'] = project_name
 
