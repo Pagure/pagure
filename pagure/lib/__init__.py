@@ -2285,8 +2285,8 @@ def filter_img_src(name, value):
         return True
     if name == 'src':
         p = urlparse.urlparse(value)
-        return (not p.netloc) \
-            or p.netloc == urlparse.urlparse(APP.config['APP_URL']).netloc
+        return (not p.netloc) or p.netloc == urlparse.urlparse(
+            pagure.APP.config['APP_URL']).netloc
     return False
 
 
