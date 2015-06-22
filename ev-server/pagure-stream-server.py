@@ -123,12 +123,16 @@ def handle_client(client_reader, client_writer):
 
     url = urlparse.urlsplit(data[1])
 
+    origin = pagure.APP.config.get('APP_URL')
+    if origin.endswith('/'):
+        origin = origin[:-1]
+
     client_writer.write((
         "HTTP/1.0 200 OK\n"
         "Content-Type: text/event-stream\n"
         "Cache: nocache\n"
         "Connection: keep-alive\n"
-        "Access-Control-Allow-Origin: *\n\n"
+        "Access-Control-Allow-Origin: %s\n\n" % origin
     ).encode())
 
     try:
