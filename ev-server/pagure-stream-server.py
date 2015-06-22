@@ -123,6 +123,12 @@ def handle_client(client_reader, client_writer):
 
     url = urlparse.urlsplit(data[1])
 
+    try:
+        obj = get_obj_from_path(url.path)
+    except PagureEvException as err:
+        log.warning(err.message)
+        return
+
     origin = pagure.APP.config.get('APP_URL')
     if origin.endswith('/'):
         origin = origin[:-1]
@@ -134,12 +140,6 @@ def handle_client(client_reader, client_writer):
         "Connection: keep-alive\n"
         "Access-Control-Allow-Origin: %s\n\n" % origin
     ).encode())
-
-    try:
-        obj = get_obj_from_path(url.path)
-    except PagureEvException as err:
-        log.warning(err.message)
-        return
 
     try:
         connection = yield trollius.From(trollius_redis.Connection.create(
