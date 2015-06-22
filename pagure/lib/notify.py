@@ -158,7 +158,8 @@ def _build_url(*args):
 
 
 def send_email(text, subject, to_mail,
-               mail_id=None, in_reply_to=None):  # pragma: no cover
+               mail_id=None, in_reply_to=None,
+               project_name=None):  # pragma: no cover
     ''' Send an email with the specified information.
 
     :arg text: the content of the email to send
@@ -168,6 +169,7 @@ def send_email(text, subject, to_mail,
     :kwarg mail_id: if defined, the header `mail-id` is set with this value
     :kwarg in_reply_to: if defined, the header `In-Reply-To` is set with
         this value
+    :kwarg project_name: if defined, the name of the project
 
     '''
     if not to_mail:
@@ -184,10 +186,15 @@ def send_email(text, subject, to_mail,
         print '*****/EMAIL******'
         return
 
+    if project_name is not None:
+        subject_tag = project_name
+    else:
+        subject_tag = 'Pagure'
+
     smtp = smtplib.SMTP(pagure.APP.config['SMTP_SERVER'])
     for mailto in to_mail.split(','):
         msg = MIMEText(text.encode('utf-8'), 'plain', 'utf-8')
-        msg['Subject'] = '[Pagure] %s' % subject
+        msg['Subject'] = '[%s] %s' % (subject_tag, subject)
         from_email = pagure.APP.config.get(
             'FROM_EMAIL', 'pagure@fedoraproject.org')
         msg['From'] = from_email
@@ -198,6 +205,9 @@ def send_email(text, subject, to_mail,
 
         if in_reply_to:
             msg['In-Reply-To'] = '<%s>' % in_reply_to
+
+        if procject_name is not None:
+            msg['X-pagure-project'] = project_name
 
         # Send the message via our own SMTP server, but don't include the
         # envelope header.
@@ -249,6 +259,7 @@ To reply, visit the link below or just reply to this email
         ','.join(mail_to),
         mail_id=comment.mail_id,
         in_reply_to=comment.issue.mail_id,
+        project_name=comment.issue.project.name,
     )
 
 
@@ -280,6 +291,7 @@ To reply, visit the link below or just reply to this email
         'New issue `%s`' % issue.title,
         ','.join(mail_to),
         mail_id=issue.mail_id,
+        project_name=issue.project.name,
     )
 
 
@@ -315,6 +327,7 @@ The issue: `%s` of project: `%s` has been %s by %s.
         ','.join(mail_to),
         mail_id='%s/assigned/%s' % (issue.mail_id, uid),
         in_reply_to=issue.mail_id,
+        project_name=issue.project.name,
     )
 
 
@@ -350,6 +363,7 @@ The pull-request: `%s` of project: `%s` has been %s by %s.
         ','.join(mail_to),
         mail_id='%s/assigned/%s' % (request.mail_id, uid),
         in_reply_to=request.mail_id,
+        project_name=request.project.name,
     )
 
 
@@ -380,6 +394,7 @@ To reply, visit the link below or just reply to this email
         'Pull-Request #%s `%s`' % (request.id, request.title),
         ','.join(mail_to),
         mail_id=request.mail_id,
+        project_name=request.project.name,
     )
 
 
@@ -414,6 +429,7 @@ Merged pull-request:
         ','.join(mail_to),
         mail_id='%s/close/%s' % (request.mail_id, uid),
         in_reply_to=request.mail_id,
+        project_name=request.project.name,
     )
 
 
@@ -448,6 +464,7 @@ Cancelled pull-request:
         ','.join(mail_to),
         mail_id='%s/close/%s' % (request.mail_id, uid),
         in_reply_to=request.mail_id,
+        project_name=request.project.name,
     )
 
 
@@ -483,6 +500,7 @@ To reply, visit the link below or just reply to this email
         ','.join(mail_to),
         mail_id=comment.mail_id,
         in_reply_to=comment.pull_request.mail_id,
+        project_name=comment.pull_request.project.name,
     )
 
 
