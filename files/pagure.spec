@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.17
+Version:        0.1.18
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -212,6 +212,11 @@ install -m 644 ev-server/pagure_ev.service \
 
 
 %changelog
+* Mon Jun 22 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.18-1
+- Update to 0.1.18
+- Fix the eventsource server for CORS
+- Fix showing/checking the merge status of a PR
+
 * Mon Jun 22 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.17-1
 - Update to 0.1.17
 - Fix for missing docs of API issue add comment (Kunaal Jain)
