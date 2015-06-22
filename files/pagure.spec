@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.16
+Version:        0.1.17
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -212,6 +212,16 @@ install -m 644 ev-server/pagure_ev.service \
 
 
 %changelog
+* Mon Jun 22 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.17-1
+- Update to 0.1.17
+- Fix for missing docs of API issue add comment (Kunaal Jain)
+- Fix the systemd init file
+- Be more careful about the URL specified, it may be of the wrong format in the
+  eventsource server
+- Allow configuring the port where the event source server runs in the
+  configuration
+- Fix bug in filter_img_src introduced with its moved to the backend library
+
 * Thu Jun 18 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.16-1
 - Update to 0.1.16
 - Clone all the remote branches when cloning a project
