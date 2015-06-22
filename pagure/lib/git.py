@@ -150,7 +150,8 @@ def update_git(obj, repo, repofolder, objtype='ticket'):
 
     # Write down what changed
     with open(file_path, 'w') as stream:
-        stream.write(json.dumps(obj.to_json()))
+        stream.write(json.dumps(obj.to_json(),
+                     sort_keys=True, indent=4, separators=(',', ': ')))
 
     # Retrieve the list of files that changed
     diff = new_repo.diff()
