@@ -95,10 +95,17 @@ def get_obj_from_path(path):
 
 @trollius.coroutine
 def handle_client(client_reader, client_writer):
-    # give client a chance to respond, timeout after 10 seconds
-    data = yield trollius.From(trollius.wait_for(
-        client_reader.readline(),
-        timeout=10.0))
+    data = None
+    while True:
+        # give client a chance to respond, timeout after 10 seconds
+        line = yield trollius.From(trollius.wait_for(
+            client_reader.readline(),
+            timeout=10.0))
+        if not line.decode().strip():
+            break
+        line = line.decode().rstrip()
+        if data is None:
+            data = line
 
     if data is None:
         log.warning("Expected ticket uid, received None")
@@ -116,19 +123,23 @@ def handle_client(client_reader, client_writer):
 
     url = urlparse.urlsplit(data[1])
 
-    client_writer.write((
-        "HTTP/1.0 200 OK\n"
-        "Content-Type: text/event-stream\n"
-        "Cache: nocache\n"
-        "Connection: keep-alive\n"
-        "Access-Control-Allow-Origin: *\n\n"
-    ).encode())
-
     try:
         obj = get_obj_from_path(url.path)
     except PagureEvException as err:
         log.warning(err.message)
         return
+
+    origin = pagure.APP.config.get('APP_URL')
+    if origin.endswith('/'):
+        origin = origin[:-1]
+
+    client_writer.write((
+        "HTTP/1.0 200 OK\n"
+        "Content-Type: text/event-stream\n"
+        "Cache: nocache\n"
+        "Connection: keep-alive\n"
+        "Access-Control-Allow-Origin: %s\n\n" % origin
+    ).encode())
 
     try:
         connection = yield trollius.From(trollius_redis.Connection.create(
