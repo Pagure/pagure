@@ -40,9 +40,7 @@ import pagure
 import pagure.lib
 from pagure.exceptions import PagureEvException
 
-
-clients = {}
-
+SERVER = None
 
 def get_obj_from_path(path):
     """ Return the Ticket or Request object based on the path provided.
@@ -170,7 +168,29 @@ def handle_client(client_reader, client_writer):
         client_writer.close()
 
 
+@trollius.coroutine
+def stats(client_reader, client_writer):
+    global SERVER
+
+    try:
+        log.info('Clients: %s', SERVER.active_count)
+        client_writer.write((
+            "HTTP/1.0 200 OK\n"
+            "Cache: nocache\n\n"
+        ).encode())
+        client_writer.write(('data: %s\n\n' % SERVER.active_count).encode())
+        yield trollius.From(client_writer.drain())
+
+    except trollius.ConnectionResetError, err:
+        print err
+        pass
+    finally:
+        client_writer.close()
+    return
+
+
 def main():
+    global SERVER
 
     try:
         loop = trollius.get_event_loop()
@@ -179,8 +199,17 @@ def main():
             host=None,
             port=pagure.APP.config['EVENTSOURCE_PORT'],
             loop=loop)
-        server = loop.run_until_complete(coro)
-        print('Serving on {}'.format(server.sockets[0].getsockname()))
+        SERVER = loop.run_until_complete(coro)
+        if pagure.APP.config.get('EV_STATS_PORT'):
+            stats_coro = trollius.start_server(
+                stats,
+                host=None,
+                port=pagure.APP.config.get('EV_STATS_PORT'),
+                loop=loop)
+            stats_server = loop.run_until_complete(stats_coro)
+        print('Serving server at {}'.format(SERVER.sockets[0].getsockname()))
+        print('Serving stats  at {}'.format(
+            stats_server.sockets[0].getsockname()))
         loop.run_forever()
     except KeyboardInterrupt:
         pass
