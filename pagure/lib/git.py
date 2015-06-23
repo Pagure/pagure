@@ -990,6 +990,8 @@ def merge_pull_request(
         requestfolder=request_folder,
     )
     try:
+        # Reset the merge_status of all opened PR to refresh their cache
+        pagure.lib.reset_status_pull_request(session, request.project)
         session.commit()
     except SQLAlchemyError as err:  # pragma: no cover
         session.rollback()
