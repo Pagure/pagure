@@ -464,8 +464,29 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1 @@
-+{"status": "Open", "blocks": [], "tags": [], "title": "Test issue", "private": false, "content": "We should work on this", "assignee": null, "depends": [], "user": {"fullname": "PY C", "default_email": "bar@pingou.com", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "comments": []}
+@@ -0,0 +1,22 @@
++{
++    "assignee": null,
++    "blocks": [],
++    "comments": [],
++    "content": "We should work on this",
++    "date_created": null,
++    "depends": [],
++    "id": 1,
++    "private": false,
++    "status": "Open",
++    "tags": [],
++    "title": "Test issue",
++    "user": {
++        "default_email": "bar@pingou.com",
++        "emails": [
++            "bar@pingou.com",
++            "foo@pingou.com"
++        ],
++        "fullname": "PY C",
++        "name": "pingou"
++    }
++}
 \ No newline at end of file
 
 """
@@ -485,9 +506,8 @@ index 0000000..60f7480
                 row[3] = '<hash>:'
                 row = ' '.join(row)
             elif 'date_created' in row:
-                data = json.loads(row[1:])
-                data['date_created'] = None
-                row = '+' + json.dumps(data)
+                t = row.split(': ')[0]
+                row = '%s: null,' % t
             elif row.startswith('index 00'):
                 row = 'index 0000000..60f7480'
             elif row.startswith('+++ b/'):
@@ -523,11 +543,30 @@ diff --git a/123 b/456
 index 458821a..77674a8
 --- a/123
 +++ b/456
-@@ -1 +1 @@
--{"status": "Open", "blocks": [], "tags": [], "title": "Test issue", "private": false, "content": "We should work on this", "assignee": null, "depends": [], "user": {"fullname": "PY C", "default_email": "bar@pingou.com", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "comments": []}
-\ No newline at end of file
-+{"status": "Open", "blocks": [], "tags": [], "title": "Test issue", "private": false, "content": "We should work on this", "assignee": null, "depends": [], "user": {"fullname": "PY C", "default_email": "bar@pingou.com", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "comments": [{"comment": "Hey look a comment!", "date_created": null, "id": 1, "parent": null, "user": {"fullname": "foo bar", "default_email": "foo@bar.com", "name": "foo", "emails": ["foo@bar.com"]}}]}
-\ No newline at end of file
+@@ -1,7 +1,22 @@
+ {
+     "assignee": null,
+     "blocks": [],
+-    "comments": [],
++    "comments": [
++        {
++            "comment": "Hey look a comment!",
++            "date_created": null,
++            "id": 1,
++            "parent": null,
++            "user": {
++                "default_email": "foo@bar.com",
++                "emails": [
++                    "foo@bar.com"
++                ],
++                "fullname": "foo bar",
++                "name": "foo"
++            }
++        }
++    ],
+     "content": "We should work on this",
+     "date_created": null,
+     "depends": [],
 
 """
         npatch = []
@@ -546,14 +585,8 @@ index 458821a..77674a8
                 row[3] = '<hash>:'
                 row = ' '.join(row)
             elif 'date_created' in row:
-                data = json.loads(row[1:])
-                data['date_created'] = None
-                comments = []
-                for comment in data['comments']:
-                    comment['date_created'] = None
-                    comments.append(comment)
-                data['comments'] = comments
-                row = row[0] + json.dumps(data)
+                t = row.split(': ')[0]
+                row = '%s: null,' % t
             elif row.startswith('index'):
                 row = 'index 458821a..77674a8'
             elif row.startswith('--- a/'):
@@ -656,8 +689,80 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1 @@
-+{"status": "Open", "branch_from": "feature", "uid": "foobar", "commit_stop": null, "title": "test PR", "comments": [], "closed_by": null, "project": {"description": "test project for ticket", "parent": null, "settings": {"Minimum_score_to_merge_pull-request": -1, "Web-hooks": null, "project_documentation": true, "pull_requests": true, "Enforce_signed-off_commits_in_pull-request": false, "Only_assignee_can_merge_pull-request": false, "issue_tracker": true}, "user": {"fullname": "PY C", "default_email": "bar@pingou.com", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "name": "test_ticket_repo"}, "assignee": null, "repo_from": {"description": "test project for ticket", "parent": null, "settings": {"Minimum_score_to_merge_pull-request": -1, "Web-hooks": null, "project_documentation": true, "pull_requests": true, "Enforce_signed-off_commits_in_pull-request": false, "Only_assignee_can_merge_pull-request": false, "issue_tracker": true}, "user": {"fullname": "PY C", "default_email": "bar@pingou.com", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "date_created": null, "id": 1, "name": "test_ticket_repo"}, "user": {"fullname": "PY C", "default_email": "bar@pingou.com", "name": "pingou", "emails": ["bar@pingou.com", "foo@pingou.com"]}, "branch": "master", "date_created": null, "commit_start": null, "id": 1}
+@@ -0,0 +1,73 @@
++{
++    "assignee": null,
++    "branch": "master",
++    "branch_from": "feature",
++    "closed_by": null,
++    "comments": [],
++    "commit_start": null,
++    "commit_stop": null,
++    "date_created": null,
++    "id": 1,
++    "project": {
++        "date_created": null,
++        "description": "test project for ticket",
++        "id": 1,
++        "name": "test_ticket_repo",
++        "parent": null,
++        "settings": {
++            "Enforce_signed-off_commits_in_pull-request": false,
++            "Minimum_score_to_merge_pull-request": -1,
++            "Only_assignee_can_merge_pull-request": false,
++            "Web-hooks": null,
++            "issue_tracker": true,
++            "project_documentation": true,
++            "pull_requests": true
++        },
++        "user": {
++            "default_email": "bar@pingou.com",
++            "emails": [
++                "bar@pingou.com",
++                "foo@pingou.com"
++            ],
++            "fullname": "PY C",
++            "name": "pingou"
++        }
++    },
++    "repo_from": {
++        "date_created": null,
++        "description": "test project for ticket",
++        "id": 1,
++        "name": "test_ticket_repo",
++        "parent": null,
++        "settings": {
++            "Enforce_signed-off_commits_in_pull-request": false,
++            "Minimum_score_to_merge_pull-request": -1,
++            "Only_assignee_can_merge_pull-request": false,
++            "Web-hooks": null,
++            "issue_tracker": true,
++            "project_documentation": true,
++            "pull_requests": true
++        },
++        "user": {
++            "default_email": "bar@pingou.com",
++            "emails": [
++                "bar@pingou.com",
++                "foo@pingou.com"
++            ],
++            "fullname": "PY C",
++            "name": "pingou"
++        }
++    },
++    "status": "Open",
++    "title": "test PR",
++    "uid": "foobar",
++    "user": {
++        "default_email": "bar@pingou.com",
++        "emails": [
++            "bar@pingou.com",
++            "foo@pingou.com"
++        ],
++        "fullname": "PY C",
++        "name": "pingou"
++    }
++}
 \ No newline at end of file
 
 """
@@ -677,11 +782,8 @@ index 0000000..60f7480
                 row[3] = '<hash>:'
                 row = ' '.join(row)
             elif 'date_created' in row:
-                data = json.loads(row[1:])
-                data['project']['date_created'] = None
-                data['repo_from']['date_created'] = None
-                data['date_created'] = None
-                row = '+' + json.dumps(data)
+                t = row.split(': ')[0]
+                row = '%s: null,' % t
             elif row.startswith('index 00'):
                 row = 'index 0000000..60f7480'
             elif row.startswith('+++ b/'):
