@@ -401,7 +401,6 @@ pagure.pfmarkdown.inject()
 # Import the application
 import pagure.ui.app
 import pagure.ui.admin
-import pagure.ui.docs
 import pagure.ui.fork
 import pagure.ui.groups
 import pagure.ui.issues
