@@ -94,8 +94,129 @@ def __get_tree_and_content(repo_obj, commit, path):
     return (tree, content, safe, extended)
 
 
-# URLs
+# Jinja filter required
 
+@APP.template_filter('markdown')
+def markdown_filter(text):
+    """ Template filter converting a string into html content using the
+    markdown library.
+    """
+    return pagure.lib.text2markdown(text, extended=False)
+
+
+# Placeholder to allow re-using pagure's templates
+@APP.route('/')
+def index():
+    return flask.redirect(APP.config['APP_URL'])
+
+
+@APP.route('/users/')
+def view_users():
+    root_url = APP.config['APP_URL']
+    if root_url.endswith('/'):
+        root_url = root_url[:-1]
+    return flask.redirect(root_url + '/users/')
+
+
+@APP.route('/groups/')
+def group_lists():
+    root_url = APP.config['APP_URL']
+    if root_url.endswith('/'):
+        root_url = root_url[:-1]
+    return flask.redirect(root_url + '/groups/')
+
+
+@APP.route('/new/')
+def new_project():
+    root_url = APP.config['APP_URL']
+    if root_url.endswith('/'):
+        root_url = root_url[:-1]
+    return flask.redirect(root_url + '/new/')
+
+
+@APP.route('/repo/<repo>/')
+@APP.route('/repo/fork/<username>/<repo>/')
+def view_repo(repo, username=None):
+    root_url = APP.config['APP_URL']
+    if root_url.endswith('/'):
+        root_url = root_url[:-1]
+    return flask.redirect(
+        root_url + flask.url_for('.view_docs', repo=repo, username=username))
+
+
+@APP.route('/<repo>/issues/')
+@APP.route('/fork/<username>/<repo>/issues/')
+def view_issues(repo, username=None):
+    root_url = APP.config['APP_URL']
+    if root_url.endswith('/'):
+        root_url = root_url[:-1]
+    return flask.redirect(
+        root_url
+        + flask.url_for('.view_docs', repo=repo, username=username)
+        + 'issues/')
+
+
+@APP.route('/<repo>/commits/')
+@APP.route('/fork/<username>/<repo>/commits/')
+def view_commits(repo, username=None):
+    root_url = APP.config['APP_URL']
+    if root_url.endswith('/'):
+        root_url = root_url[:-1]
+    return flask.redirect(
+        root_url
+        + flask.url_for('.view_docs', repo=repo, username=username)
+        + 'commits/')
+
+
+@APP.route('/<repo>/tree/')
+@APP.route('/fork/<username>/<repo>/tree/')
+def view_tree(repo, username=None):
+    root_url = APP.config['APP_URL']
+    if root_url.endswith('/'):
+        root_url = root_url[:-1]
+    return flask.redirect(
+        root_url
+        + flask.url_for('.view_docs', repo=repo, username=username)
+        + 'tree/')
+
+
+@APP.route('/<repo>/tags/')
+@APP.route('/fork/<username>/<repo>/tags/')
+def view_tags(repo, username=None):
+    root_url = APP.config['APP_URL']
+    if root_url.endswith('/'):
+        root_url = root_url[:-1]
+    return flask.redirect(
+        root_url
+        + flask.url_for('.view_docs', repo=repo, username=username)
+        + 'tags/')
+
+
+@APP.route('/<repo>/pull-requests/')
+@APP.route('/fork/<username>/<repo>/pull-requests/')
+def request_pulls(repo, username=None):
+    root_url = APP.config['APP_URL']
+    if root_url.endswith('/'):
+        root_url = root_url[:-1]
+    return flask.redirect(
+        root_url
+        + flask.url_for('.view_docs', repo=repo, username=username)
+        + 'pull-requests/')
+
+
+@APP.route('/<repo>/forks/')
+@APP.route('/fork/<username>/<repo>/forks/')
+def view_forks(repo, username=None):
+    root_url = APP.config['APP_URL']
+    if root_url.endswith('/'):
+        root_url = root_url[:-1]
+    return flask.redirect(
+        root_url
+        + flask.url_for('.view_docs', repo=repo, username=username)
+        + 'forks/')
+
+
+# The actual logic of the doc server
 
 @APP.route('/<repo>/')
 @APP.route('/<repo>')
