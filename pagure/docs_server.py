@@ -153,7 +153,7 @@ def view_issues(repo, username=None):
     return flask.redirect(
         root_url
         + flask.url_for('.view_docs', repo=repo, username=username)
-        + 'issues/')
+        + '/issues/')
 
 
 @APP.route('/<repo>/commits/')
@@ -165,7 +165,7 @@ def view_commits(repo, username=None):
     return flask.redirect(
         root_url
         + flask.url_for('.view_docs', repo=repo, username=username)
-        + 'commits/')
+        + '/commits/')
 
 
 @APP.route('/<repo>/tree/')
@@ -177,7 +177,7 @@ def view_tree(repo, username=None):
     return flask.redirect(
         root_url
         + flask.url_for('.view_docs', repo=repo, username=username)
-        + 'tree/')
+        + '/tree/')
 
 
 @APP.route('/<repo>/tags/')
@@ -189,7 +189,7 @@ def view_tags(repo, username=None):
     return flask.redirect(
         root_url
         + flask.url_for('.view_docs', repo=repo, username=username)
-        + 'tags/')
+        + '/tags/')
 
 
 @APP.route('/<repo>/pull-requests/')
@@ -201,7 +201,7 @@ def request_pulls(repo, username=None):
     return flask.redirect(
         root_url
         + flask.url_for('.view_docs', repo=repo, username=username)
-        + 'pull-requests/')
+        + '/pull-requests/')
 
 
 @APP.route('/<repo>/forks/')
@@ -213,7 +213,7 @@ def view_forks(repo, username=None):
     return flask.redirect(
         root_url
         + flask.url_for('.view_docs', repo=repo, username=username)
-        + 'forks/')
+        + '/forks/')
 
 
 # The actual logic of the doc server
