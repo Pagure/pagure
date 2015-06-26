@@ -200,6 +200,7 @@ def main():
             port=pagure.APP.config['EVENTSOURCE_PORT'],
             loop=loop)
         SERVER = loop.run_until_complete(coro)
+        log.info('Serving server at {}'.format(SERVER.sockets[0].getsockname()))
         if pagure.APP.config.get('EV_STATS_PORT'):
             stats_coro = trollius.start_server(
                 stats,
@@ -207,9 +208,8 @@ def main():
                 port=pagure.APP.config.get('EV_STATS_PORT'),
                 loop=loop)
             stats_server = loop.run_until_complete(stats_coro)
-        log.info('Serving server at {}'.format(SERVER.sockets[0].getsockname()))
-        log.info('Serving stats  at {}'.format(
-            stats_server.sockets[0].getsockname()))
+            log.info('Serving stats  at {}'.format(
+                stats_server.sockets[0].getsockname()))
         loop.run_forever()
     except KeyboardInterrupt:
         pass
