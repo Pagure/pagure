@@ -38,6 +38,7 @@ import pagure.exceptions
 import pagure.lib.git
 import pagure.lib.login
 import pagure.lib.notify
+import pagure.pfmarkdown
 from pagure.lib import model
 
 # pylint: disable=R0913
@@ -2272,9 +2273,13 @@ def add_token_to_user(session, project, acls, username):
     return 'Token created'
 
 
-def text2markdown(text):
+def text2markdown(text, extended=True):
     """ Simple text to html converter using the markdown library.
     """
+    if extended:
+        # Install our markdown modifications
+        pagure.pfmarkdown.inject()
+
     if text:
         # Hack to allow blockquotes to be marked by ~~~
         ntext = []
