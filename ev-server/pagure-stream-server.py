@@ -182,7 +182,7 @@ def stats(client_reader, client_writer):
         yield trollius.From(client_writer.drain())
 
     except trollius.ConnectionResetError, err:
-        print err
+        log.info(err)
         pass
     finally:
         client_writer.close()
@@ -207,8 +207,8 @@ def main():
                 port=pagure.APP.config.get('EV_STATS_PORT'),
                 loop=loop)
             stats_server = loop.run_until_complete(stats_coro)
-        print('Serving server at {}'.format(SERVER.sockets[0].getsockname()))
-        print('Serving stats  at {}'.format(
+        log.info('Serving server at {}'.format(SERVER.sockets[0].getsockname()))
+        log.info('Serving stats  at {}'.format(
             stats_server.sockets[0].getsockname()))
         loop.run_forever()
     except KeyboardInterrupt:
