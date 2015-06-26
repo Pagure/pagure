@@ -163,4 +163,5 @@ def view_docs(repo, username=None, branchname=None, filename=None):
         tree=tree,
         content=content,
         safe=safe,
+        nologin=True,
     )

@@ -49,6 +49,7 @@
           </ul>
         </div><!-- end mainNav -->
 
+        {% if not nologin %}
         <span id="loginInfo">
           {% if g.fas_user %}
             <span class="text">logged in as </span>
@@ -59,6 +60,7 @@
         <a href="{{ url_for('auth_login') }}?next={{request.url}}">login</a>
           {% endif %}
         </span>
+        {% endif %}
 
         <div id="content">
 
