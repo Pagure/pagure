@@ -133,7 +133,10 @@ REDIS_DB = 0
 # as the one specified in EVENTSOURCE_SOURCE or a different one if you
 # have something running in front of the server such as apache or stunnel).
 EVENTSOURCE_PORT = 8080
-
+# If this port is specified, the event source server will run another server
+# at this port and will provide information about the number of active
+# connections running on the first (main) event source server
+#EV_STATS_PORT = 8888
 
 # Authentication related configuration option
 
