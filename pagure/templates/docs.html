@@ -54,15 +54,15 @@
       <ul>
       {% for entry in tree %}
       <li class="{% if entry.filemode == 16384 %}folder{% else %}file{% endif %}">
-        {% if entry.filemode == 16384 %}
+        {% if entry.filemode == 16384 -%}
         <a href="{{ url_for('view_docs', username=username,
                   repo=repo.name, branchname=branchname,
                   filename=filename.rsplit('/', 1)[0] + '/' + entry.name if filename and '/' in filename else entry.name) }}">
-        {% else %}
+        {%- else -%}
         <a href="{{ url_for('view_docs', username=username,
                   repo=repo.name, branchname=branchname,
                   filename=filename.rsplit('/', 1)[0] + '/' + entry.name if filename and '/' in filename else entry.name) }}">
-        {% endif %}
+        {%- endif -%}
          {{ entry.name }}</a>
       </li>
       {% endfor %}

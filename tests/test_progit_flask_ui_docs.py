@@ -23,6 +23,7 @@ from mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
+import pagure.docs_server
 import pagure.lib
 import tests
 
@@ -34,12 +35,22 @@ class PagureFlaskDocstests(tests.Modeltests):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskDocstests, self).setUp()
 
+        pagure.docs_server.APP.config['TESTING'] = True
+        pagure.docs_server.SESSION = self.session
+
         pagure.APP.config['TESTING'] = True
         pagure.SESSION = self.session
         pagure.ui.SESSION = self.session
         pagure.ui.app.SESSION = self.session
-        pagure.ui.docs.SESSION = self.session
         pagure.ui.repo.SESSION = self.session
+
+        pagure.docs_server.APP.config['GIT_FOLDER'] = tests.HERE
+        pagure.docs_server.APP.config['FORK_FOLDER'] = os.path.join(
+            tests.HERE, 'forks')
+        pagure.docs_server.APP.config['TICKETS_FOLDER'] = os.path.join(
+            tests.HERE, 'tickets')
+        pagure.docs_server.APP.config['DOCS_FOLDER'] = os.path.join(
+            tests.HERE, 'docs')
 
         pagure.APP.config['GIT_FOLDER'] = tests.HERE
         pagure.APP.config['FORK_FOLDER'] = os.path.join(
@@ -48,7 +59,7 @@ class PagureFlaskDocstests(tests.Modeltests):
             tests.HERE, 'tickets')
         pagure.APP.config['DOCS_FOLDER'] = os.path.join(
             tests.HERE, 'docs')
-        self.app = pagure.APP.test_client()
+        self.app = pagure.docs_server.APP.test_client()
 
     def test_view_docs_no_project(self):
         """ Test the view_docs endpoint with no project. """
@@ -65,8 +76,12 @@ class PagureFlaskDocstests(tests.Modeltests):
         output = self.app.get('/test/docs', follow_redirects=True)
         self.assertEqual(output.status_code, 404)
         self.assertTrue(
-            '<li class="error">No docs repository could be found, please '
-            'contact an admin</li>' in output.data)
+            '<p>Documentation not found</p>' in output.data)
+
+        output = self.app.get('/test', follow_redirects=True)
+        self.assertEqual(output.status_code, 404)
+        self.assertTrue(
+            '<p>Documentation not found</p>' in output.data)
 
     def test_view_docs_project_no_docs(self):
         """ Test the view_docs endpoint with a project that disabled the
@@ -149,46 +164,46 @@ class PagureFlaskDocstests(tests.Modeltests):
         self.assertTrue('<h2>Docs</h2>' in output.data)
         self.assertFalse('<p>This repo is brand new!</p>' in output.data)
         self.assertTrue(
-            '<a href="/test/docs/master/folder1">' in output.data)
+            '<a href="/test/master/folder1">' in output.data)
         self.assertTrue(
-            '<a href="/test/docs/master/sources">' in output.data)
+            '<a href="/test/master/sources">' in output.data)
 
-        output = self.app.get('/test/docs/master/sources')
+        output = self.app.get('/test/master/sources')
         self.assertEqual(output.status_code, 200)
         self.assertTrue('<h2>Docs</h2>' in output.data)
         self.assertTrue('<section class="docs_content">' in output.data)
 
-        output = self.app.get('/test/docs/master/folder1/folder2')
+        output = self.app.get('/test/master/folder1/folder2')
         self.assertEqual(output.status_code, 200)
         self.assertTrue('<h2>Docs</h2>' in output.data)
         self.assertTrue(
             '<li class="file">\n        '
-            '<a href="/test/docs/master/folder1/folder2/test_file">'
+            '<a href="/test/master/folder1/folder2/test_file">'
             in output.data)
 
-        output = self.app.get('/test/docs/master/folder1/folder2/test_file')
+        output = self.app.get('/test/master/folder1/folder2/test_file')
         self.assertEqual(output.status_code, 200)
         self.assertTrue('<h2>Docs</h2>' in output.data)
         self.assertTrue(
             '  <section class="docs_content">\n    <pre>row1\nrow2\n'
             'row3</pre>\n  </section>' in output.data)
 
-        output = self.app.get('/test/docs/master/folder1')
+        output = self.app.get('/test/master/folder1')
         self.assertEqual(output.status_code, 200)
         self.assertTrue('<h2>Docs</h2>' in output.data)
         self.assertTrue(
             '<li class="folder">\n        '
-            '<a href="/test/docs/master/folder1/folder2">'
+            '<a href="/test/master/folder1/folder2">'
             in output.data)
 
-        output = self.app.get('/test/docs/master/folder1/foo')
+        output = self.app.get('/test/master/folder1/foo')
         self.assertEqual(output.status_code, 200)
         self.assertTrue('<h2>Docs</h2>' in output.data)
         self.assertTrue(
             '<li class="error">File folder1/foo not found</li>'
             in output.data)
 
-        output = self.app.get('/test/docs/master/folder1/foo/folder2')
+        output = self.app.get('/test/master/folder1/foo/folder2')
         self.assertEqual(output.status_code, 200)
         self.assertTrue(
             '<li class="error">File folder1/foo/folder2 not found</li>'
