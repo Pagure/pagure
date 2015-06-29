@@ -24,21 +24,23 @@ def api_git_tags(repo, username=None):
     """
     Project git tags
     ----------------
-    Returns the list of tags made on the git repo of the project.
+    List the tags made on the project Git repository.
 
     ::
 
-        /api/0/<repo>/git/tags
-        /api/0/fork/<username>/<repo>/git/tags
+        GET /api/0/<repo>/git/tags
 
-    Accepts GET queries only.
+    ::
 
-    Sample response:
+        GET /api/0/fork/<username>/<repo>/git/tags
+
+    Sample response
+    ^^^^^^^^^^^^^^^
 
     ::
 
         {
-          "tags": ["2.5.4", "2.5.5"],
+          "tags": ["this-is-a-tag"]
         }
 
     """

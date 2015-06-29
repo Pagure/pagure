@@ -26,25 +26,31 @@ def api_pull_request_views(repo, username=None):
     """
     List project's Pull-Requests
     ----------------------------
-    This endpoint can be used to retrieve the pull-requests of the specified
-    project
+    Retrieve pull requests of a project.
 
     ::
 
-        /api/0/<repo>/pull-requests
+        GET /api/0/<repo>/pull-requests
 
-        /api/0/fork/<username>/<repo>/pull-requests
+    ::
 
-    Accepts GET queries only.
+        GET /api/0/fork/<username>/<repo>/pull-requests
 
-    :kwarg status: The status of the pull-requests to return, default to
-        'True' (ie: opened pull-requests)
-    :kwarg assignee: Filters the pull-requests returned by the user they
-        are assigned to
-    :kwarg author: Filters the pull-requests returned by the user that
-        opened the pull-request
+    Parameters
+    ^^^^^^^^^^
 
-    Sample response:
+    +----------------+-----------+--------------------------------------------------------------------------------+
+    | Key            | Type      | Description                                                                    |
+    +================+===========+================================================================================+
+    | ``status``     | boolean   | Filter the status of pull requests. Default: ``True`` (opened pull requests)   |
+    +----------------+-----------+--------------------------------------------------------------------------------+
+    | ``assignee``   | string    | Filter the assignee of pull requests                                           |
+    +----------------+-----------+--------------------------------------------------------------------------------+
+    | ``author``     | string    | Filter the author of pull requests                                             |
+    +----------------+-----------+--------------------------------------------------------------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
 
     ::
 
@@ -148,18 +154,18 @@ def api_pull_request_view(repo, requestid, username=None):
     """
     Pull-request information
     ------------------------
-    This endpoint can be used to retrieve information about a specific
-    pull-request
+    Retrieve information of a specific pull request.
 
     ::
 
-        /api/0/<repo>/pull-request/<request id>
+        GET /api/0/<repo>/pull-request/<request id>
 
-        /api/0/fork/<username>/<repo>/pull-request/<request id>
+    ::
 
-    Accepts GET queries only.
+        GET /api/0/fork/<username>/<repo>/pull-request/<request id>
 
-    Sample response:
+    Sample response
+    ^^^^^^^^^^^^^^^
 
     ::
 
@@ -233,17 +239,18 @@ def api_pull_request_merge(repo, requestid, username=None):
     """
     Merge a pull-request
     --------------------
-    This endpoint can be used to instruct pagure to merge a pull-request
+    Instruct Paugre to merge a pull request.
 
     ::
 
-        /api/0/<repo>/pull-request/<request id>/merge
+        POST /api/0/<repo>/pull-request/<request id>/merge
 
-        /api/0/fork/<username>/<repo>/pull-request/<request id>/merge
+    ::
 
-    Accepts POST queries only.
+        POST /api/0/fork/<username>/<repo>/pull-request/<request id>/merge
 
-    Sample response:
+    Sample response
+    ^^^^^^^^^^^^^^^
 
     ::
 
@@ -310,18 +317,18 @@ def api_pull_request_close(repo, requestid, username=None):
     """
     Close a pull-request
     --------------------
-    This endpoint can be used to instruct pagure to close a pull-request
-    without merging it
+    Instruct Pagure to close a pull request.
 
     ::
 
-        /api/0/<repo>/pull-request/<request id>/close
+        POST /api/0/<repo>/pull-request/<request id>/close
 
-        /api/0/fork/<username>/<repo>/pull-request/<request id>/close
+    ::
 
-    Accepts POST queries only.
+        POST /api/0/fork/<username>/<repo>/pull-request/<request id>/close
 
-    Sample response:
+    Sample response
+    ^^^^^^^^^^^^^^^
 
     ::
 
@@ -379,23 +386,33 @@ def api_pull_request_add_comment(repo, requestid, username=None):
     """
     Comment on a pull-request
     -------------------------
-    This endpoint can be used to comment on a pull-request
+    Add comment to a pull request.
 
     ::
 
-        /api/0/<repo>/pull-request/<request id>/comment
+        POST /api/0/<repo>/pull-request/<request id>/comment
 
-        /api/0/fork/<username>/<repo>/pull-request/<request id>/comment
+    ::
 
-    Accepts POST queries only.
+        POST /api/0/fork/<username>/<repo>/pull-request/<request id>/comment
 
-    :arg comment: The comment to add to the pull-request
-    :kwarg commit: The hash of the commit you wish to comment on
-    :kwarg filename: The name of the file you wish to comment on
-    :kwarg row: Used in combination with filename to comment on a specific
-        row of a file of the pull-request
+    Input
+    ^^^^^
 
-    Sample response:
+    +----------------+----------+----------------------------------------------------------------------------+
+    | Key            | Type     | Description                                                                |
+    +================+==========+============================================================================+
+    | ``comment``    | string   | **Required**. The comment to add to the pull request                       |
+    +----------------+----------+----------------------------------------------------------------------------+
+    | ``commit``     | string   | The hash of the specific commit you wish to comment on                     |
+    +----------------+----------+----------------------------------------------------------------------------+
+    | ``filename``   | string   | The filename of the specific file you wish to comment on                   |
+    +----------------+----------+----------------------------------------------------------------------------+
+    | ``row``        | int      | Used in combination with filename to comment on a specific row of a file   |
+    +----------------+----------+----------------------------------------------------------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
 
     ::
 
@@ -468,41 +485,48 @@ def api_pull_request_add_flag(repo, requestid, username=None):
     """
     Flag a pull-request
     -------------------
-    This endpoint can be used to add or edit flags on a pull-request
+    Add or edit flags on a pull-request.
 
     ::
 
-        /api/0/<repo>/pull-request/<request id>/flag
+        POST /api/0/<repo>/pull-request/<request id>/flag
 
-        /api/0/fork/<username>/<repo>/pull-request/<request id>/flag
+    ::
 
-    Accepts POST queries only.
+        POST /api/0/fork/<username>/<repo>/pull-request/<request id>/flag
 
-    :arg username: The name of the application as it should be presented to
-        the user on the pull-request page (for example: jenkins, travis-ci,
-        pep8bot...)
-    :arg percent: A percentage of completion compared to the goal, it can
-        be a percentage of coverage, a 0 vs 100 for fail vs pass.
-        The percentage also determine the background color of the flag on
-        the pull-request page.
-    :arg comment: Small information message summarizing the results presented
-        here.
-    :arg url: An URL to the link the flag to. This can be the URL of a
-        specific build or test, or the URL of the application itself, but
-        there must be one.
-    :kwarg uid: An unique identifier used to identify a flag on a pull-request
-        if you do not provide it, one will be automatically generated.
-        If you do provide it, sending a second request with the same UID will
-        update the flag instead of adding a new one.
-        Maximum length: ``32`` characters.
-    :kwarg commit: The hash of the commit you use
+    Input
+    ^^^^^
 
-    Sample response:
+    +----------------+----------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+    | Key            | Type     | Description                                                                                                                                                                                                                                              |
+    +================+==========+==========================================================================================================================================================================================================================================================+
+    | ``username``   | string   | **Required**. The name of the application to be presented to users on the pull request page                                                                                                                                                              |
+    +----------------+----------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+    | ``percent``    | int      | **Required**. A percentage of completion compared to the goal. The percentage also determine the background color of the flag on the pull-request page                                                                                                   |
+    +----------------+----------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+    | ``comment``    | string   | **Required**. A short message summarizing the presented results                                                                                                                                                                                          |
+    +----------------+----------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+    | ``url``        | string   | **Required**. A URL to the result of this flag                                                                                                                                                                                                           |
+    +----------------+----------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+    | ``uid``        | string   | A unique identifier used to identify a flag on a pull-request. If the provided UID matches an existing one, then the API call will update the existing one rather than create a new one. Maximum Length: 32 characters. Default: an auto generated UID   |
+    +----------------+----------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+    | ``commit``     | string   | The hash of the commit you use                                                                                                                                                                                                                           |
+    +----------------+----------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
 
     ::
 
         {
           "message": "Flag added"
+        }
+
+    ::
+
+        {
+          "message": "Flag updated"
         }
 
     """

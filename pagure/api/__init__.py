@@ -178,15 +178,14 @@ def api_version():
     '''
     API Version
     -----------
-    Display the most recent api version.
+    Get the current API version.
 
     ::
 
-        /api/0/version
+        GET /api/0/version
 
-    Accepts GET queries only.
-
-    Sample response:
+    Sample response
+    ^^^^^^^^^^^^^^^
 
     ::
 
@@ -204,16 +203,23 @@ def api_users():
     '''
     List users
     -----------
-    Returns the list of all users that have logged into this pagure instances.
-    This can then be used as input for autocompletion in some forms/fields.
+    Retrieve users that have logged into the Paugre instance.
 
     ::
 
-        /api/0/users
+        GET /api/0/users
 
-    Accepts GET queries only.
+    Parameters
+    ^^^^^^^^^^
 
-    Sample response:
+    +---------------+----------+-------------------------------------------------+
+    | Key           | Type     | Description                                     |
+    +===============+==========+=================================================+
+    | ``pattern``   | string   | Filters the starting letters of the usernames   |
+    +---------------+----------+-------------------------------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
 
     ::
 
@@ -245,18 +251,27 @@ def api_project_tags(repo, username=None):
     '''
     List all the tags of a project
     ------------------------------
-    Returns the list of all tags assigned to the tickets of the specified
-    project.
+    List the tags made on the project's issues.
 
     ::
 
-        /api/0/<repo>/tags
+        GET /api/0/<repo>/tags
 
-        /api/0/fork/<username>/<repo>/tags
+    ::
 
-    Accepts GET queries only.
+        GET /api/0/fork/<username>/<repo>/tags
 
-    Sample response:
+    Parameters
+    ^^^^^^^^^^
+
+    +---------------+----------+--------------------------------------------+
+    | Key           | Type     | Description                                |
+    +===============+==========+============================================+
+    | ``pattern``   | string   | Filters the starting letters of the tags   |
+    +---------------+----------+--------------------------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
 
     ::
 
@@ -293,16 +308,23 @@ def api_groups():
     '''
     List groups
     -----------
-    Returns the list of all groups present on this pagure instance
-    This can then be used as input for autocompletion in some forms/fields.
+    Retrieve groups on this Pagure instance.
 
     ::
 
-        /api/0/groups
+        GET /api/0/groups
 
-    Accepts GET queries only.
+    Parameters
+    ^^^^^^^^^^
 
-    Sample response:
+    +---------------+----------+---------------------------------------------------+
+    | Key           | Type     | Description                                       |
+    +===============+==========+===================================================+
+    | ``pattern``   | string   | Filters the starting letters of the group names   |
+    +---------------+----------+---------------------------------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
 
     ::
 
@@ -332,15 +354,14 @@ def api_error_codes():
     '''
     Error codes
     ------------
-    Returns the dictionary (hash) of all the error codes present in the API
+    Get a dictionary (hash) of all error codes.
 
     ::
 
-        /api/0/error_codes
+        GET /api/0/error_codes
 
-    Accepts GET queries only.
-
-    Sample response:
+    Sample response
+    ^^^^^^^^^^^^^^^
 
     ::
 

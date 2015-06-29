@@ -29,22 +29,31 @@ def api_new_issue(repo, username=None):
     """
     Create a new issue
     ------------------
-    This endpoint can be used to open an issue on a project
+    Open a new issue on a project.
 
     ::
 
-        /api/0/<repo>/new_issue
+        POST /api/0/<repo>/new_issue
 
-        /api/0/fork/<username>/<repo>/new_issue
+    ::
 
-    Accepts POST queries only.
+        POST /api/0/fork/<username>/<repo>/new_issue
 
-    :arg title: The title of the issue/ticket to create
-    :arg issue_content: The content of the issue to create (ie the description of
-        the problem)
-    :arg private: A boolean specifying whether this issue is private or not
+    Input
+    ^^^^^
 
-    Sample response:
+    +---------------+-----------+--------------------------------------------------------------+
+    | Key           | Type      | Description                                                  |
+    +===============+===========+==============================================================+
+    | ``title``     | string    | **Required**. The title of the issue                         |
+    +---------------+-----------+--------------------------------------------------------------+
+    | ``private``   | boolean   | Include this key if you want a private issue to be created   |
+    +---------------+-----------+--------------------------------------------------------------+
+    | ``content``   | string    | **Required**. The description of the issue                   |
+    +---------------+-----------+--------------------------------------------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
 
     ::
 
@@ -131,89 +140,35 @@ def api_view_issues(repo, username=None):
     """
     List project's issues
     ---------------------
-    This endpoint can be used to retrieve the list of all issues of the
-    specified project
+    List issues of a project.
 
     ::
 
-        /api/0/<repo>/issues
-
-        /api/0/fork/<username>/<repo>/issues
-
-    Accepts GET queries only.
-
-    :kwarg status: The status of the issues to return, default to 'Open'
-    :kwarg tags: One or more tags to filter the issues returned.
-        If you want to wish to filter for issues not having a specific tag
-        you can mark the tag with an exclamation mark in front of it, for
-        example to get all the issues not tagged as ``easyfix`` you can
-        filter using the tag ``!easyfix``
-    :kwarg assignee: Filters the issues returned by the user they are
-        assigned to
-    :kwarg author: Filters the issues returned by the user that opened the
-        issue
-
-    Sample response:
+        GET /api/0/<repo>/issues
 
     ::
 
-        {
-          "args": {
-            "assignee": null,
-            "author": null,
-            "status": null,
-            "tags": []
-          },
-          "issues": [
-            {
-              "assignee": null,
-              "blocks": [],
-              "comments": [
-                {
-                  "comment": "bing",
-                  "date_created": "1427441560",
-                  "id": 379,
-                  "parent": null,
-                  "user": {
-                    "fullname": "PY.C",
-                    "name": "pingou"
-                  }
-                }
-              ],
-              "content": "bar",
-              "date_created": "1427441555",
-              "depends": [],
-              "id": 1,
-              "private": false,
-              "status": "Open",
-              "tags": [],
-              "title": "foo",
-              "user": {
-                "fullname": "PY.C",
-                "name": "pingou"
-              }
-            },
-            {
-              "assignee": null,
-              "blocks": [],
-              "comments": [],
-              "content": "report",
-              "date_created": "1427442076",
-              "depends": [],
-              "id": 2,
-              "private": false,
-              "status": "Open",
-              "tags": [],
-              "title": "bug",
-              "user": {
-                "fullname": "PY.C",
-                "name": "pingou"
-              }
-            }
-          ]
-        }
+        GET /api/0/fork/<username>/<repo>/issues
 
-        Second example:
+    Parameters
+    ^^^^^^^^^^
+
+    +----------------+----------+--------------------------------------------------------------------------------------------------------------------------------+
+    | Key            | Type     | Description                                                                                                                    |
+    +================+==========+================================================================================================================================+
+    | ``status``     | string   | Filters the status of issues. Default: ``Open``                                                                                |
+    +----------------+----------+--------------------------------------------------------------------------------------------------------------------------------+
+    | ``tags``       | string   | A list of tags you wish to filter. If you want to filter for issues not having a tag, add an exclamation mark in front of it   |
+    +----------------+----------+--------------------------------------------------------------------------------------------------------------------------------+
+    | ``assignee``   | string   | Filter the issues by assignee                                                                                                  |
+    +----------------+----------+--------------------------------------------------------------------------------------------------------------------------------+
+    | ``author``     | string   | Filter the issues by creator                                                                                                   |
+    +----------------+----------+--------------------------------------------------------------------------------------------------------------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
 
         {
           "args": {
@@ -322,30 +277,30 @@ def api_view_issue(repo, issueid, username=None):
     """
     Issue information
     -----------------
-    This endpoint can be used to retrieve information about a specific
-    issue/ticket
+    Retrieve information of a specific issue.
 
     ::
 
-        /api/0/<repo>/issue/<issue id>
+        GET /api/0/<repo>/issue/<issue id>
 
-        /api/0/fork/<username>/<repo>/issue/<issue id>
+    ::
 
-    Accepts GET queries only.
+        GET /api/0/fork/<username>/<repo>/issue/<issue id>
 
-    Sample response:
+    Sample response
+    ^^^^^^^^^^^^^^^
 
     ::
 
         {
-          "assignee": null,
+          "assignee": None,
           "blocks": [],
           "comments": [],
           "content": "This issue needs attention",
           "date_created": "1431414800",
           "depends": [],
           "id": 1,
-          "private": false,
+          "private": False,
           "status": "Open",
           "tags": [],
           "title": "test issue",
@@ -394,24 +349,32 @@ def api_change_status_issue(repo, issueid, username=None):
     """
     Change issue status
     -------------------
-    This endpoint can be used to change the status of an issue
+    Change the status of an issue.
 
     ::
 
-        /api/0/<repo>/issue/<issue id>/status
+        POST /api/0/<repo>/issue/<issue id>/status
 
-        /api/0/fork/<username>/<repo>/issue/<issue id>/status
+    ::
 
-    Accepts POST queries only.
+        POST /api/0/fork/<username>/<repo>/issue/<issue id>/status
 
-    :arg status: The new status of the specified issue
+    Input
+    ^^^^^
 
-    Sample response:
+    +--------------+----------+---------------------------------------------+
+    | Key          | Type     | Description                                 |
+    +==============+==========+=============================================+
+    | ``status``   | string   | **Required**. The new status of the issue   |
+    +--------------+----------+---------------------------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
 
     ::
 
         {
-          "message": "Edited successfully issue #1"
+          "message": "Successfully edited issue #1"
         }
 
     """
@@ -479,19 +442,27 @@ def api_comment_issue(repo, issueid, username=None):
     """
     Comment to an issue
     -------------------
-    This endpoint can be used to add a comment to an issue
+    Add a comment to an issue.
 
     ::
 
-        /api/0/<repo>/issue/<issue id>/comment
+        POST /api/0/<repo>/issue/<issue id>/comment
 
-        /api/0/fork/<username>/<repo>/issue/<issue id>/comment
+    ::
 
-    Accepts POST queries only.
+        POST /api/0/fork/<username>/<repo>/issue/<issue id>/comment
 
-    :arg comment: The comment to add to the specified issue
+    Input
+    ^^^^^
 
-    Sample response:
+    +---------------+----------+-------------------------------------------------+
+    | Key           | Type     | Description                                     |
+    +===============+==========+=================================================+
+    | ``comment``   | string   | **Required**. The comment to add to the issue   |
+    +---------------+----------+-------------------------------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
 
     ::
 

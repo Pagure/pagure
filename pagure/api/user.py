@@ -27,12 +27,14 @@ def api_view_user(username):
 
     ::
 
-        /api/0/user/<username>
-        /api/0/user/ralph
+        GET /api/0/user/<username>
 
-    Accepts GET queries only.
+    ::
 
-    Sample response:
+        GET /api/0/user/ralph
+
+    Sample response
+    ^^^^^^^^^^^^^^^
 
     ::
 
