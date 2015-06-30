@@ -251,7 +251,7 @@ header h1 span {
     margin: 0;
 }
 
-.inline h2, .inline a, .inline li{
+.inline h2, .inline a, .inline li, .inline_it{
     display: inline-block;
 }
 

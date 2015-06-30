@@ -132,6 +132,7 @@ def view_repo(repo, username=None):
         tree=tree,
         diff_commits=diff_commits,
         repo_admin=is_repo_admin(repo),
+        form=pagure.forms.ConfirmationForm(),
     )
 
 
@@ -206,6 +207,7 @@ def view_repo_branch(repo, branchname, username=None):
         tree=sorted(last_commits[0].tree, key=lambda x: x.filemode),
         diff_commits=diff_commits,
         repo_admin=is_repo_admin(repo),
+        form=pagure.forms.ConfirmationForm(),
     )
 
 
@@ -306,6 +308,7 @@ def view_commits(repo, branchname=None, username=None):
         page=page,
         total_page=total_page,
         repo_admin=is_repo_admin(repo),
+        form=pagure.forms.ConfirmationForm(),
     )
 
 

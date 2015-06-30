@@ -3,6 +3,10 @@
 {% block title %}{{ select.capitalize() }} - {{ repo.name }}{% endblock %}
 {%block tag %}home{% endblock %}
 
+{% block header %}
+<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css"
+  rel="stylesheet">
+{% endblock %}
 
 {% block repo %}
 
@@ -127,13 +131,26 @@
     <h3>Last {{ last_commits | length }} commits</h3>
     {% endif %}
     {% if diff_commits and authenticated %}
-    <span id="request_pull">
+    <span id="request_pull" class="inline_it">
         <a href="{{ url_for('new_request_pull',
             username=username, repo=repo.name,
             branch_to='master', branch_from=branchname or 'master') }}">
           {% if repo_admin %}Request pull{% else %}Compare{% endif %}
         </a>
     </span>
+    {% endif %}
+    {% if repo_admin and branchname != 'master' %}
+    <form action="{{
+        url_for('.delete_branch',
+                username=username, repo=repo.name, branchname=branchname)
+        }}" method="post" class="inline_it icon del_icon">
+        {{ form.csrf_token }}
+        <button
+          onclick="return confirm('You sure you want to remove this branch?\nThis cannot be un-done!');"
+          title="Remove branch {{ branchname }}">
+          <span class="icon icon-trash blue"> Delete branch</span>
+        </button>
+    </form>
     {% endif %}
     <ul>
       {% for commit in last_commits %}
