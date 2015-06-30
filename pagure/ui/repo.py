@@ -1307,3 +1307,40 @@ def edit_file(repo, branchname, filename, username=None):
         user=user,
         branches=repo_obj.listall_branches(),
     )
+
+
+@APP.route('/<repo>/<path:branchname>/delete', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/<path:branchname>/delete', methods=['POST'])
+@cla_required
+def delete_branch(repo, branchname, username=None):
+    """ Delete the branch of a project.
+    """
+    repo_obj = pagure.lib.get_project(SESSION, repo, user=username)
+
+    if not repo_obj:
+        flask.abort(404, 'Project not found')
+
+    if not is_repo_admin(repo_obj):
+        flask.abort(
+            403,
+            'You are not allowed to change the settings for this project')
+
+    if branchname == 'master':
+        flask.abort(403, 'You are not allowed to delete the master branch')
+
+    reponame = pagure.get_repo_path(repo_obj)
+    repo_git = pygit2.Repository(reponame)
+
+    if branchname not in repo_git.listall_branches():
+        flask.abort(404, 'Branch no found')
+
+    try:
+        branch = repo_git.lookup_branch(branchname)
+        branch.delete()
+        flask.flash('Branch `%s` deleted' % branchname)
+    except pygit2.GitError, err:
+        APP.logger.exception(err)
+        flask.flash('Could not delete `%s`' % branchname, 'error')
+
+    return flask.redirect(
+        flask.url_for('view_repo', repo=repo, username=username))
