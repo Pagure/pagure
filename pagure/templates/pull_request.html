@@ -511,7 +511,7 @@
 
  });
 
-{% if authenticated %}
+{% if authenticated and pull_request %}
 function try_async_comment(form, inline) {
   $.post( form.action + "?js=1", $(form).serialize() )
     .done(function(data) {
@@ -539,7 +539,7 @@ function try_async_comment(form, inline) {
 </script>
 
 
-{% if config['EVENTSOURCE_SOURCE'] %}
+{% if config['EVENTSOURCE_SOURCE'] and pull_request %}
 <script type="text/javascript"
   src="{{ url_for('static', filename='request_ev.js') }}"></script>
 
