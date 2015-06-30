@@ -2,7 +2,7 @@ clean_entry= function(text, element) {
   var _out = []
   var _data = $.trim(text).split(',');
   var y=0;
-  for (var j=0; i<_data.length; i++){
+  for (var j=0; j<_data.length; j++){
     if ($.trim(_data[j]) == element) {
       continue;
     }
@@ -16,21 +16,26 @@ add_tags = function(data, _issues_url) {
   console.log('adding ' + data.added_tags);
   var field = $('#taglist');
   var field2 = $('#tag');
-  var _data = field.html();
-  var _curval = field2.val();
+  var _curval = field2.val().split(',');
+  var _values = $.unique($.merge(data.added_tags, _curval));
+  var _data = '';
+  var _out = '';
 
-  for (i=0; i<data.added_tags.length; i++ ){
-    tag = data.added_tags[i]
-    _data += ',' + _issues_url + '?tags=' + tag + '">' + tag + '</a>';
-
-    if (_curval) {
-      _curval += ',';
+  for (i=0; i<_values.length; i++ ){
+    tag = _values[i]
+    if (_data && _data != ',') {
+      _data += ',';
     }
-    _curval += tag;
+    _data += _issues_url + '?tags=' + tag + '">' + tag + '</a>';
+
+    if (_out && _out != ',') {
+      _out += ',';
+    }
+    _out += tag;
   }
 
   field.html(_data);
-  field2.val(_curval);
+  field2.val(_out);
 }
 
 remove_tags = function(data, _issues_url) {
@@ -80,13 +85,20 @@ add_deps = function(data, issue_uid, _issue_url) {
   var dep = data.added_dependency;
   var _data = $.trim(field.html());
   var _url = _issue_url.replace('/-1', '/' + dep) + dep + '</a>';
-  _data += ',' + _url;
-  field.html(_data);
-  var _curval = field2.val();
-  if (_curval && _curval != ',') {
-    _curval += ',';
+  if (_data && _data != ',') {
+    _data += ',';
   }
-  field2.val(_curval + dep);
+  _data += _url;
+  field.html(_data);
+
+  var _curval = field2.val().split(',');
+  var _values = $.unique($.merge(data.added_dependency, _curval));
+  var _out = [];
+
+  if (_out && _out != ',') {
+    _out += ',';
+  }
+  field2.val(_out + dep);
 }
 
 remove_deps = function(data, issue_uid, _issue_url) {
