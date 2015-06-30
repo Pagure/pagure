@@ -170,7 +170,6 @@ def handle_client(client_reader, client_writer):
 
 @trollius.coroutine
 def stats(client_reader, client_writer):
-    global SERVER
 
     try:
         log.info('Clients: %s', SERVER.active_count)
