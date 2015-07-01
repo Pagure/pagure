@@ -282,8 +282,8 @@ def api_view_issues(repo, username=None):
     return jsonout
 
 
-@API.route('/<repo>/issue/<int:issueid>')
-@API.route('/fork/<username>/<repo>/issue/<int:issueid>')
+@API.route('/<repo>/issue/<issueid>')
+@API.route('/fork/<username>/<repo>/issue/<issueid>')
 @api_login_optional()
 @api_method
 def api_view_issue(repo, issueid, username=None):
@@ -299,6 +299,10 @@ def api_view_issue(repo, issueid, username=None):
     ::
 
         GET /api/0/fork/<username>/<repo>/issue/<issue id>
+
+    The identifier provided can be either the unique identifier or the
+    regular identifier used in the UI (for example ``24`` in
+    ``/forks/user/test/issue/24``)
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -324,6 +328,9 @@ def api_view_issue(repo, issueid, username=None):
         }
 
     """
+    comments = flask.request.args.get('comments', True)
+    if str(comments).lower() in ['0', 'False']:
+        comments = False
 
     repo = pagure.lib.get_project(SESSION, repo, user=username)
 
@@ -334,7 +341,14 @@ def api_view_issue(repo, issueid, username=None):
         raise pagure.exceptions.APIError(
             404, error_code=APIERROR.ETRACKERDISABLED)
 
-    issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
+    issue_id = issue_uid = None
+    try:
+        issue_id = int(issueid)
+    except:
+        issue_uid = issueid
+
+    issue = pagure.lib.search_issues(
+        SESSION, repo, issueid=issue_id, issueuid=issue_uid)
 
     if issue is None or issue.project != repo:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOISSUE)
@@ -350,7 +364,8 @@ def api_view_issue(repo, issueid, username=None):
         raise pagure.exceptions.APIError(
             403, error_code=APIERROR.EISSUENOTALLOWED)
 
-    jsonout = flask.jsonify(issue.to_json(public=True))
+    jsonout = flask.jsonify(
+        issue.to_json(public=True, with_comments=comments))
     return jsonout
 
 
