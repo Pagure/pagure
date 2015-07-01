@@ -1268,8 +1268,9 @@ def get_project(session, name, user=None):
 
 
 def search_issues(
-        session, repo, issueid=None, status=None, closed=False, tags=None,
-        assignee=None, author=None, private=None, count=False):
+        session, repo, issueid=None, issueuid=None, status=None,
+        closed=False, tags=None, assignee=None, author=None, private=None,
+        count=False):
     ''' Retrieve one or more issues associated to a project with the given
     criterias.
 
@@ -1287,6 +1288,8 @@ def search_issues(
     :type repo: pagure.lib.model.Project
     :kwarg issueid: the identifier of the issue to look for
     :type issueid: int or None
+    :kwarg issueuid: the unique identifier of the issue to look for
+    :type issueuid: str or None
     :kwarg status: the status of the issue to look for (incompatible with
         the `closed` argument).
     :type status: str or None
@@ -1324,6 +1327,11 @@ def search_issues(
     if issueid is not None:
         query = query.filter(
             model.Issue.id == issueid
+        )
+
+    if issueuid is not None:
+        query = query.filter(
+            model.Issue.uid == issueuid
         )
 
     if status is not None and not closed:
@@ -1438,7 +1446,7 @@ def search_issues(
         model.Issue.id
     )
 
-    if issueid is not None:
+    if issueid is not None or issueuid is not None:
         output = query.first()
     elif count:
         output = query.count()
