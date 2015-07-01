@@ -354,6 +354,73 @@ def api_view_issue(repo, issueid, username=None):
     return jsonout
 
 
+@API.route('/<repo>/issue/<issue_uid>/comment/<int:commentid>')
+@API.route('/fork/<username>/<repo>/issue/<issue_uid>/comment/<int:commentid>')
+@api_login_optional()
+@api_method
+def api_view_issue_comment(repo, issue_uid, commentid, username=None):
+    """
+    Comment of a ticket
+    -------------------
+    Retrieve a specific comment of a ticket.
+
+    ::
+
+        GET /api/0/<repo>/issue/<issue uid>/comment/<comment id>
+
+    ::
+
+        GET /api/0/fork/<username>/<repo>/issue/<issue uid>/comment/<comment id>
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "avatar_url": "https://seccdn.libravatar.org/avatar/...?s=16&d=retro",
+          "comment": "9",
+          "comment_date": "2015-07-01 15:08",
+          "date_created": "1435756127",
+          "id": 464,
+          "parent": null,
+          "user": {
+            "fullname": "P.-Y.C.",
+            "name": "pingou"
+          }
+        }
+
+    """
+
+    comment = pagure.lib.get_issue_comment(SESSION, issue_uid, commentid)
+
+    if comment is None:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    if not comment.issue.project.settings.get('issue_tracker', True):
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.ETRACKERDISABLED)
+
+    if api_authenticated():
+        if repo != flask.g.token.project:
+            raise pagure.exceptions.APIError(
+                401, error_code=APIERROR.EINVALIDTOK)
+
+    if comment.issue.private and not is_repo_admin(comment.issue.project) \
+            and (not api_authenticated() or
+                 not comment.issue.user.user == flask.g.fas_user.username):
+        raise pagure.exceptions.APIError(
+            403, error_code=APIERROR.EISSUENOTALLOWED)
+
+
+    output = comment.to_json(public=True)
+    output['avatar_url'] = pagure.lib.avatar_url(comment.user.user, size=16)
+    output['comment_date'] = comment.date_created.strftime('%Y-%m-%d %H:%M')
+    jsonout = flask.jsonify(output)
+    return jsonout
+
+
+
 @API.route('/<repo>/issue/<int:issueid>/status', methods=['POST'])
 @API.route('/fork/<username>/<repo>/<int:issueid>/status', methods=['POST'])
 @api_login_required(acls=['issue_change_status'])
