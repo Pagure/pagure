@@ -32,7 +32,7 @@ SALT_EMAIL = '<secret key to be changed>'
 APP_URL = 'https://pagure.io/'
 ### The URL at which the documentation of projects will be available
 ## This should be in a different domain to avoid XSS issues since we want
-## to allow raw html to be displayed.
+## to allow raw html to be displayed (different domain, ie not a sub-domain).
 DOC_APP_URL = 'https://docs.pagure.org'
 
 ### The URL to use to clone git repositories.
