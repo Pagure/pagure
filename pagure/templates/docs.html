@@ -76,9 +76,20 @@
   </section>
   {% endif %}
 
+
   <section class="git_links">
-    git url: {{ config.get('GIT_URL') }}:{{ repo.fullname }}.git
-  </section>
+    <table>
+      <tr>
+        <th>Git URLs: </th>
+        <td>
+          {{ config.get('GIT_URL_SSH') }}:docs/{{ repo.fullname }}.git
+        </td>
+        <td>
+          {{ config.get('GIT_URL_GIT') }}/docs/{{ repo.fullname }}.git
+        </td>
+      </tr>
+    </table>
+    </section>
 {% endif %}
 
 {% endblock %}
