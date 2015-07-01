@@ -139,7 +139,7 @@
         </a>
     </span>
     {% endif %}
-    {% if repo_admin and branchname != 'master' %}
+    {% if repo_admin and branchname and branchname != 'master' %}
     <form action="{{
         url_for('.delete_branch',
                 username=username, repo=repo.name, branchname=branchname)
