@@ -274,7 +274,7 @@
 
 {% if pull_request %}
 <section class="request_comment" id="request_comment">
-{% if pull_request.comments %}
+{% if pull_request.discussion %}
 <form action="{{ url_for('.pull_request_drop_comment', username=username,
     repo=repo.name, requestid=requestid) }}" method="post">
 
