@@ -238,7 +238,7 @@ def view_docs(repo, username=None, branchname=None, filename=None):
         flask.abort(404, 'Project not found')
 
     if not repo.settings.get('project_documentation', True):
-        flask.abort(404, 'No documentation found for this project')
+        flask.abort(404, 'This project has documentation disabled')
 
     reponame = os.path.join(APP.config['DOCS_FOLDER'], repo.path)
     if not os.path.exists(reponame):
