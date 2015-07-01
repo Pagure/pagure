@@ -166,8 +166,6 @@ private_issue = function(data, _api_issue_url, issue_uid) {
   if (data.comment_id){
     var _url = _api_issue_url.replace('-1', issue_uid)
       + '/comment/' + data.comment_id;
-    console.log(_url);
-
     $.get( _url )
       .done(function(data) {
         add_comment({
@@ -180,7 +178,6 @@ private_issue = function(data, _api_issue_url, issue_uid) {
       })
   } else if (data.fields) {
     var _url = _api_issue_url.replace('-1', issue_uid) + '?comments=0';
-    console.log(_url);
     $.get( _url )
       .done(function(ndata) {
         update_issue({
