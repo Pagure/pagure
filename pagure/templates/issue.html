@@ -349,9 +349,13 @@ source.addEventListener('message', function(e) {
   var data = $.parseJSON(e.data);
   var _issues_url ='<a href="{{
     url_for('view_issues', username=username, repo=repo.name)}}';
+  var _api_issues_url ='{{
+    url_for('api_ns.api_view_issue', username=username,
+            repo=repo.name, issueid='-1')}}';
   var _issue_url ='<a href="{{
     url_for('view_issue', username=username, repo=repo.name, issueid='-1')}}">';
-  process_event(data, "{{ issue.uid }}", _issue_url, _issues_url);
+  process_event(data, "{{ issue.uid }}", _issue_url,
+                _issues_url, _api_issues_url);
 
   }, false);
 
