@@ -192,7 +192,7 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
             }))
         else:
             redis.publish(issue.uid, json.dumps({
-                'comment_id': len(issue.comments),
+                'comment_id': issue_comment.id,
                 'comment_added': text2markdown(issue_comment.comment),
                 'comment_user': issue_comment.user.user,
                 'avatar_url': avatar_url(issue_comment.user.user, size=16),

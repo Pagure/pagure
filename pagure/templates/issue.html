@@ -126,7 +126,7 @@
 <section id="comments">
 {% if issue.comments %}
   {% for comment in issue.comments %}
-    {{ show_comment(comment, loop.index, repo, username, issueid, form, repo_admin) }}
+    {{ show_comment(comment, comment.id, repo, username, issueid, form, repo_admin) }}
   {% endfor %}
 {% endif %}
 </section>
