@@ -1326,7 +1326,8 @@ def delete_branch(repo, branchname, username=None):
     if not is_repo_admin(repo_obj):
         flask.abort(
             403,
-            'You are not allowed to change the settings for this project')
+            'You are not allowed to change the delete branch for this '
+            'project')
 
     if branchname == 'master':
         flask.abort(403, 'You are not allowed to delete the master branch')
