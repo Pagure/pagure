@@ -178,6 +178,20 @@ private_issue = function(data, _api_issue_url, issue_uid) {
           avatar_url: data.avatar_url,
         });
       })
+  } else if (data.fields) {
+    var _url = _api_issue_url.replace('-1', issue_uid) + '?comments=0';
+    console.log(_url);
+    $.get( _url )
+      .done(function(ndata) {
+        update_issue({
+          fields: data.fields,
+          issue: {
+            status: ndata.status,
+            title: ndata.title,
+            content: ndata.content,
+          }
+        });
+      })
   }
 
 }
