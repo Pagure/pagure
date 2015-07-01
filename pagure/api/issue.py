@@ -369,11 +369,11 @@ def api_view_issue(repo, issueid, username=None):
     return jsonout
 
 
-@API.route('/<repo>/issue/<issue_uid>/comment/<int:commentid>')
-@API.route('/fork/<username>/<repo>/issue/<issue_uid>/comment/<int:commentid>')
+@API.route('/<repo>/issue/<issueid>/comment/<int:commentid>')
+@API.route('/fork/<username>/<repo>/issue/<issueid>/comment/<int:commentid>')
 @api_login_optional()
 @api_method
-def api_view_issue_comment(repo, issue_uid, commentid, username=None):
+def api_view_issue_comment(repo, issueid, commentid, username=None):
     """
     Comment of a ticket
     -------------------
@@ -381,11 +381,15 @@ def api_view_issue_comment(repo, issue_uid, commentid, username=None):
 
     ::
 
-        GET /api/0/<repo>/issue/<issue uid>/comment/<comment id>
+        GET /api/0/<repo>/issue/<issue id>/comment/<comment id>
 
     ::
 
-        GET /api/0/fork/<username>/<repo>/issue/<issue uid>/comment/<comment id>
+        GET /api/0/fork/<username>/<repo>/issue/<issue id>/comment/<comment id>
+
+    The identifier provided can be either the unique identifier or the
+    regular identifier used in the UI (for example ``24`` in
+    ``/forks/user/test/issue/24``)
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -407,33 +411,45 @@ def api_view_issue_comment(repo, issue_uid, commentid, username=None):
 
     """
 
-    comment = pagure.lib.get_issue_comment(SESSION, issue_uid, commentid)
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
 
-    if comment is None:
+    if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
-    if not comment.issue.project.settings.get('issue_tracker', True):
+    if not repo.settings.get('issue_tracker', True):
         raise pagure.exceptions.APIError(
             404, error_code=APIERROR.ETRACKERDISABLED)
+
+    issue_id = issue_uid = None
+    try:
+        issue_id = int(issueid)
+    except:
+        issue_uid = issueid
+
+    issue = pagure.lib.search_issues(
+        SESSION, repo, issueid=issue_id, issueuid=issue_uid)
+
+    if issue is None or issue.project != repo:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOISSUE)
 
     if api_authenticated():
         if repo != flask.g.token.project:
             raise pagure.exceptions.APIError(
                 401, error_code=APIERROR.EINVALIDTOK)
 
-    if comment.issue.private and not is_repo_admin(comment.issue.project) \
+    if issue.private and not is_repo_admin(issue.project) \
             and (not api_authenticated() or
-                 not comment.issue.user.user == flask.g.fas_user.username):
+                 not issue.user.user == flask.g.fas_user.username):
         raise pagure.exceptions.APIError(
             403, error_code=APIERROR.EISSUENOTALLOWED)
 
+    comment = pagure.lib.get_issue_comment(SESSION, issue.uid, commentid)
 
     output = comment.to_json(public=True)
     output['avatar_url'] = pagure.lib.avatar_url(comment.user.user, size=16)
     output['comment_date'] = comment.date_created.strftime('%Y-%m-%d %H:%M')
     jsonout = flask.jsonify(output)
     return jsonout
-
 
 
 @API.route('/<repo>/issue/<int:issueid>/status', methods=['POST'])
