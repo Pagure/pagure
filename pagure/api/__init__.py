@@ -170,6 +170,7 @@ def api_method(function):
 from pagure.api import issue
 from pagure.api import fork
 from pagure.api import project
+from pagure.api import user
 
 
 @API.route('/version/')
@@ -384,6 +385,7 @@ def api():
     api_new_issue_doc = load_doc(issue.api_new_issue)
     api_view_issues_doc = load_doc(issue.api_view_issues)
     api_issue_add_comment_doc = load_doc(issue.api_comment_issue)
+    api_view_issue_doc = load_doc(issue.api_view_issue)
 
     api_pull_request_views_doc = load_doc(fork.api_pull_request_views)
     api_pull_request_view_doc = load_doc(fork.api_pull_request_view)
@@ -395,6 +397,7 @@ def api():
 
     api_version_doc = load_doc(api_version)
     api_users_doc = load_doc(api_users)
+    api_view_user_doc = load_doc(user.api_view_user)
     api_project_tags_doc = load_doc(api_project_tags)
     api_groups_doc = load_doc(api_groups)
     api_error_codes_doc = load_doc(api_error_codes)
@@ -405,6 +408,7 @@ def api():
             api_git_tags_doc,
             api_new_issue_doc,
             api_view_issues_doc,
+            api_view_issue_doc,
             api_issue_add_comment_doc,
             api_pull_request_views_doc,
             api_pull_request_view_doc,
@@ -415,6 +419,7 @@ def api():
         ],
         users=[
             api_users_doc,
+            api_view_user_doc,
             api_groups_doc,
         ],
         extras=[
