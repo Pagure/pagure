@@ -171,12 +171,12 @@ private_issue = function(data, _api_issue_url, issue_uid) {
     $.get( _url )
       .done(function(data) {
         add_comment({
-            comment_added: data.comment,
-            comment_id: data.id,
-            comment_user: data.user.name,
-            comment_date: data.comment_date,
-            avatar_url: data.avatar_url,
-          });
+          comment_added: data.comment,
+          comment_id: data.id,
+          comment_user: data.user.name,
+          comment_date: data.comment_date,
+          avatar_url: data.avatar_url,
+        });
       })
   }
 
