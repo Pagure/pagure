@@ -136,10 +136,14 @@ def request_pull(repo, requestid, username=None):
     # Closed pull-request
     if request.status != 'Open':
         commitid = request.commit_stop
-        for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
-            diff_commits.append(commit)
-            if commit.oid.hex == request.commit_start:
-                break
+        try:
+            for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
+                diff_commits.append(commit)
+                if commit.oid.hex == request.commit_start:
+                    break
+        except KeyError:
+            # This happens when repo.walk() cannot find commitid
+            pass
 
         if diff_commits:
             diff = repo_obj.diff(
