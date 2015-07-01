@@ -1028,7 +1028,10 @@ def edit_issue(session, issue, ticketfolder, user,
 
     if redis and edit:
         if issue.private:
-            redis.publish(issue.uid, json.dumps({'issue': 'private'}))
+            redis.publish(issue.uid, json.dumps({
+                'issue': 'private',
+                'fields': edit,
+            }))
         else:
             redis.publish(issue.uid, json.dumps({
                 'fields': edit,
