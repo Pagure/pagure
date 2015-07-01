@@ -205,6 +205,7 @@ def api_users():
     List users
     -----------
     Retrieve users that have logged into the Paugre instance.
+    This can then be used as input for autocompletion in some forms/fields.
 
     ::
 
@@ -310,6 +311,7 @@ def api_groups():
     List groups
     -----------
     Retrieve groups on this Pagure instance.
+    This can then be used as input for autocompletion in some forms/fields.
 
     ::
 
