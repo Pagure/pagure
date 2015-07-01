@@ -186,7 +186,10 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
 
     if redis:
         if issue.private:
-            redis.publish(issue.uid, json.dumps({'issue': 'private'}))
+            redis.publish(issue.uid, json.dumps({
+                'issue': 'private',
+                'comment_id': issue_comment.id,
+            }))
         else:
             redis.publish(issue.uid, json.dumps({
                 'comment_id': len(issue.comments),
