@@ -272,8 +272,9 @@
 </div>
 
 
-{% if pull_request and pull_request.comments%}
+{% if pull_request %}
 <section class="request_comment" id="request_comment">
+{% if pull_request.comments %}
 <form action="{{ url_for('.pull_request_drop_comment', username=username,
     repo=repo.name, requestid=requestid) }}" method="post">
 
@@ -285,6 +286,7 @@
 {% endfor %}
 {{ mergeform.csrf_token }}
 </form>
+{% endif %}
 </section>
 {% endif %}
 
