@@ -280,7 +280,7 @@ def insert_div(content):
             continue
         output.append(row)
     output = "\n".join(output)
-    output = output.replace('</h1>', '</h1><div>')
+    output = output.replace('</h1>', '</h1>\n<div>', 1)
     output = output.replace('h1', 'h3')
 
     return output
