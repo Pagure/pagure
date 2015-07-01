@@ -293,14 +293,14 @@ def api_view_issue(repo, issueid, username=None):
     ::
 
         {
-          "assignee": None,
+          "assignee": null,
           "blocks": [],
           "comments": [],
           "content": "This issue needs attention",
           "date_created": "1431414800",
           "depends": [],
           "id": 1,
-          "private": False,
+          "private": false,
           "status": "Open",
           "tags": [],
           "title": "test issue",
