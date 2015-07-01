@@ -40,7 +40,7 @@ def api_git_tags(repo, username=None):
     ::
 
         {
-          "tags": ["this-is-a-tag"]
+          "tags": ["0.0.1", "0.0.2"]
         }
 
     """
