@@ -19,6 +19,30 @@
 </div>
 
 <h2>
+    Issues
+    <a name="users" class="headerlink" title="Permalink to this headline" href="#users">
+    <img src="{{ url_for('static', filename='link.png') }}" />
+    </a>
+</h2>
+<div class="accordion">
+{% for html in issues %}
+{{ html | InsertDiv | safe }}
+{% endfor %}
+</div>
+
+<h2>
+    Pull-requests
+    <a name="users" class="headerlink" title="Permalink to this headline" href="#users">
+    <img src="{{ url_for('static', filename='link.png') }}" />
+    </a>
+</h2>
+<div class="accordion">
+{% for html in requests %}
+{{ html | InsertDiv | safe }}
+{% endfor %}
+</div>
+
+<h2>
     Users
     <a name="users" class="headerlink" title="Permalink to this headline" href="#users">
     <img src="{{ url_for('static', filename='link.png') }}" />
