@@ -186,7 +186,11 @@ process_event = function(
       data, issue_uid, _issue_url, _issues_url, _api_issue_url)
 {
   console.log(data);
-  if (data.added_tags){
+  if (data.issue == 'private'){
+    console.log('private issue');
+    private_issue(data, _api_issue_url, issue_uid)
+  }
+  else if (data.added_tags){
     add_tags(data, _issues_url);
   }
   else if (data.removed_tags){
@@ -209,9 +213,5 @@ process_event = function(
   }
   else if (data.fields){
     update_issue(data);
-  }
-  else if (data.issue == 'private'){
-    console.log('private issue');
-    private_issue(data, _api_issue_url, issue_uid)
   }
 }
