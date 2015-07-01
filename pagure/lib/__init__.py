@@ -185,13 +185,17 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
         )
 
     if redis:
-        redis.publish(issue.uid, json.dumps({
-            'comment_id': len(issue.comments),
-            'comment_added': text2markdown(issue_comment.comment),
-            'comment_user': issue_comment.user.user,
-            'avatar_url': avatar_url(issue_comment.user.user, size=16),
-            'comment_date': issue_comment.date_created.strftime('%Y-%m-%d %H:%M'),
-        }))
+        if issue.private:
+            redis.publish(issue.uid, json.dumps({'issue': 'private'}))
+        else:
+            redis.publish(issue.uid, json.dumps({
+                'comment_id': len(issue.comments),
+                'comment_added': text2markdown(issue_comment.comment),
+                'comment_user': issue_comment.user.user,
+                'avatar_url': avatar_url(issue_comment.user.user, size=16),
+                'comment_date': issue_comment.date_created.strftime(
+                    '%Y-%m-%d %H:%M'),
+            }))
 
     return 'Comment added'
 
@@ -1020,10 +1024,13 @@ def edit_issue(session, issue, ticketfolder, user,
         )
 
     if redis and edit:
-        redis.publish(issue.uid, json.dumps({
-            'fields': edit,
-            'issue': issue.to_json(public=True, with_comments=False),
-        }))
+        if issue.private:
+            redis.publish(issue.uid, json.dumps({'issue': 'private'}))
+        else:
+            redis.publish(issue.uid, json.dumps({
+                'fields': edit,
+                'issue': issue.to_json(public=True, with_comments=False),
+            }))
 
     if edit:
         session.add(issue)
