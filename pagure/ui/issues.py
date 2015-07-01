@@ -172,6 +172,7 @@ def update_issue(repo, issueid, username=None):
                         SESSION,
                         issue=issue,
                         status=new_status,
+                        private=issue.private,
                         user=flask.g.fas_user.username,
                         ticketfolder=APP.config['TICKETS_FOLDER'],
                         redis=REDIS,
