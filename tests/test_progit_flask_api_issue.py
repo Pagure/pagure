@@ -433,6 +433,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             user='pingou',
             ticketfolder=None,
             private=True,
+            issue_uid='aaabbbccc',
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -491,6 +492,32 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
 
         # Access private issue authenticated correctly
         output = self.app.get('/api/0/test/issue/2', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        data['date_created'] = '1431414800'
+        self.assertDictEqual(
+            data,
+            {
+              "assignee": None,
+              "blocks": [],
+              "comments": [],
+              "content": "We should work on this",
+              "date_created": "1431414800",
+              "depends": [],
+              "id": 2,
+              "private": True,
+              "status": "Open",
+              "tags": [],
+              "title": "Test issue",
+              "user": {
+                "fullname": "PY C",
+                "name": "pingou"
+              }
+            }
+        )
+
+        # Access private issue authenticated correctly using the issue's uid
+        output = self.app.get('/api/0/test/issue/aaabbbccc', headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['date_created'] = '1431414800'
