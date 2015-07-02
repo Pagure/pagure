@@ -931,6 +931,112 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             {'message': 'Comment added'}
         )
 
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_api_view_issue_comment(self, p_send_email, p_ugt):
+        """ Test the api_view_issue_comment endpoint. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        self.test_api_comment_issue()
+
+        # View a comment that does not exist
+        output = self.app.get('/api/0/foo/issue/100/comment/2')
+        self.assertEqual(output.status_code, 404)
+
+        # Issue exists but not the comment
+        output = self.app.get('/api/0/test/issue/1/comment/2')
+        self.assertEqual(output.status_code, 404)
+
+        # Issue and comment exists
+        output = self.app.get('/api/0/test/issue/1/comment/1')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        data['date_created'] = '1435821770'
+        data["comment_date"] = "2015-07-02 09:22"
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
+        self.assertDictEqual(
+            data,
+            {
+              "avatar_url": "https://seccdn.libravatar.org/avatar/...",
+              "comment": "This is a very interesting question",
+              "comment_date": "2015-07-02 09:22",
+              "date_created": "1435821770",
+              "id": 1,
+              "parent": None,
+              "user": {
+                "fullname": "PY C",
+                "name": "pingou"
+              }
+            }
+        )
+
+        # Issue and comment exists, using UID
+        output = self.app.get('/api/0/test/issue/aaabbbccc#1/comment/1')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        data['date_created'] = '1435821770'
+        data["comment_date"] = "2015-07-02 09:22"
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
+        self.assertDictEqual(
+            data,
+            {
+              "avatar_url": "https://seccdn.libravatar.org/avatar/...",
+              "comment": "This is a very interesting question",
+              "comment_date": "2015-07-02 09:22",
+              "date_created": "1435821770",
+              "id": 1,
+              "parent": None,
+              "user": {
+                "fullname": "PY C",
+                "name": "pingou"
+              }
+            }
+        )
+
+        # Private issue
+        output = self.app.get('/api/0/foo/issue/1/comment/2')
+        self.assertEqual(output.status_code, 403)
+
+        # Private issue - Auth - wrong token
+        headers = {'Authorization': 'token pingou_foo'}
+        output = self.app.get('/api/0/foo/issue/1/comment/2', headers=headers)
+        self.assertEqual(output.status_code, 403)
+
+        # Private issue - Auth - Invalid token
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        output = self.app.get('/api/0/foo/issue/1/comment/2', headers=headers)
+        self.assertEqual(output.status_code, 401)
+
+        # Private issue - Auth - valid token - unknown comment
+        headers = {'Authorization': 'token foo_token2'}
+        output = self.app.get('/api/0/foo/issue/1/comment/3', headers=headers)
+        self.assertEqual(output.status_code, 404)
+
+        # Private issue - Auth - valid token - known comment
+        headers = {'Authorization': 'token foo_token2'}
+        output = self.app.get('/api/0/foo/issue/1/comment/2', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        data['date_created'] = '1435821770'
+        data["comment_date"] = "2015-07-02 09:22"
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
+        self.assertDictEqual(
+            data,
+            {
+              "avatar_url": "https://seccdn.libravatar.org/avatar/...",
+              "comment": "This is a very interesting question",
+              "comment_date": "2015-07-02 09:22",
+              "date_created": "1435821770",
+              "id": 2,
+              "parent": None,
+              "user": {
+                "fullname": "foo bar",
+                "name": "foo"
+              }
+            }
+        )
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
