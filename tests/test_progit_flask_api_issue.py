@@ -905,6 +905,32 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 0)
 
+        # Create token for user foo
+        item = pagure.lib.model.Token(
+            id='foo_token2',
+            user_id=2,
+            project_id=3,
+            expiration=datetime.datetime.utcnow() + datetime.timedelta(days=30)
+        )
+        self.session.add(item)
+        self.session.commit()
+        tests.create_tokens_acl(self.session, token_id='foo_token2')
+
+        data = {
+            'comment': 'This is a very interesting question',
+        }
+        headers = {'Authorization': 'token foo_token2'}
+
+        # Valid request and authorized
+        output = self.app.post(
+            '/api/0/foo/issue/1/comment', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'Comment added'}
+        )
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
