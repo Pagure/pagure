@@ -207,7 +207,7 @@ def send_email(text, subject, to_mail,
             msg['In-Reply-To'] = '<%s>' % in_reply_to
 
         msg['X-pagure'] = pagure.APP.config['APP_URL']
-        if procject_name is not None:
+        if project_name is not None:
             msg['X-pagure-project'] = project_name
 
         # Send the message via our own SMTP server, but don't include the
