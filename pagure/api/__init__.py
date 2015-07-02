@@ -390,6 +390,7 @@ def api():
 
     api_new_issue_doc = load_doc(issue.api_new_issue)
     api_view_issue_doc = load_doc(issue.api_view_issue)
+    api_view_issue_comment_doc = load_doc(issue.api_view_issue_comment)
     api_view_issues_doc = load_doc(issue.api_view_issues)
     api_issue_add_comment_doc = load_doc(issue.api_comment_issue)
 
@@ -417,6 +418,7 @@ def api():
             api_new_issue_doc,
             api_view_issues_doc,
             api_view_issue_doc,
+            api_view_issue_comment_doc,
             api_issue_add_comment_doc,
         ],
         requests=[
