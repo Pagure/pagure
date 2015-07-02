@@ -721,8 +721,13 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             }
         )
 
-    def test_api_comment_issue(self):
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_api_comment_issue(self, p_send_email, p_ugt):
         """ Test the api_comment_issue method of the flask api. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
         tests.create_acls(self.session)
@@ -777,6 +782,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             user='pingou',
             ticketfolder=None,
             private=False,
+            issue_uid='aaabbbccc#1',
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #1')
@@ -866,6 +872,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             user='foo',
             ticketfolder=None,
             private=True,
+            issue_uid='aaabbbccc#2',
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
