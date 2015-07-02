@@ -375,9 +375,9 @@ def api_view_issue(repo, issueid, username=None):
 @api_method
 def api_view_issue_comment(repo, issueid, commentid, username=None):
     """
-    Comment of a ticket
-    -------------------
-    Retrieve a specific comment of a ticket.
+    Comment of an issue
+    --------------------
+    Retrieve a specific comment of an issue.
 
     ::
 
