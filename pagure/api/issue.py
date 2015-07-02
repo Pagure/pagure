@@ -444,6 +444,9 @@ def api_view_issue_comment(repo, issueid, commentid, username=None):
             403, error_code=APIERROR.EISSUENOTALLOWED)
 
     comment = pagure.lib.get_issue_comment(SESSION, issue.uid, commentid)
+    if not comment:
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.ENOCOMMENT)
 
     output = comment.to_json(public=True)
     output['avatar_url'] = pagure.lib.avatar_url(comment.user.user, size=16)

@@ -48,6 +48,7 @@ class APIERROR(enum.Enum):
     ENOTASSIGNEE = 'Only the assignee can merge this review'
     ENOTASSIGNED = 'This request must be assigned to be merged'
     ENOUSER = 'No such user found'
+    ENOCOMMENT = 'Comment not found'
 
 
 def check_api_acls(acls, optional=False):
