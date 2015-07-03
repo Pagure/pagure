@@ -206,6 +206,16 @@ header h1 span {
     display: block;
 }
 
+.ui-accordion .accordion-link {
+    position: absolute;
+    right: 2%;
+    margin-top: 12px; /* adjust as needed to vertically center the icon */
+    z-index: 1;
+    width: 12px; /* approx 12x12 link icon */
+    height: 12px;
+    background: url(link.png) center center no-repeat;
+}
+
 .project_name {
     font-weight: bold;
     margin: .5em 0;
