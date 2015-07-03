@@ -1,11 +1,3 @@
-Pagure API v0 Reference
-=======================
-
-Overview
---------
-
-This documentation describes the Pagure API v0.
-
 Authentication
 ~~~~~~~~~~~~~~
 
@@ -16,6 +8,12 @@ When sending HTTP request, include ``Authorization`` field in the header
 with value ``token $your-api-token``, where ``$your-api-token`` is the
 API token generated in the project setting page.
 
+So the result should look like:
+
+::
+
+    Authorization: token $your-api-token
+
 Anyone with the token can access the APIs on your behalf, so please be
 sure to keep it private and safe.
 
@@ -23,8 +21,9 @@ Request Encoding
 ~~~~~~~~~~~~~~~~
 
 The payload of POST and GET requests is encoded as
-``application/x-www-form-urlencoded``. This is an example URL of a GET
-request:
+``application/x-www-form-urlencoded``.
+
+This is an example URL of a GET request:
 ``https://pagure.io/api/0/test/issues?status=Open&tags=Pagure&tags=Enhancement``
 
 Return Encoding

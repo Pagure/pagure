@@ -6,7 +6,10 @@
 
 {% block content %}
 
-{{ api_doc }}
+<h1 class="title">Pagure API Reference</h1>
+<p>This documentation describes the Pagure API v0.</p>
+
+{{ api_doc |replace('h1', 'h2') }}
 
 <h1>List of the API endpoints:</h1>
 
