@@ -10,10 +10,14 @@ API namespace version 0.
 
 """
 
+import codecs
 import functools
+import os
 
-import flask
+import docutils
 import enum
+import flask
+import markupsafe
 
 API = flask.Blueprint('api_ns', __name__, url_prefix='/api/0')
 
@@ -21,8 +25,26 @@ API = flask.Blueprint('api_ns', __name__, url_prefix='/api/0')
 import pagure
 import pagure.lib
 from pagure import __api_version__, APP, SESSION
-from pagure.doc_utils import load_doc
+from pagure.doc_utils import load_doc, modify_rst, modify_html
 from pagure.exceptions import APIError
+
+
+def preload_docs(endpoint):
+    ''' Utility to load an RST file and turn it into fancy HTML. '''
+
+    here = os.path.dirname(os.path.abspath(__file__))
+    fname = os.path.join(here, '..', 'doc', endpoint + '.rst')
+    with codecs.open(fname, 'r', 'utf-8') as f:
+        rst = f.read()
+
+    rst = modify_rst(rst)
+    api_docs = docutils.examples.html_body(rst)
+    api_docs = modify_html(api_docs)
+    api_docs = markupsafe.Markup(api_docs)
+    return api_docs
+
+
+APIDOC = preload_docs('api')
 
 
 class APIERROR(enum.Enum):
@@ -412,6 +434,7 @@ def api():
 
     return flask.render_template(
         'api.html',
+        api_doc=APIDOC,
         projects=[
             api_git_tags_doc,
         ],
