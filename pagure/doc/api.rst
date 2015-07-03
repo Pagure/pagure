@@ -1,10 +1,10 @@
 Authentication
 ~~~~~~~~~~~~~~
 
-To access some endpoints, you need login Pagure using API token. You can
-generate one in the project setting page.
+To access some endpoints, you need to login to Pagure using API token. You
+can generate one in the project setting page.
 
-When sending HTTP request, include ``Authorization`` field in the header
+When sending HTTP request, include an ``Authorization`` field in the header
 with value ``token $your-api-token``, where ``$your-api-token`` is the
 API token generated in the project setting page.
 
@@ -12,7 +12,9 @@ So the result should look like:
 
 ::
 
-    Authorization: token $your-api-token
+    Authorization: token abcdefghijklmnop
+
+Where ``abcdefghijklmnop`` is the API token provided by pagure.
 
 Anyone with the token can access the APIs on your behalf, so please be
 sure to keep it private and safe.
