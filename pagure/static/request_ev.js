@@ -44,7 +44,22 @@ add_comment = function(data) {
 
 process_event = function(data, requestid){
   console.log(data);
+  var category = null;
+  var originalTitle = document.title;
   if (data.comment_added){
     add_comment(data);
+    category = 'comment';
+  }
+
+  if (category) {
+    var int = setInterval(function(){
+      var title = document.title;
+      document.title = (title === originalTitle) ? category : originalTitle;
+    }, 750);
+
+    $(window).focus(function () {
+      clearInterval(int);
+      document.title = originalTitle;
+    });
   }
 }

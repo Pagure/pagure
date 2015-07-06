@@ -197,32 +197,54 @@ process_event = function(
       data, issue_uid, _issue_url, _issues_url, _api_issue_url)
 {
   console.log(data);
+  var category = null;
+  var originalTitle = document.title;
   if (data.issue == 'private'){
     console.log('private issue');
     private_issue(data, _api_issue_url, issue_uid)
   }
   else if (data.added_tags){
     add_tags(data, _issues_url);
+    category = 'Tag added';
   }
   else if (data.removed_tags){
     remove_tags(data, _issues_url);
+    category = 'Tag removed';
   }
   else if (data.assigned){
     assigne_issue(data, _issues_url);
+    category = 'Issue assigned';
   }
   else if (data.unassigned){
     unassigne_issue(data);
+    category = 'Issue un-assigned';
   }
   else if (data.added_dependency){
     add_deps(data, issue_uid, _issue_url);
+    category = 'Dependency added';
   }
   else if (data.removed_dependency){
     remove_deps(data, issue_uid, _issue_url);
+    category = 'Dependency removed';
   }
   else if (data.comment_added){
     add_comment(data);
+    category = 'Comment added';
   }
   else if (data.fields){
     update_issue(data);
+    category = 'Issue edited';
+  }
+
+  if (category) {
+    var int = setInterval(function(){
+      var title = document.title;
+      document.title = (title === originalTitle) ? category : originalTitle;
+    }, 750);
+
+    $(window).focus(function () {
+      clearInterval(int);
+      document.title = originalTitle;
+    });
   }
 }
