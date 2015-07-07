@@ -746,7 +746,10 @@ def update_file_in_git(
         branchto)
 
     try:
-        ori_remote.push(refname)
+        if pygit2.__version__.startswith('0.22'):
+            ori_remote.push([refname])
+        else:
+            ori_remote.push(refname)
     except pygit2.GitError as err:  # pragma: no cover
         shutil.rmtree(newpath)
         raise pagure.exceptions.PagureException(
@@ -958,7 +961,10 @@ def merge_pull_request(
             elif merge is None and mergecode is not None:
                 branch_ref.set_target(repo_commit.oid.hex)
 
-            ori_remote.push(refname)
+            if pygit2.__version__.startswith('0.22'):
+                ori_remote.push([refname])
+            else:
+                ori_remote.push(refname)
         else:
             request.merge_status = 'FFORWARD'
             session.commit()
@@ -990,7 +996,10 @@ def merge_pull_request(
             'Merge #%s `%s`' % (request.id, request.title),
             tree,
             [head.hex, repo_commit.oid.hex])
-        ori_remote.push(refname)
+        if pygit2.__version__.startswith('0.22'):
+            ori_remote.push([refname])
+        else:
+            ori_remote.push(refname)
 
     # Update status
     pagure.lib.close_pull_request(
