@@ -204,7 +204,7 @@ def avatar_url(email, size=64):
 @APP.template_filter('short')
 def shorted_commit(cid):
     """Gets short version of the commit id"""
-    return cid[:APP.config['SHORT_LENGTH']]
+    return str(cid)[:APP.config['SHORT_LENGTH']]
 
 
 @APP.template_filter('markdown')
