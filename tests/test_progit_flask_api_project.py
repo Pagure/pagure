@@ -84,7 +84,10 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         )
         refname = 'refs/heads/master:refs/heads/master'
         ori_remote = clone_repo.remotes[0]
-        ori_remote.push(refname)
+        if pygit2.__version__.startswith('0.22'):
+            ori_remote.push([refname])
+        else:
+            ori_remote.push(refname)
 
         # Tag our first commit
         first_commit = repo.revparse_single('HEAD')
