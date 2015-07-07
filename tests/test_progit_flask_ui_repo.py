@@ -583,7 +583,10 @@ class PagureFlaskRepotests(tests.Modeltests):
         )
         refname = 'refs/heads/feature'
         ori_remote = new_repo.remotes[0]
-        ori_remote.push(refname)
+        if pygit2.__version__.startswith('0.22'):
+            ori_remote.push([refname])
+        else:
+            ori_remote.push(refname)
 
         output = self.app.get('/test')
         self.assertEqual(output.status_code, 200)

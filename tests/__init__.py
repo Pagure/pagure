@@ -365,7 +365,10 @@ def add_content_git_repo(folder):
     master_ref = repo.lookup_reference('HEAD').resolve()
     refname = '%s:%s' % (master_ref.name, master_ref.name)
 
-    ori_remote.push(refname)
+    if pygit2.__version__.startswith('0.22'):
+        ori_remote.push([refname])
+    else:
+        ori_remote.push(refname)
 
     shutil.rmtree(newfolder)
 
@@ -434,7 +437,10 @@ Dev instance: http://209.132.184.222/ (/!\\ May change unexpectedly, it's a dev 
     master_ref = repo.lookup_reference('HEAD').resolve()
     refname = '%s:%s' % (master_ref.name, master_ref.name)
 
-    ori_remote.push(refname)
+    if pygit2.__version__.startswith('0.22'):
+        ori_remote.push([refname])
+    else:
+        ori_remote.push(refname)
 
     shutil.rmtree(newfolder)
 
@@ -486,7 +492,10 @@ def add_commit_git_repo(folder, ncommits=10):
     master_ref = repo.lookup_reference('HEAD').resolve()
     refname = '%s:%s' % (master_ref.name, master_ref.name)
 
-    ori_remote.push(refname)
+    if pygit2.__version__.startswith('0.22'):
+        ori_remote.push([refname])
+    else:
+        ori_remote.push(refname)
 
     shutil.rmtree(newfolder)
 
@@ -553,7 +562,10 @@ C7Pí^DQeee<84>ÃaÜn·î<98><9e><9e>^^¶oß®<95>Ý¦M^^T©®®¦®®<8e>©©)�
     master_ref = repo.lookup_reference('HEAD').resolve()
     refname = '%s:%s' % (master_ref.name, master_ref.name)
 
-    ori_remote.push(refname)
+    if pygit2.__version__.startswith('0.22'):
+        ori_remote.push([refname])
+    else:
+        ori_remote.push(refname)
 
     shutil.rmtree(newfolder)
 

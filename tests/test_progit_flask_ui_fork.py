@@ -93,7 +93,10 @@ class PagureFlaskForktests(tests.Modeltests):
         )
         refname = 'refs/heads/master:refs/heads/master'
         ori_remote = clone_repo.remotes[0]
-        ori_remote.push(refname)
+        if pygit2.__version__.startswith('0.22'):
+            ori_remote.push([refname])
+        else:
+            ori_remote.push(refname)
 
         first_commit = repo.revparse_single('HEAD')
 
@@ -121,7 +124,10 @@ class PagureFlaskForktests(tests.Modeltests):
             )
             refname = 'refs/heads/master:refs/heads/master'
             ori_remote = clone_repo.remotes[0]
-            ori_remote.push(refname)
+            if pygit2.__version__.startswith('0.22'):
+                ori_remote.push([refname])
+            else:
+                ori_remote.push(refname)
 
         if mtype == 'conflicts':
             with open(os.path.join(repopath, 'sources'), 'w') as stream:
@@ -147,7 +153,10 @@ class PagureFlaskForktests(tests.Modeltests):
             )
             refname = 'refs/heads/master:refs/heads/master'
             ori_remote = clone_repo.remotes[0]
-            ori_remote.push(refname)
+            if pygit2.__version__.startswith('0.22'):
+                ori_remote.push([refname])
+            else:
+                ori_remote.push(refname)
 
         # Set the second repo
 
@@ -184,7 +193,10 @@ class PagureFlaskForktests(tests.Modeltests):
             )
             refname = 'refs/heads/%s' % (branch_from)
             ori_remote = repo.remotes[0]
-            ori_remote.push(refname)
+            if pygit2.__version__.startswith('0.22'):
+                ori_remote.push([refname])
+            else:
+                ori_remote.push(refname)
 
         # Create a PR for these changes
         project = pagure.lib.get_project(self.session, 'test')
@@ -554,7 +566,10 @@ class PagureFlaskForktests(tests.Modeltests):
         )
         refname = 'refs/heads/feature:refs/heads/feature'
         ori_remote = new_repo.remotes[0]
-        ori_remote.push(refname)
+        if pygit2.__version__.startswith('0.22'):
+            ori_remote.push([refname])
+        else:
+            ori_remote.push(refname)
 
         # Create a PR for these changes
         project = pagure.lib.get_project(self.session, 'test')
@@ -856,7 +871,10 @@ index 9f44358..2a552bb 100644
         )
         refname = 'refs/heads/feature:refs/heads/feature'
         ori_remote = new_repo.remotes[0]
-        ori_remote.push(refname)
+        if pygit2.__version__.startswith('0.22'):
+            ori_remote.push([refname])
+        else:
+            ori_remote.push(refname)
 
         # Create a PR for these "changes" (there are none, both repos are
         # empty)

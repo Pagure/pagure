@@ -115,7 +115,10 @@ class PagureFlaskNoMasterBranchtests(tests.Modeltests):
 
         refname = 'refs/heads/feature'
         ori_remote = clone_repo.remotes[0]
-        ori_remote.push(refname)
+        if pygit2.__version__.startswith('0.22'):
+            ori_remote.push([refname])
+        else:
+            ori_remote.push(refname)
 
         shutil.rmtree(newpath)
 

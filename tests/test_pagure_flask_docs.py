@@ -155,7 +155,11 @@ class PagureFlaskDocstests(tests.Modeltests):
         # Push the changes to the bare repo
         remote = repo.create_remote(
             'origin', os.path.join(tests.HERE, 'docs', 'test.git'))
-        remote.push('refs/heads/master:refs/heads/master')
+
+        if pygit2.__version__.startswith('0.22'):
+            remote.push(['refs/heads/master:refs/heads/master'])
+        else:
+            remote.push('refs/heads/master:refs/heads/master')
 
         # Now check the UI
 
