@@ -335,9 +335,13 @@ $(function() {
 
 <script type="text/javascript">
 var source = null;
+var sse = true;
 if (!!window.EventSource) {
   source = new EventSource('{{ config["EVENTSOURCE_SOURCE"]
     + request.script_root + request.path }}');
+  source.addEventListener('error', function(e) {
+    sse = false;
+  }, false);
 }
 
 window.onbeforeunload = function() {
@@ -361,6 +365,11 @@ source.addEventListener('message', function(e) {
 
 {% if authenticated and form %}
 function try_async_comment(form) {
+  if (!sse) {
+    $(form).off('submit');
+    form.submit();
+    return false;
+  }
   var _url = form.action + "?js=1";
   var _data = $(form).serialize();
   var btn = $(document.activeElement);

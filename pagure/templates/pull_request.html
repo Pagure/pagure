@@ -515,6 +515,11 @@
 
 {% if authenticated and pull_request %}
 function try_async_comment(form, inline) {
+  if (!sse) {
+    $(form).off('submit');
+    form.submit();
+    return false;
+  }
   $.post( form.action + "?js=1", $(form).serialize() )
     .done(function(data) {
       if(data == 'ok') {
@@ -550,6 +555,9 @@ var source = null;
 if (!!window.EventSource) {
   source = new EventSource('{{ config["EVENTSOURCE_SOURCE"]
     + request.script_root + request.path }}');
+  source.addEventListener('error', function(e) {
+    sse = false;
+  }, false);
 }
 
 window.onbeforeunload = function() {
