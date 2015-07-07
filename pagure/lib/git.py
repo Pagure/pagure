@@ -198,7 +198,10 @@ def update_git(obj, repo, repofolder, objtype='ticket'):
     master_ref = new_repo.lookup_reference('HEAD').resolve()
     refname = '%s:%s' % (master_ref.name, master_ref.name)
 
-    ori_remote.push(refname)
+    if pygit2.__version__.startswith('0.22'):
+        ori_remote.push([refname])
+    else:
+        ori_remote.push(refname)
 
     # Remove the clone
     shutil.rmtree(newpath)
@@ -264,7 +267,10 @@ def clean_git(obj, repo, repofolder, objtype='ticket'):
     master_ref = new_repo.lookup_reference('HEAD').resolve()
     refname = '%s:%s' % (master_ref.name, master_ref.name)
 
-    ori_remote.push(refname)
+    if pygit2.__version__.startswith('0.22'):
+        ori_remote.push([refname])
+    else:
+        ori_remote.push(refname)
 
     # Remove the clone
     shutil.rmtree(newpath)
@@ -648,7 +654,10 @@ def add_file_to_git(repo, issue, ticketfolder, user, filename, filestream):
     master_ref = new_repo.lookup_reference('HEAD').resolve()
     refname = '%s:%s' % (master_ref.name, master_ref.name)
 
-    ori_remote.push(refname)
+    if pygit2.__version__.startswith('0.22'):
+        ori_remote.push([refname])
+    else:
+        ori_remote.push(refname)
 
     # Remove the clone
     shutil.rmtree(newpath)
