@@ -1832,7 +1832,7 @@ def avatar_url_from_openid(openid, size=64, default='retro', dns=False):
             hashhex, query)
 
 
-def update_tags_object(
+def update_tags(
         session, obj, tags, username, ticketfolder, redis=None,
         objtype='issue'):
     """ Update the tags of a specified object (adding or removing them).
