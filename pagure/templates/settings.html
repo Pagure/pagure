@@ -43,6 +43,14 @@
             <input name="avatar_email" value="{{ repo.avatar_email if repo.avatar_email else '' }}" />
           </td>
         </tr>
+        <tr>
+          <td>
+            <label for="tags">Project tags</label>
+          </td>
+          <td>
+            <input name="tags" value="{{ repo.tags |join(', ') if repo.tags else '' }}" />
+          </td>
+        </tr>
       </table>
       <button type="submit" title="Update description">
         Update
