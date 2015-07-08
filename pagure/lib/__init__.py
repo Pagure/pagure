@@ -203,56 +203,64 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
     return 'Comment added'
 
 
-def add_issue_tag(session, issue, tags, user, ticketfolder, redis=None):
-    ''' Add a tag to an issue. '''
+def add_tag_obj(session, obj, tags, user, ticketfolder, redis=None):
+    ''' Add a tag to an object (either an issue or a project). '''
     user_obj = __get_user(session, user)
 
     if isinstance(tags, basestring):
         tags = [tags]
 
     added_tags = []
-    for issue_tag in tags:
-        issue_tag = issue_tag.strip()
+    for objtag in tags:
+        objtag = objtag.strip()
         known = False
-        for tag_issue in issue.tags:
-            if tag_issue.tag == issue_tag:
+        for tagobj in obj.tags:
+            if tagobj.tag == objtag:
                 known = True
 
         if known:
             continue
 
-        tagobj = get_tag(session, issue_tag)
+        tagobj = get_tag(session, objtag)
         if not tagobj:
-            tagobj = model.Tag(tag=issue_tag)
+            tagobj = model.Tag(tag=objtag)
             session.add(tagobj)
             session.flush()
 
-        issue_tag = model.TagIssue(
-            issue_uid=issue.uid,
-            tag=tagobj.tag,
-        )
-        session.add(issue_tag)
+        if objtype == 'issue':
+            dbobjtag = model.TagIssue(
+                issue_uid=issue.uid,
+                tag=tagobj.tag,
+            )
+        elif objtype == 'project':
+            dbobjtag = model.TagProject(
+                project_id=obj.id,
+                tag=tagobj.tag,
+            )
+
+        session.add(dbobjtag)
         # Make sure we won't have SQLAlchemy error before we continue
         session.flush()
         added_tags.append(tagobj.tag)
 
-    pagure.lib.git.update_git(
-        issue, repo=issue.project, repofolder=ticketfolder)
+    if objtype == 'issue':
+        pagure.lib.git.update_git(
+            issue, repo=issue.project, repofolder=ticketfolder)
 
-    if not issue.private:
-        pagure.lib.notify.log(
-            issue.project,
-            topic='issue.tag.added',
-            msg=dict(
-                issue=issue.to_json(public=True),
-                project=issue.project.to_json(public=True),
-                tags=added_tags,
-                agent=user_obj.username,
+        if not issue.private:
+            pagure.lib.notify.log(
+                issue.project,
+                topic='issue.tag.added',
+                msg=dict(
+                    issue=issue.to_json(public=True),
+                    project=issue.project.to_json(public=True),
+                    tags=added_tags,
+                    agent=user_obj.username,
+                )
             )
-        )
 
-    if redis:
-        redis.publish(issue.uid, json.dumps({'added_tags': added_tags}))
+        if redis:
+            redis.publish(issue.uid, json.dumps({'added_tags': added_tags}))
 
     if added_tags:
         return 'Tag added: %s' % ', '.join(added_tags)
@@ -530,36 +538,39 @@ def remove_tags(session, project, tags, ticketfolder, user):
     return msgs
 
 
-def remove_tags_issue(session, issue, tags, ticketfolder, user, redis=None):
-    ''' Removes the specified tag(s) of a issue. '''
+def remove_tags_obj(
+        session, obj, tags, ticketfolder, user, redis=None, objtype='issue'):
+    ''' Removes the specified tag(s) of a given object. '''
     user_obj = __get_user(session, user)
 
     if isinstance(tags, basestring):
         tags = [tags]
 
     removed_tags = []
-    for issue_tag in issue.tags:
-        if issue_tag.tag in tags:
-            tag = issue_tag.tag
+    for objtag in obj.tags:
+        if objtag.tag in tags:
+            tag = objtag.tag
             removed_tags.append(tag)
-            session.delete(issue_tag)
+            session.delete(objtag)
 
-    pagure.lib.git.update_git(
-        issue, repo=issue.project, repofolder=ticketfolder)
+    if objtype == 'issue':
+        pagure.lib.git.update_git(
+            issue, repo=issue.project, repofolder=ticketfolder)
 
-    pagure.lib.notify.log(
-        issue.project,
-        topic='issue.tag.removed',
-        msg=dict(
-            issue=issue.to_json(public=True),
-            project=issue.project.to_json(public=True),
-            tags=removed_tags,
-            agent=user_obj.username,
+        pagure.lib.notify.log(
+            issue.project,
+            topic='issue.tag.removed',
+            msg=dict(
+                issue=issue.to_json(public=True),
+                project=issue.project.to_json(public=True),
+                tags=removed_tags,
+                agent=user_obj.username,
+            )
         )
-    )
 
-    if redis:
-        redis.publish(issue.uid, json.dumps({'removed_tags': removed_tags}))
+        if redis:
+            redis.publish(issue.uid, json.dumps(
+                {'removed_tags': removed_tags}))
 
     return 'Removed tag: %s' % ', '.join(removed_tags)
 
@@ -1819,37 +1830,42 @@ def avatar_url_from_openid(openid, size=64, default='retro', dns=False):
             hashhex, query)
 
 
-def update_tags_issue(session, issue, tags, username, ticketfolder, redis=None):
-    """ Update the tags of a specified issue (adding or removing them).
+def update_tags_object(
+        session, obj, tags, username, ticketfolder, redis=None,
+        objtype='issue'):
+    """ Update the tags of a specified object (adding or removing them).
+    This object can be either an issue or a project.
 
     """
     if isinstance(tags, basestring):
         tags = [tags]
 
-    toadd = set(tags) - set(issue.tags_text)
-    torm = set(issue.tags_text) - set(tags)
+    toadd = set(tags) - set(obj.tags_text)
+    torm = set(obj.tags_text) - set(tags)
     messages = []
     if toadd:
         messages.append(
-            add_issue_tag(
+            add_tag_obj(
                 session,
-                issue=issue,
+                obj=obj,
                 tags=toadd,
                 user=username,
                 ticketfolder=ticketfolder,
                 redis=redis,
+                objtype=objtype,
             )
         )
 
     if torm:
         messages.append(
-            remove_tags_issue(
+            remove_tags_obj(
                 session,
-                issue=issue,
+                obj=obj,
                 tags=torm,
                 user=username,
                 ticketfolder=ticketfolder,
                 redis=redis,
+                objtype=objtype,
             )
         )
     session.commit()
