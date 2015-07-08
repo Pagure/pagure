@@ -148,8 +148,14 @@ def is_repo_admin(repo_obj):
 
     user = flask.g.fas_user.username
 
+    usergrps = [
+        usr.user
+        for grp in repo_obj.groups
+        for usr in grp.users]
+
     return user == repo_obj.user.user or (
-        user in [user.user for user in repo_obj.users])
+        user in [user.user for user in repo_obj.users]
+    ) or (user in usergrps)
 
 
 def generate_gitolite_acls():
