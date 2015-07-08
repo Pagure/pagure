@@ -649,6 +649,38 @@ class TagIssue(BASE):
         return 'TagIssue(issue:%s, tag:%s)' % (self.issue.id, self.tag)
 
 
+class TagProject(BASE):
+    """ Stores the tag associated with a project.
+
+    Table -- tags_projects
+    """
+
+    __tablename__ = 'tags_projects'
+
+    tag = sa.Column(
+        sa.Text(),
+        sa.ForeignKey(
+            'tags.tag', ondelete='CASCADE', onupdate='CASCADE'),
+        primary_key=True)
+    project_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(
+            'projects.id', ondelete='CASCADE', onupdate='CASCADE'),
+        primary_key=True)
+    date_created = sa.Column(sa.DateTime, nullable=False,
+                             default=datetime.datetime.utcnow)
+
+    project = relation(
+        'Project', foreign_keys=[project_id], remote_side=[Project.id],
+        backref=backref(
+            'tags', cascade="delete, delete-orphan", single_parent=True)
+        )
+
+    def __repr__(self):
+        return 'TagProject(project:%s, tag:%s)' % (
+            self.project.fullname, self.tag)
+
+
 class PullRequest(BASE):
     """ Stores the pull requests created on a project.
 
