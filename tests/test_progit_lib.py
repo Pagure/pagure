@@ -1564,8 +1564,8 @@ class PagureLibtests(tests.Modeltests):
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
-    def test_update_tags_object(self, p_send_email, p_ugt):
-        """ Test the update_tags_object of pagure.lib. """
+    def test_update_tags(self, p_send_email, p_ugt):
+        """ Test the update_tags of pagure.lib. """
         p_send_email.return_value = True
         p_ugt.return_value = True
 
@@ -1576,10 +1576,10 @@ class PagureLibtests(tests.Modeltests):
         # before
         self.assertEqual(issue.tags_text, [])
 
-        messages = pagure.lib.update_tags_object(
+        messages = pagure.lib.update_tags(
             self.session, issue, 'tag', 'pingou', ticketfolder=None)
         self.assertEqual(messages, ['Tag added: tag'])
-        messages = pagure.lib.update_tags_object(
+        messages = pagure.lib.update_tags(
             self.session, issue, ['tag2', 'tag3'], 'pingou',
             ticketfolder=None)
         self.assertEqual(
