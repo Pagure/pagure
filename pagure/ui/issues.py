@@ -143,7 +143,7 @@ def update_issue(repo, issueid, username=None):
 
             if repo_admin:
                 # Adjust (add/remove) tags
-                messages = pagure.lib.update_tags_object(
+                messages = pagure.lib.update_tags(
                     SESSION, issue, tags,
                     username=flask.g.fas_user.username,
                     ticketfolder=APP.config['TICKETS_FOLDER'],

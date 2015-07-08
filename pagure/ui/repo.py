@@ -798,7 +798,7 @@ def update_project(repo, username=None):
             repo.description = form.description.data
             repo.avatar_email = form.avatar_email.data.strip()
             repo.url = form.url.data.strip()
-            pagure.lib.update_tags_object(
+            pagure.lib.update_tags(
                 SESSION, repo,
                 tags=[t.strip() for t in form.tags.data.split(',')],
                 username=flask.g.fas_user.username,
