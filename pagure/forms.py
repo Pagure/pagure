@@ -32,6 +32,10 @@ class ProjectFormSimplified(wtf.Form):
         'Avatar email',
         [wtforms.validators.optional()]
     )
+    tags = wtforms.TextField(
+        'Project tags',
+        [wtforms.validators.optional()]
+    )
 
 
 class ProjectForm(ProjectFormSimplified):
