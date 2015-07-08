@@ -1230,7 +1230,7 @@ def search_projects(
     ).filter(
         model.Project.id.in_(projects.subquery())
     ).order_by(
-        model.Project.date_created
+        model.Project.name
     )
 
     if start is not None:
