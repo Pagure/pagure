@@ -87,6 +87,7 @@
 
     </ul>
     <ul class="right">
+      {% if authenticated %}
       {% if not repo_admin %}
       <li id="fork_button" {% if select == '' %}class="selected" {% endif %}>
         <form method="POST" name="fork_project"
@@ -102,6 +103,7 @@
             '.view_settings', repo=repo.name, username=username) }}">
           Settings</a>
       </li>
+      {% endif %}
       {% endif %}
     </ul>
   </div>
