@@ -203,7 +203,9 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
     return 'Comment added'
 
 
-def add_tag_obj(session, obj, tags, user, ticketfolder, redis=None):
+def add_tag_obj(
+        session, obj, tags, user, ticketfolder, redis=None,
+        objtype='issue'):
     ''' Add a tag to an object (either an issue or a project). '''
     user_obj = __get_user(session, user)
 
@@ -229,7 +231,7 @@ def add_tag_obj(session, obj, tags, user, ticketfolder, redis=None):
 
         if objtype == 'issue':
             dbobjtag = model.TagIssue(
-                issue_uid=issue.uid,
+                issue_uid=obj.uid,
                 tag=tagobj.tag,
             )
         elif objtype == 'project':
@@ -245,22 +247,22 @@ def add_tag_obj(session, obj, tags, user, ticketfolder, redis=None):
 
     if objtype == 'issue':
         pagure.lib.git.update_git(
-            issue, repo=issue.project, repofolder=ticketfolder)
+            obj, repo=obj.project, repofolder=ticketfolder)
 
-        if not issue.private:
+        if not obj.private:
             pagure.lib.notify.log(
-                issue.project,
+                obj.project,
                 topic='issue.tag.added',
                 msg=dict(
-                    issue=issue.to_json(public=True),
-                    project=issue.project.to_json(public=True),
+                    issue=obj.to_json(public=True),
+                    project=obj.project.to_json(public=True),
                     tags=added_tags,
                     agent=user_obj.username,
                 )
             )
 
         if redis:
-            redis.publish(issue.uid, json.dumps({'added_tags': added_tags}))
+            redis.publish(obj.uid, json.dumps({'added_tags': added_tags}))
 
     if added_tags:
         return 'Tag added: %s' % ', '.join(added_tags)
@@ -555,21 +557,21 @@ def remove_tags_obj(
 
     if objtype == 'issue':
         pagure.lib.git.update_git(
-            issue, repo=issue.project, repofolder=ticketfolder)
+            obj, repo=obj.project, repofolder=ticketfolder)
 
         pagure.lib.notify.log(
-            issue.project,
+            obj.project,
             topic='issue.tag.removed',
             msg=dict(
-                issue=issue.to_json(public=True),
-                project=issue.project.to_json(public=True),
+                issue=obj.to_json(public=True),
+                project=obj.project.to_json(public=True),
                 tags=removed_tags,
                 agent=user_obj.username,
             )
         )
 
         if redis:
-            redis.publish(issue.uid, json.dumps(
+            redis.publish(obj.uid, json.dumps(
                 {'removed_tags': removed_tags}))
 
     return 'Removed tag: %s' % ', '.join(removed_tags)
