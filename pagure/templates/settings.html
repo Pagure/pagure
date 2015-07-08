@@ -48,7 +48,7 @@
             <label for="tags">Project tags</label>
           </td>
           <td>
-            <input name="tags" value="{{ repo.tags |join(', ') if repo.tags else '' }}" />
+            <input name="tags" value="{{ repo.tags_text |join(', ') if repo.tags else '' }}" />
           </td>
         </tr>
       </table>
