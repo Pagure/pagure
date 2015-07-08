@@ -801,7 +801,7 @@ def update_project(repo, username=None):
             pagure.lib.update_tags_object(
                 SESSION, repo,
                 tags=form.tags.data.split(','),
-                username=flask.fas_user.username,
+                username=flask.g.fas_user.username,
                 ticketfolder=None,
                 redis=None,
                 objtype='project')
