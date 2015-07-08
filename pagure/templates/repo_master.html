@@ -87,7 +87,7 @@
 
     </ul>
     <ul class="right">
-      {% if g.fas_user and g.fas_user.username != repo.user.user %}
+      {% if not repo_admin %}
       <li id="fork_button" {% if select == '' %}class="selected" {% endif %}>
         <form method="POST" name="fork_project"
           action="{{ url_for(
@@ -96,8 +96,7 @@
           {{ forkbuttonform.csrf_token }}
         </form>
       </li>
-      {% endif %}
-      {% if g.fas_user and g.fas_user.username == repo.user.user %}
+      {% else %}
       <li id="settings_button" {% if select == 'settings' %}class="selected" {% endif %}>
         <a href="{{ url_for(
             '.view_settings', repo=repo.name, username=username) }}">
