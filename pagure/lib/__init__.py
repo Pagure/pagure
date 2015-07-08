@@ -203,9 +203,7 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
     return 'Comment added'
 
 
-def add_tag_obj(
-        session, obj, tags, user, ticketfolder, redis=None,
-        objtype='issue'):
+def add_tag_obj(session, obj, tags, user, ticketfolder, redis=None):
     ''' Add a tag to an object (either an issue or a project). '''
     user_obj = __get_user(session, user)
 
@@ -229,12 +227,12 @@ def add_tag_obj(
             session.add(tagobj)
             session.flush()
 
-        if objtype == 'issue':
+        if isinstance(obj, model.Issue):
             dbobjtag = model.TagIssue(
                 issue_uid=obj.uid,
                 tag=tagobj.tag,
             )
-        elif objtype == 'project':
+        if isinstance(obj, model.Project):
             dbobjtag = model.TagProject(
                 project_id=obj.id,
                 tag=tagobj.tag,
@@ -245,7 +243,7 @@ def add_tag_obj(
         session.flush()
         added_tags.append(tagobj.tag)
 
-    if objtype == 'issue':
+    if isinstance(obj, model.Issue):
         pagure.lib.git.update_git(
             obj, repo=obj.project, repofolder=ticketfolder)
 
@@ -541,7 +539,7 @@ def remove_tags(session, project, tags, ticketfolder, user):
 
 
 def remove_tags_obj(
-        session, obj, tags, ticketfolder, user, redis=None, objtype='issue'):
+        session, obj, tags, ticketfolder, user, redis=None):
     ''' Removes the specified tag(s) of a given object. '''
     user_obj = __get_user(session, user)
 
@@ -555,7 +553,7 @@ def remove_tags_obj(
             removed_tags.append(tag)
             session.delete(objtag)
 
-    if objtype == 'issue':
+    if isinstance(obj, model.Issue):
         pagure.lib.git.update_git(
             obj, repo=obj.project, repofolder=ticketfolder)
 
@@ -1832,9 +1830,7 @@ def avatar_url_from_openid(openid, size=64, default='retro', dns=False):
             hashhex, query)
 
 
-def update_tags(
-        session, obj, tags, username, ticketfolder, redis=None,
-        objtype='issue'):
+def update_tags(session, obj, tags, username, ticketfolder, redis=None):
     """ Update the tags of a specified object (adding or removing them).
     This object can be either an issue or a project.
 
@@ -1854,7 +1850,6 @@ def update_tags(
                 user=username,
                 ticketfolder=ticketfolder,
                 redis=redis,
-                objtype=objtype,
             )
         )
 
@@ -1867,7 +1862,6 @@ def update_tags(
                 user=username,
                 ticketfolder=ticketfolder,
                 redis=redis,
-                objtype=objtype,
             )
         )
     session.commit()
