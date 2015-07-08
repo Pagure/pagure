@@ -798,6 +798,13 @@ def update_project(repo, username=None):
             repo.description = form.description.data
             repo.avatar_email = form.avatar_email.data.strip()
             repo.url = form.url.data.strip()
+            pagure.lib.update_tags_object(
+                SESSION, repo,
+                tags=form.tags.data.split(','),
+                username=flask.fas_user.username,
+                ticketfolder=None,
+                redis=None,
+                objtype='project')
             SESSION.add(repo)
             SESSION.commit()
             flask.flash('Project updated')
