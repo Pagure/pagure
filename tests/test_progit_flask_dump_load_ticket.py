@@ -134,9 +134,9 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Issue assigned')
         # Add a couple of tags on the ticket
-        msg = pagure.lib.add_issue_tag(
+        msg = pagure.lib.add_tag_obj(
             session=self.session,
-            issue=issue,
+            obj=issue,
             tags=[' feature ', 'future '],
             user='pingou',
             ticketfolder=repopath,

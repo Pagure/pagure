@@ -1179,9 +1179,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         # Add a tag to the issue
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        msg = pagure.lib.add_issue_tag(
+        msg = pagure.lib.add_tag_obj(
             session=self.session,
-            issue=issue,
+            obj=issue,
             tags='tag1',
             user='pingou',
             ticketfolder=None)
@@ -1264,9 +1264,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         # Add a tag to the issue
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        msg = pagure.lib.add_issue_tag(
+        msg = pagure.lib.add_tag_obj(
             session=self.session,
-            issue=issue,
+            obj=issue,
             tags='tag1',
             user='pingou',
             ticketfolder=None)
