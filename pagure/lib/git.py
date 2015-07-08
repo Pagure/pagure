@@ -420,7 +420,7 @@ def update_ticket_from_git(
 
     # Update tags
     tags = json_data.get('tags', [])
-    pagure.lib.update_tags_issue(
+    pagure.lib.update_tags_object(
         session, issue, tags, username=user.user, ticketfolder=None)
 
     # Update assignee
