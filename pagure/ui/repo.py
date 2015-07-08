@@ -800,7 +800,7 @@ def update_project(repo, username=None):
             repo.url = form.url.data.strip()
             pagure.lib.update_tags_object(
                 SESSION, repo,
-                tags=form.tags.data.split(','),
+                tags=[t.strip() for t in form.tags.data.split(',')],
                 username=flask.g.fas_user.username,
                 ticketfolder=None,
                 redis=None,
