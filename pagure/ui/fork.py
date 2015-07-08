@@ -99,6 +99,7 @@ def request_pulls(repo, username=None):
         status=status,
         assignee=assignee,
         author=author,
+        repo_admin=is_repo_admin(repo),
     )
 
 

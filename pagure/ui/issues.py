@@ -398,6 +398,7 @@ def view_issues(repo, username=None):
         tags=tags,
         assignee=assignee,
         author=author,
+        repo_admin=is_repo_admin(repo),
     )
 
 
@@ -477,6 +478,7 @@ def new_issue(repo, username=None):
         form=form,
         repo=repo,
         username=username,
+        repo_admin=is_repo_admin(repo),
     )
 
 
@@ -642,6 +644,7 @@ def edit_issue(repo, issueid, username=None):
         username=username,
         issue=issue,
         issueid=issueid,
+        repo_admin=is_repo_admin(repo),
     )
 
 

@@ -606,6 +606,7 @@ def view_tree(repo, identifier=None, username=None):
         filename='',
         content=content,
         output_type=output_type,
+        repo_admin=is_repo_admin(repo),
     )
 
 
@@ -626,6 +627,7 @@ def view_forks(repo, username=None):
         select='forks',
         username=username,
         repo=repo,
+        repo_admin=is_repo_admin(repo),
     )
 
 
