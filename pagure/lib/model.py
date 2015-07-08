@@ -331,6 +331,11 @@ class Project(BASE):
         return str_name
 
     @property
+    def tags_text(self):
+        ''' Return the list of tags in a simple text form. '''
+        return [tag.tag for tag in self.tags]
+
+    @property
     def settings(self):
         """ Return the dict stored as string in the database as an actual
         dict object.
