@@ -42,18 +42,18 @@ def api_new_issue(repo, username=None):
     Input
     ^^^^^
 
-    +---------------+-----------+---------------+------------------------------+
-    | Key           | Type      | Optionality   | Description                  |
-    +===============+===========+===============+==============================+
-    | ``title``     | string    | Mandatory     | The title of the issue       |
-    +---------------+-----------+---------------+------------------------------+
-    | ``content``   | string    | Mandatory     | | The description of the     |
-    |               |           |               |   issue                      |
-    +---------------+-----------+---------------+------------------------------+
-    | ``private``   | boolean   | Optional      | | Include this key if        |
-    |               |           |               |   you want a private issue   |
-    |               |           |               |   to be created              |
-    +---------------+-----------+---------------+------------------------------+
+    +--------------+----------+--------------+-----------------------------+
+    | Key          | Type     | Optionality  | Description                 |
+    +==============+==========+==============+=============================+
+    | ``title``    | string   | Mandatory    | The title of the issue      |
+    +--------------+----------+--------------+-----------------------------+
+    | ``content``  | string   | Mandatory    | | The description of the    |
+    |              |          |              |   issue                     |
+    +--------------+----------+--------------+-----------------------------+
+    | ``private``  | boolean  | Optional     | | Include this key if       |
+    |              |          |              |   you want a private issue  |
+    |              |          |              |   to be created             |
+    +--------------+----------+--------------+-----------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -156,27 +156,27 @@ def api_view_issues(repo, username=None):
     Parameters
     ^^^^^^^^^^
 
-    +----------------+----------+---------------+---------------------------+
-    | Key            | Type     | Optionality   | Description               |
-    +================+==========+===============+===========================+
-    | ``status``     | string   | Optional      | | Filters the status of   |
-    |                |          |               |   issues. Default:        |
-    |                |          |               |   ``Open``                |
-    +----------------+----------+---------------+---------------------------+
-    | ``tags``       | string   | Optional      | | A list of tags you      |
-    |                |          |               |   wish to filter. If      |
-    |                |          |               |   you want to filter      |
-    |                |          |               |   for issues not having   |
-    |                |          |               |   a tag, add an           |
-    |                |          |               |   exclamation mark in     |
-    |                |          |               |   front of it             |
-    +----------------+----------+---------------+---------------------------+
-    | ``assignee``   | string   | Optional      | | Filter the issues       |
-    |                |          |               |   by assignee             |
-    +----------------+----------+---------------+---------------------------+
-    | ``author``     | string   | Optional      | | Filter the issues       |
-    |                |          |               |   by creator              |
-    +----------------+----------+---------------+---------------------------+
+    +---------------+---------+--------------+---------------------------+
+    | Key           | Type    | Optionality  | Description               |
+    +===============+=========+==============+===========================+
+    | ``status``    | string  | Optional     | | Filters the status of   |
+    |               |         |              |   issues. Default:        |
+    |               |         |              |   ``Open``                |
+    +---------------+---------+--------------+---------------------------+
+    | ``tags``      | string  | Optional     | | A list of tags you      |
+    |               |         |              |   wish to filter. If      |
+    |               |         |              |   you want to filter      |
+    |               |         |              |   for issues not having   |
+    |               |         |              |   a tag, add an           |
+    |               |         |              |   exclamation mark in     |
+    |               |         |              |   front of it             |
+    +---------------+---------+--------------+---------------------------+
+    | ``assignee``  | string  | Optional     | | Filter the issues       |
+    |               |         |              |   by assignee             |
+    +---------------+---------+--------------+---------------------------+
+    | ``author``    | string  | Optional     | | Filter the issues       |
+    |               |         |              |   by creator              |
+    +---------------+---------+--------------+---------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -397,7 +397,7 @@ def api_view_issue_comment(repo, issueid, commentid, username=None):
     ::
 
         {
-          "avatar_url": "https://seccdn.libravatar.org/avatar/...?s=16&d=retro",
+          "avatar_url": "https://seccdn.libravatar.org/avatar/...",
           "comment": "9",
           "comment_date": "2015-07-01 15:08",
           "date_created": "1435756127",
@@ -476,11 +476,11 @@ def api_change_status_issue(repo, issueid, username=None):
     Input
     ^^^^^
 
-    +--------------+----------+---------------+-------------------------------+
-    | Key          | Type     | Optionality   | Description                   |
-    +==============+==========+===============+===============================+
-    | ``status``   | string   | Mandatory     | The new status of the issue   |
-    +--------------+----------+---------------+-------------------------------+
+    +-------------+---------+--------------+------------------------------+
+    | Key         | Type    | Optionality  | Description                  |
+    +=============+=========+==============+==============================+
+    | ``status``  | string  | Mandatory    | The new status of the issue  |
+    +-------------+---------+--------------+------------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -569,12 +569,12 @@ def api_comment_issue(repo, issueid, username=None):
     Input
     ^^^^^
 
-    +---------------+----------+---------------+---------------------------+
-    | Key           | Type     | Optionality   | Description               |
-    +===============+==========+===============+===========================+
-    | ``comment``   | string   | Mandatory     | | The comment to add to   |
-    |               |          |               |   the issue               |
-    +---------------+----------+---------------+---------------------------+
+    +--------------+----------+---------------+---------------------------+
+    | Key          | Type     | Optionality   | Description               |
+    +==============+==========+===============+===========================+
+    | ``comment``  | string   | Mandatory     | | The comment to add to   |
+    |              |          |               |   the issue               |
+    +--------------+----------+---------------+---------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^

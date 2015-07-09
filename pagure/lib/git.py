@@ -872,7 +872,7 @@ def merge_pull_request(
     if request.project.settings.get(
             'Enforce_signed-off_commits_in_pull-request', False):
         for commit in diff_commits:
-            if not 'signed-off-by' in commit.message.lower():
+            if 'signed-off-by' not in commit.message.lower():
                 raise pagure.exceptions.PagureException(
                     'This repo enforces that all commits are '
                     'signed off by their author. ')

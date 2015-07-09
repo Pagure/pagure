@@ -327,4 +327,3 @@ class EditFileForm(wtf.Form):
             self.email.choices = [
                 (email.email, email.email) for email in kwargs['emails']
             ]
-

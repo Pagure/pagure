@@ -1321,7 +1321,8 @@ def edit_file(repo, branchname, filename, username=None):
 
 
 @APP.route('/<repo>/<path:branchname>/delete', methods=['POST'])
-@APP.route('/fork/<username>/<repo>/<path:branchname>/delete', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/<path:branchname>/delete',
+           methods=['POST'])
 @cla_required
 def delete_branch(repo, branchname, username=None):
     """ Delete the branch of a project.

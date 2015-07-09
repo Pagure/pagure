@@ -1125,7 +1125,7 @@ def fork_project(session, user, repo, gitfolder,
 
     frepo = pygit2.clone_repository(reponame, forkreponame, bare=True)
     # Clone all the branches as well
-    for branch in  frepo.listall_branches(pygit2.GIT_BRANCH_REMOTE):
+    for branch in frepo.listall_branches(pygit2.GIT_BRANCH_REMOTE):
         if branch == 'origin/master':
             continue
         br = frepo.lookup_branch(branch, pygit2.GIT_BRANCH_REMOTE)
@@ -1625,6 +1625,7 @@ def close_pull_request(session, request, user, requestfolder, merged=True):
         )
     )
 
+
 def reset_status_pull_request(session, project):
     ''' Reset the status of all opened Pull-Requests of a project.
     '''
@@ -1786,7 +1787,7 @@ def update_user_ssh(session, user, ssh_key):
     message = 'Nothing to update'
 
     ssh_key = ssh_key.strip().replace('\n', '') \
-              if ssh_key and ssh_key.strip() else None
+        if ssh_key and ssh_key.strip() else None
 
     if ssh_key != user.public_ssh_key:
         user.public_ssh_key = ssh_key
