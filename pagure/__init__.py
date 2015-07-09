@@ -26,7 +26,7 @@ from logging.handlers import SMTPHandler
 import flask
 import pygit2
 import redis
-from flask_fas_openid import FAS
+from pagure.flask_fas_openid import FAS
 from functools import wraps
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -54,7 +54,7 @@ if 'PAGURE_CONFIG' in os.environ:
 
 FAS = FAS(APP)
 SESSION = pagure.lib.create_session(APP.config['DB_URL'])
-REDIS=None
+REDIS = None
 if APP.config['EVENTSOURCE_SOURCE']:
     POOL = redis.ConnectionPool(
         host=APP.config['REDIS_HOST'],
@@ -69,9 +69,9 @@ if not APP.debug:
     ))
 
 # Send classic logs into syslog
-handler = logging.StreamHandler()
-handler.setLevel(APP.config.get('log_level', 'INFO'))
-APP.logger.addHandler(handler)
+SHANDLER = logging.StreamHandler()
+SHANDLER.setLevel(APP.config.get('log_level', 'INFO'))
+APP.logger.addHandler(SHANDLER)
 
 LOG = APP.logger
 

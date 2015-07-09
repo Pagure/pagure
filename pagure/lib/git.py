@@ -150,8 +150,9 @@ def update_git(obj, repo, repofolder, objtype='ticket'):
 
     # Write down what changed
     with open(file_path, 'w') as stream:
-        stream.write(json.dumps(obj.to_json(),
-                     sort_keys=True, indent=4, separators=(',', ': ')))
+        stream.write(json.dumps(
+            obj.to_json(), sort_keys=True, indent=4,
+            separators=(',', ': ')))
 
     # Retrieve the list of files that changed
     diff = new_repo.diff()
@@ -230,8 +231,6 @@ def clean_git(obj, repo, repofolder, objtype='ticket'):
 
     # Remove the file
     os.unlink(file_path)
-
-    diff = new_repo.diff()
 
     # Add the changes to the index
     index.remove(obj.uid)
@@ -756,15 +755,15 @@ def read_output(cmd, abspath, input=None, keepends=False, **kw):
         stdin = subprocess.PIPE
     else:
         stdin = None
-    p = subprocess.Popen(
+    procs = subprocess.Popen(
         cmd,
         stdin=stdin,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         cwd=abspath,
         **kw)
-    (out, err) = p.communicate(input)
-    retcode = p.wait()
+    (out, err) = procs.communicate(input)
+    retcode = procs.wait()
     if retcode:
         print 'ERROR: %s =-- %s' % (cmd, retcode)
         print out

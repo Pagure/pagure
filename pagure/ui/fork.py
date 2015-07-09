@@ -224,10 +224,10 @@ def request_pull_patch(repo, requestid, username=None):
                 break
     else:
         try:
-            diff_commits, diff = pagure.lib.git.diff_pull_request(
+            diff_commits = pagure.lib.git.diff_pull_request(
                 SESSION, request, repo_obj, orig_repo,
                 requestfolder=APP.config['REQUESTS_FOLDER'],
-                with_diff=False)
+                with_diff=False)[0]
         except pagure.exceptions.PagureException as err:
             flask.flash(err.message, 'error')
             return flask.redirect(flask.url_for(
@@ -697,7 +697,7 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
         return flask.redirect(flask.url_for(
             'view_repo', username=username, repo=repo.name))
 
-    repo_admin=is_repo_admin(repo)
+    repo_admin = is_repo_admin(repo)
 
     form = pagure.forms.RequestPullForm()
     if form.validate_on_submit() and repo_admin:

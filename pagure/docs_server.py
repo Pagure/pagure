@@ -37,9 +37,9 @@ if not APP.debug:
     ))
 
 # Send classic logs into syslog
-handler = logging.StreamHandler()
-handler.setLevel(APP.config.get('log_level', 'INFO'))
-APP.logger.addHandler(handler)
+SHANDLER = logging.StreamHandler()
+SHANDLER.setLevel(APP.config.get('log_level', 'INFO'))
+APP.logger.addHandler(SHANDLER)
 
 LOG = APP.logger
 
@@ -107,11 +107,13 @@ def markdown_filter(text):
 # Placeholder to allow re-using pagure's templates
 @APP.route('/')
 def index():
+    ''' Redirects to the front page of this pagure instance. '''
     return flask.redirect(APP.config['APP_URL'])
 
 
 @APP.route('/users/')
 def view_users():
+    ''' Redirects to the list of users on this pagure instance. '''
     root_url = APP.config['APP_URL']
     if root_url.endswith('/'):
         root_url = root_url[:-1]
@@ -120,6 +122,7 @@ def view_users():
 
 @APP.route('/groups/')
 def group_lists():
+    ''' Redirects to the list of groups on this pagure instance. '''
     root_url = APP.config['APP_URL']
     if root_url.endswith('/'):
         root_url = root_url[:-1]
@@ -128,6 +131,9 @@ def group_lists():
 
 @APP.route('/new/')
 def new_project():
+    ''' Redirects to the page to create a new project on this pagure
+    instance.
+    '''
     root_url = APP.config['APP_URL']
     if root_url.endswith('/'):
         root_url = root_url[:-1]
@@ -137,6 +143,7 @@ def new_project():
 @APP.route('/repo/<repo>/')
 @APP.route('/repo/fork/<username>/<repo>/')
 def view_repo(repo, username=None):
+    ''' Redirects to the overview page of this project. '''
     root_url = APP.config['APP_URL']
     if root_url.endswith('/'):
         root_url = root_url[:-1]
@@ -147,6 +154,7 @@ def view_repo(repo, username=None):
 @APP.route('/<repo>/issues/')
 @APP.route('/fork/<username>/<repo>/issues/')
 def view_issues(repo, username=None):
+    ''' Redirects to the page listing all issues of this project. '''
     root_url = APP.config['APP_URL']
     if root_url.endswith('/'):
         root_url = root_url[:-1]
@@ -159,6 +167,7 @@ def view_issues(repo, username=None):
 @APP.route('/<repo>/commits/')
 @APP.route('/fork/<username>/<repo>/commits/')
 def view_commits(repo, username=None):
+    ''' Redirects to the page listing all commits of this project. '''
     root_url = APP.config['APP_URL']
     if root_url.endswith('/'):
         root_url = root_url[:-1]
@@ -171,6 +180,8 @@ def view_commits(repo, username=None):
 @APP.route('/<repo>/tree/')
 @APP.route('/fork/<username>/<repo>/tree/')
 def view_tree(repo, username=None):
+    ''' Redirects to the page displaying the tree of files of this project.
+    '''
     root_url = APP.config['APP_URL']
     if root_url.endswith('/'):
         root_url = root_url[:-1]
@@ -183,6 +194,7 @@ def view_tree(repo, username=None):
 @APP.route('/<repo>/tags/')
 @APP.route('/fork/<username>/<repo>/tags/')
 def view_tags(repo, username=None):
+    ''' Redirects to the page listing all tags of this project. '''
     root_url = APP.config['APP_URL']
     if root_url.endswith('/'):
         root_url = root_url[:-1]
@@ -195,6 +207,7 @@ def view_tags(repo, username=None):
 @APP.route('/<repo>/pull-requests/')
 @APP.route('/fork/<username>/<repo>/pull-requests/')
 def request_pulls(repo, username=None):
+    ''' Redirects to the page listing all pull-requests of this project. '''
     root_url = APP.config['APP_URL']
     if root_url.endswith('/'):
         root_url = root_url[:-1]
@@ -207,6 +220,7 @@ def request_pulls(repo, username=None):
 @APP.route('/<repo>/forks/')
 @APP.route('/fork/<username>/<repo>/forks/')
 def view_forks(repo, username=None):
+    ''' Redirects to the page listing all forks of this project. '''
     root_url = APP.config['APP_URL']
     if root_url.endswith('/'):
         root_url = root_url[:-1]

@@ -269,7 +269,7 @@ def add_tag_obj(session, obj, tags, user, ticketfolder, redis=None):
 
 
 def add_issue_assignee(session, issue, assignee, user, ticketfolder,
-                      redis=None):
+                       redis=None):
     ''' Add an assignee to an issue, in other words, assigned an issue. '''
     user_obj = __get_user(session, user)
 
@@ -812,7 +812,7 @@ def add_pull_request_flag(session, request, username, percent, comment, url,
 
 def new_project(session, user, name, blacklist,
                 gitfolder, docfolder, ticketfolder, requestfolder,
-                description=None, url=None,avatar_email=None,
+                description=None, url=None, avatar_email=None,
                 parent_id=None):
     ''' Create a new project based on the information provided.
     '''
@@ -1785,7 +1785,8 @@ def update_user_ssh(session, user, ssh_key):
 
     message = 'Nothing to update'
 
-    ssh_key = ssh_key.strip().replace('\n', '') if ssh_key and ssh_key.strip() else None
+    ssh_key = ssh_key.strip().replace('\n', '') \
+              if ssh_key and ssh_key.strip() else None
 
     if ssh_key != user.public_ssh_key:
         user.public_ssh_key = ssh_key

@@ -21,7 +21,7 @@ import mimetypes
 import pagure.doc_utils
 import pagure.lib
 import pagure.forms
-from pagure import (APP,  SESSION, REDIS, LOG, __get_file_in_tree,
+from pagure import (APP, SESSION, REDIS, LOG, __get_file_in_tree,
                     cla_required, is_repo_admin, authenticated)
 
 
