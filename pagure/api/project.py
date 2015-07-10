@@ -97,8 +97,38 @@ def api_projects():
 
         {
           "projects": [
-            "https://pagure.org/fedmsg",
-            "https://pagure.org/fork/pingou/fedmsg"
+            {
+              "date_created": "1427441537",
+              "description": "A web-based calendar for Fedora",
+              "id": 7,
+              "name": "fedocal",
+              "parent": null,
+              "user": {
+                "fullname": "Pierre-Yves C",
+                "name": "pingou"
+              }
+            },
+            {
+              "date_created": "1431666007",
+              "description": "An awesome messaging servicefor everyone",
+              "id": 12,
+              "name": "fedmsg",
+              "parent": {
+                "date_created": "1433423298",
+                "description": "An awesome messaging servicefor everyone",
+                "id": 11,
+                "name": "fedmsg",
+                "parent": null,
+                "user": {
+                  "fullname": "Ralph B",
+                  "name": "ralph"
+                }
+              },
+              "user": {
+                "fullname": "Pierre-Yves C",
+                "name": "pingou"
+              }
+            }
           ]
         }
 
@@ -124,11 +154,6 @@ def api_projects():
         root = root[:-1]
 
     jsonout = flask.jsonify({
-        'projects': [
-            root + flask.url_for(
-                'view_repo',
-                repo=p.name,
-                username=p.user.username if p.is_fork else None)
-            for p in projects
-        ]})
+        'projects': [ p.to_json(api=True, public=True) for p in projects]
+    })
     return jsonout
