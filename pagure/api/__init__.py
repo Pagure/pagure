@@ -410,6 +410,7 @@ def api_error_codes():
 def api():
     ''' Display the api information page. '''
     api_git_tags_doc = load_doc(project.api_git_tags)
+    api_projects_doc = load_doc(project.api_projects)
 
     api_new_issue_doc = load_doc(issue.api_new_issue)
     api_view_issue_doc = load_doc(issue.api_view_issue)
@@ -437,6 +438,7 @@ def api():
         api_doc=APIDOC,
         projects=[
             api_git_tags_doc,
+            api_projects_doc,
         ],
         issues=[
             api_new_issue_doc,
