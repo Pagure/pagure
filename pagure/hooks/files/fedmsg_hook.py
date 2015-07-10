@@ -36,11 +36,23 @@ def build_stats(commit):
     total = {}
     for line in output[1:]:
         additions, deletions, path = line.split('\t')
+        additions, deletions = additions.strip(), deletions.strip()
+
+        try:
+            additions = int(additions)
+        except ValueError:
+            additions = 0
+
+        try:
+            deletions = int(deletions)
+        except ValueError:
+            deletions = 0
+
         path = path.strip()
         files[path] = {
-            'additions': int(additions.strip()),
-            'deletions': int(deletions.strip()),
-            'lines': int(additions.strip()) + int(deletions.strip()),
+            'additions':  additions,
+            'deletions': deletions,
+            'lines': additions + deletions,
         }
 
     total = defaultdict(int)
