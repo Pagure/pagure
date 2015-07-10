@@ -1,3 +1,6 @@
 mock
 nose
 nosexcover
+
+# Seems that mock doesn't list this one
+funcsigs
