@@ -149,10 +149,6 @@ def api_projects():
         raise pagure.exceptions.APIError(
             404, error_code=APIERROR.ENOPROJECTS)
 
-    root = pagure.APP.config['APP_URL']
-    if root.endswith('/'):
-        root = root[:-1]
-
     jsonout = flask.jsonify({
         'projects': [ p.to_json(api=True, public=True) for p in projects]
     })
