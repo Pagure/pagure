@@ -102,6 +102,41 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             {'tags': ['0.0.1']}
         )
 
+    def test_api_projects(self):
+        """ Test the api_projects method of the flask api. """
+        tests.create_projects(self.session)
+
+        # Check before adding
+        repo = pagure.lib.get_project(self.session, 'test')
+        self.assertEqual(repo.tags, [])
+
+        # Adding a tag
+        output = pagure.lib.update_tags(
+            self.session, repo, 'infra', 'pingou',
+            ticketfolder=None, redis=None)
+        self.assertEqual(output, ['Tag added: infra'])
+
+        # Check after adding
+        repo = pagure.lib.get_project(self.session, 'test')
+        self.assertEqual(len(repo.tags), 1)
+        self.assertEqual(repo.tags_text, ['infra'])
+
+        # Check the API
+        output = self.app.get('/api/0/projects?tags=inf')
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'error_code': 'ENOPROJECTS', 'error': 'No projects found'}
+        )
+        output = self.app.get('/api/0/projects?tags=infra')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'projects': ['https://pagure.org/test']}
+        )
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
