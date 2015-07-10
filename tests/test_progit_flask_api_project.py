@@ -136,6 +136,21 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             data,
             {'projects': ['https://pagure.org/test']}
         )
+        output = self.app.get('/api/0/projects?username=pingou')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'projects':
+                ['https://pagure.org/test', 'https://pagure.org/test2']}
+        )
+        output = self.app.get('/api/0/projects?username=pingou&tags=infra')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'projects': ['https://pagure.org/test']}
+        )
 
 
 if __name__ == '__main__':
