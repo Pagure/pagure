@@ -1172,7 +1172,7 @@ def fork_project(session, user, repo, gitfolder,
 
 
 def search_projects(
-        session, username=None, fork=None,
+        session, username=None, fork=None, tags=None,
         start=None, limit=None, count=False):
     '''List existing projects
     '''
@@ -1235,6 +1235,16 @@ def search_projects(
             projects = projects.filter(
                 model.Project.parent_id == None
             )
+
+    if tags is not None:
+        if not isinstance(tags, (list, tuple)):
+            tags = [tags]
+
+        projects = projects.filter(
+            model.Project.id == model.TagProject.project_id
+        ).filter(
+            model.TagProject.tag.in_(tags)
+        )
 
     query = session.query(
         model.Project
