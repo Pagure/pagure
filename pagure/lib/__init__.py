@@ -1236,7 +1236,7 @@ def search_projects(
                 model.Project.parent_id == None
             )
 
-    if tags is not None:
+    if tags:
         if not isinstance(tags, (list, tuple)):
             tags = [tags]
 
