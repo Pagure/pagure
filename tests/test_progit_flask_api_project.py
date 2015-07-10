@@ -132,24 +132,80 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         output = self.app.get('/api/0/projects?tags=infra')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
+        data['projects'][0]['date_created'] = "1436527638"
         self.assertDictEqual(
             data,
-            {'projects': ['https://pagure.org/test']}
+            {
+              "projects": [
+                {
+                  "date_created": "1436527638",
+                  "description": "test project #1",
+                  "id": 1,
+                  "name": "test",
+                  "parent": None,
+                  "user": {
+                    "fullname": "PY C",
+                    "name": "pingou"
+                  }
+                }
+              ]
+            }
         )
         output = self.app.get('/api/0/projects?username=pingou')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
+        data['projects'][0]['date_created'] = "1436527638"
+        data['projects'][1]['date_created'] = "1436527638"
         self.assertDictEqual(
             data,
-            {'projects':
-                ['https://pagure.org/test', 'https://pagure.org/test2']}
+            {
+              "projects": [
+                {
+                  "date_created": "1436527638",
+                  "description": "test project #1",
+                  "id": 1,
+                  "name": "test",
+                  "parent": None,
+                  "user": {
+                    "fullname": "PY C",
+                    "name": "pingou"
+                  }
+                },
+                {
+                  "date_created": "1436527638",
+                  "description": "test project #2",
+                  "id": 2,
+                  "name": "test2",
+                  "parent": None,
+                  "user": {
+                    "fullname": "PY C",
+                    "name": "pingou"
+                  }
+                }
+              ]
+            }
         )
         output = self.app.get('/api/0/projects?username=pingou&tags=infra')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
+        data['projects'][0]['date_created'] = "1436527638"
         self.assertDictEqual(
             data,
-            {'projects': ['https://pagure.org/test']}
+            {
+              "projects": [
+                {
+                  "date_created": "1436527638",
+                  "description": "test project #1",
+                  "id": 1,
+                  "name": "test",
+                  "parent": None,
+                  "user": {
+                    "fullname": "PY C",
+                    "name": "pingou"
+                  }
+                }
+              ]
+            }
         )
 
 
