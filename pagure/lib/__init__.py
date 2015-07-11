@@ -2366,3 +2366,11 @@ def clean_input(text):
         ],
         attributes=attrs,
     )
+
+
+def is_binary(text):
+    """ Returns wether we think this text correspond to a binary file or not
+    """
+    textchars = bytearray([7,8,9,10,12,13,27]) + bytearray(range(0x20, 0x100))
+    is_binary_string = lambda bytes: bool(bytes.translate(None, textchars))
+    return is_binary_string(text)
