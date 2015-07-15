@@ -2368,40 +2368,10 @@ def clean_input(text):
     )
 
 
-def is_binary(text):
-    """ Returns wether we think this text correspond to a binary file or not
+def could_be_text(text):
+    """ Returns wether we think this chain of character could be text or not
     """
-    btext = bytes(text)
-
-    import imghdr
-    print 'imghdr', imghdr.what('foo', h=btext)
-    if imghdr.what('foo', h=text):
-        return True
-
-    import StringIO
-    from PIL import Image
     try:
-        im = Image.open(StringIO.StringIO(text))
-        if im:
-            return True
-    except IOError, err:
-        print 'ERROR', err
-        pass
-    print btext
-
-    if b'\x00' in btext:
+        text.encode('utf-8')
+    except:
         return True
-
-    _printable_extended_ascii = b'\n\r\t\f\b'
-    if bytes is str:
-        # Python 2 means we need to invoke chr() explicitly
-        _printable_extended_ascii += b''.join(map(chr, range(32, 256)))
-    else:
-        # Python 3 means bytes accepts integer input directly
-        _printable_extended_ascii += bytes(range(32, 256))
-
-    # Now check for a high percentage of ASCII control characters
-    # Binary if control chars are > 30% of the string
-    control_chars = btext.translate(None, _printable_extended_ascii)
-    nontext_ratio = float(len(control_chars)) / float(len(btext))
-    return nontext_ratio > 0.3
