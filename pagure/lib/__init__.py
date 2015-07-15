@@ -2372,6 +2372,24 @@ def is_binary(text):
     """ Returns wether we think this text correspond to a binary file or not
     """
     btext = bytes(text)
+
+    import imghdr
+    print 'imghdr', imghdr.what('foo', h=btext)
+    if imghdr.what('foo', h=text):
+        return True
+
+    import StringIO
+    from PIL import Image
+    try:
+        im = Image.open(text)
+        im = Image.open(StringIO.StringIO(text))
+        if im:
+            return True
+    except IOError, err:
+        print 'ERROR', err
+        pass
+    print btext
+
     if b'\x00' in btext:
         return True
 
