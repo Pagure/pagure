@@ -354,7 +354,7 @@ def view_file(repo, identifier, filename, username=None):
         content = commit
 
     if isinstance(content, pygit2.Blob):
-        if content.is_binary or pagure.lib.could_be_text(data):
+        if content.is_binary or not pagure.lib.could_be_text(data):
             ext = filename[filename.rfind('.'):]
             if ext in (
                     '.gif', '.png', '.bmp', '.tif', '.tiff', '.jpg',
@@ -1302,7 +1302,7 @@ def edit_file(repo, branchname, filename, username=None):
             flask.abort(404, 'File not found')
 
         data = repo_obj[content.oid].data
-        if content.is_binary or pagure.lib.could_be_text(data):
+        if content.is_binary or not pagure.lib.could_be_text(data):
             flask.abort(400, 'Cannot edit binary files')
     else:
         data = form.content.data

@@ -2373,5 +2373,6 @@ def could_be_text(text):
     """
     try:
         text.encode('utf-8')
-    except:
         return True
+    except:
+        return False
