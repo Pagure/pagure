@@ -2371,4 +2371,20 @@ def clean_input(text):
 def is_binary(text):
     """ Returns wether we think this text correspond to a binary file or not
     """
-    return '\0' in text
+    btext = bytes(text)
+    if b'\x00' in btext:
+        return True
+
+    _printable_extended_ascii = b'\n\r\t\f\b'
+    if bytes is str:
+        # Python 2 means we need to invoke chr() explicitly
+        _printable_extended_ascii += b''.join(map(chr, range(32, 256)))
+    else:
+        # Python 3 means bytes accepts integer input directly
+        _printable_extended_ascii += bytes(range(32, 256))
+
+    # Now check for a high percentage of ASCII control characters
+    # Binary if control chars are > 30% of the string
+    control_chars = btext.translate(None, _printable_extended_ascii)
+    nontext_ratio = float(len(control_chars)) / float(len(btext))
+    return nontext_ratio > 0.3
