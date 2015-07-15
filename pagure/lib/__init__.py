@@ -2381,7 +2381,6 @@ def is_binary(text):
     import StringIO
     from PIL import Image
     try:
-        im = Image.open(text)
         im = Image.open(StringIO.StringIO(text))
         if im:
             return True
