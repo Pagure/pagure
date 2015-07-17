@@ -26,6 +26,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 
 import pagure.lib
 import tests
+from pagure.lib.repo import PagureRepo
 
 
 class PagureFlaskSlashInBranchtests(tests.Modeltests):
@@ -89,10 +90,7 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
         )
         refname = 'refs/heads/master'
         ori_remote = clone_repo.remotes[0]
-        if pygit2.__version__.startswith('0.22'):
-            ori_remote.push([refname])
-        else:
-            ori_remote.push(refname)
+        PagureRepo.push(ori_remote, refname)
 
         master_branch = clone_repo.lookup_branch('master')
         first_commit = master_branch.get_object().hex
@@ -121,10 +119,7 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
 
         refname = 'refs/heads/maxamilion/feature'
         ori_remote = clone_repo.remotes[0]
-        if pygit2.__version__.startswith('0.22'):
-            ori_remote.push([refname])
-        else:
-            ori_remote.push(refname)
+        PagureRepo.push(ori_remote, refname)
 
         shutil.rmtree(newpath)
 

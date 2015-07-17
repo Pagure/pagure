@@ -35,7 +35,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 import pagure
 import pagure.lib
 import pagure.lib.model
-
+from pagure.lib.repo import PagureRepo
 
 DB_PATH = 'sqlite:///:memory:'
 FAITOUT_URL = 'http://209.132.184.152/faitout/'
@@ -365,10 +365,7 @@ def add_content_git_repo(folder):
     master_ref = repo.lookup_reference('HEAD').resolve()
     refname = '%s:%s' % (master_ref.name, master_ref.name)
 
-    if pygit2.__version__.startswith('0.22'):
-        ori_remote.push([refname])
-    else:
-        ori_remote.push(refname)
+    PagureRepo.push(ori_remote, refname)
 
     shutil.rmtree(newfolder)
 
@@ -437,10 +434,7 @@ Dev instance: http://209.132.184.222/ (/!\\ May change unexpectedly, it's a dev 
     master_ref = repo.lookup_reference('HEAD').resolve()
     refname = '%s:%s' % (master_ref.name, master_ref.name)
 
-    if pygit2.__version__.startswith('0.22'):
-        ori_remote.push([refname])
-    else:
-        ori_remote.push(refname)
+    PagureRepo.push(ori_remote, refname)
 
     shutil.rmtree(newfolder)
 
@@ -492,10 +486,7 @@ def add_commit_git_repo(folder, ncommits=10):
     master_ref = repo.lookup_reference('HEAD').resolve()
     refname = '%s:%s' % (master_ref.name, master_ref.name)
 
-    if pygit2.__version__.startswith('0.22'):
-        ori_remote.push([refname])
-    else:
-        ori_remote.push(refname)
+    PagureRepo.push(ori_remote, refname)
 
     shutil.rmtree(newfolder)
 
@@ -562,10 +553,7 @@ C7Pí^DQeee<84>ÃaÜn·î<98><9e><9e>^^¶oß®<95>Ý¦M^^T©®®¦®®<8e>©©)�
     master_ref = repo.lookup_reference('HEAD').resolve()
     refname = '%s:%s' % (master_ref.name, master_ref.name)
 
-    if pygit2.__version__.startswith('0.22'):
-        ori_remote.push([refname])
-    else:
-        ori_remote.push(refname)
+    PagureRepo.push(ori_remote, refname)
 
     shutil.rmtree(newfolder)
 

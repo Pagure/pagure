@@ -26,6 +26,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 import pagure.docs_server
 import pagure.lib
 import tests
+from pagure.lib.repo import PagureRepo
 
 
 class PagureFlaskDocstests(tests.Modeltests):
@@ -156,10 +157,7 @@ class PagureFlaskDocstests(tests.Modeltests):
         remote = repo.create_remote(
             'origin', os.path.join(tests.HERE, 'docs', 'test.git'))
 
-        if pygit2.__version__.startswith('0.22'):
-            remote.push(['refs/heads/master:refs/heads/master'])
-        else:
-            remote.push('refs/heads/master:refs/heads/master')
+        PagureRepo.push(remote, 'refs/heads/master:refs/heads/master')
 
         # Now check the UI
 
