@@ -1,4 +1,4 @@
-mock
+mock == 1.1.2
 nose
 nosexcover
 
