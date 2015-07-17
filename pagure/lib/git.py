@@ -27,6 +27,7 @@ import pagure.exceptions
 import pagure.lib
 import pagure.lib.notify
 from pagure.lib import model
+from pagure.lib.repo import PagureRepo
 
 # pylint: disable=R0913,E1101,R0914
 
@@ -198,10 +199,7 @@ def update_git(obj, repo, repofolder, objtype='ticket'):
     master_ref = new_repo.lookup_reference('HEAD').resolve()
     refname = '%s:%s' % (master_ref.name, master_ref.name)
 
-    if pygit2.__version__.startswith('0.22'):
-        ori_remote.push([refname])
-    else:
-        ori_remote.push(refname)
+    PagureRepo.push(ori_remote, refname)
 
     # Remove the clone
     shutil.rmtree(newpath)
@@ -267,10 +265,7 @@ def clean_git(obj, repo, repofolder, objtype='ticket'):
     master_ref = new_repo.lookup_reference('HEAD').resolve()
     refname = '%s:%s' % (master_ref.name, master_ref.name)
 
-    if pygit2.__version__.startswith('0.22'):
-        ori_remote.push([refname])
-    else:
-        ori_remote.push(refname)
+    PagureRepo.push(ori_remote, refname)
 
     # Remove the clone
     shutil.rmtree(newpath)
@@ -654,10 +649,7 @@ def add_file_to_git(repo, issue, ticketfolder, user, filename, filestream):
     master_ref = new_repo.lookup_reference('HEAD').resolve()
     refname = '%s:%s' % (master_ref.name, master_ref.name)
 
-    if pygit2.__version__.startswith('0.22'):
-        ori_remote.push([refname])
-    else:
-        ori_remote.push(refname)
+    PagureRepo.push(ori_remote, refname)
 
     # Remove the clone
     shutil.rmtree(newpath)
@@ -746,10 +738,7 @@ def update_file_in_git(
         branchto)
 
     try:
-        if pygit2.__version__.startswith('0.22'):
-            ori_remote.push([refname])
-        else:
-            ori_remote.push(refname)
+        PagureRepo.push(ori_remote, refname)
     except pygit2.GitError as err:  # pragma: no cover
         shutil.rmtree(newpath)
         raise pagure.exceptions.PagureException(
@@ -867,7 +856,7 @@ def merge_pull_request(
     '''
     # Get the fork
     repopath = pagure.get_repo_path(request.project_from)
-    fork_obj = pygit2.Repository(repopath)
+    fork_obj = PagureRepo(repopath)
 
     # Get the original repo
     parentpath = pagure.get_repo_path(request.project)
@@ -878,7 +867,7 @@ def merge_pull_request(
 
     # Update the start and stop commits in the DB, one last time
     diff_commits = diff_pull_request(
-        session, request, pygit2.Repository(parentpath), fork_obj,
+        session, request, PagureRepo(parentpath), fork_obj,
         requestfolder=request_folder, with_diff=False)[0]
 
     if request.project.settings.get(
@@ -961,10 +950,7 @@ def merge_pull_request(
             elif merge is None and mergecode is not None:
                 branch_ref.set_target(repo_commit.oid.hex)
 
-            if pygit2.__version__.startswith('0.22'):
-                ori_remote.push([refname])
-            else:
-                ori_remote.push(refname)
+            PagureRepo.push(ori_remote, refname)
         else:
             request.merge_status = 'FFORWARD'
             session.commit()
@@ -996,10 +982,7 @@ def merge_pull_request(
             'Merge #%s `%s`' % (request.id, request.title),
             tree,
             [head.hex, repo_commit.oid.hex])
-        if pygit2.__version__.startswith('0.22'):
-            ori_remote.push([refname])
-        else:
-            ori_remote.push(refname)
+        PagureRepo.push(ori_remote, refname)
 
     # Update status
     pagure.lib.close_pull_request(
@@ -1100,7 +1083,7 @@ def get_git_tags(project):
     specified project.
     """
     repopath = pagure.get_repo_path(project)
-    repo_obj = pygit2.Repository(repopath)
+    repo_obj = PagureRepo(repopath)
     tags = [
         tag.split('refs/tags/')[1]
         for tag in repo_obj.listall_references()
@@ -1114,7 +1097,7 @@ def get_git_tags_objects(project):
     repositorie the specified project.
     """
     repopath = pagure.get_repo_path(project)
-    repo_obj = pygit2.Repository(repopath)
+    repo_obj = PagureRepo(repopath)
     tags = [
         repo_obj.lookup_reference(tag)
         for tag in repo_obj.listall_references()
