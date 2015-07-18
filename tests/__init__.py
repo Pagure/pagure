@@ -38,7 +38,7 @@ import pagure.lib.model
 from pagure.lib.repo import PagureRepo
 
 DB_PATH = 'sqlite:///:memory:'
-FAITOUT_URL = 'http://209.132.184.152/faitout/'
+FAITOUT_URL = 'http://faitout.cloud.fedoraproject.org/faitout/'
 HERE = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 
 
