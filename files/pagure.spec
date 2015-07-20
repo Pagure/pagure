@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.18
+Version:        0.1.19
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -212,6 +212,42 @@ install -m 644 ev-server/pagure_ev.service \
 
 
 %changelog
+* Mon Jul 20 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.19-1
+- Update to 0.1.19
+- Prettify the JSON stored in the git for tickets/requests... (Simo Sorce)
+- Use the project name as subject tag in the notifications sent (Simo Sorce)
+- Add an X-pagure header with either the pagure instance or the project name
+- Reset the merge status of all the open PR when one is merged
+- Add a second server listing the number of connections opened on the first
+  eventsource server
+- Log the info instead of printing them in the eventsource server
+- Split the documentation to a different wsgi application to avoid any risk of
+  cross-site forgery
+- Fix the JS logic when adding a tag or a dependency to avoid having duplicates
+  in the input field
+- Allow deleting a git branch of a project via the UI
+- Include the font-awesome in the source rather than relying on an external cdn
+- Do not try to connect to the eventsource server if we're not viewing a
+  pull-request
+- Fix showing the first comment made on a PR via the eventsource server
+- Fix showing the git URLs in the doc server
+- Much better API documentation (Lei Yang)
+- Handle showing closed PR that were not merged
+- Fix refreshing the UI of private tickets via the eventsource (making calls to
+  the API to get the info while only getting what changed via the SSE)
+- Fix the anchor links in the API documentation
+- Blink the tab upon changes in the page
+- Ensure we close both SSE server when stopping pagure_ev
+- Let the HTML form trigger if we did not connect to the EV server successfully
+- The admins of a repo are anyone with commit access to the repo, directly or
+  via a group
+- Order the project by names in the front page (instead of creation date)
+- Add the ability to tag a project
+- Fix the fedmsg_hook when there are only deletions or only additions
+- Add a new API endpoint allowing to search projects (by name, author, tag ...)
+- Make pagure compatible with pygit 0.22.0
+- Adjust unit-tests for all these changes
+
 * Mon Jun 22 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.18-1
 - Update to 0.1.18
 - Fix the eventsource server for CORS
