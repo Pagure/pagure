@@ -689,7 +689,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,73 @@
+@@ -0,0 +1,75 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
@@ -715,6 +715,7 @@ index 0000000..60f7480
 +            "project_documentation": true,
 +            "pull_requests": true
 +        },
++        "tags": [],
 +        "user": {
 +            "default_email": "bar@pingou.com",
 +            "emails": [
@@ -740,6 +741,7 @@ index 0000000..60f7480
 +            "project_documentation": true,
 +            "pull_requests": true
 +        },
++        "tags": [],
 +        "user": {
 +            "default_email": "bar@pingou.com",
 +            "emails": [
@@ -938,6 +940,7 @@ index 0000000..60f7480
                 },
                 "name": "test",
                 "date_created": "1426500194",
+                "tags": [],
                 "user": {
                     "fullname": "Pierre-YvesChibon",
                     "name": "pingou",
@@ -1016,6 +1019,7 @@ index 0000000..60f7480
                     "parent": None,
                     "name": "test",
                     "date_created": "1426500194",
+                    "tags": [],
                     "user": {
                         "fullname": "Pierre-YvesChibon",
                         "name": "pingou",
@@ -1039,6 +1043,7 @@ index 0000000..60f7480
                 },
                 "name": "test",
                 "date_created": "1426843440",
+                "tags": [],
                 "user": {
                     "fullname": "fake user",
                     "name": "fake",
@@ -1098,6 +1103,7 @@ index 0000000..60f7480
                 "parent": None,
                 "name": "test",
                 "date_created": "1426500194",
+                "tags": [],
                 "user": {
                     "fullname": "Pierre-YvesChibon",
                     "name": "pingou",
@@ -1131,6 +1137,7 @@ index 0000000..60f7480
                     "parent": None,
                     "name": "test",
                     "date_created": "1426500194",
+                    "tags": [],
                     "user": {
                         "fullname": "Pierre-YvesChibon",
                         "name": "pingou",
@@ -1154,6 +1161,7 @@ index 0000000..60f7480
                 },
                 "name": "test",
                 "date_created": "1426843440",
+                "tags": [],
                 "user": {
                     "fullname": "fake user",
                     "name": "fake",
