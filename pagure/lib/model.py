@@ -377,6 +377,7 @@ class Project(BASE):
                 public=public, api=api) if self.parent else None,
             'date_created': self.date_created.strftime('%s'),
             'user': self.user.to_json(public=public),
+            'tags': self.tags_text,
         }
         if not api:
             output['settings'] = self.settings
