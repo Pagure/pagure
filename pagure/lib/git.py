@@ -361,6 +361,11 @@ def get_project_from_json(
 
         session.commit()
         project = pagure.lib.get_project(session, name, user=user.username)
+        tags = jsondata.get('tags', None)
+        if tags:
+            pagure.lib.add_tag_obj(
+                session, project, tags=tags, user=user.username,
+                ticketfolder=None, redis=None)
 
     return project
 
