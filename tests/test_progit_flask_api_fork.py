@@ -122,6 +122,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                       "name": "pingou"
                     }
                   },
+                  "remote_git": None,
                   "repo_from": {
                     "date_created": "1431414800",
                     "description": "test project #1",
@@ -241,6 +242,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                   "name": "pingou"
                 }
               },
+              "remote_git": None,
               "repo_from": {
                 "date_created": "1431414800",
                 "description": "test project #1",

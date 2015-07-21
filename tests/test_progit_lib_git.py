@@ -689,7 +689,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,75 @@
+@@ -0,0 +1,76 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
@@ -726,6 +726,7 @@ index 0000000..60f7480
 +            "name": "pingou"
 +        }
 +    },
++    "remote_git": null,
 +    "repo_from": {
 +        "date_created": null,
 +        "description": "test project for ticket",
