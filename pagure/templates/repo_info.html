@@ -138,6 +138,13 @@
           {% if repo_admin %}Request pull{% else %}Compare{% endif %}
         </a>
     </span>
+    {% elif authenticated %}
+    <span id="request_pull" class="inline_it">
+        <a href="{{ url_for('new_remote_request_pull',
+            username=username, repo=repo.name) }}">
+          Open a remote pull-request
+        </a>
+    </span>
     {% endif %}
     {% if repo_admin and branchname and branchname != 'master' %}
     <form action="{{
