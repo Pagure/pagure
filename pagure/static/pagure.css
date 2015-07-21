@@ -785,6 +785,7 @@ header.repo.forked > p {
     display: block;
     font-weight: normal;
     font-size: .9em;
+    white-space: pre-line;
 }
 
 .commit_diff {
