@@ -26,6 +26,7 @@ from logging.handlers import SMTPHandler
 import flask
 import pygit2
 import redis
+import werkzeug
 from pagure.flask_fas_openid import FAS
 from functools import wraps
 from sqlalchemy.exc import SQLAlchemyError
@@ -396,6 +397,33 @@ def get_repo_path(repo):
 
     if not os.path.exists(repopath):
         flask.abort(404, 'No git repo found')
+
+    return repopath
+
+
+def get_remote_repo_path(remote_git, branch_from):
+    """ Return the path of the remote git repository corresponding to the
+    provided information.
+    """
+    repopath = os.path.join(
+        APP.config['REMOTE_GIT_FOLDER'],
+        werkzeug.secure_filename('%s_%s' % (remote_git, branch_from))
+    )
+
+    if not os.path.exists(repopath):
+        try:
+            pygit2.clone_repository(
+                remote_git, repopath, checkout_branch=branch_from)
+        except Exception as err:
+            LOG.debug(err)
+            LOG.exception(err)
+            flask.abort(500, 'Could not clone the remote git repository')
+    else:
+        repo = pagure.lib.repo.PagureRepo(repopath)
+        try:
+            repo.pull(branch=branch_from)
+        except pagure.exceptions.PagureException as err:
+            flask.abort(500, err.message)
 
     return repopath
 
