@@ -859,12 +859,19 @@ def merge_pull_request(
         session, request, username, request_folder, domerge=True):
     ''' Merge the specified pull-request.
     '''
-    # Get the fork
-    repopath = pagure.get_repo_path(request.project_from)
-    fork_obj = PagureRepo(repopath)
+    if request.remote:
+        # Get the fork
+        repopath = pagure.get_remote_repo_path(
+            request.remote_git, request.branch_from)
+        # Get the original repo
+        parentpath = pagure.get_repo_path(request.project)
+    else:
+        # Get the fork
+        repopath = pagure.get_repo_path(request.project_from)
+        # Get the original repo
+        parentpath = _get_parent_repo_path(repo_from)
 
-    # Get the original repo
-    parentpath = pagure.get_repo_path(request.project)
+    fork_obj = PagureRepo(repopath)
 
     # Clone the original repo into a temp folder
     newpath = tempfile.mkdtemp(prefix='pagure-pr-merge')
@@ -900,13 +907,15 @@ def merge_pull_request(
         raise pagure.exceptions.BranchNotFoundException(
             'Branch %s could not be found in the repo %s' % (
                 request.branch_from, request.project_from.fullname
+                if request.project_from else request.remote_git
             ))
 
     repo_commit = fork_obj[branch.get_object().hex]
 
     ori_remote = new_repo.remotes[0]
     # Add the fork as remote repo
-    reponame = '%s_%s' % (request.user.user, request.project_from.name)
+    reponame = '%s_%s' % (request.user.user, request.uid)
+
     remote = new_repo.create_remote(reponame, repopath)
 
     # Fetch the commits
