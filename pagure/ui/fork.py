@@ -792,3 +792,133 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
         branch_from=branch_from,
         repo_admin=repo_admin,
     )
+
+
+@APP.route('/<repo>/diff/remote/', methods=('GET', 'POST'))
+@APP.route('/<repo>/diff/remote', methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<repo>/diff/remote/', methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<repo>/diff/remote', methods=('GET', 'POST'))
+@cla_required
+def new_remote_request_pull(repo, username=None):
+    """ Request pulling the changes from a remote fork into the project.
+    """
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    confirm = flask.request.values.get('confirm', False)
+
+    if not repo:
+        flask.abort(404)
+
+    if not repo.settings.get('pull_requests', True):
+        flask.abort(404, 'No pull-requests found for this project')
+
+    parentpath = pagure.get_repo_path(repo)
+    orig_repo = pygit2.Repository(parentpath)
+
+    repo_admin = is_repo_admin(repo)
+
+    form = pagure.forms.RemoteRequestPullForm()
+    if form.validate_on_submit() and repo_admin:
+        branch_from = form.branch_from.data.strip()
+        branch_to = form.branch_to.data.strip()
+        remote_git = form.git_repo.data.strip()
+
+        repopath = pagure.get_remote_repo_path(remote_git, branch_from)
+        repo_obj = pygit2.Repository(repopath)
+
+        try:
+            diff, diff_commits, orig_commit = _get_pr_info(
+                repo_obj, orig_repo, branch_from, branch_to)
+        except pagure.exceptions.PagureException as err:
+            flask.flash(err.message, 'error')
+            return flask.redirect(flask.url_for(
+                'view_repo', username=username, repo=repo.name))
+
+        if not confirm:
+            return flask.render_template(
+            'pull_request.html',
+            select='requests',
+            repo=repo,
+            username=username,
+            repo_obj=repo_obj,
+            orig_repo=orig_repo,
+            diff_commits=diff_commits,
+            diff=diff,
+            form=form,
+            branches=sorted(orig_repo.listall_branches()),
+            branch_to=branch_to,
+            branch_from=branch_from,
+            repo_admin=repo_admin,
+            remote_git=remote_git,
+        )
+
+        try:
+            if repo.settings.get(
+                    'Enforce_signed-off_commits_in_pull-request', False):
+                for commit in diff_commits:
+                    if 'signed-off-by' not in commit.message.lower():
+                        raise pagure.exceptions.PagureException(
+                            'This repo enforces that all commits are '
+                            'signed off by their author. ')
+
+            if orig_commit:
+                orig_commit = orig_commit.oid.hex
+
+            parent = repo
+            if repo.parent:
+                parent = repo.parent
+
+            request = pagure.lib.new_pull_request(
+                SESSION,
+                repo_to=parent,
+                branch_to=branch_to,
+                branch_from=branch_from,
+                repo_from=None,
+                remote_git=remote_git,
+                title=form.title.data,
+                user=flask.g.fas_user.username,
+                requestfolder=APP.config['REQUESTS_FOLDER'],
+            )
+            try:
+                SESSION.commit()
+                flask.flash('Request created')
+            except SQLAlchemyError as err:  # pragma: no cover
+                SESSION.rollback()
+                APP.logger.exception(err)
+                flask.flash(
+                    'Could not register this pull-request in '
+                    'the database', 'error')
+
+            if not parent.is_fork:
+                url = flask.url_for(
+                    'request_pull', requestid=request.id,
+                    username=None, repo=parent.name)
+            else:
+                url = flask.url_for(
+                    'request_pull', requestid=request.id,
+                    username=parent.user, repo=parent.name)
+
+            return flask.redirect(url)
+        except pagure.exceptions.PagureException, err:  # pragma: no cover
+            # There could be a PagureException thrown if the
+            # flask.g.fas_user wasn't in the DB but then it shouldn't
+            # be recognized as a repo admin and thus, if we ever are
+            # here, we are in trouble.
+            flask.flash(str(err), 'error')
+        except SQLAlchemyError, err:  # pragma: no cover
+            SESSION.rollback()
+            flask.flash(str(err), 'error')
+
+    if not is_repo_admin(repo):
+        form = None
+
+    return flask.render_template(
+        'remote_pull_request.html',
+        select='requests',
+        repo=repo,
+        username=username,
+        form=form,
+        branches=sorted(orig_repo.listall_branches()),
+        repo_admin=repo_admin,
+    )
