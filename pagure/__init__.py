@@ -386,7 +386,7 @@ def __get_file_in_tree(repo_obj, tree, filepath):
 
 
 def get_repo_path(repo):
-    """ Return the pat of the git repository corresponding to the provided
+    """ Return the path of the git repository corresponding to the provided
     Repository object from the DB.
     """
     if repo.is_fork:
