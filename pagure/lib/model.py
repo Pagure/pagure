@@ -16,6 +16,8 @@ import logging
 import json
 
 import sqlalchemy as sa
+import werkzeug
+
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.declarative import declarative_base
@@ -821,6 +823,19 @@ class PullRequest(BASE):
                     break
 
         return len(positive) - len(negative)
+
+    @property
+    def remote(self):
+        ''' Return whether the current PullRequest is a remote pull-request
+        or not.
+        '''
+        return not self.remote_git is None
+
+    @property
+    def remote_git_path(self):
+        ''' Return the path to the local clone of the remote git repo. '''
+        return '%s_%s' % (
+            self.uid, werkzeug.secure_filename(self.remote_git))
 
     def to_json(self, public=False, api=False):
         ''' Returns a dictionnary representation of the pull-request.
