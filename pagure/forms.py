@@ -93,6 +93,26 @@ class RequestPullForm(wtf.Form):
     )
 
 
+class RemoteRequestPullForm(wtf.Form):
+    ''' Form to create a remote request pull. '''
+    title = wtforms.TextField(
+        'Title<span class="error">*</span>',
+        [wtforms.validators.Required()]
+    )
+    git_repo = wtforms.TextField(
+        'Git repo address<span class="error">*</span>',
+        [wtforms.validators.Required()]
+    )
+    branch_from = wtforms.TextField(
+        'Git branch<span class="error">*</span>',
+        [wtforms.validators.Required()]
+    )
+    branch_to = wtforms.TextField(
+        'Git branch to merge in<span class="error">*</span>',
+        [wtforms.validators.Required()]
+    )
+
+
 class AddIssueTagForm(wtf.Form):
     ''' Form to add a comment to an issue. '''
     tag = wtforms.TextField(
