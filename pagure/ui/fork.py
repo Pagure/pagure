@@ -194,11 +194,16 @@ def request_pull(repo, requestid, username=None):
     if not request:
         flask.abort(404, 'Pull-request not found')
 
-    repo_from = request.project_from
-    repopath = pagure.get_repo_path(repo_from)
-    repo_obj = pygit2.Repository(repopath)
+    if request.remote:
+        repopath = pagure.get_remote_repo_path(
+            request.remote_git, request.branch_from)
+        parentpath = pagure.get_repo_path(request.project)
+    else:
+        repo_from = request.project_from
+        repopath = pagure.get_repo_path(repo_from)
+        parentpath = _get_parent_repo_path(repo_from)
 
-    parentpath = _get_parent_repo_path(repo_from)
+    repo_obj = pygit2.Repository(repopath)
     orig_repo = pygit2.Repository(parentpath)
 
     diff_commits = []
