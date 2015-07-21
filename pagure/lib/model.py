@@ -841,7 +841,9 @@ class PullRequest(BASE):
             'branch': self.branch,
             'project': self.project.to_json(public=public, api=api),
             'branch_from': self.branch_from,
-            'repo_from': self.project_from.to_json(public=public, api=api),
+            'repo_from': self.project_from.to_json(
+                public=public, api=api) if self.project_from else None,
+            'remote_git': self.remote_git,
             'date_created': self.date_created.strftime('%s'),
             'user': self.user.to_json(public=public),
             'assignee': self.assignee.to_json(
