@@ -38,6 +38,75 @@ def _get_parent_repo_path(repo):
     return parentpath
 
 
+def _get_pr_info(repo_obj, orig_repo, branch_from, branch_to):
+    ''' Return the info needed to see a diff or make a Pull-Request between
+    the two specified repo.
+    '''
+    frombranch = repo_obj.lookup_branch(branch_from)
+    if not frombranch and not repo_obj.is_empty:
+        flask.abort(
+            400,
+            'Branch %s does not exist' % branch_from)
+
+    branch = orig_repo.lookup_branch(branch_to)
+    if not branch and not orig_repo.is_empty:
+        flask.abort(
+            400,
+            'Branch %s could not be found in the target repo' % branch_to)
+
+    branch = repo_obj.lookup_branch(branch_from)
+    commitid = None
+    if branch:
+        commitid = branch.get_object().hex
+
+    diff_commits = []
+    diff = None
+    if not repo_obj.is_empty and not orig_repo.is_empty:
+        orig_commit = orig_repo[
+            orig_repo.lookup_branch(branch_to).get_object().hex]
+
+        master_commits = [
+            commit.oid.hex
+            for commit in orig_repo.walk(
+                orig_commit.oid.hex, pygit2.GIT_SORT_TIME)
+        ]
+
+        repo_commit = repo_obj[commitid]
+
+        for commit in repo_obj.walk(
+                repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
+            if commit.oid.hex in master_commits:
+                break
+            diff_commits.append(commit)
+
+        if diff_commits:
+            first_commit = repo_obj[diff_commits[-1].oid.hex]
+            diff = repo_obj.diff(
+                repo_obj.revparse_single(first_commit.parents[0].oid.hex),
+                repo_obj.revparse_single(diff_commits[0].oid.hex)
+            )
+
+    elif orig_repo.is_empty and not repo_obj.is_empty:
+        orig_commit = None
+        if 'master' in repo_obj.listall_branches():
+            repo_commit = repo_obj[repo_obj.head.target]
+        else:
+            branch = repo_obj.lookup_branch(branch_from)
+            repo_commit = branch.get_object()
+
+        for commit in repo_obj.walk(
+                repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
+            diff_commits.append(commit)
+
+        diff = repo_commit.tree.diff_to_tree(swap=True)
+    else:
+        raise pagure.exceptions.PagureException(
+            'Fork is empty, there are no commits to request pulling'
+        )
+
+    return  (diff, diff_commits, orig_commit)
+
+
 @APP.route('/<repo>/pull-requests/')
 @APP.route('/<repo>/pull-requests')
 @APP.route('/fork/<username>/<repo>/pull-requests/')
@@ -633,67 +702,11 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
     parentpath = _get_parent_repo_path(repo)
     orig_repo = pygit2.Repository(parentpath)
 
-    frombranch = repo_obj.lookup_branch(branch_from)
-    if not frombranch and not repo_obj.is_empty:
-        flask.abort(
-            400,
-            'Branch %s does not exist' % branch_from)
-
-    branch = orig_repo.lookup_branch(branch_to)
-    if not branch and not orig_repo.is_empty:
-        flask.abort(
-            400,
-            'Branch %s could not be found in the target repo' % branch_to)
-
-    branch = repo_obj.lookup_branch(branch_from)
-    commitid = None
-    if branch:
-        commitid = branch.get_object().hex
-
-    diff_commits = []
-    diff = None
-    if not repo_obj.is_empty and not orig_repo.is_empty:
-        orig_commit = orig_repo[
-            orig_repo.lookup_branch(branch_to).get_object().hex]
-
-        master_commits = [
-            commit.oid.hex
-            for commit in orig_repo.walk(
-                orig_commit.oid.hex, pygit2.GIT_SORT_TIME)
-        ]
-
-        repo_commit = repo_obj[commitid]
-
-        for commit in repo_obj.walk(
-                repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
-            if commit.oid.hex in master_commits:
-                break
-            diff_commits.append(commit)
-
-        if diff_commits:
-            first_commit = repo_obj[diff_commits[-1].oid.hex]
-            diff = repo_obj.diff(
-                repo_obj.revparse_single(first_commit.parents[0].oid.hex),
-                repo_obj.revparse_single(diff_commits[0].oid.hex)
-            )
-
-    elif orig_repo.is_empty and not repo_obj.is_empty:
-        orig_commit = None
-        if 'master' in repo_obj.listall_branches():
-            repo_commit = repo_obj[repo_obj.head.target]
-        else:
-            branch = repo_obj.lookup_branch(branch_from)
-            repo_commit = branch.get_object()
-
-        for commit in repo_obj.walk(
-                repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
-            diff_commits.append(commit)
-
-        diff = repo_commit.tree.diff_to_tree(swap=True)
-    else:
-        flask.flash(
-            'Fork is empty, there are no commits to request pulling',
-            'error')
+    try:
+        diff, diff_commits, orig_commit = _get_pr_info(
+            repo_obj, orig_repo, branch_from, branch_to)
+    except pagure.exceptions.PagureException as err:
+        flask.flash(err.message, 'error')
         return flask.redirect(flask.url_for(
             'view_repo', username=username, repo=repo.name))
 
