@@ -954,18 +954,25 @@ def drop_issue(session, issue, user, ticketfolder):
     return issue
 
 
-def new_pull_request(session, repo_from, branch_from,
+def new_pull_request(session, branch_from,
                      repo_to, branch_to, title, user,
-                     requestfolder, requestuid=None, requestid=None,
+                     requestfolder, repo_from=None, remote_git=None,
+                     requestuid=None, requestid=None,
                      status='Open', notify=True):
     ''' Create a new pull request on the specified repo. '''
+    if not repo_from and not remote_git:
+        pagure.exceptions.PagureException(
+            'Invalid input, you must specify either a local repo or a '
+            'remote one')
+
     user_obj = __get_user(session, user)
 
     request = model.PullRequest(
         id=requestid or get_next_id(session, repo_to.id),
         uid=requestuid or uuid.uuid4().hex,
         project_id=repo_to.id,
-        project_id_from=repo_from.id,
+        project_id_from=repo_from.id if repo_from else None,
+        remote_git=remote_git if remote_git else None,
         branch=branch_to,
         branch_from=branch_from,
         title=title,
