@@ -719,7 +719,8 @@ def view_settings(repo, username=None):
     if not repo:
         flask.abort(404, 'Project not found')
 
-    if not is_repo_admin(repo):
+    repo_admin = is_repo_admin(repo)
+    if not repo_admin:
         flask.abort(
             403,
             'You are not allowed to change the settings for this project')
@@ -765,6 +766,7 @@ def view_settings(repo, username=None):
         tag_form=tag_form,
         tags=tags,
         plugins=plugins,
+        repo_admin=repo_admin,
     )
 
 
