@@ -837,21 +837,21 @@ def new_remote_request_pull(repo, username=None):
 
         if not confirm:
             return flask.render_template(
-            'pull_request.html',
-            select='requests',
-            repo=repo,
-            username=username,
-            repo_obj=repo_obj,
-            orig_repo=orig_repo,
-            diff_commits=diff_commits,
-            diff=diff,
-            form=form,
-            branches=sorted(orig_repo.listall_branches()),
-            branch_to=branch_to,
-            branch_from=branch_from,
-            repo_admin=repo_admin,
-            remote_git=remote_git,
-        )
+                'pull_request.html',
+                select='requests',
+                repo=repo,
+                username=username,
+                repo_obj=repo_obj,
+                orig_repo=orig_repo,
+                diff_commits=diff_commits,
+                diff=diff,
+                form=form,
+                branches=sorted(orig_repo.listall_branches()),
+                branch_to=branch_to,
+                branch_from=branch_from,
+                repo_admin=repo_admin,
+                remote_git=remote_git,
+            )
 
         try:
             if repo.settings.get(
