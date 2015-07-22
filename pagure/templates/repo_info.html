@@ -85,7 +85,7 @@
       <td>
       {% if page > 1%}
           <a href="{{ url_for('.%s' % origin, username=username,
-                    repo=repo.name) }}?page={{page - 1}}">
+                    repo=repo.name, branchname=branchname, page=page-1) }}">
             &lt; Previous
         </a>
       {% else %}
@@ -96,7 +96,7 @@
       <td>
         {% if page < total_page %}
         <a href="{{ url_for('.%s' % origin, username=username,
-                    repo=repo.name) }}?page={{page + 1}}">
+                    repo=repo.name, branchname=branchname, page=page+1) }}">
             Next &gt;
         </a>
         {% else %}
