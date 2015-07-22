@@ -150,6 +150,6 @@ def api_projects():
             404, error_code=APIERROR.ENOPROJECTS)
 
     jsonout = flask.jsonify({
-        'projects': [ p.to_json(api=True, public=True) for p in projects]
+        'projects': [p.to_json(api=True, public=True) for p in projects]
     })
     return jsonout

@@ -828,7 +828,7 @@ class PullRequest(BASE):
         ''' Return whether the current PullRequest is a remote pull-request
         or not.
         '''
-        return not self.remote_git is None
+        return self.remote_git is not None
 
     def to_json(self, public=False, api=False):
         ''' Returns a dictionnary representation of the pull-request.
