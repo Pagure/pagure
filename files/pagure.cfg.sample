@@ -66,6 +66,14 @@ REQUESTS_FOLDER = os.path.join(
     'requests'
 )
 
+### Folder containing the clones for the remote pull-requests
+REMOTE_GIT_FOLDER = os.path.join(
+    os.path.abspath(os.path.dirname(__file__)),
+    '..',
+    'remotes'
+)
+
+
 ### Configuration file for gitolite
 GITOLITE_CONFIG = os.path.join(
     os.path.abspath(os.path.dirname(__file__)),
