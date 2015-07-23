@@ -11,6 +11,7 @@
 
 import pygit2
 
+import pagure
 import pagure.exceptions
 
 
@@ -57,4 +58,7 @@ class PagureRepo(pygit2.Repository):
                     raise pagure.exceptions.PagureException(
                         'Pulling remote changes leads to a conflict')
                 else:
+                    pagure.LOG.debug(
+                        'Un-expected merge result: %s' % (
+                        pygit2.GIT_MERGE_ANALYSIS_NORMAL))
                     raise AssertionError('Unknown merge analysis result')
