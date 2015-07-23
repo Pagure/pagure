@@ -93,12 +93,8 @@ class RequestPullForm(wtf.Form):
     )
 
 
-class RemoteRequestPullForm(wtf.Form):
+class RemoteRequestPullForm(RequestPullForm):
     ''' Form to create a remote request pull. '''
-    title = wtforms.TextField(
-        'Title<span class="error">*</span>',
-        [wtforms.validators.Required()]
-    )
     git_repo = wtforms.TextField(
         'Git repo address<span class="error">*</span>',
         [wtforms.validators.Required()]
