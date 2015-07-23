@@ -27,6 +27,11 @@ def upgrade():
         column_name='project_id_from',
         nullable=True,
         existing_nullable=False)
+    op.create_check_constraint(
+        "ck_lcl_or_remo_pr",
+        "pull_requests",
+        'NOT(project_id_from IS NULL AND remote_git IS NULL)'
+    )
 
 
 def downgrade():
