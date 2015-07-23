@@ -961,7 +961,7 @@ def new_pull_request(session, branch_from,
                      status='Open', notify=True):
     ''' Create a new pull request on the specified repo. '''
     if not repo_from and not remote_git:
-        pagure.exceptions.PagureException(
+        raise pagure.exceptions.PagureException(
             'Invalid input, you must specify either a local repo or a '
             'remote one')
 
