@@ -44,8 +44,8 @@ In the case of pagure, the milter is used to allow replying on a comment
 of a ticket or a pull-request by directly replying to the notification sent.
 No need to go to the page anymore to reply to a comment someone made.
 
-The milter integrates with an smtp server such as postfix or sendmail that
-you will have running and have access to in order to change its configuration.
+The milter integrates with a MTA such as postfix or sendmail that you will
+have running and have access to in order to change its configuration.
 
 
 Pagure EventSource Server
