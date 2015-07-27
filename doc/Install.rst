@@ -122,6 +122,23 @@ running (in our case: ``git``).
     chown git:git /var/www/releases
 
 
+* Create the folders where the repos, forks and checkouts will be stored
+
+Pagure stores the sources of a project in a git repo, offers a place to
+store the project's documentation in another repo, stores a JSON dump of all
+issues and of all pull-requests in another two repos, and keeps a local
+checkout of remote projects when asked to do remote pull-requests.
+All these repositories are stored in different folders that must be
+created manually.
+
+For example you can place them under ``/srv/git/repositories/`` which would
+make ``/srv/git`` the home of your gitolite user.
+
+You would then create the folders with:
+::
+    mkdir /srv/git/repositories/{docs,forks,tickets,requests,checkouts}
+
+
 * Configure apache
 
 If installed by RPM, you will find an example apache configuration file
