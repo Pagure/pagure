@@ -36,6 +36,27 @@ In postfix this is done via:
     non_smtpd_milters = unix:/var/run/pagure/paguresock
     smtpd_milters = unix:/var/run/pagure/paguresock
 
+
+* Install the files of the milter as follow:
+
++--------------------------------------+---------------------------------------------------+
+|              Source                  |                   Destination                     |
++======================================+===================================================+
+| ``milters/comment_email_milter.py``  | ``/usr/share//pagure/comment_email_milter.py``    |
++----------------------------------------+-------------------------------------------------+
+| ``milters/milter_tempfile.conf``     | ``/usr/lib/tmpfiles.d/pagure-milter.conf``        |
++----------------------------------------+-------------------------------------------------+
+| ``milters/pagure_milter.service``    | ``/usr/lib/systemd/system/pagure_milter.service`` |
++--------------------------------------+---------------------------------------------------+
+
+The first file is the script of the milter itself.
+
+The second file is a file specific for systemd and ensuring the temporary
+folders needed by the milter are re-created if needed at each boot.
+
+The third file is the systemd service file.
+
+
 * Activate the service and ensure it's started upon boot:
 ::
 
