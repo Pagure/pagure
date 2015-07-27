@@ -41,5 +41,7 @@ The second file is the systemd service file.
 * Finally, activate the service and ensure it's started upon boot:
 ::
 
+    systemctl enable redis
+    systemctl start redis
     systemctl enable pagure_ev
     systemctl start pagure_ev
