@@ -22,6 +22,7 @@ its derivative via the `EPEL repository <>`. So installing it is as easy as:
     dnf install pagure pagure-milters pagure-ev
 
 or
+
 ::
     yum install pagure pagure-milters pagure-ev
 
