@@ -12,13 +12,13 @@ Configure your system
 The eventsource server is easy to set-up.
 
 * Installed the required dependencies
-
 ::
 
     python-redis
     python-trollius
     python-trollius-redis
     systemd
+
 
 ..note: This last one is necessary if you want to use the service file provided.
         Otherwise, you will have to write your own.
@@ -32,6 +32,11 @@ The eventsource server is easy to set-up.
 +----------------------------------------+-----------------------------------------------------+
 | ``ev-server/pagure_ev.service``        | ``/usr/lib/systemd/system/pagure_ev.service``       |
 +----------------------------------------+-----------------------------------------------------+
+
+The first file is the script of the SSE server itself.
+
+The second file is the systemd service file.
+
 
 * Finally, activate the service and ensure it's started upon boot:
 ::
