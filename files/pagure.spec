@@ -7,8 +7,8 @@ Release:        1%{?dist}
 Summary:        A git-centered forge
 
 License:        GPLv2+
-URL:            http://fedorahosted.org/pagure/
-Source0:        https://fedorahosted.org/releases/p/a/pagure/%{name}-%{version}.tar.gz
+URL:            https://pagure.io/pagure
+Source0:        https://pagure.io/releases/pagure/%{name}-%{version}.tar.gz
 
 BuildArch:      noarch
 
