@@ -83,7 +83,6 @@ create/merge pull-requests across or within projects.
 %package milters
 Summary:            Milter to integrate pagure with emails
 BuildArch:          noarch
-BuildRequires:      python-pymilter
 BuildRequires:      systemd-devel
 Requires:           python-pymilter
 Requires(post):     systemd
@@ -103,6 +102,7 @@ This is useful for example to allow commenting on a ticket by email.
 Summary:   EventSource server for pagure
 BuildArch: noarch
 
+BuildRequires:      systemd-devel
 Requires:  python-redis
 Requires:  python-trollius
 Requires:  python-trollius-redis
