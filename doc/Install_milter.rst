@@ -10,6 +10,18 @@ on wikipedia `https://en.wikipedia.org/wiki/Milter <https://en.wikipedia.org/wik
 Configure your system
 ---------------------
 
+* Installed the required dependencies
+::
+
+    python-pymilter
+    systemd
+
+..note: This last one is necessary if you want to use the service file provided.
+        Otherwise, you will have to write your own.
+
+..note: It also requires a MTA, we used postfix.
+
+
 * Create an alias ``reply``
 
 This can be done in ``/etc/aliases``, for example:
