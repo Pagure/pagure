@@ -16,7 +16,8 @@ Here as well there are two ways of obtaining the RPM:
 * From the main repositories
 
 Pagure is packaged for Fedora since Fedora 21 and is available for RHEL and
-its derivative via the `EPEL repository <>`. So installing it is as easy as:
+its derivative via the `EPEL repository <https://fedoraproject.org/wiki/EPEL>`.
+So installing it is as easy as:
 ::
 
     dnf install pagure pagure-milters pagure-ev
@@ -30,7 +31,8 @@ The ``pagure`` package contains the core of the application and the doc server.
 (See the ``Overview`` page for a global overview of the structure of the
 project).
 
-The ``pagure-milters`` package contains, as the name says, the milter.
+The ``pagure-milters`` package contains, as the name says, the milter (a
+mail filter to hook into a MTA).
 
 The ``pagure-ev`` package contains the eventsource server.
 
@@ -58,7 +60,7 @@ Simply follow these steps:
 This will build pagure from the version present in your clone.
 
 
-Once, the RPM is installed, the services ``pagure_milter`` and ``pagure_ev``
+Once, the RPM is installed the services ``pagure_milter`` and ``pagure_ev``
 are ready to be used but the database and the web-application parts still
 need to be configured.
 
@@ -106,7 +108,7 @@ To install pagure via this mechanism simply follow these steps:
 Set-up pagure
 -------------
 
-Once pagure's files are installed, you still need to set-up some things.
+Once pagure's files are installed, you still need to set up some things.
 
 
 * Create the folder release
@@ -152,11 +154,11 @@ Adjust it for your needs.
 
 * Configure the WSGI file
 
-If install by RPM, you will find an example WSGI file at:
+If you installed by RPM, you will find an example WSGI file at:
 ``/usr/share/pagure/pagure.wsgi`` and ``/usr/share/pagure/docs_pagure.wsgi``
 for the doc server.
 
-If not install by RPM, these files are present in the sources at:
+If you did not install by RPM, these files are present in the sources at:
 ``files/pagure.wsgi`` and ``files/doc_pagure.wsgi``.
 
 Adjust them for your needs
@@ -164,13 +166,13 @@ Adjust them for your needs
 
 * Give apache permission to read the repositories owned by the ``git`` user.
 
-The web application run under the ``git`` user name, the same username as
-your gitolite user, but apache itself runs under the ``apache`` (or
-``httpd2``) user. So apache by default, apache will not be allowed to read
-git repositories created and managed by gitolite.
+For the sake of this document, we assume that the web application runs under
+the ``git`` user, the same user as your gitolite user, but apache itself
+runs under the ``httpd`` (or ``apache2``) user. So by default, apache
+will not be allowed to read git repositories created and managed by gitolite.
 
 To give apache this permission (required to make git clone via http work),
-we use facl
+we use file access control lists (aka FACL):
 ::
     setfacl -m user:apache:rx --default
     setfacl -Rdm user:apache:rx /srv/git

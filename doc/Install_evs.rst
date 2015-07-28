@@ -11,17 +11,16 @@ Configure your system
 
 The eventsource server is easy to set-up.
 
-* Installed the required dependencies
+* Install the required dependencies
 ::
 
     python-redis
     python-trollius
     python-trollius-redis
-    systemd
 
+..note: We ship a systemd unit file for pagure_milter but we welcome patches
+        for scripts for other init systems.
 
-..note: This last one is necessary if you want to use the service file provided.
-        Otherwise, you will have to write your own.
 
 * Install the files of the SSE server as follow:
 
@@ -30,7 +29,7 @@ The eventsource server is easy to set-up.
 +========================================+=====================================================+
 | ``ev-server/pagure-stream-server.py``  | ``/usr/libexec/pagure-ev/pagure-stream-server.py``  |
 +----------------------------------------+-----------------------------------------------------+
-| ``ev-server/pagure_ev.service``        | ``/usr/lib/systemd/system/pagure_ev.service``       |
+| ``ev-server/pagure_ev.service``        | ``/etc/systemd/system/pagure_ev.service``           |
 +----------------------------------------+-----------------------------------------------------+
 
 The first file is the script of the SSE server itself.

@@ -1,7 +1,7 @@
 Overview
 ========
 
-Pagure is split over multiple components, each having their interest and all
+Pagure is split over multiple components, each having their purpose and all
 but one (the core application) being optional.
 
 These components are:
@@ -13,8 +13,7 @@ Pagure core application
 -----------------------
 
 The core application is the flask application interacting with gitolite to
-provide a web UI to these git repositories as well as tickets and
-pull-requests.
+provide a web UI to the git repositories as well as tickets and pull-requests.
 This is the main application for the forge.
 
 
@@ -26,7 +25,7 @@ for security concern, displaying information directly provided by the user
 without a clear/safe way of filtering for un-safe script or hacks is a
 security hole.
 For this reason we also strongly encourage anyone wanting to deploy their
-own instance of pagure with the doc server, to run this application on an
+own instance of pagure with the doc server, to run this application on a
 completely different domain name (not just a sub-domain) in order to reduce
 the cross-site forgery risks.
 

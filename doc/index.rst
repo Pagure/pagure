@@ -10,6 +10,9 @@ Features:
 * Collaboration: Fork a project and make a pull-request
 * Integration: Create pull-request from a fork hosted somewhere else than in
     pagure
+* Async: Sources, doc, ticket and pull-requests meta-data are available in
+    the web interface but also in git repos which can thus be cloned and
+    change locally.
 * ``Freedom``: Pagure is fully Free and Open-Source Software!
 
 

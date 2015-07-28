@@ -1,23 +1,23 @@
 Installing pagure's milter
 ==========================
 
-A milter is a script that is ran by a MTA upon receiving an email via either
-a network or an unix socket.
+A milter is a script that is ran by a Mail Transfer Agent (`MTA
+<https://en.wikipedia.org/wiki/MTA>`_)
+upon receiving an email via either a network or an unix socket.
 
 If you want more information feel free to check out the corresponding page
-on wikipedia `https://en.wikipedia.org/wiki/Milter <https://en.wikipedia.org/wiki/Milter>`_.
+on wikipedia: `https://en.wikipedia.org/wiki/Milter <https://en.wikipedia.org/wiki/Milter>`_.
 
 Configure your system
 ---------------------
 
-* Installed the required dependencies
+* Install the required dependencies
 ::
 
     python-pymilter
-    systemd
 
-..note: This last one is necessary if you want to use the service file provided.
-        Otherwise, you will have to write your own.
+..note: We ship a systemd unit file for pagure_milter but we welcome patches
+        for scripts for other init systems.
 
 ..note: It also requires a MTA, we used postfix.
 
@@ -30,7 +30,7 @@ This can be done in ``/etc/aliases``, for example:
     reply:      /dev/null
 
 
-* Activate the ability of you MTA, to split users based on the character ``+``.
+* Activate the ability of your MTA, to split users based on the character ``+``.
   This way all the emails sent to ``reply+...@example.com`` will be forwarded
   to your alias for ``reply``.
 
@@ -58,7 +58,7 @@ In postfix this is done via:
 +----------------------------------------+-------------------------------------------------+
 | ``milters/milter_tempfile.conf``     | ``/usr/lib/tmpfiles.d/pagure-milter.conf``        |
 +----------------------------------------+-------------------------------------------------+
-| ``milters/pagure_milter.service``    | ``/usr/lib/systemd/system/pagure_milter.service`` |
+| ``milters/pagure_milter.service``    | ``/etc/systemd/system/pagure_milter.service``     |
 +--------------------------------------+---------------------------------------------------+
 
 The first file is the script of the milter itself.
