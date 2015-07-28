@@ -236,7 +236,7 @@ process_event = function(
     category = 'Issue edited';
   }
 
-  if (category) {
+  if (category && !document.hasFocus()) {
     var int = setInterval(function(){
       var title = document.title;
       document.title = (title === originalTitle) ? category : originalTitle;

@@ -51,7 +51,7 @@ process_event = function(data, requestid){
     category = 'comment';
   }
 
-  if (category) {
+  if (category && !document.hasFocus()) {
     var int = setInterval(function(){
       var title = document.title;
       document.title = (title === originalTitle) ? category : originalTitle;
