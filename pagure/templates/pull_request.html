@@ -569,6 +569,7 @@ function try_async_comment(form, inline) {
 
 <script type="text/javascript">
 var source = null;
+var sse = true;
 if (!!window.EventSource) {
   source = new EventSource('{{ config["EVENTSOURCE_SOURCE"]
     + request.script_root + request.path }}');
