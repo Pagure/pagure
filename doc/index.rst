@@ -26,7 +26,9 @@ Contents:
    :maxdepth: 2
 
    overview
-   deployment
+   install
+   install_milter
+   install_evs
    configuration
    development
    contributing
