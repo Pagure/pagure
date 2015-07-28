@@ -373,7 +373,8 @@ def pull_request_add_comment(
                 redis=REDIS,
             )
             SESSION.commit()
-            flask.flash(message)
+            if not is_js:
+                flask.flash(message)
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
             APP.logger.exception(err)
