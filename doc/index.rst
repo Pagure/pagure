@@ -25,10 +25,11 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   development
-   contributing
+   overview
    deployment
    configuration
+   development
+   contributing
    contributors
 
 
