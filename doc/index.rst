@@ -3,20 +3,21 @@ Pagure
 
 Pagure is a light-weight git-centered forge based on pygit2.
 
-Currently, Pagure offers a decent web-interface for git repositories, a simple
-ticket system and supports open collaboration by offering the possibility to
-create new projects, fork existing ones and create/merge pull-requests across
-or within projects.
+Features:
+* Open-sources: Web-interface for the git repositories
+* Flexibility: Ability to create any project you want
+* One place: Keep your documentation and tickets in pagure
+* Collaboration: Fork a project and make a pull-request
+* Integration: Create pull-request from a fork hosted somewhere else than in
+    pagure
+* ``Freedom``: Pagure is fully Free and Open-Source Software!
 
 
 Resources:
 
-- `Home page <http://pagure.org/`_
-- `Documentation <http://pagure.rtfd.org/>`_
+- `Home page <https://pagure.io/`_
 - `Git repository <http://pagure.io/pagure>`_
 - `Github mirror <https://github.com/pypingou/pagure>`_
-- `Discussion mailing-list
-  <https://lists.fedorahosted.org/mailman/listinfo/pagure>`_
 
 
 Contents:
