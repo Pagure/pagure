@@ -8,7 +8,7 @@ Anonymous:
 
 ::
 
-  git clone git://pagure.io/pagure.git
+  git clone https://pagure.io/pagure.git
 
 Contributors:
 
@@ -54,7 +54,7 @@ Run the server:
 ::
 
     ./runserver
-  
+
 To get some profiling information you can also run it as:
 
 ::
