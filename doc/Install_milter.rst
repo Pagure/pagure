@@ -2,11 +2,12 @@ Installing pagure's milter
 ==========================
 
 A milter is a script that is ran by a Mail Transfer Agent (`MTA
-<https://en.wikipedia.org/wiki/MTA>`_)
+<https://en.wikipedia.org/wiki/Message_transfer_agent>`_)
 upon receiving an email via either a network or an unix socket.
 
 If you want more information feel free to check out the corresponding page
-on wikipedia: `https://en.wikipedia.org/wiki/Milter <https://en.wikipedia.org/wiki/Milter>`_.
+on wikipedia: `https://en.wikipedia.org/wiki/Milter
+<https://en.wikipedia.org/wiki/Milter>`_.
 
 Configure your system
 ---------------------
