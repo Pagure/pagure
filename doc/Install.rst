@@ -172,7 +172,7 @@ git repositories created and managed by gitolite.
 To give apache this permission (required to make git clone via http work),
 we use facl
 ::
-    ...
+    setfacl -m user:apache:rwx --default
     setfacl -Rdm user:apache:rx /srv/git
     setfacl -Rm user:apache:rx /srv/git
 
