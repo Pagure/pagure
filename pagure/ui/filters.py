@@ -143,7 +143,13 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
                 output.append(
                     '<tr><td></td>'
                     '<td colspan="2"><table style="width:100%%"><tr>'
-                    '<td><a href="%(url)s">%(user)s</a></td>'
+                    '<td>'
+                    '<header id="comment-%(commentid)s">'
+                    '<a href="%(url)s">%(user)s</a> '
+                    '<a class="headerlink" href="#comment-%(commentid)s" '
+                    'title="Permalink to this headline"> %(anchor)s </a>'
+                    '</header>'
+                    '</td>'
                     '<td class="right">'
                     '%(date)s%(templ_delete)s'
                     '</td>'
@@ -159,6 +165,8 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
                             'date': comment.date_created.strftime(
                                 '%b %d %Y %H:%M:%S'),
                             'comment': markdown_filter(comment.comment),
+                            'commentid': comment.id,
+                            'anchor': u'¶',
                         }
                     )
                 )
