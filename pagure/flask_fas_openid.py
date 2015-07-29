@@ -130,7 +130,7 @@ class FAS(object):  # pragma: no cover
             sreg_resp = sreg.SRegResponse.fromSuccessResponse(info)
             teams_resp = teams.TeamsResponse.fromSuccessResponse(info)
             cla_resp = cla.CLAResponse.fromSuccessResponse(info)
-            ssh_resp = ax.FetchResponse.fromSuccessResponse(info)
+            ax_resp = ax.FetchResponse.fromSuccessResponse(info)
             user = {'fullname': '', 'username': '', 'email': '',
                     'timezone': '', 'cla_done': False, 'groups': []}
             if not sreg_resp:
@@ -146,9 +146,9 @@ class FAS(object):  # pragma: no cover
             if teams_resp:
                 # The groups do not contain the cla_ groups
                 user['groups'] = frozenset(teams_resp.teams)
-            if ssh_resp:
+            if ax_resp:
                 user['ssh_key'] = '\n'.join(
-                    ssh_resp.get('http://fedoauth.org/openid/schema/SSH/key'))
+                    ax_resp.get('http://fedoauth.org/openid/schema/SSH/key'))
             flask.session['FLASK_FAS_OPENID_USER'] = user
             flask.session.modified = True
             if self.postlogin_func is not None:
