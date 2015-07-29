@@ -147,8 +147,17 @@ class FAS(object):  # pragma: no cover
                 # The groups do not contain the cla_ groups
                 user['groups'] = frozenset(teams_resp.teams)
             if ax_resp:
-                user['ssh_key'] = '\n'.join(
-                    ax_resp.get('http://fedoauth.org/openid/schema/SSH/key'))
+                ssh_keys = ax_resp.get(
+                    'http://fedoauth.org/openid/schema/SSH/key')
+                if isinstance(ssh_keys, (list, tuple)):
+                    ssh_keys = '\n'.join(
+                        ssh_key
+                        for ssh_key in ssh_keys
+                        if ssh_key.strip()
+                    )
+                if ssh_keys:
+                    user['ssh_key'] = ssh_keys
+
             flask.session['FLASK_FAS_OPENID_USER'] = user
             flask.session.modified = True
             if self.postlogin_func is not None:
