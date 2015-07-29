@@ -287,11 +287,13 @@ def set_session():
 def set_user(return_url):
     ''' After login method. '''
     try:
+
         pagure.lib.set_up_user(
             session=SESSION,
             username=flask.g.fas_user.username,
             fullname=flask.g.fas_user.fullname,
             default_email=flask.g.fas_user.email,
+            ssh_key=flask.g.fas_user.get('ssh_key')
         )
         SESSION.commit()
     except SQLAlchemyError, err:

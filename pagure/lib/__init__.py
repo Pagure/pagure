@@ -1757,7 +1757,8 @@ def get_pull_request_flag_by_uid(session, flag_uid):
     return query.first()
 
 
-def set_up_user(session, username, fullname, default_email, emails=None):
+def set_up_user(session, username, fullname, default_email,
+                emails=None, ssh_key=None):
     ''' Set up a new user into the database or update its information. '''
     user = search_user(session, username=username)
     if not user:
@@ -1781,6 +1782,9 @@ def set_up_user(session, username, fullname, default_email, emails=None):
     emails.add(default_email)
     for email in emails:
         add_email_to_user(session, user, email)
+
+    if ssh_key and not user.public_ssh_key:
+        user.public_ssh_key = ssh_key
 
     return user
 
