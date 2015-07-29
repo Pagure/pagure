@@ -202,7 +202,7 @@ def mergeable_request_pull():
         merge_status = pagure.lib.git.merge_pull_request(
             session=pagure.SESSION,
             request=request,
-            username=flask.g.fas_user.username,
+            username=None,
             request_folder=None,
             domerge=False)
     except pygit2.GitError as err:
