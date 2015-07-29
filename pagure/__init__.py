@@ -252,7 +252,7 @@ work.
                 flask.url_for('auth_login', next=flask.request.url))
         elif auth_method == 'fas' and not flask.g.fas_user.cla_done:
             flask.flash('You must sign the FPCA (Fedora Project Contributor '
-                        'Agreement to use pagure', 'errors')
+                        'Agreement) to use pagure', 'errors')
             return flask.redirect(flask.url_for('.index'))
         return function(*args, **kwargs)
     return decorated_function
