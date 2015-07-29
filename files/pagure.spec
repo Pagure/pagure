@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.19
+Version:        0.1.20
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -212,6 +212,22 @@ install -m 644 ev-server/pagure_ev.service \
 
 
 %changelog
+* Wed Jul 29 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.20
+- Update to 0.1.20
+- Include the tags in the JSON representation of a project
+- Add the ability to open a pull-request from a git repo not hosted on pagure
+- Fix pagination when browsing the list of commits
+- Fix the fork button when viewing the Settings of a project
+- Adjust the example apache configuration file
+- Add a favicon with pagure's logo
+- Fix asynchronous commentting on pull-requests
+- Start working on some documentation on how to install pagure
+- Do no flash messages when a comment is submitted via javascript (ie: async)
+- Do not blink the tittle of the page if the page is already on focus
+- Retrieve ssh key from FAS and set it up in pagure if none is currently set-up
+- Fix anchors for comments on the pull-request pages
+- Fix checking the merge status of a PR when user is not logged in
+
 * Mon Jul 20 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.19-1
 - Update to 0.1.19
 - Prettify the JSON stored in the git for tickets/requests... (Simo Sorce)
