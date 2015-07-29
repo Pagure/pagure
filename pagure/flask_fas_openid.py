@@ -34,7 +34,7 @@ import flask
 
 from openid.consumer import consumer
 from openid.fetchers import setDefaultFetcher, Urllib2Fetcher
-from openid.extensions import pape, sreg
+from openid.extensions import pape, sreg, ax
 from openid_cla import cla
 from openid_teams import teams
 
@@ -130,6 +130,7 @@ class FAS(object):  # pragma: no cover
             sreg_resp = sreg.SRegResponse.fromSuccessResponse(info)
             teams_resp = teams.TeamsResponse.fromSuccessResponse(info)
             cla_resp = cla.CLAResponse.fromSuccessResponse(info)
+            ssh_resp = ax.FetchResponse.fromSuccessResponse(info)
             user = {'fullname': '', 'username': '', 'email': '',
                     'timezone': '', 'cla_done': False, 'groups': []}
             if not sreg_resp:
@@ -145,6 +146,9 @@ class FAS(object):  # pragma: no cover
             if teams_resp:
                 # The groups do not contain the cla_ groups
                 user['groups'] = frozenset(teams_resp.teams)
+            if ssh_resp:
+                user['ssh_key'] = '\n'.join(
+                    ssh_resp.get('http://fedoauth.org/openid/schema/SSH/key'))
             flask.session['FLASK_FAS_OPENID_USER'] = user
             flask.session.modified = True
             if self.postlogin_func is not None:
@@ -175,7 +179,7 @@ class FAS(object):  # pragma: no cover
         flask.g.fas_session_id = 0
 
     # pylint: disable=R0913
-    def login(self, return_url=None, cancel_url=None, groups=None):
+    def login(self, return_url=None, cancel_url=None, groups=None, ssh=False):
         """Tries to log in a user.
 
         Sets the user information on :attr:`flask.g.fas_user`.
@@ -189,6 +193,8 @@ class FAS(object):  # pragma: no cover
         :kwarg return_url: The URL to forward the user to after login
         :kwarg groups: A string or a list of group the user should belong
             to to be authentified.
+        :kwarg ssh: A boolean to specify if you want to retrieve the user's
+            public SSH key or not.
         :returns: True if the user was succesfully authenticated.
         :raises: Might raise an redirect to the OpenID endpoint
         """
@@ -219,6 +225,12 @@ class FAS(object):  # pragma: no cover
         request.addExtension(teams.TeamsRequest(requested=groups))
         request.addExtension(cla.CLARequest(
             requested=[cla.CLA_URI_FEDORA_DONE]))
+        if ssh is True:
+            req = ax.FetchRequest()
+            req.add(ax.AttrInfo(
+                type_uri='http://fedoauth.org/openid/schema/SSH/key',
+                count='unlimited'))
+            request.addExtension(req)
 
         trust_root = self.normalize_url(flask.request.url_root)
         return_to = trust_root + '_flask_fas_openid_handler/'
