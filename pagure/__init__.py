@@ -340,7 +340,7 @@ def auth_login():  # pragma: no cover
         admins = set(admins)
 
     if APP.config.get('PAGURE_AUTH', None) == 'fas':
-        return FAS.login(return_url=return_point, groups=admins)
+        return FAS.login(return_url=return_point, groups=admins, ssh=True)
     elif APP.config.get('PAGURE_AUTH', None) == 'local':
         form = pagure.login_forms.LoginForm()
         return flask.render_template(
