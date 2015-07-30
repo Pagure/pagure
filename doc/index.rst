@@ -4,6 +4,7 @@ Pagure
 Pagure is a light-weight git-centered forge based on pygit2.
 
 Features:
+
 * Open-sources: Web-interface for the git repositories
 * Flexibility: Ability to create any project you want
 * One place: Keep your documentation and tickets in pagure
