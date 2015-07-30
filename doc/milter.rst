@@ -1,7 +1,7 @@
 Pagure's Milter
 ===============
 
-`Milter<http://www.postfix.org/MILTER_README.html>`_ are script executed by
+`Milter <http://www.postfix.org/MILTER_README.html>`_ are script executed by
 postfix upon sending or receiving an email.
 
 We use this system to allow pagure's users to comment on a ticket (or a
