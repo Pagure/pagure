@@ -32,7 +32,7 @@ at the top level of the sources.
 
 
 Run pagure for development
--------------------------
+--------------------------
 Adjust the configuration file (secret key, database URL, admin group...)
 See :doc:`configuration` for more detailed information about the
 configuration.
