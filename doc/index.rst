@@ -19,7 +19,7 @@ Features:
 
 Resources:
 
-- `Home page <https://pagure.io/`_
+- `Home page <https://pagure.io/>`_
 - `Git repository <http://pagure.io/pagure>`_
 - `Github mirror <https://github.com/pypingou/pagure>`_
 
