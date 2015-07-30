@@ -8,7 +8,7 @@ On July 29, 2015 (release 0.1.20), the list looks as follow:
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  2951           Pierre-Yves Chibon <pingou@pingoured.fr>
+  2951              Pierre-Yves Chibon <pingou@pingoured.fr>
     59              Johan Cwiklinski <johan@x-tnd.be>
     13              Mathieu Bridon <bochecha@fedoraproject.org>
     12              Sayan Chowdhury <sayan.chowdhury2012@gmail.com>
