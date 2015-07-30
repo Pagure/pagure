@@ -10,10 +10,10 @@ Features:
 * ``One place``: Keep your documentation and tickets in pagure
 * ``Collaboration``: Fork a project and make a pull-request
 * ``Integration``: Create pull-request from a fork hosted somewhere else than in
-    pagure
+  pagure
 * ``Open data``: Sources, doc, ticket and pull-requests meta-data are available
-    in the web interface but also in git repos which can thus be cloned and
-    changed locally.
+  in the web interface but also in git repos which can thus be cloned and changed
+  locally.
 * ``Freedom``: Pagure is fully Free and Open-Source Software!
 
 
