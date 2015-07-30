@@ -17,5 +17,7 @@ build/
 *.conf
 .coverage
 
+_build/
+
 # Just a local folder I use for testing
 clones/
