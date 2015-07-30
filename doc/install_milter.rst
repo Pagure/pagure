@@ -13,14 +13,15 @@ Configure your system
 ---------------------
 
 * Install the required dependencies
+
 ::
 
     python-pymilter
 
-..note: We ship a systemd unit file for pagure_milter but we welcome patches
+..note:: We ship a systemd unit file for pagure_milter but we welcome patches
         for scripts for other init systems.
 
-..note: It also requires a MTA, we used postfix.
+..note:: It also requires a MTA, we used postfix.
 
 
 * Create an alias ``reply``
@@ -71,6 +72,7 @@ The third file is the systemd service file.
 
 
 * Activate the service and ensure it's started upon boot:
+
 ::
 
     systemctl enable pagure_milter

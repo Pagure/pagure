@@ -36,7 +36,7 @@ mail filter to hook into a MTA).
 
 The ``pagure-ev`` package contains the eventsource server.
 
-..note: The last two packages are optional, pagure would work fine without
+..note:: The last two packages are optional, pagure would work fine without
         them.
 
 * From the sources
@@ -46,15 +46,19 @@ you can easily rebuild it as RPM.
 
 Simply follow these steps:
 # Clone the sources::
+
     git clone https://pagure.io/pagure.git
 
 # Go to the folder::
+
     cd pagure
 
 # Build a tarball of the latest version of pagure::
+
     python setup.py sdist
 
 # Build the RPM::
+
     rpmbuild -ta dist/pagure*.tar.gz
 
 This will build pagure from the version present in your clone.
@@ -75,16 +79,19 @@ of the web applications of pagure (ie: the core + the doc server).
 
 To install pagure via this mechanism simply follow these steps:
 # Clone the sources::
+
     git clone https://pagure.io/pagure.git
 
 # Go to the folder::
+
     cd pagure
 
 # Install the latest version of pagure::
+
     python setup.py build
     sudo python setup.py install
 
-..note: To install the eventsource server or the milter, refer to their
+..note:: To install the eventsource server or the milter, refer to their
         respective documentations.
 
 # Install the additional files as follow:
@@ -138,6 +145,7 @@ make ``/srv/git`` the home of your gitolite user.
 
 You would then create the folders with:
 ::
+
     mkdir /srv/git/repositories/{docs,forks,tickets,requests,checkouts}
 
 
@@ -174,6 +182,7 @@ will not be allowed to read git repositories created and managed by gitolite.
 To give apache this permission (required to make git clone via http work),
 we use file access control lists (aka FACL):
 ::
+
     setfacl -m user:apache:rx --default
     setfacl -Rdm user:apache:rx /srv/git
     setfacl -Rm user:apache:rx /srv/git

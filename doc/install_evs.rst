@@ -12,13 +12,14 @@ Configure your system
 The eventsource server is easy to set-up.
 
 * Install the required dependencies
+
 ::
 
     python-redis
     python-trollius
     python-trollius-redis
 
-..note: We ship a systemd unit file for pagure_milter but we welcome patches
+..note:: We ship a systemd unit file for pagure_milter but we welcome patches
         for scripts for other init systems.
 
 
@@ -38,6 +39,7 @@ The second file is the systemd service file.
 
 
 * Finally, activate the service and ensure it's started upon boot:
+
 ::
 
     systemctl enable redis
