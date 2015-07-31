@@ -54,7 +54,8 @@ def __get_tree(repo_obj, tree, filepath, index=0, extended=False):
         return (tree, None, None)
 
     for element in tree:
-        if element.name == filename or element.name.startswith('index'):
+        if element.name == filename or \
+                (not filename and element.name.startswith('index')):
             # If we have a folder we must go one level deeper
             if element.filemode == 16384:
                 if (index + 1) == len(filepath):
@@ -233,16 +234,10 @@ def view_forks(repo, username=None):
 # The actual logic of the doc server
 
 @APP.route('/<repo>/')
-@APP.route('/<repo>')
 @APP.route('/<repo>/<path:filename>')
-@APP.route('/<repo>/<branchname>')
-@APP.route('/<repo>/<branchname>/<path:filename>')
 @APP.route('/fork/<username>/<repo>/')
-@APP.route('/fork/<username>/<repo>')
 @APP.route('/fork/<username>/<repo>/<path:filename>')
-@APP.route('/fork/<username>/<repo>/<branchname>')
-@APP.route('/fork/<username>/<repo>/<branchname>/<path:filename>')
-def view_docs(repo, username=None, branchname=None, filename=None):
+def view_docs(repo, username=None, filename=None):
     """ Display the documentation
     """
 
@@ -260,15 +255,12 @@ def view_docs(repo, username=None, branchname=None, filename=None):
 
     repo_obj = pygit2.Repository(reponame)
 
-    if branchname in repo_obj.listall_branches():
-        branch = repo_obj.lookup_branch(branchname)
-        commit = branch.get_object()
+
+    if not repo_obj.is_empty:
+        commit = repo_obj[repo_obj.head.target]
     else:
-        if not repo_obj.is_empty:
-            commit = repo_obj[repo_obj.head.target]
-        else:
-            commit = None
-        branchname = 'master'
+        flask.abort(404, 'No content found is the repository')
+    branchname = 'master'
 
     content = None
     tree = None
@@ -287,16 +279,12 @@ def view_docs(repo, username=None, branchname=None, filename=None):
         except pagure.exceptions.FileNotFoundException as err:
             flask.flash(err.message, 'error')
 
-    return flask.render_template(
-        'docs.html',
-        select='docs',
-        repo_obj=repo_obj,
-        repo=repo,
-        username=username,
-        branchname=branchname,
-        filename=filename,
-        tree=tree,
-        content=content,
-        safe=safe,
-        nologin=True,
-    )
+    mimetype = None
+    if not filename:
+        pass
+    elif filename.endswith('.css'):
+        mimetype = 'text/css'
+    elif filename.endswith('.js'):
+        mimetype = 'application/javascript'
+
+    return flask.Response(content, mimetype=mimetype)
