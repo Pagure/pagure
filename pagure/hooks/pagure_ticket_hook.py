@@ -85,8 +85,8 @@ class PagureTicketHook(BaseHook):
 
         # Install the main post-receive file
         postreceive = os.path.join(hookfolder, 'post-receive')
-        hook_file = os.path.join(hook_files, 'git_multimail.py')
-        if not os.path.exists(hook_file):
+        hook_file = os.path.join(hook_files, 'post-receive')
+        if not os.path.exists(postreceive):
             os.symlink(hook_file, postreceive)
 
     @classmethod
