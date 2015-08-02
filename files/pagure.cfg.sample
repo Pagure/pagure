@@ -36,8 +36,8 @@ APP_URL = 'https://pagure.io/'
 DOC_APP_URL = 'https://docs.pagure.org'
 
 ### The URL to use to clone git repositories.
-GIT_URL_SSH = 'git@pagure.io'
-GIT_URL_GIT = 'git://pagure.io'
+GIT_URL_SSH = 'ssh://git@pagure.io/'
+GIT_URL_GIT = 'git://pagure.io/'
 
 ### Folder containing to the git repos
 GIT_FOLDER = os.path.join(

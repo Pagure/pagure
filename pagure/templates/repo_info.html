@@ -44,13 +44,13 @@
 
     <p>If you already have a git repo:</p>
     <pre>
-      git remote add origin {{ config.get('GIT_URL_SSH') }}:{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
+      git remote add origin {{ config.get('GIT_URL_SSH') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
       git push -u origin master
     </pre>
 
     <p>If you have not createt your git repo yet:</p>
     <pre>
-      git clone {{ config.get('GIT_URL_SSH') }}:{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
+      git clone {{ config.get('GIT_URL_SSH') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
       cd {{ repo.name }}
       touch README.rst
       git add README.rst
@@ -205,40 +205,40 @@
         <td>Project</td>
         <td>:</td>
         <td>
-          {{ config.get('GIT_URL_SSH') }}:{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
+          {{ config.get('GIT_URL_SSH') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
         </td>
         <td>
-          {{ config.get('GIT_URL_GIT') }}/{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
+          {{ config.get('GIT_URL_GIT') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
         </td>
       </tr>
       <tr class="extra_gits">
         <td>Docs</td>
         <td>:</td>
         <td>
-          {{ config.get('GIT_URL_SSH') }}:docs/{{ repo.fullname }}.git
+          {{ config.get('GIT_URL_SSH') }}docs/{{ repo.fullname }}.git
         </td>
         <td>
-          {{ config.get('GIT_URL_GIT') }}/docs/{{ repo.fullname }}.git
+          {{ config.get('GIT_URL_GIT') }}docs/{{ repo.fullname }}.git
         </td>
       </tr>
       <tr class="extra_gits">
         <td>Tickets</td>
         <td>:</td>
         <td>
-          {{ config.get('GIT_URL_SSH') }}:tickets/{{ repo.fullname }}.git
+          {{ config.get('GIT_URL_SSH') }}tickets/{{ repo.fullname }}.git
         </td>
         <td>
-          {{ config.get('GIT_URL_GIT') }}/tickets/{{ repo.fullname }}.git
+          {{ config.get('GIT_URL_GIT') }}tickets/{{ repo.fullname }}.git
         </td>
       </tr>
       <tr class="extra_gits">
         <td>Requests</td>
         <td>:</td>
         <td>
-          {{ config.get('GIT_URL_SSH') }}:requests/{{ repo.fullname }}.git
+          {{ config.get('GIT_URL_SSH') }}requests/{{ repo.fullname }}.git
         </td>
         <td>
-          {{ config.get('GIT_URL_GIT') }}/requests/{{ repo.fullname }}.git
+          {{ config.get('GIT_URL_GIT') }}requests/{{ repo.fullname }}.git
         </td>
       </tr>
     </table>

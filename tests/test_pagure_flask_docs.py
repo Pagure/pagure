@@ -97,7 +97,7 @@ class PagureFlaskDocstests(tests.Modeltests):
         self.assertTrue('<h2>Docs</h2>' in output.data)
         self.assertTrue('<p>This repo is brand new!</p>' in output.data)
         self.assertTrue(
-            'git clone git@pagure.org:docs/test.git' in output.data)
+            'git clone ssh://git@pagure.org/docs/test.git' in output.data)
 
         repo.settings = {'project_documentation': False}
         self.session.add(repo)
@@ -117,7 +117,7 @@ class PagureFlaskDocstests(tests.Modeltests):
         self.assertTrue('<h2>Docs</h2>' in output.data)
         self.assertTrue('<p>This repo is brand new!</p>' in output.data)
         self.assertTrue(
-            'git clone git@pagure.org:docs/test.git' in output.data)
+            'git clone ssh://git@pagure.org/docs/test.git' in output.data)
 
         # forked doc repo
         docrepo = os.path.join(tests.HERE, 'docs', 'test', 'test.git')

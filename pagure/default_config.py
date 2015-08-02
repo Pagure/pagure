@@ -34,8 +34,8 @@ EMAIL_ERROR = 'pingou@pingoured.fr'
 APP_URL = 'https://pagure.org/'
 
 # The URL to use to clone the git repositories.
-GIT_URL_SSH = 'git@pagure.org'
-GIT_URL_GIT = 'git://pagure.org'
+GIT_URL_SSH = 'ssh://git@pagure.org/'
+GIT_URL_GIT = 'git://pagure.org/'
 
 
 # Number of items displayed per page
