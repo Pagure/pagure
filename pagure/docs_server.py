@@ -43,6 +43,24 @@ APP.logger.addHandler(SHANDLER)
 
 LOG = APP.logger
 
+TMPL_HTML = '''
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <style type="text/css">
+    ul {{
+      margin: 0;
+      padding: 0;
+    }}
+  </style>
+</head>
+<body>
+{content}
+</body>
+</html>
+'''
+
 
 def __get_tree(repo_obj, tree, filepath, index=0, extended=False):
     ''' Retrieve the entry corresponding to the provided filename in a
@@ -148,5 +166,14 @@ def view_docs(repo, username=None, filename=None):
         mimetype = 'text/css'
     elif filename.endswith('.js'):
         mimetype = 'application/javascript'
+
+    if not filename and not content:
+        if not len(tree):
+            flask.abort(404, 'No content found is the repository')
+        html = '<li>'
+        for el in tree:
+            html += '<ul><a href="{0}">{0}</a></ul>'.format(el.name)
+        html += '</li>'
+        content = TMPL_HTML.format(content=html)
 
     return flask.Response(content, mimetype=mimetype)
