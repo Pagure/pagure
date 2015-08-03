@@ -93,11 +93,7 @@ class PagureFlaskDocstests(tests.Modeltests):
         tests.create_projects_git(os.path.join(tests.HERE, 'docs'))
 
         output = self.app.get('/test/docs')
-        self.assertEqual(output.status_code, 200)
-        self.assertTrue('<h2>Docs</h2>' in output.data)
-        self.assertTrue('<p>This repo is brand new!</p>' in output.data)
-        self.assertTrue(
-            'git clone ssh://git@pagure.org/docs/test.git' in output.data)
+        self.assertEqual(output.status_code, 404)
 
         repo.settings = {'project_documentation': False}
         self.session.add(repo)
@@ -113,11 +109,7 @@ class PagureFlaskDocstests(tests.Modeltests):
             os.path.join(tests.HERE, 'docs', 'test.git'), bare=True)
 
         output = self.app.get('/test/docs')
-        self.assertEqual(output.status_code, 200)
-        self.assertTrue('<h2>Docs</h2>' in output.data)
-        self.assertTrue('<p>This repo is brand new!</p>' in output.data)
-        self.assertTrue(
-            'git clone ssh://git@pagure.org/docs/test.git' in output.data)
+        self.assertEqual(output.status_code, 404)
 
         # forked doc repo
         docrepo = os.path.join(tests.HERE, 'docs', 'test', 'test.git')
@@ -162,54 +154,33 @@ class PagureFlaskDocstests(tests.Modeltests):
         # Now check the UI
 
         output = self.app.get('/test/docs')
-        self.assertEqual(output.status_code, 200)
-        self.assertTrue('<h2>Docs</h2>' in output.data)
-        self.assertFalse('<p>This repo is brand new!</p>' in output.data)
-        self.assertTrue(
-            '<a href="/test/master/folder1">' in output.data)
-        self.assertTrue(
-            '<a href="/test/master/sources">' in output.data)
+        self.assertEqual(output.status_code, 404)
 
-        output = self.app.get('/test/master/sources')
+        output = self.app.get('/test/sources')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue('<h2>Docs</h2>' in output.data)
-        self.assertTrue('<section class="docs_content">' in output.data)
+        self.assertEqual('<pre>foo\n bar</pre>', output.data)
 
-        output = self.app.get('/test/master/folder1/folder2')
+        output = self.app.get('/test/folder1/folder2')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue('<h2>Docs</h2>' in output.data)
         self.assertTrue(
-            '<li class="file">\n        '
-            '<a href="/test/master/folder1/folder2/test_file">'
+            '<li><ul><a href="test_file">test_file</a></ul></li>'
             in output.data)
 
-        output = self.app.get('/test/master/folder1/folder2/test_file')
+        output = self.app.get('/test/folder1/folder2/test_file')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue('<h2>Docs</h2>' in output.data)
-        self.assertTrue(
-            '  <section class="docs_content">\n    <pre>row1\nrow2\n'
-            'row3</pre>\n  </section>' in output.data)
+        self.assertEqual('<pre>row1\nrow2\nrow3</pre>', output.data)
 
-        output = self.app.get('/test/master/folder1')
+        output = self.app.get('/test/folder1')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue('<h2>Docs</h2>' in output.data)
         self.assertTrue(
-            '<li class="folder">\n        '
-            '<a href="/test/master/folder1/folder2">'
+            '<li><ul><a href="folder2">folder2/</a></ul></li>'
             in output.data)
 
-        output = self.app.get('/test/master/folder1/foo')
-        self.assertEqual(output.status_code, 200)
-        self.assertTrue('<h2>Docs</h2>' in output.data)
-        self.assertTrue(
-            '<li class="error">File folder1/foo not found</li>'
-            in output.data)
+        output = self.app.get('/test/folder1/foo')
+        self.assertEqual(output.status_code, 404)
 
-        output = self.app.get('/test/master/folder1/foo/folder2')
-        self.assertEqual(output.status_code, 200)
-        self.assertTrue(
-            '<li class="error">File folder1/foo/folder2 not found</li>'
-            in output.data)
+        output = self.app.get('/test/folder1/foo/folder2')
+        self.assertEqual(output.status_code, 404)
 
 
 if __name__ == '__main__':
