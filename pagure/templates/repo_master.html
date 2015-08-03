@@ -41,8 +41,7 @@
 
       {% if config['DOC_APP_URL'] and repo.settings.get('project_documentation', True) %}
       <li {% if select == 'docs' %}class="selected" {% endif %}>
-        <a href="{{ config['DOC_APP_URL'] +  url_for('.view_repo', username=username,
-                    repo=repo.name) }}">Docs</a>
+        <a href="{{ url_for('.view_docs', username=username, repo=repo.name) }}">Docs</a>
       </li>
       {% endif %}
 

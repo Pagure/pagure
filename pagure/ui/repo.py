@@ -1359,3 +1359,19 @@ def delete_branch(repo, branchname, username=None):
 
     return flask.redirect(
         flask.url_for('view_repo', repo=repo, username=username))
+
+
+@APP.route('/docs/<repo>/')
+@APP.route('/docs/<repo>/<path:filename>')
+@APP.route('/docs/fork/<username>/<repo>/')
+@APP.route('/docs/fork/<username>/<repo>/<path:filename>')
+def view_docs(repo, username=None, filename=None):
+    """ Display the documentation
+    """
+    repo_obj = pagure.lib.get_project(SESSION, repo, user=username)
+    return flask.render_template(
+        'docs.html',
+        repo=repo_obj,
+        username=username,
+        filename=filename,
+    )
