@@ -32,3 +32,6 @@ This list is generated using
 
   git shortlog -s -n -e
 
+
+The pagure logo has been created by ``Micah Denn <micah.denn@gmail.com>``,
+many thanks to him for his work and understanding during the process.
