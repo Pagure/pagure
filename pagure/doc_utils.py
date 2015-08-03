@@ -93,7 +93,7 @@ def convert_readme(content, ext, view_file_url=None):
     if ext and ext in ['.rst']:
         safe = True
         output = convert_doc(content, view_file_url)
-    elif ext and ext in ['.mk']:
+    elif ext and ext in ['.mk', '.md']:
         output = markdown.markdown(content)
         safe = True
     elif not ext or (ext and ext in ['.text', '.txt']):
