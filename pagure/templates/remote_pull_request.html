@@ -14,9 +14,9 @@
   <form action="{{ url_for('.new_remote_request_pull', username=username,
     repo=repo.name) }}" method="post">
     <table>
-      {{ render_field_in_row(form.title) }}
-      {{ render_field_in_row(form.git_repo) }}
-      {{ render_field_in_row(form.branch_from) }}
+      {{ render_field_in_row(form.title, size=80) }}
+      {{ render_field_in_row(form.git_repo, size=80) }}
+      {{ render_field_in_row(form.branch_from, size=80) }}
       <tr>
         <td>To branch</td>
         <td>

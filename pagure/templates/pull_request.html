@@ -73,7 +73,7 @@
     branch_to=branch_to) }}" method="post">
   {% endif %}
     <table>
-      {{ render_field_in_row(form.title) }}
+      {{ render_field_in_row(form.title, size=80) }}
       <tr>
         <td>From branch:</td>
         <td>{{ branch_from }}</td>
