@@ -6,90 +6,15 @@
 
 {% block repo %}
 
-<h2>Docs</h2>
-
-{% if repo_obj and repo_obj.is_empty %}
-
-  <section class="repo_info">
-    <p>This repo is brand new!</p>
-
-    <p>If you already have a git repo:</p>
-    <pre>
-      git remote add origin {{ config.get('GIT_URL_SSH') }}docs/{{ repo.fullname }}.git
-      git push -u origin master
-    </pre>
-
-    <p>If you have not created your git repo yet:</p>
-    <pre>
-      git clone {{ config.get('GIT_URL_SSH') }}docs/{{ repo.fullname }}.git
-      cd {{ repo.name }}
-      touch README.rst
-      git add README.rst
-      git commit -m "Add README file"
-      git push -u origin master
-    </pre>
-
-    </section>
-
-{% else %}
-  <h3>
-    <a href="{{ url_for('view_docs', username=username,
-                repo=repo.name, branchname=branchname) }}">
-    {{ branchname }}</a>/{% if filename %}{%
-    for file in filename.split('/') %}
-      {% if loop.first %}
-      {% set path = file %}
-      {% else %}
-      {% set path = path + '/' + file %}
-      {% endif %}
-      {% if loop.index != loop.length %}<a href="{{
-          url_for('view_docs', username=username,
-                  repo=repo.name, branchname=branchname, filename=path) }}"
-      >{{ file }}</a>/{% else %}{{ file }}{% endif %}
-    {% endfor %}{% endif %}
-  </h3>
-
-  {% if tree %}
-  <section class="tree_list">
-      <ul>
-      {% for entry in tree %}
-      <li class="{% if entry.filemode == 16384 %}folder{% else %}file{% endif %}">
-        {% if entry.filemode == 16384 -%}
-        <a href="{{ url_for('view_docs', username=username,
-                  repo=repo.name, branchname=branchname,
-                  filename=filename.rsplit('/', 1)[0] + '/' + entry.name if filename and '/' in filename else entry.name) }}">
-        {%- else -%}
-        <a href="{{ url_for('view_docs', username=username,
-                  repo=repo.name, branchname=branchname,
-                  filename=filename.rsplit('/', 1)[0] + '/' + entry.name if filename and '/' in filename else entry.name) }}">
-        {%- endif -%}
-         {{ entry.name }}</a>
-      </li>
-      {% endfor %}
-    </ul>
-  </section>
-  {% endif %}
-
-  {% if content %}
-  <section class="docs_content">
-    {{ content |safe }}
-  </section>
-  {% endif %}
-
-
-  <section class="git_links">
-    <table>
-      <tr>
-        <th>Git URLs: </th>
-        <td>
-          {{ config.get('GIT_URL_SSH') }}docs/{{ repo.fullname }}.git
-        </td>
-        <td>
-          {{ config.get('GIT_URL_GIT') }}docs/{{ repo.fullname }}.git
-        </td>
-      </tr>
-    </table>
-    </section>
-{% endif %}
+<iframe id="docframe" src="{{ config['DOC_APP_URL'] + url_for('.view_repo',
+                username=username, repo=repo.name, filename=filename) }}"
+    frameborder="0" style="min-height:700px;width:100%"
+    onload="resize_iframe()">
+  <p>Your browser does not support iframe, please visit
+  <a href="{{ config['DOC_APP_URL'] + url_for('.view_repo',
+                username=username, repo=repo.name, filename=filename)
+           }}">the documentation directly</a>
+  </p>
+</iframe>
 
 {% endblock %}
