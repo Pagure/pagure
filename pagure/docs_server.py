@@ -168,7 +168,7 @@ def view_docs(repo, username=None, filename=None):
         mimetype = 'application/javascript'
 
     if not content:
-        if not len(tree):
+        if not tree or not len(tree):
             flask.abort(404, 'No content found is the repository')
         html = '<li>'
         for el in tree:
