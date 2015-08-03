@@ -167,12 +167,16 @@ def view_docs(repo, username=None, filename=None):
     elif filename.endswith('.js'):
         mimetype = 'application/javascript'
 
-    if not filename and not content:
+    if not content:
         if not len(tree):
             flask.abort(404, 'No content found is the repository')
         html = '<li>'
         for el in tree:
-            html += '<ul><a href="{0}">{0}</a></ul>'.format(el.name)
+            name = el.name
+            # Append a trailing '/' to the folders
+            if el.filemode == 16384:
+                name += '/'
+            html += '<ul><a href="{0}">{1}</a></ul>'.format(el.name, name)
         html += '</li>'
         content = TMPL_HTML.format(content=html)
 
