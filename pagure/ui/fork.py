@@ -911,9 +911,6 @@ def new_remote_request_pull(repo, username=None):
             SESSION.rollback()
             flask.flash(str(err), 'error')
 
-    if not is_repo_admin(repo):
-        form = None
-
     return flask.render_template(
         'remote_pull_request.html',
         select='requests',

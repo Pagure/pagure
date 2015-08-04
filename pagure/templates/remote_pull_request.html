@@ -9,7 +9,7 @@
 
 <h2>New remote pull-request</h2>
 
-{% if form and repo_admin %}
+{% if form %}
 <section class="new_project">
   <form action="{{ url_for('.new_remote_request_pull', username=username,
     repo=repo.name) }}" method="post">
