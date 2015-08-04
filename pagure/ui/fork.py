@@ -699,7 +699,11 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
     if not repo:
         flask.abort(404)
 
-    if not repo.settings.get('pull_requests', True):
+    parent = repo
+    if repo.parent:
+        parent = repo.parent
+
+    if not parent.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-requests found for this project')
 
     repopath = pagure.get_repo_path(repo)
@@ -731,10 +735,6 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
 
             if orig_commit:
                 orig_commit = orig_commit.oid.hex
-
-            parent = repo
-            if repo.parent:
-                parent = repo.parent
 
             request = pagure.lib.new_pull_request(
                 SESSION,
