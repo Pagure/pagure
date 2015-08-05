@@ -21,9 +21,9 @@
         <td>To branch</td>
         <td>
           <select id="branch_select" name="branch_to">
-              <option>{{ branch_to }}</option>
+            {% if branch_to %}<option>{{ branch_to }}</option>{% endif %}
             {% for branch in branches |reverse %}
-              {% if branch != branch_to %}
+              {% if not branch_to or branch != branch_to %}
               <option>{{ branch }}</option>
               {% endif %}
             {% endfor %}
