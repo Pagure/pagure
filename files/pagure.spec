@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.20
+Version:        0.1.21
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -212,6 +212,17 @@ install -m 644 ev-server/pagure_ev.service \
 
 
 %changelog
+* Wed Aug 05 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.21
+- Update to 0.1.21
+- Make SSH protocol explicit for SSH URLs (Till Maas)
+- Adjust the documentation (layout and content)
+- Rework the doc server to allow showing html files directly
+- Fix installing the pagure hook correctly (tickets and requests)
+- Give proper attribution to the pagure logo to Micah Deen in the documentation
+- Increase pull request text field lengths to 80 (Till Maas)
+- Fix who can open a remote PR and the check that the repo allows PR
+- If there is no commit and no content, it means we didn't find the file: 404
+
 * Wed Jul 29 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.20
 - Update to 0.1.20
 - Include the tags in the JSON representation of a project
