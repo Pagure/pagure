@@ -353,6 +353,9 @@ def view_file(repo, identifier, filename, username=None):
     else:
         content = commit
 
+    if not content:
+        flask.abort(404, 'File not found')
+
     if isinstance(content, pygit2.Blob):
         if content.is_binary or not pagure.lib.could_be_text(content.data):
             ext = filename[filename.rfind('.'):]
