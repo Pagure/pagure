@@ -2332,9 +2332,10 @@ def add_token_to_user(session, project, acls, username):
 def text2markdown(text, extended=True):
     """ Simple text to html converter using the markdown library.
     """
+    md = markdown.Markdown()
     if extended:
         # Install our markdown modifications
-        pagure.pfmarkdown.inject()
+        md = markdown.Markdown(extensions=['pagure.pfmarkdown'])
 
     if text:
         # Hack to allow blockquotes to be marked by ~~~
@@ -2347,7 +2348,7 @@ def text2markdown(text, extended=True):
             if indent:
                 line = '    %s' % line
             ntext.append(line)
-        return clean_input(markdown.markdown('\n'.join(ntext)))
+        return clean_input(md.convert('\n'.join(ntext)))
 
     return ''
 
