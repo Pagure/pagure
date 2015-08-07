@@ -205,6 +205,7 @@ def view_repo_branch(repo, branchname, username=None):
         'repo_info.html',
         select='overview',
         repo=repo,
+        head=repo_obj.head.shorthand,
         username=username,
         branches=sorted(repo_obj.listall_branches()),
         branchname=branchname,
@@ -873,7 +874,6 @@ def change_ref_head(repo, username=None):
 
     return flask.redirect(flask.url_for(
                 'view_settings', username=username, repo=repo.name))
-
 
 
 @APP.route('/<repo>/delete', methods=['POST'])

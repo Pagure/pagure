@@ -134,7 +134,7 @@
     <span id="request_pull" class="inline_it">
         <a href="{{ url_for('new_request_pull',
             username=username, repo=repo.name,
-            branch_to='master', branch_from=branchname or 'master') }}">
+            branch_to=head, branch_from=branchname or 'master') }}">
           {% if repo_admin %}Request pull{% else %}Compare{% endif %}
         </a>
     </span>
