@@ -378,7 +378,7 @@ def view_file(repo, identifier, filename, username=None):
                     filename,
                     content.data
                 )
-            except ClassNotFound:
+            except (ClassNotFound, TypeError):
                 lexer = TextLexer()
 
             content = highlight(
