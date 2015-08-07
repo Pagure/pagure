@@ -347,7 +347,7 @@ class EditFileForm(wtf.Form):
 class DefaultBranchForm(wtf.Form):
     """Form to change the default branh for a repository"""
     branches = wtforms.SelectField(
-        'deafult_branch',
+        'default_branch',
         [wtforms.validators.Required()],
         choices=[(item, item) for item in []]
     )

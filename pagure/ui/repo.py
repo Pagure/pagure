@@ -75,7 +75,11 @@ def view_repo(repo, username=None):
 
     readme = None
     safe = False
-    branchname = repo_obj.head.shorthand if not repo_obj.is_empty else None
+
+    if not repo_obj.is_empty and not repo_obj.head_is_unborn:
+        branchname = repo_obj.head.shorthand
+    else:
+        branchname = None
     for i in tree:
         name, ext = os.path.splitext(i.name)
         if name == 'README':
@@ -719,6 +723,7 @@ def view_settings(repo, username=None):
             flask.url_for('auth_login', next=flask.request.url))
 
     repo = pagure.lib.get_project(SESSION, repo, user=username)
+
     if not repo:
         flask.abort(404, 'Project not found')
 
@@ -734,9 +739,9 @@ def view_settings(repo, username=None):
         APP.config.get('DISABLED_PLUGINS'))
     tags = pagure.lib.get_tags_of_project(SESSION, repo)
 
-
     form = pagure.forms.ConfirmationForm()
     tag_form = pagure.forms.AddIssueTagForm()
+
     branches = repo_obj.listall_branches()
     branches_form = pagure.forms.DefaultBranchForm(branches=branches)
     if form.validate_on_submit():
@@ -763,7 +768,11 @@ def view_settings(repo, username=None):
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')
-    branchname = repo_obj.head.shorthand if not repo_obj.is_empty else None
+
+    if not repo_obj.is_empty and not repo_obj.head_is_unborn:
+        branchname = repo_obj.head.shorthand
+    else:
+        branchname = None
     return flask.render_template(
         'settings.html',
         select='settings',
@@ -850,12 +859,17 @@ def change_ref_head(repo, username=None):
             'You are not allowed to change the settings for this project')
     repopath = pagure.get_repo_path(repo)
     repo_obj = pygit2.Repository(repopath)
-    branchname = flask.request.form['branches']
-    try:
-        reference = repo_obj.lookup_reference('refs/heads/%s'%branchname).resolve()
-        repo_obj.set_head(reference.name)
-    except Exception as err:
-        APP.logger.exception(err)
+    branches = repo_obj.listall_branches()
+    form = pagure.forms.DefaultBranchForm(branches=branches)
+
+    if form.validate_on_submit():
+        branchname = form.branches.data
+        try:
+            reference = repo_obj.lookup_reference('refs/heads/%s'%branchname).resolve()
+            repo_obj.set_head(reference.name)
+            flask.flash('Default branch updated to %s'%branchname)
+        except Exception as err:
+            APP.logger.exception(err)
 
     return flask.redirect(flask.url_for(
                 'view_settings', username=username, repo=repo.name))

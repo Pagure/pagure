@@ -62,11 +62,11 @@
     <h3> Default Branch </h3>
 
     <form action="{{ url_for('change_ref_head',
-                     username=username, repo=repo.name) }}" method="post"
-          enctype="multipart/form-data">
+                     username=username, repo=repo.name) }}" method="post">
     {{ branches_form.csrf_token }}
     {{ branches_form.branches }}
     <input type="submit" value="Make Default"/>
+  </form>
   </div>
   <div>
     <h3>Private web-hook key</h3>

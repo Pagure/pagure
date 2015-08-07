@@ -10,7 +10,7 @@
         <a href="{{ url_for('view_repo', username=username, repo=repo.name)}}">
             {{ repo.fullname }}
         </a>
-        {% if branchname %} ({{ branchname }}) {% else %} ({{ 'None' }}) {% endif %}
+        {% if branchname %} ({{ branchname }}) {% endif %}
     </h2>
     <span id="projectinfo">
     {% if repo.description %}{{ repo.description | markdown |safe }}{% else %}-{% endif -%}
