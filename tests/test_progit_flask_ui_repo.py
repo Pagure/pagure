@@ -105,6 +105,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 in output.data)
 
             data['user'] = 'foo'
+            tests.create_projects_git(tests.HERE)
             output = self.app.post(
                 '/test/adduser', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
@@ -176,6 +177,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 in output.data)
 
             data['group'] = 'foo'
+            tests.create_projects_git(tests.HERE)
             output = self.app.post(
                 '/test/addgroup', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
@@ -209,6 +211,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
+            tests.create_projects_git(tests.HERE)
             output = self.app.post('/test/settings')
 
             csrf_token = output.data.split(
@@ -272,6 +275,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
+            tests.create_projects_git(tests.HERE)
             output = self.app.post('/test/update', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<header class="repo">' in output.data)
@@ -1514,6 +1518,7 @@ index 0000000..fb7093d
             repo = pagure.lib.get_project(self.session, 'test')
             self.assertEqual(repo.hook_token, 'aaabbbccc')
 
+            tests.create_projects_git(tests.HERE)
             output = self.app.post(
                 '/test/hook_token', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
@@ -1567,6 +1572,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 400)
 
             data['regenerate'] = 'tickets'
+            tests.create_projects_git(tests.HERE)
             output = self.app.post(
                 '/test/regenerate', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
@@ -1752,6 +1758,91 @@ index 0000000..fb7093d
             self.assertIn(
                 '<textarea cols="140" rows="13 " id="textareaCode" '
                 'name="content">', output.data)
+
+    @patch('pagure.ui.repo.admin_session_timedout')
+    def test_change_ref_head(self,ast):
+        """ Test the change_ref_head endpoint. """
+        ast.return_value = False
+
+        output = self.app.post('/foo/default/branch/')
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/foo/default/branch/')
+            self.assertEqual(output.status_code, 404)
+
+            tests.create_projects(self.session)
+
+            output = self.app.post('/test/default/branch/')
+            self.assertEqual(output.status_code, 403)
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            repo = tests.create_projects_git(tests.HERE)
+            output = self.app.post('/test/default/branch/',
+                                    follow_redirects=True) # without git branch
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<header class="repo">' in output.data)
+            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertTrue(
+                '<ul id="flashes">\n                </ul>' in output.data)
+            self.assertIn(
+                '<select id="branches" name="branches"></select>', output.data)
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            repo_obj = pygit2.Repository(repo[0])
+            tree = repo_obj.index.write_tree()
+            author = pygit2.Signature(
+                'Alice Author', 'alice@authors.tld')
+            committer = pygit2.Signature(
+                'Cecil Committer', 'cecil@committers.tld')
+            repo_obj.create_commit(
+                'refs/heads/master',  # the name of the reference to update
+                author,
+                committer,
+                'Add sources file for testing',
+                # binary string representing the tree object ID
+                tree,
+                # list of binary strings representing parents of the new commit
+                []
+            )
+            repo_obj.create_branch("feature",repo_obj.head.get_object())
+
+            data = {
+                'branches': 'feature',
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post('/test/default/branch/',     # changing head to feature branch
+                                    data=data,
+                                    follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<header class="repo">' in output.data)
+            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertIn(
+                '<select id="branches" name="branches">', output.data)
+            self.assertTrue(
+                '<li class="message">Default branch updated to feature</li>'
+                in output.data)
+
+            data = {
+                'branches': 'master',
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post('/test/default/branch/',     # changing head to master branch
+                                    data=data,
+                                    follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<header class="repo">' in output.data)
+            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertIn(
+                '<select id="branches" name="branches">', output.data)
+            self.assertTrue(
+                '<li class="message">Default branch updated to master</li>'
+                in output.data)
 
 
 if __name__ == '__main__':

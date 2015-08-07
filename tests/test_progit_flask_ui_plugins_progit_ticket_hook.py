@@ -87,6 +87,7 @@ class PagureFlaskPluginPagureTicketHooktests(tests.Modeltests):
             tests.create_projects_git(os.path.join(tests.HERE, 'tickets'))
 
             # With the git repo
+            tests.create_projects_git(tests.HERE)
             output = self.app.post(
                 '/test/settings/pagure tickets', data=data,
                 follow_redirects=True)

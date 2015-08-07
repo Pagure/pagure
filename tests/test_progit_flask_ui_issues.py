@@ -1215,6 +1215,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '"tag1"</p>' in output.data)
 
             data['csrf_token'] = csrf_token
+            tests.create_projects_git(tests.HERE)
             output = self.app.post(
                 '/test/tag/tag1/edit', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
@@ -1280,6 +1281,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         # Edit tag
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
+            tests.create_projects_git(tests.HERE)
             output = self.app.post(
                 '/test/droptag/', data={}, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
