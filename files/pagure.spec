@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.21
+Version:        0.1.22
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -212,6 +212,12 @@ install -m 644 ev-server/pagure_ev.service \
 
 
 %changelog
+* Fri Aug 07 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.22
+- Update to 0.1.22
+- Adjust the README to the current state of pagure
+- Rework how we integrate our custom tags into markdown to avoid the infinite
+  loop we run into once in a while
+
 * Wed Aug 05 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.21
 - Update to 0.1.21
 - Make SSH protocol explicit for SSH URLs (Till Maas)
