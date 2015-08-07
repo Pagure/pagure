@@ -75,6 +75,7 @@ def view_repo(repo, username=None):
 
     readme = None
     safe = False
+    branchname = repo_obj.head.shorthand if not repo_obj.is_empty else None
     for i in tree:
         name, ext = os.path.splitext(i.name)
         if name == 'README':
@@ -83,7 +84,7 @@ def view_repo(repo, username=None):
                 content, ext,
                 view_file_url=flask.url_for(
                     'view_raw_file', username=username,
-                    repo=repo.name, identifier='master', filename=''))
+                    repo=repo.name, identifier=branchname, filename=''))
 
     diff_commits = []
     if repo.is_fork:
@@ -127,7 +128,7 @@ def view_repo(repo, username=None):
         readme=readme,
         safe=safe,
         branches=sorted(repo_obj.listall_branches()),
-        branchname='master',
+        branchname=branchname,
         last_commits=last_commits,
         tree=tree,
         diff_commits=diff_commits,
@@ -718,7 +719,6 @@ def view_settings(repo, username=None):
             flask.url_for('auth_login', next=flask.request.url))
 
     repo = pagure.lib.get_project(SESSION, repo, user=username)
-
     if not repo:
         flask.abort(404, 'Project not found')
 
@@ -727,14 +727,18 @@ def view_settings(repo, username=None):
         flask.abort(
             403,
             'You are not allowed to change the settings for this project')
+    reponame = pagure.get_repo_path(repo)
+    repo_obj = pygit2.Repository(reponame)
 
     plugins = pagure.ui.plugins.get_plugin_names(
         APP.config.get('DISABLED_PLUGINS'))
     tags = pagure.lib.get_tags_of_project(SESSION, repo)
 
+
     form = pagure.forms.ConfirmationForm()
     tag_form = pagure.forms.AddIssueTagForm()
-
+    branches = repo_obj.listall_branches()
+    branches_form = pagure.forms.DefaultBranchForm(branches=branches)
     if form.validate_on_submit():
         settings = {}
         for key in flask.request.form:
@@ -759,7 +763,7 @@ def view_settings(repo, username=None):
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')
-
+    branchname = repo_obj.head.shorthand if not repo_obj.is_empty else None
     return flask.render_template(
         'settings.html',
         select='settings',
@@ -767,9 +771,11 @@ def view_settings(repo, username=None):
         repo=repo,
         form=form,
         tag_form=tag_form,
+        branches_form=branches_form,
         tags=tags,
         plugins=plugins,
         repo_admin=repo_admin,
+        branchname = branchname,
     )
 
 
@@ -818,6 +824,42 @@ def update_project(repo, username=None):
 
     return flask.redirect(flask.url_for(
         'view_settings', username=username, repo=repo.name))
+
+
+@APP.route('/<repo>/default/branch/', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/default/branch/', methods=['POST'])
+@cla_required
+def change_ref_head(repo, username=None):
+    """ Change HEAD reference
+    """
+
+    if admin_session_timedout():
+        flask.flash('Action canceled, try it again', 'error')
+        url = flask.url_for(
+            'view_settings', username=username, repo=repo)
+        return flask.redirect(
+            flask.url_for('auth_login', next=url))
+
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    if not is_repo_admin(repo):
+        flask.abort(
+            403,
+            'You are not allowed to change the settings for this project')
+    repopath = pagure.get_repo_path(repo)
+    repo_obj = pygit2.Repository(repopath)
+    branchname = flask.request.form['branches']
+    try:
+        reference = repo_obj.lookup_reference('refs/heads/%s'%branchname).resolve()
+        repo_obj.set_head(reference.name)
+    except Exception as err:
+        APP.logger.exception(err)
+
+    return flask.redirect(flask.url_for(
+                'view_settings', username=username, repo=repo.name))
+
 
 
 @APP.route('/<repo>/delete', methods=['POST'])

@@ -343,3 +343,22 @@ class EditFileForm(wtf.Form):
             self.email.choices = [
                 (email.email, email.email) for email in kwargs['emails']
             ]
+
+class DefaultBranchForm(wtf.Form):
+    """Form to change the default branh for a repository"""
+    branches = wtforms.SelectField(
+        'deafult_branch',
+        [wtforms.validators.Required()],
+        choices=[(item, item) for item in []]
+    )
+
+    def __init__(self, *args, **kwargs):
+        """ Calls the default constructor with the normal argument but
+        uses the list of collection provided to fill the choices of the
+        drop-down list.
+        """
+        super(DefaultBranchForm, self).__init__(*args, **kwargs)
+        if 'branches' in kwargs:
+            self.branches.choices = [
+                (branch, branch) for branch in kwargs['branches']
+            ]
