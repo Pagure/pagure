@@ -159,7 +159,10 @@ def view_repo_branch(repo, branchname, username=None):
         flask.abort(404, 'Branch no found')
 
     branch = repo_obj.lookup_branch(branchname)
-
+    if not repo_obj.is_empty and not repo_obj.head_is_unborn:
+        head = repo_obj.head.shorthand
+    else:
+        head = None
     cnt = 0
     last_commits = []
     for commit in repo_obj.walk(branch.get_object().hex, pygit2.GIT_SORT_TIME):
@@ -182,14 +185,18 @@ def view_repo_branch(repo, branchname, username=None):
 
     if not repo_obj.is_empty and not orig_repo.is_empty:
 
-        master_branch = orig_repo.lookup_branch('master')
-        master_commits = []
+        if not orig_repo.head_is_unborn:
+            compare_branch = orig_repo.lookup_branch(orig_repo.head.shorthand)
+        else:
+            compare_branch = None
 
-        if master_branch:
-            master_commits = [
+        compare_commits = []
+
+        if compare_branch:
+            compare_commits = [
                 commit.oid.hex
                 for commit in orig_repo.walk(
-                    master_branch.get_object().hex,
+                    compare_branch.get_object().hex,
                     pygit2.GIT_SORT_TIME)
             ]
 
@@ -197,7 +204,7 @@ def view_repo_branch(repo, branchname, username=None):
 
         for commit in repo_obj.walk(
                 repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
-            if commit.oid.hex in master_commits:
+            if commit.oid.hex in compare_commits:
                 break
             diff_commits.append(commit.oid.hex)
 
@@ -205,7 +212,7 @@ def view_repo_branch(repo, branchname, username=None):
         'repo_info.html',
         select='overview',
         repo=repo,
-        head=repo_obj.head.shorthand,
+        head=head,
         username=username,
         branches=sorted(repo_obj.listall_branches()),
         branchname=branchname,
@@ -240,8 +247,10 @@ def view_commits(repo, branchname=None, username=None):
 
     if branchname:
         branch = repo_obj.lookup_branch(branchname)
+    elif not repo_obj.is_empty and not repo_obj.head_is_unborn:
+        branch = repo_obj.lookup_branch(repo_obj.head.shorthand)
     else:
-        branch = repo_obj.lookup_branch('master')
+        branch = None
 
     try:
         page = int(flask.request.args.get('page', 1))
@@ -278,14 +287,18 @@ def view_commits(repo, branchname=None, username=None):
     if not repo_obj.is_empty and not orig_repo.is_empty \
             and repo_obj.listall_branches() > 1:
 
-        master_branch = orig_repo.lookup_branch('master')
-        master_commits = []
+        if not orig_repo.head_is_unborn:
+            compare_branch = orig_repo.lookup_branch(orig_repo.head.shorthand)
+        else:
+            compare_branch = None
 
-        if master_branch:
-            master_commits = [
+        compare_commits = []
+
+        if compare_branch:
+            compare_commits = [
                 commit.oid.hex
                 for commit in orig_repo.walk(
-                    master_branch.get_object().hex,
+                    compare_branch.get_object().hex,
                     pygit2.GIT_SORT_TIME)
             ]
 
@@ -294,7 +307,7 @@ def view_commits(repo, branchname=None, username=None):
 
             for commit in repo_obj.walk(
                     repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
-                if commit.oid.hex in master_commits:
+                if commit.oid.hex in compare_commits:
                     break
                 diff_commits.append(commit.oid.hex)
 

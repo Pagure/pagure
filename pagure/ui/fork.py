@@ -919,4 +919,5 @@ def new_remote_request_pull(repo, username=None):
         form=form,
         branches=sorted(orig_repo.listall_branches()),
         repo_admin=repo_admin,
+        branch_to=orig_repo.head.shorthand,
     )
