@@ -1372,6 +1372,10 @@ def view_docs(repo, username=None, filename=None):
     """ Display the documentation
     """
     repo_obj = pagure.lib.get_project(SESSION, repo, user=username)
+
+    if not repo_obj:
+        flask.abort(404, 'Project not found')
+
     return flask.render_template(
         'docs.html',
         repo=repo_obj,
