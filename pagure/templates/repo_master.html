@@ -39,7 +39,7 @@
                     repo=repo.name) }}">Overview</a>
       </li>
 
-      {% if config['DOC_APP_URL'] and repo.settings.get('project_documentation', True) %}
+      {% if config['DOC_APP_URL'] and repo and repo.settings.get('project_documentation', True) %}
       <li {% if select == 'docs' %}class="selected" {% endif %}>
         <a href="{{ url_for('.view_docs', username=username, repo=repo.name) }}">Docs</a>
       </li>
@@ -60,14 +60,14 @@
                    repo=repo.name) }}">Tags</a>
       </li>
 
-      {% if repo.settings.get('issue_tracker', True) %}
+      {% if repo and repo.settings.get('issue_tracker', True) %}
       <li {% if select == 'issues' %}class="selected" {% endif %}>
           <a href="{{ url_for('.view_issues', username=username,
                      repo=repo.name) }}">Issues</a>
       </li>
       {% endif %}
 
-      {% if repo.settings.get('pull_requests', True) %}
+      {% if repo and repo.settings.get('pull_requests', True) %}
       <li {% if select == 'requests' %}class="selected" {% endif %}>
         <a href="{{ url_for('.request_pulls', username=username,
                    repo=repo.name) }}">
@@ -76,7 +76,7 @@
       </li>
       {% endif %}
 
-      {% if repo.forks %}
+      {% if repo and repo.forks %}
       <li {% if select == 'forks' %}class="selected" {% endif %}>
         <a href="{{ url_for('.view_forks', username=username,
                    repo=repo.name) }}">
