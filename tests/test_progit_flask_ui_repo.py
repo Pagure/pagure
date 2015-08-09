@@ -50,6 +50,8 @@ class PagureFlaskRepotests(tests.Modeltests):
             tests.HERE, 'tickets')
         pagure.APP.config['DOCS_FOLDER'] = os.path.join(
             tests.HERE, 'docs')
+        pagure.APP.config['UPLOAD_FOLDER_PATH'] = os.path.join(
+            tests.HERE, 'releases')
         self.app = pagure.APP.test_client()
 
     @patch('pagure.ui.repo.admin_session_timedout')
@@ -1843,6 +1845,53 @@ index 0000000..fb7093d
             self.assertTrue(
                 '<li class="message">Default branch updated to master</li>'
                 in output.data)
+
+    def test_new_release(self):
+        """ Test the new_release endpoint. """
+
+        output = self.app.post('/foo/upload/')
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/foo/upload/')
+            self.assertEqual(output.status_code, 404)
+
+            tests.create_projects(self.session)
+
+            output = self.app.post('/test/upload/')
+            self.assertEqual(output.status_code, 403)
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            img = os.path.join(tests.HERE, 'placebo.png')
+
+            # Missing CSRF Token
+            data = {'filestream': open(img)}
+            output = self.app.post('/test/upload/', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<h2>Upload a new release</h2>', output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            # Upload Ok but No git repo
+            data = {'filestream': open(img), 'csrf_token': csrf_token}
+            output = self.app.post(
+                '/test/upload/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+            self.assertIn('<li class="message">File uploaded</li>', output.data)
+            self.assertIn('<pre>No git repo found</pre>', output.data)
+
+            repo = tests.create_projects_git(tests.HERE)
+
+            # Upload successful
+            data = {'filestream': open(img), 'csrf_token': csrf_token}
+            output = self.app.post(
+                '/test/upload/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<li class="message">File uploaded</li>', output.data)
+            self.assertIn('This project has not been tagged.', output.data)
 
 
 if __name__ == '__main__':
