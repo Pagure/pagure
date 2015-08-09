@@ -1956,8 +1956,10 @@ index 0000000..fb7093d
             self.assertIn('<li class="message">File uploaded</li>', output.data)
             self.assertIn('This project has not been tagged.', output.data)
 
-    def test_add_token(self):
+    @patch('pagure.ui.repo.admin_session_timedout')
+    def test_add_token(self, ast):
         """ Test the add_token endpoint. """
+        ast.return_value = False
 
         output = self.app.get('/foo/token/new/')
         self.assertEqual(output.status_code, 302)
@@ -1980,9 +1982,20 @@ index 0000000..fb7093d
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            data = {'csrf_token': csrf_token}
+
+            ast.return_value = True
+            # Test when the session timed-out
+            output = self.app.post('/test/token/new/', data=data)
+            self.assertEqual(output.status_code, 302)
+            output = self.app.get('/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li class="error">Action canceled, try it again</li>',
+                output.data)
+            ast.return_value = False
 
             # Missing acls
-            data = {'csrf_token': csrf_token}
             output = self.app.post('/test/token/new/', data=data)
             self.assertEqual(output.status_code, 200)
             self.assertIn('<h2>Create a new token</h2>', output.data)
