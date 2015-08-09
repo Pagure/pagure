@@ -883,7 +883,7 @@ def change_ref_head(repo, username=None):
             reference = repo_obj.lookup_reference('refs/heads/%s'%branchname).resolve()
             repo_obj.set_head(reference.name)
             flask.flash('Default branch updated to %s'%branchname)
-        except Exception as err:
+        except Exception as err:  # pragma: no cover
             APP.logger.exception(err)
 
     return flask.redirect(flask.url_for(
