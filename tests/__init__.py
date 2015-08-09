@@ -101,7 +101,8 @@ class Modeltests(unittest.TestCase):
                 shutil.rmtree(folder)
             os.mkdir(folder)
 
-        self.session = pagure.lib.model.create_tables(DB_PATH)
+        self.session = pagure.lib.model.create_tables(
+            DB_PATH, acls=pagure.APP.config.get('ACLS', {}))
 
         # Create a couple of users
         item = pagure.lib.model.User(
