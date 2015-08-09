@@ -75,6 +75,17 @@ class PagureFlaskRepotests(tests.Modeltests):
             ast.return_value = True
             output = self.app.get('/test/adduser')
             self.assertEqual(output.status_code, 302)
+
+            # Redirect also happens for POST request
+            output = self.app.post('/test/adduser')
+            self.assertEqual(output.status_code, 302)
+            # Check the message flashed during the redirect
+            output = self.app.get('/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li class="error">Action canceled, try it again</li>',
+                output.data)
+
             ast.return_value = False
 
         user.username = 'pingou'
