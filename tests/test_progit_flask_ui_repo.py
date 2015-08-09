@@ -1956,6 +1956,55 @@ index 0000000..fb7093d
             self.assertIn('<li class="message">File uploaded</li>', output.data)
             self.assertIn('This project has not been tagged.', output.data)
 
+    def test_add_token(self):
+        """ Test the add_token endpoint. """
+
+        output = self.app.get('/foo/token/new/')
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/foo/token/new/')
+            self.assertEqual(output.status_code, 404)
+
+            tests.create_projects(self.session)
+
+            output = self.app.get('/test/token/new/')
+            self.assertEqual(output.status_code, 403)
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/token/new/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<h2>Create a new token</h2>', output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            # Missing acls
+            data = {'csrf_token': csrf_token}
+            output = self.app.post('/test/token/new/', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<h2>Create a new token</h2>', output.data)
+
+            data = {'csrf_token': csrf_token, 'acls': ['issue_create']}
+            output = self.app.post(
+                '/test/token/new/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+            self.assertIn('<li class="message">Token created</li>', output.data)
+            self.assertIn('<pre>No git repo found</pre>', output.data)
+
+            repo = tests.create_projects_git(tests.HERE)
+
+            # Upload successful
+            data = {'csrf_token': csrf_token, 'acls': ['issue_create']}
+            output = self.app.post(
+                '/test/token/new/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<li class="message">Token created</li>', output.data)
+            self.assertIn('<h2>Settings</h2>', output.data)
+            self.assertIn('<span class="message">Valid</span> until:', output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskRepotests)
