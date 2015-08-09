@@ -1772,13 +1772,18 @@ index 0000000..fb7093d
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_change_ref_head(self,ast):
         """ Test the change_ref_head endpoint. """
-        ast.return_value = False
+        ast.return_value = True
 
         output = self.app.post('/foo/default/branch/')
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
+            output = self.app.post('/foo/default/branch/')
+            self.assertEqual(output.status_code, 302)
+
+            ast.return_value = False
+
             output = self.app.post('/foo/default/branch/')
             self.assertEqual(output.status_code, 404)
 
