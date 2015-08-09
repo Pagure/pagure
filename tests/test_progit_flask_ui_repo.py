@@ -1603,6 +1603,19 @@ index 0000000..fb7093d
             output = self.app.post('/test/regenerate', data=data)
             self.assertEqual(output.status_code, 400)
 
+            # Create an issue to play with
+            repo = pagure.lib.get_project(self.session, 'test')
+            msg = pagure.lib.new_issue(
+                session=self.session,
+                repo=repo,
+                title='Test issue',
+                content='We should work on this',
+                user='pingou',
+                ticketfolder=None
+            )
+            self.session.commit()
+            self.assertEqual(msg.title, 'Test issue')
+
             data['regenerate'] = 'tickets'
             tests.create_projects_git(tests.HERE)
             output = self.app.post(
@@ -1611,6 +1624,21 @@ index 0000000..fb7093d
             self.assertIn(
                 '<li class="message">Tickets git repo updated</li>',
                 output.data)
+
+            # Create a request to play with
+            repo = pagure.lib.get_project(self.session, 'test')
+            msg = pagure.lib.new_pull_request(
+                session=self.session,
+                repo_from=repo,
+                branch_from='branch',
+                repo_to=repo,
+                branch_to='master',
+                title='Test pull-request',
+                user='pingou',
+                requestfolder=None,
+            )
+            self.session.commit()
+            self.assertEqual(msg.title, 'Test pull-request')
 
             data['regenerate'] = 'requests'
             output = self.app.post(
