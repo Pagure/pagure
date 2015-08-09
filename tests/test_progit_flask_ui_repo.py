@@ -2095,6 +2095,23 @@ index 0000000..fb7093d
                 repo.tokens[0].expiration.date(),
                 datetime.datetime.utcnow().date())
 
+    def test_view_docs(self):
+        """ Test the view_docs endpoint. """
+        output = self.app.get('/docs/foo/')
+        # No project registered in the DB
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+
+        output = self.app.get('/docs/test/')
+        # No git repo associated
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects_git(tests.HERE, bare=True)
+
+        output = self.app.get('/docs/test/')
+        self.assertEqual(output.status_code, 404)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskRepotests)
