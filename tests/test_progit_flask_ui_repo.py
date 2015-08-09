@@ -11,6 +11,7 @@
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
+import datetime
 import json
 import unittest
 import shutil
@@ -2017,6 +2018,82 @@ index 0000000..fb7093d
             self.assertIn('<li class="message">Token created</li>', output.data)
             self.assertIn('<h2>Settings</h2>', output.data)
             self.assertIn('<span class="message">Valid</span> until:', output.data)
+
+    @patch('pagure.ui.repo.admin_session_timedout')
+    def test_revoke_api_token(self, ast):
+        """ Test the revoke_api_token endpoint. """
+        ast.return_value = False
+
+        output = self.app.post('/foo/token/revoke/123')
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/foo/token/revoke/123')
+            self.assertEqual(output.status_code, 404)
+
+            tests.create_projects(self.session)
+
+            output = self.app.post('/test/token/revoke/123')
+            self.assertEqual(output.status_code, 403)
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/token/new')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<h2>Create a new token</h2>', output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            data = {'csrf_token': csrf_token}
+
+            ast.return_value = True
+            # Test when the session timed-out
+            output = self.app.post('/test/token/revoke/123', data=data)
+            self.assertEqual(output.status_code, 302)
+            output = self.app.get('/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li class="error">Action canceled, try it again</li>',
+                output.data)
+            ast.return_value = False
+
+            output = self.app.post('/test/token/revoke/123', data=data)
+            self.assertEqual(output.status_code, 404)
+            self.assertIn('<pre>Token not found</pre>', output.data)
+
+            # Create a token to revoke
+            repo = tests.create_projects_git(tests.HERE)
+            data = {'csrf_token': csrf_token, 'acls': ['issue_create']}
+            output = self.app.post(
+                '/test/token/new/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<li class="message">Token created</li>', output.data)
+
+            # Existing token will expire in 60 days
+            repo = pagure.lib.get_project(self.session, 'test')
+            self.assertEqual(
+                repo.tokens[0].expiration.date(),
+                datetime.datetime.utcnow().date() + datetime.timedelta(days=60))
+
+            token = repo.tokens[0].id
+            output = self.app.post(
+                '/test/token/revoke/%s' % token,
+                data=data,
+                follow_redirects=True)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<li class="message">Token revoked</li>', output.data)
+
+            # Existing token has been expired
+            repo = pagure.lib.get_project(self.session, 'test')
+            self.assertEqual(
+                repo.tokens[0].expiration.date(),
+                repo.tokens[0].created.date())
+            self.assertEqual(
+                repo.tokens[0].expiration.date(),
+                datetime.datetime.utcnow().date())
 
 
 if __name__ == '__main__':
