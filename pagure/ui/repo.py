@@ -681,6 +681,7 @@ def view_tags(repo, username=None):
 @APP.route('/<repo>/upload', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/upload/', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/upload', methods=('GET', 'POST'))
+@cla_required
 def new_release(repo, username=None):
     """ Upload a new release.
     """
