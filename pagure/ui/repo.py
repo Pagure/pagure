@@ -1446,6 +1446,9 @@ def view_docs(repo, username=None, filename=None):
     if not repo_obj:
         flask.abort(404, 'Project not found')
 
+    if not APP.config.get('DOC_APP_URL'):
+        flask.abort(404, 'This pagure instance has no doc server')
+
     return flask.render_template(
         'docs.html',
         repo=repo_obj,
