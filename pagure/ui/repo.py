@@ -812,7 +812,7 @@ def update_project(repo, username=None):
     if admin_session_timedout():
         flask.flash('Action canceled, try it again', 'error')
         url = flask.url_for(
-            'view_settings', username=username, repo=repo.name)
+            'view_settings', username=username, repo=repo)
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
