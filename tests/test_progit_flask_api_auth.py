@@ -139,7 +139,6 @@ class PagureFlaskApiAuthtests(tests.Modeltests):
         """
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
-        tests.create_acls(self.session)
         tests.create_tokens_acl(self.session)
 
         output = self.app.post('/api/0/test/new_issue')

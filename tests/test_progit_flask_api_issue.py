@@ -49,7 +49,6 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(tests.HERE, 'tickets'))
         tests.create_tokens(self.session)
-        tests.create_acls(self.session)
         tests.create_tokens_acl(self.session)
 
         headers = {'Authorization': 'token aaabbbcccddd'}
@@ -553,7 +552,6 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(tests.HERE, 'tickets'))
         tests.create_tokens(self.session)
-        tests.create_acls(self.session)
         tests.create_tokens_acl(self.session)
 
         headers = {'Authorization': 'token aaabbbcccddd'}
@@ -633,7 +631,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         # Give `change_status_issue` to this token
         item = pagure.lib.model.TokenAcl(
             token_id='pingou_foo',
-            acl_id=4,
+            acl_id=6,
         )
         self.session.add(item)
         self.session.commit()
@@ -736,7 +734,6 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
-        tests.create_acls(self.session)
         tests.create_tokens_acl(self.session)
 
         headers = {'Authorization': 'token aaabbbcccddd'}
@@ -863,7 +860,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         # Give `change_status_issue` to this token
         item = pagure.lib.model.TokenAcl(
             token_id='pingou_foo',
-            acl_id=5,
+            acl_id=1,
         )
         self.session.add(item)
         self.session.commit()

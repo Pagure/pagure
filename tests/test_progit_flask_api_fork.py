@@ -51,7 +51,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
-        tests.create_acls(self.session)
         tests.create_tokens_acl(self.session)
 
         # Create a pull-request
@@ -167,7 +166,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
-        tests.create_acls(self.session)
         tests.create_tokens_acl(self.session)
 
         # Create a pull-request
@@ -286,7 +284,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
-        tests.create_acls(self.session)
         tests.create_tokens_acl(self.session)
 
         # Create the pull-request to close
@@ -357,7 +354,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         self.session.commit()
         item = pagure.lib.model.TokenAcl(
             token_id='foobar_token',
-            acl_id=6,
+            acl_id=2,
         )
         self.session.add(item)
         self.session.commit()
@@ -399,7 +396,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
-        tests.create_acls(self.session)
         tests.create_tokens_acl(self.session)
 
         # Create the pull-request to close
@@ -470,7 +466,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         self.session.commit()
         item = pagure.lib.model.TokenAcl(
             token_id='foobar_token',
-            acl_id=2,
+            acl_id=3,
         )
         self.session.add(item)
         self.session.commit()
@@ -510,7 +506,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
-        tests.create_acls(self.session)
         tests.create_tokens_acl(self.session)
 
         headers = {'Authorization': 'token aaabbbcccddd'}
@@ -625,7 +620,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
-        tests.create_acls(self.session)
         tests.create_tokens_acl(self.session)
 
         headers = {'Authorization': 'token aaabbbcccddd'}
