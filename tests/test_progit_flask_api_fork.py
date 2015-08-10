@@ -99,6 +99,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                 "author": None,
                 "status": True
               },
+              "total_requests": 1,
               "requests": [
                 {
                   "assignee": None,

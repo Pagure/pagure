@@ -154,6 +154,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "status": None,
                 "tags": []
               },
+              "total_issues": 1,
               "issues": [
                 {
                   "assignee": None,
@@ -204,6 +205,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "status": None,
                 "tags": []
               },
+              "total_issues": 1,
               "issues": [
                 {
                   "assignee": None,
@@ -257,6 +259,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "status": None,
                 "tags": []
               },
+              "total_issues": 1,
               "issues": [
                 {
                   "assignee": None,
@@ -296,6 +299,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "status": None,
                 "tags": []
               },
+              "total_issues": 2,
               "issues": [
                 {
                   "assignee": None,
@@ -348,6 +352,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "status": "Closed",
                 "tags": []
               },
+              "total_issues": 0,
               "issues": []
             }
         )
@@ -365,6 +370,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "status": "Invalid",
                 "tags": []
               },
+              "total_issues": 0,
               "issues": []
             }
         )

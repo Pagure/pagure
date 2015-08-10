@@ -100,7 +100,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         data = json.loads(output.data)
         self.assertDictEqual(
             data,
-            {'tags': ['0.0.1']}
+            {'tags': ['0.0.1'], 'total_tags': 1}
         )
 
     def test_api_projects(self):
@@ -137,6 +137,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
+              "total_projects": 1,
               "projects": [
                 {
                   "date_created": "1436527638",
@@ -161,6 +162,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
+              "total_projects": 2,
               "projects": [
                 {
                   "date_created": "1436527638",
@@ -196,6 +198,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
+              "total_projects": 1,
               "projects": [
                 {
                   "date_created": "1436527638",

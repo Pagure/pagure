@@ -54,13 +54,15 @@ class PagureFlaskApitests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         self.assertEqual(sorted(data['users']), ['foo', 'pingou'])
-        self.assertEqual(data.keys(), ['users'])
+        self.assertEqual(sorted(data.keys()), ['total_users', 'users'])
+        self.assertEqual(data['total_users'], 2)
 
         output = self.app.get('/api/0/users?pattern=p')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         self.assertEqual(data['users'], ['pingou'])
-        self.assertEqual(data.keys(), ['users'])
+        self.assertEqual(sorted(data.keys()), ['total_users', 'users'])
+        self.assertEqual(data['total_users'], 1)
 
     def test_api_project_tags(self):
         """ Test the api_project_tags function.  """
@@ -76,8 +78,9 @@ class PagureFlaskApitests(tests.Modeltests):
         output = self.app.get('/api/0/test/tags/')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
-        self.assertEqual(data.keys(), ['tags'])
+        self.assertEqual(sorted(data.keys()), ['tags', 'total_tags'])
         self.assertEqual(data['tags'], [])
+        self.assertEqual(data['total_tags'], 0)
 
         # Add an issue and tag it so that we can list them
         item = pagure.lib.model.Issue(
@@ -105,20 +108,23 @@ class PagureFlaskApitests(tests.Modeltests):
         output = self.app.get('/api/0/test/tags/')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
-        self.assertEqual(data.keys(), ['tags'])
+        self.assertEqual(sorted(data.keys()), ['tags', 'total_tags'])
         self.assertEqual(data['tags'], ['tag1'])
+        self.assertEqual(data['total_tags'], 1)
 
         output = self.app.get('/api/0/test/tags/?pattern=t')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
-        self.assertEqual(data.keys(), ['tags'])
+        self.assertEqual(sorted(data.keys()), ['tags', 'total_tags'])
         self.assertEqual(data['tags'], ['tag1'])
+        self.assertEqual(data['total_tags'], 1)
 
         output = self.app.get('/api/0/test/tags/?pattern=p')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
-        self.assertEqual(data.keys(), ['tags'])
+        self.assertEqual(sorted(data.keys()), ['tags', 'total_tags'])
         self.assertEqual(data['tags'], [])
+        self.assertEqual(data['total_tags'], 0)
 
     def test_api_groups(self):
         """ Test the api_groups function.  """
@@ -143,13 +149,15 @@ class PagureFlaskApitests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         self.assertEqual(data['groups'], ['group1', 'rel-eng'])
-        self.assertEqual(data.keys(), ['groups'])
+        self.assertEqual(sorted(data.keys()), ['groups', 'total_groups'])
+        self.assertEqual(data['total_groups'], 2)
 
         output = self.app.get('/api/0/groups?pattern=re')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         self.assertEqual(data['groups'], ['rel-eng'])
-        self.assertEqual(data.keys(), ['groups'])
+        self.assertEqual(sorted(data.keys()), ['groups', 'total_groups'])
+        self.assertEqual(data['total_groups'], 1)
 
 
 if __name__ == '__main__':
