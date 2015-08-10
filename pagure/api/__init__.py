@@ -251,6 +251,7 @@ def api_users():
     ::
 
         {
+          "total_users": 2,
           "users": ["user1", "user2"]
         }
 
@@ -259,13 +260,12 @@ def api_users():
     if pattern is not None and not pattern.endswith('*'):
         pattern += '*'
 
+    users = pagure.lib.search_user(SESSION, pattern=pattern)
+
     return flask.jsonify(
         {
-            'users': [
-                user.username
-                for user in pagure.lib.search_user(
-                    SESSION, pattern=pattern)
-            ]
+            'total_users': len(users),
+            'users': [user.username for user in users]
         }
     )
 
@@ -304,6 +304,7 @@ def api_project_tags(repo, username=None):
     ::
 
         {
+          "total_tags": 2,
           "tags": ["tag1", "tag2"]
         }
 
@@ -319,13 +320,13 @@ def api_project_tags(repo, username=None):
         jsonout.status_code = 404
         return jsonout
 
+    tags = pagure.lib.get_tags_of_project(
+        SESSION, project_obj, pattern=pattern)
+
     return flask.jsonify(
         {
-            'tags': [
-                tag.tag
-                for tag in pagure.lib.get_tags_of_project(
-                    SESSION, project_obj, pattern=pattern)
-            ]
+            'total_tags': len(tags),
+            'tags': [tag.tag for tag in tags]
         }
     )
 
@@ -360,6 +361,7 @@ def api_groups():
     ::
 
         {
+          "total_groups": 2,
           "groups": ["group1", "group2"]
         }
 
@@ -368,13 +370,12 @@ def api_groups():
     if pattern is not None and not pattern.endswith('*'):
         pattern += '*'
 
+    groups = pagure.lib.search_groups(SESSION, pattern=pattern)
+
     return flask.jsonify(
         {
-            'groups': [
-                group.group_name
-                for group in pagure.lib.search_groups(
-                    SESSION, pattern=pattern)
-            ]
+            'total_groups': len(groups),
+            'groups': [group.group_name for group in groups]
         }
     )
 

@@ -192,6 +192,7 @@ def api_view_issues(repo, username=None):
               "0.1"
             ]
           },
+          "total_issues": 1,
           "issues": [
             {
               "assignee": null,
@@ -271,6 +272,7 @@ def api_view_issues(repo, username=None):
             author=author, private=private)
 
     jsonout = flask.jsonify({
+        'total_issues': len(issues),
         'issues': [issue.to_json(public=True) for issue in issues],
         'args': {
             'status': status,

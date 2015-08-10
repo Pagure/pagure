@@ -40,6 +40,7 @@ def api_git_tags(repo, username=None):
     ::
 
         {
+          "total_tags": 2,
           "tags": ["0.0.1", "0.0.2"]
         }
 
@@ -51,7 +52,10 @@ def api_git_tags(repo, username=None):
 
     tags = pagure.lib.git.get_git_tags(repo)
 
-    jsonout = flask.jsonify({'tags': tags})
+    jsonout = flask.jsonify({
+        'total_tags': len(tags),
+        'tags': tags
+    })
     return jsonout
 
 
@@ -96,6 +100,7 @@ def api_projects():
     ::
 
         {
+          "total_projects": 2,
           "projects": [
             {
               "date_created": "1427441537",
@@ -150,6 +155,7 @@ def api_projects():
             404, error_code=APIERROR.ENOPROJECTS)
 
     jsonout = flask.jsonify({
+        'total_projects': len(projects),
         'projects': [p.to_json(api=True, public=True) for p in projects]
     })
     return jsonout

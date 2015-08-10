@@ -65,6 +65,7 @@ def api_pull_request_views(repo, username=None):
             "author": null,
             "status": true
           },
+          "total_requests": 1,
           "requests": [
             {
               "assignee": null,
@@ -140,6 +141,7 @@ def api_pull_request_views(repo, username=None):
             status=status)
 
     jsonout = flask.jsonify({
+        'total_requests': len(requests),
         'requests': [
             request.to_json(public=True, api=True)
             for request in requests],
