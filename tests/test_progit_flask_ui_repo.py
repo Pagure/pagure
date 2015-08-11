@@ -1562,12 +1562,14 @@ index 0000000..fb7093d
         repo = pagure.lib.get_project(self.session, 'test')
         self.assertNotEqual(repo.hook_token, 'aaabbbccc')
 
+    @patch('pagure.lib.notify.send_email')
     @patch('pagure.ui.repo.admin_session_timedout')
     @patch('pagure.lib.git.update_git')
-    def test_regenerate_git(self, upgit, ast):
+    def test_regenerate_git(self, upgit, ast, sendmail):
         """ Test the regenerate_git endpoint. """
         ast.return_value = False
         upgit.return_value = True
+        sendmail.return_value = True
         tests.create_projects(self.session)
 
         user = tests.FakeUser()
