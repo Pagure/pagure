@@ -135,6 +135,9 @@ class Modeltests(unittest.TestCase):
 
         self.session.commit()
 
+        # Prevent unit-tests to send email, globally
+        pagure.APP.config['EMAIL_SEND'] = False
+
     # pylint: disable=C0103
     def tearDown(self):
         """ Remove the test.db database if there is one. """
