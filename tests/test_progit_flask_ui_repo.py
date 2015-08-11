@@ -2095,6 +2095,55 @@ index 0000000..fb7093d
                 repo.tokens[0].expiration.date(),
                 datetime.datetime.utcnow().date())
 
+    def test_delete_branch(self):
+        """ Test the delete_branch endpoint. """
+        output = self.app.post('/foo/master/delete')
+        # No project registered in the DB
+        self.assertEqual(output.status_code, 302)
+
+        tests.create_projects(self.session)
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/foo/master/delete')
+            # Unknown repo
+            self.assertEqual(output.status_code, 404)
+
+            output = self.app.post('/test/master/delete')
+            self.assertEqual(output.status_code, 403)
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/test/master/delete')
+            self.assertEqual(output.status_code, 403)
+            self.assertIn(
+                '<p>You are not allowed to delete the master branch</p>',
+                output.data)
+
+            tests.create_projects_git(tests.HERE, bare=True)
+
+            output = self.app.post('/test/bar/delete')
+            self.assertEqual(output.status_code, 404)
+            self.assertIn('<pre>Branch no found</pre>', output.data)
+
+            # Add a branch that we can delete
+            path = os.path.join(tests.HERE, 'test.git')
+            tests.add_content_git_repo(path)
+            repo = pygit2.Repository(path)
+            repo.create_branch('foo', repo.head.get_object())
+
+            # Check before deletion
+            output = self.app.post('/test', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<a href="/test/branch/foo">', output.data)
+            self.assertIn('<a href="/test/branch/master">', output.data)
+
+            # Delete the branch
+            output = self.app.post('/test/foo/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertNotIn('<a href="/test/branch/foo">', output.data)
+            self.assertIn('<a href="/test/branch/master">', output.data)
+
     def test_view_docs(self):
         """ Test the view_docs endpoint. """
         output = self.app.get('/docs/foo/')
