@@ -30,6 +30,10 @@ from kitchen.text.converters import to_bytes
 
 _i = 0
 
+REPLY_MSG = 'To reply, visit the link below'
+if pagure.APP.config['EVENTSOURCE_SOURCE']:
+    REPLY_MSG += 'or just reply to this email'
+
 
 def fedmsg_publish(*args, **kwargs):  # pragma: no cover
     ''' Try to publish a message on the fedmsg bus. '''
@@ -239,10 +243,11 @@ def notify_new_comment(comment, user=None):
 %s
 ``
 
-To reply, visit the link below or just reply to this email
+%s
 %s
 """ % (comment.user.user,
        comment.comment,
+       REPLY_MSG,
        _build_url(
            pagure.APP.config['APP_URL'],
            comment.issue.project.name,
@@ -274,11 +279,12 @@ def notify_new_issue(issue, user=None):
 %s
 ``
 
-To reply, visit the link below or just reply to this email
+%s
 %s
 """ % (issue.user.user,
        issue.project.name,
        issue.content,
+       REPLY_MSG,
        _build_url(
            pagure.APP.config['APP_URL'],
            issue.project.name,
@@ -378,11 +384,12 @@ def notify_new_pull_request(request):
 %s
 ``
 
-To reply, visit the link below or just reply to this email
+%s
 %s
 """ % (request.user.user,
        request.project.name,
        request.title,
+       REPLY_MSG,
        _build_url(
            pagure.APP.config['APP_URL'],
            request.project.name,
@@ -479,11 +486,12 @@ def notify_pull_request_comment(comment, user):
 %s
 ``
 
-To reply, visit the link below or just reply to this email
+%s
 %s
 """ % (comment.user.user,
        comment.pull_request.title,
        comment.comment,
+       REPLY_MSG,
        _build_url(
            pagure.APP.config['APP_URL'],
            comment.pull_request.project.name,
