@@ -25,6 +25,7 @@
 {% endfor %}
 </div>
 
+{% if issues %}
 <h2>
     Issues
     <a name="users" title="Permalink to this headline" href="#users">
@@ -36,6 +37,7 @@
 {{ html | InsertDiv | safe }}
 {% endfor %}
 </div>
+{% endif %}
 
 <h2>
     Pull-requests
