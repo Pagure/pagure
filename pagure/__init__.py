@@ -31,12 +31,6 @@ from pagure.flask_fas_openid import FAS
 from functools import wraps
 from sqlalchemy.exc import SQLAlchemyError
 
-import pagure.lib
-import pagure.mail_logging
-import pagure.doc_utils
-import pagure.forms
-import pagure.login_forms
-
 from pygments import highlight
 from pygments.lexers.text import DiffLexer
 from pygments.formatters import HtmlFormatter
@@ -51,6 +45,13 @@ APP.config.from_object('pagure.default_config')
 
 if 'PAGURE_CONFIG' in os.environ:
     APP.config.from_envvar('PAGURE_CONFIG')
+
+
+import pagure.lib
+import pagure.mail_logging
+import pagure.doc_utils
+import pagure.forms
+import pagure.login_forms
 
 
 FAS = FAS(APP)
