@@ -434,9 +434,18 @@ def api():
     api_version_doc = load_doc(api_version)
     api_users_doc = load_doc(api_users)
     api_view_user_doc = load_doc(user.api_view_user)
-    api_project_tags_doc = load_doc(api_project_tags)
+    if pagure.APP.config.get('PROJECT_TICKETS', True):
+        api_project_tags_doc = load_doc(api_project_tags)
     api_groups_doc = load_doc(api_groups)
     api_error_codes_doc = load_doc(api_error_codes)
+
+    extras = [
+        api_version_doc,
+        api_error_codes_doc,
+    ]
+
+    if pagure.APP.config.get('PROJECT_TICKETS', True):
+        extras.append(api_project_tags_doc)
 
     return flask.render_template(
         'api.html',
@@ -459,11 +468,7 @@ def api():
             api_view_user_doc,
             api_groups_doc,
         ],
-        extras=[
-            api_version_doc,
-            api_project_tags_doc,
-            api_error_codes_doc,
-        ],
+        extras=extras,
     )
 
 
