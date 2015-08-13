@@ -191,7 +191,8 @@ def api_method(function):
     return wrapper
 
 
-from pagure.api import issue
+if pagure.APP.config.get('PROJECT_TICKETS', True):
+    from pagure.api import issue
 from pagure.api import fork
 from pagure.api import project
 from pagure.api import user
@@ -414,11 +415,13 @@ def api():
     api_git_tags_doc = load_doc(project.api_git_tags)
     api_projects_doc = load_doc(project.api_projects)
 
-    api_new_issue_doc = load_doc(issue.api_new_issue)
-    api_view_issue_doc = load_doc(issue.api_view_issue)
-    api_view_issue_comment_doc = load_doc(issue.api_view_issue_comment)
-    api_view_issues_doc = load_doc(issue.api_view_issues)
-    api_issue_add_comment_doc = load_doc(issue.api_comment_issue)
+    issues = []
+    if pagure.APP.config.get('PROJECT_TICKETS', True):
+        issues.append(load_doc(issue.api_new_issue))
+        issues.append(load_doc(issue.api_view_issues))
+        issues.append(load_doc(issue.api_view_issue))
+        issues.append(load_doc(issue.api_view_issue_comment))
+        issues.append(load_doc(issue.api_comment_issue))
 
     api_pull_request_views_doc = load_doc(fork.api_pull_request_views)
     api_pull_request_view_doc = load_doc(fork.api_pull_request_view)
@@ -442,13 +445,7 @@ def api():
             api_git_tags_doc,
             api_projects_doc,
         ],
-        issues=[
-            api_new_issue_doc,
-            api_view_issues_doc,
-            api_view_issue_doc,
-            api_view_issue_comment_doc,
-            api_issue_add_comment_doc,
-        ],
+        issues=issues,
         requests=[
             api_pull_request_views_doc,
             api_pull_request_view_doc,
