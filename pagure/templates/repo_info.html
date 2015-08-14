@@ -211,6 +211,7 @@
           {{ config.get('GIT_URL_GIT') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
         </td>
       </tr>
+      {% if config['DOC_APP_URL'] and repo and repo.settings.get('project_documentation', True) %}
       <tr class="extra_gits">
         <td>Docs</td>
         <td>:</td>
@@ -221,6 +222,7 @@
           {{ config.get('GIT_URL_GIT') }}docs/{{ repo.fullname }}.git
         </td>
       </tr>
+      {% endif %}
       {% if config.get('PROJECT_TICKETS', True) %}
       <tr class="extra_gits">
         <td>Tickets</td>
