@@ -357,6 +357,10 @@ class Project(BASE):
             for key in default:
                 if key not in current:
                     current[key] = default[key]
+                elif key == 'Minimum_score_to_merge_pull-request':
+                    current[key] = int(current[key])
+                elif str(current[key]).lower() in ['true', 'y']:
+                    current[key] = True
             return current
         else:
             return default

@@ -1074,7 +1074,7 @@ def update_project_settings(session, repo, settings, user):
                 update.append(key)
                 if key == 'Minimum_score_to_merge_pull-request':
                     try:
-                        settings[key] = int(settings[key]) or -1
+                        settings[key] = int(settings[key]) if settings[key] else -1
                     except ValueError:
                         raise pagure.exceptions.PagureException(
                             "Please enter a numeric value for the 'minimum "
