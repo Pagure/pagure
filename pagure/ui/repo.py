@@ -685,6 +685,10 @@ def view_tags(repo, username=None):
 def new_release(repo, username=None):
     """ Upload a new release.
     """
+    if not APP.config.get('UPLOAD_FOLDER_PATH') \
+            and not APP.config.get('UPLOAD_FOLDER'):
+        flask.abort(404)
+
     repo = pagure.lib.get_project(SESSION, repo, user=username)
 
     if not repo:
