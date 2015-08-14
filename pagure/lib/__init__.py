@@ -1073,7 +1073,12 @@ def update_project_settings(session, repo, settings, user):
             if new_settings[key] != settings[key]:
                 update.append(key)
                 if key == 'Minimum_score_to_merge_pull-request':
-                    settings[key] = settings[key] or -1
+                    try:
+                        settings[key] = int(settings[key]) or -1
+                    except ValueError:
+                        raise pagure.exceptions.PagureException(
+                            "Please enter a numeric value for the 'minimum "
+                            "score to merge pull request' field.")
                 elif key == 'Web-hooks':
                     settings[key] = settings[key] or None
                 new_settings[key] = settings[key]
