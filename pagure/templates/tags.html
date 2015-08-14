@@ -12,6 +12,7 @@
 
 <h2>Tags</h2>
 
+{% if config.get('UPLOAD_FOLDER_PATH') and config.get('UPLOAD_FOLDER') %}
 <p>
   If the developers have upload one or more tarball(s), you will be able to
   find them in the <a href="{{ config['APP_URL'] + config['UPLOAD_FOLDER'] + repo.fullname }}">
@@ -29,6 +30,7 @@
   </button>
   </a>
 </p>
+{% endif %}
 {% endif %}
 
 <section class="tag_list">
