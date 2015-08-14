@@ -221,6 +221,7 @@
           {{ config.get('GIT_URL_GIT') }}docs/{{ repo.fullname }}.git
         </td>
       </tr>
+      {% if config.get('PROJECT_TICKETS', True) %}
       <tr class="extra_gits">
         <td>Tickets</td>
         <td>:</td>
@@ -231,6 +232,7 @@
           {{ config.get('GIT_URL_GIT') }}tickets/{{ repo.fullname }}.git
         </td>
       </tr>
+      {% endif %}
       <tr class="extra_gits">
         <td>Requests</td>
         <td>:</td>
