@@ -168,6 +168,7 @@
   <table>
     {% for key in repo.settings | sort %}
     {% if not config.get('PROJECT_TICKETS', True) and key in ['issue_tracker'] %}
+    {% elif not config.get('DOC_APP_URL') and key in ['project_documentation'] %}
     {% else %}
     <tr>
       <td><label for="{{ key }}">Activate {{ key | replace('_', ' ') }}</label></td>
