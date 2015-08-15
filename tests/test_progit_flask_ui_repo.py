@@ -404,8 +404,8 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<ul id="flashes">\n                </ul>' in output.data)
             # Both checkbox checked before
             self.assertTrue(
-                '<input id="project_documentation" type="checkbox" value="y" '
-                'name="project_documentation" checked=""/>' in output.data)
+                '<input id="pull_requests" type="checkbox" value="y" '
+                'name="pull_requests" checked=""/>' in output.data)
             self.assertTrue(
                 '<input id="issue_tracker" type="checkbox" value="y" '
                 'name="issue_tracker" checked=""/>' in output.data)
@@ -430,8 +430,8 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertTrue(
                 '<ul id="flashes">\n                </ul>' in output.data)
             self.assertTrue(
-                '<input id="project_documentation" type="checkbox" value="y" '
-                'name="project_documentation" checked=""/>' in output.data)
+                '<input id="pull_requests" type="checkbox" value="y" '
+                'name="pull_requests" checked=""/>' in output.data)
             self.assertTrue(
                 '<input id="issue_tracker" type="checkbox" value="y" '
                 'name="issue_tracker" checked=""/>' in output.data)
@@ -456,15 +456,15 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertTrue(
                 '<ul id="flashes">\n                </ul>' in output.data)
             self.assertTrue(
-                '<input id="project_documentation" type="checkbox" value="y" '
-                'name="project_documentation" />' in output.data)
+                '<input id="pull_requests" type="checkbox" value="y" '
+                'name="pull_requests" />' in output.data)
             self.assertTrue(
                 '<input id="issue_tracker" type="checkbox" value="y" '
                 'name="issue_tracker" />' in output.data)
 
             data = {
                 'csrf_token': csrf_token,
-                'project_documentation': 'y',
+                'pull_requests': 'y',
                 'issue_tracker': 'y',
             }
             output = self.app.post(
@@ -486,8 +486,8 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertTrue(
                 '<ul id="flashes">\n                </ul>' in output.data)
             self.assertTrue(
-                '<input id="project_documentation" type="checkbox" value="y" '
-                'name="project_documentation" checked=""/>' in output.data)
+                '<input id="pull_requests" type="checkbox" value="y" '
+                'name="pull_requests" checked=""/>' in output.data)
             self.assertTrue(
                 '<input id="issue_tracker" type="checkbox" value="y" '
                 'name="issue_tracker" checked=""/>' in output.data)
