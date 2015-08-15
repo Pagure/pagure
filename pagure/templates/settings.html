@@ -167,6 +167,8 @@
                   username=username, repo=repo.name) }}" method="post">
   <table>
     {% for key in repo.settings | sort %}
+    {% if not config.get('PROJECT_TICKETS', True) and key in ['issue_tracker'] %}
+    {% else %}
     <tr>
       <td><label for="{{ key }}">Activate {{ key | replace('_', ' ') }}</label></td>
       <td>
@@ -179,6 +181,7 @@
         {% endif %}
       </td>
     </tr>
+    {% endif %}
     {% endfor %}
   </table>
   <p class="buttons indent">
@@ -279,6 +282,8 @@
 </section>
 {% endif %}
 
+
+{% if config.get('PROJECT_TICKETS', True) %}
 <section class="tags">
   <h2>Tags</h2>
 
@@ -314,7 +319,7 @@
   {% endfor %}
   </ul>
 </section>
-
+{% endif %}
 
 <section class="delete">
   <form action="{{ url_for('.delete_repo',

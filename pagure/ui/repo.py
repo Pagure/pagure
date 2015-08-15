@@ -747,6 +747,7 @@ def view_settings(repo, username=None):
         flask.abort(
             403,
             'You are not allowed to change the settings for this project')
+
     reponame = pagure.get_repo_path(repo)
     repo_obj = pygit2.Repository(reponame)
 
@@ -788,6 +789,7 @@ def view_settings(repo, username=None):
         branchname = repo_obj.head.shorthand
     else:
         branchname = None
+
     return flask.render_template(
         'settings.html',
         select='settings',
