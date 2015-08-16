@@ -35,7 +35,7 @@ APP_URL = 'https://pagure.org/'
 
 
 # Enables / Disables tickets for project for the entire pagure instance
-PROJECT_TICKETS = True
+ENABLE_TICKETS = True
 
 # The URL to use to clone the git repositories.
 GIT_URL_SSH = 'ssh://git@pagure.org/'

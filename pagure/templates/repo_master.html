@@ -60,7 +60,7 @@
                    repo=repo.name) }}">Tags</a>
       </li>
 
-      {% if config.get('PROJECT_TICKETS', True) and repo
+      {% if config.get('ENABLE_TICKETS', True) and repo
             and repo.settings.get('issue_tracker', True) %}
       <li {% if select == 'issues' %}class="selected" {% endif %}>
           <a href="{{ url_for('.view_issues', username=username,

@@ -119,7 +119,7 @@ class PagureExtension(markdown.extensions.Extension):
         ])
 
         md.inlinePatterns['mention'] = MentionPattern(MENTION_RE)
-        if pagure.APP.config.get('PROJECT_TICKETS', True):
+        if pagure.APP.config.get('ENABLE_TICKETS', True):
             md.inlinePatterns['explicit_fork_issue'] = \
                 ExplicitForkIssuePattern(EXPLICIT_FORK_ISSUE_RE)
             md.inlinePatterns['explicit_main_issue'] = \

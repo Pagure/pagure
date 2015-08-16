@@ -191,7 +191,7 @@ def api_method(function):
     return wrapper
 
 
-if pagure.APP.config.get('PROJECT_TICKETS', True):
+if pagure.APP.config.get('ENABLE_TICKETS', True):
     from pagure.api import issue
 from pagure.api import fork
 from pagure.api import project
@@ -416,7 +416,7 @@ def api():
     api_projects_doc = load_doc(project.api_projects)
 
     issues = []
-    if pagure.APP.config.get('PROJECT_TICKETS', True):
+    if pagure.APP.config.get('ENABLE_TICKETS', True):
         issues.append(load_doc(issue.api_new_issue))
         issues.append(load_doc(issue.api_view_issues))
         issues.append(load_doc(issue.api_view_issue))
@@ -434,7 +434,7 @@ def api():
     api_version_doc = load_doc(api_version)
     api_users_doc = load_doc(api_users)
     api_view_user_doc = load_doc(user.api_view_user)
-    if pagure.APP.config.get('PROJECT_TICKETS', True):
+    if pagure.APP.config.get('ENABLE_TICKETS', True):
         api_project_tags_doc = load_doc(api_project_tags)
     api_groups_doc = load_doc(api_groups)
     api_error_codes_doc = load_doc(api_error_codes)
@@ -444,7 +444,7 @@ def api():
         api_error_codes_doc,
     ]
 
-    if pagure.APP.config.get('PROJECT_TICKETS', True):
+    if pagure.APP.config.get('ENABLE_TICKETS', True):
         extras.append(api_project_tags_doc)
 
     return flask.render_template(

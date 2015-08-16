@@ -435,7 +435,7 @@ import pagure.ui.app
 import pagure.ui.admin
 import pagure.ui.fork
 import pagure.ui.groups
-if APP.config.get('PROJECT_TICKETS', True):
+if APP.config.get('ENABLE_TICKETS', True):
     import pagure.ui.issues
 import pagure.ui.plugins
 import pagure.ui.repo
