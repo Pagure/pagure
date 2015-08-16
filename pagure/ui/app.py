@@ -228,6 +228,9 @@ def view_user(username):
 def new_project():
     """ Form to create a new project.
     """
+    if not pagure.APP.config.get('ENABLE_NEW_PROJECTS', True):
+        flask.abort(404)
+
     form = pagure.forms.ProjectForm()
     if form.validate_on_submit():
         name = form.name.data

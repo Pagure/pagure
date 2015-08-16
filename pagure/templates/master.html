@@ -41,11 +41,13 @@
               <a href="{{ url_for('admin_index') }}">Admin</a>
             </li>
             {% endif %}
+            {% if config.get('ENABLE_NEW_PROJECTS', True) %}
             <li id="new_project" class="right">
               <a href="{{url_for('new_project')}}">
                 New project
               </a>
             </li>
+            {% endif %}
           </ul>
         </div><!-- end mainNav -->
 
