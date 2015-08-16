@@ -120,6 +120,9 @@ class PagureMilter(Milter.Base):
             self.log('No In-Reply-To, keep going')
             return Milter.CONTINUE
 
+        # Ensure we don't get extra lines in the message-id
+        msg_id = msg_id.split('\n')[0].strip()
+
         self.log('msg-ig %s' % msg_id)
         self.log('To %s' % msg['to'])
         self.log('From %s' % msg['From'])
@@ -142,8 +145,10 @@ class PagureMilter(Milter.Base):
         msg_id = clean_item(msg_id)
 
         if msg_id and '-ticket-' in msg_id:
+            self.log('Processing issue')
             return self.handle_ticket_email(msg, msg_id)
         elif msg_id and '-pull-request-' in msg_id:
+            self.log('Processing pull-request')
             return self.handle_request_email(msg, msg_id)
         else:
             self.log('Not a pagure ticket or pull-request email, let it go')
