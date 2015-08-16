@@ -125,9 +125,29 @@ def index():
     )
 
 
+@APP.route('/search/')
+@APP.route('/search')
+def search():
+    """ Search this pagure instance for projects or users.
+    """
+    stype = flask.request.args.get('type', 'projects')
+    term = flask.request.args.get('term')
+    page = flask.request.args.get('page', 1)
+    try:
+        page = int(page)
+    except ValueError:
+        page = 1
+
+    if stype == 'projects':
+        return flask.redirect(flask.url_for('index'))
+    else:
+        return flask.redirect(flask.url_for('view_users', username=term))
+
+
 @APP.route('/users/')
 @APP.route('/users')
-def view_users():
+@APP.route('/users/<username>')
+def view_users(username=None):
     """ Present the list of users.
     """
     page = flask.request.args.get('page', 1)
@@ -136,7 +156,12 @@ def view_users():
     except ValueError:
         page = 1
 
-    users = pagure.lib.search_user(SESSION)
+    users = pagure.lib.search_user(SESSION, pattern=username)
+
+    if len(users) == 1:
+        flask.flash('Only one result found, redirecting you to it')
+        return flask.redirect(
+            flask.url_for('view_user', username=users[0].username))
 
     limit = APP.config['ITEM_PER_PAGE']
     start = limit * (page - 1)

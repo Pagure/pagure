@@ -23,6 +23,18 @@
         <div id="header">
           <img src="{{ url_for('static', filename='pagure-logo.png') }}"
             alt="pagure Logo" id="kojiLogo"/>
+          <form action="{{url_for('search')}}" id="headerSearch">
+            <select name="type">
+              <option value="projects"
+                {% if select=='projects' %} selected {% endif %}>
+                  Projects</option>
+              <option value="user"
+                {% if select=='users' %} selected {% endif %}>
+                  Users</option>
+            </select>
+            <input type="text" name="term"/>
+            <input type="submit" value="Search"/>
+          </form>
         </div><!-- end header -->
 
         <!-- MAIN NAVIGATION -->
