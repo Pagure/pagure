@@ -322,6 +322,7 @@
 </section>
 {% endif %}
 
+{% if config.get('ENABLE_DEL_PROJECTS', True) %}
 <section class="delete">
   <form action="{{ url_for('.delete_repo',
                   username=username, repo=repo.name) }}"
@@ -336,6 +337,7 @@
     </button>
   </form>
 </section>
+{% endif %}
 
 {% endblock %}
 

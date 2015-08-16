@@ -40,6 +40,9 @@ ENABLE_TICKETS = True
 # Enables / Disables creating projects on this pagure instance
 ENABLE_NEW_PROJECTS = True
 
+# Enables / Disables deleting projects on this pagure instance
+ENABLE_DEL_PROJECTS = True
+
 # The URL to use to clone the git repositories.
 GIT_URL_SSH = 'ssh://git@pagure.org/'
 GIT_URL_GIT = 'git://pagure.org/'

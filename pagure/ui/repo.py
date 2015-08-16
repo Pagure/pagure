@@ -902,6 +902,9 @@ def change_ref_head(repo, username=None):
 def delete_repo(repo, username=None):
     """ Delete the present project.
     """
+    if not pagure.APP.config.get('ENABLE_DEL_PROJECTS', True):
+        flask.abort(404)
+
     if admin_session_timedout():
         flask.flash('Action canceled, try it again', 'error')
         url = flask.url_for(
