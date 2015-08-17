@@ -191,7 +191,7 @@ def view_users(username=None):
 def view_projects(pattern=None):
     """ Present the list of projects.
     """
-    forks = flask.request.args.get('forks', False)
+    forks = flask.request.args.get('forks')
     page = flask.request.args.get('page', 1)
 
     try:
@@ -204,6 +204,8 @@ def view_projects(pattern=None):
     if str(forks).lower() in ['true', '1']:
         forks = None
         select = 'projects_forks'
+    else:
+        forks = False
 
     limit = APP.config['ITEM_PER_PAGE']
     start = limit * (page - 1)
