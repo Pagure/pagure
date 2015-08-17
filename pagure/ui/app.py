@@ -139,7 +139,10 @@ def search():
         page = 1
 
     if stype == 'projects':
-        return flask.redirect(flask.url_for('index'))
+        return flask.redirect(flask.url_for('view_projects', pattern=term))
+    elif stype == 'projects_forks':
+        return flask.redirect(flask.url_for(
+            'view_projects', pattern=term, forks=True))
     else:
         return flask.redirect(flask.url_for('view_users', username=term))
 
@@ -177,6 +180,59 @@ def view_users(username=None):
         users_length=users_length,
         total_page=total_page,
         page=page,
+        select='users',
+    )
+
+
+
+@APP.route('/projects/')
+@APP.route('/projects')
+@APP.route('/projects/<pattern>')
+def view_projects(pattern=None):
+    """ Present the list of projects.
+    """
+    forks = flask.request.args.get('forks', False)
+    page = flask.request.args.get('page', 1)
+
+    try:
+        page = int(page)
+    except ValueError:
+        page = 1
+
+    select = 'projects'
+    # If forks is specified, we want both forks and projects
+    if str(forks).lower() in ['true', '1']:
+        forks = None
+        select = 'projects_forks'
+
+    limit = APP.config['ITEM_PER_PAGE']
+    start = limit * (page - 1)
+
+
+    projects = pagure.lib.search_projects(
+        SESSION, pattern=pattern, fork=forks, start=start, limit=limit)
+
+    if len(projects) == 1:
+        flask.flash('Only one result found, redirecting you to it')
+        return flask.redirect(flask.url_for(
+            'view_repo', repo=projects[0].name,
+            username=projects[0].user.username if projects[0].is_fork else None
+        ))
+
+    limit = APP.config['ITEM_PER_PAGE']
+    start = limit * (page - 1)
+    end = limit * page
+    projects_length = len(projects)
+    projects = projects[start:end]
+
+    total_page = int(ceil(projects_length / float(limit)))
+
+    return flask.render_template(
+        'index.html',
+        repos=projects,
+        total_page=total_page,
+        page=page,
+        select=select,
     )
 
 
