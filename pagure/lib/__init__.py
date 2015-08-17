@@ -1260,9 +1260,14 @@ def search_projects(
 
     if pattern:
         pattern = pattern.replace('*', '%')
-        projects = projects.filter(
-            model.Project.name.like(pattern)
-        )
+        if '%' in pattern:
+            projects = projects.filter(
+                model.Project.name.like(pattern)
+            )
+        else:
+            projects = projects.filter(
+                model.Project.name == pattern
+            )
 
     query = session.query(
         model.Project
