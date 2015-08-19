@@ -304,8 +304,15 @@ header h1 span {
 
 .code_table tr .cell1{
     width: 20px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
+.code_table tr .cell1 a::before {
+    content: attr(data-line-number);
+}
 
 .git_links {
     padding-top: 3em;

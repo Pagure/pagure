@@ -838,7 +838,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertTrue('<section class="file_content">' in output.data)
         self.assertTrue(
-            '<tr><td class="cell1"><a id="_1" href="#_1">1</a></td>'
+            '<tr><td class="cell1"><a id="_1" href="#_1" data-line-number="1"></a></td>'
             in output.data)
         self.assertTrue(
             '<td class="cell2"><pre> bar</pre></td>' in output.data)
@@ -913,7 +913,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertTrue('<section class="file_content">' in output.data)
         self.assertTrue(
-            '<tr><td class="cell1"><a id="_1" href="#_1">1</a></td>'
+            '<tr><td class="cell1"><a id="_1" href="#_1" data-line-number="1"></a></td>'
             in output.data)
         self.assertTrue(
             '<td class="cell2"><pre> barRow 0</pre></td>' in output.data)
