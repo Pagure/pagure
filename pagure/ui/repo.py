@@ -653,10 +653,10 @@ def view_forks(repo, username=None):
     )
 
 
-@APP.route('/<repo>/tags/')
-@APP.route('/<repo>/tags')
-@APP.route('/fork/<username>/<repo>/tags/')
-@APP.route('/fork/<username>/<repo>/tags')
+@APP.route('/<repo>/releases/')
+@APP.route('/<repo>/releases')
+@APP.route('/fork/<username>/<repo>/releases/')
+@APP.route('/fork/<username>/<repo>/releases')
 def view_tags(repo, username=None):
     """ Presents all the tags of the project.
     """
