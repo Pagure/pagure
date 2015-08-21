@@ -41,3 +41,13 @@ APP_URL
 This key indicates the URL at which this pagure instance will be made available.
 
 Defaults to ``https://pagure.org/``
+
+
+EMAIL_ERROR
+~~~~~~~~~~~
+
+Pagure sends email when it caches an un-expected error (which saves you from
+having to monitor the logs regularly but if you like, the error is still
+present in the logs).
+This setting allows you to specify to which email address to send these error
+reports.
