@@ -40,7 +40,7 @@ APP_URL
 
 This key indicates the URL at which this pagure instance will be made available.
 
-Defaults to ``https://pagure.org/``
+Defaults to: ``https://pagure.org/``
 
 
 EMAIL_ERROR
@@ -51,3 +51,25 @@ having to monitor the logs regularly but if you like, the error is still
 present in the logs).
 This setting allows you to specify to which email address to send these error
 reports.
+
+
+GIT_URL_SSH
+~~~~~~~~~~~
+
+This configuration key provides the information to the user on how to clone
+the git repos hosted on pagure via `SSH <>`_.
+
+The URL should end with a slash ``/``.
+
+Defaults to: ``'ssh://git@pagure.org/'``
+
+
+GIT_URL_GIT
+~~~~~~~~~~~
+This configuration key provides the information to the user on how to clone
+the git repos hosted on pagure anonymously. These access can be granted via
+the ``git://`` or ``http(s)://`` protocols.
+
+The URL should end with a slash ``/``.
+
+Defaults to: ``'git://pagure.org/'``
