@@ -73,3 +73,57 @@ the ``git://`` or ``http(s)://`` protocols.
 The URL should end with a slash ``/``.
 
 Defaults to: ``'git://pagure.org/'``
+
+
+GIT_FOLDER
+~~~~~~~~~~
+
+This configuration key points to the folder where are stored the git repos
+of the projects.
+
+Each project in pagure has 4 git repositories:
+
+- the main repo for the code
+- the doc repo showed in the doc server
+- the ticket and request repos storing the metadata of the
+  tickets/pull-requests
+
+There are then another 2 folders specifying the locations of the forks and
+remote git repo used for the remotes pull-requests (ie: pull-request coming
+from a project not hosted on pagure).
+
+
+FORK_FOLDER
+~~~~~~~~~~~
+
+This configuration key points to the folder where are stored the git repos
+of forks of the projects.
+
+
+DOCS_FOLDER
+~~~~~~~~~~~
+
+This configuration key points to the folder where are stored the git repos
+for the documentation of the projects.
+
+
+TICKETS_FOLDER
+~~~~~~~~~~~~~~
+
+This configuration key points to the folder where are stored the git repos
+storing the metadata of the tickets opened against the project.
+
+
+REQUESTS_FOLDER
+~~~~~~~~~~~~~~~
+
+This configuration key points to the folder where are stored the git repos
+storing the metadata of the pull-requests opened against the project.
+
+
+REMOTE_GIT_FOLDER
+~~~~~~~~~~~~~~~~~
+
+This configuration key points to the folder where are stored the remote git
+repos (ie: not hosted on pagure) that someone used to open a pull-request
+against a project hosted on pagure.
