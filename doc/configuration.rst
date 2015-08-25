@@ -140,3 +140,54 @@ be set to True in production.
 
 Defaults to: ``False`` for development, must be ``True`` in production with
 https.
+
+
+Configure Gitolite
+------------------
+
+Pagure uses `gitolite <http://gitolite.com/>`_ as an authorization layer.
+Gitolite relies on `SSH <https://en.wikipedia.org/wiki/Secure_Shell>`_ for
+the authentication. In other words, SSH let you in and gitolite check if you
+are allowed to do what you are trying to do once you are inside.
+
+
+GITOLITE_HOME
+~~~~~~~~~~~~~
+
+This configuration key should point to the home of the user under which
+gitolite is ran.
+
+
+GITOLITE_VERSION
+~~~~~~~~~~~~~~~~
+
+This configuration key allows to specify which version of gitolite you are
+using, it can be either ``2`` or ``3``.
+
+Defaults to: ``3``.
+
+
+GITOLITE_KEYDIR
+~~~~~~~~~~~~~~~
+
+This configuration key points to the folder where gitolite stores and accesses
+the public SSH keys of all the user have access to the server.
+
+Since pagure is the user interface, it is pagure that writes down the files
+in this directory effectively setting up the users to be able to use gitolite.
+
+
+GL_RC
+~~~~~
+
+This configuration key must point to the file ``gitolite.rc`` used by gitolite
+to record who has access to what (ie: who has access to which repo/branch).
+
+
+GL_BINDIR
+~~~~~~~~~
+
+This configuration key indicates the folder in which the gitolite tools can
+be found. It can be as simple as ``/usr/bin/`` if the tools have been installed
+using a package manager or something like ``/opt/bin/`` for a more custom
+install.
