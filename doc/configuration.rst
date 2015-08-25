@@ -18,6 +18,15 @@ This key is used by flask to create the session. It should be kept secret
 and set as a long and random string.
 
 
+SALT_EMAIL
+~~~~~~~~~~
+
+This key is used for when sending notification to ensure that when sending
+notifications to different users, each one of them has a different, unique
+and un-fakable ``Reply-To`` header that is then used by the milter to find
+out if the response received is a real one or a fake/invalid one.
+
+
 DB_URL
 ~~~~~~
 
