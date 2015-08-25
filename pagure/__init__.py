@@ -233,7 +233,7 @@ def generate_authorized_key_file():  # pragma: no cover
                     raise pagure.exceptions.PagureException(
                         'Non-supported gitolite version "%s"' %
                         gitolite_version)
-                stream.write(row + '\n')
+                stream.write(row.encode('utf-8') + '\n')
             stream.write('# gitolite end\n')
 
 
