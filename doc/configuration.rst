@@ -4,6 +4,7 @@ Configuration
 Pagure offers a wide-varieties of options that must or can be used to
 adjust its behavior.
 
+
 Must options
 ------------
 
@@ -140,6 +141,15 @@ be set to True in production.
 
 Defaults to: ``False`` for development, must be ``True`` in production with
 https.
+
+
+FROM_EMAIL
+~~~~~~~~~~
+
+This setting allows to specify the email address used by this pagure instance
+when sending emails (notifications).
+
+Defaults to: ``pagure@pagure.org``
 
 
 Configure Gitolite
