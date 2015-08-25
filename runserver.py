@@ -14,4 +14,8 @@ if '--profile' in sys.argv:
     APP.config['PROFILE'] = True
     APP.wsgi_app = ProfilerMiddleware(APP.wsgi_app, restrictions=[30])
 
-APP.run()
+port = None
+if len(sys.argv) == 2:
+    port = int(sys.argv[1])
+
+APP.run(port=port)
