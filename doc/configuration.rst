@@ -152,6 +152,16 @@ when sending emails (notifications).
 Defaults to: ``pagure@pagure.org``
 
 
+DOMAIN_EMAIL_NOTIFICATIONS
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This setting allows to specify the domain used by this pagure instance
+when sending emails (notifications). More precisely, this setting is used
+when building the ``msg-id`` header of the emails sent.
+
+Defaults to: ``pagure.org``
+
+
 Configure Gitolite
 ------------------
 
