@@ -130,7 +130,8 @@
           repo=pull_request.project_from.name,
           branchname=pull_request.branch_from)
         }}">
-          {{ pull_request.project_from.fullname }} ({{ pull_request.branch_from }})
+          {{ pull_request.project_from.fullname or pull_request.remote_git
+            }} ({{ pull_request.branch_from }})
         </a>
       </td>
     </tr>
@@ -204,6 +205,7 @@
     {% if pull_request and pull_request.status and pull_request.project_from.is_fork %}
       <a href="{{ url_for('view_commit', username=pull_request.project_from.user.user,
                   repo=pull_request.project_from.name, commitid=commit.oid.hex)}}">
+    {% elif pull_request.remote %}
     {% else %}
       <a href="{{ url_for('view_commit', username=username,
                   repo=repo.name, commitid=commit.oid.hex)}}">
@@ -213,7 +215,9 @@
         <span class="commitdate" title="{{ commit.commit_time|format_ts }}">
           {{ commit.commit_time|humanize }}
         </span>
+    {% if not pull_request.remote %}
       </a>
+    {% endif %}
     </li>
     {% else %}
       <p class="error"> No commits found </p>
