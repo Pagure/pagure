@@ -127,3 +127,16 @@ REMOTE_GIT_FOLDER
 This configuration key points to the folder where are stored the remote git
 repos (ie: not hosted on pagure) that someone used to open a pull-request
 against a project hosted on pagure.
+
+
+SESSION_COOKIE_SECURE
+~~~~~~~~~~~~~~~~~~~~~
+
+When this is set to True, the session cookie will only be returned to the
+server via ssl (https). If you connect to the server via plain http, the
+cookie will not be sent. This prevents sniffing of the cookie contents.
+This may be set to False when testing your application but should always
+be set to True in production.
+
+Defaults to: ``False`` for development, must be ``True`` in production with
+https.
