@@ -1653,19 +1653,19 @@ index 0000000..fb7093d
 
     def test_view_tags(self):
         """ Test the view_tags endpoint. """
-        output = self.app.get('/foo/tags')
+        output = self.app.get('/foo/releases')
         # No project registered in the DB
         self.assertEqual(output.status_code, 404)
 
         tests.create_projects(self.session)
 
-        output = self.app.get('/test/tags')
+        output = self.app.get('/test/releases')
         # No git repo associated
         self.assertEqual(output.status_code, 404)
 
         tests.create_projects_git(tests.HERE, bare=True)
 
-        output = self.app.get('/test/tags')
+        output = self.app.get('/test/releases')
         self.assertEqual(output.status_code, 200)
         self.assertIn('This project has not been tagged.', output.data)
 
@@ -1678,7 +1678,7 @@ index 0000000..fb7093d
             "0.0.1", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
             "Release 0.0.1")
 
-        output = self.app.get('/test/tags')
+        output = self.app.get('/test/releases')
         self.assertEqual(output.status_code, 200)
         self.assertIn('0.0.1', output.data)
         self.assertIn('<span class="tagid">', output.data)
