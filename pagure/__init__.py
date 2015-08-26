@@ -19,6 +19,7 @@ __api_version__ = '0.5'
 import datetime
 import logging
 import os
+import shutil
 import subprocess
 import urlparse
 from logging.handlers import SMTPHandler
@@ -415,7 +416,7 @@ def get_repo_path(repo):
     return repopath
 
 
-def get_remote_repo_path(remote_git, branch_from):
+def get_remote_repo_path(remote_git, branch_from, loop=False):
     """ Return the path of the remote git repository corresponding to the
     provided information.
     """
@@ -436,7 +437,27 @@ def get_remote_repo_path(remote_git, branch_from):
         repo = pagure.lib.repo.PagureRepo(repopath)
         try:
             repo.pull(branch=branch_from)
+        except pagure.exceptions.GitConflictsException as err:
+            # In this case, we drop the repo and re-try
+            try:
+                shutil.rmtree(repopath)
+            except Exception as err:
+                LOG.debug(err)
+                LOG.exception(err)
+                flask.abort(500, err.message)
+
+            if loop:
+                # Let's be sure we don't run into an infinite loop
+                LOG.debug(err)
+                LOG.exception(err)
+                flask.abort(500, err.message)
+            else:
+                return get_remote_repo_path(
+                    remote_git, branch_from, loop=True)
+
         except pagure.exceptions.PagureException as err:
+            LOG.debug(err)
+            LOG.exception(err)
             flask.abort(500, err.message)
 
     return repopath
