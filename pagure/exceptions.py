@@ -50,3 +50,10 @@ class PagureEvException(PagureException):
     ''' Exceptions used in the pagure-stream-server.
     '''
     pass
+
+
+class GitConflictsException(PagureException):
+    ''' Exception used when trying to pull on a repo and that leads to
+    conflicts.
+    '''
+    pass

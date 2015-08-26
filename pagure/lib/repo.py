@@ -55,7 +55,7 @@ class PagureRepo(pygit2.Repository):
                     master_ref.set_target(remote_master_id)
                     self.head.set_target(remote_master_id)
                 elif merge_result & pygit2.GIT_MERGE_ANALYSIS_NORMAL:
-                    raise pagure.exceptions.PagureException(
+                    raise pagure.exceptions.GitConflictsException(
                         'Pulling remote changes leads to a conflict')
                 else:
                     pagure.LOG.debug(
