@@ -190,6 +190,10 @@ def generate_gitolite_acls():
             stderr=subprocess.PIPE,
             cwd=gitolite_folder
         )
+        # We need to do this because gitolite will also try to recreate the authorized_keys
+        #  file, but it will ignore any keyfiles with more then a single line. So it will
+        #  never create a authorized_keys file with more than one key for any single user.
+        generate_authorized_key_file()
 
 
 def generate_gitolite_key(user, key):  # pragma: no cover
@@ -199,7 +203,14 @@ def generate_gitolite_key(user, key):  # pragma: no cover
     if gitolite_keydir:
         keyfile = os.path.join(gitolite_keydir, '%s.pub' % user)
         with open(keyfile, 'w') as stream:
-            stream.write(key + '\n')
+            # If we do more then one line, gitolite will ignore the key file.
+            # Symptom: WARNING: keydir/<username>.pub does not contain exactly 1 line; ignoring
+            # Let us make sure we at least have the users first key in there until
+            #  we manually recreate the authorized_keys file (should happen almost
+            #  the same time, but to prevent issues in the most trivial case where
+            #  a user just has a single key, we also use the gitolite system as
+            #  fallback).
+            stream.write(key.split('\n')[0])
 
 
 def generate_authorized_key_file():  # pragma: no cover
