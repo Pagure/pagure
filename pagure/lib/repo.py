@@ -29,7 +29,7 @@ class PagureRepo(pygit2.Repository):
         else:
             remote.push(refname)
 
-    def pull(self, remote_name='origin', branch='master'):
+    def pull(self, remote_name='origin', branch='master', force=False):
         ''' pull changes for the specified remote (defaults to origin).
 
         Code from MichaelBoselowitz at:
@@ -43,6 +43,12 @@ class PagureRepo(pygit2.Repository):
                 remote.fetch()
                 remote_master_id = self.lookup_reference(
                     'refs/remotes/origin/%s' % branch).target
+
+                if force:
+                    repo_branch = self.lookup_reference(
+                        'refs/heads/%s' % branch)
+                    repo_branch.set_target(remote_master_id)
+
                 merge_result, _ = self.merge_analysis(remote_master_id)
                 # Up to date, do nothing
                 if merge_result & pygit2.GIT_MERGE_ANALYSIS_UP_TO_DATE:
