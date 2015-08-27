@@ -1,7 +1,14 @@
 {% extends "repo_master.html" %}
 {% from "_formhelper.html" import render_field_in_row, show_comment %}
 
-{% block title %}PR#{{ requestid }}: {{ pull_request.title }} - {{ repo.name }}{% endblock %}
+{% block title %}
+  {%- if pull_request -%}
+    PR#{{ requestid }}: {{ pull_request.title }} - {{ repo.name }}
+  {%- else -%}
+    Diff from {{ branch_from }} to {{ branch_to }} - {{ repo.name }}
+  {%- endif -%}
+{% endblock %}
+
 {%block tag %}home{% endblock %}
 
 {% block header %}
