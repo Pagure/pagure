@@ -57,6 +57,7 @@ def main(folder, debug=False):
                 username=user,
                 fullname=user,
                 default_email='%s@fedoraproject.org' % user,
+                keydir=pagure.APP.config.get('GITOLITE_KEYDIR', None),
             )
             pagure.SESSION.commit()
         except SQLAlchemyError, err:

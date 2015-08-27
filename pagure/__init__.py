@@ -160,59 +160,6 @@ def is_repo_admin(repo_obj):
     ) or (user in usergrps)
 
 
-def generate_gitolite_acls():
-    """ Generate the gitolite configuration file for all repos
-    """
-    pagure.lib.git.write_gitolite_acls(
-        SESSION, APP.config['GITOLITE_CONFIG'])
-
-    gitolite_folder = APP.config.get('GITOLITE_HOME', None)
-    gitolite_version = APP.config.get('GITOLITE_VERSION', 3)
-    if gitolite_folder:
-        if gitolite_version == 2:
-            cmd = 'GL_RC=%s GL_BINDIR=%s gl-compile-conf' % (
-                APP.config.get('GL_RC'), APP.config.get('GL_BINDIR')
-            )
-        elif gitolite_version == 3:
-            cmd = 'HOME=%s gitolite compile && HOME=%s gitolite trigger '\
-                'POST_COMPILE' % (
-                    APP.config.get('GITOLITE_HOME'),
-                    APP.config.get('GITOLITE_HOME')
-                )
-        else:
-            raise pagure.exceptions.PagureException(
-                'Non-supported gitolite version "%s"' % gitolite_version
-            )
-        subprocess.Popen(
-            cmd,
-            shell=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            cwd=gitolite_folder
-        )
-        # We need to do this because gitolite will also try to recreate the authorized_keys
-        #  file, but it will ignore any keyfiles with more then a single line. So it will
-        #  never create a authorized_keys file with more than one key for any single user.
-        generate_authorized_key_file()
-
-
-def generate_gitolite_key(user, key):  # pragma: no cover
-    """ Generate the gitolite ssh key file for the specified user
-    """
-    gitolite_keydir = APP.config.get('GITOLITE_KEYDIR', None)
-    if gitolite_keydir:
-        keyfile = os.path.join(gitolite_keydir, '%s.pub' % user)
-        with open(keyfile, 'w') as stream:
-            # If we do more then one line, gitolite will ignore the key file.
-            # Symptom: WARNING: keydir/<username>.pub does not contain exactly 1 line; ignoring
-            # Let us make sure we at least have the users first key in there until
-            #  we manually recreate the authorized_keys file (should happen almost
-            #  the same time, but to prevent issues in the most trivial case where
-            #  a user just has a single key, we also use the gitolite system as
-            #  fallback).
-            stream.write(key.split('\n')[0])
-
-
 def generate_authorized_key_file():  # pragma: no cover
     """ Regenerate the `authorized_keys` file used by gitolite.
     """
@@ -305,7 +252,8 @@ def set_user(return_url):
             username=flask.g.fas_user.username,
             fullname=flask.g.fas_user.fullname,
             default_email=flask.g.fas_user.email,
-            ssh_key=flask.g.fas_user.get('ssh_key')
+            ssh_key=flask.g.fas_user.get('ssh_key'),
+            keydir=APP.config.get('GITOLITE_KEYDIR', None),
         )
         SESSION.commit()
     except SQLAlchemyError, err:

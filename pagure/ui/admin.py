@@ -16,8 +16,8 @@ from sqlalchemy.exc import SQLAlchemyError
 import pagure.exceptions
 import pagure.forms
 import pagure.lib
+import pagure.lib.git
 from pagure import (APP, SESSION,
-                    generate_gitolite_acls, generate_authorized_key_file,
                     is_admin, admin_session_timedout)
 
 # pylint: disable=E1101
@@ -63,7 +63,7 @@ def admin_generate_acl():
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
         try:
-            generate_gitolite_acls()
+            pagure.lib.git.generate_gitolite_acls()
             flask.flash('Gitolite ACLs updated')
         except pagure.exceptions.PagureException, err:
             flask.flash(str(err), 'error')

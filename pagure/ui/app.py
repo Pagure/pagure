@@ -15,11 +15,11 @@ from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.exceptions
 import pagure.lib
+import pagure.lib.git
 import pagure.forms
 import pagure.ui.filters
 from pagure import (APP, SESSION, cla_required,
-                    generate_gitolite_acls, generate_gitolite_key,
-                    generate_authorized_key_file, authenticated,
+                    authenticated,
                     admin_session_timedout)
 
 
@@ -358,7 +358,7 @@ def new_project():
                 requestfolder=APP.config['REQUESTS_FOLDER'],
             )
             SESSION.commit()
-            generate_gitolite_acls()
+            pagure.lib.git.generate_gitolite_acls()
             flask.flash(message)
             return flask.redirect(flask.url_for('view_repo', repo=name))
         except pagure.exceptions.PagureException, err:
@@ -397,9 +397,9 @@ def user_settings():
                 SESSION,
                 user=user,
                 ssh_key=ssh_key,
+                keydir=APP.config.get('GITOLITE_KEYDIR', None),
             )
             if message != 'Nothing to update':
-                generate_gitolite_key(user.user, ssh_key)
                 generate_authorized_key_file()
             SESSION.commit()
             flask.flash(message)

@@ -997,7 +997,8 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             username='skvidal',
             fullname='Seth',
-            default_email='skvidal@fp.o'
+            default_email='skvidal@fp.o',
+            keydir=pagure.APP.config.get('GITOLITE_KEYDIR', None),
         )
         self.session.commit()
 
@@ -1018,7 +1019,8 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             username='skvidal',
             fullname='Seth V',
-            default_email='skvidal@fp.o'
+            default_email='skvidal@fp.o',
+            keydir=pagure.APP.config.get('GITOLITE_KEYDIR', None),
         )
         self.session.commit()
         # Nothing changed
@@ -1034,7 +1036,8 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             username='skvidal',
             fullname='Seth',
-            default_email='svidal@fp.o'
+            default_email='svidal@fp.o',
+            keydir=pagure.APP.config.get('GITOLITE_KEYDIR', None),
         )
         self.session.commit()
         # Email added
@@ -1052,13 +1055,13 @@ class PagureLibtests(tests.Modeltests):
         user = pagure.lib.search_user(self.session, username='foo')
         self.assertEqual(user.public_ssh_key, None)
 
-        msg = pagure.lib.update_user_ssh(self.session, user, 'blah')
+        msg = pagure.lib.update_user_ssh(self.session, user, 'blah', keydir=None)
         self.assertEqual(msg, 'Public ssh key updated')
 
-        msg = pagure.lib.update_user_ssh(self.session, user, 'blah')
+        msg = pagure.lib.update_user_ssh(self.session, user, 'blah', keydir=None)
         self.assertEqual(msg, 'Nothing to update')
 
-        msg = pagure.lib.update_user_ssh(self.session, 'foo', None)
+        msg = pagure.lib.update_user_ssh(self.session, 'foo', None, keydir=None)
         self.assertEqual(msg, 'Public ssh key updated')
 
     def test_avatar_url(self):

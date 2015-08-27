@@ -1048,7 +1048,7 @@ def remove_user(repo, userid, username=None):
                 break
         try:
             SESSION.commit()
-            pagure.generate_gitolite_acls()
+            pagure.lib.git.generate_gitolite_acls()
             flask.flash('User removed')
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
@@ -1094,7 +1094,7 @@ def add_user(repo, username=None):
                 user=flask.g.fas_user.username,
             )
             SESSION.commit()
-            pagure.generate_gitolite_acls()
+            pagure.lib.git.generate_gitolite_acls()
             flask.flash(msg)
             return flask.redirect(
                 flask.url_for(
@@ -1150,7 +1150,7 @@ def add_group_project(repo, username=None):
                 user=flask.g.fas_user.username,
             )
             SESSION.commit()
-            pagure.generate_gitolite_acls()
+            pagure.lib.git.generate_gitolite_acls()
             flask.flash(msg)
             return flask.redirect(
                 flask.url_for(

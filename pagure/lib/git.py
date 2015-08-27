@@ -120,6 +120,39 @@ def write_gitolite_acls(session, configfile):
             stream.write(row + '\n')
 
 
+def generate_gitolite_acls():
+    """ Generate the gitolite configuration file for all repos
+    """
+    pagure.lib.git.write_gitolite_acls(
+        pagure.SESSION, pagure.APP.config['GITOLITE_CONFIG'])
+
+    gitolite_folder = pagure.APP.config.get('GITOLITE_HOME', None)
+    gitolite_version = pagure.APP.config.get('GITOLITE_VERSION', 3)
+    if gitolite_folder:
+        if gitolite_version == 2:
+            cmd = 'GL_RC=%s GL_BINDIR=%s gl-compile-conf' % (
+                pagure.APP.config.get('GL_RC'),
+                pagure.APP.config.get('GL_BINDIR')
+            )
+        elif gitolite_version == 3:
+            cmd = 'HOME=%s gitolite compile && HOME=%s gitolite trigger '\
+                'POST_COMPILE' % (
+                    pagure.APP.config.get('GITOLITE_HOME'),
+                    pagure.APP.config.get('GITOLITE_HOME')
+                )
+        else:
+            raise pagure.exceptions.PagureException(
+                'Non-supported gitolite version "%s"' % gitolite_version
+            )
+        subprocess.Popen(
+            cmd,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd=gitolite_folder
+        )
+
+
 def update_git(obj, repo, repofolder, objtype='ticket'):
     """ Update the given issue in its git.
 
@@ -307,6 +340,7 @@ def get_user_from_json(session, jsondata, key='user'):
             fullname=fullname or username,
             default_email=default_email,
             emails=useremails,
+            keydir=pagure.APP.config.get('GITOLITE_KEYDIR', None),
         )
         session.commit()
 

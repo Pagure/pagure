@@ -152,6 +152,36 @@ def search_user(session, username=None, email=None, token=None, pattern=None):
 
     return output
 
+def create_user_ssh_keys_on_disk(user, gitolite_keydir):
+    if gitolite_keydir:
+        # First remove any old keyfiles for the user
+        # Assumption: we populated the keydir. This means that files
+        #  will be in 0/<username>.pub, ..., and not in any deeper
+        #  directory structures. Also, this means that if a user
+        #  had 5 lines, they will be up to at most keys_4/<username>.pub,
+        #  meaning that if a user is not in keys_<i>/<username>.pub, with
+        #  i being any integer, the user is most certainly not in
+        #  keys_<i+1>/<username>.pub.
+        i = 0
+        keyline_file = os.path.join(gitolite_keydir,
+                                    'keys_%i' % i,
+                                    '%s.pub' % user.user)
+        while os.path.exists(keyline_file):
+            os.path.rm(keyline_file)
+            i += 1
+            keyline_file = os.path.join(gitolite_keydir,
+                                        'keys_%i' % i,
+                                        '%s.pub' % user.user)
+
+        # Now let's create new keyfiles for the user
+        keys = user.public_ssh_key.split('\n')
+        for i in range(len(keys)):
+            keyline_dir = os.path.join(gitolite_keydir, 'keys_%i' % i)
+            if not os.path.exists(keyline_dir):
+                os.mkdir(keyline_dir)
+            keyfile = os.path.join(keyline_dir, '%s.pub' % user.user)
+            with open(keyfile, 'w') as stream:
+                stream.write(keys[i].strip().encode('UTF-8'))
 
 def add_issue_comment(session, issue, comment, user, ticketfolder,
                       notify=True, redis=None):
@@ -1774,7 +1804,7 @@ def get_pull_request_flag_by_uid(session, flag_uid):
 
 
 def set_up_user(session, username, fullname, default_email,
-                emails=None, ssh_key=None):
+                emails=None, ssh_key=None, keydir=None):
     ''' Set up a new user into the database or update its information. '''
     user = search_user(session, username=username)
     if not user:
@@ -1800,7 +1830,7 @@ def set_up_user(session, username, fullname, default_email,
         add_email_to_user(session, user, email)
 
     if ssh_key and not user.public_ssh_key:
-        user.public_ssh_key = ssh_key
+        update_user_ssh(session, user, ssh_key, keydir)
 
     return user
 
@@ -1816,18 +1846,18 @@ def add_email_to_user(session, user, user_email):
         session.flush()
 
 
-def update_user_ssh(session, user, ssh_key):
+def update_user_ssh(session, user, ssh_key, keydir):
     ''' Set up a new user into the database or update its information. '''
     if isinstance(user, basestring):
         user = __get_user(session, user)
 
     message = 'Nothing to update'
 
-    ssh_key = ssh_key.strip().replace('\n', '') \
-        if ssh_key and ssh_key.strip() else None
-
     if ssh_key != user.public_ssh_key:
         user.public_ssh_key = ssh_key
+        if keydir:
+            create_user_ssh_keys_on_disk(user, keydir)
+        pagure.lib.git.generate_gitolite_acls()
         session.add(user)
         session.flush()
         message = 'Public ssh key updated'

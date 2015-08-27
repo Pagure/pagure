@@ -21,7 +21,7 @@ import pagure.lib
 import pagure.lib.git
 import pagure.forms
 from pagure import (APP, REDIS, SESSION, LOG, cla_required,
-                    is_repo_admin, generate_gitolite_acls)
+                    is_repo_admin)
 
 
 # pylint: disable=E1101
@@ -728,7 +728,7 @@ def fork_project(repo, username=None):
             user=flask.g.fas_user.username)
 
         SESSION.commit()
-        generate_gitolite_acls()
+        pagure.lib.git.generate_gitolite_acls()
         flask.flash(message)
         return flask.redirect(
             flask.url_for(
