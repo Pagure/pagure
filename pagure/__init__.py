@@ -19,7 +19,6 @@ __api_version__ = '0.5'
 import datetime
 import logging
 import os
-import shutil
 import subprocess
 import urlparse
 from logging.handlers import SMTPHandler
