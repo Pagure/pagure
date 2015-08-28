@@ -9,6 +9,19 @@
 
 <h2>New remote pull-request</h2>
 
+<p>
+  Remote pull-requests are pull-requests made from a project *not* hosted
+  on pagure or not hosted on the same pagure instance than the target project,
+  hosted on pagure.
+</p>
+
+<p>
+  If you wish to create a pull-request from a fork to a project on pagure,
+  visit your fork, go to the branch where you pushed your changes, it will
+  show the commits that can be merged with a red asterisk and click on the
+  "Pull-Request" button.
+</p>
+
 {% if form %}
 <section class="new_project">
   <form action="{{ url_for('.new_remote_request_pull', username=username,
