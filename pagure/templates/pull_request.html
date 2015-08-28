@@ -384,16 +384,41 @@
   );
 
   $( ".tabs" ).tabs({
-      activate: function( event, ui ) {
-        var _title = ui.newPanel.attr('id');
-        if ($.inArray( _title, [ "request_diff", "commit_list" ] ) >= 0) {
-          window.location.hash = _title;
-        }
+    activate: function( event, ui ) {
+      var _title = ui.newPanel.attr('id');
+      if ($.inArray( _title, [ "request_diff", "commit_list" ] ) >= 0) {
+        window.location.hash = _title;
       }
+    }
   });
 
 {% if pull_request %}
 {# These lines are only for existing pull-requests, not new ones #}
+
+  $( ".tabs" ).on('tabsactivate',
+    function(event, ui) {
+      if (ui.newPanel.selector == '#preview') {
+        var _text = $( "#comment" ).val();
+        var _url = "{{ url_for('markdown_preview') }}";
+          $.ajax({
+              url: _url ,
+              type: 'POST',
+              data: {
+                content: _text,
+                csrf_token: "{{ mergeform.csrf_token.current_token }}",
+              },
+              dataType: 'html',
+              success: function(res) {
+                  $( "#preview" ).html(emojione.toImage(res));
+              },
+              error: function() {
+                  alert('Unable to generate preview!');
+              }
+          });
+          return false;
+      }
+    }
+  );
 
   emoji_complete(json_url, folder);
 
