@@ -354,8 +354,6 @@ def pull_request_add_comment(
 
     is_js = flask.request.args.get('js', False)
 
-    repo = request.project_from
-
     form = pagure.forms.AddPullRequestCommentForm()
     form.commit.data = commit
     form.filename.data = filename
@@ -395,6 +393,7 @@ def pull_request_add_comment(
 
     if is_js:
         return 'failed'
+
     return flask.render_template(
         'pull_request_comment.html',
         select='requests',
