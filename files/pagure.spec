@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.22
+Version:        0.1.23
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -212,6 +212,32 @@ install -m 644 ev-server/pagure_ev.service \
 
 
 %changelog
+* Sun Aug 30 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.23
+- Update to 0.1.23
+- Return a 404 error if we can't find the doc repo asked
+- Fix for #106 Allow setting the default branch of the git repo and in the UI
+  (Ghost-script)
+- Improve unit-tests suite
+- Add a global boolean to disable entirely tickets on all projects of a pagure
+  instance (with no way to re-set them per project)
+- Do display uploading a tarball if it is not entirely configured
+- Ensure we do not offer to reply by email if the milter is not set up
+- Ensure there is no new line character on the msg-id and improve logging in the
+  milter
+- Add a configuration key to globally disable creating projects
+- Add a configuration key to globally disable deleting projects
+- Add the possibility to search projects/users
+- Drop links to the individual commits in a remote pull-request
+- Input that are cleaned via the noJS filter are safe to be displayed (avoid
+  double HTML escaping)
+- When writing the authorized_key file, encode the data in UTF-8
+- Makes page title easier to find in multi-tab cases (dhrish20)
+- Fix authorized_keys file creation (Patrick Uiterwijk)
+- Honor also symlinked README's in repo overview (Jan Pakorný)
+- Fix the patch generation for remote PR
+- Fix showing the comment's preview on the pull-request page
+- Fix bug in checking if a PR can be merged
+
 * Fri Aug 07 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.22
 - Update to 0.1.22
 - Adjust the README to the current state of pagure
