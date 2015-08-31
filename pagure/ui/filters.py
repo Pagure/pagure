@@ -295,11 +295,11 @@ def insert_div(content):
 
 
 @APP.template_filter('noJS')
-def no_js(content):
+def no_js(content, ignore=None):
     """ Template filter replacing <script by &lt;script and </script> by
     &lt;/script&gt;
     """
-    return pagure.lib.clean_input(content)
+    return pagure.lib.clean_input(content, ignore=ignore)
 
 
 @APP.template_filter('toRGB')
