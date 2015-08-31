@@ -2396,7 +2396,9 @@ def clean_input(text, ignore=None):
         'col', 'tbody', 'pre', 'img', 'hr',
     ]
     if ignore:
-        tags = list(set(tags).difference(set(ignore)))
+        for tag in ignore:
+            if tag in tags:
+                tags.remove(tag)
 
     return bleach.clean(text, tags=tags, attributes=attrs)
 
