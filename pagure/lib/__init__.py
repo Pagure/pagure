@@ -2380,20 +2380,25 @@ def filter_img_src(name, value):
     return False
 
 
-def clean_input(text):
+def clean_input(text, ignore=None):
     """ For a given html text, escape everything we do not want to support
     to avoid potential security breach.
     """
+    if ignore and not isinstance(ignore, (tuple, set, list)):
+        ignore = [ignore]
+
     attrs = bleach.ALLOWED_ATTRIBUTES
-    attrs['img'] = filter_img_src
-    return bleach.clean(
-        text,
-        tags=bleach.ALLOWED_TAGS + [
-            'p', 'br', 'div', 'h1', 'h2', 'h3', 'table', 'td', 'tr', 'th',
-            'col', 'tbody', 'pre', 'img', 'hr',
-        ],
-        attributes=attrs,
-    )
+    if ignore and 'img' not in ignore:
+        attrs['img'] = filter_img_src
+
+    tags = bleach.ALLOWED_TAGS + [
+        'p', 'br', 'div', 'h1', 'h2', 'h3', 'table', 'td', 'tr', 'th',
+        'col', 'tbody', 'pre', 'img', 'hr',
+    ]
+    if ignore:
+        tags = list(set(tags).difference(set(ignore)))
+
+    return bleach.clean(text, tags=tags, attributes=attrs)
 
 
 def could_be_text(text):
