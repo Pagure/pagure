@@ -37,7 +37,7 @@
 
 <h2>
     <span class="issueid">#{{ issueid }}</span> <span id="issuetitle">{{
-        issue.title | noJS | safe }}</span>
+        issue.title | noJS("img") | safe }}</span>
     {% if authenticated and (repo_admin or g.fas_user.username == issue.user.username) %}
     -  <a href="{{ url_for('edit_issue', username=username,
                   repo=repo.name, issueid=issueid) }}">
