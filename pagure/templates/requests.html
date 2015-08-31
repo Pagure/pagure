@@ -56,7 +56,7 @@
             <td>
               <a href="{{ url_for('request_pull', username=username,
                   repo=repo.name, requestid=request.id) }}">
-                {{ request.title | noJS | safe }}
+                {{ request.title | noJS("img") | safe }}
               </a>
             </td>
             <td>
