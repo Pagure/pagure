@@ -75,6 +75,9 @@ for line in sys.stdin.readlines():
         print "Deleting a reference/branch, so we won't run the "\
             "pagure hook"
         break
+    elif set(oldrev) == set(['0']):
+        print "New reference/branch"
+        oldrev = '^%s' % oldrev
     elif pagure.lib.git.is_forced_push(oldrev, newrev, abspath):
         base = pagure.lib.git.get_base_revision(oldrev, newrev, abspath)
         if base:
