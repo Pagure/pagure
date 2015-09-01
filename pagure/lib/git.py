@@ -823,6 +823,16 @@ def get_base_revision(torev, fromrev, abspath):
     return pagure.lib.git.read_git_lines(cmd, abspath)
 
 
+def get_default_branch(abspath):
+    """ Return the default branch of a repo. """
+    cmd = ['rev-parse', '--abbrev-ref', 'HEAD']
+    out = pagure.lib.git.read_git_lines(cmd, abspath)
+    if out:
+        return out[0]
+    else:
+        return 'master'
+
+
 def get_pusher(commit, abspath):
     ''' Return the name of the person that pushed the commit. '''
     user = pagure.lib.git.read_git_lines(
