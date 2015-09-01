@@ -815,6 +815,14 @@ def is_forced_push(torev, fromrev, abspath):
     return len(out) > 0
 
 
+def get_base_revision(torev, fromrev, abspath):
+    """ Return the base revision between HEAD and BASE.
+    This is useful in case of force-push.
+    """
+    cmd = ['merge-base', fromrev, torev]
+    return pagure.lib.git.read_git_lines(cmd, abspath)
+
+
 def get_pusher(commit, abspath):
     ''' Return the name of the person that pushed the commit. '''
     user = pagure.lib.git.read_git_lines(
