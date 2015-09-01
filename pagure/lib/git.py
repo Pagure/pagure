@@ -806,6 +806,15 @@ def get_revs_between(torev, fromrev, abspath):
     return pagure.lib.git.read_git_lines(cmd, abspath)
 
 
+def is_forced_push(torev, fromrev, abspath):
+    """ Returns wether there was a force push between HEAD and BASE. """
+
+    # Returns if there was any commits deleted in the changeset
+    cmd = ['rev-list', '%s' % torev, '^%s' % (fromrev)]
+    out = pagure.lib.git.read_git_lines(cmd, abspath)
+    return len(out) > 0
+
+
 def get_pusher(commit, abspath):
     ''' Return the name of the person that pushed the commit. '''
     user = pagure.lib.git.read_git_lines(
