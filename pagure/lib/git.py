@@ -797,10 +797,13 @@ def read_git_lines(args, abspath, keepends=False, **kw):
     ).splitlines(keepends)
 
 
-def get_revs_between(torev, fromrev, abspath):
+def get_revs_between(torev, fromrev, abspath, forced=False):
     """ Yield revisions between HEAD and BASE. """
 
     cmd = ['rev-list', '%s...%s' % (torev, fromrev)]
+    if forced:
+        head = get_default_branch(abspath)
+        cmd.append('^%s' % head)
     if set(fromrev) == set('0'):
         cmd = ['rev-list', '%s' % torev]
     elif set(torev) == set('0') or set(torev) == set('^0'):
