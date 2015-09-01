@@ -803,6 +803,9 @@ def get_revs_between(torev, fromrev, abspath):
     cmd = ['rev-list', '%s...%s' % (torev, fromrev)]
     if set(fromrev) == set('0'):
         cmd = ['rev-list', '%s' % torev]
+    elif set(torev) == set('0') or set(torev) == set('^0'):
+        head = get_default_branch(abspath)
+        cmd = ['rev-list', '%s' % fromrev, '^%s' % head]
     return pagure.lib.git.read_git_lines(cmd, abspath)
 
 
