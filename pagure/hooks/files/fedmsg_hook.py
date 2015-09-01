@@ -72,9 +72,13 @@ for line in sys.stdin.readlines():
     (oldrev, newrev, refname) = line.strip().split(' ', 2)
 
     if set(newrev) == set(['0']):
-            print "Deleting a reference/branch, so we won't run the "\
-                "pagure hook"
-            break
+        print "Deleting a reference/branch, so we won't run the "\
+            "pagure hook"
+        break
+    elif pagure.lib.git.is_forced_push(oldrev, newrev, abspath):
+        base = pagure.lib.git.get_base_revision(oldrev, newrev, abspath)
+        if base:
+            oldrev = base[0]
 
     revs = pagure.lib.git.get_revs_between(oldrev, newrev, abspath)
     project_name = pagure.lib.git.get_repo_name(abspath)
