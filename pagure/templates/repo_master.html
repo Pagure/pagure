@@ -57,7 +57,7 @@
 
       <li {% if select == 'tags' %}class="selected" {% endif %}>
         <a href="{{ url_for('.view_tags', username=username,
-                   repo=repo.name) }}">Release</a>
+                   repo=repo.name) }}">Releases</a>
       </li>
 
       {% if config.get('ENABLE_TICKETS', True) and repo
