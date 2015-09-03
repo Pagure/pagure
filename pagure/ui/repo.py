@@ -679,7 +679,7 @@ def view_tags(repo, username=None):
     tags = pagure.lib.git.get_git_tags_objects(repo)
 
     return flask.render_template(
-        'tags.html',
+        'releases.html',
         select='tags',
         username=username,
         repo=repo,
