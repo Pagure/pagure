@@ -1946,7 +1946,8 @@ index 0000000..fb7093d
             output = self.app.post(
                 '/test/upload/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 404)
-            self.assertIn('<li class="message">File uploaded</li>', output.data)
+            self.assertIn('<li class="message">File', output.data)
+            self.assertIn('uploaded</li>', output.data)
             self.assertIn('<pre>No git repo found</pre>', output.data)
 
             repo = tests.create_projects_git(tests.HERE)
@@ -1956,7 +1957,8 @@ index 0000000..fb7093d
             output = self.app.post(
                 '/test/upload/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<li class="message">File uploaded</li>', output.data)
+            self.assertIn('<li class="message">File', output.data)
+            self.assertIn('uploaded</li>', output.data)
             self.assertIn('This project has not been tagged.', output.data)
 
     @patch('pagure.ui.repo.admin_session_timedout')
