@@ -79,10 +79,11 @@ def main(folder, debug=False):
             continue
 
         try:
+            name = project.split('.git')[0]
             pagure.lib.new_project(
                 session=pagure.SESSION,
-                user=pocs[project.split('.git')[0]],
-                name=project.split('.git')[0],
+                user=pocs[name],
+                name=name,
                 blacklist=pagure.APP.config['BLACKLISTED_PROJECTS'],
                 gitfolder=pagure.APP.config['GIT_FOLDER'],
                 docfolder=pagure.APP.config['DOCS_FOLDER'],
