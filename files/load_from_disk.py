@@ -70,7 +70,7 @@ def main(folder, debug=False):
 
         if not project.endswith('.git'):
             if debug:
-                print '  -skip: not a git'
+                print '  -skip: not a git repository'
             continue
 
         if project.split('.git')[0] not in pocs:
