@@ -220,3 +220,23 @@ This configuration key indicates the folder in which the gitolite tools can
 be found. It can be as simple as ``/usr/bin/`` if the tools have been installed
 using a package manager or something like ``/opt/bin/`` for a more custom
 install.
+
+
+Optional options
+----------------
+
+SSH_KEYS
+~~~~~~~~
+
+It is a good pratice to publish the fingerprint and public SSH key of a
+server you provide access to.
+Pagure offers the possibility to expose this information based on the values
+set in the configuration file, in the ``SSH_KEYS`` configuration key.
+
+See the `SSH hostkeys/Fingerprints page on pagure.io <https://pagure.io/ssh_info>`_.
+
+.. warning: The format is important
+
+    SSH_KEYS = {'RSA': {'fingerprint': '<foo>', 'pubkey': '<bar>'}}
+
+Where `<foo>` and `<bar>` must be replaced by your values.
