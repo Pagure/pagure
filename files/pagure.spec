@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.23
+Version:        0.1.24
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -212,7 +212,16 @@ install -m 644 ev-server/pagure_ev.service \
 
 
 %changelog
-* Sun Aug 30 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.23
+* Tue Sep 08 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.24-1
+- Update to 0.1.24
+- Fix changelog to add the -release
+- Block the <img> tag on titles
+- Better fedmsg notifications (for example for new branches or rebase)
+- Support uploading multiple files at once
+- Add a load_from_disk utility script to the sources
+- Fix indentation to the right on very long pull-request
+
+* Sun Aug 30 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.23-1
 - Update to 0.1.23
 - Return a 404 error if we can't find the doc repo asked
 - Fix for #106 Allow setting the default branch of the git repo and in the UI
@@ -238,13 +247,13 @@ install -m 644 ev-server/pagure_ev.service \
 - Fix showing the comment's preview on the pull-request page
 - Fix bug in checking if a PR can be merged
 
-* Fri Aug 07 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.22
+* Fri Aug 07 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.22-1
 - Update to 0.1.22
 - Adjust the README to the current state of pagure
 - Rework how we integrate our custom tags into markdown to avoid the infinite
   loop we run into once in a while
 
-* Wed Aug 05 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.21
+* Wed Aug 05 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.21-1
 - Update to 0.1.21
 - Make SSH protocol explicit for SSH URLs (Till Maas)
 - Adjust the documentation (layout and content)
@@ -255,7 +264,7 @@ install -m 644 ev-server/pagure_ev.service \
 - Fix who can open a remote PR and the check that the repo allows PR
 - If there is no commit and no content, it means we didn't find the file: 404
 
-* Wed Jul 29 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.20
+* Wed Jul 29 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.20-1
 - Update to 0.1.20
 - Include the tags in the JSON representation of a project
 - Add the ability to open a pull-request from a git repo not hosted on pagure
