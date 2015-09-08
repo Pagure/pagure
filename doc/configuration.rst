@@ -240,3 +240,12 @@ See the `SSH hostkeys/Fingerprints page on pagure.io <https://pagure.io/ssh_info
     SSH_KEYS = {'RSA': {'fingerprint': '<foo>', 'pubkey': '<bar>'}}
 
 Where `<foo>` and `<bar>` must be replaced by your values.
+
+
+ITEM_PER_PAGE
+~~~~~~~~~~~~~
+This configuration key allows you to configure the length of a page by
+setting the number of items on the page. Items can be commits, users, groups
+or projects for example.
+
+Defaults to: ``50``.
