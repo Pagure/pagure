@@ -110,7 +110,8 @@
               </a>
               {% else %}
               <a href="{{ url_for('view_issues', username=username,
-                repo=repo.name, tags=tags, author=author, status=status) }}">(unassigned)</a>
+                repo=repo.name, tags=tags, author=author, status=status,
+                assignee=0) }}">(unassigned)</a>
               {% endif %}
             </td>
         </tr>
