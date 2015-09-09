@@ -80,6 +80,8 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
 
     cnt = 1
     for line in loc.split('\n'):
+        if line == '</pre></div>':
+            break
         if filename and commit:
             output.append(
                 '<tr><td class="cell1">'
@@ -114,8 +116,6 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
         cnt += 1
         if not line:
             output.append(line)
-            continue
-        if line == '</pre></div>':
             continue
         if line.startswith('<div'):
             line = line.split('<pre style="line-height: 125%">')[1]
