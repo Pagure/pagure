@@ -249,3 +249,12 @@ setting the number of items on the page. Items can be commits, users, groups
 or projects for example.
 
 Defaults to: ``50``.
+
+
+SMTP_SERVER
+~~~~~~~~~~~
+
+This configuration key allows to configure the SMTP server to use when
+sending emails.
+
+Defaults to: ``localhost``.
