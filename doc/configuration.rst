@@ -258,3 +258,12 @@ This configuration key allows to configure the SMTP server to use when
 sending emails.
 
 Defaults to: ``localhost``.
+
+
+SHORT_LENGTH
+~~~~~~~~~~~~
+
+This configuration key allows to configure the length of the commit ids or
+file hex displayed in the user interface.
+
+Defaults to: ``6``.
