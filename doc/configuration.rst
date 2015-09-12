@@ -267,3 +267,21 @@ This configuration key allows to configure the length of the commit ids or
 file hex displayed in the user interface.
 
 Defaults to: ``6``.
+
+
+BLACKLISTED_PROJECTS
+~~~~~~~~~~~~~~~~~~~~
+
+This configuration key allows to set a list of project name that are forbiden.
+This list is used for example to avoid conflicts at the URL level between the
+static files located under ``/static/`` and a project that would be named
+``static`` and thus be located at ``/static``.
+
+Defaults to:
+
+::
+
+    [
+        'static', 'pv', 'releases', 'new', 'api', 'settings',
+        'logout', 'login', 'users', 'groups'
+    ]
