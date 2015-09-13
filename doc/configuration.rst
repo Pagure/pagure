@@ -285,3 +285,15 @@ Defaults to:
         'static', 'pv', 'releases', 'new', 'api', 'settings',
         'logout', 'login', 'users', 'groups'
     ]
+
+
+
+CHECK_SESSION_IP
+~~~~~~~~~~~~~~~~
+
+This configuration key allows to configure wether to check the user's IP
+address when retrieving its session. This make things more secure but
+under certain setup it might not work (for example is there are proxies
+in front of the application).
+
+Defaults to: ``True``.
