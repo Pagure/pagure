@@ -297,3 +297,15 @@ under certain setup it might not work (for example is there are proxies
 in front of the application).
 
 Defaults to: ``True``.
+
+
+PAGURE_AUTH
+~~~~~~~~~~~~
+
+This configuration key allows to specify which authentication method to use.
+Pagure supports currently two authentication methods, one relying on the
+Fedora Account System `FAS <https://admin.fedoraproject.org/accounts>`_,
+the other relying on local user accounts.
+It can therefore be either ``fas`` or ``local``.
+
+Defaults to: ``fas``.
