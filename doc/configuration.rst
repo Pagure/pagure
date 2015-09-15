@@ -309,3 +309,15 @@ the other relying on local user accounts.
 It can therefore be either ``fas`` or ``local``.
 
 Defaults to: ``fas``.
+
+
+IP_ALLOWED_INTERNAL
+~~~~~~~~~~~~~~~~~~~
+
+This configuration key allows to specify which IP addresses are allowed
+to access the internal API endpoint. These endpoints are accessed by the
+milters for example and allow to perform action in the name of someone else.
+So they are sensitive, thus the check for the origin of the request using
+these endpoints.
+
+Defaults to: ``['127.0.0.1', 'localhost', '::1']``.
