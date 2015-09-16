@@ -321,3 +321,12 @@ So they are sensitive, thus the check for the origin of the request using
 these endpoints.
 
 Defaults to: ``['127.0.0.1', 'localhost', '::1']``.
+
+
+MAX_CONTENT_LENGTH
+~~~~~~~~~~~~~~~~~~
+
+This configuration key allows to specify the maximum size allowed when
+uploading content to pagure (for example, screenshots to a ticket).
+
+Defaults to: ``4 * 1024 * 1024`` which corresponds to 4 megabytes.
