@@ -339,3 +339,12 @@ This configuration key allows to activate or de-activate the ticketing system
 for all the projects hosted on this pagure instance.
 
 Defaults to: ``True``
+
+
+ENABLE_NEW_PROJECTS
+~~~~~~~~~~~~~~~~~~~
+
+This configuration key allows to create or forbids creating new projects in
+the user interface of this pagure instance.
+
+Defaults to: ``True``
