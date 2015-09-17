@@ -330,3 +330,12 @@ This configuration key allows to specify the maximum size allowed when
 uploading content to pagure (for example, screenshots to a ticket).
 
 Defaults to: ``4 * 1024 * 1024`` which corresponds to 4 megabytes.
+
+
+ENABLE_TICKETS
+~~~~~~~~~~~~~~
+
+This configuration key allows to activate or de-activate the ticketing system
+for all the projects hosted on this pagure instance.
+
+Defaults to: ``True``
