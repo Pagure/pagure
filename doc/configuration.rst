@@ -348,3 +348,12 @@ This configuration key allows to create or forbids creating new projects in
 the user interface of this pagure instance.
 
 Defaults to: ``True``
+
+
+ENABLE_DEL_PROJECTS
+~~~~~~~~~~~~~~~~~~~
+
+This configuration key allows to delete or forbids deleting projects in
+the user interface of this pagure instance.
+
+Defaults to: ``True``
