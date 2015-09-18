@@ -357,3 +357,13 @@ This configuration key allows to delete or forbids deleting projects in
 the user interface of this pagure instance.
 
 Defaults to: ``True``
+
+
+EMAIL_SEND
+~~~~~~~~~~
+
+This configuration key allows turning on or off any email notification for
+this pagure instance. This can be useful to turn off when developing on
+pagure, or for test or pre-production instances.
+
+Defaults to: ``True``.
