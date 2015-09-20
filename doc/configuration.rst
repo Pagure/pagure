@@ -222,6 +222,48 @@ using a package manager or something like ``/opt/bin/`` for a more custom
 install.
 
 
+EventSource options
+-------------------
+
+EVENTSOURCE_SOURCE
+~~~~~~~~~~~~~~~~~~
+
+This configuration key indicates the URL at which the EventSource server is
+available. If not defined, pagure will behave as if there are no EventSource
+server running.
+
+EVENTSOURCE_PORT
+~~~~~~~~~~~~~~~~
+
+This configuration key indicates the port at which the EventSource server is
+running. This allows adjusting the port via the configuration file instead
+of hard-coding it in the code.
+
+REDIS_HOST
+~~~~~~~~~~
+
+This configuration key indicates the host at which the `redis <http://redis.io/>`_
+server is running.
+
+Defaults to: ``0.0.0.0``.
+
+REDIS_PORT
+~~~~~~~~~~
+
+This configuration key indicates the port at which the reds server can be
+contacted.
+
+Defaults to: ``6379``.
+
+REDIS_DB
+~~~~~~~~
+
+This configuration key indicates the name of the redis database to use to
+communicate with the EventSource server.
+
+Defaults to: ``0``.
+
+
 Optional options
 ----------------
 
