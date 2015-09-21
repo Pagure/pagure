@@ -1,14 +1,14 @@
 Configuration
 =============
 
-Pagure offers a wide-varieties of options that must or can be used to
+Pagure offers a wide varieties of options that must or can be used to
 adjust its behavior.
 
 
 Must options
 ------------
 
-Here are listed the options you must set-up in order to get pagure running.
+Here are the options you must set up in order to get pagure running.
 
 
 SECRET_KEY
