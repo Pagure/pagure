@@ -77,7 +77,7 @@ Defaults to: ``'ssh://git@pagure.org/'``
 GIT_URL_GIT
 ~~~~~~~~~~~
 This configuration key provides the information to the user on how to clone
-the git repos hosted on pagure anonymously. These access can be granted via
+the git repos hosted on pagure anonymously. This access can be granted via
 the ``git://`` or ``http(s)://`` protocols.
 
 The URL should end with a slash ``/``.
@@ -88,8 +88,8 @@ Defaults to: ``'git://pagure.org/'``
 GIT_FOLDER
 ~~~~~~~~~~
 
-This configuration key points to the folder where are stored the git repos
-of the projects.
+This configuration key points to where the folders containing the git repos
+of the projects are located.
 
 Each project in pagure has 4 git repositories:
 
@@ -100,7 +100,7 @@ Each project in pagure has 4 git repositories:
 
 There are then another 2 folders specifying the locations of the forks and
 remote git repo used for the remotes pull-requests (ie: pull-request coming
-from a project not hosted on pagure).
+from a project not hosted on this instance of pagure).
 
 
 FORK_FOLDER
