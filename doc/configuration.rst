@@ -67,7 +67,7 @@ GIT_URL_SSH
 ~~~~~~~~~~~
 
 This configuration key provides the information to the user on how to clone
-the git repos hosted on pagure via `SSH <>`_.
+the git repos hosted on pagure via `SSH <https://en.wikipedia.org/wiki/Secure_Shell>`_.
 
 The URL should end with a slash ``/``.
 
