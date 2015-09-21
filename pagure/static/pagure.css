@@ -406,8 +406,30 @@ pre {
     font-family: "courier new";
 }
 
+.commit_list table,
+.commit_list td {
+    border-collapse: collapse;
+    margin: 0;
+}
+
+.commit_list table {
+    width: 100%;
+}
+
+.commit_list table .commitid,
+.commit_list table .commit_msg_btn
+{
+    width: 8%;
+}
+
+.commit_list table .commitdate
+{
+    width: 12%;
+}
+
 .tree_list li:nth-child(odd),
 .commit_list li:nth-child(odd),
+.commit_list tr:nth-child(odd),
 .tag_list li:nth-child(odd),
 table.list tr:nth-child(odd) td
 {
@@ -419,16 +441,19 @@ table.list tr:nth-child(odd) td
 }
 
 .commit_list ul,
+.commit_list td,
 .tag_list ul, {
     padding-left: 0;
 }
 
 .commit_list li,
+.commit_list td,
 .tag_list li {
     list-style-type: none;
 }
 
 .commit_list li,
+.commit_list td,
 .tree_list li,
 .tag_list li {
     padding:0 .5em;
@@ -436,20 +461,24 @@ table.list tr:nth-child(odd) td
 
 .tree_list li:hover,
 .commit_list li:hover,
+.commit_list tr:hover,
 .tag_list li:hover,
 table.list tr:hover td
-
 {
     color: white;
     background-color: #0066cc;
+    border-color: #0066cc;
 }
 
 .tree_list li:hover a,
 .commit_list li:hover a,
+.commit_list tr:hover a,
 .tag_list li:hover a,
 .commit_list li:hover > a > span.commitid,
+.commit_list tr:hover > a > span.commitid,
 .tag_list li:hover > a > span.tagid,
 .commit_list li:hover > a > span.commitdate,
+.commit_list tr:hover > a > span.commitdate,
 .tree_list li:hover > a > span.filehex,
 table.list tr:hover td > a
 {
@@ -457,6 +486,7 @@ table.list tr:hover td > a
 }
 
 .commit_list li > a:first-child,
+.commit_list td > a:first-child,
 .tree_list li > a:first-child,
 .tag_list li > a:first-child,
 table.list tbody td > a
@@ -465,6 +495,7 @@ table.list tbody td > a
 }
 
 .commit_list li > a > span.commitid,
+.commit_list td > a > span.commitid,
 .tag_list li > a > span.tagid,
 .tree_list li > a > span.filehex
 {
@@ -497,7 +528,8 @@ table.list tbody td > a
     overflow: auto;
 }
 
-.commit_list li > a > span.commitdate
+.commit_list li > a > span.commitdate,
+.commit_list td > .commitdate
 {
     color: #4d4d4d;
     display: inline-block;
@@ -905,11 +937,15 @@ span.CONFLICTS {
     color: #666!important;
 }
 
-.tabs .ui-widget-content a{
+.tabs .ui-widget-content a,
+.tabs .ui-widget-content table tr td a
+{
     color: #0066CC!important;
 }
 
-.tabs .commit_list a:hover {
+.tabs .commit_list a:hover,
+.tabs .ui-widget-content table tr:hover > td a
+{
     color: white!important;
 }
 

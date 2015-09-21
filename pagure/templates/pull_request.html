@@ -201,30 +201,38 @@
   </ul>
 
 <div class="commit_list" id="commit_list">
-  <ul>
-    {% for commit in diff_commits %}
-    <li>
-    {% if pull_request and pull_request.status and pull_request.project_from.is_fork %}
-      <a href="{{ url_for('view_commit', username=pull_request.project_from.user.user,
-                  repo=pull_request.project_from.name, commitid=commit.oid.hex)}}">
-    {% elif pull_request and pull_request.remote %}
-    {% else %}
-      <a href="{{ url_for('view_commit', username=username,
-                  repo=repo.name, commitid=commit.oid.hex)}}">
-    {% endif %}
-        <span class="commitid">{{ commit.oid.hex|short }}</span>
-        {{ commit.message.split('\n')[0] }}
-        <span class="commitdate" title="{{ commit.commit_time|format_ts }}">
-          {{ commit.commit_time|humanize }}
-        </span>
-    {% if pull_request and not pull_request.remote %}
-      </a>
-    {% endif %}
-    </li>
-    {% else %}
-      <p class="error"> No commits found </p>
-    {% endfor %}
-  </ul>
+  <table>
+      {% for commit in diff_commits %}
+      <tr>
+        <td class="commitid">{{ commit.oid.hex|short }}</td>
+        <td>
+          {% if pull_request and pull_request.status and pull_request.project_from.is_fork %}
+          <a href="{{ url_for('view_commit', username=pull_request.project_from.user.user,
+                    repo=pull_request.project_from.name, commitid=commit.oid.hex)}}">
+          {% elif pull_request and pull_request.remote %}
+          <a>
+          {% else %}
+          <a href="{{ url_for('view_commit', username=username,
+                        repo=repo.name, commitid=commit.oid.hex)}}">
+          {% endif %}
+            {{ commit.message.strip().split('\n')[0] }}
+            <div class="commit_msg_txt commit_message_body" id="commit_msg_{{ loop.index }}">
+                {{ commit.message.strip().split('\n')[2:] | join('\n') }}
+            </div>
+          </a>
+        </td>
+        {% if commit.message.strip().split('\n') | length > 1 %}
+        <td class="commit_msg_btn" data-id="{{ loop.index }}">more</td>
+        {% else %}
+        <td></td>
+        {% endif %}
+        <td class="commitdate" title="{{ commit.commit_time|format_ts }}">
+          {{ commit.commit_time|humanize }}</td>
+      </tr>
+      {% else %}
+      <tr><td class="error"> No commits found </td></tr>
+      {% endfor %}
+  </table>
 </div>
 
 <div class="request_diff" id="request_diff">
@@ -363,6 +371,12 @@
 <script type="text/javascript">
 
  $(document).ready(function() {
+
+  $( ".commit_msg_txt" ).hide();
+  $( ".commit_msg_btn" ).click(function() {
+    var msgid = $( this ).attr('data-id');
+    $( '#commit_msg_' + msgid).toggle();
+  });
 
   var folder = '{{url_for("static", filename="emoji/png/") }}';
   var json_url = '{{ url_for("static", filename="emoji/emoji_strategy.json") }}';
