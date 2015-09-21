@@ -1088,7 +1088,8 @@ index 0000000..2a552bb
                 '<title>PR#1: PR from the feature branch - test - '
                 'Pagure</title>', output.data)
             self.assertIn(
-                '<h3>Title: PR from the feature branch</h3>', output.data)
+                '<h2>Pull Request: PR from the feature branch</h2>',
+                output.data)
             self.assertNotIn(
                 '<li class="message">Request assigned</li>', output.data)
 
@@ -1111,7 +1112,8 @@ index 0000000..2a552bb
                 '<title>PR#1: PR from the feature branch - test - '
                 'Pagure</title>', output.data)
             self.assertIn(
-                '<h3>Title: PR from the feature branch</h3>', output.data)
+                '<h2>Pull Request: PR from the feature branch</h2>',
+                output.data)
             self.assertNotIn(
                 '<li class="message">Request assigned</li>', output.data)
 
@@ -1129,7 +1131,8 @@ index 0000000..2a552bb
                 '<title>PR#1: PR from the feature branch - test - '
                 'Pagure</title>', output.data)
             self.assertIn(
-                '<h3>Title: PR from the feature branch</h3>', output.data)
+                '<h2>Pull Request: PR from the feature branch</h2>',
+                output.data)
             self.assertIn(
                 '<li class="error">No user &#34;bar&#34; found</li>',
                 output.data)
@@ -1148,7 +1151,8 @@ index 0000000..2a552bb
                 '<title>PR#1: PR from the feature branch - test - '
                 'Pagure</title>', output.data)
             self.assertIn(
-                '<h3>Title: PR from the feature branch</h3>', output.data)
+                '<h2>Pull Request: PR from the feature branch</h2>',
+                output.data)
             self.assertIn(
                 '<li class="message">Request assigned</li>', output.data)
 
