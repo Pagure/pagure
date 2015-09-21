@@ -333,7 +333,7 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
             output = self.app.get('/test/diff/master..maxamilion/feature')
             self.assertEqual(output.status_code, 200)
             self.assertEqual(
-                output.data.count('<span class="commitid">'), 1)
+                output.data.count('<td class="commitid">'), 1)
             self.assertIn('<h3>.gitignore</h3>', output.data)
 
 

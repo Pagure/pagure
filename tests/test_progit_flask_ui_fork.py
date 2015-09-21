@@ -583,7 +583,7 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertIn(
                 '<title>PR#1: PR from the feature branch - test - '
                 'Pagure</title>', output.data)
-        self.assertTrue(output.data.count('<span class="commitid">'), 1)
+        self.assertTrue(output.data.count('<td class="commitid">'), 1)
 
         shutil.rmtree(newpath)
 
@@ -1270,7 +1270,7 @@ index 0000000..2a552bb
                 '<title>Diff from master to feature - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<p class="error"> No commits found </p>', output.data)
+                '<td class="error"> No commits found </td>', output.data)
 
             output = self.app.get('/test/diff/master..feature')
             self.assertEqual(output.status_code, 200)
