@@ -20,19 +20,10 @@
 
 {% block repo %}
 
-<h2>Title: {{ pull_request.title | noJS("img") | safe }}</h2>
 
 {% if pull_request %}
+<h2>Pull Request: {{ pull_request.title | noJS("img") | safe }}</h2>
 <div class="header">
-    <h3>Request pull
-      <a href="{{ url_for('view_repo', username=username, repo=repo.name)}}">
-        {{ repo.name }}
-      </a>
-
-      (<a href="{{ url_for('view_tree', username=username,
-               repo=repo.name, identifier=commitid) }}"
-      >tree</a>)
-    </h3>
     <ul class="buttons">
   {% if pull_request.status == 'Open' and repo_admin %}
       <li>
@@ -64,6 +55,11 @@
       </li>
     </ul>
 </div>
+{% else %}
+<h2>Diff
+      (<a href="{{ url_for('view_tree', username=username,
+               repo=repo.name, identifier=commitid) }}"
+      >tree</a>)</h2>
 {% endif %}
 
 {% if form and repo_admin %}
