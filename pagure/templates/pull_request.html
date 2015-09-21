@@ -22,7 +22,13 @@
 
 
 {% if pull_request %}
-<h2>Pull Request: {{ pull_request.title | noJS("img") | safe }}</h2>
+<h2>Pull Request: {{ pull_request.title | noJS("img") | safe
+  }} {% if g.fas_user and g.fas_user.username == pull_request.user.username
+  %}<a class="edit_icon"
+    href="{{ url_for('request_pull_edit', username=username,
+            repo=repo.name, requestid=requestid) }}" title="Update title"></a>{%
+  endif %}</h2>
+
 <div class="header">
     <ul class="buttons">
   {% if pull_request.status == 'Open' and repo_admin %}

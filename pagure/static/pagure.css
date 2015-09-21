@@ -723,7 +723,9 @@ header a.button:hover {
     color: red;
 }
 
-a.user_settings {
+a.user_settings,
+a.edit_icon
+{
     display: inline-block;
     width: 16px;
     height: 16px;
