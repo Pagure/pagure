@@ -824,7 +824,7 @@ def new_remote_request_pull(repo, username=None):
     repo_admin = is_repo_admin(repo)
 
     form = pagure.forms.RemoteRequestPullForm()
-    if form.validate_on_submit() and repo_admin:
+    if form.validate_on_submit():
         branch_from = form.branch_from.data.strip()
         branch_to = form.branch_to.data.strip()
         remote_git = form.git_repo.data.strip()
