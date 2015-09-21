@@ -324,6 +324,68 @@ def request_pull_patch(repo, requestid, username=None):
     return flask.Response(patch, content_type="text/plain;charset=UTF-8")
 
 
+
+@APP.route('/<repo>/pull-request/<int:requestid>/edit/',
+           methods=('GET', 'POST'))
+@APP.route('/<repo>/pull-request/<int:requestid>/edit',
+           methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/edit/',
+           methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/edit',
+           methods=('GET', 'POST'))
+@cla_required
+def request_pull_edit(repo, requestid, username=None):
+    """ Edit the title of a pull-request.
+    """
+
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    if not repo.settings.get('pull_requests', True):
+        flask.abort(404, 'No pull-requests found for this project')
+
+    request = pagure.lib.search_pull_requests(
+        SESSION, project_id=repo.id, requestid=requestid)
+
+    if not request:
+        flask.abort(404, 'Pull-request not found')
+
+    if not is_repo_admin(repo) \
+            or flask.g.fas_user.username != request.user.username :
+        flask.abort(403, 'You are not allowed to edit this pull-request')
+
+    form = pagure.forms.RequestPullForm()
+
+    if form.validate_on_submit():
+        request.title = form.title.data
+        SESSION.add(request)
+        try:
+            SESSION.commit()
+            flask.flash('Request pull edited!')
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash(
+                'Could not edit this pull-request in the database',
+                'error')
+        return flask.redirect(flask.url_for(
+            'request_pull', username=username,
+            repo=repo.name, requestid=requestid))
+    elif flask.request.method == 'GET':
+        form.title.data = request.title
+
+    return flask.render_template(
+        'pull_request_title.html',
+        select='requests',
+        request=request,
+        repo=repo,
+        username=username,
+        form=form,
+    )
+
+
 @APP.route('/<repo>/pull-request/<int:requestid>/comment',
            methods=['POST'])
 @APP.route('/<repo>/pull-request/<int:requestid>/comment/<commit>/'
