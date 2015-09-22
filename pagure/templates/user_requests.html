@@ -1,0 +1,64 @@
+{% extends "master.html" %}
+{% from "_formhelper.html" import render_field_in_row %}
+
+{% block title %}Pull-requests of {{ username }}{% endblock %}
+{%block tag %}home{% endblock %}
+
+
+{% block content %}
+
+<h2>Opened pull-requests</h2>
+
+
+<table class="list requests">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Title</th>
+            <th>Project</th>
+            <th class="open_by">Opened by</th>
+            <th class="open_date">Opened on</th>
+            <th class="assigned">Assigned to</th>
+        </tr>
+    </thead>
+    <tfoot>
+    </tfoot>
+    <tbody>
+    {% for request in requests %}
+        <tr>
+            <td>#{{ request.id }}</td>
+            <td>
+              <a href="{{ url_for('request_pull', username=request.project.username if request.project.is_fork else None,
+                  repo=request.project.name, requestid=request.id) }}">
+                {{ request.title | noJS("img") | safe }}
+              </a>
+            </td>
+            <td>
+              <a href="{{ url_for(
+                'view_repo',
+                username=request.project.username if request.project.is_fork else None,
+                repo=request.project.name)}}">
+                {{ request.project.name }}
+              </a>
+            </td>
+            <td>
+              {{ request.user.user | avatar(16) | safe }}
+              {{ request.user.user }}
+            </td>
+            <td>
+                {{ request.date_created.strftime('%Y-%m-%d %H:%M') }}
+            </td>
+            <td>
+              {{ request.assignee.user | avatar(16) | safe }}
+              {{ request.assignee.user }}
+            </td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="5" class="noresult">No pull-request found</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

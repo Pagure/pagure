@@ -305,6 +305,28 @@ def view_user(username):
     )
 
 
+@APP.route('/user/<username>/requests/')
+@APP.route('/user/<username>/requests')
+def view_user_requests(username):
+    """ Shows the pull-requests for the specified user.
+    """
+    user = pagure.lib.search_user(SESSION, username=username)
+    if not user:
+        flask.abort(404, 'No user `%s` found' % username)
+
+    requests = pagure.lib.get_pull_request_of_user(
+        SESSION,
+        username=username
+    )
+
+    return flask.render_template(
+        'user_requests.html',
+        username=username,
+        user=user,
+        requests=requests,
+    )
+
+
 @APP.route('/new/', methods=('GET', 'POST'))
 @APP.route('/new', methods=('GET', 'POST'))
 @cla_required
