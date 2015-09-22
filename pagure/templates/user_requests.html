@@ -57,8 +57,12 @@
                 {{ request.date_created.strftime('%Y-%m-%d %H:%M') }}
             </td>
             <td>
+              {% if request.assignee %}
               {{ request.assignee.user | avatar(16) | safe }}
               {{ request.assignee.user }}
+              {% else %}
+              (unassigned)
+              {% endif %}
             </td>
         </tr>
     {% else %}
