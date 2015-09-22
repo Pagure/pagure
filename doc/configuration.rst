@@ -106,37 +106,37 @@ from a project not hosted on this instance of pagure).
 FORK_FOLDER
 ~~~~~~~~~~~
 
-This configuration key points to the folder where are stored the git repos
-of forks of the projects.
+This configuration key points to the folder where the git repos of forks of
+the projects are stored.
 
 
 DOCS_FOLDER
 ~~~~~~~~~~~
 
-This configuration key points to the folder where are stored the git repos
-for the documentation of the projects.
+This configuration key points to the folder where the git repos for the
+documentation of the projects are stored.
 
 
 TICKETS_FOLDER
 ~~~~~~~~~~~~~~
 
-This configuration key points to the folder where are stored the git repos
-storing the metadata of the tickets opened against the project.
+This configuration key points to the folder where the git repos storing the
+metadata of the tickets opened against the project are stored .
 
 
 REQUESTS_FOLDER
 ~~~~~~~~~~~~~~~
 
-This configuration key points to the folder where are stored the git repos
-storing the metadata of the pull-requests opened against the project.
+This configuration key points to the folder where the git repos storing the
+metadata of the pull-requests opened against the project are stored.
 
 
 REMOTE_GIT_FOLDER
 ~~~~~~~~~~~~~~~~~
 
-This configuration key points to the folder where are stored the remote git
-repos (ie: not hosted on pagure) that someone used to open a pull-request
-against a project hosted on pagure.
+This configuration key points to the folder where the remote git repos (ie:
+not hosted on pagure) that someone used to open a pull-request against a
+project hosted on pagure are stored.
 
 
 SESSION_COOKIE_SECURE
@@ -314,7 +314,7 @@ Defaults to: ``6``.
 BLACKLISTED_PROJECTS
 ~~~~~~~~~~~~~~~~~~~~
 
-This configuration key allows to set a list of project name that are forbiden.
+This configuration key allows to set a list of project name that are forbidden.
 This list is used for example to avoid conflicts at the URL level between the
 static files located under ``/static/`` and a project that would be named
 ``static`` and thus be located at ``/static``.
@@ -333,9 +333,9 @@ Defaults to:
 CHECK_SESSION_IP
 ~~~~~~~~~~~~~~~~
 
-This configuration key allows to configure wether to check the user's IP
-address when retrieving its session. This make things more secure but
-under certain setup it might not work (for example is there are proxies
+This configuration key allows to configure whether to check the user's IP
+address when retrieving its session. This makes things more secure but
+under certain setup it might not work (for example if there are proxies
 in front of the application).
 
 Defaults to: ``True``.
@@ -404,7 +404,7 @@ Defaults to: ``True``
 EMAIL_SEND
 ~~~~~~~~~~
 
-This configuration key allows turning on or off any email notification for
+This configuration key allows turning on or off all email notification for
 this pagure instance. This can be useful to turn off when developing on
 pagure, or for test or pre-production instances.
 
