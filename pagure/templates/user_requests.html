@@ -45,6 +45,7 @@
                 'view_repo',
                 username=request.project.username if request.project.is_fork else None,
                 repo=request.project.name)}}">
+                {{ request.project.username + '/' if request.project.is_fork }}
                 {{ request.project.name }}
               </a>
             </td>
