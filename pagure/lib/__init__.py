@@ -2411,3 +2411,68 @@ def could_be_text(text):
         return True
     except:
         return False
+
+
+def get_pull_request_of_user(session, username):
+    '''List the opened pull-requests of an user.
+    These pull-requests have either been opened by that user or against
+    projects that user has commit on.
+    '''
+    projects = session.query(
+        sqlalchemy.distinct(model.Project.id)
+    )
+
+    projects = projects.filter(
+        # User created the project
+        sqlalchemy.and_(
+            model.User.user == username,
+            model.User.id == model.Project.user_id,
+        )
+    )
+    q2 = session.query(
+        model.Project.id
+    ).filter(
+        # User got commit right
+        sqlalchemy.and_(
+            model.User.user == username,
+            model.User.id == model.ProjectUser.user_id,
+            model.ProjectUser.project_id == model.Project.id
+        )
+    )
+    q3 = session.query(
+        model.Project.id
+    ).filter(
+        # User created a group that has commit right
+        sqlalchemy.and_(
+            model.User.user == username,
+            model.PagureGroup.user_id == model.User.id,
+            model.PagureGroup.group_type == 'user',
+            model.PagureGroup.id == model.ProjectGroup.group_id,
+            model.Project.id == model.ProjectGroup.project_id,
+        )
+    )
+    q4 = session.query(
+        model.Project.id
+    ).filter(
+        # User is part of a group that has commit right
+        sqlalchemy.and_(
+            model.User.user == username,
+            model.PagureUserGroup.user_id == model.User.id,
+            model.PagureUserGroup.group_id == model.PagureGroup.id,
+            model.PagureGroup.group_type == 'user',
+            model.PagureGroup.id == model.ProjectGroup.group_id,
+            model.Project.id == model.ProjectGroup.project_id,
+        )
+    )
+
+    projects = projects.union(q2).union(q3).union(q4)
+
+    query = session.query(
+        model.PullRequest
+    ).filter(
+        model.PullRequest.project_id.in_(projects.subquery())
+    ).order_by(
+        model.PullRequest.date_created.desc()
+    )
+
+    return query.all()
