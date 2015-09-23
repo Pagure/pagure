@@ -58,6 +58,11 @@ def view_repo(repo, username=None):
 
     repo_obj = pygit2.Repository(reponame)
 
+    if not repo_obj.is_empty and not repo_obj.head_is_unborn:
+        head = repo_obj.head.shorthand
+    else:
+        head = None
+
     cnt = 0
     last_commits = []
     tree = []
@@ -140,6 +145,7 @@ def view_repo(repo, username=None):
         repo=repo,
         repo_obj=repo_obj,
         username=username,
+        head=head,
         readme=readme,
         safe=safe,
         branches=sorted(repo_obj.listall_branches()),
