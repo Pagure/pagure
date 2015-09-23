@@ -30,7 +30,7 @@ import pagure
 import pagure.lib
 
 
-MENTION_RE = r'^(.*?)@(\w+)'
+MENTION_RE = r'@(\w+)'
 EXPLICIT_FORK_ISSUE_RE = r'(\w+)/(\w+)#([0-9]+)'
 EXPLICIT_MAIN_ISSUE_RE = r'[^|\w](?<!\/)(\w+)#([0-9]+)'
 IMPLICIT_ISSUE_RE = r'[^|\w](?<!\w)#([0-9]+)'
@@ -41,7 +41,7 @@ class MentionPattern(markdown.inlinepatterns.Pattern):
 
     def handleMatch(self, m):
         """ When the pattern matches, update the text. """
-        name = markdown.util.AtomicString(m.group(3))
+        name = markdown.util.AtomicString(m.group(2))
         text = ' @%s' % name
         user = pagure.lib.search_user(pagure.SESSION, username=name)
         if not user:
