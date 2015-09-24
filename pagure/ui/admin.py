@@ -17,7 +17,7 @@ import pagure.exceptions
 import pagure.forms
 import pagure.lib
 import pagure.lib.git
-from pagure import (APP, SESSION,
+from pagure import (APP, SESSION, generate_user_key_files,
                     is_admin, admin_session_timedout)
 
 # pylint: disable=E1101
@@ -73,12 +73,13 @@ def admin_generate_acl():
 @APP.route('/admin/ssh', methods=['POST'])
 @admin_required
 def admin_refresh_ssh():
-    """ Regenerate the gitolite ACL file. """
+    """ Regenerate the user key files. """
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
         try:
-            generate_authorized_key_file()
-            flask.flash('Authorized file updated')
+            generate_user_key_files()
+            pagure.lib.git.generate_gitolite_acls()
+            flask.flash('User key files regenerated')
         except pagure.exceptions.PagureException, err:
             flask.flash(str(err), 'error')
     return flask.redirect(flask.url_for('admin_index'))

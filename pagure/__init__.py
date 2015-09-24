@@ -48,6 +48,7 @@ if 'PAGURE_CONFIG' in os.environ:
 
 
 import pagure.lib
+import pagure.lib.git
 import pagure.mail_logging
 import pagure.doc_utils
 import pagure.forms
@@ -160,39 +161,16 @@ def is_repo_admin(repo_obj):
     ) or (user in usergrps)
 
 
-def generate_authorized_key_file():  # pragma: no cover
-    """ Regenerate the `authorized_keys` file used by gitolite.
+def generate_user_key_files():
+    """ Regenerate the key files used by gitolite.
     """
     gitolite_home = APP.config.get('GITOLITE_HOME', None)
     if gitolite_home:
         users = pagure.lib.search_user(SESSION)
-
-        authorized_file = os.path.join(
-            gitolite_home, '.ssh', 'authorized_keys')
-        with open(authorized_file, 'w') as stream:
-            stream.write('# gitolite start\n')
-            gitolite_version = APP.config.get('GITOLITE_VERSION', 3)
-            for user in users:
-                if not user.public_ssh_key:
-                    continue
-                if gitolite_version == 2:
-                    row = 'command="/usr/bin/gl-auth-command %s",' \
-                        'no-port-forwarding,no-X11-forwarding,'\
-                        'no-agent-forwarding,no-pty %s' % (
-                            user.user, user.public_ssh_key.strip())
-                elif gitolite_version == 3:
-                    row = 'command="HOME=%s '\
-                        '/usr/share/gitolite3/gitolite-shell %s",' \
-                        'no-port-forwarding,no-X11-forwarding,'\
-                        'no-agent-forwarding,no-pty %s' % (
-                            gitolite_home, user.user,
-                            user.public_ssh_key.strip())
-                else:
-                    raise pagure.exceptions.PagureException(
-                        'Non-supported gitolite version "%s"' %
-                        gitolite_version)
-                stream.write(row.encode('utf-8') + '\n')
-            stream.write('# gitolite end\n')
+        for user in users:
+            pagure.lib.update_user_ssh(SESSION, user, user.public_ssh_key,
+                                       APP.config.get('GITOLITE_KEYDIR', None))
+    pagure.lib.git.generate_gitolite_acls()
 
 
 def cla_required(function):

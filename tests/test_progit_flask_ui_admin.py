@@ -72,7 +72,7 @@ class PagureFlaskAdmintests(tests.Modeltests):
             self.assertTrue('<h2>Admin section</h2>' in output.data)
             self.assertTrue('Re-generate gitolite ACLs file' in output.data)
             self.assertTrue(
-                'Re-generate ssh authorized_key file' in output.data)
+                'Re-generate user ssh key files' in output.data)
 
     @patch('pagure.lib.git.write_gitolite_acls')
     def test_admin_generate_acl(self, wga):
@@ -101,7 +101,7 @@ class PagureFlaskAdmintests(tests.Modeltests):
             self.assertTrue('<h2>Admin section</h2>' in output.data)
             self.assertTrue('Re-generate gitolite ACLs file' in output.data)
             self.assertTrue(
-                'Re-generate ssh authorized_key file' in output.data)
+                'Re-generate user ssh key files' in output.data)
             self.assertFalse(
                 '<li class="message">Gitolite ACLs updated</li>'
                 in output.data)
@@ -116,12 +116,12 @@ class PagureFlaskAdmintests(tests.Modeltests):
             self.assertTrue('<h2>Admin section</h2>' in output.data)
             self.assertTrue('Re-generate gitolite ACLs file' in output.data)
             self.assertTrue(
-                'Re-generate ssh authorized_key file' in output.data)
+                'Re-generate user ssh key files' in output.data)
             self.assertTrue(
                 '<li class="message">Gitolite ACLs updated</li>'
                 in output.data)
 
-    @patch('pagure.generate_authorized_key_file')
+    @patch('pagure.generate_user_key_files')
     def test_admin_refresh_ssh(self, gakf):
         """ Test the admin_refresh_ssh endpoint. """
         gakf.return_value = True
@@ -148,7 +148,7 @@ class PagureFlaskAdmintests(tests.Modeltests):
             self.assertTrue('<h2>Admin section</h2>' in output.data)
             self.assertTrue('Re-generate gitolite ACLs file' in output.data)
             self.assertTrue(
-                'Re-generate ssh authorized_key file' in output.data)
+                'Re-generate user ssh key files' in output.data)
             self.assertFalse(
                 '<li class="message">Authorized file updated</li>'
                 in output.data)
@@ -163,9 +163,9 @@ class PagureFlaskAdmintests(tests.Modeltests):
             self.assertTrue('<h2>Admin section</h2>' in output.data)
             self.assertTrue('Re-generate gitolite ACLs file' in output.data)
             self.assertTrue(
-                'Re-generate ssh authorized_key file' in output.data)
+                'Re-generate user ssh key files' in output.data)
             self.assertTrue(
-                '<li class="message">Authorized file updated</li>'
+                '<li class="message">User key files regenerated</li>'
                 in output.data)
 
     def test_admin_generate_hook_token(self):
@@ -193,7 +193,7 @@ class PagureFlaskAdmintests(tests.Modeltests):
             self.assertTrue('<h2>Admin section</h2>' in output.data)
             self.assertTrue('Re-generate gitolite ACLs file' in output.data)
             self.assertTrue(
-                'Re-generate ssh authorized_key file' in output.data)
+                'Re-generate user ssh key files' in output.data)
             self.assertTrue(
                 'Re-generate hook-token for every projects' in output.data)
 
@@ -207,7 +207,7 @@ class PagureFlaskAdmintests(tests.Modeltests):
             self.assertTrue('<h2>Admin section</h2>' in output.data)
             self.assertTrue('Re-generate gitolite ACLs file' in output.data)
             self.assertTrue(
-                'Re-generate ssh authorized_key file' in output.data)
+                'Re-generate user ssh key files' in output.data)
             self.assertTrue(
                 'Re-generate hook-token for every projects' in output.data)
             self.assertTrue(

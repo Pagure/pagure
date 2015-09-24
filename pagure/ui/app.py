@@ -399,8 +399,6 @@ def user_settings():
                 ssh_key=ssh_key,
                 keydir=APP.config.get('GITOLITE_KEYDIR', None),
             )
-            if message != 'Nothing to update':
-                generate_authorized_key_file()
             SESSION.commit()
             flask.flash(message)
             return flask.redirect(
