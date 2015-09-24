@@ -1074,6 +1074,9 @@ def remove_user(repo, userid, username=None):
 def add_user(repo, username=None):
     """ Add the specified user from the project.
     """
+    if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
+        flask.abort(404)
+
     if admin_session_timedout():
         if flask.request.method == 'POST':
             flask.flash('Action canceled, try it again', 'error')
@@ -1130,6 +1133,9 @@ def add_user(repo, username=None):
 def add_group_project(repo, username=None):
     """ Add the specified group from the project.
     """
+    if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
+        flask.abort(404)
+
     if admin_session_timedout():
         if flask.request.method == 'POST':
             flask.flash('Action canceled, try it again', 'error')

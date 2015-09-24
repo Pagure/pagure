@@ -24,6 +24,9 @@ import pagure.lib.git
 @pagure.APP.route('/groups')
 def group_lists():
     ''' List all the groups associated with all the projects. '''
+    if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
+        flask.abort(404)
+
     group_type = 'user'
     if pagure.is_admin():
         group_type = None
@@ -52,6 +55,8 @@ def group_lists():
 @pagure.APP.route('/group/<group>', methods=['GET', 'POST'])
 def view_group(group):
     ''' Displays information about this group. '''
+    if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
+        flask.abort(404)
 
     group_type = 'user'
     if pagure.is_admin():
@@ -113,6 +118,9 @@ def view_group(group):
 def group_user_delete(user, group):
     """ Delete an user from a certain group
     """
+    if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
+        flask.abort(404)
+
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
 
@@ -152,6 +160,9 @@ def group_user_delete(user, group):
 def group_delete(group):
     """ Delete a certain group
     """
+    if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
+        flask.abort(404)
+
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
         group_obj = pagure.lib.search_groups(
@@ -187,6 +198,9 @@ def group_delete(group):
 def add_group():
     """ Endpoint to create groups
     """
+    if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
+        flask.abort(404)
+
     user = pagure.lib.search_user(
         pagure.SESSION, username=flask.g.fas_user.username)
     if not user:  # pragma: no cover

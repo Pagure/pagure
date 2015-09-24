@@ -217,6 +217,7 @@
   </form>
 </section>
 
+{% if config.get('ENABLE_USER_MNGT', True) %}
 <section class="users">
   <h2>Users and Groups</h2>
 
@@ -269,6 +270,7 @@
   {% endfor %}
   </ul>
 </section>
+{% endif %}
 
 
 {% if plugins %}
