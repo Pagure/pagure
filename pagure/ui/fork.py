@@ -628,10 +628,10 @@ def cancel_request_pull(repo, requestid, username=None):
         if not request:
             flask.abort(404, 'Pull-request not found')
 
-        if not is_repo_admin(repo_obj):
-            flask.abort(
-                403,
-                'You are not allowed to cancel pull-request for this project')
+        if not is_repo_admin(repo_obj) and not flask.g.fas_user.username:
+          flask.abort(
+              403,
+              'You are not allowed to cancel pull-request for this project')
 
         pagure.lib.close_pull_request(
             SESSION, request, flask.g.fas_user.username,
