@@ -1851,18 +1851,11 @@ def update_user_ssh(session, user, ssh_key, keydir):
     if isinstance(user, basestring):
         user = __get_user(session, user)
 
-    message = 'Nothing to update'
-
-    if ssh_key != user.public_ssh_key:
-        user.public_ssh_key = ssh_key
-        if keydir:
-            create_user_ssh_keys_on_disk(user, keydir)
-        pagure.lib.git.generate_gitolite_acls()
-        session.add(user)
-        session.flush()
-        message = 'Public ssh key updated'
-
-    return message
+    user.public_ssh_key = ssh_key
+    if keydir and user.public_ssh_key:
+        create_user_ssh_keys_on_disk(user, keydir)
+    session.add(user)
+    session.flush()
 
 
 def avatar_url(username, size=64, default='retro'):
