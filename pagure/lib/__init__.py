@@ -167,7 +167,7 @@ def create_user_ssh_keys_on_disk(user, gitolite_keydir):
                                     'keys_%i' % i,
                                     '%s.pub' % user.user)
         while os.path.exists(keyline_file):
-            os.path.rm(keyline_file)
+            os.unlink(keyline_file)
             i += 1
             keyline_file = os.path.join(gitolite_keydir,
                                         'keys_%i' % i,
