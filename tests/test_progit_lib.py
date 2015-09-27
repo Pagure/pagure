@@ -1056,13 +1056,16 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(user.public_ssh_key, None)
 
         msg = pagure.lib.update_user_ssh(self.session, user, 'blah', keydir=None)
-        self.assertEqual(msg, 'Public ssh key updated')
+        user = pagure.lib.search_user(self.session, username='foo')
+        self.assertEqual(user.public_ssh_key, 'blah')
 
         msg = pagure.lib.update_user_ssh(self.session, user, 'blah', keydir=None)
-        self.assertEqual(msg, 'Nothing to update')
+        user = pagure.lib.search_user(self.session, username='foo')
+        self.assertEqual(user.public_ssh_key, 'blah')
 
         msg = pagure.lib.update_user_ssh(self.session, 'foo', None, keydir=None)
-        self.assertEqual(msg, 'Public ssh key updated')
+        user = pagure.lib.search_user(self.session, username='foo')
+        self.assertEqual(user.public_ssh_key, None)
 
     def test_avatar_url(self):
         """ Test the avatar_url of pagure.lib. """
