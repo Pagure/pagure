@@ -152,6 +152,7 @@ def search_user(session, username=None, email=None, token=None, pattern=None):
 
     return output
 
+
 def create_user_ssh_keys_on_disk(user, gitolite_keydir):
     if gitolite_keydir:
         # First remove any old keyfiles for the user
@@ -182,6 +183,7 @@ def create_user_ssh_keys_on_disk(user, gitolite_keydir):
             keyfile = os.path.join(keyline_dir, '%s.pub' % user.user)
             with open(keyfile, 'w') as stream:
                 stream.write(keys[i].strip().encode('UTF-8'))
+
 
 def add_issue_comment(session, issue, comment, user, ticketfolder,
                       notify=True, redis=None):

@@ -393,13 +393,16 @@ def user_settings():
         ssh_key = form.ssh_key.data
 
         try:
-            message = pagure.lib.update_user_ssh(
-                SESSION,
-                user=user,
-                ssh_key=ssh_key,
-                keydir=APP.config.get('GITOLITE_KEYDIR', None),
-            )
-            SESSION.commit()
+            message = 'Nothing to update'
+            if user.public_ssh_key != ssh_key:
+                pagure.lib.update_user_ssh(
+                    SESSION,
+                    user=user,
+                    ssh_key=ssh_key,
+                    keydir=APP.config.get('GITOLITE_KEYDIR', None),
+                )
+                SESSION.commit()
+                message = 'Public ssh key updated'
             flask.flash(message)
             return flask.redirect(
                 flask.url_for('view_user', username=user.user))
