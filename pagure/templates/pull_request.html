@@ -253,13 +253,11 @@
 {% for patch in diff %}
 <section class="commit_diff">
 <header>
-    <h3>
-        {% if patch.new_file_path == patch.old_file_path %}
+    <h3>{% if patch.new_file_path == patch.old_file_path -%}
         {{ patch.new_file_path }}
-        {% else %}
+        {%- else -%}
         {{ patch.new_file_path }} (Renamed from "{{ patch.old_file_path }}")
-        {% endif %}
-    </h3>
+        {%- endif %}</h3>
     <ul class="buttons">
       <li class="addrem_bar">
       {% if (patch.additions + patch.deletions) %}
