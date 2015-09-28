@@ -241,7 +241,8 @@ def request_pull(repo, requestid, username=None):
                 'Could not update this pull-request in the database',
                 'error')
 
-    diff.find_similar()
+    if diff:
+        diff.find_similar()
 
     form = pagure.forms.ConfirmationForm()
 
