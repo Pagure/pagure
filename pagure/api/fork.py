@@ -42,10 +42,13 @@ def api_pull_request_views(repo, username=None):
     +---------------+----------+--------------+----------------------------+
     | Key           | Type     | Optionality  | Description                |
     +===============+==========+==============+============================+
-    | ``status``    | boolean  | Optional     | | Filter the status of     |
+    | ``status``    | string   | Optional     | | Filter the status of     |
     |               |          |              |   pull requests. Default:  |
     |               |          |              |   ``True`` (opened pull    |
-    |               |          |              |   requests)                |
+    |               |          |              |   requests), can be ``0``  |
+    |               |          |              |   or ``closed`` for closed |
+    |               |          |              |   requests or ``Merged``   |
+    |               |          |              |   for merged requests.     |
     +---------------+----------+--------------+----------------------------+
     | ``assignee``  | string   | Optional     | | Filter the assignee of   |
     |               |          |              |   pull requests            |
@@ -101,6 +104,7 @@ def api_pull_request_views(repo, username=None):
               "status": true,
               "title": "test pull-request",
               "uid": "1431414800",
+              "updated_on": "1431414800",
               "user": {
                 "fullname": "PY C",
                 "name": "pingou"
@@ -125,7 +129,7 @@ def api_pull_request_views(repo, username=None):
     author = flask.request.args.get('author', None)
 
     requests = []
-    if status is False or str(status).lower() == 'closed':
+    if str(status).lower() in ['0', 'false', 'closed']:
         requests = pagure.lib.search_pull_requests(
             SESSION,
             project_id=repo.id,
@@ -210,6 +214,7 @@ def api_pull_request_view(repo, requestid, username=None):
           "status": true,
           "title": "test pull-request",
           "uid": "1431414800",
+          "updated_on": "1431414800",
           "user": {
             "fullname": "PY C",
             "name": "pingou"
