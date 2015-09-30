@@ -759,6 +759,11 @@ class PullRequest(BASE):
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
+    updated_on = sa.Column(
+        sa.DateTime,
+        nullable=False,
+        default=sa.func.now(),
+        onupdate=sa.func.now())
 
     __table_args__ = (
         sa.CheckConstraint(
@@ -849,6 +854,7 @@ class PullRequest(BASE):
                 public=public, api=api) if self.project_from else None,
             'remote_git': self.remote_git,
             'date_created': self.date_created.strftime('%s'),
+            'updated_on': self.updated_on.strftime('%s'),
             'user': self.user.to_json(public=public),
             'assignee': self.assignee.to_json(
                 public=public) if self.assignee else None,
