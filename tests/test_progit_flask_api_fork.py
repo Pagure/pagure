@@ -87,6 +87,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['requests'][0]['date_created'] = '1431414800'
+        data['requests'][0]['updated_on'] = '1431414800'
         data['requests'][0]['project']['date_created'] = '1431414800'
         data['requests'][0]['repo_from']['date_created'] = '1431414800'
         data['requests'][0]['uid'] = '1431414800'
@@ -138,6 +139,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                   "status": 'Open',
                   "title": "test pull-request",
                   "uid": "1431414800",
+                  "updated_on": "1431414800",
                   "user": {
                     "fullname": "PY C",
                     "name": "pingou"
@@ -154,6 +156,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data2 = json.loads(output.data)
         data2['requests'][0]['date_created'] = '1431414800'
+        data2['requests'][0]['updated_on'] = '1431414800'
         data2['requests'][0]['project']['date_created'] = '1431414800'
         data2['requests'][0]['repo_from']['date_created'] = '1431414800'
         data2['requests'][0]['uid'] = '1431414800'
@@ -214,6 +217,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['date_created'] = '1431414800'
+        data['updated_on'] = '1431414800'
         data['project']['date_created'] = '1431414800'
         data['repo_from']['date_created'] = '1431414800'
         data['uid'] = '1431414800'
@@ -257,6 +261,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
               "status": 'Open',
               "title": "test pull-request",
               "uid": "1431414800",
+              "updated_on": "1431414800",
               "user": {
                 "fullname": "PY C",
                 "name": "pingou"
@@ -275,6 +280,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         data2['repo_from']['date_created'] = '1431414800'
         data2['uid'] = '1431414800'
         data2['date_created'] = '1431414800'
+        data2['updated_on'] = '1431414800'
         self.assertDictEqual(data, data2)
 
     @patch('pagure.lib.notify.send_email')

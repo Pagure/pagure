@@ -689,7 +689,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,76 @@
+@@ -0,0 +1,77 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
@@ -756,6 +756,7 @@ index 0000000..60f7480
 +    "status": "Open",
 +    "title": "test PR",
 +    "uid": "foobar",
++    "updated_on": null,
 +    "user": {
 +        "default_email": "bar@pingou.com",
 +        "emails": [
@@ -785,6 +786,9 @@ index 0000000..60f7480
                 row[3] = '<hash>:'
                 row = ' '.join(row)
             elif 'date_created' in row:
+                t = row.split(': ')[0]
+                row = '%s: null,' % t
+            elif 'updated_on' in row:
                 t = row.split(': ')[0]
                 row = '%s: null,' % t
             elif row.startswith('index 00'):
