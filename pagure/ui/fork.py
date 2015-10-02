@@ -355,6 +355,9 @@ def request_pull_edit(repo, requestid, username=None):
     if not request:
         flask.abort(404, 'Pull-request not found')
 
+    if request.status != 'Open':
+        flask.abort(400, 'Pull-request is already closed')
+
     if not is_repo_admin(repo) \
             or flask.g.fas_user.username != request.user.username :
         flask.abort(403, 'You are not allowed to edit this pull-request')
