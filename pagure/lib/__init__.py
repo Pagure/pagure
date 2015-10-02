@@ -1669,6 +1669,7 @@ def close_pull_request(session, request, user, requestfolder, merged=True):
     else:
         request.status = 'Closed'
     request.closed_by_id = user_obj.id
+    request.closed_at = datetime.datetime.utcnow()
     session.add(request)
     session.flush()
 
