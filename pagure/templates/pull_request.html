@@ -40,7 +40,7 @@
           <input class="button" type="submit" value="Merge"/>
         </form>
       </li>
-  {% elif pull_request.status == 'Open' and
+  {% elif pull_request.status == 'Open' and authenticated and
         (repo_admin or g.fas_user.username == pull_request.user.username) %}
       <li>
         <form action="{{ url_for('cancel_request_pull', username=username,
