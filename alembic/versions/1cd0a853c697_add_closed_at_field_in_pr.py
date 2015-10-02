@@ -27,6 +27,9 @@ def upgrade():
         )
     )
 
+    op.execute('''UPDATE "pull_requests" SET closed_at=date_created '''
+               '''WHERE STATUS != 'Open';''')
+
 
 def downgrade():
     ''' Remove the column closed_at from the table pull_requests.
