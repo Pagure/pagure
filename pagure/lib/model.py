@@ -858,7 +858,8 @@ class PullRequest(BASE):
             'remote_git': self.remote_git,
             'date_created': self.date_created.strftime('%s'),
             'updated_on': self.updated_on.strftime('%s'),
-            'closed_at': self.closed_at.strftime('%s'),
+            'closed_at': self.closed_at.strftime(
+                '%s') if self.closed_at else None,
             'user': self.user.to_json(public=public),
             'assignee': self.assignee.to_json(
                 public=public) if self.assignee else None,
