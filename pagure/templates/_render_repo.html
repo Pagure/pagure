@@ -33,7 +33,9 @@
 
 
 {% macro render_repos(list, total, page, title, count, id, username=None) %}
-    <section class="project_list" id="{{ id }}">
+    <section class="project_list" id="{{ id }}" {%
+        if id in config.get('SHOW_PROJECTS_INDEX', [])
+        %} style="display:none;" {% endif %}>
         <header>
             {% set title_lvl = 3 if username else 2 %}
             <h{{ title_lvl }}>{{ title }} ({{ count }})</h{{ title_lvl }}>
@@ -81,14 +83,18 @@
 
             <label class="switch">
                 <input type="checkbox" class="switch-input"
-                    name="{% if all %}my{% endif %}repos" checked>
+                    name="{% if all %}my{% endif %}repos" {%
+                    if 'myrepos' not in config.get('SHOW_PROJECTS_INDEX', [])
+                    %} checked {% endif %}/>
                 <span class="switch-label" data-on="On" data-off="Off"></span>
                 <span class="switch-handle"></span>
             </label>
         <strong>Forks:</strong>
             <label class="switch">
                 <input type="checkbox" class="switch-input"
-                    name="{% if all %}my{% endif %}forks" checked>
+                    name="{% if all %}my{% endif %}forks" {%
+                    if 'myforks' not in config.get('SHOW_PROJECTS_INDEX', [])
+                    %} checked {% endif %}/>
                 <span class="switch-label" data-on="On" data-off="Off"></span>
                 <span class="switch-handle"></span>
             </label>
@@ -96,7 +102,9 @@
         <strong>All repos:</strong>
             <label class="switch">
                 <input type="checkbox" class="switch-input"
-                    name="repos" id="allrepos" />
+                    name="repos" id="allrepos" {%
+                    if 'repos' not in config.get('SHOW_PROJECTS_INDEX', [])
+                    %} checked {% endif %}/>
                 <span class="switch-label" data-on="On" data-off="Off"></span>
                 <span class="switch-handle"></span>
             </label>

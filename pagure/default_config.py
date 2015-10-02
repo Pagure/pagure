@@ -46,6 +46,9 @@ ENABLE_DEL_PROJECTS = True
 # Enables / Disables managing access to the repos
 ENABLE_USER_MNGT = True
 
+# Enables / Disables showing all the projects by default on the front page
+SHOW_PROJECTS_INDEX = []
+
 # The URL to use to clone the git repositories.
 GIT_URL_SSH = 'ssh://git@pagure.org/'
 GIT_URL_GIT = 'git://pagure.org/'
