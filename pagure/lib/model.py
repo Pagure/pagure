@@ -756,6 +756,9 @@ class PullRequest(BASE):
         sa.Integer,
         sa.ForeignKey('users.id', onupdate='CASCADE'),
         nullable=True)
+    closed_at = sa.Column(
+        sa.DateTime,
+        nullable=True)
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
@@ -855,6 +858,7 @@ class PullRequest(BASE):
             'remote_git': self.remote_git,
             'date_created': self.date_created.strftime('%s'),
             'updated_on': self.updated_on.strftime('%s'),
+            'closed_at': self.closed_at.strftime('%s'),
             'user': self.user.to_json(public=public),
             'assignee': self.assignee.to_json(
                 public=public) if self.assignee else None,
