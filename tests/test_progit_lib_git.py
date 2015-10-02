@@ -689,11 +689,12 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,77 @@
+@@ -0,0 +1,78 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
 +    "branch_from": "feature",
++    "closed_at": null,
 +    "closed_by": null,
 +    "comments": [],
 +    "commit_start": null,
