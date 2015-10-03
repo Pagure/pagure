@@ -92,7 +92,9 @@ class ContextInjector(logging.Filter):  # pragma: no cover
         except RuntimeError:
             pass
         try:
-            record.form = flask.request.form
+            record.form = dict(flask.request.form)
+            if 'csrf_token' in record.form:
+                del(record.form['csrf_token'])
         except RuntimeError:
             pass
 
