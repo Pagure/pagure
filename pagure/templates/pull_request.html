@@ -40,7 +40,8 @@
           <input class="button" type="submit" value="Merge"/>
         </form>
       </li>
-  {% elif pull_request.status == 'Open' and authenticated and
+  {% endif %}
+  {% if pull_request.status == 'Open' and authenticated and
         (repo_admin or g.fas_user.username == pull_request.user.username) %}
       <li>
         <form action="{{ url_for('cancel_request_pull', username=username,
@@ -49,7 +50,8 @@
           <input type="submit" value="Close" id="cancel_pr" class="button"/>
         </form>
       </li>
-  {% elif pull_request.status != 'Open' %}
+  {% endif %}
+  {% if pull_request.status != 'Open' %}
     <li>
       <span class="error">{{ pull_request.status }} by
         <a href="{{ url_for('view_user', username=pull_request.closed_by.user)}} ">
