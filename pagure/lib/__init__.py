@@ -177,6 +177,8 @@ def create_user_ssh_keys_on_disk(user, gitolite_keydir):
         # Now let's create new keyfiles for the user
         keys = user.public_ssh_key.split('\n')
         for i in range(len(keys)):
+            if not keys[i]:
+                continue
             keyline_dir = os.path.join(gitolite_keydir, 'keys_%i' % i)
             if not os.path.exists(keyline_dir):
                 os.mkdir(keyline_dir)
