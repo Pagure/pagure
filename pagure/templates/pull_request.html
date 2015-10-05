@@ -22,7 +22,7 @@
 
 
 {% if pull_request %}
-<h2>Pull Request: {{ pull_request.title | noJS("img") | safe
+<h2>Pull Request: {{ pull_request.title | noJS(ignore="img") | safe
   }}{% if authenticated and (g.fas_user.username == pull_request.user.username
     or repo_admin) and pull_request.status == 'Open'
   %}<a class="edit_icon"
