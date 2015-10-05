@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.25
+Version:        0.1.26
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -212,6 +212,10 @@ install -m 644 ev-server/pagure_ev.service \
 
 
 %changelog
+* Mon Oct 05 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.26-1
+- Update to 0.1.26
+- Let admins close PRs as well
+
 * Mon Oct 05 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.25-1
 - Update to 0.1.25
 - Improve the documentation (especially the part about configuring pagure and
