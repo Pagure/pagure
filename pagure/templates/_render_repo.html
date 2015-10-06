@@ -32,7 +32,8 @@
 {%- endmacro %}
 
 
-{% macro render_repos(list, total, page, title, count, id, username=None) %}
+{% macro render_repos(
+        list, total, pagetitle, page, title, count, id, username=None) %}
     <section class="project_list" id="{{ id }}"{%
         if id in config.get('SHOW_PROJECTS_INDEX', [])
         %} style="display:none;" {% endif %}>
@@ -46,7 +47,7 @@
                 <tr>
                     <td>
                     {% if page > 1%}
-                        <a href="{{ url_for('index') }}?page={{page - 1}}">
+                        <a href="{{ url_for('index') }}?{{ pagetitle }}={{page - 1}}">
                             &lt; Previous
                         </a>
                     {% else %}
@@ -56,7 +57,7 @@
                     <td>{{ page }} / {{ total }}</td>
                     <td>
                         {% if page < total %}
-                        <a href="{{ url_for('index') }}?page={{page + 1}}">
+                        <a href="{{ url_for('index') }}?{{ pagetitle }}={{page + 1}}">
                             Next &gt;
                         </a>
                         {% else %}
