@@ -8,7 +8,7 @@
     <link type="text/css" rel="stylesheet" href="https://ryanlerch.fedorapeople.org/fedora-bootstrap/fedora-bootstrap.min.css" />
     {% block header %}{% endblock %}
   </head>
-  <body id="{% block tag %}{% endblock %}">
+  <body id="{{ tag }}">
 	<div class="masthead">
 	        <div class="container"><img src="{{ url_for('static', filename='pagure-logo.png') }}"
             alt="pagure Logo" id="kojiLogo"/></div>
@@ -16,11 +16,11 @@
         <nav class="navbar navbar-light navbar-underline p-t-0 p-b-0 m-b-lg">
           <div class="container-narrow">
             <ul class="nav navbar-nav nav-justified nav-underline">
-              <li class="nav-item active"><a class="nav-link" href="{{url_for('index')}}">Home</a></li>
-              <li class="nav-item"><a class="nav-link" href="{{ url_for('view_users') }}">Users</a></li>
-              <li class="nav-item"><a class="nav-link" href="{{ url_for('group_lists') }}">Groups</a></li>
+              <li class="nav-item {% if tag == 'home'%}active{% endif %}"><a class="nav-link" href="{{url_for('index')}}">Home</a></li>
+              <li class="nav-item {% if tag == 'users'%}active{% endif %}"><a class="nav-link" href="{{ url_for('view_users') }}">Users</a></li>
+              <li class="nav-item {% if tag == 'groups'%}active{% endif %}"><a class="nav-link" href="{{ url_for('group_lists') }}">Groups</a></li>
               {% if admin %}
-              <li class="nav-item"><a class="nav-link" href="{{ url_for('admin_index') }}">Admin</a></li>
+              <li class="nav-item {% if tag == 'admin'%}active{% endif %}"><a class="nav-link" href="{{ url_for('admin_index') }}">Admin</a></li>
               {% endif %}
               {% if config.get('ENABLE_NEW_PROJECTS', True) %}
               <li class="nav-item"><a class="nav-link" href="{{ url_for('new_project') }}">New Project</a></li>

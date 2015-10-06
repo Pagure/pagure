@@ -2,7 +2,7 @@
 {% from "_formhelper.html" import render_field_in_cell %}
 
 {% block title %}{{ user.user }}'s settings{% endblock %}
-{%block tag %}users{% endblock %}
+{% set tag = "users"%}
 
 {% block header %}
 <link href="{{ url_for('static', filename='fontawesome/font-awesome.min.css') }}"

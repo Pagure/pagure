@@ -4,7 +4,7 @@
 {% extends "repo_master.html" %}
 
 {% block title %}{{ select.capitalize() }} {{ plugin.name }} - {{ repo.name }}{% endblock %}
-{%block tag %}home{% endblock %}
+{% set tag = "home" %}
 {% endif %}
 
 

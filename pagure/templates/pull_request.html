@@ -9,7 +9,7 @@
   {%- endif -%}
 {% endblock %}
 
-{%block tag %}home{% endblock %}
+{% set tag = "home" %}
 
 {% block header %}
 <link href="{{ url_for('static', filename='fontawesome/font-awesome.min.css') }}"

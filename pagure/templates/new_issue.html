@@ -4,7 +4,7 @@
 {% block title %}{% if not type or type == 'new'
     %}New issue{% elif type and type == 'edit'
     %}Edit issue #{{ issueid }} {% endif %} - {{ repo.name }}{% endblock %}
-{%block tag %}home{% endblock %}
+{% set tag = "home" %}
 
 
 {% block repo %}

@@ -1,7 +1,7 @@
 {% extends "repo_master.html" %}
 
 {% block title %}Commit - {{ repo.name }} - {{ commitid }}{% endblock %}
-{%block tag %}commit{% endblock %}
+{% set tag = "commit"%}
 
 {% block repo %}
 
