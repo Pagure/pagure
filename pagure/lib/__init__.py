@@ -878,6 +878,10 @@ def new_project(session, user, name, blacklist,
     session.commit()
 
     pygit2.init_repository(gitrepo, bare=True)
+    http_clone_file = os.path.join(gitrepo, 'git-daemon-export-ok')
+    if not os.path.exists(http_clone_file):
+        with open(http_clone_file, 'w') as stream:
+            pass
 
     docrepo = os.path.join(docfolder, project.path)
     if os.path.exists(docrepo):
