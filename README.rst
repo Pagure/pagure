@@ -26,6 +26,20 @@ Get it running
 * Retrieve the sources::
 
     git clone git://github.com/pypingou/pagure
+    cd pagure
+
+
+* Install dependencies
+
+  * development virtualenv::
+
+      dnf install libgit2-devel
+      virtualenv devel
+      devel/bin/pip install -r requirements.txt
+
+  * Fedora RPMs::
+
+      dnf install $(cat requirements-fedora.txt)
 
 
 * Create the folder that will receive the projects, forks, docs and tickets'
@@ -36,19 +50,26 @@ Get it running
 
 * Create the inital database scheme::
 
+    # development virtualenv only
+    source devel/bin/activate
+
     python createdb.py
 
 
 * Run it::
+
+    # development virtualenv only
+    source devel/bin/activate
 
     ./runserver.py
 
 
 * To get some profiling information you can also run it as::
 
+    # development virtualenv only
+    source devel/bin/activate
+
     ./runserver.py --profile
 
 
-
 This will launch the application at http://127.0.0.1:5000
-

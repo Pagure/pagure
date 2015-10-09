@@ -1,0 +1,11 @@
+python-arrow
+python-bleach
+python-flask
+python-flask-wtf
+python-jinja2
+python-markdown
+python-openid-cla
+python-openid-teams
+python-redis
+python-sqlalchemy
+python-straight-plugin
