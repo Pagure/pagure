@@ -8,8 +8,6 @@ import argparse
 import sys
 import os
 
-from pagure import APP
-APP.debug = True
 
 parser = argparse.ArgumentParser(
     description='Run the packages2 app')
@@ -36,6 +34,9 @@ if args.profile:
     APP.wsgi_app = ProfilerMiddleware(APP.wsgi_app, restrictions=[30])
 
 if args.config:
-    os.environ['PKGS_CONFIG'] = args.config
+    os.environ['PAGURE_CONFIG'] = args.config
 
+
+from pagure import APP
+APP.debug = True
 APP.run(port=int(args.port))
