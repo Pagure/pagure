@@ -1184,7 +1184,7 @@ def get_git_tags_objects(project):
     tags = [
         repo_obj[repo_obj.lookup_reference(tag).target]
         for tag in repo_obj.listall_references()
-        if 'refs/tags/' in tag
+        if 'refs/tags/' in tag and repo_obj.lookup_reference(tag)
     ]
 
     return tags
