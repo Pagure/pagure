@@ -53,6 +53,7 @@ def new_user():
         user = model.User()
         user.token = token
         form.populate_obj(obj=user)
+        user.default_email = form.email_address.data
         SESSION.add(user)
         SESSION.flush()
 
