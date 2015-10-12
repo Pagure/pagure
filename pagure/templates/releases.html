@@ -40,7 +40,10 @@
     <li>
       <a href="{{ url_for('.view_tree', username=username, repo=repo.name,
                           identifier=tag.get_object().hex) }}">
-        {{ tag.shorthand }}
+        {{ tag.name }}
+        {% if tag.message %}
+        -- {{ tag.message.split('\n')[0] }}
+        {% endif %}
       <span class="tagid">{{ tag.get_object().hex | short }}</span>
       </a>
     </li>
