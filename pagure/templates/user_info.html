@@ -28,10 +28,10 @@
     </p>
 
     {{ render_repos(
-            repos, total_page_repos, repopage,
+            repos, total_page_repos, 'repopage', repopage,
             'Projects', repos_length, 'repos') }}
     {{ render_repos(
-            forks, total_page_forks, forkpage,
+            forks, total_page_forks, 'forkpage', forkpage,
             'Forks', forks_length, 'forks') }}
     <section class="project_list" id="group_list">
         <header>
