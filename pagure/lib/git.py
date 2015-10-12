@@ -1165,11 +1165,13 @@ def get_git_tags(project):
     """
     repopath = pagure.get_repo_path(project)
     repo_obj = PagureRepo(repopath)
+
     tags = [
         tag.split('refs/tags/')[1]
         for tag in repo_obj.listall_references()
         if 'refs/tags/' in tag
     ]
+
     return tags
 
 
@@ -1180,8 +1182,9 @@ def get_git_tags_objects(project):
     repopath = pagure.get_repo_path(project)
     repo_obj = PagureRepo(repopath)
     tags = [
-        repo_obj.lookup_reference(tag)
+        repo_obj[repo_obj.lookup_reference(tag).target]
         for tag in repo_obj.listall_references()
         if 'refs/tags/' in tag
     ]
+
     return tags
