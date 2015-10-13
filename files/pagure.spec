@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.28
+Version:        0.1.29
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -212,6 +212,12 @@ install -m 644 ev-server/pagure_ev.service \
 
 
 %changelog
+* Tue Oct 13 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.29-1
+- Use monospace fonts for online editing as well as comment on tickets and
+  pull-requests
+- Fix online editing of symlinked files (such as the README)
+- Handle potential error when converting from rst to html
+
 * Mon Oct 12 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.28-1
 - Update to 0.1.28
 - Fix the call to noJS() in the pull-request template to avoid crashing
