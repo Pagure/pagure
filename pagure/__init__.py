@@ -341,7 +341,8 @@ def __get_file_in_tree(repo_obj, tree, filepath, bail_on_tree=False):
                 return blob
             else:
                 return __get_file_in_tree(
-                    repo_obj, repo_obj[entry.oid], filepath[1:])
+                    repo_obj, repo_obj[entry.oid], filepath[1:],
+                    bail_on_tree=bail_on_tree)
 
 
 def get_repo_path(repo):
