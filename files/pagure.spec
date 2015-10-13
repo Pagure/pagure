@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.30
+Version:        0.1.31
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -212,6 +212,11 @@ install -m 644 ev-server/pagure_ev.service \
 
 
 %changelog
+* Tue Oct 13 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.31-1
+- Forward the bail_on_tree boolean when iterating so that we know how to behave
+  when we run into a git tree (where we expected a git blob)
+  -> fixes error received by email
+
 * Tue Oct 13 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.30-1
 - Fix error received by email by checking the right variable if it is a git tree
   or a git blob
