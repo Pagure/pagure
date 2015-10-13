@@ -30,7 +30,10 @@ pre, code {
 }
 
 textarea {
-    font-size: 100%;
+    font-family: monospace;
+    font-size: 120%;
+    border: 1px #ccc solid;
+    background: rgba(255, 255, 255, 0.5);
 }
 
 button {
@@ -39,11 +42,6 @@ button {
 
 select {
     font-size: 100%;
-}
-
-textarea {
-    border: 1px #ccc solid;
-    background: rgba(255, 255, 255, 0.5);
 }
 
 td, th {
@@ -945,8 +943,7 @@ span.CONFLICTS {
     color: #0066CC!important;
 }
 
-.tabs .commit_list a:hover,
-.tabs .ui-widget-content table tr:hover > td a
+.tabs #commit_list table tr:hover > td a
 {
     color: white!important;
 }
@@ -990,13 +987,23 @@ span.CONFLICTS {
     left: 0;
     position: absolute;
     text-align: right;
-    top: 0;
+    margin-top: 0.4px;
     width: 27px;
-    font-size: 92.3%;
     line-height: 100%;
+    font-family: monospace;
+    font-size: 120%
+}
+
+.lineNum br {
+    margin-top: 2px;
 }
 
 #commit_block {
     padding-top: 2em;
     padding-left: 2em;
+}
+
+#issue_content, #comment {
+    font-family: monospace;
+    font-size: 120%;
 }
