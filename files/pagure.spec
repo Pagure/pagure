@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.29
+Version:        0.1.30
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -212,6 +212,12 @@ install -m 644 ev-server/pagure_ev.service \
 
 
 %changelog
+* Tue Oct 13 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.30-1
+- Fix error received by email by checking the right variable if it is a git tree
+  or a git blob
+- Unless we explicitly accept all images tag, always filter them (fixes
+  attaching images to a ticket)
+
 * Tue Oct 13 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.29-1
 - Use monospace fonts for online editing as well as comment on tickets and
   pull-requests
