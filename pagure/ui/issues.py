@@ -722,7 +722,7 @@ def view_issue_raw_file(repo, filename=None, username=None):
     encoding = None
 
     content = __get_file_in_tree(
-        repo_obj, commit.tree, filename.split('/'))
+        repo_obj, commit.tree, filename.split('/'), bail_on_tree=True)
     if not content or isinstance(content, pygit2.Tree):
         flask.abort(404, 'File not found')
 

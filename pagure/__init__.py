@@ -310,7 +310,7 @@ def auth_logout():  # pragma: no cover
     return flask.redirect(return_point)
 
 
-def __get_file_in_tree(repo_obj, tree, filepath):
+def __get_file_in_tree(repo_obj, tree, filepath, bail_on_tree=False):
     ''' Retrieve the entry corresponding to the provided filename in a
     given tree.
     '''
@@ -322,6 +322,9 @@ def __get_file_in_tree(repo_obj, tree, filepath):
         if entry.name == filename:
             if len(filepath) == 1:
                 blob = repo_obj[entry.oid]
+                # If we get a tree instead of a blob, let's escape
+                if isinstance(tree, pygit2.Tree) and bail_on_tree:
+                    return blob
                 content = blob.data
                 # If it's a (sane) symlink, we try a single-level dereference
                 if entry.filemode == pygit2.GIT_FILEMODE_LINK \
