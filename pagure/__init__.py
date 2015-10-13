@@ -323,7 +323,7 @@ def __get_file_in_tree(repo_obj, tree, filepath, bail_on_tree=False):
             if len(filepath) == 1:
                 blob = repo_obj[entry.oid]
                 # If we get a tree instead of a blob, let's escape
-                if isinstance(tree, pygit2.Tree) and bail_on_tree:
+                if isinstance(blob, pygit2.Tree) and bail_on_tree:
                     return blob
                 content = blob.data
                 # If it's a (sane) symlink, we try a single-level dereference
