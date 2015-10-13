@@ -88,18 +88,9 @@ def view_repo(repo, username=None):
     for i in tree:
         name, ext = os.path.splitext(i.name)
         if name == 'README':
-            content = repo_obj[i.oid].data
-            # If it's a (sane) symlink, we try a single-level dereference
-            if i.filemode == pygit2.GIT_FILEMODE_LINK \
-                    and os.path.normpath(content) == content \
-                    and not os.path.isabs(content):
-                try:
-                    dereferenced = last_commits[0].tree[content]
-                except KeyError:
-                    pass
-                else:
-                    if dereferenced.filemode == pygit2.GIT_FILEMODE_BLOB:
-                        content = repo_obj[dereferenced.oid].data
+            content = __get_file_in_tree(
+                repo_obj, last_commits[0].tree, [i.name]).data
+
             readme, safe = pagure.doc_utils.convert_readme(
                 content, ext,
                 view_file_url=flask.url_for(

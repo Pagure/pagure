@@ -314,13 +314,28 @@ def __get_file_in_tree(repo_obj, tree, filepath):
     ''' Retrieve the entry corresponding to the provided filename in a
     given tree.
     '''
+
     filename = filepath[0]
     if isinstance(tree, pygit2.Blob):
         return
     for entry in tree:
         if entry.name == filename:
             if len(filepath) == 1:
-                return repo_obj[entry.oid]
+                blob = repo_obj[entry.oid]
+                content = blob.data
+                # If it's a (sane) symlink, we try a single-level dereference
+                if entry.filemode == pygit2.GIT_FILEMODE_LINK \
+                        and os.path.normpath(content) == content \
+                        and not os.path.isabs(content):
+                    try:
+                        dereferenced = tree[content]
+                    except KeyError:
+                        pass
+                    else:
+                        if dereferenced.filemode == pygit2.GIT_FILEMODE_BLOB:
+                            blob = repo_obj[dereferenced.oid]
+
+                return blob
             else:
                 return __get_file_in_tree(
                     repo_obj, repo_obj[entry.oid], filepath[1:])
