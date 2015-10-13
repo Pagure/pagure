@@ -2421,7 +2421,7 @@ def clean_input(text, ignore=None):
         ignore = [ignore]
 
     attrs = bleach.ALLOWED_ATTRIBUTES
-    if ignore and 'img' not in ignore:
+    if not ignore or not 'img' in ignore:
         attrs['img'] = filter_img_src
 
     tags = bleach.ALLOWED_TAGS + [
