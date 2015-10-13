@@ -71,17 +71,22 @@ def convert_doc(rst_string, view_file_url=None):
     rst = modify_rst(rst_string, view_file_url)
 
     overrides = {'report_level': 'quiet'}
-    html = docutils.core.publish_parts(
-        source=rst,
-        writer_name='html',
-        settings_overrides=overrides)
+    try:
+        html = docutils.core.publish_parts(
+            source=rst,
+            writer_name='html',
+            settings_overrides=overrides)
+    except:
+        return '<pre>%s</pre>' % rst
 
-    html_string = html['html_body']
+    else:
 
-    html_string = modify_html(html_string)
+        html_string = html['html_body']
 
-    html_string = markupsafe.Markup(html_string)
-    return html_string
+        html_string = modify_html(html_string)
+
+        html_string = markupsafe.Markup(html_string)
+        return html_string
 
 
 def convert_readme(content, ext, view_file_url=None):
