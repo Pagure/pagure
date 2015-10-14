@@ -152,7 +152,7 @@ class User(BASE):
     __tablename__ = 'users'
     id = sa.Column(sa.Integer, primary_key=True)
     user = sa.Column(sa.String(256), nullable=False, unique=True, index=True)
-    fullname = sa.Column(sa.Text, nullable=False, index=True)
+    fullname = sa.Column(sa.String(256), nullable=False, index=True)
     public_ssh_key = sa.Column(sa.Text, nullable=True)
     default_email = sa.Column(sa.Text, nullable=False)
 
