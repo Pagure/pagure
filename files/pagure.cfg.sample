@@ -1,3 +1,4 @@
+from datetime import timedelta
 
 ### Set the time after which the admin session expires
 # There are two sessions on pagure, login that holds for 31 days and
