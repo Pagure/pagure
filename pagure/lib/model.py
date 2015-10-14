@@ -129,7 +129,7 @@ class StatusIssue(BASE):
     __tablename__ = 'status_issue'
 
     id = sa.Column(sa.Integer, primary_key=True)
-    status = sa.Column(sa.Text, nullable=False, unique=True)
+    status = sa.Column(sa.String, nullable=False, unique=True)
 
 
 class StatusPullRequest(BASE):
@@ -140,7 +140,7 @@ class StatusPullRequest(BASE):
     __tablename__ = 'status_pull_requests'
 
     id = sa.Column(sa.Integer, primary_key=True)
-    status = sa.Column(sa.Text, nullable=False, unique=True)
+    status = sa.Column(sa.String, nullable=False, unique=True)
 
 
 class User(BASE):
@@ -219,7 +219,7 @@ class UserEmail(BASE):
         sa.ForeignKey('users.id', onupdate='CASCADE'),
         nullable=False,
         index=True)
-    email = sa.Column(sa.Text, nullable=False, unique=True)
+    email = sa.Column(sa.String, nullable=False, unique=True)
 
     user = relation(
         'User', foreign_keys=[user_id], remote_side=[User.id],
@@ -242,7 +242,7 @@ class UserEmailPending(BASE):
         sa.ForeignKey('users.id', onupdate='CASCADE'),
         nullable=False,
         index=True)
-    email = sa.Column(sa.Text, nullable=False, unique=True)
+    email = sa.Column(sa.String, nullable=False, unique=True)
     token = sa.Column(sa.String(50), nullable=True)
     created = sa.Column(
         sa.DateTime,
@@ -445,7 +445,7 @@ class Issue(BASE):
         nullable=True,
         index=True)
     status = sa.Column(
-        sa.Text,
+        sa.String,
         sa.ForeignKey(
             'status_issue.status', onupdate='CASCADE'),
         default='Open',
@@ -538,12 +538,12 @@ class IssueToIssue(BASE):
     __tablename__ = 'issue_to_issue'
 
     parent_issue_id = sa.Column(
-        sa.Text,
+        sa.String,
         sa.ForeignKey(
             'issues.uid', ondelete='CASCADE', onupdate='CASCADE'),
         primary_key=True)
     child_issue_id = sa.Column(
-        sa.Text,
+        sa.String,
         sa.ForeignKey(
             'issues.uid', ondelete='CASCADE', onupdate='CASCADE'),
         primary_key=True)
@@ -559,7 +559,7 @@ class IssueComment(BASE):
 
     id = sa.Column(sa.Integer, primary_key=True)
     issue_uid = sa.Column(
-        sa.Text,
+        sa.String,
         sa.ForeignKey(
             'issues.uid', ondelete='CASCADE', onupdate='CASCADE'),
         index=True)
@@ -624,7 +624,7 @@ class Tag(BASE):
 
     __tablename__ = 'tags'
 
-    tag = sa.Column(sa.Text(), primary_key=True)
+    tag = sa.Column(sa.String(), primary_key=True)
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
 
@@ -638,12 +638,12 @@ class TagIssue(BASE):
     __tablename__ = 'tags_issues'
 
     tag = sa.Column(
-        sa.Text(),
+        sa.String(),
         sa.ForeignKey(
             'tags.tag', ondelete='CASCADE', onupdate='CASCADE'),
         primary_key=True)
     issue_uid = sa.Column(
-        sa.Text,
+        sa.String,
         sa.ForeignKey(
             'issues.uid', ondelete='CASCADE', onupdate='CASCADE'),
         primary_key=True)
@@ -669,7 +669,7 @@ class TagProject(BASE):
     __tablename__ = 'tags_projects'
 
     tag = sa.Column(
-        sa.Text(),
+        sa.String(),
         sa.ForeignKey(
             'tags.tag', ondelete='CASCADE', onupdate='CASCADE'),
         primary_key=True)
@@ -747,7 +747,7 @@ class PullRequest(BASE):
         nullable=True)
 
     status = sa.Column(
-        sa.Text,
+        sa.String,
         sa.ForeignKey(
             'status_pull_requests.status', onupdate='CASCADE'),
         default='Open',
@@ -899,7 +899,7 @@ class PullRequestComment(BASE):
 
     id = sa.Column(sa.Integer, primary_key=True)
     pull_request_uid = sa.Column(
-        sa.Text,
+        sa.String,
         sa.ForeignKey(
             'pull_requests.uid', ondelete='CASCADE', onupdate='CASCADE'),
         nullable=False)
@@ -967,7 +967,7 @@ class PullRequestFlag(BASE):
     id = sa.Column(sa.Integer, primary_key=True)
     uid = sa.Column(sa.String(32), unique=True, nullable=False)
     pull_request_uid = sa.Column(
-        sa.Text,
+        sa.String,
         sa.ForeignKey(
             'pull_requests.uid', ondelete='CASCADE', onupdate='CASCADE'),
         nullable=False)
