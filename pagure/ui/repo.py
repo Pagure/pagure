@@ -621,6 +621,10 @@ def view_tree(repo, identifier=None, username=None):
                 if 'master' in repo_obj.listall_branches():
                     commit = repo_obj[repo_obj.head.target]
                     branchname = 'master'
+        # If we're arriving here from the release page, we may have a Tag
+        # where we expected a commit, in this case, get the actual commit
+        if isinstance(commit, pygit2.Tag):
+            commit = commit.get_object()
 
         if commit:
             content = sorted(commit.tree, key=lambda x: x.filemode)
