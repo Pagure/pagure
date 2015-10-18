@@ -2381,7 +2381,7 @@ def add_token_to_user(session, project, acls, username):
 def text2markdown(text, extended=True):
     """ Simple text to html converter using the markdown library.
     """
-    md = markdown.Markdown()
+    md = markdown.Markdown(safe_mode="escape")
     if extended:
         # Install our markdown modifications
         md = markdown.Markdown(extensions=['pagure.pfmarkdown'])
