@@ -2440,7 +2440,7 @@ def could_be_text(text):
     """ Returns wether we think this chain of character could be text or not
     """
     try:
-        text.encode('utf-8')
+        text.decode('utf-8')
         return True
     except:
         return False
