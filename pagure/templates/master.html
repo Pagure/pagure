@@ -6,65 +6,76 @@
     <link rel="shortcut icon" type="image/vnd.microsoft.icon"
         href="{{ url_for('static', filename='favicon.ico')}}"/>
     <link type="text/css" rel="stylesheet" href="https://ryanlerch.fedorapeople.org/fedora-bootstrap/fedora-bootstrap.min.css" />
+  <link href="https://cdn.jsdelivr.net/open-iconic/1.1.0/font/css/open-iconic.min.css" rel="stylesheet"/>
     {% block header %}{% endblock %}
   </head>
   <body id="{{ tag }}">
-	<div class="masthead">
-	        <div class="container"><img src="{{ url_for('static', filename='pagure-logo.png') }}"
-            alt="pagure Logo" id="kojiLogo"/></div>
-        </div>
-        <nav class="navbar navbar-light navbar-underline p-t-0 p-b-0 m-b-lg">
-          <div class="container-narrow">
-            <ul class="nav navbar-nav nav-justified nav-underline">
-              <li class="nav-item {% if tag == 'home'%}active{% endif %}"><a class="nav-link" href="{{url_for('index')}}">Home</a></li>
-              <li class="nav-item {% if tag == 'users'%}active{% endif %}"><a class="nav-link" href="{{ url_for('view_users') }}">Users</a></li>
-              <li class="nav-item {% if tag == 'groups'%}active{% endif %}"><a class="nav-link" href="{{ url_for('group_lists') }}">Groups</a></li>
-              {% if admin %}
-              <li class="nav-item {% if tag == 'admin'%}active{% endif %}"><a class="nav-link" href="{{ url_for('admin_index') }}">Admin</a></li>
-              {% endif %}
-              {% if config.get('ENABLE_NEW_PROJECTS', True) %}
-              <li class="nav-item"><a class="nav-link" href="{{ url_for('new_project') }}">New Project</a></li>
-              {% endif %}
-            </ul>
+  <!-- start masthead -->
+    <div class="masthead">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-3">
+            <img src="{{ url_for('static', filename='pagure-logo.png') }}" alt="pagure Logo" id="kojiLogo"/>
           </div>
-        </nav>
-    <div id="wrap">
-      <div id="innerwrap">
+          <div class="col-sm-9">
+            <div class="row">
+		          <div class="col-sm-12 text-right">
+			          <form action="{{url_for('search')}}" id="headerSearch" class="form-inline">
+			            <div class="btn-group">
+                    <select name="type" class="selectpicker" data-style="btn-secondary btn-sm" data-width="auto">
+                      <option value="projects"{% if select=='projects' %} selected {% endif %}>Projects</option>
+                        <option value="projects_forks"{% if select=='projects_forks' %} selected {% endif %}>Projects &amp; Forks</option>
+                        <option value="user"{% if select=='users' %} selected {% endif %}>Users</option>
+                      </select>
+			              <input type="text" name="term" class="form-control form-control-sm" title="Search field, use * to broaden your search" />
+		              </div>
+                  <input type="submit" value="Search" class="btn btn-primary btn-sm"/>
+                </form>
+		          </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+	<!-- close masthead-->
+
+  <nav class="navbar navbar-light navbar-underline p-t-0 p-b-0">
+	  <div class="container">
+	    <ul class="nav navbar-nav nav-underline">
+	      <li class="nav-item p-l p-r {% if tag == 'home'%}active{% endif %}"><a class="nav-link" href="{{url_for('index')}}">Projects</a></li>
+	      <li class="nav-item p-l p-r {% if tag == 'users'%}active{% endif %}"><a class="nav-link" href="{{ url_for('view_users') }}">Users</a></li>
+	      <li class="nav-item p-l p-r {% if tag == 'groups'%}active{% endif %}"><a class="nav-link" href="{{ url_for('group_lists') }}">Groups</a></li>
+	      {% if admin %}
+	      <li class="nav-item p-l p-r {% if tag == 'admin'%}active{% endif %}"><a class="nav-link" href="{{ url_for('admin_index') }}">Admin</a></li>
+	      {% endif %}
+	    </ul>
+	    <ul class="nav navbar-nav nav-underline" style="float:right;">
+	      {% if config.get('ENABLE_NEW_PROJECTS', True) %}
+	      <li class="nav-item p-l"><a class="nav-link" href="{{ url_for('new_project') }}"><span class="oi" data-glyph="plus" title="Create New" aria-hidden="true"></span>
+</a></li>
+	      {% endif %}
+	      {% if not nologin %}
+
+		{% if g.fas_user %}
+
+			<li class="nav-item p-l"><a class="nav-link" href="#">{{ g.fas_user.username | avatar(24) | safe }}</a></li>
+			 <!--<a href="{{ url_for('user_settings') }}">{{ g.fas_user.username }}</a>
+			 <a href="{{ url_for('auth_logout') }}?next={{request.url}}">log out</a> -->
+		{% else %}
+		       <li class="nav-item p-l"><a class="nav-link" href="{{ url_for('auth_login') }}?next={{request.url}}">login</a></li>
+		{% endif %}
+              {% endif %}
+
+	      <li class="nav-item p-l"><a class="nav-link" href="{{ url_for('new_project') }}">New Project</a></li>
+	    </ul>
+	  </div>
+	</nav>
+    <div class="bodycontent p-t-lg p-b-lg">
+      <div class="container">
 
         <!-- HEADER -->
         <div id="header">
-
-          <form action="{{url_for('search')}}" id="headerSearch">
-            <select name="type">
-              <option value="projects"
-                {% if select=='projects' %} selected {% endif %}>
-                  Projects</option>
-              <option value="projects_forks"
-                {% if select=='projects_forks' %} selected {% endif %}>
-                  Projects &amp; Forks</option>
-              <option value="user"
-                {% if select=='users' %} selected {% endif %}>
-                  Users</option>
-            </select>
-            <input type="text" name="term"
-                title="Search field, use * to broaden your search" />
-            <input type="submit" value="Search"/>
-          </form>
         </div><!-- end header -->
-
-
-        {% if not nologin %}
-        <span id="loginInfo">
-          {% if g.fas_user %}
-            <span class="text">logged in as </span>
-            <a href="{{ url_for('user_settings') }}">
-                {{ g.fas_user.username }}</a> |
-            <a href="{{ url_for('auth_logout') }}?next={{request.url}}">log out</a>
-          {% else %}
-        <a href="{{ url_for('auth_login') }}?next={{request.url}}">login</a>
-          {% endif %}
-        </span>
-        {% endif %}
 
         <div id="content">
 
@@ -81,14 +92,17 @@
             {% block content %}{% endblock %}
 
         </div>
+      </div>
+    </div>
 
-        <p id="footer">
-          Copyright &copy; 2014-2015 Red Hat
+    <div class="footer p-t p-b">
+        <div class="container">
+            <p class="text-muted credit">
+         Copyright &copy; 2014-2015 Red Hat
           <a href="https://pagure.io/pagure">pagure</a> --
           {{version}}
-        </p>
-
-      </div>
+            </p>
+        </div>
     </div>
 
     {% block jscripts %}
@@ -103,6 +117,9 @@
     <script type="text/javascript"
         src="{{ url_for('static',
             filename='sorttable.js') }}">
+    </script>
+    <script type="text/javascript"
+        src="https://ryanlerch.fedorapeople.org/fedora-bootstrap/fedora-bootstrap.min.js">
     </script>
     {% endblock %}
 
