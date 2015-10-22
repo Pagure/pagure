@@ -97,9 +97,9 @@ def convert_readme(content, ext, view_file_url=None):
     safe = False
     if ext and ext in ['.rst']:
         safe = True
-        output = convert_doc(content, view_file_url)
+        output = convert_doc(content.decode('utf-8'), view_file_url)
     elif ext and ext in ['.mk', '.md']:
-        output = markdown.markdown(content)
+        output = markdown.markdown(content.decode('utf-8'))
         safe = True
     elif not ext or (ext and ext in ['.text', '.txt']):
         safe = True
