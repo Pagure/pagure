@@ -363,7 +363,6 @@ def request_pull_edit(repo, requestid, username=None):
         flask.abort(403, 'You are not allowed to edit this pull-request')
 
     form = pagure.forms.RequestPullForm()
-
     if form.validate_on_submit():
         request.title = form.title.data
         SESSION.add(request)
@@ -476,12 +475,12 @@ def pull_request_add_comment(
 
 
 @APP.route('/<repo>/pull-request/<int:requestid>/comment/drop',
-           methods=['POST'])
+           methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/comment/drop',
-           methods=['POST'])
+           methods=('GET', 'POST'))
 @cla_required
 def pull_request_drop_comment(repo, requestid, username=None):
-    """ Delete a comment of a pull-request.
+    """ Delete and Edit comment of a pull-request.
     """
     repo = pagure.lib.get_project(SESSION, repo, user=username)
 
@@ -496,9 +495,41 @@ def pull_request_drop_comment(repo, requestid, username=None):
 
     if not request:
         flask.abort(404, 'Pull-request not found')
-
+    
     form = pagure.forms.ConfirmationForm()
+    edit_comment_form = pagure.forms.AddPullRequestCommentForm()
+    
     if form.validate_on_submit():
+        
+        commentid = flask.request.args.get('commentid')
+        comment = pagure.lib.get_request_comment(
+            SESSION, request.uid, commentid)
+        
+        if comment is not None:
+            comment.comment = edit_comment_form.comment.data
+            SESSION.commit()
+        
+        if flask.request.form.get('edit_comment'):
+            commentid = flask.request.form.get('edit_comment')
+            comment = pagure.lib.get_request_comment(
+                SESSION, request.uid, commentid)
+            if comment is None or comment.pull_request.project != repo:
+                    flask.abort(404,'Comment not found')
+
+            if (flask.g.fas_user.username != comment.user.username
+                    or comment.parent.status is False):
+                flask.abort(403,
+                            "You are not allowed to edit the comment")
+            return flask.render_template(
+                'pull_request_add_comment.html',
+                select='requests',
+                requestid=requestid,
+                repo=repo,
+                username=username,
+                form=form,
+                commentid = commentid,
+                comment = comment
+            )
 
         if flask.request.form.get('drop_comment'):
             commentid = flask.request.form.get('drop_comment')
