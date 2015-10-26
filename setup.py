@@ -9,7 +9,16 @@ __requires__ = ['SQLAlchemy >= 0.8', 'jinja2 >= 2.4']
 import pkg_resources
 
 from setuptools import setup
-from pagure import __version__
+
+
+pagurefile = os.path.join(os.path.dirname(__file__), 'pagure', '__init__.py')
+
+# Thanks to SQLAlchemy:
+# https://github.com/zzzeek/sqlalchemy/blob/master/setup.py#L104
+with open(pagurefile) as stream:
+    __version__ = re.compile(
+        r".*__version__ = '(.*?)'", re.S
+    ).match(stream.read()).group(1)
 
 
 def get_requirements(requirements_file='requirements.txt'):
