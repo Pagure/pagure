@@ -17,9 +17,6 @@
 {% block content %}
     <h2>
         {{ username | avatar(36) | safe }} {{ username }}
-        {% if g.fas_user and g.fas_user.username == username %}
-          <a class="user_settings" href="{{ url_for('user_settings') }}" title="Update your settings">Settings</a>
-        {% endif %}
 
     </h2>
     {{ repos_switch(False, hide=False) }}

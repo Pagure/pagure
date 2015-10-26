@@ -6,7 +6,9 @@
     <link rel="shortcut icon" type="image/vnd.microsoft.icon"
         href="{{ url_for('static', filename='favicon.ico')}}"/>
     <link type="text/css" rel="stylesheet" href="https://ryanlerch.fedorapeople.org/fedora-bootstrap/fedora-bootstrap.min.css" />
-  <link href="https://cdn.jsdelivr.net/open-iconic/1.1.0/font/css/open-iconic.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/open-iconic/1.1.0/font/css/open-iconic.min.css" rel="stylesheet"/>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,700,400italic,700italic,300italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/font-hack/2.013/css/hack-extended.min.css">
     {% block header %}{% endblock %}
   </head>
   <body id="{{ tag }}">
@@ -55,18 +57,22 @@
 </a></li>
 	      {% endif %}
 	      {% if not nologin %}
-
 		{% if g.fas_user %}
-
-			<li class="nav-item p-l"><a class="nav-link" href="#">{{ g.fas_user.username | avatar(24) | safe }}</a></li>
+			<li class="nav-item dropdown p-l">
+			  <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">{{ g.fas_user.username | avatar(24) | safe }}</a>
+		      <div class="dropdown-menu dropdown-menu-right">
+		        <a class="dropdown-item" href="{{ url_for('view_user', username=g.fas_user.username) }}">My Public Profile</a>
+                <a class="dropdown-item" href="{{ url_for('user_settings') }}">My Settings</a>
+		        <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{{ url_for('auth_logout') }}?next={{request.url}}">Log Out</a>
+              </div>
+			</li>
 			 <!--<a href="{{ url_for('user_settings') }}">{{ g.fas_user.username }}</a>
 			 <a href="{{ url_for('auth_logout') }}?next={{request.url}}">log out</a> -->
 		{% else %}
-		       <li class="nav-item p-l"><a class="nav-link" href="{{ url_for('auth_login') }}?next={{request.url}}">login</a></li>
+		       <li class="nav-item p-l"><a class="nav-link" href="{{ url_for('auth_login') }}?next={{request.url}}"><span class="oi" data-glyph="account-login" title="Log In" aria-hidden="true"></a></li>
 		{% endif %}
               {% endif %}
-
-	      <li class="nav-item p-l"><a class="nav-link" href="{{ url_for('new_project') }}">New Project</a></li>
 	    </ul>
 	  </div>
 	</nav>
