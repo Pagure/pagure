@@ -507,6 +507,13 @@
     }
   );
 
+
+  $( "#clear_comment").click(
+    function() {
+      $( "#comment" ).val("");
+    }
+  );
+
   var cur_hash = null;
 
   highlight_comment = function() {
