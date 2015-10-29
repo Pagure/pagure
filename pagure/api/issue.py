@@ -82,7 +82,7 @@ def api_new_issue(repo, username=None):
     if form.validate_on_submit():
         title = form.title.data
         content = form.issue_content.data
-        private = form.private.data
+        private = str(form.private.data).lower() in ['true', '1']
 
         try:
             issue = pagure.lib.new_issue(
@@ -90,7 +90,7 @@ def api_new_issue(repo, username=None):
                 repo=repo,
                 title=title,
                 content=content,
-                private=private or False,
+                private=private,
                 user=flask.g.fas_user.username,
                 ticketfolder=APP.config['TICKETS_FOLDER'],
             )
