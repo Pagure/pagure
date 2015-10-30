@@ -23,8 +23,9 @@
           enctype="multipart/form-data">
 
   {% elif type and type == 'edit' %}
-      <form action="{{ url_for('.edit_issue', username=username,
-                       repo=repo.name, issueid=issueid) }}" method="post">
+    <form action="{{ url_for('.edit_issue', username=username,
+                       repo=repo.name, issueid=issueid) }}" method="post"
+          enctype="multipart/form-data">
   {% endif %}
 
     <table>

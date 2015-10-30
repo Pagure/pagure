@@ -621,11 +621,39 @@ def edit_issue(repo, issueid, username=None):
                 redis=REDIS,
             )
             SESSION.commit()
+
+            # If there is a file attached, attach it.
+            filestream = flask.request.files.get('filestream')
+            if filestream and '<!!image>' in issue.content:
+                new_filename = pagure.lib.git.add_file_to_git(
+                    repo=repo,
+                    issue=issue,
+                    ticketfolder=APP.config['TICKETS_FOLDER'],
+                    user=flask.g.fas_user,
+                    filename=filestream.filename,
+                    filestream=filestream.stream,
+                )
+                # Replace the <!!image> tag in the comment with the link
+                # to the actual image
+                filelocation = flask.url_for(
+                    'view_issue_raw_file',
+                    repo=repo.name,
+                    username=username,
+                    filename=new_filename,
+                )
+                new_filename = new_filename.split('-', 1)[1]
+                url = '[![%s](%s)](%s)' % (
+                    new_filename, filelocation, filelocation)
+                issue.content = issue.content.replace('<!!image>', url)
+                SESSION.add(issue)
+                SESSION.commit()
             flask.flash(message)
             url = flask.url_for(
                 'view_issue', username=username,
                 repo=repo.name, issueid=issueid)
             return flask.redirect(url)
+        except pagure.exceptions.PagureException, err:
+            flask.flash(str(err), 'error')
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')
