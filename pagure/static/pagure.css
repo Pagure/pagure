@@ -901,11 +901,11 @@ ul.changes {
 }
 
 #tabs {
-    width: 550px;
+    width: 98%;
 }
 
 #tabs textarea {
-    width: 500px;
+    width: 100%;
 }
 
 table.sortable th:not(.sorttable_sorted):not(.sorttable_sorted_reverse):not(.sorttable_nosort):after {
