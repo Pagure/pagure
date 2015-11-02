@@ -851,7 +851,7 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
     if not is_repo_admin(repo):
         form = None
 
-    if len(diff_commits) and form:
+    if len(diff_commits) == 1 and form:
         form.title.data=diff_commits[0].message.strip().split('\n')[0]
 
     return flask.render_template(
