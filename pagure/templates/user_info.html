@@ -22,17 +22,17 @@
         {% endif %}
 
     </h2>
-    {{ repos_switch(False) }}
+    {{ repos_switch(False, hide=False) }}
     <p title="{{ user.created.strftime('%Y-%m-%d') }}">
       Joined {{ user.created | humanize }}
     </p>
 
     {{ render_repos(
             repos, total_page_repos, 'repopage', repopage,
-            'Projects', repos_length, 'repos') }}
+            'Projects', repos_length, 'repos', hide=False) }}
     {{ render_repos(
             forks, total_page_forks, 'forkpage', forkpage,
-            'Forks', forks_length, 'forks') }}
+            'Forks', forks_length, 'forks', hide=False) }}
     <section class="project_list" id="group_list">
         <header>
             <h2>Groups ({{ user.groups | length }})</h2>

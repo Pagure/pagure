@@ -33,9 +33,9 @@
 
 
 {% macro render_repos(
-        list, total, pagetitle, page, title, count, id, username=None) %}
+        list, total, pagetitle, page, title, count, id, username=None, hide=True) %}
     <section class="project_list" id="{{ id }}"{%
-        if g.fas_user and id in config.get('SHOW_PROJECTS_INDEX', [])
+        if g.fas_user and id in config.get('SHOW_PROJECTS_INDEX', []) and hide
         %} style="display:none;" {% endif %}>
         <header>
             {% set title_lvl = 3 if username else 2 %}
@@ -75,7 +75,7 @@
 {% endmacro %}
 
 
-{% macro repos_switch(all = True) %}
+{% macro repos_switch(all=True, hide=True) %}
     <aside class="show_parts">
         <div class="container">
         <strong>
@@ -85,7 +85,7 @@
             <label class="switch">
                 <input type="checkbox" class="switch-input"
                     name="{% if all %}my{% endif %}repos" {%
-                    if 'myrepos' not in config.get('SHOW_PROJECTS_INDEX', [])
+                    if 'myrepos' not in config.get('SHOW_PROJECTS_INDEX', []) and not hide
                     %} checked {% endif %}/>
                 <span class="switch-label" data-on="On" data-off="Off"></span>
                 <span class="switch-handle"></span>
@@ -94,7 +94,7 @@
             <label class="switch">
                 <input type="checkbox" class="switch-input"
                     name="{% if all %}my{% endif %}forks" {%
-                    if 'myforks' not in config.get('SHOW_PROJECTS_INDEX', [])
+                    if 'myforks' not in config.get('SHOW_PROJECTS_INDEX', []) and not hide
                     %} checked {% endif %}/>
                 <span class="switch-label" data-on="On" data-off="Off"></span>
                 <span class="switch-handle"></span>
@@ -104,7 +104,7 @@
             <label class="switch">
                 <input type="checkbox" class="switch-input"
                     name="repos" id="allrepos" {%
-                    if 'repos' not in config.get('SHOW_PROJECTS_INDEX', [])
+                    if 'repos' not in config.get('SHOW_PROJECTS_INDEX', []) and not hide
                     %} checked {% endif %}/>
                 <span class="switch-label" data-on="On" data-off="Off"></span>
                 <span class="switch-handle"></span>
