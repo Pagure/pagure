@@ -53,7 +53,7 @@
   {% endif %}
   {% if pull_request.status != 'Open' %}
     <li>
-      <span class="error">{{ pull_request.status }} by
+      <span>{{ pull_request.status }} by
         <a href="{{ url_for('view_user', username=pull_request.closed_by.user)}} ">
           {{ pull_request.closed_by.user if pull_request.closed_by else ''}}
         </a>
