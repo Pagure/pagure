@@ -260,6 +260,11 @@ def view_commits(repo, branchname=None, username=None):
     else:
         branch = None
 
+    if not repo_obj.is_empty and not repo_obj.head_is_unborn:
+        head = repo_obj.head.shorthand
+    else:
+        head = None
+
     try:
         page = int(flask.request.args.get('page', 1))
     except ValueError:
@@ -328,6 +333,7 @@ def view_commits(repo, branchname=None, username=None):
         repo_obj=repo_obj,
         repo=repo,
         username=username,
+        head=head,
         branches=sorted(repo_obj.listall_branches()),
         branchname=branchname,
         last_commits=last_commits,
