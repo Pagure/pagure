@@ -480,7 +480,7 @@ class PagureFlaskForktests(tests.Modeltests):
                 '<title>PR#1: PR from the feature branch - test - '
                 'Pagure</title>', output.data)
         self.assertIn(
-            '<span class="error">Merged by', output.data)
+            '<span>Merged by', output.data)
         self.assertIn(
             'title="View file as of 2a552b">View</a>', output.data)
 
