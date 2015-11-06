@@ -1182,6 +1182,12 @@ def fork_project(session, user, repo, gitfolder,
             continue
         frepo.create_branch(name, frepo.get(br.target.hex))
 
+    # Create the git-daemin-export-ok file on the clone
+    http_clone_file = os.path.join(forkreponame, 'git-daemon-export-ok')
+    if not os.path.exists(http_clone_file):
+        with open(http_clone_file, 'w') as stream:
+            pass
+
     docrepo = os.path.join(docfolder, project.path)
     if os.path.exists(docrepo):
         shutil.rmtree(forkreponame)
