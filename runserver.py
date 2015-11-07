@@ -28,6 +28,8 @@ parser.add_argument(
 
 args = parser.parse_args()
 
+from pagure import APP
+
 if args.profile:
     from werkzeug.contrib.profiler import ProfilerMiddleware
     APP.config['PROFILE'] = True
@@ -36,7 +38,5 @@ if args.profile:
 if args.config:
     os.environ['PAGURE_CONFIG'] = args.config
 
-
-from pagure import APP
 APP.debug = True
 APP.run(port=int(args.port))
