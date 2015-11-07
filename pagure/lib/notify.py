@@ -11,24 +11,19 @@ pagure notifications.
 
 import datetime
 import hashlib
-import hmac
 import json
 import urlparse
 import smtplib
-import six
 import time
-import uuid
 import warnings
 
 import flask
 import requests
+import six
 import pagure
 
 from email.mime.text import MIMEText
-from kitchen.text.converters import to_bytes
 
-
-_i = 0
 
 REPLY_MSG = 'To reply, visit the link below'
 if pagure.APP.config['EVENTSOURCE_SOURCE']:
@@ -49,53 +44,12 @@ def fedmsg_publish(*args, **kwargs):  # pragma: no cover
         warnings.warn(str(err))
 
 
-def log(project, topic, msg):
+def log(project, topic, msg, redis=None):
     ''' This is the place where we send notifications to user about actions
     occuring in pagure.
     '''
     # Send fedmsg notification (if fedmsg is there and set-up)
     fedmsg_publish(topic, msg)
-
-    # Send web-hooks notification
-    if not isinstance(project, basestring) \
-            and project.settings.get('Web-hooks'):  # pragma: no cover
-        global _i
-        _i += 1
-        year = datetime.datetime.now().year
-        if isinstance(topic, six.text_type):
-            topic = to_bytes(topic, encoding='utf8', nonstring="passthru")
-        msg = dict(
-            topic=topic.decode('utf-8'),
-            msg=msg,
-            timestamp=int(time.time()),
-            msg_id=str(year) + '-' + str(uuid.uuid4()),
-            i=_i,
-        )
-
-        content = json.dumps(msg)
-        hashhex = hmac.new(
-            str(project.hook_token), content, hashlib.sha1).hexdigest()
-        headers = {
-            'X-Pagure-Topic': topic,
-            'X-Pagure-Signature': hashhex
-        }
-        msg = flask.json.dumps(msg)
-        for url in project.settings.get('Web-hooks').split('\n'):
-            url = url.strip()
-            try:
-                req = requests.post(
-                    url,
-                    headers=headers,
-                    data={'payload': msg}
-                )
-                if not req:
-                    raise pagure.exceptions.PagureException(
-                        'An error occured while querying: %s - '
-                        'Error code: %s' % (url, req.status_code))
-            except (requests.exceptions.RequestException, Exception) as err:
-                raise pagure.exceptions.PagureException(
-                    'An error occured while querying: %s - Error: %s' % (
-                        url, err))
 
 
 def _clean_emails(emails, user):
