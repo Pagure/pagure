@@ -215,7 +215,8 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
                 issue=issue.to_json(public=True),
                 project=issue.project.to_json(public=True),
                 agent=user_obj.username,
-            )
+            ),
+            redis=redis,
         )
 
     if redis:
@@ -290,9 +291,11 @@ def add_tag_obj(session, obj, tags, user, ticketfolder, redis=None):
                     project=obj.project.to_json(public=True),
                     tags=added_tags,
                     agent=user_obj.username,
-                )
+                ),
+                redis=redis,
             )
 
+        # Send notification for the event-source server
         if redis:
             redis.publish(obj.uid, json.dumps({'added_tags': added_tags}))
 
@@ -323,9 +326,11 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder,
                     issue=issue.to_json(public=True),
                     project=issue.project.to_json(public=True),
                     agent=user_obj.username,
-                )
+                ),
+                redis=redis,
             )
 
+        # Send notification for the event-source server
         if redis:
             redis.publish(issue.uid, json.dumps({'unassigned': '-'}))
 
@@ -354,9 +359,11 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder,
                     issue=issue.to_json(public=True),
                     project=issue.project.to_json(public=True),
                     agent=user_obj.username,
-                )
+                ),
+                redis=redis,
             )
 
+        # Send notification for the event-source server
         if redis:
             redis.publish(issue.uid, json.dumps(
                 {'assigned': assignee_obj.to_json(public=True)}))
@@ -365,7 +372,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder,
 
 
 def add_pull_request_assignee(
-        session, request, assignee, user, requestfolder):
+        session, request, assignee, user, requestfolder, redis=None):
     ''' Add an assignee to a request, in other words, assigned an issue. '''
     __get_user(session, assignee)
     user_obj = __get_user(session, user)
@@ -385,7 +392,8 @@ def add_pull_request_assignee(
                 request=request.to_json(public=True),
                 project=request.project.to_json(public=True),
                 agent=user_obj.username,
-            )
+            ),
+            redis=redis,
         )
 
         return 'Request reset'
@@ -412,7 +420,8 @@ def add_pull_request_assignee(
                 request=request.to_json(public=True),
                 project=request.project.to_json(public=True),
                 agent=user_obj.username,
-            )
+            ),
+            redis=redis
         )
 
         return 'Request assigned'
@@ -457,9 +466,11 @@ def add_issue_dependency(
                     project=issue.project.to_json(public=True),
                     added_dependency=issue_blocked.id,
                     agent=user_obj.username,
-                )
+                ),
+                redis=redis
             )
 
+        # Send notification for the event-source server
         if redis:
             redis.publish(issue.uid, json.dumps({
                 'added_dependency': issue_blocked.id,
@@ -515,9 +526,11 @@ def remove_issue_dependency(
                     project=issue.project.to_json(public=True),
                     removed_dependency=child_del,
                     agent=user_obj.username,
-                )
+                ),
+                redis=redis
             )
 
+        # Send notification for the event-source server
         if redis:
             redis.publish(issue.uid, json.dumps({
                 'removed_dependency': child_del,
@@ -533,7 +546,7 @@ def remove_issue_dependency(
         return 'Dependency removed'
 
 
-def remove_tags(session, project, tags, ticketfolder, user):
+def remove_tags(session, project, tags, ticketfolder, user, redis=None):
     ''' Removes the specified tag of a project. '''
     user_obj = __get_user(session, user)
 
@@ -566,7 +579,8 @@ def remove_tags(session, project, tags, ticketfolder, user):
             project=project.to_json(public=True),
             tags=removed_tags,
             agent=user_obj.username,
-        )
+        ),
+        redis=redis
     )
 
     return msgs
@@ -599,9 +613,11 @@ def remove_tags_obj(
                 project=obj.project.to_json(public=True),
                 tags=removed_tags,
                 agent=user_obj.username,
-            )
+            ),
+            redis=redis
         )
 
+        # Send notification for the event-source server
         if redis:
             redis.publish(obj.uid, json.dumps(
                 {'removed_tags': removed_tags}))
@@ -609,7 +625,8 @@ def remove_tags_obj(
     return 'Removed tag: %s' % ', '.join(removed_tags)
 
 
-def edit_issue_tags(session, project, old_tag, new_tag, ticketfolder, user):
+def edit_issue_tags(session, project, old_tag, new_tag, ticketfolder, user,
+                    redis=None):
     ''' Removes the specified tag of a project. '''
     user_obj = __get_user(session, user)
 
@@ -668,13 +685,14 @@ def edit_issue_tags(session, project, old_tag, new_tag, ticketfolder, user):
                 old_tag=old_tag,
                 new_tag=new_tag,
                 agent=user_obj.username,
-            )
+            ),
+            redis=redis
         )
 
     return msgs
 
 
-def add_user_to_project(session, project, new_user, user):
+def add_user_to_project(session, project, new_user, user, redis=None):
     ''' Add a specified user to a specified project. '''
     new_user_obj = __get_user(session, new_user)
     user_obj = __get_user(session, user)
@@ -701,13 +719,14 @@ def add_user_to_project(session, project, new_user, user):
             project=project.to_json(public=True),
             new_user=new_user_obj.username,
             agent=user_obj.username,
-        )
+        ),
+        redis=redis,
     )
 
     return 'User added'
 
 
-def add_group_to_project(session, project, new_group, user):
+def add_group_to_project(session, project, new_group, user, redis=None):
     ''' Add a specified group to a specified project. '''
     group_obj = search_groups(session, group_name=new_group)
 
@@ -748,7 +767,8 @@ def add_group_to_project(session, project, new_group, user):
             project=project.to_json(public=True),
             new_group=group_obj.group_name,
             agent=user,
-        )
+        ),
+        redis=redis,
     )
 
     return 'Group added'
@@ -778,6 +798,7 @@ def add_pull_request_comment(session, request, commit, filename, row,
     if notify:
         pagure.lib.notify.notify_pull_request_comment(pr_comment, user_obj)
 
+    # Send notification for the event-source server
     if redis:
         redis.publish(request.uid, json.dumps({
             'request_id': len(request.comments),
@@ -796,14 +817,15 @@ def add_pull_request_comment(session, request, commit, filename, row,
         msg=dict(
             pullrequest=request.to_json(public=True),
             agent=user_obj.username,
-        )
+        ),
+        redis=redis,
     )
 
     return 'Comment added'
 
 
 def add_pull_request_flag(session, request, username, percent, comment, url,
-                          uid, user, requestfolder):
+                          uid, user, requestfolder, redis=None):
     ''' Add a flag to a pull-request. '''
     user_obj = __get_user(session, user)
 
@@ -838,7 +860,8 @@ def add_pull_request_flag(session, request, username, percent, comment, url,
             pullrequest=request.to_json(public=True),
             flag=pr_flag.to_json(public=True),
             agent=user_obj.username,
-        )
+        ),
+        redis=redis,
     )
 
     return 'Flag %s' % action
@@ -916,7 +939,7 @@ def new_project(session, user, name, blacklist,
         msg=dict(
             project=project.to_json(public=True),
             agent=user_obj.username,
-        )
+        ),
     )
 
     return 'Project "%s" created' % name
@@ -924,7 +947,7 @@ def new_project(session, user, name, blacklist,
 
 def new_issue(session, repo, title, content, user, ticketfolder,
               issue_id=None, issue_uid=None, private=False, status=None,
-              notify=True):
+              notify=True, redis=None):
     ''' Create a new issue for the specified repo. '''
     user_obj = __get_user(session, user)
 
@@ -959,13 +982,14 @@ def new_issue(session, repo, title, content, user, ticketfolder,
                 issue=issue.to_json(public=True),
                 project=issue.project.to_json(public=True),
                 agent=user_obj.username,
-            )
+            ),
+            redis=redis
         )
 
     return issue
 
 
-def drop_issue(session, issue, user, ticketfolder):
+def drop_issue(session, issue, user, ticketfolder, redis):
     ''' Delete a specified issue. '''
     user_obj = __get_user(session, user)
 
@@ -986,7 +1010,8 @@ def drop_issue(session, issue, user, ticketfolder):
                 issue=issue.to_json(public=True),
                 project=issue.project.to_json(public=True),
                 agent=user_obj.username,
-            )
+            ),
+            redis=redis,
         )
 
     return issue
@@ -996,7 +1021,7 @@ def new_pull_request(session, branch_from,
                      repo_to, branch_to, title, user,
                      requestfolder, repo_from=None, remote_git=None,
                      requestuid=None, requestid=None,
-                     status='Open', notify=True):
+                     status='Open', notify=True, redis=None):
     ''' Create a new pull request on the specified repo. '''
     if not repo_from and not remote_git:
         raise pagure.exceptions.PagureException(
@@ -1033,7 +1058,8 @@ def new_pull_request(session, branch_from,
         msg=dict(
             pullrequest=request.to_json(public=True),
             agent=user_obj.username,
-        )
+        ),
+        redis=redis,
     )
 
     return request
@@ -1079,7 +1105,8 @@ def edit_issue(session, issue, ticketfolder, user,
                 project=issue.project.to_json(public=True),
                 fields=edit,
                 agent=user_obj.username,
-            )
+            ),
+            redis=redis,
         )
 
     if redis and edit:
@@ -1100,7 +1127,7 @@ def edit_issue(session, issue, ticketfolder, user,
         return 'Successfully edited issue #%s' % issue.id
 
 
-def update_project_settings(session, repo, settings, user):
+def update_project_settings(session, repo, settings, user, redis=None):
     ''' Update the settings of a project. '''
     user_obj = __get_user(session, user)
 
@@ -1137,7 +1164,8 @@ def update_project_settings(session, repo, settings, user):
                 project=repo.to_json(public=True),
                 fields=update,
                 agent=user_obj.username,
-            )
+            ),
+            redis=redis,
         )
 
         return 'Edited successfully settings of repo: %s' % repo.fullname
@@ -1221,7 +1249,7 @@ def fork_project(session, user, repo, gitfolder,
         msg=dict(
             project=project.to_json(public=True),
             agent=user_obj.username,
-        )
+        ),
     )
 
     return 'Repo "%s" cloned to "%s/%s"' % (repo.name, user, repo.name)
@@ -1671,7 +1699,8 @@ def search_pull_requests(
     return output
 
 
-def close_pull_request(session, request, user, requestfolder, merged=True):
+def close_pull_request(session, request, user, requestfolder, merged=True,
+                       redis=None):
     ''' Close the provided pull-request.
     '''
     user_obj = __get_user(session, user)
@@ -1700,7 +1729,8 @@ def close_pull_request(session, request, user, requestfolder, merged=True):
             pullrequest=request.to_json(public=True),
             merged=merged,
             agent=user_obj.username,
-        )
+        ),
+        redis=redis,
     )
 
 
