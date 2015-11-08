@@ -20,7 +20,7 @@ Configure your system
     python-trollius
     python-trollius-redis
 
-..note:: We ship a systemd unit file for pagure_webhook but we welcome patches
+.. note:: We ship a systemd unit file for pagure_webhook but we welcome patches
         for scripts for other init systems.
 
 
@@ -30,9 +30,9 @@ Configure your system
 |              Source                          |                       Destination                        |
 +==============================================+==========================================================+
 | ``webhook-server/pagure-webhook-server.py``  | ``/usr/libexec/pagure-webhook/pagure-webhook-server.py`` |
-+----------------------------------------+----------------------------------------------------------------+
++----------------------------------------------+----------------------------------------------------------+
 | ``webhook-server/pagure_webhook.service``    | ``/etc/systemd/system/pagure_webhook.service``           |
-+--------------------------------------+------------------------------------------------------------------+
++----------------------------------------------+----------------------------------------------------------+
 
 The first file is the script of the web-hook server itself.
 

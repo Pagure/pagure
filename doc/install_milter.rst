@@ -18,10 +18,10 @@ Configure your system
 
     python-pymilter
 
-..note:: We ship a systemd unit file for pagure_milter but we welcome patches
+.. note:: We ship a systemd unit file for pagure_milter but we welcome patches
         for scripts for other init systems.
 
-..note:: It also requires a MTA, we used postfix.
+.. note:: It also requires a MTA, we used postfix.
 
 
 * Create an alias ``reply``
@@ -57,9 +57,9 @@ In postfix this is done via:
 |              Source                  |                   Destination                     |
 +======================================+===================================================+
 | ``milters/comment_email_milter.py``  | ``/usr/share//pagure/comment_email_milter.py``    |
-+----------------------------------------+-------------------------------------------------+
++--------------------------------------+---------------------------------------------------+
 | ``milters/milter_tempfile.conf``     | ``/usr/lib/tmpfiles.d/pagure-milter.conf``        |
-+----------------------------------------+-------------------------------------------------+
++--------------------------------------+---------------------------------------------------+
 | ``milters/pagure_milter.service``    | ``/etc/systemd/system/pagure_milter.service``     |
 +--------------------------------------+---------------------------------------------------+
 

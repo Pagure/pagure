@@ -25,6 +25,7 @@ So installing it is as easy as:
 or
 
 ::
+
     yum install pagure pagure-milters pagure-ev pagure-webhook
 
 The ``pagure`` package contains the core of the application and the doc server.
@@ -39,7 +40,7 @@ The ``pagure-ev`` package contains the eventsource server.
 The ``pagure-webhook`` package contains the web-hook server.
 
 
-..note:: The last three packages are optional, pagure would work fine without
+.. note:: The last three packages are optional, pagure would work fine without
         them.
 
 * From the sources
@@ -94,7 +95,7 @@ To install pagure via this mechanism simply follow these steps:
     python setup.py build
     sudo python setup.py install
 
-..note:: To install the eventsource server or the milter, refer to their
+.. note:: To install the eventsource server or the milter, refer to their
         respective documentations.
 
 # Install the additional files as follow:

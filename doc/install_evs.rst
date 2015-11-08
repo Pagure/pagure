@@ -19,7 +19,7 @@ The eventsource server is easy to set-up.
     python-trollius
     python-trollius-redis
 
-..note:: We ship a systemd unit file for pagure_milter but we welcome patches
+.. note:: We ship a systemd unit file for pagure_milter but we welcome patches
         for scripts for other init systems.
 
 
