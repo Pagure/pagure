@@ -986,6 +986,9 @@ def delete_repo(repo, username=None):
 def new_repo_hook_token(repo, username=None):
     """ Re-generate a hook token for the present project.
     """
+    if not pagure.APP.config.get('WEBHOOK', False):
+        flask.abort(404)
+
     if admin_session_timedout():
         flask.flash('Action canceled, try it again', 'error')
         url = flask.url_for(
