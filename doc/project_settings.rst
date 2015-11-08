@@ -85,8 +85,10 @@ To vote against a pull-request, use either:
 Web-hooks
 ---------
 
-Pagure supports sending notification about event happening on a project
-via [web-hooks|].
+Pagure offers the option of sending notification about event happening on a
+project via [web-hooks|https://en.wikipedia.org/wiki/Webhook]. This option
+is off by default and can be turned on for a pagure instance in its
+configuration file.
 
 The URL of the web-hooks can be entered in this field.
 
