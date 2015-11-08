@@ -124,14 +124,16 @@ SHORT_LENGTH = 6
 
 ### List of blacklisted project names that can conflicts for pagure's URLs
 ### or other
-BLACKLISTED_PROJECTS = ['static', 'pv']
+BLACKLISTED_PROJECTS = [
+    'static', 'pv', 'releases', 'new', 'api', 'settings',
+    'logout', 'login', 'users', 'groups']
 
 ### IP addresses allowed to access the internal endpoints
 ### These endpoints are used by the milter and are security sensitive, thus
 ### the IP filter
 IP_ALLOWED_INTERNAL = ['127.0.0.1', 'localhost', '::1']
 
-### EventSource/Redis configuration
+### EventSource/Web-Hook/Redis configuration
 # The eventsource integration is what allows pagure to refresh the content
 # on your page when someone else comments on the ticket (and this without
 # asking you to reload the page.
@@ -140,9 +142,6 @@ IP_ALLOWED_INTERNAL = ['127.0.0.1', 'localhost', '::1']
 # https://ev.pagure.io or https://pagure.io:8080 or whatever you are using
 # (Note: the urls sent to it start with a '/' so no need to add one yourself)
 EVENTSOURCE_SOURCE = None
-REDIS_HOST = '0.0.0.0'
-REDIS_PORT = 6379
-REDIS_DB = 0
 # Port where the event source server is running (maybe be the same port
 # as the one specified in EVENTSOURCE_SOURCE or a different one if you
 # have something running in front of the server such as apache or stunnel).
@@ -151,6 +150,16 @@ EVENTSOURCE_PORT = 8080
 # at this port and will provide information about the number of active
 # connections running on the first (main) event source server
 #EV_STATS_PORT = 8888
+# Web-hook can be turned on or off allowing using them for notifications, or
+# not.
+WEBHOOK = False
+
+### Redis configuration
+# A redis server is required for both the Event-Source server or the web-hook
+# server.
+REDIS_HOST = '0.0.0.0'
+REDIS_PORT = 6379
+REDIS_DB = 0
 
 # Authentication related configuration option
 
