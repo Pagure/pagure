@@ -20,12 +20,12 @@ its derivative via the `EPEL repository <https://fedoraproject.org/wiki/EPEL>`.
 So installing it is as easy as:
 ::
 
-    dnf install pagure pagure-milters pagure-ev
+    dnf install pagure pagure-milters pagure-ev pagure-webhook
 
 or
 
 ::
-    yum install pagure pagure-milters pagure-ev
+    yum install pagure pagure-milters pagure-ev pagure-webhook
 
 The ``pagure`` package contains the core of the application and the doc server.
 (See the ``Overview`` page for a global overview of the structure of the
@@ -36,7 +36,10 @@ mail filter to hook into a MTA).
 
 The ``pagure-ev`` package contains the eventsource server.
 
-..note:: The last two packages are optional, pagure would work fine without
+The ``pagure-webhook`` package contains the web-hook server.
+
+
+..note:: The last three packages are optional, pagure would work fine without
         them.
 
 * From the sources
