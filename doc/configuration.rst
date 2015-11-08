@@ -239,6 +239,28 @@ This configuration key indicates the port at which the EventSource server is
 running. This allows adjusting the port via the configuration file instead
 of hard-coding it in the code.
 
+.. note:: The EventSource server requires a redis server (see ``Redis options``
+         below)
+
+
+Web-hooks notifications
+-----------------------
+
+WEBHOOK
+~~~~~~~
+
+This configuration key allows turning on or off web-hooks notifications for
+this pagure instance.
+
+Defaults to: ``False``.
+
+.. note:: The Web-hooks server requires a redis server (see ``Redis options``
+         below)
+
+
+Redis options
+-------------
+
 REDIS_HOST
 ~~~~~~~~~~
 
