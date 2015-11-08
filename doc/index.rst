@@ -33,6 +33,7 @@ Contents:
    install
    install_milter
    install_evs
+   install_webhooks
    configuration
    development
    contributing
