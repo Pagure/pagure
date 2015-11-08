@@ -68,6 +68,8 @@
     <input type="submit" value="Make Default"/>
   </form>
   </div>
+
+  {% if config.get('WEBHOOK') %}
   <div>
     <h3>Private web-hook key</h3>
     <p>
@@ -95,6 +97,7 @@
     {{ form.csrf_token }}
   </form>
   </div>
+  {% endif %}
 
   <div>
     <h3>API key</h3>
@@ -169,6 +172,7 @@
     {% for key in repo.settings | sort %}
     {% if not config.get('ENABLE_TICKETS', True) and key in ['issue_tracker'] %}
     {% elif not config.get('DOC_APP_URL') and key in ['project_documentation'] %}
+    {% elif not config.get('WEBHOOK') and key in ['Web-hooks'] %}
     {% else %}
     <tr>
       <td><label for="{{ key }}">Activate {{ key | replace('_', ' ') }}</label></td>
