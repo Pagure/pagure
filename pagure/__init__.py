@@ -58,7 +58,7 @@ import pagure.login_forms
 FAS = FAS(APP)
 SESSION = pagure.lib.create_session(APP.config['DB_URL'])
 REDIS = None
-if APP.config['EVENTSOURCE_SOURCE']:
+if APP.config['EVENTSOURCE_SOURCE'] or APP.config['WEBHOOK']:
     POOL = redis.ConnectionPool(
         host=APP.config['REDIS_HOST'],
         port=APP.config['REDIS_PORT'],
