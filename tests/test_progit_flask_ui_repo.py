@@ -1520,6 +1520,7 @@ index 0000000..fb7093d
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
+            pagure.APP.config['WEBHOOK'] = True
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<h2>New project</h2>' in output.data)
@@ -1538,11 +1539,14 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 302)
             ast.return_value = False
 
+            pagure.APP.config['WEBHOOK'] = False
+
         repo = pagure.lib.get_project(self.session, 'test')
         self.assertEqual(repo.hook_token, 'aaabbbccc')
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
+            pagure.APP.config['WEBHOOK'] = True
             output = self.app.post('/test/hook_token')
             self.assertEqual(output.status_code, 400)
 
@@ -1558,6 +1562,7 @@ index 0000000..fb7093d
             self.assertIn(
                 '<li class="message">New hook token generated</li>',
                 output.data)
+            pagure.APP.config['WEBHOOK'] = False
 
         repo = pagure.lib.get_project(self.session, 'test')
         self.assertNotEqual(repo.hook_token, 'aaabbbccc')
