@@ -989,7 +989,7 @@ def new_issue(session, repo, title, content, user, ticketfolder,
     return issue
 
 
-def drop_issue(session, issue, user, ticketfolder, redis):
+def drop_issue(session, issue, user, ticketfolder, redis=None):
     ''' Delete a specified issue. '''
     user_obj = __get_user(session, user)
 
