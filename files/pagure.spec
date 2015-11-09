@@ -80,6 +80,7 @@ Currently, Pagure offers a web-interface for git repositories, a ticket
 system and possibilities to create new projects, fork existing ones and
 create/merge pull-requests across or within projects.
 
+
 %package milters
 Summary:            Milter to integrate pagure with emails
 BuildArch:          noarch
@@ -91,8 +92,6 @@ Requires(postun):   systemd
 # It would work with sendmail but we configure things (like the tempfile)
 # to work with postfix
 Requires:           postfix
-
-
 %description milters
 Milters (Mail filters) allowing the integration of pagure and emails.
 This is useful for example to allow commenting on a ticket by email.
@@ -111,7 +110,23 @@ Requires(preun): systemd
 Requires(postun): systemd
 %description ev
 Pagure comes with an eventsource server allowing live update of the pages
-supporting it. This packages provides it.
+supporting it. This package provides it.
+
+
+%package webhook
+Summary:   Web-Hook server for pagure
+BuildArch: noarch
+
+BuildRequires:      systemd-devel
+Requires:  python-redis
+Requires:  python-trollius
+Requires:  python-trollius-redis
+Requires(post): systemd
+Requires(preun): systemd
+Requires(postun): systemd
+%description ev
+Pagure comes with an webhook server allowing http callbacks for any action
+done on a project. This package provides it.
 
 
 %prep
@@ -165,21 +180,33 @@ install -m 755 ev-server/pagure-stream-server.py \
 install -m 644 ev-server/pagure_ev.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_ev.service
 
+# Install the web-hook
+mkdir -p $RPM_BUILD_ROOT/%{_libexecdir}/pagure-webhook
+install -m 755 webhook-server/pagure-webhook-server.py \
+    $RPM_BUILD_ROOT/%{_libexecdir}/pagure-webhook/pagure-webhook-server.py
+install -m 644 webhook-server/pagure_webhook.service \
+    $RPM_BUILD_ROOT/%{_unitdir}/pagure_webhook.service
 
 %post milters
 %systemd_post pagure_milter.service
 %post ev
 %systemd_post pagure_ev.service
+%post webhook
+%systemd_post pagure_webhook.service
 
 %preun milters
 %systemd_preun pagure_milter.service
 %preun ev
 %systemd_preun pagure_ev.service
+%preun webhook
+%systemd_preun pagure_webhook.service
 
 %postun milters
 %systemd_postun_with_restart pagure_milter.service
 %postun ev
 %systemd_postun_with_restart pagure_ev.service
+%postun webhook
+%systemd_postun_with_restart pagure_webhook.service
 
 
 %files
@@ -209,6 +236,12 @@ install -m 644 ev-server/pagure_ev.service \
 %license LICENSE
 %{_libexecdir}/pagure-ev/
 %{_unitdir}/pagure_ev.service
+
+
+%files webhook
+%license LICENSE
+%{_libexecdir}/pagure-webhook/
+%{_unitdir}/pagure_webhook.service
 
 
 %changelog
