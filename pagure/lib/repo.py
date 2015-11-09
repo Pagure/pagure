@@ -31,7 +31,7 @@ class PagureRepo(pygit2.Repository):
     @staticmethod
     def push(remote, refname):
         """ Push the given reference to the specified remote. """
-        pygit2_version = pagure.lib.git.get_pygit2_version()
+        pygit2_version = get_pygit2_version()
         if pygit2_version >= (0, 22):
             remote.push([refname])
         else:
