@@ -32,13 +32,6 @@ from pagure.lib.repo import PagureRepo
 # pylint: disable=R0913,E1101,R0914
 
 
-def get_pygit2_version():
-    ''' Return pygit2 version as a tuple of integers.
-    This is needed for correct version comparison.
-    '''
-    return tuple([int(i) for i in pygit2.__version__.split('.')])
-
-
 def commit_to_patch(repo_obj, commits):
     ''' For a given commit (PyGit2 commit object) of a specified git repo,
     returns a string representation of the changes the commit did in a

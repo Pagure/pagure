@@ -13,7 +13,13 @@ import pygit2
 
 import pagure
 import pagure.exceptions
-import pagure.lib.git
+
+
+def get_pygit2_version():
+    ''' Return pygit2 version as a tuple of integers.
+    This is needed for correct version comparison.
+    '''
+    return tuple([int(i) for i in pygit2.__version__.split('.')])
 
 
 class PagureRepo(pygit2.Repository):
