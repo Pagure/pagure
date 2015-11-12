@@ -51,6 +51,15 @@ def log(project, topic, msg, redis=None):
     # Send fedmsg notification (if fedmsg is there and set-up)
     fedmsg_publish(topic, msg)
 
+    if redis:
+        redis.publish(
+            'hook',
+            json.dumps({
+                'project': project.fullname,
+                'topic': topic,
+                'msg': msg,
+            }))
+
 
 def _clean_emails(emails, user):
     ''' Remove the email of the user doing the action if it is in the list.
