@@ -50,10 +50,9 @@ _i = 0
 
 def call_web_hooks(project, topic, msg):
     ''' Sends the web-hook notification. '''
-    log.info("Processing project %s - sending: %s" % (
-        project.fullname, topic)
-    )
-    log.debug('msg: %s' % msg)
+    log.info(
+        "Processing project: %s - topic: %s", project.fullname, topic)
+    log.debug('msg: %s', msg)
 
     # Send web-hooks notification
     global _i
@@ -110,7 +109,9 @@ def handle_client():
         # Inside a while loop, wait for incoming events.
         while True:
             reply = yield trollius.From(subscriber.next_published())
-            print(u'Received: ', repr(reply.value), u'on channel', reply.channel)
+            log.info(
+                'Received: %s on channel: %s',
+                repr(reply.value), reply.channel)
             data = json.loads(reply.value)
             username = None
             if '/' in data['project']:
@@ -119,6 +120,7 @@ def handle_client():
                 projectname = data['project']
             project = pagure.lib.get_project(
                 session=pagure.SESSION, name=projectname, user=username)
+            log.info('Got the project, going to the webhooks')
             call_web_hooks(project, data['topic'], data['msg'])
 
 
