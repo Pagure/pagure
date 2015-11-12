@@ -20,8 +20,7 @@ import pagure.exceptions
 import pagure.lib
 import pagure.lib.git
 import pagure.forms
-from pagure import (APP, REDIS, SESSION, LOG, cla_required,
-                    is_repo_admin)
+from pagure import (APP, SESSION, LOG, cla_required, is_repo_admin)
 
 
 # pylint: disable=E1101
@@ -445,7 +444,6 @@ def pull_request_add_comment(
                 comment=comment,
                 user=flask.g.fas_user.username,
                 requestfolder=APP.config['REQUESTS_FOLDER'],
-                redis=REDIS,
             )
             SESSION.commit()
             if not is_js:

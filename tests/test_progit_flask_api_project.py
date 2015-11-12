@@ -114,7 +114,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         # Adding a tag
         output = pagure.lib.update_tags(
             self.session, repo, 'infra', 'pingou',
-            ticketfolder=None, redis=None)
+            ticketfolder=None)
         self.assertEqual(output, ['Tag added: infra'])
 
         # Check after adding

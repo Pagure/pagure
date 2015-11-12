@@ -21,7 +21,7 @@ import mimetypes
 import pagure.doc_utils
 import pagure.lib
 import pagure.forms
-from pagure import (APP, SESSION, REDIS, LOG, __get_file_in_tree,
+from pagure import (APP, SESSION, LOG, __get_file_in_tree,
                     cla_required, is_repo_admin, authenticated)
 
 
@@ -135,7 +135,6 @@ def update_issue(repo, issueid, username=None):
                     comment=comment,
                     user=flask.g.fas_user.username,
                     ticketfolder=APP.config['TICKETS_FOLDER'],
-                    redis=REDIS,
                 )
                 SESSION.commit()
                 if message and not is_js:
@@ -146,8 +145,8 @@ def update_issue(repo, issueid, username=None):
                 messages = pagure.lib.update_tags(
                     SESSION, issue, tags,
                     username=flask.g.fas_user.username,
-                    ticketfolder=APP.config['TICKETS_FOLDER'],
-                    redis=REDIS)
+                    ticketfolder=APP.config['TICKETS_FOLDER']
+                )
                 if not is_js:
                     for message in messages:
                         flask.flash(message)
@@ -159,7 +158,6 @@ def update_issue(repo, issueid, username=None):
                 assignee=assignee or None,
                 user=flask.g.fas_user.username,
                 ticketfolder=APP.config['TICKETS_FOLDER'],
-                redis=REDIS,
             )
             if message and not is_js:
                 SESSION.commit()
@@ -175,7 +173,6 @@ def update_issue(repo, issueid, username=None):
                         private=issue.private,
                         user=flask.g.fas_user.username,
                         ticketfolder=APP.config['TICKETS_FOLDER'],
-                        redis=REDIS,
                     )
                     SESSION.commit()
                     if message:
@@ -186,7 +183,6 @@ def update_issue(repo, issueid, username=None):
                 SESSION, repo, issue, depends,
                 username=flask.g.fas_user.username,
                 ticketfolder=APP.config['TICKETS_FOLDER'],
-                redis=REDIS,
             )
             if not is_js:
                 for message in messages:
@@ -197,7 +193,6 @@ def update_issue(repo, issueid, username=None):
                 SESSION, repo, issue, blocks,
                 username=flask.g.fas_user.username,
                 ticketfolder=APP.config['TICKETS_FOLDER'],
-                redis=REDIS,
             )
             if not is_js:
                 for message in messages:
@@ -618,7 +613,6 @@ def edit_issue(repo, issueid, username=None):
                 user=flask.g.fas_user.username,
                 ticketfolder=APP.config['TICKETS_FOLDER'],
                 private=private,
-                redis=REDIS,
             )
             SESSION.commit()
 

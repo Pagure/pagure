@@ -399,7 +399,7 @@ def get_project_from_json(
         if tags:
             pagure.lib.add_tag_obj(
                 session, project, tags=tags, user=user.username,
-                ticketfolder=None, redis=None)
+                ticketfolder=None)
 
     return project
 

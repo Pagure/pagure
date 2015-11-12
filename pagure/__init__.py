@@ -25,7 +25,6 @@ from logging.handlers import SMTPHandler
 
 import flask
 import pygit2
-import redis
 import werkzeug
 from pagure.flask_fas_openid import FAS
 from functools import wraps
@@ -59,11 +58,11 @@ FAS = FAS(APP)
 SESSION = pagure.lib.create_session(APP.config['DB_URL'])
 REDIS = None
 if APP.config['EVENTSOURCE_SOURCE'] or APP.config['WEBHOOK']:
-    POOL = redis.ConnectionPool(
+    pagure.lib.set_redis(
         host=APP.config['REDIS_HOST'],
         port=APP.config['REDIS_PORT'],
-        db=APP.config['REDIS_DB'])
-    REDIS = redis.StrictRedis(connection_pool=POOL)
+        db=APP.config['REDIS_DB']
+    )
 
 if not APP.debug:
     APP.logger.addHandler(pagure.mail_logging.get_mail_handler(
