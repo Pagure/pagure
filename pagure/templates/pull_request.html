@@ -73,7 +73,7 @@
       >tree</a>)</h2>
 {% endif %}
 
-{% if form and repo_admin %}
+{% if form and (repo_admin or remote_git) %}
 <section class="new_project">
   {% if remote_git %}
   <form action="{{ url_for('.new_remote_request_pull', username=username,
