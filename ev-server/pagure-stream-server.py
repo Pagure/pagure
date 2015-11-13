@@ -220,7 +220,7 @@ def main():
     if pagure.APP.config.get('EV_STATS_PORT'):
         stats_server.close()
     log.info("End Connection")
-    loop.run_until_complete(server.wait_closed())
+    loop.run_until_complete(SERVER.wait_closed())
     loop.close()
     log.info("End")
 
