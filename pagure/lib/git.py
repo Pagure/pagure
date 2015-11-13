@@ -946,7 +946,7 @@ def merge_pull_request(
 
     # Update the start and stop commits in the DB, one last time
     diff_commits = diff_pull_request(
-        session, request, PagureRepo(parentpath), fork_obj,
+        session, request, fork_obj, PagureRepo(parentpath),
         requestfolder=request_folder, with_diff=False)[0]
 
     if request.project.settings.get(
