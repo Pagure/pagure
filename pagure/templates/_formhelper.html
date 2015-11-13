@@ -80,6 +80,9 @@
         {% if id != 0 and g.fas_user and (
             (comment.parent.status in [True, 'Open'] and g.fas_user.username == comment.user.username)
             or repo_admin) %}
+        <button type="submit" name="edit_comment" value="{{ comment.id }}">
+                <span class="icon icon-edit blue"></span>
+        </button>
         <button type="submit" name="drop_comment" value="{{ comment.id }}"
             onclick="return confirm('Do you really want to remove this comment?');"
             title="Remove comment">

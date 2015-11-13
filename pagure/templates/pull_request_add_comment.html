@@ -1,0 +1,14 @@
+<section class="add_comment">
+  <form action="{{ url_for(
+    'pull_request_drop_comment', username=username, repo=repo.name,
+    requestid=requestid, commentid=comment.id) }}"
+    method="post">
+    <div>
+            <textarea id="comment" name="comment" title="comment" value="Comment">{{ comment.comment }}</textarea>
+
+    </div>
+  {{ form.csrf_token }}
+  <input type="submit" class="submit positive button" value="Comment">
+  <input type="button" class="cancel" value="Cancel">
+  </form>
+</section>
