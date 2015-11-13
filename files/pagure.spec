@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.31
+Version:        0.1.32
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -212,6 +212,28 @@ install -m 644 ev-server/pagure_ev.service \
 
 
 %changelog
+* Fri Nov 13 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.32-1
+- Update to 0.1.32
+- Fix the example configuration file
+- Make pagure work on MySQL
+- Hide sections on the front page only if the user is logged out
+- Fix the release page where sometime tags are commits
+- Escape the raw html in markdown
+- Decode the bytes returned by pygit2 to try to guess if the content is a text
+  or not
+- Fix the 'Clear' button on the pull-request page (farhaanbukhsh)
+- Fix installing pagure in a venv
+- Fix uploading images when editing the first comment of a ticket
+- Let the author of the merge commit be the user doing the merge
+- Suggest the title of the PR only if it has one and only one commit in
+- Do not hide sections on the user page if we set some to be hidden on the front
+  page
+- Forward the head to the commits page to fix the pull-request button
+- Ensure we create the git-daemon-export-ok when forking a repo (fixes cloning
+  over https)
+- Add instructions on how to get pagure working in a venv (Daniel Mach)
+- Improve the way we retrieve and check pygit2's version (Daniel Mach)
+
 * Tue Oct 13 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.31-1
 - Forward the bail_on_tree boolean when iterating so that we know how to behave
   when we run into a git tree (where we expected a git blob)
