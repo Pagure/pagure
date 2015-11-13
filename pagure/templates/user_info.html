@@ -27,6 +27,17 @@
       Joined {{ user.created | humanize }}
     </p>
 
+    {% if config.get('DATAGREPPER_URL') %}
+    <section class="project_list" id="user_graph">
+        <header>
+            <h2>Contributions</h2>
+        </header>
+        <a href="{{config.get('DATAGREPPER_URL')}}/raw?category=pagure&user={{username}}" target="_blank">
+          <img src="{{config.get('DATAGREPPER_URL')}}/charts/line?category=pagure&user={{username}}&split_on=users&delta=31536000&N=12&title=&width=600&height=200&style=light&fill=True" alt="User activity graph"/>
+        </a>
+    </section>
+    {% endif %}
+
     {{ render_repos(
             repos, total_page_repos, 'repopage', repopage,
             'Projects', repos_length, 'repos', hide=False) }}

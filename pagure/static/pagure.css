@@ -178,6 +178,10 @@ header h1 span {
     border-spacing: 1em;
 }
 
+#user_graph {
+    min-height: 400px;
+}
+
 .project_link {
     border: 1px solid #CCCCCC;
     border-radius: 5px 5px 5px 5px;

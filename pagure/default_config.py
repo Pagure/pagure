@@ -21,6 +21,9 @@ SECRET_KEY = '<insert here your own key>'
 # url to the database server:
 DB_URL = 'sqlite:////var/tmp/pagure_dev.sqlite'
 
+# url to datagrepper (optional):
+#DATAGREPPER_URL = 'https://apps.fedoraproject.org/datagrepper'
+
 # The FAS group in which the admin of pagure are
 ADMIN_GROUP = 'sysadmin-main'
 
