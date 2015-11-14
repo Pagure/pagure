@@ -16,6 +16,7 @@ import wtforms
 
 STRICT_REGEX = '^[a-zA-Z0-9-_]+$'
 TAGS_REGEX = '^[a-zA-Z0-9-_, .]+$'
+PROJECT_NAME_REGEX = '^[a-zA-z0-9_][a-zA-Z0-9-_]+$'
 
 
 class ProjectFormSimplified(wtf.Form):
@@ -44,7 +45,7 @@ class ProjectForm(ProjectFormSimplified):
         'Project name <span class="error">*</span>',
         [
             wtforms.validators.Required(),
-            wtforms.validators.Regexp(STRICT_REGEX, flags=re.IGNORECASE)
+            wtforms.validators.Regexp(PROJECT_NAME_REGEX, flags=re.IGNORECASE)
         ]
     )
 
@@ -343,6 +344,7 @@ class EditFileForm(wtf.Form):
             self.email.choices = [
                 (email.email, email.email) for email in kwargs['emails']
             ]
+
 
 class DefaultBranchForm(wtf.Form):
     """Form to change the default branh for a repository"""
