@@ -179,7 +179,7 @@ header h1 span {
 }
 
 #user_graph {
-    min-height: 400px;
+    min-height: 150px;
     background-image: url('images/spinner.gif');
     background-position: center;
     background-repeat: no-repeat;
