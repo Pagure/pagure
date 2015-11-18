@@ -300,10 +300,14 @@ def request_pull_patch(repo, requestid, username=None):
     diff_commits = []
     if request.status != 'Open':
         commitid = request.commit_stop
-        for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
-            diff_commits.append(commit)
-            if commit.oid.hex == request.commit_start:
-                break
+        try:
+            for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
+                diff_commits.append(commit)
+                if commit.oid.hex == request.commit_start:
+                    break
+        except KeyError:
+            # This happens when repo.walk() cannot find commitid
+            pass
     else:
         try:
             diff_commits = pagure.lib.git.diff_pull_request(
