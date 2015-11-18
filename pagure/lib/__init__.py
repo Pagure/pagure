@@ -1591,7 +1591,7 @@ def search_pull_requests(
     query = session.query(
         model.PullRequest
     ).order_by(
-        model.PullRequest.id
+        model.PullRequest.id.desc()
     )
 
     if requestid:
