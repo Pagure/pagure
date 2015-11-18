@@ -377,6 +377,9 @@ def view_file(repo, identifier, filename, username=None):
             commit = repo_obj[repo_obj.head.target]
             branchname = 'master'
 
+    if isinstance(commit, pygit2.Tag):
+        commit = commit.get_object()
+
     if commit and not isinstance(commit, pygit2.Blob):
         content = __get_file_in_tree(
             repo_obj, commit.tree, filename.split('/'), bail_on_tree=True)
@@ -473,6 +476,9 @@ def view_raw_file(repo, identifier, filename=None, username=None):
 
     if not commit:
         flask.abort(400, 'Commit %s not found' % (identifier))
+
+    if isinstance(commit, pygit2.Tag):
+        commit = commit.get_object()
 
     mimetype = None
     encoding = None
