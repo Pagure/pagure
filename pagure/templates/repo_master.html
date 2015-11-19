@@ -32,47 +32,44 @@
 
 </header>
 
-  <div class="horizontal-menu">
-    <ul>
-      <li {% if select == 'overview' %}class="selected" {% endif %}>
-        <a href="{{ url_for('view_repo', username=username,
+    <ul class="nav nav-tabs nav-justified">
+      <li class="nav-item">
+        <a {% if select == 'overview' %}class="nav-link active" {% else %}class="nav-link"{% endif %} href="{{ url_for('view_repo', username=username,
                     repo=repo.name) }}">Overview</a>
       </li>
 
       {% if config['DOC_APP_URL'] and repo and repo.settings.get('project_documentation', True) %}
-      <li {% if select == 'docs' %}class="selected" {% endif %}>
-        <a href="{{ url_for('.view_docs', username=username, repo=repo.name) }}">Docs</a>
+      <li class="nav-item" >
+        <a  {% if select == 'docs' %}class="active nav-link"  {% else %}class="nav-link"{% endif %} href="{{ url_for('.view_docs', username=username, repo=repo.name) }}">Docs</a>
       </li>
       {% endif %}
 
-      <li {% if select == 'logs' %}class="selected" {% endif %}>
-        <a href="{{ url_for('.view_commits', username=username,
+      <li class="nav-item">
+        <a {% if select == 'logs' %}class="active nav-link"  {% else %}class="nav-link"{% endif %} href="{{ url_for('.view_commits', username=username,
                    repo=repo.name, branchname=branchname) }}">Commits</a>
       </li>
 
-      <li {% if select == 'tree' %}class="selected" {% endif %}>
-        <a href="{{ url_for('.view_tree', username=username,
+      <li class="nav-item">
+        <a {% if select == 'tree' %}class="active nav-link"  {% else %}class="nav-link"{% endif %} href="{{ url_for('.view_tree', username=username,
                    repo=repo.name, identifier=branchname) }}">Tree</a>
       </li>
 
-      <li {% if select == 'tags' %}class="selected" {% endif %}>
-        <a href="{{ url_for('.view_tags', username=username,
+      <li class="nav-item">
+        <a {% if select == 'tags' %}class="active nav-link"  {% else %}class="nav-link"{% endif %} href="{{ url_for('.view_tags', username=username,
                    repo=repo.name) }}">Releases</a>
       </li>
 
       {% if config.get('ENABLE_TICKETS', True) and repo
             and repo.settings.get('issue_tracker', True) %}
-      <li {% if select == 'issues' %}class="selected" {% endif %}>
-          <a href="{{ url_for('.view_issues', username=username,
-                     repo=repo.name) }}">Issues ({{
-        repo.open_tickets if repo_admin else repo.open_tickets_public
-        }})</a>
+      <li class="nav-item">
+          <a {% if select == 'issues' %}class="active nav-link"  {% else %}class="nav-link"{% endif %} href="{{ url_for('.view_issues', username=username,
+                     repo=repo.name) }}">Issues <span class="label label-default label-pill">{{ repo.issues|count }}</span></a>
       </li>
       {% endif %}
 
       {% if repo and repo.settings.get('pull_requests', True) %}
-      <li {% if select == 'requests' %}class="selected" {% endif %}>
-        <a href="{{ url_for('.request_pulls', username=username,
+      <li class="nav-item">
+        <a {% if select == 'requests' %}class="active nav-link"  {% else %}class="nav-link"{% endif %} href="{{ url_for('.request_pulls', username=username,
                    repo=repo.name) }}">
           Pull-requests ({{repo.open_requests }})
         </a>
@@ -80,18 +77,15 @@
       {% endif %}
 
       {% if repo and repo.forks %}
-      <li {% if select == 'forks' %}class="selected" {% endif %}>
-        <a href="{{ url_for('.view_forks', username=username,
+      <li class="nav-item">
+        <a {% if select == 'forks' %}class="active nav-link"  {% else %}class="nav-link"{% endif %} href="{{ url_for('.view_forks', username=username,
                    repo=repo.name) }}">
         Forks ({{ repo.forks |length }})</a>
       </li>
       {% endif %}
-
-    </ul>
-    <ul class="right">
       {% if authenticated %}
       {% if not repo_admin %}
-      <li id="fork_button" {% if select == '' %}class="selected" {% endif %}>
+      <li id="fork_button" {% if select == '' %}class="active nav-item" {% endif %}>
         <form method="POST" name="fork_project"
           action="{{ url_for(
             '.fork_project', repo=repo.name, username=username) }}">
@@ -100,15 +94,14 @@
         </form>
       </li>
       {% else %}
-      <li id="settings_button" {% if select == 'settings' %}class="selected" {% endif %}>
-        <a href="{{ url_for(
+      <li class="nav-item">
+        <a {% if select == 'settings' %}class="active nav-link" {% else %}class="nav-link"{% endif %} href="{{ url_for(
             '.view_settings', repo=repo.name, username=username) }}">
           Settings</a>
       </li>
       {% endif %}
       {% endif %}
     </ul>
-  </div>
 {% block repo %}
 {% endblock %}
 
