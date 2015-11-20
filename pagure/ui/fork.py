@@ -31,10 +31,12 @@ def _get_parent_repo_path(repo):
     """ Return the path of the parent git repository corresponding to the
     provided Repository object from the DB.
     """
-    if repo.parent or repo.is_fork:
+    if repo.parent:
         parentpath = os.path.join(APP.config['GIT_FOLDER'], repo.parent.path)
         if repo.parent.is_fork:
             parentpath = os.path.join(APP.config['FORK_FOLDER'], repo.parent.path)
+    elif repo.is_fork:
+        parentpath = os.path.join(APP.config['FORK_FOLDER'], repo.path)
     else:
         parentpath = os.path.join(APP.config['GIT_FOLDER'], repo.path)
 
