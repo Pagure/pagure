@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.32
+Version:        0.1.33
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -212,6 +212,21 @@ install -m 644 ev-server/pagure_ev.service \
 
 
 %changelog
+* Fri Nov 20 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.33-1
+- Update to 0.1.33
+- Prevent project with a name starting with a non-alphanumerical character
+  (Farhaanbukhsh)
+- Ensure we appropriately set the private flag when creating an issue
+- Add an activity graph on the user profile using datagrepper
+- Sometime the identified we get is a Tag, not a commit (fixes traceback
+  received by email)
+- Order the PR from the most recent to the oldest
+- Fix the patch view of a PR when we cannot find one of the commit (fixes
+  traceback received by email)
+- Allow user that are not admin to create a remote pull-request
+- Fix closing the EV server by calling the appropriate variable
+- Fix generating the diff of remote pull-request
+
 * Fri Nov 13 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.32-1
 - Update to 0.1.32
 - Fix the example configuration file
