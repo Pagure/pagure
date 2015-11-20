@@ -393,7 +393,7 @@ def view_file(repo, identifier, filename, username=None):
         flask.abort(404, 'File not found')
 
     if isinstance(content, pygit2.Blob):
-        if content.is_binary or not pagure.lib.could_be_text(content.data):
+        if content.is_binary and not pagure.lib.could_be_text(content.data):
             ext = filename[filename.rfind('.'):]
             if ext in (
                     '.gif', '.png', '.bmp', '.tif', '.tiff', '.jpg',
@@ -409,16 +409,17 @@ def view_file(repo, identifier, filename, username=None):
             else:
                 output_type = 'binary'
         else:
+            file_content = content.data.decode('utf-8')
             try:
                 lexer = guess_lexer_for_filename(
                     filename,
-                    content.data
+                    file_content
                 )
             except (ClassNotFound, TypeError):
                 lexer = TextLexer()
 
             content = highlight(
-                content.data,
+                file_content,
                 lexer,
                 HtmlFormatter(
                     noclasses=True,
