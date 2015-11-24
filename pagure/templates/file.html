@@ -62,21 +62,35 @@
     {% endif %}
   </section>
   {% else %}
-  <section class="tree_list">
-  <h3>Tree</h3>
-  <ul>
-    {% for entry in content %}
-    <li class="{% if entry.filemode == 16384 %}folder{% else %}file{% endif %}">
-      <a href="{{ url_for('view_file', username=username,
-                repo=repo.name, identifier=branchname,
-                filename=filename + '/' + entry.name if filename else entry.name) }}">
-        {{ entry.name }}
-        <span class="filehex">{{ entry.hex|short }}</span>
-        </a>
-    </li>
-    {% endfor %}
-  </ul>
-  </section>
+    <div class="card">
+      <div class="card-header">
+        Current Tree
+      </div>
+      <div class="card-block p-a-0">
+          <table class="table table-sm">
+		<tbody>
+                    {% for entry in content %}
+		    <tr>
+		        <td class="pagure-table-icon">
+			    {% if entry.filemode == 16384 %}
+			        <span class="oi text-muted" data-glyph="folder"></span>
+			    {% else %}
+			        <span class="oi text-muted" data-glyph="file"></span>
+			    {% endif %}
+			</td>
+			<td class="pagure-table-filename table-expand-col">
+			    {% if entry.filemode == 16384 %}<strong>{% endif%}<a href="{{ url_for('view_file', username=username, repo=repo.name, identifier=branchname, filename=entry.name) }}">
+                               {{ entry.name }}
+                            </a>{% if entry.filemode == 16384 %}</strong>{% endif%}
+			</td>
+			<td class-"pagure-table-filehex">
+                            {{ entry.hex|short }}
+			</td>
+		    {% endfor %}
+		</tbody>
+	  </table>
+      </div>
+    </div>
   {% endif %}
 {% else %}
 No content found in this repository

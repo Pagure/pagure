@@ -216,6 +216,21 @@ def view_repo_branch(repo, branchname, username=None):
                 break
             diff_commits.append(commit.oid.hex)
 
+        readme = None
+        safe=False
+        tree=sorted(last_commits[0].tree, key=lambda x: x.filemode)
+        for i in tree:
+            name, ext = os.path.splitext(i.name)
+            if name == 'README':
+                content = __get_file_in_tree(
+                    repo_obj, last_commits[0].tree, [i.name]).data
+
+                readme, safe = pagure.doc_utils.convert_readme(
+                    content, ext,
+                    view_file_url=flask.url_for(
+                        'view_raw_file', username=username,
+                        repo=repo.name, identifier=branchname, filename=''))
+
     return flask.render_template(
         'repo_info.html',
         select='overview',
@@ -225,7 +240,9 @@ def view_repo_branch(repo, branchname, username=None):
         branches=sorted(repo_obj.listall_branches()),
         branchname=branchname,
         last_commits=last_commits,
-        tree=sorted(last_commits[0].tree, key=lambda x: x.filemode),
+        tree=tree,
+        safe=safe,
+        readme=readme,
         diff_commits=diff_commits,
         repo_admin=is_repo_admin(repo),
         form=pagure.forms.ConfirmationForm(),

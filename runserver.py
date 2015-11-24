@@ -39,4 +39,4 @@ if args.config:
     os.environ['PAGURE_CONFIG'] = args.config
 
 APP.debug = True
-APP.run(port=int(args.port))
+APP.run(host='0.0.0.0', port=int(args.port))

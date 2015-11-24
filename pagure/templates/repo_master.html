@@ -5,34 +5,51 @@
 
 
 {% block content %}
-<header class="repo{% if repo.is_fork %} forked{% endif %}">
-    <h2>
-        <a href="{{ url_for('view_repo', username=username, repo=repo.name)}}">
-            {{ repo.fullname }}
-        </a>
-        {% if branchname %} ({{ branchname }}) {% endif %}
-    </h2>
-    <span id="projectinfo">
-    {% if repo.description %}{{ repo.description | markdown |safe }}{% else %}-{% endif -%}
-    {%- if repo.url %} | <a class="inline" href="{{ repo.url }}">{{ repo.url }}</a>{% endif %}
-    </span>
+<div class="repo-header p-t">
+  <div class="container">
+    <header class="repo{% if repo.is_fork %} forked{% endif %}">
+        <h2>
+            <a href="{{ url_for('view_repo', username=username, repo=repo.name)}}">
+                {{ repo.fullname }}
+            </a>
+          {% if branchname %}
+            <div class="btn-group pull-right">
+              <button type="button" class="btn btn-info">{{ branchname }}</button>
+              <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="sr-only">Toggle Dropdown</span>
+              </button>
+              <div class="dropdown-menu">
+                {% for branch in branches %}
+                  <a class="dropdown-item" href="{{ url_for('view_repo_branch',
+                              username=username, repo=repo.name, branchname=branch) }}">
+                    {{ branch }}
+                  </a>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
 
-    {% if repo.is_fork %}
-    <aside id="parent">
-        Forked from
-        {% if repo.parent.is_fork %}
-        <a href="{{ url_for('view_repo', repo=repo.parent.name, username=repo.parent.user.user)}}">
-        {% else %}
-        <a href="{{ url_for('view_repo', repo=repo.parent.name)}}">
+        </h2>
+        <span id="projectinfo">
+        {% if repo.description %}{{ repo.description | markdown |safe }}{% else %}-{% endif -%}
+        {%- if repo.url %} | <a class="inline" href="{{ repo.url }}">{{ repo.url }}</a>{% endif %}
+        </span>
+
+        {% if repo.is_fork %}
+        <aside id="parent">
+            Forked from
+            {% if repo.parent.is_fork %}
+            <a href="{{ url_for('view_repo', repo=repo.parent.name, username=repo.parent.user.user)}}">
+            {% else %}
+            <a href="{{ url_for('view_repo', repo=repo.parent.name)}}">
+            {% endif %}
+                {{ repo.parent.fullname }}
+            </a>
+        </aside>
         {% endif %}
-            {{ repo.parent.fullname }}
-        </a>
-    </aside>
-    {% endif %}
 
-</header>
-
-    <ul class="nav nav-tabs nav-justified">
+    </header>
+    <ul class="nav nav-tabs nav-small">
       <li class="nav-item">
         <a {% if select == 'overview' %}class="nav-link active" {% else %}class="nav-link"{% endif %} href="{{ url_for('view_repo', username=username,
                     repo=repo.name) }}">Overview</a>
@@ -102,7 +119,10 @@
       {% endif %}
       {% endif %}
     </ul>
+  </div>
+</div>
+<div class="container p-t-lg">
 {% block repo %}
 {% endblock %}
-
+</div>
 {% endblock %}

@@ -9,33 +9,77 @@
 {% endblock %}
 
 {% block repo %}
+<div class="row">
+  <div class="col-md-8">
+    {% if readme %}
+      <section class="readme">
+        {% if safe %}
+          {{ readme | noJS |safe }}
+        {% else %}
+          {{ readme | noJS }}
+        {% endif %}
+      </section>
+    {% endif %}
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        Admins
+      </div>
+      <div class="card-block p-a-0">
+        <ul>
+          <li>
+            <a href="{{ url_for('view_user', username=repo.user.user)}}">
+              {{ repo.user.user | avatar(32) | safe }}
+              {{ repo.user.fullname }} ({{ repo.user.user }})  -  creator
+            </a>
+          </li>
+          {% for user in repo.users %}
+          <li>
+            <a href="{{ url_for('view_user', username=user.user)}}">
+              {{ user.user | avatar(32) | safe }}
+              {{ user.fullname }} ({{ user.user }})
+            </a>
+          </li>
+          {% endfor %}
+          {% for group in repo.groups %}
+          <li>
+            <a href="{{ url_for('view_group', group=group.group_name)}}">
+              @{{ group.group_name }}
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
 
-  <section class="admin_list">
-    <h3>Admins</h3>
-    <ul>
+    <div class="card">
+      <div class="card-header">
+        Recent Commits
+      </div>
+      <div class="card-block p-a-0">
+      {% for commit in last_commits %}
       <li>
-        <a href="{{ url_for('view_user', username=repo.user.user)}}">
-          {{ repo.user.user | avatar(32) | safe }}
-          {{ repo.user.fullname }} ({{ repo.user.user }})  -  creator
-        </a>
-      </li>
-      {% for user in repo.users %}
-      <li>
-        <a href="{{ url_for('view_user', username=user.user)}}">
-          {{ user.user | avatar(32) | safe }}
-          {{ user.fullname }} ({{ user.user }})
-        </a>
-      </li>
-      {% endfor %}
-      {% for group in repo.groups %}
-      <li>
-        <a href="{{ url_for('view_group', group=group.group_name)}}">
-          @{{ group.group_name }}
+        {{ commit.author | author2avatar(20) | safe }}
+        <a href="{{ url_for('view_commit', username=username,
+                repo=repo.name, commitid=commit.hex) }}">
+            <span class="commitid">{{ commit.hex|short }}</span>
+            {% if diff_commits and commit.oid.hex in diff_commits %}
+            <span class="new_commit" title="Commit not in the main repo">*</span>
+            {% endif %}
+            {{ commit.message.split('\n')[0] }}
+            <span class="commitdate" title="{{ commit.commit_time|format_ts }}">
+              {{ commit.commit_time|humanize }}
+            </span>
         </a>
       </li>
       {% endfor %}
-    </ul>
-  </section>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 
 {% if repo_obj and repo_obj.is_empty %}
 
@@ -113,24 +157,7 @@
   </table>
   {% endif %}
 
-  {% if tree %}
-    <section class="tree_list">
-      <h3>Current tree</h3>
-      <ul>
-        {% for entry in tree %}
-        <li class="{% if entry.filemode == 16384 %}folder{% else %}file{% endif %}">
-            <a href="{{ url_for('view_file', username=username,
-                      repo=repo.name, identifier=branchname, filename=entry.name) }}">
-                {{ entry.name }}
-                <span class="filehex" >{{ entry.hex|short }}</span>
-            </a>
-        </li>
-        {% endfor %}
-      </ul>
-    </section>
-  {% endif %}
-
-  <section class="commit_list">
+<!--  <section class="commit_list">
     {% if origin == 'view_commits' %}
     <h3>Commits list</h3>
     {% else %}
@@ -165,35 +192,7 @@
         </button>
     </form>
     {% endif %}
-    <ul>
-      {% for commit in last_commits %}
-      <li>
-        {{ commit.author | author2avatar(20) | safe }}
-        <a href="{{ url_for('view_commit', username=username,
-                repo=repo.name, commitid=commit.hex) }}">
-            <span class="commitid">{{ commit.hex|short }}</span>
-            {% if diff_commits and commit.oid.hex in diff_commits %}
-            <span class="new_commit" title="Commit not in the main repo">*</span>
-            {% endif %}
-            {{ commit.message.split('\n')[0] }}
-            <span class="commitdate" title="{{ commit.commit_time|format_ts }}">
-              {{ commit.commit_time|humanize }}
-            </span>
-        </a>
-      </li>
-      {% endfor %}
-    </ul>
-  </section>
-
-  {% if readme %}
-  <section class="readme">
-    {% if safe %}
-      {{ readme | noJS |safe }}
-    {% else %}
-      {{ readme | noJS }}
-    {% endif %}
-  </section>
-  {% endif %}
+  </section>-->
 
   <section class="git_links">
     <table>
