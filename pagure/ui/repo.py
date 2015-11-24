@@ -239,6 +239,7 @@ def view_repo_branch(repo, branchname, username=None):
         username=username,
         branches=sorted(repo_obj.listall_branches()),
         branchname=branchname,
+        origin='view_repo_branch',
         last_commits=last_commits,
         tree=tree,
         safe=safe,
@@ -341,12 +342,10 @@ def view_commits(repo, branchname=None, username=None):
                     break
                 diff_commits.append(commit.oid.hex)
 
-    origin = 'view_commits'
-
     return flask.render_template(
         'repo_info.html',
         select='logs',
-        origin=origin,
+        origin='view_commits',
         repo_obj=repo_obj,
         repo=repo,
         username=username,
@@ -450,7 +449,9 @@ def view_file(repo, identifier, filename, username=None):
         'file.html',
         select='tree',
         repo=repo,
+        origin='view_file',
         username=username,
+        branches=sorted(repo_obj.listall_branches()),
         branchname=branchname,
         filename=filename,
         content=content,

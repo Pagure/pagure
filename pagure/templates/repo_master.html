@@ -20,10 +20,22 @@
               </button>
               <div class="dropdown-menu">
                 {% for branch in branches %}
-                  <a class="dropdown-item" href="{{ url_for('view_repo_branch',
-                              username=username, repo=repo.name, branchname=branch) }}">
-                    {{ branch }}
-                  </a>
+                  {% if origin == 'view_commits' %}
+                    <a class="dropdown-item" href="{{ url_for('view_commits',
+                                username=username, repo=repo.name, branchname=branch) }}">
+                      {{ branch }}
+                    </a>
+                  {% elif origin == 'view_repo_branch' %}
+                    <a class="dropdown-item" href="{{ url_for('view_repo_branch',
+                                username=username, repo=repo.name, branchname=branch) }}">
+                      {{ branch }}
+                    </a>
+                  {% elif origin == 'view_file' %}
+                    <a class="dropdown-item" href="{{ url_for('view_file',
+                                username=username, repo=repo.name, branchname=branch) }}">
+                      {{ branch }}
+                    </a>
+                  {% endif %}
                 {% endfor %}
               </div>
             </div>
@@ -51,8 +63,7 @@
     </header>
     <ul class="nav nav-tabs nav-small">
       <li class="nav-item">
-        <a {% if select == 'overview' %}class="nav-link active" {% else %}class="nav-link"{% endif %} href="{{ url_for('view_repo', username=username,
-                    repo=repo.name) }}">Overview</a>
+        <a {% if select == 'overview' %}class="nav-link active" {% else %}class="nav-link"{% endif %} href="{{ url_for('view_repo',username=username, repo=repo.name) }}">Overview</a>
       </li>
 
       {% if config['DOC_APP_URL'] and repo and repo.settings.get('project_documentation', True) %}
