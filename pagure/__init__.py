@@ -321,7 +321,10 @@ def __get_file_in_tree(repo_obj, tree, filepath, bail_on_tree=False):
     for entry in tree:
         if entry.name == filename:
             if len(filepath) == 1:
-                blob = repo_obj[entry.oid]
+                blob = repo_obj.get(entry.id)
+                # If we can't get the content (for example: an empty folder)
+                if blob is None:
+                    return
                 # If we get a tree instead of a blob, let's escape
                 if isinstance(blob, pygit2.Tree) and bail_on_tree:
                     return blob
@@ -340,8 +343,12 @@ def __get_file_in_tree(repo_obj, tree, filepath, bail_on_tree=False):
 
                 return blob
             else:
+                nextitem = repo_obj[entry.oid]
+                # If we can't get the content (for example: an empty folder)
+                if nextitem is None:
+                    return
                 return __get_file_in_tree(
-                    repo_obj, repo_obj[entry.oid], filepath[1:],
+                    repo_obj, nextitem, filepath[1:],
                     bail_on_tree=bail_on_tree)
 
 
