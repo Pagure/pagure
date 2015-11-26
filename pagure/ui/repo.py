@@ -393,22 +393,19 @@ def view_file(repo, identifier, filename, username=None):
         flask.abort(404, 'File not found')
 
     if isinstance(content, pygit2.Blob):
-        if content.is_binary and not pagure.lib.could_be_text(content.data):
-            ext = filename[filename.rfind('.'):]
-            if ext in (
-                    '.gif', '.png', '.bmp', '.tif', '.tiff', '.jpg',
-                    '.jpeg', '.ppm', '.pnm', '.pbm', '.pgm', '.webp', '.ico'):
-                try:
-                    Image.open(StringIO(content.data))
-                    output_type = 'image'
-                except IOError as err:
-                    LOG.debug(
-                        'Failed to load image %s, error: %s', filename, err
-                    )
-                    output_type = 'binary'
-            else:
+        ext = filename[filename.rfind('.'):]
+        if ext in (
+                '.gif', '.png', '.bmp', '.tif', '.tiff', '.jpg',
+                '.jpeg', '.ppm', '.pnm', '.pbm', '.pgm', '.webp', '.ico'):
+            try:
+                Image.open(StringIO(content.data))
+                output_type = 'image'
+            except IOError as err:
+                LOG.debug(
+                    'Failed to load image %s, error: %s', filename, err
+                )
                 output_type = 'binary'
-        else:
+        elif not content.is_binary and pagure.lib.could_be_text(content.data):
             file_content = content.data.decode('utf-8')
             try:
                 lexer = guess_lexer_for_filename(
@@ -426,6 +423,8 @@ def view_file(repo, identifier, filename, username=None):
                     style="tango",)
             )
             output_type = 'file'
+        else:
+            output_type = 'binary'
     else:
         content = sorted(content, key=lambda x: x.filemode)
         output_type = 'tree'
