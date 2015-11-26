@@ -457,7 +457,7 @@
       var nextid = rowid.replace('_' + row, '_' + (Number(row) + 1));
       var next_row = table.find('#' + nextid).parent().parent();
       {# If we're at the last row, we won't be able to find the next_row
-         that we therefore we need to add it manually #}
+         therefore we need to add it manually #}
       if (next_row.length == 0) {
         table.find("tr:last").after(
             '<tr><td><a id="' + nextid + '"></a></td></tr>');
