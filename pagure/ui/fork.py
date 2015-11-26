@@ -10,6 +10,7 @@
 
 import flask
 import os
+import datetime
 
 import pygit2
 from sqlalchemy.exc import SQLAlchemyError
@@ -366,7 +367,6 @@ def request_pull_edit(repo, requestid, username=None):
         flask.abort(403, 'You are not allowed to edit this pull-request')
 
     form = pagure.forms.RequestPullForm()
-
     if form.validate_on_submit():
         request.title = form.title.data
         SESSION.add(request)
@@ -531,6 +531,77 @@ def pull_request_drop_comment(repo, requestid, username=None):
     return flask.redirect(flask.url_for(
         'request_pull', username=username,
         repo=repo.name, requestid=requestid))
+
+
+@APP.route('/<repo>/pull-request/<int:requestid>/comment/<int:commentid>/edit',
+           methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/comment'
+           '/<int:commentid>/edit', methods=('GET', 'POST'))
+@cla_required
+def pull_request_edit_comment(repo, requestid, commentid, username=None):
+    """Edit comment of a pull request
+    """
+    project = pagure.lib.get_project(SESSION, repo, user=username)
+
+    if not project:
+        flask.abort(404, 'Project not found')
+
+    if not project.settings.get('pull_requests', True):
+        flask.abort(404, 'No pull-requests found for this project')
+
+    request = pagure.lib.search_pull_requests(
+        SESSION, project_id=project.id, requestid=requestid)
+
+    if not request:
+        flask.abort(404, 'Pull-request not found')
+
+    comment = pagure.lib.get_request_comment(
+        SESSION, request.uid, commentid)
+    if comment is None or comment.pull_request.project != project:
+        flask.abort(404, 'Comment not found')
+
+    if (flask.g.fas_user.username != comment.user.username
+            or comment.parent.status is False) \
+            and not is_repo_admin(project):
+        flask.abort(403,
+                    "You are not allowed to edit the comment")
+
+    form = pagure.forms.EditCommentForm()
+
+    if form.validate_on_submit():
+
+        updated_comment = form.update_comment.data
+        try:
+            message = pagure.lib.edit_pull_request_comment(
+                SESSION,
+                request=request,
+                comment=comment,
+                user=flask.g.fas_user.username,
+                updated_comment=updated_comment,
+                requestfolder=APP.config['REQUESTS_FOLDER'],
+                redis=REDIS,
+            )
+            SESSION.commit()
+            flask.flash(message)
+        except SQLAlchemyError, err:  # pragma: no cover
+            SESSION.rollback()
+            LOG.error(err)
+            flask.flash(
+                'Could not edit the comment: %s' % commentid, 'error')
+
+        return flask.redirect(flask.url_for(
+            'request_pull', username=username,
+            repo=project.name, requestid=requestid))
+
+    return flask.render_template(
+        'pull_request_comment_update.html',
+        select='requests',
+        requestid=requestid,
+        repo=project,
+        username=username,
+        form=form,
+        comment=comment
+    )
 
 
 @APP.route('/<repo>/pull-request/<int:requestid>/merge', methods=['POST'])

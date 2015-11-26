@@ -364,3 +364,11 @@ class DefaultBranchForm(wtf.Form):
             self.branches.choices = [
                 (branch, branch) for branch in kwargs['branches']
             ]
+
+class EditCommentForm(wtf.Form):
+    """ Form to verify that comment is not empty
+    """
+    update_comment = wtforms.TextAreaField(
+        'Comment<span class="error">*</span>',
+        [wtforms.validators.Required()]
+    )

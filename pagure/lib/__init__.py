@@ -834,6 +834,43 @@ def add_pull_request_comment(session, request, commit, filename, row,
     return 'Comment added'
 
 
+def edit_pull_request_comment(session, request, comment, user,
+                              updated_comment, requestfolder, redis):
+    '''Edit a comment in the pull request'''
+    user_obj = __get_user(session, user)
+    comment.comment = updated_comment
+    comment.edited_on = datetime.datetime.utcnow()
+    comment.editor = user_obj
+
+    session.add(comment)
+    # Make sure we won't have SQLAlchemy error before we continue
+    session.flush()
+
+    pagure.lib.git.update_git(
+        request, repo=request.project, repofolder=requestfolder)
+
+    pagure.lib.notify.log(
+        request.project,
+        topic='pull-request.comment.edited',
+        msg=dict(
+            pullrequest=request.to_json(public=True),
+            agent=user_obj.username,
+        )
+    )
+
+    if redis:
+        redis.publish(request.uid, json.dumps({
+            'request_id': len(request.comments),
+            'comment_updated': text2markdown(comment.comment),
+            'comment_id': comment.id,
+            'comment_editor': user_obj.user,
+            'avatar_url': avatar_url(comment.user.user, size=16),
+            'comment_date': comment.date_created.strftime('%Y-%m-%d %H:%M'),
+        }))
+
+    return "Comment updated"
+
+
 def add_pull_request_flag(session, request, username, percent, comment, url,
                           uid, user, requestfolder):
     ''' Add a flag to a pull-request. '''

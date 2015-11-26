@@ -74,12 +74,25 @@
       <a class="headerlink" title="Permalink to this headline"
         href="#comment-{{ id }}">¶</a>
       <aside class="issue_action icon">
+
+        {% if comment.edited_on %}
+            <span title="{{
+            comment.updated_info
+            }}">Edited by {{ comment.editor.username }} {{ comment.edited_on | humanize }}</span>
+        {% endif %}
+
         <a class="reply" title="Reply to this comment - loose formating">
           reply
         </a>
+
         {% if id != 0 and g.fas_user and (
             (comment.parent.status in [True, 'Open'] and g.fas_user.username == comment.user.username)
             or repo_admin) %}
+        <a href="{{ url_for(
+            'pull_request_edit_comment', username=username, repo=repo.name,
+            requestid=issueid, commentid=comment.id)}}" >
+            <span class="icon icon-edit blue"></span>
+        </a>
         <button type="submit" name="drop_comment" value="{{ comment.id }}"
             onclick="return confirm('Do you really want to remove this comment?');"
             title="Remove comment">

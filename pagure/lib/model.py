@@ -928,6 +928,15 @@ class PullRequestComment(BASE):
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
+    editor_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey('users.id', onupdate='CASCADE'),
+        nullable=True)
+
+    editor = relation('User', foreign_keys=[editor_id],
+                         remote_side=[User.id])
+
+    edited_on = sa.Column(sa.DATETIME, nullable=True)
 
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id],

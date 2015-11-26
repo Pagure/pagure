@@ -1,0 +1,25 @@
+{% extends "repo_master.html" %}
+
+{% block repo %}
+<section class="request_comment add_comment">
+    <form action="{{ url_for(
+        'pull_request_edit_comment', username=username, repo=repo.name,
+        requestid=requestid, commentid=comment.id) }}" method="post">
+
+        <div class="tabs  ui-widget ui-widget-content ui-corner-all" id="comment_block">
+
+            <div id="edit">
+                <textarea id="update_comment" name="update_comment">{{ comment.comment }}</textarea>
+            </div>
+
+        <div>
+
+  {{ form.csrf_token }}
+    <div>
+        <input type="submit" class="submit positive button" value="Update">
+        <input type="button" class="cancel" value="Cancel" onclick="location.href='{{ url_for(
+            'request_pull', username=username, repo=repo.name, requestid=requestid) }}'"/>
+    </div>
+  </form>
+</section>
+{% endblock %}
