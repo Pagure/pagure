@@ -12,34 +12,7 @@
             <a href="{{ url_for('view_repo', username=username, repo=repo.name)}}">
                 {{ repo.fullname }}
             </a>
-          {% if branchname %}
-            <div class="btn-group pull-right">
-              <button type="button" class="btn btn-info">{{ branchname }}</button>
-              <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="sr-only">Toggle Dropdown</span>
-              </button>
-              <div class="dropdown-menu">
-                {% for branch in branches %}
-                  {% if origin == 'view_commits' %}
-                    <a class="dropdown-item" href="{{ url_for('view_commits',
-                                username=username, repo=repo.name, branchname=branch) }}">
-                      {{ branch }}
-                    </a>
-                  {% elif origin == 'view_repo_branch' %}
-                    <a class="dropdown-item" href="{{ url_for('view_repo_branch',
-                                username=username, repo=repo.name, branchname=branch) }}">
-                      {{ branch }}
-                    </a>
-                  {% elif origin == 'view_file' %}
-                    <a class="dropdown-item" href="{{ url_for('view_file',
-                                username=username, repo=repo.name, branchname=branch) }}">
-                      {{ branch }}
-                    </a>
-                  {% endif %}
-                {% endfor %}
-              </div>
-            </div>
-          {% endif %}
+
 
         </h2>
         <span id="projectinfo">

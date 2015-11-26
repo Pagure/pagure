@@ -10,74 +10,159 @@
 
 {% block repo %}
 <div class="row">
-  <div class="col-md-8">
-    {% if readme %}
-      <section class="readme">
-        {% if safe %}
-          {{ readme | noJS |safe }}
-        {% else %}
-          {{ readme | noJS }}
-        {% endif %}
-      </section>
-    {% endif %}
-  </div>
-  <div class="col-md-4">
-    <div class="card">
-      <div class="card-header">
-        Admins
-      </div>
-      <div class="card-block p-a-0">
-        <ul>
-          <li>
-            <a href="{{ url_for('view_user', username=repo.user.user)}}">
-              {{ repo.user.user | avatar(32) | safe }}
-              {{ repo.user.fullname }} ({{ repo.user.user }})  -  creator
-            </a>
-          </li>
-          {% for user in repo.users %}
-          <li>
-            <a href="{{ url_for('view_user', username=user.user)}}">
-              {{ user.user | avatar(32) | safe }}
-              {{ user.fullname }} ({{ user.user }})
-            </a>
-          </li>
-          {% endfor %}
-          {% for group in repo.groups %}
-          <li>
-            <a href="{{ url_for('view_group', group=group.group_name)}}">
-              @{{ group.group_name }}
-            </a>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
+  {% if origin == 'view_repo' or origin == 'view_repo_branch' %}
+    <div class="col-md-8">
+      {% if readme %}
+        <section class="readme">
+          {% if safe %}
+            {{ readme | noJS |safe }}
+          {% else %}
+            {{ readme | noJS }}
+          {% endif %}
+        </section>
+      {% endif %}
     </div>
-
-    <div class="card">
-      <div class="card-header">
-        Recent Commits
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">
+          Admins
+        </div>
+        <div class="card-block p-a-0">
+          <ul>
+            <li>
+              <a href="{{ url_for('view_user', username=repo.user.user)}}">
+                {{ repo.user.user | avatar(32) | safe }}
+                {{ repo.user.fullname }} ({{ repo.user.user }})  -  creator
+              </a>
+            </li>
+            {% for user in repo.users %}
+            <li>
+              <a href="{{ url_for('view_user', username=user.user)}}">
+                {{ user.user | avatar(32) | safe }}
+                {{ user.fullname }} ({{ user.user }})
+              </a>
+            </li>
+            {% endfor %}
+            {% for group in repo.groups %}
+            <li>
+              <a href="{{ url_for('view_group', group=group.group_name)}}">
+                @{{ group.group_name }}
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
       </div>
-      <div class="card-block p-a-0">
-      {% for commit in last_commits %}
-      <li>
-        {{ commit.author | author2avatar(20) | safe }}
-        <a href="{{ url_for('view_commit', username=username,
-                repo=repo.name, commitid=commit.hex) }}">
-            <span class="commitid">{{ commit.hex|short }}</span>
-            {% if diff_commits and commit.oid.hex in diff_commits %}
-            <span class="new_commit" title="Commit not in the main repo">*</span>
+
+      <div class="card">
+        <div class="card-header">
+          Recent Commits
+        </div>
+        <div class="card-block p-a-0">
+        {% for commit in last_commits %}
+        <li>
+          {{ commit.author | author2avatar(20) | safe }}
+          <a href="{{ url_for('view_commit', username=username,
+                  repo=repo.name, commitid=commit.hex) }}">
+              <span class="commitid">{{ commit.hex|short }}</span>
+              {% if diff_commits and commit.oid.hex in diff_commits %}
+              <span class="new_commit" title="Commit not in the main repo">*</span>
+              {% endif %}
+              {{ commit.message.split('\n')[0] }}
+              <span class="commitdate" title="{{ commit.commit_time|format_ts }}">
+                {{ commit.commit_time|humanize }}
+              </span>
+          </a>
+        </li>
+        {% endfor %}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          Branches
+        </div>
+        <div class="card-block p-a-0">
+          {% for branch in branches %}
+          <li>
+            <a href="{{ url_for('view_repo_branch',
+                        username=username, repo=repo.name, branchname=branch) }}">
+              {{ branch }}
+            </a>
+            (<a href="{{ url_for('view_commits', username=username,
+                       repo=repo.name, branchname=branch) }}">commits</a>)
+
+          </li>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          Branches
+        </div>
+        <div class="card-block p-a-0">
+          <table>
+            <tr>
+              <th>Git URLs</th>
+              <td><a id="more_gits">more</a> | </td>
+              <td>
+                <a href="{{ url_for('ssh_hostkey') }}">
+                  SSH Hostkey/Fingerprint
+                </a>
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>Project</td>
+              <td>:</td>
+              <td>
+                {{ config.get('GIT_URL_SSH') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
+              </td>
+              <td>
+                {{ config.get('GIT_URL_GIT') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
+              </td>
+            </tr>
+            {% if config['DOC_APP_URL'] and repo and repo.settings.get('project_documentation', True) %}
+            <tr class="extra_gits">
+              <td>Docs</td>
+              <td>:</td>
+              <td>
+                {{ config.get('GIT_URL_SSH') }}docs/{{ repo.fullname }}.git
+              </td>
+              <td>
+                {{ config.get('GIT_URL_GIT') }}docs/{{ repo.fullname }}.git
+              </td>
+            </tr>
             {% endif %}
-            {{ commit.message.split('\n')[0] }}
-            <span class="commitdate" title="{{ commit.commit_time|format_ts }}">
-              {{ commit.commit_time|humanize }}
-            </span>
-        </a>
-      </li>
-      {% endfor %}
+            {% if config.get('ENABLE_TICKETS', True) %}
+            <tr class="extra_gits">
+              <td>Tickets</td>
+              <td>:</td>
+              <td>
+                {{ config.get('GIT_URL_SSH') }}tickets/{{ repo.fullname }}.git
+              </td>
+              <td>
+                {{ config.get('GIT_URL_GIT') }}tickets/{{ repo.fullname }}.git
+              </td>
+            </tr>
+            {% endif %}
+            <tr class="extra_gits">
+              <td>Requests</td>
+              <td>:</td>
+              <td>
+                {{ config.get('GIT_URL_SSH') }}requests/{{ repo.fullname }}.git
+              </td>
+              <td>
+                {{ config.get('GIT_URL_GIT') }}requests/{{ repo.fullname }}.git
+              </td>
+            </tr>
+          </table>
+        </div>
       </div>
-    </div>
 
-  </div>
+    </div>
+  {% endif %}
 </div>
 
 
@@ -112,24 +197,26 @@
 
 {% else %}
 
-  <section class="branch_list">
-    <h3>Branches</h3>
-    <ul>
-      {% for branch in branches %}
-      <li>
-        <a href="{{ url_for('view_repo_branch',
-                    username=username, repo=repo.name, branchname=branch) }}">
-          {{ branch }}
-        </a>
-        (<a href="{{ url_for('view_commits', username=username,
-                   repo=repo.name, branchname=branch) }}">commits</a>)
-
-      </li>
-      {% endfor %}
-    </ul>
-  </section>
-
   {% if total_page %}
+
+  <nav>
+    <ul class="pagination">
+      <li {% if page <= 1%} class="disabled" {% endif %}>
+        <a href="{{ url_for('.%s' % origin, username=username,
+                    repo=repo.name, branchname=branchname, page=page-1) }}" aria-label="Previous">
+          <span aria-hidden="true">Newer</span>
+          <span class="sr-only">Newer</span>
+        </a>
+      </li>
+      <li class="active"><a href="#">page {{ page }} of {{total_page}}</a></li>
+      <li {% if page >= total_page %}class="disabled"{%endif%}>
+        <a href="{{ url_for('.%s' % origin, username=username,repo=repo.name, branchname=branchname, page=page+1) }}" aria-label="Next">
+          <span aria-hidden="true">Older</span>
+          <span class="sr-only">Older</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
   <table>
     <tr>
       <td>
@@ -156,106 +243,26 @@
     </tr>
   </table>
   {% endif %}
-
-<!--  <section class="commit_list">
     {% if origin == 'view_commits' %}
-    <h3>Commits list</h3>
-    {% else %}
-    <h3>Last {{ last_commits | length }} commits</h3>
-    {% endif %}
-    {% if diff_commits and authenticated %}
-    <span id="request_pull" class="inline_it">
-        <a href="{{ url_for('new_request_pull',
-            username=username, repo=repo.name,
-            branch_to=head, branch_from=branchname or 'master') }}">
-          {% if repo_admin %}Request pull{% else %}Compare{% endif %}
-        </a>
-    </span>
-    {% elif authenticated %}
-    <span id="request_pull" class="inline_it">
-        <a href="{{ url_for('new_remote_request_pull',
-            username=username, repo=repo.name) }}">
-          Open a remote pull-request
-        </a>
-    </span>
-    {% endif %}
-    {% if repo_admin and branchname and branchname != 'master' %}
-    <form action="{{
-        url_for('.delete_branch',
-                username=username, repo=repo.name, branchname=branchname)
-        }}" method="post" class="inline_it icon del_icon">
-        {{ form.csrf_token }}
-        <button
-            onclick="return confirm('Are you sure you want to remove this branch?\nThis cannot be un-done!');"
-          title="Remove branch {{ branchname }}">
-          <span class="icon icon-trash blue"> Delete branch</span>
-        </button>
-    </form>
-    {% endif %}
-  </section>-->
-
-  <section class="git_links">
-    <table>
-      <tr>
-        <th>Git URLs</th>
-        <td>
-          {% if authenticated and repo_admin %}
-          <a id="more_gits">more</a> | </td>
-          {% endif %}
-        <td>
-          <a href="{{ url_for('ssh_hostkey') }}">
-            SSH Hostkey/Fingerprint
+      <div class="list-group">
+        {% for commit in last_commits %}
+          <a href="{{ url_for('view_commit', username=username,
+                          repo=repo.name, commitid=commit.hex) }}" class="list-group-item">
+                      <h5><strong>{{ commit.message.split('\n')[0] }}</strong></h5>
+                  {{ commit.author | author2avatar(20) | safe }} {{ commit.author.name }}
+                      <span class="commitid">{{ commit.hex|short }}</span>
+                      {% if diff_commits and commit.oid.hex in diff_commits %}
+                      <span class="new_commit" title="Commit not in the main repo">*</span>
+                      {% endif %}
+                      <span class="commitdate" title="{{ commit.commit_time|format_ts }}">
+                        {{ commit.commit_time|humanize }}
+                      </span>
           </a>
-        </td>
-        <td></td>
-      </tr>
-      <tr>
-        <td>Project</td>
-        <td>:</td>
-        <td>
-          {{ config.get('GIT_URL_SSH') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
-        </td>
-        <td>
-          {{ config.get('GIT_URL_GIT') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
-        </td>
-      </tr>
-      {% if config['DOC_APP_URL'] and repo and repo.settings.get('project_documentation', True) %}
-      <tr class="extra_gits">
-        <td>Docs</td>
-        <td>:</td>
-        <td>
-          {{ config.get('GIT_URL_SSH') }}docs/{{ repo.fullname }}.git
-        </td>
-        <td>
-          {{ config.get('GIT_URL_GIT') }}docs/{{ repo.fullname }}.git
-        </td>
-      </tr>
-      {% endif %}
-      {% if authenticated and repo_admin %}
-      {% if config.get('ENABLE_TICKETS', True) %}
-      <tr class="extra_gits">
-        <td>Tickets</td>
-        <td>:</td>
-        <td>
-          {{ config.get('GIT_URL_SSH') }}tickets/{{ repo.fullname }}.git
-        </td>
-        <td>
-          {{ config.get('GIT_URL_GIT') }}tickets/{{ repo.fullname }}.git
-        </td>
-      </tr>
-      {% endif %}
-      <tr class="extra_gits">
-        <td>Requests</td>
-        <td>:</td>
-        <td>
-          {{ config.get('GIT_URL_SSH') }}requests/{{ repo.fullname }}.git
-        </td>
-        <td>
-          {{ config.get('GIT_URL_GIT') }}requests/{{ repo.fullname }}.git
-        </td>
-      </tr>
-      {% endif %}
-    </table>
+        {% endfor %}
+      </div>
+    {% endif %}
+  <section class="git_links">
+
   </section>
 {% endif %}
 

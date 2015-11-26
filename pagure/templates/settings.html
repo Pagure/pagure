@@ -12,156 +12,185 @@
 {% block repo %}
 
 <section class="settings">
-  <h2>Settings</h2>
-
-  <div>
-    <h3>Update project</h3>
-    <form action="{{ url_for('.update_project',
-                    username=username, repo=repo.name) }}" method="post">
-      <table>
-        <tr>
-          <td>
-            <label for="description">Description</label>
-          </td>
-          <td>
-            <input name="description" value="{{ repo.description }}" /> <br />
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <label for="url">Project's url</label>
-          </td>
-          <td>
-            <input name="url" value="{{ repo.url if repo.url else '' }}" />
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <label for="avatar">Avatar email</label>
-          </td>
-          <td>
-            <input name="avatar_email" value="{{ repo.avatar_email if repo.avatar_email else '' }}" />
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <label for="tags">Project tags</label>
-          </td>
-          <td>
-            <input name="tags" value="{{ repo.tags_text |join(', ') if repo.tags else '' }}" />
-          </td>
-        </tr>
-      </table>
-      <button type="submit" title="Update description">
-        Update
-      </button>
-      {{ form.csrf_token }}
-    </form>
-  </div>
-  <div>
-    <h3> Default Branch </h3>
-
-    <form action="{{ url_for('change_ref_head',
-                     username=username, repo=repo.name) }}" method="post">
-    {{ branches_form.csrf_token }}
-    {{ branches_form.branches }}
-    <input type="submit" value="Make Default"/>
-  </form>
-  </div>
-
-  {% if config.get('WEBHOOK') %}
-  <div>
-    <h3>Private web-hook key</h3>
-    <p>
-      Each message sent to the web-hook are signed via hmac and SHA1 using
-      this private key.
-    </p>
-    <p>
-      This key is private to your project, make sure to store in a safe place
-      and do not share it.
-    </p>
-    <pre>
-        {{ repo.hook_token }}
-    </pre>
-    <form action="{{ url_for('.new_repo_hook_token',
-                  username=username, repo=repo.name) }}"
-        method="post" class="icon">
-    <button class="icon_button" type="submit"
-      onclick="return confirm('Are you sure to generate a new token for '
-        + 'this project/fork? \nThis will break all web hook in place and '
-        + 'cannot be un-done.');"
-      title="Generate a new hook token">
-      <span class="icon icon-refresh blue"></span>
-      Re-generate
-    </button>
-    {{ form.csrf_token }}
-  </form>
-  </div>
-  {% endif %}
-
-  <div>
-    <h3>API key</h3>
-    <p>
-      API keys are tokens used to authenticate you on pagure. They can also
-      be used to grant access to 3rd party application to behave on this
-      project on your name.
-    </p>
-    <p>
-      These keys are valid for <span class="strong">60</span> days.
-    </p>
-    <p>
-      These keys are private to your project, make sure to store in a safe
-      place and do not share it.
-    </p>
-
-    {% if repo.tokens %}
-    <table>
-    {% for token in repo.tokens %}
-      {% if token.user.username == g.fas_user.username %}
-      <tr>
-        <td>
-          {{ token.id }}
-        </td>
-        <td>
-        {% if token.expired %}
-          <span class="error">Expired</span> since {{ token.expiration.date() }}
-        {% else %}
-          <span class="message">Valid</span> until: {{ token.expiration.date() }}
-        {% endif %}
-        </td>
-        <td>
-          <a class="clickable"
-            onclick="show_acls({{ token.acls_list |safe }})">ACLs</a>
-        </td>
-        <td>
-          <form action="{{ url_for('.revoke_api_token',
-                username=username, repo=repo.name, token_id=token.id) }}"
-            method="post" class="icon">
-            <button class="icon_button" type="submit"
-                onclick="return confirm('Are you sure to revoke this token ?'
-                    + '\nThis will break all application using it and '
-                    + 'cannot be un-done.');"
-                title="Revoke token">
-              <span class="icon icon-trash blue"></span>
-              Revoke
+  <h3>Settings for {{repo.name}}</h3>
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2">
+      <div class="card">
+        <div class="card-header">
+          Project Details
+        </div>
+        <div class="card-block">
+          <form action="{{ url_for('.update_project',
+                          username=username, repo=repo.name) }}" method="post">
+            <fieldset class="form-group">
+              <label for="description">Description</label>
+              <input class="form-control" name="description" value="{{ repo.description }}" required/>
+              <small class="text-muted">Short description of the project</small>
+            </fieldset>
+            <fieldset class="form-group">
+                <label for="url">Project's url</label>
+                <input class="form-control" name="url" value="{{ repo.url if repo.url else '' }}" />
+                <small class="text-muted">Website URL of the project</small>
+            </fieldset>
+            <fieldset class="form-group">
+              <label for="avatar">Avatar email</label>
+              <input class="form-control" name="avatar_email" value="{{ repo.avatar_email if repo.avatar_email else '' }}" />
+              <small class="text-muted">Email address linked to avatar to display for the project</small>
+            </fieldset>
+            <fieldset class="form-group">
+              <label for="tags">Project tags</label>
+              <input class="form-control" name="tags" value="{{ repo.tags_text |join(', ') if repo.tags else '' }}" />
+              <small class="text-muted">tags for project</small>
+            </fieldset>
+            <button class="btn btn-primary" type="submit" title="Update description">
+              Update
             </button>
             {{ form.csrf_token }}
           </form>
-        </td>
-      </tr>
-      {% endif %}
-    {% endfor %}
-    </table>
-    {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8 col-md-offset-2">
+      <div class="card">
+        <div class="card-header">
+          Default Branch
+        </div>
+        <div class="card-block">
+          <form action="{{ url_for('change_ref_head',
+                 username=username, repo=repo.name) }}" method="post">
+            {{ branches_form.csrf_token }}
+            {{ branches_form.branches(class_="c-select") }}
+            <input class="btn btn-primary" type="submit" value="Make Default"/>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8 col-md-offset-2">
+      <div class="card">
+        <div class="card-header">
+          <strong>Private web-hook key</strong>
+        </div>
+        <div class="card-block">
+          <p>
+            Each message sent to the web-hook are signed via hmac and SHA1 using
+            this private key.
+          </p>
+          <p>
+            This key is private to your project, make sure to store in a safe place
+            and do not share it.
+          </p>
+          <div class="form-group">
+            <div class="input-group">
+              <div class="input-group-addon"><span class="oi" data-glyph="key"></span></div>
+              <input class="form-control" type="text" value="{{ repo.hook_token }}" readonly>
+            </div>
+          </div>
 
-    <a href="{{ url_for('.add_token', username=username, repo=repo.name) }}"
-        method="post" class="icon">
-    <button class="icon_button" type="submit"
-      title="Generate a new API token">
-      <span class="icon icon-plus blue"></span>
-      Get a new Key
-    </button>
-    </a>
+          <form action="{{ url_for('.new_repo_hook_token',
+                        username=username, repo=repo.name) }}"
+              method="post" class="icon">
+          <button class="btn btn-primary" type="submit"
+            onclick="return confirm('Are you sure to generate a new token for '
+              + 'this project/fork? \nThis will break all web hook in place and '
+              + 'cannot be un-done.');"
+            title="Generate a new hook token">
+            <span class="oi" data-glyph="reload"></span> &nbsp;Re-generate
+          </button>
+          {{ form.csrf_token }}
+        </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-8 col-md-offset-2">
+      <div class="card">
+        <div class="card-header">
+          <strong>API Keys</strong>
+        </div>
+        <div class="card-block">
+          <p>
+            API keys are tokens used to authenticate you on pagure. They can also
+            be used to grant access to 3rd party application to behave on this
+            project on your name.
+          </p>
+          <p>
+            These keys are valid for <span class="strong">60</span> days.
+          </p>
+          <p>
+            These keys are private to your project, make sure to store in a safe
+            place and do not share it.
+          </p>
+        </div>
+        {% if repo.tokens %}
+        <ul class="list-group list-group-flush">
+        {% for token in repo.tokens %}
+          {% if token.user.username == g.fas_user.username %}
+            <li class="list-group-item">
+              <div class="form-group">
+                <div class="input-group">
+                  <div class="input-group-addon"><span class="oi" data-glyph="key"></span></div>
+                  <input class="form-control" type="text" value="{{ token.id }}" readonly>
+                </div>
+              </div>
+            {% if token.expired %}
+              <span class="text-danger"><strong>Expired</strong> since {{ token.expiration.date() }}</span>
+            {% else %}
+              <span class="text-success"><strong>Valid</strong> until: {{ token.expiration.date() }}</span>
+              <form class="pull-right" action="{{ url_for('.revoke_api_token',
+                    username=username, repo=repo.name, token_id=token.id) }}"
+                method="post" class="icon">
+                <button class="btn btn-danger" type="submit"
+                    onclick="return confirm('Are you sure to revoke this token ?'
+                        + '\nThis will break all application using it and '
+                        + 'cannot be un-done.');"
+                    title="Revoke token">
+                  <span class="oi" data-glyph="trash"></span> &nbsp;Revoke
+                </button>
+                {{ form.csrf_token }}
+              </form>
+            {% endif %}
+              <button type="button" class="btn btn-link" data-toggle="modal" data-target="#acls{{ token.id }}">
+                ACLs
+              </button>
+              <div class="modal fade" id="acls{{ token.id }}" tabindex="-1" role="dialog" aria-labelledby="ACLs" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                      </button>
+                      <h4 class="modal-title" id="myModalLabel">ACLs</h4>
+                    </div>
+                    <div class="modal-body">
+                      {{ token.acls_list |safe }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+          {% endif %}
+        {% endfor %}
+        </ul>
+        {% endif %}
+        <div class="card-block">
+          <a href="{{ url_for('.add_token', username=username, repo=repo.name) }}"
+              method="post" class="icon">
+          <button class="btn btn-primary" type="submit"
+            title="Generate a new API token">
+            Create new key
+          </button>
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+
+  <div>
+    <h3>API key</h3>
   </div>
 
 

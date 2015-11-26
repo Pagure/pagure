@@ -139,6 +139,7 @@ def view_repo(repo, username=None):
         head=head,
         readme=readme,
         safe=safe,
+        origin='view_repo',
         branches=sorted(repo_obj.listall_branches()),
         branchname=branchname,
         last_commits=last_commits,
