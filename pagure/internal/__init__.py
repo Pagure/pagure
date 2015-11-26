@@ -182,7 +182,10 @@ def mergeable_request_pull():
 
     form = pagure.forms.ConfirmationForm()
     if not form.validate_on_submit():
-        response = flask.jsonify({'message': 'Invalid input submitted'})
+        response = flask.jsonify({
+            'code': 'CONFLICTS',
+            'message': 'Invalid input submitted',
+        })
         response.status_code = 400
         return response
 
@@ -192,7 +195,10 @@ def mergeable_request_pull():
         pagure.SESSION, request_uid=requestid)
 
     if not request:
-        response = flask.jsonify({'message': 'Pull-request not found'})
+        response = flask.jsonify({
+            'code': 'CONFLICTS',
+            'message': 'Pull-request not found',
+        })
         response.status_code = 404
         return response
 
@@ -210,11 +216,13 @@ def mergeable_request_pull():
             request_folder=None,
             domerge=False)
     except pygit2.GitError as err:
-        response = flask.jsonify({'message': err.message})
+        response = flask.jsonify({
+            'code': 'CONFLICTS', 'message': err.message})
         response.status_code = 409
         return response
     except pagure.exceptions.PagureException as err:
-        response = flask.jsonify({'message': err.message})
+        response = flask.jsonify({
+            'code': 'CONFLICTS', 'message': err.message})
         response.status_code = 500
         return response
 
