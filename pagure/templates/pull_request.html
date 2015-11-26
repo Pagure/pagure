@@ -568,9 +568,15 @@
         _obj.prepend($('<li><span class="'+res.code+'" title="'
           +res.message+'">'+res.short_code+'</span></li>'));
       },
-      error: function() {
+      error: function(res) {
         var _obj = $('.header .buttons');
-        _obj.prepend($('<li>Could not determine if the PR can be merged</li>'));
+        if (res.responseJSON.message) {
+          _obj.prepend($('<li><span class="'
+            + res.responseJSON.code +'"</span>'
+            + res.responseJSON.message + '</li>'));
+        } else {
+          _obj.prepend($('<li>Could not determine if the PR can be merged</li>'));
+        }
       }
     });
     return false;
