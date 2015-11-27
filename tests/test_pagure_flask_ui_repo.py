@@ -976,7 +976,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         # View what's supposed to be an image
         output = self.app.get('/test/raw/master/f/test.jpg')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue(output.data.startswith('<89>PNG^M'))
+        self.assertTrue(output.data.startswith('\x00\x00\x01\x00'))
 
         # View by commit id
         repo = pygit2.Repository(os.path.join(tests.HERE, 'test.git'))
@@ -984,17 +984,17 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         output = self.app.get('/test/raw/%s/f/test.jpg' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
-        self.assertTrue(output.data.startswith('<89>PNG^M'))
+        self.assertTrue(output.data.startswith('\x00\x00\x01\x00'))
 
         # View by image name -- somehow we support this
         output = self.app.get('/test/raw/sources/f/test.jpg')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue(output.data.startswith('<89>PNG^M'))
+        self.assertTrue(output.data.startswith('\x00\x00\x01\x00'))
 
         # View binary file
         output = self.app.get('/test/raw/sources/f/test_binary')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue(output.data.startswith('<89>PNG^M'))
+        self.assertTrue(output.data.startswith('\x00\x00\x01\x00'))
 
         # View folder
         output = self.app.get('/test/raw/master/f/folder1')
