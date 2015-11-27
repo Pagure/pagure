@@ -19,6 +19,7 @@ BuildRequires:  python-nose
 BuildRequires:  py-bcrypt
 BuildRequires:  python-alembic
 BuildRequires:  python-arrow
+BuildRequires:  python-binaryornot
 BuildRequires:  python-bleach
 BuildRequires:  python-blinker
 BuildRequires:  python-chardet
@@ -53,6 +54,7 @@ Requires:  python-sqlalchemy > 0.8
 Requires:  py-bcrypt
 Requires:  python-alembic
 Requires:  python-arrow
+Requires:  python-binaryornot
 Requires:  python-bleach
 Requires:  python-blinker
 Requires:  python-chardet

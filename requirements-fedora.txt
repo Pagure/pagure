@@ -1,5 +1,6 @@
 python-alembic
 python-arrow
+python-binaryornot
 python-bleach
 python-blinker
 python-chardet
