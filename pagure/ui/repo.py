@@ -30,6 +30,8 @@ from sqlalchemy.exc import SQLAlchemyError
 import mimetypes
 import chardet
 
+from binaryornot.helpers import is_binary_string
+
 import pagure.exceptions
 import pagure.lib
 import pagure.lib.git
@@ -434,7 +436,7 @@ def view_file(repo, identifier, filename, username=None):
         elif ext in ('.rst', '.mk', '.md') and not rawtext:
             content, safe = pagure.doc_utils.convert_readme(content.data, ext)
             output_type = 'markup'
-        elif not content.is_binary and pagure.lib.could_be_text(content.data):
+        elif not is_binary_string(content.data):
             file_content = content.data.decode('utf-8')
             try:
                 lexer = guess_lexer_for_filename(
@@ -1458,7 +1460,7 @@ def edit_file(repo, branchname, filename, username=None):
             flask.abort(404, 'File not found')
 
         data = repo_obj[content.oid].data.decode('utf-8')
-        if content.is_binary or not pagure.lib.could_be_text(data):
+        if is_binary_string(content.data):
             flask.abort(400, 'Cannot edit binary files')
     else:
         data = form.content.data.decode('utf-8')
