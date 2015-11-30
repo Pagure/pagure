@@ -193,7 +193,10 @@
     <table>
       <tr>
         <th>Git URLs</th>
-        <td><a id="more_gits">more</a> | </td>
+        <td>
+          {% if authenticated and repo_admin %}
+          <a id="more_gits">more</a> | </td>
+          {% endif %}
         <td>
           <a href="{{ url_for('ssh_hostkey') }}">
             SSH Hostkey/Fingerprint
