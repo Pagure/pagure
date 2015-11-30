@@ -32,6 +32,35 @@
 {%- endmacro %}
 
 
+{% macro pagination_link(pagetitle, page, total) -%}
+<aside>
+    <table>
+        <tr>
+            <td>
+            {% if page > 1%}
+                <a href="{{ url_for('index') }}?{{ pagetitle }}={{page - 1}}">
+                    &lt; Previous
+                </a>
+            {% else %}
+                &lt; Previous
+            {% endif %}
+            </td>
+            <td>{{ page }} / {{ total }}</td>
+            <td>
+                {% if page < total %}
+                <a href="{{ url_for('index') }}?{{ pagetitle }}={{page + 1}}">
+                    Next &gt;
+                </a>
+                {% else %}
+                Next >
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+</aside>
+{%- endmacro %}
+
+
 {% macro render_repos(
         list, total, pagetitle, page, title, count, id, username=None, hide=True) %}
     <section class="project_list" id="{{ id }}"{%
@@ -42,61 +71,13 @@
             <h{{ title_lvl }}>{{ title }} ({{ count }})</h{{ title_lvl }}>
         </header>
         {% if total and total > 1 %}
-        <aside>
-            <table>
-                <tr>
-                    <td>
-                    {% if page > 1%}
-                        <a href="{{ url_for('index') }}?{{ pagetitle }}={{page - 1}}">
-                            &lt; Previous
-                        </a>
-                    {% else %}
-                        &lt; Previous
-                    {% endif %}
-                    </td>
-                    <td>{{ page }} / {{ total }}</td>
-                    <td>
-                        {% if page < total %}
-                        <a href="{{ url_for('index') }}?{{ pagetitle }}={{page + 1}}">
-                            Next &gt;
-                        </a>
-                        {% else %}
-                        Next >
-                        {% endif %}
-                    </td>
-                </tr>
-            </table>
-        </aside>
+        {{ pagination_link(pagetitle, page, total) }}
         {% endif %}
         <div>
             {{ render_row(list) }}
         </div>
         {% if total and total > 1 %}
-        <aside>
-            <table>
-                <tr>
-                    <td>
-                    {% if page > 1%}
-                        <a href="{{ url_for('index') }}?{{ pagetitle }}={{page - 1}}">
-                            &lt; Previous
-                        </a>
-                    {% else %}
-                        &lt; Previous
-                    {% endif %}
-                    </td>
-                    <td>{{ page }} / {{ total }}</td>
-                    <td>
-                        {% if page < total %}
-                        <a href="{{ url_for('index') }}?{{ pagetitle }}={{page + 1}}">
-                            Next &gt;
-                        </a>
-                        {% else %}
-                        Next >
-                        {% endif %}
-                    </td>
-                </tr>
-            </table>
-        </aside>
+        {{ pagination_link(patetitle, page, total) }}
         {% endif %}
     </section>
 {% endmacro %}
