@@ -223,6 +223,7 @@
         </td>
       </tr>
       {% endif %}
+      {% if authenticated and repo_admin %}
       {% if config.get('ENABLE_TICKETS', True) %}
       <tr class="extra_gits">
         <td>Tickets</td>
@@ -245,6 +246,7 @@
           {{ config.get('GIT_URL_GIT') }}requests/{{ repo.fullname }}.git
         </td>
       </tr>
+      {% endif %}
     </table>
   </section>
 {% endif %}
