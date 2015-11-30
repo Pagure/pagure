@@ -725,6 +725,13 @@ def fork_project(repo, username=None):
     if repo is None:
         flask.abort(404)
 
+    if pagure.lib.get_project(
+            SESSION, repo.name, user=flask.g.fas_user.username):
+        flask.flash('You have already forked this project', 'error')
+        return flask.redirect(flask.url_for(
+            'view_repo', repo=repo.name, username=flask.g.fas_user.username
+        ))
+
     try:
         message = pagure.lib.fork_project(
             session=SESSION,
