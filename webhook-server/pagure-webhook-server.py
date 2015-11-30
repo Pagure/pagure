@@ -96,7 +96,7 @@ def call_web_hooks(project, topic, msg):
 
 
 @trollius.coroutine
-def handle_client():
+def handle_messages():
         connection = yield trollius.From(trollius_redis.Connection.create(
             host='0.0.0.0', port=6379, db=0))
 
@@ -129,7 +129,7 @@ def main():
     try:
         loop = trollius.get_event_loop()
         tasks = [
-            trollius.async(handle_client()),
+            trollius.async(handle_messages()),
         ]
         loop.run_until_complete(trollius.wait(tasks))
         loop.run_forever()
