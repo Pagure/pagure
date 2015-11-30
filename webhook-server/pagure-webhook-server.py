@@ -86,11 +86,11 @@ def call_web_hooks(project, topic, msg):
                 data={'payload': msg}
             )
             if not req:
-                raise pagure.exceptions.PagureException(
+                log.info(
                     'An error occured while querying: %s - '
                     'Error code: %s' % (url, req.status_code))
         except (requests.exceptions.RequestException, Exception) as err:
-            raise pagure.exceptions.PagureException(
+            log.info(
                 'An error occured while querying: %s - Error: %s' % (
                     url, err))
 
