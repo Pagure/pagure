@@ -71,6 +71,33 @@
         <div>
             {{ render_row(list) }}
         </div>
+        {% if total and total > 1 %}
+        <aside>
+            <table>
+                <tr>
+                    <td>
+                    {% if page > 1%}
+                        <a href="{{ url_for('index') }}?{{ pagetitle }}={{page - 1}}">
+                            &lt; Previous
+                        </a>
+                    {% else %}
+                        &lt; Previous
+                    {% endif %}
+                    </td>
+                    <td>{{ page }} / {{ total }}</td>
+                    <td>
+                        {% if page < total %}
+                        <a href="{{ url_for('index') }}?{{ pagetitle }}={{page + 1}}">
+                            Next &gt;
+                        </a>
+                        {% else %}
+                        Next >
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+        </aside>
+        {% endif %}
     </section>
 {% endmacro %}
 
