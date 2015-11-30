@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.33
+Version:        0.1.34
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -124,7 +124,7 @@ Requires:  python-trollius-redis
 Requires(post): systemd
 Requires(preun): systemd
 Requires(postun): systemd
-%description ev
+%description webhook
 Pagure comes with an webhook server allowing http callbacks for any action
 done on a project. This package provides it.
 
@@ -245,6 +245,21 @@ install -m 644 webhook-server/pagure_webhook.service \
 
 
 %changelog
+* Mon Nov 30 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.34-1
+- Update to 0.1.34
+- Fix the encoding of the files we're displaying on the UI
+- Fix commenting on the last line of a diff
+- Fix returning error message from the internal API (shows the PR as conflicting
+  then)
+- Fix stacktrace encountered in some repo if the content of a folder is empty
+  (or is a git submodule)
+- Split the web-hooks into their own server
+- If you try to fork a forked project, redirect the user to the fork
+- Show the repo from and repo to when opening a new PR
+- Add the pagination links at the bottom of the repo list as well
+- Add the groups to the pool of users to notify upon changes to a project
+- Hide private repo from user who do not have commit access
+
 * Fri Nov 20 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.33-1
 - Update to 0.1.33
 - Prevent project with a name starting with a non-alphanumerical character
