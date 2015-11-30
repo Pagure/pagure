@@ -41,7 +41,8 @@ The ``pagure-webhook`` package contains the web-hook server.
 
 
 .. note:: The last three packages are optional, pagure would work fine without
-        them.
+        them but the live-update, the webhook and the comment by email
+        services will not work.
 
 * From the sources
 

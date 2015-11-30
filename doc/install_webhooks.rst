@@ -36,7 +36,7 @@ Configure your system
 
 The first file is the script of the web-hook server itself.
 
-The secondg file is the systemd service file.
+The second file is the systemd service file.
 
 
 * Activate the service and ensure it's started upon boot:
