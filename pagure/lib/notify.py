@@ -53,7 +53,7 @@ def log(project, topic, msg, redis=None):
 
     if redis:
         redis.publish(
-            'hook',
+            'pagure.hook',
             json.dumps({
                 'project': project.fullname,
                 'topic': topic,

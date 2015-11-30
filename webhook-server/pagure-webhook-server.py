@@ -104,7 +104,7 @@ def handle_client():
         subscriber = yield trollius.From(connection.start_subscribe())
 
         # Subscribe to channel.
-        yield trollius.From(subscriber.subscribe(['hook']))
+        yield trollius.From(subscriber.subscribe(['pagure.hook']))
 
         # Inside a while loop, wait for incoming events.
         while True:

@@ -232,12 +232,12 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
 
     if REDIS:
         if issue.private:
-            REDIS.publish(issue.uid, json.dumps({
+            REDIS.publish('pagure.%s' % issue.uid, json.dumps({
                 'issue': 'private',
                 'comment_id': issue_comment.id,
             }))
         else:
-            REDIS.publish(issue.uid, json.dumps({
+            REDIS.publish('pagure.%s' % issue.uid, json.dumps({
                 'comment_id': issue_comment.id,
                 'comment_added': text2markdown(issue_comment.comment),
                 'comment_user': issue_comment.user.user,
@@ -308,7 +308,8 @@ def add_tag_obj(session, obj, tags, user, ticketfolder):
 
         # Send notification for the event-source server
         if REDIS:
-            REDIS.publish(obj.uid, json.dumps({'added_tags': added_tags}))
+            REDIS.publish('pagure.%s' % obj.uid, json.dumps(
+                {'added_tags': added_tags}))
 
     if added_tags:
         return 'Tag added: %s' % ', '.join(added_tags)
@@ -342,7 +343,8 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
 
         # Send notification for the event-source server
         if REDIS:
-            REDIS.publish(issue.uid, json.dumps({'unassigned': '-'}))
+            REDIS.publish('pagure.%s' % issue.uid, json.dumps(
+                {'unassigned': '-'}))
 
         return 'Assignee reset'
     elif assignee is None and issue.assignee is None:
@@ -375,7 +377,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
 
         # Send notification for the event-source server
         if REDIS:
-            REDIS.publish(issue.uid, json.dumps(
+            REDIS.publish('pagure.%s' % issue.uid, json.dumps(
                 {'assigned': assignee_obj.to_json(public=True)}))
 
         return 'Issue assigned'
@@ -482,12 +484,12 @@ def add_issue_dependency(
 
         # Send notification for the event-source server
         if REDIS:
-            REDIS.publish(issue.uid, json.dumps({
+            REDIS.publish('pagure.%s' % issue.uid, json.dumps({
                 'added_dependency': issue_blocked.id,
                 'issue_uid': issue.uid,
                 'type': 'children',
             }))
-            REDIS.publish(issue_blocked.uid, json.dumps({
+            REDIS.publish('pagure.%s' % issue_blocked.uid, json.dumps({
                 'added_dependency': issue.id,
                 'issue_uid': issue_blocked.uid,
                 'type': 'parent',
@@ -542,12 +544,12 @@ def remove_issue_dependency(
 
         # Send notification for the event-source server
         if REDIS:
-            REDIS.publish(issue.uid, json.dumps({
+            REDIS.publish('pagure.%s' % issue.uid, json.dumps({
                 'removed_dependency': child_del,
                 'issue_uid': issue.uid,
                 'type': 'children',
             }))
-            REDIS.publish(issue_blocked.uid, json.dumps({
+            REDIS.publish('pagure.%s' % issue_blocked.uid, json.dumps({
                 'removed_dependency': issue.id,
                 'issue_uid': issue_blocked.uid,
                 'type': 'parent',
@@ -629,7 +631,7 @@ def remove_tags_obj(
 
         # Send notification for the event-source server
         if REDIS:
-            REDIS.publish(obj.uid, json.dumps(
+            REDIS.publish('pagure.%s' % obj.uid, json.dumps(
                 {'removed_tags': removed_tags}))
 
     return 'Removed tag: %s' % ', '.join(removed_tags)
@@ -808,7 +810,7 @@ def add_pull_request_comment(session, request, commit, filename, row,
 
     # Send notification for the event-source server
     if REDIS:
-        REDIS.publish(request.uid, json.dumps({
+        REDIS.publish('pagure.%s' % request.uid, json.dumps({
             'request_id': len(request.comments),
             'comment_added': text2markdown(pr_comment.comment),
             'comment_user': pr_comment.user.user,
@@ -1118,12 +1120,12 @@ def edit_issue(session, issue, ticketfolder, user,
 
     if REDIS and edit:
         if issue.private:
-            REDIS.publish(issue.uid, json.dumps({
+            REDIS.publish('pagure.%s' % issue.uid, json.dumps({
                 'issue': 'private',
                 'fields': edit,
             }))
         else:
-            REDIS.publish(issue.uid, json.dumps({
+            REDIS.publish('pagure.%s' % issue.uid, json.dumps({
                 'fields': edit,
                 'issue': issue.to_json(public=True, with_comments=False),
             }))
