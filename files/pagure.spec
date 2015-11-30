@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.34
+Version:        0.1.35
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -245,6 +245,11 @@ install -m 644 webhook-server/pagure_webhook.service \
 
 
 %changelog
+* Mon Nov 30 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.35-1
+- Update to 0.1.35
+- Fix the web-hook server by preventing it to raise any exception (rather log
+  the errors)
+
 * Mon Nov 30 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.34-1
 - Update to 0.1.34
 - Fix the encoding of the files we're displaying on the UI
