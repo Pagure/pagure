@@ -88,15 +88,29 @@
     <table>
       {{ render_field_in_row(form.title, size=80) }}
       <tr>
+          <td>From git repo:</td>
+          <td>
+          {% if remote_git -%}
+            {{ remote_git }}
+          {%- else -%}
+            {{ repo.fullname}}
+          {%- endif %}
+          </td>
+      </tr>
+      <tr>
         <td>From branch:</td>
         <td>{{ branch_from }}</td>
       </tr>
-      {% if remote_git %}
       <tr>
-          <td>Git repo:</td>
-          <td>{{ remote_git }}</td>
+          <td>To git repo:</td>
+          <td>
+            {% if repo.is_fork -%}
+              {{ repo.parent.fullname }}
+            {% else %}
+              {{ repo.fullname }}
+            {% endif %}
+          </td>
       </tr>
-      {% endif %}
       <tr>
         <td>To branch:</td>
         <td>
