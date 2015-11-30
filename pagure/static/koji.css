@@ -1,3 +1,8 @@
+html
+{
+	font-size:14px;
+}
+
 .nav-tabs
 {
 	border-bottom:none;
@@ -9,6 +14,43 @@
 	border-bottom:1px solid #DDD;
 }
 
-.highlighted-line {
-    background-color: #FFFABA;
+.repo-name
+{
+
+}
+
+.code_table {
+    background: #FDF6E3;
+    min-width: 100%;
+}
+
+.code_table tr td{
+    padding: 0;
+}
+
+.code_table tr td pre{
+    padding: 0;
+    margin: 0;
+}
+
+.code_table tr .cell1{
+    width: 20px;
+    background: #eee8d5;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    text-align:center;
+}
+
+.code_table tr .cell2{
+    padding-left:15px;
+}
+
+.code_table tr .cell1 a::before {
+    content: attr(data-line-number);
+    color:#91a1a1!important;
+    font-family: Hack;
+    padding-left:3px;
+    padding-right:3px;
 }

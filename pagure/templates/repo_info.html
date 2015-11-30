@@ -24,33 +24,101 @@
     </div>
     <div class="col-md-4">
       <div class="card">
-        <div class="card-header">
-          Admins
-        </div>
-        <div class="card-block p-a-0">
-          <ul>
-            <li>
-              <a href="{{ url_for('view_user', username=repo.user.user)}}">
-                {{ repo.user.user | avatar(32) | safe }}
+        <div class="card-block">
+          {%- if repo.url %}
+          <h4>Project Website</h4>
+          <p><a class="inline" href="{{ repo.url }}">{{ repo.url }}</a></p>
+          {% endif %}
+          <h4>Admins</h4>
+          <p>
+              <div><a href="{{ url_for('view_user', username=repo.user.user)}}">
+                {{ repo.user.user | avatar(20) | safe }}
                 {{ repo.user.fullname }} ({{ repo.user.user }})  -  creator
-              </a>
-            </li>
+              </a></div>
             {% for user in repo.users %}
-            <li>
+            <div>
               <a href="{{ url_for('view_user', username=user.user)}}">
-                {{ user.user | avatar(32) | safe }}
+                {{ user.user | avatar(20) | safe }}
                 {{ user.fullname }} ({{ user.user }})
               </a>
-            </li>
+            </div>
             {% endfor %}
             {% for group in repo.groups %}
-            <li>
+            <div>
               <a href="{{ url_for('view_group', group=group.group_name)}}">
                 @{{ group.group_name }}
               </a>
-            </li>
+            </div>
             {% endfor %}
-          </ul>
+          </p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <strong>GIT URLs</strong>
+        </div>
+        <div class="card-block">
+            <div class="form-group">
+              <div class="input-group">
+                <div class="input-group-addon">SSH</span></div>
+                <input class="form-control" type="text" value="{{ config.get('GIT_URL_SSH') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git" readonly>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="input-group">
+                <div class="input-group-addon">GIT</span></div>
+                <input class="form-control" type="text" value="{{ config.get('GIT_URL_GIT') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git" readonly>
+              </div>
+            </div>
+
+            <div class="collapse" id="moregiturls">
+              {% if config['DOC_APP_URL'] and repo and repo.settings.get('project_documentation', True) %}
+              <h4>Docs</h4>
+              <div class="form-group">
+                <div class="input-group">
+                  <div class="input-group-addon">SSH</span></div>
+                  <input class="form-control" type="text" value="{{ config.get('GIT_URL_SSH') }}docs/{{ repo.fullname }}.git" readonly>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="input-group">
+                  <div class="input-group-addon">GIT</span></div>
+                  <input class="form-control" type="text" value="{{ config.get('GIT_URL_GIT') }}docs/{{ repo.fullname }}.git" readonly>
+                </div>
+              </div>
+              {%endif%}
+              {% if config.get('ENABLE_TICKETS', True) %}
+              <h4>Tickets</h4>
+              <div class="form-group">
+                <div class="input-group">
+                  <div class="input-group-addon">SSH</span></div>
+                  <input class="form-control" type="text" value="{{ config.get('GIT_URL_SSH') }}tickets/{{ repo.fullname }}.git" readonly>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="input-group">
+                  <div class="input-group-addon">GIT</span></div>
+                  <input class="form-control" type="text" value="{{ config.get('GIT_URL_GIT') }}tickets/{{ repo.fullname }}.git" readonly>
+                </div>
+              </div>
+              {%endif%}
+              <h4>Requests</h4>
+              <div class="form-group">
+                <div class="input-group">
+                  <div class="input-group-addon">SSH</span></div>
+                  <input class="form-control" type="text" value="{{ config.get('GIT_URL_SSH') }}requests/{{ repo.fullname }}.git" readonly>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="input-group">
+                  <div class="input-group-addon">GIT</span></div>
+                  <input class="form-control" type="text" value="{{ config.get('GIT_URL_GIT') }}requests/{{ repo.fullname }}.git" readonly>
+                </div>
+              </div>
+            </div>
+            <a class="btn btn-link" data-toggle="collapse" href="#moregiturls" aria-expanded="false" aria-controls="moregiturls">More</a>
+
         </div>
       </div>
 
@@ -59,108 +127,23 @@
           Recent Commits
         </div>
         <div class="card-block p-a-0">
+        <div class="list-group list-group-flush">
         {% for commit in last_commits %}
-        <li>
-          {{ commit.author | author2avatar(20) | safe }}
-          <a href="{{ url_for('view_commit', username=username,
-                  repo=repo.name, commitid=commit.hex) }}">
-              <span class="commitid">{{ commit.hex|short }}</span>
-              {% if diff_commits and commit.oid.hex in diff_commits %}
-              <span class="new_commit" title="Commit not in the main repo">*</span>
-              {% endif %}
-              {{ commit.message.split('\n')[0] }}
-              <span class="commitdate" title="{{ commit.commit_time|format_ts }}">
-                {{ commit.commit_time|humanize }}
-              </span>
+          <a href="{{ url_for('view_commit', username=username, repo=repo.name, commitid=commit.hex) }}" class="list-group-item">
+                <div><strong>
+                  {{ commit.message.split('\n')[0] }}
+                {% if diff_commits and commit.oid.hex in diff_commits %}
+                <span class="new_commit" title="Commit not in the main repo">*</span>
+                {% endif %}
+                </strong></div>
+                <div class="commitdate" title="{{ commit.commit_time|format_ts }}">
+                  {{ commit.commit_time|humanize }}
+                </div>
           </a>
-        </li>
         {% endfor %}
         </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          Branches
-        </div>
-        <div class="card-block p-a-0">
-          {% for branch in branches %}
-          <li>
-            <a href="{{ url_for('view_repo_branch',
-                        username=username, repo=repo.name, branchname=branch) }}">
-              {{ branch }}
-            </a>
-            (<a href="{{ url_for('view_commits', username=username,
-                       repo=repo.name, branchname=branch) }}">commits</a>)
-
-          </li>
-          {% endfor %}
         </div>
       </div>
-
-      <div class="card">
-        <div class="card-header">
-          Branches
-        </div>
-        <div class="card-block p-a-0">
-          <table>
-            <tr>
-              <th>Git URLs</th>
-              <td><a id="more_gits">more</a> | </td>
-              <td>
-                <a href="{{ url_for('ssh_hostkey') }}">
-                  SSH Hostkey/Fingerprint
-                </a>
-              </td>
-              <td></td>
-            </tr>
-            <tr>
-              <td>Project</td>
-              <td>:</td>
-              <td>
-                {{ config.get('GIT_URL_SSH') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
-              </td>
-              <td>
-                {{ config.get('GIT_URL_GIT') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
-              </td>
-            </tr>
-            {% if config['DOC_APP_URL'] and repo and repo.settings.get('project_documentation', True) %}
-            <tr class="extra_gits">
-              <td>Docs</td>
-              <td>:</td>
-              <td>
-                {{ config.get('GIT_URL_SSH') }}docs/{{ repo.fullname }}.git
-              </td>
-              <td>
-                {{ config.get('GIT_URL_GIT') }}docs/{{ repo.fullname }}.git
-              </td>
-            </tr>
-            {% endif %}
-            {% if config.get('ENABLE_TICKETS', True) %}
-            <tr class="extra_gits">
-              <td>Tickets</td>
-              <td>:</td>
-              <td>
-                {{ config.get('GIT_URL_SSH') }}tickets/{{ repo.fullname }}.git
-              </td>
-              <td>
-                {{ config.get('GIT_URL_GIT') }}tickets/{{ repo.fullname }}.git
-              </td>
-            </tr>
-            {% endif %}
-            <tr class="extra_gits">
-              <td>Requests</td>
-              <td>:</td>
-              <td>
-                {{ config.get('GIT_URL_SSH') }}requests/{{ repo.fullname }}.git
-              </td>
-              <td>
-                {{ config.get('GIT_URL_GIT') }}requests/{{ repo.fullname }}.git
-              </td>
-            </tr>
-          </table>
-        </div>
-      </div>
-
     </div>
   {% endif %}
 </div>
@@ -196,10 +179,35 @@
     </section>
 
 {% else %}
+    {% if origin == 'view_commits' %}
+      <div class="list-group">
+        {% for commit in last_commits %}
+          <a href="{{ url_for('view_commit', username=username,
+                          repo=repo.name, commitid=commit.hex) }}" class="list-group-item {% if diff_commits and commit.oid.hex in diff_commits %}p-l-lg{% endif %}" style="position:relative;">
+                      {% if diff_commits and commit.oid.hex in diff_commits %}
+                      <div title="This commit is not in the main branch of this Repo" style="position:absolute; left:0; top:0; padding:5px; padding-top:20px; height:100%; background:#eee; vertical-align:middle;"><span class="oi" data-glyph="arrow-thick-right"></span></div>
+                      {% endif %}
+                      <h5>
+                        <strong>{{ commit.message.split('\n')[0] }}</strong>
+                          <div class="pull-right">
+
+                          <span class="commitdate" title="{{ commit.commit_time|format_ts }}">
+                          {{ commit.commit_time|humanize }}
+                        </span>
+                        </div>
+                      </h5>
+                  {{ commit.author | author2avatar(20) | safe }} {{ commit.author.name }}
+                      <div class="pull-right">
+                        <span class="label label-default">{{ commit.hex|short }}</span>
+                      </div>
+          </a>
+        {% endfor %}
+      </div>
+    {% endif %}
 
   {% if total_page %}
 
-  <nav>
+  <nav class="text-center">
     <ul class="pagination">
       <li {% if page <= 1%} class="disabled" {% endif %}>
         <a href="{{ url_for('.%s' % origin, username=username,
@@ -217,53 +225,8 @@
       </li>
     </ul>
   </nav>
-  <table>
-    <tr>
-      <td>
-      {% if page > 1%}
-          <a href="{{ url_for('.%s' % origin, username=username,
-                    repo=repo.name, branchname=branchname, page=page-1) }}">
-            &lt; Previous
-        </a>
-      {% else %}
-          &lt; Previous
-      {% endif %}
-      </td>
-      <td>{{ page }} / {{ total_page }}</td>
-      <td>
-        {% if page < total_page %}
-        <a href="{{ url_for('.%s' % origin, username=username,
-                    repo=repo.name, branchname=branchname, page=page+1) }}">
-            Next &gt;
-        </a>
-        {% else %}
-        Next >
-        {% endif %}
-      </td>
-    </tr>
-  </table>
   {% endif %}
-    {% if origin == 'view_commits' %}
-      <div class="list-group">
-        {% for commit in last_commits %}
-          <a href="{{ url_for('view_commit', username=username,
-                          repo=repo.name, commitid=commit.hex) }}" class="list-group-item">
-                      <h5><strong>{{ commit.message.split('\n')[0] }}</strong></h5>
-                  {{ commit.author | author2avatar(20) | safe }} {{ commit.author.name }}
-                      <span class="commitid">{{ commit.hex|short }}</span>
-                      {% if diff_commits and commit.oid.hex in diff_commits %}
-                      <span class="new_commit" title="Commit not in the main repo">*</span>
-                      {% endif %}
-                      <span class="commitdate" title="{{ commit.commit_time|format_ts }}">
-                        {{ commit.commit_time|humanize }}
-                      </span>
-          </a>
-        {% endfor %}
-      </div>
-    {% endif %}
-  <section class="git_links">
 
-  </section>
 {% endif %}
 
 {% endblock %}

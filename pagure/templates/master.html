@@ -18,7 +18,7 @@
       <div class="container">
         <div class="row">
           <div class="col-sm-3">
-            <img src="{{ url_for('static', filename='pagure-logo.png') }}" alt="pagure Logo" id="kojiLogo"/>
+            <img height=40px src="{{ url_for('static', filename='pagure-logo.png') }}" alt="pagure Logo" id="kojiLogo"/>
           </div>
           <div class="col-sm-9">
             <div class="row">
@@ -98,6 +98,7 @@
           <a href="https://pagure.io/pagure">pagure</a> --
           {{version}}
             </p>
+            <p><a href="{{ url_for('ssh_hostkey') }}">SSH Hostkey/Fingerprint</a></p>
         </div>
     </div>
 
