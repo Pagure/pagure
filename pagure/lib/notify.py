@@ -88,6 +88,14 @@ def _get_emails_for_issue(issue):
         if user.default_email:
             emails.add(user.default_email)
 
+    # Add people in groups with commits access to the project:
+    for group in issue.project.groups:
+        if group.creator.default_email:
+            emails.add(group.creator.default_email)
+        for user in group.users:
+            if user.default_email:
+                emails.add(user.default_email)
+
     # Add people that commented on the ticket
     for comment in issue.comments:
         if comment.user.default_email:
