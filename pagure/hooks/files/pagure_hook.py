@@ -80,7 +80,7 @@ def relates_commit(commitid, issue, app_url=None):
         pagure.SESSION.commit()
     except pagure.exceptions.PagureException as err:
         print err
-    except SQLAlchemyError, err:  # pragma: no cover
+    except SQLAlchemyError as err:  # pragma: no cover
         pagure.SESSION.rollback()
         pagure.APP.logger.exception(err)
 
@@ -112,7 +112,7 @@ def fixes_commit(commitid, issue, app_url=None):
         pagure.SESSION.commit()
     except pagure.exceptions.PagureException as err:
         print err
-    except SQLAlchemyError, err:  # pragma: no cover
+    except SQLAlchemyError as err:  # pragma: no cover
         pagure.SESSION.rollback()
         pagure.APP.logger.exception(err)
 
@@ -133,7 +133,7 @@ def fixes_commit(commitid, issue, app_url=None):
             pagure.SESSION.commit()
         except pagure.exceptions.PagureException as err:
             print err
-        except SQLAlchemyError, err:  # pragma: no cover
+        except SQLAlchemyError as err:  # pragma: no cover
             pagure.SESSION.rollback()
             pagure.APP.logger.exception(err)
 

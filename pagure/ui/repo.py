@@ -809,7 +809,7 @@ def view_settings(repo, username=None):
         except pagure.exceptions.PagureException as msg:
             SESSION.rollback()
             flask.flash(msg, 'error')
-        except SQLAlchemyError, err:  # pragma: no cover
+        except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')
 
@@ -872,7 +872,7 @@ def update_project(repo, username=None):
             SESSION.add(repo)
             SESSION.commit()
             flask.flash('Project updated')
-        except SQLAlchemyError, err:  # pragma: no cover
+        except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')
 
@@ -954,7 +954,7 @@ def delete_repo(repo, username=None):
             SESSION.delete(issue)
         SESSION.delete(repo)
         SESSION.commit()
-    except SQLAlchemyError, err:  # pragma: no cover
+    except SQLAlchemyError as err:  # pragma: no cover
         SESSION.rollback()
         APP.logger.exception(err)
         flask.flash('Could not delete the project', 'error')
@@ -971,7 +971,7 @@ def delete_repo(repo, username=None):
         shutil.rmtree(docpath)
         shutil.rmtree(ticketpath)
         shutil.rmtree(requestpath)
-    except (OSError, IOError), err:
+    except (OSError, IOError) as err:
         APP.logger.exception(err)
         flask.flash(
             'Could not delete all the repos from the system', 'error')
@@ -1014,7 +1014,7 @@ def new_repo_hook_token(repo, username=None):
         repo.hook_token = pagure.lib.login.id_generator(40)
         SESSION.commit()
         flask.flash('New hook token generated')
-    except SQLAlchemyError, err:  # pragma: no cover
+    except SQLAlchemyError as err:  # pragma: no cover
         SESSION.rollback()
         APP.logger.exception(err)
         flask.flash('Could not generate a new token for this project', 'error')
@@ -1468,7 +1468,7 @@ def delete_branch(repo, branchname, username=None):
         branch = repo_git.lookup_branch(branchname)
         branch.delete()
         flask.flash('Branch `%s` deleted' % branchname)
-    except pygit2.GitError, err:
+    except pygit2.GitError as err:
         APP.logger.exception(err)
         flask.flash('Could not delete `%s`' % branchname, 'error')
 

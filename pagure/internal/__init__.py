@@ -109,7 +109,7 @@ def pull_request_add_comment():
             requestfolder=pagure.APP.config['REQUESTS_FOLDER'],
         )
         pagure.SESSION.commit()
-    except SQLAlchemyError, err:  # pragma: no cover
+    except SQLAlchemyError as err:  # pragma: no cover
         pagure.SESSION.rollback()
         pagure.APP.logger.exception(err)
         flask.abort(500, 'Error when saving the request to the database')
@@ -164,7 +164,7 @@ def ticket_add_comment():
             ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
             notify=True)
         pagure.SESSION.commit()
-    except SQLAlchemyError, err:  # pragma: no cover
+    except SQLAlchemyError as err:  # pragma: no cover
         pagure.SESSION.rollback()
         pagure.APP.logger.exception(err)
         flask.abort(500, 'Error when saving the request to the database')

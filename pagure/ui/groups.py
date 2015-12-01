@@ -84,7 +84,7 @@ def view_group(group):
             pagure.SESSION.commit()
             pagure.lib.git.generate_gitolite_acls()
             flask.flash(msg)
-        except pagure.exceptions.PagureException, err:
+        except pagure.exceptions.PagureException as err:
             pagure.SESSION.rollback()
             flask.flash(err.message, 'error')
             return flask.redirect(
@@ -136,7 +136,7 @@ def group_user_delete(user, group):
             pagure.lib.git.generate_gitolite_acls()
             flask.flash(
                 'User `%s` removed from the group `%s`' % (user, group))
-        except pagure.exceptions.PagureException, err:
+        except pagure.exceptions.PagureException as err:
             pagure.SESSION.rollback()
             flask.flash(err.message, 'error')
             return flask.redirect(
@@ -236,7 +236,7 @@ def add_group():
             flask.flash('Group `%s` created.' % group_name)
             flask.flash(msg)
             return flask.redirect(flask.url_for('.group_lists'))
-        except pagure.exceptions.PagureException, err:
+        except pagure.exceptions.PagureException as err:
             pagure.SESSION.rollback()
             flask.flash(err.message, 'error')
         except SQLAlchemyError as err:  # pragma: no cover

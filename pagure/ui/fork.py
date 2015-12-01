@@ -448,7 +448,7 @@ def pull_request_add_comment(
             SESSION.commit()
             if not is_js:
                 flask.flash(message)
-        except SQLAlchemyError, err:  # pragma: no cover
+        except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             APP.logger.exception(err)
             flask.flash(str(err), 'error')
@@ -522,7 +522,7 @@ def pull_request_drop_comment(repo, requestid, username=None):
             try:
                 SESSION.commit()
                 flask.flash('Comment removed')
-            except SQLAlchemyError, err:  # pragma: no cover
+            except SQLAlchemyError as err:  # pragma: no cover
                 SESSION.rollback()
                 LOG.error(err)
                 flask.flash(
@@ -694,10 +694,10 @@ def set_assignee_requests(repo, requestid, username=None):
             if message:
                 SESSION.commit()
                 flask.flash(message)
-        except pagure.exceptions.PagureException, err:
+        except pagure.exceptions.PagureException as err:
             SESSION.rollback()
             flask.flash(err.message, 'error')
-        except SQLAlchemyError, err:  # pragma: no cover
+        except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             APP.logger.exception(err)
             flask.flash(str(err), 'error')
@@ -752,9 +752,9 @@ def fork_project(repo, username=None):
                 username=flask.g.fas_user.username,
                 repo=repo.name)
         )
-    except pagure.exceptions.PagureException, err:
+    except pagure.exceptions.PagureException as err:
         flask.flash(str(err), 'error')
-    except SQLAlchemyError, err:  # pragma: no cover
+    except SQLAlchemyError as err:  # pragma: no cover
         SESSION.rollback()
         flask.flash(str(err), 'error')
 
@@ -848,12 +848,12 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
                     username=parent.user, repo=parent.name)
 
             return flask.redirect(url)
-        except pagure.exceptions.PagureException, err:  # pragma: no cover
+        except pagure.exceptions.PagureException as err:  # pragma: no cover
             # There could be a PagureException thrown if the flask.g.fas_user
             # wasn't in the DB but then it shouldn't be recognized as a
             # repo admin and thus, if we ever are here, we are in trouble.
             flask.flash(str(err), 'error')
-        except SQLAlchemyError, err:  # pragma: no cover
+        except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')
 
@@ -986,13 +986,13 @@ def new_remote_request_pull(repo, username=None):
                     username=parent.user, repo=parent.name)
 
             return flask.redirect(url)
-        except pagure.exceptions.PagureException, err:  # pragma: no cover
+        except pagure.exceptions.PagureException as err:  # pragma: no cover
             # There could be a PagureException thrown if the
             # flask.g.fas_user wasn't in the DB but then it shouldn't
             # be recognized as a repo admin and thus, if we ever are
             # here, we are in trouble.
             flask.flash(str(err), 'error')
-        except SQLAlchemyError, err:  # pragma: no cover
+        except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')
 

@@ -233,7 +233,7 @@ def set_user(return_url):
             keydir=APP.config.get('GITOLITE_KEYDIR', None),
         )
         SESSION.commit()
-    except SQLAlchemyError, err:
+    except SQLAlchemyError as err:
         SESSION.rollback()
         LOG.debug(err)
         LOG.exception(err)

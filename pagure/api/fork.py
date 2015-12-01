@@ -487,7 +487,7 @@ def api_pull_request_add_comment(repo, requestid, username=None):
         except pagure.exceptions.PagureException as err:
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.ENOCODE, error=str(err))
-        except SQLAlchemyError, err:  # pragma: no cover
+        except SQLAlchemyError as err:  # pragma: no cover
             APP.logger.exception(err)
             SESSION.rollback()
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
@@ -621,7 +621,7 @@ def api_pull_request_add_flag(repo, requestid, username=None):
         except pagure.exceptions.PagureException as err:
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.ENOCODE, error=str(err))
-        except SQLAlchemyError, err:  # pragma: no cover
+        except SQLAlchemyError as err:  # pragma: no cover
             APP.logger.exception(err)
             SESSION.rollback()
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)

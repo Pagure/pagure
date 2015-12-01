@@ -65,7 +65,7 @@ def admin_generate_acl():
         try:
             pagure.lib.git.generate_gitolite_acls()
             flask.flash('Gitolite ACLs updated')
-        except pagure.exceptions.PagureException, err:
+        except pagure.exceptions.PagureException as err:
             flask.flash(str(err), 'error')
     return flask.redirect(flask.url_for('admin_index'))
 
@@ -80,7 +80,7 @@ def admin_refresh_ssh():
             generate_user_key_files()
             pagure.lib.git.generate_gitolite_acls()
             flask.flash('User key files regenerated')
-        except pagure.exceptions.PagureException, err:
+        except pagure.exceptions.PagureException as err:
             flask.flash(str(err), 'error')
     return flask.redirect(flask.url_for('admin_index'))
 

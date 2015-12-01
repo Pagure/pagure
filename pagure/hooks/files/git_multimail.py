@@ -424,7 +424,7 @@ class Config(object):
                     self.section, name)],
                 env=self.env, keepends=True,
                 ))
-        except CommandError, e:
+        except CommandError as e:
             if e.retcode == 1:
                 # "the section or key is invalid"; i.e., there is no
                 # value for the specified key.
@@ -465,7 +465,7 @@ class Config(object):
                 ['config', '--unset-all', '%s.%s' % (self.section, name)],
                 env=self.env,
                 )
-        except CommandError, e:
+        except CommandError as e:
             if e.retcode == 5:
                 # The name doesn't exist, which is what we wanted anyway...
                 pass
@@ -644,7 +644,7 @@ class Change(object):
 
             try:
                 value = value % values
-            except KeyError, e:
+            except KeyError as e:
                 if DEBUG:
                     sys.stderr.write(
                         'Warning: unknown variable %r in the following '
@@ -1403,7 +1403,7 @@ class SendMailer(Mailer):
     def send(self, lines, to_addrs):
         try:
             p = subprocess.Popen(self.command, stdin=subprocess.PIPE)
-        except OSError, e:
+        except OSError as e:
             sys.stderr.write(
                 '*** Cannot execute command: %s\n' % ' '.join(self.command)
                 + '*** %s\n' % str(e)
@@ -1443,7 +1443,7 @@ class SMTPMailer(Mailer):
         self.smtpserver = smtpserver
         try:
             self.smtp = smtplib.SMTP(self.smtpserver)
-        except Exception, e:
+        except Exception as e:
             sys.stderr.write(
                 '*** Error establishing SMTP connection to %s***\n' %
                 self.smtpserver)
@@ -1461,7 +1461,7 @@ class SMTPMailer(Mailer):
                 to_addrs = [
                     email for (name, email) in getaddresses([to_addrs])]
             self.smtp.sendmail(self.envelopesender, to_addrs, msg)
-        except Exception, e:
+        except Exception as e:
             sys.stderr.write('*** Error sending email***\n')
             sys.stderr.write('*** %s\n' % str(e))
             self.smtp.quit()
@@ -2581,7 +2581,7 @@ def main(args):
             run_as_update_hook(environment, mailer, refname, oldrev, newrev)
         else:
             run_as_post_receive_hook(environment, mailer)
-    except ConfigurationException, e:
+    except ConfigurationException as e:
         sys.exit(str(e))
 
 

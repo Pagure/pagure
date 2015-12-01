@@ -92,7 +92,7 @@ def update_issue(repo, issueid, username=None):
                 SESSION.commit()
                 if not is_js:
                     flask.flash('Comment removed')
-            except SQLAlchemyError, err:  # pragma: no cover
+            except SQLAlchemyError as err:  # pragma: no cover
                 is_js = False
                 SESSION.rollback()
                 LOG.error(err)
@@ -198,12 +198,12 @@ def update_issue(repo, issueid, username=None):
                 for message in messages:
                     flask.flash(message)
 
-        except pagure.exceptions.PagureException, err:
+        except pagure.exceptions.PagureException as err:
             is_js = False
             SESSION.rollback()
             if not is_js:
                 flask.flash(err.message, 'error')
-        except SQLAlchemyError, err:  # pragma: no cover
+        except SQLAlchemyError as err:  # pragma: no cover
             is_js = False
             SESSION.rollback()
             APP.logger.exception(err)
@@ -249,7 +249,7 @@ def edit_tag(repo, tag, username=None):
             SESSION.commit()
             for msg in msgs:
                 flask.flash(msg)
-        except SQLAlchemyError, err:  # pragma: no cover
+        except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             LOG.error(err)
             flask.flash('Could not edit tag: %s' % tag, 'error')
@@ -297,7 +297,7 @@ def remove_tag(repo, username=None):
             SESSION.commit()
             for msg in msgs:
                 flask.flash(msg)
-        except SQLAlchemyError, err:  # pragma: no cover
+        except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             LOG.error(err)
             flask.flash(
@@ -461,9 +461,9 @@ def new_issue(repo, username=None):
             return flask.redirect(flask.url_for(
                 '.view_issue', username=username, repo=repo.name,
                 issueid=issue.id))
-        except pagure.exceptions.PagureException, err:
+        except pagure.exceptions.PagureException as err:
             flask.flash(str(err), 'error')
-        except SQLAlchemyError, err:  # pragma: no cover
+        except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')
 
@@ -558,7 +558,7 @@ def delete_issue(repo, issueid, username=None):
             flask.flash('Issue deleted')
             return flask.redirect(flask.url_for(
                 'view_issues', username=username, repo=repo.name))
-        except SQLAlchemyError, err:  # pragma: no cover
+        except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             APP.logger.exception(err)
             flask.flash('Could not delete the issue', 'error')
@@ -646,9 +646,9 @@ def edit_issue(repo, issueid, username=None):
                 'view_issue', username=username,
                 repo=repo.name, issueid=issueid)
             return flask.redirect(url)
-        except pagure.exceptions.PagureException, err:
+        except pagure.exceptions.PagureException as err:
             flask.flash(str(err), 'error')
-        except SQLAlchemyError, err:  # pragma: no cover
+        except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')
     elif flask.request.method == 'GET':

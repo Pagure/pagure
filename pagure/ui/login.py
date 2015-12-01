@@ -128,7 +128,7 @@ def do_login():
                 flask.g.fas_session_id = visit_key
                 flask.g.fas_user.login_time = now
                 flask.flash('Welcome %s' % user_obj.username)
-            except SQLAlchemyError, err:  # pragma: no cover
+            except SQLAlchemyError as err:  # pragma: no cover
                 flask.flash(
                     'Could not set the session in the db, '
                     'please report this error to an admin', 'error')
@@ -156,7 +156,7 @@ def confirm_user(token):
             SESSION.commit()
             flask.flash('Email confirmed, account activated')
             return flask.redirect(flask.url_for('auth_login'))
-        except SQLAlchemyError, err:  # pragma: no cover
+        except SQLAlchemyError as err:  # pragma: no cover
             flask.flash(
                 'Could not set the account as active in the db, '
                 'please report this error to an admin', 'error')
@@ -371,7 +371,7 @@ def _check_session_cookie():
                 SESSION.add(session)
                 try:
                     SESSION.commit()
-                except SQLAlchemyError, err:  # pragma: no cover
+                except SQLAlchemyError as err:  # pragma: no cover
                     flask.flash(
                         'Could not prolong the session in the db, '
                         'please report this error to an admin', 'error')

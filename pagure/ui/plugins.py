@@ -105,7 +105,7 @@ def view_plugin(repo, plugin, username=None, full=True):
             SESSION.add(dbobj)
         try:
             SESSION.flush()
-        except SQLAlchemyError, err:  # pragma: no cover
+        except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             APP.logger.debug('Could not add plugin %s', plugin.name)
             APP.logger.exception(err)

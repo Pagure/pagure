@@ -180,7 +180,7 @@ def stats(client_reader, client_writer):
         client_writer.write(('data: %s\n\n' % SERVER.active_count).encode())
         yield trollius.From(client_writer.drain())
 
-    except trollius.ConnectionResetError, err:
+    except trollius.ConnectionResetError as err:
         log.info(err)
         pass
     finally:

@@ -60,7 +60,7 @@ def main(folder, debug=False):
                 keydir=pagure.APP.config.get('GITOLITE_KEYDIR', None),
             )
             pagure.SESSION.commit()
-        except SQLAlchemyError, err:
+        except SQLAlchemyError as err:
             pagure.SESSION.rollback()
             print 'ERROR with user %s' % user
             print err
@@ -92,10 +92,10 @@ def main(folder, debug=False):
                 requestfolder=pagure.APP.config['REQUESTS_FOLDER'],
             )
             pagure.SESSION.commit()
-        except pagure.exceptions.PagureException, err:
+        except pagure.exceptions.PagureException as err:
             print 'ERROR with project %s' % project
             print err
-        except SQLAlchemyError, err:  # pragma: no cover
+        except SQLAlchemyError as err:  # pragma: no cover
             pagure.SESSION.rollback()
             print 'ERROR (DB) with project %s' % project
             print err

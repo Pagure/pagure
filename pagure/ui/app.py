@@ -361,9 +361,9 @@ def new_project():
             pagure.lib.git.generate_gitolite_acls()
             flask.flash(message)
             return flask.redirect(flask.url_for('view_repo', repo=name))
-        except pagure.exceptions.PagureException, err:
+        except pagure.exceptions.PagureException as err:
             flask.flash(str(err), 'error')
-        except SQLAlchemyError, err:  # pragma: no cover
+        except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')
 
@@ -406,7 +406,7 @@ def user_settings():
             flask.flash(message)
             return flask.redirect(
                 flask.url_for('view_user', username=user.user))
-        except SQLAlchemyError, err:  # pragma: no cover
+        except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')
     elif flask.request.method == 'GET':
@@ -514,7 +514,7 @@ def add_user_email():
             SESSION.commit()
             flask.flash('Email pending validation')
             return flask.redirect(flask.url_for('.user_settings'))
-        except pagure.exceptions.PagureException, err:
+        except pagure.exceptions.PagureException as err:
             flask.flash(str(err), 'error')
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
@@ -586,7 +586,7 @@ def confirm_email(token):
             SESSION.delete(email)
             SESSION.commit()
             flask.flash('Email validated')
-        except SQLAlchemyError, err:  # pragma: no cover
+        except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(
                 'Could not set the account as active in the db, '

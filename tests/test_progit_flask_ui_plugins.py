@@ -138,7 +138,7 @@ class PagureFlaskPluginstests(tests.Modeltests):
 
         try:
             form.validate()
-        except Exception, err:
+        except Exception as err:
             self.assertEqual(
                 str(err), 'no field named "active" in form')
 
