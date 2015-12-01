@@ -12,6 +12,33 @@
 </div>
 {% endmacro %}
 
+{% macro render_bootstrap_field(field, field_description="") %}
+            <fieldset class="form-group {% if field.errors %}has-error{% endif %}">
+              {{ field.label }}
+              {% if field.errors %}
+                {{ field(class_="form-control form-control-error")|safe }}
+              {% else %}
+                {{ field(class_="form-control")|safe }}
+              {% endif %}
+              <div>
+                {% if field_description %}
+                  <small class="text-muted">{{field_description}}</small>
+                {% endif %}
+                {% if field.errors %}
+                <span class="pull-right text-danger">
+                  <small>
+                  {% for error in field.errors %}
+                    {{ error }}&nbsp;
+                  {% endfor %}
+                  </small>
+                </span>
+                {% endif %}
+              </div>
+            </fieldset>
+{% endmacro %}
+
+(class_="c-select")
+
 {% macro render_field_invert(field, after="") %}
 <div class="row">
   {{ field(**kwargs)|safe }}{{ field.label }}

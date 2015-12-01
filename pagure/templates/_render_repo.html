@@ -1,33 +1,26 @@
 {% macro render_row(items) -%}
     {% for repo in items %}
-        {% if loop.index == 1 %}
-    <div class="project_row">
-        {% endif %}
         {% if repo.is_fork %}
-        {% set url = url_for('view_repo', username=repo.user.username, repo=repo.name) %}
+          {% set url = url_for('view_repo', username=repo.user.username, repo=repo.name) %}
         {% else %}
-        {% set url = url_for('view_repo', repo=repo.name) %}
+          {% set url = url_for('view_repo', repo=repo.name) %}
         {% endif %}
-        <a class="project_link logo_link"
-            href="{{ url }}"
+        <a class="list-group-item"
+            href="{{ url }}">
+            <span>
             {% if repo.avatar_email %}
-            style="background-image: url({{ repo.avatar_email | avatar_url }})">
+              <img src="{{ repo.avatar_email | avatar_url }}" />
             {% else %}
-            style="background-image: url({{ url_for('static', filename='placebo.png') }})">
+              <img src="{{ url_for('static', filename='placebo.png') }}" />
             {% endif %}
-            <span class="repo_name">{{ repo.name }}</span>
+            </span>
+            <h3 class="repo_name">{{ repo.name }}</h3>
             {% if repo.description %}
-            <span class="repo_desc">{{ repo.description | wraps(20) }}</span>
+            <span class="repo_desc">{{ repo.description }}</span>
             {% endif %}
         </a>
-        {% if loop.last %}
-    </div>
-        {% elif loop.index is divisibleby(3) or loop.last %}
-    </div>
-    <div class="project_row">
-        {% endif %}
     {% else %}
-    <p>No project found</p>
+    <p>No projects found</p>
     {% endfor %}
 {%- endmacro %}
 
@@ -73,7 +66,7 @@
         {% if total and total > 1 %}
         {{ pagination_link(pagetitle, page, total) }}
         {% endif %}
-        <div>
+        <div class="list-group">
             {{ render_row(list) }}
         </div>
         {% if total and total > 1 %}

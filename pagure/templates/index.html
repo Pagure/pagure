@@ -13,6 +13,7 @@
 {% from "_render_repo.html" import repos_switch %}
 
 {% block content %}
+  <div class="container p-t">
     {% if username %}
         <h2>
             {{ username | avatar(36) | safe }} {{ username }}
@@ -47,4 +48,5 @@
         });
     </script>
     {% endif %}
+  </div>
 {% endblock %}

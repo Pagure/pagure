@@ -78,7 +78,7 @@
 	  </div>
 	</nav>
     <div class="bodycontent">
-            <!--{% with messages = get_flashed_messages(with_categories=true) %}
+            {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if category, messages %}
                 <ul id="flashes">
                     {% for category, message in messages %}
@@ -86,7 +86,7 @@
                     {% endfor %}
                 </ul>
                 {% endif %}
-            {% endwith %}-->
+            {% endwith %}
 
             {% block content %}{% endblock %}
     </div>
