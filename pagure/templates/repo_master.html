@@ -72,61 +72,62 @@
       <li class="nav-item">
         <a {% if select == 'overview' %}class="nav-link active" {% else %}class="nav-link"{% endif %} href="{{ url_for('view_repo',username=username, repo=repo.name) }}">Overview</a>
       </li>
+        {% if config['DOC_APP_URL'] and repo and repo.settings.get('project_documentation', True) %}
+        <li class="nav-item" >
+          <a  {% if select == 'docs' %}class="active nav-link"  {% else %}class="nav-link"{% endif %} href="{{ url_for('.view_docs', username=username, repo=repo.name) }}">Docs</a>
+        </li>
+        {% endif %}
 
-      {% if config['DOC_APP_URL'] and repo and repo.settings.get('project_documentation', True) %}
-      <li class="nav-item" >
-        <a  {% if select == 'docs' %}class="active nav-link"  {% else %}class="nav-link"{% endif %} href="{{ url_for('.view_docs', username=username, repo=repo.name) }}">Docs</a>
-      </li>
-      {% endif %}
+        <li class="nav-item">
+          <a {% if select == 'logs' %}class="active nav-link"  {% else %}class="nav-link"{% endif %} href="{{ url_for('.view_commits', username=username,
+                     repo=repo.name, branchname=branchname) }}">Commits</a>
+        </li>
 
-      <li class="nav-item">
-        <a {% if select == 'logs' %}class="active nav-link"  {% else %}class="nav-link"{% endif %} href="{{ url_for('.view_commits', username=username,
-                   repo=repo.name, branchname=branchname) }}">Commits</a>
-      </li>
+        <li class="nav-item">
+          <a {% if select == 'tree' %}class="active nav-link"  {% else %}class="nav-link"{% endif %} href="{{ url_for('.view_tree', username=username,
+                     repo=repo.name, identifier=branchname) }}">Files</a>
+        </li>
 
-      <li class="nav-item">
-        <a {% if select == 'tree' %}class="active nav-link"  {% else %}class="nav-link"{% endif %} href="{{ url_for('.view_tree', username=username,
-                   repo=repo.name, identifier=branchname) }}">Files</a>
-      </li>
+        <li class="nav-item">
+          <a {% if select == 'tags' %}class="active nav-link"  {% else %}class="nav-link"{% endif %} href="{{ url_for('.view_tags', username=username,
+                     repo=repo.name) }}">Releases</a>
+        </li>
 
-      <li class="nav-item">
-        <a {% if select == 'tags' %}class="active nav-link"  {% else %}class="nav-link"{% endif %} href="{{ url_for('.view_tags', username=username,
-                   repo=repo.name) }}">Releases</a>
-      </li>
+        {% if config.get('ENABLE_TICKETS', True) and repo
+              and repo.settings.get('issue_tracker', True) %}
+        <li class="nav-item">
+            <a {% if select == 'issues' %}class="active nav-link"  {% else %}class="nav-link"{% endif %} href="{{ url_for('.view_issues', username=username,
+                       repo=repo.name) }}">Issues <span class="label label-default label-pill">{{ repo.issues|count }}</span></a>
+        </li>
+        {% endif %}
 
-      {% if config.get('ENABLE_TICKETS', True) and repo
-            and repo.settings.get('issue_tracker', True) %}
-      <li class="nav-item">
-          <a {% if select == 'issues' %}class="active nav-link"  {% else %}class="nav-link"{% endif %} href="{{ url_for('.view_issues', username=username,
-                     repo=repo.name) }}">Issues <span class="label label-default label-pill">{{ repo.issues|count }}</span></a>
-      </li>
-      {% endif %}
+        {% if repo and repo.settings.get('pull_requests', True) %}
+        <li class="nav-item">
+          <a {% if select == 'requests' %}class="active nav-link"  {% else %}class="nav-link"{% endif %} href="{{ url_for('.request_pulls', username=username,
+                     repo=repo.name) }}">
+            Pull-requests
+          </a>
+        </li>
+        {% endif %}
 
-      {% if repo and repo.settings.get('pull_requests', True) %}
-      <li class="nav-item">
-        <a {% if select == 'requests' %}class="active nav-link"  {% else %}class="nav-link"{% endif %} href="{{ url_for('.request_pulls', username=username,
-                   repo=repo.name) }}">
-          Pull-requests ({{repo.open_requests }})
-        </a>
-      </li>
-      {% endif %}
+        {% if repo and repo.forks %}
+        <li class="nav-item">
+          <a {% if select == 'forks' %}class="active nav-link"  {% else %}class="nav-link"{% endif %} href="{{ url_for('.view_forks', username=username,
+                     repo=repo.name) }}">
+          Forks ({{ repo.forks |length }})</a>
+        </li>
+        {% endif %}
 
-      {% if repo and repo.forks %}
-      <li class="nav-item">
-        <a {% if select == 'forks' %}class="active nav-link"  {% else %}class="nav-link"{% endif %} href="{{ url_for('.view_forks', username=username,
-                   repo=repo.name) }}">
-        Forks ({{ repo.forks |length }})</a>
-      </li>
-      {% endif %}
       {% if authenticated %}
-      {% if repo_admin %}
-      <li class="nav-item">
-        <a {% if select == 'settings' %}class="active nav-link" {% else %}class="nav-link"{% endif %} href="{{ url_for(
-            '.view_settings', repo=repo.name, username=username) }}">
-          Settings</a>
-      </li>
+        {% if repo_admin %}
+          <li class="nav-item">
+            <a {% if select == 'settings' %}class="active nav-link" {% else %}class="nav-link"{% endif %} href="{{ url_for(
+                '.view_settings', repo=repo.name, username=username) }}">
+              Settings</a>
+          </li>
+        {% endif %}
       {% endif %}
-      {% endif %}
+
     </ul>
   </div>
 </div>

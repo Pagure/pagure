@@ -54,3 +54,27 @@ html
     padding-left:3px;
     padding-right:3px;
 }
+
+.alert-info pre
+{
+    background-color:#CFE5F0;
+}
+
+.card-header > .breadcrumb
+{
+padding:0;
+background:none;
+margin-bottom:0;
+display:inline-block;
+}
+
+.card-header > .breadcrumb .oi
+{
+font-size:0.8rem;
+}
+
+.file-button-bar
+{
+background:#ededed;
+padding: 0.3rem;
+}

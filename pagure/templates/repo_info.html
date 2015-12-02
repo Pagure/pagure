@@ -9,17 +9,53 @@
 {% endblock %}
 
 {% block repo %}
-<div class="row">
-  {% if origin == 'view_repo' or origin == 'view_repo_branch' %}
-    <div class="col-md-8">
-      {% if readme %}
-        <section class="readme">
-          {% if safe %}
-            {{ readme | noJS |safe }}
-          {% else %}
-            {{ readme | noJS }}
-          {% endif %}
-        </section>
+  <div class="row">
+    {% if repo_obj and repo_obj.is_empty %}
+      <div class="col-md-8">
+        <div class="alert {% if category == 'error' %}alert-warning{% else %}alert-info{%endif%}" role="alert">
+          <p>This repo is brand new!</p>
+            {% if authenticated and repo_admin %}
+              <p>If you already have a git repo:</p>
+              <pre>git remote add origin {{ config.get('GIT_URL_SSH') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
+  git push -u origin master</pre>
+
+              <p>If you have not created your git repo yet:</p>
+              <pre>git clone {{ config.get('GIT_URL_SSH') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
+  cd {{ repo.name }}
+  touch README.rst
+  git add README.rst
+  git commit -m "Add README file"
+  git push -u origin master</pre>
+            {% else %}
+              <p>The Project Creator has not pushed any code yet</p>
+            {% endif %}
+        </div>
+      </div>
+    {% else %}
+      {% if origin == 'view_commits' %}
+        <div class="list-group">
+          {% for commit in last_commits %}
+            <a href="{{ url_for('view_commit', username=username, repo=repo.name, commitid=commit.hex) }}" class="list-group-item {% if diff_commits and commit.oid.hex in diff_commits %}p-l-lg{% endif %}" style="position:relative;">
+              {% if diff_commits and commit.oid.hex in diff_commits %}
+                <div title="This commit is not in the main branch of this Repo" style="position:absolute; left:0; top:0; padding:5px; padding-top:20px; height:100%; background:#eee; vertical-align:middle;">
+                  <span class="oi" data-glyph="arrow-thick-right"></span>
+                </div>
+              {% endif %}
+              <h5>
+                <strong>{{ commit.message.split('\n')[0] }}</strong>
+                <div class="pull-right">
+                  <span class="commitdate" title="{{ commit.commit_time|format_ts }}">
+                    {{ commit.commit_time|humanize }}
+                  </span>
+                </div>
+              </h5>
+              {{ commit.author | author2avatar(20) | safe }} {{ commit.author.name }}
+              <div class="pull-right">
+                <span class="label label-default">{{ commit.hex|short }}</span>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
       {% endif %}
     </div>
     <div class="col-md-4">
@@ -127,24 +163,26 @@
           Recent Commits
         </div>
         <div class="card-block p-a-0">
-        <div class="list-group list-group-flush">
-        {% for commit in last_commits %}
-          <a href="{{ url_for('view_commit', username=username, repo=repo.name, commitid=commit.hex) }}" class="list-group-item">
+          <div class="list-group list-group-flush">
+            {% for commit in last_commits %}
+              <a href="{{ url_for('view_commit', username=username, repo=repo.name, commitid=commit.hex) }}" class="list-group-item">
                 <div><strong>
                   {{ commit.message.split('\n')[0] }}
-                {% if diff_commits and commit.oid.hex in diff_commits %}
-                <span class="new_commit" title="Commit not in the main repo">*</span>
-                {% endif %}
+                  {% if diff_commits and commit.oid.hex in diff_commits %}
+                    <span class="new_commit" title="Commit not in the main repo">*</span>
+                  {% endif %}
                 </strong></div>
                 <div class="commitdate" title="{{ commit.commit_time|format_ts }}">
                   {{ commit.commit_time|humanize }}
                 </div>
-          </a>
-        {% endfor %}
-        </div>
+              </a>
+            {% endfor %}
+          </div>
         </div>
       </div>
+      {% endif %}
     </div>
+
   {% endif %}
 </div>
 

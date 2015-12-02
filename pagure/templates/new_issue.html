@@ -1,6 +1,9 @@
 {% extends "repo_master.html" %}
-{% from "_formhelper.html" import render_field_in_row %}
-
+{% from "_formhelper.html" import render_bootstrap_field %}
+{% block header%}
+<link rel="stylesheet" href="//cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+<script src="//cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+{% endblock%}
 {% block title %}{% if not type or type == 'new'
     %}New issue{% elif type and type == 'edit'
     %}Edit issue #{{ issueid }} {% endif %} - {{ repo.name }}{% endblock %}
@@ -8,100 +11,99 @@
 
 
 {% block repo %}
-
-{% if not type or type == 'new' %}
-<h2>New issue</h2>
-{% elif type and type == 'edit' %}
-<h2>Edit issue #{{ issueid }}</h2>
-{% endif %}
-
-
-<section class="new_issue">
-  {% if not type or type == 'new' %}
-    <form action="{{ url_for('.new_issue',
-                     username=username, repo=repo.name) }}" method="post"
-          enctype="multipart/form-data">
-
-  {% elif type and type == 'edit' %}
-    <form action="{{ url_for('.edit_issue', username=username,
-                       repo=repo.name, issueid=issueid) }}" method="post"
-          enctype="multipart/form-data">
-  {% endif %}
-
-    <table>
-      {{ render_field_in_row(form.title) }}
-      {{ render_field_in_row(form.status) }}
-      {{ render_field_in_row(form.private) }}
-    </table>
-    Attach file
-    <input id="file-picker" type="file" name="filestream" accept="image/*" multiple>
-    <div id="tabs">
-      <ul>
-        <li><a href="#new_comment">Comment</a></li>
-        <li><a href="#preview">Preview</a></li>
-      </ul>
-      <div id="new_comment">
-        <div>
-          <textarea id="issue_content" name="issue_content"
-            placeholder="Report your issue/request here">
-          {%- if issue %}{{ issue.content }}{% endif -%}
-          </textarea>
-          {% if form.issue_content.errors %}
-          <p class="errors">
-            {% for error in form.issue_content.errors %}
-            {{ error }}<br />
-            {% endfor %}
-          </p>
-          {% endif %}
-        </div>
+<div class="row">
+  <div class="col-md-8 col-md-offset-2">
+    <div class="card">
+      <div class="card-header">
+        {% if not type or type == 'new' %}
+        New issue
+        {% elif type and type == 'edit' %}
+        Edit issue #{{ issueid }}
+        {% endif %}
       </div>
-      <div id="preview">
+      <div class="card-block">
+        {% if not type or type == 'new' %}
+          <form action="{{ url_for('.new_issue',
+                           username=username, repo=repo.name) }}" method="post"
+                enctype="multipart/form-data">
+
+        {% elif type and type == 'edit' %}
+          <form action="{{ url_for('.edit_issue', username=username,
+                             repo=repo.name, issueid=issueid) }}" method="post"
+                enctype="multipart/form-data">
+        {% endif %}
+        {{ render_bootstrap_field(form.title, field_description="the name of your project") }}
+        {{ render_bootstrap_field(form.status, field_description="bug statuss") }}
+        {{ render_bootstrap_field(form.private, field_description="the name of your project") }}
+          <fieldset class="form-group">
+            <label for="issue_content">Description</label>
+            <textarea class="form-control" id="issue_content" name="issue_content"
+                placeholder="Report your issue/request here">
+              {%- if issue %}{{ issue.content }}{% endif -%}
+            </textarea>
+            <div>
+              <small class="text-muted">&nbsp;</small>
+              {% if form.issue_content.errors %}
+              <span class="pull-right text-danger">
+                <small>
+                {% for error in form.issue_content.errors %}
+                  {{ error }}&nbsp;
+                {% endfor %}
+                </small>
+              </span>
+              {% endif %}
+            </div>
+          </fieldset>
+        <input id="file-picker" type="file" name="filestream" accept="image/*" multiple>
+        Attach file
+        <p>
+          (supports the <a href="http://daringfireball.net/projects/markdown/syntax"
+                          target="_blank">Markdown syntax</a>)
+        </p>
+
+        <p class="buttons indent">
+          {% if not type or type == 'new' %}
+          <input type="submit" class="submit positive button" value="Create">
+          {% elif type and type == 'edit' %}
+          <input type="submit" class="submit positive button" value="Edit">
+          {% endif %}
+          <input type="button" value="Cancel" class="button" onclick="history.back();">
+          {{ form.csrf_token }}
+        </p>
+      </form>
       </div>
     </div>
-    <p>
-      (supports the <a href="http://daringfireball.net/projects/markdown/syntax"
-                      target="_blank">Markdown syntax</a>)
-    </p>
-
-    <p class="buttons indent">
-      {% if not type or type == 'new' %}
-      <input type="submit" class="submit positive button" value="Create">
-      {% elif type and type == 'edit' %}
-      <input type="submit" class="submit positive button" value="Edit">
-      {% endif %}
-      <input type="button" value="Cancel" class="button" onclick="history.back();">
-      {{ form.csrf_token }}
-    </p>
-  </form>
-</section>
+  </div>
+</div>
 
 {% endblock %}
 
 {% block jscripts %}
 {{ super() }}
+<script>
+var simplemde = new SimpleMDE({ element: $("#issue_content")[0] });
+</script>
 <script type="text/javascript">
 {% if authenticated and form %}
 $(document).ready(function() {
   // Set up the handler for the file input box.
   $("#file-picker").on("change", function() {
+    alert("s")
     //doUpload("{{ form.csrf_token.current_token }}", this.files);
-    var _txt = $("#issue_content").val();
+    var _txt = simplemde.value();
     if (_txt) {
       _txt += '\n';
     }
     var _loc = "{{ url_for('view_issue_raw_file', repo=repo.name, username=username, filename='') }}" + this.file;
 
-    $("#issue_content").val(_txt + '<!!image>');
+    simplemde.value(_txt + '<!!image>');
   });
 });
 {% endif %}
 
 $(function() {
-  $( "#tabs" ).tabs();
-
-  $( "#tabs" ).on('tabsactivate',
+  $( "#previewinmarkdown" ).click(
     function(event, ui) {
-      if (ui.newPanel.selector == '#preview') {
         var _text = $( "#issue_content" ).val();
         var _url = "{{ url_for('markdown_preview') }}";
           $.ajax({
@@ -120,7 +122,6 @@ $(function() {
               }
           });
           return false;
-      }
     }
   );
 });

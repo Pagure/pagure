@@ -14,26 +14,35 @@
 
 {% macro render_bootstrap_field(field, field_description="") %}
             <fieldset class="form-group {% if field.errors %}has-error{% endif %}">
-              {{ field.label }}
-              {% if field.errors %}
-                {{ field(class_="form-control form-control-error")|safe }}
+              {% set formclasses = "form-control"%}
+              {% if field.errors %} {% set formclasses = formclasses + " form-control-error" %} {% endif %}
+              {% if field.type == "SelectField" %} {% set formclasses = formclasses + " c-select" %} {% endif %}
+
+              {% if field.type == 'BooleanField' %}
+                {% set formclasses = formclasses + " checkbox-inline" %}
+                  <label class="c-input c-checkbox">
+                    {{ field(type='checkbox', **kwargs) }}
+                    <span class="c-indicator"></span>
+                    {{ field.label }}
+                  </label>
               {% else %}
-                {{ field(class_="form-control")|safe }}
+                {{ field.label }}
+                {{ field(class_=formclasses)|safe }}
+                <div>
+                  {% if field_description %}
+                    <small class="text-muted">{{field_description}}</small>
+                  {% endif %}
+                  {% if field.errors %}
+                  <span class="pull-right text-danger">
+                    <small>
+                    {% for error in field.errors %}
+                      {{ error }}&nbsp;
+                    {% endfor %}
+                    </small>
+                  </span>
+                  {% endif %}
+                </div>
               {% endif %}
-              <div>
-                {% if field_description %}
-                  <small class="text-muted">{{field_description}}</small>
-                {% endif %}
-                {% if field.errors %}
-                <span class="pull-right text-danger">
-                  <small>
-                  {% for error in field.errors %}
-                    {{ error }}&nbsp;
-                  {% endfor %}
-                  </small>
-                </span>
-                {% endif %}
-              </div>
             </fieldset>
 {% endmacro %}
 
