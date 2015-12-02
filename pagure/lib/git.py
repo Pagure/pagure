@@ -190,7 +190,12 @@ def update_git(obj, repo, repofolder, objtype='ticket'):
 
     # Retrieve the list of files that changed
     diff = new_repo.diff()
-    files = [patch.new_file_path for patch in diff]
+    files = []
+    for p in diff:
+        if hasattr(p, 'new_file_path'):
+            files.append(p.new_file_path)
+        elif hasattr(p, 'delta'):
+            files.append(p.delta.new_file.path)
 
     # Add the changes to the index
     if added:
@@ -729,7 +734,12 @@ def update_file_in_git(
 
     # Retrieve the list of files that changed
     diff = new_repo.diff()
-    files = [patch.new_file_path for patch in diff]
+    files = []
+    for p in diff:
+        if hasattr(p, 'new_file_path'):
+            files.append(p.new_file_path)
+        elif hasattr(p, 'delta'):
+            files.append(p.delta.new_file.path)
 
     # Add the changes to the index
     added = False

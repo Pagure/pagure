@@ -245,7 +245,10 @@ def patch_to_diff(patch):
         content = content + "@@ -%i,%i +%i,%i @@\n" % (
             hunk.old_start, hunk.old_lines, hunk.new_start, hunk.new_lines)
         for line in hunk.lines:
-            content = content + ' '.join(line)
+            if hasattr(line, 'content'):
+                content = content + line.origin + ' '+ line.content
+            else:
+                content = content + ' '.join(line)
     return content
 
 

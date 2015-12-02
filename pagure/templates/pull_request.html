@@ -272,19 +272,38 @@
 <section class="commit_diff">
 <header>
     <h3>
-        {%- if patch.new_file_path == patch.old_file_path -%}
-        {{ patch.new_file_path }}
-        {%- else -%}
-        {{ patch.new_file_path }} (Renamed from "{{ patch.old_file_path }}")
+        {%- if patch | hasattr('new_file_path') -%}
+          {%- if patch.new_file_path == patch.old_file_path -%}
+          {{ patch.new_file_path }}
+          {%- else -%}
+          {{ patch.new_file_path }} (Renamed from "{{ patch.old_file_path }}")
+          {%- endif -%}
+        {%- elif patch | hasattr('delta') -%}
+          {%- if patch.delta.new_file.path == patch.delta.old_file.path -%}
+          {{ patch.delta.new_file.path }}
+          {%- else -%}
+          {{ patch.delta.new_file.path }} (Renamed from "{{ patch.delta.old_file.path }}")
+          {%- endif -%}
         {%- endif -%}
     </h3>
     <ul class="buttons">
       <li class="addrem_bar">
+      {% if patch | hasattr('additions') %}
+      {# Version of pygit2 -0.21.4 -- F21/EL7 #}
       {% if (patch.additions + patch.deletions) %}
         <span style="width: {{ (100.0 * patch.additions / (patch.additions + patch.deletions))|round|int }}%">
           {% if patch.additions > 0 %}+{{ patch.additions }}{% endif %}
           {% if patch.deletions > 0 %}-{{ patch.deletions }}{% endif %}
         </span>
+      {% endif %}
+      {% else %}
+      {# Version of pygit2 -0.23.0 -- F23 #}
+      {% if (patch.line_stats[1] + patch.line_stats[2]) %}
+        <span style="width: {{ (100.0 * patch.line_stats[1] / (patch.line_stats[1] + patch.line_stats[2]))|round|int }}%">
+          {% if patch.line_stats[1] > 0 %}+{{ patch.line_stats[1] }}{% endif %}
+          {% if patch.line_stats[2] > 0 %}-{{ patch.line_stats[2] }}{% endif %}
+        </span>
+      {% endif %}
       {% endif %}
       </li>
       <li>
@@ -308,6 +327,8 @@
         {% endif %}
         {% if patch |hasattr('new_id') %}
         title="View file as of {{ patch.new_id|short }}">View</a>
+        {% elif patch |hasattr('delta') %}
+        title="View file as of {{ patch.delta.new_file.id|short }}">View</a>
         {% else %}
         title="View file as of {{ patch.new_oid|short }}">View</a>
         {% endif %}
