@@ -832,7 +832,7 @@ def edit_comment_issue(repo, issueid, commentid, username=None):
             repo=project.name, issueid=issueid))
 
     return flask.render_template(
-        'pull_request_comment_update.html',
+        'comment_update.html',
         select='requests',
         requestid=issueid,
         repo=project,

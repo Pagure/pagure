@@ -593,7 +593,7 @@ def pull_request_edit_comment(repo, requestid, commentid, username=None):
             repo=project.name, requestid=requestid))
 
     return flask.render_template(
-        'pull_request_comment_update.html',
+        'comment_update.html',
         select='requests',
         requestid=requestid,
         repo=project,
