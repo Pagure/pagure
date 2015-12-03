@@ -1,8 +1,12 @@
+{% if not is_js %}
 {% extends "repo_master.html" %}
+{% endif %}
 
 {% block repo %}
 <section class="edit_comment">
+  {% if not is_js %}
   <form action="{{ request.base_url }}" method="post">
+  {% endif %}
 
     <div class="tabs ui-widget ui-widget-content ui-corner-all"
         id="comment_block">
@@ -15,9 +19,12 @@
 
   {{ form.csrf_token }}
     <div>
-      <input type="submit" class="submit positive button" value="Update">
+      <input type="hidden" name="edit_comment" value="{{ comment.id }}"/>
+      <input type="submit" class="submit positive button" value="Update" />
       <input type="button" class="cancel" value="Cancel" onclick="history.back();"/>
     </div>
+  {% if not is_js %}
   </form>
+  {% endif %}
 </section>
 {% endblock %}

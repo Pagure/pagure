@@ -326,6 +326,25 @@ $(function() {
     $(obj).html(preview);
   });
 
+  $(".edit_btn").click(function() {
+    var commentid = $( this ).attr('data-comment');
+    var _url = '{{ request.base_url }}' + '/comment/' + commentid + '/edit';
+    $.ajax({
+        url: _url + '?js=1',
+        type: 'GET',
+        dataType: 'html',
+        success: function(res) {
+            var el = $('#comment-' + commentid);
+            var sec = el.parent().children()[1];
+            $(sec).html(res);
+        },
+        error: function() {
+            alert('Could not make edit work');
+        }
+    });
+    return false;
+  })
+
 });
 </script>
 

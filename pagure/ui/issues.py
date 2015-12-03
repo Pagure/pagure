@@ -65,6 +65,13 @@ def update_issue(repo, issueid, username=None):
         flask.abort(
             403, 'This issue is private and you are not allowed to view it')
 
+    if flask.request.form.get('edit_comment'):
+        commentid = flask.request.form.get('edit_comment')
+        form = pagure.forms.EditCommentForm()
+        if form.validate_on_submit():
+            return edit_comment_issue(
+                repo.name, issueid, commentid, username=username)
+
     status = pagure.lib.get_issue_statuses(SESSION)
     form = pagure.forms.UpdateIssueForm(status=status)
 
@@ -781,6 +788,8 @@ def view_issue_raw_file(repo, filename=None, username=None):
 def edit_comment_issue(repo, issueid, commentid, username=None):
     """Edit comment of an issue
     """
+    is_js = flask.request.args.get('js', False)
+
     project = pagure.lib.get_project(SESSION, repo, user=username)
 
     if not project:
@@ -838,5 +847,6 @@ def edit_comment_issue(repo, issueid, commentid, username=None):
         repo=project,
         username=username,
         form=form,
-        comment=comment
+        comment=comment,
+        is_js=is_js,
     )
