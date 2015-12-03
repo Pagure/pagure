@@ -15,6 +15,9 @@ import sqlalchemy as sa
 
 
 def upgrade():
+    ''' Add the columns editor_id and edited_on to the table
+    pull_request_comments.
+    '''
 
     op.add_column(
         'pull_request_comments',
@@ -35,5 +38,8 @@ def upgrade():
 
 
 def downgrade():
+    ''' Remove the columns editor_id and edited_on from the table
+    pull_request_comments.
+    '''
     op.drop_column('pull_request_comments', 'editor_id')
     op.drop_column('pull_request_comments', 'edited_on')
