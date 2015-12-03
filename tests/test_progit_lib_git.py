@@ -622,7 +622,7 @@ index 458821a..77674a8
 
         repo = pagure.lib.get_project(self.session, 'test_ticket_repo')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        pagure.lib.git.clean_git(issue, repo, tests.HERE, objtype='ticket')
+        pagure.lib.git.clean_git(issue, repo, tests.HERE)
 
         # No more files in the git repo
         commit = gitrepo.revparse_single('HEAD')

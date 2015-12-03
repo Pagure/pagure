@@ -153,7 +153,7 @@ def generate_gitolite_acls():
         )
 
 
-def update_git(obj, repo, repofolder, objtype='ticket'):
+def update_git(obj, repo, repofolder):
     """ Update the given issue in its git.
 
     This method forks the provided repo, add/edit the issue whose file name
@@ -227,7 +227,7 @@ def update_git(obj, repo, repofolder, objtype='ticket'):
         'refs/heads/master',
         author,
         author,
-        'Updated %s %s: %s' % (objtype, obj.uid, obj.title),
+        'Updated %s %s: %s' % (obj.isa, obj.uid, obj.title),
         new_repo.index.write_tree(),
         parents)
     index.write()
@@ -243,7 +243,7 @@ def update_git(obj, repo, repofolder, objtype='ticket'):
     shutil.rmtree(newpath)
 
 
-def clean_git(obj, repo, repofolder, objtype='ticket'):
+def clean_git(obj, repo, repofolder):
     """ Update the given issue remove it from its git.
 
     """
@@ -293,7 +293,7 @@ def clean_git(obj, repo, repofolder, objtype='ticket'):
         'refs/heads/master',
         author,
         author,
-        'Removed %s %s: %s' % (objtype, obj.uid, obj.title),
+        'Removed %s %s: %s' % (obj.isa, obj.uid, obj.title),
         new_repo.index.write_tree(),
         parents)
     index.write()

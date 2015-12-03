@@ -479,6 +479,11 @@ class Issue(BASE):
         )
 
     @property
+    def isa(self):
+        ''' A string to allow finding out that this is an issue. '''
+        return 'issue'
+
+    @property
     def mail_id(self):
         ''' Return a unique reprensetation of the issue as string that
         can be used when sending emails.
@@ -793,6 +798,11 @@ class PullRequest(BASE):
         return 'PullRequest(%s, project:%s, user:%s, title:%s)' % (
             self.id, self.project.name, self.user.user, self.title
         )
+
+    @property
+    def isa(self):
+        ''' A string to allow finding out that this is an pull-request. '''
+        return 'pull-request'
 
     @property
     def mail_id(self):
