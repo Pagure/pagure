@@ -771,3 +771,72 @@ def view_issue_raw_file(repo, filename=None, username=None):
         headers['Content-Encoding'] = encoding
 
     return (data, 200, headers)
+
+
+@APP.route('/<repo>/issue/<int:issueid>/comment/<int:commentid>/edit',
+           methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/comment'
+           '/<int:commentid>/edit', methods=('GET', 'POST'))
+@cla_required
+def edit_comment_issue(repo, issueid, commentid, username=None):
+    """Edit comment of an issue
+    """
+    project = pagure.lib.get_project(SESSION, repo, user=username)
+
+    if not project:
+        flask.abort(404, 'Project not found')
+
+    if not project.settings.get('issue_tracker', True):
+        flask.abort(404, 'No issue tracker found for this project')
+
+    issue = pagure.lib.search_issues(SESSION, project, issueid=issueid)
+
+    if issue is None or issue.project != project:
+        flask.abort(404, 'Issue not found')
+
+    comment = pagure.lib.get_issue_comment(
+        SESSION, issue.uid, commentid)
+
+    if comment is None or comment.parent.project != project:
+        flask.abort(404, 'Comment not found')
+
+    if (flask.g.fas_user.username != comment.user.username
+            or comment.parent.status != 'Open') \
+            and not is_repo_admin(project):
+        flask.abort(403, 'You are not allowed to edit this comment')
+
+    form = pagure.forms.EditCommentForm()
+
+    if form.validate_on_submit():
+
+        updated_comment = form.update_comment.data
+        try:
+            message = pagure.lib.edit_comment(
+                SESSION,
+                parent=issue,
+                comment=comment,
+                user=flask.g.fas_user.username,
+                updated_comment=updated_comment,
+                folder=APP.config['TICKETS_FOLDER'],
+            )
+            SESSION.commit()
+            flask.flash(message)
+        except SQLAlchemyError, err:  # pragma: no cover
+            SESSION.rollback()
+            LOG.error(err)
+            flask.flash(
+                'Could not edit the comment: %s' % commentid, 'error')
+
+        return flask.redirect(flask.url_for(
+            'view_issue', username=username,
+            repo=project.name, issueid=issueid))
+
+    return flask.render_template(
+        'pull_request_comment_update.html',
+        select='requests',
+        requestid=issueid,
+        repo=project,
+        username=username,
+        form=form,
+        comment=comment
+    )
