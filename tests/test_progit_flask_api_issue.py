@@ -958,6 +958,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data['date_created'] = '1435821770'
         data["comment_date"] = "2015-07-02 09:22"
         data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
+        print output.data
         self.assertDictEqual(
             data,
             {
@@ -965,6 +966,8 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "comment": "This is a very interesting question",
               "comment_date": "2015-07-02 09:22",
               "date_created": "1435821770",
+              "edited_on": None,
+              "editor": None,
               "id": 1,
               "parent": None,
               "user": {
@@ -988,6 +991,8 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "comment": "This is a very interesting question",
               "comment_date": "2015-07-02 09:22",
               "date_created": "1435821770",
+              "edited_on": None,
+              "editor": None,
               "id": 1,
               "parent": None,
               "user": {
@@ -1031,6 +1036,8 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "comment": "This is a very interesting question",
               "comment_date": "2015-07-02 09:22",
               "date_created": "1435821770",
+              "edited_on": None,
+              "editor": None,
               "id": 2,
               "parent": None,
               "user": {
