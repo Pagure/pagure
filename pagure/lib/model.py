@@ -624,6 +624,8 @@ class IssueComment(BASE):
             'parent': self.parent_id,
             'date_created': self.date_created.strftime('%s'),
             'user': self.user.to_json(public=public),
+            'edited_on': self.edited_on.strftime('%s') if self.edited_on else None,
+            'editor': self.editor.to_json(public=public) if self.editor_id else None,
         }
         return output
 
@@ -859,7 +861,7 @@ class PullRequest(BASE):
         '''
         return self.remote_git is not None
 
-    def to_json(self, public=False, api=False):
+    def to_json(self, public=False, api=False, with_comments=True):
         ''' Returns a dictionnary representation of the pull-request.
 
         '''
@@ -888,18 +890,9 @@ class PullRequest(BASE):
         }
 
         comments = []
-        for comment in self.comments:
-            cmt = {
-                'id': comment.id,
-                'commit': comment.commit_id,
-                'filename': comment.filename,
-                'line': comment.line,
-                'comment': comment.comment,
-                'parent': comment.parent_id,
-                'date_created': comment.date_created.strftime('%s'),
-                'user': comment.user.to_json(public=public),
-            }
-            comments.append(cmt)
+        if with_comments:
+            for comment in self.comments:
+                comments.append(comment.to_json(public=public))
 
         output['comments'] = comments
 
@@ -978,6 +971,20 @@ class PullRequestComment(BASE):
     def parent(self):
         ''' Return the parent, in this case the pull_request object. '''
         return self.pull_request
+
+    def to_json(self, public=False):
+        return {
+            'id': self.id,
+            'commit': self.commit_id,
+            'filename': self.filename,
+            'line': self.line,
+            'comment': self.comment,
+            'parent': self.parent_id,
+            'date_created': self.date_created.strftime('%s'),
+            'user': self.user.to_json(public=public),
+            'edited_on': self.edited_on.strftime('%s') if self.edited_on else None,
+            'editor': self.editor.to_json(public=public) if self.editor_id else None,
+        }
 
 
 class PullRequestFlag(BASE):
