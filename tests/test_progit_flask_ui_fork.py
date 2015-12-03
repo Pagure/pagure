@@ -1576,7 +1576,7 @@ index 0000000..2a552bb
             output = self.app.get('/test/pull-request/1/comment/1/edit')
             self.assertEqual(output.status_code, 200)
 
-            self.assertIn('<section class="request_comment add_comment">', output.data)
+            self.assertIn('<section class="edit_comment">', output.data)
             # Checking if the comment is there in the update page
             self.assertIn(
                 'This look alright but we can do better</textarea>', output.data)
@@ -1616,6 +1616,7 @@ index 0000000..2a552bb
                 '/test/pull-request/1/comment/edit/1', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 404)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskForktests)

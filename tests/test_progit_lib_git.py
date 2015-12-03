@@ -454,7 +454,7 @@ index 9f44358..2a552bb 100644
         patch = pagure.lib.git.commit_to_patch(repo, commit)
         exp = """Mon Sep 17 00:00:00 2001
 From: pagure <pagure>
-Subject: Updated ticket <hash>: Test issue
+Subject: Updated issue <hash>: Test issue
 
 
 ---
@@ -501,7 +501,7 @@ index 0000000..60f7480
                 row[2] = 'a/123'
                 row[3] = 'b/456'
                 row = ' '.join(row)
-            elif 'Updated ticket' in row:
+            elif 'Updated issue' in row:
                 row = row.split()
                 row[3] = '<hash>:'
                 row = ' '.join(row)
@@ -534,7 +534,7 @@ index 0000000..60f7480
         patch = pagure.lib.git.commit_to_patch(repo, commit)
         exp = """Mon Sep 17 00:00:00 2001
 From: pagure <pagure>
-Subject: Updated ticket <hash>: Test issue
+Subject: Updated issue <hash>: Test issue
 
 
 ---
@@ -543,7 +543,7 @@ diff --git a/123 b/456
 index 458821a..77674a8
 --- a/123
 +++ b/456
-@@ -1,7 +1,22 @@
+@@ -1,7 +1,24 @@
  {
      "assignee": null,
      "blocks": [],
@@ -552,6 +552,8 @@ index 458821a..77674a8
 +        {
 +            "comment": "Hey look a comment!",
 +            "date_created": null,
++            "edited_on": null,
++            "editor": null,
 +            "id": 1,
 +            "parent": null,
 +            "user": {
@@ -580,7 +582,7 @@ index 458821a..77674a8
                 row[2] = 'a/123'
                 row[3] = 'b/456'
                 row = ' '.join(row)
-            elif 'Updated ticket' in row:
+            elif 'Updated issue' in row:
                 row = row.split()
                 row[3] = '<hash>:'
                 row = ' '.join(row)
@@ -679,7 +681,7 @@ index 458821a..77674a8
         patch = pagure.lib.git.commit_to_patch(repo, commit)
         exp = """Mon Sep 17 00:00:00 2001
 From: pagure <pagure>
-Subject: Updated ticket <hash>: test PR
+Subject: Updated pull-request <hash>: test PR
 
 
 ---
@@ -782,7 +784,7 @@ index 0000000..60f7480
                 row[2] = 'a/123'
                 row[3] = 'b/456'
                 row = ' '.join(row)
-            elif 'Updated ticket' in row:
+            elif 'Updated pull-request' in row:
                 row = row.split()
                 row[3] = '<hash>:'
                 row = ' '.join(row)
@@ -1221,7 +1223,7 @@ index 0000000..60f7480
             ['log', '-1', "--pretty='%s'"], gitrepo)
         self.assertEqual(len(output), 1)
         self.assertTrue(
-            output[0].startswith("'Updated ticket ")
+            output[0].startswith("'Updated issue ")
         )
         self.assertTrue(
             output[0].endswith(": Test issue'")
