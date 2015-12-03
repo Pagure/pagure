@@ -23,10 +23,10 @@
                   <label class="c-input c-checkbox">
                     {{ field(type='checkbox', **kwargs) }}
                     <span class="c-indicator"></span>
-                    {{ field.label }}
+                    <strong>{{ field.label }}</strong>
                   </label>
               {% else %}
-                {{ field.label }}
+                <strong>{{ field.label }}</strong>
                 {{ field(class_=formclasses)|safe }}
                 <div>
                   {% if field_description %}

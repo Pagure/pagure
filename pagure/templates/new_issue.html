@@ -1,9 +1,6 @@
 {% extends "repo_master.html" %}
 {% from "_formhelper.html" import render_bootstrap_field %}
-{% block header%}
-<link rel="stylesheet" href="//cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
-<script src="//cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
-{% endblock%}
+
 {% block title %}{% if not type or type == 'new'
     %}New issue{% elif type and type == 'edit'
     %}Edit issue #{{ issueid }} {% endif %} - {{ repo.name }}{% endblock %}
@@ -36,13 +33,14 @@
         {{ render_bootstrap_field(form.status, field_description="bug statuss") }}
         {{ render_bootstrap_field(form.private, field_description="the name of your project") }}
           <fieldset class="form-group">
-            <label for="issue_content">Description</label>
-            <textarea class="form-control" id="issue_content" name="issue_content"
+            <label for="issue_content"><strong>Description</strong></label>
+            <small class="text-muted pull-right"><span class="btn btn-sm btn-secondary inactive" aria-pressed="false" id="previewinmarkdown">Preview</span></small>
+            <textarea class="form-control" rows="8" id="issue_content" name="issue_content"
                 placeholder="Report your issue/request here">
               {%- if issue %}{{ issue.content }}{% endif -%}
             </textarea>
             <div>
-              <small class="text-muted">&nbsp;</small>
+
               {% if form.issue_content.errors %}
               <span class="pull-right text-danger">
                 <small>
@@ -53,21 +51,19 @@
               </span>
               {% endif %}
             </div>
+            <div id="preview">
+            </div>
           </fieldset>
-        <input id="file-picker" type="file" name="filestream" accept="image/*" multiple>
-        Attach file
-        <p>
-          (supports the <a href="http://daringfireball.net/projects/markdown/syntax"
-                          target="_blank">Markdown syntax</a>)
-        </p>
+        Attach file <input id="file-picker" type="file" name="filestream" accept="image/*" multiple>
+
 
         <p class="buttons indent">
           {% if not type or type == 'new' %}
-          <input type="submit" class="submit positive button" value="Create">
+          <input type="submit" class="btn btn-primary" value="Create">
           {% elif type and type == 'edit' %}
-          <input type="submit" class="submit positive button" value="Edit">
+          <input type="submit" class="btn btn-primary" value="Update">
           {% endif %}
-          <input type="button" value="Cancel" class="button" onclick="history.back();">
+          <input type="button" value="Cancel" class="btn btn-secondary" onclick="history.back();">
           {{ form.csrf_token }}
         </p>
       </form>
@@ -80,23 +76,19 @@
 
 {% block jscripts %}
 {{ super() }}
-<script>
-var simplemde = new SimpleMDE({ element: $("#issue_content")[0] });
-</script>
 <script type="text/javascript">
 {% if authenticated and form %}
 $(document).ready(function() {
   // Set up the handler for the file input box.
   $("#file-picker").on("change", function() {
-    alert("s")
     //doUpload("{{ form.csrf_token.current_token }}", this.files);
-    var _txt = simplemde.value();
+    var _txt = $("#issue_content").val();
     if (_txt) {
       _txt += '\n';
     }
     var _loc = "{{ url_for('view_issue_raw_file', repo=repo.name, username=username, filename='') }}" + this.file;
 
-    simplemde.value(_txt + '<!!image>');
+    $("#issue_content").val(_txt + '<!!image>');
   });
 });
 {% endif %}
@@ -104,24 +96,35 @@ $(document).ready(function() {
 $(function() {
   $( "#previewinmarkdown" ).click(
     function(event, ui) {
-        var _text = $( "#issue_content" ).val();
-        var _url = "{{ url_for('markdown_preview') }}";
-          $.ajax({
-              url: _url ,
-              type: 'POST',
-              data: {
-                content: _text,
-                csrf_token: "{{ form.csrf_token.current_token }}",
-              },
-              dataType: 'html',
-              success: function(res) {
-                  $( "#preview" ).html(res);
-              },
-              error: function() {
-                  alert('Unable to generate preview!');
-              }
-          });
-          return false;
+        if ($( "#previewinmarkdown" ).hasClass("inactive")){
+          var _text = $( "#issue_content" ).val();
+          var _url = "{{ url_for('markdown_preview') }}";
+            $.ajax({
+                url: _url ,
+                type: 'POST',
+                data: {
+                  content: _text,
+                  csrf_token: "{{ form.csrf_token.current_token }}",
+                },
+                dataType: 'html',
+                success: function(res) {
+                    $( "#preview" ).html(res);
+                    $( "#previewinmarkdown" ).removeClass("inactive");
+                    $( "#previewinmarkdown" ).addClass("active");
+                    $( "#issue_content" ).hide();
+                    $( "#preview" ).show();
+                },
+                error: function() {
+                    alert('Unable to generate preview!');
+                }
+            });
+            return false;
+          } else if ($( "#previewinmarkdown" ).hasClass("active")){
+            $( "#previewinmarkdown" ).addClass("inactive");
+            $( "#previewinmarkdown" ).removeClass("active");
+            $( "#issue_content" ).show();
+            $( "#preview" ).hide();
+          }
     }
   );
 });
