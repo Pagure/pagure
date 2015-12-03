@@ -557,14 +557,14 @@ def pull_request_edit_comment(repo, requestid, commentid, username=None):
 
     comment = pagure.lib.get_request_comment(
         SESSION, request.uid, commentid)
-    if comment is None or comment.pull_request.project != project:
+
+    if comment is None or comment.parent.project != project:
         flask.abort(404, 'Comment not found')
 
     if (flask.g.fas_user.username != comment.user.username
-            or comment.parent.status is False) \
+            or comment.parent.status != 'Open') \
             and not is_repo_admin(project):
-        flask.abort(403,
-                    "You are not allowed to edit the comment")
+        flask.abort(403, 'You are not allowed to edit the comment')
 
     form = pagure.forms.EditCommentForm()
 
