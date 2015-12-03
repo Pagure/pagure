@@ -574,12 +574,11 @@ def pull_request_edit_comment(repo, requestid, commentid, username=None):
         try:
             message = pagure.lib.edit_comment(
                 SESSION,
-                request=request,
+                parent=request,
                 comment=comment,
                 user=flask.g.fas_user.username,
                 updated_comment=updated_comment,
-                requestfolder=APP.config['REQUESTS_FOLDER'],
-                redis=REDIS,
+                folder=APP.config['REQUESTS_FOLDER'],
             )
             SESSION.commit()
             flask.flash(message)
