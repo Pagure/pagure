@@ -849,13 +849,17 @@ def edit_comment(session, parent, comment, user,
     pagure.lib.git.update_git(
         parent, repo=parent.project, repofolder=folder)
 
-    topic = 'issue.comment.edited'
-    key = 'issue'
-    id_ = 'issue_id'
+    topic = 'unknown'
+    key = 'unknown'
+    id_ = 'unknown'
     if parent.isa == 'pull-request':
         topic = 'pull-request.comment.edited'
         key = 'pullrequest'
         id_ = 'request_id'
+    elif parent.isa == 'issue':
+        topic = 'issue.comment.edited'
+        key = 'issue'
+        id_ = 'issue_id'
 
     pagure.lib.notify.log(
         parent.project,
