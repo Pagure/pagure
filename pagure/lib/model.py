@@ -580,6 +580,11 @@ class IssueComment(BASE):
         sa.ForeignKey('users.id', onupdate='CASCADE'),
         nullable=False,
         index=True)
+    edited_on = sa.Column(sa.DateTime, nullable=True)
+    editor_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey('users.id', onupdate='CASCADE'),
+        nullable=True)
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
@@ -593,6 +598,8 @@ class IssueComment(BASE):
     )
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id], backref='comment_issues')
+    editor = relation('User', foreign_keys=[editor_id],
+                         remote_side=[User.id])
 
     @property
     def mail_id(self):
@@ -935,18 +942,14 @@ class PullRequestComment(BASE):
         sa.Integer,
         sa.ForeignKey('pull_request_comments.id', onupdate='CASCADE'),
         nullable=True)
-
-    date_created = sa.Column(sa.DateTime, nullable=False,
-                             default=datetime.datetime.utcnow)
+    edited_on = sa.Column(sa.DateTime, nullable=True)
     editor_id = sa.Column(
         sa.Integer,
         sa.ForeignKey('users.id', onupdate='CASCADE'),
         nullable=True)
 
-    editor = relation('User', foreign_keys=[editor_id],
-                         remote_side=[User.id])
-
-    edited_on = sa.Column(sa.DATETIME, nullable=True)
+    date_created = sa.Column(sa.DateTime, nullable=False,
+                             default=datetime.datetime.utcnow)
 
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id],
@@ -960,6 +963,8 @@ class PullRequestComment(BASE):
         ),
         foreign_keys=[pull_request_uid],
         remote_side=[PullRequest.uid])
+    editor = relation('User', foreign_keys=[editor_id],
+                         remote_side=[User.id])
 
     @property
     def mail_id(self):
