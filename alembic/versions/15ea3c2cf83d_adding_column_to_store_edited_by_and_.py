@@ -1,14 +1,14 @@
-"""Adding column to store edited_by and edited_on a commnet
+"""Adding column to store edited_by and edited_on a comment
 
 Revision ID: 15ea3c2cf83d
-Revises: 21f45b08d882
+Revises: 1cd0a853c697
 Create Date: 2015-11-09 16:18:47.192088
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '15ea3c2cf83d'
-down_revision = '21f45b08d882'
+down_revision = '1cd0a853c697'
 
 from alembic import op
 import sqlalchemy as sa
@@ -29,7 +29,7 @@ def upgrade():
         'pull_request_comments',
         sa.Column(
             'edited_on',
-            sa.DATETIME,
+            sa.DateTime,
             nullable=True)
     )
 
