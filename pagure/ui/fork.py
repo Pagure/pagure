@@ -572,7 +572,7 @@ def pull_request_edit_comment(repo, requestid, commentid, username=None):
 
         updated_comment = form.update_comment.data
         try:
-            message = pagure.lib.edit_pull_request_comment(
+            message = pagure.lib.edit_comment(
                 SESSION,
                 request=request,
                 comment=comment,

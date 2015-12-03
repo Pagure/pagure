@@ -834,9 +834,9 @@ def add_pull_request_comment(session, request, commit, filename, row,
     return 'Comment added'
 
 
-def edit_pull_request_comment(session, request, comment, user,
-                              updated_comment, requestfolder, redis):
-    '''Edit a comment in the pull request'''
+def edit_comment(session, parent, comment, user,
+                 updated_comment, folder, redis):
+    ''' Edit a comment. '''
     user_obj = __get_user(session, user)
     comment.comment = updated_comment
     comment.edited_on = datetime.datetime.utcnow()
@@ -847,20 +847,28 @@ def edit_pull_request_comment(session, request, comment, user,
     session.flush()
 
     pagure.lib.git.update_git(
-        request, repo=request.project, repofolder=requestfolder)
+        parent, repo=parent.project, repofolder=folder)
+
+    topic = 'issue.comment.edited'
+    key = 'issue'
+    id_ = 'issue_id'
+    if parent.isa == 'pull-request':
+        topic = 'pull-request.comment.edited'
+        key = 'pullrequest'
+        id_ = 'request_id'
 
     pagure.lib.notify.log(
-        request.project,
-        topic='pull-request.comment.edited',
-        msg=dict(
-            pullrequest=request.to_json(public=True),
-            agent=user_obj.username,
-        )
+        parent.project,
+        topic=topic,
+        msg={
+            key: parent.to_json(public=True),
+            'agent': user_obj.username,
+        }
     )
 
     if redis:
         redis.publish(request.uid, json.dumps({
-            'request_id': len(request.comments),
+            id_: len(request.comments),
             'comment_updated': text2markdown(comment.comment),
             'comment_id': comment.id,
             'comment_editor': user_obj.user,
@@ -1817,7 +1825,7 @@ def get_issue_comment(session, issue_uid, comment_id):
 
 
 def get_request_comment(session, request_uid, comment_id):
-    ''' Return a specific comment of a specified issue.
+    ''' Return a specific comment of a specified request.
     '''
     query = session.query(
         model.PullRequestComment
