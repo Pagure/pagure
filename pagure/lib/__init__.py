@@ -835,7 +835,7 @@ def add_pull_request_comment(session, request, commit, filename, row,
 
 
 def edit_comment(session, parent, comment, user,
-                 updated_comment, folder, redis):
+                 updated_comment, folder):
     ''' Edit a comment. '''
     user_obj = __get_user(session, user)
     comment.comment = updated_comment
@@ -863,12 +863,13 @@ def edit_comment(session, parent, comment, user,
         msg={
             key: parent.to_json(public=True),
             'agent': user_obj.username,
-        }
+        },
+        redis=REDIS,
     )
 
-    if redis:
-        redis.publish(request.uid, json.dumps({
-            id_: len(request.comments),
+    if REDIS:
+        REDIS.publish(parent.uid, json.dumps({
+            id_: len(parent.comments),
             'comment_updated': text2markdown(comment.comment),
             'comment_id': comment.id,
             'comment_editor': user_obj.user,
