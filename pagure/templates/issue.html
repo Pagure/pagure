@@ -336,14 +336,26 @@ $(function() {
         success: function(res) {
             var el = $('#comment-' + commentid);
             var sec = el.parent().children()[1];
-            $(sec).html(res);
+            $(sec).hide();
+            $(sec).after(res);
+            cancel_edit_btn();
         },
         error: function() {
             alert('Could not make edit work');
         }
     });
     return false;
-  })
+  });
+
+  function cancel_edit_btn() {
+    $( ".cancel" ).click(
+      function() {
+        $(this).parent().parent().parent().parent().parent().find('.comment_body').show();
+        $(this).parent().parent().parent().parent().remove();
+        return false;
+      }
+    );
+  };
 
 });
 </script>
