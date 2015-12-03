@@ -88,7 +88,9 @@
         {% if id != 0 and g.fas_user and (
             (comment.parent.status in [True, 'Open'] and g.fas_user.username == comment.user.username)
             or repo_admin) %}
-        <a href="{{ '%s/comment/%s/edit' % (request.base_url, comment.id) }}" >
+        <a href="{{ '%s/comment/%s/edit' % (request.base_url, comment.id) }}"
+            class="edit_btn" data-comment="{{ comment.id }}"
+            data-objid="{{ issueid }}">
             <span class="icon icon-edit blue"></span>
         </a>
         <button type="submit" name="drop_comment" value="{{ comment.id }}"
