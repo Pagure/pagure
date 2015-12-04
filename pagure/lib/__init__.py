@@ -873,7 +873,7 @@ def edit_comment(session, parent, comment, user,
     )
 
     if REDIS:
-        REDIS.publish(parent.uid, json.dumps({
+        REDIS.publish('pagure.%s' % parent.uid, json.dumps({
             id_: len(parent.comments),
             'comment_updated': text2markdown(comment.comment),
             'comment_id': comment.id,
