@@ -145,6 +145,16 @@ add_comment = function(data) {
   field.html(field.html() + _data);
 }
 
+update_comment = function(data) {
+  console.log('Updating comment ' + data.comment_id);
+  var field = $('#comment-' + data.comment_id);
+  field.find('.issue_action').html(
+    '<span title="' + data.comment_date + '">Edited by ' + data.comment_editor + ' seconds ago</span>'
+    + '<a class="reply" title="Reply to this comment - loose formating"> reply </a>');
+  var sec = field.parent();
+  sec.find('.comment_body').html(data.comment_updated);
+}
+
 update_issue = function(data) {
   console.log('Adjusting issue ' + data.fields);
   for (i=0; i<data.fields.length; i++){
@@ -231,9 +241,15 @@ process_event = function(
     add_comment(data);
     category = 'Comment added';
   }
+  else if (data.comment_updated){
+    update_comment(data);
+    category = 'Comment updated';
+  }
   else if (data.fields){
     update_issue(data);
     category = 'Issue edited';
+  } else {
+    console.log('Unknown data');
   }
 
   if (category && !document.hasFocus()) {
