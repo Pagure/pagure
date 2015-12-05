@@ -232,6 +232,7 @@ def view_projects(pattern=None):
     return flask.render_template(
         'index.html',
         repos=projects,
+        repos_length=projects_length,
         total_page=total_page,
         page=page,
         select=select,
