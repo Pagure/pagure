@@ -1,5 +1,5 @@
 {% extends "repo_master.html" %}
-{% from "_formhelper.html" import render_field, show_comment %}
+{% from "_formhelper.html" import render_field, render_bootstrap_field, show_comment %}
 
 {% block title %}Issue #{{ issueid }} - {{ repo.name }}{% endblock %}
 {% set tag = "home"%}
@@ -9,14 +9,25 @@
   rel="stylesheet" />
 <link href="{{ url_for('static', filename='emoji/emojione.sprites.css') }}"
   rel="stylesheet" />
+<link href="{{ url_for('static', filename='selectize.bootstrap3.css') }}"
+  rel="stylesheet" />
 {% endblock %}
 
 {% block repo %}
+
+<h2>
+    <span class="issueid">Issue #{{ issueid }}</span> <span id="issuetitle">{{
+        issue.title | noJS("img") | safe }}</span>
+    {% if authenticated and (repo_admin or g.fas_user.username == issue.user.username) %}
+    <a class="btn btn-primary pull-right" href="{{ url_for('edit_issue', username=username,
+                  repo=repo.name, issueid=issueid) }}">
+        Edit</a>
+    {% endif %}
+
 {% if authenticated and repo_admin %}
-<aside class="delete_ticket">
-<form method="post" class="icon" action="{{ url_for('.delete_issue',
+<form method="post" class="pull-right" action="{{ url_for('.delete_issue',
                     username=username, repo=repo.name, issueid=issueid) }}">
-  <button class="icon_button" type="submit"
+  <button class="btn btn-danger" type="submit"
       onclick="return confirm('Are you sure to delete this ticket? \nThis is final and cannot be un-done.');"
       title="Delete this ticket">
     <span class="icon icon-trash blue"></span>
@@ -24,9 +35,8 @@
   </button>
   {{ form.csrf_token }}
 </form>
-</aside>
 {% endif %}
-
+</h2>
 {% if authenticated and form %}
   <form action="{{ url_for('update_issue', username=username,
            repo=repo.name, issueid=issueid) }}" method="post"
@@ -35,137 +45,138 @@
   {{ form.csrf_token }}
 {% endif %}
 
-<h2>
-    <span class="issueid">#{{ issueid }}</span> <span id="issuetitle">{{
-        issue.title | noJS("img") | safe }}</span>
-    {% if authenticated and (repo_admin or g.fas_user.username == issue.user.username) %}
-    -  <a href="{{ url_for('edit_issue', username=username,
-                  repo=repo.name, issueid=issueid) }}">
-        Edit</a>
+<div class="row m-t-md">
+  <div class="col-md-8">
+    {{ show_comment(issue, 0, repo, username, issueid, form) }}
+
+    <section id="comments">
+    {% if issue.comments %}
+      {% for comment in issue.comments %}
+        {{ show_comment(comment, comment.id, repo, username, issueid, form, repo_admin) }}
+      {% endfor %}
     {% endif %}
-    <aside class="issue_action">
-    {% if authenticated and repo_admin %}
-        {{ render_field(form.status) }}
-        <input type="submit" class="submit positive button" value="Update">
+    </section>
+
+    <section class="issue_comment add_comment">
+    {% if authenticated and form %}
+
+      <fieldset class="form-group">
+        <label for="comment"><strong>Add new comment</strong></label>
+        <small class="text-muted pull-right"><span class="btn btn-sm btn-secondary inactive" aria-pressed="false" id="previewinmarkdown">Preview</span></small>
+        <textarea class="form-control" rows=8 id="comment" name="comment" placeholder="Enter your comment here"></textarea>
+
+        <div id="preview">
+        </div>
+      </fieldset>
+
+      <header>
+        <label for="comment">Add new comment</label>
+        (supports the <a href="http://daringfireball.net/projects/markdown/syntax"
+          target="_blank">Markdown syntax</a>)
+      </header>
+      Select files OR drag them into the comment field below.
+      <input id="file-picker" type="file" name="file" accept="image/*" multiple>
+      <fieldset id="progress" style="display: none">
+        <div class="progress-trough">
+          <div id="progress-bar" class="progress-bar">0%</div>
+        </div>
+      </fieldset>
+        <div>
+          <input type="submit" class="submit positive button" value="Comment">
+          <input type="button" value="Clear" id="clear_comment" />
+        </div>
     {% else %}
-        Status: {{ issue.status }}
+      <p><a href="{{ url_for('auth_login', next=request.url) }}">Login</a> to comment on this ticket.</p>
     {% endif %}
-    </aside>
-</h2>
+    </section>
 
-<section id="tags">
-    Tags:
-    <span id="taglist">
-    {% for tag in issue.tags %}
-    <a href="{{ url_for('view_issues', username=username,
-               repo=repo.name, tags=tag.tag) }}">{{ tag.tag }}</a>
-        {%- if not loop.last -%},{%- endif -%}
-    {% endfor %}
-    </span>
-    {% if authenticated and repo_admin %}
-      <input id="tag" type="text" value="{{ issue.tags_text | join(',') }}"
-        placeholder="tag1, tag2" name="tag" title="comma separated list of tags">
-    {% endif %}
-</section>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-block">
+        <aside class="issue_action">
+        {% if authenticated and repo_admin %}
+            {{ render_bootstrap_field(form.status) }}
+        {% else %}
+            Status: {{ issue.status }}
+        {% endif %}
+        </aside>
 
-<section id="assigned">
-    Assigned:
-    <span id="assigneduser">
-    {% if issue.assignee %}
-    <a href="{{ url_for('view_issues', username=username,
-               repo=repo.name, assignee=issue.assignee.username) }}">
-        {{ issue.assignee.username }}</a>
-    {% endif %}
-    </span>
-    {% if authenticated %}
-        <input value="{{ issue.assignee.username or '' }}"
-          name="assignee" id="assignee" placeholder="username" >
-    {% endif %}
-</section>
+        <section id="tags">
+            <div><strong>Tags</strong></div>
+            {% if authenticated and repo_admin %}
+              <input id="tag" type="text" value="{{ issue.tags_text | join(',') }}"
+                placeholder="tag1, tag2" name="tag" title="comma separated list of tags">
+            {% else %}
+              <span id="taglist">
+              {% for tag in issue.tags %}
+              <a href="{{ url_for('view_issues', username=username,
+                         repo=repo.name, tags=tag.tag) }}">{{ tag.tag }}</a>
+                  {%- if not loop.last -%},{%- endif -%}
+              {% endfor %}
+              </span>
+            {% endif %}
+        </section>
 
-<section id="blocking">
-    Blocking:
-    <span id="blockers">
-    {% if issue.parents %}
-    {% for ticket in issue.parents %}
-        <a href="{{ url_for('view_issue', username=username,
-                  repo=repo.name, issueid=ticket.id)
-        }}">{{ ticket.id }}</a>{%- if not loop.last -%},{%- endif -%}
-    {% endfor %}
-    {% endif %}
-    </span>
+        <section id="assigned">
+            <div><strong>Assignee</strong></div>
+            <span id="assigneduser">
+            {% if issue.assignee %}
+            <a href="{{ url_for('view_issues', username=username,
+                       repo=repo.name, assignee=issue.assignee.username) }}">
+                {{ issue.assignee.username }}</a>
+            {% endif %}
+            </span>
+            {% if authenticated and repo_admin %}
+                <input class="form-control" value="{{ issue.assignee.username or '' }}"
+                  name="assignee" id="assignee" placeholder="username" >
+            {% endif %}
+        </section>
 
-    {% if authenticated %}
-        <input id="blocks" type="text"
-            placeholder="issue blocked" name="blocks"
-            value="{{ issue.blocks_text | join(',') }}">
-    {% endif %}
-</section>
+        <section id="blocking">
+            <div><strong>Blocked</strong></div>
+            <span id="blockers">
+            {% if issue.parents %}
+            {% for ticket in issue.parents %}
+                <a href="{{ url_for('view_issue', username=username,
+                          repo=repo.name, issueid=ticket.id)
+                }}">{{ ticket.id }}</a>{%- if not loop.last -%},{%- endif -%}
+            {% endfor %}
+            {% endif %}
+            </span>
 
-<section id="depending">
-    Depends on:
-    <span id="dependencies">
-    {% if issue.children %}
-    {% for ticket in issue.children %}
-        <a href="{{ url_for('view_issue', username=username,
-                  repo=repo.name, issueid=ticket.id)
-          }}">{{ ticket.id }}</a>{%- if not loop.last -%},{%- endif -%}
-    {% endfor %}
-    {% endif %}
-    </span>
+            {% if authenticated and repo_admin%}
+                <input class="form-control" id="blocks" type="text"
+                    placeholder="issue blocked" name="blocks"
+                    value="{{ issue.blocks_text | join(',') }}">
+            {% endif %}
+        </section>
 
-    {% if authenticated %}
-        <input id="depends" type="text"
-            placeholder="issue depending" name="depends"
-            value="{{ issue.depends_text | join(',') }}">
-    {% endif %}
-</section>
+        <section id="depending">
+            <div><strong>Depends on</strong></div>
+            <span id="dependencies">
+            {% if issue.children %}
+            {% for ticket in issue.children %}
+                <a href="{{ url_for('view_issue', username=username,
+                          repo=repo.name, issueid=ticket.id)
+                  }}">{{ ticket.id }}</a>{%- if not loop.last -%},{%- endif -%}
+            {% endfor %}
+            {% endif %}
+            </span>
 
-{{ show_comment(issue, 0, repo, username, issueid, form) }}
-
-<section id="comments">
-{% if issue.comments %}
-  {% for comment in issue.comments %}
-    {{ show_comment(comment, comment.id, repo, username, issueid, form, repo_admin) }}
-  {% endfor %}
-{% endif %}
-</section>
-
-<section class="issue_comment add_comment">
-{% if authenticated and form %}
-  <header>
-    <label for="comment">Add new comment</label>
-    (supports the <a href="http://daringfireball.net/projects/markdown/syntax"
-      target="_blank">Markdown syntax</a>)
-  </header>
-  Select files OR drag them into the comment field below.
-  <input id="file-picker" type="file" name="file" accept="image/*" multiple>
-  <fieldset id="progress" style="display: none">
-    <div class="progress-trough">
-      <div id="progress-bar" class="progress-bar">0%</div>
-    </div>
-  </fieldset>
-  <div id="tabs">
-    <ul>
-      <li><a href="#edit">Comment</a></li>
-      <li><a href="#preview">Preview</a></li>
-    </ul>
-    <div id="edit">
-      <div>
-        <textarea id="comment" name="comment" placeholder="Enter your comment here"></textarea>
+            {% if authenticated and repo_admin %}
+                <input class="form-control" id="depends" type="text"
+                    placeholder="issue depending" name="depends"
+                    value="{{ issue.depends_text | join(',') }}">
+            {% endif %}
+        </section>
+        {% if authenticated and repo_admin %}
+            <input type="submit" class="btn btn-primary" value="Update">
+        {% endif %}
       </div>
     </div>
-    <div id="preview">
-    </div>
-    <div>
-      <input type="submit" class="submit positive button" value="Comment">
-      <input type="button" value="Clear" id="clear_comment" />
-    </div>
   </div>
-{% else %}
-  <p><a href="{{ url_for('auth_login', next=request.url) }}">Login</a> to comment on this ticket.</p>
-{% endif %}
-</section>
+</div>
 
 {% if authenticated and form %}
   </form>
@@ -187,6 +198,7 @@
 <script type="text/javascript"
   src="{{ url_for('static', filename='upload.js') }}">
 </script>
+<script src="{{ url_for('static', filename='selectize.min.js') }}" rel="text/javascript"/>
 <script type="text/javascript">
 
 var emojiStrategy;
@@ -215,32 +227,9 @@ $(function() {
   emoji_complete(json_url, folder);
 
 
-  $( "#tabs" ).tabs();
+$(function() {
 
-  $( "#tabs" ).on('tabsactivate',
-    function(event, ui) {
-      if (ui.newPanel.selector == '#preview') {
-        var _text = $( "#comment" ).val();
-        var _url = "{{ url_for('markdown_preview') }}";
-          $.ajax({
-              url: _url ,
-              type: 'POST',
-              data: {
-                content: _text,
-                csrf_token: "{{ form.csrf_token.current_token }}",
-              },
-              dataType: 'html',
-              success: function(res) {
-                  $( "#preview" ).html(emojione.toImage(res));
-              },
-              error: function() {
-                  alert('Unable to generate preview!');
-              }
-          });
-          return false;
-      }
-    }
-  );
+});
 
   $( ".reply" ).click(
     function() {
@@ -261,7 +250,7 @@ $(function() {
     }
   );
 
-  var cache = {};
+/*  var cache = {};
   $( "#tag" ).autocomplete({
     source: function( request, response ) {
       var pattern = request.term;
@@ -282,7 +271,7 @@ $(function() {
     },
     minLength: 0,
     delay: 200,
-  });
+  });*/
 
   $('#assignee').autocomplete({
     source: function( request, response ) {
@@ -433,6 +422,60 @@ function try_async_comment(form) {
 
 </script>
 {% endif %}
+<script>
+$( document ).ready(function() {
+    console.log( "ready!" );
+    var available_tags = [];
+    {%for tog in tag_list %}
+      available_tags.push("{{tog.tag}}");
+    {%endfor%}
+    var items = available_tags.map(function(x) { return { item: x }; });
+        console.log( items );
+            console.log( available_tags );
+    $('#tag').selectize({
+        delimiter: ',',
+        options: items,
+        persist: false,
+        create: true,
+    labelField: "item",
+    valueField: "item"
+    });
 
+  $( "#previewinmarkdown" ).click(
+    function(event, ui) {
+        if ($( "#previewinmarkdown" ).hasClass("inactive")){
+          var _text = $( "#comment" ).val();
+          var _url = "{{ url_for('markdown_preview') }}";
+            $.ajax({
+                url: _url ,
+                type: 'POST',
+                data: {
+                  content: _text,
+                  csrf_token: "{{ form.csrf_token.current_token }}",
+                },
+                dataType: 'html',
+                success: function(res) {
+                    $( "#preview" ).html(res);
+                    $( "#previewinmarkdown" ).removeClass("inactive");
+                    $( "#previewinmarkdown" ).addClass("active");
+                    $( "#comment" ).hide();
+                    $( "#preview" ).show();
+                },
+                error: function() {
+                    alert('Unable to generate preview!');
+                }
+            });
+            return false;
+          } else if ($( "#previewinmarkdown" ).hasClass("active")){
+            $( "#previewinmarkdown" ).addClass("inactive");
+            $( "#previewinmarkdown" ).removeClass("active");
+            $( "#comment" ).show();
+            $( "#preview" ).hide();
+          }
+    }
+  );
+
+});
+</script>
 {% endblock %}
 

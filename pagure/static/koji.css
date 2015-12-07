@@ -91,7 +91,10 @@ padding: 0.3rem;
     line-height: 1.2;
 }
 
-
+#pagure-issues-list .td-open_date
+{
+white-space: nowrap;
+}
 
 
 
