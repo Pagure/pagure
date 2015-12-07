@@ -10,7 +10,20 @@
 
 {% block repo %}
 
-<h2>Tags</h2>
+<h2>
+  Releases
+{% if config.get('UPLOAD_FOLDER_PATH') and config.get('UPLOAD_FOLDER') %}
+  {% if repo_admin %}
+    <a class="pull-right" href="{{ url_for('.new_release', username=username, repo=repo.name) }}"
+        method="get" class="icon">
+    <button class="btn btn-primary" type="submit" title="Upload a tarball">
+      <span class="icon icon-plus blue"></span>
+      Upload a new release
+    </button>
+    </a>
+  {% endif %}
+{% endif %}
+</h2>
 
 {% if config.get('UPLOAD_FOLDER_PATH') and config.get('UPLOAD_FOLDER') %}
 <p>
@@ -19,26 +32,13 @@
     release folder
   </a>.
 </p>
-
-{% if repo_admin %}
-<p>
-  <a href="{{ url_for('.new_release', username=username, repo=repo.name) }}"
-      method="get" class="icon">
-  <button class="icon_button" type="submit" title="Upload a tarball">
-    <span class="icon icon-plus blue"></span>
-    Upload a new release
-  </button>
-  </a>
-</p>
-{% endif %}
 {% endif %}
 
 <section class="tag_list">
   {% if tags %}
-  <ul>
+  <div class="list-group">
     {% for tag in tags %}
-    <li>
-      <a href="{{ url_for('.view_tree', username=username, repo=repo.name,
+      <a class="list-group-item" href="{{ url_for('.view_tree', username=username, repo=repo.name,
                           identifier=tag.oid) }}">
         {{ tag.name }}
         {% if tag.message %}
@@ -46,9 +46,8 @@
         {% endif %}
       <span class="tagid">{{ tag.oid | short }}</span>
       </a>
-    </li>
     {% endfor %}
-  </ul>
+  </div>
   {% else %}
   <p>
     This project has not been tagged.

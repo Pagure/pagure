@@ -90,7 +90,7 @@
 
         <li class="nav-item">
           <a {% if select == 'tags' %}class="active nav-link"  {% else %}class="nav-link"{% endif %} href="{{ url_for('.view_tags', username=username,
-                     repo=repo.name) }}">Releases</a>
+                     repo=repo.name) }}">Releases </a>
         </li>
 
         {% if config.get('ENABLE_TICKETS', True) and repo
@@ -113,8 +113,7 @@
         {% if repo and repo.forks %}
         <li class="nav-item">
           <a {% if select == 'forks' %}class="active nav-link"  {% else %}class="nav-link"{% endif %} href="{{ url_for('.view_forks', username=username,
-                     repo=repo.name) }}">
-          Forks ({{ repo.forks |length }})</a>
+                     repo=repo.name) }}">Forks <span class="label label-default label-pill">{{ repo.forks |length }}</span></a>
         </li>
         {% endif %}
 

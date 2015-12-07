@@ -7,69 +7,73 @@
 {% block repo %}
 
 <div class="inline">
-  <h2>
+  <h3>
     {% if status and status != 'Open' %}
-    Closed
-    {% endif %}
-    Issues ({{ issues|count }})
-  </h2>
-    {% if status and status != 'Open' %}
-      <a href="{{ url_for('view_issues', username=username,
-                 repo=repo.name, tags=tags, author=author, assignee=assignee) }}">
-      ({{ oth_issues }} Open)</a>
+      {{ issues|count }} Closed Issues
     {% else %}
-      <a href="{{ url_for('view_issues', username=username,
-                 repo=repo.name, status='Closed', tags=tags, author=author,
-                 assignee=assignee) }}">
-      ({{ oth_issues }} Closed)</a>
+      {{ issues|count }} Open Issues
     {% endif %}
 
-    {% if oth_issues %}
-    <div class="addrem_bar issues_pbar">
-      {% if (issues | length + oth_issues) %}
-        <span style="width: {{ (100.0 * (1 - issues | length / (issues | length + oth_issues)))|round|int }}%">
-            {{ (100.0 * (1 - issues | length / (issues | length + oth_issues)))|round|int }}%
-        </span>
-      {% endif %}
-    </div>
-    {% endif %}
-
-    <aside id="issue_action">
-      <a class="btn_reset" href="{{ url_for('view_issues', username=username,
-                 repo=repo.name) }}">
-        <button>Reset all filters</button>
-      </a>
-      <br />
-      <a class="btn_create" href="{{ url_for('new_issue', username=username, repo=repo.name) }}">
-        <button>Create new issue</button>
-      </a>
-    </aside>
+    <a class="pull-right" href="{{ url_for('new_issue', username=username, repo=repo.name) }}">
+      <button class="btn btn-secondary btn-sm">New Issue</button>
+    </a>
+  </h3>
 </div>
 
 <section id="tags">
-    Tags:
+  <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
+    {% if status and status != 'Open' %}
+      <a class="btn btn-secondary btn-sm" href="{{ url_for('view_issues', username=username,
+                 repo=repo.name, tags=tags, author=author, assignee=assignee) }}">Open</a>
+      <a class="btn btn-primary btn-sm" href="{{ url_for('view_issues', username=username,
+                 repo=repo.name, status='Closed', tags=tags, author=author,
+                 assignee=assignee) }}">Closed</a>
+    {% else %}
+      <a class="btn btn-primary btn-sm" href="{{ url_for('view_issues', username=username,
+                 repo=repo.name, tags=tags, author=author, assignee=assignee) }}">Open</a>
+      <a class="btn btn-secondary btn-sm" href="{{ url_for('view_issues', username=username,
+                 repo=repo.name, status='Closed', tags=tags, author=author,
+                 assignee=assignee) }}">Closed</a>
+    {% endif %}
+  </span>
+  <span class="oi m-l-md" data-glyph="tag"></span>
+  <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
     {% for tag in tag_list %}
-    <a href="{{ url_for('view_issues', username=username,
-               repo=repo.name, tags=tag.tag,
-               author=author, assignee=assignee, status=status) }}"
-               title="Filter issues by tag">
-        {{ tag.tag }}</a>{% if not loop.last %},{% endif %}
+      {% if tag.tag in tags %}
+        {% if status and status != 'Open' %}
+        <a class="btn btn-secondary btn-sm {% if tag.tag in tags%}active{%endif%}" href="{{ url_for('view_issues', username=username,
+                 repo=repo.name, status='Closed') }}"
+                   title="Filter issues by tag">
+         {% else %}
+        <a class="btn btn-secondary btn-sm {% if tag.tag in tags%}active{%endif%}" href="{{ url_for('view_issues', username=username,
+                 repo=repo.name) }}"
+                   title="Filter issues by tag">
+         {% endif %}
+      {% else %}
+        <a class="btn btn-secondary btn-sm {% if tag.tag in tags%}active{%endif%}" href="{{ url_for('view_issues', username=username,
+                   repo=repo.name, tags=tag.tag,
+                   author=author, assignee=assignee, status=status) }}"
+                   title="Filter issues by tag">
+      {% endif %}
+
+        {{ tag.tag }}</a>
     {% endfor %}
+</span>
 </section>
 
 <table id="pagure-issues-list" class="table table-sm">
     <thead>
         <tr>
             <th>#</th>
-            <th>Title</th>
+            <th id="issue-title">Title</th>
             <th class="open_by">
-                Opened by (<a href="{{ url_for('view_issues', username=username,
+                Reporter&nbsp;(<a href="{{ url_for('view_issues', username=username,
                 repo=repo.name, tags=tags, assignee=assignee,
                 status=status) }}">reset</a>)
             </th>
-            <th class="open_date">Opened on</th>
+            <th class="open_date">Opened</th>
             <th class="assigned">
-              Assigned to (<a href="{{ url_for('view_issues', username=username,
+              Assignee&nbsp;(<a href="{{ url_for('view_issues', username=username,
                 repo=repo.name, tags=tags, author=author,
                 status=status) }}">reset</a>)
             </th>

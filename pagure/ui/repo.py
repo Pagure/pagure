@@ -1282,7 +1282,8 @@ def add_token(repo, username=None):
     if not repo:
         flask.abort(404, 'Project not found')
 
-    if not is_repo_admin(repo):
+    repo_admin = is_repo_admin(repo)
+    if not repo_admin:
         flask.abort(
             403,
             'You are not allowed to change the settings for this project')
@@ -1311,8 +1312,10 @@ def add_token(repo, username=None):
 
     return flask.render_template(
         'add_token.html',
+        select='settings',
         form=form,
         acls=acls,
+        repo_admin=repo_admin,
         username=username,
         repo=repo,
     )

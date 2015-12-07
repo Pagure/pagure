@@ -10,8 +10,7 @@
 
 {% block repo %}
 
-<section class="settings">
-  <h3>{{ plugin.name }}</h3>
+
 
   <form action="{{ url_for('.view_plugin',
                   username=username, repo=repo.name, plugin=plugin.name,
@@ -27,7 +26,6 @@
       {{ form.csrf_token }}
     </p>
   </form>
-  </section>
 
 
 {% endblock %}

@@ -1,26 +1,36 @@
 {% macro render_row(items) -%}
     {% for repo in items %}
-        {% if repo.is_fork %}
-          {% set url = url_for('view_repo', username=repo.user.username, repo=repo.name) %}
-        {% else %}
-          {% set url = url_for('view_repo', repo=repo.name) %}
+        {% if loop.index == 1 %}
+<div class="card-deck-wrapper">
+  <div class="card-deck">
         {% endif %}
-        <a class="list-group-item"
+        {% if repo.is_fork %}
+        {% set url = url_for('view_repo', username=repo.user.username, repo=repo.name) %}
+        {% else %}
+        {% set url = url_for('view_repo', repo=repo.name) %}
+        {% endif %}
+        <div class="card">
+        <div class="card-block">
+        <a class="project_link logo_link"
             href="{{ url }}">
-            <span>
-            {% if repo.avatar_email %}
-              <img src="{{ repo.avatar_email | avatar_url }}" />
-            {% else %}
-              <img src="{{ url_for('static', filename='placebo.png') }}" />
-            {% endif %}
-            </span>
-            <h3 class="repo_name">{{ repo.name }}</h3>
+            <div class="repo_name"><strong>{{ repo.name }}</strong></div>
             {% if repo.description %}
-            <span class="repo_desc">{{ repo.description }}</span>
+            <div class="repo_desc"><small>{{ repo.description }}</small></div>
             {% endif %}
         </a>
+        </div>
+        </div>
+        {% if loop.last %}
+    </div>
+    </div>
+        {% elif loop.index is divisibleby(3) or loop.last %}
+    </div>
+    </div>
+    <div class="card-deck-wrapper">
+  <div class="card-deck">
+        {% endif %}
     {% else %}
-    <p>No projects found</p>
+    <p>No project found</p>
     {% endfor %}
 {%- endmacro %}
 
@@ -66,7 +76,7 @@
         {% if total and total > 1 %}
         {{ pagination_link(pagetitle, page, total) }}
         {% endif %}
-        <div class="list-group">
+        <div>
             {{ render_row(list) }}
         </div>
         {% if total and total > 1 %}

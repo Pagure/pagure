@@ -186,193 +186,248 @@
       </div>
     </div>
 
-  </div>
+    <div class="col-md-8 col-md-offset-2">
+      <div class="card">
+        <div class="card-header">
+          Project options
+        </div>
+        <div class="card-block">
+          <form action="{{ url_for('.view_settings',
+                          username=username, repo=repo.name) }}" method="post">
+            {% for key in repo.settings | sort %}
+            {% if not config.get('ENABLE_TICKETS', True) and key in ['issue_tracker'] %}
+            {% elif not config.get('DOC_APP_URL') and key in ['project_documentation'] %}
+            {% elif not config.get('WEBHOOK') and key in ['Web-hooks'] %}
+            {% else %}
+              {% if repo.settings[key] in [True, False, 'y'] %}
+                <div>
+                  <label class="c-input c-checkbox">
+                    <input id="{{ key }}" type="checkbox" value="y" name="{{ key }}" {%
+                            if repo.settings[key] -%}checked=""{%- endif -%}/>
+                    <span class="c-indicator"></span>
+                    Activate {{ key | replace('_', ' ') }}
+                  </label>
+                </div>
+              {% else %}
+                <div class="form-inline">
+                  <input width="4em" class="form-control" id="{{ key }}" type="text" {% if repo.settings[key]
+                        %}value="{{ repo.settings[key] }}"{% endif %} name="{{ key }}" />
+                  <label for="{{ key }}">Activate {{ key | replace('_', ' ') }}</label>
+                </div>
+              {% endif %}
+            {% endif %}
+            {% endfor %}
+          </table>
+          <p class="p-t-md">
+              <input type="submit" class="btn btn-primary" value="Update">
+              {{ form.csrf_token }}
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
 
+    <div class="col-md-8 col-md-offset-2">
+      <div class="card">
+        <div class="card-header">
+          Re-generate git repos
+        </div>
+        <div class="card-block">
+          <form action="{{ url_for('.regenerate_git',
+                          username=username, repo=repo.name) }}" method="post"
+                class="icon">
+            <input name="regenerate" value="tickets" type="hidden"/>
+            <button class="btn btn-primary" type="submit"
+              title="Regenerate tickets git repo">
+              <span class="oi" data-glyph="reload"></span> &nbsp;Regenerate the git repo for issues
+            </button>
+            {{ form.csrf_token }}
+          </form>
+          <form class="m-t-md" action="{{ url_for('.regenerate_git',
+                          username=username, repo=repo.name) }}" method="post"
+                class="icon">
+            <input name="regenerate" value="requests" type="hidden"/>
+            <button class="btn btn-primary" type="submit"
+              title="Regenerate requests git repo">
+              <span class="oi" data-glyph="reload"></span> &nbsp;Regenerate the git repo for requests
+            </button>
+            {{ form.csrf_token }}
+          </form>
+        </div>
+      </div>
+    </div>
 
-  <div>
-    <h3>API key</h3>
-  </div>
+    {% if config.get('ENABLE_USER_MNGT', True) %}
+    <div class="col-md-8 col-md-offset-2">
+      <div class="card">
+        <div class="card-header">
+          Users and Groups
+        </div>
+        <div class="card-block">
 
+          <p>Here below is the list of user having commit rights to this repo.</p>
 
-  <h3>Project's options</h3>
-  <form action="{{ url_for('.view_settings',
-                  username=username, repo=repo.name) }}" method="post">
-  <table>
-    {% for key in repo.settings | sort %}
-    {% if not config.get('ENABLE_TICKETS', True) and key in ['issue_tracker'] %}
-    {% elif not config.get('DOC_APP_URL') and key in ['project_documentation'] %}
-    {% elif not config.get('WEBHOOK') and key in ['Web-hooks'] %}
-    {% else %}
-    <tr>
-      <td><label for="{{ key }}">Activate {{ key | replace('_', ' ') }}</label></td>
-      <td>
-        {% if repo.settings[key] in [True, False, 'y'] %}
-        <input id="{{ key }}" type="checkbox" value="y" name="{{ key }}" {%
-         if repo.settings[key] -%}checked=""{%- endif -%}/>
-        {% else %}
-        <input id="{{ key }}" type="text" {% if repo.settings[key]
-            %}value="{{ repo.settings[key] }}"{% endif %} name="{{ key }}" />
-        {% endif %}
-      </td>
-    </tr>
+          <p>
+            <a href="{{ url_for('.add_user', username=username, repo=repo.name) }}"
+                class="btn btn-primary">
+                add user
+            </a>
+
+            <a href="{{ url_for('.add_group_project', username=username, repo=repo.name) }}"
+                class="btn btn-primary">
+                add group
+            </a>
+          </p>
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <a href="{{ url_for('.view_user', username=repo.user.user) }}"><span class="oi" data-glyph="person"></span>&nbsp; {{ repo.user.user }}</a>
+              (owner)
+            </li>
+          {% for user in repo.users %}
+            <li class="list-group-item">
+              <a href="{{ url_for('.view_user', username=user.user) }}"><span class="oi" data-glyph="person"></span>&nbsp; {{ user.user }}</a>
+              <form class="pull-right" method="POST"
+                action="{{ url_for('.remove_user', username=username, repo=repo.name, userid=user.id) }}">
+                <button
+                  onclick="return confirm('You sure you want to remove this user from this project?');"
+                  title="Remove user" class="btn btn-danger btn-sm">
+                  <span class="oi" data-glyph="trash"></span>
+                </button>
+                {{ form.csrf_token }}
+              </form>
+            </li>
+          {% endfor %}
+          {% for group in repo.groups %}
+            <li class="list-group-item">
+              <a href="{{ url_for('.view_group', group=group.group_name) }}"><span class="oi" data-glyph="people"></span>&nbsp; {{ group.group_name }}</a>
+              <form class="pull-right" method="POST"
+                action="">
+                <button
+                  onclick="return confirm('You sure you want to remove this group from this project?');"
+                  title="Remove group" class="btn btn-danger btn-sm pull-right">
+                  <span class="oi" data-glyph="trash"></span>
+                </button>
+                {{ form.csrf_token }}
+              </form>
+            </li>
+          {% endfor %}
+          </ul>
+      </div>
+    </div>
     {% endif %}
-    {% endfor %}
-  </table>
-  <p class="buttons indent">
-      <input type="submit" class="submit positive button" value="Update">
-      <input type="button" value="Cancel" class="button" onclick="history.back();">
-      {{ form.csrf_token }}
-    </p>
-  </form>
-
-  <h3>Re-generate git repos</h3>
-  <form action="{{ url_for('.regenerate_git',
-                  username=username, repo=repo.name) }}" method="post"
-        class="icon">
-    <input name="regenerate" value="tickets" type="hidden"/>
-    <button class="" type="submit"
-      title="Regenerate tickets git repo">
-      <span class="icon icon-refresh blue"></span>
-      Regenerate the git repo for issues
-    </button>
-    {{ form.csrf_token }}
-  </form>
-  <form action="{{ url_for('.regenerate_git',
-                  username=username, repo=repo.name) }}" method="post"
-        class="icon">
-    <input name="regenerate" value="requests" type="hidden"/>
-    <button class="icon_button" type="submit"
-      title="Regenerate requests git repo">
-      <span class="icon icon-refresh blue"></span>
-      Regenerate the git repo for requests
-    </button>
-    {{ form.csrf_token }}
-  </form>
-</section>
-
-{% if config.get('ENABLE_USER_MNGT', True) %}
-<section class="users">
-  <h2>Users and Groups</h2>
-
-  <p>Here below is the list of user having commit rights to this repo.</p>
-
-  <p>
-    <a href="{{ url_for('.add_user', username=username, repo=repo.name) }}"
-        class="icon icon-plus-sign blue">
-        [add]
-    </a>
-
-    <a href="{{ url_for('.add_group_project', username=username, repo=repo.name) }}"
-        class="icon icon-plus-sign blue">
-        [add group]
-    </a>
-  </p>
-
-  <ul>
-    <li>
-      <a href="{{ url_for('.view_user', username=repo.user.user) }}">{{ repo.user.user }}</a>
-      (owner)
-    </li>
-  {% for user in repo.users %}
-    <li>
-      <a href="{{ url_for('.view_user', username=user.user) }}">{{ user.user }}</a>
-      <form class="icon del_icon" method="POST"
-        action="{{ url_for('.remove_user', username=username, repo=repo.name, userid=user.id) }}">
-        <button
-          onclick="return confirm('You sure you want to remove this user from this project?');"
-          title="Remove user">
-          <span class="icon icon-trash blue"></span>
-        </button>
-        {{ form.csrf_token }}
-      </form>
-    </li>
-  {% endfor %}
-  {% for group in repo.groups %}
-    <li>
-      <a href="{{ url_for('.view_group', group=group.group_name) }}">@{{ group.group_name }}</a>
-      <form class="icon del_icon" method="POST"
-        action="">
-        <button
-          onclick="return confirm('You sure you want to remove this group from this project?');"
-          title="Remove group">
-          <span class="icon icon-trash blue"></span>
-        </button>
-        {{ form.csrf_token }}
-      </form>
-    </li>
-  {% endfor %}
-  </ul>
-</section>
-{% endif %}
 
 
-{% if plugins %}
-<section class="hooks">
-  <h2>Hooks</h2>
-  <div id="accordion">
-    {% for plugin in plugins %}
-      <h3 class="plugin_title" data-plugin="{{ plugin }}">{{ plugin }}</h3>
-      <div id="body_{{ plugin }}"></div>
-    {% endfor %}
+    {% if plugins %}
+    <div class="col-md-8 col-md-offset-2">
+      <div class="card">
+        <div class="card-header">
+          Hooks
+        </div>
+        <div class="card-block">
+          <div id="accordions" role="tablist" aria-multiselectable="true">
+            {% set idcount = 1 %}
+            {% for plugin in plugins %}
+            <div class="panel panel-default" >
+              <div class="panel-heading" role="tab" id="pluginheading{{idcount}}">
+                <h4 class="panel-title">
+                  <a data-toggle="collapse" data-parent="#accordions" href="#plugincollapse{{idcount}}" aria-expanded="true" aria-controls="plugincollapse{{idcount}}">
+                    <span id="dropdowncaret" class="oi" data-glyph="caret-right"></span>&nbsp;{{ plugin }}
+                  </a>
+                </h4>
+              </div>
+              <div id="plugincollapse{{ idcount }}" data-plugin="{{ plugin }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="pluginheading{{ idcount }}">
+                <span class="oi oi-spin pull-left" data-glyph="loop-circular"></span>
+              </div>
+            </div>
+            {% set idcount = idcount+1 %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+
+    {% if config.get('ENABLE_TICKETS', True) %}
+    <div class="col-md-8 col-md-offset-2">
+      <div class="card">
+        <div class="card-header">
+          <strong>Issue Tags</strong>
+        </div>
+        <div class="card-block">
+          <p>
+            Here below is the list of tags associated with one or more issue of
+            the project.
+          </p>
+        </div>
+        <ul class="list-group list-group-flush">
+        {% for tag in tags %}
+          <li class="list-group-item clearfix">
+            <a href="{{ url_for('view_issues', username=username,
+              repo=repo.name, tags=tag.tag) }}">
+              <span class="oi" data-glyph="tag"></span>&nbsp; {{ tag.tag }}
+            </a>
+            <div class="pull-right">
+            <form class="icon del_icon pull-right" method="POST"
+              action="{{ url_for('remove_tag', username=username, repo=repo.name) }}">
+              <input type="hidden" value="{{ tag.tag }}" name="tag" />
+              {{ tag_form.csrf_token }}
+              <button
+                onclick="return confirm('Do you really want to remove the tag: {{ tag.tag }}?');"
+                title="Remove tag" class="btn btn-danger btn-sm">
+                <span class="oi" data-glyph="trash"></span>
+              </button>
+            </form>
+            <a href="{{ url_for(
+                  '.edit_tag',username=username, repo=repo.name, tag=tag.tag) }}">
+              <button class="btn btn-default btn-sm" title="Edit tag">
+                <span class="oi" data-glyph="pencil"></span>
+              </button>
+            </a>
+            </div>
+          </li>
+        {% endfor %}
+        </ul>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if config.get('ENABLE_DEL_PROJECTS', True) %}
+    <div class="col-md-8 col-md-offset-2">
+      <div class="card">
+        <div class="card-header">
+          Delete Project
+        </div>
+        <div class="card-block">
+        <form action="{{ url_for('.delete_repo',
+                        username=username, repo=repo.name) }}"
+              method="post" class="icon">
+          <button class="btn btn-danger" type="submit"
+            onclick="return confirm('Are you sure to delete {{repo.name}}? \nThis is final and cannot be un-done.');"
+            title="Delete the project/fork">
+              <span class="oi" data-glyph="trash"></span>&nbsp; Delete the {{repo.name}} project
+          </button>
+        </form>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+
   </div>
 </section>
-{% endif %}
 
 
-{% if config.get('ENABLE_TICKETS', True) %}
-<section class="tags">
-  <h2>Tags</h2>
 
-  <p>
-    Here below is the list of tags associated with one or more issue of
-    the project.
-  </p>
 
-  <ul>
-  {% for tag in tags %}
-    <li>
-      <a href="{{ url_for('view_issues', username=username,
-        repo=repo.name, tags=tag.tag) }}">
-        {{ tag.tag }}
-      </a>
-      <form class="icon del_icon" method="POST"
-        action="{{ url_for('remove_tag', username=username, repo=repo.name) }}">
-        <input type="hidden" value="{{ tag.tag }}" name="tag" />
-        {{ tag_form.csrf_token }}
-        <button
-          onclick="return confirm('Do you really want to remove the tag: {{ tag.tag }}?');"
-          title="Remove tag">
-          <span class="icon icon-trash blue"></span>
-        </button>
-      </form>
-      <a href="{{ url_for(
-            '.edit_tag',username=username, repo=repo.name, tag=tag.tag) }}">
-        <button class="icon_button" title="Edit tag">
-          <span class="icon icon-edit blue"></span>
-        </button>
-      </a>
-    </li>
-  {% endfor %}
-  </ul>
-</section>
-{% endif %}
 
-{% if config.get('ENABLE_DEL_PROJECTS', True) %}
+
+
 <section class="delete">
-  <form action="{{ url_for('.delete_repo',
-                  username=username, repo=repo.name) }}"
-        method="post" class="icon">
-    <button class="icon_button" type="submit"
-      onclick="return confirm('Are you sure to delete this project/fork? \nThis is final and cannot be un-done.');"
-      title="Delete the project/fork">
-      <h3>
-        <span class="icon icon-trash blue"></span>
-        Delete project
-      </h3>
-    </button>
-  </form>
+
 </section>
-{% endif %}
+
 
 {% endblock %}
 
@@ -397,14 +452,9 @@
         cache: false,
     });
     }
-
-  $(function() {
-    $( "#accordion" ).accordion({
-      collapsible: true,
-      active: false,
-      heightStyle: 'content',
-      activate: function( event, ui ) {
-        var _plugin = ui.newHeader.attr('data-plugin');
+$('#accordions').on('shown.bs.collapse', function (e) {
+        var _plugin = $(e.target).attr('data-plugin');
+        $(e.target).siblings().find("#dropdowncaret").attr('data-glyph', "caret-bottom");
         if (!_plugin) {
           return false;
         }
@@ -416,13 +466,16 @@
             type: 'GET',
             dataType: 'html',
             success: function(res) {
-                ui.newPanel.html(res);
+                $("#"+e.target.id).html(res);
             },
         });
         return false;
+})
 
-      }
-    });
-  });
+
+$('#accordions').on('hide.bs.collapse', function (e) {
+        $(e.target).siblings().find("#dropdowncaret").attr('data-glyph', "caret-right");
+})
+
 </script>
 {% endblock %}
