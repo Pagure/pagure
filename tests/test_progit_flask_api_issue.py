@@ -958,7 +958,6 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data['date_created'] = '1435821770'
         data["comment_date"] = "2015-07-02 09:22"
         data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
-        print output.data
         self.assertDictEqual(
             data,
             {
