@@ -64,7 +64,7 @@
 {% macro render_repos(
         list, total, pagetitle, page, title, count, id, username=None, hide=True) %}
     <section class="project_list" id="{{ id }}"{%
-        if g.fas_user and id in config.get('SHOW_PROJECTS_INDEX', []) and hide
+        if g.fas_user and id not in config.get('SHOW_PROJECTS_INDEX', []) and hide
         %} style="display:none;" {% endif %}>
         <header>
             {% set title_lvl = 3 if username else 2 %}
@@ -89,34 +89,37 @@
         <strong>
             {% if all %}My repos:{% else %}Repos:{% endif %}
         </strong>
-
-            <label class="switch">
-                <input type="checkbox" class="switch-input"
-                    name="{% if all %}my{% endif %}repos" {%
-                    if 'myrepos' not in config.get('SHOW_PROJECTS_INDEX', []) and not hide
-                    %} checked {% endif %}/>
-                <span class="switch-label" data-on="On" data-off="Off"></span>
-                <span class="switch-handle"></span>
-            </label>
+        <label class="switch">
+            <input type="checkbox" class="switch-input"
+                name="{% if all %}my{% endif %}repos"
+                {%- if (
+                    (all and 'myrepos' in config.get('SHOW_PROJECTS_INDEX', []))
+                    or
+                    (not all and 'repos' not in config.get('SHOW_PROJECTS_INDEX', []))
+                  )
+                  or not hide %} checked {% endif %}/>
+            <span class="switch-label" data-on="On" data-off="Off"></span>
+            <span class="switch-handle"></span>
+        </label>
         <strong>Forks:</strong>
-            <label class="switch">
-                <input type="checkbox" class="switch-input"
-                    name="{% if all %}my{% endif %}forks" {%
-                    if 'myforks' not in config.get('SHOW_PROJECTS_INDEX', []) and not hide
-                    %} checked {% endif %}/>
-                <span class="switch-label" data-on="On" data-off="Off"></span>
-                <span class="switch-handle"></span>
-            </label>
+        <label class="switch">
+            <input type="checkbox" class="switch-input"
+                name="{% if all %}my{% endif %}forks" {%
+                if 'myforks' in config.get('SHOW_PROJECTS_INDEX', []) or not hide
+                %} checked {% endif %}/>
+            <span class="switch-label" data-on="On" data-off="Off"></span>
+            <span class="switch-handle"></span>
+        </label>
         {% if all %}
         <strong>All repos:</strong>
-            <label class="switch">
-                <input type="checkbox" class="switch-input"
-                    name="repos" id="allrepos" {%
-                    if 'repos' not in config.get('SHOW_PROJECTS_INDEX', []) and not hide
-                    %} checked {% endif %}/>
-                <span class="switch-label" data-on="On" data-off="Off"></span>
-                <span class="switch-handle"></span>
-            </label>
+        <label class="switch">
+            <input type="checkbox" class="switch-input"
+                name="repos" id="allrepos" {%
+                if 'repos' in config.get('SHOW_PROJECTS_INDEX', []) or not hide
+                %} checked {% endif %}/>
+            <span class="switch-label" data-on="On" data-off="Off"></span>
+            <span class="switch-handle"></span>
+        </label>
         {% endif %}
         </div>
     </aside>
