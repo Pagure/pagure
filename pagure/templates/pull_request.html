@@ -264,7 +264,8 @@
 
 {% if authenticated and pull_request %}
 <form action="{{ url_for('.pull_request_drop_comment', username=username,
-    repo=repo.name, requestid=requestid) }}" method="post" class="icon">
+    repo=repo.name, requestid=requestid) }}" method="post" class="icon"
+    onsubmit="return try_async_comment(this, null)">
 {% endif %}
 
 {% if diff %}
@@ -359,7 +360,8 @@
 <section class="request_comment" id="request_comment">
 {% if pull_request.discussion %}
 <form action="{{ url_for('.pull_request_drop_comment', username=username,
-    repo=repo.name, requestid=requestid) }}" method="post">
+    repo=repo.name, requestid=requestid) }}" method="post"
+    onsubmit="return try_async_comment(this, null)">
 
 {% for comment in pull_request.discussion %}
   {% if not comment.commit_id %}
@@ -670,7 +672,24 @@ function try_async_comment(form, inline) {
     .done(function(data) {
       if(data == 'ok') {
         // We have submitted the comment correctly
-        $('#comment').val('');
+        if ($('#comment').val()){
+          $('#comment').val('');
+        } else {
+          $('#update_comment').val('');
+          var it = $($('#update_comment').parent().parent().parent().parent().parent().parent().children()[1]);
+          if (it.length) {
+            if (!it.is(':visible')){
+              it.show()
+            }
+            $('#update_comment').parent().parent().parent().parent().parent().remove();
+          } else {
+            it = $($('#update_comment').parent().parent().parent().parent().children()[1]);
+            if (!it.is(':visible')){
+              it.show()
+            }
+            $('#update_comment').parent().parent().parent().remove();
+          }
+        }
         if (inline){
             $(form).remove();
         }

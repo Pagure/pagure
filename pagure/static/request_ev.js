@@ -42,6 +42,22 @@ add_comment = function(data) {
   }
 }
 
+update_comment = function(data) {
+  console.log('Updating comment ' + data.comment_id);
+  var field = $('#comment-' + data.comment_id);
+  field.find('.issue_action').html(
+    '<span title="' + data.comment_date + '">Edited by ' + data.comment_editor + ' seconds ago</span>'
+    + '<a class="reply" title="Reply to this comment - loose formating"> reply </a>');
+  var sec = field.parent();
+  if (sec.find('.comment_body').length) {
+    sec.find('.comment_body').html(data.comment_updated);
+  } else {
+    sec.parent().parent().find('.comment_date').html(
+        ' Updated by ' + data.comment_editor + ' seconds ago');
+    sec.parent().parent().find('.pr_comment').html(data.comment_updated);
+  }
+}
+
 process_event = function(data, requestid){
   console.log(data);
   var category = null;
@@ -49,6 +65,11 @@ process_event = function(data, requestid){
   if (data.comment_added){
     add_comment(data);
     category = 'comment';
+  } else if (data.comment_updated){
+    update_comment(data);
+    category = 'Comment updated';
+  } else {
+    console.log('Unknown data');
   }
 
   if (category && !document.hasFocus()) {

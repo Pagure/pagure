@@ -461,7 +461,7 @@ def pull_request_add_comment(
             'request_pull', username=username,
             repo=repo.name, requestid=requestid))
 
-    if is_js:
+    if is_js and flask.request.method == 'POST':
         return 'failed'
 
     return flask.render_template(
@@ -590,16 +590,24 @@ def pull_request_edit_comment(repo, requestid, commentid, username=None):
                 folder=APP.config['REQUESTS_FOLDER'],
             )
             SESSION.commit()
-            flask.flash(message)
+            if not is_js:
+                flask.flash(message)
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
             LOG.error(err)
+            if is_js:
+                return 'error'
             flask.flash(
                 'Could not edit the comment: %s' % commentid, 'error')
 
+        if is_js:
+            return 'ok'
         return flask.redirect(flask.url_for(
             'request_pull', username=username,
             repo=project.name, requestid=requestid))
+
+    if is_js and flask.request.method == 'POST':
+        return 'failed'
 
     return flask.render_template(
         'comment_update.html',
