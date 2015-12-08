@@ -953,6 +953,7 @@ class PullRequestComment(BASE):
         'PullRequest',
         backref=backref(
             'comments', cascade="delete, delete-orphan",
+            order_by="PullRequestComment.date_created"
         ),
         foreign_keys=[pull_request_uid],
         remote_side=[PullRequest.uid])
