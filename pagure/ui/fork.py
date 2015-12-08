@@ -499,6 +499,13 @@ def pull_request_drop_comment(repo, requestid, username=None):
     if not request:
         flask.abort(404, 'Pull-request not found')
 
+    if flask.request.form.get('edit_comment'):
+        commentid = flask.request.form.get('edit_comment')
+        form = pagure.forms.EditCommentForm()
+        if form.validate_on_submit():
+            return pull_request_edit_comment(
+                repo.name, requestid, commentid, username=username)
+
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
 
@@ -541,6 +548,8 @@ def pull_request_drop_comment(repo, requestid, username=None):
 def pull_request_edit_comment(repo, requestid, commentid, username=None):
     """Edit comment of a pull request
     """
+    is_js = flask.request.args.get('js', False)
+
     project = pagure.lib.get_project(SESSION, repo, user=username)
 
     if not project:
@@ -599,7 +608,8 @@ def pull_request_edit_comment(repo, requestid, commentid, username=None):
         repo=project,
         username=username,
         form=form,
-        comment=comment
+        comment=comment,
+        is_js=is_js,
     )
 
 

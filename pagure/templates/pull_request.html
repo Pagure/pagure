@@ -462,14 +462,6 @@
     return window.confirm("Are you sure you want to close this requested pull?");
   });
 
-  function comment() {
-    $( ".cancel" ).click(
-      function() {
-        $(this).parent().parent().parent().parent().remove();
-      }
-    );
-  };
-
   $( ".code_table tr" ).hover(
     function() {
       $( this ).find( "img" ).show().width(13);
@@ -502,7 +494,7 @@
         $.get( url , function( data ) {
           next_row.before(
             '<tr><td></td><td colspan="2" class="pr_comment_form">' + data + '</td></tr>' );
-          comment();
+          cancel_edit_btn();
           emoji_complete(json_url, folder);
         });
       } else {
@@ -555,6 +547,44 @@
       $( "#comment" ).val("");
     }
   );
+
+  $(".edit_btn").click(function() {
+    var commentid = $( this ).attr('data-comment');
+    var _url = '{{ request.base_url }}' + '/comment/' + commentid + '/edit';
+    $.ajax({
+        url: _url + '?js=1',
+        type: 'GET',
+        dataType: 'html',
+        success: function(res) {
+            var el = $('#comment-' + commentid);
+            var sec = el.parent().children()[1];
+            if (!sec) {
+              sec = el.parent().parent();
+              $(sec).next().hide();
+              var row = $(sec).parent().parent().append(
+                "<tr><td>" + res + "</td></tr>");
+            } else {
+              $(sec).hide();
+              $(sec).after(res);
+            }
+            cancel_edit_btn();
+        },
+        error: function() {
+            alert('Could not make edit work');
+        }
+    });
+    return false;
+  });
+
+  function cancel_edit_btn() {
+    $( ".cancel" ).click(
+      function() {
+        $(this).parent().parent().parent().parent().parent().find('.comment_body').show();
+        $(this).parent().parent().parent().parent().remove();
+        return false;
+      }
+    );
+  };
 
   var cur_hash = null;
 
