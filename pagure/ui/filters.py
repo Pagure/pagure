@@ -122,6 +122,11 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
         output.append('<td class="cell2"><pre>%s</pre></td>' % line)
         output.append('</tr>')
 
+        tpl_edit = '<a href="%(delete_url)s" ' \
+            'class="edit_btn" data-comment="%(commentid)s" ' \
+            'data-objid="%(requestid)s"> ' \
+            '<span class="icon icon-edit blue"></span></a>'
+
         tpl_delete = '<button type="submit" name="drop_comment" ' \
             'value="%(commentid)s"' \
             'onclick="return confirm(\'Do you really want to remove' \
@@ -134,11 +139,24 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
             for comment in comments[cnt - 1]:
 
                 templ_delete = ''
+                templ_edit = ''
                 if authenticated() and (
                         (comment.parent.status is True
                          and comment.user.user == flask.g.fas_user.username)
-                        or is_repo_admin(comment.parent.project)):
+                         or is_repo_admin(comment.parent.project)):
                     templ_delete = tpl_delete % ({'commentid': comment.id})
+                    templ_edit = tpl_edit %({
+                        'delete_url': flask.url_for(
+                            'pull_request_edit_comment',
+                            repo=comment.parent.project.name,
+                            requestid=comment.parent.id,
+                            commentid=comment.id,
+                            username=comment.parent.user.user \
+                                if comment.parent.project.is_fork else None
+                        ),
+                        'requestid': comment.parent.id,
+                        'commentid': comment.id,
+                    })
 
                 output.append(
                     '<tr><td></td>'
@@ -151,7 +169,7 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
                     '</header>'
                     '</td>'
                     '<td class="right">'
-                    '%(date)s%(templ_delete)s'
+                    '%(date)s%(templ_edit)s%(templ_delete)s'
                     '</td>'
                     '</tr>'
                     '<tr><td colspan="2" class="pr_comment">%(comment)s'
@@ -161,6 +179,7 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
                             'url': flask.url_for(
                                 'view_user', username=comment.user.user),
                             'templ_delete': templ_delete,
+                            'templ_edit': templ_edit,
                             'user': comment.user.user,
                             'date': comment.date_created.strftime(
                                 '%b %d %Y %H:%M:%S'),
