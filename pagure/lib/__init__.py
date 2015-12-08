@@ -879,7 +879,7 @@ def edit_comment(session, parent, comment, user,
             'comment_id': comment.id,
             'comment_editor': user_obj.user,
             'avatar_url': avatar_url(comment.user.user, size=16),
-            'comment_date': comment.date_created.strftime('%Y-%m-%d %H:%M'),
+            'comment_date': comment.date_created.strftime('%Y-%m-%d %H:%M:%S'),
         }))
 
     return "Comment updated"
