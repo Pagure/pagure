@@ -73,7 +73,7 @@
         {{ user.user | avatar(32) | safe }}
         {{ user.fullname }} ({{ user.user }})
       </a>
-      {% if user != group.creator %}
+      {% if authenticated and user != group.creator and member %}
        <form class="icon" method="POST" style="display: inline-block"
         action="{{ url_for('group_user_delete',
             group=group.group_name, user=user.user) }}">
