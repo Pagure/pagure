@@ -158,6 +158,14 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
                         'commentid': comment.id,
                     })
 
+                comment_date = comment.date_created.strftime(
+                    '%b %d %Y %H:%M:%S')
+                if comment.edited_on:
+                    comment_date = 'Updated by %s on %s' %(
+                        comment.editor.user,
+                        comment.edited_on.strftime('%b %d %Y %H:%M:%S'),
+                    )
+
                 output.append(
                     '<tr><td></td>'
                     '<td colspan="2"><table style="width:100%%"><tr>'
@@ -169,7 +177,8 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
                     '</header>'
                     '</td>'
                     '<td class="right">'
-                    '%(date)s%(templ_edit)s%(templ_delete)s'
+                    '<span class="comment_date">%(date)s</span>'
+                    '%(templ_edit)s%(templ_delete)s'
                     '</td>'
                     '</tr>'
                     '<tr><td colspan="2" class="pr_comment">%(comment)s'
@@ -181,8 +190,7 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
                             'templ_delete': templ_delete,
                             'templ_edit': templ_edit,
                             'user': comment.user.user,
-                            'date': comment.date_created.strftime(
-                                '%b %d %Y %H:%M:%S'),
+                            'date': comment_date,
                             'comment': markdown_filter(comment.comment),
                             'commentid': comment.id,
                             'anchor': u'¶',
