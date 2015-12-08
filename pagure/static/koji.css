@@ -97,6 +97,14 @@ white-space: nowrap;
 }
 
 
+#preview
+{
+    height: 16rem;
+    background:#ddd;
+    padding:1em;
+    border:1px solid #aaa;
+}
+
 
 .oi-spin {
   -webkit-animation: spin 2s infinite linear;

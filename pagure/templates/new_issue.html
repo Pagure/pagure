@@ -69,6 +69,21 @@
       </form>
       </div>
     </div>
+
+{% if authenticated and repo_admin and type and type == 'edit' %}
+<form method="post" class="pull-right" action="{{ url_for('.delete_issue',
+                    username=username, repo=repo.name, issueid=issueid) }}">
+  <button class="btn btn-danger" type="submit"
+      onclick="return confirm('Are you sure to delete this ticket? \nThis is final and cannot be un-done.');"
+      title="Delete this ticket">
+    <span class="icon icon-trash blue"></span>
+    Delete issue
+  </button>
+  {{ form.csrf_token }}
+</form>
+{% endif %}
+
+
   </div>
 </div>
 

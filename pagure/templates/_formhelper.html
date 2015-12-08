@@ -113,9 +113,38 @@
   <div class="card-block">
 
     <section class="issue_comment">
-      <header id="comment-{{ id }}">
+      <div class="comment_body">
+        {% autoescape false %}
+        {% if id == 0 %}
+        {{ comment.content | markdown }}
+        {% else %}
+        {{ comment.comment | markdown }}
+        {% endif %}
+        {% endautoescape %}
+      </div>
+    </section>
+        <aside class="issue_action icon pull-right p-b">
+          <a class="reply btn btn-secondary btn-sm" title="Reply to this comment - loose formating">
+            reply
+          </a>
+          {% if id != 0 and g.fas_user and (
+              (comment.parent.status in [True, 'Open'] and g.fas_user.username == comment.user.username)
+              or repo_admin) %}
+          <button class="btn btn-danger btn-sm" type="submit" name="drop_comment" value="{{ comment.id }}"
+              onclick="return confirm('Do you really want to remove this comment?');"
+              title="Remove comment">
+              <span class="oi" data-glyph="trash"></span>
+          </button>
+          {% endif %}
+        </aside>
+  </div>
+</div>
+{% endmacro %}
 
-      </header>
+
+{% macro show_initial_comment(comment, id, repo, username, issueid, form, repo_admin) %}
+<div class="clearfix p-b-lg">
+    <section class="issue_comment">
       <div class="comment_body">
         {% autoescape false %}
         {% if id == 0 %}
@@ -127,7 +156,7 @@
       </div>
     </section>
         <aside class="issue_action icon pull-right">
-          <a class="reply" title="Reply to this comment - loose formating">
+          <a class="reply btn-secondary btn-sm" title="Reply to this comment - loose formating">
             reply
           </a>
           {% if id != 0 and g.fas_user and (
@@ -140,6 +169,5 @@
           </button>
           {% endif %}
         </aside>
-  </div>
 </div>
 {% endmacro %}
