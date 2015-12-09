@@ -29,7 +29,7 @@ DB_URL = 'sqlite:////var/tmp/pagure_dev.sqlite'
 ADMIN_GROUP = 'sysadmin-main'
 
 # Whether or not to send emails
-EMAIL_SEND = True
+EMAIL_SEND = False
 
 # The email address to which the flask.log will send the errors (tracebacks)
 EMAIL_ERROR = 'pingou@pingoured.fr'
