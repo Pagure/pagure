@@ -413,6 +413,8 @@ function try_async_comment(form) {
       if(data == 'ok') {
         {# The event-source server will automatically refresh the UI #}
         $('#comment').val('');
+        $('#comments').find('.comment_body').show();
+        $('#comments').find('.edit_comment').remove();
       } else {
         // Make the browser submit the form sync
         $(form).off('submit');

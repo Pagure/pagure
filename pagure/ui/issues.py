@@ -829,16 +829,25 @@ def edit_comment_issue(repo, issueid, commentid, username=None):
                 folder=APP.config['TICKETS_FOLDER'],
             )
             SESSION.commit()
-            flask.flash(message)
+            if not is_js:
+                flask.flash(message)
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
             LOG.error(err)
+            if is_js:
+                return 'error'
             flask.flash(
                 'Could not edit the comment: %s' % commentid, 'error')
+
+        if is_js:
+            return 'ok'
 
         return flask.redirect(flask.url_for(
             'view_issue', username=username,
             repo=project.name, issueid=issueid))
+
+    if is_js and flask.request.method == 'POST':
+        return 'failed'
 
     return flask.render_template(
         'comment_update.html',
