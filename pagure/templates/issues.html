@@ -6,8 +6,8 @@
 
 {% block repo %}
 
-<div class="inline">
-  <h3>
+
+  <h2 class="p-b">
     {% if status and status != 'Open' %}
       {{ issues|count }} Closed Issues
     {% else %}
@@ -15,10 +15,10 @@
     {% endif %}
 
     <a class="pull-right" href="{{ url_for('new_issue', username=username, repo=repo.name) }}">
-      <button class="btn btn-secondary btn-sm">New Issue</button>
+      <button class="btn btn-success btn-sm">New Issue</button>
     </a>
-  </h3>
-</div>
+  </h2>
+
 
 <section id="tags">
   <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
@@ -60,9 +60,9 @@
     {% endfor %}
 </span>
 </section>
-
-<table id="pagure-issues-list" class="table table-sm">
-    <thead>
+<div class="card m-t">
+<table id="pagure-issues-list" class="table table-hover table-striped m-b-0">
+    <thead class="thead-default">
         <tr>
             <th>#</th>
             <th id="issue-title">Title</th>
@@ -126,5 +126,5 @@
     {% endfor %}
     </tbody>
 </table>
-
+</div>
 {% endblock %}

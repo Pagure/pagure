@@ -142,7 +142,7 @@
 {% endmacro %}
 
 
-{% macro show_initial_comment(comment, id, repo, username, issueid, form, repo_admin) %}
+{% macro show_initial_comment(comment, id, repo, username, issueid, form, repo_admin, issue) %}
 <div class="clearfix p-b-lg">
     <section class="issue_comment">
       <div class="comment_body">
@@ -156,18 +156,14 @@
       </div>
     </section>
         <aside class="issue_action icon pull-right">
-          <a class="reply btn-secondary btn-sm" title="Reply to this comment - loose formating">
+          <a class="btn btn-secondary btn-sm" title="Reply to this comment - loose formating">
             reply
           </a>
-          {% if id != 0 and g.fas_user and (
-              (comment.parent.status in [True, 'Open'] and g.fas_user.username == comment.user.username)
-              or repo_admin) %}
-          <button type="submit" name="drop_comment" value="{{ comment.id }}"
-              onclick="return confirm('Do you really want to remove this comment?');"
-              title="Remove comment">
-              <span class="icon icon-remove blue"></span>
-          </button>
-          {% endif %}
+      {% if repo_admin or g.fas_user.username == issue.user.username %}
+      <a class="btn btn-secondary btn-sm" href="{{ url_for('edit_issue', username=username,
+                    repo=repo.name, issueid=issueid) }}">
+          edit</a>
+      {% endif %}
         </aside>
 </div>
 {% endmacro %}

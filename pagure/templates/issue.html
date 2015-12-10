@@ -14,21 +14,17 @@
 {% endblock %}
 
 {% block repo %}
-
-<h2>
-    <span class="issueid label label-default">#{{ issueid }}</span> <span id="issuetitle">{{
-        issue.title | noJS("img") | safe }}</span>
-    {% if authenticated and (repo_admin or g.fas_user.username == issue.user.username) %}
-    <a class="btn btn-primary pull-right" href="{{ url_for('edit_issue', username=username,
-                  repo=repo.name, issueid=issueid) }}">
-        Edit</a>
-    {% endif %}
-</h2>
-<h5 class="text-muted"> Created {{ issue.date_created | humanize}} by {{ issue.user.user }}</h5>
-
 <div class="row m-t-md">
   <div class="col-md-8">
-    {{ show_initial_comment(issue, 0, repo, username, issueid, form) }}
+
+    <h2>
+      <span class="issueid label label-default">#{{ issueid }}</span> <span id="issuetitle">{{
+          issue.title | noJS("img") | safe }}</span>
+    </h2>
+<h5 class="text-muted"> Created {{ issue.date_created | humanize}} by {{ issue.user.user }}</h5>
+
+
+    {{ show_initial_comment(issue, 0, repo, username, issueid, form, issue) }}
 
     <section id="comments">
     {% if issue.comments %}

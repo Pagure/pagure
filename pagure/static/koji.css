@@ -79,7 +79,7 @@ background:#ededed;
 padding: 0.3rem;
 }
 
-#issue-title
+#issue-title, .stretch-table-column
 {
 	min-width:99%;
 }
@@ -91,7 +91,7 @@ padding: 0.3rem;
     line-height: 1.2;
 }
 
-#pagure-issues-list .td-open_date
+#pagure-issues-list .td-open_date, .nowrap
 {
 white-space: nowrap;
 }
@@ -109,6 +109,11 @@ white-space: nowrap;
 .issue-metadata-form
 {
 display:none;
+}
+
+.bodycontent
+{
+min-height:800px;
 }
 
 .oi-spin {
