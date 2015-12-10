@@ -7,7 +7,7 @@
 {% block repo %}
 
 
-  <h2 class="p-b">
+  <h2 class="p-b-1">
     {% if status and status != 'Open' %}
       {{ issues|count }} Closed Issues
     {% else %}
@@ -36,7 +36,7 @@
                  assignee=assignee) }}">Closed</a>
     {% endif %}
   </span>
-  <span class="oi m-l-md" data-glyph="tag"></span>
+  <span class="oi m-l-2" data-glyph="tag"></span>
   <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
     {% for tag in tag_list %}
       {% if tag.tag in tags %}
@@ -60,7 +60,7 @@
     {% endfor %}
 </span>
 </section>
-<div class="card m-t">
+<div class="card m-t-1">
 <table id="pagure-issues-list" class="table table-hover table-striped m-b-0">
     <thead class="thead-default">
         <tr>

@@ -5,7 +5,7 @@
 
 
 {% block content %}
-<div class="repo-header p-t">
+<div class="repo-header p-t-1">
   <div class="container">
     <header>
         <h2 class="repo-name m-b-0">
@@ -64,7 +64,7 @@
             </a>
         </div>
         {% endif %}
-        <div class="projectinfo m-t">
+        <div class="projectinfo m-t-1">
         {% if repo.description %}{{ repo.description | markdown |safe }}{% else %}-{% endif -%}
         </div>
     </header>
@@ -130,7 +130,7 @@
     </ul>
   </div>
 </div>
-<div class="container p-t-lg">
+<div class="container p-t-3">
 {% block repo %}
 {% endblock %}
 </div>

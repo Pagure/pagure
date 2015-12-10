@@ -45,21 +45,21 @@
   <nav class="navbar navbar-light navbar-underline p-t-0 p-b-0">
 	  <div class="container">
 	    <ul class="nav navbar-nav nav-underline">
-	      <li class="nav-item p-l p-r {% if tag == 'home'%}active{% endif %}"><a class="nav-link" href="{{url_for('index')}}">Projects</a></li>
-	      <li class="nav-item p-l p-r {% if tag == 'users'%}active{% endif %}"><a class="nav-link" href="{{ url_for('view_users') }}">Users</a></li>
-	      <li class="nav-item p-l p-r {% if tag == 'groups'%}active{% endif %}"><a class="nav-link" href="{{ url_for('group_lists') }}">Groups</a></li>
+	      <li class="nav-item p-x-1 {% if tag == 'home'%}active{% endif %}"><a class="nav-link" href="{{url_for('index')}}">Projects</a></li>
+	      <li class="nav-item p-x-1 {% if tag == 'users'%}active{% endif %}"><a class="nav-link" href="{{ url_for('view_users') }}">Users</a></li>
+	      <li class="nav-item p-x-1 {% if tag == 'groups'%}active{% endif %}"><a class="nav-link" href="{{ url_for('group_lists') }}">Groups</a></li>
 	      {% if admin %}
-	      <li class="nav-item p-l p-r {% if tag == 'admin'%}active{% endif %}"><a class="nav-link" href="{{ url_for('admin_index') }}">Admin</a></li>
+	      <li class="nav-item p-x-1 {% if tag == 'admin'%}active{% endif %}"><a class="nav-link" href="{{ url_for('admin_index') }}">Admin</a></li>
 	      {% endif %}
 	    </ul>
 	    <ul class="nav navbar-nav nav-underline" style="float:right;">
 	      {% if config.get('ENABLE_NEW_PROJECTS', True) %}
-	      <li class="nav-item p-l"><a class="nav-link" href="{{ url_for('new_project') }}"><span class="oi" data-glyph="plus" title="Create New" aria-hidden="true"></span>
+	      <li class="nav-item p-l-1"><a class="nav-link" href="{{ url_for('new_project') }}"><span class="oi" data-glyph="plus" title="Create New" aria-hidden="true"></span>
 </a></li>
 	      {% endif %}
 	      {% if not nologin %}
 		{% if g.fas_user %}
-			<li class="nav-item dropdown p-l">
+			<li class="nav-item dropdown p-l-1">
 			  <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">{{ g.fas_user.username | avatar(24) | safe }}</a>
 		      <div class="dropdown-menu dropdown-menu-right">
 		        <a class="dropdown-item" href="{{ url_for('view_user', username=g.fas_user.username) }}">My Public Profile</a>
@@ -71,17 +71,17 @@
 			 <!--<a href="{{ url_for('user_settings') }}">{{ g.fas_user.username }}</a>
 			 <a href="{{ url_for('auth_logout') }}?next={{request.url}}">log out</a> -->
 		{% else %}
-		       <li class="nav-item p-l"><a class="nav-link" href="{{ url_for('auth_login') }}?next={{request.url}}"><span class="oi" data-glyph="account-login" title="Log In" aria-hidden="true"></a></li>
+		       <li class="nav-item p-l-1"><a class="nav-link" href="{{ url_for('auth_login') }}?next={{request.url}}"><span class="oi" data-glyph="account-login" title="Log In" aria-hidden="true"></a></li>
 		{% endif %}
               {% endif %}
 	    </ul>
 	  </div>
 	</nav>
-    <div class="bodycontent p-b-lg">
+    <div class="bodycontent p-b-3">
 
             {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if category, messages %}
-                <ul id="flashes">
+                {% if messages %}
+                <div class="container p-t-2">
                     {% for category, message in messages %}
                     <li class="{{ category }}">{{ message }}</li>
                     {% endfor %}
@@ -92,7 +92,7 @@
             {% block content %}{% endblock %}
     </div>
 
-    <div class="footer p-t p-b">
+    <div class="footer p-t-1 p-b-1">
         <div class="container">
             <p class="text-muted credit">
          Copyright &copy; 2014-2015 Red Hat

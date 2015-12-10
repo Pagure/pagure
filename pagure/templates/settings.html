@@ -218,7 +218,7 @@
             {% endif %}
             {% endfor %}
           </table>
-          <p class="p-t-md">
+          <p class="p-t-2">
               <input type="submit" class="btn btn-primary" value="Update">
               {{ form.csrf_token }}
             </p>
@@ -243,7 +243,7 @@
             </button>
             {{ form.csrf_token }}
           </form>
-          <form class="m-t-md" action="{{ url_for('.regenerate_git',
+          <form class="m-t-2" action="{{ url_for('.regenerate_git',
                           username=username, repo=repo.name) }}" method="post"
                 class="icon">
             <input name="regenerate" value="requests" type="hidden"/>
