@@ -45,15 +45,16 @@ add_comment = function(data) {
 update_comment = function(data) {
   console.log('Updating comment ' + data.comment_id);
   var field = $('#comment-' + data.comment_id);
-  field.find('.issue_action').html(
-    '<span title="' + data.comment_date + '">Edited by ' + data.comment_editor + ' seconds ago</span>'
-    + '<a class="reply" title="Reply to this comment - loose formating"> reply </a>');
+  field.find('.edit_date').html(
+    '<span title="' + data.comment_date + '">Edited by '
+    + data.comment_editor + ' seconds ago</span>');
   var sec = field.parent();
   if (sec.find('.comment_body').length) {
     sec.find('.comment_body').html(data.comment_updated);
   } else {
     sec.parent().parent().find('.comment_date').html(
-        ' Updated by ' + data.comment_editor + ' seconds ago');
+        '<span title="' + data.comment_date + '">Edited by '
+        + data.comment_editor + ' seconds ago</span>');
     sec.parent().parent().find('.pr_comment').html(data.comment_updated);
   }
 }

@@ -75,11 +75,13 @@
         href="#comment-{{ id }}">¶</a>
       <aside class="issue_action icon">
 
+        <span class="edit_date" title="{{
+            comment.edited_on.strftime('%Y-%m-%d %H:%M:%S') if comment.edited_on
+        }}">
         {% if comment.edited_on %}
-            <span title="{{
-            comment.updated_info
-            }}">Edited by {{ comment.editor.username }} {{ comment.edited_on | humanize }}</span>
+            Edited by {{ comment.editor.username }} {{ comment.edited_on | humanize }}
         {% endif %}
+        </span>
 
         <a class="reply" title="Reply to this comment - loose formating">
           reply
