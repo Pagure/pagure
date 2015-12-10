@@ -581,15 +581,12 @@
   function cancel_edit_btn() {
     $( ".cancel" ).click(
       function() {
-        var item = $(this).parent().parent().parent().parent().parent().find('.comment_body');
-        if (item.length) {
-          $(this).parent().parent().parent().parent().remove();
-          item.show();
-        } else {
-          item = $(this).parent().parent().parent().parent().parent().parent().parent().children()[1];
-          $(this).parent().parent().parent().parent().parent().parent().remove();
-          $(item).show();
+        var item = $(this).closest('tr');
+        if (!item.length) {
+            item = $(this).closest('section');
         }
+        $(item.parent().children()[1]).show();
+        item.remove();
         return false;
       }
     );

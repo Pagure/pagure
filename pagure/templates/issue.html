@@ -350,8 +350,8 @@ $(function() {
   function cancel_edit_btn() {
     $( ".cancel" ).click(
       function() {
-        $(this).parent().parent().parent().parent().parent().find('.comment_body').show();
-        $(this).parent().parent().parent().parent().remove();
+        $(this).closest('#comments').find('.comment_body').show();
+        $(this).closest('.edit_comment').remove();
         return false;
       }
     );
