@@ -50,7 +50,7 @@
 
           <fieldset class="form-group">
             <label for="comment"><strong>Add new comment</strong></label>
-            <small class="text-muted pull-right"><span class="btn btn-sm btn-secondary inactive" aria-pressed="false" id="previewinmarkdown">Preview</span></small>
+            <small class="text-muted pull-xs-right"><span class="btn btn-sm btn-secondary inactive" aria-pressed="false" id="previewinmarkdown">Preview</span></small>
             <textarea class="form-control" rows=8 id="comment" name="comment" placeholder="Enter your comment here"></textarea>
 
             <div id="preview">
@@ -205,14 +205,6 @@
 <script src="{{ url_for('static', filename='selectize.min.js') }}" rel="text/javascript"/>
 <script type="text/javascript">
 
-var emojiStrategy;
-$.getJSON(
-  '{{ url_for("static", filename="emoji/emoji_strategy.json") }}',
-  function( data ) {
-    emojiStrategy =  data;
-  }
-);
-
 {% if authenticated and form %}
 $(document).ready(function() {
   // Set up the drag/drop zone.
@@ -225,11 +217,7 @@ $(document).ready(function() {
 });
 {% endif %}
 
-$(function() {
-  var folder = '{{url_for("static", filename="emoji/png/") }}';
-  var json_url = '{{ url_for("static", filename="emoji/emoji_strategy.json") }}';
-  emoji_complete(json_url, folder);
-});
+
 
 /*  var cache = {};
   $( "#tag" ).autocomplete({
@@ -276,11 +264,7 @@ $(function() {
   $(window.onload=highlight_comment());
   $(window).on('hashchange', highlight_comment);
 
-  $(".comment_body").each(function(ind, obj) {
-    var source = $(obj).html();
-    var preview = emojione.toImage(source);
-    $(obj).html(preview);
-  });
+
 
   $(".edit_btn").click(function() {
     var commentid = $( this ).attr('data-comment');
@@ -392,6 +376,24 @@ function try_async_comment(form) {
 <script>
 $( document ).ready(function() {
     console.log( "ready!" );
+var emojiStrategy;
+$.getJSON(
+  '{{ url_for("static", filename="emoji/emoji_strategy.json") }}',
+  function( data ) {
+    emojiStrategy =  data;
+  }
+);
+
+  var folder = '{{url_for("static", filename="emoji/png/") }}';
+  var json_url = '{{ url_for("static", filename="emoji/emoji_strategy.json") }}';
+  emoji_complete(json_url, folder);
+
+
+  $(".comment_body").each(function(ind, obj) {
+    var source = $(obj).html();
+    var preview = emojione.toImage(source);
+    $(obj).html(preview);
+  });
 
   $( ".editmetadatatoggle" ).click(
     function() {

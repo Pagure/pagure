@@ -34,7 +34,7 @@
         {{ render_bootstrap_field(form.private, field_description="the name of your project") }}
           <fieldset class="form-group">
             <label for="issue_content"><strong>Description</strong></label>
-            <small class="text-muted pull-right"><span class="btn btn-sm btn-secondary inactive" aria-pressed="false" id="previewinmarkdown">Preview</span></small>
+            <small class="text-muted pull-xs-right"><span class="btn btn-sm btn-secondary inactive" aria-pressed="false" id="previewinmarkdown">Preview</span></small>
             <textarea class="form-control" rows="8" id="issue_content" name="issue_content"
                 placeholder="Report your issue/request here">
               {%- if issue %}{{ issue.content }}{% endif -%}
@@ -42,7 +42,7 @@
             <div>
 
               {% if form.issue_content.errors %}
-              <span class="pull-right text-danger">
+              <span class="pull-xs-right text-danger">
                 <small>
                 {% for error in form.issue_content.errors %}
                   {{ error }}&nbsp;
@@ -71,7 +71,7 @@
     </div>
 
 {% if authenticated and repo_admin and type and type == 'edit' %}
-<form method="post" class="pull-right" action="{{ url_for('.delete_issue',
+<form method="post" class="pull-xs-right" action="{{ url_for('.delete_issue',
                     username=username, repo=repo.name, issueid=issueid) }}">
   <button class="btn btn-danger" type="submit"
       onclick="return confirm('Are you sure to delete this ticket? \nThis is final and cannot be un-done.');"

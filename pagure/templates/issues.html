@@ -14,7 +14,7 @@
       {{ issues|count }} Open Issues
     {% endif %}
 
-    <a class="pull-right" href="{{ url_for('new_issue', username=username, repo=repo.name) }}">
+    <a class="pull-xs-right" href="{{ url_for('new_issue', username=username, repo=repo.name) }}">
       <button class="btn btn-success btn-sm">New Issue</button>
     </a>
   </h2>

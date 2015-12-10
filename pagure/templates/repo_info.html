@@ -61,14 +61,14 @@
               {% endif %}
               <h5>
                 <strong>{{ commit.message.split('\n')[0] }}</strong>
-                <div class="pull-right">
+                <div class="pull-xs-right">
                   <span class="commitdate" title="{{ commit.commit_time|format_ts }}">
                     {{ commit.commit_time|humanize }}
                   </span>
                 </div>
               </h5>
               {{ commit.author | author2avatar(20) | safe }} {{ commit.author.name }}
-              <div class="pull-right">
+              <div class="pull-xs-right">
                 <span class="label label-default">{{ commit.hex|short }}</span>
               </div>
             </a>

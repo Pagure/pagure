@@ -156,3 +156,10 @@ min-height:800px;
     transform: rotate(359deg);
   }
 }
+
+
+@media (min-width:768px) {
+	.container {
+		max-width:55pc
+	}
+}

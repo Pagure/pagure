@@ -33,7 +33,7 @@
                     <small class="text-muted">{{field_description}}</small>
                   {% endif %}
                   {% if field.errors %}
-                  <span class="pull-right text-danger">
+                  <span class="pull-xs-right text-danger">
                     <small>
                     {% for error in field.errors %}
                       {{ error }}&nbsp;
@@ -104,7 +104,7 @@
         {{ comment.user.user | avatar(16) | safe }}
         <a href="{{ url_for('view_user', username=comment.user.user)}}">
           {{ comment.user.user }}
-        </a> <a class="headerlink pull-right" title="Permalink to this headline"
+        </a> <a class="headerlink pull-xs-right" title="Permalink to this headline"
           href="#comment-{{ id }}"><span title="{{
           comment.date_created.strftime('%Y-%m-%d %H:%M:%S')
           }}">{{ comment.date_created | humanize}}</span>
@@ -123,7 +123,7 @@
         {% endautoescape %}
       </div>
     </section>
-        <aside class="issue_action icon pull-right p-b-1">
+        <aside class="issue_action icon pull-xs-right p-b-1">
           <a class="reply btn btn-secondary btn-sm" title="Reply to this comment - loose formating">
             reply
           </a>
@@ -155,7 +155,7 @@
         {% endautoescape %}
       </div>
     </section>
-        <aside class="issue_action icon pull-right">
+        <aside class="issue_action icon pull-xs-right">
           <a class="btn btn-secondary btn-sm" title="Reply to this comment - loose formating">
             reply
           </a>

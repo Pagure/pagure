@@ -136,7 +136,7 @@
               <span class="text-danger"><strong>Expired</strong> since {{ token.expiration.date() }}</span>
             {% else %}
               <span class="text-success"><strong>Valid</strong> until: {{ token.expiration.date() }}</span>
-              <form class="pull-right" action="{{ url_for('.revoke_api_token',
+              <form class="pull-xs-right" action="{{ url_for('.revoke_api_token',
                     username=username, repo=repo.name, token_id=token.id) }}"
                 method="post" class="icon">
                 <button class="btn btn-danger" type="submit"
@@ -287,7 +287,7 @@
           {% for user in repo.users %}
             <li class="list-group-item">
               <a href="{{ url_for('.view_user', username=user.user) }}"><span class="oi" data-glyph="person"></span>&nbsp; {{ user.user }}</a>
-              <form class="pull-right" method="POST"
+              <form class="pull-xs-right" method="POST"
                 action="{{ url_for('.remove_user', username=username, repo=repo.name, userid=user.id) }}">
                 <button
                   onclick="return confirm('You sure you want to remove this user from this project?');"
@@ -301,11 +301,11 @@
           {% for group in repo.groups %}
             <li class="list-group-item">
               <a href="{{ url_for('.view_group', group=group.group_name) }}"><span class="oi" data-glyph="people"></span>&nbsp; {{ group.group_name }}</a>
-              <form class="pull-right" method="POST"
+              <form class="pull-xs-right" method="POST"
                 action="">
                 <button
                   onclick="return confirm('You sure you want to remove this group from this project?');"
-                  title="Remove group" class="btn btn-danger btn-sm pull-right">
+                  title="Remove group" class="btn btn-danger btn-sm pull-xs-right">
                   <span class="oi" data-glyph="trash"></span>
                 </button>
                 {{ form.csrf_token }}
@@ -368,8 +368,8 @@
               repo=repo.name, tags=tag.tag) }}">
               <span class="oi" data-glyph="tag"></span>&nbsp; {{ tag.tag }}
             </a>
-            <div class="pull-right">
-            <form class="icon del_icon pull-right" method="POST"
+            <div class="pull-xs-right">
+            <form class="icon del_icon pull-xs-right" method="POST"
               action="{{ url_for('remove_tag', username=username, repo=repo.name) }}">
               <input type="hidden" value="{{ tag.tag }}" name="tag" />
               {{ tag_form.csrf_token }}
