@@ -33,6 +33,24 @@
       </div>
     {% else %}
       {% if origin == 'view_commits' %}
+
+        {% if diff_commits and authenticated %}
+        <span id="request_pull" class="inline_it">
+            <a href="{{ url_for('new_request_pull',
+        username=username, repo=repo.name,
+        branch_to=head, branch_from=branchname or 'master') }}">
+      {% if repo_admin %}Request pull{% else %}Compare{% endif %}
+            </a>
+        </span>
+        {% elif authenticated %}
+        <span id="request_pull" class="inline_it">
+            <a href="{{ url_for('new_remote_request_pull',
+        username=username, repo=repo.name) }}">
+      Open a remote pull-request
+            </a>
+        </span>
+        {% endif %}
+
         <div class="list-group">
           {% for commit in last_commits %}
             <a href="{{ url_for('view_commit', username=username, repo=repo.name, commitid=commit.hex) }}" class="list-group-item {% if diff_commits and commit.oid.hex in diff_commits %}p-l-lg{% endif %}" style="position:relative;">
