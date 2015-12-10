@@ -19,15 +19,15 @@
 {% endblock %}
 
 {% block repo %}
-
-
+<div class="row m-t-md">
+  <div class="col-md-8">
 {% if pull_request %}
-<h2>Pull Request: {{ pull_request.title | noJS(ignore="img") | safe
+<h2><span class="label label-default">PR#{{requestid}}</span> {{ pull_request.title | noJS(ignore="img") | safe
   }}{% if authenticated and (g.fas_user.username == pull_request.user.username
     or repo_admin) and pull_request.status == 'Open'
   %}<a class="edit_icon"
     href="{{ url_for('request_pull_edit', username=username,
-            repo=repo.name, requestid=requestid) }}" title="Update title"></a>{%
+            repo=repo.name, requestid=requestid) }}" title="Update title">edit</a>{%
   endif %}</h2>
 
 <div class="header">
