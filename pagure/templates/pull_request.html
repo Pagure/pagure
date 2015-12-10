@@ -669,27 +669,15 @@ function try_async_comment(form, inline) {
     .done(function(data) {
       if(data == 'ok') {
         // We have submitted the comment correctly
-        if ($('#comment').val()){
-          $('#comment').val('');
-        } else {
-          $('#update_comment').val('');
-          var it = $($('#update_comment').parent().parent().parent().parent().parent().parent().children()[1]);
-          if (it.length) {
-            if (!it.is(':visible')){
-              it.show()
-            }
-            $('#update_comment').parent().parent().parent().parent().parent().remove();
-          } else {
-            it = $($('#update_comment').parent().parent().parent().parent().children()[1]);
-            if (!it.is(':visible')){
-              it.show()
-            }
-            $('#update_comment').parent().parent().parent().remove();
-          }
+        $('#update_comment').val('');
+        var item = $('#update_comment').closest('tr');
+        if (!item.length) {
+          item = $('#update_comment').closest('section');
         }
-        if (inline){
-            $(form).remove();
+        if (!$(item.parent().children()[1]).is(':visible')){
+          $(item.parent().children()[1]).show()
         }
+        item.remove();
       } else {
         // Make the browser submit the form sync
         $(form).off('submit');
