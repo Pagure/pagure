@@ -362,7 +362,7 @@ def request_pull_edit(repo, requestid, username=None):
         flask.abort(400, 'Pull-request is already closed')
 
     if not is_repo_admin(repo) \
-            or flask.g.fas_user.username != request.user.username :
+            and flask.g.fas_user.username != request.user.username :
         flask.abort(403, 'You are not allowed to edit this pull-request')
 
     form = pagure.forms.RequestPullForm()
