@@ -21,7 +21,7 @@
       <span class="issueid label label-default">#{{ issueid }}</span> <span id="issuetitle">{{
           issue.title | noJS("img") | safe }}</span>
     </h2>
-<h5 class="text-muted"> Created {{ issue.date_created | humanize}} by {{ issue.user.user }}</h5>
+<h5 class="text-muted"> <a href="#" data-toggle="tooltip" title="pants">Created</a> {{ issue.date_created | humanize}} by {{ issue.user.user }}</h5>
 
 
     {{ show_initial_comment(issue, 0, repo, username, issueid, form, issue) }}
@@ -202,6 +202,7 @@
 <script type="text/javascript"
   src="{{ url_for('static', filename='upload.js') }}">
 </script>
+
 <script src="{{ url_for('static', filename='selectize.min.js') }}" rel="text/javascript"/>
 <script type="text/javascript">
 
@@ -375,20 +376,20 @@ function try_async_comment(form) {
 {% endif %}
 <script>
 $( document ).ready(function() {
-    console.log( "ready!" );
-var emojiStrategy;
-$.getJSON(
-  '{{ url_for("static", filename="emoji/emoji_strategy.json") }}',
-  function( data ) {
-    emojiStrategy =  data;
-  }
-);
+  console.log( "ready!" );
+  var emojiStrategy;
+  $.getJSON(
+    '{{ url_for("static", filename="emoji/emoji_strategy.json") }}',
+    function( data ) {
+      emojiStrategy =  data;
+    }
+  );
 
   var folder = '{{url_for("static", filename="emoji/png/") }}';
   var json_url = '{{ url_for("static", filename="emoji/emoji_strategy.json") }}';
   emoji_complete(json_url, folder);
 
-
+$('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
   $(".comment_body").each(function(ind, obj) {
     var source = $(obj).html();
     var preview = emojione.toImage(source);

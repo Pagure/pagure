@@ -119,10 +119,10 @@
 
       {% if authenticated %}
         {% if repo_admin %}
-          <li class="nav-item">
-            <a {% if select == 'settings' %}class="active nav-link" {% else %}class="nav-link"{% endif %} href="{{ url_for(
+          <li class="nav-item pull-xs-right">
+            <a title="Settings" {% if select == 'settings' %}class="active nav-link" {% else %}class="nav-link"{% endif %} href="{{ url_for(
                 '.view_settings', repo=repo.name, username=username) }}">
-              <span class="oi hidden-md-up" data-glyph="cog"></span><span class="hidden-sm-down">Settings</span></a>
+              <span class="oi" data-glyph="cog"></span></a>
           </li>
         {% endif %}
       {% endif %}
