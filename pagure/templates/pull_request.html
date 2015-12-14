@@ -1,9 +1,11 @@
 {% extends "repo_master.html" %}
-{% from "_formhelper.html" import render_field_in_row, show_comment %}
+{% from "_formhelper.html" import render_field_in_row, show_comment, render_bootstrap_field %}
 
 {% block title %}
   {%- if pull_request -%}
     PR#{{ requestid }}: {{ pull_request.title }} - {{ repo.name }}
+  {% elif form and (repo_admin or remote_git) %}
+    Create new Pull Request for {{ branch_to }} - {{ repo.name }}
   {%- else -%}
     Diff from {{ branch_from }} to {{ branch_to }} - {{ repo.name }}
   {%- endif -%}
@@ -16,11 +18,13 @@
   rel="stylesheet" />
 <link href="{{ url_for('static', filename='emoji/emojione.sprites.css') }}"
   rel="stylesheet" />
+  <link href="{{ url_for('static', filename='selectize.bootstrap3.css') }}"
+  rel="stylesheet" />
 {% endblock %}
 
 {% block repo %}
-<div class="row m-t-2">
-  <div class="col-md-8">
+<div class="row">
+  <div class="{% if pull_request %}col-md-8{% elif form and (repo_admin or remote_git) %}col-md-12{%endif%}">
 {% if pull_request %}
 <h2><span class="label label-default">PR#{{requestid}}</span> {{ pull_request.title | noJS(ignore="img") | safe
   }}{% if authenticated and (g.fas_user.username == pull_request.user.username
@@ -66,6 +70,8 @@
       </li>
     </ul>
 </div>
+{% elif form and (repo_admin or remote_git) %}
+<h2>Create pull request</h2>
 {% else %}
 <h2>Diff
       (<a href="{{ url_for('view_tree', username=username,
@@ -85,8 +91,20 @@
     repo=repo.name, commitid=commitid, branch_from=branch_from,
     branch_to=branch_to) }}" method="post">
   {% endif %}
+  Pull from
+<span class="pr-toplabel">{% if remote_git -%}{{ remote_git }}{%- else -%}<span class="oi" data-glyph="fork"></span> {{ repo.fullname}}{%- endif %}</span> <span class="pr-toplabel"> <span class="oi" data-glyph="random"> </span>{{ branch_from }}</span>
+  into
+<span class="pr-toplabel">{% if repo.is_fork -%}{{ repo.parent.fullname }}{% else %}{{ repo.fullname }}{% endif %}</span>
+          <select class="pr-toplabel-select" id="branch_select" name="branch_to">
+              <option value="{{ branch_to }}">{{ branch_to }}</option>
+            {% for branch in branches |reverse %}
+              {% if branch != branch_to %}
+              <option value="{{ branch }}">{{ branch }}</option>
+              {% endif %}
+            {% endfor %}
+          </select>
     <table>
-      {{ render_field_in_row(form.title, size=80) }}
+      {{ render_bootstrap_field(form.title) }}
       <tr>
           <td>From git repo:</td>
           <td>
@@ -104,24 +122,13 @@
       <tr>
           <td>To git repo:</td>
           <td>
-            {% if repo.is_fork -%}
-              {{ repo.parent.fullname }}
-            {% else %}
-              {{ repo.fullname }}
-            {% endif %}
+
           </td>
       </tr>
       <tr>
         <td>To branch:</td>
         <td>
-          <select id="branch_select" name="branch_to">
-              <option>{{ branch_to }}</option>
-            {% for branch in branches |reverse %}
-              {% if branch != branch_to %}
-              <option>{{ branch }}</option>
-              {% endif %}
-            {% endfor %}
-          </select>
+
         </td>
       </tr>
     </table>
@@ -409,7 +416,8 @@
   <p><a href="{{ url_for('auth_login', next=request.url) }}">Login</a> to comment.</p>
 {% endif %}
 </section>
-
+</div>
+</div>
 
 {% endblock %}
 
@@ -421,6 +429,7 @@
 <script type="text/javascript"
     src="{{ url_for('static', filename='emoji/emojione.min.js') }}">
 </script>
+<script src="{{ url_for('static', filename='selectize.min.js') }}" type="text/javascript"> </script>
 
 <script type="text/javascript">
 
@@ -435,16 +444,23 @@
   var folder = '{{url_for("static", filename="emoji/png/") }}';
   var json_url = '{{ url_for("static", filename="emoji/emoji_strategy.json") }}';
 
-  $( "#branch_select" ).change(
-    function() {
-      var sel = $('#branch_select');
-      var final_url = "{{ url_for('.new_request_pull', username=username,
-        repo=repo.name, branch_from=branch_from,
-        branch_to='--') }}";
-      final_url = final_url.replace('--', sel.val());
-      window.location.href = final_url;
+
+  var branchselect = $('#branch_select').selectize({
+      create: false,
+      sortField: 'text',
+      allowEmptyOption: false,
+      onChange:     function(value) {
+        if (value != ""){
+        var sel = $('#branch_select');
+        var final_url = "{{ url_for('.new_request_pull', username=username,
+          repo=repo.name, branch_from=branch_from,
+          branch_to='--') }}";
+        final_url = final_url.replace('--', sel.val());
+        window.location.href = final_url;
+        }
     }
-  );
+  });
+
 
   $( ".tabs" ).tabs({
     activate: function( event, ui ) {
@@ -721,6 +737,25 @@ source.addEventListener('message', function(e) {
   process_event(data, "{{ request.uid }}");
 
   }, false);
+
+    $('#assignee').selectize({
+      valueField: 'user',
+      labelField: 'user',
+      searchField: 'user',
+      maxItems: 1,
+      create: false,
+      load: function(query, callback) {
+          if (!query.length) return callback();
+          $.getJSON(
+            "{{ url_for('api_ns.api_users') }}", {
+              pattern: query.term
+            },
+            function( data ) {
+              callback( data.users.map(function(x) { return { user: x }; }) );
+            }
+          );
+      }
+  });
 </script>
 {% endif %}
 
