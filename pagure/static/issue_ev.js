@@ -84,7 +84,7 @@ add_deps = function(data, issue_uid, _issue_url) {
   }
   var dep = data.added_dependency;
   var _data = $.trim(field.html());
-  var _url = _issue_url.replace('/issue_id_placeholder', '/' + dep) + dep + '</a>';
+  var _url = _issue_url.replace('/-123456789', '/' + dep) + dep + '</a>';
   if (_data && _data != ',') {
     _data += ',';
   }
@@ -115,7 +115,7 @@ remove_deps = function(data, issue_uid, _issue_url) {
   var dep = data.removed_dependency;
   // Set links
   var _data = $.trim(field.html()).split(',');
-  var _url = _issue_url.replace('/issue_id_placeholder', '/' + dep) + dep + '</a>';
+  var _url = _issue_url.replace('/-123456789', '/' + dep) + dep + '</a>';
   field.html(clean_entry(field.html(), _url).join());
   // Set the value in the input field
   field2.val(clean_entry(field2.val(), dep).join());
@@ -174,7 +174,7 @@ update_issue = function(data) {
 
 private_issue = function(data, _api_issue_url, issue_uid) {
   if (data.comment_id){
-    var _url = _api_issue_url.replace('issue_id_placeholder', issue_uid)
+    var _url = _api_issue_url.replace('-123456789', issue_uid)
       + '/comment/' + data.comment_id;
     $.get( _url )
       .done(function(data) {
