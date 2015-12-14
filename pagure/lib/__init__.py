@@ -873,8 +873,8 @@ def edit_comment(session, parent, comment, user,
     )
 
     if REDIS:
-        if issue.private:
-            REDIS.publish('pagure.%s' % issue.uid, json.dumps({
+        if comment.parent.private:
+            REDIS.publish('pagure.%s' % comment.parent.uid, json.dumps({
                 'comment_updated': 'private',
                 'comment_id': comment.id,
             }))
