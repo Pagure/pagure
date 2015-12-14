@@ -360,7 +360,7 @@ $(function() {
 });
 </script>
 
-{% if config['EVENTSOURCE_SOURCE'] %}
+{% if config['EVENTSOURCE_SOURCE'] and not issue.private %}
 <script type="text/javascript"
   src="{{ url_for('static', filename='issue_ev.js') }}"></script>
 
