@@ -1,4 +1,4 @@
-"""Issue editors
+"""Adding column to store edited_by and edited_on a issue comment
 
 Revision ID: 3b441ef4e928
 Revises: 15ea3c2cf83d

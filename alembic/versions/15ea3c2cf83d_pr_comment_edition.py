@@ -1,4 +1,4 @@
-"""Adding column to store edited_by and edited_on a comment
+"""Adding column to store edited_by and edited_on a PR comment
 
 Revision ID: 15ea3c2cf83d
 Revises: 1cd0a853c697
