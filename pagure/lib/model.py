@@ -460,6 +460,25 @@ class Issue(BASE):
         backref=backref(
             'issues', cascade="delete, delete-orphan", single_parent=True)
         )
+
+    _p = relation(
+        'Project', foreign_keys=[project_id], remote_side=[Project.id],
+        primaryjoin="and_( "
+            "Project.id==Issue.project_id, "
+            "Issue.status=='Open')",
+        backref=backref(
+            'open_tickets', cascade="delete, delete-orphan", single_parent=True)
+        )
+    _p2 = relation(
+        'Project', foreign_keys=[project_id], remote_side=[Project.id],
+        primaryjoin="and_( "
+            "Project.id==Issue.project_id, "
+            "Issue.status=='Open', "
+            "Issue.private==False)",
+        backref=backref(
+            'open_tickets_public', cascade="delete, delete-orphan", single_parent=True)
+        )
+
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id], backref='issues')
     assignee = relation('User', foreign_keys=[assignee_id],
@@ -796,6 +815,16 @@ class PullRequest(BASE):
         single_parent=True)
     project_from = relation(
         'Project', foreign_keys=[project_id_from], remote_side=[Project.id])
+
+    _p = relation(
+        'Project', foreign_keys=[project_id], remote_side=[Project.id],
+        primaryjoin="and_( "
+            "Project.id==PullRequest.project_id, "
+            "PullRequest.status=='Open')",
+        backref=backref(
+            'open_requests', cascade="delete, delete-orphan", single_parent=True)
+        )
+
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id], backref='pull_requests')
     assignee = relation('User', foreign_keys=[assignee_id],
