@@ -873,14 +873,20 @@ def edit_comment(session, parent, comment, user,
     )
 
     if REDIS:
-        REDIS.publish('pagure.%s' % parent.uid, json.dumps({
-            id_: len(parent.comments),
-            'comment_updated': text2markdown(comment.comment),
-            'comment_id': comment.id,
-            'comment_editor': user_obj.user,
-            'avatar_url': avatar_url(comment.user.user, size=16),
-            'comment_date': comment.edited_on.strftime('%Y-%m-%d %H:%M:%S'),
-        }))
+        if issue.private:
+            REDIS.publish('pagure.%s' % issue.uid, json.dumps({
+                'comment_updated': 'private',
+                'comment_id': comment.id,
+            }))
+        else:
+            REDIS.publish('pagure.%s' % parent.uid, json.dumps({
+                id_: len(parent.comments),
+                'comment_updated': text2markdown(comment.comment),
+                'comment_id': comment.id,
+                'comment_editor': user_obj.user,
+                'avatar_url': avatar_url(comment.user.user, size=16),
+                'comment_date': comment.edited_on.strftime('%Y-%m-%d %H:%M:%S'),
+            }))
 
     return "Comment updated"
 

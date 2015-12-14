@@ -200,7 +200,20 @@ private_issue = function(data, _api_issue_url, issue_uid) {
         });
       })
   }
+}
 
+private_issue_update = function(data, _api_issue_url, issue_uid) {
+  var _url = _api_issue_url.replace('-1', issue_uid)
+    + '/comment/' + data.comment_id;
+  $.get( _url )
+    .done(function(data) {
+      update_comment({
+        comment_updated: data.comment,
+        comment_id: data.id,
+        comment_user: data.user.name,
+        comment_editor: data.comment_date,
+      });
+    })
 }
 
 process_event = function(
@@ -212,6 +225,10 @@ process_event = function(
   if (data.issue == 'private'){
     console.log('private issue');
     private_issue(data, _api_issue_url, issue_uid)
+  }
+  else if (data.comment_updated == 'private'){
+    console.log('private issue updated');
+    private_issue_update(data, _api_issue_url, issue_uid)
   }
   else if (data.added_tags){
     add_tags(data, _issues_url);
