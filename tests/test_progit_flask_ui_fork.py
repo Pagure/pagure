@@ -1599,10 +1599,9 @@ index 0000000..2a552bb
                 'Pagure</title>', output.data)
             # Checking if Edited by User is there or not
             self.assertIn(
-                '<span title="">Edited by pingou just now</span>', output.data)
+                '>\n            Edited by pingou just now\n        </span>', output.data)
             self.assertIn(
                 '<li class="message">Comment updated</li>', output.data)
-
 
             #  Project w/o pull-request
             repo = pagure.lib.get_project(self.session, 'test')
