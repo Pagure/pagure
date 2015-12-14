@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        0.1.35
+Version:        0.1.36
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -245,6 +245,19 @@ install -m 644 webhook-server/pagure_webhook.service \
 
 
 %changelog
+* Mon Dec 14 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.36-1
+- Update to 0.1.36
+- Add the ssh info on the front page if the repo is empty
+- Make the code handling exception be python3 compatible
+- Make pagure compatible with F23 (ie: pygit2 0.23.0)
+- Fix pagination when rendering the repo blocks (Gaurav Kumar)
+- Make the SHOW_PROJECTS_INDEX list what should be showing in the index page
+- Adjust pagure to work on recent version of psutils as well as the old one
+- Added 'projects' to the blacklisted list of projects (Gaurav Kumar)
+- Removed delete icons for non group members on the group info page (Gaurav
+  Kumar)
+- Fixed forbidden error for PR title editing (Gaurav Kumar)
+
 * Mon Nov 30 2015 Pierre-Yves Chibon <pingou@pingoured.fr> - 0.1.35-1
 - Update to 0.1.35
 - Fix the web-hook server by preventing it to raise any exception (rather log
