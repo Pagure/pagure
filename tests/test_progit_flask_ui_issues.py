@@ -1388,6 +1388,131 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post('/test/issue/1/drop', data=data)
             self.assertEqual(output.status_code, 404)
 
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_update_issue_edit_comment(self,  p_send_email, p_ugt):
+        """ Test the issues edit comment endpoint """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+
+        # Create issues to play with
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/issue/1')
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            # Add new comment
+            data = {
+                'csrf_token': csrf_token,
+                'comment': 'Woohoo a second comment !',
+            }
+            output = self.app.post(
+                '/test/issue/1/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
+            self.assertTrue(
+                '<li class="message">Comment added</li>' in output.data)
+            self.assertTrue(
+                '<p>Woohoo a second comment !</p>' in output.data)
+            self.assertEqual(
+                output.data.count('<div class="comment_body">'), 2)
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(len(issue.comments), 1)
+        self.assertEqual(issue.comments[0].comment, 'Woohoo a second comment !')
+
+        data = {
+            'csrf_token': csrf_token,
+            'edit_comment': 1,
+            'update_comment': 'Updated comment',
+        }
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            # Wrong issue id
+            output = self.app.post(
+                '/test/issue/3/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+            # Wrong user
+            output = self.app.post(
+                '/test/issue/1/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 403)
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            # Edit comment
+            output = self.app.post(
+                '/test/issue/1/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
+            self.assertTrue(
+                '<li class="message">Comment updated</li>' in output.data)
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(len(issue.comments), 1)
+        self.assertEqual(issue.comments[0].comment, 'Updated comment')
+
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/issue/1/comment/1/edit')
+            self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
+            self.assertTrue('<div id="edit">' in output.data)
+            self.assertTrue('<section class="edit_comment">' in output.data)
+            self.assertTrue('<textarea id="update_comment"' in output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data['csrf_token'] = csrf_token
+            data['update_comment'] = 'Second update'
+
+            # Edit the comment with the other endpoint
+            output = self.app.post(
+                '/test/issue/1/comment/1/edit',
+                data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue(
+                '<p>test project<a href="/test/issue/1"> #1</a></p>'
+                in output.data)
+            self.assertTrue(
+                '<li class="message">Comment updated</li>' in output.data)
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(len(issue.comments), 1)
+        self.assertEqual(issue.comments[0].comment, 'Second update')
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskIssuestests)
