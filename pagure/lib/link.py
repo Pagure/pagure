@@ -30,11 +30,14 @@ RELATES = [
 ]
 
 
-def get_relation(session, reponame, username, text, reftype='relates'):
+def get_relation(session, reponame, username, text, reftype='relates',
+                 include_prs=False):
     ''' For a given text, searches using regex if the text contains
     reference to another issue in this project or another one.
 
     Returns the list of issues referenced (possibly empty).
+    If include_prs=True, it may also contain pull requests (may still
+    be empty).
 
     By default it searches for references of type: `relates`, for example:
     ``this commits relates to #2``.
@@ -52,24 +55,30 @@ def get_relation(session, reponame, username, text, reftype='relates'):
     if reftype == 'fixes':
         regex = FIXES
 
-    issues = []
+    relations = []
     for motif in regex:
-        issueid = None
+        relid = None
         project = None
         if motif.match(text):
             if len(motif.match(text).groups()) >= 2:
-                issueid = motif.match(text).group(2)
+                relid = motif.match(text).group(2)
                 project = motif.match(text).group(1)
             else:
-                issueid = motif.match(text).group(1)
+                relid = motif.match(text).group(1)
 
-        if issueid:
-            issue = pagure.lib.search_issues(
-                session, repo=repo, issueid=issueid)
-            if issue is None or issue.project.name not in [project, repo.name]:
+        if relid:
+            relation = pagure.lib.search_issues(
+                session, repo=repo, issueid=relid)
+
+            if relation is None and include_prs:
+                relation = pagure.lib.search_pull_requests(
+                    session, project_id=repo.id, requestid=relid)
+
+            if relation is None or relation.project.name not in [project,
+                                                                 repo.name]:
                 continue
 
-            if issue not in issues:
-                issues.append(issue)
+            if relation not in relations:
+                relations.append(relation)
 
-    return issues
+    return relations

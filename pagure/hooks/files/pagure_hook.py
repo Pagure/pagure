@@ -6,9 +6,7 @@ relates to an issue.
 """
 
 import os
-import re
 import sys
-import subprocess
 
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -37,13 +35,15 @@ def generate_revision_change_log(new_commits_list):
         line = line.strip()
 
         print '*', line
-        for issue in pagure.lib.link.get_relation(
+        for relation in pagure.lib.link.get_relation(
                 pagure.SESSION,
                 pagure.lib.git.get_repo_name(abspath),
                 pagure.lib.git.get_username(abspath),
                 line,
-                'fixes'):
-            fixes_commit(commitid, issue, pagure.APP.config.get('APP_URL'))
+                'fixes',
+                include_prs=True):
+            fixes_relation(commitid, relation,
+                           pagure.APP.config.get('APP_URL'))
 
         for issue in pagure.lib.link.get_relation(
                 pagure.SESSION,
@@ -70,7 +70,7 @@ def relates_commit(commitid, issue, app_url=None):
         commitid[:8], url)
 
     try:
-        message = pagure.lib.add_issue_comment(
+        pagure.lib.add_issue_comment(
             pagure.SESSION,
             issue=issue,
             comment=comment,
@@ -85,30 +85,42 @@ def relates_commit(commitid, issue, app_url=None):
         pagure.APP.logger.exception(err)
 
 
-def fixes_commit(commitid, issue, app_url=None):
-    ''' Add a comment to an issue that this commit fixes it and update
+def fixes_relation(commitid, relation, app_url=None):
+    ''' Add a comment to an issue or PR that this commit fixes it and update
     the status if the commit is in the master branch. '''
 
     url = '../%s' % commitid[:8]
     if app_url:
         if app_url.endswith('/'):
             app_url = app_url[:-1]
-        project = issue.project.path.split('.git')[0]
-        if issue.project.is_fork:
+        project = relation.project.path.split('.git')[0]
+        if relation.project.is_fork:
             project = 'fork/%s' % project
         url = '%s/%s/%s' % (app_url, project, commitid[:8])
 
-    comment = ''' Commit [%s](%s) fixes this ticket''' % (
-        commitid[:8], url)
+    comment = ''' Commit [%s](%s) fixes this %s''' % (
+        commitid[:8], url, relation.isa)
 
     try:
-        message = pagure.lib.add_issue_comment(
-            pagure.SESSION,
-            issue=issue,
-            comment=comment,
-            user=pagure.lib.git.get_pusher_email(commitid, abspath),
-            ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
-        )
+        if relation.isa == 'issue':
+            pagure.lib.add_issue_comment(
+                pagure.SESSION,
+                issue=relation,
+                comment=comment,
+                user=pagure.lib.git.get_pusher_email(commitid, abspath),
+                ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
+            )
+        elif relation.isa == 'pull-request':
+            pagure.lib.add_pull_request_comment(
+                pagure.SESSION,
+                request=relation,
+                commit=None,
+                filename=None,
+                row=None,
+                comment=comment,
+                user=pagure.lib.git.get_pusher_email(commitid, abspath),
+                requestfolder=pagure.APP.config['REQUESTS_FOLDER'],
+            )
         pagure.SESSION.commit()
     except pagure.exceptions.PagureException as err:
         print err
@@ -124,12 +136,20 @@ def fixes_commit(commitid, issue, app_url=None):
 
     if 'master' in branches:
         try:
-            pagure.lib.edit_issue(
-                pagure.SESSION,
-                issue,
-                ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
-                user=pagure.lib.git.get_pusher_email(commitid, abspath),
-                status='Fixed')
+            if relation.isa == 'issue':
+                pagure.lib.edit_issue(
+                    pagure.SESSION,
+                    relation,
+                    ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
+                    user=pagure.lib.git.get_pusher_email(commitid, abspath),
+                    status='Fixed')
+            elif relation.isa == 'pull-request':
+                pagure.lib.close_pull_request(
+                    pagure.SESSION,
+                    relation,
+                    requestfolder=pagure.APP.config['REQUESTS_FOLDER'],
+                    user=pagure.lib.git.get_pusher_email(commitid, abspath),
+                    merged=True)
             pagure.SESSION.commit()
         except pagure.exceptions.PagureException as err:
             print err
@@ -140,7 +160,6 @@ def fixes_commit(commitid, issue, app_url=None):
 
 def run_as_post_receive_hook():
 
-    changes = []
     for line in sys.stdin:
         if pagure.APP.config.get('HOOK_DEBUG', False):
             print line
