@@ -370,6 +370,42 @@ class Project(BASE):
         ''' Ensures the settings are properly saved. '''
         self._settings = json.dumps(settings)
 
+    @property
+    def open_requests(self):
+        ''' Returns the number of open pull-requests for this project. '''
+        return BASE.metadata.bind.query(
+            PullRequest
+        ).filter(
+            self.id == PullRequest.project_id
+        ).filter(
+            PullRequest.status == 'Open'
+        ).count()
+
+    @property
+    def open_tickets(self):
+        ''' Returns the number of open tickets for this project. '''
+        return BASE.metadata.bind.query(
+            Issue
+        ).filter(
+            self.id == Issue.project_id
+        ).filter(
+            Issue.status == 'Open'
+        ).count()
+
+    @property
+    def open_tickets_public(self):
+        ''' Returns the number of open tickets for this project. '''
+        return BASE.metadata.bind.query(
+            Issue
+        ).filter(
+            self.id == Issue.project_id
+        ).filter(
+            Issue.status == 'Open'
+        ).filter(
+            Issue.private == False
+        ).count()
+
+
     def to_json(self, public=False, api=False):
         ''' Return a representation of the project as JSON.
         '''
@@ -459,24 +495,6 @@ class Issue(BASE):
         'Project', foreign_keys=[project_id], remote_side=[Project.id],
         backref=backref(
             'issues', cascade="delete, delete-orphan", single_parent=True)
-        )
-
-    _p = relation(
-        'Project', foreign_keys=[project_id], remote_side=[Project.id],
-        primaryjoin="and_( "
-            "Project.id==Issue.project_id, "
-            "Issue.status=='Open')",
-        backref=backref(
-            'open_tickets', cascade="delete, delete-orphan", single_parent=True)
-        )
-    _p2 = relation(
-        'Project', foreign_keys=[project_id], remote_side=[Project.id],
-        primaryjoin="and_( "
-            "Project.id==Issue.project_id, "
-            "Issue.status=='Open', "
-            "Issue.private==False)",
-        backref=backref(
-            'open_tickets_public', cascade="delete, delete-orphan", single_parent=True)
         )
 
     user = relation('User', foreign_keys=[user_id],
@@ -815,15 +833,6 @@ class PullRequest(BASE):
         single_parent=True)
     project_from = relation(
         'Project', foreign_keys=[project_id_from], remote_side=[Project.id])
-
-    _p = relation(
-        'Project', foreign_keys=[project_id], remote_side=[Project.id],
-        primaryjoin="and_( "
-            "Project.id==PullRequest.project_id, "
-            "PullRequest.status=='Open')",
-        backref=backref(
-            'open_requests', cascade="delete, delete-orphan", single_parent=True)
-        )
 
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id], backref='pull_requests')

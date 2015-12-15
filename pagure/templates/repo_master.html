@@ -65,7 +65,7 @@
       <li {% if select == 'issues' %}class="selected" {% endif %}>
           <a href="{{ url_for('.view_issues', username=username,
                      repo=repo.name) }}">Issues ({{
-        repo.open_tickets |length if repo_admin else repo.open_tickets_public | length
+        repo.open_tickets if repo_admin else repo.open_tickets_public
         }})</a>
       </li>
       {% endif %}
@@ -74,7 +74,7 @@
       <li {% if select == 'requests' %}class="selected" {% endif %}>
         <a href="{{ url_for('.request_pulls', username=username,
                    repo=repo.name) }}">
-          Pull-requests ({{repo.open_requests |length }})
+          Pull-requests ({{repo.open_requests }})
         </a>
       </li>
       {% endif %}

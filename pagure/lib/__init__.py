@@ -85,6 +85,7 @@ def create_session(db_url, debug=False, pool_recycle=3600):
     engine = sqlalchemy.create_engine(
         db_url, echo=debug, pool_recycle=pool_recycle)
     scopedsession = scoped_session(sessionmaker(bind=engine))
+    model.BASE.metadata.bind = scopedsession
     return scopedsession
 
 
