@@ -189,8 +189,42 @@ min-height:800px;
 right:6px!important;
 }
 
-@media (min-width:768px) {
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  text-overflow: ellipsis;
+}
+
+.repo_desc
+{
+  height:2.5em;
+  line-height:1;
+  padding-left:65px;
+}
+
+.repo_name
+{
+  padding-top:4px;
+  padding-left:65px;
+}
+
+.project_wrapper
+{
+border:1px solid #ddd;
+position:relative;
+}
+.project_metadata
+{
+
+   bottom:0;
+   background:#eee;
+   width:100%;
+  margin-top:2px;
+}
+/*@media (min-width:768px) {
 	.container {
 		max-width:55pc
 	}
-}
+}*/

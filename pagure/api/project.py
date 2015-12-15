@@ -141,6 +141,7 @@ def api_projects():
     tags = flask.request.values.getlist('tags')
     username = flask.request.values.get('username', None)
     fork = flask.request.values.get('fork', None)
+    pattern = flask.request.values.get('pattern', None)
 
     if str(fork).lower() in ['1', 'true']:
         fork = True
@@ -148,7 +149,7 @@ def api_projects():
         fork = False
 
     projects = pagure.lib.search_projects(
-        SESSION, username=username, fork=fork, tags=tags)
+        SESSION, username=username, fork=fork, tags=tags, pattern=pattern)
 
     if not projects:
         raise pagure.exceptions.APIError(

@@ -1,16 +1,20 @@
 {% extends "master.html" %}
 {% block title %}Users{% endblock %}
 {% set tag = "users" %}
+{% from "_browseheader.html" import browse_header %}
 
+{% block header %}
+<link href="{{ url_for('static', filename='selectize.bootstrap3.css') }}"
+  rel="stylesheet" />
+{% endblock %}
 
 {% block content %}
-
-<h2>Users</h2>
-
-{% if config.get('PAGURE_AUTH') == 'local' %}
-<a href="{{ url_for('new_user') }}">Create User</a>
-{% endif %}
-
+<div class="repo-header p-t-1">
+  <div class="container">
+        {{browse_header(select=select)}}
+</div>
+</div>
+  <div class="container">
 {% if total_page and total_page > 1 %}
 <table>
     <tr>
@@ -51,5 +55,43 @@
     {% endfor %}
   </ul>
 </section>
+</div>
 
+{% endblock %}
+
+{% block jscripts %}
+    {{ super() }}
+<script src="{{ url_for('static', filename='selectize.min.js') }}" type="text/javascript"> </script>
+<script type="text/javascript">
+$(document).ready(function() {
+            $('#term').selectize({
+                valueField: 'user',
+                labelField: 'user',
+                searchField: 'user',
+                onType: function(value){
+                  if (value == ""){
+                  this.close();
+                  }
+                },
+                onChange: function(value){
+                  if (value != ""){
+                    $('#headerSearch').submit();
+                  }
+                },
+                maxItems: 1,
+                create: false,
+                load: function(query, callback) {
+                    if (!query.length) return callback();
+                    $.getJSON(
+                      "{{ url_for('api_ns.api_users') }}", {
+                        pattern: query
+                      },
+                      function( data ) {
+                        callback( data.users.map(function(x) { return { user: x }; }) );
+                      }
+                    );
+                }
+            });
+});
+</script>
 {% endblock %}

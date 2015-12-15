@@ -1,36 +1,32 @@
 {% macro render_row(items) -%}
     {% for repo in items %}
-        {% if loop.index == 1 %}
-<div class="card-deck-wrapper">
-  <div class="card-deck">
-        {% endif %}
         {% if repo.is_fork %}
         {% set url = url_for('view_repo', username=repo.user.username, repo=repo.name) %}
         {% else %}
         {% set url = url_for('view_repo', repo=repo.name) %}
         {% endif %}
-        <div class="card">
-        <div class="card-block">
-        <a class="project_link logo_link"
-            href="{{ url }}">
-            <div class="repo_name"><strong>{{ repo.name }}</strong></div>
-            {% if repo.description %}
-            <div class="repo_desc"><small>{{ repo.description }}</small></div>
+  <div class="col-lg-4 col-md-6">
+    <div class="project_wrapper m-b-1">
+            {% if repo.avatar_email %}
+
+            <img class="projecticon pull-xs-left" src="{{ repo.avatar_email | avatar_url }}" width=60 height=60 />
+
+            {% else %}
+      <div class="projecticon pull-xs-left"><canvas width="60" height="60" data-jdenticon-hash="{{ repo.name|return_md5 }}"></canvas></div>
             {% endif %}
-        </a>
-        </div>
-        </div>
-        {% if loop.last %}
+        <a class="project_link logo_link" href="{{ url }}">
+            <div class="repo_name"><strong>{{ repo.name }}</strong></div>
+       </a>
+       <div class="repo_desc" title="{{ repo.description }}" data-toggle="tooltip">
+        <small>{% if repo.description %}{{ repo.description }}{%else%}<span class="text-muted">no description<span>{% endif %}</small>
+      </div>
+      <div class="project_metadata">
+        <div style="text-align:right;" class="p-r-1 text-muted"><span class="oi" data-glyph="fork"></span>{{repo.forks|count}}</div>
+      </div>
     </div>
-    </div>
-        {% elif loop.index is divisibleby(3) or loop.last %}
-    </div>
-    </div>
-    <div class="card-deck-wrapper">
-  <div class="card-deck">
-        {% endif %}
+  </div>
     {% else %}
-    <p>No project found</p>
+<p>No projects found</p>
     {% endfor %}
 {%- endmacro %}
 
@@ -41,7 +37,7 @@
         <tr>
             <td>
             {% if page > 1%}
-                <a href="{{ url_for('index') }}?{{ pagetitle }}={{page - 1}}">
+                <a href="{{ url_for('browse_projects') }}?{{ pagetitle }}={{page - 1}}">
                     &lt; Previous
                 </a>
             {% else %}
@@ -51,7 +47,7 @@
             <td>{{ page }} / {{ total }}</td>
             <td>
                 {% if page < total %}
-                <a href="{{ url_for('index') }}?{{ pagetitle }}={{page + 1}}">
+                <a href="{{ url_for('browse_projects') }}?{{ pagetitle }}={{page + 1}}">
                     Next &gt;
                 </a>
                 {% else %}
@@ -66,9 +62,7 @@
 
 {% macro render_repos(
         list, total, pagetitle, page, title, count, id, username=None, hide=True) %}
-    <section class="project_list" id="{{ id }}"{%
-        if g.fas_user and id not in config.get('SHOW_PROJECTS_INDEX', []) and hide
-        %} style="display:none;" {% endif %}>
+    <section class="project_list p-t-2" id="{{ id }}">
         <header>
             {% set title_lvl = 3 if username else 2 %}
             <h{{ title_lvl }}>{{ title }} ({{ count }})</h{{ title_lvl }}>
@@ -76,13 +70,44 @@
         {% if total and total > 1 %}
         {{ pagination_link(pagetitle, page, total) }}
         {% endif %}
-        <div>
+        <div class="row">
             {{ render_row(list) }}
         </div>
+    </section>
         {% if total and total > 1 %}
         {{ pagination_link(pagetitle, page, total) }}
         {% endif %}
-    </section>
+{% endmacro %}
+
+{% macro render_user_repos(
+        list, total, pagetitle, page, title, count, id, username=None, hide=True) %}
+      <div class="card" id="{{ id }}">
+          <div class="card-header">
+              {{ title }} <span class="label label-default">{{ count }}</span>
+          </div>
+          {% if total and total > 1 %}
+          {{ pagination_link(pagetitle, page, total) }}
+          {% endif %}
+          <div class="card-block">
+
+                    {% for repo in list %}
+                        {% if repo.is_fork %}
+                        {% set url = url_for('view_repo', username=repo.user.username, repo=repo.name) %}
+                        {% else %}
+                        {% set url = url_for('view_repo', repo=repo.name) %}
+                        {% endif %}
+                        <a class="project_link logo_link" href="{{ url }}">
+                            <div><strong>{{ repo.name }}</strong></div>
+                       </a>
+                    {% else %}
+                <p>No projects found</p>
+                    {% endfor %}
+
+          </div>
+          {% if total and total > 1 %}
+          {{ pagination_link(pagetitle, page, total) }}
+          {% endif %}
+      </div>
 {% endmacro %}
 
 

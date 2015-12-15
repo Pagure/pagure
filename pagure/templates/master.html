@@ -18,41 +18,18 @@
       <div class="container">
         <div class="row">
           <div class="col-sm-3">
-            <img height=40px src="{{ url_for('static', filename='pagure-logo.png') }}" alt="pagure Logo" id="kojiLogo"/>
+            <a href="/"><img height=40px src="{{ url_for('static', filename='pagure-logo.png') }}" alt="pagure Logo" id="kojiLogo"/></a>
           </div>
           <div class="col-sm-9">
             <div class="row">
-		          <div class="col-sm-12 text-right">
-			          <form action="{{url_for('search')}}" id="headerSearch" class="form-inline">
-			            <div class="btn-group">
-                    <select name="type" class="selectpicker" data-style="btn-secondary btn-sm" data-width="auto">
-                      <option value="projects"{% if select=='projects' %} selected {% endif %}>Projects</option>
-                        <option value="projects_forks"{% if select=='projects_forks' %} selected {% endif %}>Projects &amp; Forks</option>
-                        <option value="user"{% if select=='users' %} selected {% endif %}>Users</option>
-                      </select>
-			              <input type="text" name="term" class="form-control form-control-sm" title="Search field, use * to broaden your search" />
-		              </div>
-                  <input type="submit" value="Search" class="btn btn-primary btn-sm"/>
-                </form>
-		          </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-	<!-- close masthead-->
 
-  <nav class="navbar navbar-light navbar-underline p-t-0 p-b-0">
+  <nav class="navbar navbar-light p-t-0 p-b-0">
 	  <div class="container">
-	    <ul class="nav navbar-nav nav-underline">
-	      <li class="nav-item p-x-1 {% if tag == 'home'%}active{% endif %}"><a class="nav-link" href="{{url_for('index')}}">Projects</a></li>
-	      <li class="nav-item p-x-1 {% if tag == 'users'%}active{% endif %}"><a class="nav-link" href="{{ url_for('view_users') }}">Users</a></li>
-	      <li class="nav-item p-x-1 {% if tag == 'groups'%}active{% endif %}"><a class="nav-link" href="{{ url_for('group_lists') }}">Groups</a></li>
+	    <ul class="nav navbar-nav nav-underline pull-xs-right">
+	      <li class="nav-item"><a class="nav-link" href="/browse/projects/">Browse</a></li>
 	      {% if admin %}
-	      <li class="nav-item p-x-1 {% if tag == 'admin'%}active{% endif %}"><a class="nav-link" href="{{ url_for('admin_index') }}">Admin</a></li>
+	      <li class="nav-item"><a class="nav-link" href="{{ url_for('admin_index') }}">Admin</a></li>
 	      {% endif %}
-	    </ul>
-	    <ul class="nav navbar-nav nav-underline" style="float:right;">
 	      {% if config.get('ENABLE_NEW_PROJECTS', True) %}
 	      <li class="nav-item p-l-1"><a class="nav-link" href="{{ url_for('new_project') }}"><span class="oi" data-glyph="plus" title="Create New" aria-hidden="true"></span>
 </a></li>
@@ -77,6 +54,14 @@
 	    </ul>
 	  </div>
 	</nav>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- close masthead-->
+
     <div class="bodycontent p-b-3">
 
             {% with messages = get_flashed_messages(with_categories=true) %}
@@ -114,6 +99,14 @@
     </script>
     <script type="text/javascript"
         src="https://ryanlerch.fedorapeople.org/fedora-bootstrap/fedora-bootstrap.js">
+    </script>
+    <script type="text/javascript">
+$('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
+  $(".comment_body").each(function(ind, obj) {
+    var source = $(obj).html();
+    var preview = emojione.toImage(source);
+    $(obj).html(preview);
+  });
     </script>
     {% endblock %}
 

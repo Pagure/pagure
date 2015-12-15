@@ -13,6 +13,7 @@ import textwrap
 
 import arrow
 import flask
+import md5
 
 from pygments import highlight
 from pygments.lexers.text import DiffLexer
@@ -217,12 +218,12 @@ def text_wraps(text, size=10):
 
 
 @APP.template_filter('avatar')
-def avatar(packager, size=64):
+def avatar(packager, size=64, default="retro"):
     """ Template filter sorting the given branches, Fedora first then EPEL,
     then whatever is left.
     """
     output = '<img class="avatar circle" src="%s"/>' % (
-        pagure.lib.avatar_url(packager, size)
+        pagure.lib.avatar_url(packager, size, default)
     )
 
     return output
@@ -349,3 +350,11 @@ def int_to_rgb(percent):
     except ValueError:
         pass
     return output
+
+@APP.template_filter('return_md5')
+def return_md5(text):
+    """ Template filter to return an MD5 for a string
+    """
+    m = md5.new()
+    m.update(text)
+    return pagure.lib.clean_input(m.hexdigest())

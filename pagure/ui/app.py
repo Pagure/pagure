@@ -27,6 +27,8 @@ from pagure import (APP, SESSION, cla_required,
 # pylint: disable=E1101
 
 
+@APP.route('/browse/projects', endpoint='browse_projects')
+@APP.route('/browse/projects/', endpoint='browse_projects')
 @APP.route('/')
 def index():
     """ Front page of the application.
@@ -113,6 +115,7 @@ def index():
         total_page=total_page,
         page=page,
         username=username,
+        select="projects",
         repopage=repopage,
         forkpage=forkpage,
         user_repos=user_repos,

@@ -5,16 +5,25 @@
 
 
 {% block header %}
-    <link rel="stylesheet" type="text/css" media="screen"
-        href="{{ url_for('static', filename='toggle.css') }}"/>
+<link href="{{ url_for('static', filename='selectize.bootstrap3.css') }}"
+  rel="stylesheet" />
+
+
 {% endblock %}
 
-{% from "_render_repo.html" import render_repos %}
-{% from "_render_repo.html" import repos_switch %}
+{% from "_render_repo.html" import render_repos, render_user_repos%}
+{% from "_browseheader.html" import browse_header %}
+
+{% if (not username) or (request.path == '/browse/projects') or (request.path == '/browse/projects/') %}
+  {% set indexcontext = 'browse' %}
+{% else %}
+  {% set indexcontext = 'userpage' %}
+{% endif %}
 
 {% block content %}
-  <div class="container p-t-1">
-    {% if username %}
+<div class="repo-header p-t-1">
+  <div class="container">
+    {% if indexcontext == 'userpage' %}
         <h2>
             {{ username | avatar(36) | safe }} {{ username }}
             {% if g.fas_user and g.fas_user.username == username %}
@@ -24,22 +33,83 @@
                 </a>
             {% endif %}
         </h2>
-        {{ repos_switch() }}
-        {{ render_repos(
-            user_repos, total_page_repos, 'repopage', repopage,
-            'My Projects', user_repos_length, 'myrepos', username) }}
-        {{ render_repos(
-            user_forks, total_page_forks, 'forkpage', forkpage,
-            'My Forks', user_forks_length, 'myforks', username) }}
+    {% else %}
+        {{browse_header(select=select)}}
     {% endif %}
+
+</div>
+</div>
+  <div class="container">
+    {% if indexcontext == 'userpage' %}
+      <div class="row">
+        <div class="col-md-4">
+            {{ render_user_repos(
+                user_repos, total_page_repos, 'repopage', repopage,
+                'My Projects', user_repos_length, 'myrepos', username) }}
+        </div>
+        <div class="col-md-4">
+            {{ render_user_repos(
+                user_forks, total_page_forks, 'forkpage', forkpage,
+                'My Forks', user_forks_length, 'myforks', username) }}
+        </div>
+      </div>
+    {% else %}
     {{ render_repos(
         repos, total_page, 'page', page,
         'All Projects', repos_length, 'repos', username) }}
+    {% endif %}
   </div>
+
 {% endblock %}
 
 {% block jscripts %}
     {{ super() }}
+<script src="//cdn.jsdelivr.net/jdenticon/1.3.2/jdenticon.min.js" async></script>
+<script src="{{ url_for('static', filename='selectize.min.js') }}" type="text/javascript"> </script>
+<script src="{{ url_for('static', filename='jquery.dotdotdot.min.js') }}" type="text/javascript"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+            $('#term').selectize({
+                valueField: 'name',
+                labelField: 'name',
+                onType: function(value){
+                  if (value == ""){
+                  this.close();
+                  }
+                },
+                onChange: function(value){
+                  if (value != ""){
+                    $('#headerSearch').submit();
+                  }
+                },
+                searchField: 'name',
+                maxItems: 1,
+                create: false,
+                load: function(query, callback) {
+                    if (!query.length) return callback();
+                    $.getJSON(
+                      "{{ url_for('api_ns.api_projects') }}", {
+                        pattern: "*"+query+"*"
+                      },
+                      function( data ) {
+                        callback( data.projects );
+                      }
+                    );
+                },
+                render: {
+                    option: function(item, escape) {
+                        {% set reponame = 'item.name' %}
+                        return '<div>' +
+                            '<div class="title">' +
+                                '<span class="name"><strong>' + escape(item.name) + '</strong></span>' +
+                            '</div>' +
+                            '<div class="description"><small>' + escape(item.description) + '</small></div>' +
+                        '</div>';
+                    }
+                },
+            });
+});
+</script>
     {% if username %}
     <script type="text/javascript">
         $(function(){
@@ -49,5 +119,12 @@
         });
     </script>
     {% endif %}
+    <script>
+$(document).ready(function() {
+    $(".repo_desc").dotdotdot({
+        watch:"window"
+    });
+});
+</script>
 
 {% endblock %}

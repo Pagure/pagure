@@ -203,7 +203,7 @@
   src="{{ url_for('static', filename='upload.js') }}">
 </script>
 
-<script src="{{ url_for('static', filename='selectize.min.js') }}" rel="text/javascript"/>
+<script src="{{ url_for('static', filename='selectize.min.js') }}" type="text/javascript"/>
 <script type="text/javascript">
 
 {% if authenticated and form %}
@@ -388,13 +388,6 @@ $( document ).ready(function() {
   var folder = '{{url_for("static", filename="emoji/png/") }}';
   var json_url = '{{ url_for("static", filename="emoji/emoji_strategy.json") }}';
   emoji_complete(json_url, folder);
-
-$('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
-  $(".comment_body").each(function(ind, obj) {
-    var source = $(obj).html();
-    var preview = emojione.toImage(source);
-    $(obj).html(preview);
-  });
 
   $( ".editmetadatatoggle" ).click(
     function() {
