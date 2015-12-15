@@ -311,11 +311,7 @@ class Project(BASE):
     @property
     def path(self):
         ''' Return the name of the git repo on the filesystem. '''
-        if self.parent_id:
-            path = '%s/%s.git' % (self.user.user, self.name)
-        else:
-            path = '%s.git' % (self.name)
-        return path
+        return '%s.git' % self.fullname
 
     @property
     def is_fork(self):
