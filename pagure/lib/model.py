@@ -72,6 +72,7 @@ def create_tables(db_url, alembic_ini=None, acls=None, debug=False):
         command.stamp(alembic_cfg, "head")
 
     scopedsession = scoped_session(sessionmaker(bind=engine))
+    BASE.metadata.bind = scopedsession
     # Insert the default data into the db
     create_default_status(scopedsession, acls=acls)
     return scopedsession
@@ -373,8 +374,7 @@ class Project(BASE):
     @property
     def open_requests(self):
         ''' Returns the number of open pull-requests for this project. '''
-        return BASE.metadata.bind.query(
-            PullRequest
+        return PullRequest.query(
         ).filter(
             self.id == PullRequest.project_id
         ).filter(
@@ -384,8 +384,7 @@ class Project(BASE):
     @property
     def open_tickets(self):
         ''' Returns the number of open tickets for this project. '''
-        return BASE.metadata.bind.query(
-            Issue
+        return Issue.query(
         ).filter(
             self.id == Issue.project_id
         ).filter(
@@ -395,8 +394,7 @@ class Project(BASE):
     @property
     def open_tickets_public(self):
         ''' Returns the number of open tickets for this project. '''
-        return BASE.metadata.bind.query(
-            Issue
+        return Issue.query(
         ).filter(
             self.id == Issue.project_id
         ).filter(
