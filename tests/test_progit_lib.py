@@ -146,8 +146,8 @@ class PagureLibtests(tests.Modeltests):
         # Before
         issues = pagure.lib.search_issues(self.session, repo)
         self.assertEqual(len(issues), 0)
-        self.assertEqual(len(repo.open_tickets), 0)
-        self.assertEqual(len(repo.open_tickets_public), 0)
+        self.assertEqual(repo.open_tickets, 0)
+        self.assertEqual(repo.open_tickets_public, 0)
 
         # See where it fails
         self.assertRaises(
@@ -195,8 +195,8 @@ class PagureLibtests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
-        self.assertEqual(len(repo.open_tickets), 1)
-        self.assertEqual(len(repo.open_tickets_public), 1)
+        self.assertEqual(repo.open_tickets, 1)
+        self.assertEqual(repo.open_tickets_public, 1)
 
         msg = pagure.lib.new_issue(
             session=self.session,
@@ -209,8 +209,8 @@ class PagureLibtests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #2')
-        self.assertEqual(len(repo.open_tickets), 2)
-        self.assertEqual(len(repo.open_tickets_public), 2)
+        self.assertEqual(repo.open_tickets, 2)
+        self.assertEqual(repo.open_tickets_public, 2)
 
         # After
         issues = pagure.lib.search_issues(self.session, repo)
@@ -228,8 +228,8 @@ class PagureLibtests(tests.Modeltests):
         repo = pagure.lib.get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=2)
 
-        self.assertEqual(len(repo.open_tickets), 2)
-        self.assertEqual(len(repo.open_tickets_public), 2)
+        self.assertEqual(repo.open_tickets, 2)
+        self.assertEqual(repo.open_tickets_public, 2)
 
         # Edit the issue
         msg = pagure.lib.edit_issue(
@@ -265,8 +265,8 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Successfully edited issue #2')
 
-        self.assertEqual(len(repo.open_tickets), 1)
-        self.assertEqual(len(repo.open_tickets_public), 1)
+        self.assertEqual(repo.open_tickets, 1)
+        self.assertEqual(repo.open_tickets_public, 1)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -1287,7 +1287,7 @@ class PagureLibtests(tests.Modeltests):
 
         # Add an extra user to project `foo`
         repo = pagure.lib.get_project(self.session, 'test')
-        self.assertEqual(len(repo.open_requests), 0)
+        self.assertEqual(repo.open_requests, 0)
 
         msg = pagure.lib.add_user_to_project(
             session=self.session,
@@ -1315,7 +1315,7 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(req.id, 1)
         self.assertEqual(req.title, 'test pull-request')
-        self.assertEqual(len(repo.open_requests), 1)
+        self.assertEqual(repo.open_requests, 1)
 
     @patch('pagure.lib.notify.send_email')
     def test_add_pull_request_comment(self, mockemail):
@@ -1452,7 +1452,7 @@ class PagureLibtests(tests.Modeltests):
         self.test_new_pull_request()
 
         repo = pagure.lib.get_project(self.session, 'test')
-        self.assertEqual(len(repo.open_requests), 1)
+        self.assertEqual(repo.open_requests, 1)
         request = pagure.lib.search_pull_requests(self.session, requestid=1)
 
         pagure.lib.close_pull_request(
@@ -1464,7 +1464,7 @@ class PagureLibtests(tests.Modeltests):
         )
         self.session.commit()
         repo = pagure.lib.get_project(self.session, 'test')
-        self.assertEqual(len(repo.open_requests), 0)
+        self.assertEqual(repo.open_requests, 0)
 
         prs = pagure.lib.search_pull_requests(
             session=self.session,
@@ -1625,8 +1625,8 @@ class PagureLibtests(tests.Modeltests):
         repo = pagure.lib.get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 
-        self.assertEqual(len(repo.open_tickets), 2)
-        self.assertEqual(len(repo.open_tickets_public), 2)
+        self.assertEqual(repo.open_tickets, 2)
+        self.assertEqual(repo.open_tickets_public, 2)
 
         # Create issues to play with
         msg = pagure.lib.new_issue(
@@ -1641,8 +1641,8 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #3')
 
-        self.assertEqual(len(repo.open_tickets), 3)
-        self.assertEqual(len(repo.open_tickets_public), 2)
+        self.assertEqual(repo.open_tickets, 3)
+        self.assertEqual(repo.open_tickets_public, 2)
 
         # before
         self.assertEqual(issue.tags_text, [])
