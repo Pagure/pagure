@@ -61,7 +61,7 @@ def relates_commit(commitid, issue, app_url=None):
     if app_url:
         if app_url.endswith('/'):
             app_url = app_url[:-1]
-        project = issue.project.path.split('.git')[0]
+        project = issue.project.fullname
         if issue.project.is_fork:
             project = 'fork/%s' % project
         url = '%s/%s/%s' % (app_url, project, commitid[:8])
@@ -93,7 +93,7 @@ def fixes_relation(commitid, relation, app_url=None):
     if app_url:
         if app_url.endswith('/'):
             app_url = app_url[:-1]
-        project = relation.project.path.split('.git')[0]
+        project = relation.project.fullname
         if relation.project.is_fork:
             project = 'fork/%s' % project
         url = '%s/%s/%s' % (app_url, project, commitid[:8])
