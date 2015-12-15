@@ -374,7 +374,8 @@ class Project(BASE):
     @property
     def open_requests(self):
         ''' Returns the number of open pull-requests for this project. '''
-        return PullRequest.query(
+        return BASE.metadata.bind.query(
+            PullRequest
         ).filter(
             self.id == PullRequest.project_id
         ).filter(
@@ -384,7 +385,8 @@ class Project(BASE):
     @property
     def open_tickets(self):
         ''' Returns the number of open tickets for this project. '''
-        return Issue.query(
+        return BASE.metadata.bind.query(
+            Issue
         ).filter(
             self.id == Issue.project_id
         ).filter(
@@ -394,7 +396,8 @@ class Project(BASE):
     @property
     def open_tickets_public(self):
         ''' Returns the number of open tickets for this project. '''
-        return Issue.query(
+        return BASE.metadata.bind.query(
+            Issue
         ).filter(
             self.id == Issue.project_id
         ).filter(
