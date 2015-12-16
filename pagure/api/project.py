@@ -84,6 +84,9 @@ def api_projects():
     | ``tags``      | string   | Optional      | | Filters the projects   |
     |               |          |               |   returned by their tags |
     +---------------+----------+---------------+--------------------------+
+    | ``pattern``   | string   | Optional      | | Filters the projects   |
+    |               |          |               |   by the pattern string  |
+    +---------------+----------+---------------+--------------------------+
     | ``username``  | string   | Optional      | | Filters the projects   |
     |               |          |               |   returned by the users  |
     |               |          |               |   having commit rights   |
