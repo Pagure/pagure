@@ -97,7 +97,13 @@
               and repo.settings.get('issue_tracker', True) %}
         <li class="nav-item">
             <a {% if select == 'issues' %}class="active nav-link"  {% else %}class="nav-link"{% endif %} href="{{ url_for('.view_issues', username=username,
-                       repo=repo.name) }}"><span class="oi hidden-md-up" data-glyph="warning"></span><span class="hidden-sm-down">Issues&nbsp;</span><span class="label label-default label-pill hidden-sm-down">{{ repo.issues|count }}</span></a>
+                       repo=repo.name) }}">
+                <span class="oi hidden-md-up" data-glyph="warning"></span>
+                <span class="hidden-sm-down">Issues&nbsp;</span>
+                <span class="label label-default label-pill hidden-sm-down">
+                  {{ repo.open_tickets if repo_admin else repo.open_tickets_public }}
+                </span>
+            </a>
         </li>
         {% endif %}
 
@@ -105,7 +111,10 @@
         <li class="nav-item">
           <a {% if select == 'requests' %}class="active nav-link"  {% else %}class="nav-link"{% endif %} href="{{ url_for('.request_pulls', username=username,
                      repo=repo.name) }}">
-            <span class="oi hidden-md-up" data-glyph="task"></span><span class="hidden-sm-down">Pull Requests</span>
+            <span class="oi hidden-md-up" data-glyph="task"></span>
+            <span class="hidden-sm-down">Pull Requests&nbsp;</span>
+            <span class="label label-default label-pill hidden-sm-down">
+                  {{ repo.open_requests }}
           </a>
         </li>
         {% endif %}
