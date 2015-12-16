@@ -75,36 +75,74 @@
           {% endfor %}
         </div>
       {% endif %}
-    </div>
-    <div class="col-md-4">
-      <div class="card">
-        <div class="card-block">
-          {%- if repo.url %}
-          <h4>Project Website</h4>
-          <p><a class="inline" href="{{ repo.url }}">{{ repo.url }}</a></p>
-          {% endif %}
-          <h4>Admins</h4>
-          <p>
-              <div><a href="{{ url_for('view_user', username=repo.user.user)}}">
-                {{ repo.user.user | avatar(20) | safe }}
-                {{ repo.user.fullname }} ({{ repo.user.user }})  -  creator
-              </a></div>
-            {% for user in repo.users %}
-            <div>
-              <a href="{{ url_for('view_user', username=user.user)}}">
-                {{ user.user | avatar(20) | safe }}
-                {{ user.fullname }} ({{ user.user }})
+
+      {% if total_page %}
+        <nav class="text-center">
+          <ul class="pagination">
+            <li {% if page <= 1%} class="disabled" {% endif %}>
+              <a href="{{ url_for('.%s' % origin, username=username,
+                          repo=repo.name, branchname=branchname, page=page-1) }}" aria-label="Previous">
+                <span aria-hidden="true">Newer</span>
+                <span class="sr-only">Newer</span>
               </a>
-            </div>
-            {% endfor %}
-            {% for group in repo.groups %}
-            <div>
-              <a href="{{ url_for('view_group', group=group.group_name)}}">
-                @{{ group.group_name }}
+            </li>
+            <li class="active"><a href="#">page {{ page }} of {{total_page}}</a></li>
+            <li {% if page >= total_page %}class="disabled"{%endif%}>
+              <a href="{{ url_for('.%s' % origin, username=username,repo=repo.name, branchname=branchname, page=page+1) }}" aria-label="Next">
+                <span aria-hidden="true">Older</span>
+                <span class="sr-only">Older</span>
               </a>
-            </div>
-            {% endfor %}
-          </p>
+            </li>
+          </ul>
+        </nav>
+      {% endif %}
+    {% endif %}
+
+    {% if origin == 'view_repo' or origin == 'view_repo_branch' %}
+
+      {% if readme %}
+        <div class="col-md-8">
+          <section class="readme">
+            {% if safe %}
+              {{ readme | noJS |safe }}
+            {% else %}
+              {{ readme | noJS }}
+            {% endif %}
+          </section>
+        </div>
+      {% endif %}
+
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-block">
+            {%- if repo.url %}
+              <h4>Project Website</h4>
+              <p><a class="inline" href="{{ repo.url }}">{{ repo.url }}</a></p>
+            {% endif %}
+            <h4>Admins</h4>
+            <p>
+              <div>
+                <a href="{{ url_for('view_user', username=repo.user.user)}}">
+                  {{ repo.user.user | avatar(20) | safe }}
+                  {{ repo.user.fullname }} ({{ repo.user.user }})  -  creator
+                </a>
+              </div>
+              {% for user in repo.users %}
+                <div>
+                  <a href="{{ url_for('view_user', username=user.user)}}">
+                    {{ user.user | avatar(20) | safe }}
+                    {{ user.fullname }} ({{ user.user }})
+                  </a>
+                </div>
+              {% endfor %}
+              {% for group in repo.groups %}
+                <div>
+                  <a href="{{ url_for('view_group', group=group.group_name)}}">
+                    @{{ group.group_name }}
+                  </a>
+                </div>
+              {% endfor %}
+            </p>
         </div>
       </div>
 
@@ -125,57 +163,58 @@
                 <input class="form-control" type="text" value="{{ config.get('GIT_URL_GIT') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git" readonly>
               </div>
             </div>
-
-            <div class="collapse" id="moregiturls">
-              {% if config['DOC_APP_URL'] and repo and repo.settings.get('project_documentation', True) %}
-              <h4>Docs</h4>
-              <div class="form-group">
-                <div class="input-group">
-                  <div class="input-group-addon">SSH</span></div>
-                  <input class="form-control" type="text" value="{{ config.get('GIT_URL_SSH') }}docs/{{ repo.fullname }}.git" readonly>
+            {% if authenticated and repo_admin %}
+              <div class="collapse" id="moregiturls">
+                {% if config['DOC_APP_URL'] and repo and repo.settings.get('project_documentation', True) %}
+                <h4>Docs</h4>
+                <div class="form-group">
+                  <div class="input-group">
+                    <div class="input-group-addon">SSH</span></div>
+                    <input class="form-control" type="text" value="{{ config.get('GIT_URL_SSH') }}docs/{{ repo.fullname }}.git" readonly>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="input-group">
+                    <div class="input-group-addon">GIT</span></div>
+                    <input class="form-control" type="text" value="{{ config.get('GIT_URL_GIT') }}docs/{{ repo.fullname }}.git" readonly>
+                  </div>
+                </div>
+                {%endif%}
+                {% if config.get('ENABLE_TICKETS', True) %}
+                <h4>Tickets</h4>
+                <div class="form-group">
+                  <div class="input-group">
+                    <div class="input-group-addon">SSH</span></div>
+                    <input class="form-control" type="text" value="{{ config.get('GIT_URL_SSH') }}tickets/{{ repo.fullname }}.git" readonly>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="input-group">
+                    <div class="input-group-addon">GIT</span></div>
+                    <input class="form-control" type="text" value="{{ config.get('GIT_URL_GIT') }}tickets/{{ repo.fullname }}.git" readonly>
+                  </div>
+                </div>
+                {%endif%}
+                <h4>Requests</h4>
+                <div class="form-group">
+                  <div class="input-group">
+                    <div class="input-group-addon">SSH</span></div>
+                    <input class="form-control" type="text" value="{{ config.get('GIT_URL_SSH') }}requests/{{ repo.fullname }}.git" readonly>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="input-group">
+                    <div class="input-group-addon">GIT</span></div>
+                    <input class="form-control" type="text" value="{{ config.get('GIT_URL_GIT') }}requests/{{ repo.fullname }}.git" readonly>
+                  </div>
                 </div>
               </div>
-              <div class="form-group">
-                <div class="input-group">
-                  <div class="input-group-addon">GIT</span></div>
-                  <input class="form-control" type="text" value="{{ config.get('GIT_URL_GIT') }}docs/{{ repo.fullname }}.git" readonly>
-                </div>
-              </div>
-              {%endif%}
-              {% if config.get('ENABLE_TICKETS', True) %}
-              <h4>Tickets</h4>
-              <div class="form-group">
-                <div class="input-group">
-                  <div class="input-group-addon">SSH</span></div>
-                  <input class="form-control" type="text" value="{{ config.get('GIT_URL_SSH') }}tickets/{{ repo.fullname }}.git" readonly>
-                </div>
-              </div>
-              <div class="form-group">
-                <div class="input-group">
-                  <div class="input-group-addon">GIT</span></div>
-                  <input class="form-control" type="text" value="{{ config.get('GIT_URL_GIT') }}tickets/{{ repo.fullname }}.git" readonly>
-                </div>
-              </div>
-              {%endif%}
-              <h4>Requests</h4>
-              <div class="form-group">
-                <div class="input-group">
-                  <div class="input-group-addon">SSH</span></div>
-                  <input class="form-control" type="text" value="{{ config.get('GIT_URL_SSH') }}requests/{{ repo.fullname }}.git" readonly>
-                </div>
-              </div>
-              <div class="form-group">
-                <div class="input-group">
-                  <div class="input-group-addon">GIT</span></div>
-                  <input class="form-control" type="text" value="{{ config.get('GIT_URL_GIT') }}requests/{{ repo.fullname }}.git" readonly>
-                </div>
-              </div>
-            </div>
-            <a class="btn btn-link" data-toggle="collapse" href="#moregiturls" aria-expanded="false" aria-controls="moregiturls">More</a>
-
+              <a class="btn btn-link" data-toggle="collapse" href="#moregiturls" aria-expanded="false" aria-controls="moregiturls">More</a>
+            {% endif %}
         </div>
       </div>
 
+      {% if repo_obj and not repo_obj.is_empty %}
       <div class="card">
         <div class="card-header">
           Recent Commits
@@ -203,87 +242,6 @@
 
   {% endif %}
 </div>
-
-
-{% if repo_obj and repo_obj.is_empty %}
-
-  <section class="repo_info">
-    <p>This repo is brand new!</p>
-
-    <p>If you already have a git repo:</p>
-    <pre>
-      git remote add origin {{ config.get('GIT_URL_SSH') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
-      git push -u origin master
-    </pre>
-
-    <p>If you have not created your git repo yet:</p>
-    <pre>
-      git clone {{ config.get('GIT_URL_SSH') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
-      cd {{ repo.name }}
-      touch README.rst
-      git add README.rst
-      git commit -m "Add README file"
-      git push -u origin master
-    </pre>
-
-
-    <p>
-        Note, you may want to checkout out the
-        <a href="{{ url_for('ssh_hostkey') }}">SSH Hostkey/Fingerprint</a>
-        information page
-    </p>
-    </section>
-
-{% else %}
-    {% if origin == 'view_commits' %}
-      <div class="list-group">
-        {% for commit in last_commits %}
-          <a href="{{ url_for('view_commit', username=username,
-                          repo=repo.name, commitid=commit.hex) }}" class="list-group-item {% if diff_commits and commit.oid.hex in diff_commits %}p-l-lg{% endif %}" style="position:relative;">
-                      {% if diff_commits and commit.oid.hex in diff_commits %}
-                      <div title="This commit is not in the main branch of this Repo" style="position:absolute; left:0; top:0; padding:5px; padding-top:20px; height:100%; background:#eee; vertical-align:middle;"><span class="oi" data-glyph="arrow-thick-right"></span></div>
-                      {% endif %}
-                      <h5>
-                        <strong>{{ commit.message.split('\n')[0] }}</strong>
-                          <div class="pull-right">
-
-                          <span class="commitdate" title="{{ commit.commit_time|format_ts }}">
-                          {{ commit.commit_time|humanize }}
-                        </span>
-                        </div>
-                      </h5>
-                  {{ commit.author | author2avatar(20) | safe }} {{ commit.author.name }}
-                      <div class="pull-right">
-                        <span class="label label-default">{{ commit.hex|short }}</span>
-                      </div>
-          </a>
-        {% endfor %}
-      </div>
-    {% endif %}
-
-  {% if total_page %}
-
-  <nav class="text-center">
-    <ul class="pagination">
-      <li {% if page <= 1%} class="disabled" {% endif %}>
-        <a href="{{ url_for('.%s' % origin, username=username,
-                    repo=repo.name, branchname=branchname, page=page-1) }}" aria-label="Previous">
-          <span aria-hidden="true">Newer</span>
-          <span class="sr-only">Newer</span>
-        </a>
-      </li>
-      <li class="active"><a href="#">page {{ page }} of {{total_page}}</a></li>
-      <li {% if page >= total_page %}class="disabled"{%endif%}>
-        <a href="{{ url_for('.%s' % origin, username=username,repo=repo.name, branchname=branchname, page=page+1) }}" aria-label="Next">
-          <span aria-hidden="true">Older</span>
-          <span class="sr-only">Older</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
-  {% endif %}
-
-{% endif %}
 
 {% endblock %}
 
