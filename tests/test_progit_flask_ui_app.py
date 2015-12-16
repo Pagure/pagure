@@ -55,13 +55,17 @@ class PagureFlaskApptests(tests.Modeltests):
 
         output = self.app.get('/')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue('<h2>All Projects (0)</h2>' in output.data)
+        self.assertIn(
+            '<h2 class=" m-b-1">All Projects <span class="label '
+            'label-default">0</span></h2', output.data)
 
         tests.create_projects(self.session)
 
         output = self.app.get('/?page=abc')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue('<h2>All Projects (2)</h2>' in output.data)
+        self.assertIn(
+            '<h2 class=" m-b-1">All Projects <span class="label '
+            'label-default">2</span></h2', output.data)
 
         # Add a 3rd project with a long description
         item = pagure.lib.model.Project(
@@ -76,24 +80,31 @@ class PagureFlaskApptests(tests.Modeltests):
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/?repopage=abc&forkpage=def')
-            self.assertTrue(
-                '<section class="project_list" id="repos">' in output.data)
-            self.assertTrue('<h3>My Forks (0)</h3>' in output.data)
-            self.assertTrue(
-                '<section class="project_list" id="myforks">' in output.data)
-            self.assertTrue('<h3>My Projects (0)</h3>' in output.data)
-            self.assertTrue(
-                '<section class="project_list" id="myrepos">' in output.data)
-            self.assertTrue('<h3>All Projects (3)</h3>' in output.data)
+            self.assertIn(
+                'My Projects <span class="label label-default">0</span>',
+                output.data)
+            self.assertIn(
+                'My Forks <span class="label label-default">0</span>',
+                output.data)
+            self.assertEqual(
+                output.data.count('<p>No projects found</p>'), 2)
+            self.assertEqual(
+                output.data.count('<div class="card-header">'), 2)
 
     def test_view_users(self):
         """ Test the view_users endpoint. """
 
         output = self.app.get('/users/?page=abc')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue('<p>2 users registered.</p>' in output.data)
-        self.assertTrue('<a href="/user/pingou">' in output.data)
-        self.assertTrue('<a href="/user/foo">' in output.data)
+        self.assertIn(
+            '<h2 class="m-b-1">Users <span class="label '
+            'label-default">2</span></h2', output.data)
+        self.assertIn(
+            '<a class="project_link logo_link" href="/user/pingou">',
+            output.data)
+        self.assertIn(
+            '<a class="project_link logo_link" href="/user/foo">',
+            output.data)
 
     def test_view_user(self):
         """ Test the view_user endpoint. """
@@ -101,11 +112,15 @@ class PagureFlaskApptests(tests.Modeltests):
         output = self.app.get('/user/pingou?repopage=abc&forkpage=def')
         self.assertEqual(output.status_code, 200)
         self.assertTrue(
-            '<section class="project_list" id="repos">' in output.data)
-        self.assertTrue('<h2>Projects (0)</h2>' in output.data)
+            '<section class="project_list p-t-2" id="repos">' in output.data)
+        self.assertIn(
+            '<h2 class=" m-b-1">Projects <span class="label '
+            'label-default">0</span></h2', output.data)
         self.assertTrue(
-            '<section class="project_list" id="forks">' in output.data)
-        self.assertTrue('<h2>Forks (0)</h2>' in output.data)
+            '<section class="project_list p-t-2" id="forks">' in output.data)
+        self.assertIn(
+            '<h2 class=" m-b-1">Forks <span class="label '
+            'label-default">0</span></h2', output.data)
 
         tests.create_projects(self.session)
         self.gitrepos = tests.create_projects_git(
@@ -114,11 +129,15 @@ class PagureFlaskApptests(tests.Modeltests):
         output = self.app.get('/user/pingou?repopage=abc&forkpage=def')
         self.assertEqual(output.status_code, 200)
         self.assertTrue(
-            '<section class="project_list" id="repos">' in output.data)
-        self.assertTrue('<h2>Projects (2)</h2>' in output.data)
+            '<section class="project_list p-t-2" id="repos">' in output.data)
+        self.assertIn(
+            '<h2 class=" m-b-1">Projects <span class="label '
+            'label-default">2</span></h2', output.data)
         self.assertTrue(
-            '<section class="project_list" id="forks">' in output.data)
-        self.assertTrue('<h2>Forks (0)</h2>' in output.data)
+            '<section class="project_list p-t-2" id="forks">' in output.data)
+        self.assertIn(
+            '<h2 class=" m-b-1">Forks <span class="label '
+            'label-default">0</span></h2', output.data)
 
     def test_new_project(self):
         """ Test the new_project endpoint. """
@@ -138,7 +157,7 @@ class PagureFlaskApptests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>New project</h2>' in output.data)
+            self.assertIn('<strong>Create new Project</strong>', output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -149,23 +168,23 @@ class PagureFlaskApptests(tests.Modeltests):
 
             output = self.app.post('/new/', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>New project</h2>' in output.data)
-            self.assertTrue(
-                '<td class="errors">This field is required.</td>'
-                in output.data)
+            self.assertIn('<strong>Create new Project</strong>', output.data)
+            self.assertIn(
+                '<small>\n                      This field is required.'
+                '&nbsp;\n                    </small>', output.data)
 
             data['name'] = 'project-1'
             output = self.app.post('/new/', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>New project</h2>' in output.data)
-            self.assertFalse(
-                '<td class="errors">This field is required.</td>'
-                in output.data)
+            self.assertIn('<strong>Create new Project</strong>', output.data)
+            self.assertNotIn(
+                '<small>\n                      This field is required.'
+                '&nbsp;\n                    </small>', output.data)
 
             data['csrf_token'] =  csrf_token
             output = self.app.post('/new/', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>New project</h2>' in output.data)
+            self.assertIn('<strong>Create new Project</strong>', output.data)
             self.assertTrue(
                 '<li class="error">No user &#34;username&#34; found</li>'
                 in output.data)
@@ -235,10 +254,12 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertTrue(
                 '<li class="message">Public ssh key updated</li>'
                 in output.data)
-            self.assertTrue(
-                '<section class="project_list" id="repos">' in output.data)
-            self.assertTrue(
-                '<section class="project_list" id="forks">' in output.data)
+            self.assertIn(
+                'Projects <span class="label label-default">1</span>',
+                output.data)
+            self.assertIn(
+                'Forks <span class="label label-default">0</span>',
+                output.data)
 
             ast.return_value = True
             output = self.app.get('/settings/')
