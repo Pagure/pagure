@@ -7,13 +7,13 @@
 
 {% block repo %}
 
-<h2>Edit tag: {{ tag }}</h2>
+<h2>Edit tag: {{ edit_tag }}</h2>
 
 <section class="edit_tag">
     <form action="{{ url_for('.edit_tag',
-                     username=username, repo=repo.name, tag=tag) }}" method="post">
+                     username=username, repo=repo.name, tag=edit_tag) }}" method="post">
 
-    <p>Enter in the field below the new name for the tag: "{{ tag }}"</p>
+    <p>Enter in the field below the new name for the tag: "{{ edit_tag }}"</p>
     <table>
       {{ render_field_in_row(form.tag) }}
     </table>

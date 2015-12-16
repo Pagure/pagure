@@ -269,7 +269,7 @@ def edit_tag(repo, tag, username=None):
         form=form,
         username=username,
         repo=repo,
-        tag=tag,
+        edit_tag=tag,
     )
 
 
