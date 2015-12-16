@@ -1,17 +1,17 @@
 html
 {
-	font-size:14px;
+    font-size:14px;
 }
 
 .nav-tabs
 {
-	border-bottom:none;
+    border-bottom:none;
 }
 
 .repo-header
 {
-	background:#f3f3f3;
-	border-bottom:1px solid #DDD;
+    background:#f3f3f3;
+    border-bottom:1px solid #DDD;
 }
 
 .repo-name
@@ -81,7 +81,7 @@ padding: 0.3rem;
 
 #issue-title, .stretch-table-column
 {
-	min-width:99%;
+    min-width:99%;
 }
 
 .btn-group-sm.issues-tagbar > .btn-sm {
@@ -239,7 +239,11 @@ position:relative;
   margin-top:2px;
 }
 /*@media (min-width:768px) {
-	.container {
-		max-width:55pc
-	}
+    .container {
+        max-width:55pc
+    }
 }*/
+
+.nav-tabs .nav-link {
+    padding: 0.5em 0.8em;
+}
