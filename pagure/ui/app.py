@@ -177,6 +177,21 @@ def view_users(username=None):
 
     total_page = int(ceil(users_length / float(limit)))
 
+    for user in users:
+        repos_length = pagure.lib.search_projects(
+          SESSION,
+          username=user.user,
+          fork=False,
+          count=True)
+
+        forks_length = pagure.lib.search_projects(
+          SESSION,
+          username=user.user,
+          fork=True,
+          count=True)
+        user.repos_length = repos_length
+        user.forks_length = forks_length
+
     return flask.render_template(
         'user_list.html',
         users=users,
