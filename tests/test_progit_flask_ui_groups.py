@@ -53,8 +53,10 @@ class PagureFlaskGroupstests(tests.Modeltests):
     def test_group_lists(self):
         """ Test the group_lists endpoint. """
         output = self.app.get('/groups')
-        self.assertIn('<h2>Groups</h2>', output.data)
-        self.assertIn('<p>0 groups.</p>', output.data)
+        self.assertIn(
+            '<h2 class="m-b-1">\n'
+            '    Groups <span class="label label-default">0</span>',
+            output.data)
 
     def test_add_group(self):
         """ Test the add_group endpoint. """
@@ -110,8 +112,10 @@ class PagureFlaskGroupstests(tests.Modeltests):
             self.assertIn(
                 '<li class="message">Group `test_group` created.</li>',
                 output.data)
-            self.assertIn('<h2>Groups</h2>', output.data)
-            self.assertIn('<p>1 groups.</p>', output.data)
+            self.assertIn(
+                '<h2 class="m-b-1">\n'
+                '    Groups <span class="label label-default">1</span>',
+                output.data)
 
         user = tests.FakeUser(
             username='pingou',
@@ -138,8 +142,10 @@ class PagureFlaskGroupstests(tests.Modeltests):
             self.assertIn(
                 '<li class="message">Group `test_admin_group` created.</li>',
                 output.data)
-            self.assertIn('<h2>Groups</h2>', output.data)
-            self.assertIn('<p>2 groups.</p>', output.data)
+            self.assertIn(
+                '<h2 class="m-b-1">\n'
+                '    Groups <span class="label label-default">2</span>',
+                output.data)
 
     def test_group_delete(self):
         """ Test the group_delete endpoint. """
@@ -153,14 +159,20 @@ class PagureFlaskGroupstests(tests.Modeltests):
             self.assertIn(
                 '<p>No groups have been created on this pagure instance '
                 'yet</p>', output.data)
-            self.assertIn('<p>0 groups.</p>', output.data)
+            self.assertIn(
+                '<h2 class="m-b-1">\n'
+                '    Groups <span class="label label-default">0</span>',
+                output.data)
 
         self.test_add_group()
 
         with tests.user_set(pagure.APP, user):
             output = self.app.post('/group/foo/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<p>1 groups.</p>', output.data)
+            self.assertIn(
+                '<h2 class="m-b-1">\n'
+                '    Groups <span class="label label-default">1</span>',
+                output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -176,7 +188,10 @@ class PagureFlaskGroupstests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<li class="error">No group `bar` found</li>', output.data)
-            self.assertIn('<p>1 groups.</p>', output.data)
+            self.assertIn(
+                '<h2 class="m-b-1">\n'
+                '    Groups <span class="label label-default">1</span>',
+                output.data)
 
             output = self.app.post(
                 '/group/test_group/delete', data=data, follow_redirects=True)
@@ -184,7 +199,10 @@ class PagureFlaskGroupstests(tests.Modeltests):
             self.assertIn(
                 '<li class="error">You are not allowed to delete the group '
                 'test_group</li>', output.data)
-            self.assertIn('<p>1 groups.</p>', output.data)
+            self.assertIn(
+                '<h2 class="m-b-1">\n'
+                '    Groups <span class="label label-default">1</span>',
+                output.data)
 
         user.username = 'bar'
         with tests.user_set(pagure.APP, user):
@@ -202,7 +220,10 @@ class PagureFlaskGroupstests(tests.Modeltests):
             self.assertIn(
                 '<li class="message">Group `test_group` has been deleted'
                 '</li>', output.data)
-            self.assertIn('<p>0 groups.</p>', output.data)
+            self.assertIn(
+                '<h2 class="m-b-1">\n'
+                '    Groups <span class="label label-default">0</span>',
+                output.data)
 
     def test_view_group(self):
         """ Test the view_group endpoint. """
