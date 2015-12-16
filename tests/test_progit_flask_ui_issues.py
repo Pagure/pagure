@@ -69,7 +69,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
             output = self.app.get('/test/new_issue')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>New issue</h2>' in output.data)
+            self.assertTrue(
+                '<div class="card-header">\n        New issue'
+                in output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -80,14 +82,18 @@ class PagureFlaskIssuestests(tests.Modeltests):
             # Insufficient input
             output = self.app.post('/test/new_issue', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>New issue</h2>' in output.data)
+            self.assertTrue(
+                '<div class="card-header">\n        New issue'
+                in output.data)
             self.assertEqual(output.data.count(
                 'This field is required.'), 2)
 
             data['title'] = 'Test issue'
             output = self.app.post('/test/new_issue', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>New issue</h2>' in output.data)
+            self.assertTrue(
+                '<div class="card-header">\n        New issue'
+                in output.data)
             self.assertEqual(output.data.count(
                 'This field is required.'), 1)
 
@@ -95,7 +101,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             data['status'] = 'Open'
             output = self.app.post('/test/new_issue', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>New issue</h2>' in output.data)
+            self.assertTrue(
+                '<div class="card-header">\n        New issue'
+                in output.data)
             self.assertEqual(output.data.count(
                 '<td class="errors">This field is required.</td>'), 0)
 
@@ -103,7 +111,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             data['csrf_token'] = csrf_token
             output = self.app.post('/test/new_issue', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>New issue</h2>' in output.data)
+            self.assertTrue(
+                '<div class="card-header">\n        New issue'
+                in output.data)
             self.assertEqual(output.data.count(
                 '<td class="errors">This field is required.</td>'), 0)
             self.assertTrue(
@@ -152,7 +162,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/new_issue')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>New issue</h2>' in output.data)
+            self.assertTrue(
+                '<div class="card-header">\n        New issue'
+                in output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -219,7 +231,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         output = self.app.get('/test/issues')
         self.assertEqual(output.status_code, 200)
         self.assertTrue('<p>test project #1</p>' in output.data)
-        self.assertTrue('<h2>\n    Issues (0)\n  </h2>' in output.data)
+        self.assertTrue(
+            '<h2 class="p-b-1">\n      0 Open Issues' in output.data)
 
         # Create issues to play with
         repo = pagure.lib.get_project(self.session, 'test')
@@ -240,7 +253,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertTrue(
                 '<p>test project<a href="/test/issue/1"> #1</a></p>'
                 in output.data)
-        self.assertTrue('<h2>\n    Issues (1)\n  </h2>' in output.data)
+        self.assertTrue(
+            '<h2 class="p-b-1">\n      1 Open Issues' in output.data)
 
         # Status = closed
         output = self.app.get('/test/issues?status=cloSED')
@@ -249,7 +263,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<p>test project<a href="/test/issue/1"> #1</a></p>'
                 in output.data)
         self.assertTrue(
-            '<h2>\n    Closed\n    Issues (0)\n  </h2>' in output.data)
+            '<h2 class="p-b-1">\n      0 Closed Issues' in output.data)
 
         # Status = fixed
         output = self.app.get('/test/issues?status=fixed')
@@ -258,7 +272,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<p>test project<a href="/test/issue/1"> #1</a></p>'
                 in output.data)
         self.assertTrue(
-            '<h2>\n    Closed\n    Issues (0)\n  </h2>' in output.data)
+            '<h2 class="p-b-1">\n      0 Closed Issues' in output.data)
 
         # Project w/o issue tracker
         repo = pagure.lib.get_project(self.session, 'test')
@@ -1090,7 +1104,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/1/edit')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>Edit issue #1</h2>' in output.data)
+            self.assertTrue(
+                '<div class="card-header">\n        Edit '
+                'issue #1\n      </div>' in output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -1101,21 +1117,29 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
             output = self.app.post('/test/issue/1/edit', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>Edit issue #1</h2>' in output.data)
+            self.assertTrue(
+                '<div class="card-header">\n        Edit '
+                'issue #1\n      </div>' in output.data)
             self.assertEqual(output.data.count(
-                '<td class="errors">This field is required.</td>'), 1)
+                '<small>\n                      This field is required'
+                '.&nbsp;\n                    </small>'), 1)
             self.assertEqual(output.data.count(
-                '<td class="errors">Not a valid choice</td>'), 1)
+                '<small>\n                      Not a valid choice'
+                '&nbsp;\n                    </small>'), 1)
 
             data['status'] = 'Open'
             data['title'] = 'Test issue #1'
             output = self.app.post('/test/issue/1/edit', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>Edit issue #1</h2>' in output.data)
+            self.assertTrue(
+                '<div class="card-header">\n        Edit '
+                'issue #1\n      </div>' in output.data)
             self.assertEqual(output.data.count(
-                '<td class="errors">This field is required.</td>'), 0)
+                '<small>\n                      This field is required'
+                '.&nbsp;\n                    </small>'), 0)
             self.assertEqual(output.data.count(
-                '<td class="errors">Not a valid choice</td>'), 0)
+                '<small>\n                      Not a valid choice'
+                '.&nbsp;\n                    </small>'), 0)
 
             data['csrf_token'] = csrf_token
             output = self.app.post(
@@ -1125,13 +1149,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<li class="message">Successfully edited issue #1</li>'
                 in output.data)
             self.assertTrue(
-                '<span class="issueid">#1</span> <span id="issuetitle">'
-                'Test issue #1</span>' in output.data)
+                '<span class="issueid label label-default">#1</span> '
+                '<span id="issuetitle">Test issue #1</span>' in output.data)
             self.assertEqual(output.data.count(
                 '<option selected value="Open">Open</option>'), 1)
             self.assertEqual(output.data.count(
-                '<div class="comment_body">\n      '
-                '<p>We should work on this!</p>'), 1)
+                '<div class="comment_body">\n'
+                '        <p>We should work on this!</p>'), 1)
 
         # Project w/o issue tracker
         repo = pagure.lib.get_project(self.session, 'test')
@@ -1285,9 +1309,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/droptag/', data={}, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>Settings</h2>' in output.data)
             self.assertTrue(
-                '<ul id="flashes">\n                </ul>' in output.data)
+                '<title>Settings - test - Pagure</title>' in output.data)
+            self.assertTrue("<h3>Settings for test</h3>" in output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -1297,15 +1321,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/droptag/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>Settings</h2>' in output.data)
-            self.assertTrue(
-                '<ul id="flashes">\n                </ul>' in output.data)
+            self.assertTrue("<h3>Settings for test</h3>" in output.data)
 
             data['csrf_token'] = csrf_token
             output = self.app.post(
                 '/test/droptag/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertTrue("<h3>Settings for test</h3>" in output.data)
             self.assertTrue(
                 '<li class="message">Removed tag: tag1</li>' in output.data)
 
@@ -1488,7 +1510,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 in output.data)
             self.assertTrue('<div id="edit">' in output.data)
             self.assertTrue('<section class="edit_comment">' in output.data)
-            self.assertTrue('<textarea id="update_comment"' in output.data)
+            self.assertTrue(
+                '<textarea class="form-control" id="update_comment"'
+                in output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
