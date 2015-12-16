@@ -197,6 +197,21 @@ right:6px!important;
   text-overflow: ellipsis;
 }
 
+.projecticon .oi
+{
+font-size: 3.5rem;
+line-height: 5rem;
+padding-left: 0.5rem;
+color: #bbb;
+}
+
+.projecticon-search .oi
+{
+font-size: 2.5rem;
+line-height: 3rem;
+color: #bbb;
+}
+
 .repo_desc
 {
   height:2.5em;

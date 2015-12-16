@@ -203,7 +203,7 @@
   src="{{ url_for('static', filename='upload.js') }}">
 </script>
 
-<script src="{{ url_for('static', filename='selectize.min.js') }}" type="text/javascript"/>
+<script type="text/javascript" src="{{ url_for('static', filename='selectize.min.js') }}"></script>
 <script type="text/javascript">
 
 {% if authenticated and form %}
@@ -218,32 +218,7 @@ $(document).ready(function() {
 });
 {% endif %}
 
-
-
-/*  var cache = {};
-  $( "#tag" ).autocomplete({
-    source: function( request, response ) {
-      var pattern = request.term;
-      if ( pattern in cache ) {
-        response( cache[ pattern ] );
-        return;
-      }
-
-      $.getJSON(
-        "{{ url_for('api_ns.api_project_tags', repo=repo.name, username=username) }}", {
-          pattern: request.term
-        },
-        function( data ) {
-          cache[ pattern ] = data.tags;
-          response( data.tags );
-        }
-      );
-    },
-    minLength: 0,
-    delay: 200,
-  });*/
-
-
+$(document).ready(function() {
   var cur_hash = null;
 
   highlight_comment = function() {
@@ -276,8 +251,9 @@ $(document).ready(function() {
         dataType: 'html',
         success: function(res) {
             var el = $('#comment-' + commentid);
-            var sec = el.parent().children()[1];
+            var sec = el.parent().find('.issue_comment');
             $(sec).hide();
+            el.parent().find('.issue_actions').hide();
             $(sec).after(res);
             cancel_edit_btn();
         },
@@ -289,18 +265,20 @@ $(document).ready(function() {
   });
 
   function cancel_edit_btn() {
-    $( ".cancel" ).click(
+    $( "#comment_update_cancel" ).click(
       function() {
-        $(this).closest('#comments').find('.comment_body').show();
+        $(this).closest('#comments').find('.issue_comment').show();
+        $(this).closest('#comments').find('.issue_actions').show();
         $(this).closest('.edit_comment').remove();
         return false;
-      }
-    );
+      });
   };
 
 });
 </script>
+    <script type="text/javascript">
 
+    </script>
 {% if config['EVENTSOURCE_SOURCE'] and not issue.private %}
 <script type="text/javascript"
   src="{{ url_for('static', filename='issue_ev.js') }}"></script>
@@ -388,6 +366,12 @@ $( document ).ready(function() {
   var folder = '{{url_for("static", filename="emoji/png/") }}';
   var json_url = '{{ url_for("static", filename="emoji/emoji_strategy.json") }}';
   emoji_complete(json_url, folder);
+
+  $(".comment_body").each(function(ind, obj) {
+    var source = $(obj).html();
+    var preview = emojione.toImage(source);
+    $(obj).html(preview);
+  });
 
   $( ".editmetadatatoggle" ).click(
     function() {

@@ -114,6 +114,10 @@
 
     <section class="issue_comment">
       <div class="comment_body">
+        <span class="edit_date" title="{{
+            comment.edited_on.strftime('%Y-%m-%d %H:%M:%S') if comment.edited_on
+        }}">
+        </span>
         {% autoescape false %}
         {% if id == 0 %}
         {{ comment.content | markdown }}
@@ -123,6 +127,10 @@
         {% endautoescape %}
       </div>
     </section>
+    <div class="issue_actions m-t-2">
+        {% if comment.edited_on %}
+            <small class="text-muted">Edited {{ comment.edited_on | humanize }} by {{ comment.editor.username }} </small>
+        {% endif %}
         <aside class="issue_action icon pull-xs-right p-b-1">
           <a class="reply btn btn-secondary btn-sm" data-toggle="tooltip" title="Reply to this comment - loose formating">
             reply
@@ -137,6 +145,7 @@
           </button>
           {% endif %}
         </aside>
+      </div>
   </div>
 </div>
 {% endmacro %}

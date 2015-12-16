@@ -100,6 +100,7 @@ $(document).ready(function() {
                     option: function(item, escape) {
                         {% set reponame = 'item.name' %}
                         return '<div>' +
+                            '<div class="projecticon-search pull-xs-left"><span class="oi" data-glyph="document"></span></div>'+
                             '<div class="title">' +
                                 '<span class="name"><strong>' + escape(item.name) + '</strong></span>' +
                             '</div>' +

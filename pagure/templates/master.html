@@ -102,11 +102,6 @@
     </script>
     <script type="text/javascript">
 $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
-  $(".comment_body").each(function(ind, obj) {
-    var source = $(obj).html();
-    var preview = emojione.toImage(source);
-    $(obj).html(preview);
-  });
     </script>
     {% endblock %}
 

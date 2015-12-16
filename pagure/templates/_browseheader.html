@@ -8,7 +8,7 @@
               <option value="projects_forks"{% if select=='projects_forks' %} selected {% endif %}>Projects &amp; Forks</option>
               <option value="user"{% if select=='users' %} selected {% endif %}>Users</option>
             </select>
-        <input type="text" name="term" id="term" placeholder="{% if select=='projects' %}Search projects{% endif %}{% if select=='users' %} Search Users {% endif %}" class="form-control" title="Search field, use * to broaden your search" />
+        <input type="text" name="term" id="term" placeholder="{% if select=='projects' %}Search projects{% elif select=='users' %} Search Users {% elif select=='groups'%} Search Groups{% endif %}" class="form-control" title="Search" />
           <input type="submit" style="display:none;" value="Search" class="btn btn-primary"/>
     </form>
   </div>

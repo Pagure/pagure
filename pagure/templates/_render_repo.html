@@ -12,7 +12,7 @@
             <img class="projecticon pull-xs-left" src="{{ repo.avatar_email | avatar_url }}" width=60 height=60 />
 
             {% else %}
-      <div class="projecticon pull-xs-left"><canvas width="60" height="60" data-jdenticon-hash="{{ repo.name|return_md5 }}"></canvas></div>
+            <div class="projecticon pull-xs-left"><span class="oi" data-glyph="document"></span></div>
             {% endif %}
         <a class="project_link logo_link" href="{{ url }}">
             <div class="repo_name"><strong>{{ repo.name }}</strong></div>
@@ -63,10 +63,7 @@
 {% macro render_repos(
         list, total, pagetitle, page, title, count, id, username=None, hide=True) %}
     <section class="project_list p-t-2" id="{{ id }}">
-        <header>
-            {% set title_lvl = 3 if username else 2 %}
-            <h{{ title_lvl }}>{{ title }} ({{ count }})</h{{ title_lvl }}>
-        </header>
+        <h2 class=" m-b-1">{{ title }} <span class="label label-default">{{ count }}</span></h2>
         {% if total and total > 1 %}
         {{ pagination_link(pagetitle, page, total) }}
         {% endif %}

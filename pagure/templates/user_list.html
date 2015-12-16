@@ -41,19 +41,26 @@
 </table>
 {% endif %}
 
-<p>{{ users_length }} users registered.</p>
 
-<section class="user_list">
-  <ul>
+
+<section class="user_list p-t-2">
+     <h2 class="m-b-1">Users <span class="label label-default">{{ users_length }}</span></h2>
     {% for user in users %}
-    <li>
-      <a href="{{ url_for('view_user', username=user.user)}}">
-        {{ user.user | avatar(32) | safe }}
-        {{ user.fullname }} ({{ user.user }})
-      </a>
-    </li>
+        <div class="col-lg-4 col-md-6">
+          <div class="project_wrapper m-b-1">
+              <img class="projecticon pull-xs-left" src="{{ user.user | avatar_url }}" width=60 height=60 />
+              <a class="project_link logo_link" href="{{ url_for('view_user', username=user.user)}}">
+                  <div class="repo_name"><strong>{{ user.fullname }}</strong></div>
+             </a>
+             <div class="repo_desc">
+              <small>{{ user.user }} {{user.created}}</small>
+            </div>
+            <div class="project_metadata">
+              <div style="text-align:right;" class="p-r-1 text-muted"><span class="oi" data-glyph="fork"></span> {{user.forks_length}} &nbsp;<span class="oi" data-glyph="document"></span> {{user.repos_length}} &nbsp;<span class="oi" data-glyph="people"></span> {{user.groups|count}} </div>
+            </div>
+          </div>
+        </div>
     {% endfor %}
-  </ul>
 </section>
 </div>
 
@@ -90,7 +97,18 @@ $(document).ready(function() {
                         callback( data.users.map(function(x) { return { user: x }; }) );
                       }
                     );
-                }
+                },
+                render: {
+                    option: function(item, escape) {
+                        return '<div>' +
+                            '<div class="projecticon-search pull-xs-left"><span class="oi" data-glyph="person"></span></div>'+
+                            '<div class="title">' +
+                                '<span class="name"><strong>' + escape(item.user) + '</strong></span>' +
+                            '</div>' +
+                            '<div class="description"><small>' + escape(item.user) + '</small></div>' +
+                        '</div>';
+                    }
+                },
             });
 });
 </script>
