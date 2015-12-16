@@ -135,6 +135,11 @@
           <a class="reply btn btn-secondary btn-sm" data-toggle="tooltip" title="Reply to this comment - loose formating">
             reply
           </a>
+          <a href="{{ '%s/comment/%s/edit' % (request.base_url, comment.id) }}"
+              class="edit_btn" data-comment="{{ comment.id }}"
+              data-objid="{{ issueid }}">
+              <span class="icon icon-edit blue"></span>
+          </a>
           {% if id != 0 and g.fas_user and (
               (comment.parent.status in [True, 'Open'] and g.fas_user.username == comment.user.username)
               or repo_admin) %}
