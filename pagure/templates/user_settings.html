@@ -1,95 +1,94 @@
 {% extends "master.html" %}
-{% from "_formhelper.html" import render_field_in_cell %}
+{% from "_formhelper.html" import render_bootstrap_field %}
 
 {% block title %}{{ user.user }}'s settings{% endblock %}
 {% set tag = "users"%}
 
-{% block header %}
-<link href="{{ url_for('static', filename='fontawesome/font-awesome.min.css') }}"
-  rel="stylesheet" />
-{% endblock %}
-
-{% macro render_email(email, form) %}
-<td>
-  {{ email.email }}
-  <form class="icon del_icon" method="POST"
-    action="{{ url_for('remove_user_email') }}">
-    <input type="hidden" value="{{ email.email }}" name="email" />
-    {{ form.csrf_token }}
-    <button
-      onclick="return confirm('Do you really want to remove the email: {{ email.email }}?');"
-      title="Remove email">
-      <span class="icon icon-remove blue"></span>
-    </button>
-  </form>
-  {% if email.email == user.default_email %}
-  (<span class="icon-home blue" title="default email"></span>)
+{% macro render_email(email, form=None) %}
+<div class="list-group-item {% if not form %}disabled{% endif %}">
+  <span class="oi" data-glyph="envelope-closed"></span> &nbsp;{{ email.email }}
+  {% if form %}
+    <form class="pull-xs-right" method="POST"
+      action="{{ url_for('remove_user_email') }}">
+      <input type="hidden" value="{{ email.email }}" name="email" />
+      {{ form.csrf_token }}
+      <button
+        onclick="return confirm('Do you really want to remove the email: {{ email.email }}?');"
+        title="Remove email" class="btn btn-sm btn-danger">
+        <span class="oi" data-glyph="trash"></span>
+      </button>
+    </form>
+    {% if email.email == user.default_email %}
+    <span class="text-muted pull-xs-right p-r-1"><span class="oi" data-glyph="star" title="default email address" data-toggle="tooltip"></span></span>
+    {% else %}
+    <form style="display:inline;" method="POST"
+      action="{{ url_for('set_default_email') }}">
+      <input type="hidden" value="{{ email.email }}" name="email" />
+      {{ form.csrf_token }}
+      <a class="pull-xs-right p-r-1" href="javascript:void(0);" onclick="$(this).closest('form').submit();" title="Set default email address">
+        <small>set as default</small>
+      </a>
+    </form>
+    {% endif %}
   {% else %}
-  <form class="icon star_icon" method="POST"
-    action="{{ url_for('set_default_email') }}">
-    <input type="hidden" value="{{ email.email }}" name="email" />
-    {{ form.csrf_token }}
-    <button
-      title="Set default email address">
-      (<span class="icon icon-ok blue"></span>)
-    </button>
-  </form>
+        <div class="pull-xs-right"><small>pending verification via email</small></div>
   {% endif %}
-</td>
+</div>
 {% endmacro %}
 
 
 {% block content %}
-<section class="user_settings">
-    <header>
-        <h2>{{ user.user }}'s settings</h2>
-    </header>
-    <table>
-      <tr>
-        <th>Full name</th>
-        <td> {{ user.fullname }} </td>
-      </tr>
-      <tr>
-        <th>Emails</th>
+<div class="container p-t-3">
+  <div class="col-md-8 col-md-offset-2">
+    <div class="card m-b-3">
+      <div class="card-header">
+          Basic Information
+      </div>
+      <div class="card-block">
+        <fieldset class="form-group">
+          <label for="description"><strong>Username</strong></label>
+          <div>{{ user.user }}</div>
+        </fieldset>
+        <fieldset class="form-group">
+          <label for="description"><strong>Full Name</strong></label>
+          <div>{{ user.fullname }}</div>
+        </fieldset>
+      </div>
+    </div>
+
+    <div class="card m-b-3">
+      <div class="card-header">
+        <strong>Email Addresses</strong>
+            <a class="btn btn-success btn-sm pull-xs-right" href="{{ url_for('add_user_email') }}">
+                  Add Email
+            </a>
+      </div>
+      <div class="list-group list-group-flush">
         {% for email in user.emails %}
           {{ render_email(email, form) }}
-      </tr>
-      <tr>
-        <td></td>
         {% endfor %}
-      </tr>
-      <tr>
-        <td></td>
-        <td>
-          <a href="{{ url_for('add_user_email') }}">
-                Add another email address
-          </a>
-        </td>
-      </tr>
-      <tr>
-        <th title="Email pending validation">Emails pending</th>
         {% for email in user.emails_pending %}
-          <td>{{ email.email }}</td>
-      </tr>
-      <tr>
-        <td></td>
+          {{ render_email(email) }}
         {% endfor %}
-      </tr>
-    </table>
+      </div>
+    </div>
 
-    <form action="{{ url_for('user_settings') }}" method="post">
-    <table>
-      <tr>
-          {{ render_field_in_cell(form.ssh_key) }}
-      </tr>
-    </table>
-    </table>
-    <p class="buttons indent">
-      <input type="submit" class="submit positive button" value="Update">
-      <input type="button" value="Cancel" class="button" onclick="history.back();">
-      {{ form.csrf_token }}
-    </p>
-    </form>
+    <div class="card m-b-3">
+      <div class="card-header">
+          <strong>Authentication</strong>
+      </div>
+      <div class="card-block">
+        <form action="{{ url_for('user_settings') }}" method="post">
+          {{ render_bootstrap_field(form.ssh_key) }}
+          <p class="buttons indent">
+            <input type="submit" class="btn btn-primary" value="Update">
+            <input type="button" class="btn btn-secondary" value="Cancel" class="button" onclick="history.back();">
+            {{ form.csrf_token }}
+          </p>
+        </form>
+      </div>
+    </div>
 
-</section>
+  </div>
+</div>
 {% endblock %}

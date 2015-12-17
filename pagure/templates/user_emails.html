@@ -1,26 +1,26 @@
 {% extends "master.html" %}
-{% from "_formhelper.html" import render_field_in_row %}
+{% from "_formhelper.html" import render_bootstrap_field %}
 
 {% block title %}Add email{% endblock %}
 {% set tag = "home" %}
 
 
 {% block content %}
-
-<h2>Add new email</h2>
-
-<section class="new_email">
-    <form action="{{ url_for('.add_user_email') }}" method="post">
-
-    <table>
-      {{ render_field_in_row(form.email) }}
-    </table>
-    <p class="buttons indent">
-      <input type="submit" class="submit positive button" value="Add">
-      <input type="button" value="Cancel" class="button" onclick="history.back();">
-      {{ form.csrf_token }}
-    </p>
-  </form>
-</section>
-
+<div class="container p-t-3">
+  <div class="col-md-8 col-md-offset-2">
+    <div class="card">
+      <div class="card-header">
+      <strong>Add new email</strong>
+      </div>
+      <div class="card-block">
+        <form action="{{ url_for('.add_user_email') }}" method="post">
+            {{ render_bootstrap_field(form.email) }}
+            <input type="submit" class="btn btn-primary" value="Add">
+            <input type="button" value="Cancel" class="btn btn-secondary" onclick="history.back();">
+            {{ form.csrf_token }}
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

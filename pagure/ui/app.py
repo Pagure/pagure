@@ -424,7 +424,7 @@ def user_settings():
                 message = 'Public ssh key updated'
             flask.flash(message)
             return flask.redirect(
-                flask.url_for('view_user', username=user.user))
+                flask.url_for('.user_settings'))
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')
@@ -515,18 +515,9 @@ def add_user_email():
     if not user:
         flask.abort(404, 'User not found')
 
-    form = pagure.forms.UserEmailForm()
+    form = pagure.forms.UserEmailForm(emails=[mail.email for mail in user.emails])
     if form.validate_on_submit():
         email = form.email.data
-        useremails = [mail.email for mail in user.emails]
-
-        if email in useremails:
-            flask.flash(
-                'The email: %s is already associated to you' % email,
-                'error')
-            return flask.redirect(
-                flask.url_for('.user_settings')
-            )
 
         try:
             pagure.lib.add_user_pending_email(SESSION, user, email)

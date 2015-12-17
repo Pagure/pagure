@@ -229,7 +229,7 @@ class AddPullRequestFlagForm(wtf.Form):
 class UserSettingsForm(wtf.Form):
     ''' Form to create or edit project. '''
     ssh_key = wtforms.TextAreaField(
-        'Public ssh key <span class="error">*</span>',
+        'Public SSH key <span class="error">*</span>',
         [wtforms.validators.Required()]
     )
 
@@ -270,6 +270,19 @@ class UserEmailForm(wtf.Form):
     email = wtforms.TextField(
         'email', [wtforms.validators.Required()]
     )
+
+    def __init__(self, emails, *args, **kwargs):
+        wtf.Form.__init__(self, *args, **kwargs)
+        self.emails = emails
+        print self.emails
+
+    def validate(self):
+        rv = wtf.Form.validate(self)
+        if not rv:
+            return False
+        if self.email.data in self.emails:
+            self.email.errors.append('the email %s is already associated to you' % self.email.data)
+            return False
 
 
 class ProjectCommentForm(wtf.Form):
