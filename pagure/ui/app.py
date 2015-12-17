@@ -473,6 +473,7 @@ def remove_user_email():
         )
 
     form = pagure.forms.UserEmailForm()
+
     if form.validate_on_submit():
         email = form.email.data
         useremails = [mail.email for mail in user.emails]
@@ -515,7 +516,8 @@ def add_user_email():
     if not user:
         flask.abort(404, 'User not found')
 
-    form = pagure.forms.UserEmailForm(emails=[mail.email for mail in user.emails])
+    form = pagure.forms.UserEmailForm(
+        emails=[mail.email for mail in user.emails])
     if form.validate_on_submit():
         email = form.email.data
 
@@ -561,6 +563,7 @@ def set_default_email():
             flask.flash(
                 'You do not have the email: %s, nothing to set' % email,
                 'error')
+
             return flask.redirect(
                 flask.url_for('.user_settings')
             )
