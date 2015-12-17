@@ -10,8 +10,6 @@
 
 {% block repo %}
 
-
-
   <form action="{{ url_for('.view_plugin',
                   username=username, repo=repo.name, plugin=plugin.name,
                   ) }}" method="post">
@@ -26,6 +24,5 @@
       {{ form.csrf_token }}
     </p>
   </form>
-
 
 {% endblock %}
