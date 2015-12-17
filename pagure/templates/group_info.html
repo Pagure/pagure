@@ -3,98 +3,205 @@
 
 {% block title %}Group {{ group.name }}{% endblock %}
 {% set tag = "groups" %}
-
+{% from "_browseheader.html" import browse_header %}
 
 {% block header %}
-<link rel="stylesheet" type="text/css" media="screen"
-    href="{{ url_for('static', filename='toggle.css') }}"/>
-<link href="{{ url_for('static', filename='fontawesome/font-awesome.min.css') }}"
+<link href="{{ url_for('static', filename='selectize.bootstrap3.css') }}"
   rel="stylesheet" />
 {% endblock %}
 
 {% block content %}
-<div class="inline">
-    <h2>Group: {{ group.group_name }}</h2>
-    {% if authenticated and (member or admin) %}
-    <aside id="issue_action">
-      <form class="icon" method="POST" style="display: inline-block"
-        action="{{ url_for('group_delete',
-            group=group.group_name) }}">
-        {{ form.csrf_token }}
-        <button
-          onclick="return confirm('Are you sure you want to delete the group `{{group.group_name}}`?');"
-          title="Delete group">
-          <span class="icon icon-trash blue"></span>
-          Delete group
-        </button>
-      </form>
-    </aside>
-    {% endif %}
+<div class="repo-header p-t-1">
+  <div class="container">
+        {{browse_header(select=tag)}}
+  </div>
+</div>
+<div class="p-t-2">
+  <div class="container">
+    <header>
+        <h2 class="repo-name m-b-0">
+            <span class="oi" data-glyph="people"></span> &nbsp;{{ group.group_name }}
+            {% if authenticated and (member or admin) %}
+              <form class="pull-xs-right" method="POST"
+                action="{{ url_for('group_delete',
+                    group=group.group_name) }}">
+                {{ form.csrf_token }}
+                <button
+                  onclick="return confirm('Are you sure you want to delete the group `{{group.group_name}}`?');"
+                  title="Delete group"
+                  class="btn btn-danger">
+                  <span class="oi" data-glyph="trash"></span> &nbsp;Delete group
+                </button>
+              </form>
+             {% endif %}
+        </h2>
+        <div class="m-t-0">
+          created {{ group.created |humanize }}
+          by {{ group.creator.fullname }} ({{ group.creator.user }})
+        </div>
+        <div class="projectinfo m-t-1">
+
+        </div>
+    </header>
+    <div class="row">
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-header">
+            Projects in {{group.group_name}} <span class="label label-default">{{ group.projects | length }}</span>
+          </div>
+          <div class="list-group">
+            {% for repo in group.projects %}
+              <div class="list-group-item">
+                {% if repo.is_fork %}
+                  {% set url = url_for('view_repo', username=repo.user.username, repo=repo.name) %}
+                {% else %}
+                  {% set url = url_for('view_repo', repo=repo.name) %}
+                {% endif %}
+
+                {% if repo.avatar_email %}
+                  <img class="projecticon pull-xs-left" src="{{ repo.avatar_email | avatar_url }}" width=60 height=60 />
+                {% else %}
+                    <div class="projecticon pull-xs-left"><span class="oi" data-glyph="document"></span></div>
+                {% endif %}
+                <a class="project_link logo_link" href="{{ url }}">
+                    <div class="repo_name">
+                      <strong>{{ repo.name }}</strong>
+                    </div>
+                </a>
+                <div class="repo_desc" title="{{ repo.description }}" data-toggle="tooltip">
+                  <small>{% if repo.description %}{{ repo.description }}{%else%}<span class="text-muted">no description<span>{% endif %}</small>
+                </div>
+              </div>
+            {% else %}
+                <p>No projects found</p>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-header">
+            Group Members <span class="label label-default">{{group.users|count}}</span>
+            {% if authenticated and (member or admin) %}
+              <div id="add_user_button" class="btn btn-secondary btn-sm pull-xs-right"><span class="oi" data-glyph="plus"></span></div>
+            {% endif %}
+          </div>
+          <div class="list-group list-group-flush">
+
+            {% if authenticated and (member or admin) %}
+            <div class="list-group-item" id="add_user_form_wrapper" style="display:none;">
+              <form action="{{ url_for('.view_group', group=group.group_name)
+                }}" method="post" id="add_user_form">
+                  <input placeholder="search for user" class="form-control" id="user" name="user" title="User name"/>
+                </div>
+                {{ form.csrf_token }}
+              </form>
+            </div>
+            {% endif %}
+
+            {% for user in group.users %}
+            <div class="list-group-item">
+              <a href="{{ url_for('view_user', username=user.user)}}" title="{{ user.fullname }}" data-toggle="tooltip">
+                {{ user.user | avatar(28) | safe }}
+                {{ user.user }}
+              </a>
+              {% if authenticated and user != group.creator and member %}
+               <form class="pull-xs-right" method="POST" style="display: inline-block"
+                action="{{ url_for('group_user_delete',
+                    group=group.group_name, user=user.user) }}">
+                {{ form.csrf_token }}
+                <button
+                  onclick="return confirm('Are you sure to remove user `{{
+                    user.user}}` from the group `{{group.group_name}}`?');"
+                  title="Remove user from group"
+                  class="btn btn-sm btn-danger">
+                  <span class="oi" data-glyph="trash"></span>
+                </button>
+              </form>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div> <!--list-group-->
+        </div> <!--card-->
+      </div> <!--col-md-4 -->
+    </div> <!--row-->
+  </div> <!--container-->
 </div>
 
+{% endblock %}
 
-<table>
-  <tr>
-    <th>Created</th>
-    <td title="{{ group.created.strftime('%b %d %Y %H:%M:%S') }}">
-        {{ group.created |humanize }}
-    </td>
-  </tr>
-  <tr>
-    <th>By</th>
-    <td>
-      <a href="{{ url_for('view_user', username=group.creator.user)}}">
-        {{ group.creator.user | avatar(24) | safe }}
-        {{ group.creator.fullname }} ({{ group.creator.user }})
-      </a>
-    </td>
-  </tr>
-</table>
+{% block jscripts %}
+  {{ super() }}
+  <script src="{{ url_for('static', filename='selectize.min.js') }}" type="text/javascript"> </script>
+  <script type="text/javascript">
+  $(document).ready(function() {
 
-<h3>Members</h3>
+    $('#term').selectize({
+        valueField: 'group',
+        labelField: 'group',
+        searchField: 'group',
+        onType: function(value){
+          if (value == ""){
+          this.close();
+          }
+        },
+        onChange: function(value){
+          if (value != ""){
+            $('#headerSearch').submit();
+          }
+        },
+        maxItems: 1,
+        create: false,
+        load: function(query, callback) {
+            if (!query.length) return callback();
+            $.getJSON(
+              "{{ url_for('api_ns.api_groups') }}", {
+                pattern: query
+              },
+              function( data ) {
+                callback( data.groups.map(function(x) { return { group: x }; }) );
+              }
+            );
+        }
+    });
 
-{% if authenticated and (member or admin) %}
-<section class="add_users">
-  <h4>Add an user to this group</h4>
-  <form action="{{ url_for('.view_group', group=group.group_name)
-    }}" method="post">
-    <input id="user" name="user" title="User name"/>
-    {{ form.csrf_token }}
-  <input type="submit" class="submit positive button" value="Add">
-  </form>
-</section>
-{% endif %}
+     var usersearch = $('#user').selectize({
+                valueField: 'user',
+                labelField: 'user',
+                searchField: 'user',
+                onChange: function(value){
+                  if (value != ""){
+                    $('#add_user_form').submit();
+                  }
+                },
+                maxItems: 1,
+                create: false,
+                preload: 'focus',
+                load: function(query, callback) {
+                    $.getJSON(
+                      "{{ url_for('api_ns.api_users') }}",
+                      function( data ) {
+                        callback( data.users.map(function(x) { return { user: x }; }) );
+                      }
+                    );
+                },
+                render: {
+                    option: function(item, escape) {
+                        return '<div>' +
+                            '<div>' +
+                                '<span><strong>' + escape(item.user) + '</strong></span>' +
+                            '</div>' +
+                        '</div>';
+                    }
+                },
+            });
 
-<section class="user_list">
-  <ul>
-    {% for user in group.users %}
-    <li>
-      <a href="{{ url_for('view_user', username=user.user)}}">
-        {{ user.user | avatar(32) | safe }}
-        {{ user.fullname }} ({{ user.user }})
-      </a>
-      {% if authenticated and user != group.creator and member %}
-       <form class="icon" method="POST" style="display: inline-block"
-        action="{{ url_for('group_user_delete',
-            group=group.group_name, user=user.user) }}">
-        {{ form.csrf_token }}
-        <button
-          onclick="return confirm('Are you sure to remove user `{{
-            user.user}}` from the group `{{group.group_name}}`?');"
-          title="Remove user from group">
-          <span class="icon icon-trash blue"></span>
-        </button>
-      </form>
-      {% endif %}
-    </li>
-    {% endfor %}
-  </ul>
-</section>
+    $('#add_user_button').click(function(){
+      $('#add_user_button').hide();
+      $('#add_user_form_wrapper').show();
+      usersearch[0].selectize.focus();
+    });
 
-<section class="project_list">
-  {{ render_repos(
-      group.projects, 1, 0,
-      "Group's Projects", group.projects | length, 'grouprepos', None) }}
-</section>
-
+  });
+</script>
 {% endblock %}
