@@ -271,18 +271,15 @@ class UserEmailForm(wtf.Form):
         'email', [wtforms.validators.Required()]
     )
 
-    def __init__(self, emails, *args, **kwargs):
-        wtf.Form.__init__(self, *args, **kwargs)
-        self.emails = emails
-        print self.emails
-
-    def validate(self):
-        rv = wtf.Form.validate(self)
-        if not rv:
-            return False
-        if self.email.data in self.emails:
-            self.email.errors.append('the email %s is already associated to you' % self.email.data)
-            return False
+    def __init__(self, *args, **kwargs):
+        super(UserEmailForm, self).__init__(*args, **kwargs)
+        if 'emails' in kwargs:
+            if kwargs['emails']:
+                self.email.validators.append(
+                    wtforms.validators.NoneOf(kwargs['emails'])
+                )
+        else:
+            self.email.validators = [wtforms.validators.Required()]
 
 
 class ProjectCommentForm(wtf.Form):
