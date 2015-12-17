@@ -105,7 +105,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<div class="card-header">\n        New issue'
                 in output.data)
             self.assertEqual(output.data.count(
-                '<td class="errors">This field is required.</td>'), 0)
+                '</button>\n                      This field is required.'),
+                0)
 
             # Invalid user
             data['csrf_token'] = csrf_token
@@ -117,7 +118,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.data.count(
                 '<td class="errors">This field is required.</td>'), 0)
             self.assertTrue(
-                '<li class="error">No user &#34;username&#34; found</li>'
+                '</button>\n                      No user &#34;username&#34; found'
                 in output.data)
 
         user.username = 'pingou'
@@ -125,8 +126,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/new_issue', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<li class="message">Issue created</li>' in output.data)
+            self.assertIn(
+                '</button>\n                      Issue created', output.data)
             self.assertTrue(
                 '<p>test project<a href="/test/issue/1"> #1</a></p>'
                 in output.data)
@@ -185,8 +186,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             stream.close()
 
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<li class="message">Issue created</li>' in output.data)
+            self.assertIn(
+                '</button>\n                      Issue created', output.data)
             self.assertTrue(
                 '<p>test project<a href="/test/issue/1"> #1</a></p>'
                 in output.data)
@@ -465,9 +466,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue(
                 '<p>test project<a href="/test/issue/1"> #1</a></p>'
                 in output.data)
-            self.assertTrue(
-                '<li class="message">Successfully edited issue #1</li>'
-                in output.data)
+            self.assertIn(
+                '</button>\n                      Successfully edited issue #1',
+                output.data)
             self.assertTrue(
                 '<option selected value="Fixed">Fixed</option>'
                 in output.data)
@@ -484,10 +485,12 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue(
                 '<p>test project<a href="/test/issue/1"> #1</a></p>'
                 in output.data)
-            self.assertTrue(
-                '<li class="message">Comment added</li>' in output.data)
-            self.assertFalse(
-                'li class="message">No changes to edit</li>' in output.data)
+            self.assertIn(
+                '</button>\n                      Comment added',
+                output.data)
+            self.assertNotIn(
+                '</button>\n                      No changes to edit',
+                output.data)
             self.assertTrue(
                 '<p>Woohoo a second comment !</p>' in output.data)
             self.assertEqual(
@@ -508,10 +511,12 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue(
                 '<p>test project<a href="/test/issue/1"> #1</a></p>'
                 in output.data)
-            self.assertTrue(
-                '<li class="message">Tag added: tag2</li>' in output.data)
-            self.assertFalse(
-                'li class="message">No changes to edit</li>' in output.data)
+            self.assertIn(
+                '</button>\n                      Tag added: tag2',
+                output.data)
+            self.assertNotIn(
+                '</button>\n                      No changes to edit',
+                output.data)
             self.assertTrue(
                 '<p>Woohoo a second comment !</p>' in output.data)
             self.assertEqual(
@@ -532,9 +537,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue(
                 '<p>test project<a href="/test/issue/1"> #1</a></p>'
                 in output.data)
-            self.assertTrue(
-                '<li class="error">No user &#34;ralph&#34; found</li>'
-                in output.data)
+            self.assertIn(
+                '</button>\n                      No user &#34;ralph&#34; found',
+                output.data)
             self.assertTrue(
                 '<p>Woohoo a second comment !</p>' in output.data)
             self.assertEqual(
@@ -555,8 +560,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue(
                 '<p>test project<a href="/test/issue/1"> #1</a></p>'
                 in output.data)
-            self.assertTrue(
-                '<li class="message">Issue assigned</li>' in output.data)
+            self.assertIn(
+                '</button>\n                      Issue assigned',
+                output.data)
             self.assertTrue(
                 '<a href="/test/issues?assignee=pingou">' in output.data)
             self.assertTrue(
@@ -600,9 +606,10 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue(
                 '<p>test project<a href="/test/issue/1"> #1</a></p>'
                 in output.data)
-            self.assertTrue(
-                '<li class="error">You cannot close a ticket that has ticket '
-                'depending that are still open.</li>' in output.data)
+            self.assertIn(
+                '</button>\n                      You cannot close a ticket '
+                'that has ticket depending that are still open.',
+                output.data)
             self.assertTrue(
                 '<option selected value="Open">Open</option>'
                 in output.data)
@@ -687,8 +694,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue(
                 '<p>test project<a href="/test/issue/1"> #1</a></p>'
                 in output.data)
-            self.assertTrue(
-                '<li class="message">Comment added</li>' in output.data)
+            self.assertIn(
+                '</button>\n                      Comment added',
+                output.data)
             self.assertTrue(
                 '<p>Woohoo a second comment !</p>' in output.data)
             self.assertEqual(
@@ -725,8 +733,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue(
                 '<p>test project<a href="/test/issue/1"> #1</a></p>'
                 in output.data)
-            self.assertTrue(
-                '<li class="message">Comment removed</li>' in output.data)
+            self.assertIn(
+                '</button>\n                      Comment removed',
+                output.data)
 
             # Drop non-existant comment
             output = self.app.post(
@@ -794,8 +803,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue(
                 '<p>test project<a href="/test/issue/1"> #1</a></p>'
                 in output.data)
-            self.assertTrue(
-                '<li class="message">Dependency added</li>' in output.data)
+            self.assertIn(
+                '</button>\n                      Dependency added',
+                output.data)
 
             # Add an invalid dependent ticket
             data = {
@@ -808,8 +818,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue(
                 '<p>test project<a href="/test/issue/1"> #1</a></p>'
                 in output.data)
-            self.assertFalse(
-                '<li class="message">Dependency added</li>' in output.data)
+            self.assertNotIn(
+                '</button>\n                      Dependency added', output.data)
 
         repo = pagure.lib.get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
@@ -873,8 +883,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue(
                 '<p>test project<a href="/test/issue/1"> #1</a></p>'
                 in output.data)
-            self.assertTrue(
-                '<li class="message">Dependency added</li>' in output.data)
+            self.assertIn(
+                '</button>\n                      Dependency added',
+                output.data)
 
             # Add an invalid dependent ticket
             data = {
@@ -887,8 +898,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue(
                 '<p>test project<a href="/test/issue/1"> #1</a></p>'
                 in output.data)
-            self.assertFalse(
-                '<li class="message">Dependency added</li>' in output.data)
+            self.assertNotIn(
+                '</button>\n                      Dependency added',
+                output.data)
 
         repo = pagure.lib.get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
@@ -1145,9 +1157,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/edit', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<li class="message">Successfully edited issue #1</li>'
-                in output.data)
+            self.assertIn(
+                '</button>\n                      Successfully edited issue #1',
+                output.data)
             self.assertTrue(
                 '<span class="issueid label label-default">#1</span> '
                 '<span id="issuetitle">Test issue #1</span>' in output.data)
@@ -1246,9 +1258,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue(
                 '<p>test project<a href="/test/issue/1"> #1</a></p>'
                 in output.data)
-            self.assertTrue(
-                '<li class="message">Edited tag: tag1 to tag2</li>'
-                in output.data)
+            self.assertIn(
+                '</button>\n                      Edited tag: tag1 to tag2',
+                output.data)
 
         # After edit, list tags
         tags = pagure.lib.get_tags_of_project(self.session, repo)
@@ -1328,8 +1340,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/droptag/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue("<h3>Settings for test</h3>" in output.data)
-            self.assertTrue(
-                '<li class="message">Removed tag: tag1</li>' in output.data)
+            self.assertIn(
+                '</button>\n                      Removed tag: tag1',
+                output.data)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -1397,7 +1410,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<title>Issues - test - Pagure</title>', output.data)
             self.assertIn(
-                '<li class="message">Issue deleted</li>', output.data)
+                '</button>\n                      Issue deleted', output.data)
 
         # Project w/o issue tracker
         repo = pagure.lib.get_project(self.session, 'test')
@@ -1455,8 +1468,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue(
                 '<p>test project<a href="/test/issue/1"> #1</a></p>'
                 in output.data)
-            self.assertTrue(
-                '<li class="message">Comment added</li>' in output.data)
+            self.assertIn(
+                '</button>\n                      Comment added',
+                output.data)
             self.assertTrue(
                 '<p>Woohoo a second comment !</p>' in output.data)
             self.assertEqual(
@@ -1495,8 +1509,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue(
                 '<p>test project<a href="/test/issue/1"> #1</a></p>'
                 in output.data)
-            self.assertTrue(
-                '<li class="message">Comment updated</li>' in output.data)
+            self.assertIn(
+                '</button>\n                      Comment updated',
+                output.data)
 
         repo = pagure.lib.get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
@@ -1529,8 +1544,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue(
                 '<p>test project<a href="/test/issue/1"> #1</a></p>'
                 in output.data)
-            self.assertTrue(
-                '<li class="message">Comment updated</li>' in output.data)
+            self.assertIn(
+                '</button>\n                      Comment updated',
+                output.data)
 
         repo = pagure.lib.get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
