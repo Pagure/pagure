@@ -1,5 +1,4 @@
 {% extends "master.html" %}
-
 {% block title %}Users{% endblock %}
 {%block tag %}users{% endblock %}
 
@@ -7,6 +6,10 @@
 {% block content %}
 
 <h2>Users</h2>
+
+{% if config.get('PAGURE_AUTH') == 'local' %}
+<a href="{{ url_for('new_user') }}">Create User</a>
+{% endif %}
 
 {% if total_page and total_page > 1 %}
 <table>
