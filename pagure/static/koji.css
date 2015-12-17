@@ -14,6 +14,11 @@ html
     border-bottom:1px solid #DDD;
 }
 
+.notification-spacer
+{
+    background:#f3f3f3;
+}
+
 .repo-name
 {
 
