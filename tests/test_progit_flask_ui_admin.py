@@ -60,8 +60,9 @@ class PagureFlaskAdmintests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/admin', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<li class="error">Access restricted</li>' in output.data)
+            self.assertIn(
+                '</button>\n                      Access restricted',
+                 output.data)
 
         user = tests.FakeUser(
             username='pingou',
@@ -89,8 +90,9 @@ class PagureFlaskAdmintests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.post('/admin/gitolite', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<li class="error">Access restricted</li>' in output.data)
+            self.assertIn(
+                '</button>\n                      Access restricted',
+                 output.data)
 
         user = tests.FakeUser(
             username='pingou',
@@ -118,7 +120,7 @@ class PagureFlaskAdmintests(tests.Modeltests):
             self.assertTrue(
                 'Re-generate user ssh key files' in output.data)
             self.assertTrue(
-                '<li class="message">Gitolite ACLs updated</li>'
+                '</button>\n                      Gitolite ACLs updated'
                 in output.data)
 
     @patch('pagure.generate_user_key_files')
@@ -136,8 +138,9 @@ class PagureFlaskAdmintests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.post('/admin/ssh', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<li class="error">Access restricted</li>' in output.data)
+            self.assertIn(
+                '</button>\n                      Access restricted',
+                 output.data)
 
         user = tests.FakeUser(
             username='pingou',
@@ -165,7 +168,7 @@ class PagureFlaskAdmintests(tests.Modeltests):
             self.assertTrue(
                 'Re-generate user ssh key files' in output.data)
             self.assertTrue(
-                '<li class="message">User key files regenerated</li>'
+                '</button>\n                      User key files regenerated'
                 in output.data)
 
     def test_admin_generate_hook_token(self):
@@ -181,8 +184,9 @@ class PagureFlaskAdmintests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.post('/admin/hook_token', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<li class="error">Access restricted</li>' in output.data)
+            self.assertIn(
+                '</button>\n                      Access restricted',
+                 output.data)
 
         user = tests.FakeUser(
             username='pingou',
@@ -211,7 +215,7 @@ class PagureFlaskAdmintests(tests.Modeltests):
             self.assertTrue(
                 'Re-generate hook-token for every projects' in output.data)
             self.assertTrue(
-                '<li class="message">Hook token all re-generated</li>'
+                '</button>\n                      Hook token all re-generated'
                 in output.data)
 
 

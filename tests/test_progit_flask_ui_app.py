@@ -185,9 +185,9 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post('/new/', data=data)
             self.assertEqual(output.status_code, 200)
             self.assertIn('<strong>Create new Project</strong>', output.data)
-            self.assertTrue(
-                '<li class="error">No user &#34;username&#34; found</li>'
-                in output.data)
+            self.assertIn(
+                '</button>\n                      No user &#34;username&#34; found',
+                output.data)
 
         user.username = 'foo'
         with tests.user_set(pagure.APP, user):
@@ -195,9 +195,9 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post('/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>Project #1</p>' in output.data)
-            self.assertTrue(
-                '<li class="message">Project &#34;project-1&#34; created</li>'
-                in output.data)
+            self.assertIn(
+                '</button>\n                      Project &#34;project-1&#34; created',
+                output.data)
 
         # After
         projects = pagure.lib.search_projects(self.session)
@@ -227,10 +227,12 @@ class PagureFlaskApptests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue("<h2>foo's settings</h2>" in output.data)
-            self.assertTrue(
-                '<textarea id="ssh_key" name="ssh_key"></textarea>'
-                in output.data)
+            self.assertIn(
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
+            self.assertIn(
+                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
+                '</textarea>', output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -241,10 +243,12 @@ class PagureFlaskApptests(tests.Modeltests):
 
             output = self.app.post('/settings/', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue("<h2>foo's settings</h2>" in output.data)
-            self.assertTrue(
-                '<textarea id="ssh_key" name="ssh_key">this is my ssh key'
-                '</textarea>' in output.data)
+            self.assertIn(
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
+            self.assertIn(
+                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
+                'this is my ssh key</textarea>', output.data)
 
             data['csrf_token'] =  csrf_token
 
@@ -252,14 +256,14 @@ class PagureFlaskApptests(tests.Modeltests):
                 '/settings/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
-                '<li class="message">Public ssh key updated</li>'
+                '</button>\n                      Public ssh key updated'
                 in output.data)
             self.assertIn(
-                'Projects <span class="label label-default">1</span>',
-                output.data)
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
             self.assertIn(
-                'Forks <span class="label label-default">0</span>',
-                output.data)
+                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
+                'this is my ssh key</textarea>', output.data)
 
             ast.return_value = True
             output = self.app.get('/settings/')
@@ -281,10 +285,12 @@ class PagureFlaskApptests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue("<h2>foo's settings</h2>" in output.data)
-            self.assertTrue(
-                '<textarea id="ssh_key" name="ssh_key"></textarea>'
-                in output.data)
+            self.assertIn(
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
+            self.assertIn(
+                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
+                '</textarea>', output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -316,10 +322,12 @@ class PagureFlaskApptests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.post('/settings/')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue("<h2>foo's settings</h2>" in output.data)
-            self.assertTrue(
-                '<textarea id="ssh_key" name="ssh_key"></textarea>'
-                in output.data)
+            self.assertIn(
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
+            self.assertIn(
+                '<textarea class="form-control form-control-error" id="ssh_key" name="ssh_key">'
+                '</textarea>', output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -331,19 +339,26 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/email/drop', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue("<h2>foo's settings</h2>" in output.data)
             self.assertIn(
-                '<li class="error">You must always have at least one email</li>',
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
+            self.assertIn(
+                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
+                '</textarea>', output.data)
+            self.assertIn(
+                '</button>\n                      You must always have at least one email',
                 output.data)
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
             output = self.app.post('/settings/')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue("<h2>pingou's settings</h2>" in output.data)
-            self.assertTrue(
-                '<textarea id="ssh_key" name="ssh_key"></textarea>'
-                in output.data)
+            self.assertIn(
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
+            self.assertIn(
+                '<textarea class="form-control form-control-error" id="ssh_key" name="ssh_key">'
+                '</textarea>', output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -355,7 +370,9 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/email/drop', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue("<h2>pingou's settings</h2>" in output.data)
+            self.assertIn(
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
             self.assertEqual(output.data.count('foo@pingou.com'), 4)
 
             data = {
@@ -366,10 +383,12 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/email/drop', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue("<h2>pingou's settings</h2>" in output.data)
             self.assertIn(
-                '<li class="error">You do not have the email: foobar@pingou'
-                '.com, nothing to remove</li>', output.data)
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
+            self.assertIn(
+                '</button>\n                      You do not have the '
+                'email: foobar@pingou.com, nothing to remove', output.data)
 
             data = {
                 'csrf_token':  csrf_token,
@@ -410,32 +429,33 @@ class PagureFlaskApptests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.post('/settings/email/add')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>Add new email</h2>' in output.data)
-            self.assertTrue(
-                '<input id="email" name="email" type="text" value="">'
-                in output.data)
+
+            self.assertTrue("<strong>Add new email</strong>" in output.data)
+            self.assertIn(
+                '<input class="form-control form-control-error" id="email" '
+                'name="email" type="text" value="">', output.data)
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
             output = self.app.post('/settings/email/add')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue("<h2>Add new email</h2>" in output.data)
-            self.assertTrue(
-                '<input id="email" name="email" type="text" value="">'
-                in output.data)
+            self.assertTrue("<strong>Add new email</strong>" in output.data)
+            self.assertIn(
+                '<input class="form-control form-control-error" id="email" '
+                'name="email" type="text" value="">', output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
-                'email': 'foo@pingou.com',
+                'email': 'foo2@pingou.com',
             }
 
             output = self.app.post(
                 '/settings/email/add', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue("<h2>Add new email</h2>" in output.data)
-            self.assertEqual(output.data.count('foo@pingou.com'), 1)
+            self.assertTrue("<strong>Add new email</strong>" in output.data)
+            self.assertEqual(output.data.count('foo2@pingou.com'), 1)
 
             # New email
             data = {
@@ -446,9 +466,11 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/email/add', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>pingou\'s settings</h2>' in output.data)
             self.assertIn(
-                '<li class="message">Email pending validation</li>',
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
+            self.assertIn(
+                '</button>\n                      Email pending validation',
                 output.data)
             self.assertEqual(output.data.count('foo@pingou.com'), 4)
             self.assertEqual(output.data.count('bar@pingou.com'), 4)
@@ -463,13 +485,13 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/email/add', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>pingou\'s settings</h2>' in output.data)
+            self.assertTrue("<strong>Add new email</strong>" in output.data)
             self.assertIn(
-                '<li class="error">The email: foo@pingou.com is already '
-                'associated to you</li>', output.data)
+                'Invalid value, can&#39;t be any of: bar@pingou.com, '
+                'foo@pingou.com.&nbsp;', output.data)
             self.assertEqual(output.data.count('foo@pingou.com'), 5)
             self.assertEqual(output.data.count('bar@pingou.com'), 4)
-            self.assertEqual(output.data.count('foobar@pingou.com'), 1)
+            self.assertEqual(output.data.count('foobar@pingou.com'), 0)
 
             # Email registered by someone else
             data = {
@@ -480,10 +502,10 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/email/add', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue("<h2>Add new email</h2>" in output.data)
+            self.assertTrue("<strong>Add new email</strong>" in output.data)
             self.assertIn(
-                '<li class="error">Someone else has already registered this '
-                'email</li>', output.data)
+                'Invalid value, can&#39;t be any of: foo@bar.com.&nbsp;',
+                output.data)
 
             ast.return_value = True
             output = self.app.post('/settings/email/add', data=data)
@@ -507,10 +529,12 @@ class PagureFlaskApptests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue("<h2>pingou's settings</h2>" in output.data)
-            self.assertTrue(
-                '<textarea id="ssh_key" name="ssh_key"></textarea>'
-                in output.data)
+            self.assertIn(
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
+            self.assertIn(
+                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
+                '</textarea>', output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -522,7 +546,9 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/email/default', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue("<h2>pingou's settings</h2>" in output.data)
+            self.assertIn(
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
             self.assertEqual(output.data.count('foo@pingou.com'), 4)
 
             # Set invalid default email
@@ -534,11 +560,14 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/email/default', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue("<h2>pingou's settings</h2>" in output.data)
+            self.assertIn(
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
             self.assertEqual(output.data.count('foo@pingou.com'), 4)
             self.assertIn(
-                '<li class="error">You do not have the email: foobar@pingou'
-                '.com, nothing to set</li>', output.data)
+                '</button>\n                      You do not have the '
+                'email: foobar@pingou.com, nothing to set',
+                output.data)
 
             # Set default email
             data = {
@@ -549,11 +578,13 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post(
                 '/settings/email/default', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue("<h2>pingou's settings</h2>" in output.data)
+            self.assertIn(
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
             self.assertEqual(output.data.count('foo@pingou.com'), 4)
             self.assertIn(
-                '<li class="message">Default email set to: foo@pingou.com</li>',
-                output.data)
+                '</button>\n                      Default email set to: '
+                'foo@pingou.com', output.data)
 
             ast.return_value = True
             output = self.app.post('/settings/email/default', data=data)
@@ -588,9 +619,10 @@ class PagureFlaskApptests(tests.Modeltests):
                 '/settings/email/confirm/foobar', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                "<h2>pingou's settings</h2>", output.data)
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
             self.assertIn(
-                '<li class="error">No email associated with this token.</li>',
+                '</button>\n                      No email associated with this token.',
                 output.data)
 
             # Confirm email
@@ -598,9 +630,11 @@ class PagureFlaskApptests(tests.Modeltests):
                 '/settings/email/confirm/abcdef', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                "<h2>pingou's settings</h2>", output.data)
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
             self.assertIn(
-                '<li class="message">Email validated</li>', output.data)
+                '</button>\n                      Email validated',
+                output.data)
 
         userobj = pagure.lib.search_user(self.session, username='pingou')
         self.assertEqual(len(userobj.emails), 3)
