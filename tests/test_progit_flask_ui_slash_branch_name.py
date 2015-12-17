@@ -140,9 +140,11 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
         # With git repo
         output = self.app.get('/test')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<h3>Last 1 commits</h3>', output.data)
-        self.assertEqual(
-            output.data.count('<a href="/test/branch/maxamilion/feature'), 1)
+        self.assertIn(
+            '<div class="card-block">            <h4>Admins</h4>', output.data)
+        self.assertEqual(output.data.count(
+            '<a class="dropdown-item" href="/test/branch/maxamilion/feature'),
+            1)
 
     @patch('pagure.lib.notify.send_email')
     def test_view_repo_branch(self, send_email):
@@ -161,10 +163,11 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
         # With git repo
         output = self.app.get('/test/branch/maxamilion/feature')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<h3>Last 2 commits</h3>', output.data)
-        self.assertEqual
-        (
-            output.data.count('<a href="/test/branch/maxamilion/feature'), 1)
+        self.assertIn(
+            '<div class="card-block">            <h4>Admins</h4>', output.data)
+        self.assertEqual(output.data.count(
+            '<a class="dropdown-item" href="/test/branch/maxamilion/feature'),
+            1)
 
     @patch('pagure.lib.notify.send_email')
     def test_view_commits(self, send_email):
@@ -187,7 +190,7 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
 
         output = self.app.get('/test/commits/maxamilion/feature')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<h3>Commits list</h3>', output.data)
+        self.assertIn('<title>Logs - test - Pagure</title>', output.data)
         self.assertIn('Add sources file for testing', output.data)
         self.assertIn('Add .gitignore file for testing', output.data)
         self.assertEqual(output.data.count('<span class="commitdate"'), 2)
@@ -210,7 +213,10 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
         output = self.app.get('/test/blob/master/f/sources')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<a href="/test/tree/master">master</a>/sources</h2>',
+            '<li><a href="/test/tree/master"><span class="oi" '
+            'data-glyph="random"></span>&nbsp; master</a></li>'
+            '<li class="active"><span class="oi" data-glyph="file">'
+            '</span>&nbsp; sources</li>',
             output.data)
 
         output = self.app.get('/test/blob/master/f/.gitignore')
@@ -219,8 +225,12 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
         output = self.app.get('/test/blob/maxamilion/feature/f/.gitignore')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<a href="/test/tree/maxamilion/feature">maxamilion/feature</a>'
-            '/.gitignore</h2>', output.data)
+            '<li><a href="/test/tree/maxamilion/feature">'
+            '<span class="oi" data-glyph="random"></span>'
+            '&nbsp; maxamilion/feature</a></li>'
+            '<li class="active"><span class="oi" data-glyph="file">'
+            '</span>&nbsp; .gitignore</li>',
+            output.data)
         self.assertIn('<td class="cell2"><pre>*~</pre></td>', output.data)
 
     @patch('pagure.lib.notify.send_email')
@@ -277,34 +287,47 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
         output = self.app.get('/test/tree/master')
         self.assertEqual(output.status_code, 200)
         self.assertIn('<a href="/test/blob/master/f/sources">', output.data)
-        self.assertEqual(output.data.count('<li class="file">'), 1)
+        self.assertEqual(
+            output.data.count('<span class="oi text-muted" data-glyph="file">'), 1)
 
         output = self.app.get('/test/tree/master/sources')
         self.assertEqual(output.status_code, 200)
         self.assertIn('<a href="/test/blob/master/f/sources">', output.data)
-        self.assertEqual(output.data.count('<li class="file">'), 1)
+        self.assertEqual(
+            output.data.count('<span class="oi text-muted" data-glyph="file">'), 1)
 
         output = self.app.get('/test/tree/feature')
         self.assertEqual(output.status_code, 200)
         self.assertIn('<a href="/test/blob/master/f/sources">', output.data)
-        self.assertIn('<span class="filehex">9f4435</span>', output.data)
-        self.assertEqual(output.data.count('<li class="file">'), 1)
+        self.assertIn(
+            '<td class-"pagure-table-filehex">\n'
+            '                            9f4435', output.data)
+        self.assertEqual(
+            output.data.count('<span class="oi text-muted" data-glyph="file">'), 1)
 
         output = self.app.get('/test/tree/maxamilion/feature')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             '<a href="/test/blob/maxamilion/feature/f/sources">',
             output.data)
-        self.assertIn('<span class="filehex">9f4435</span>', output.data)
-        self.assertIn('<span class="filehex">e4e5f6</span>', output.data)
-        self.assertEqual(output.data.count('<li class="file">'), 2)
+        self.assertIn(
+            '<td class-"pagure-table-filehex">\n'
+            '                            9f4435', output.data)
+        self.assertIn(
+            '<td class-"pagure-table-filehex">\n'
+            '                            e4e5f6', output.data)
+        self.assertEqual(
+            output.data.count('<span class="oi text-muted" data-glyph="file">'), 2)
 
         # Wrong identifier, back onto master
         output = self.app.get('/test/tree/maxamilion/feature/f/.gitignore')
         self.assertEqual(output.status_code, 200)
         self.assertIn('<a href="/test/blob/master/f/sources">', output.data)
-        self.assertIn('<span class="filehex">9f4435</span>', output.data)
-        self.assertEqual(output.data.count('<li class="file">'), 1)
+        self.assertIn(
+            '<td class-"pagure-table-filehex">\n'
+            '                            9f4435', output.data)
+        self.assertEqual(
+            output.data.count('<span class="oi text-muted" data-glyph="file">'), 1)
 
     @patch('pagure.lib.notify.send_email')
     def test_new_request_pull(self, send_email):

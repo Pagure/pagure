@@ -321,8 +321,8 @@ class PagureFlaskForktests(tests.Modeltests):
                 '<h2><span class="label label-default">PR#1</span> '
                 'PR from the feature branch<a class="edit_icon"', output.data)
             self.assertIn(
-                '<li class="error">This request must be assigned to be merged</li>',
-                output.data)
+                '</button>\n                      This request must be '
+                'assigned to be merged', output.data)
 
             # PR assigned but not to this user
             repo = pagure.lib.get_project(self.session, 'test')
@@ -338,8 +338,8 @@ class PagureFlaskForktests(tests.Modeltests):
                 '<h2><span class="label label-default">PR#1</span> '
                 'PR from the feature branch<a class="edit_icon', output.data)
             self.assertIn(
-                '<li class="error">Only the assignee can merge this review</li>',
-                output.data)
+                '</button>\n                      Only the assignee can '
+                'merge this review', output.data)
 
             # Project w/ minimal PR score
             settings['Only_assignee_can_merge_pull-request'] = False
@@ -355,8 +355,9 @@ class PagureFlaskForktests(tests.Modeltests):
                 '<h2><span class="label label-default">PR#1</span> '
                 'PR from the feature branch<a class="edit_icon', output.data)
             self.assertIn(
-                '<li class="error">This request does not have the minimum '
-                'review score necessary to be merged</li>', output.data)
+                '</button>\n                      This request does not '
+                'have the minimum review score necessary to be merged',
+                output.data)
 
             # Merge
             settings['Minimum_score_to_merge_pull-request'] = -1
@@ -369,7 +370,8 @@ class PagureFlaskForktests(tests.Modeltests):
             self.assertIn(
                 '<title>Overview - test - Pagure</title>', output.data)
             self.assertIn(
-                '<li class="message">Changes merged!</li>', output.data)
+                '</button>\n                      Changes merged!',
+                output.data)
 
     @patch('pagure.lib.notify.send_email')
     def test_merge_request_pull_merge(self, send_email):
@@ -402,7 +404,8 @@ class PagureFlaskForktests(tests.Modeltests):
             self.assertIn(
                 '<title>Overview - test - Pagure</title>', output.data)
             self.assertIn(
-                '<li class="message">Changes merged!</li>', output.data)
+                '</button>\n                      Changes merged!',
+                output.data)
 
     @patch('pagure.lib.notify.send_email')
     def test_merge_request_pull_conflicts(self, send_email):
@@ -436,7 +439,8 @@ class PagureFlaskForktests(tests.Modeltests):
                 '<h2><span class="label label-default">PR#1</span> '
                 'PR from the feature branch<a class="edit_icon"', output.data)
             self.assertIn(
-                '<li class="error">Merge conflicts!</li>', output.data)
+                '</button>\n                      Merge conflicts!',
+                output.data)
 
     @patch('pagure.lib.notify.send_email')
     def test_merge_request_pull_nochange(self, send_email):
@@ -470,8 +474,8 @@ class PagureFlaskForktests(tests.Modeltests):
                 '<h2><span class="label label-default">PR#1</span> '
                 'PR from the master branch</h2>', output.data)
             self.assertIn(
-                '<li class="error">Nothing to do, changes were already '
-                'merged</li>', output.data)
+                '</button>\n                      Nothing to do, changes '
+                'were already merged', output.data)
 
     @patch('pagure.lib.notify.send_email')
     def test_request_pull_close(self, send_email):
@@ -648,8 +652,8 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertIn(
             '<title>Overview - test - Pagure</title>', output.data)
         self.assertIn(
-            '<li class="error">Fork is empty, there are no commits to '
-            'request pulling</li>', output.data)
+            '</button>\n                      Fork is empty, there are no '
+            'commits to request pulling', output.data)
 
         shutil.rmtree(newpath)
 
@@ -981,8 +985,8 @@ index 0000000..2a552bb
         self.assertIn(
             '<title>Overview - test - Pagure</title>', output.data)
         self.assertIn(
-            '<li class="error">Fork is empty, there are no commits to '
-            'request pulling</li>', output.data)
+            '</button>\n                      Fork is empty, there are no '
+            'commits to request pulling', output.data)
 
         shutil.rmtree(newpath)
 
@@ -1008,7 +1012,8 @@ index 0000000..2a552bb
             self.assertIn(
                 '<title>Overview - test - Pagure</title>', output.data)
             self.assertIn(
-                '<li class="error">Invalid input submitted</li>', output.data)
+                '</button>\n                      Invalid input submitted',
+                output.data)
 
             output = self.app.get('/test/pull-request/1')
             self.assertEqual(output.status_code, 200)
@@ -1063,7 +1068,7 @@ index 0000000..2a552bb
             self.assertIn(
                 '<title>Overview - test - Pagure</title>', output.data)
             self.assertIn(
-                '<li class="message">Request pull canceled!</li>',
+                '</button>\n                      Request pull canceled!',
                 output.data)
 
     @patch('pagure.lib.notify.send_email')
@@ -1097,7 +1102,8 @@ index 0000000..2a552bb
                 '<h2><span class="label label-default">PR#1</span> '
                 'PR from the feature branch</h2>', output.data)
             self.assertNotIn(
-                '<li class="message">Request assigned</li>', output.data)
+                '</button>\n                      Request assigned',
+                output.data)
 
             output = self.app.get('/test/pull-request/1')
             self.assertEqual(output.status_code, 200)
@@ -1121,7 +1127,8 @@ index 0000000..2a552bb
                 '<h2><span class="label label-default">PR#1</span> '
                 'PR from the feature branch</h2>', output.data)
             self.assertNotIn(
-                '<li class="message">Request assigned</li>', output.data)
+                '</button>\n                      Request assigned',
+                output.data)
 
             # Invalid assignee
             data = {
@@ -1140,7 +1147,7 @@ index 0000000..2a552bb
                 '<h2><span class="label label-default">PR#1</span> '
                 'PR from the feature branch</h2>', output.data)
             self.assertIn(
-                '<li class="error">No user &#34;bar&#34; found</li>',
+                '</button>\n                      No user &#34;bar&#34; found',
                 output.data)
 
             # Assign the PR
@@ -1160,7 +1167,8 @@ index 0000000..2a552bb
                 '<h2><span class="label label-default">PR#1</span> '
                 'PR from the feature branch</h2>', output.data)
             self.assertIn(
-                '<li class="message">Request assigned</li>', output.data)
+                '</button>\n                      Request assigned',
+                output.data)
 
             # Pull-Request closed
             repo = pagure.lib.get_project(self.session, 'test')
@@ -1223,8 +1231,8 @@ index 0000000..2a552bb
                 '/do_fork/test', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<li class="error">You may not fork your own repo</li>',
-                output.data)
+                '</button>\n                      You may not fork your '
+                'own repo', output.data)
 
         user.username = 'foo'
         with tests.user_set(pagure.APP, user):
@@ -1239,8 +1247,8 @@ index 0000000..2a552bb
                 '/do_fork/test', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<li class="message">Repo &#34;test&#34; cloned to '
-                '&#34;foo/test&#34;</li>', output.data)
+                '</button>\n                      Repo &#34;test&#34; '
+                'cloned to &#34;foo/test&#34;', output.data)
 
     @patch('pagure.lib.notify.send_email')
     def test_new_request_pull(self, send_email):
@@ -1313,7 +1321,8 @@ index 0000000..2a552bb
                 '<title>PR#2: foo bar PR - test\n - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<li class="message">Request created</li>', output.data)
+                '</button>\n                      Request created',
+                output.data)
 
     @patch('pagure.lib.notify.send_email')
     def test_new_request_pull_empty_repo(self, send_email):
@@ -1347,8 +1356,8 @@ index 0000000..2a552bb
             self.assertIn(
                 '<title>Overview - test - Pagure</title>', output.data)
             self.assertIn(
-                '<li class="error">Fork is empty, there are no commits to '
-                'request pulling</li>', output.data)
+                '</button>\n                      Fork is empty, there are '
+                'no commits to request pulling', output.data)
 
             output = self.app.get('/test/new_issue')
             csrf_token = output.data.split(
@@ -1365,8 +1374,8 @@ index 0000000..2a552bb
             self.assertIn(
                 '<title>Overview - test - Pagure</title>', output.data)
             self.assertIn(
-                '<li class="error">Fork is empty, there are no commits to '
-                'request pulling</li>', output.data)
+                '</button>\n                      Fork is empty, there are '
+                'no commits to request pulling', output.data)
 
         shutil.rmtree(newpath)
 
@@ -1400,8 +1409,8 @@ index 0000000..2a552bb
             self.assertIn(
                 '<title>Overview - test - Pagure</title>', output.data)
             self.assertIn(
-                '<li class="error">Fork is empty, there are no commits to '
-                'request pulling</li>', output.data)
+                '</button>\n                      Fork is empty, there are '
+                'no commits to request pulling', output.data)
 
         shutil.rmtree(newpath)
 
@@ -1441,7 +1450,8 @@ index 0000000..2a552bb
                 '<title>PR#1: PR from the feature branch - test\n - '
                 'Pagure</title>', output.data)
             self.assertIn(
-                '<li class="message">Comment added</li>', output.data)
+                '</button>\n                      Comment added',
+                output.data)
 
             # Project w/o pull-request
             repo = pagure.lib.get_project(self.session, 'test')
@@ -1520,7 +1530,8 @@ index 0000000..2a552bb
                 '<h2><span class="label label-default">PR#1</span> '
                 'PR from the feature branch<a class="edit_icon"', output.data)
             self.assertIn(
-                '<li class="message">Comment removed</li>', output.data)
+                '</button>\n                      Comment removed',
+                output.data)
 
             # Project w/o pull-request
             repo = pagure.lib.get_project(self.session, 'test')
@@ -1573,9 +1584,11 @@ index 0000000..2a552bb
 
             self.assertIn(
                 '<h2><span class="label label-default">PR#1</span> '
-                'PR from the feature branch<a class="edit_icon"', output.data)
+                'PR from the feature branch<a class="edit_icon"',
+                output.data)
             self.assertIn(
-                '<li class="message">Comment added</li>', output.data)
+                '</button>\n                      Comment added',
+                output.data)
             # Check if the comment is there
             self.assertIn(
                 '<p>This look alright but we can do better</p>', output.data)
@@ -1608,7 +1621,7 @@ index 0000000..2a552bb
                 '<small class="text-muted">Edited just now by pingou </small>',
                 output.data)
             self.assertIn(
-                '<li class="message">Comment updated</li>', output.data)
+                '</button>\n                      Comment updated', output.data)
 
             #  Project w/o pull-request
             repo = pagure.lib.get_project(self.session, 'test')
