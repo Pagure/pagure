@@ -98,7 +98,11 @@ class PagureFlaskPluginstests(tests.Modeltests):
             output = self.app.get('/test/settings/Mail')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<section class="settings">\n  <h3>Mail</h3>', output.data)
+                '<form action="/test/settings/Mail" method="post">',
+                output.data)
+            self.assertIn(
+                '<td><label for="mail_to">Mail to</label></td>',
+                output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -113,7 +117,7 @@ class PagureFlaskPluginstests(tests.Modeltests):
                 '/test/settings/Mail', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<section class="settings">\n  <h2>Settings</h2>',
+                '<section class="settings">\n  <h3>Settings for test</h3>',
                 output.data)
             self.assertIn(
                 '<li class="message">Hook Mail activated</li>', output.data)
@@ -127,7 +131,7 @@ class PagureFlaskPluginstests(tests.Modeltests):
                 '/test/settings/Mail', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<section class="settings">\n  <h2>Settings</h2>',
+                '<section class="settings">\n  <h3>Settings for test</h3>',
                 output.data)
             self.assertIn(
                 '<li class="message">Hook Mail inactived</li>', output.data)
