@@ -137,8 +137,12 @@ class PagureFlaskNoMasterBranchtests(tests.Modeltests):
         # With git repo
         output = self.app.get('/test')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<h3>Last 0 commits</h3>', output.data)
-        self.assertTrue(output.data.count('<a href="/test/branch/'), 1)
+        self.assertIn(
+            '<div class="container p-t-3">\n  <div class="row">',
+            output.data)
+        self.assertEqual(
+            output.data.count('<a class="dropdown-item" href="/test/branch/'),
+            0)
 
     @patch('pagure.lib.notify.send_email')
     def test_view_repo_branch(self, send_email):
@@ -157,8 +161,12 @@ class PagureFlaskNoMasterBranchtests(tests.Modeltests):
         # With git repo
         output = self.app.get('/test/branch/feature')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<h3>Last 2 commits</h3>', output.data)
-        self.assertTrue(output.data.count('<a href="/test/branch/'), 1)
+        self.assertIn(
+            '<div class="container p-t-3">\n  <div class="row">',
+            output.data)
+        self.assertEqual(
+            output.data.count('<a class="dropdown-item" href="/test/branch/'),
+            1)
 
     @patch('pagure.lib.notify.send_email')
     def test_view_commits(self, send_email):
@@ -178,17 +186,21 @@ class PagureFlaskNoMasterBranchtests(tests.Modeltests):
         output = self.app.get('/test/commits')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<h3>Commits list</h3>\n    <ul>\n    </ul>', output.data)
-        self.assertTrue(output.data.count('<a href="/test/branch/'), 1)
+            '<div class="list-group">\n        </div>', output.data)
+        self.assertNotIn(
+            '<div class="btn-group pull-xs-right">', output.data)
 
         output = self.app.get('/test/commits/feature')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<h3>Commits list</h3>', output.data)
+        self.assertIn(
+            '<div class="container p-t-3">\n  <div class="row">',
+            output.data)
         self.assertIn('Add sources file for testing', output.data)
         self.assertIn('Add .gitignore file for testing', output.data)
         self.assertNotIn(
-            '<h3>Commits list</h3>\n    <ul>\n    </ul>', output.data)
-        self.assertTrue(output.data.count('<a href="/test/branch/'), 1)
+            '<div class="list-group">\n        </div>', output.data)
+        self.assertEqual(
+            output.data.count('class="list-group-item p-l-3"'), 2)
 
     @patch('pagure.lib.notify.send_email')
     def test_view_file(self, send_email):
@@ -211,7 +223,12 @@ class PagureFlaskNoMasterBranchtests(tests.Modeltests):
         output = self.app.get('/test/blob/feature/f/sources')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<a href="/test/tree/feature">feature</a>/sources</h2>',
+            '<a href="/test/tree/feature">'
+            '<span class="oi" data-glyph="random"></span>&nbsp; feature</a>',
+            output.data)
+        self.assertIn(
+            '</li><li class="active"><span class="oi" data-glyph="file">'
+            '</span>&nbsp; sources</li>',
             output.data)
         self.assertIn(
             '<td class="cell2"><pre>foo</pre></td>', output.data)
@@ -274,7 +291,10 @@ class PagureFlaskNoMasterBranchtests(tests.Modeltests):
         output = self.app.get('/test/tree/feature')
         self.assertEqual(output.status_code, 200)
         self.assertIn('<a href="/test/blob/feature/f/sources">', output.data)
-        self.assertIn('<span class="filehex">9f4435</span>', output.data)
+        self.assertIn(
+            '<td class-"pagure-table-filehex">\n'
+            '                            9f4435\n            </td>',
+            output.data)
 
         output = self.app.get('/test/tree/feature/sources')
         self.assertEqual(output.status_code, 200)
