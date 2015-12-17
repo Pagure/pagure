@@ -120,7 +120,7 @@ class PagureFlaskPluginstests(tests.Modeltests):
                 '<section class="settings">\n  <h3>Settings for test</h3>',
                 output.data)
             self.assertIn(
-                '<li class="message">Hook Mail activated</li>', output.data)
+                '</button>\n                      Hook Mail activated', output.data)
 
             data = {
                 'mail_to': '',
@@ -134,7 +134,7 @@ class PagureFlaskPluginstests(tests.Modeltests):
                 '<section class="settings">\n  <h3>Settings for test</h3>',
                 output.data)
             self.assertIn(
-                '<li class="message">Hook Mail inactived</li>', output.data)
+                '</button>\n                      Hook Mail inactived', output.data)
 
     def test_RequiredIf(self):
         """ Test the behavior of the RequiredIf validator. """
