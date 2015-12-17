@@ -60,7 +60,7 @@ class PagureFlaskPluginPagureRequestHooktests(tests.Modeltests):
             output = self.app.get('/test/settings/pagure requests')
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
-            self.assertTrue('<h3>pagure requests</h3>' in output.data)
+            self.assertTrue('<h3>pagure requests settings</h3>' in output.data)
             self.assertTrue(
                 '<input id="active" name="active" type="checkbox" value="y">'
                 in output.data)
@@ -73,7 +73,7 @@ class PagureFlaskPluginPagureRequestHooktests(tests.Modeltests):
             output = self.app.post('/test/settings/pagure requests', data=data)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
-            self.assertTrue('<h3>pagure requests</h3>' in output.data)
+            self.assertTrue('<h3>pagure requests settings</h3>' in output.data)
             self.assertTrue(
                 '<input id="active" name="active" type="checkbox" value="y">'
                 in output.data)
@@ -92,15 +92,17 @@ class PagureFlaskPluginPagureRequestHooktests(tests.Modeltests):
                 '/test/settings/pagure requests', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertIn(
+                '<section class="settings">\n  <h3>Settings for test</h3>',
+                output.data)
             self.assertTrue(
-                '<li class="message">Hook pagure requests inactived</li>'
+                '</button>\n                      Hook pagure requests inactived'
                 in output.data)
 
             output = self.app.get('/test/settings/pagure requests')
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
-            self.assertTrue('<h3>pagure requests</h3>' in output.data)
+            self.assertTrue('<h3>pagure requests settings</h3>' in output.data)
             self.assertTrue(
                 '<input id="active" name="active" type="checkbox" value="y">'
                 in output.data)
@@ -119,15 +121,17 @@ class PagureFlaskPluginPagureRequestHooktests(tests.Modeltests):
                 '/test/settings/pagure requests', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertIn(
+                '<section class="settings">\n  <h3>Settings for test</h3>',
+                output.data)
             self.assertTrue(
-                '<li class="message">Hook pagure requests activated</li>'
+                '</button>\n                      Hook pagure requests activated'
                 in output.data)
 
             output = self.app.get('/test/settings/pagure requests')
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
-            self.assertTrue('<h3>pagure requests</h3>' in output.data)
+            self.assertTrue('<h3>pagure requests settings</h3>' in output.data)
             self.assertTrue(
                 '<input checked id="active" name="active" type="checkbox" '
                 'value="y">' in output.data)
@@ -142,15 +146,17 @@ class PagureFlaskPluginPagureRequestHooktests(tests.Modeltests):
                 '/test/settings/pagure requests', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>Settings</h2>' in output.data)
+            self.assertIn(
+                '<section class="settings">\n  <h3>Settings for test</h3>',
+                output.data)
             self.assertTrue(
-                '<li class="message">Hook pagure requests inactived</li>'
+                '</button>\n                      Hook pagure requests inactived'
                 in output.data)
 
             output = self.app.get('/test/settings/pagure requests')
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
-            self.assertTrue('<h3>pagure requests</h3>' in output.data)
+            self.assertTrue('<h3>pagure requests settings</h3>' in output.data)
             self.assertTrue(
                 '<input id="active" name="active" type="checkbox" '
                 'value="y">' in output.data)

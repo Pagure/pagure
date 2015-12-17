@@ -60,7 +60,7 @@ class PagureFlaskPluginFedmsgtests(tests.Modeltests):
             output = self.app.get('/test/settings/Fedmsg')
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
-            self.assertTrue('<h3>Fedmsg</h3>' in output.data)
+            self.assertTrue('<h3>Fedmsg settings</h3>' in output.data)
             self.assertTrue(
                 '<input id="active" name="active" type="checkbox" value="y">'
                 in output.data)
@@ -73,7 +73,7 @@ class PagureFlaskPluginFedmsgtests(tests.Modeltests):
             output = self.app.post('/test/settings/Fedmsg', data=data)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
-            self.assertTrue('<h3>Fedmsg</h3>' in output.data)
+            self.assertTrue('<h3>Fedmsg settings</h3>' in output.data)
             self.assertTrue(
                 '<input id="active" name="active" type="checkbox" value="y">'
                 in output.data)
@@ -92,13 +92,15 @@ class PagureFlaskPluginFedmsgtests(tests.Modeltests):
             output = self.app.post(
                 '/test/settings/Fedmsg', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>Settings</h2>' in output.data)
             self.assertIn(
-                '<li class="message">Hook Fedmsg inactived</li>',
+                '<section class="settings">\n  <h3>Settings for test</h3>',
+                output.data)
+            self.assertIn(
+                '</button>\n                      Hook Fedmsg inactived',
                 output.data)
             output = self.app.get('/test/settings/Fedmsg', data=data)
             self.assertTrue('<p>test project #1</p>' in output.data)
-            self.assertIn('<h3>Fedmsg</h3>', output.data)
+            self.assertIn('<h3>Fedmsg settings</h3>', output.data)
             self.assertIn(
                 '<input id="active" name="active" type="checkbox" value="y">',
                 output.data)
@@ -115,14 +117,16 @@ class PagureFlaskPluginFedmsgtests(tests.Modeltests):
             output = self.app.post(
                 '/test/settings/Fedmsg', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>Settings</h2>' in output.data)
             self.assertIn(
-                '<li class="message">Hook Fedmsg activated</li>',
+                '<section class="settings">\n  <h3>Settings for test</h3>',
+                output.data)
+            self.assertIn(
+                '</button>\n                      Hook Fedmsg activated',
                 output.data)
             output = self.app.get('/test/settings/Fedmsg', data=data)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
-            self.assertTrue('<h3>Fedmsg</h3>' in output.data)
+            self.assertTrue('<h3>Fedmsg settings</h3>' in output.data)
             self.assertTrue(
                 '<input checked id="active" name="active" type="checkbox" '
                 'value="y">' in output.data)
@@ -135,14 +139,16 @@ class PagureFlaskPluginFedmsgtests(tests.Modeltests):
             output = self.app.post(
                 '/test/settings/Fedmsg', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>Settings</h2>' in output.data)
             self.assertIn(
-                '<li class="message">Hook Fedmsg inactived</li>',
+                '<section class="settings">\n  <h3>Settings for test</h3>',
+                output.data)
+            self.assertIn(
+                '</button>\n                      Hook Fedmsg inactived',
                 output.data)
             output = self.app.get('/test/settings/Fedmsg', data=data)
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<p>test project #1</p>' in output.data)
-            self.assertTrue('<h3>Fedmsg</h3>' in output.data)
+            self.assertTrue('<h3>Fedmsg settings</h3>' in output.data)
             self.assertTrue(
                 '<input id="active" name="active" type="checkbox" '
                 'value="y">' in output.data)
