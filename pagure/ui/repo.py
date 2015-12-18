@@ -192,6 +192,9 @@ def view_repo_branch(repo, branchname, username=None):
 
     orig_repo = pygit2.Repository(parentname)
 
+    tree = None
+    safe=False
+    readme = None
     if not repo_obj.is_empty and not orig_repo.is_empty:
 
         if not orig_repo.head_is_unborn:
@@ -217,8 +220,6 @@ def view_repo_branch(repo, branchname, username=None):
                 break
             diff_commits.append(commit.oid.hex)
 
-        readme = None
-        safe=False
         tree=sorted(last_commits[0].tree, key=lambda x: x.filemode)
         for i in tree:
             name, ext = os.path.splitext(i.name)
