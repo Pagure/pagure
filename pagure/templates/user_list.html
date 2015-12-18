@@ -44,7 +44,16 @@
 
 
 <section class="user_list p-t-2">
-     <h2 class="m-b-1">Users <span class="label label-default">{{ users_length }}</span></h2>
+    <h2 class="m-b-1">
+        Users <span class="label label-default">{{ users_length }}</span>
+        {%- if authenticated and config.get('PAGURE_AUTH') == 'local' %}
+        <a href="{{ url_for('new_user') }}">
+        <button type="button" class="btn btn-success pull-xs-right">
+            New User
+        </button>
+        </a>
+        {% endif -%}
+    </h2>
     {% for user in users %}
         <div class="col-lg-4 col-md-6">
           <div class="project_wrapper m-b-1">
