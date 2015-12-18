@@ -9,7 +9,7 @@
         type="text/css" rel="stylesheet" />
     <link href="{{ url_for('static', filename='koji.css') }}"
         type="text/css" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='open_iconic_1.1.0/css/open-iconic.min.css') }}"\
+    <link href="{{ url_for('static', filename='open_iconic_1.1.0/css/open-iconic.min.css') }}"
         type="text/css" rel="stylesheet" />
     <link href="{{ url_for('static', filename='fonts/fonts.css') }}"
         rel="stylesheet" type="text/css" />
@@ -46,7 +46,8 @@
           <li class="nav-item p-l-1">
             <a class="nav-link" href="{{ url_for('new_project') }}">
                 <span class="oi" data-glyph="plus" title="Create New"
-                aria-hidden="true"></span>
+                    aria-hidden="true">
+                </span>
             </a>
           </li>
           {% endif %}
@@ -73,6 +74,7 @@
             <li class="nav-item p-l-1">
               <a class="nav-link" href="{{ url_for('auth_login') }}?next={{request.url}}">
                 <span class="oi" data-glyph="account-login" title="Log In" aria-hidden="true">
+                </span>
               </a>
             </li>
             {% endif %}
