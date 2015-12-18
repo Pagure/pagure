@@ -65,15 +65,16 @@
         username=None, hide=True) %}
 
     <section class="project_list container p-t-2" id="{{ id }}">
-        <h2 class=" m-b-1">{{ title }}
-            <span class="label label-default">{{ count }}</span>
-            {% if username %}
+        <h2 class=" m-b-1">{{
+            title
+            }} <span class="label label-default">{{ count }}</span>
+            {%- if username -%}
             <a href="{{ url_for('new_project') }}">
             <button type="button" class="btn btn-success pull-xs-right">
               New Project
             </button>
             </a>
-            {% endif %}
+            {%- endif -%}
         </h2>
         {% if total and total > 1 %}
         {{ pagination_link(pagetitle, page, total) }}
