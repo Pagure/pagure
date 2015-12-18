@@ -1904,7 +1904,7 @@ index 0000000..fb7093d
             self.assertIn('<h3>Settings for test</h3>', output.data)
             self.assertIn(
                 '<select class="c-select" id="branches" name="branches">'
-                '<option value="feature">feature</option>'
+                '<option selected value="feature">feature</option>'
                 '<option value="master">master</option>'
                 '</select>', output.data)
             self.assertIn(
@@ -1926,7 +1926,7 @@ index 0000000..fb7093d
             self.assertIn(
                 '<select class="c-select" id="branches" name="branches">'
                 '<option value="feature">feature</option>'
-                '<option value="master">master</option>'
+                '<option selected value="master">master</option>'
                 '</select>', output.data)
             self.assertIn(
                 '</button>\n                      Default branch updated '
