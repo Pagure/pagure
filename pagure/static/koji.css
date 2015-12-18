@@ -252,3 +252,7 @@ position:relative;
 .nav-tabs .nav-link {
     padding: 0.5em 0.8em;
 }
+
+.red-icon {
+    color: #d9534f;
+}

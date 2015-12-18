@@ -18,10 +18,17 @@
   <div class="col-md-8">
 
     <h2>
-      <span class="issueid label label-default">#{{ issueid }}</span> <span id="issuetitle">{{
-          issue.title | noJS("img") | safe }}</span>
+      <span class="issueid label label-default">#{{ issueid }}</span>
+      <span id="issuetitle">{{issue.title | noJS("img") | safe }}</span>
+      {% if issue.private %}
+        <span class="oi red-icon" data-glyph="lock-locked" title="Private issue"></span>
+      {% endif %}
     </h2>
-<h5 class="text-muted"> <a href="#" data-toggle="tooltip" title="pants">Created</a> {{ issue.date_created | humanize}} by {{ issue.user.user }}</h5>
+
+  <h5 class="text-muted">
+    <a href="#" data-toggle="tooltip" title="pants">Created</a>
+    {{ issue.date_created | humanize}} by {{ issue.user.user }}
+  </h5>
 
 
     {{ show_initial_comment(issue, 0, repo, username, issueid, form, issue) }}
@@ -50,8 +57,14 @@
 
           <fieldset class="form-group">
             <label for="comment"><strong>Add new comment</strong></label>
-            <small class="text-muted pull-xs-right"><span class="btn btn-sm btn-secondary inactive" aria-pressed="false" id="previewinmarkdown">Preview</span></small>
-            <textarea class="form-control" rows=8 id="comment" name="comment" placeholder="Enter your comment here"></textarea>
+            <small class="text-muted pull-xs-right">
+              <span class="btn btn-sm btn-secondary inactive"
+                aria-pressed="false" id="previewinmarkdown">Preview
+              </span>
+            </small>
+            <textarea class="form-control" rows=8 id="comment"
+                name="comment" placeholder="Enter your comment here">
+            </textarea>
 
             <div id="preview">
             </div>

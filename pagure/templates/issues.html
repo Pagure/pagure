@@ -84,12 +84,17 @@
     <tbody>
     {% for issue in issues %}
         <tr>
-            <td sorttable_customkey={{issue.id}}>#{{ issue.id }}</td>
+            <td sorttable_customkey={{issue.id}}>
+              #{{ issue.id }}
+            </td>
             <td>
-                <a href="{{ url_for('view_issue', username=username,
-                    repo=repo.name, issueid=issue.id) }}">
-                    {{ issue.title | noJS("img") | safe }}
-                </a>
+              <a href="{{ url_for('view_issue', username=username,
+                         repo=repo.name, issueid=issue.id) }}">
+                {{ issue.title | noJS("img") | safe }}
+              </a>
+              {% if issue.private %}
+              <span class="oi red-icon" data-glyph="lock-locked" title="Private issue"></span>
+              {% endif %}
             </td>
             <td>
                 <a href="{{ url_for('view_issues', username=username,
