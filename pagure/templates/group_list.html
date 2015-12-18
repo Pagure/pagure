@@ -21,7 +21,8 @@
     Groups <span class="label label-default">{{ groups | length }}</span>
     {% if authenticated %}
 
-      <button type="button" id="new_user_btn" class="btn btn-success pull-xs-right" data-toggle="modal" data-target="#add_group">
+      <button type="button" id="new_user_btn" data-target="#add_group"
+        class="btn btn-success pull-xs-right" data-toggle="modal">
         New Group
       </button>
 

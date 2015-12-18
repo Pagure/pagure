@@ -18,7 +18,10 @@
       <div class="container">
         <div class="row">
           <div class="col-sm-3">
-            <a href="/"><img height=40px src="{{ url_for('static', filename='pagure-logo.png') }}" alt="pagure Logo" id="kojiLogo"/></a>
+            <a href="/">
+              <img height=40px src="{{ url_for('static', filename='pagure-logo.png') }}"
+                alt="pagure Logo" id="kojiLogo"/>
+            </a>
           </div>
           <div class="col-sm-9">
             <div class="row">
@@ -26,35 +29,52 @@
   <nav class="navbar navbar-light p-t-0 p-b-0">
       <div class="container">
         <ul class="nav navbar-nav nav-underline pull-xs-right">
-          <li class="nav-item"><a class="nav-link" href="/browse/projects/">Browse</a></li>
+          <li class="nav-item">
+            <a class="nav-link" href="/browse/projects/">Browse</a>
+          </li>
           {% if admin %}
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('admin_index') }}">Admin</a></li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('admin_index') }}">Admin</a>
+          </li>
           {% endif %}
           {% if config.get('ENABLE_NEW_PROJECTS', True) %}
-          <li class="nav-item p-l-1"><a class="nav-link" href="{{ url_for('new_project') }}"><span class="oi" data-glyph="plus" title="Create New" aria-hidden="true"></span>
-</a></li>
+          <li class="nav-item p-l-1">
+            <a class="nav-link" href="{{ url_for('new_project') }}">
+                <span class="oi" data-glyph="plus" title="Create New"
+                aria-hidden="true"></span>
+            </a>
+          </li>
           {% endif %}
           {% if not nologin %}
             {% if g.fas_user %}
             <li class="nav-item dropdown p-l-1">
-                  <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">{{ g.fas_user.username | avatar(24) | safe }}</a>
+                  <a class="nav-link dropdown-toggle" data-toggle="dropdown"
+                     href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                    {{ g.fas_user.username | avatar(24) | safe }}
+                  </a>
                   <div class="dropdown-menu dropdown-menu-right">
-                    <a class="dropdown-item" href="{{ url_for('view_user', username=g.fas_user.username) }}">My Public Profile</a>
-                <a class="dropdown-item" href="{{ url_for('user_settings') }}">My Settings</a>
+                    <a class="dropdown-item" href="{{ url_for('view_user', username=g.fas_user.username)
+                      }}">My Public Profile</a>
+                <a class="dropdown-item" href="{{ url_for('user_settings')
+                  }}">My Settings</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="{{ url_for('auth_logout') }}?next={{request.url}}">Log Out</a>
+                <a class="dropdown-item" href="{{ url_for('auth_logout')
+                  }}?next={{request.url}}">Log Out</a>
               </div>
             </li>
                  <!--<a href="{{ url_for('user_settings') }}">{{ g.fas_user.username }}</a>
                      <a href="{{ url_for('auth_logout') }}?next={{request.url}}">log out</a> -->
             {% else %}
-               <li class="nav-item p-l-1"><a class="nav-link" href="{{ url_for('auth_login') }}?next={{request.url}}"><span class="oi" data-glyph="account-login" title="Log In" aria-hidden="true"></a></li>
+            <li class="nav-item p-l-1">
+              <a class="nav-link" href="{{ url_for('auth_login') }}?next={{request.url}}">
+                <span class="oi" data-glyph="account-login" title="Log In" aria-hidden="true">
+              </a>
+            </li>
             {% endif %}
-              {% endif %}
+          {% endif %}
         </ul>
       </div>
     </nav>
-
 
             </div>
           </div>
@@ -69,7 +89,10 @@
                 <div class="notification-spacer">
                 <div class="container p-t-2">
                     {% for category, message in messages %}
-                    <div class="alert {% if category == 'error' %}alert-warning{% else %}alert-info{%endif%} alert-dismissible" role="alert">
+                    <div class="alert {%
+                      if category == 'error' %}alert-warning{%
+                      else %}alert-info{%
+                      endif %} alert-dismissible" role="alert">
                       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                         <span class="sr-only">Close</span>
