@@ -840,6 +840,9 @@ def view_settings(repo, username=None):
     else:
         branchname = None
 
+    if flask.request.method == 'GET' and branchname:
+        branches_form.branches.data = branchname
+
     return flask.render_template(
         'settings.html',
         select='settings',
