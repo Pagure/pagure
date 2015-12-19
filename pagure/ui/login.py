@@ -262,6 +262,44 @@ def reset_password(token):
 # Methods specific to local login.
 #
 
+@APP.route('/password/change/<username>/', methods=['GET', 'POST'])
+@APP.route('/password/change/<username>', methods=['GET', 'POST'])
+def change_password(username):
+    """ Method to change the password for local auth users.
+    """
+    form = forms.ChangePasswordForm()
+    user_obj = pagure.lib.search_user(SESSION, username=username)
+    if not user_obj:
+        flask.flash('No user associated with this username.', 'error')
+        return flask.redirect(flask.url_for('auth_login'))
+    if form.validate_on_submit():
+        old_password = '%s%s' % (
+            form.old_password.data, APP.config.get('PASSWORD_SEED', None))
+        if user_obj.password == hashlib.sha512(old_password).hexdigest():
+            password = '%s%s' % (
+                form.password.data, APP.config.get('PASSWORD_SEED', None))
+            user_obj.password = hashlib.sha512(password).hexdigest()
+            SESSION.add(user_obj)
+
+        try:
+            SESSION.commit()
+            flask.flash(
+                'Password changed')
+        except SQLAlchemyError as err:
+            SESSION.rollback()
+            flask.flash('Could not set the new password.', 'error')
+            APP.logger.debug(
+                'Password lost change - Error setting password.')
+            APP.logger.exception(err)
+
+        return flask.redirect(flask.url_for('auth_login'))
+
+    return flask.render_template(
+        'login/password_change.html',
+        form=form,
+        username=username,
+    )
+
 
 def send_confirmation_email(user):
     """ Sends the confirmation email asking the user to confirm its email

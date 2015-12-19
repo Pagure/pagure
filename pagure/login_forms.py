@@ -86,3 +86,18 @@ class NewUserForm(wtf.Form):
         'Confirm password  <span class="error">*</span>',
         [wtforms.validators.Required(), same_password]
     )
+
+class ChangePasswordForm(wtf.Form):
+    """ Form to reset one's password in the local database. """
+    old_password = wtforms.PasswordField(
+        'Old Password  <span class="error">*</span>',
+        [wtforms.validators.Required()]
+    )
+    password = wtforms.PasswordField(
+        'Password  <span class="error">*</span>',
+        [wtforms.validators.Required()]
+    )
+    confirm_password = wtforms.PasswordField(
+        'Confirm password  <span class="error">*</span>',
+        [wtforms.validators.Required(), same_password]
+    )
