@@ -32,23 +32,20 @@
 
     {{ render_repos_as_card(repos, repos_length, 'Projects') }}
     {{ render_repos_as_card(forks, forks_length,'Forks',) }}
-    <section class="project_list" id="group_list">
-        <header>
-            <h2>Groups ({{ user.groups | length }})</h2>
-        </header>
+    <div class="card" id="group_list">
+        <div class="card-header">
+            Groups <span class="label label-default">{{ user.groups | length }}</span>
+        </div>
         {% for group in user.groups %}
-          <div class="col-lg-4 col-md-6">
-            <div class="project_wrapper m-b-1">
-                <div class="projecticon pull-xs-left"><span class="oi" data-glyph="people"></span></div>
-                <a class="project_link logo_link" href="{{ url_for('view_group', group=group.group_name)}}">
-                    <div class="repo_name"><strong>{{ group }}</strong></div>
+          <div class="list-group">
+                <a class="list-group-item" href="{{ url_for('view_group', group=group.group_name)}}">
+                    <div class=""><strong><span class="oi" data-glyph="people"></span> &nbsp;{{ group }}</strong></div>
                </a>
-            </div>
           </div>
         {% else %}
         <p>No group found</p>
         {% endfor %}
-    </section>
+    </div>
 
     {% if config.get('DATAGREPPER_URL') %}
     <section class="project_list" id="user_graph">
