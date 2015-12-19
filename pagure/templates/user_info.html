@@ -29,24 +29,28 @@
     <p title="{{ user.created.strftime('%Y-%m-%d') }}">
       Joined {{ user.created | humanize }}
     </p>
-
-    {{ render_repos_as_card(repos, repos_length, 'Projects') }}
-    {{ render_repos_as_card(forks, forks_length,'Forks',) }}
-    <div class="card" id="group_list">
-        <div class="card-header">
-            Groups <span class="label label-default">{{ user.groups | length }}</span>
+    <div class="row">
+      <div class="col-md-8">
+        {{ render_repos_as_card(repos, repos_length, 'Projects') }}
+        {{ render_repos_as_card(forks, forks_length,'Forks',) }}
+      </div>
+      <div class="col-md-4">
+        <div class="card" id="group_list">
+            <div class="card-header">
+                Groups <span class="label label-default">{{ user.groups | length }}</span>
+            </div>
+            {% for group in user.groups %}
+              <div class="list-group">
+                    <a class="list-group-item" href="{{ url_for('view_group', group=group.group_name)}}">
+                        <div class=""><strong><span class="oi" data-glyph="people"></span> &nbsp;{{ group }}</strong></div>
+                   </a>
+              </div>
+            {% else %}
+            <p>No group found</p>
+            {% endfor %}
         </div>
-        {% for group in user.groups %}
-          <div class="list-group">
-                <a class="list-group-item" href="{{ url_for('view_group', group=group.group_name)}}">
-                    <div class=""><strong><span class="oi" data-glyph="people"></span> &nbsp;{{ group }}</strong></div>
-               </a>
-          </div>
-        {% else %}
-        <p>No group found</p>
-        {% endfor %}
+      </div>
     </div>
-
     {% if config.get('DATAGREPPER_URL') %}
     <section class="project_list" id="user_graph">
         <header>
