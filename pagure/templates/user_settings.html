@@ -38,6 +38,7 @@
 
 
 {% block content %}
+<<<<<<< HEAD
 <div class="container p-t-3">
   <div class="col-md-8 col-md-offset-2">
     <div class="card m-b-3">
@@ -64,6 +65,26 @@
             </a>
       </div>
       <div class="list-group list-group-flush">
+=======
+<section class="user_settings">
+    <header>
+        <h2>{{ user.user }}'s settings</h2>
+    </header>
+    <table>
+      <tr>
+        <th>Full name</th>
+        <td> {{ user.fullname }} </td>
+      </tr>
+      <tr>
+        <td>
+            {% if config.get('PAGURE_AUTH')=='local' %}
+                <a href="{{ url_for('change_password', username=g.fas_user.username) }}">Change password</a>
+            {% endif %}
+        </td>
+     </tr>
+      <tr>
+        <th>Emails</th>
+>>>>>>> Add a change password link for local auth
         {% for email in user.emails %}
           {{ render_email(email, form) }}
         {% endfor %}
