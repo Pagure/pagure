@@ -1,5 +1,5 @@
 {% extends "master.html" %}
-{% from "_render_repo.html" import render_repos %}
+{% from "_render_repo.html" import render_repos_as_card %}
 
 {% block title %}Group {{ group.name }}{% endblock %}
 {% set tag = "groups" %}
@@ -40,43 +40,12 @@
           by {{ group.creator.fullname }} ({{ group.creator.user }})
         </div>
         <div class="projectinfo m-t-1">
-
         </div>
     </header>
     <div class="row">
       <div class="col-md-8">
-        <div class="card">
-          <div class="card-header">
-            Projects in {{group.group_name}} <span class="label label-default">{{ group.projects | length }}</span>
-          </div>
-          <div class="list-group">
-            {% for repo in group.projects %}
-              <div class="list-group-item">
-                {% if repo.is_fork %}
-                  {% set url = url_for('view_repo', username=repo.user.username, repo=repo.name) %}
-                {% else %}
-                  {% set url = url_for('view_repo', repo=repo.name) %}
-                {% endif %}
-
-                {% if repo.avatar_email %}
-                  <img class="projecticon pull-xs-left" src="{{ repo.avatar_email | avatar_url }}" width=60 height=60 />
-                {% else %}
-                    <div class="projecticon pull-xs-left"><span class="oi" data-glyph="document"></span></div>
-                {% endif %}
-                <a class="project_link logo_link" href="{{ url }}">
-                    <div class="repo_name">
-                      <strong>{{ repo.name }}</strong>
-                    </div>
-                </a>
-                <div class="repo_desc" title="{{ repo.description }}" data-toggle="tooltip">
-                  <small>{% if repo.description %}{{ repo.description }}{%else%}<span class="text-muted">no description<span>{% endif %}</small>
-                </div>
-              </div>
-            {% else %}
-                <p>No projects found</p>
-            {% endfor %}
-          </div>
-        </div>
+            {{ render_repos_as_card(
+                group.projects, group.projects|count, 'Projects') }}
       </div>
       <div class="col-md-4">
         <div class="card">
