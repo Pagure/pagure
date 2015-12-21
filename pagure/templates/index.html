@@ -3,61 +3,25 @@
 {% block title %}Home{% endblock %}
 {% set tag = "home" %}i
 
+{% from "_render_repo.html" import render_repos, render_user_repos%}
+{% from "_browseheader.html" import browse_header %}
+
 
 {% block header %}
 <link href="{{ url_for('static', filename='selectize.bootstrap3.css') }}"
   rel="stylesheet" />
-
-
 {% endblock %}
-
-{% from "_render_repo.html" import render_repos, render_user_repos%}
-{% from "_browseheader.html" import browse_header %}
-
-{% if (not username) or (request.path == '/browse/projects') or (request.path == '/browse/projects/') %}
-  {% set indexcontext = 'browse' %}
-{% else %}
-  {% set indexcontext = 'userpage' %}
-{% endif %}
 
 {% block content %}
 <div class="repo-header p-t-1">
   <div class="container">
-    {% if indexcontext == 'userpage' %}
-        <h2>
-            {{ username | avatar(36) | safe }} {{ username }}
-            {% if g.fas_user and g.fas_user.username == username %}
-                <a class="user_settings" href="{{ url_for('user_settings') }}"
-                   title="Update your settings">
-                  Settings
-                </a>
-            {% endif %}
-        </h2>
-    {% else %}
-        {{browse_header(select=select)}}
-    {% endif %}
-
-</div>
+    {{browse_header(select=select)}}
+  </div>
 </div>
   <div class="container">
-    {% if indexcontext == 'userpage' %}
-      <div class="row">
-        <div class="col-md-4">
-            {{ render_user_repos(
-                user_repos, total_page_repos, 'repopage', repopage,
-                'My Projects', user_repos_length, 'myrepos', username) }}
-        </div>
-        <div class="col-md-4">
-            {{ render_user_repos(
-                user_forks, total_page_forks, 'forkpage', forkpage,
-                'My Forks', user_forks_length, 'myforks', username) }}
-        </div>
-      </div>
-    {% else %}
     {{ render_repos(
         repos, total_page, 'page', page,
         'All Projects', repos_length, 'repos', username) }}
-    {% endif %}
   </div>
 
 {% endblock %}
