@@ -70,7 +70,8 @@ def index_auth():
     """
     user = pagure.lib.search_user(SESSION, username=flask.g.fas_user.username)
     if not user:
-        flask.abort(404, 'No user `%s` found, re-login maybe?' % username)
+        flask.abort(404, 'No user `%s` found, re-login maybe?' % (
+            flask.g.fas_user.username))
 
     repopage = flask.request.args.get('repopage', 1)
     try:
