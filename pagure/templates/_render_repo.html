@@ -33,29 +33,23 @@
 
 {% macro pagination_link(pagetitle, page, total) -%}
 <aside>
-    <table>
-        <tr>
-            <td>
-            {% if page > 1%}
-                <a href="{{ url_for('browse_projects') }}?{{ pagetitle }}={{page - 1}}">
-                    &lt; Previous
-                </a>
-            {% else %}
-                &lt; Previous
-            {% endif %}
-            </td>
-            <td>{{ page }} / {{ total }}</td>
-            <td>
-                {% if page < total %}
-                <a href="{{ url_for('browse_projects') }}?{{ pagetitle }}={{page + 1}}">
-                    Next &gt;
-                </a>
-                {% else %}
-                Next >
-                {% endif %}
-            </td>
-        </tr>
-    </table>
+    <nav class="text-center">
+      <ul class="pagination">
+        <li {% if page <= 1%} class="disabled" {% endif %}>
+          <a href="{{ url_for('browse_projects') }}?{{ pagetitle }}={{page - 1}}">
+            <span aria-hidden="true">&laquo;</span>
+            <span class="sr-only">Newer</span>
+          </a>
+        </li>
+        <li class="active">page {{ page }} of {{ total }}</li>
+        <li {% if page >= total %}class="disabled"{%endif%}>
+          <a href="{{ url_for('browse_projects') }}?{{ pagetitle }}={{page + 1}}">
+            <span aria-hidden="true">&raquo;</span>
+            <span class="sr-only">Older</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
 </aside>
 {%- endmacro %}
 
@@ -82,10 +76,10 @@
         <div class="row">
             {{ render_row(list) }}
         </div>
-    </section>
         {% if total and total > 1 %}
         {{ pagination_link(pagetitle, page, total) }}
         {% endif %}
+    </section>
 {% endmacro %}
 
 {% macro render_user_repos(
