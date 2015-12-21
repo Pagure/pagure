@@ -54,77 +54,79 @@ def index():
 
     total_page = int(ceil(num_repos / float(limit)))
 
-    repopage = None
-    forkpage = None
-    user_repos = None
-    user_forks = None
-    total_page_repos = None
-    total_page_forks = None
-    username = None
-    user_repos_length = None
-    user_forks_length = None
-
     if authenticated():
-        username = flask.g.fas_user.username
-
-        repopage = flask.request.args.get('repopage', 1)
-        try:
-            repopage = int(repopage)
-        except ValueError:
-            repopage = 1
-
-        forkpage = flask.request.args.get('forkpage', 1)
-        try:
-            forkpage = int(forkpage)
-        except ValueError:
-            forkpage = 1
-
-        repo_start = limit * (repopage - 1)
-        fork_start = limit * (forkpage - 1)
-
-        user_repos = pagure.lib.search_projects(
-            SESSION,
-            username=username,
-            fork=False,
-            start=repo_start,
-            limit=limit)
-        user_repos_length = pagure.lib.search_projects(
-            SESSION,
-            username=username,
-            fork=False,
-            count=True)
-
-        user_forks = pagure.lib.search_projects(
-            SESSION,
-            username=username,
-            fork=True,
-            start=fork_start,
-            limit=limit)
-        user_forks_length = pagure.lib.search_projects(
-            SESSION,
-            username=username,
-            fork=True,
-            count=True)
-
-        total_page_repos = int(ceil(user_repos_length / float(limit)))
-        total_page_forks = int(ceil(user_forks_length / float(limit)))
+        return index_auth()
 
     return flask.render_template(
         'index.html',
-        repos=repos,
-        total_page=total_page,
-        page=page,
-        username=username,
         select="projects",
+        repos=repos,
+        repos_length=num_repos,
+    )
+
+
+def index_auth():
+    """ Front page for authenticated user.
+    """
+    user = pagure.lib.search_user(SESSION, username=flask.g.fas_user.username)
+    if not user:
+        flask.abort(404, 'No user `%s` found, re-login maybe?' % username)
+
+    repopage = flask.request.args.get('repopage', 1)
+    try:
+        repopage = int(repopage)
+    except ValueError:
+        repopage = 1
+
+    forkpage = flask.request.args.get('forkpage', 1)
+    try:
+        forkpage = int(forkpage)
+    except ValueError:
+        forkpage = 1
+
+    limit = APP.config['ITEM_PER_PAGE']
+    repo_start = limit * (repopage - 1)
+    fork_start = limit * (forkpage - 1)
+
+    repos = pagure.lib.search_projects(
+        SESSION,
+        username=flask.g.fas_user.username,
+        fork=False,
+        start=repo_start,
+        limit=limit)
+    repos_length = pagure.lib.search_projects(
+        SESSION,
+        username=flask.g.fas_user.username,
+        fork=False,
+        count=True)
+
+    forks = pagure.lib.search_projects(
+        SESSION,
+        username=flask.g.fas_user.username,
+        fork=True,
+        start=fork_start,
+        limit=limit)
+    forks_length = pagure.lib.search_projects(
+        SESSION,
+        username=flask.g.fas_user.username,
+        fork=True,
+        count=True)
+
+    total_page_repos = int(ceil(repos_length / float(limit)))
+    total_page_forks = int(ceil(forks_length / float(limit)))
+
+    return flask.render_template(
+        'index_auth.html',
+        username=flask.g.fas_user.username,
+        user=user,
+        forks=forks,
+        repos=repos,
         repopage=repopage,
         forkpage=forkpage,
-        user_repos=user_repos,
-        user_forks=user_forks,
         total_page_repos=total_page_repos,
         total_page_forks=total_page_forks,
-        user_repos_length=user_repos_length,
-        user_forks_length=user_forks_length,
-        repos_length=num_repos,
+        repos_length=repos_length,
+        forks_length=forks_length,
     )
 
 

@@ -1,0 +1,82 @@
+{% extends "master.html" %}
+
+{% block title %}Home{% endblock %}
+{% set tag = "projects" %}
+{% from "_browseheader.html" import browse_header %}
+
+
+{% block header %}
+  <link rel="stylesheet" type="text/css" media="screen"
+      href="{{ url_for('static', filename='toggle.css') }}"/>
+{% endblock %}
+
+
+{% from "_render_repo.html" import render_repos_as_card %}
+
+{% block content %}
+<div class="repo-header p-t-1">
+  <div class="container">
+    {{browse_header(select=tag)}}
+  </div>
+</div>
+<div class="p-t-2">
+  <div class="container">
+    <h2>
+      {{ username | avatar(36) | safe }} {{ username }}
+      {% if g.fas_user and g.fas_user.username == username %}
+        <a class="user_settings" href="{{ url_for('user_settings') }}"
+           title="Update your settings">
+          Settings
+        </a>
+      {% endif %}
+    </h2>
+
+    <div class="row">
+      <div class="col-md-8">
+        {{ render_repos_as_card(repos, repos_length, 'Projects') }}
+        {{ render_repos_as_card(forks, forks_length,'Forks',) }}
+      </div>
+      <div class="col-md-4">
+        <div class="card" id="group_list">
+            <div class="card-header">
+                Groups <span class="label label-default">{{ user.groups | length }}</span>
+            </div>
+            {% for group in user.groups %}
+              <div class="list-group">
+                <a class="list-group-item" href="{{ url_for(
+                    'view_group', group=group)}}">
+                  <div class=""><strong><span class="oi" data-glyph="people">
+                    </span> &nbsp;{{ group }}</strong>
+                  </div>
+                </a>
+              </div>
+            {% else %}
+            <p>No group found</p>
+            {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% if config.get('DATAGREPPER_URL') %}
+    <section class="project_list" id="user_graph">
+        <header>
+            <h2>Contributions</h2>
+        </header>
+        <a href="{{config.get('DATAGREPPER_URL')}}/raw?category={{config.get('DATAGREPPER_CATEGORY', 'pagure')}}&user={{username}}" target="_blank">
+          <img src="{{config.get('DATAGREPPER_URL')}}/charts/line?category={{config.get('DATAGREPPER_CATEGORY', 'pagure')}}&user={{username}}&split_on=users&delta=31536000&N=12&title=&width=600&height=200&style=light&fill=True" alt="User activity graph"/>
+        </a>
+    </section>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block jscripts %}
+    {{ super() }}
+    <script type="text/javascript">
+      $(function(){
+        $('.show_parts input[type="checkbox"]').change(function(){
+          $('#' + $(this).attr('name')).toggle();
+        });
+      });
+    </script>
+{% endblock %}
