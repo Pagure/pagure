@@ -82,14 +82,14 @@
             <li {% if page <= 1%} class="disabled" {% endif %}>
               <a href="{{ url_for('.%s' % origin, username=username,
                           repo=repo.name, branchname=branchname, page=page-1) }}" aria-label="Previous">
-                <span aria-hidden="true">Newer</span>
+                <span aria-hidden="true">&laquo;</span>
                 <span class="sr-only">Newer</span>
               </a>
             </li>
-            <li class="active"><a href="#">page {{ page }} of {{total_page}}</a></li>
+            <li class="active">page {{ page }} of {{total_page}}</li>
             <li {% if page >= total_page %}class="disabled"{%endif%}>
               <a href="{{ url_for('.%s' % origin, username=username,repo=repo.name, branchname=branchname, page=page+1) }}" aria-label="Next">
-                <span aria-hidden="true">Older</span>
+                <span aria-hidden="true">&raquo;</span>
                 <span class="sr-only">Older</span>
               </a>
             </li>
