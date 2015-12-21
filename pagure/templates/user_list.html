@@ -51,7 +51,8 @@
     {% for user in users %}
         <div class="col-lg-4 col-md-6">
           <div class="project_wrapper m-b-1">
-              <img class="projecticon pull-xs-left" src="{{ user.user | avatar_url }}" width=60 height=60 />
+              <img class="projecticon pull-xs-left" src="{{
+                user.default_email | avatar_url(60) |safe }}" width=60 height=60 />
               <a class="project_link logo_link" href="{{ url_for('view_user', username=user.user)}}">
                   <div class="repo_name"><strong>{{ user.fullname }}</strong></div>
              </a>
