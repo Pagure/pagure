@@ -58,6 +58,14 @@ class PagureFlaskAdmintests(tests.Modeltests):
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
+            output = self.app.post('/admin', follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+            self.assertIn(
+                '</button>\n                      Access restricted',
+                 output.data)
+
+        user.username = 'foo'
+        with tests.user_set(pagure.APP, user):
             output = self.app.get('/admin', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -87,6 +95,14 @@ class PagureFlaskAdmintests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/admin/gitolite', follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+            self.assertIn(
+                '</button>\n                      Access restricted',
+                 output.data)
+
+        user.username = 'foo'
         with tests.user_set(pagure.APP, user):
             output = self.app.post('/admin/gitolite', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
@@ -137,6 +153,14 @@ class PagureFlaskAdmintests(tests.Modeltests):
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
             output = self.app.post('/admin/ssh', follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+            self.assertIn(
+                '</button>\n                      Access restricted',
+                 output.data)
+
+        user.username = 'foo'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/admin/ssh', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '</button>\n                      Access restricted',
@@ -181,6 +205,14 @@ class PagureFlaskAdmintests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/admin/hook_token', follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+            self.assertIn(
+                '</button>\n                      Access restricted',
+                 output.data)
+
+        user.username = 'foo'
         with tests.user_set(pagure.APP, user):
             output = self.app.post('/admin/hook_token', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
