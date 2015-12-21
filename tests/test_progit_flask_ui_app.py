@@ -77,19 +77,21 @@ class PagureFlaskApptests(tests.Modeltests):
         self.session.add(item)
         self.session.commit()
 
-        user = tests.FakeUser()
+        user = tests.FakeUser(username='foo')
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/?repopage=abc&forkpage=def')
             self.assertIn(
-                'My Projects <span class="label label-default">0</span>',
+                'Projects <span class="label label-default">1</span>',
                 output.data)
             self.assertIn(
-                'My Forks <span class="label label-default">0</span>',
+                'Forks <span class="label label-default">0</span>',
                 output.data)
             self.assertEqual(
-                output.data.count('<p>No projects found</p>'), 2)
+                output.data.count('<p>No projects found</p>'), 1)
             self.assertEqual(
-                output.data.count('<div class="card-header">'), 2)
+                output.data.count('<p>No group found</p>'), 1)
+            self.assertEqual(
+                output.data.count('<div class="card-header">'), 3)
 
     def test_view_users(self):
         """ Test the view_users endpoint. """
@@ -112,17 +114,11 @@ class PagureFlaskApptests(tests.Modeltests):
         output = self.app.get('/user/pingou?repopage=abc&forkpage=def')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<section class="project_list container p-t-2" id="repos">',
+            'Projects <span class="label label-default">0</span>',
             output.data)
         self.assertIn(
-            '<h2 class=" m-b-1">Projects '
-            '<span class="label label-default">0</span></h2>', output.data)
-        self.assertIn(
-            '<section class="project_list container p-t-2" id="forks">',
+            'Forks <span class="label label-default">0</span>',
             output.data)
-        self.assertIn(
-            '<h2 class=" m-b-1">Forks <span class="label '
-            'label-default">0</span></h2', output.data)
 
         tests.create_projects(self.session)
         self.gitrepos = tests.create_projects_git(
@@ -131,17 +127,10 @@ class PagureFlaskApptests(tests.Modeltests):
         output = self.app.get('/user/pingou?repopage=abc&forkpage=def')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<section class="project_list container p-t-2" id="repos">',
+            'Projects <span class="label label-default">2</span>',
             output.data)
         self.assertIn(
-            '<h2 class=" m-b-1">Projects '
-            '<span class="label label-default">2</span></h2>', output.data)
-        self.assertIn(
-            '<section class="project_list container p-t-2" id="forks">',
-            output.data)
-        self.assertIn(
-            '<h2 class=" m-b-1">Forks <span class="label '
-            'label-default">0</span></h2', output.data)
+            'Forks <span class="label label-default">0</span>', output.data)
 
     def test_new_project(self):
         """ Test the new_project endpoint. """

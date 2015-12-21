@@ -65,6 +65,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
+
             output = self.app.get('/foo/adduser')
             self.assertEqual(output.status_code, 404)
 
@@ -80,14 +81,16 @@ class PagureFlaskRepotests(tests.Modeltests):
             # Redirect also happens for POST request
             output = self.app.post('/test/adduser')
             self.assertEqual(output.status_code, 302)
-            # Check the message flashed during the redirect
-            output = self.app.get('/')
-            self.assertEqual(output.status_code, 200)
-            self.assertIn(
-                '</button>\n                      Action canceled, try it '
-                'again',output.data)
 
-            ast.return_value = False
+        # Need to do this un-authentified since our fake user isn't in the DB
+        # Check the message flashed during the redirect
+        output = self.app.get('/')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(
+            '</button>\n                      Action canceled, try it '
+            'again',output.data)
+
+        ast.return_value = False
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
@@ -150,14 +153,16 @@ class PagureFlaskRepotests(tests.Modeltests):
             # Redirect also happens for POST request
             output = self.app.post('/test/addgroup')
             self.assertEqual(output.status_code, 302)
-            # Check the message flashed during the redirect
-            output = self.app.get('/')
-            self.assertEqual(output.status_code, 200)
-            self.assertIn(
-                '</button>\n                      Action canceled, try it '
-                'again', output.data)
 
-            ast.return_value = False
+        # Need to do this un-authentified since our fake user isn't in the DB
+        # Check the message flashed during the redirect
+        output = self.app.get('/')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(
+            '</button>\n                      Action canceled, try it '
+            'again', output.data)
+
+        ast.return_value = False
 
         msg = pagure.lib.add_group(
             self.session,
@@ -1322,11 +1327,10 @@ index 0000000..fb7093d
                 '</button>\n                      Could not delete all the '
                 'repos from the system', output.data)
             self.assertIn(
-                '<h2 class=" m-b-1">Projects <span class="label '
-                'label-default">1</span></h2>', output.data)
+                '<div class="card-header">\n            Projects <span '
+                'class="label label-default">1</span>', output.data)
             self.assertIn(
-                '<div style="text-align:right;" class="p-r-1 text-muted">'
-                '<span class="oi" data-glyph="fork"></span>0</div>',
+                'Forks <span class="label label-default">0</span>',
                 output.data)
 
             # Only git repo
@@ -1345,11 +1349,10 @@ index 0000000..fb7093d
                 '</button>\n                      Could not delete all the '
                 'repos from the system' in output.data)
             self.assertIn(
-                '<h2 class=" m-b-1">Projects <span class="label '
-                'label-default">1</span></h2>', output.data)
+                '<div class="card-header">\n            Projects <span '
+                'class="label label-default">1</span>', output.data)
             self.assertIn(
-                '<div style="text-align:right;" class="p-r-1 text-muted">'
-                '<span class="oi" data-glyph="fork"></span>0</div>',
+                'Forks <span class="label label-default">0</span>',
                 output.data)
 
             # Only git and doc repo
@@ -1384,6 +1387,16 @@ index 0000000..fb7093d
                 os.path.join(tests.HERE, 'tickets'), bare=True)
             tests.create_projects_git(
                 os.path.join(tests.HERE, 'requests'), bare=True)
+
+            # Check repo was created
+            output = self.app.get('/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n            Projects <span '
+                'class="label label-default">2</span>', output.data)
+            self.assertIn(
+                'Forks <span class="label label-default">0</span>',
+                output.data)
 
             # add issues
             repo = pagure.lib.get_project(self.session, 'test')
@@ -1466,14 +1479,23 @@ index 0000000..fb7093d
             )
             self.assertEqual(msg, 'Comment added')
 
+            # Check before deleting the project
+            output = self.app.get('/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n            Projects <span '
+                'class="label label-default">2</span>', output.data)
+            self.assertIn(
+                'Forks <span class="label label-default">0</span>',
+                output.data)
+
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<h2 class=" m-b-1">Projects <span class="label '
-                'label-default">1</span></h2>', output.data)
+                '<div class="card-header">\n            Projects <span '
+                'class="label label-default">1</span>', output.data)
             self.assertIn(
-                '<div style="text-align:right;" class="p-r-1 text-muted">'
-                '<span class="oi" data-glyph="fork"></span>0</div>',
+                'Forks <span class="label label-default">0</span>',
                 output.data)
 
             repo = pagure.lib.get_project(self.session, 'test')
@@ -1498,15 +1520,24 @@ index 0000000..fb7093d
             tests.add_content_git_repo(
                 os.path.join(tests.HERE, 'tickets', 'pingou', 'test3.git'))
 
+            # Check before deleting the fork
+            output = self.app.get('/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n            Projects <span '
+                'class="label label-default">1</span>', output.data)
+            self.assertIn(
+                'Forks <span class="label label-default">1</span>',
+                output.data)
+
             output = self.app.post(
                 '/fork/pingou/test3/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<h2 class=" m-b-1">Projects <span class="label '
-                'label-default">1</span></h2>', output.data)
+                '<div class="card-header">\n            Projects <span '
+                'class="label label-default">1</span>', output.data)
             self.assertIn(
-                '<div style="text-align:right;" class="p-r-1 text-muted">'
-                '<span class="oi" data-glyph="fork"></span>0</div>',
+                'Forks <span class="label label-default">0</span>',
                 output.data)
 
     @patch('pagure.ui.repo.admin_session_timedout')
