@@ -83,3 +83,37 @@ No content found in this repository
 {% endif %}
 
 {% endblock %}
+
+{% block jscripts %}
+{{ super() }}
+<script type="text/javascript">
+function updateHighlight() {
+  var cls = "highlighted-line";
+  $('.' + cls).removeClass(cls)
+  if (location.hash !== '') {
+    var lines = location.hash.substr(2).split('-').map(function (x) { return parseInt(x, 10) });
+    for (var i = lines[lines.length - 1]; i >= lines[0]; i--) {
+      $('[data-line-number=' + i + ']').closest('tr').addClass(cls);
+    }
+  }
+}
+$(document).ready(updateHighlight);
+$(window).on('hashchange', updateHighlight);
+var selected = [];
+$("[data-line-number]").click(function (ev) {
+  var line = $(this).attr('data-line-number');
+  if (ev.shiftKey) {
+    selected = selected.slice(-1).concat(line);
+  } else {
+    selected = [line];
+  }
+
+  var hash = '_' + selected[0];
+  if (selected.length === 2) {
+    hash = '_' + Math.min(selected[0], selected[1]) + '-' + Math.max(selected[0], selected[1]);
+  }
+  window.location.hash = hash;
+  return false;
+});
+</script>
+{% endblock %}
