@@ -117,37 +117,40 @@
 <script type="text/javascript">
 $(document).ready(function() {
 
-$('#add_group').on('shown.bs.modal', function () {
-  $('#group_name').focus()
-})
-            $('#term').selectize({
-                valueField: 'group',
-                labelField: 'group',
-                searchField: 'group',
-                onType: function(value){
-                  if (value == ""){
-                  this.close();
-                  }
-                },
-                onChange: function(value){
-                  if (value != ""){
-                    $('#headerSearch').submit();
-                  }
-                },
-                maxItems: 1,
-                create: false,
-                load: function(query, callback) {
-                    if (!query.length) return callback();
-                    $.getJSON(
-                      "{{ url_for('api_ns.api_groups') }}", {
-                        pattern: query
-                      },
-                      function( data ) {
-                        callback( data.groups.map(function(x) { return { group: x }; }) );
-                      }
-                    );
-                }
-            });
+  $('#add_group').on(
+    'shown.bs.modal', function () {
+      $('#group_name').focus()
+    }
+  );
+
+  $('#term').selectize({
+    valueField: 'group',
+    labelField: 'group',
+    searchField: 'group',
+    onType: function(value){
+      if (value == ""){
+      this.close();
+      }
+    },
+    onChange: function(value){
+      if (value != ""){
+        $('#headerSearch').submit();
+      }
+    },
+    maxItems: 1,
+    create: false,
+    load: function(query, callback) {
+      if (!query.length) return callback();
+      $.getJSON(
+        "{{ url_for('api_ns.api_groups') }}", {
+          pattern: query
+        },
+        function( data ) {
+          callback( data.groups.map(function(x) { return { group: x }; }) );
+        }
+      );
+    }
+  });
 });
 </script>
 {% endblock %}

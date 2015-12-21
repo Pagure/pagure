@@ -106,64 +106,64 @@
   $(document).ready(function() {
 
     $('#term').selectize({
-        valueField: 'group',
-        labelField: 'group',
-        searchField: 'group',
-        onType: function(value){
-          if (value == ""){
-          this.close();
-          }
-        },
-        onChange: function(value){
-          if (value != ""){
-            $('#headerSearch').submit();
-          }
-        },
-        maxItems: 1,
-        create: false,
-        load: function(query, callback) {
-            if (!query.length) return callback();
-            $.getJSON(
-              "{{ url_for('api_ns.api_groups') }}", {
-                pattern: query
-              },
-              function( data ) {
-                callback( data.groups.map(function(x) { return { group: x }; }) );
-              }
-            );
+      valueField: 'group',
+      labelField: 'group',
+      searchField: 'group',
+      onType: function(value){
+        if (value == ""){
+        this.close();
         }
+      },
+      onChange: function(value){
+        if (value != ""){
+          $('#headerSearch').submit();
+        }
+      },
+      maxItems: 1,
+      create: false,
+      load: function(query, callback) {
+        if (!query.length) return callback();
+        $.getJSON(
+          "{{ url_for('api_ns.api_groups') }}", {
+            pattern: query
+          },
+          function( data ) {
+            callback( data.groups.map(function(x) { return { group: x }; }) );
+          }
+        );
+      }
     });
 
-     var usersearch = $('#user').selectize({
-                valueField: 'user',
-                labelField: 'user',
-                searchField: 'user',
-                onChange: function(value){
-                  if (value != ""){
-                    $('#add_user_form').submit();
-                  }
-                },
-                maxItems: 1,
-                create: false,
-                preload: 'focus',
-                load: function(query, callback) {
-                    $.getJSON(
-                      "{{ url_for('api_ns.api_users') }}",
-                      function( data ) {
-                        callback( data.users.map(function(x) { return { user: x }; }) );
-                      }
-                    );
-                },
-                render: {
-                    option: function(item, escape) {
-                        return '<div>' +
-                            '<div>' +
-                                '<span><strong>' + escape(item.user) + '</strong></span>' +
-                            '</div>' +
-                        '</div>';
-                    }
-                },
-            });
+    var usersearch = $('#user').selectize({
+      valueField: 'user',
+      labelField: 'user',
+      searchField: 'user',
+      onChange: function(value){
+        if (value != ""){
+          $('#add_user_form').submit();
+        }
+      },
+      maxItems: 1,
+      create: false,
+      preload: 'focus',
+      load: function(query, callback) {
+        $.getJSON(
+          "{{ url_for('api_ns.api_users') }}",
+          function( data ) {
+            callback( data.users.map(function(x) { return { user: x }; }) );
+          }
+        );
+      },
+      render: {
+        option: function(item, escape) {
+        return '<div>' +
+            '<div>' +
+              '<span><strong>' + escape(item.user) + '</strong></span>' +
+            '</div>' +
+          '</div>';
+        }
+      },
+    });
 
     $('#add_user_button').click(function(){
       $('#add_user_button').hide();

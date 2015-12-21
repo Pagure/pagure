@@ -3,25 +3,36 @@
   <div class="col-md-8 col-md-offset-2">
     <form action="{{url_for('search')}}" id="headerSearch" class="m-y-2">
 
-          <select name="type" class="c-select" style="display:none;">
-            <option value="projects"{% if select=='projects' %} selected {% endif %}>Projects</option>
-              <option value="projects_forks"{% if select=='projects_forks' %} selected {% endif %}>Projects &amp; Forks</option>
-              <option value="user"{% if select=='users' %} selected {% endif %}>Users</option>
-            </select>
-        <input type="text" name="term" id="term" placeholder="{% if select=='projects' %}Search projects{% elif select=='users' %} Search Users {% elif select=='groups'%} Search Groups{% endif %}" class="form-control" title="Search" />
-          <input type="submit" style="display:none;" value="Search" class="btn btn-primary"/>
+      <select name="type" class="c-select" style="display:none;">
+        <option value="projects"{% if select=='projects' %} selected {% endif %}>Projects</option>
+        <option value="projects_forks"{% if select=='projects_forks' %} selected {% endif %}>Projects &amp; Forks</option>
+        <option value="user"{% if select=='users' %} selected {% endif %}>Users</option>
+      </select>
+
+      <input type="text" name="term" id="term" placeholder="{%
+        if select=='projects' %}Search projects{%
+        elif select=='users' %} Search Users {%
+        elif select=='groups'%} Search Groups{%
+        endif %}" class="form-control" title="Search" />
+      <input type="submit" style="display:none;" value="Search" class="btn btn-primary" />
     </form>
   </div>
 </div>
 <ul class="nav nav-tabs nav-small">
   <li class="nav-item">
-    <a {% if select == 'projects' %}class="nav-link active" {% else %}class="nav-link"{% endif %} href="{{ url_for('browse_projects') }}">Projects</a>
+    <a {% if select == 'projects' %}class="nav-link active" {%
+        else %}class="nav-link"{%
+        endif %} href="{{ url_for('browse_projects') }}">Projects</a>
   </li>
   <li class="nav-item">
-    <a {% if select == 'users' %}class="nav-link active" {% else %}class="nav-link"{% endif %} href="{{ url_for('view_users') }}">Users</a>
+    <a {% if select == 'users' %}class="nav-link active" {%
+        else %}class="nav-link"{%
+        endif %} href="{{ url_for('view_users') }}">Users</a>
   </li>
   <li class="nav-item">
-    <a {% if select == 'groups' %}class="nav-link active" {% else %}class="nav-link"{% endif %} href="{{ url_for('group_lists') }}">Groups</a>
+    <a {% if select == 'groups' %}class="nav-link active" {%
+        else %}class="nav-link"{%
+        endif %} href="{{ url_for('group_lists') }}">Groups</a>
   </li>
 </ul>
 {%- endmacro %}
