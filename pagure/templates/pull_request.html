@@ -29,46 +29,48 @@
 <h2><span class="label label-default">PR#{{requestid}}</span> {{ pull_request.title | noJS(ignore="img") | safe
   }}{% if authenticated and (g.fas_user.username == pull_request.user.username
     or repo_admin) and pull_request.status == 'Open'
-  %}<a class="edit_icon"
-    href="{{ url_for('request_pull_edit', username=username,
-            repo=repo.name, requestid=requestid) }}" title="Update title">edit</a>{%
+  %}<small>
+    (<a class="edit_icon"
+       href="{{ url_for('request_pull_edit', username=username,
+            repo=repo.name, requestid=requestid) }}"
+      title="Update title">edit</a>)</small> {%
   endif %}</h2>
 
 <div class="header">
-    <ul class="buttons">
-  {% if pull_request.status == 'Open' and repo_admin %}
-      <li>
-        <form action="{{ url_for('merge_request_pull', username=username,
-            repo=repo.name, requestid=requestid) }}" method="POST">
-          {{ mergeform.csrf_token }}
-          <input class="button" type="submit" value="Merge"/>
-        </form>
-      </li>
-  {% endif %}
-  {% if pull_request.status == 'Open' and authenticated and
+  <div class="btn-group" role="group" >
+    {% if pull_request.status == 'Open' and repo_admin %}
+     <span class="btn btn-default">
+      <form action="{{ url_for('merge_request_pull', username=username,
+          repo=repo.name, requestid=requestid) }}" method="POST">
+        {{ mergeform.csrf_token }}
+        <button type="submit" class="btn btn-success">Merge</button>
+      </form>
+     </span>
+    {% endif %}
+    {% if pull_request.status == 'Open' and authenticated and
         (repo_admin or g.fas_user.username == pull_request.user.username) %}
-      <li>
-        <form action="{{ url_for('cancel_request_pull', username=username,
-            repo=repo.name, requestid=requestid) }}" method="POST">
-          {{ mergeform.csrf_token }}
-          <input type="submit" value="Close" id="cancel_pr" class="button"/>
-        </form>
-      </li>
-  {% endif %}
-  {% if pull_request.status != 'Open' %}
-    <li>
-      <span>{{ pull_request.status }} by
+     <span class="btn btn-default">
+      <form action="{{ url_for('cancel_request_pull', username=username,
+          repo=repo.name, requestid=requestid) }}" method="POST">
+        {{ mergeform.csrf_token }}
+        <button type="submit" value="Close" id="cancel_pr" class="btn btn-danger">Close</button>
+      </form>
+     </span>
+    {% endif %}
+    {% if pull_request.status != 'Open' %}
+     <span>{{ pull_request.status }} by
         <a href="{{ url_for('view_user', username=pull_request.closed_by.user)}} ">
           {{ pull_request.closed_by.user if pull_request.closed_by else ''}}
         </a>
-      </span>
-    </li>
-  {% endif %}
-      <li>
-        <a class="button patch" href="{{ url_for('request_pull_patch', username=username,
-            repo=repo.name, requestid=requestid) }}">Patch</a>
-      </li>
-    </ul>
+     </span>
+    {% endif %}
+     <span class="btn btn-default">
+      <a class="button patch" href="{{ url_for('request_pull_patch', username=username,
+            repo=repo.name, requestid=requestid) }}">
+        <button type="submit" class="btn btn-info">Patch</button>
+      </a>
+     </span>
+  </div>
 </div>
 {% elif form and (repo_admin or remote_git) %}
 <h2>Create pull request</h2>
