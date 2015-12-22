@@ -490,11 +490,8 @@ function setup_edit_btns() {
         type: 'GET',
         dataType: 'html',
         success: function(res) {
-          console.log(commentid);
           var el = $('#comment-' + commentid);
-          console.log(el);
           var sec = el.parent().find('.issue_comment');
-          console.log(sec);
           $(sec).hide();
           el.parent().find('.issue_actions').hide();
           $(sec).after(res);
@@ -506,6 +503,22 @@ function setup_edit_btns() {
     });
     return false;
   });
+};
+
+function setup_reply_btns() {
+  $(".reply").unbind();
+  $( ".reply" ).click(
+    function() {
+      var _section = $(this).closest('.card-block');
+      var _comment = _section.find('.comment_body');
+      var _text = _comment.text().split("\n");
+      var _output = new Array();
+      for (var cnt=0; cnt < _text.length; cnt++) {
+          _output[cnt] = '> ' + _text[cnt];
+      }
+      $( "#comment" ).val(_output.join("\n"));
+    }
+  );
 };
 
  $(document).ready(function() {
@@ -612,19 +625,6 @@ function setup_edit_btns() {
     }
   );
 
-  $( ".reply" ).click(
-    function() {
-        var _section = $(this).parent().parent().parent();
-        var _comment = _section.find('.comment_body');
-        var _text = _comment.text().split("\n");
-        var _output = new Array();
-        for (cnt = 0; cnt < _text.length - 1; cnt ++) {
-            _output[cnt] = '> ' + jQuery.trim(_text[cnt + 1]);
-        }
-        $( "#comment" ).val(_output.join("\n"));
-    }
-  );
-
   $( "#clear_comment").click(
     function() {
       $( "#comment" ).val("");
@@ -667,6 +667,7 @@ function setup_edit_btns() {
   );
 
   setup_edit_btns();
+  setup_reply_btns();
 
   var cur_hash = null;
 
@@ -818,6 +819,7 @@ source.addEventListener('message', function(e) {
   var data = $.parseJSON(e.data);
   process_event(data, "{{ request.uid }}");
   setup_edit_btns();
+  setup_reply_btns();
   }, false);
 </script>
 {% endif %}
