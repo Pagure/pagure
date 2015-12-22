@@ -124,24 +124,39 @@ remove_deps = function(data, issue_uid, _issue_url) {
 add_comment = function(data) {
   console.log('Adding comment ' + data.comment_added);
   var field = $('#comments');
-  var _data = '<section class="issue_comment"> \
-    <header id="comment-' + data.comment_id + '"> \
-      <img class="avatar circle" src="' + data.avatar_url + '"/> \
-      <a href="/user/' + data.comment_user + '"> \
-        ' + data.comment_user + '\
-      </a> - <span title="' + data.comment_date + '">seconds ago</span> \
-      <a class="headerlink" title="Permalink to this headline" \
-        href="#comment-' + data.comment_id + '">¶</a> \
-      <aside class="issue_action icon"> \
-        <a class="reply" title="Reply to this comment - loose formating"> \
-          reply \
-        </a> \
-      </aside> \
-    </header> \
-    <div class="comment_body"> \
-      <p>' + data.comment_added + '</p> \
+  var _data = '<div class="card clearfix"> \
+    <div id="comment-539" class="card-header"> \
+    <img class="avatar circle" src="' + data.avatar_url + '"/> \
+    <a href="/user/' + data.comment_user + '"> ' + data.comment_user + '\
+      </a> \
+      <a class="headerlink pull-xs-right" title="Permalink to this headline" \
+        href="#comment-' + data.comment_id + '"> \
+        <span title="">seconds ago</span> \
+       </a>\
+    </div>\
+    <div class="card-block">\
+      <section class="issue_comment"> \
+        <div class="comment_body"> \
+          <span class="edit_date" title=""> \
+          </span>\
+      ' + data.comment_added + '\
+        </div> \
+      </section> \
+      <div class="issue_actions m-t-2"> \
+        <aside class="issue_action icon pull-xs-right p-b-1"> \
+          <a class="reply btn btn-secondary btn-sm" data-toggle="tooltip" title="Reply to this comment - loose formating"> \
+            reply \
+          </a> \
+          <button class="btn btn-danger btn-sm" \
+            title="Remove comment" \
+            name="drop_comment" value="' + data.comment_id + '" type="submit"  \
+            onclick="return confirm(\'Do you really want to remove this comment?\');" \
+            ><span class="oi" data-glyph="trash"></span> \
+          </button> \
+        </aside> \
+      </div> \
     </div> \
-  </section>';
+    </div>';
   field.html(field.html() + _data);
 }
 
