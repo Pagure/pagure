@@ -234,8 +234,14 @@
     <li><a href="#commit_list">Commits ({{ diff_commits|length }})</a></li>
   </ul>
 
-<div class="commit_list" id="commit_list">
-  <table>
+
+<div class="card" id="commit_list" style="display:none">
+<table class="table table-hover table-striped m-b-0">
+  <thead>
+  </thead>
+  <tfoot>
+  </tfoot>
+  <tbody>
       {% for commit in diff_commits %}
       <tr>
         <td class="commitid">{{ commit.oid.hex|short }}</td>
@@ -266,7 +272,8 @@
       {% else %}
       <tr><td class="error"> No commits found </td></tr>
       {% endfor %}
-  </table>
+  </tbody>
+</table>
 </div>
 
 <div class="request_diff" id="request_diff">
@@ -361,7 +368,6 @@
 </form>
 {% endif %}
 
-</div>
 </div>
 
 
