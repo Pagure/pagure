@@ -467,6 +467,46 @@
 <script src="{{ url_for('static', filename='selectize.min.js') }}" type="text/javascript"> </script>
 
 <script type="text/javascript">
+function cancel_edit_btn() {
+  $(".cancel").unbind();
+  $( ".cancel" ).click(
+    function() {
+      item = $(this).closest('section');
+      $(item.parent().find('.issue_comment')).show();
+      $(item.parent().find('.issue_actions')).show();
+      $(item.parent().find('.edit_comment')).remove();
+      return false;
+    }
+  );
+};
+
+function setup_edit_btns() {
+  $(".edit_btn").unbind();
+  $(".edit_btn").click(function() {
+    var commentid = $( this ).attr('data-comment');
+    var _url = '{{ request.base_url }}' + '/comment/' + commentid + '/edit';
+    $.ajax({
+        url: _url + '?js=1',
+        type: 'GET',
+        dataType: 'html',
+        success: function(res) {
+          console.log(commentid);
+          var el = $('#comment-' + commentid);
+          console.log(el);
+          var sec = el.parent().find('.issue_comment');
+          console.log(sec);
+          $(sec).hide();
+          el.parent().find('.issue_actions').hide();
+          $(sec).after(res);
+          cancel_edit_btn();
+        },
+        error: function() {
+          alert('Could not make edit work');
+        }
+    });
+    return false;
+  });
+};
 
  $(document).ready(function() {
 
@@ -495,7 +535,6 @@
         }
     }
   });
-
 
   $( ".tabs" ).tabs({
     activate: function( event, ui ) {
@@ -627,43 +666,7 @@
     }
   );
 
-  function setup_edit_btns() {
-    $(".edit_btn").click(function() {
-      var commentid = $( this ).attr('data-comment');
-      var _url = '{{ request.base_url }}' + '/comment/' + commentid + '/edit';
-      $.ajax({
-          url: _url + '?js=1',
-          type: 'GET',
-          dataType: 'html',
-          success: function(res) {
-              var el = $('#comment-' + commentid);
-              console.log(el);
-              var sec = el.parent().find('.issue_comment');
-              console.log(sec);
-              $(sec).hide();
-              el.parent().find('.issue_actions').hide();
-              $(sec).after(res);
-              cancel_edit_btn();
-          },
-          error: function() {
-              alert('Could not make edit work');
-          }
-      });
-      return false;
-    });
-  };
   setup_edit_btns();
-
-  function cancel_edit_btn() {
-    $( ".cancel" ).click(
-      function() {
-        item = $(this).closest('section');
-        $(item.parent().children()[1]).show();
-        item.remove();
-        return false;
-      }
-    );
-  };
 
   var cur_hash = null;
 
