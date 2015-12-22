@@ -65,14 +65,14 @@
               </span>
             </small>
             <textarea class="form-control" rows=8 id="comment" name="comment"
-            placeholder="Enter your comment here"></textarea>
+            placeholder="Enter your comment here" tabindex=1></textarea>
 
             <div id="preview">
             </div>
           </fieldset>
 
           Select files OR drag them into the comment field below.
-          <input id="file-picker" type="file" name="file" accept="image/*" multiple>
+          <input id="file-picker" type="file" name="file" accept="image/*" multiple tabindex=3 />
           <fieldset id="progress" style="display: none">
             <div class="progress-trough">
               <div id="progress-bar" class="progress-bar">0%</div>
@@ -83,8 +83,8 @@
           <input type="hidden" name="blocks" value="{{ issue.blocks_text | join(',') }}">
           <input type="hidden" name="depends" value="{{ issue.depends_text | join(',') }}">
             <div>
-              <input type="submit" class="btn btn-primary" value="Update Issue">
-              <input type="button" class="btn btn-secondary" value="Clear" id="clear_comment" />
+              <input type="submit" class="btn btn-primary" value="Update Issue" tabindex=2 />
+              <input type="button" class="btn btn-secondary" value="Clear" id="clear_comment" tabindex=4 />
             </div>
         </form>
         {% else %}
