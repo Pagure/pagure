@@ -107,6 +107,12 @@ def update_issue(repo, issueid, username=None):
                     flask.flash(
                         'Could not remove the comment: %s' % commentid,
                         'error')
+            if is_js:
+                return 'ok'
+            else:
+                return flask.redirect(flask.url_for(
+                    'view_issue', username=username, repo=repo.name,
+                    issueid=issueid))
 
         comment = form.comment.data
         depends = []
