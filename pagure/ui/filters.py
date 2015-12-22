@@ -90,7 +90,7 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
                 '<td class="prc" data-row="%(cnt_lbl)s"'
                 ' data-filename="%(filename)s" data-commit="%(commit)s">'
                 '<p>'
-                '<img src="%(img)s" alt="Add comment" title="Add comment"/>'
+                '<img class="prc_img" src="%(img)s" alt="Add comment" title="Add comment"/>'
                 '</p>'
                 '</td>' % (
                     {
@@ -123,17 +123,19 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
         output.append('<td class="cell2"><pre>%s</pre></td>' % line)
         output.append('</tr>')
 
-        tpl_edit = '<a href="%(delete_url)s" ' \
-            'class="edit_btn" data-comment="%(commentid)s" ' \
-            'data-objid="%(requestid)s"> ' \
-            '<span class="icon icon-edit blue"></span></a>'
+        tpl_edit = '<a href="%(edit_url)s"' \
+            'class="edit_btn" data-comment="%(commentid)s"' \
+            'data-objid="%(requestid)s">' \
+            '<span class="icon icon-edit blue"></span>' \
+            '</a>'
+        tpl_edited = '<small class="text-muted" title="%(edit_date)s">' \
+            'Edited %(human_edit_date)s by %(user)s </small>'
 
-        tpl_delete = '<button type="submit" name="drop_comment" ' \
-            'value="%(commentid)s"' \
-            'onclick="return confirm(\'Do you really want to remove' \
-            ' this comment?\');"' \
-            'title="Remove comment">' \
-            '<span class="icon icon-remove blue"></span>' \
+        tpl_delete = '<button class="btn btn-danger btn-sm" '\
+            'title="Remove comment" '\
+            'onclick="return confirm(\'Do you really want to remove this comment?\');"' \
+            ' value="%(commentid)s" name="drop_comment" type="submit">' \
+            '<span class="oi" data-glyph="trash"></span>' \
             '</button>'
 
         if cnt - 1 in comments:
@@ -141,13 +143,14 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
 
                 templ_delete = ''
                 templ_edit = ''
+                templ_edited = ''
                 if authenticated() and (
                         (comment.parent.status is True
                          and comment.user.user == flask.g.fas_user.username)
                          or is_repo_admin(comment.parent.project)):
                     templ_delete = tpl_delete % ({'commentid': comment.id})
                     templ_edit = tpl_edit %({
-                        'delete_url': flask.url_for(
+                        'edit_url': flask.url_for(
                             'pull_request_edit_comment',
                             repo=comment.parent.project.name,
                             requestid=comment.parent.id,
@@ -159,42 +162,53 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
                         'commentid': comment.id,
                     })
 
-                comment_date = comment.date_created.strftime(
-                    '%b %d %Y %H:%M:%S')
                 if comment.edited_on:
-                    comment_date = 'Updated by %s on %s' %(
-                        comment.editor.user,
-                        comment.edited_on.strftime('%b %d %Y %H:%M:%S'),
-                    )
+                    templ_edited = tpl_edited %({
+                        'edit_date':comment.edited_on.strftime(
+                            '%b %d %Y %H:%M:%S'),
+                        'human_edit_date': humanize_date(comment.edited_on),
+                        'user': comment.editor.user,
+                    })
 
                 output.append(
                     '<tr><td></td>'
-                    '<td colspan="2"><table style="width:100%%"><tr>'
-                    '<td>'
-                    '<header id="comment-%(commentid)s">'
-                    '<a href="%(url)s">%(user)s</a> '
-                    '<a class="headerlink" href="#comment-%(commentid)s" '
-                    'title="Permalink to this headline"> %(anchor)s </a>'
-                    '</header>'
-                    '</td>'
-                    '<td class="right">'
-                    '<span class="comment_date">%(date)s</span>'
-                    '%(templ_edit)s%(templ_delete)s'
-                    '</td>'
-                    '</tr>'
-                    '<tr><td colspan="2" class="pr_comment">%(comment)s'
-                    '</td></tr>'
-                    '</table></td></tr>' % (
+                    '<td colspan="2">'
+                    '<div class="card clearfix">'
+                    '<div id="comment-%(commentid)s" class="card-header">'
+                    '<img class="avatar circle" src="%(avatar_url)s"/>'
+                    '<a href="%(url)s"> %(user)s</a>'
+                    '<a class="headerlink pull-xs-right" title="Permalink to this headline"'
+                    'href="#comment-%(commentid)s">'
+                    '<span title="%(date)s">%(human_date)s</span>'
+                    '</a></div>'
+                    '<div class="card-block">'
+                    '<section class="issue_comment">'
+                    '<div class="comment_body">'
+                    '<p>%(comment)s</p>'
+                    '</div>'
+                    '</section>'
+                    '<div class="issue_actions m-t-2">'
+                    '%(templ_edited)s'
+                    '<aside class="issue_action icon pull-xs-right p-b-1">'
+                    '%(templ_edit)s'
+                    '%(templ_delete)s'
+                    '</aside>'
+                    '</div></div></div>'
+                    '</td></tr>' % (
                         {
                             'url': flask.url_for(
                                 'view_user', username=comment.user.user),
                             'templ_delete': templ_delete,
                             'templ_edit': templ_edit,
+                            'templ_edited': templ_edited,
                             'user': comment.user.user,
-                            'date': comment_date,
+                            'avatar_url': avatar_url(
+                                comment.user.default_email, 32),
+                            'date': comment.date_created.strftime(
+                                '%b %d %Y %H:%M:%S'),
+                            'human_date': humanize_date(comment.date_created),
                             'comment': markdown_filter(comment.comment),
                             'commentid': comment.id,
-                            'anchor': u'¶',
                         }
                     )
                 )

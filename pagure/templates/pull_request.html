@@ -24,7 +24,7 @@
 
 {% block repo %}
 <div class="row">
-  <div class="{% if pull_request %}col-md-8{% elif form and (repo_admin or remote_git) %}col-md-12{%endif%}">
+  <div class="{% if pull_request %}col-md-12{% elif form and (repo_admin or remote_git) %}col-md-12{%endif%}">
 {% if pull_request %}
 <h2><span class="label label-default">PR#{{requestid}}</span> {{ pull_request.title | noJS(ignore="img") | safe
   }}{% if authenticated and (g.fas_user.username == pull_request.user.username
@@ -58,7 +58,7 @@
      </span>
     {% endif %}
     {% if pull_request.status != 'Open' %}
-     <span>{{ pull_request.status }} by
+     <span class="btn btn-default">{{ pull_request.status }} by
         <a href="{{ url_for('view_user', username=pull_request.closed_by.user)}} ">
           {{ pull_request.closed_by.user if pull_request.closed_by else ''}}
         </a>
@@ -67,7 +67,7 @@
      <span class="btn btn-default">
       <a class="button patch" href="{{ url_for('request_pull_patch', username=username,
             repo=repo.name, requestid=requestid) }}">
-        <button type="submit" class="btn btn-info">Patch</button>
+        <button type="submit" class="btn btn-info">Patch View</button>
       </a>
      </span>
   </div>
@@ -146,289 +146,311 @@
 {% endif %}
 
 {% if pull_request %}
-<section class="pr_info">
-  <table>
-    <tr>
-      <th>By</th>
-      <td>
-        <a href="{{ url_for('view_user', username=pull_request.user.user) }}">
-        {{ pull_request.user.user | avatar(16) | safe }}
-        {{ pull_request.user.fullname }} ({{ pull_request.user.user }})
-      </a>
-      </td>
-    </tr>
-    <tr>
-      <th>From</th>
-      <td>
-        <a href="{{ url_for('view_repo_branch',
-          username=pull_request.project_from.user.user
-            if pull_request.project_from.is_fork else None,
-          repo=pull_request.project_from.name,
-          branchname=pull_request.branch_from)
-        }}">
-          {{ pull_request.project_from.fullname or pull_request.remote_git
-            }} ({{ pull_request.branch_from }})
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <th>To</th>
-      <td>
-        <a href="{{ url_for('view_repo_branch',
-          username=pull_request.project.user.user
-            if pull_request.project.is_fork else None,
-          repo=pull_request.project.name,
-          branchname=pull_request.branch)
-        }}">
-          {{ pull_request.project.fullname }} ({{ pull_request.branch }})
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <th>Created</th>
-      <td title="{{ pull_request.date_created.strftime('%b %d %Y %H:%M:%S') }}">
-        {{ pull_request.date_created |humanize }}
-      </td>
-    </tr>
-    <tr>
-      <th>Assignee</th>
-      <td>
-        {% if authenticated and mergeform and pull_request.status == True %}
-        <form method="POST" action="{{ url_for('.set_assignee_requests',
-            username=username, repo=repo.name, requestid=requestid) }}">
-          <input value="{{ pull_request.assignee.username or '' }}"
-            name="user" id="assignee" placeholder="username" >
-          {{ mergeform.csrf_token }}
-          <input type="submit" class="submit positive button" value="Update">
-        </form>
-        {% else %}
-        {{ pull_request.assignee.username or '' }}
-        {% endif %}
-      </td>
-    </tr>
-  </table>
-</section>
+<div class="row m-t-12">
+  <div class="col-md-8">
 
-{% if pull_request.flags %}
-<section id="pr_flags">
-  <table>
-    {% for flag in pull_request.flags %}
-      <tr style="background-color: {{ flag.percent | toRGB }}">
-        <td>{{ flag.percent }}%</td>
-        <td><a href="{{ flag.url }}">{{ flag.username }}</a></td>
-        <td>{{ flag.comment }}</td>
-        <td title="{{ flag.date_created }}" class="right">
-          {{ flag.date_created | humanize }}
-        </td>
-      </tr>
-    {% endfor %}
-  </table>
-</section>
+    <section class="pr_info">
+    <div class="card" id="pr_flags">
+      <div class="card-block">
+        <table class="table table-hover table-striped m-b-0">
+          <thead></thead>
+          <tfoot></tfoot>
+          <tbody>
+          <tr>
+            <th>By</th>
+            <td>
+              <a href="{{ url_for('view_user', username=pull_request.user.user) }}">
+              {{ pull_request.user.user | avatar(16) | safe }}
+              {{ pull_request.user.fullname }} ({{ pull_request.user.user }})
+            </a>
+            </td>
+          </tr>
+          <tr>
+            <th>From</th>
+            <td>
+              <a href="{{ url_for('view_repo_branch',
+                username=pull_request.project_from.user.user
+                  if pull_request.project_from.is_fork else None,
+                repo=pull_request.project_from.name,
+                branchname=pull_request.branch_from)
+              }}">
+                {{ pull_request.project_from.fullname or pull_request.remote_git
+                  }} ({{ pull_request.branch_from }})
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <th>To</th>
+            <td>
+              <a href="{{ url_for('view_repo_branch',
+                username=pull_request.project.user.user
+                  if pull_request.project.is_fork else None,
+                repo=pull_request.project.name,
+                branchname=pull_request.branch)
+              }}">
+                {{ pull_request.project.fullname }} ({{ pull_request.branch }})
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <th>Created</th>
+            <td title="{{ pull_request.date_created.strftime('%b %d %Y %H:%M:%S') }}">
+              {{ pull_request.date_created |humanize }}
+            </td>
+          </tr>
+          <tr>
+            <th>Assignee</th>
+            <td>
+              {% if authenticated and mergeform and pull_request.status == True %}
+              <form method="POST" action="{{ url_for('.set_assignee_requests',
+                  username=username, repo=repo.name, requestid=requestid) }}">
+                <input value="{{ pull_request.assignee.username or '' }}"
+                  name="user" id="assignee" placeholder="username" >
+                {{ mergeform.csrf_token }}
+                <input type="submit" class="submit positive button" value="Update">
+              </form>
+              {% else %}
+              {{ pull_request.assignee.username or '' }}
+              {% endif %}
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    </section>
+  </div>
+
+  <div class="col-md-4">
+    {% if pull_request.flags %}
+    <div class="card" id="pr_flags">
+      <div class="card-block">
+        <table class="table table-hover table-striped m-b-0">
+          <thead></thead>
+          <tfoot></tfoot>
+          <tbody>
+            {% for flag in pull_request.flags %}
+              <tr style="background-color: {{ flag.percent | toRGB }}">
+                <td>{{ flag.percent }}%</td>
+                <td><a href="{{ flag.url }}">{{ flag.username }}</a></td>
+                <td>{{ flag.comment }}</td>
+                <td title="{{ flag.date_created }}" class="right">
+                  {{ flag.date_created | humanize }}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
 {% endif %}
 
-{% endif %}
-
-<div class="tabs">
-  <ul>
-    <li><a href="#request_diff">Diff</a></li>
-    <li><a href="#commit_list">Commits ({{ diff_commits|length }})</a></li>
-  </ul>
-
+<ul class="nav nav-pills nav-small">
+  <li class="nav-item active" data-id="nav-diff"><a href="#request_diff">Diff</a></li>
+  <li class="nav-item" data-id="nav-commits">
+    <a href="#commit_list">
+      <span class="hidden-sm-down">Commits&nbsp;</span>
+      <span class="label label-default label-pill hidden-sm-down">
+        {{ diff_commits|length }}
+      </span>
+    </a>
+  </li>
+</ul>
 
 <div class="card" id="commit_list" style="display:none">
-<table class="table table-hover table-striped m-b-0">
-  <thead>
-  </thead>
-  <tfoot>
-  </tfoot>
-  <tbody>
-      {% for commit in diff_commits %}
-      <tr>
-        <td class="commitid">{{ commit.oid.hex|short }}</td>
-        <td>
-          {% if pull_request and pull_request.status and pull_request.project_from.is_fork %}
-          <a href="{{ url_for('view_commit', username=pull_request.project_from.user.user,
-                    repo=pull_request.project_from.name, commitid=commit.oid.hex)}}">
-          {% elif pull_request and pull_request.remote %}
-          <a>
+  <table class="table table-hover table-striped m-b-0">
+    <thead>
+    </thead>
+    <tfoot>
+    </tfoot>
+    <tbody>
+        {% for commit in diff_commits %}
+        <tr>
+          <td class="commitid">{{ commit.oid.hex|short }}</td>
+          <td>
+            {% if pull_request and pull_request.status and pull_request.project_from.is_fork %}
+            <a href="{{ url_for('view_commit', username=pull_request.project_from.user.user,
+                      repo=pull_request.project_from.name, commitid=commit.oid.hex)}}">
+            {% elif pull_request and pull_request.remote %}
+            <a>
+            {% else %}
+            <a href="{{ url_for('view_commit', username=username,
+                          repo=repo.name, commitid=commit.oid.hex)}}">
+            {% endif %}
+              {{ commit.message.strip().split('\n')[0] }}
+              <div class="commit_msg_txt commit_message_body" id="commit_msg_{{ loop.index }}">
+                  {{ commit.message.strip().split('\n')[2:] | join('\n') }}
+              </div>
+            </a>
+          </td>
+          {% if commit.message.strip().split('\n') | length > 1 %}
+          <td class="commit_msg_btn" data-id="{{ loop.index }}">more</td>
           {% else %}
-          <a href="{{ url_for('view_commit', username=username,
-                        repo=repo.name, commitid=commit.oid.hex)}}">
+          <td></td>
           {% endif %}
-            {{ commit.message.strip().split('\n')[0] }}
-            <div class="commit_msg_txt commit_message_body" id="commit_msg_{{ loop.index }}">
-                {{ commit.message.strip().split('\n')[2:] | join('\n') }}
-            </div>
-          </a>
-        </td>
-        {% if commit.message.strip().split('\n') | length > 1 %}
-        <td class="commit_msg_btn" data-id="{{ loop.index }}">more</td>
+          <td class="commitdate" title="{{ commit.commit_time|format_ts }}">
+            {{ commit.commit_time|humanize }}</td>
+        </tr>
         {% else %}
-        <td></td>
-        {% endif %}
-        <td class="commitdate" title="{{ commit.commit_time|format_ts }}">
-          {{ commit.commit_time|humanize }}</td>
-      </tr>
-      {% else %}
-      <tr><td class="error"> No commits found </td></tr>
-      {% endfor %}
-  </tbody>
-</table>
+        <tr><td class="error"> No commits found </td></tr>
+        {% endfor %}
+    </tbody>
+  </table>
 </div>
 
 <div class="request_diff" id="request_diff">
 
-{% if authenticated and pull_request %}
-<form action="{{ url_for('.pull_request_drop_comment', username=username,
-    repo=repo.name, requestid=requestid) }}" method="post" class="icon"
-    onsubmit="return try_async_comment(this, null)">
-{% endif %}
-
-{% if diff %}
-{% for patch in diff %}
-<section class="commit_diff">
-<header>
-    <h3>
-        {%- if patch | hasattr('new_file_path') -%}
-          {%- if patch.new_file_path == patch.old_file_path -%}
-          {{ patch.new_file_path }}
-          {%- else -%}
-          {{ patch.new_file_path }} (Renamed from "{{ patch.old_file_path }}")
-          {%- endif -%}
-        {%- elif patch | hasattr('delta') -%}
-          {%- if patch.delta.new_file.path == patch.delta.old_file.path -%}
-          {{ patch.delta.new_file.path }}
-          {%- else -%}
-          {{ patch.delta.new_file.path }} (Renamed from "{{ patch.delta.old_file.path }}")
-          {%- endif -%}
-        {%- endif -%}
-    </h3>
-    <ul class="buttons">
-      <li class="addrem_bar">
-      {% if patch | hasattr('additions') %}
-      {# Version of pygit2 -0.21.4 -- F21/EL7 #}
-      {% if (patch.additions + patch.deletions) %}
-        <span style="width: {{ (100.0 * patch.additions / (patch.additions + patch.deletions))|round|int }}%">
-          {% if patch.additions > 0 %}+{{ patch.additions }}{% endif %}
-          {% if patch.deletions > 0 %}-{{ patch.deletions }}{% endif %}
-        </span>
-      {% endif %}
-      {% else %}
-      {# Version of pygit2 -0.23.0 -- F23 #}
-      {% if (patch.line_stats[1] + patch.line_stats[2]) %}
-        <span style="width: {{ (100.0 * patch.line_stats[1] / (patch.line_stats[1] + patch.line_stats[2]))|round|int }}%">
-          {% if patch.line_stats[1] > 0 %}+{{ patch.line_stats[1] }}{% endif %}
-          {% if patch.line_stats[2] > 0 %}-{{ patch.line_stats[2] }}{% endif %}
-        </span>
-      {% endif %}
-      {% endif %}
-      </li>
-      <li>
-        {% if pull_request %}
-        <a class="button view" href="{{
-            url_for(
-                'view_file',
-                username=pull_request.project_from.user.username
-                    if pull_request.project_from.is_fork else None,
-                repo=pull_request.project_from.name,
-                identifier=pull_request.branch_from,
-                filename=patch.new_file_path) }}"
-        {% else %}
-        <a class="button view" href="{{
-            url_for(
-                'view_file',
-                username=username,
-                repo=repo.name,
-                identifier=branch_from,
-                filename=patch.new_file_path) }}"
-        {% endif %}
-        {% if patch |hasattr('new_id') %}
-        title="View file as of {{ patch.new_id|short }}">View</a>
-        {% elif patch |hasattr('delta') %}
-        title="View file as of {{ patch.delta.new_file.id|short }}">View</a>
-        {% else %}
-        title="View file as of {{ patch.new_oid|short }}">View</a>
-        {% endif %}
-      </li>
-    </ul>
-</header>
-{% autoescape false %}
-    {{ patch | patch_to_diff | html_diff | format_loc(
-            filename=patch.new_file_path,
-            commit=patch.new_id or patch.new_oid,
-            prequest=pull_request,
-            index=loop.index)}}
-{% endautoescape %}
-</section>
-{% endfor %}
-{% endif %}
-
-{% if authenticated and pull_request %}
-{{ mergeform.csrf_token }}
-</form>
-{% endif %}
-
-</div>
-
-
-{% if pull_request %}
-<section class="request_comment" id="request_comment">
-{% if pull_request.discussion %}
-<form action="{{ url_for('.pull_request_drop_comment', username=username,
-    repo=repo.name, requestid=requestid) }}" method="post"
-    onsubmit="return try_async_comment(this, null)">
-
-{% for comment in pull_request.discussion %}
-  {% if not comment.commit_id %}
-    {{ show_comment(comment, comment.id, repo, username,
-                    requestid, form, repo_admin) }}
+  {% if authenticated and pull_request %}
+  <form action="{{ url_for('.pull_request_drop_comment', username=username,
+      repo=repo.name, requestid=requestid) }}" method="post" class="icon"
+      onsubmit="return try_async_comment(this, null)">
   {% endif %}
-{% endfor %}
-{{ mergeform.csrf_token }}
-</form>
-{% endif %}
-</section>
-{% endif %}
 
-    <div class="card">
+    {% if diff %}
+    {% for patch in diff %}
+    <section class="commit_diff">
+    <div class="card clearfix">
       <div class="card-header">
-
-        <section class="request_comment add_comment">
-        {% if authenticated and mergeform and pull_request %}
-
-
-          <form action="{{ url_for(
-            'pull_request_add_comment', username=username, repo=repo.name,
-            requestid=requestid) }}"
-            method="post" onsubmit="return try_async_comment(this, false)">
-          {{ mergeform.csrf_token }}
-
-          <fieldset class="form-group">
-            <label for="comment"><strong>Add new comment</strong></label>
-            <small class="text-muted pull-xs-right">
-              <span class="btn btn-sm btn-secondary inactive"
-                aria-pressed="false" id="previewinmarkdown">Preview
+          <h3>
+            {%- if patch | hasattr('new_file_path') -%}
+              {%- if patch.new_file_path == patch.old_file_path -%}
+              {{ patch.new_file_path }}
+              {%- else -%}
+              {{ patch.new_file_path }} (Renamed from "{{ patch.old_file_path }}")
+              {%- endif -%}
+            {%- elif patch | hasattr('delta') -%}
+              {%- if patch.delta.new_file.path == patch.delta.old_file.path -%}
+              {{ patch.delta.new_file.path }}
+              {%- else -%}
+              {{ patch.delta.new_file.path }} (Renamed from "{{ patch.delta.old_file.path }}")
+              {%- endif -%}
+            {%- endif -%}
+          </h3>
+            {% if patch | hasattr('additions') %}
+            {# Version of pygit2 -0.21.4 -- F21/EL7 #}
+            {% if (patch.additions + patch.deletions) %}
+              <span style="width: {{ (100.0 * patch.additions / (patch.additions + patch.deletions))|round|int }}%">
+                {% if patch.additions > 0 %}+{{ patch.additions }}{% endif %}
+                {% if patch.deletions > 0 %}-{{ patch.deletions }}{% endif %}
               </span>
-            </small>
-            <textarea class="form-control" rows=8 id="comment" name="comment"
-            placeholder="Enter your comment here"></textarea>
+            {% endif %}
+            {% else %}
+            {# Version of pygit2 -0.23.0 -- F23 #}
+            {% if (patch.line_stats[1] + patch.line_stats[2]) %}
+              <span style="width: {{ (100.0 * patch.line_stats[1] / (patch.line_stats[1] + patch.line_stats[2]))|round|int }}%">
+                {% if patch.line_stats[1] > 0 %}+{{ patch.line_stats[1] }}{% endif %}
+                {% if patch.line_stats[2] > 0 %}-{{ patch.line_stats[2] }}{% endif %}
+              </span>
+            {% endif %}
+            {% endif %}
 
-            <div id="preview">
-            </div>
-          </fieldset>
-
-            <div>
-              <input type="submit" class="btn btn-primary" value="Update Issue">
-              <input type="button" class="btn btn-secondary" value="Clear" id="clear_comment" />
-            </div>
-        </form>
-        {% else %}
-          <p><a href="{{ url_for('auth_login', next=request.url) }}">Login</a> to comment on this ticket.</p>
-        {% endif %}
-        </section>
-
+            {% if pull_request %}
+            <a class="button view headerlink pull-xs-right" href="{{
+                url_for(
+                    'view_file',
+                    username=pull_request.project_from.user.username
+                        if pull_request.project_from.is_fork else None,
+                    repo=pull_request.project_from.name,
+                    identifier=pull_request.branch_from,
+                    filename=patch.new_file_path) }}"
+            {% else %}
+            <a class="button view headerlink pull-xs-right" href="{{
+                url_for(
+                    'view_file',
+                    username=username,
+                    repo=repo.name,
+                    identifier=branch_from,
+                    filename=patch.new_file_path) }}"
+            {% endif %}
+            {% if patch |hasattr('new_id') %}
+            title="View file as of {{ patch.new_id|short }}">View</a>
+            {% elif patch |hasattr('delta') %}
+            title="View file as of {{ patch.delta.new_file.id|short }}">View</a>
+            {% else %}
+            title="View file as of {{ patch.new_oid|short }}">View</a>
+            {% endif %}
+      </div>
+      <div class="card-block">
+    {% autoescape false %}
+        {{ patch | patch_to_diff | html_diff | format_loc(
+                filename=patch.new_file_path,
+                commit=patch.new_id or patch.new_oid,
+                prequest=pull_request,
+                index=loop.index)}}
+    {% endautoescape %}
       </div>
     </div>
+    </section>
+    {% endfor %}
+    {% endif %}
+
+  {% if authenticated and pull_request %}
+  {{ mergeform.csrf_token }}
+  </form>
+  {% endif %}
+
+
+  {% if pull_request %}
+  <section class="request_comment" id="request_comment">
+    {% if pull_request.discussion %}
+      <form action="{{ url_for('.pull_request_drop_comment', username=username,
+          repo=repo.name, requestid=requestid) }}" method="post"
+          onsubmit="return try_async_comment(this, null)">
+
+      {% for comment in pull_request.discussion %}
+        {% if not comment.commit_id %}
+          {{ show_comment(comment, comment.id, repo, username,
+                          requestid, form, repo_admin) }}
+        {% endif %}
+      {% endfor %}
+      {{ mergeform.csrf_token }}
+      </form>
+    {% endif %}
+    </section>
+  {% endif %}
+
+  <div class="card">
+    <div class="card-header">
+
+      <section class="request_comment add_comment">
+      {% if authenticated and mergeform and pull_request %}
+
+
+        <form action="{{ url_for(
+          'pull_request_add_comment', username=username, repo=repo.name,
+          requestid=requestid) }}"
+          method="post" onsubmit="return try_async_comment(this, false)">
+        {{ mergeform.csrf_token }}
+
+        <fieldset class="form-group">
+          <label for="comment"><strong>Add new comment</strong></label>
+          <small class="text-muted pull-xs-right">
+            <span class="btn btn-sm btn-secondary inactive"
+              aria-pressed="false" id="previewinmarkdown">Preview
+            </span>
+          </small>
+          <textarea class="form-control" rows=8 id="comment" name="comment"
+          placeholder="Enter your comment here"></textarea>
+
+          <div id="preview">
+          </div>
+        </fieldset>
+
+          <div>
+            <input type="submit" class="btn btn-primary" value="Update Issue">
+            <input type="button" class="btn btn-secondary" value="Clear" id="clear_comment" />
+          </div>
+      </form>
+      {% else %}
+        <p><a href="{{ url_for('auth_login', next=request.url) }}">Login</a> to comment on this ticket.</p>
+      {% endif %}
+      </section>
+
+    </div>
+  </div>
 </div>
 </div>
 
@@ -495,9 +517,9 @@
 
   $( ".code_table tr" ).hover(
     function() {
-      $( this ).find( "img" ).show().width(13);
+      $( this ).find( ".prc_img" ).show().width(13);
     }, function() {
-      $( this ).find( "img" ).hide();
+      $( this ).find( ".prc_img" ).hide();
     }
   );
 
@@ -534,27 +556,19 @@
     }
   );
 
-  $( ".tabs" ).on('tabsactivate',
-    function(event, ui) {
-      if (ui.newPanel.selector == '#preview') {
-        var _text = $( "#comment" ).val();
-        var _url = "{{ url_for('markdown_preview') }}";
-        $.ajax({
-            url: _url ,
-            type: 'POST',
-            data: {
-              content: _text,
-              csrf_token: "{{ mergeform.csrf_token.current_token }}",
-            },
-            dataType: 'html',
-            success: function(res) {
-                $( "#preview" ).html(res);
-            },
-            error: function() {
-                alert('Unable to generate preview!');
-            }
-        });
-        return false;
+  $( ".nav-item" ).click(
+    function() {
+      var header = $( this ).attr('data-id');
+      if (header == 'nav-diff') {
+        $($(this).parent().children()[1]).removeClass('active');
+        $(this).addClass('active');
+        $('#commit_list').hide();
+        $('.commit_diff').show();
+      } else {
+        $($(this).parent().children()[0]).removeClass('active');
+        $(this).addClass('active');
+        $('.commit_diff').hide();
+        $('#commit_list').show();
       }
     }
   );
@@ -571,7 +585,6 @@
         $( "#comment" ).val(_output.join("\n"));
     }
   );
-
 
   $( "#clear_comment").click(
     function() {
@@ -613,7 +626,6 @@
           }
     }
   );
-
 
   $(".edit_btn").click(function() {
     var commentid = $( this ).attr('data-comment');
