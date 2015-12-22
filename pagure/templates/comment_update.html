@@ -23,7 +23,7 @@
     <div>
       <input type="hidden" name="edit_comment" value="{{ comment.id }}" />
       <input type="submit" class="btn btn-primary" value="Update" />
-      <input type="button" id="comment_update_cancel" class="btn btn-secondary" value="Cancel" {% if not is_js -%}
+      <input type="button" id="comment_update_cancel" class="btn btn-secondary cancel" value="Cancel" {% if not is_js -%}
         onclick="history.back();"{% endif %} />
     </div>
 
