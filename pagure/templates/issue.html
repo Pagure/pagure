@@ -17,30 +17,33 @@
 <div class="row m-t-2">
   <div class="col-md-8">
 
-    <h2>
-      <span class="issueid label label-default">#{{ issueid }}</span>
-      <span id="issuetitle">{{issue.title | noJS("img") | safe }}</span>
-      {% if issue.private %}
-        <span class="oi red-icon" data-glyph="lock-locked" title="Private issue"></span>
-      {% endif %}
-    </h2>
+  <h2>
+    <span class="issueid label label-default">#{{ issueid }}</span>
+    <span id="issuetitle">{{issue.title | noJS("img") | safe }}</span>
+    {% if issue.private %}
+      <span class="oi red-icon" data-glyph="lock-locked" title="Private issue"></span>
+    {% endif %}
+  </h2>
 
   <h5 class="text-muted">
     <a href="#" data-toggle="tooltip" title="pants">Created</a>
     {{ issue.date_created | humanize}} by {{ issue.user.user }}
   </h5>
 
-
     {{ show_initial_comment(issue, 0, repo, username, issueid, form, issue) }}
 
-    <section id="comments">
-    {% if issue.comments %}
-      {% for comment in issue.comments %}
-        {{ show_comment(comment, comment.id, repo, username, issueid, form, repo_admin) }}
-      {% endfor %}
-    {% endif %}
-    </section>
-
+  <section id="comments">
+    <form action="{{ url_for('update_issue', username=username,
+               repo=repo.name, issueid=issueid) }}" method="post"
+               onsubmit="return try_async_comment(this)">
+      {{ form.csrf_token }}
+      {% if issue.comments %}
+        {% for comment in issue.comments %}
+          {{ show_comment(comment, comment.id, repo, username, issueid, form, repo_admin) }}
+        {% endfor %}
+      {% endif %}
+    </form>
+  </section>
 
     <div class="card">
       <div class="card-header">
@@ -327,18 +330,18 @@ source.addEventListener('message', function(e) {
 
 {% if authenticated and form %}
 function try_async_comment(form) {
-  if (!sse) {
-    $(form).off('submit');
-    form.submit();
-    return false;
-  }
-  var _url = form.action + "?js=1";
   var _data = $(form).serialize();
   var btn = $(document.activeElement);
   if (btn[0].name == 'drop_comment'){
     _data += '&drop_comment=' + btn[0].value;
     return true;
   }
+  if (!sse) {
+    $(form).off('submit');
+    form.submit();
+    return false;
+  }
+  var _url = form.action + "?js=1";
   $.post( _url, _data )
     .done(function(data) {
       if(data == 'ok') {
@@ -411,7 +414,7 @@ $( document ).ready(function() {
   });
 
 
-$('#blocks').selectize({
+  $('#blocks').selectize({
       plugins: ['remove_button'],
       valueField: 'id',
       labelField: 'id',
@@ -437,7 +440,7 @@ $('#blocks').selectize({
       }
   });
 
-$('#depends').selectize({
+  $('#depends').selectize({
       plugins: ['remove_button'],
       valueField: 'id',
       labelField: 'id',
