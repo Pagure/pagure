@@ -11,7 +11,7 @@ add_comment = function(data) {
   }
 
   var _data = '<div class="card clearfix"> \
-    <div id="comment-539" class="card-header"> \
+    <div id="comment-' + data.comment_id + '" class="card-header"> \
     <img class="avatar circle" src="' + data.avatar_url + '"/> \
     <a href="/user/' + data.comment_user + '"> ' + data.comment_user + '\
       </a> \
