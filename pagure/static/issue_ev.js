@@ -125,7 +125,7 @@ add_comment = function(data) {
   console.log('Adding comment ' + data.comment_added);
   var field = $('#comments');
   var _data = '<div class="card clearfix"> \
-    <div id="comment-539" class="card-header"> \
+    <div id="comment-' + data.comment_id + '" class="card-header"> \
     <img class="avatar circle" src="' + data.avatar_url + '"/> \
     <a href="/user/' + data.comment_user + '"> ' + data.comment_user + '\
       </a> \
@@ -146,6 +146,11 @@ add_comment = function(data) {
         <aside class="issue_action icon pull-xs-right p-b-1"> \
           <a class="reply btn btn-secondary btn-sm" data-toggle="tooltip" title="Reply to this comment - loose formating"> \
             reply \
+          </a> \
+          <a class="edit_btn" data-objid="' + data.issue_id
+          + '" data-comment="' + data.comment_id
+          + '" href="/test/issue/' + data.issue_id + '/comment/' + data.comment_id + '/edit"> \
+            <span class="icon icon-edit blue"></span> \
           </a> \
           <button class="btn btn-danger btn-sm" \
             title="Remove comment" \
