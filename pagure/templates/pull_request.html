@@ -627,41 +627,37 @@
     }
   );
 
-  $(".edit_btn").click(function() {
-    var commentid = $( this ).attr('data-comment');
-    var _url = '{{ request.base_url }}' + '/comment/' + commentid + '/edit';
-    $.ajax({
-        url: _url + '?js=1',
-        type: 'GET',
-        dataType: 'html',
-        success: function(res) {
-            var el = $('#comment-' + commentid);
-            var sec = el.parent().children()[1];
-            if (!sec) {
-              sec = el.parent().parent();
-              $(sec).next().hide();
-              var row = $(sec).parent().parent().append(
-                "<tr><td>" + res + "</td></tr>");
-            } else {
+  function setup_edit_btns() {
+    $(".edit_btn").click(function() {
+      var commentid = $( this ).attr('data-comment');
+      var _url = '{{ request.base_url }}' + '/comment/' + commentid + '/edit';
+      $.ajax({
+          url: _url + '?js=1',
+          type: 'GET',
+          dataType: 'html',
+          success: function(res) {
+              var el = $('#comment-' + commentid);
+              console.log(el);
+              var sec = el.parent().find('.issue_comment');
+              console.log(sec);
               $(sec).hide();
+              el.parent().find('.issue_actions').hide();
               $(sec).after(res);
-            }
-            cancel_edit_btn();
-        },
-        error: function() {
-            alert('Could not make edit work');
-        }
+              cancel_edit_btn();
+          },
+          error: function() {
+              alert('Could not make edit work');
+          }
+      });
+      return false;
     });
-    return false;
-  });
+  };
+  setup_edit_btns();
 
   function cancel_edit_btn() {
     $( ".cancel" ).click(
       function() {
-        var item = $(this).closest('tr');
-        if (!item.length) {
-            item = $(this).closest('section');
-        }
+        item = $(this).closest('section');
         $(item.parent().children()[1]).show();
         item.remove();
         return false;
@@ -756,35 +752,38 @@ $('#assignee').selectize({
 });
 
 function try_async_comment(form, inline) {
+  $(form).off('submit');
+  var _data = $(form).serialize();
+  var btn = $(document.activeElement);
+  if (btn[0].name == 'drop_comment'){
+    _data += '&drop_comment=' + btn[0].value;
+    return true;
+  }
   if (!sse) {
-    $(form).off('submit');
+    console.log('no sse, submitting');
     form.submit();
     return false;
   }
   $.post( form.action + "?js=1", $(form).serialize() )
     .done(function(data) {
       if(data == 'ok') {
-        // We have submitted the comment correctly
-        $('#update_comment').val('');
-        var item = $('#update_comment').closest('tr');
-        if (!item.length) {
-          item = $('#update_comment').closest('section');
-        }
+        $('#comment').val('');
+        /* We have submitted the comment correctly */
+        var item = $('#comment_block').closest('section');
         if (!$(item.parent().children()[1]).is(':visible')){
           $(item.parent().children()[1]).show()
         }
         item.remove();
       } else {
         // Make the browser submit the form sync
-        $(form).off('submit');
         form.submit();
       }
     })
     .fail(function() {
       // Make the browser submit the form sync
-      $(form).off('submit');
       form.submit();
     })
+  $(form).on('submit');
   return false;
 };
 {% endif %}
@@ -815,6 +814,7 @@ source.addEventListener('message', function(e) {
   console.log(e.data);
   var data = $.parseJSON(e.data);
   process_event(data, "{{ request.uid }}");
+  setup_edit_btns();
   }, false);
 </script>
 {% endif %}
