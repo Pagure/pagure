@@ -123,19 +123,19 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
         output.append('<td class="cell2"><pre>%s</pre></td>' % line)
         output.append('</tr>')
 
-        tpl_edit = '<a href="%(edit_url)s"' \
-            'class="edit_btn" data-comment="%(commentid)s"' \
+        tpl_edit = '<a href="%(edit_url)s" ' \
+            'class="edit_btn" data-comment="%(commentid)s" ' \
             'data-objid="%(requestid)s">' \
             '<span class="icon icon-edit blue"></span>' \
             '</a>'
-        tpl_edited = '<small class="text-muted" title="%(edit_date)s">' \
+        tpl_edited = '<small class="text-muted" title="%(edit_date)s"> ' \
             'Edited %(human_edit_date)s by %(user)s </small>'
 
         tpl_delete = '<button class="btn btn-danger btn-sm" '\
             'title="Remove comment" '\
-            'onclick="return confirm(\'Do you really want to remove this comment?\');"' \
-            ' value="%(commentid)s" name="drop_comment" type="submit">' \
-            '<span class="oi" data-glyph="trash"></span>' \
+            'name="drop_comment" value="%(commentid)s" type="submit" ' \
+            'onclick="return confirm(\'Do you really want to remove this comment?\');" '\
+            '><span class="oi" data-glyph="trash"></span>' \
             '</button>'
 
         if cnt - 1 in comments:
@@ -177,14 +177,14 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
                     '<div id="comment-%(commentid)s" class="card-header">'
                     '<img class="avatar circle" src="%(avatar_url)s"/>'
                     '<a href="%(url)s"> %(user)s</a>'
-                    '<a class="headerlink pull-xs-right" title="Permalink to this headline"'
-                    'href="#comment-%(commentid)s">'
+                    '<a class="headerlink pull-xs-right" title="Permalink '
+                    'to this headline" href="#comment-%(commentid)s">'
                     '<span title="%(date)s">%(human_date)s</span>'
                     '</a></div>'
                     '<div class="card-block">'
                     '<section class="issue_comment">'
                     '<div class="comment_body">'
-                    '<p>%(comment)s</p>'
+                    '%(comment)s'
                     '</div>'
                     '</section>'
                     '<div class="issue_actions m-t-2">'
@@ -209,6 +209,7 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
                             'human_date': humanize_date(comment.date_created),
                             'comment': markdown_filter(comment.comment),
                             'commentid': comment.id,
+                            'anchor': u'¶',
                         }
                     )
                 )
