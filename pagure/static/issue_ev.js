@@ -162,12 +162,18 @@ add_comment = function(data) {
 
 update_comment = function(data) {
   console.log('Updating comment ' + data.comment_id);
-  var field = $('#comment-' + data.comment_id);
-  field.find('.edit_date').html(
-    '<span title="' + data.comment_date + '">Edited by '
-    + data.comment_editor + ' seconds ago</span>');
-  var sec = field.parent();
-  sec.find('.comment_body').html(data.comment_updated);
+  var field = $('#comment-' + data.comment_id).parent();
+  var edited = field.find('.text-muted');
+  if (edited.length == 0) {
+    $(field.find('aside')).before(
+        '<small class="text-muted">Edited a just now by '
+        + data.comment_editor + '</small>');
+  } else {
+    edited.html('Edited a just now by ' + data.comment_editor)
+  }
+  field.find('.comment_body').html(data.comment_updated);
+  field.find('.issue_actions').show();
+  field.find('.issue_comment').show();
 }
 
 update_issue = function(data) {
