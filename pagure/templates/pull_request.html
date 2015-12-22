@@ -306,7 +306,7 @@
   {% if authenticated and pull_request %}
   <form action="{{ url_for('.pull_request_drop_comment', username=username,
       repo=repo.name, requestid=requestid) }}" method="post" class="icon"
-      onsubmit="return try_async_comment(this, null)">
+      onsubmit="return try_async_comment(this, null)" >
   {% endif %}
 
     {% if diff %}
@@ -736,6 +736,25 @@
  });
 
 {% if authenticated and pull_request %}
+$('#assignee').selectize({
+  valueField: 'user',
+  labelField: 'user',
+  searchField: 'user',
+  maxItems: 1,
+  create: false,
+  load: function(query, callback) {
+    if (!query.length) return callback();
+    $.getJSON(
+      "{{ url_for('api_ns.api_users') }}", {
+        pattern: query.term
+      },
+      function( data ) {
+        callback( data.users.map(function(x) { return { user: x }; }) );
+      }
+    );
+  }
+});
+
 function try_async_comment(form, inline) {
   if (!sse) {
     $(form).off('submit');
@@ -796,27 +815,7 @@ source.addEventListener('message', function(e) {
   console.log(e.data);
   var data = $.parseJSON(e.data);
   process_event(data, "{{ request.uid }}");
-
   }, false);
-
-    $('#assignee').selectize({
-      valueField: 'user',
-      labelField: 'user',
-      searchField: 'user',
-      maxItems: 1,
-      create: false,
-      load: function(query, callback) {
-          if (!query.length) return callback();
-          $.getJSON(
-            "{{ url_for('api_ns.api_users') }}", {
-              pattern: query.term
-            },
-            function( data ) {
-              callback( data.users.map(function(x) { return { user: x }; }) );
-            }
-          );
-      }
-  });
 </script>
 {% endif %}
 
