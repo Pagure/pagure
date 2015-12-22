@@ -24,8 +24,8 @@ add_comment = function(data) {
       <section class="issue_comment"> \
         <div class="comment_body"> \
           <span class="edit_date" title=""> \
-          </span>\
-      ' + data.comment_added + '\
+          </span>'
+        + data.comment_added + '\
         </div> \
       </section> \
       <div class="issue_actions m-t-2"> \
@@ -67,17 +67,12 @@ add_comment = function(data) {
 update_comment = function(data) {
   console.log('Updating comment ' + data.comment_id);
   var field = $('#comment-' + data.comment_id).parent();
-  console.log($('#comment-' + data.comment_id));
-  console.log(field);
   var edited = field.find('.text-muted');
-  console.log(edited);
   if (edited.length == 0) {
-    console.log('First edition');
     $(field.find('aside')).before(
         '<small class="text-muted">Edited a just now by '
         + data.comment_editor + '</small>');
   } else {
-    console.log('edited before');
     edited.html('Edited a just now by ' + data.comment_editor)
   }
   field.find('.comment_body').html(data.comment_updated);

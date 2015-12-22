@@ -118,13 +118,15 @@
             comment.edited_on.strftime('%Y-%m-%d %H:%M:%S') if comment.edited_on
         }}">
         </span>
-        {% autoescape false %}
-        {% if id == 0 %}
-        {{ comment.content | markdown }}
-        {% else %}
-        {{ comment.comment | markdown }}
-        {% endif %}
-        {% endautoescape %}
+        <span class="comment_text">
+        {%- autoescape false %}
+        {%- if id == 0 -%}
+{{ comment.content | markdown }}
+        {%- else -%}
+{{ comment.comment | markdown }}
+        {%- endif -%}
+        {% endautoescape -%}
+        </span>
       </div>
     </section>
     <div class="issue_actions m-t-2">
