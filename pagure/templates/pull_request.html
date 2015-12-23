@@ -302,7 +302,6 @@
 </div>
 
 <div class="request_diff" id="request_diff">
-
   {% if diff %}
     <div class="card clearfix">
       <div class="card-header">
@@ -431,6 +430,7 @@
   {{ mergeform.csrf_token }}
   </form>
   {% endif %}
+</div>
 
 
   {% if pull_request %}
@@ -452,46 +452,46 @@
     </section>
   {% endif %}
 
+  {% if authenticated and mergeform and pull_request %}
   <div class="card">
     <div class="card-header">
 
       <section class="request_comment add_comment">
-      {% if authenticated and mergeform and pull_request %}
 
+        {% if authenticated %}
+          <form action="{{ url_for(
+              'pull_request_add_comment', username=username, repo=repo.name,
+              requestid=requestid) }}"
+              method="post" onsubmit="return try_async_comment(this, false)">
+            {{ mergeform.csrf_token }}
 
-        <form action="{{ url_for(
-          'pull_request_add_comment', username=username, repo=repo.name,
-          requestid=requestid) }}"
-          method="post" onsubmit="return try_async_comment(this, false)">
-        {{ mergeform.csrf_token }}
+            <fieldset class="form-group">
+              <label for="comment"><strong>Add new comment</strong></label>
+              <small class="text-muted pull-xs-right">
+                <span class="btn btn-sm btn-secondary inactive"
+                  aria-pressed="false" id="previewinmarkdown">Preview
+                </span>
+              </small>
+              <textarea class="form-control" rows=8 id="comment" name="comment"
+              placeholder="Enter your comment here"></textarea>
+              <div id="preview">
+              </div>
+            </fieldset>
 
-        <fieldset class="form-group">
-          <label for="comment"><strong>Add new comment</strong></label>
-          <small class="text-muted pull-xs-right">
-            <span class="btn btn-sm btn-secondary inactive"
-              aria-pressed="false" id="previewinmarkdown">Preview
-            </span>
-          </small>
-          <textarea class="form-control" rows=8 id="comment" name="comment"
-          placeholder="Enter your comment here"></textarea>
-
-          <div id="preview">
-          </div>
-        </fieldset>
-
-          <div>
-            <input type="submit" class="btn btn-primary" value="Update Issue">
-            <input type="button" class="btn btn-secondary" value="Clear" id="clear_comment" />
-          </div>
-      </form>
-      {% else %}
-        <p><a href="{{ url_for('auth_login', next=request.url) }}">Login</a> to comment on this ticket.</p>
-      {% endif %}
+            <div>
+              <input type="submit" class="btn btn-primary" value="Update Issue">
+              <input type="button" class="btn btn-secondary" value="Clear" id="clear_comment" />
+            </div>
+          </form>
+        {% else %}
+          <p><a href="{{ url_for('auth_login', next=request.url) }}">Login</a> to comment on this ticket.</p>
+        {% endif %}
       </section>
 
     </div>
   </div>
-</div>
+  {% endif %}
+
 </div>
 
 </div>
@@ -590,14 +590,22 @@ function setup_reply_btns() {
     }
   });
 
-  $( ".tabs" ).tabs({
-    activate: function( event, ui ) {
-      var _title = ui.newPanel.attr('id');
-      if ($.inArray( _title, [ "request_diff", "commit_list" ] ) >= 0) {
-        window.location.hash = _title;
+  $( ".nav-item" ).click(
+    function() {
+      var header = $( this ).attr('data-id');
+      if (header == 'nav-diff') {
+        $($(this).parent().children()[1]).removeClass('active');
+        $(this).addClass('active');
+        $('#commit_list').hide();
+        $('#request_diff').show();
+      } else {
+        $($(this).parent().children()[0]).removeClass('active');
+        $(this).addClass('active');
+        $('#request_diff').hide();
+        $('#commit_list').show();
       }
     }
-  });
+  );
 
 {% if pull_request %}
 {# These lines are only for existing pull-requests, not new ones #}
@@ -645,23 +653,6 @@ function setup_reply_btns() {
         });
       } else {
         next_row.prev().find('.pr_comment_form').parent().remove();
-      }
-    }
-  );
-
-  $( ".nav-item" ).click(
-    function() {
-      var header = $( this ).attr('data-id');
-      if (header == 'nav-diff') {
-        $($(this).parent().children()[1]).removeClass('active');
-        $(this).addClass('active');
-        $('#commit_list').hide();
-        $('.commit_diff').show();
-      } else {
-        $($(this).parent().children()[0]).removeClass('active');
-        $(this).addClass('active');
-        $('.commit_diff').hide();
-        $('#commit_list').show();
       }
     }
   );
