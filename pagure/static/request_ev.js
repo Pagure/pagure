@@ -59,7 +59,7 @@ add_comment = function(data) {
   } else {
     // Generic comment
     console.log('generic');
-    var field = $('#request_comment');
+    var field = $($('#request_comment').find('form'));
     field.html(field.html() + _data);
   }
 }
