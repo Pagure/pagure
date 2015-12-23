@@ -112,7 +112,11 @@
         </div>
       {% endif %}
 
+      {% if readme %}
       <div class="col-md-4">
+      {% else %}
+      <div class="col-md-12">
+      {% endif %}
         <div class="card">
           <div class="card-block">
             {%- if repo.url %}
