@@ -113,7 +113,12 @@
               {% endif %}
             {% endfor %}
           </select>
-    <table>
+  <div class="card" id="pr_flags">
+      <div class="card-block">
+        <table class="table table-hover table-striped m-b-0">
+          <thead></thead>
+          <tfoot></tfoot>
+    <tbody>
       {{ render_bootstrap_field(form.title) }}
       <tr>
           <td>From git repo:</td>
@@ -141,6 +146,7 @@
 
         </td>
       </tr>
+    </tbody>
     </table>
     <p class="buttons indent">
       <input type="submit" class="submit positive button" value="Create">
