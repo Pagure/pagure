@@ -2001,7 +2001,7 @@ index 0000000..fb7093d
                 '</button>\n                      File', output.data)
             self.assertIn(
                 'uploaded\n                    </div>', output.data)
-            self.assertIn('<pre>No git repo found</pre>', output.data)
+            self.assertIn('<p>No git repo found</p>', output.data)
 
             repo = tests.create_projects_git(tests.HERE)
 
@@ -2067,7 +2067,7 @@ index 0000000..fb7093d
             self.assertIn(
                 '</button>\n                      Token created',
                 output.data)
-            self.assertIn('<pre>No git repo found</pre>', output.data)
+            self.assertIn('<p>No git repo found</p>', output.data)
 
             repo = tests.create_projects_git(tests.HERE)
 
@@ -2126,7 +2126,7 @@ index 0000000..fb7093d
 
             output = self.app.post('/test/token/revoke/123', data=data)
             self.assertEqual(output.status_code, 404)
-            self.assertIn('<pre>Token not found</pre>', output.data)
+            self.assertIn('<p>Token not found</p>', output.data)
 
             # Create a token to revoke
             repo = tests.create_projects_git(tests.HERE)
@@ -2193,7 +2193,7 @@ index 0000000..fb7093d
 
             output = self.app.post('/test/bar/delete')
             self.assertEqual(output.status_code, 404)
-            self.assertIn('<pre>Branch no found</pre>', output.data)
+            self.assertIn('<p>Branch no found</p>', output.data)
 
             # Add a branch that we can delete
             path = os.path.join(tests.HERE, 'test.git')
