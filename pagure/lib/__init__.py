@@ -1271,6 +1271,13 @@ def fork_project(session, user, repo, gitfolder,
         parent_id=repo.id,
         hook_token=pagure.lib.login.id_generator(40)
     )
+
+    #disable issues, PRs in the fork by default
+    default_repo_settings = project.settings
+    default_repo_settings['issue_tracker'] = False
+    default_repo_settings['pull_requests'] = False
+    project.settings = default_repo_settings
+
     session.add(project)
     # Make sure we won't have SQLAlchemy error before we create the repo
     session.flush()
