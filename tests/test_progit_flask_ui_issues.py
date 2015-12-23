@@ -1162,7 +1162,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output.data)
             self.assertIn(
                 '<span class="issueid label label-default">#1</span>\n'
-                '      <span id="issuetitle">Test issue #1</span>',
+                '    <span id="issuetitle">Test issue #1</span>',
                 output.data)
             self.assertEqual(output.data.count(
                 '<option selected value="Open">Open</option>'), 1)

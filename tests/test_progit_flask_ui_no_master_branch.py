@@ -310,7 +310,8 @@ class PagureFlaskNoMasterBranchtests(tests.Modeltests):
         tests.create_projects(self.session)
         # Non-existant git repo
         output = self.app.get('/test/diff/master..feature')
-        self.assertEqual(output.status_code, 302)
+        # (used to be 302 but seeing a diff is allowed even logged out)
+        self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
@@ -320,7 +321,11 @@ class PagureFlaskNoMasterBranchtests(tests.Modeltests):
         self.set_up_git_repo()
 
         output = self.app.get('/test/diff/master..feature')
-        self.assertEqual(output.status_code, 302)
+        # (used to be 302 but seeing a diff is allowed even logged out)
+        self.assertEqual(output.status_code, 400)
+        self.assertIn(
+            '<p>Branch master could not be found in the target repo</p>',
+            output.data)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):

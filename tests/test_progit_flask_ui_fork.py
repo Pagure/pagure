@@ -319,7 +319,7 @@ class PagureFlaskForktests(tests.Modeltests):
                 'Pagure</title>', output.data)
             self.assertIn(
                 '<h2><span class="label label-default">PR#1</span> '
-                'PR from the feature branch<a class="edit_icon"', output.data)
+                'PR from the feature branch<small>', output.data)
             self.assertIn(
                 '</button>\n                      This request must be '
                 'assigned to be merged', output.data)
@@ -336,7 +336,7 @@ class PagureFlaskForktests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<h2><span class="label label-default">PR#1</span> '
-                'PR from the feature branch<a class="edit_icon', output.data)
+                'PR from the feature branch<small>', output.data)
             self.assertIn(
                 '</button>\n                      Only the assignee can '
                 'merge this review', output.data)
@@ -353,7 +353,7 @@ class PagureFlaskForktests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<h2><span class="label label-default">PR#1</span> '
-                'PR from the feature branch<a class="edit_icon', output.data)
+                'PR from the feature branch<small>', output.data)
             self.assertIn(
                 '</button>\n                      This request does not '
                 'have the minimum review score necessary to be merged',
@@ -437,7 +437,7 @@ class PagureFlaskForktests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<h2><span class="label label-default">PR#1</span> '
-                'PR from the feature branch<a class="edit_icon"', output.data)
+                'PR from the feature branch<small>', output.data)
             self.assertIn(
                 '</button>\n                      Merge conflicts!',
                 output.data)
@@ -490,7 +490,7 @@ class PagureFlaskForktests(tests.Modeltests):
             '<h2><span class="label label-default">PR#1</span> '
             'PR from the feature branch</h2>', output.data)
         self.assertIn(
-            '<span>Merged by', output.data)
+            '<span class="btn btn-default">Merged by', output.data)
         self.assertIn(
             'title="View file as of 2a552b">View</a>', output.data)
 
@@ -1433,7 +1433,7 @@ index 0000000..2a552bb
             output = self.app.post('/test/pull-request/1/comment')
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
-                output.data.startswith('<section class="add_comment">'))
+                output.data.startswith('\n<section class="add_comment">'))
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -1528,7 +1528,7 @@ index 0000000..2a552bb
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<h2><span class="label label-default">PR#1</span> '
-                'PR from the feature branch<a class="edit_icon"', output.data)
+                'PR from the feature branch<small>', output.data)
             self.assertIn(
                 '</button>\n                      Comment removed',
                 output.data)
@@ -1568,7 +1568,7 @@ index 0000000..2a552bb
             self.assertEqual(output.status_code, 200)
             # Creating comment to play with
             self.assertTrue(
-                output.data.startswith('<section class="add_comment">'))
+                output.data.startswith('\n<section class="add_comment">'))
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -1584,8 +1584,7 @@ index 0000000..2a552bb
 
             self.assertIn(
                 '<h2><span class="label label-default">PR#1</span> '
-                'PR from the feature branch<a class="edit_icon"',
-                output.data)
+                'PR from the feature branch<small>', output.data)
             self.assertIn(
                 '</button>\n                      Comment added',
                 output.data)
@@ -1615,7 +1614,7 @@ index 0000000..2a552bb
                 '<p>This look alright but we can do better than this.</p>', output.data)
             self.assertIn(
                 '<h2><span class="label label-default">PR#1</span> '
-                'PR from the feature branch<a class="edit_icon"', output.data)
+                'PR from the feature branch<small>', output.data)
             # Checking if Edited by User is there or not
             self.assertIn(
                 '<small class="text-muted">Edited just now by pingou </small>',

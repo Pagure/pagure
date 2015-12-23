@@ -339,7 +339,8 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
         tests.create_projects(self.session)
         # Non-existant git repo
         output = self.app.get('/test/diff/master..maxamilion/feature')
-        self.assertEqual(output.status_code, 302)
+        # (used to be 302 but seeing a diff is allowed even logged out)
+        self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
@@ -349,7 +350,10 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
         self.set_up_git_repo()
 
         output = self.app.get('/test/diff/master..maxamilion/feature')
-        self.assertEqual(output.status_code, 302)
+        # (used to be 302 but seeing a diff is allowed even logged out)
+        self.assertEqual(output.status_code, 200)
+        self.assertEqual(output.data.count('<td class="commitid">'), 1)
+        self.assertIn('<h5>.gitignore', output.data)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
@@ -357,7 +361,7 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertEqual(
                 output.data.count('<td class="commitid">'), 1)
-            self.assertIn('<h3>.gitignore</h3>', output.data)
+            self.assertIn('<h5>.gitignore', output.data)
 
 
 if __name__ == '__main__':
