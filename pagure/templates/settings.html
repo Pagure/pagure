@@ -24,7 +24,8 @@
                           username=username, repo=repo.name) }}" method="post">
             <fieldset class="form-group">
               <label for="description">Description</label>
-              <input class="form-control" name="description" value="{{ repo.description }}" required/>
+              <input class="form-control" name="description" value="{{
+                repo.description if repo.description }}" required/>
               <small class="text-muted">Short description of the project</small>
             </fieldset>
             <fieldset class="form-group">
