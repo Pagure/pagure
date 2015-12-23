@@ -5,13 +5,19 @@
 
 
 {% block content %}
-    <h2>Page not found (404)</h2>
-    {% if error and error.description %}
-    <p>With the message:</p>
-    <pre>{{ error.description }}</pre>
-    {% else %}
-    <p>The requested page cannot be found, we're sorry :(</p>
-    {% endif %}
-    <p>Maybe you enter a bad URL, or the page has moved or has been removed, or...<br/>
-    Use the main navigation menu to get (re)started.</p>
+<div class="container p-t-3">
+  <div class="row">
+    <div class="col-md-8">
+      <h2>Page not found (404)</h2>
+      {% if error and error.description %}
+      <p>With the message:</p>
+      <pre>{{ error.description }}</pre>
+      {% else %}
+      <p>The requested page cannot be found, we're sorry :(</p>
+      {% endif %}
+      <p>Maybe you enter a bad URL, or the page has moved or has been removed, or...<br/>
+      Use the main navigation menu to get (re)started.</p>
+    </div>
+  </div>
+</div>
 {% endblock %}
