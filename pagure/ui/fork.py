@@ -864,7 +864,6 @@ def fork_project(repo, username=None):
 @APP.route(
     '/fork/<username>/<repo>/diff/<path:branch_to>..<path:branch_from>',
     methods=('GET', 'POST'))
-@cla_required
 def new_request_pull(repo, branch_to, branch_from, username=None):
     """ Request pulling the changes from the fork into the project.
     """
