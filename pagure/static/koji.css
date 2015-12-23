@@ -303,6 +303,12 @@ span.CONFLICTS {
   background: url(/static/red.png) 0 50% no-repeat;
 }
 
+.highlighted-line,
+.highlighted-line td,
+.highlighted-line td pre {
+     background-color: #FFFABA;
+}
+
 
 /* Added */
 .nav {
