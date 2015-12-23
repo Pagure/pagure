@@ -674,6 +674,10 @@ function setup_reply_btns() {
 
   highlight_comment = function() {
     var _hash = window.location.hash;
+    console.log(_hash);
+    if (_hash == '#commit_list' || _hash == '#request_diff') {
+        return false;
+    }
     if (_hash != cur_hash) {
       $( cur_hash ).css(
         "background", "linear-gradient(to bottom, #ededed 0%, #fff 100%)"
