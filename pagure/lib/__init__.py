@@ -989,7 +989,7 @@ def new_project(session, user, name, blacklist,
         raise pagure.exceptions.RepoExistsException(
             'The tickets repo "%s" already exists' % project.path
         )
-    pygit2.init_repository(ticketrepo, bare=True)
+    pygit2.init_repository(ticketrepo, bare=True, mode=pygit2.GIT_REPOSITORY_INIT_SHARED_GROUP)
 
     requestrepo = os.path.join(requestfolder, project.path)
     if os.path.exists(requestrepo):
@@ -1298,7 +1298,8 @@ def fork_project(session, user, repo, gitfolder,
         raise pagure.exceptions.RepoExistsException(
             'The tickets repo "%s" already exists' % project.path
         )
-    pygit2.init_repository(ticketrepo, bare=True)
+    pygit2.init_repository(ticketrepo, bare=True, mode=pygit2.GIT_REPOSITORY_INIT_SHARED_GROUP)
+
 
     requestrepo = os.path.join(requestfolder, project.path)
     if os.path.exists(requestrepo):
