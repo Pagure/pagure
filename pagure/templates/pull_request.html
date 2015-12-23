@@ -303,18 +303,21 @@
 
 <div class="request_diff" id="request_diff">
 
-  {% if authenticated and pull_request %}
-  <form action="{{ url_for('.pull_request_drop_comment', username=username,
-      repo=repo.name, requestid=requestid) }}" method="post" class="icon"
-      onsubmit="return try_async_comment(this, null)" >
-  {% endif %}
-
-    {% if diff %}
-    {% for patch in diff %}
-    <section class="commit_diff">
+  {% if diff %}
     <div class="card clearfix">
       <div class="card-header">
-          <h3>
+        <h5>Changes summary:</h5>
+      </div>
+      <div class="card-block">
+    <table class="table table-hover table-striped m-b-0">
+      <thead>
+      </thead>
+      <tfoot>
+      </tfoot>
+      <tbody>
+    {% for patch in diff %}
+        <tr>
+          <th>
             {%- if patch | hasattr('new_file_path') -%}
               {%- if patch.new_file_path == patch.old_file_path -%}
               {{ patch.new_file_path }}
@@ -328,7 +331,8 @@
               {{ patch.delta.new_file.path }} (Renamed from "{{ patch.delta.old_file.path }}")
               {%- endif -%}
             {%- endif -%}
-          </h3>
+          </th>
+          <td>
             {% if patch | hasattr('additions') %}
             {# Version of pygit2 -0.21.4 -- F21/EL7 #}
             {% if (patch.additions + patch.deletions) %}
@@ -346,9 +350,44 @@
               </span>
             {% endif %}
             {% endif %}
+          </td>
+        </tr>
+    {% endfor %}
+      </tbody>
+    </table>
+      </div>
+    </div>
+  {% endif %}
+
+
+  {% if authenticated and pull_request %}
+  <form action="{{ url_for('.pull_request_drop_comment', username=username,
+      repo=repo.name, requestid=requestid) }}" method="post" class="icon"
+      onsubmit="return try_async_comment(this, null)" >
+  {% endif %}
+
+  {% if diff %}
+    {% for patch in diff %}
+    <section class="commit_diff">
+    <div class="card clearfix">
+      <div class="card-header">
+          <h5>
+            {%- if patch | hasattr('new_file_path') -%}
+              {%- if patch.new_file_path == patch.old_file_path -%}
+              {{ patch.new_file_path }}
+              {%- else -%}
+              {{ patch.new_file_path }} (Renamed from "{{ patch.old_file_path }}")
+              {%- endif -%}
+            {%- elif patch | hasattr('delta') -%}
+              {%- if patch.delta.new_file.path == patch.delta.old_file.path -%}
+              {{ patch.delta.new_file.path }}
+              {%- else -%}
+              {{ patch.delta.new_file.path }} (Renamed from "{{ patch.delta.old_file.path }}")
+              {%- endif -%}
+            {%- endif -%}
 
             {% if pull_request %}
-            <a class="button view headerlink pull-xs-right" href="{{
+            <a class="button small view headerlink pull-xs-right" href="{{
                 url_for(
                     'view_file',
                     username=pull_request.project_from.user.username
@@ -357,7 +396,7 @@
                     identifier=pull_request.branch_from,
                     filename=patch.new_file_path) }}"
             {% else %}
-            <a class="button view headerlink pull-xs-right" href="{{
+            <a class="button small view headerlink pull-xs-right" href="{{
                 url_for(
                     'view_file',
                     username=username,
@@ -372,6 +411,7 @@
             {% else %}
             title="View file as of {{ patch.new_oid|short }}">View</a>
             {% endif %}
+          </h5>
       </div>
       <div class="card-block">
     {% autoescape false %}
