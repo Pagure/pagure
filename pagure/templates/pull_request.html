@@ -94,7 +94,15 @@
     branch_to=branch_to) }}" method="post">
   {% endif %}
   Pull from
-<span class="pr-toplabel">{% if remote_git -%}{{ remote_git }}{%- else -%}<span class="oi" data-glyph="fork"></span> {{ repo.fullname}}{%- endif %}</span> <span class="pr-toplabel"> <span class="oi" data-glyph="random"> </span>{{ branch_from }}</span>
+    <span class="pr-toplabel">{%
+      if remote_git -%}{{ remote_git }}{%-
+      else -%}
+        <span class="oi" data-glyph="fork"></span> {{ repo.fullname }} {%-
+      endif -%}
+    </span>
+    <span class="pr-toplabel">
+      <span class="oi" data-glyph="random">
+    </span> {{ branch_from }} </span>
   into
 <span class="pr-toplabel">{% if repo.is_fork -%}{{ repo.parent.fullname }}{% else %}{{ repo.fullname }}{% endif %}</span>
           <select class="pr-toplabel-select" id="branch_select" name="branch_to">
