@@ -54,7 +54,7 @@ def index():
 
     total_page = int(ceil(num_repos / float(limit)))
 
-    if authenticated():
+    if authenticated() and flask.request.path == '/':
         return index_auth()
 
     return flask.render_template(
