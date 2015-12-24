@@ -993,7 +993,8 @@ def new_project(session, user, name, blacklist,
             'The tickets repo "%s" already exists' % project.path
         )
     pygit2.init_repository(
-        ticketrepo, bare=True, mode=pygit2.GIT_REPOSITORY_INIT_SHARED_GROUP)
+        ticketrepo, bare=True,
+        mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
 
     requestrepo = os.path.join(requestfolder, project.path)
     if os.path.exists(requestrepo):
@@ -1004,7 +1005,8 @@ def new_project(session, user, name, blacklist,
             'The requests repo "%s" already exists' % project.path
         )
     pygit2.init_repository(
-        requestrepo, bare=True, mode=pygit2.GIT_REPOSITORY_INIT_SHARED_GROUP)
+        requestrepo, bare=True,
+        mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
 
     pagure.lib.notify.log(
         project,
@@ -1304,7 +1306,8 @@ def fork_project(session, user, repo, gitfolder,
             'The tickets repo "%s" already exists' % project.path
         )
     pygit2.init_repository(
-        ticketrepo, bare=True, mode=pygit2.GIT_REPOSITORY_INIT_SHARED_GROUP)
+        ticketrepo, bare=True,
+        mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
 
     requestrepo = os.path.join(requestfolder, project.path)
     if os.path.exists(requestrepo):
@@ -1315,7 +1318,8 @@ def fork_project(session, user, repo, gitfolder,
             'The requests repo "%s" already exists' % project.path
         )
     pygit2.init_repository(
-        requestrepo, bare=True, mode=pygit2.GIT_REPOSITORY_INIT_SHARED_GROUP)
+        requestrepo, bare=True,
+        mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
 
     pagure.lib.notify.log(
         project,
