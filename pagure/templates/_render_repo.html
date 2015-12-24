@@ -161,7 +161,8 @@
           <div class="card-header">
             {{name}} <span class="label label-default">{{total}}</span>
           </div>
-          <div class="list-group">
+          {% if list %}
+            <div class="list-group">
             {% for repo in list %}
               <div class="list-group-item">
                 {% if repo.is_fork %}
@@ -184,9 +185,12 @@
                   <small>{% if repo.description %}{{ repo.description }}{%else%}<span class="text-muted">no description<span>{% endif %}</small>
                 </div>
               </div>
-            {% else %}
-                <p>No projects found</p>
             {% endfor %}
+            </div>
+        {% else %}
+          <div class="card-block">
+            <p>No projects found</p>
           </div>
+        {% endif %}
         </div>
 {% endmacro %}
