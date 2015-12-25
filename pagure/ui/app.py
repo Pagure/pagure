@@ -62,6 +62,8 @@ def index():
         select="projects",
         repos=repos,
         repos_length=num_repos,
+        total_page=total_page,
+        page=page,
     )
 
 
