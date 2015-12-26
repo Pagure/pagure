@@ -59,7 +59,7 @@ GIT_URL_GIT = 'git://pagure.org/'
 
 
 # Number of items displayed per page
-ITEM_PER_PAGE = 50
+ITEM_PER_PAGE = 48
 
 # Maximum size of the uploaded content
 MAX_CONTENT_LENGTH = 4 * 1024 * 1024  # 4 megabytes
