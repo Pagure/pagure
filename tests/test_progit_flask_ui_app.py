@@ -99,8 +99,8 @@ class PagureFlaskApptests(tests.Modeltests):
         output = self.app.get('/users/?page=abc')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<h2 class="m-b-1">\n        Users <span class="label '
-            'label-default">2</span></h2', output.data)
+            '<h2 class="m-b-1">\n      Users '
+            '<span class="label label-default">2</span></h2>', output.data)
         self.assertIn(
             '<a class="project_link logo_link" href="/user/pingou">',
             output.data)
