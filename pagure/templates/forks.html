@@ -17,7 +17,8 @@
         <h5>
           <strong>{{ fork.user.user }}/{{ fork.name }}</strong>
           <div class="pull-xs-right">
-            <span class="commitdate" data-toggle="tooltip" title="{{ fork.date_created.strftime('%Y-%m-%d %H:%M') }}">
+            <span class="commitdate" data-toggle="tooltip" title="{{
+                fork.date_created.strftime('%Y-%m-%d %H:%M:%S') }}">
               Forked {{ fork.date_created|humanize }}
             </span>
           </div>

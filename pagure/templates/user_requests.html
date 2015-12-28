@@ -54,7 +54,7 @@
               {{ request.user.user }}
             </td>
             <td>
-                {{ request.date_created.strftime('%Y-%m-%d %H:%M') }}
+                {{ request.date_created.strftime('%Y-%m-%d %H:%M:%S') }}
             </td>
             <td>
               {% if request.assignee %}

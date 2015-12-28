@@ -245,7 +245,7 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
                 'comment_user': issue_comment.user.user,
                 'avatar_url': avatar_url(issue_comment.user.user, size=16),
                 'comment_date': issue_comment.date_created.strftime(
-                    '%Y-%m-%d %H:%M'),
+                    '%Y-%m-%d %H:%M:%S'),
             }))
 
     return 'Comment added'
@@ -818,7 +818,7 @@ def add_pull_request_comment(session, request, commit, filename, row,
             'comment_user': pr_comment.user.user,
             'comment_id': pr_comment.id,
             'avatar_url': avatar_url(pr_comment.user.user, size=16),
-            'comment_date': pr_comment.date_created.strftime('%Y-%m-%d %H:%M'),
+            'comment_date': pr_comment.date_created.strftime('%Y-%m-%d %H:%M:%S'),
             'commit_id': commit,
             'filename': filename,
             'line': row,

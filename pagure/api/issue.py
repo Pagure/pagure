@@ -452,7 +452,7 @@ def api_view_issue_comment(repo, issueid, commentid, username=None):
 
     output = comment.to_json(public=True)
     output['avatar_url'] = pagure.lib.avatar_url(comment.user.user, size=16)
-    output['comment_date'] = comment.date_created.strftime('%Y-%m-%d %H:%M')
+    output['comment_date'] = comment.date_created.strftime('%Y-%m-%d %H:%M:%S')
     jsonout = flask.jsonify(output)
     return jsonout
 
