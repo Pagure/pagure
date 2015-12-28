@@ -36,14 +36,14 @@
     <nav class="text-center">
       <ul class="pagination">
         <li {% if page <= 1%} class="disabled" {% endif %}>
-          <a href="{{ url_for('browse_projects') }}?{{ pagetitle }}={{page - 1}}">
+          <a href="{{ request.base_url }}?{{ pagetitle }}={{page - 1}}">
             <span aria-hidden="true">&laquo;</span>
             <span class="sr-only">Newer</span>
           </a>
         </li>
         <li class="active">page {{ page }} of {{ total }}</li>
         <li {% if page >= total %}class="disabled"{%endif%}>
-          <a href="{{ url_for('browse_projects') }}?{{ pagetitle }}={{page + 1}}">
+          <a href="{{ request.base_url }}?{{ pagetitle }}={{page + 1}}">
             <span aria-hidden="true">&raquo;</span>
             <span class="sr-only">Older</span>
           </a>
