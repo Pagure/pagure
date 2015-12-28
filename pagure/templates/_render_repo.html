@@ -156,7 +156,10 @@
     </aside>
 {% endmacro %}
 
-{% macro render_repos_as_card(list, total, name) %}
+{% macro render_repos_as_card(list, total, name, pagetitle, page, total_page) %}
+        {% if total_page and total_page > 1 %}
+        {{ pagination_link(pagetitle, page, total_page) }}
+        {% endif %}
         <div class="card">
           <div class="card-header">
             {{name}} <span class="label label-default">{{total}}</span>
@@ -193,4 +196,7 @@
           </div>
         {% endif %}
         </div>
+        {% if total_page and total_page > 1 %}
+        {{ pagination_link(pagetitle, page, total_page) }}
+        {% endif %}
 {% endmacro %}
