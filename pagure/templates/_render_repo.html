@@ -94,12 +94,12 @@
           <div class="card-block">
 
                     {% for repo in list %}
-                        {% if repo.is_fork %}
-                        {% set url = url_for('view_repo', username=repo.user.username, repo=repo.name) %}
-                        {% else %}
-                        {% set url = url_for('view_repo', repo=repo.name) %}
-                        {% endif %}
-                        <a class="project_link logo_link" href="{{ url }}">
+                        <a class="project_link logo_link" href="{{
+                            url_for(
+                            'view_repo',
+                            username=repo.user.username if repo.is_fork else None,
+                            repo=repo.name)
+                        }}">
                             <div><strong>{{ repo.name }}</strong></div>
                        </a>
                     {% else %}
