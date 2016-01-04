@@ -17,15 +17,15 @@
             {% if authenticated and repo_admin %}
               <p>If you already have a git repo:</p>
               <pre>git remote add origin {{ config.get('GIT_URL_SSH') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
-  git push -u origin master</pre>
+git push -u origin master</pre>
 
               <p>If you have not created your git repo yet:</p>
               <pre>git clone {{ config.get('GIT_URL_SSH') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git
-  cd {{ repo.name }}
-  touch README.rst
-  git add README.rst
-  git commit -m "Add README file"
-  git push -u origin master</pre>
+cd {{ repo.name }}
+touch README.rst
+git add README.rst
+git commit -m "Add README file"
+git push -u origin master</pre>
             {% else %}
               <p>The Project Creator has not pushed any code yet</p>
             {% endif %}
