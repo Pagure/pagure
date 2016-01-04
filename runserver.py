@@ -36,7 +36,11 @@ if args.profile:
     APP.wsgi_app = ProfilerMiddleware(APP.wsgi_app, restrictions=[30])
 
 if args.config:
-    os.environ['PAGURE_CONFIG'] = args.config
+    config = args.config
+    if not config.startswith('/'):
+        here = os.path.join(os.path.dirname(os.path.abspath(__file__)))
+        config = os.path.join(here, config)
+    os.environ['PAGURE_CONFIG'] = config
 
 APP.debug = True
 APP.run(host='0.0.0.0', port=int(args.port))
