@@ -112,7 +112,7 @@ git push -u origin master</pre>
         </div>
       {% endif %}
 
-      {% if readme %}
+      {% if readme or (repo_obj and repo_obj.is_empty) %}
       <div class="col-md-4">
       {% else %}
       <div class="col-md-12">
