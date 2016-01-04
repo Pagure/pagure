@@ -43,7 +43,7 @@
       <form action="{{ url_for('merge_request_pull', username=username,
           repo=repo.name, requestid=requestid) }}" method="POST">
         {{ mergeform.csrf_token }}
-        <button type="submit" class="btn btn-success">Merge</button>
+        <button id="merge_btn" type="submit" class="btn btn-success">Merge</button>
       </form>
      </span>
     {% endif %}
@@ -765,6 +765,9 @@ function setup_reply_btns() {
         var _obj = $('#pr_flags').find('tbody');
         _obj.append($('<tr><th>PR Status:</th><td><span class="'+res.code+'" title="'
           +res.message+'"></span>'+res.short_code+'</td></tr>'));
+        if (res.code == 'CONFLICTS' || res.code == 'NO_CHANGE') {
+          $('#merge_btn').attr("disabled", "disabled");
+        }
       },
       error: function(res) {
         var _obj = $('#pr_flags').find('tbody');
@@ -777,6 +780,7 @@ function setup_reply_btns() {
             $('<tr><th>PR Status:</th><td><span class="'+ res.responseJSON.code +'"></span>'
               + res.responseJSON.message +'</td></tr>'));
         }
+        $('#merge_btn').attr("disabled", "disabled");
       }
     });
     return false;
