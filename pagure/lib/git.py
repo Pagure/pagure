@@ -963,6 +963,7 @@ def merge_pull_request(
             'Enforce_signed-off_commits_in_pull-request', False):
         for commit in diff_commits:
             if 'signed-off-by' not in commit.message.lower():
+                shutil.rmtree(newpath)
                 raise pagure.exceptions.PagureException(
                     'This repo enforces that all commits are '
                     'signed off by their author. ')
@@ -1013,12 +1014,12 @@ def merge_pull_request(
             pagure.lib.close_pull_request(
                 session, request, username,
                 requestfolder=request_folder)
+            shutil.rmtree(newpath)
             try:
                 session.commit()
             except SQLAlchemyError as err:  # pragma: no cover
                 session.rollback()
                 pagure.APP.logger.exception(err)
-                shutil.rmtree(newpath)
                 raise pagure.exceptions.PagureException(
                     'Could not close this pull-request')
             raise pagure.exceptions.PagureException(
@@ -1026,6 +1027,7 @@ def merge_pull_request(
         else:
             request.merge_status = 'NO_CHANGE'
             session.commit()
+            shutil.rmtree(newpath)
             return 'NO_CHANGE'
 
     elif (
@@ -1045,6 +1047,7 @@ def merge_pull_request(
         else:
             request.merge_status = 'FFORWARD'
             session.commit()
+            shutil.rmtree(newpath)
             return 'FFORWARD'
 
     else:
@@ -1063,6 +1066,7 @@ def merge_pull_request(
         if not domerge:
             request.merge_status = 'MERGE'
             session.commit()
+            shutil.rmtree(newpath)
             return 'MERGE'
 
         head = new_repo.lookup_reference('HEAD').get_object()

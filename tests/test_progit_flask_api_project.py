@@ -103,6 +103,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             {'tags': ['0.0.1'], 'total_tags': 1}
         )
 
+        shutil.rmtree(newpath)
+
     def test_api_projects(self):
         """ Test the api_projects method of the flask api. """
         tests.create_projects(self.session)

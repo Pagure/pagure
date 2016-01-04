@@ -624,6 +624,8 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(
             output.data.count('<span class="commitid">'), 0)
 
+        shutil.rmtree(newpath)
+
     def test_view_repo_branch(self):
         """ Test the view_repo_branch endpoint. """
 
