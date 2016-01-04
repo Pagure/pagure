@@ -291,7 +291,13 @@ def patch_to_diff(patch):
             if hasattr(line, 'content'):
                 content = content + line.origin + ' '+ line.content
             else:
+                # Avoid situation where at the end of a file we get:
+                # + foo<
+                # \ No newline at end of file
+                if line[0] == '<':
+                    line = ('',line[1])
                 content = content + ' '.join(line)
+
     return content
 
 
