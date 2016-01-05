@@ -13,7 +13,6 @@ import hashlib
 import datetime
 import urlparse
 import bcrypt
-from kitchen.text.converters import to_unicode, to_bytes
 
 import flask
 from sqlalchemy.exc import SQLAlchemyError
