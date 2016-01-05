@@ -12,6 +12,7 @@
 import hashlib
 import datetime
 import urlparse
+import bcrypt
 
 import flask
 from sqlalchemy.exc import SQLAlchemyError
@@ -44,9 +45,8 @@ def new_user():
             flask.flash('Email address already taken.', 'error')
             return flask.redirect(flask.request.url)
 
-        password = '%s%s' % (
-            form.password.data, APP.config.get('PASSWORD_SEED', None))
-        form.password.data = hashlib.sha512(password).hexdigest()
+        password = bcrypt.hashpw(form.password.data, bcrypt.gensalt())
+        form.password.data = password
 
         token = pagure.lib.login.id_generator(40)
 
@@ -98,12 +98,12 @@ def do_login():
 
     if form.validate_on_submit():
         username = form.username.data
-        password = '%s%s' % (
-            form.password.data, APP.config.get('PASSWORD_SEED', None))
-        password = hashlib.sha512(password).hexdigest()
 
         user_obj = pagure.lib.search_user(SESSION, username=username)
+        password = bcrypt.hashpw(form.password.data, user_obj.password)
+
         if not user_obj or user_obj.password != password:
+            print user_obj.password, password
             flask.flash('Username or password invalid.', 'error')
             return flask.redirect(flask.url_for('auth_login'))
         elif user_obj.token:
@@ -232,9 +232,7 @@ def reset_password(token):
 
     if form.validate_on_submit():
 
-        password = '%s%s' % (
-            form.password.data, APP.config.get('PASSWORD_SEED', None))
-        user_obj.password = hashlib.sha512(password).hexdigest()
+        user_obj.password = bcrypt.hashpw(form.password.data, bcrypt.gensalt())
         user_obj.token = None
         SESSION.add(user_obj)
 
@@ -273,12 +271,9 @@ def change_password(username):
         flask.flash('No user associated with this username.', 'error')
         return flask.redirect(flask.url_for('auth_login'))
     if form.validate_on_submit():
-        old_password = '%s%s' % (
-            form.old_password.data, APP.config.get('PASSWORD_SEED', None))
-        if user_obj.password == hashlib.sha512(old_password).hexdigest():
-            password = '%s%s' % (
-                form.password.data, APP.config.get('PASSWORD_SEED', None))
-            user_obj.password = hashlib.sha512(password).hexdigest()
+        old_password = bcrypt.hashpw(form.old_password.data, user_obj.password)
+        if user_obj.password == old_password:
+            user_obj.password = bcrypt.hashpw(form.password.data, bcrypt.gensalt())
             SESSION.add(user_obj)
 
         try:
@@ -295,7 +290,7 @@ def change_password(username):
         return flask.redirect(flask.url_for('auth_login'))
 
     return flask.render_template(
-        'login/password_change.html',
+        'login/password_recover.html',
         form=form,
         username=username,
     )
