@@ -85,7 +85,7 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
             break
         if filename and commit:
             output.append(
-                '<tr><td class="cell1">'
+                '<tr id="c-%(commit)s-%(cnt_lbl)s"><td class="cell1">'
                 '<a id="%(cnt)s" href="#%(cnt)s" data-line-number="%(cnt_lbl)s"></a></td>'
                 '<td class="prc" data-row="%(cnt_lbl)s"'
                 ' data-filename="%(filename)s" data-commit="%(commit)s">'
