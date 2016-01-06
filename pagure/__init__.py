@@ -26,7 +26,7 @@ from logging.handlers import SMTPHandler
 import flask
 import pygit2
 import werkzeug
-from pagure.flask_fas_openid import FAS
+from flask_fas_openid import FAS
 from functools import wraps
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -279,7 +279,7 @@ def auth_login():  # pragma: no cover
         admins = set(admins)
 
     if APP.config.get('PAGURE_AUTH', None) == 'fas':
-        return FAS.login(return_url=return_point, groups=admins, ssh=True)
+        return FAS.login(return_url=return_point, groups=admins)
     elif APP.config.get('PAGURE_AUTH', None) == 'local':
         form = pagure.login_forms.LoginForm()
         return flask.render_template(
