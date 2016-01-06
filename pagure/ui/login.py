@@ -45,7 +45,7 @@ def new_user():
             flask.flash('Email address already taken.', 'error')
             return flask.redirect(flask.request.url)
 
-        password = bcrypt.hashpw(form.password.data, bcrypt.gensalt())
+        password = bcrypt.hashpw(str(form.password.data), bcrypt.gensalt())
         form.password.data = password
 
         token = pagure.lib.login.id_generator(40)
@@ -100,17 +100,20 @@ def do_login():
         username = form.username.data
 
         user_obj = pagure.lib.search_user(SESSION, username=username)
-        password = bcrypt.hashpw(form.password.data, user_obj.password)
+        try:
+            password = bcrypt.hashpw(str(form.password.data), user_obj.password)
+        except ValueError:
+             password = '%s%s' % (form.password.data, APP.config.get('PASSWORD_SEED', None))
+             password = hashlib.sha512(password).hexdigest()
 
         if not user_obj or user_obj.password != password:
-            print user_obj.password, password
             flask.flash('Username or password invalid.', 'error')
             return flask.redirect(flask.url_for('auth_login'))
         elif user_obj.token:
             flask.flash(
                 'Invalid user, did you confirm the creation with the url '
-                'provided by email?', 'error')
-            return flask.redirect(flask.url_for('auth_login'))
+               'provided by email?', 'error')
+           return flask.redirect(flask.url_for('auth_login'))
         else:
             visit_key = pagure.lib.login.id_generator(40)
             now = datetime.datetime.utcnow()
@@ -232,7 +235,7 @@ def reset_password(token):
 
     if form.validate_on_submit():
 
-        user_obj.password = bcrypt.hashpw(form.password.data, bcrypt.gensalt())
+        user_obj.password = bcrypt.hashpw(str(form.password.data), bcrypt.gensalt())
         user_obj.token = None
         SESSION.add(user_obj)
 
@@ -271,9 +274,9 @@ def change_password(username):
         flask.flash('No user associated with this username.', 'error')
         return flask.redirect(flask.url_for('auth_login'))
     if form.validate_on_submit():
-        old_password = bcrypt.hashpw(form.old_password.data, user_obj.password)
+        old_password = bcrypt.hashpw(str(orm.old_password.data), user_obj.password)
         if user_obj.password == old_password:
-            user_obj.password = bcrypt.hashpw(form.password.data, bcrypt.gensalt())
+            user_obj.password = bcrypt.hashpw(str(form.password.data), bcrypt.gensalt())
             SESSION.add(user_obj)
 
         try:
