@@ -119,6 +119,7 @@ def do_login():
         elif user_obj.token:
             flask.flash(
                 'Invalid user, did you confirm the creation with the url '
+
                 'provided by email?', 'error')
             return flask.redirect(flask.url_for('auth_login'))
 
@@ -247,6 +248,7 @@ def reset_password(token):
         return flask.redirect(flask.url_for('auth_login'))
 
     if form.validate_on_submit():
+
 
         user_obj.password = generate_hashed_value(form.password.data)
 
