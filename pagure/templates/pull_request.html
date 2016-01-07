@@ -136,29 +136,6 @@
   </div>
 
   <div class="col-md-4">
-    {% if pull_request.flags %}
-    <div class="card" id="pr_flags">
-      <div class="card-block">
-        <table class="table table-hover table-striped m-b-0">
-          <thead></thead>
-          <tfoot></tfoot>
-          <tbody>
-            {% for flag in pull_request.flags %}
-              <tr style="background-color: {{ flag.percent | toRGB }}">
-                <td>{{ flag.percent }}%</td>
-                <td><a href="{{ flag.url }}">{{ flag.username }}</a></td>
-                <td>{{ flag.comment }}</td>
-                <td title="{{ flag.date_created }}" class="right">
-                  {{ flag.date_created | humanize }}
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-    {% endif %}
-
   </div>
 </div>
 {% endif %}
@@ -286,7 +263,7 @@
               title="View file as of {{ patch_new_id|short }}">View</a>
             </h5>
         </div>
-        <div class="card-block">
+
       {% autoescape false %}
           {{ patch | patch_to_diff | html_diff | format_loc(
                   filename=patch_new_file_path,
@@ -294,7 +271,7 @@
                   prequest=pull_request,
                   index=loop.index)}}
       {% endautoescape %}
-        </div>
+
       </div>
       </section>
       {% endfor %}
@@ -393,54 +370,35 @@
       {% endif %}
         <small id="merge-alert-message"></small>
       </div>
+      
+    {% if pull_request.flags %}
     <div class="card" id="pr_flags">
+      <ul class="list-group list-group-flush">
+            {% for flag in pull_request.flags %}
+              <li class="list-group-item">
+                <div>
+                  <span><a href="{{ flag.url }}">{{ flag.username }}</a></span>
+                  <div class="pull-xs-right"><span class="label {%if flag.percent <= 10%}label-danger{%elif flag.percent <= 90%}label-warning{%else%}label-success{%endif%}">{{ flag.percent }}%</label></div>
+                </div>
+                <small><div class="clearfix">
+                    <span>{{ flag.comment }}</span>
+                    <div title="{{ flag.date_created }}" class="pull-xs-right">
+                    {{ flag.date_created | humanize }}</div>
+                </div>
+                </small>
+              </li>
+            {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+    
+    {#
+    <div class="card">
       <div class="card-block">
         <table class="table table-hover table-striped m-b-0">
           <thead></thead>
           <tfoot></tfoot>
           <tbody>
-          {#<tr>
-            <th>By</th>
-            <td>
-              <a href="{{ url_for('view_user', username=pull_request.user.user) }}">
-              {{ pull_request.user.user | avatar(16) | safe }}
-              {{ pull_request.user.fullname }} ({{ pull_request.user.user }})
-            </a>
-            </td>
-          </tr>
-          <tr>
-            <th>From</th>
-            <td>
-              <a href="{{ url_for('view_repo_branch',
-                username=pull_request.project_from.user.user
-                  if pull_request.project_from.is_fork else None,
-                repo=pull_request.project_from.name,
-                branchname=pull_request.branch_from)
-              }}">
-                {{ pull_request.project_from.fullname or pull_request.remote_git
-                  }} ({{ pull_request.branch_from }})
-              </a>
-            </td>
-          </tr>
-          <tr>
-            <th>To</th>
-            <td>
-              <a href="{{ url_for('view_repo_branch',
-                username=pull_request.project.user.user
-                  if pull_request.project.is_fork else None,
-                repo=pull_request.project.name,
-                branchname=pull_request.branch)
-              }}">
-                {{ pull_request.project.fullname }} ({{ pull_request.branch }})
-              </a>
-            </td>
-          </tr>
-          <tr>
-            <th>Created</th>
-            <td title="{{ pull_request.date_created.strftime('%b %d %Y %H:%M:%S') }}">
-              {{ pull_request.date_created |humanize }} 
-            </td>
-          </tr>#}
           <tr>
             <th>Assignee</th>
             <td>
@@ -460,14 +418,14 @@
         </table>
       </div>
     </div>
+    #}
     </section>
   {% endif %}
   {% if diff %}
     <div class="card clearfix">
       <div class="card-header">
-        <h5>Changes summary:</h5>
+        <h5><strong>Changes summary</strong></h5>
       </div>
-      <div class="card-block">
     <table class="table table-hover table-striped m-b-0">
       <thead>
       </thead>
@@ -514,7 +472,6 @@
     {% endfor %}
       </tbody>
     </table>
-      </div>
     </div>
   {% endif %}
   </div>
