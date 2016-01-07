@@ -477,7 +477,7 @@ function cancel_edit_btn() {
       item = $(this).closest('section');
       $(item.parent().find('.issue_comment')).show();
       $(item.parent().find('.issue_actions')).show();
-      $(item.parent().find('.edit_comment')).remove();
+      $(item.parent().closest('.pr_comment_form')).remove();
       return false;
     }
   );
@@ -598,7 +598,9 @@ function setup_reply_btns() {
       if (next_row.prev().find('.pr_comment_form').length == 0){
         $.get( url , function( data ) {
           next_row.before(
-            '<tr><td></td><td colspan="2" class="pr_comment_form"><div class="card m-x-1"><div class="card-block">' + data + '</div></div></td></tr>' );
+            '<tr><td></td><td colspan="2" class="pr_comment_form"> \
+            <div class="card m-x-1"><div class="card-block">'
+            + data + '</div></div></td></tr>' );
           cancel_edit_btn();
           emoji_complete(json_url, folder);
         });
