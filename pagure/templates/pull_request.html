@@ -24,7 +24,7 @@
 
 {% block repo %}
 <div class="row">
-  <div class="{% if pull_request %}col-md-8{% elif form and (repo_admin or remote_git) %}col-md-8{%endif%}">
+  <div class="{% if pull_request %}col-md-8{% elif form and (repo_admin or remote_git) %}col-md-12{%endif%}">
 {% if pull_request %}
 <h2><span class="label label-default">PR#{{requestid}}</span> {{ pull_request.title | noJS(ignore="img") | safe
   }}{% if authenticated and (g.fas_user.username == pull_request.user.username
@@ -98,6 +98,7 @@
     repo=repo.name, commitid=commitid, branch_from=branch_from,
     branch_to=branch_to) }}" method="post">
   {% endif %}
+  <div class="p-b-1">
   Pull from
     <span class="pr-toplabel">{%
       if remote_git -%}{{ remote_git }}{%-
@@ -118,32 +119,25 @@
               {% endif %}
             {% endfor %}
           </select>
+    </div>
       {{ render_bootstrap_field(form.title) }}
     <p class="buttons indent">
-      <input type="submit" class="submit positive button" value="Create">
+      <input type="submit" class="btn btn-primary" value="Create">
       {{ form.csrf_token }}
-      <a href="{{ url_for('view_repo', username=username, repo=repo.name)}}">
-        <input type="button" value="Cancel" />
+      <a class="btn btn-secondary" href="{{ url_for('view_repo', username=username, repo=repo.name)}}">
+        Cancel
       </a>
     </p>
   </form>
 </section>
 {% endif %}
 
-{% if pull_request %}
-<div class="row">
-  <div class="col-md-8">
-  </div>
-
-  <div class="col-md-4">
-  </div>
-</div>
-{% endif %}
-
 <ul class="nav nav-tabs nav-small" role="tablist" id="pr-tabs">
-  <li class="nav-item"><a class="nav-link active" data-toggle="tab" role="tab" href="#comments">Comments</a></li>
+  {% if pull_request %} 
+    <li class="nav-item"><a class="nav-link active" data-toggle="tab" role="tab" href="#comments">Comments</a></li>
+  {%endif%}
   <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" role="tab" href="#request_diff">
+    <a class="nav-link {% if not pull_request %}active{% endif %}" data-toggle="tab" role="tab" href="#request_diff">
       <span class="hidden-sm-down">Files Changed&nbsp;</span>
       <span class="label label-default label-pill hidden-sm-down">
         {{diff|length}}
@@ -193,7 +187,7 @@
       </div>
   </div>
 
-  <div class="tab-pane" role="tabpanel" id="request_diff">
+  <div class="tab-pane {% if not pull_request %}active{% endif %}" role="tabpanel" id="request_diff">
     {% if authenticated and pull_request %}
     <form action="{{ url_for('.pull_request_drop_comment', username=username,
         repo=repo.name, requestid=requestid) }}" method="post" class="icon"
@@ -411,7 +405,7 @@
     #}
     </section>
   {% endif %}
-  {% if diff %}
+  {% if diff and pull_request%}
     <div class="card clearfix">
       <div class="card-header">
         <h5><strong>Changes summary</strong></h5>
