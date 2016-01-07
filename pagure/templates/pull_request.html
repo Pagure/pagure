@@ -271,7 +271,7 @@
   {% if pull_request %}
   <div class="tab-pane active" role="tabpanel" id="comments">
     <section class="request_comment" id="request_comment">
-    {% if pull_request.discussion %}
+    {% if pull_request.comments %}
       <form action="{{ url_for('.pull_request_drop_comment', username=username,
           repo=repo.name, requestid=requestid) }}" method="post"
           onsubmit="return try_async_comment(this, null)">
