@@ -618,7 +618,7 @@ function setup_reply_btns() {
       if (next_row.prev().find('.pr_comment_form').length == 0){
         $.get( url , function( data ) {
           next_row.before(
-            '<tr><td></td><td colspan="2" class="pr_comment_form">' + data + '</td></tr>' );
+            '<tr><td></td><td colspan="2" class="pr_comment_form"><div class="card m-x-1"><div class="card-block">' + data + '</div></div></td></tr>' );
           cancel_edit_btn();
           emoji_complete(json_url, folder);
         });

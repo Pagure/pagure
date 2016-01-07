@@ -90,7 +90,7 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
                 '<td class="prc" data-row="%(cnt_lbl)s"'
                 ' data-filename="%(filename)s" data-commit="%(commit)s">'
                 '<p>'
-                '<img class="prc_img" src="%(img)s" alt="Add comment" title="Add comment"/>'
+                '<span class="oi prc_img" data-glyph="comment-square" alt="Add comment" title="Add comment"></span>'
                 '</p>'
                 '</td>' % (
                     {
@@ -124,14 +124,14 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
         output.append('</tr>')
 
         tpl_edit = '<a href="%(edit_url)s" ' \
-            'class="edit_btn" data-comment="%(commentid)s" ' \
+            'class="btn btn-secondary btn-sm" data-comment="%(commentid)s" ' \
             'data-objid="%(requestid)s">' \
-            '<span class="icon icon-edit blue"></span>' \
+            '<span class="oi" data-glyph="pencil"></span>' \
             '</a>'
         tpl_edited = '<small class="text-muted" title="%(edit_date)s"> ' \
             'Edited %(human_edit_date)s by %(user)s </small>'
 
-        tpl_delete = '<button class="btn btn-danger btn-sm" '\
+        tpl_delete = '<button class="btn btn-secondary btn-sm" '\
             'title="Remove comment" '\
             'name="drop_comment" value="%(commentid)s" type="submit" ' \
             'onclick="return confirm(\'Do you really want to remove this comment?\');" '\
@@ -171,17 +171,17 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
                     })
 
                 output.append(
-                    '<tr><td></td>'
+                    '<tr class="inline-pr-comment"><td></td>'
                     '<td colspan="2">'
-                    '<div class="card clearfix">'
-                    '<div id="comment-%(commentid)s" class="card-header">'
+                    '<div class="card clearfix m-x-1 ">'
+                    '<div class="card-block">'
+                    '<small><div id="comment-%(commentid)s">'
                     '<img class="avatar circle" src="%(avatar_url)s"/>'
-                    '<a href="%(url)s"> %(user)s</a>'
-                    '<a class="headerlink pull-xs-right" title="Permalink '
+                    '<a href="%(url)s"> %(user)s</a> commented '
+                    '<a class="headerlink" title="Permalink '
                     'to this headline" href="#comment-%(commentid)s">'
                     '<span title="%(date)s">%(human_date)s</span>'
-                    '</a></div>'
-                    '<div class="card-block">'
+                    '</a></div></small>'
                     '<section class="issue_comment">'
                     '<div class="comment_body">'
                     '%(comment)s'
@@ -189,7 +189,7 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
                     '</section>'
                     '<div class="issue_actions m-t-2">'
                     '%(templ_edited)s'
-                    '<aside class="issue_action icon pull-xs-right p-b-1">'
+                    '<aside class="btn-group issue_action icon pull-xs-right p-b-1">'
                     '%(templ_edit)s'
                     '%(templ_delete)s'
                     '</aside>'
@@ -203,7 +203,7 @@ def format_loc(loc, commit=None, filename=None, prequest=None, index=None):
                             'templ_edited': templ_edited,
                             'user': comment.user.user,
                             'avatar_url': avatar_url(
-                                comment.user.default_email, 32),
+                                comment.user.default_email, 16),
                             'date': comment.date_created.strftime(
                                 '%b %d %Y %H:%M:%S'),
                             'human_date': humanize_date(comment.date_created),
