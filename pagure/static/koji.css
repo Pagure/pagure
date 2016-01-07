@@ -359,3 +359,11 @@ btn-group-vertical > .btn-group::after, .btn-group-vertical > .btn-group::before
     margin-bottom: 0;
     padding-left: 0;
 }
+
+#pr-tabs
+{
+ border-bottom: 1px solid #ddd;
+ margin-bottom:1.5em;
+ margin-top:2em;
+}
+
