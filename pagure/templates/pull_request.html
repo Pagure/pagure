@@ -786,7 +786,7 @@ function try_async_comment(form, inline) {
       if(data == 'ok') {
         $('#comment').val('');
         /* We have submitted the comment correctly */
-        var item = $('#comment_block').closest('section');
+        var item = $('.pr_comment_form').closest('tr');
         if (!$(item.parent().children()[1]).is(':visible')){
           $(item.parent().children()[1]).show()
         }
