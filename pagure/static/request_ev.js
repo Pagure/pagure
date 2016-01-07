@@ -13,6 +13,40 @@ add_comment = function(data) {
     edit_btn = '';
   }
 
+  if (inline) {
+    var _data = '<tr class="inline-pr-comment"><td></td> \
+        <td colspan="2"> \
+        <div class="card clearfix m-x-1 "> \
+        <div class="card-block"> \
+        <small><div id="comment-' + data.comment_id + '"> \
+        <img class="avatar circle" src="' + data.avatar_url + '"/> \
+        <a href="/user/' + data.comment_user + '"> ' + data.comment_user + '</a> commented  \
+        <a class="headerlink" title="Permalink to this headline" \
+        href="#comment-' + data.comment_id + '"> \
+        <span title="' + data.comment_date + '">Just now</span> \
+        </a></div></small> \
+        <section class="issue_comment"> \
+        <div class="comment_body"> \
+        ' + data.comment_added + ' \
+        </div> \
+        </section> \
+        <div class="issue_actions m-t-2"> \
+        <aside class="btn-group issue_action icon pull-xs-right p-b-1"> \
+            <div class="btn-group" role="group" aria-label="Basic example"> \
+              <a class="reply btn btn-secondary btn-sm" data-toggle="tooltip" title="Reply to this comment - loose formating"> \
+                <span class="oi" data-glyph="share-boxed"></span> \
+              </a>'
+              + edit_btn +
+              '<button class="btn btn-secondary btn-sm" type="submit" name="drop_comment" value="' + data.comment_id + '" \
+                  onclick="return confirm(\'Do you really want to remove this comment?\');" \
+                  title="Remove comment"> \
+                  <span class="oi" data-glyph="trash"></span> \
+                </button> \
+            </div> \
+        </aside> \
+        </div></div></div> \
+        </td></tr>';
+  } else {
   var _data = '<div class="card clearfix"> \
     <div id="comment-' + data.comment_id + '" class="card-header"> \
     <img class="avatar circle" src="' + data.avatar_url + '"/> \
@@ -46,16 +80,15 @@ add_comment = function(data) {
           </div> \
         </div> \
     </div>';
+  }
 
   if (inline){
     // Inline comment
     console.log('Inline');
-    var _row = '<tr><td></td><td colspan="2"><table style="width:100%"> \
-      <tr><td>' + _data + '</td></tr></table></td></tr>';
     var field = $('[data-commit="' + data.commit_id + '"]').parent();
     var id = field.children().children().attr('id').split('_')[0];
     var row = $('#' + id + '_' + (parseInt(data.line) + 1)).parent().parent();
-    row.before(_row);
+    row.before(_data);
   } else {
     // Generic comment
     console.log('generic');
