@@ -35,7 +35,7 @@
        href="{{ url_for('request_pull_edit', username=username,
             repo=repo.name, requestid=requestid) }}"
       title="Update title">edit</a>
-      
+
     {% if pull_request.status == 'Open' and authenticated and
         (repo_admin or g.fas_user.username == pull_request.user.username) %}
       <span><form style="display:inline;" action="{{ url_for('cancel_request_pull', username=username,
@@ -49,15 +49,15 @@
 </h2>
 
   <h5 class="text-muted">
-    Proposed <a href="#" data-toggle="tooltip" title="{{ pull_request.date_created.strftime('%b %d %Y %H:%M:%S') }}">{{ pull_request.date_created |humanize }}</a> 
+    Proposed <a href="#" data-toggle="tooltip" title="{{ pull_request.date_created.strftime('%b %d %Y %H:%M:%S') }}">{{ pull_request.date_created |humanize }}</a>
     by {{ pull_request.user.user | avatar(16) | safe }} {{ pull_request.user.user }}
   </h5>
 
   From
-    <span class="pr-toplabel">{{ pull_request.project_from.fullname or pull_request.remote_git}}</span> <span class="pr-toplabel"> 
+    <span class="pr-toplabel">{{ pull_request.project_from.fullname or pull_request.remote_git}}</span> <span class="pr-toplabel">
     <span class="oi" data-glyph="random"> </span>{{ pull_request.branch_from }}</span>
   into
-    <span class="pr-toplabel">{{ pull_request.project.fullname }}</span> 
+    <span class="pr-toplabel">{{ pull_request.project.fullname }}</span>
     <span class="pr-toplabel"><span class="oi" data-glyph="random"></span> {{ pull_request.branch }}</span>
 
 <div class="header">
@@ -133,14 +133,14 @@
 {% endif %}
 
 <ul class="nav nav-tabs nav-small" role="tablist" id="pr-tabs">
-  {% if pull_request %} 
+  {% if pull_request %}
     <li class="nav-item"><a class="nav-link active" data-toggle="tab" role="tab" href="#comments">Comments</a></li>
   {%endif%}
   <li class="nav-item">
     <a class="nav-link {% if not pull_request %}active{% endif %}" data-toggle="tab" role="tab" href="#request_diff">
       <span class="hidden-sm-down">Files Changed&nbsp;</span>
       <span class="label label-default label-pill hidden-sm-down">
-        {{diff|length}}
+        {{ diff|length if diff else 0}}
       </span>
     </a>
   </li>
@@ -169,7 +169,7 @@
               <a class="list-group-item" href="{{ url_for('view_commit', username=username,
                             repo=repo.name, commitid=commit.oid.hex)}}">
               {% endif %}
-              
+
               <h5>
                 <strong>{{ commit.message.strip().split('\n')[0] }}</strong>
                 <div class="pull-xs-right">
@@ -183,6 +183,8 @@
                 <span class="label label-default">{{ commit.hex|short }}</span>
               </div>
             </a>
+          {% else %}
+          <p class="error"> No commits found </p>
           {% endfor %}
       </div>
   </div>
@@ -293,7 +295,7 @@
       </form>
     {% endif %}
     </section>
-    
+
     {% if authenticated and mergeform and pull_request %}
     <div class="card">
       <div class="card-header">
@@ -354,7 +356,7 @@
       {% endif %}
         <small id="merge-alert-message"></small>
       </div>
-      
+
     {% if pull_request.flags %}
     <div class="card" id="pr_flags">
       <ul class="list-group list-group-flush">
@@ -375,7 +377,7 @@
       </ul>
     </div>
     {% endif %}
-    
+
     {#
     <div class="card">
       <div class="card-block">
@@ -702,7 +704,7 @@ function setup_reply_btns() {
           $('#merge-alert').addClass("alert-success");
           $('#merge-alert-message').append(res.message);
           $('#merge-alert').show();
-        } 
+        }
         else if (res.code == 'MERGE') {
           $('#merge_btn').addClass("btn-warning");
           $('#merge-alert').addClass("alert-warning");
