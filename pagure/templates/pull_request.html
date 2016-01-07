@@ -284,8 +284,12 @@
           <div class="card">
             <div class="card-header">
               <div>
-                {{comment.user.user}} commented on line <a href="#c-{{comment.commit_id}}-{{comment.line}}" onclick="showTab()">{{comment.line}} of {{comment.filename}}</a>
-                <div class="pull-xs-right text-muted"><span title="{{comment.date_created.strftime('%Y-%m-%d %H:%M:%S')}}">{{ comment.date_created | humanize}}</span></div>
+                {{comment.user.user}} commented on line
+                    <a href="#c-{{comment.commit_id}}-{{comment.line}}" onclick="showTab()">{{
+                        comment.line}} of {{comment.filename}}</a>
+                <div class="pull-xs-right text-muted">
+                    <span title="{{comment.date_created.strftime('%Y-%m-%d %H:%M:%S')}}">{{
+                        comment.date_created | humanize}}</span></div>
               </div>
             </div>
           </div>
