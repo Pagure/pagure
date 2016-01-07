@@ -130,31 +130,31 @@
       </div>
     </section>
     <div class="issue_actions m-t-2">
-        {% if comment.edited_on %}
-            <small class="text-muted">Edited {{ comment.edited_on | humanize }} by {{ comment.editor.username }} </small>
-        {% endif %}
-        <div class="issue_action icon pull-xs-right p-b-1">
-          <div class="btn-group" role="group" aria-label="Basic example">
-            <a class="reply btn btn-secondary btn-sm" data-toggle="tooltip" title="Reply to this comment - loose formating">
-              <span class="oi" data-glyph="share-boxed"></span>
-            </a>
-            <a class="btn btn-secondary btn-sm" href="{{ '%s/comment/%s/edit' % (request.base_url, comment.id) }}"
-                class="edit_btn" data-comment="{{ comment.id }}"
-                data-objid="{{ issueid }}">
-                <span class="oi" data-glyph="pencil"></span>
-            </a>
-            {% if id != 0 and g.fas_user and (
-                (comment.parent.status in [True, 'Open'] and g.fas_user.username == comment.user.username)
-                or repo_admin) %}
-            <button class="btn btn-secondary btn-sm" type="submit" name="drop_comment" value="{{ comment.id }}"
-                onclick="return confirm('Do you really want to remove this comment?');"
-                title="Remove comment">
-                <span class="oi" data-glyph="trash"></span>
-            </button>
-            {% endif %}
-          </div>
+      {% if comment.edited_on %}
+          <small class="text-muted">Edited {{ comment.edited_on | humanize }} by {{ comment.editor.username }} </small>
+      {% endif %}
+      <div class="issue_action icon pull-xs-right p-b-1">
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <a class="reply btn btn-secondary btn-sm" data-toggle="tooltip" title="Reply to this comment - loose formating">
+            <span class="oi" data-glyph="share-boxed"></span>
+          </a>
+          <a class="btn btn-secondary btn-sm" href="{{ '%s/comment/%s/edit' % (request.base_url, comment.id) }}"
+              class="edit_btn" data-comment="{{ comment.id }}"
+              data-objid="{{ issueid }}">
+              <span class="oi" data-glyph="pencil"></span>
+          </a>
+          {% if id != 0 and g.fas_user and (
+              (comment.parent.status in [True, 'Open'] and g.fas_user.username == comment.user.username)
+              or repo_admin) %}
+          <button class="btn btn-secondary btn-sm" type="submit" name="drop_comment" value="{{ comment.id }}"
+              onclick="return confirm('Do you really want to remove this comment?');"
+              title="Remove comment">
+              <span class="oi" data-glyph="trash"></span>
+          </button>
+          {% endif %}
         </div>
       </div>
+    </div>
   </div>
 </div>
 {% endmacro %}
