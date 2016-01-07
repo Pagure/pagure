@@ -318,8 +318,9 @@ class PagureFlaskForktests(tests.Modeltests):
                 '<title>PR#1: PR from the feature branch - test\n - '
                 'Pagure</title>', output.data)
             self.assertIn(
-                '<h2><span class="label label-default">PR#1</span> '
-                'PR from the feature branch<small>', output.data)
+                '<h2><span class="label label-default">PR#1</span> PR from '
+                'the feature branch     <span class="pull-xs-right">',
+                output.data)
             self.assertIn(
                 '</button>\n                      This request must be '
                 'assigned to be merged', output.data)
@@ -335,8 +336,9 @@ class PagureFlaskForktests(tests.Modeltests):
                 '/test/pull-request/1/merge', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<h2><span class="label label-default">PR#1</span> '
-                'PR from the feature branch<small>', output.data)
+                '<h2><span class="label label-default">PR#1</span> PR from '
+                'the feature branch     <span class="pull-xs-right">',
+                output.data)
             self.assertIn(
                 '</button>\n                      Only the assignee can '
                 'merge this review', output.data)
@@ -352,8 +354,9 @@ class PagureFlaskForktests(tests.Modeltests):
                 '/test/pull-request/1/merge', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<h2><span class="label label-default">PR#1</span> '
-                'PR from the feature branch<small>', output.data)
+                '<h2><span class="label label-default">PR#1</span> PR from '
+                'the feature branch     <span class="pull-xs-right">',
+                output.data)
             self.assertIn(
                 '</button>\n                      This request does not '
                 'have the minimum review score necessary to be merged',
@@ -436,8 +439,9 @@ class PagureFlaskForktests(tests.Modeltests):
                 '/test/pull-request/1/merge', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<h2><span class="label label-default">PR#1</span> '
-                'PR from the feature branch<small>', output.data)
+                '<h2><span class="label label-default">PR#1</span> PR from '
+                'the feature branch     <span class="pull-xs-right">',
+                output.data)
             self.assertIn(
                 '</button>\n                      Merge conflicts!',
                 output.data)
@@ -593,7 +597,8 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertIn(
             '<h2><span class="label label-default">PR#1</span> '
             'PR from the feature branch</h2>', output.data)
-        self.assertTrue(output.data.count('<td class="commitid">'), 1)
+        self.assertTrue(
+            output.data.count('<span class="commitdate" title='), 1)
 
         shutil.rmtree(newpath)
 
@@ -670,24 +675,32 @@ class PagureFlaskForktests(tests.Modeltests):
 
         output = self.app.get('/test/pull-requests')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('Pull-requests (0)', output.data)
+        self.assertIn(
+            'Pull Requests <span class="label label-default">0</span>',
+            output.data)
         self.assertIn('(0 Closed)</a>', output.data)
 
         self.set_up_git_repo(new_project=None, branch_from='feature')
 
         output = self.app.get('/test/pull-requests')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('Pull-requests (1)', output.data)
+        self.assertIn(
+            'Pull Requests <span class="label label-default">1</span>',
+            output.data)
         self.assertIn('(0 Closed)</a>', output.data)
 
         output = self.app.get('/test/pull-requests?status=Closed')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('Closed Pull-requests (0)', output.data)
+        self.assertIn(
+            'Closed Pull Requests <span class="label label-default">0</span>',
+            output.data)
         self.assertIn('(1 Open)</a>', output.data)
 
         output = self.app.get('/test/pull-requests?status=0')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('Closed/Merged Pull-requests (0)', output.data)
+        self.assertIn(
+            'Closed/Merged Pull Requests <span class="label label-default">0</span>',
+            output.data)
         self.assertIn('(1 Open)</a>', output.data)
 
         # Project w/o pull-request
@@ -1284,7 +1297,7 @@ index 0000000..2a552bb
                 '<title>Diff from master to feature - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<td class="error"> No commits found </td>', output.data)
+                '<p class="error"> No commits found </p>', output.data)
 
             output = self.app.get('/test/diff/master..feature')
             self.assertEqual(output.status_code, 200)
@@ -1303,8 +1316,8 @@ index 0000000..2a552bb
                 '<title>    Create new Pull Request for master - test - '
                 'Pagure</title>', output.data)
             self.assertIn(
-                '<input type="submit" class="submit positive button" '
-                'value="Create">', output.data)
+                '<input type="submit" class="btn btn-primary" value="Create">',
+                output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -1527,8 +1540,9 @@ index 0000000..2a552bb
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<h2><span class="label label-default">PR#1</span> '
-                'PR from the feature branch<small>', output.data)
+                '<h2><span class="label label-default">PR#1</span> PR from '
+                'the feature branch     <span class="pull-xs-right">',
+                output.data)
             self.assertIn(
                 '</button>\n                      Comment removed',
                 output.data)
@@ -1583,8 +1597,9 @@ index 0000000..2a552bb
             self.assertEqual(output.status_code, 200)
 
             self.assertIn(
-                '<h2><span class="label label-default">PR#1</span> '
-                'PR from the feature branch<small>', output.data)
+                '<h2><span class="label label-default">PR#1</span> PR from '
+                'the feature branch     <span class="pull-xs-right">',
+                output.data)
             self.assertIn(
                 '</button>\n                      Comment added',
                 output.data)
@@ -1613,8 +1628,9 @@ index 0000000..2a552bb
             self.assertIn(
                 '<p>This look alright but we can do better than this.</p>', output.data)
             self.assertIn(
-                '<h2><span class="label label-default">PR#1</span> '
-                'PR from the feature branch<small>', output.data)
+                '<h2><span class="label label-default">PR#1</span> PR from '
+                'the feature branch     <span class="pull-xs-right">',
+                output.data)
             # Checking if Edited by User is there or not
             self.assertIn(
                 '<small class="text-muted">Edited just now by pingou </small>',
