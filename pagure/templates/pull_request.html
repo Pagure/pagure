@@ -774,6 +774,7 @@ $('#assignee').selectize({
 
 function try_async_comment(form, inline) {
   $(form).off('submit');
+  $(form).find('input[type="submit"]').attr("disabled", "disabled");
   var _data = $(form).serialize();
   var btn = $(document.activeElement);
   if (btn[0].name == 'drop_comment'){
