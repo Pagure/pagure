@@ -6,13 +6,22 @@
 
 {% block repo %}
 
-<div class="inline">
-  <h2>
+<div>
+  <h2 class="p-b-1">
     {% if status|lower != 'open' and status|lower != 'false' %}
     {{ status }} {% elif status|lower != 'open' -%}
     Closed/Merged {% endif -%}
-    Pull-requests ({{ requests|count }})
+    Pull Requests <span class="label label-default">{{ requests|count }}</span>
   </h2>
+
+<div>
+  <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
+      <a class="btn {% if status|lower == 'open' %}btn-primary{%else%}btn-secondary{%endif%} btn-sm" href="{{ url_for('request_pulls', username=username,
+                 repo=repo.name) }}">Open</a>
+      <a class="btn {% if status|lower == 'open' %}btn-secondary{%else%}btn-primary{%endif%} btn-sm" href="{{ url_for('request_pulls', username=username,
+               repo=repo.name) }}?status=0">Closed</a>
+  </span>
+</div>
   {% if status|lower == 'open' %}
     <a href="{{ url_for('request_pulls', username=username,
                repo=repo.name) }}?status=0">
