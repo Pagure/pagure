@@ -426,15 +426,10 @@
       <div class="card-header">
         <h5><strong>Changes summary</strong></h5>
       </div>
-    <table class="table table-hover table-striped m-b-0">
-      <thead>
-      </thead>
-      <tfoot>
-      </tfoot>
-      <tbody>
+    <div class="list-group list-group-flush">
     {% for patch in diff %}
-        <tr>
-          <th>
+        <div class="list-group-item">
+          <span>
             {%- if patch | hasattr('new_file_path') -%}
               {%- if patch.new_file_path == patch.old_file_path -%}
               {{ patch.new_file_path }}
@@ -448,8 +443,8 @@
               {{ patch.delta.new_file.path }} (Renamed from "{{ patch.delta.old_file.path }}")
               {%- endif -%}
             {%- endif -%}
-          </th>
-          <td>
+          </span>
+          <div class="pull-right">
             {% if patch | hasattr('additions') %}
             {# Version of pygit2 -0.21.4 -- F21/EL7 #}
             {% if (patch.additions + patch.deletions) %}
@@ -467,11 +462,10 @@
               </span>
             {% endif %}
             {% endif %}
-          </td>
-        </tr>
+          </div>
+        </div>
     {% endfor %}
-      </tbody>
-    </table>
+      </div>
     </div>
   {% endif %}
   </div>
