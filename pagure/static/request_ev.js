@@ -1,9 +1,12 @@
 add_comment = function(data) {
   console.log('Adding comment ' + data.comment_added);
   var field = $('#comments');
-  var edit_btn = '<a class="reply btn btn-secondary btn-sm" \
-    data-toggle="tooltip" title="Reply to this comment - loose formating"> \
-    reply </a>';
+  var edit_btn = '<a class="btn btn-secondary btn-sm" \
+        " href="/test/pull-request/' + data.request_id + '/comment/' + data.comment_id + '/edit" \
+        class="edit_btn" data-comment="' + data.comment_id + '" \
+        data-objid="' + data.request_id + '"> \
+        <span class="oi" data-glyph="pencil"></span> \
+    </a>';
   var inline = false;
   if (data.commit_id){
     inline = true;
@@ -29,22 +32,19 @@ add_comment = function(data) {
         </div> \
       </section> \
       <div class="issue_actions m-t-2"> \
-        <aside class="issue_action icon pull-xs-right p-b-1">'
-          + edit_btn
-          + '<a class="edit_btn" data-objid="' + data.request_id
-          + '" data-comment="' + data.comment_id
-          + '" href="/test/pull-request/' + data.request_id + '/comment/' + data.comment_id + '/edit"> \
-            <span class="icon icon-edit blue"></span> \
-          </a> \
-          <button class="btn btn-danger btn-sm" \
-            title="Remove comment" \
-            name="drop_comment" value="' + data.comment_id + '" type="submit"  \
-            onclick="return confirm(\'Do you really want to remove this comment?\');" \
-            ><span class="oi" data-glyph="trash"></span> \
-          </button> \
-        </aside> \
-      </div> \
-    </div> \
+        <div class="issue_action icon pull-xs-right p-b-1"> \
+          <div class="btn-group" role="group" aria-label="Basic example"> \
+            <a class="reply btn btn-secondary btn-sm" data-toggle="tooltip" title="Reply to this comment - loose formating"> \
+              <span class="oi" data-glyph="share-boxed"></span> \
+            </a>'
+            + edit_btn
+            + '<button class="btn btn-secondary btn-sm" type="submit" name="drop_comment" value="' + data.comment_id + '" \
+                onclick="return confirm(\'Do you really want to remove this comment?\');" \
+                title="Remove comment"> \
+                <span class="oi" data-glyph="trash"></span> \
+            </button> \
+          </div> \
+        </div> \
     </div>';
 
   if (inline){
