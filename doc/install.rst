@@ -205,3 +205,27 @@ that you will have to copy to the right location.
 
 Confer the ``Configuration`` section of this documentation for a full
 explanation of all the options of pagure.
+
+* Create the database
+
+You first need to create the database itself. For this, since pagure can
+work with: `PostgreSQL <http://www.postgresql.org/>`_,
+`MySQL <http://www.mysql.com/>`_ or `MariaDB <http://mariadb.org/>`_, we
+would like to invite you to consult the documentation of your database system
+for this operation.
+
+Once you have specified in the configuration file the to url used to connect
+to the database, and create the database itself, you can now create the
+tables, the database scheme.
+
+To create the database tables, you need to run the script
+``/usr/share/pagure/pagure_createdb.py`` and specify it the configuration
+file to use via an environment variable.
+
+For example:
+::
+
+    PAGURE_CONFIG=/etc/pagure/pagure.cfg python /usr/share/pagure/pagure_createdb.py
+
+This will tell ``/usr/share/pagure/pagure_createdb.py`` to use the database
+information specified in the file ``/etc/pagure/pagure.cfg``.
