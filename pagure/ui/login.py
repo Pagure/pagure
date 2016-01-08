@@ -13,6 +13,8 @@ import hashlib
 import datetime
 import urlparse
 import bcrypt
+from kitchen.text.converters import to_unicode
+from cryptography.hazmat.primitives import constant_time
 
 import flask
 from sqlalchemy.exc import SQLAlchemyError
@@ -119,7 +121,6 @@ def do_login():
         elif user_obj.token:
             flask.flash(
                 'Invalid user, did you confirm the creation with the url '
-
                 'provided by email?', 'error')
             return flask.redirect(flask.url_for('auth_login'))
 
