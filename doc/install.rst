@@ -151,7 +151,7 @@ make ``/srv/git`` the home of your gitolite user.
 You would then create the folders with:
 ::
 
-    mkdir /srv/git/repositories/{docs,forks,tickets,requests,checkouts}
+    mkdir /srv/git/repositories/{docs,forks,tickets,requests,remotes}
 
 
 * Configure apache
