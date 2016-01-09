@@ -13,7 +13,7 @@ import hashlib
 import datetime
 import urlparse
 import bcrypt
-from kitchen.text.converters import to_unicode
+from kitchen.text.converters import to_unicode, to_bytes
 from cryptography.hazmat.primitives import constant_time
 
 import flask
@@ -46,11 +46,8 @@ def new_user():
         if pagure.lib.search_user(SESSION, email=email):
             flask.flash('Email address already taken.', 'error')
             return flask.redirect(flask.request.url)
-        try:
-            form.password.data = str(form.password.data)
-        except UnicodeEncodeError:
-            form.password.data = to_unicode(form.password.data)
-        password = bcrypt.hashpw(form.password.data, bcrypt.gensalt())
+
+        password = bcrypt.hashpw(to_unicode(form.password.data), bcrypt.gensalt())
         form.password.data = '$2$'+password
 
         token = pagure.lib.login.id_generator(40)
@@ -104,27 +101,26 @@ def do_login():
     if form.validate_on_submit():
         username = form.username.data
         user_obj = pagure.lib.search_user(SESSION, username=username)
-        if user_obj.password.startswith("$2$"):
-                password = bcrypt.hashpw(form.password.data, user_obj.password[3:])
-        elif user_obj.password.startswith("$1$"):
-             password = '%s%s' % (form.password.data, APP.config.get('PASSWORD_SEED', None))
-             password = hashlib.sha512(password).hexdigest()
-             if constant_time.bytes_eq(user_obj.password[3:], password):
-                user_obj.password = "$2$"+bcrypt.hashpw(form.password.data, bcrypt.gensalt())
-                password = bcrypt.hashpw(form.password.data, user_obj.password[3:])
-                SESSION.add(user_obj);
-
-
-
-        if not user_obj or user_obj.password[3:] != password:
+        _, version, password = user_obj.password.split('$', 2)
+        if version == '2':
+                password = bcrypt.hashpw(to_unicode(form.password.data), password)
+        elif version == '1':
+                password = '%s%s' % (to_unicode(form.password.data), APP.config.get('PASSWORD_SEED', None))
+                password = hashlib.sha512(password).hexdigest()
+        if not user_obj or not constant_time.bytes_eq(to_bytes(user_obj.password[3:]), to_bytes(password)):
             flask.flash('Username or password invalid.', 'error')
             return flask.redirect(flask.url_for('auth_login'))
         elif user_obj.token:
             flask.flash(
                 'Invalid user, did you confirm the creation with the url '
-               'provided by email?', 'error')
+                'provided by email?', 'error')
             return flask.redirect(flask.url_for('auth_login'))
         else:
+
+            if version == '1':
+                user_obj.password = "$2$"+bcrypt.hashpw(to_unicode(form.password.data), bcrypt.gensalt())
+                SESSION.add(user_obj)
+
             visit_key = pagure.lib.login.id_generator(40)
             now = datetime.datetime.utcnow()
             expiry = now + datetime.timedelta(days=30)
@@ -245,7 +241,7 @@ def reset_password(token):
 
     if form.validate_on_submit():
 
-        user_obj.password = '$2$'+bcrypt.hashpw(form.password.data, bcrypt.gensalt())
+        user_obj.password = '$2$'+bcrypt.hashpw(to_unicode(form.password.data), bcrypt.gensalt())
         user_obj.token = None
         SESSION.add(user_obj)
 
@@ -285,7 +281,7 @@ def change_password(username):
         return flask.redirect(flask.url_for('auth_login'))
     if form.validate_on_submit():
         old_password = bcrypt.hashpw(form.old_password.data, user_obj.password[3:])
-        if constant_time.bytes_eq(user_obj.password[3:], old_password):
+        if constant_time.bytes_eq(to_bytes(user_obj.password[3:]), to_bytes(old_password)):
             user_obj.password = '$2$'+bcrypt.hashpw(form.password.data, bcrypt.gensalt())
             SESSION.add(user_obj)
 
