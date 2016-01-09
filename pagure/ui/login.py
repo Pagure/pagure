@@ -13,7 +13,7 @@ import hashlib
 import datetime
 import urlparse
 import bcrypt
-from kitchen.text.converters import to_unicode
+from kitchen.text.converters import to_unicode, to_bytes
 from cryptography.hazmat.primitives import constant_time
 
 import flask
