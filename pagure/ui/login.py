@@ -48,6 +48,7 @@ def new_user():
             return flask.redirect(flask.request.url)
 
         password = bcrypt.hashpw(to_unicode(form.password.data), bcrypt.gensalt())
+
         form.password.data = '$2$'+password
 
         token = pagure.lib.login.id_generator(40)
@@ -102,14 +103,22 @@ def do_login():
         username = form.username.data
         user_obj = pagure.lib.search_user(SESSION, username=username)
         _, version, password = user_obj.password.split('$', 2)
+
         if version == '2':
                 password = bcrypt.hashpw(to_unicode(form.password.data), password)
-        elif version == '1':
-                password = '%s%s' % (to_unicode(form.password.data), APP.config.get('PASSWORD_SEED', None))
+
+        else:
+                password = '%s%s' % (to_unicode(form.password.data),
+                                        APP.config.get('PASSWORD_SEED', None))
                 password = hashlib.sha512(password).hexdigest()
-        if not user_obj or not constant_time.bytes_eq(to_bytes(user_obj.password[3:]), to_bytes(password)):
+
+        if not user_obj or not constant_time.bytes_eq(
+                                    to_bytes(user_obj.password[3:]),
+                                    to_bytes(password)):
+
             flask.flash('Username or password invalid.', 'error')
             return flask.redirect(flask.url_for('auth_login'))
+
         elif user_obj.token:
             flask.flash(
                 'Invalid user, did you confirm the creation with the url '
@@ -117,8 +126,10 @@ def do_login():
             return flask.redirect(flask.url_for('auth_login'))
         else:
 
-            if version == '1':
-                user_obj.password = "$2$"+bcrypt.hashpw(to_unicode(form.password.data), bcrypt.gensalt())
+            if version is not '2':
+                user_obj.password = "$2$"+bcrypt.hashpw(
+                                            to_unicode(form.password.data),
+                                            bcrypt.gensalt())
                 SESSION.add(user_obj)
 
             visit_key = pagure.lib.login.id_generator(40)
@@ -241,7 +252,10 @@ def reset_password(token):
 
     if form.validate_on_submit():
 
-        user_obj.password = '$2$'+bcrypt.hashpw(to_unicode(form.password.data), bcrypt.gensalt())
+        user_obj.password = '$2$'+bcrypt.hashpw(
+                                   to_unicode(form.password.data),
+                                   bcrypt.gensalt())
+
         user_obj.token = None
         SESSION.add(user_obj)
 
@@ -280,10 +294,21 @@ def change_password(username):
         flask.flash('No user associated with this username.', 'error')
         return flask.redirect(flask.url_for('auth_login'))
     if form.validate_on_submit():
-        old_password = bcrypt.hashpw(form.old_password.data, user_obj.password[3:])
-        if constant_time.bytes_eq(to_bytes(user_obj.password[3:]), to_bytes(old_password)):
-            user_obj.password = '$2$'+bcrypt.hashpw(form.password.data, bcrypt.gensalt())
+        old_password = bcrypt.hashpw(
+            form.old_password.data, user_obj.password[3:])
+
+        if constant_time.bytes_eq(to_bytes(user_obj.password[3:]),
+                                  to_bytes(old_password)):
+
+            user_obj.password = '$2$' + \
+                bcrypt.hashpw(form.password.data, bcrypt.gensalt())
             SESSION.add(user_obj)
+
+        else:
+            flask.flash(
+                'Invalid user, this user never asked for a password change',
+                'error')
+            return flask.redirect(flask.url_for('auth_login'))
 
         try:
             SESSION.commit()
