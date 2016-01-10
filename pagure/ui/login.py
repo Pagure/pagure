@@ -29,6 +29,17 @@ from pagure import APP, SESSION
 # pylint: disable=E1101
 
 
+def generate_hashed_value(password):
+    """ Generate hash value for password
+    """
+    return '$2$' + bcrypt.hashpw(to_unicode(password), bcrypt.gensalt())
+
+def retrive_hashed_value(password, hash_value):
+    """Retrive hash value to compare
+    """
+    return bcrypt.hashpw(to_unicode(password), hash_value)
+
+
 @APP.route('/user/new/', methods=['GET', 'POST'])
 @APP.route('/user/new', methods=['GET', 'POST'])
 def new_user():
@@ -47,9 +58,7 @@ def new_user():
             flask.flash('Email address already taken.', 'error')
             return flask.redirect(flask.request.url)
 
-        password = bcrypt.hashpw(to_unicode(form.password.data), bcrypt.gensalt())
-
-        form.password.data = '$2$'+password
+        form.password.data = generate_hashed_value(form.password.data)
 
         token = pagure.lib.login.id_generator(40)
 
@@ -102,18 +111,23 @@ def do_login():
     if form.validate_on_submit():
         username = form.username.data
         user_obj = pagure.lib.search_user(SESSION, username=username)
-        _, version, password = user_obj.password.split('$', 2)
+        _, version, user_password = user_obj.password.split('$', 2)
 
         if version == '2':
-                password = bcrypt.hashpw(to_unicode(form.password.data), password)
+                password = retrive_hashed_value(form.password.data, user_password)
 
-        else:
+        elif version == '1':
                 password = '%s%s' % (to_unicode(form.password.data),
                                         APP.config.get('PASSWORD_SEED', None))
                 password = hashlib.sha512(password).hexdigest()
 
+        else:
+             flask.flash('Something is wrong with your account', 'error')
+             return flask.redirect(flask.url_for('auth_login'))
+
+
         if not user_obj or not constant_time.bytes_eq(
-                                    to_bytes(user_obj.password[3:]),
+                                    to_bytes(user_password),
                                     to_bytes(password)):
 
             flask.flash('Username or password invalid.', 'error')
@@ -127,9 +141,7 @@ def do_login():
         else:
 
             if version is not '2':
-                user_obj.password = "$2$"+bcrypt.hashpw(
-                                            to_unicode(form.password.data),
-                                            bcrypt.gensalt())
+                user_obj.password = generate_hashed_value(form.password.data)
                 SESSION.add(user_obj)
 
             visit_key = pagure.lib.login.id_generator(40)
@@ -252,9 +264,7 @@ def reset_password(token):
 
     if form.validate_on_submit():
 
-        user_obj.password = '$2$'+bcrypt.hashpw(
-                                   to_unicode(form.password.data),
-                                   bcrypt.gensalt())
+        user_obj.password = generate_hashed_value(form.password.data)
 
         user_obj.token = None
         SESSION.add(user_obj)
@@ -290,23 +300,24 @@ def change_password(username):
     """
     form = forms.ChangePasswordForm()
     user_obj = pagure.lib.search_user(SESSION, username=username)
+    _, version, user_password = user_obj.password.split('$', 2)
+
     if not user_obj:
         flask.flash('No user associated with this username.', 'error')
         return flask.redirect(flask.url_for('auth_login'))
     if form.validate_on_submit():
-        old_password = bcrypt.hashpw(
-            form.old_password.data, user_obj.password[3:])
+        old_password = retrive_hashed_value(
+            form.old_password.data, user_password)
 
-        if constant_time.bytes_eq(to_bytes(user_obj.password[3:]),
+        if constant_time.bytes_eq(to_bytes(user_password),
                                   to_bytes(old_password)):
 
-            user_obj.password = '$2$' + \
-                bcrypt.hashpw(form.password.data, bcrypt.gensalt())
+            user_obj.password = generate_hashed_value(form.password.data)
             SESSION.add(user_obj)
 
         else:
             flask.flash(
-                'Invalid user, this user never asked for a password change',
+                'Invalid user, old password does not match',
                 'error')
             return flask.redirect(flask.url_for('auth_login'))
 
