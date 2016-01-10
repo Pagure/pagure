@@ -30,6 +30,17 @@ from pagure.lib.login import generate_hashed_value, check_password
 # pylint: disable=E1101
 
 
+def generate_hashed_value(password):
+    """ Generate hash value for password
+    """
+    return '$2$' + bcrypt.hashpw(to_unicode(password), bcrypt.gensalt())
+
+def retrive_hashed_value(password, hash_value):
+    """Retrive hash value to compare
+    """
+    return bcrypt.hashpw(to_unicode(password), hash_value)
+
+
 @APP.route('/user/new/', methods=['GET', 'POST'])
 @APP.route('/user/new', methods=['GET', 'POST'])
 def new_user():
@@ -125,7 +136,7 @@ def do_login():
             return flask.redirect(flask.url_for('auth_login'))
 
         else:
-            if not user_obj.password.startswith('$2$'):
+
                 user_obj.password = generate_hashed_value(form.password.data)
                 SESSION.add(user_obj)
 
