@@ -21,6 +21,8 @@
       <a class="btn {% if status|lower == 'open' %}btn-secondary{%else%}btn-primary{%endif%} btn-sm" href="{{ url_for('request_pulls', username=username,
                repo=repo.name) }}?status=0">Closed</a>
   </span>
+  <a class="btn btn-secondary btn-sm pull-xs-right" href="{{ url_for('request_pulls', 
+  username=username, repo=repo.name) }}">Reset Filters</a>
 </div>
 </div>
 <div class="card m-t-1">
