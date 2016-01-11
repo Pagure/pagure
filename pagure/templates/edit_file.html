@@ -72,7 +72,8 @@
         <label for="commit_title"><strong>Commit Title</strong></label>
         <input type="text" class="form-control" id="commit_title" name="commit_title"
             placeholder="Update {{ filename }}"
-            value="{{ form.commit_title.data if form.commit_title.data else 'Update %s' filename }}" />
+            value="{{ form.commit_title.data if form.commit_title.data else
+            'Update %s' % filename }}" />
       </fieldset>
       <fieldset class="form-group">
         <label for="commit_message"><strong>Commit Description</strong></label>
