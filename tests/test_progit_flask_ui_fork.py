@@ -678,7 +678,13 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertIn(
             'Pull Requests <span class="label label-default">0</span>',
             output.data)
-        self.assertIn('(0 Closed)</a>', output.data)
+        # Open is primary
+        self.assertIn(
+            '<a class="btn btn-primary btn-sm" '
+            'href="/test/pull-requests">Open</a>', output.data)
+        self.assertIn(
+            '<a class="btn btn-secondary btn-sm" '
+            'href="/test/pull-requests?status=0">Closed</a>', output.data)
 
         self.set_up_git_repo(new_project=None, branch_from='feature')
 
@@ -687,21 +693,39 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertIn(
             'Pull Requests <span class="label label-default">1</span>',
             output.data)
-        self.assertIn('(0 Closed)</a>', output.data)
+        # Open is primary
+        self.assertIn(
+            '<a class="btn btn-primary btn-sm" '
+            'href="/test/pull-requests">Open</a>', output.data)
+        self.assertIn(
+            '<a class="btn btn-secondary btn-sm" '
+            'href="/test/pull-requests?status=0">Closed</a>', output.data)
 
         output = self.app.get('/test/pull-requests?status=Closed')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             'Closed Pull Requests <span class="label label-default">0</span>',
             output.data)
-        self.assertIn('(1 Open)</a>', output.data)
+        # Close is primary
+        self.assertIn(
+            '<a class="btn btn-secondary btn-sm" '
+            'href="/test/pull-requests">Open</a>', output.data)
+        self.assertIn(
+            '<a class="btn btn-primary btn-sm" '
+            'href="/test/pull-requests?status=0">Closed</a>', output.data)
 
         output = self.app.get('/test/pull-requests?status=0')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             'Closed/Merged Pull Requests <span class="label label-default">0</span>',
             output.data)
-        self.assertIn('(1 Open)</a>', output.data)
+        # Close is primary
+        self.assertIn(
+            '<a class="btn btn-secondary btn-sm" '
+            'href="/test/pull-requests">Open</a>', output.data)
+        self.assertIn(
+            '<a class="btn btn-primary btn-sm" '
+            'href="/test/pull-requests?status=0">Closed</a>', output.data)
 
         # Project w/o pull-request
         repo = pagure.lib.get_project(self.session, 'test')
