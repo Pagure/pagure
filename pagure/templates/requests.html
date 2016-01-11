@@ -22,34 +22,17 @@
                repo=repo.name) }}?status=0">Closed</a>
   </span>
 </div>
-  {% if status|lower == 'open' %}
-    <a href="{{ url_for('request_pulls', username=username,
-               repo=repo.name) }}?status=0">
-      ({{ oth_requests }} Closed)</a>
-  {% else %}
-    <a href="{{ url_for('request_pulls', username=username,
-                 repo=repo.name) }}">
-      ({{ oth_requests }} Open)</a>
-  {% endif %}
-
-  <aside id="issue_action">
-      <a class="btn_reset" href="{{ url_for('request_pulls', username=username,
-                 repo=repo.name) }}">
-        <button>Reset all filters</button>
-      </a>
-    </aside>
 </div>
-<div class="card">
-<table class="table table-hover table-striped m-b-0">
-    <thead>
+<div class="card m-t-1">
+<table id="pagure-issues-list" class="table table-hover table-striped m-b-0">
+    <thead class="thead-default">
         <tr>
-            <th>#</th>
-            <th class="stretch-table-column">Title</th>
+            <th class="stretch-table-column">Pull Request</th>
+            <th class="open_date nowrap">Opened</th>
             <th class="open_by">
               Reporter(<a href="{{ url_for('request_pulls', username=username,
                 repo=repo.name, assignee=assignee, status=status) }}">reset</a>)
             </th>
-            <th class="open_date nowrap">Opened date</th>
             <th class="assigned">
               Assignee(<a href="{{ url_for('request_pulls', username=username,
                 repo=repo.name, author=author, status=status) }}">reset</a>)
@@ -61,14 +44,17 @@
     <tbody>
     {% for request in requests %}
         <tr>
-            <td>#{{ request.id }}</td>
             <td>
               <a href="{{ url_for('request_pull', username=username,
                   repo=repo.name, requestid=request.id) }}">
-                {{ request.title | noJS("img") | safe }}
+                <span class="label label-default">PR#{{ request.id }}</span> {% if status|lower != 'open' %}<span class="label {% if request.status|lower == 'merged' %}label-success{%elif request.status|lower == 'closed'%}label-danger{%endif%}">{{request.status}}</span>{%endif%} {{ request.title | noJS("img") | safe }}
               </a>
             </td>
-            <td>
+            <td class="nowrap">
+                    <span title="{{request.date_created.strftime('%Y-%m-%d %H:%M:%S')}}">{{
+                        request.date_created | humanize}}</span>
+            </td>
+            <td class="nowrap">
               <a href="{{ url_for('request_pulls', username=username,
                   repo=repo.name, author=request.user.user,
                   assignee=assignee, status=status) }}"
@@ -77,10 +63,7 @@
                 {{ request.user.user }}
               </a>
             </td>
-            <td>
-                {{ request.date_created.strftime('%Y-%m-%d %H:%M:%S') }}
-            </td>
-            <td>
+            <td class="nowrap">
               {% if request.assignee %}
               <a href="{{ url_for('request_pulls', username=username,
                 repo=repo.name, assignee=request.assignee.username,
@@ -97,7 +80,7 @@
         </tr>
     {% else %}
         <tr>
-            <td colspan="5" class="noresult">No pull-request found</td>
+            <td colspan="5" class="noresult">No Pull Requests found</td>
         </tr>
     {% endfor %}
     </tbody>
