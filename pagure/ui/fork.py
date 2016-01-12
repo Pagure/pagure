@@ -878,7 +878,7 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
         parent = repo.parent
 
     if not parent.settings.get('pull_requests', True):
-        flask.abort(404, 'No pull-requests found for this project')
+        flask.abort(404, 'No pull-request allowed on this project')
 
     repopath = pagure.get_repo_path(repo)
     repo_obj = pygit2.Repository(repopath)
