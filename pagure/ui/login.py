@@ -25,19 +25,9 @@ import pagure.lib.login
 import pagure.lib.model as model
 import pagure.lib.notify
 from pagure import APP, SESSION
+from pagure.lib.login import generate_hashed_value, retrieve_hashed_value
 
 # pylint: disable=E1101
-
-
-def generate_hashed_value(password):
-    """ Generate hash value for password
-    """
-    return '$2$' + bcrypt.hashpw(to_unicode(password), bcrypt.gensalt())
-
-def retrive_hashed_value(password, hash_value):
-    """Retrive hash value to compare
-    """
-    return bcrypt.hashpw(to_unicode(password), hash_value)
 
 
 @APP.route('/user/new/', methods=['GET', 'POST'])
@@ -114,7 +104,7 @@ def do_login():
         _, version, user_password = user_obj.password.split('$', 2)
 
         if version == '2':
-                password = retrive_hashed_value(form.password.data, user_password)
+                password = retrieve_hashed_value(form.password.data, user_password)
 
         elif version == '1':
                 password = '%s%s' % (to_unicode(form.password.data),
@@ -140,7 +130,7 @@ def do_login():
             return flask.redirect(flask.url_for('auth_login'))
         else:
 
-            if version is not '2':
+            if version != '2':
                 user_obj.password = generate_hashed_value(form.password.data)
                 SESSION.add(user_obj)
 
@@ -306,8 +296,14 @@ def change_password(username):
         flask.flash('No user associated with this username.', 'error')
         return flask.redirect(flask.url_for('auth_login'))
     if form.validate_on_submit():
-        old_password = retrive_hashed_value(
-            form.old_password.data, user_password)
+        if version == '2':
+            old_password = retrieve_hashed_value(
+                form.old_password.data, user_password)
+
+        elif version == '1':
+            old_password = '%s%s' % (to_unicode(form.old_password.data),
+                                        APP.config.get('PASSWORD_SEED', None))
+            old_password = hashlib.sha512(old_password).hexdigest()
 
         if constant_time.bytes_eq(to_bytes(user_password),
                                   to_bytes(old_password)):

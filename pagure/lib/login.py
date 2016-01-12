@@ -10,6 +10,7 @@
 
 import random
 import string
+import bcrypt
 
 from pagure.lib import model
 
@@ -61,3 +62,13 @@ def get_users_by_group(session, group):
     )
 
     return query.all()
+
+def generate_hashed_value(password):
+    """ Generate hash value for password
+    """
+    return '$2$' + bcrypt.hashpw(to_unicode(password), bcrypt.gensalt())
+
+def retrieve_hashed_value(password, hash_value):
+    """Retrieve hash value to compare
+    """
+    return bcrypt.hashpw(to_unicode(password), hash_value)
