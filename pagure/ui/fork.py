@@ -989,7 +989,7 @@ def new_remote_request_pull(repo, username=None):
         flask.abort(404)
 
     if not repo.settings.get('pull_requests', True):
-        flask.abort(404, 'No pull-requests found for this project')
+        flask.abort(404, 'No pull-request allowed on this project')
 
     parentpath = pagure.get_repo_path(repo)
     orig_repo = pygit2.Repository(parentpath)
