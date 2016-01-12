@@ -382,33 +382,34 @@
     </div>
     {% endif %}
 
-    {#
     <div class="card">
       <div class="card-block">
-        <table class="table table-hover table-striped m-b-0">
-          <thead></thead>
-          <tfoot></tfoot>
-          <tbody>
-          <tr>
-            <th>Assignee</th>
-            <td>
-              {% if authenticated and mergeform and pull_request.status == True %}
-              <form method="POST" action="{{ url_for('.set_assignee_requests',
-                  username=username, repo=repo.name, requestid=requestid) }}">
+        {% if authenticated and mergeform and pull_request.status == 'Open' %}
+          <form method="POST" action="{{ url_for('.set_assignee_requests',
+              username=username, repo=repo.name, requestid=requestid) }}">
+            <fieldset class="form-group issue-metadata-form">
+              <label><strong>Assignee</strong></label>
+              <div>
                 <input value="{{ pull_request.assignee.username or '' }}"
-                  name="user" id="assignee" placeholder="username" >
+                    name="user" id="assignee" placeholder="username" >
                 {{ mergeform.csrf_token }}
-                <input type="submit" class="submit positive button" value="Update">
-              </form>
-              {% else %}
-              {{ pull_request.assignee.username or '' }}
-              {% endif %}
-            </td>
-          </tr>
-        </table>
+              </div>
+              </fieldset>
+        {% endif %}
+              <fieldset class="form-group issue-metadata-display">
+                <label><strong>Assignee</strong></label>
+                <div>
+                  {{ pull_request.assignee.username or '' }}
+                </div>
+              </fieldset>
+        {% if authenticated and mergeform and pull_request.status == 'Open' %}
+              <input type="submit" class="btn btn-primary issue-metadata-form" value="Update">
+              <a class="btn btn-secondary issue-metadata-form editmetadatatoggle" >cancel</a>
+            </form>
+            <a class="btn btn-secondary issue-metadata-display editmetadatatoggle" >Edit Metadata</a>
+        {% endif %}
       </div>
     </div>
-    #}
     </section>
   {% endif %}
   {% if diff and pull_request%}
@@ -771,6 +772,13 @@ $('#assignee').selectize({
     );
   }
 });
+
+  $( ".editmetadatatoggle" ).click(
+    function() {
+      $( ".issue-metadata-form" ).toggle();
+      $( ".issue-metadata-display" ).toggle();
+    }
+  );
 
 function try_async_comment(form, inline) {
   $(form).off('submit');
