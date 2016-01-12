@@ -34,7 +34,7 @@ git push -u origin master</pre>
     {% else %}
       {% if origin == 'view_commits' %}
 
-        {% if diff_commits and authenticated %}
+        {% if diff_commits and authenticated and repo.settings.get('pull_requests', True) %}
         <span id="request_pull" class="inline_it">
             <a href="{{ url_for('new_request_pull',
         username=username, repo=repo.name,
@@ -42,7 +42,7 @@ git push -u origin master</pre>
       {% if repo_admin %}Request pull{% else %}Compare{% endif %}
             </a>
         </span>
-        {% elif authenticated %}
+        {% elif authenticated and repo.settings.get('pull_requests', True) %}
         <span id="request_pull" class="inline_it">
             <a href="{{ url_for('new_remote_request_pull',
         username=username, repo=repo.name) }}">
