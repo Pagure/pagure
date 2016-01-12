@@ -774,14 +774,14 @@ def set_assignee_requests(repo, requestid, username=None):
     if request.status != 'Open':
         flask.abort(403, 'Pull-request closed')
 
-    form = pagure.forms.AddUserForm()
+    form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
         try:
             # Assign or update assignee of the ticket
             message = pagure.lib.add_pull_request_assignee(
                 SESSION,
                 request=request,
-                assignee=form.user.data or None,
+                assignee=flask.request.form.get('user', '').strip() or None,
                 user=flask.g.fas_user.username,
                 requestfolder=APP.config['REQUESTS_FOLDER'],)
             if message:
