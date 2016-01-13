@@ -29,6 +29,7 @@
         <thead class="thead-default">
             <tr>
                 <th class="nowrap">#</th>
+                <th>Status</th>
                 <th>Title</th>
                 <th class="open_date nowrap">Opened</th>
                 <th class="nowrap">Project</th>
@@ -41,10 +42,15 @@
         {% for request in requests %}
             <tr class="pr-status pr-status-{{request.status|lower}}">
                 <td class="nowrap"><span class="label label-default">PR#{{ request.id }}</span></td>
+                <td><span class="label {%
+                    if request.status|lower == 'merged' %}label-success{%
+                    elif request.status|lower == 'closed' %}label-danger{%
+                    elif request.status|lower == 'open'%}label-primary{%
+                    endif%}">{{request.status}}</span></td>
                 <td class="stretch-table-column">
                   <a href="{{ url_for('request_pull', username=request.project.username if request.project.is_fork else None,
                       repo=request.project.name, requestid=request.id) }}">
-                    {{ request.title | noJS("img") | safe }}  <span class="label {% if request.status|lower == 'merged' %}label-success{%elif request.status|lower == 'closed'%}label-danger{%elif request.status|lower == 'open'%}label-primary{%endif%}">{{request.status}}</span>
+                    {{ request.title | noJS("img") | safe }}
                   </a>
                 </td>
                 <td class="nowrap">
