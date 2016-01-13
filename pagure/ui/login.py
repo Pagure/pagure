@@ -25,9 +25,10 @@ import pagure.lib.login
 import pagure.lib.model as model
 import pagure.lib.notify
 from pagure import APP, SESSION
-from pagure.lib.login import generate_hashed_value, retrieve_hashed_value
+from pagure.lib.login import generate_hashed_value, retrieve_hashed_value, get_password
 
 # pylint: disable=E1101
+
 
 
 @APP.route('/user/new/', methods=['GET', 'POST'])
@@ -103,18 +104,7 @@ def do_login():
         user_obj = pagure.lib.search_user(SESSION, username=username)
         _, version, user_password = user_obj.password.split('$', 2)
 
-        if version == '2':
-                password = retrieve_hashed_value(form.password.data, user_password)
-
-        elif version == '1':
-                password = '%s%s' % (to_unicode(form.password.data),
-                                        APP.config.get('PASSWORD_SEED', None))
-                password = hashlib.sha512(password).hexdigest()
-
-        else:
-             flask.flash('Something is wrong with your account', 'error')
-             return flask.redirect(flask.url_for('auth_login'))
-
+        password = get_password(form.password.data, user_password, version)
 
         if not user_obj or not constant_time.bytes_eq(
                                     to_bytes(user_password),
@@ -125,8 +115,8 @@ def do_login():
 
         elif user_obj.token:
             flask.flash(
-                'Invalid user, did you confirm the creation with the url '
-                'provided by email?', 'error')
+               'Invalid user, did you confirm the creation with the url '
+               'provided by email?', 'error')
             return flask.redirect(flask.url_for('auth_login'))
         else:
 
@@ -296,14 +286,8 @@ def change_password(username):
         flask.flash('No user associated with this username.', 'error')
         return flask.redirect(flask.url_for('auth_login'))
     if form.validate_on_submit():
-        if version == '2':
-            old_password = retrieve_hashed_value(
-                form.old_password.data, user_password)
 
-        elif version == '1':
-            old_password = '%s%s' % (to_unicode(form.old_password.data),
-                                        APP.config.get('PASSWORD_SEED', None))
-            old_password = hashlib.sha512(old_password).hexdigest()
+        old_password = get_password(form.old_password.data, user_password, version)
 
         if constant_time.bytes_eq(to_bytes(user_password),
                                   to_bytes(old_password)):
