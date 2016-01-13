@@ -19,10 +19,10 @@
     </h3>
     <div>
       <span class="btn-group btn-group-sm issues-tagbar" role="group">
-          <a data-togglebutton="pr-status-all" class="btn btn-primary btn-sm" href="#">All</a>
-          <a data-togglebutton="pr-status-open" id="toggle-open" class="btn btn-secondary btn-sm" href="#">Open</a>
+          <a data-togglebutton="pr-status-open" id="toggle-open" class="btn btn-primary btn-sm" href="#">Open</a>
           <a data-togglebutton="pr-status-merged" id="toggle-merged" class="btn btn-secondary btn-sm" href="#">Merged</a>
           <a data-togglebutton="pr-status-closed" id="toggle-closed" class="btn btn-secondary btn-sm" href="#">Closed</a>
+          <a data-togglebutton="pr-status-all" class="btn btn-secondary btn-sm" href="#">All</a>
       </span>
     </div>
     <table class="table table-hover table-striped m-b-0 m-t-1">
@@ -40,7 +40,8 @@
         </tfoot>
         <tbody>
         {% for request in requests %}
-            <tr class="pr-status pr-status-{{request.status|lower}}">
+            <tr class="pr-status pr-status-{{request.status|lower}}" 
+              {%if request.status|lower != "open" %}style="display:none;"{% endif %}>
                 <td class="nowrap"><span class="label label-default">PR#{{ request.id }}</span></td>
                 <td><span class="label {%
                     if request.status|lower == 'merged' %}label-success{%
