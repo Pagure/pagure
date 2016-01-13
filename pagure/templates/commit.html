@@ -7,64 +7,75 @@
 
 {% set splitted_message = commit.message.split('\n') %}
 <div class="header">
-<h3>
-    {{ splitted_message[0] }}
-    (commit: <span class="commitid" title="{{ commitid }}">{{ commitid|short }}
-    </span> - <a href="{{ url_for('view_tree', username=username,
-        repo=repo.name, identifier=commitid) }}">tree</a>)
-    {% if splitted_message|length > 1 %}
-    <span class="commit_message_body">
-        {% for message in splitted_message %}
-            {% if loop.index > 1 %}
-                {{ message }}
-            {% endif %}
-        {% endfor %}
-    </span>
-    {% endif %}
-</h3>
-
-<ul class="buttons">
-    <li><a class="button raw" href="{{ url_for('view_raw_file', username=username,
-            repo=repo.name, identifier=commitid) }}" title="View as raw">Raw</a></li>
-    <li>
-        <a class="button patch" href="{{ url_for('view_commit_patch', username=username,
-            repo=repo.name, commitid=commitid) }}">Patch</a>
-    </li>
-</ul>
-
+  <h4>
+    <span class="label label-default" title="{{ commitid }}">Commit {{ commitid|short }}</span>
+    <span>{{ splitted_message[0] }}</span>
+    <div class="pull-xs-right btn-group">
+      <a class="btn btn-secondary btn-sm" href="{{ url_for('view_raw_file', username=username,
+            repo=repo.name, identifier=commitid) }}" title="View as raw">raw</a>
+      <a class="btn btn-secondary btn-sm" href="{{ url_for('view_commit_patch', username=username,
+            repo=repo.name, commitid=commitid) }}">patch</a>
+      <a class="btn btn-secondary btn-sm" href="{{ url_for('view_tree', username=username,
+            repo=repo.name, identifier=commitid) }}">tree</a>
+      {% if commit.parents|length == 1 %}
+      <a class="btn btn-secondary btn-sm" title={{commit.parents[0].oid.hex}} href="{{ url_for('view_commit', username=username,
+            repo=repo.name, commitid=commit.parents[0].oid.hex) }}">parent</a>
+      {% elif commit.parents|length > 1 %}
+      <div class="btn-group" role="group">
+        <button id="parentsDrop" type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          parents
+        </button>
+        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="parentsDrop">
+          {% for parent in commit.parents %}
+            <a class="dropdown-item" href="{{ url_for('view_commit', username=username,
+                  repo=repo.name, commitid=parent.oid.hex) }}" class="commitid">{{parent.oid.hex}}</a>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif%}
+    </div>
+  </h4>
+  <h5 class="text-muted">
+    {% if commit.author| author2user == commit.committer| author2user %}
+      Authored and Committed by {{ commit.author | author2user |safe }}
+      <span data-toggle="tooltip" title="{{commit.commit_time | format_ts}}">{{commit.commit_time | humanize}}</span>
+    {% else %}
+    Authored by {{ commit.author | author2user |safe }}
+      <span data-toggle="tooltip" title="{{commit.commit_time | format_ts}}">{{commit.commit_time | humanize}}</span>, 
+    Committed by {{ commit.committer | author2user |safe }}
+      <span data-toggle="tooltip" title="{{commit.commit_time | format_ts}}">{{commit.commit_time | humanize}}</span>, 
+    {% endif%}
+  </h5>
 </div>
+
+    {% if splitted_message|length > 1 %}
+    <pre class="commit_message_body">
+        {% for message in splitted_message %}
+{{ message }}
+        {% endfor %}
+    </pre>
+    {% endif %}
+
 <table>
-  <tr>
-    <th>Author</th>
-    <td>
-      {{ commit.author | author2user |safe }}
-      - {{ commit.commit_time | format_ts}}
-    </td>
-  </tr>
-  <tr>
-    <th>Committer</th>
-    <td>
-      {{ commit.committer | author2user |safe }}
-      - {{ commit.commit_time | format_ts }}
-    </td>
-  </tr>
-  <tr>
-    <th>Parent</th>
-    <td>
-      {% for parent in commit.parents %}
-        <a href="{{ url_for('view_commit', username=username,
-                  repo=repo.name, commitid=parent.oid.hex) }}" class="commitid">
-          {{ parent.oid.hex }}
-        </a> <br />
-      {% endfor %}
-    </td>
-  </tr>
   <tr>
       <th>Changes</th>
       <td>
         <ul class="changes">
         {% for patch in diff %}
           <li>
+            {% if patch | hasattr('new_file_path') %}
+              <a href="{{ url_for('view_file', username=username,
+                        repo=repo.name, identifier=commitid,
+                        filename=patch.new_file_path) }}" title="View file as of {{ commitid|short }}">
+                {{  patch.new_file_path }}
+              </a>
+            {% elif patch | hasattr('delta') %}
+              <a href="{{ url_for('view_file', username=username,
+                        repo=repo.name, identifier=commitid,
+                        filename=patch.delta.new_file.path) }}" title="View file as of {{ commitid|short }}">
+                {{  patch.delta.new_file.path }}
+              </a>
+            {% endif %}
             <span class="addrem_bar">
               {% if not patch.is_binary  %}
               {% if patch | hasattr('additions') %}
@@ -93,40 +104,39 @@
 </table>
 
 {% for patch in diff %}
-<section class="commit_diff">
-    <header>
-        {% if patch | hasattr('new_file_path') %}
-        <h3>{{  patch.new_file_path }}</h3>
-        {% elif patch | hasattr('delta') %}
-        <h3>{{  patch.delta.new_file.path }}</h3>
-        {% endif %}
-        <ul class="buttons">
-            <li class="addrem_bar">
-            {% if not patch.is_binary  %}
-              {% if patch | hasattr('additions') %}
-              {% if (patch.additions + patch.deletions) %}
-                <span style="width: {{ (100.0 * patch.additions / (patch.additions + patch.deletions))|round|int }}%">
-                  {% if patch.additions > 0 %}+{{ patch.additions }}{% endif %}
-                  {% if patch.deletions > 0 %}-{{ patch.deletions }}{% endif %}
-                </span>
-              {% endif %}
-              {% else %}
-              {% if (patch.line_stats[1] + patch.line_stats[2]) %}
-                <span style="width: {{ (100.0 * patch.line_stats[1] / (patch.line_stats[1] + patch.line_stats[2]))|round|int }}%">
-                  {% if patch.line_stats[1] > 0 %}+{{ patch.line_stats[1] }}{% endif %}
-                  {% if patch.line_stats[2] > 0 %}-{{ patch.line_stats[2] }}{% endif %}
-                </span>
-              {% endif %}
-              {% endif %}
-              {% endif %}
-            </li>
-            <li>
-                <a class="button view" href="{{ url_for('view_file', username=username,
-                    repo=repo.name, identifier=commitid,
-                    filename=patch.new_file_path) }}" title="View file as of {{ commitid|short }}">View</a>
-            </li>
-        </ul>
-    </header>
+<div class="card">
+  <div class="card-header">
+    {% if patch | hasattr('new_file_path') %}
+      <a href="{{ url_for('view_file', username=username,
+                repo=repo.name, identifier=commitid,
+                filename=patch.new_file_path) }}" title="View file as of {{ commitid|short }}">
+        {{  patch.new_file_path }}
+      </a>
+    {% elif patch | hasattr('delta') %}
+      <a href="{{ url_for('view_file', username=username,
+                repo=repo.name, identifier=commitid,
+                filename=patch.delta.new_file.path) }}" title="View file as of {{ commitid|short }}">
+        {{  patch.delta.new_file.path }}
+      </a>
+    {% endif %}
+        {% if not patch.is_binary  %}
+          {% if patch | hasattr('additions') %}
+          {% if (patch.additions + patch.deletions) %}
+            <span style="width: {{ (100.0 * patch.additions / (patch.additions + patch.deletions))|round|int }}%">
+              {% if patch.additions > 0 %}<span class="label label-success">+{{ patch.additions }}</span> {% endif %}
+              {% if patch.deletions > 0 %}<span class="label label-danger">-{{ patch.deletions }}</span>{% endif %}
+            </span>
+          {% endif %}
+          {% else %}
+          {% if (patch.line_stats[1] + patch.line_stats[2]) %}
+            <span style="width: {{ (100.0 * patch.line_stats[1] / (patch.line_stats[1] + patch.line_stats[2]))|round|int }}%">
+              {% if patch.line_stats[1] > 0 %}<span class="label label-success">+{{ patch.line_stats[1] }}</span> {% endif %}
+              {% if patch.line_stats[2] > 0 %}<span class="label label-danger">-{{ patch.line_stats[2] }}</span>{% endif %}
+            </span>
+          {% endif %}
+          {% endif %}
+          {% endif %}
+  </div>
 
     {% if patch.is_binary %}
         <p class="noresult">Binary diffs cannot be rendered.</p>
@@ -135,7 +145,7 @@
         {{ patch|patch_to_diff|html_diff}}
         {% endautoescape %}
     {% endif %}
-</section>
+</div>
 
 {% endfor %}
 
