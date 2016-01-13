@@ -584,6 +584,7 @@ def view_commit(repo, commitid, username=None):
         select='logs',
         repo=repo,
         username=username,
+        repo_admin=is_repo_admin(repo),
         commitid=commitid,
         commit=commit,
         diff=diff,
