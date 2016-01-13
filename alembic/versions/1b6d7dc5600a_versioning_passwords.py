@@ -12,11 +12,14 @@ down_revision = '3b441ef4e928'
 
 from alembic import op
 import sqlalchemy as sa
-
+import sqlalchemy.orm
+from pagure.lib import model
 
 def upgrade():
-        op.execute('''UPDATE "users" SET password = '$1$' || password;''')
-
+        engine = op.get_bind().engine
+        session = sa.orm.scoped_session(sa.orm.sessionmaker(bind=engine))
+        session.query(model.User).update({model.User.password: '$1$' + model.User.password}, synchronize_session=False);
+        session.commit()
 
 
 def downgrade():
