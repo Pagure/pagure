@@ -306,8 +306,10 @@ def author_to_user(author, size=16):
     """ Template filter transforming a pygit2 Author object into a text
     either with just the username or linking to the user in pagure.
     """
-    user = pagure.lib.search_user(SESSION, email=author.email)
     output = author.name
+    if not author.email:
+        return output
+    user = pagure.lib.search_user(SESSION, email=author.email)
     if user:
         output = "%s <a href='%s'>%s</a>" % (
             avatar(user.user, size),
