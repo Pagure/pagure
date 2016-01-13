@@ -1,76 +1,102 @@
 {% extends "master.html" %}
 {% from "_formhelper.html" import render_field_in_row %}
+{% from "_browseheader.html" import browse_header %}
 
 {% block title %}Pull-requests of {{ username }}{% endblock %}
-{% set tag = "home"%}
+{% set tag = "users"%}
 
 
 {% block content %}
+<div class="repo-header p-t-1">
+  <div class="container">
+    {{browse_header(select=tag)}}
+  </div>
+</div>
+<div class="p-t-2">
+  <div class="container">
+    <h3 class="p-b-2">
+        Pull Requests opened by {{ username | avatar(20) | safe }} {{ username }}
+    </h3>
+    <div>
+      <span class="btn-group btn-group-sm issues-tagbar" role="group">
+          <a data-togglebutton="pr-status-all" class="btn btn-primary btn-sm" href="#">All</a>
+          <a data-togglebutton="pr-status-open" id="toggle-open" class="btn btn-secondary btn-sm" href="#">Open</a>
+          <a data-togglebutton="pr-status-merged" id="toggle-merged" class="btn btn-secondary btn-sm" href="#">Merged</a>
+          <a data-togglebutton="pr-status-closed" id="toggle-closed" class="btn btn-secondary btn-sm" href="#">Closed</a>
+      </span>
+    </div>
+    <table class="table table-hover table-striped m-b-0 m-t-1">
+        <thead class="thead-default">
+            <tr>
+                <th class="nowrap">#</th>
+                <th>Title</th>
+                <th class="open_date nowrap">Opened</th>
+                <th class="nowrap">Project</th>
+                <th class="assigned nowrap">Assigned to</th>
+            </tr>
+        </thead>
+        <tfoot>
+        </tfoot>
+        <tbody>
+        {% for request in requests %}
+            <tr class="pr-status pr-status-{{request.status|lower}}">
+                <td class="nowrap"><span class="label label-default">PR#{{ request.id }}</span></td>
+                <td class="stretch-table-column">
+                  <a href="{{ url_for('request_pull', username=request.project.username if request.project.is_fork else None,
+                      repo=request.project.name, requestid=request.id) }}">
+                    {{ request.title | noJS("img") | safe }}  <span class="label {% if request.status|lower == 'merged' %}label-success{%elif request.status|lower == 'closed'%}label-danger{%elif request.status|lower == 'open'%}label-primary{%endif%}">{{request.status}}</span>
+                  </a>
+                </td>
+                <td class="nowrap">
+                    <span title="{{request.date_created.strftime('%Y-%m-%d %H:%M:%S')}}">{{
+                        request.date_created | humanize}}</span>
+                </td>
+                <td class="nowrap">
+                  <a href="{{ url_for(
+                    'view_repo',
+                    username=request.project.username if request.project.is_fork else None,
+                    repo=request.project.name)}}">
+                    {{ request.project.username + '/' if request.project.is_fork }}
+                    {{ request.project.name }}
+                  </a>
+                </td>
+                <td class="nowrap">
+                  {% if request.assignee %}
+                  {{ request.assignee.user | avatar(16) | safe }}
+                  {{ request.assignee.user }}
+                  {% else %}
+                  <span class="text-muted">unassigned</span>
+                  {% endif %}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5" class="noresult">No pull-request found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+  </div>
+</div>
 
-<h2>Opened pull-requests for</h2>
+{% endblock %}
 
-<h3>
-    {{ username | avatar(36) | safe }} {{ username }}
-    {% if g.fas_user and g.fas_user.username == username %}
-      <a class="user_settings" href="{{ url_for('user_settings') }}" title="Update your settings">Settings</a>
-    {% endif %}
-
-</h3>
-
-<table class="list requests">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>Title</th>
-            <th>Project</th>
-            <th class="open_by">Opened by</th>
-            <th class="open_date">Opened on</th>
-            <th class="assigned">Assigned to</th>
-        </tr>
-    </thead>
-    <tfoot>
-    </tfoot>
-    <tbody>
-    {% for request in requests %}
-        <tr>
-            <td>#{{ request.id }}</td>
-            <td>
-              <a href="{{ url_for('request_pull', username=request.project.username if request.project.is_fork else None,
-                  repo=request.project.name, requestid=request.id) }}">
-                {{ request.title | noJS("img") | safe }}
-              </a>
-            </td>
-            <td>
-              <a href="{{ url_for(
-                'view_repo',
-                username=request.project.username if request.project.is_fork else None,
-                repo=request.project.name)}}">
-                {{ request.project.username + '/' if request.project.is_fork }}
-                {{ request.project.name }}
-              </a>
-            </td>
-            <td>
-              {{ request.user.user | avatar(16) | safe }}
-              {{ request.user.user }}
-            </td>
-            <td>
-                {{ request.date_created.strftime('%Y-%m-%d %H:%M:%S') }}
-            </td>
-            <td>
-              {% if request.assignee %}
-              {{ request.assignee.user | avatar(16) | safe }}
-              {{ request.assignee.user }}
-              {% else %}
-              (unassigned)
-              {% endif %}
-            </td>
-        </tr>
-    {% else %}
-        <tr>
-            <td colspan="5" class="noresult">No pull-request found</td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
-
+{% block jscripts %}
+    {{ super() }}
+    <script type="text/javascript">
+      $(function(){
+        $('.issues-tagbar .btn').click(function(){
+          $('.issues-tagbar .btn-primary').addClass("btn-secondary");
+          $('.issues-tagbar .btn-primary').removeClass("btn-primary");
+          $(this).removeClass("btn-secondary");
+          $(this).addClass("btn-primary");
+          if ($(this).attr("data-togglebutton") == "pr-status-all"){
+            $(".pr-status").show();
+          } else {
+            $(".pr-status").hide();
+            $("."+$(this).attr("data-togglebutton")).show();
+          }
+        });
+      });
+    </script>
 {% endblock %}
