@@ -50,18 +50,31 @@
     {% for user in users %}
       <div class="col-lg-4 col-md-6">
         <div class="project_wrapper m-b-1">
-            <img class="projecticon pull-xs-left" src="{{
-              user.default_email | avatar_url(60) |safe }}" width=60 height=60 />
-            <a class="project_link logo_link" href="{{ url_for('view_user', username=user.user)}}">
-                <div class="repo_name"><strong>{{ user.fullname }}</strong></div>
-           </a>
-           <div class="repo_desc">
+          <img class="projecticon pull-xs-left" src="{{
+            user.default_email | avatar_url(60) |safe }}" width=60 height=60 />
+          <a class="project_link logo_link" href="{{ url_for('view_user', username=user.user)}}">
+            <div class="repo_name"><strong>{{ user.fullname }}</strong></div>
+          </a>
+          <div class="repo_desc">
             <small>{{ user.user }} joined <span title="{{
             user.created.strftime('%Y-%m-%d %H:%M:%S') }}">{{
             user.created | humanize }}</span></small>
           </div>
           <div class="project_metadata">
-            <div style="text-align:right;" class="p-r-1 text-muted"><span class="oi" data-glyph="fork"></span> {{user.forks_length}} &nbsp;<span class="oi" data-glyph="document"></span> {{user.repos_length}} &nbsp;<span class="oi" data-glyph="people"></span> {{user.groups|count}} </div>
+            <div style="text-align:right;" class="p-r-1 text-muted">
+              <span title="Forks">
+                <span class="oi" data-glyph="fork"></span>
+                {{- user.forks_length}} &nbsp;
+              </span>
+              <span title="Projects">
+                <span class="oi" data-glyph="document"></span>
+                {{- user.repos_length}} &nbsp;
+              </span>
+              <span title="Groups">
+                <span class="oi" data-glyph="people"></span>
+                {{- user.groups|count}}
+              </span>
+            </div>
           </div>
         </div>
       </div>
