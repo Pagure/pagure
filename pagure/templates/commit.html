@@ -37,10 +37,10 @@
   </h4>
   <h5 class="text-muted">
     {% if commit.author| author2user == commit.committer| author2user %}
-      Authored and Committed by {{ commit.author | author2user |safe }}
+      <a href="#" id="diff_list_link">{{diff|count}} file{{'s' if diff|count > 1}}</a> Authored and Committed by {{ commit.author | author2user |safe }}
       <span data-toggle="tooltip" title="{{commit.commit_time | format_ts}}">{{commit.commit_time | humanize}}</span>
     {% else %}
-    Authored by {{ commit.author | author2user |safe }}
+    <a href="#" id="diff_list_link">{{diff|count}} file{{'s' if diff|count > 1}}</a> Authored by {{ commit.author | author2user |safe }}
       <span data-toggle="tooltip" title="{{commit.commit_time | format_ts}}">{{commit.commit_time | humanize}}</span>, 
     Committed by {{ commit.committer | author2user |safe }}
       <span data-toggle="tooltip" title="{{commit.commit_time | format_ts}}">{{commit.commit_time | humanize}}</span>, 
@@ -48,6 +48,42 @@
   </h5>
 </div>
 
+<div class="list-group" id="diff_list" style="display:none;">
+  {% set filecount = 0 %}
+  {% for patch in diff %}
+      {% set filecount = filecount + 1 %}
+      {% if patch | hasattr('new_file_path') %}
+        <a class="list-group-item" href="#diff-file-{{filecount}}">
+          {{  patch.new_file_path }}
+      {% elif patch | hasattr('delta') %}
+        <a class="list-group-item" href="#diff-file-{{filecount}}">
+          {{  patch.delta.new_file.path }}
+      {% endif %}
+      <div class="pull-xs-right">
+        {% if not patch.is_binary  %}
+        {% if patch | hasattr('additions') %}
+        {% if (patch.additions + patch.deletions) %}
+          <span style="width: {{ (100.0 * patch.additions / (patch.additions + patch.deletions))|round|int }}%">
+            {% if patch.additions > 0 %}<span class="label label-success">+{{ patch.additions }}</span>{% endif %}
+            {% if patch.deletions > 0 %}<span class="label label-danger">-{{ patch.deletions }}</span>{% endif %}
+          </span>
+        {% endif %}
+        {% else %}
+        {% if (patch.line_stats[1] + patch.line_stats[2]) %}
+          <span style="width: {{ (100.0 * patch.line_stats[1] / (patch.line_stats[1] + patch.line_stats[2]))|round|int }}%">
+            {% if patch.line_stats[1] > 0 %}<span class="label label-success">+{{ patch.line_stats[1] }}</span>{% endif %}
+            {% if patch.line_stats[2] > 0 %}<span class="label label-danger">-{{ patch.line_stats[2] }}</span>{% endif %}
+          </span>
+        {% endif %}
+        {% endif %}
+        {% endif %}
+      </div>
+      {{ patch.new_file_path }}
+    </a>
+  {% endfor %}
+</div>
+
+<div class="m-y-1">
     {% if splitted_message|length > 1 %}
     <pre class="commit_message_body">
         {% for message in splitted_message %}
@@ -55,56 +91,12 @@
         {% endfor %}
     </pre>
     {% endif %}
+</div>
 
-<table>
-  <tr>
-      <th>Changes</th>
-      <td>
-        <ul class="changes">
-        {% for patch in diff %}
-          <li>
-            {% if patch | hasattr('new_file_path') %}
-              <a href="{{ url_for('view_file', username=username,
-                        repo=repo.name, identifier=commitid,
-                        filename=patch.new_file_path) }}" title="View file as of {{ commitid|short }}">
-                {{  patch.new_file_path }}
-              </a>
-            {% elif patch | hasattr('delta') %}
-              <a href="{{ url_for('view_file', username=username,
-                        repo=repo.name, identifier=commitid,
-                        filename=patch.delta.new_file.path) }}" title="View file as of {{ commitid|short }}">
-                {{  patch.delta.new_file.path }}
-              </a>
-            {% endif %}
-            <span class="addrem_bar">
-              {% if not patch.is_binary  %}
-              {% if patch | hasattr('additions') %}
-              {% if (patch.additions + patch.deletions) %}
-                <span style="width: {{ (100.0 * patch.additions / (patch.additions + patch.deletions))|round|int }}%">
-                  {% if patch.additions > 0 %}+{{ patch.additions }}{% endif %}
-                  {% if patch.deletions > 0 %}-{{ patch.deletions }}{% endif %}
-                </span>
-              {% endif %}
-              {% else %}
-              {% if (patch.line_stats[1] + patch.line_stats[2]) %}
-                <span style="width: {{ (100.0 * patch.line_stats[1] / (patch.line_stats[1] + patch.line_stats[2]))|round|int }}%">
-                  {% if patch.line_stats[1] > 0 %}+{{ patch.line_stats[1] }}{% endif %}
-                  {% if patch.line_stats[2] > 0 %}-{{ patch.line_stats[2] }}{% endif %}
-                </span>
-              {% endif %}
-              {% endif %}
-              {% endif %}
-            </span>
-            {{ patch.new_file_path }}
-          </li>
-        {% endfor %}
-        </ul>
-      </td>
-  </tr>
-</table>
-
+{% set filecount = 0 %}
 {% for patch in diff %}
-<div class="card">
+  {% set filecount = filecount + 1 %}
+<div class="card" id="diff-file-{{filecount}}">
   <div class="card-header">
     {% if patch | hasattr('new_file_path') %}
       <a href="{{ url_for('view_file', username=username,
@@ -149,4 +141,17 @@
 
 {% endfor %}
 
+{% endblock %}
+
+
+
+{% block jscripts %}
+    {{ super() }}
+    <script type="text/javascript">
+      $(function(){
+        $('#diff_list_link').click(function(){
+          $('#diff_list').toggle();
+        });
+      });
+    </script>
 {% endblock %}

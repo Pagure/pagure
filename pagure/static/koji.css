@@ -367,3 +367,15 @@ btn-group-vertical > .btn-group::after, .btn-group-vertical > .btn-group::before
  margin-top:2em;
 }
 
+.commit_message_body
+{
+  font-family: "Open Sans";
+  background: transparent;
+padding:0;
+}
+
+.card pre
+{
+margin-bottom:0;
+}
+
