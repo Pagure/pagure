@@ -38,7 +38,8 @@
                   <div class="pull-xs-right">
                     {% if repo.open_tickets_public == 0 %}
                       <span class="text-muted">
-                        <span class="oi" data-glyph="warning"></span>
+                        <span class="oi" data-glyph="warning"
+                          title="{{ repo.open_tickets_public }} open issues against {{repo.name}}"></span>
                         {{ repo.open_tickets_public }}
                       </span>
                     {% else %}
@@ -51,7 +52,8 @@
 
                     {% if repo.open_requests == 0 %}
                       <span class="text-muted">
-                        <span class="oi" data-glyph="arrow-thick-bottom"></span>
+                        <span class="oi" data-glyph="arrow-thick-bottom"
+                          title="{{repo.open_requests}} open pull requests in {{repo.name}}"></span>
                         {{repo.open_requests}}
                       </span>
                     {% else %}
