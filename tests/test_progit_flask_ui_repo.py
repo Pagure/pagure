@@ -47,6 +47,8 @@ class PagureFlaskRepotests(tests.Modeltests):
         pagure.APP.config['GIT_FOLDER'] = tests.HERE
         pagure.APP.config['FORK_FOLDER'] = os.path.join(
             tests.HERE, 'forks')
+        pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
+            tests.HERE, 'requests')
         pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
             tests.HERE, 'tickets')
         pagure.APP.config['DOCS_FOLDER'] = os.path.join(
@@ -1389,6 +1391,8 @@ index 0000000..fb7093d
             )
             self.session.add(item)
             self.session.commit()
+
+            # Create all the git repos
             tests.create_projects_git(tests.HERE)
             tests.create_projects_git(os.path.join(tests.HERE, 'docs'))
             tests.create_projects_git(
@@ -1400,7 +1404,7 @@ index 0000000..fb7093d
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<div class="card-header">\n            Projects <span '
+                '<div class="card-header">\n            My Projects <span '
                 'class="label label-default">2</span>', output.data)
             self.assertIn(
                 'Forks <span class="label label-default">0</span>',
@@ -1491,7 +1495,7 @@ index 0000000..fb7093d
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<div class="card-header">\n            Projects <span '
+                '<div class="card-header">\n            My Projects <span '
                 'class="label label-default">2</span>', output.data)
             self.assertIn(
                 'Forks <span class="label label-default">0</span>',
@@ -1532,7 +1536,7 @@ index 0000000..fb7093d
             output = self.app.get('/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<div class="card-header">\n            Projects <span '
+                '<div class="card-header">\n            My Projects <span '
                 'class="label label-default">1</span>', output.data)
             self.assertIn(
                 'Forks <span class="label label-default">1</span>',
