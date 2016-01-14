@@ -87,16 +87,10 @@ def index_auth():
     except ValueError:
         forkpage = 1
 
-    limit = APP.config['ITEM_PER_PAGE']
-    repo_start = limit * (repopage - 1)
-    fork_start = limit * (forkpage - 1)
-
     repos = pagure.lib.search_projects(
         SESSION,
         username=flask.g.fas_user.username,
-        fork=False,
-        start=repo_start,
-        limit=limit)
+        fork=False)
     repos_length = pagure.lib.search_projects(
         SESSION,
         username=flask.g.fas_user.username,
@@ -106,17 +100,12 @@ def index_auth():
     forks = pagure.lib.search_projects(
         SESSION,
         username=flask.g.fas_user.username,
-        fork=True,
-        start=fork_start,
-        limit=limit)
+        fork=True)
     forks_length = pagure.lib.search_projects(
         SESSION,
         username=flask.g.fas_user.username,
         fork=True,
         count=True)
-
-    total_page_repos = int(ceil(repos_length / float(limit)))
-    total_page_forks = int(ceil(forks_length / float(limit)))
 
     return flask.render_template(
         'index_auth.html',
@@ -126,8 +115,6 @@ def index_auth():
         repos=repos,
         repopage=repopage,
         forkpage=forkpage,
-        total_page_repos=total_page_repos,
-        total_page_forks=total_page_forks,
         repos_length=repos_length,
         forks_length=forks_length,
     )

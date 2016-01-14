@@ -379,3 +379,7 @@ padding:0;
 margin-bottom:0;
 }
 
+a.notblue {
+    color: inherit;
+    text-decoration:none;
+}
