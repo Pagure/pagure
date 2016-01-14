@@ -1038,9 +1038,11 @@ class PagureFlaskRepotests(tests.Modeltests):
         # View first commit
         output = self.app.get('/test/%s' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
-        self.assertTrue('<section class="commit_diff">' in output.data)
-        self.assertTrue('<th>Author</th>' in output.data)
-        self.assertTrue('<th>Committer</th>' in output.data)
+        self.assertTrue(
+            '<div class="list-group" id="diff_list" style="display:none;">'
+            in output.data)
+        self.assertTrue('</a> Authored by Alice Author' in output.data)
+        self.assertTrue('Committed by Cecil Committer' in output.data)
         self.assertTrue(
             '<span style="color: #00A000">+ Pagure</span>' in output.data)
         self.assertTrue(
@@ -1055,9 +1057,11 @@ class PagureFlaskRepotests(tests.Modeltests):
         # View another commit
         output = self.app.get('/test/%s' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
-        self.assertTrue('<section class="commit_diff">' in output.data)
-        self.assertTrue('<th>Author</th>' in output.data)
-        self.assertTrue('<th>Committer</th>' in output.data)
+        self.assertTrue(
+            '<div class="list-group" id="diff_list" style="display:none;">'
+            in output.data)
+        self.assertTrue('</a> Authored by Alice Author' in output.data)
+        self.assertTrue('Committed by Cecil Committer' in output.data)
         self.assertTrue(
             '<div class="highlight" style="background: #f8f8f8">'
             '<pre style="line-height: 125%">'
@@ -1090,9 +1094,11 @@ class PagureFlaskRepotests(tests.Modeltests):
         # View commit of fork
         output = self.app.get('/fork/pingou/test3/%s' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
-        self.assertTrue('<section class="commit_diff">' in output.data)
-        self.assertTrue('<th>Author</th>' in output.data)
-        self.assertTrue('<th>Committer</th>' in output.data)
+        self.assertTrue(
+            '<div class="list-group" id="diff_list" style="display:none;">'
+            in output.data)
+        self.assertTrue('</a> Authored by Alice Author' in output.data)
+        self.assertTrue('Committed by Cecil Committer' in output.data)
         self.assertTrue(
             '<span style="color: #00A000">+ Pagure</span>' in output.data)
         self.assertTrue(
