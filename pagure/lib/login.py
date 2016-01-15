@@ -81,6 +81,11 @@ def retrieve_hashed_value(password, hash_value):
 def check_password(entered_password, user_password, seed=None):
     """ Version checking and returning the password
     """
+    if not user_password.count('$') >= 2:
+        raise pagure.exceptions.PagureException(
+            'Password of unknown version found in the database'
+        )
+
     _, version, user_password = user_password.split('$', 2)
 
     if version == '2':
