@@ -94,4 +94,5 @@ def check_password(entered_password, user_password, seed=None):
         flask.flash('Something went wrong')
         return flask.redirect(flask.url_for('auth_login'))
 
-    return constant_time.bytes_eq(to_bytes(entered_password), to_bytes(user_password))
+    return constant_time.bytes_eq(
+        to_bytes(password), to_bytes(user_password))
