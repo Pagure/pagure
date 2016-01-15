@@ -25,15 +25,9 @@ import pagure.lib.login
 import pagure.lib.model as model
 import pagure.lib.notify
 from pagure import APP, SESSION
-<<<<<<< HEAD
 from pagure.lib.login import generate_hashed_value, check_password
-=======
-from pagure.lib.login import generate_hashed_value, retrieve_hashed_value, get_password
->>>>>>> Add fucntions in lib
 
 # pylint: disable=E1101
-
-
 
 @APP.route('/user/new/', methods=['GET', 'POST'])
 @APP.route('/user/new', methods=['GET', 'POST'])
@@ -125,8 +119,8 @@ def do_login():
 
         elif user_obj.token:
             flask.flash(
-               'Invalid user, did you confirm the creation with the url '
-               'provided by email?', 'error')
+                'Invalid user, did you confirm the creation with the url '
+                'provided by email?', 'error')
             return flask.redirect(flask.url_for('auth_login'))
 
         else:
@@ -298,7 +292,8 @@ def change_password(username):
 
     if form.validate_on_submit():
 
-        old_password = get_password(form.old_password.data, user_password, version)
+        old_password = get_password(
+            form.old_password.data, user_password, version)
 
         try:
             password_checks = check_password(
