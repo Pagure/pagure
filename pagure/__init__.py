@@ -278,7 +278,7 @@ def auth_login():  # pragma: no cover
     else:  # pragma: no cover
         admins = set(admins)
 
-    if APP.config.get('PAGURE_AUTH', None) == 'fas':
+    if APP.config.get('PAGURE_AUTH', None) in ['fas', 'openid']:
         return FAS.login(return_url=return_point, groups=admins)
     elif APP.config.get('PAGURE_AUTH', None) == 'local':
         form = pagure.login_forms.LoginForm()
@@ -300,7 +300,7 @@ def auth_logout():  # pragma: no cover
     if not authenticated():
         return flask.redirect(return_point)
 
-    if APP.config.get('PAGURE_AUTH', None) == 'fas':
+    if APP.config.get('PAGURE_AUTH', None) in ['fas', 'openid']:
         if hasattr(flask.g, 'fas_user') and flask.g.fas_user is not None:
             FAS.logout()
             flask.flash("You are no longer logged-in")
