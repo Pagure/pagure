@@ -81,6 +81,8 @@ def retrieve_hashed_value(password, hash_value):
 def get_password(entered_password, user_password, version):
     """ Version checking and returning the password
     """
+    _, version, user_password = user_password.split('$', 2)
+
     if version == '2':
         password = retrieve_hashed_value(entered_password, user_password)
 
