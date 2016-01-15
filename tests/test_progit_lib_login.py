@@ -48,6 +48,27 @@ class PagureLibLogintests(tests.Modeltests):
         session = pagure.lib.login.get_session_by_visitkey(self.session, 'foo')
         self.assertEqual(session, None)
 
+    def test_generate_hashed_value(self):
+        ''' Test pagure.lib.login.generate_hashed_value. '''
+        password = pagure.lib.login.generate_hashed_value('foo')
+        self.assertTrue(password.startswith('$2$'))
+        self.assertEqual(len(password), 63)
+
+    def test_retrieve_hashed_value(self):
+        ''' Test pagure.lib.login.retrieve_hashed_value. '''
+
+        password = pagure.lib.login.generate_hashed_value('foo')
+        foo = pagure.lib.login.retrieve_hashed_value('foo', password[3:])
+        self.assertNotEqual(foo, None)
+
+    def test_check_password(self):
+        ''' Test pagure.lib.login.check_password. '''
+
+        password = pagure.lib.login.generate_hashed_value('foo')
+        self.assertTrue(
+            pagure.lib.login.check_password('foo', password)
+        )
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibLogintests)
