@@ -91,8 +91,9 @@ def check_password(entered_password, user_password, seed=None):
         password = hashlib.sha512(password).hexdigest()
 
     else:
-        flask.flash('Something went wrong')
-        return flask.redirect(flask.url_for('auth_login'))
+        raise pagure.exceptions.PagureException(
+            'Password of unknown version found in the database'
+        )
 
     return constant_time.bytes_eq(
         to_bytes(password), to_bytes(user_password))
