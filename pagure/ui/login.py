@@ -72,7 +72,7 @@ def new_user():
             flask.flash(
                 'User created, please check your email to activate the '
                 'account')
-        except SQLAlchemyError as err:
+        except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             flask.flash('Could not create user.')
             APP.logger.debug('Could not create user.')
@@ -211,7 +211,7 @@ def lost_password():
             send_lostpassword_email(user_obj)
             flask.flash(
                 'Check your email to finish changing your password')
-        except SQLAlchemyError as err:
+        except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(
                 'Could not set the token allowing changing a password.',
@@ -255,7 +255,7 @@ def reset_password(token):
             SESSION.commit()
             flask.flash(
                 'Password changed')
-        except SQLAlchemyError as err:
+        except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             flask.flash('Could not set the new password.', 'error')
             APP.logger.debug(
@@ -314,7 +314,7 @@ def change_password(username):
             SESSION.commit()
             flask.flash(
                 'Password changed')
-        except SQLAlchemyError as err:
+        except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             flask.flash('Could not set the new password.', 'error')
             APP.logger.debug(
