@@ -99,13 +99,10 @@ def do_login():
     if form.validate_on_submit():
         username = form.username.data
         user_obj = pagure.lib.search_user(SESSION, username=username)
-        if not user_obj:
-            flask.flash('Username or password invalid.', 'error')
-            return flask.redirect(flask.url_for('auth_login'))
 
         try:
             password_checks = check_password(
-                form.password.data, user_obj.password,
+                form.old_password.data, user_obj.password,
                 seed=APP.config.get('PASSWORD_SEED', None))
         except pagure.exceptions.PagureException as err:
             APP.logger.exception(err)
@@ -123,7 +120,6 @@ def do_login():
             return flask.redirect(flask.url_for('auth_login'))
 
         else:
-
                 user_obj.password = generate_hashed_value(form.password.data)
                 SESSION.add(user_obj)
 
