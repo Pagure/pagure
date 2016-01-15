@@ -14,6 +14,7 @@ import bcrypt
 
 from pagure.lib import model
 from kitchen.text.converters import to_unicode, to_bytes
+from cryptography.hazmat.primitives import constant_time
 
 
 def id_generator(size=15, chars=string.ascii_uppercase + string.digits):
@@ -92,4 +93,4 @@ def get_password(entered_password, user_password, version):
         flask.flash('Something went wrong')
         return flask.redirect(flask.url_for('auth_login'))
 
-    return password
+    return constant_time.bytes_eq(to_bytes(entered_password), to_bytes(user_password))

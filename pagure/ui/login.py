@@ -14,7 +14,6 @@ import datetime
 import urlparse
 import bcrypt
 from kitchen.text.converters import to_unicode, to_bytes
-from cryptography.hazmat.primitives import constant_time
 
 import flask
 from sqlalchemy.exc import SQLAlchemyError
@@ -28,6 +27,7 @@ from pagure import APP, SESSION
 from pagure.lib.login import generate_hashed_value, retrieve_hashed_value, get_password
 
 # pylint: disable=E1101
+
 
 @APP.route('/user/new/', methods=['GET', 'POST'])
 @APP.route('/user/new', methods=['GET', 'POST'])
@@ -102,11 +102,7 @@ def do_login():
         user_obj = pagure.lib.search_user(SESSION, username=username)
         _, version, user_password = user_obj.password.split('$', 2)
 
-        password = get_password(form.password.data, user_password, version)
-
-        if not user_obj or not constant_time.bytes_eq(
-                to_bytes(user_password),
-                to_bytes(password)):
+        if not user_obj or not get_password(form.password.data, user_password, version):
 
             flask.flash('Username or password invalid.', 'error')
             return flask.redirect(flask.url_for('auth_login'))
@@ -285,11 +281,7 @@ def change_password(username):
         return flask.redirect(flask.url_for('auth_login'))
     if form.validate_on_submit():
 
-        old_password = get_password(
-            form.old_password.data, user_password, version)
-
-        if constant_time.bytes_eq(to_bytes(user_password),
-                                  to_bytes(old_password)):
+        if get_password(form.old_password.data, user_password, version):
 
             user_obj.password = generate_hashed_value(form.password.data)
             SESSION.add(user_obj)
