@@ -100,10 +100,17 @@ def do_login():
     if form.validate_on_submit():
         username = form.username.data
         user_obj = pagure.lib.search_user(SESSION, username=username)
-        _, version, user_password = user_obj.password.split('$', 2)
 
-        if not user_obj or not get_password(form.password.data, user_password, version):
+        try:
+            password_checks = check_password(
+                form.old_password.data, user_obj.password,
+                seed=APP.config.get('PASSWORD_SEED', None))
+        except pagure.exceptions.PagureException as err:
+            APP.logger.exception(err)
+            flask.flash('Username or password of invalid format.', 'error')
+            return flask.redirect(flask.url_for('auth_login'))
 
+        if not user_obj or not password_checks:
             flask.flash('Username or password invalid.', 'error')
             return flask.redirect(flask.url_for('auth_login'))
 
@@ -112,9 +119,10 @@ def do_login():
                 'Invalid user, did you confirm the creation with the url '
                 'provided by email?', 'error')
             return flask.redirect(flask.url_for('auth_login'))
+
         else:
 
-            if version != '2':
+            if not user_obj.password.startswith('$2$'):
                 user_obj.password = generate_hashed_value(form.password.data)
                 SESSION.add(user_obj)
 
@@ -274,22 +282,32 @@ def change_password(username):
     """
     form = forms.ChangePasswordForm()
     user_obj = pagure.lib.search_user(SESSION, username=username)
-    _, version, user_password = user_obj.password.split('$', 2)
 
     if not user_obj:
         flask.flash('No user associated with this username.', 'error')
         return flask.redirect(flask.url_for('auth_login'))
+
     if form.validate_on_submit():
 
-        if get_password(form.old_password.data, user_password, version):
+        try:
+            password_checks = check_password(
+                form.old_password.data, user_obj.password,
+                seed=APP.config.get('PASSWORD_SEED', None))
+        except pagure.exceptions.PagureException as err:
+            APP.logger.exception(err)
+            flask.flash(
+                'Could not update your password, either user or password '
+                'could not be checked', 'error')
+            return flask.redirect(flask.url_for('auth_login'))
 
+        if password_checks:
             user_obj.password = generate_hashed_value(form.password.data)
             SESSION.add(user_obj)
 
         else:
             flask.flash(
-                'Invalid user, old password does not match',
-                'error')
+                'Could not update your password, either user or password '
+                'could not be checked', 'error')
             return flask.redirect(flask.url_for('auth_login'))
 
         try:
