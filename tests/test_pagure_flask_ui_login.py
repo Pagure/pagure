@@ -69,7 +69,7 @@ class PagureFlaskLogintests(tests.Modeltests):
         data = {
             'user': 'foo',
             'fullname': 'user foo',
-            'email_address': 'foo@example.com',
+            'email_address': 'foo@bar.com',
             'password': 'barpass',
             'confirm_password': 'barpass',
         }
@@ -93,8 +93,15 @@ class PagureFlaskLogintests(tests.Modeltests):
             '<form action="/user/new" method="post">', output.data)
         self.assertIn('Username already taken.', output.data)
 
-        # Submit the form with another user name
+        # Submit the form with another username
         data['user'] = 'foouser'
+        output = self.app.post('/user/new', data=data, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>New user - Pagure</title>', output.data)
+        self.assertIn('Email address already taken.', output.data)
+
+        # Submit the form with proper data
+        data['email_address'] = 'foo@example.com'
         output = self.app.post('/user/new', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
         self.assertIn('<title>Login - Pagure</title>', output.data)
