@@ -78,7 +78,7 @@ def retrieve_hashed_value(password, hash_value):
     return bcrypt.hashpw(to_unicode(password), hash_value)
 
 
-def get_password(entered_password, user_password, version):
+def check_password(entered_password, user_password, seed=None):
     """ Version checking and returning the password
     """
     _, version, user_password = user_password.split('$', 2)
@@ -87,8 +87,7 @@ def get_password(entered_password, user_password, version):
         password = retrieve_hashed_value(entered_password, user_password)
 
     elif version == '1':
-        password = '%s%s' % (to_unicode(entered_password),
-                             APP.config.get('PASSWORD_SEED', None))
+        password = '%s%s' % (to_unicode(entered_password), seed)
         password = hashlib.sha512(password).hexdigest()
 
     else:
