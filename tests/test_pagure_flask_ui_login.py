@@ -39,6 +39,7 @@ class PagureFlaskLogintests(tests.Modeltests):
 
         pagure.APP.config['TESTING'] = True
         pagure.APP.config['EMAIL_SEND'] = True
+        pagure.APP.config['PAGURE_AUTH'] = 'local'
         pagure.SESSION = self.session
         pagure.ui.SESSION = self.session
         pagure.ui.login.SESSION = self.session
