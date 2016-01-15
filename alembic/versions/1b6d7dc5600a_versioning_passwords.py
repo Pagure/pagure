@@ -15,12 +15,14 @@ import sqlalchemy as sa
 import sqlalchemy.orm
 from pagure.lib import model
 
+
 def upgrade():
-        engine = op.get_bind().engine
-        session = sa.orm.scoped_session(sa.orm.sessionmaker(bind=engine))
-        session.query(model.User).update({model.User.password: '$1$' + model.User.password}, synchronize_session=False);
-        session.commit()
+    engine = op.get_bind().engine
+    session = sa.orm.scoped_session(sa.orm.sessionmaker(bind=engine))
+    session.query(model.User).update(
+        {model.User.password: '$1$' + model.User.password}, synchronize_session=False)
+    session.commit()
 
 
 def downgrade():
-        raise ValueError("Password can not be downgraded")
+    raise ValueError("Password can not be downgraded")

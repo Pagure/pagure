@@ -29,8 +29,6 @@ from pagure.lib.login import generate_hashed_value, retrieve_hashed_value, get_p
 
 # pylint: disable=E1101
 
-
-
 @APP.route('/user/new/', methods=['GET', 'POST'])
 @APP.route('/user/new', methods=['GET', 'POST'])
 def new_user():
@@ -107,16 +105,16 @@ def do_login():
         password = get_password(form.password.data, user_password, version)
 
         if not user_obj or not constant_time.bytes_eq(
-                                    to_bytes(user_password),
-                                    to_bytes(password)):
+                to_bytes(user_password),
+                to_bytes(password)):
 
             flask.flash('Username or password invalid.', 'error')
             return flask.redirect(flask.url_for('auth_login'))
 
         elif user_obj.token:
             flask.flash(
-               'Invalid user, did you confirm the creation with the url '
-               'provided by email?', 'error')
+                'Invalid user, did you confirm the creation with the url '
+                'provided by email?', 'error')
             return flask.redirect(flask.url_for('auth_login'))
         else:
 
@@ -287,7 +285,8 @@ def change_password(username):
         return flask.redirect(flask.url_for('auth_login'))
     if form.validate_on_submit():
 
-        old_password = get_password(form.old_password.data, user_password, version)
+        old_password = get_password(
+            form.old_password.data, user_password, version)
 
         if constant_time.bytes_eq(to_bytes(user_password),
                                   to_bytes(old_password)):

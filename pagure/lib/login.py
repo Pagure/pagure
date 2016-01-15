@@ -64,26 +64,32 @@ def get_users_by_group(session, group):
 
     return query.all()
 
+
 def generate_hashed_value(password):
     """ Generate hash value for password
     """
     return '$2$' + bcrypt.hashpw(to_unicode(password), bcrypt.gensalt())
+
 
 def retrieve_hashed_value(password, hash_value):
     """ Retrieve hash value to compare
     """
     return bcrypt.hashpw(to_unicode(password), hash_value)
 
+
 def get_password(entered_password, user_password, version):
     """ Version checking and returning the password
     """
     if version == '2':
-         password = retrieve_hashed_value(
-                entered_password, user_password)
-         return password
+        password = retrieve_hashed_value(entered_password, user_password)
 
     elif version == '1':
-            password = '%s%s' % (to_unicode(entered_password),
-                                        APP.config.get('PASSWORD_SEED', None))
-            password = hashlib.sha512(password).hexdigest()
-            return password
+        password = '%s%s' % (to_unicode(entered_password),
+                             APP.config.get('PASSWORD_SEED', None))
+        password = hashlib.sha512(password).hexdigest()
+
+    else:
+        flask.flash('Something went wrong')
+        return flask.redirect(flask.url_for('auth_login'))
+
+    return password
