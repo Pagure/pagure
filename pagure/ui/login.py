@@ -13,8 +13,6 @@ import hashlib
 import datetime
 import urlparse
 import bcrypt
-from kitchen.text.converters import to_unicode, to_bytes
-from cryptography.hazmat.primitives import constant_time
 
 import flask
 from sqlalchemy.exc import SQLAlchemyError
@@ -28,6 +26,7 @@ from pagure import APP, SESSION
 from pagure.lib.login import generate_hashed_value, check_password
 
 # pylint: disable=E1101
+
 
 @APP.route('/user/new/', methods=['GET', 'POST'])
 @APP.route('/user/new', methods=['GET', 'POST'])
@@ -291,9 +290,6 @@ def change_password(username):
         return flask.redirect(flask.url_for('auth_login'))
 
     if form.validate_on_submit():
-
-        old_password = get_password(
-            form.old_password.data, user_password, version)
 
         try:
             password_checks = check_password(
