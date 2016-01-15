@@ -24,7 +24,7 @@ import pagure.lib.login
 import pagure.lib.model as model
 import pagure.lib.notify
 from pagure import APP, SESSION
-from pagure.lib.login import generate_hashed_value, retrieve_hashed_value, get_password
+from pagure.lib.login import generate_hashed_value, check_password
 
 # pylint: disable=E1101
 
