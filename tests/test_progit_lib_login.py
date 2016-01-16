@@ -90,6 +90,13 @@ class PagureLibLogintests(tests.Modeltests):
             'foo',
             password
         )
+        password = '%s%s' % ('foo', APP.config.get('PASSWORD_SEED', None))
+        password = hashlib.sha512(password).hexdigest()
+        with self.assertRaises(PagureException):
+            pagure.lib.login.check_password('foo', password)
+        password = '$3$' + password
+        with self.assertRaises(PagureException):
+            pagure.lib.login.check_password('foo', password)
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibLogintests)
