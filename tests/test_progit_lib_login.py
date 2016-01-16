@@ -23,6 +23,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 
 import pagure.lib
 import pagure.lib.login
+import hashlib
+from pagure import APP
 import tests
 
 
@@ -61,7 +63,11 @@ class PagureLibLogintests(tests.Modeltests):
         self.assertTrue(
             pagure.lib.login.check_password('foo', password)
         )
-
+        password = '%s%s' % ('foo', APP.config.get('PASSWORD_SEED', None))
+        password = '$1$'+hashlib.sha512(password).hexdigest()
+        self.assertTrue(
+             pagure.lib.login.check_password('foo', password)
+        )
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibLogintests)
