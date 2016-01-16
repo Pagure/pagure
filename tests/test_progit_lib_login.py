@@ -60,22 +60,36 @@ class PagureLibLogintests(tests.Modeltests):
     def test_check_password(self):
         ''' Test pagure.lib.login.check_password. '''
 
+        # Version 2
         password = pagure.lib.login.generate_hashed_value('foo')
         self.assertTrue(
-            pagure.lib.login.check_password('foo', password)
-        )
+            pagure.lib.login.check_password('foo', password))
+        self.assertFalse(
+            pagure.lib.login.check_password('bar', password))
+
+        # Version 1
         password = '%s%s' % ('foo', APP.config.get('PASSWORD_SEED', None))
         password = '$1$' + hashlib.sha512(password).hexdigest()
-        self.assertTrue(
-            pagure.lib.login.check_password('foo', password)
-        )
+        self.assertTrue(pagure.lib.login.check_password('foo', password))
+        self.assertFalse(pagure.lib.login.check_password('bar', password))
+
+        # Invalid password  -  No version
         password = '%s%s' % ('foo', APP.config.get('PASSWORD_SEED', None))
         password = hashlib.sha512(password).hexdigest()
-        with self.assertRaises(PagureException):
-            pagure.lib.login.check_password('foo', password)
+        self.assertRaises(
+            PagureException,
+            pagure.lib.login.check_password,
+            'foo', password
+        )
+
+        # Invalid password  -  Invalid version
         password = '$3$' + password
-        with self.assertRaises(PagureException):
-            pagure.lib.login.check_password('foo', password)
+        self.assertRaises(
+            PagureException,
+            pagure.lib.login.check_password,
+            'foo',
+            password
+        )
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibLogintests)
