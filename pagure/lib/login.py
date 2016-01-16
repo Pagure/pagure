@@ -12,6 +12,8 @@ import random
 import string
 import bcrypt
 
+import hashlib
+import pagure
 from pagure.lib import model
 from kitchen.text.converters import to_unicode, to_bytes
 from cryptography.hazmat.primitives import constant_time
