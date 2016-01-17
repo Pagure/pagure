@@ -103,7 +103,7 @@ def do_login():
 
         try:
             password_checks = check_password(
-                form.old_password.data, user_obj.password,
+                form.password.data, user_obj.password,
                 seed=APP.config.get('PASSWORD_SEED', None))
         except pagure.exceptions.PagureException as err:
             APP.logger.exception(err)
