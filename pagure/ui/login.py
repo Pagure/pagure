@@ -180,11 +180,13 @@ def lost_password():
             flask.flash('Username invalid.', 'error')
             return flask.redirect(flask.url_for('auth_login'))
         elif user_obj.token:
-            flask.flash(
-                'Invalid user, did you confirm the creation with the url '
-                'provided by email? Or did you already ask for a password '
-                'change?', 'error')
-            return flask.redirect(flask.url_for('auth_login'))
+            current_time = datetime.datetime.now()
+            invalid_period = user_obj.updated_on + datetime.timedelta(minutes=3)
+            if current_time < invalid_period:
+                flask.flash('An email was sent to you less than 3 minutes ago, '
+                    'did you check your spam folder? Otherwise, '
+                    'try again after some time.', 'error')
+                return flask.redirect(flask.url_for('auth_login'))
 
         token = pagure.lib.login.id_generator(40)
         user_obj.token = token
