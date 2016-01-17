@@ -12,7 +12,7 @@ new projects, fork existing ones and create/merge pull-requests across or
 within projects.
 
 
-Homepage: https://github.com/pypingou/pagure
+Homepage: https://pagure.io/pagure
 
 See it at work: https://pagure.io
 
@@ -25,7 +25,7 @@ Get it running
 
 * Retrieve the sources::
 
-    git clone git://github.com/pypingou/pagure
+    git clone https://pagure.io/pagure.git
     cd pagure
 
 
