@@ -113,6 +113,58 @@ class PagureFlaskLogintests(tests.Modeltests):
         items = pagure.lib.search_user(self.session)
         self.assertEqual(3, len(items))
 
+    def test_do_login(self):
+        """ Test the do_login endpoint. """
+
+        output = self.app.get('/login/')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn(
+            '<form action="/dologin" method="post">', output.data)
+
+        # This has all the data needed
+        data = {
+            'username': 'foouser',
+            'password': 'barpass',
+        }
+
+        # Submit this form  -  Doesn't work since there is no csrf token
+        output = self.app.post('/dologin', data=data, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn(
+            '<form action="/dologin" method="post">', output.data)
+        self.assertIn('Insufficient information provided', output.data)
+
+        csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+        # Submit the form with the csrf token  -  but invalid user
+        data['csrf_token'] = csrf_token
+        output = self.app.post('/dologin', data=data, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn(
+            '<form action="/dologin" method="post">', output.data)
+        self.assertIn('Username or password invalid.', output.data)
+
+        # Create a local user
+        self.test_new_user()
+
+        items = pagure.lib.search_user(self.session)
+        self.assertEqual(3, len(items))
+
+        # Submit the form with the csrf token  -  but invalid user
+        data['csrf_token'] = csrf_token
+        output = self.app.post('/dologin', data=data, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn(
+            '<form action="/dologin" method="post">', output.data)
+        self.assertIn(
+            'Invalid user, did you confirm the creation with the url '
+            'provided by email?', output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskLogintests)
