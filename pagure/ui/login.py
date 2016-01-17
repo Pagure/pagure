@@ -99,6 +99,9 @@ def do_login():
     if form.validate_on_submit():
         username = form.username.data
         user_obj = pagure.lib.search_user(SESSION, username=username)
+        if not user_obj:
+            flask.flash('Username or password invalid.', 'error')
+            return flask.redirect(flask.url_for('auth_login'))
 
         try:
             password_checks = check_password(
