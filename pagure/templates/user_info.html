@@ -6,8 +6,8 @@
 
 
 {% block header %}
-    <link rel="stylesheet" type="text/css" media="screen"
-        href="{{ url_for('static', filename='toggle.css') }}"/>
+  <link href="{{ url_for('static', filename='selectize.bootstrap3.css') }}"
+  rel="stylesheet" />
 {% endblock %}
 
 
@@ -79,4 +79,48 @@
         });
       });
     </script>
+<script src="{{ url_for('static', filename='selectize.min.js') }}" type="text/javascript"> </script>
+<script type="text/javascript">
+$(document).ready(function() {
+  $('#term').selectize({
+    valueField: 'user',
+    labelField: 'user',
+    searchField: 'user',
+    onType: function(value){
+      if (value == ""){
+      this.close();
+      }
+    },
+    onChange: function(value){
+      if (value != ""){
+        $('#headerSearch').submit();
+      }
+    },
+    maxItems: 1,
+    create: false,
+    load: function(query, callback) {
+      if (!query.length) return callback();
+      $.getJSON(
+        "{{ url_for('api_ns.api_users') }}", {
+          pattern: query
+        },
+        function( data ) {
+          callback( data.users.map(function(x) { return { user: x }; }) );
+        }
+      );
+    },
+    render: {
+      option: function(item, escape) {
+        return '<div>' +
+          '<div class="projecticon-search pull-xs-left"><span class="oi" data-glyph="person"></span></div>'+
+          '<div class="title">' +
+            '<span class="name"><strong>' + escape(item.user) + '</strong></span>' +
+          '</div>' +
+          '<div class="description"><small>' + escape(item.user) + '</small></div>' +
+        '</div>';
+      }
+    },
+  });
+});
+</script>
 {% endblock %}
