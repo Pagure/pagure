@@ -411,6 +411,7 @@ def view_file(repo, identifier, filename, username=None):
         flask.abort(404, 'File not found')
 
     if isinstance(content, pygit2.Blob):
+        disableMarkup = str(flask.request.args.get('renderMarkup')).lower() in ['0', 'false']
         ext = filename[filename.rfind('.'):]
         if ext in (
                 '.gif', '.png', '.bmp', '.tif', '.tiff', '.jpg',
@@ -423,6 +424,9 @@ def view_file(repo, identifier, filename, username=None):
                     'Failed to load image %s, error: %s', filename, err
                 )
                 output_type = 'binary'
+        elif ext in ('.rst', '.mk', '.md') and not disableMarkup:
+            content, safe = pagure.doc_utils.convert_readme(content.data, ext)
+            output_type = 'markup'
         elif not content.is_binary and pagure.lib.could_be_text(content.data):
             file_content = content.data.decode('utf-8')
             try:

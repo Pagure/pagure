@@ -27,19 +27,25 @@
       </div>
 
 {% if content %}
-  {% if output_type == 'file' or output_type == 'binary' or output_type == 'image' %}
+  {% if output_type in ('file','binary','image','markup') %}
   <div class="card-block p-a-0">
         {% if content %}
-          {% if output_type == 'file' or output_type == 'binary' or output_type == 'image' %}
+          {% if output_type in ('file','binary','image','markup') %}
             <div class="file-button-bar">
-                {% if output_type=='file' and repo_admin %}
+                {% if output_type in ('file','markup') and repo_admin %}
                 <a class="btn btn-sm btn-secondary" href="{{ url_for('edit_file', username=username,
                             repo=repo.name, branchname=branchname,
                             filename=filename) }}" title="Edit file">Edit</a>
                 {% endif %}
+                {% if output_type == 'markup'  %}
+                <a class="btn btn-sm btn-secondary" href="{{ url_for('view_file', username=username,
+                            repo=repo.name, identifier=branchname,
+                            filename=filename, renderMarkup=false) }}" title="View as text">Text</a>
+                {% else %}
                 <a class="btn btn-secondary btn-sm" href="{{ url_for('view_file', username=username,
                             repo=repo.name, identifier=branchname,
                             filename=filename) }}" title="View as blob">Blob</a>
+                {% endif %}
                 <a class="btn btn-secondary btn-sm" href="{{ url_for('view_raw_file', username=username,
                             repo=repo.name, identifier=branchname,
                             filename=filename) }}" title="View as raw">Raw</a>
@@ -50,6 +56,10 @@
     {% if output_type=='file' %}
         {% autoescape false %}
         {{ content | format_loc}}
+        {% endautoescape %}
+    {% elif output_type == 'markup' %}
+        {% autoescape false %}
+        {{ content | noJS }}
         {% endautoescape %}
     {% elif output_type == 'image' %}
         <img src="{{ url_for('view_raw_file', username=username,
