@@ -383,3 +383,13 @@ a.notblue {
     color: inherit;
     text-decoration:none;
 }
+
+#headerSearch .selectize-control.single .selectize-input::after
+{
+content: "\e08f";
+font-family: "Icons";
+border:none;
+top:30%;
+right:22px;
+color:#aaa;
+}
