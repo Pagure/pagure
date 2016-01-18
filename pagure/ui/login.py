@@ -66,7 +66,7 @@ def new_user():
             SESSION.flush()
 
         try:
-            SESSION.flush()
+            SESSION.commit()
             send_confirmation_email(user)
             flask.flash(
                 'User created, please check your email to activate the '
@@ -76,8 +76,6 @@ def new_user():
             flask.flash('Could not create user.')
             APP.logger.debug('Could not create user.')
             APP.logger.exception(err)
-
-        SESSION.commit()
 
         return flask.redirect(flask.url_for('auth_login'))
 
