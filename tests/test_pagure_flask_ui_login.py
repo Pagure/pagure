@@ -154,7 +154,7 @@ class PagureFlaskLogintests(tests.Modeltests):
         items = pagure.lib.search_user(self.session)
         self.assertEqual(3, len(items))
 
-        # Submit the form with the csrf token  -  but invalid user
+        # Submit the form with the csrf token  -  but user not confirmed
         data['csrf_token'] = csrf_token
         output = self.app.post('/dologin', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
@@ -165,7 +165,7 @@ class PagureFlaskLogintests(tests.Modeltests):
             'Invalid user, did you confirm the creation with the url '
             'provided by email?', output.data)
 
-        # Wrong password submitted
+        # User in the DB, csrf provided  -  but wrong password submitted
         data['password'] = 'password'
         output = self.app.post('/dologin', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
