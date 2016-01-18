@@ -185,6 +185,17 @@ class PagureFlaskLogintests(tests.Modeltests):
             'Invalid user, did you confirm the creation with the url '
             'provided by email?', output.data)
 
+        # Wrong password submitted
+        data['password'] = 'password'
+        output = self.app.post('/dologin', data=data, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn(
+            '<form action="/dologin" method="post">', output.data)
+        self.assertIn('Username or password invalid.', output.data)
+
+
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskLogintests)
