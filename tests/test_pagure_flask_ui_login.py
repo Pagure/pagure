@@ -42,7 +42,7 @@ class PagureFlaskLogintests(tests.Modeltests):
         super(PagureFlaskLogintests, self).setUp()
 
         pagure.APP.config['TESTING'] = True
-        pagure.APP.config['EMAIL_SEND'] = True
+        pagure.APP.config['EMAIL_SEND'] = False
         pagure.APP.config['PAGURE_AUTH'] = 'local'
         pagure.SESSION = self.session
         pagure.ui.SESSION = self.session
@@ -380,7 +380,6 @@ class PagureFlaskLogintests(tests.Modeltests):
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertNotEqual(item.token, None)
-        print item.password
         self.assertTrue(item.password.startswith('$2$'))
 
         old_password = item.password
