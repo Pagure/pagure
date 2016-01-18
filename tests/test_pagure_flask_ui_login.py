@@ -46,6 +46,7 @@ class PagureFlaskLogintests(tests.Modeltests):
         pagure.APP.config['PAGURE_AUTH'] = 'local'
         pagure.SESSION = self.session
         pagure.ui.SESSION = self.session
+        pagure.ui.app.SESSION = self.session
         pagure.ui.login.SESSION = self.session
 
         self.app = pagure.APP.test_client()
@@ -415,6 +416,108 @@ class PagureFlaskLogintests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn('<title>Login - Pagure</title>', output.data)
         self.assertIn('Password changed', output.data)
+
+    def test_change_password(self):
+        """ Test the change_password endpoint. """
+
+        # Not logged in, redirects
+        output = self.app.get('/password/change', follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn('<form action="/dologin" method="post">', output.data)
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/password/change')
+            self.assertEqual(output.status_code, 404)
+            self.assertIn('User not found', output.data)
+
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/password/change')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<title>Change password - Pagure</title>', output.data)
+            self.assertIn(
+                '<form action="/password/change" method="post">', output.data)
+
+            data = {
+                'old_password': 'foo',
+                'password': 'foo',
+                'confirm_password': 'foo',
+            }
+
+            # No CSRF token
+            output = self.app.post('/password/change', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<title>Change password - Pagure</title>', output.data)
+            self.assertIn(
+                '<form action="/password/change" method="post">', output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            # With CSRF  -  Invalid password format
+            data['csrf_token'] = csrf_token
+            output = self.app.post(
+                '/password/change', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<title>Home - Pagure</title>', output.data)
+            self.assertIn(
+                'Could not update your password, either user or password '
+                'could not be checked', output.data)
+
+        self.test_new_user()
+
+        # Remove token of foouser
+        item = pagure.lib.search_user(self.session, username='foouser')
+        self.assertEqual(item.user, 'foouser')
+        self.assertNotEqual(item.token, None)
+        self.assertTrue(item.password.startswith('$2$'))
+        item.token = None
+        self.session.add(item)
+        self.session.commit()
+
+        user = tests.FakeUser(username='foouser')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/password/change')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<title>Change password - Pagure</title>', output.data)
+            self.assertIn(
+                '<form action="/password/change" method="post">', output.data)
+
+            data = {
+                'old_password': 'foo',
+                'password': 'foo',
+                'confirm_password': 'foo',
+            }
+
+            # No CSRF token
+            output = self.app.post('/password/change', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<title>Change password - Pagure</title>', output.data)
+            self.assertIn(
+                '<form action="/password/change" method="post">', output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            # With CSRF  -  Incorrect password
+            data['csrf_token'] = csrf_token
+            output = self.app.post(
+                '/password/change', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<title>Home - Pagure</title>', output.data)
+            self.assertIn(
+                'Could not update your password, either user or password '
+                'could not be checked', output.data)
+
+            # With CSRF  -  Correct password
+            data['old_password'] = 'barpass'
+            output = self.app.post(
+                '/password/change', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<title>Home - Pagure</title>', output.data)
+            self.assertIn('Password changed', output.data)
 
 
 if __name__ == '__main__':
