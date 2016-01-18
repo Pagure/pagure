@@ -312,6 +312,58 @@ class PagureFlaskLogintests(tests.Modeltests):
         self.assertIn(
             'Email confirmed, account activated', output.data)
 
+    def test_lost_password(self):
+        """ Test the lost_password endpoint. """
+
+        output = self.app.get('/password/lost')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Lost password - Pagure</title>', output.data)
+        self.assertIn(
+            '<form action="/password/lost" method="post">', output.data)
+
+        # Prepare the data to send
+        data = {
+            'username': 'foouser',
+        }
+
+        # Missing CSRF
+        output = self.app.post('/password/lost', data=data)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Lost password - Pagure</title>', output.data)
+        self.assertIn(
+            '<form action="/password/lost" method="post">', output.data)
+
+        csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+        # With the CSRF  -  But invalid user
+        data['csrf_token'] = csrf_token
+        output = self.app.post(
+            '/password/lost', data=data, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn('Username invalid.', output.data)
+
+        # With the CSRF and a valid user
+        data['username'] = 'foo'
+        output = self.app.post(
+            '/password/lost', data=data, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn(
+            'Check your email to finish changing your password', output.data)
+
+        # With the CSRF and a valid user  -  but too quick after the last one
+        data['username'] = 'foo'
+        output = self.app.post(
+            '/password/lost', data=data, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn(
+            'An email was sent to you less than 3 minutes ago, did you '
+            'check your spam folder? Otherwise, try again after some time.',
+            output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskLogintests)
