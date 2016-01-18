@@ -364,6 +364,59 @@ class PagureFlaskLogintests(tests.Modeltests):
             'check your spam folder? Otherwise, try again after some time.',
             output.data)
 
+    def test_reset_password(self):
+        """ Test the reset_password endpoint. """
+
+        output = self.app.get('/password/reset/foo', follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn('No user associated with this token.', output.data)
+        self.assertIn('<form action="/dologin" method="post">', output.data)
+
+        self.test_lost_password()
+        self.test_new_user()
+
+        # Check the password
+        item = pagure.lib.search_user(self.session, username='foouser')
+        self.assertEqual(item.user, 'foouser')
+        self.assertNotEqual(item.token, None)
+        print item.password
+        self.assertTrue(item.password.startswith('$2$'))
+
+        old_password = item.password
+        token = item.token
+
+        output = self.app.get(
+            '/password/reset/%s' % token, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Change password - Pagure</title>', output.data)
+        self.assertIn(
+            '<form action="/password/reset/', output.data)
+
+        data = {
+            'password': 'passwd',
+            'confirm_password': 'passwd',
+        }
+
+        # Missing CSRF
+        output = self.app.post(
+            '/password/reset/%s' % token, data=data, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Change password - Pagure</title>', output.data)
+        self.assertIn(
+            '<form action="/password/reset/', output.data)
+
+        csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+        # With CSRF
+        data['csrf_token'] = csrf_token
+        output = self.app.post(
+            '/password/reset/%s' % token, data=data, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn('Password changed', output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskLogintests)
