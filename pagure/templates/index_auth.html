@@ -106,7 +106,7 @@
                 {% endif %}
                 <a href="{{ url }}">
                   <span class="oi text-muted" data-glyph="fork"></span>
-                  <strong>{{ fork.name }}</strong>
+                  <strong>{{username}}/{{ fork.name }}</strong>
                 </a>
                   <div class="pull-xs-right">
                     {% if fork.open_tickets_public == 0 %}
