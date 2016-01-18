@@ -205,6 +205,34 @@ class PagureFlaskLogintests(tests.Modeltests):
             'Invalid user, did you confirm the creation with the url '
             'provided by email?', output.data)
 
+        # Confirm the user so that we can log in
+        item = pagure.lib.search_user(self.session, username='foouser')
+        self.assertEqual(item.user, 'foouser')
+        self.assertNotEqual(item.token, None)
+
+        # Remove the token
+        item.token = None
+        self.session.add(item)
+        self.session.commit
+
+        # Check the user
+        item = pagure.lib.search_user(self.session, username='foouser')
+        self.assertEqual(item.user, 'foouser')
+        self.assertEqual(item.token, None)
+
+        # Login but cannot save the session to the DB due to the missing IP
+        # address in the flask request
+        data['password'] = 'barpass'
+        output = self.app.post('/dologin', data=data, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Home - Pagure</title>', output.data)
+        self.assertIn(
+            '<a class="nav-link" href="/login/?next=http://localhost/">',
+            output.data)
+        self.assertIn(
+            'Could not set the session in the db, please report this error '
+            'to an admin', output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskLogintests)
