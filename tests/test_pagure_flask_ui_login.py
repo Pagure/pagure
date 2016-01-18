@@ -519,6 +519,29 @@ class PagureFlaskLogintests(tests.Modeltests):
             self.assertIn('<title>Home - Pagure</title>', output.data)
             self.assertIn('Password changed', output.data)
 
+    def test_logout(self):
+        """ Test the auth_logout endpoint for local login. """
+
+        output = self.app.get('/logout/', follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Home - Pagure</title>', output.data)
+        self.assertNotIn('You have been logged out', output.data)
+        self.assertIn(
+            '<a class="nav-link" href="/login/?next=http://localhost/">',
+            output.data)
+
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/logout/', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<title>Home - Pagure</title>', output.data)
+            self.assertIn('You have been logged out', output.data)
+            # Due to the way the tests are running we do not actually
+            # log out
+            self.assertIn(
+                '<a href="/logout/?next=http://localhost/">log out</a>',
+                output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskLogintests)
