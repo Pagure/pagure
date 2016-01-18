@@ -87,8 +87,6 @@ class PagureFlaskApptests(tests.Modeltests):
                 'Forks <span class="label label-default">0</span>',
                 output.data)
             self.assertEqual(
-                output.data.count('<p>No projects found</p>'), 1)
-            self.assertEqual(
                 output.data.count('<p>No group found</p>'), 1)
             self.assertEqual(
                 output.data.count('<div class="card-header">'), 3)
