@@ -12,6 +12,7 @@ __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
 import datetime
+import hashlib
 import json
 import unittest
 import shutil
@@ -256,6 +257,34 @@ class PagureFlaskLogintests(tests.Modeltests):
             '<form action="/dologin" method="post">', output.data)
         self.assertIn('Username or password of invalid format.', output.data)
 
+        # Make the password be version 1
+        item = pagure.lib.search_user(self.session, username='foouser')
+        self.assertEqual(item.user, 'foouser')
+        self.assertTrue(item.password.startswith('$2$'))
+
+        # V1 password
+        password = '%s%s' % ('barpass', None)
+        password = hashlib.sha512(password).hexdigest()
+        item.token = None
+        item.password = '$1$%s' % password
+        self.session.add(item)
+        self.session.commit
+
+        # Check the password
+        item = pagure.lib.search_user(self.session, username='foouser')
+        self.assertEqual(item.user, 'foouser')
+        self.assertTrue(item.password.startswith('$1$'))
+
+        # Log in with a v1 password
+        output = self.app.post('/dologin', data=data, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Home - Pagure</title>', output.data)
+        self.assertIn(
+            '<a class="nav-link" href="/login/?next=http://localhost/">',
+            output.data)
+        self.assertIn(
+            'Could not set the session in the db, please report this error '
+            'to an admin', output.data)
 
 
 if __name__ == '__main__':
