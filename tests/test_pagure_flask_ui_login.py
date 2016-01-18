@@ -286,6 +286,32 @@ class PagureFlaskLogintests(tests.Modeltests):
             'Could not set the session in the db, please report this error '
             'to an admin', output.data)
 
+    def test_confirm_user(self):
+        """ Test the confirm_user endpoint. """
+
+        output = self.app.get('/confirm/foo', follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Home - Pagure</title>', output.data)
+        self.assertIn(
+            'No user associated with this token.', output.data)
+
+        # Create a local user
+        self.test_new_user()
+
+        items = pagure.lib.search_user(self.session)
+        self.assertEqual(3, len(items))
+        item = pagure.lib.search_user(self.session, username='foouser')
+        self.assertEqual(item.user, 'foouser')
+        self.assertTrue(item.password.startswith('$2$'))
+        self.assertNotEqual(item.token, None)
+
+        output = self.app.get(
+            '/confirm/%s' % item.token, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn(
+            'Email confirmed, account activated', output.data)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskLogintests)
