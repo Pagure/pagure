@@ -103,7 +103,11 @@ def admin_session_timedout():
     timedout = False
     if not authenticated():
         return True
-    if (datetime.datetime.utcnow() - flask.g.fas_user.login_time) > \
+    login_time = flask.g.fas_user.login_time
+    # This is because flask_fas_openid will store this as a posix timestamp
+    if not isinstance(login_time, datetime.datetime):
+        login_time = datetime.datetime.utcfromtimestamp(login_time)
+    if (datetime.datetime.utcnow() - login_time) > \
             APP.config.get('ADMIN_SESSION_LIFETIME',
                            datetime.timedelta(minutes=15)):
         timedout = True
