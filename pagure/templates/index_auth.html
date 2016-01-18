@@ -37,7 +37,7 @@
                 </a>
                   <div class="pull-xs-right">
                     {% if repo.open_tickets_public == 0 %}
-                      <span class="text-muted"
+                      <span class="text-muted" data-toggle="tooltip"
                         title="{{ repo.open_tickets_public }} open issues against {{repo.name}}">
                         <span class="oi" data-glyph="warning"></span>
                         {{- repo.open_tickets_public }}
@@ -52,7 +52,7 @@
                     {% endif %}
 
                     {% if repo.open_requests == 0 %}
-                      <span class="text-muted"
+                      <span class="text-muted" data-toggle="tooltip"
                         title="{{repo.open_requests}} open pull requests in {{repo.name}}">
                         <span class="oi" data-glyph="arrow-thick-bottom"></span>
                         {{- repo.open_requests}}
@@ -76,7 +76,64 @@
           </div>
         {% endif %}
         </div>
-        {{ render_repos_as_card(forks, forks_length,'Forks', 'forkpage', forkpage, total_page_forks) }}
+
+        <div class="card">
+          <div class="card-header">
+            My Forks <span class="label label-default">{{forks | count}}</span>
+          </div>
+          {% if forks %}
+            <div class="list-group list-group-flush">
+            {% for fork in forks %}
+              <div class="list-group-item">
+                {% if fork.is_fork %}
+                  {% set url = url_for('view_repo', username=fork.user.username, repo=fork.name) %}
+                {% else %}
+                  {% set url = url_for('view_repo', repo=fork.name) %}
+                {% endif %}
+                <a href="{{ url }}">
+                  <span class="oi text-muted" data-glyph="fork"></span>
+                  <strong>{{ fork.name }}</strong>
+                </a>
+                  <div class="pull-xs-right">
+                    {% if fork.open_tickets_public == 0 %}
+                      <span class="text-muted" data-toggle="tooltip"
+                        title="{{ fork.open_tickets_public }} open issues against {{fork.name}}">
+                        <span class="oi" data-glyph="warning"></span>
+                        {{- fork.open_tickets_public }}
+                      </span>
+                    {% else %}
+                      <a class="notblue" data-toggle="tooltip"
+                        href="{{ url_for('.view_issues', repo=fork.name) }}"
+                        title="{{ fork.open_tickets_public }} open issues against {{fork.name}}">
+                        <span class="oi" data-glyph="warning"></span>
+                        {{- fork.open_tickets_public }}
+                      </a>
+                    {% endif %}
+
+                    {% if fork.open_requests == 0 %}
+                      <span class="text-muted" data-toggle="tooltip"
+                        title="{{fork.open_requests}} open pull requests in {{fork.name}}">
+                        <span class="oi" data-glyph="arrow-thick-bottom"></span>
+                        {{- fork.open_requests}}
+                      </span>
+                    {% else %}
+                      <a class="notblue" data-toggle="tooltip"
+                        href="{{ url_for('.request_pulls', repo=fork.name) }}"
+                        title="{{fork.open_requests}} open pull requests in {{fork.name}}">
+                        <span class="oi" data-glyph="arrow-thick-bottom"></span>
+                        {{- fork.open_requests}}
+                      </a>
+                    {% endif %}
+                  </div>
+              </div>
+            {% endfor %}
+            </div>
+        {% else %}
+          <div class="card-block">
+            <p>You have no forks</p>
+          </div>
+        {% endif %}
+        </div>
       </div>
       <div class="col-md-4">
         <div class="card" id="group_list">
