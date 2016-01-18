@@ -309,6 +309,7 @@ def auth_logout():  # pragma: no cover
             FAS.logout()
             flask.flash("You are no longer logged-in")
     elif APP.config.get('PAGURE_AUTH', None) == 'local':
+        import pagure.ui.login as login
         login.logout()
     return flask.redirect(return_point)
 
