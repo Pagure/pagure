@@ -117,7 +117,7 @@
                   <a href="{{ url_for('view_repo', repo=fork.parent.name) }}">
                     {{fork.parent.name}}
                   </a>
-                  {% if fork.settings.get('pull_requests', True) %}
+                  {% if fork.settings.get('issue_tracker', True) %}
                     {% if fork.open_tickets_public == 0 %}
                       <span class="text-muted" data-toggle="tooltip"
                         title="{{ fork.open_tickets_public }} open issues against {{fork.name}}">
@@ -133,7 +133,7 @@
                       </a>
                     {% endif %}
                   {% endif %}
-                  {% if fork.settings.get('issue_tracker', True) %}
+                  {% if fork.settings.get('pull_requests', True) %}
                     {% if fork.open_requests == 0 %}
                       <span class="text-muted" data-toggle="tooltip"
                         title="{{fork.open_requests}} open pull requests in {{fork.name}}">
