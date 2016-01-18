@@ -174,7 +174,16 @@ class PagureFlaskLogintests(tests.Modeltests):
             '<form action="/dologin" method="post">', output.data)
         self.assertIn('Username or password invalid.', output.data)
 
-
+        # When account is not confirmed i.e user_obj != None
+        data['password'] = 'barpass'
+        output = self.app.post('/dologin', data=data, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn(
+            '<form action="/dologin" method="post">', output.data)
+        self.assertIn(
+            'Invalid user, did you confirm the creation with the url '
+            'provided by email?', output.data)
 
 
 if __name__ == '__main__':
