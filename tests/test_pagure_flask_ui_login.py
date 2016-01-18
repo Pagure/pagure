@@ -233,6 +233,30 @@ class PagureFlaskLogintests(tests.Modeltests):
             'Could not set the session in the db, please report this error '
             'to an admin', output.data)
 
+        # Make the password invalid
+        item = pagure.lib.search_user(self.session, username='foouser')
+        self.assertEqual(item.user, 'foouser')
+        self.assertTrue(item.password.startswith('$2$'))
+
+        # Remove the $2$
+        item.password = item.password[3:]
+        self.session.add(item)
+        self.session.commit
+
+        # Check the password
+        item = pagure.lib.search_user(self.session, username='foouser')
+        self.assertEqual(item.user, 'foouser')
+        self.assertFalse(item.password.startswith('$2$'))
+
+        # Try login again
+        output = self.app.post('/dologin', data=data, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn(
+            '<form action="/dologin" method="post">', output.data)
+        self.assertIn('Username or password of invalid format.', output.data)
+
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskLogintests)
