@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014, 2015 - Copyright Red Hat Inc
+ (c) 2014-2016 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -194,7 +194,7 @@ def lost_password():
             flask.flash('Username invalid.', 'error')
             return flask.redirect(flask.url_for('auth_login'))
         elif user_obj.token:
-            current_time = datetime.datetime.now()
+            current_time = datetime.datetime.utcnow()
             invalid_period = user_obj.updated_on + datetime.timedelta(minutes=3)
             if current_time < invalid_period:
                 flask.flash('An email was sent to you less than 3 minutes ago, '
@@ -272,10 +272,6 @@ def reset_password(token):
     )
 
 
-#
-# Methods specific to local login.
-#
-
 @APP.route('/password/change/<username>/', methods=['GET', 'POST'])
 @APP.route('/password/change/<username>', methods=['GET', 'POST'])
 def change_password(username):
@@ -330,6 +326,10 @@ def change_password(username):
         username=username,
     )
 
+
+#
+# Methods specific to local login.
+#
 
 def send_confirmation_email(user):
     """ Sends the confirmation email asking the user to confirm its email
