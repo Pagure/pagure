@@ -27,6 +27,7 @@ import sqlalchemy
 import sqlalchemy.schema
 from datetime import timedelta
 from sqlalchemy import func
+from sqlalchemy import asc
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
@@ -1431,7 +1432,7 @@ def search_projects(
     ).filter(
         model.Project.id.in_(projects.subquery())
     ).order_by(
-        model.Project.name
+        asc(func.lower(model.Project.name))
     )
 
     if start is not None:
