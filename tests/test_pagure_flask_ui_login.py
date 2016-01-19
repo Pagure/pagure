@@ -84,7 +84,7 @@ class PagureFlaskLogintests(tests.Modeltests):
             '<form action="/user/new" method="post">', output.data)
 
         csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
         # Submit the form with the csrf token
         data['csrf_token'] = csrf_token
@@ -139,7 +139,7 @@ class PagureFlaskLogintests(tests.Modeltests):
         self.assertIn('Insufficient information provided', output.data)
 
         csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
         # Submit the form with the csrf token  -  but invalid user
         data['csrf_token'] = csrf_token
@@ -335,7 +335,7 @@ class PagureFlaskLogintests(tests.Modeltests):
             '<form action="/password/lost" method="post">', output.data)
 
         csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
         # With the CSRF  -  But invalid user
         data['csrf_token'] = csrf_token
@@ -407,7 +407,7 @@ class PagureFlaskLogintests(tests.Modeltests):
             '<form action="/password/reset/', output.data)
 
         csrf_token = output.data.split(
-                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
         # With CSRF
         data['csrf_token'] = csrf_token
@@ -436,7 +436,8 @@ class PagureFlaskLogintests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/password/change')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<title>Change password - Pagure</title>', output.data)
+            self.assertIn(
+                '<title>Change password - Pagure</title>', output.data)
             self.assertIn(
                 '<form action="/password/change" method="post">', output.data)
 
@@ -449,7 +450,8 @@ class PagureFlaskLogintests(tests.Modeltests):
             # No CSRF token
             output = self.app.post('/password/change', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<title>Change password - Pagure</title>', output.data)
+            self.assertIn(
+                '<title>Change password - Pagure</title>', output.data)
             self.assertIn(
                 '<form action="/password/change" method="post">', output.data)
 
@@ -481,7 +483,8 @@ class PagureFlaskLogintests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/password/change')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<title>Change password - Pagure</title>', output.data)
+            self.assertIn(
+                '<title>Change password - Pagure</title>', output.data)
             self.assertIn(
                 '<form action="/password/change" method="post">', output.data)
 
@@ -494,7 +497,8 @@ class PagureFlaskLogintests(tests.Modeltests):
             # No CSRF token
             output = self.app.post('/password/change', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<title>Change password - Pagure</title>', output.data)
+            self.assertIn(
+                '<title>Change password - Pagure</title>', output.data)
             self.assertIn(
                 '<form action="/password/change" method="post">', output.data)
 

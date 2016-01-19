@@ -22,7 +22,7 @@ import pagure.lib
 import pagure.lib.login
 import pagure.lib.model as model
 import pagure.lib.notify
-from pagure import APP, SESSION
+from pagure import APP, SESSION, cla_required
 from pagure.lib.login import generate_hashed_value, check_password
 
 # pylint: disable=E1101
@@ -193,11 +193,12 @@ def lost_password():
             return flask.redirect(flask.url_for('auth_login'))
         elif user_obj.token:
             current_time = datetime.datetime.utcnow()
-            invalid_period = user_obj.updated_on + datetime.timedelta(minutes=3)
+            invalid_period = user_obj.updated_on + \
+                datetime.timedelta(minutes=3)
             if current_time < invalid_period:
                 flask.flash('An email was sent to you less than 3 minutes ago, '
-                    'did you check your spam folder? Otherwise, '
-                    'try again after some time.', 'error')
+                            'did you check your spam folder? Otherwise, '
+                            'try again after some time.', 'error')
                 return flask.redirect(flask.url_for('auth_login'))
 
         token = pagure.lib.login.id_generator(40)
@@ -268,19 +269,24 @@ def reset_password(token):
         form=form,
         token=token,
     )
+#
+# Methods specific to local login.
+#
 
 
-@APP.route('/password/change/<username>/', methods=['GET', 'POST'])
-@APP.route('/password/change/<username>', methods=['GET', 'POST'])
-def change_password(username):
+@APP.route('/password/change/', methods=['GET', 'POST'])
+@APP.route('/password/change', methods=['GET', 'POST'])
+@cla_required
+def change_password():
     """ Method to change the password for local auth users.
     """
+
     form = forms.ChangePasswordForm()
-    user_obj = pagure.lib.search_user(SESSION, username=username)
+    user_obj = pagure.lib.search_user(
+        SESSION, username=flask.g.fas_user.username)
 
     if not user_obj:
-        flask.flash('No user associated with this username.', 'error')
-        return flask.redirect(flask.url_for('auth_login'))
+        flask.abort(404, 'User not found')
 
     if form.validate_on_submit():
 
@@ -321,13 +327,8 @@ def change_password(username):
     return flask.render_template(
         'login/password_recover.html',
         form=form,
-        username=username,
     )
 
-
-#
-# Methods specific to local login.
-#
 
 def send_confirmation_email(user):
     """ Sends the confirmation email asking the user to confirm its email
