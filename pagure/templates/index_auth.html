@@ -11,7 +11,7 @@
 {% endblock %}
 
 
-{% from "_render_repo.html" import render_repos_as_card %}
+{% from "_render_repo.html" import render_repos_as_card, render_contributions_graph %}
 
 {% block content %}
 <div class="p-t-2">
@@ -159,6 +159,9 @@
           </div>
         {% endif %}
         </div>
+
+        {{render_contributions_graph(username)}}
+
       </div>
       <div class="col-md-4">
         <div class="card" id="group_list">
@@ -180,16 +183,6 @@
         </div>
       </div>
     </div>
-    {% if config.get('DATAGREPPER_URL') %}
-    <section class="project_list" id="user_graph">
-        <header>
-            <h2>Contributions</h2>
-        </header>
-        <a href="{{config.get('DATAGREPPER_URL')}}/raw?category={{config.get('DATAGREPPER_CATEGORY', 'pagure')}}&user={{username}}" target="_blank">
-          <img src="{{config.get('DATAGREPPER_URL')}}/charts/line?category={{config.get('DATAGREPPER_CATEGORY', 'pagure')}}&user={{username}}&split_on=users&delta=31536000&N=12&title=&width=600&height=200&style=light&fill=True" alt="User activity graph"/>
-        </a>
-    </section>
-    {% endif %}
   </div>
 </div>
 {% endblock %}
