@@ -121,6 +121,8 @@ def do_login():
             return flask.redirect(flask.url_for('auth_login'))
 
         else:
+
+            if not user_obj.password.startswith('$2$'):
                 user_obj.password = generate_hashed_value(form.password.data)
                 SESSION.add(user_obj)
 
