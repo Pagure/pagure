@@ -5,6 +5,7 @@
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
+   Farhaan Bukhsh <farhaan.bukhsh@gmail.com>
 
 """
 
