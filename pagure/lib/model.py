@@ -130,7 +130,7 @@ class StatusIssue(BASE):
     __tablename__ = 'status_issue'
 
     id = sa.Column(sa.Integer, primary_key=True)
-    status = sa.Column(sa.String(256), nullable=False, unique=True)
+    status = sa.Column(sa.String(255), nullable=False, unique=True)
 
 
 class StatusPullRequest(BASE):
@@ -141,7 +141,7 @@ class StatusPullRequest(BASE):
     __tablename__ = 'status_pull_requests'
 
     id = sa.Column(sa.Integer, primary_key=True)
-    status = sa.Column(sa.String(256), nullable=False, unique=True)
+    status = sa.Column(sa.String(255), nullable=False, unique=True)
 
 
 class User(BASE):
@@ -152,8 +152,8 @@ class User(BASE):
 
     __tablename__ = 'users'
     id = sa.Column(sa.Integer, primary_key=True)
-    user = sa.Column(sa.String(256), nullable=False, unique=True, index=True)
-    fullname = sa.Column(sa.String(256), nullable=False, index=True)
+    user = sa.Column(sa.String(255), nullable=False, unique=True, index=True)
+    fullname = sa.Column(sa.String(255), nullable=False, index=True)
     public_ssh_key = sa.Column(sa.Text, nullable=True)
     default_email = sa.Column(sa.Text, nullable=False)
 
@@ -220,7 +220,7 @@ class UserEmail(BASE):
         sa.ForeignKey('users.id', onupdate='CASCADE'),
         nullable=False,
         index=True)
-    email = sa.Column(sa.String(256), nullable=False, unique=True)
+    email = sa.Column(sa.String(255), nullable=False, unique=True)
 
     user = relation(
         'User', foreign_keys=[user_id], remote_side=[User.id],
@@ -243,7 +243,7 @@ class UserEmailPending(BASE):
         sa.ForeignKey('users.id', onupdate='CASCADE'),
         nullable=False,
         index=True)
-    email = sa.Column(sa.String(256), nullable=False, unique=True)
+    email = sa.Column(sa.String(255), nullable=False, unique=True)
     token = sa.Column(sa.String(50), nullable=True)
     created = sa.Column(
         sa.DateTime,
@@ -478,7 +478,7 @@ class Issue(BASE):
         nullable=True,
         index=True)
     status = sa.Column(
-        sa.String(256),
+        sa.String(255),
         sa.ForeignKey(
             'status_issue.status', onupdate='CASCADE'),
         default='Open',
@@ -672,7 +672,7 @@ class Tag(BASE):
 
     __tablename__ = 'tags'
 
-    tag = sa.Column(sa.String(256), primary_key=True)
+    tag = sa.Column(sa.String(255), primary_key=True)
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
 
@@ -686,7 +686,7 @@ class TagIssue(BASE):
     __tablename__ = 'tags_issues'
 
     tag = sa.Column(
-        sa.String(256),
+        sa.String(255),
         sa.ForeignKey(
             'tags.tag', ondelete='CASCADE', onupdate='CASCADE'),
         primary_key=True)
@@ -717,7 +717,7 @@ class TagProject(BASE):
     __tablename__ = 'tags_projects'
 
     tag = sa.Column(
-        sa.String(256),
+        sa.String(255),
         sa.ForeignKey(
             'tags.tag', ondelete='CASCADE', onupdate='CASCADE'),
         primary_key=True)
@@ -795,7 +795,7 @@ class PullRequest(BASE):
         nullable=True)
 
     status = sa.Column(
-        sa.String(256),
+        sa.String(255),
         sa.ForeignKey(
             'status_pull_requests.status', onupdate='CASCADE'),
         default='Open',
