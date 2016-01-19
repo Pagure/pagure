@@ -411,7 +411,7 @@ def view_file(repo, identifier, filename, username=None):
         flask.abort(404, 'File not found')
 
     if isinstance(content, pygit2.Blob):
-        raw = str(flask.request.args.get('raw')).lower() in ['1', 'true']
+        rawtext = str(flask.request.args.get('text')).lower() in ['1', 'true']
         ext = filename[filename.rfind('.'):]
         if ext in (
                 '.gif', '.png', '.bmp', '.tif', '.tiff', '.jpg',
@@ -424,7 +424,7 @@ def view_file(repo, identifier, filename, username=None):
                     'Failed to load image %s, error: %s', filename, err
                 )
                 output_type = 'binary'
-        elif ext in ('.rst', '.mk', '.md') and not raw:
+        elif ext in ('.rst', '.mk', '.md') and not rawtext:
             content, safe = pagure.doc_utils.convert_readme(content.data, ext)
             output_type = 'markup'
         elif not content.is_binary and pagure.lib.could_be_text(content.data):
