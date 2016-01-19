@@ -111,7 +111,7 @@ def do_login():
             flask.flash('Username or password of invalid format.', 'error')
             return flask.redirect(flask.url_for('auth_login'))
 
-        if not user_obj or not password_checks:
+        if not password_checks:
             flask.flash('Username or password invalid.', 'error')
             return flask.redirect(flask.url_for('auth_login'))
 
@@ -248,7 +248,6 @@ def reset_password(token):
 
     if form.validate_on_submit():
 
-
         user_obj.password = generate_hashed_value(form.password.data)
 
         user_obj.token = None
@@ -322,7 +321,7 @@ def change_password():
             SESSION.rollback()
             flask.flash('Could not set the new password.', 'error')
             APP.logger.debug(
-                'Password lost change - Error setting password.')
+                'Password change  - Error setting new password.')
             APP.logger.exception(err)
 
         return flask.redirect(flask.url_for('auth_login'))
