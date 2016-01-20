@@ -23,7 +23,7 @@ import pagure.lib
 import pagure.lib.login
 import pagure.lib.model as model
 import pagure.lib.notify
-from pagure import APP, SESSION, cla_required
+from pagure import APP, SESSION, login_required
 from pagure.lib.login import generate_hashed_value, check_password
 
 # pylint: disable=E1101
@@ -278,7 +278,7 @@ def reset_password(token):
 
 @APP.route('/password/change/', methods=['GET', 'POST'])
 @APP.route('/password/change', methods=['GET', 'POST'])
-@cla_required
+@login_required
 def change_password():
     """ Method to change the password for local auth users.
     """

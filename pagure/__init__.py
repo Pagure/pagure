@@ -179,12 +179,11 @@ def generate_user_key_files():
     pagure.lib.git.generate_gitolite_acls()
 
 
-def cla_required(function):
-    """ Flask decorator to retrict access to CLA signed user.
-To use this decorator you need to have a function named 'auth_login'.
-Without that function the redirect if the user is not logged in will not
-work.
-"""
+def login_required(function):
+    """ Flask decorator to retrict access to logged in user.
+    If the auth system is ``fas`` it will also require that the user sign
+    the FPCA.
+    """
     auth_method = APP.config.get('PAGURE_AUTH', None)
 
     @wraps(function)

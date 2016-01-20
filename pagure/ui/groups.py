@@ -114,7 +114,7 @@ def view_group(group):
 
 
 @pagure.APP.route('/group/<group>/<user>/delete', methods=['POST'])
-@pagure.cla_required
+@pagure.login_required
 def group_user_delete(user, group):
     """ Delete an user from a certain group
     """
@@ -156,7 +156,7 @@ def group_user_delete(user, group):
 
 
 @pagure.APP.route('/group/<group>/delete', methods=['POST'])
-@pagure.cla_required
+@pagure.login_required
 def group_delete(group):
     """ Delete a certain group
     """
@@ -194,7 +194,7 @@ def group_delete(group):
 
 @pagure.APP.route('/group/add/', methods=['GET', 'POST'])
 @pagure.APP.route('/group/add', methods=['GET', 'POST'])
-@pagure.cla_required
+@pagure.login_required
 def add_group():
     """ Endpoint to create groups
     """

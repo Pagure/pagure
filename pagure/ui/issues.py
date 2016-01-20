@@ -22,7 +22,7 @@ import pagure.doc_utils
 import pagure.lib
 import pagure.forms
 from pagure import (APP, SESSION, LOG, __get_file_in_tree,
-                    cla_required, is_repo_admin, authenticated)
+                    login_required, is_repo_admin, authenticated)
 
 
 # pylint: disable=E1101
@@ -35,7 +35,7 @@ from pagure import (APP, SESSION, LOG, __get_file_in_tree,
            methods=['GET', 'POST'])
 @APP.route('/fork/<username>/<repo>/issue/<int:issueid>/update',
            methods=['GET', 'POST'])
-@cla_required
+@login_required
 def update_issue(repo, issueid, username=None):
     ''' Add a comment to an issue. '''
     is_js = flask.request.args.get('js', False)
@@ -234,7 +234,7 @@ def update_issue(repo, issueid, username=None):
 @APP.route('/<repo>/tag/<tag>/edit', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/tag/<tag>/edit/', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/tag/<tag>/edit', methods=('GET', 'POST'))
-@cla_required
+@login_required
 def edit_tag(repo, tag, username=None):
     """ Edit the specified tag of a project.
     """
@@ -281,7 +281,7 @@ def edit_tag(repo, tag, username=None):
 
 @APP.route('/<repo>/droptag/', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/droptag/', methods=['POST'])
-@cla_required
+@login_required
 def remove_tag(repo, username=None):
     """ Remove the specified tag from the project.
     """
@@ -414,7 +414,7 @@ def view_issues(repo, username=None):
 @APP.route('/<repo>/new_issue', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/new_issue/', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/new_issue', methods=('GET', 'POST'))
-@cla_required
+@login_required
 def new_issue(repo, username=None):
     """ Create a new issue
     """
@@ -587,7 +587,7 @@ def delete_issue(repo, issueid, username=None):
            methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/issue/<int:issueid>/edit',
            methods=('GET', 'POST'))
-@cla_required
+@login_required
 def edit_issue(repo, issueid, username=None):
     """ Edit the specified issue
     """
@@ -687,7 +687,7 @@ def edit_issue(repo, issueid, username=None):
 @APP.route('/<repo>/issue/<int:issueid>/upload', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/issue/<int:issueid>/upload',
            methods=['POST'])
-@cla_required
+@login_required
 def upload_issue(repo, issueid, username=None):
     ''' Upload a file to a ticket.
     '''
@@ -791,7 +791,7 @@ def view_issue_raw_file(repo, filename=None, username=None):
            methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/issue/<int:issueid>/comment'
            '/<int:commentid>/edit', methods=('GET', 'POST'))
-@cla_required
+@login_required
 def edit_comment_issue(repo, issueid, commentid, username=None):
     """Edit comment of an issue
     """

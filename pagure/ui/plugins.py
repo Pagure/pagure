@@ -17,7 +17,7 @@ from pagure.hooks import BaseHook
 import pagure.exceptions
 import pagure.lib
 import pagure.forms
-from pagure import APP, SESSION, cla_required, is_repo_admin
+from pagure import APP, SESSION, login_required, is_repo_admin
 from pagure.lib.model import BASE
 
 # pylint: disable=E1101
@@ -64,7 +64,7 @@ def get_plugin(plugin_name):
            methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/settings/<plugin>/<int:full>',
            methods=('GET', 'POST'))
-@cla_required
+@login_required
 def view_plugin(repo, plugin, username=None, full=True):
     """ Presents the settings of the project.
     """

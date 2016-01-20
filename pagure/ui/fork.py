@@ -21,7 +21,7 @@ import pagure.exceptions
 import pagure.lib
 import pagure.lib.git
 import pagure.forms
-from pagure import (APP, SESSION, LOG, cla_required, is_repo_admin)
+from pagure import (APP, SESSION, LOG, login_required, is_repo_admin)
 
 
 # pylint: disable=E1101
@@ -345,7 +345,7 @@ def request_pull_patch(repo, requestid, username=None):
            methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/edit',
            methods=('GET', 'POST'))
-@cla_required
+@login_required
 def request_pull_edit(repo, requestid, username=None):
     """ Edit the title of a pull-request.
     """
@@ -408,7 +408,7 @@ def request_pull_edit(repo, requestid, username=None):
            methods=['POST'])
 @APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/comment/'
            '<commit>/<path:filename>/<row>', methods=('GET', 'POST'))
-@cla_required
+@login_required
 def pull_request_add_comment(
         repo, requestid, commit=None,
         filename=None, row=None, username=None):
@@ -486,7 +486,7 @@ def pull_request_add_comment(
            methods=['POST'])
 @APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/comment/drop',
            methods=['POST'])
-@cla_required
+@login_required
 def pull_request_drop_comment(repo, requestid, username=None):
     """ Delete a comment of a pull-request.
     """
@@ -549,7 +549,7 @@ def pull_request_drop_comment(repo, requestid, username=None):
            methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/comment'
            '/<int:commentid>/edit', methods=('GET', 'POST'))
-@cla_required
+@login_required
 def pull_request_edit_comment(repo, requestid, commentid, username=None):
     """Edit comment of a pull request
     """
@@ -629,7 +629,7 @@ def pull_request_edit_comment(repo, requestid, commentid, username=None):
 @APP.route('/<repo>/pull-request/<int:requestid>/merge', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/merge',
            methods=['POST'])
-@cla_required
+@login_required
 def merge_request_pull(repo, requestid, username=None):
     """ Request pulling the changes from the fork into the project.
     """
@@ -704,7 +704,7 @@ def merge_request_pull(repo, requestid, username=None):
            methods=['POST'])
 @APP.route('/fork/<username>/<repo>/pull-request/cancel/<int:requestid>',
            methods=['POST'])
-@cla_required
+@login_required
 def cancel_request_pull(repo, requestid, username=None):
     """ Cancel request pulling request.
     """
@@ -754,7 +754,7 @@ def cancel_request_pull(repo, requestid, username=None):
 @APP.route('/<repo>/pull-request/<int:requestid>/assign', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/assign',
            methods=['POST'])
-@cla_required
+@login_required
 def set_assignee_requests(repo, requestid, username=None):
     ''' Assign a pull-request. '''
     repo = pagure.lib.get_project(SESSION, repo, user=username)
@@ -805,7 +805,7 @@ def set_assignee_requests(repo, requestid, username=None):
 
 @APP.route('/do_fork/<repo>', methods=['POST'])
 @APP.route('/do_fork/<username>/<repo>', methods=['POST'])
-@cla_required
+@login_required
 def fork_project(repo, username=None):
     """ Fork the project specified into the user's namespace
     """
@@ -978,7 +978,7 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
     '/fork/<username>/<repo>/diff/remote/', methods=('GET', 'POST'))
 @APP.route(
     '/fork/<username>/<repo>/diff/remote', methods=('GET', 'POST'))
-@cla_required
+@login_required
 def new_remote_request_pull(repo, username=None):
     """ Request pulling the changes from a remote fork into the project.
     """

@@ -36,7 +36,7 @@ import pagure.lib.git
 import pagure.forms
 import pagure
 import pagure.ui.plugins
-from pagure import (APP, SESSION, LOG, __get_file_in_tree, cla_required,
+from pagure import (APP, SESSION, LOG, __get_file_in_tree, login_required,
                     is_repo_admin, admin_session_timedout)
 
 # pylint: disable=E1101
@@ -732,7 +732,7 @@ def view_tags(repo, username=None):
 @APP.route('/<repo>/upload', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/upload/', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/upload', methods=('GET', 'POST'))
-@cla_required
+@login_required
 def new_release(repo, username=None):
     """ Upload a new release.
     """
@@ -782,7 +782,7 @@ def new_release(repo, username=None):
 @APP.route('/<repo>/settings', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/settings/', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/settings', methods=('GET', 'POST'))
-@cla_required
+@login_required
 def view_settings(repo, username=None):
     """ Presents the settings of the project.
     """
@@ -865,7 +865,7 @@ def view_settings(repo, username=None):
 
 @APP.route('/<repo>/update', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/update', methods=['POST'])
-@cla_required
+@login_required
 def update_project(repo, username=None):
     """ Update the description of a project.
     """
@@ -912,7 +912,7 @@ def update_project(repo, username=None):
 
 @APP.route('/<repo>/default/branch/', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/default/branch/', methods=['POST'])
-@cla_required
+@login_required
 def change_ref_head(repo, username=None):
     """ Change HEAD reference
     """
@@ -952,7 +952,7 @@ def change_ref_head(repo, username=None):
 
 @APP.route('/<repo>/delete', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/delete', methods=['POST'])
-@cla_required
+@login_required
 def delete_repo(repo, username=None):
     """ Delete the present project.
     """
@@ -1012,7 +1012,7 @@ def delete_repo(repo, username=None):
 
 @APP.route('/<repo>/hook_token', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/hook_token', methods=['POST'])
-@cla_required
+@login_required
 def new_repo_hook_token(repo, username=None):
     """ Re-generate a hook token for the present project.
     """
@@ -1055,7 +1055,7 @@ def new_repo_hook_token(repo, username=None):
 
 @APP.route('/<repo>/dropuser/<userid>', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/dropuser/<userid>', methods=['POST'])
-@cla_required
+@login_required
 def remove_user(repo, userid, username=None):
     """ Remove the specified user from the project.
     """
@@ -1110,7 +1110,7 @@ def remove_user(repo, userid, username=None):
 @APP.route('/<repo>/adduser', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/adduser/', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/adduser', methods=('GET', 'POST'))
-@cla_required
+@login_required
 def add_user(repo, username=None):
     """ Add the specified user from the project.
     """
@@ -1169,7 +1169,7 @@ def add_user(repo, username=None):
 @APP.route('/<repo>/addgroup', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/addgroup/', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/addgroup', methods=('GET', 'POST'))
-@cla_required
+@login_required
 def add_group_project(repo, username=None):
     """ Add the specified group from the project.
     """
@@ -1226,7 +1226,7 @@ def add_group_project(repo, username=None):
 
 @APP.route('/<repo>/regenerate', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/regenerate', methods=['POST'])
-@cla_required
+@login_required
 def regenerate_git(repo, username=None):
     """ Regenerate the specified git repo with the content in the project.
     """
@@ -1276,7 +1276,7 @@ def regenerate_git(repo, username=None):
 @APP.route('/<repo>/token/new', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/token/new/', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/token/new', methods=('GET', 'POST'))
-@cla_required
+@login_required
 def add_token(repo, username=None):
     """ Add a token to a specified project.
     """
@@ -1333,7 +1333,7 @@ def add_token(repo, username=None):
 @APP.route('/<repo>/token/revoke/<token_id>', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/token/revoke/<token_id>',
            methods=['POST'])
-@cla_required
+@login_required
 def revoke_api_token(repo, token_id, username=None):
     """ Revokie a token to a specified project.
     """
@@ -1387,7 +1387,7 @@ def revoke_api_token(repo, token_id, username=None):
 @APP.route(
     '/fork/<username>/<repo>/edit/<path:branchname>/f/<path:filename>',
     methods=('GET', 'POST'))
-@cla_required
+@login_required
 def edit_file(repo, branchname, filename, username=None):
     """ Edit a file online.
     """
@@ -1474,7 +1474,7 @@ def edit_file(repo, branchname, filename, username=None):
 @APP.route('/<repo>/<path:branchname>/delete', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/<path:branchname>/delete',
            methods=['POST'])
-@cla_required
+@login_required
 def delete_branch(repo, branchname, username=None):
     """ Delete the branch of a project.
     """

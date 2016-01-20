@@ -18,7 +18,7 @@ import pagure.lib
 import pagure.lib.git
 import pagure.forms
 import pagure.ui.filters
-from pagure import (APP, SESSION, cla_required,
+from pagure import (APP, SESSION, login_required,
                     authenticated,
                     admin_session_timedout)
 
@@ -340,7 +340,7 @@ def view_user_requests(username):
 
 @APP.route('/new/', methods=('GET', 'POST'))
 @APP.route('/new', methods=('GET', 'POST'))
-@cla_required
+@login_required
 def new_project():
     """ Form to create a new project.
     """
@@ -386,7 +386,7 @@ def new_project():
 
 @APP.route('/settings/', methods=('GET', 'POST'))
 @APP.route('/settings', methods=('GET', 'POST'))
-@cla_required
+@login_required
 def user_settings():
     """ Update the user settings.
     """
@@ -444,7 +444,7 @@ def markdown_preview():
 
 
 @APP.route('/settings/email/drop', methods=['POST'])
-@cla_required
+@login_required
 def remove_user_email():
     """ Remove the specified email from the logged in user.
     """
@@ -495,7 +495,7 @@ def remove_user_email():
 
 @APP.route('/settings/email/add/', methods=['GET', 'POST'])
 @APP.route('/settings/email/add', methods=['GET', 'POST'])
-@cla_required
+@login_required
 def add_user_email():
     """ Add a new email for the logged in user.
     """
@@ -533,7 +533,7 @@ def add_user_email():
 
 
 @APP.route('/settings/email/default', methods=['POST'])
-@cla_required
+@login_required
 def set_default_email():
     """ Set the default email address of the user.
     """
