@@ -335,17 +335,44 @@ $(document).ready(function() {
     $(".extra_gits").hide();
 });
 
-
 $(function() {
-    $( "#more_gits" ).click(
-      function() {
-        if ($( "#more_gits" ).html() == 'more') {
-          $( "#more_gits" ).html('less');
-        } else {
-          $( "#more_gits" ).html('more');
+  $( "#more_gits" ).click(function() {
+      if ($( "#more_gits" ).html() == 'more') {
+        $( "#more_gits" ).html('less');
+      } else {
+        $( "#more_gits" ).html('more');
+      }
+  });
+
+  {% if authenticated and repo_admin %}
+  $.ajax({
+    url: '{{ url_for("internal_ns.get_pull_request_ready_branch") }}' ,
+    type: 'POST',
+    data: {
+      repo: "{{ repo.name }}",
+      repouser: "{{ repo.user.user if repo.is_fork else '' }}",
+      csrf_token: "{{ form.csrf_token.current_token }}",
+    },
+    dataType: 'json',
+    success: function(res) {
+      if (res.code == 'OK'){
+        for (branch in res.message){
+          html = '<div class="alert alert-info" role="alert"> \
+                The branch ' + branch +' contains ' + res.message[branch].length
+                +  ' commits not in the main branch \
+                <span class="pr-toplabel"> \
+                <span class="oi" data-glyph="random"> </span> \
+                {{ head }}</span> \
+                <div id="request_pull" class="pull-xs-right"> \
+                <a class="btn btn-primary btn-sm" href="/test/diff/'
+                + '{{ head }}..' + branch + '"> Request pull </a> \
+                </div></div>';
+          $($('.bodycontent').find('.row').children()[0]).before(html)
         }
       }
-    );
+    }
+  });
+  {% endif %}
 });
 </script>
 
