@@ -5,6 +5,7 @@ arrow
 bleach
 blinker
 chardet
+cryptography
 docutils
 enum34
 flask
