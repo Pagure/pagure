@@ -16,11 +16,13 @@ BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
 BuildRequires:  python-nose
 
+BuildRequires:  py-bcrypt
 BuildRequires:  python-alembic
 BuildRequires:  python-arrow
 BuildRequires:  python-bleach
 BuildRequires:  python-blinker
 BuildRequires:  python-chardet
+BuildRequires:  python-cryptography
 BuildRequires:  python-docutils
 BuildRequires:  python-flask
 BuildRequires:  python-flask-wtf
@@ -47,11 +49,13 @@ BuildRequires:  python-sqlalchemy > 0.8
 Requires:  python-sqlalchemy > 0.8
 %endif
 
+Requires:  py-bcrypt
 Requires:  python-alembic
 Requires:  python-arrow
 Requires:  python-bleach
 Requires:  python-blinker
 Requires:  python-chardet
+Requires:  python-cryptography
 Requires:  python-docutils
 Requires:  python-enum34
 Requires:  python-flask
