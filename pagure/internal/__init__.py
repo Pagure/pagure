@@ -12,6 +12,7 @@ Internal endpoints.
 
 import shutil
 import tempfile
+import os
 
 import flask
 import pygit2
@@ -230,3 +231,89 @@ def mergeable_request_pull():
         'code': merge_status,
         'short_code': MERGE_OPTIONS[merge_status]['short_code'],
         'message': MERGE_OPTIONS[merge_status]['message']})
+
+
+@PV.route('pull-request/ready', methods=['POST'])
+def get_pull_request_ready_branch():
+    """ Return the list of branches that have commits not in the main
+    branch/repo (thus for which one could open a PR) and the number of
+    commits that differ.
+    """
+    form = pagure.forms.ConfirmationForm()
+    if not form.validate_on_submit():
+        response = flask.jsonify({
+            'code': 'ERROR',
+            'message': 'Invalid input submitted',
+        })
+        response.status_code = 400
+        return response
+
+    repo = pagure.lib.get_project(
+        pagure.SESSION,
+        flask.request.form.get('repo', '').strip() or None,
+        user=flask.request.form.get('repouser', '').strip() or None)
+
+    if not repo:
+        response = flask.jsonify({
+            'code': 'ERROR',
+            'message': 'No repo found with the information provided',
+        })
+        response.status_code = 404
+        return response
+
+    reponame = pagure.get_repo_path(repo)
+    repo_obj = pygit2.Repository(reponame)
+
+    branches = {}
+
+    for branchname in repo_obj.listall_branches():
+        branch = repo_obj.lookup_branch(branchname)
+
+        diff_commits = []
+        if repo.is_fork:
+            parentname = os.path.join(
+                pagure.APP.config['GIT_FOLDER'], repo.parent.path)
+            if repo.parent.is_fork:
+                parentname = os.path.join(
+                    pagure.APP.config['FORK_FOLDER'], repo.parent.path)
+        else:
+            parentname = os.path.join(pagure.APP.config['GIT_FOLDER'], repo.path)
+
+        orig_repo = pygit2.Repository(parentname)
+
+        if not repo_obj.is_empty and not orig_repo.is_empty \
+                and repo_obj.listall_branches() > 1:
+
+            if not orig_repo.head_is_unborn:
+                compare_branch = orig_repo.lookup_branch(
+                    orig_repo.head.shorthand)
+            else:
+                compare_branch = None
+
+            compare_commits = []
+
+            if compare_branch:
+                compare_commits = [
+                    commit.oid.hex
+                    for commit in orig_repo.walk(
+                        compare_branch.get_object().hex,
+                        pygit2.GIT_SORT_TIME)
+                ]
+
+            repo_commit = repo_obj[branch.get_object().hex]
+
+            for commit in repo_obj.walk(
+                    repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
+                if commit.oid.hex in compare_commits:
+                    break
+                diff_commits.append(commit.oid.hex)
+
+        if diff_commits:
+            branches[branchname] = diff_commits
+
+    return flask.jsonify(
+        {
+            'code': 'OK',
+            'message': branches,
+        }
+    )
