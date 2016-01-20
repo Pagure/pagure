@@ -52,6 +52,7 @@ import pagure.lib
 import pagure.lib.git
 import pagure.login_forms
 import pagure.mail_logging
+import pagure.proxy
 
 
 FAS = FAS(APP)
@@ -76,6 +77,8 @@ SHANDLER.setLevel(APP.config.get('log_level', 'INFO'))
 APP.logger.addHandler(SHANDLER)
 
 LOG = APP.logger
+
+APP.wsgi_app = pagure.proxy.ReverseProxied(APP.wsgi_app)
 
 
 def authenticated():
