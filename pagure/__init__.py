@@ -46,12 +46,12 @@ if 'PAGURE_CONFIG' in os.environ:
     APP.config.from_envvar('PAGURE_CONFIG')
 
 
-import pagure.lib
-import pagure.lib.git
-import pagure.mail_logging
 import pagure.doc_utils
 import pagure.forms
+import pagure.lib
+import pagure.lib.git
 import pagure.login_forms
+import pagure.mail_logging
 
 
 FAS = FAS(APP)
