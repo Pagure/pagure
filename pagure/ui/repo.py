@@ -322,7 +322,8 @@ def view_commits(repo, branchname=None, username=None):
             and repo_obj.listall_branches() > 1:
 
         if not orig_repo.head_is_unborn:
-            compare_branch = orig_repo.lookup_branch(orig_repo.head.shorthand)
+            compare_branch = orig_repo.lookup_branch(
+                orig_repo.head.shorthand)
         else:
             compare_branch = None
 
