@@ -174,6 +174,7 @@ def request_pulls(repo, username=None):
         assignee=assignee,
         author=author,
         repo_admin=is_repo_admin(repo),
+        form=pagure.forms.ConfirmationForm(),
     )
 
 

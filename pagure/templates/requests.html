@@ -21,7 +21,7 @@
       <a class="btn {% if status|lower == 'open' %}btn-secondary{%else%}btn-primary{%endif%} btn-sm" href="{{ url_for('request_pulls', username=username,
                repo=repo.name) }}?status=0">Closed</a>
   </span>
-  <a class="btn btn-secondary btn-sm pull-xs-right" href="{{ url_for('request_pulls', 
+  <a class="btn btn-secondary btn-sm pull-xs-right" href="{{ url_for('request_pulls',
   username=username, repo=repo.name) }}">Reset Filters</a>
 </div>
 </div>
@@ -90,3 +90,42 @@
 </div>
 {% endblock %}
 
+
+
+{% block jscripts %}
+{{ super() }}
+{% if authenticated and repo_admin %}
+<script type="text/javascript">
+
+$(function() {
+  $.ajax({
+    url: '{{ url_for("internal_ns.get_pull_request_ready_branch") }}' ,
+    type: 'POST',
+    data: {
+      repo: "{{ repo.name }}",
+      repouser: "{{ repo.user.user if repo.is_fork else '' }}",
+      csrf_token: "{{ form.csrf_token.current_token }}",
+    },
+    dataType: 'json',
+    success: function(res) {
+      if (res.code == 'OK'){
+        for (branch in res.message){
+          html = '<div class="alert alert-info" role="alert"> \
+                The branch ' + branch +' contains ' + res.message[branch].length
+                +  ' commits not in the main branch \
+                <span class="pr-toplabel"> \
+                <span class="oi" data-glyph="random"> </span> \
+                {{ head }}</span> \
+                <div id="request_pull" class="pull-xs-right"> \
+                <a class="btn btn-primary btn-sm" href="/test/diff/'
+                + '{{ head }}..' + branch + '"> Request pull </a> \
+                </div></div>';
+          $($('.bodycontent').find('.card').children()[0]).before(html)
+        }
+      }
+    }
+  });
+});
+{% endif %}
+</script>
+{% endblock %}
