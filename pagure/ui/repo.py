@@ -177,7 +177,7 @@ def view_repo_branch(repo, branchname, username=None):
     for commit in repo_obj.walk(branch.get_object().hex, pygit2.GIT_SORT_TIME):
         last_commits.append(commit)
         cnt += 1
-        if cnt == 10:
+        if cnt == 3:
             break
 
     diff_commits = []
