@@ -81,7 +81,8 @@ git push -u origin master</pre>
         <div id="diff_commits" class="list-group m-t-1" style="display:none;">
           {% for diff_commit_full in diff_commits_full %}
              <a href="{{ url_for('view_commit', username=username,
-                        repo=repo.name, commitid=diff_commit_full.hex) }}" class="list-group-item">
+                        repo=repo.name, commitid=diff_commit_full.hex)
+                }}" class="list-group-item">
               <h5>
                 <strong>{{ diff_commit_full.message.split('\n')[0] }}</strong>
                 <div class="pull-xs-right">
@@ -90,7 +91,8 @@ git push -u origin master</pre>
                   </span>
                 </div>
               </h5>
-              {{ diff_commit_full.author | author2avatar(20) | safe }} {{ diff_commit_full.author.name }}
+              {{ diff_commit_full.author | author2avatar(20) | safe }}
+              {{ diff_commit_full.author.name }}
               <div class="pull-xs-right">
                 <span class="label label-default">{{ diff_commit_full.hex|short }}</span>
               </div>
@@ -104,7 +106,9 @@ git push -u origin master</pre>
         <div class="list-group m-t-1">
           {% for commit in last_commits %}
             <a href="{{ url_for('view_commit', username=username, repo=repo.name, commitid=commit.hex) }}"
-                class="list-group-item {% if diff_commits and commit.oid.hex in diff_commits %}p-l-3{% endif %}" style="position:relative;">
+                class="list-group-item {%
+                  if diff_commits and commit.oid.hex in diff_commits %}p-l-3{%
+                  endif %}" style="position:relative;">
               {% if diff_commits and commit.oid.hex in diff_commits %}
                 <div title="This commit is not in the main branch of this Repo"
                     style="position:absolute; left:0; top:0; padding:5px; padding-top:20px; height:100%; background:#eee; vertical-align:middle;">
@@ -133,14 +137,17 @@ git push -u origin master</pre>
           <ul class="pagination">
             <li {% if page <= 1%} class="disabled" {% endif %}>
               <a href="{{ url_for('.%s' % origin, username=username,
-                          repo=repo.name, branchname=branchname, page=page-1) }}" aria-label="Previous">
+                          repo=repo.name, branchname=branchname, page=page-1)
+                }}" aria-label="Previous">
                 <span aria-hidden="true">&laquo;</span>
                 <span class="sr-only">Newer</span>
               </a>
             </li>
             <li class="active">page {{ page }} of {{total_page}}</li>
             <li {% if page >= total_page %}class="disabled"{%endif%}>
-              <a href="{{ url_for('.%s' % origin, username=username,repo=repo.name, branchname=branchname, page=page+1) }}" aria-label="Next">
+              <a href="{{ url_for('.%s' % origin, username=username,
+                          repo=repo.name, branchname=branchname, page=page+1)
+                }}" aria-label="Next">
                 <span aria-hidden="true">&raquo;</span>
                 <span class="sr-only">Older</span>
               </a>
@@ -210,13 +217,15 @@ git push -u origin master</pre>
             <div class="form-group">
               <div class="input-group">
                 <div class="input-group-addon">SSH</span></div>
-                <input class="form-control" type="text" value="{{ config.get('GIT_URL_SSH') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git" readonly>
+                <input class="form-control" type="text" value="{{
+                  config.get('GIT_URL_SSH') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git" readonly>
               </div>
             </div>
             <div class="form-group">
               <div class="input-group">
                 <div class="input-group-addon">GIT</span></div>
-                <input class="form-control" type="text" value="{{ config.get('GIT_URL_GIT') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git" readonly>
+                <input class="form-control" type="text" value="{{
+                  config.get('GIT_URL_GIT') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git" readonly>
               </div>
             </div>
             {% if authenticated and repo_admin %}
@@ -226,13 +235,15 @@ git push -u origin master</pre>
                 <div class="form-group">
                   <div class="input-group">
                     <div class="input-group-addon">SSH</span></div>
-                    <input class="form-control" type="text" value="{{ config.get('GIT_URL_SSH') }}docs/{{ repo.fullname }}.git" readonly>
+                    <input class="form-control" type="text" value="{{
+                      config.get('GIT_URL_SSH') }}docs/{{ repo.fullname }}.git" readonly>
                   </div>
                 </div>
                 <div class="form-group">
                   <div class="input-group">
                     <div class="input-group-addon">GIT</span></div>
-                    <input class="form-control" type="text" value="{{ config.get('GIT_URL_GIT') }}docs/{{ repo.fullname }}.git" readonly>
+                    <input class="form-control" type="text" value="{{
+                      config.get('GIT_URL_GIT') }}docs/{{ repo.fullname }}.git" readonly>
                   </div>
                 </div>
                 {%endif%}
@@ -241,13 +252,15 @@ git push -u origin master</pre>
                 <div class="form-group">
                   <div class="input-group">
                     <div class="input-group-addon">SSH</span></div>
-                    <input class="form-control" type="text" value="{{ config.get('GIT_URL_SSH') }}tickets/{{ repo.fullname }}.git" readonly>
+                    <input class="form-control" type="text" value="{{
+                      config.get('GIT_URL_SSH') }}tickets/{{ repo.fullname }}.git" readonly>
                   </div>
                 </div>
                 <div class="form-group">
                   <div class="input-group">
                     <div class="input-group-addon">GIT</span></div>
-                    <input class="form-control" type="text" value="{{ config.get('GIT_URL_GIT') }}tickets/{{ repo.fullname }}.git" readonly>
+                    <input class="form-control" type="text" value="{{
+                      config.get('GIT_URL_GIT') }}tickets/{{ repo.fullname }}.git" readonly>
                   </div>
                 </div>
                 {%endif%}
@@ -255,17 +268,20 @@ git push -u origin master</pre>
                 <div class="form-group">
                   <div class="input-group">
                     <div class="input-group-addon">SSH</span></div>
-                    <input class="form-control" type="text" value="{{ config.get('GIT_URL_SSH') }}requests/{{ repo.fullname }}.git" readonly>
+                    <input class="form-control" type="text" value="{{
+                      config.get('GIT_URL_SSH') }}requests/{{ repo.fullname }}.git" readonly>
                   </div>
                 </div>
                 <div class="form-group">
                   <div class="input-group">
                     <div class="input-group-addon">GIT</span></div>
-                    <input class="form-control" type="text" value="{{ config.get('GIT_URL_GIT') }}requests/{{ repo.fullname }}.git" readonly>
+                    <input class="form-control" type="text" value="{{
+                      config.get('GIT_URL_GIT') }}requests/{{ repo.fullname }}.git" readonly>
                   </div>
                 </div>
               </div>
-              <a class="btn btn-link" data-toggle="collapse" href="#moregiturls" aria-expanded="false" aria-controls="moregiturls">More</a>
+              <a class="btn btn-link" data-toggle="collapse" href="#moregiturls"
+                aria-expanded="false" aria-controls="moregiturls">More</a>
             {% endif %}
         </div>
       </div>
@@ -278,7 +294,9 @@ git push -u origin master</pre>
         <div class="card-block p-a-0">
           <div class="list-group list-group-flush">
             {% for commit in last_commits %}
-              <a href="{{ url_for('view_commit', username=username, repo=repo.name, commitid=commit.hex) }}" class="list-group-item">
+              <a href="{{
+                  url_for('view_commit', username=username,
+                  repo=repo.name, commitid=commit.hex) }}" class="list-group-item">
                 <div><strong>
                   {{ commit.message.split('\n')[0] }}
                   {% if diff_commits and commit.oid.hex in diff_commits %}
