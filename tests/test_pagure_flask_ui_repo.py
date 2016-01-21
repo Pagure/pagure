@@ -500,6 +500,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         tests.create_projects(self.session)
+        tests.create_projects_git(tests.HERE, bare=True)
 
         output = self.app.get('/test/forks')
         self.assertEqual(output.status_code, 200)

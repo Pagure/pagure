@@ -193,7 +193,10 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
         self.assertIn('<title>Logs - test - Pagure</title>', output.data)
         self.assertIn('Add sources file for testing', output.data)
         self.assertIn('Add .gitignore file for testing', output.data)
-        self.assertEqual(output.data.count('<span class="commitdate"'), 2)
+        self.assertEqual(output.data.count('<span class="commitdate"'), 3)
+        self.assertIn(
+            'Displaying <a href="#" id="commit_graph_link">2 commits</a> in',
+            output.data)
 
     @patch('pagure.lib.notify.send_email')
     def test_view_file(self, send_email):
