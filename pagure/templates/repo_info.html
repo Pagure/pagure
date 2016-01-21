@@ -289,7 +289,7 @@ git push -u origin master</pre>
       {% if repo_obj and not repo_obj.is_empty %}
       <div class="card">
         <div class="card-header">
-          Recent Commits
+          <strong>Recent Commits in <span class="pr-toplabel"><span class="oi" data-glyph="random"></span> {{branchname}}</span></strong>
         </div>
         <div class="card-block p-a-0">
           <div class="list-group list-group-flush">
@@ -297,15 +297,21 @@ git push -u origin master</pre>
               <a href="{{
                   url_for('view_commit', username=username,
                   repo=repo.name, commitid=commit.hex) }}" class="list-group-item">
-                <div><strong>
+                <div class="commitdate" title="{{ commit.commit_time|format_ts }}">
+                  <small>
+                    <strong>
+                      {{ commit.author | author2avatar(20) | safe }}
+                      {{ commit.author.name }}
+                    </strong>
+                    commited {{ commit.commit_time|humanize }}
+                  </small>
+                </div>
+                <div><small>
                   {{ commit.message.split('\n')[0] }}
                   {% if diff_commits and commit.oid.hex in diff_commits %}
                     <span class="new_commit" title="Commit not in the main repo">*</span>
                   {% endif %}
-                </strong></div>
-                <div class="commitdate" title="{{ commit.commit_time|format_ts }}">
-                  {{ commit.commit_time|humanize }}
-                </div>
+                </small></div>
               </a>
             {% endfor %}
           </div>
