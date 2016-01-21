@@ -101,7 +101,7 @@ git push -u origin master</pre>
         </div>
 
        </div>
-      {%endif%}
+      {% endif %}
 
         <div class="list-group m-t-1">
           {% for commit in last_commits %}
@@ -286,7 +286,7 @@ git push -u origin master</pre>
         </div>
       </div>
 
-      {% if repo_obj and not repo_obj.is_empty %}
+      {% if last_commits %}
       <div class="card">
         <div class="card-header">
           <strong>Recent Commits in <span class="pr-toplabel"><span class="oi" data-glyph="random"></span> {{branchname}}</span></strong>
