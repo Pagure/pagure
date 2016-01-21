@@ -306,6 +306,7 @@ def view_commits(repo, branchname=None, username=None):
     total_page = int(ceil(n_commits / float(limit)))
 
     diff_commits = []
+    diff_commits_full = []
     if repo.is_fork:
         parentname = os.path.join(
             APP.config['GIT_FOLDER'], repo.parent.path)
@@ -343,6 +344,7 @@ def view_commits(repo, branchname=None, username=None):
                 if commit.oid.hex in compare_commits:
                     break
                 diff_commits.append(commit.oid.hex)
+                diff_commits_full.append(commit)
 
     return flask.render_template(
         'repo_info.html',
@@ -356,6 +358,8 @@ def view_commits(repo, branchname=None, username=None):
         branchname=branchname,
         last_commits=last_commits,
         diff_commits=diff_commits,
+        diff_commits_full=diff_commits_full,
+        number_of_commits=n_commits,
         page=page,
         total_page=total_page,
         repo_admin=is_repo_admin(repo),
