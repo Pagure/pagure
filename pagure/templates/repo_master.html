@@ -66,8 +66,9 @@
             </a>
         </div>
         {% endif %}
-        <div class="projectinfo m-t-1">
-        {% if repo.description %}{{ repo.description | markdown |safe }}{% else %}-{% endif -%}
+        <div class="projectinfo m-t-1 m-b-1">
+        {% if repo.description %}{{ repo.description | safe }}{% else %}-{% endif -%}
+        {%- if repo.url %} &nbsp;| &nbsp;<a class="inline" href="{{ repo.url }}">{{ repo.url }}</a>{% endif %}
         </div>
     </header>
     <ul class="nav nav-tabs nav-small">
