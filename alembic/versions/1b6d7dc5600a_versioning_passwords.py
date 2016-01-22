@@ -17,10 +17,14 @@ from pagure.lib import model
 
 
 def upgrade():
-    engine = op.get_bind().engine
-    session = sa.orm.scoped_session(sa.orm.sessionmaker(bind=engine))
-    session.query(model.User).update(
-        {model.User.password: '$1$' + model.User.password}, synchronize_session=False)
+    engine = op.get_bind()
+    Session = sqlalchemy.orm.scoped_session(sqlalchemy.orm.sessionmaker())
+    Session.configure(bind=engine)
+    session = Session()
+    for user in session.query(model.User).filter(
+            model.User.password != None).all():
+        user.password = '$1$%s' % user.password
+        session.add(user)
     session.commit()
 
 
