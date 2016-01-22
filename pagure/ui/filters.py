@@ -237,8 +237,13 @@ def avatar(packager, size=64, default="retro"):
     """ Template filter sorting the given branches, Fedora first then EPEL,
     then whatever is left.
     """
+    if not '@' in packager:
+        user = pagure.lib.search_user(SESSION, username=packager)
+        if user:
+            packager = user.default_email
+
     output = '<img class="avatar circle" src="%s"/>' % (
-        pagure.lib.avatar_url(packager, size, default)
+        avatar_url(packager, size)
     )
 
     return output
@@ -373,6 +378,7 @@ def int_to_rgb(percent):
     except ValueError:
         pass
     return output
+
 
 @APP.template_filter('return_md5')
 def return_md5(text):

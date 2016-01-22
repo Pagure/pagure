@@ -1989,17 +1989,6 @@ def update_user_ssh(session, user, ssh_key, keydir):
     session.flush()
 
 
-def avatar_url(username, size=64, default='retro'):
-    ''' Return the URL to be used for the avatar. '''
-    openid = "http://%s.id.fedoraproject.org/" % username
-    try:
-        return avatar_url_from_openid(openid, size, default)
-    except Exception as err:
-        pagure.LOG.debug('openid %s', openid)
-        pagure.LOG.debug(err)
-        return ''
-
-
 def avatar_url_from_openid(openid, size=64, default='retro', dns=False):
     """
     Our own implementation since fas doesn't support this nicely yet.
