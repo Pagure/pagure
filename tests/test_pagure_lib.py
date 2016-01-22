@@ -1080,13 +1080,13 @@ class PagureLibtests(tests.Modeltests):
         user = pagure.lib.search_user(self.session, username='foo')
         self.assertEqual(user.public_ssh_key, None)
 
-    def test_avatar_url(self):
-        """ Test the avatar_url of pagure.lib. """
-        output = pagure.lib.avatar_url('pingou')
+    def test_avatar_url_from_openid(self):
+        """ Test the avatar_url_from_openid of pagure.lib. """
+        output = pagure.lib.avatar_url_from_openid('pingou@fedoraproject.org')
         self.assertEqual(
             output,
             'https://seccdn.libravatar.org/avatar/'
-            '01fe73d687f4db328da1183f2a1b5b22962ca9d9c50f0728aafeac974856311c'
+            'b3ee7bb4de70b6522c2478df3b4cd6322b5ec5d62ac7ceb1128e3d4ff42f6928'
             '?s=64&d=retro')
 
     def test_fork_project(self):
