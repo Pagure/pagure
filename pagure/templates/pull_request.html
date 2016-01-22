@@ -50,7 +50,7 @@
 
   <h5 class="text-muted">
     Proposed <a href="#" data-toggle="tooltip" title="{{ pull_request.date_created.strftime('%b %d %Y %H:%M:%S') }}">{{ pull_request.date_created |humanize }}</a>
-    by {{ pull_request.user.user | avatar(16) | safe }} {{ pull_request.user.user }}
+    by {{ pull_request.user.default_email | avatar(16) | safe }} {{ pull_request.user.user }}
   </h5>
 
   From

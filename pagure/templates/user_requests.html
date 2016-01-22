@@ -40,7 +40,7 @@
         </tfoot>
         <tbody>
         {% for request in requests %}
-            <tr class="pr-status pr-status-{{request.status|lower}}" 
+            <tr class="pr-status pr-status-{{request.status|lower}}"
               {%if request.status|lower != "open" %}style="display:none;"{% endif %}>
                 <td class="nowrap"><span class="label label-default">PR#{{ request.id }}</span></td>
                 <td><span class="label {%
@@ -69,7 +69,7 @@
                 </td>
                 <td class="nowrap">
                   {% if request.assignee %}
-                  {{ request.assignee.user | avatar(16) | safe }}
+                  {{ request.assignee.default_email | avatar(16) | safe }}
                   {{ request.assignee.user }}
                   {% else %}
                   <span class="text-muted">unassigned</span>

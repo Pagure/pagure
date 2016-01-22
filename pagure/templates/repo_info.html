@@ -184,14 +184,14 @@ git push -u origin master</pre>
             <div class="m-b-2">
               <div>
                 <a href="{{ url_for('view_user', username=repo.user.user)}}">
-                  {{ repo.user.user | avatar(20) | safe }}
+                  {{ repo.user.default_email | avatar(20) | safe }}
                   {{ repo.user.fullname }} ({{ repo.user.user }})  -  creator
                 </a>
               </div>
               {% for user in repo.users %}
                 <div>
                   <a href="{{ url_for('view_user', username=user.user)}}">
-                    {{ user.user | avatar(20) | safe }}
+                    {{ user.default_email | avatar(20) | safe }}
                     {{ user.fullname }} ({{ user.user }})
                   </a>
                 </div>

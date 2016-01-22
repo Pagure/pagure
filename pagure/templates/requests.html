@@ -61,7 +61,7 @@
                   repo=repo.name, author=request.user.user,
                   assignee=assignee, status=status) }}"
                   title="Filter requests by reporter">
-                {{ request.user.user | avatar(16) | safe }}
+                {{ request.user.default_email | avatar(16) | safe }}
                 {{ request.user.user }}
               </a>
             </td>
@@ -71,7 +71,7 @@
                 repo=repo.name, assignee=request.assignee.username,
                 author=author, status=status) }}"
                 title="Filter issues by assignee">
-                {{ request.assignee.user | avatar(16) | safe }}
+                {{ request.assignee.default_email | avatar(16) | safe }}
                 {{ request.assignee.user }}
               </a>
               {% else %}

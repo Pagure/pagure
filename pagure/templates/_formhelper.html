@@ -101,7 +101,7 @@
 {% macro show_comment(comment, id, repo, username, issueid, form, repo_admin) %}
 <div class="card clearfix">
   <div id="comment-{{ id }}" class="card-header">
-        {{ comment.user.user | avatar(16) | safe }}
+        {{ comment.user.default_email | avatar(16) | safe }}
         <a href="{{ url_for('view_user', username=comment.user.user)}}">
           {{ comment.user.user }}
         </a> <a class="headerlink pull-xs-right" title="Permalink to this headline"

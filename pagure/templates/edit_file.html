@@ -50,7 +50,7 @@
                 endif %}>{{ email.email }}</option>
             {% endfor %}
           </select>
-          {{ user.username | avatar(16) | safe }}
+          {{ user.default_email | avatar(16) | safe }}
           {{ user.fullname }}
         </div>
       </fieldset>

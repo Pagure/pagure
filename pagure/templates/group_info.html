@@ -71,7 +71,7 @@
             {% for user in group.users %}
             <div class="list-group-item">
               <a href="{{ url_for('view_user', username=user.user)}}" title="{{ user.fullname }}" data-toggle="tooltip">
-                {{ user.user | avatar(28) | safe }}
+                {{ user.default_email | avatar(28) | safe }}
                 {{ user.user }}
               </a>
               {% if authenticated and user != group.creator and member %}

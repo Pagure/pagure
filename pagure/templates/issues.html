@@ -101,7 +101,7 @@
                     repo=repo.name, author=issue.user.user,
                     tags=tags, assignee=assignee, status=status) }}"
                     title="Filter issues by reporter">
-                    {{ issue.user.user | avatar(16) | safe }}
+                    {{ issue.user.default_email | avatar(16) | safe }}
                     {{ issue.user.user }}
                 </a>
             </td>
@@ -114,7 +114,7 @@
                 repo=repo.name, assignee=issue.assignee.username,
                 tags=tags, author=author, status=status) }}"
                 title="Filter issues by assignee">
-                {{ issue.assignee.user | avatar(16) | safe }}
+                {{ issue.assignee.default_email | avatar(16) | safe }}
                 {{ issue.assignee.user }}
               </a>
               {% else %}

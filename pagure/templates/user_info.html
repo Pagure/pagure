@@ -23,7 +23,7 @@
 <div class="p-t-2">
   <div class="container">
     <h2>
-        {{ username | avatar(36) | safe }} {{ username }}
+        {{ user.default_email | avatar(36) | safe }} {{ username }}
 
     </h2>
     <p title="{{ user.created.strftime('%Y-%m-%d') }}">
