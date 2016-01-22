@@ -217,7 +217,11 @@ git push -u origin master</pre>
                </div>
             {% endfor %}
             </div>
-            <h5><strong>Source GIT URLs</strong>{% if authenticated and repo_admin %}
+            <h5><strong>Source GIT URLs</strong>{% if
+              (authenticated and repo_admin) or
+              (config['DOC_APP_URL'] and repo and
+                      repo.settings.get('project_documentation', True))
+              %}
                   <span class="pull-xs-right"><a data-toggle="collapse" href="#moregiturls"
                   aria-expanded="false" aria-controls="moregiturls"
                   id="more_gits">more</a></span>{%endif%}</h5>
@@ -236,10 +240,12 @@ git push -u origin master</pre>
                     config.get('GIT_URL_GIT') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git" readonly>
                 </div>
               </div>
-              {% if authenticated and repo_admin %}
-                <div class="collapse" id="moregiturls">
-                  {% if config['DOC_APP_URL'] and repo and repo.settings.get('project_documentation', True) %}
+              <div class="collapse" id="moregiturls">
+                  {% if config['DOC_APP_URL']
+                      and repo
+                      and repo.settings.get('project_documentation', True) %}
                   <h5><strong>Docs GIT URLs</strong></h5>
+                  {% if authenticated and repo_admin %}
                   <div class="form-group">
                     <div class="input-group input-group-sm">
                       <div class="input-group-addon">SSH</span></div>
@@ -247,6 +253,7 @@ git push -u origin master</pre>
                         config.get('GIT_URL_SSH') }}docs/{{ repo.fullname }}.git" readonly>
                     </div>
                   </div>
+                  {% endif %}
                   <div class="form-group">
                     <div class="input-group input-group-sm">
                       <div class="input-group-addon">GIT</span></div>
@@ -255,6 +262,7 @@ git push -u origin master</pre>
                     </div>
                   </div>
                   {%endif%}
+              {% if authenticated and repo_admin %}
                   {% if config.get('ENABLE_TICKETS', True) %}
                   <h5><strong>Issues GIT URLs</strong></h5>
                   <div class="form-group">
@@ -262,13 +270,6 @@ git push -u origin master</pre>
                       <div class="input-group-addon">SSH</span></div>
                       <input class="form-control" type="text" value="{{
                         config.get('GIT_URL_SSH') }}tickets/{{ repo.fullname }}.git" readonly>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <div class="input-group input-group-sm">
-                      <div class="input-group-addon">GIT</span></div>
-                      <input class="form-control" type="text" value="{{
-                        config.get('GIT_URL_GIT') }}tickets/{{ repo.fullname }}.git" readonly>
                     </div>
                   </div>
                   {%endif%}
@@ -280,15 +281,10 @@ git push -u origin master</pre>
                         config.get('GIT_URL_SSH') }}requests/{{ repo.fullname }}.git" readonly>
                     </div>
                   </div>
-                  <div class="form-group">
-                    <div class="input-group input-group-sm">
-                      <div class="input-group-addon">GIT</span></div>
-                      <input class="form-control" type="text" value="{{
-                        config.get('GIT_URL_GIT') }}requests/{{ repo.fullname }}.git" readonly>
-                    </div>
-                  </div>
-                </div>
               {% endif %}
+                </div>
+                </div>
+              </div>
             </div>
         </div>
       </div>
