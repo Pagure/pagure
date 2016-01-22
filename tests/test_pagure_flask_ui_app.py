@@ -185,7 +185,9 @@ class PagureFlaskApptests(tests.Modeltests):
             data['csrf_token'] =  csrf_token
             output = self.app.post('/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<p>Project #1</p>' in output.data)
+            self.assertIn(
+                '<div class="projectinfo m-t-1 m-b-1">\nProject #1        </div>',
+                output.data)
             self.assertIn(
                 '</button>\n                      Project &#34;project-1&#34; created',
                 output.data)

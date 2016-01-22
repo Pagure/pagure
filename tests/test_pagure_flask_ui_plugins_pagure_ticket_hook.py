@@ -59,7 +59,9 @@ class PagureFlaskPluginPagureTicketHooktests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/settings/pagure tickets')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertIn(
+                '<div class="projectinfo m-t-1 m-b-1">\n'
+                'test project #1        </div>', output.data)
             self.assertTrue('<h3>pagure tickets settings</h3>' in output.data)
             self.assertTrue(
                 '<input id="active" name="active" type="checkbox" value="y">'
@@ -72,7 +74,9 @@ class PagureFlaskPluginPagureTicketHooktests(tests.Modeltests):
 
             output = self.app.post('/test/settings/pagure tickets', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertIn(
+                '<div class="projectinfo m-t-1 m-b-1">\n'
+                'test project #1        </div>', output.data)
             self.assertTrue('<h3>pagure tickets settings</h3>' in output.data)
             self.assertTrue(
                 '<input id="active" name="active" type="checkbox" value="y">'
@@ -101,7 +105,9 @@ class PagureFlaskPluginPagureTicketHooktests(tests.Modeltests):
 
             output = self.app.get('/test/settings/pagure tickets')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertIn(
+                '<div class="projectinfo m-t-1 m-b-1">\n'
+                'test project #1        </div>', output.data)
             self.assertTrue('<h3>pagure tickets settings</h3>' in output.data)
             self.assertTrue(
                 '<input id="active" name="active" type="checkbox" value="y">'
@@ -130,7 +136,9 @@ class PagureFlaskPluginPagureTicketHooktests(tests.Modeltests):
 
             output = self.app.get('/test/settings/pagure tickets')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertIn(
+                '<div class="projectinfo m-t-1 m-b-1">\n'
+                'test project #1        </div>', output.data)
             self.assertTrue('<h3>pagure tickets settings</h3>' in output.data)
             self.assertTrue(
                 '<input checked id="active" name="active" type="checkbox" '
@@ -155,7 +163,9 @@ class PagureFlaskPluginPagureTicketHooktests(tests.Modeltests):
 
             output = self.app.get('/test/settings/pagure tickets')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<p>test project #1</p>' in output.data)
+            self.assertIn(
+                '<div class="projectinfo m-t-1 m-b-1">\n'
+                'test project #1        </div>', output.data)
             self.assertTrue('<h3>pagure tickets settings</h3>' in output.data)
             self.assertTrue(
                 '<input id="active" name="active" type="checkbox" '

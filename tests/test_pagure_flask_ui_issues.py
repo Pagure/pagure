@@ -128,12 +128,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '</button>\n                      Issue created', output.data)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/1/edit">', output.data)
 
         # Project w/o issue tracker
         repo = pagure.lib.get_project(self.session, 'test')
@@ -188,12 +187,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '</button>\n                      Issue created', output.data)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/1/edit">', output.data)
 
         # Project w/o issue tracker
         repo = pagure.lib.get_project(self.session, 'test')
@@ -231,7 +229,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         output = self.app.get('/test/issues')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue('<p>test project #1</p>' in output.data)
+        self.assertIn(
+            'div class="projectinfo m-t-1 m-b-1">\ntest project #1        '
+            '</div>', output.data)
         self.assertTrue(
             '<h2 class="p-b-1">\n      0 Open Issues' in output.data)
 
@@ -251,27 +251,21 @@ class PagureFlaskIssuestests(tests.Modeltests):
         # Whole list
         output = self.app.get('/test/issues')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
         self.assertTrue(
             '<h2 class="p-b-1">\n      1 Open Issues' in output.data)
 
         # Status = closed
         output = self.app.get('/test/issues?status=cloSED')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
         self.assertTrue(
             '<h2 class="p-b-1">\n      0 Closed Issues' in output.data)
 
         # Status = fixed
         output = self.app.get('/test/issues?status=fixed')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
         self.assertTrue(
             '<h2 class="p-b-1">\n      0 Closed Issues' in output.data)
 
@@ -314,9 +308,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+        self.assertIn(
+            '<a class="btn btn-secondary btn-sm" href="/test/issue/1/edit">',
+            output.data)
         self.assertTrue(
             '<p><a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1'
             '">Login</a> to comment on this ticket.</p>'
@@ -326,9 +320,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+            '<a class="btn btn-secondary btn-sm" href="/test/issue/1/edit">',
+            output.data)
             self.assertFalse(
                 '<p><a href="/login/">Login</a> to comment on this ticket.</p>'
                 in output.data)
@@ -337,9 +331,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/1/edit">', output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -373,9 +367,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/2')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #2 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<span class="oi red-icon" data-glyph="lock-locked" '
+                'title="Private issue"></span>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/2/edit">', output.data)
 
         # Project w/o issue tracker
         repo = pagure.lib.get_project(self.session, 'test')
@@ -419,9 +418,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/1/edit">', output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -441,9 +442,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/1/edit">', output.data)
             self.assertFalse(
                 '<option selected value="Fixed">Fixed</option>'
                 in output.data)
@@ -452,9 +455,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/1/edit">', output.data)
             self.assertFalse(
                 '<option selected value="Fixed">Fixed</option>'
                 in output.data)
@@ -463,9 +468,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/1/edit">', output.data)
             self.assertIn(
                 '</button>\n                      Successfully edited issue #1',
                 output.data)
@@ -482,9 +489,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/1/edit">', output.data)
             self.assertIn(
                 '</button>\n                      Comment added',
                 output.data)
@@ -508,9 +517,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/1/edit">', output.data)
             self.assertIn(
                 '</button>\n                      Tag added: tag2',
                 output.data)
@@ -534,9 +545,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/1/edit">', output.data)
             self.assertIn(
                 '</button>\n                      No user &#34;ralph&#34; found',
                 output.data)
@@ -557,9 +570,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/1/edit">', output.data)
             self.assertIn(
                 '</button>\n                      Issue assigned',
                 output.data)
@@ -603,9 +618,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/2/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #2 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/2/edit">', output.data)
             self.assertIn(
                 '</button>\n                      You cannot close a ticket '
                 'that has ticket depending that are still open.',
@@ -676,9 +693,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/1/edit">', output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -691,9 +710,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/1/edit">', output.data)
             self.assertIn(
                 '</button>\n                      Comment added',
                 output.data)
@@ -730,9 +751,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/1/edit">', output.data)
             self.assertIn(
                 '</button>\n                      Comment removed',
                 output.data)
@@ -785,9 +808,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/1/edit">', output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -800,9 +825,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/1/edit">', output.data)
             self.assertIn(
                 '</button>\n                      Dependency added',
                 output.data)
@@ -815,9 +842,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/1/edit">', output.data)
             self.assertNotIn(
                 '</button>\n                      Dependency added', output.data)
 
@@ -865,9 +894,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/1/edit">', output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -880,9 +911,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/1/edit">', output.data)
             self.assertIn(
                 '</button>\n                      Dependency added',
                 output.data)
@@ -895,9 +928,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/1/edit">', output.data)
             self.assertNotIn(
                 '</button>\n                      Dependency added',
                 output.data)
@@ -936,9 +971,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/1/edit">', output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -1256,9 +1293,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/tag/tag1/edit', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
             self.assertIn(
                 '</button>\n                      Edited tag: tag1 to tag2',
                 output.data)
@@ -1451,9 +1487,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/1/edit">', output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -1466,9 +1504,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/1/edit">', output.data)
             self.assertIn(
                 '</button>\n                      Comment added',
                 output.data)
@@ -1507,9 +1547,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/1/edit">', output.data)
             self.assertIn(
                 '</button>\n                      Comment updated',
                 output.data)
@@ -1521,9 +1563,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/1/comment/1/edit')
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>test - Pagure</title>', output.data)
             self.assertTrue('<div id="edit">' in output.data)
             self.assertTrue('<section class="edit_comment">' in output.data)
             self.assertTrue(
@@ -1542,9 +1583,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<p>test project<a href="/test/issue/1"> #1</a></p>'
-                in output.data)
+            self.assertIn(
+                '<title>Issue #1 - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<a class="btn btn-secondary btn-sm" '
+                'href="/test/issue/1/edit">', output.data)
             self.assertIn(
                 '</button>\n                      Comment updated',
                 output.data)

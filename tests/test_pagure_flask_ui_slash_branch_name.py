@@ -141,7 +141,8 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
         output = self.app.get('/test')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<div class="card-block">            <h4>Admins</h4>', output.data)
+            '<div class="card-block">\n            '
+            '<h5><strong>Owners</strong></h5>', output.data)
         self.assertEqual(output.data.count(
             '<a class="dropdown-item" href="/test/branch/maxamilion/feature'),
             1)
@@ -164,7 +165,8 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
         output = self.app.get('/test/branch/maxamilion/feature')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<div class="card-block">            <h4>Admins</h4>', output.data)
+            '<div class="card-block">\n            '
+            '<h5><strong>Owners</strong></h5>', output.data)
         self.assertEqual(output.data.count(
             '<a class="dropdown-item" href="/test/branch/maxamilion/feature'),
             1)
