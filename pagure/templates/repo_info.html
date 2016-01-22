@@ -219,7 +219,8 @@ git push -u origin master</pre>
             </div>
             <h5><strong>Source GIT URLs</strong>{% if authenticated and repo_admin %}
                   <span class="pull-xs-right"><a data-toggle="collapse" href="#moregiturls"
-                  aria-expanded="false" aria-controls="moregiturls">more</a></span>{%endif%}</h5>
+                  aria-expanded="false" aria-controls="moregiturls"
+                  id="more_gits">more</a></span>{%endif%}</h5>
             <div>
               <div class="form-group">
                 <div class="input-group input-group-sm">
@@ -342,14 +343,10 @@ $(document).ready(function() {
 $(function() {
     $( "#more_gits" ).click(
       function() {
-        var _xgits = $(".extra_gits");
-        _xgits.toggle();
-        console.log(_xgits[0]);
-        console.log(_xgits.is(':visible'));
-        if (_xgits.is(':visible')) {
-            $( "#more_gits" ).html('less');
+        if ($( "#more_gits" ).html() == 'more') {
+          $( "#more_gits" ).html('less');
         } else {
-            $( "#more_gits" ).html('more');
+          $( "#more_gits" ).html('more');
         }
       }
     );
