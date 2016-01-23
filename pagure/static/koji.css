@@ -250,7 +250,7 @@ position:relative;
 }*/
 
 .nav-tabs .nav-link {
-    padding: 0.5em 0.8em;
+    padding: 0.5em 0.6em;
 }
 
 .red-icon {
@@ -392,3 +392,5 @@ top:30%;
 right:22px;
 color:#aaa;
 }
+
+.footer a, .footer a:hover { color: #d9d9d9; }
