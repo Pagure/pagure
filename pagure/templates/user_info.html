@@ -33,7 +33,7 @@
       <div class="col-md-8">
         {{ render_repos_as_card(repos, repos_length, 'Projects', 'repopage', repopage, total_page_repos) }}
         {{ render_repos_as_card(forks, forks_length,'Forks', 'forkpage', forkpage, total_page_forks) }}
-        {{render_contributions_graph(username)}}
+        {{ render_contributions_graph(username) }}
       </div>
       <div class="col-md-4">
         <div class="card" id="group_list">
