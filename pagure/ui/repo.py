@@ -277,6 +277,7 @@ def view_commits(repo, branchname=None, username=None):
         branch = repo_obj.lookup_branch(branchname)
     elif not repo_obj.is_empty and not repo_obj.head_is_unborn:
         branch = repo_obj.lookup_branch(repo_obj.head.shorthand)
+        branchname = branch.branch_name
     else:
         branch = None
 
