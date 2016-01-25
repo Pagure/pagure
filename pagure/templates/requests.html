@@ -160,7 +160,21 @@ $(function() {
       console.log("done");
       if (res.code == 'OK'){
         for (branch in res.message){
-          html = '<small><a class="dropdown-item" href="/{{repo.name}}/diff/'+ 'master..' + branch + '">From <span class="pr-toplabel"><span class="oi" data-glyph="document"> </span>{{repo.name}}</span> <span class="pr-toplabel"><span class="oi" data-glyph="random"> </span>'+branch+'</span></a></small> ';
+          var url = "{{ url_for(
+            'new_request_pull',
+            repo=repo.name,
+            username=repo.user.user if repo.is_fork else None,
+            branch_to=head,
+            branch_from='') }}";
+          html = '<small><a class="dropdown-item" href="' + url + branch + '">'
+            + 'From <span class="pr-toplabel">'
+              + '<span class="oi" data-glyph="document"> </span>'
+              + '{{ repo.name }}'
+            + '</span>'
+            + '<span class="pr-toplabel">'
+              + '<span class="oi" data-glyph="random"> </span>'
+              + branch
+            + '</span></a></small> ';
           $("#PR-dropdown .dropdown-menu").prepend(html);
         }
       }

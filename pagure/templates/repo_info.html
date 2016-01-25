@@ -371,6 +371,12 @@ $(function() {
     success: function(res) {
       if (res.code == 'OK'){
         for (branch in res.message){
+          var url = "{{ url_for(
+            'new_request_pull',
+            repo=repo.name,
+            username=repo.user.user if repo.is_fork else None,
+            branch_to=head,
+            branch_from='') }}";
           html = '<div class="alert alert-info" role="alert"> \
                 The branch ' + branch +' contains ' + res.message[branch].length
                 +  ' commits not in the main branch \
@@ -378,22 +384,20 @@ $(function() {
                 <span class="oi" data-glyph="random"> </span> \
                 {{ head }}</span> \
                 <div id="request_pull" class="pull-xs-right"> \
-                <a class="btn btn-primary btn-sm" href="/{{repo.name}}/diff/'
-                + '{{ head }}..' + branch + '"> Request pull </a> \
+                <a class="btn btn-primary btn-sm" href="' + url + branch + '"> Request pull </a> \
                 </div></div>';
           /*$($('.bodycontent').find('.row').children()[0]).before(html);*/
           {% if repo.is_fork %}
           html2 = '<div id="request_pull" class="pull-xs-right"> \
                 <a class="small label label-sm label-primary" data-toggle="tooltip" \
-                href="/fork/{{repo.user.user}}/{{repo.name}}/diff/'
-                + '{{ head }}..' + branch + '"\
+                href="' + url + branch + '"\
                  title="' + branch +' contains ' + res.message[branch].length+' \
                  commit not in the upstream project. Click to create new PR now.'+'"> New PR</a> \
                 </div></div>';
           {% else %}
           html2 = '<div id="request_pull" class="pull-xs-right"> \
                 <a class="small label label-sm label-primary" data-toggle="tooltip" \
-                href="/{{repo.name}}/diff/' + '{{ head }}..' + branch + '"\
+                href="' + url + branch + '"\
                  title="' + branch +' contains ' + res.message[branch].length+' \
                  commit not in the main branch. Click to create new PR now.'+'"> New PR</a> \
                 </div></div>';
