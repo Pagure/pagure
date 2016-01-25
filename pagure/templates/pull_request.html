@@ -796,10 +796,16 @@ function try_async_comment(form, inline) {
 </script>
 
 <script type="text/javascript">
-function updateHighlight() {
+function updateHighlight(onload) {
   var cls = "highlighted-line";
   $('.' + cls).removeClass(cls)
   if (location.hash !== '') {
+    if (onload) {
+        $('#request_diff').addClass('active');
+        $('#comments').removeClass('active');
+        $('[href="#request_diff"]').addClass('active');
+        $('[href="#comments"]').removeClass('active');
+    }
     var file = location.hash.substr(2).split(',')[0];
     var lines = location.hash.substr(4).split('-').map(function (x) { return parseInt(x, 10) });
     for (var i = lines[lines.length - 1]; i >= lines[0]; i--) {
@@ -807,7 +813,7 @@ function updateHighlight() {
     }
   }
 }
-$(document).ready(updateHighlight);
+$(document).ready(updateHighlight(true));
 $(window).on('hashchange', updateHighlight);
 var selected = [];
 $("[data-line-number]").click(function (ev) {
