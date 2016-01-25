@@ -813,7 +813,7 @@ function updateHighlight(onload) {
     }
   }
 }
-$(document).ready(updateHighlight(true));
+$(document).ready(function () { updateHighlight(true) } );
 $(window).on('hashchange', updateHighlight);
 var selected = [];
 $("[data-line-number]").click(function (ev) {
