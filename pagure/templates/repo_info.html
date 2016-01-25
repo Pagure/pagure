@@ -207,7 +207,8 @@ git push -u origin master</pre>
                   <span class="oi" data-glyph="random"></span> {{ branch }}
                 </a>
                 {% else %}
-                <span class="oi" data-glyph="star"></span> {{ branch }}
+                <span class="oi" data-glyph="star" title="current branch">
+                </span> {{ branch }}
                 {% endif %}
                 {#
                 {% if repo_admin and branchname and branchname != head %}
