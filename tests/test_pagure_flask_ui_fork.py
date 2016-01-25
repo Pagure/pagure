@@ -672,6 +672,8 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(tests.HERE, 'repos'), bare=True)
 
         output = self.app.get('/test/pull-requests')
         self.assertEqual(output.status_code, 200)
