@@ -12,6 +12,23 @@
     {{ status }} {% elif status|lower != 'open' -%}
     Closed/Merged {% endif -%}
     Pull Requests <span class="label label-default">{{ requests|count }}</span>
+    {% if authenticated and repo.settings.get('pull_requests', True) %}
+        <span id="request_pull" class="inline_it">
+
+        </span>
+
+    <div class="dropdown pull-xs-right" id="PR-dropdown">
+      <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        File Pull Request
+      </button>
+      <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+        <a class="dropdown-item" href="{{ url_for('new_remote_request_pull',
+        username=username, repo=repo.name) }}">
+          <small>Remote pull-request</small>
+        </a>
+      </div>
+    </div>
+    {%endif%}
   </h2>
 
 <div>
@@ -94,7 +111,7 @@
 
 {% block jscripts %}
 {{ super() }}
-{% if authenticated and repo_admin %}
+{% if authenticated %}
 <script type="text/javascript">
 
 $(function() {
@@ -103,24 +120,48 @@ $(function() {
     type: 'POST',
     data: {
       repo: "{{ repo.name }}",
-      repouser: "{{ repo.user.user if repo.is_fork else '' }}",
+      repouser: "{{ g.fas_user.username }}",
       csrf_token: "{{ form.csrf_token.current_token }}",
     },
     dataType: 'json',
+    error: function(res) {
+       console.log(res);
+    },
     success: function(res) {
+      console.log("done");
       if (res.code == 'OK'){
         for (branch in res.message){
-          html = '<div class="alert alert-info" role="alert"> \
-                The branch ' + branch +' contains ' + res.message[branch].length
-                +  ' commits not in the main branch \
-                <span class="pr-toplabel"> \
-                <span class="oi" data-glyph="random"> </span> \
-                {{ head }}</span> \
-                <div id="request_pull" class="pull-xs-right"> \
-                <a class="btn btn-primary btn-sm" href="/test/diff/'
-                + '{{ head }}..' + branch + '"> Request pull </a> \
-                </div></div>';
-          $($('.bodycontent').find('.card').children()[0]).before(html)
+          html = '<small><a class="dropdown-item" \
+          href="/fork/{{g.fas_user.username}}/{{repo.name}}/diff/'+ 'master..' + branch + '">From <span class="pr-toplabel"><span class="oi" data-glyph="fork"> </span>{{ g.fas_user.username }}/{{repo.name}}</span> <span class="pr-toplabel"><span class="oi" data-glyph="random"> </span>'+branch+'</span></a></small> ';
+          $("#PR-dropdown .dropdown-menu").prepend(html);
+        }
+      }
+    }
+  });
+});
+{% endif %}
+{% if authenticated and repo_admin %}
+
+
+$(function() {
+  $.ajax({
+    url: '{{ url_for("internal_ns.get_pull_request_ready_branch") }}' ,
+    type: 'POST',
+    data: {
+      repo: "{{ repo.name }}",
+      repouser: "",
+      csrf_token: "{{ form.csrf_token.current_token }}",
+    },
+    dataType: 'json',
+    error: function(res) {
+       console.log(res);
+    },
+    success: function(res) {
+      console.log("done");
+      if (res.code == 'OK'){
+        for (branch in res.message){
+          html = '<small><a class="dropdown-item" href="/{{repo.name}}/diff/'+ 'master..' + branch + '">From <span class="pr-toplabel"><span class="oi" data-glyph="document"> </span>{{repo.name}}</span> <span class="pr-toplabel"><span class="oi" data-glyph="random"> </span>'+branch+'</span></a></small> ';
+          $("#PR-dropdown .dropdown-menu").prepend(html);
         }
       }
     }
