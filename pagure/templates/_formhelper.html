@@ -170,11 +170,7 @@
     <section class="issue_comment">
       <div class="comment_body">
         {% autoescape false %}
-        {% if id == 0 %}
         {{ comment.content | markdown }}
-        {% else %}
-        {{ comment.comment | markdown }}
-        {% endif %}
         {% endautoescape %}
       </div>
     </section>
