@@ -163,6 +163,13 @@ def request_pulls(repo, username=None):
             author=author,
             count=True)
 
+    reponame = pagure.get_repo_path(repo)
+    repo_obj = pygit2.Repository(reponame)
+    if not repo_obj.is_empty and not repo_obj.head_is_unborn:
+        head = repo_obj.head.shorthand
+    else:
+        head = 'master'
+
     return flask.render_template(
         'requests.html',
         select='requests',
@@ -175,6 +182,7 @@ def request_pulls(repo, username=None):
         author=author,
         repo_admin=is_repo_admin(repo),
         form=pagure.forms.ConfirmationForm(),
+        head=head,
     )
 
 
