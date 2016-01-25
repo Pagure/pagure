@@ -401,3 +401,14 @@ color:#aaa;
     background-repeat: no-repeat;
     min-height: 150px;
 }
+
+.repoinfo-branchlistitem
+{
+ padding:3px 5px 3px 5px;
+}
+
+.repoinfo-activebranch
+{
+  background:#eee;
+  border:1px solid #ccc;
+}

@@ -180,7 +180,7 @@ git push -u origin master</pre>
       {% endif %}
         <div class="card">
           <div class="card-block">
-            <h5><strong>Owners</strong></h5>
+            <h5><strong title="pants">Owners</strong></h5>
             <div class="m-b-2">
               <div>
                 <a href="{{ url_for('view_user', username=repo.user.user)}}">
@@ -200,6 +200,20 @@ git push -u origin master</pre>
               <div>
                 <a href="{{ url_for('view_group', group=group.group_name)}}">
                   @{{ group.group_name }}
+                </a>
+              </div>
+              {% endfor %}
+            </div>
+            <h5><strong>Branches</strong></h5>
+            <div class="m-b-2">
+            {% for branch in branches %}
+              <div id="branch-{{branch}}" class="repoinfo-branchlistitem {% if branchname == branch %}repoinfo-activebranch{%endif%}">
+                {% if not branchname == branch %}
+                <a href="{{ url_for('view_repo_branch',
+                  username=username, repo=repo.name, branchname=branch) }}">
+                {% endif %}
+                  <span class="oi" data-glyph="random"></span> {{branch}}
+                {% if not branchname == branch %}
                 </a>
               </div>
               {% endfor %}
@@ -369,10 +383,28 @@ $(function() {
                 <span class="oi" data-glyph="random"> </span> \
                 {{ head }}</span> \
                 <div id="request_pull" class="pull-xs-right"> \
-                <a class="btn btn-primary btn-sm" href="/test/diff/'
+                <a class="btn btn-primary btn-sm" href="/{{repo.name}}/diff/'
                 + '{{ head }}..' + branch + '"> Request pull </a> \
                 </div></div>';
-          $($('.bodycontent').find('.row').children()[0]).before(html)
+          /*$($('.bodycontent').find('.row').children()[0]).before(html);*/
+          {% if repo.is_fork %}
+          html2 = '<div id="request_pull" class="pull-xs-right"> \
+                <a class="small label label-sm label-primary" data-toggle="tooltip" \
+                href="/fork/{{repo.user.user}}/{{repo.name}}/diff/'
+                + '{{ head }}..' + branch + '"\
+                 title="' + branch +' contains ' + res.message[branch].length+' \
+                 commit not in the upstream project. Click to create new PR now.'+'"> New PR</a> \
+                </div></div>';
+          {% else %}
+          html2 = '<div id="request_pull" class="pull-xs-right"> \
+                <a class="small label label-sm label-primary" data-toggle="tooltip" \
+                href="/{{repo.name}}/diff/' + '{{ head }}..' + branch + '"\
+                 title="' + branch +' contains ' + res.message[branch].length+' \
+                 commit not in the main branch. Click to create new PR now.'+'"> New PR</a> \
+                </div></div>';
+          {%endif%}
+          $('#branch-'+branch).append(html2);
+          $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
         }
       }
     }
