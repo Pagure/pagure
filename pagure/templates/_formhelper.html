@@ -160,7 +160,7 @@
 {% endmacro %}
 
 
-{% macro show_initial_comment(comment, id, repo, username, issueid, form, repo_admin, issue) %}
+{% macro show_initial_comment(comment, username, repo, issueid, repo_admin) %}
 <div class="clearfix p-b-3">
     <section class="issue_comment">
       <div class="comment_body">
@@ -177,10 +177,10 @@
           <a class="btn btn-secondary btn-sm" title="Reply to this comment - loose formating">
             reply
           </a>
-      {% if repo_admin or g.fas_user.username == issue.user.username %}
+      {% if repo_admin or (g.fas_user.username == comment.user.username) %}
       <a class="btn btn-secondary btn-sm" href="{{ url_for('edit_issue', username=username,
                     repo=repo.name, issueid=issueid) }}">
-          edit</a>
+           edit</a>
       {% endif %}
         </aside>
 </div>
