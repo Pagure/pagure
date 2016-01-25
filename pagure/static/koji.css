@@ -20,11 +20,6 @@ html
     background:#f3f3f3;
 }
 
-.repo-name
-{
-
-}
-
 .code_table {
     background: #FDF6E3;
     min-width: 100%;
@@ -228,7 +223,11 @@ color: #bbb;
 .repo_name
 {
   padding-top:4px;
-  padding-left:65px;
+  width: 80%;
+  padding-left: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .project_wrapper
