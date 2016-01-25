@@ -317,7 +317,7 @@ def author_to_user(author, size=16):
     user = pagure.lib.search_user(SESSION, email=author.email)
     if user:
         output = "%s <a href='%s'>%s</a>" % (
-            avatar(user.user, size),
+            avatar(user.default_email, size),
             flask.url_for('view_user', username=user.username),
             author.name,
         )
