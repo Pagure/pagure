@@ -308,7 +308,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 200)
-        self.assertIn(
+        # Not authentified = No edit
+        self.assertNotIn(
             '<a class="btn btn-secondary btn-sm" href="/test/issue/1/edit">',
             output.data)
         self.assertTrue(
@@ -320,7 +321,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
-            self.assertIn(
+            # Not author nor admin = No edit
+            self.assertNotIn(
             '<a class="btn btn-secondary btn-sm" href="/test/issue/1/edit">',
             output.data)
             self.assertFalse(
