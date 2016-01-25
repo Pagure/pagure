@@ -375,7 +375,7 @@ $(function() {
             'new_request_pull',
             repo=repo.name,
             username=repo.user.user if repo.is_fork else None,
-            branch_to=head,
+            branch_to=head or 'master',
             branch_from='') }}";
           html = '<div class="alert alert-info" role="alert"> \
                 The branch ' + branch +' contains ' + res.message[branch].length
