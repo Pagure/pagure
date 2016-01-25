@@ -138,11 +138,15 @@
           <a class="reply btn btn-secondary btn-sm" data-toggle="tooltip" title="Reply to this comment - loose formating">
             <span class="oi" data-glyph="share-boxed"></span>
           </a>
+          {% if id != 0 and g.fas_user and (
+              (comment.parent.status in [True, 'Open'] and g.fas_user.username == comment.user.username)
+              or repo_admin) %}
           <a class="btn btn-secondary btn-sm" href="{{ '%s/comment/%s/edit' % (request.base_url, comment.id) }}"
               class="edit_btn" data-comment="{{ comment.id }}"
               data-objid="{{ issueid }}">
               <span class="oi" data-glyph="pencil"></span>
           </a>
+          {% endif %}
           {% if id != 0 and g.fas_user and (
               (comment.parent.status in [True, 'Open'] and g.fas_user.username == comment.user.username)
               or repo_admin) %}
@@ -151,6 +155,7 @@
               title="Remove comment">
               <span class="oi" data-glyph="trash"></span>
           </button>
+
           {% endif %}
         </div>
       </div>
@@ -177,7 +182,8 @@
           <a class="btn btn-secondary btn-sm" title="Reply to this comment - loose formating">
             reply
           </a>
-      {% if repo_admin or (g.fas_user.username == comment.user.username) %}
+      {% if repo_admin or (
+            g.fas_user and g.fas_user.username == comment.user.username) %}
       <a class="btn btn-secondary btn-sm" href="{{ url_for('edit_issue', username=username,
                     repo=repo.name, issueid=issueid) }}">
           edit</a>
