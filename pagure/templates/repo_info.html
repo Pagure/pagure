@@ -209,6 +209,21 @@ git push -u origin master</pre>
                 {% else %}
                 <span class="oi" data-glyph="star"></span> {{ branch }}
                 {% endif %}
+                {#
+                {% if repo_admin and branchname and branchname != head %}
+                <form action="{{
+                  url_for('.delete_branch',
+                          username=username, repo=repo.name, branchname=branchname)
+                  }}" method="post" class="inline icon del_icon">
+                  {{ form.csrf_token }}
+                  <button class="btn btn-secondary repoinfo-branchlistitem"
+                      onclick="return confirm('Are you sure you want to remove this branch?\nThis cannot be un-done!');"
+                    title="Remove branch {{ branchname }}">
+                    <span class="oi" data-glyph="trash"></span>
+                  </button>
+                </form>
+                {% endif %}
+                #}
               </div>
               {% endfor %}
             </div>
