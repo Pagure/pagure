@@ -329,7 +329,7 @@ def author_to_avatar(author, size=32):
     """ Template filter transforming a pygit2 Author object into an avatar.
     """
     user = pagure.lib.search_user(SESSION, email=author.email)
-    output = user.user if user else author.name
+    output = user.default_email if user else author.email
     return avatar(output, size)
 
 
