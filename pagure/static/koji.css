@@ -284,22 +284,22 @@ position:relative;
 
 span.NO_CHANGE {
   padding-left: 20px;
-  background: url(/static/grey.png) 0 50% no-repeat;
+  background: url(images/grey.png) 0 50% no-repeat;
 }
 
 span.FFORWARD {
   padding-left: 20px;
-  background: url(/static/green.png) 0 50% no-repeat;
+  background: url(images/green.png) 0 50% no-repeat;
 }
 
 span.MERGE {
   padding-left: 20px;
-  background: url(/static/orange.png) 0 50% no-repeat;
+  background: url(images/orange.png) 0 50% no-repeat;
 }
 
 span.CONFLICTS {
   padding-left: 20px;
-  background: url(/static/red.png) 0 50% no-repeat;
+  background: url(images/red.png) 0 50% no-repeat;
 }
 
 .highlighted-line,
