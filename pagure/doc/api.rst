@@ -23,10 +23,14 @@ Request Encoding
 ~~~~~~~~~~~~~~~~
 
 The payload of POST and GET requests is encoded as
+
 ``application/x-www-form-urlencoded``.
 
+
 This is an example URL of a GET request:
+
 ``https://pagure.io/api/0/test/issues?status=Open&tags=Pagure&tags=Enhancement``
+
 
 Return Encoding
 ~~~~~~~~~~~~~~~
