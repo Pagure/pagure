@@ -342,7 +342,7 @@ btn-group-vertical > .btn-group::after, .btn-group-vertical > .btn-group::before
 {
   font-family: "Open Sans";
   background: transparent;
-padding:0;
+  padding: 0;
 }
 
 .card pre
@@ -357,12 +357,12 @@ a.notblue {
 
 #headerSearch .selectize-control.single .selectize-input::after
 {
-content: "\e08f";
-font-family: "Icons";
-border:none;
-top:30%;
-right:22px;
-color:#aaa;
+  content: "\e08f";
+  font-family: "Icons";
+  border:none;
+  top:30%;
+  right:22px;
+  color:#aaa;
 }
 
 .footer a, .footer a:hover { color: #d9d9d9; }
@@ -377,6 +377,22 @@ color:#aaa;
 .repoinfo-branchlistitem
 {
  padding:3px 5px 3px 5px;
+}
+
+.branch_name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.branch_del {
+  padding: 0px 0px;
+  margin: 0px 0px;
+}
+
+.branch_del .btn-secondary{
+  border: 0px;
+  color: #0275d8;
 }
 
 .repoinfo-activebranch

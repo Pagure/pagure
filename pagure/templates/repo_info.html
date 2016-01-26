@@ -200,31 +200,34 @@ git push -u origin master</pre>
             <h5><strong>Branches</strong></h5>
             <div class="m-b-2">
             {% for branch in branches %}
-              <div id="branch-{{branch}}" class="repoinfo-branchlistitem">
-                {% if not branchname == branch %}
-                <a href="{{ url_for('view_repo_branch',
-                  username=username, repo=repo.name, branchname=branch) }}">
-                  <span class="oi" data-glyph="random"></span> {{ branch }}
-                </a>
-                {% else %}
-                <span class="oi" data-glyph="star" title="current branch">
-                </span> {{ branch }}
-                {% endif %}
-                {#
-                {% if repo_admin and branchname and branchname != head %}
-                <form action="{{
-                  url_for('.delete_branch',
-                          username=username, repo=repo.name, branchname=branchname)
-                  }}" method="post" class="inline icon del_icon">
-                  {{ form.csrf_token }}
-                  <button class="btn btn-secondary repoinfo-branchlistitem"
-                      onclick="return confirm('Are you sure you want to remove this branch?\nThis cannot be un-done!');"
-                    title="Remove branch {{ branchname }}">
-                    <span class="oi" data-glyph="trash"></span>
-                  </button>
-                </form>
-                {% endif %}
-                #}
+              <div id="branch-{{branch}}" class="repoinfo-branchlistitem row">
+                <div class="branch_name col-md-8">
+                  {% if not branchname == branch %}
+                  <a class="" href="{{ url_for('view_repo_branch',
+                    username=username, repo=repo.name, branchname=branch) }}"
+                    title="{{ branch }}">
+                    <span class="oi" data-glyph="random"></span> {{ branch }}
+                  </a>
+                  {% else %}
+                  <span class="oi" data-glyph="star" title="current branch">
+                  </span> {{ branch }}
+                  {% endif %}
+                </div>
+                <div class="branch_del col-md-1">
+                  {% if repo_admin and branch != head %}
+                  <form action="{{
+                    url_for('.delete_branch',
+                            username=username, repo=repo.name, branchname=branch)
+                    }}" method="post" class="inline icon del_icon">
+                    {{ form.csrf_token }}
+                    <button class="btn btn-secondary repoinfo-branchlistitem"
+                        onclick="return confirm('Are you sure you want to remove the branch: {{ branch }}?\nThis cannot be un-done!');"
+                      title="Remove branch {{ branch }}">
+                      <span class="oi" data-glyph="trash"></span>
+                    </button>
+                  </form>
+                  {% endif %}
+                </div>
               </div>
               {% endfor %}
             </div>
@@ -383,19 +386,19 @@ $(function() {
                 <span class="pr-toplabel"> \
                 <span class="oi" data-glyph="random"> </span> \
                 {{ head }}</span> \
-                <div id="request_pull" class="pull-xs-right"> \
+                <div id="request_pull" class="col-md-2"> \
                 <a class="btn btn-primary btn-sm" href="' + url + branch + '"> Request pull </a> \
                 </div></div>';
           /*$($('.bodycontent').find('.row').children()[0]).before(html);*/
           {% if repo.is_fork %}
-          html2 = '<div id="request_pull" class="pull-xs-right"> \
+          html2 = '<div id="request_pull" class="col-md-2"> \
                 <a class="small label label-sm label-primary" data-toggle="tooltip" \
                 href="' + url + branch + '"\
                  title="' + branch +' contains ' + res.message[branch].length+' \
                  commit not in the upstream project. Click to create new PR now.'+'"> New PR</a> \
                 </div></div>';
           {% else %}
-          html2 = '<div id="request_pull" class="pull-xs-right"> \
+          html2 = '<div id="request_pull" class="col-md-2"> \
                 <a class="small label label-sm label-primary" data-toggle="tooltip" \
                 href="' + url + branch + '"\
                  title="' + branch +' contains ' + res.message[branch].length+' \
