@@ -47,4 +47,4 @@ This list is generated using
 The old pagure logo has been created by ``Micah Denn <micah.denn@gmail.com>``,
 the new one, as well as the entire version 2 of the user interface (using
 bootstrap) is the work of ``Ryan Lerch <rlerch@redhat.com>`` many thanks
-to them for his work and understanding during the process.
+to them for their work and understanding during the process.
