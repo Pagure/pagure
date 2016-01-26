@@ -55,10 +55,28 @@
 
   From
     <span class="pr-toplabel">{{ pull_request.project_from.fullname or pull_request.remote_git}}</span> <span class="pr-toplabel">
-    <span class="oi" data-glyph="random"> </span>{{ pull_request.branch_from }}</span>
+    <span class="oi" data-glyph="random"> </span>
+    <a href="{{ url_for('view_repo_branch',
+          username=pull_request.project_from.user.user
+            if pull_request.project_from.is_fork else None,
+          repo=pull_request.project_from.name,
+          branchname=pull_request.branch_from)
+        }}">
+    {{ pull_request.branch_from }}
+    </a>
+    </span>
   into
     <span class="pr-toplabel">{{ pull_request.project.fullname }}</span>
-    <span class="pr-toplabel"><span class="oi" data-glyph="random"></span> {{ pull_request.branch }}</span>
+    <span class="pr-toplabel"><span class="oi" data-glyph="random"></span>
+    <a href="{{ url_for('view_repo_branch',
+          username=pull_request.project.user.user
+            if pull_request.project.is_fork else None,
+          repo=pull_request.project.name,
+          branchname=pull_request.branch)
+        }}">
+    {{ pull_request.branch }}
+    </a>
+    </span>
 
 <div class="header">
   <div class="btn-group" role="group" >
