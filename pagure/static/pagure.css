@@ -384,3 +384,11 @@ color:#aaa;
   background:#eee;
   border:1px solid #ccc;
 }
+
+.api code {
+  padding: 0rem 0.4rem;
+}
+
+.api h3 {
+  padding-left: 1em;
+}

@@ -5,117 +5,134 @@
 {% set tag = "index" %}
 
 {% block content %}
+<div class="p-t-2 api">
+  <div class="container">
+    <header>
+        <h2 class="repo-name m-b-0">
+            <span class="oi" data-glyph="grid-three-up"></span>
+            &nbsp; Pagure API Reference
+        </h2>
+        <div class="m-t-0">
+          This documentation describes the Pagure API v{{ version[0] }}
+          revision {{ version[2] }}.
+        </div>
+        <div class="projectinfo m-t-1">
+        </div>
+    </header>
+    <div class="row">
+      <div class="col-md-10">
 
-<h1 class="title">Pagure API Reference</h1>
-<p>This documentation describes the Pagure API v0.</p>
+        {{ api_doc |replace('h1', 'h2') }}
 
-{{ api_doc |replace('h1', 'h2') }}
+        <h1>List of the API endpoints:</h1>
 
-<h1>List of the API endpoints:</h1>
+        <h2>
+            Projects
+            <a name="projects" title="Permalink to this headline" href="#projects">
+              <span class="oi" data-glyph="link-intact"></span>
+            </a>
+        </h2>
+        <div class="accordion">
+        {% for html in projects %}
+        {{ html | InsertDiv | safe }}
+        {% endfor %}
+        </div>
 
-<h2>
-    Projects
-    <a name="projects" title="Permalink to this headline" href="#projects">
-    <img src="{{ url_for('static', filename='images/link.png') }}" />
-    </a>
-</h2>
-<div class="accordion">
-{% for html in projects %}
-{{ html | InsertDiv | safe }}
-{% endfor %}
+        {% if issues %}
+        <h2>
+            Issues
+            <a name="users" title="Permalink to this headline" href="#issues">
+              <span class="oi" data-glyph="link-intact"></span>
+            </a>
+        </h2>
+        <div class="accordion">
+        {% for html in issues %}
+        {{ html | InsertDiv | safe }}
+        {% endfor %}
+        </div>
+        {% endif %}
+
+        <h2>
+            Pull-requests
+            <a name="users"title="Permalink to this headline" href="#pull-requests">
+              <span class="oi" data-glyph="link-intact"></span>
+            </a>
+        </h2>
+        <div class="accordion">
+        {% for html in requests %}
+        {{ html | InsertDiv | safe }}
+        {% endfor %}
+        </div>
+
+        <h2>
+            Users
+            <a name="users" title="Permalink to this headline" href="#users">
+              <span class="oi" data-glyph="link-intact"></span>
+            </a>
+        </h2>
+        <div class="accordion">
+        {% for html in users %}
+        {{ html | InsertDiv | safe }}
+        {% endfor %}
+        </div>
+
+        <h2>
+            Extras
+            <a name="extras" title="Permalink to this headline" href="#extras">
+              <span class="oi" data-glyph="link-intact"></span>
+            </a>
+        </h2>
+
+        <div class="accordion">
+        {% for html in extras %}
+        {{ html | InsertDiv |safe }}
+        {% endfor %}
+        </div>
+
+      </div>
+    </div>
+  </div>
 </div>
-
-{% if issues %}
-<h2>
-    Issues
-    <a name="users" title="Permalink to this headline" href="#users">
-    <img src="{{ url_for('static', filename='images/link.png') }}" />
-    </a>
-</h2>
-<div class="accordion">
-{% for html in issues %}
-{{ html | InsertDiv | safe }}
-{% endfor %}
-</div>
-{% endif %}
-
-<h2>
-    Pull-requests
-    <a name="users"title="Permalink to this headline" href="#users">
-    <img src="{{ url_for('static', filename='images/link.png') }}" />
-    </a>
-</h2>
-<div class="accordion">
-{% for html in requests %}
-{{ html | InsertDiv | safe }}
-{% endfor %}
-</div>
-
-<h2>
-    Users
-    <a name="users" title="Permalink to this headline" href="#users">
-    <img src="{{ url_for('static', filename='images/link.png') }}" />
-    </a>
-</h2>
-<div class="accordion">
-{% for html in users %}
-{{ html | InsertDiv | safe }}
-{% endfor %}
-</div>
-
-<h2>
-    Extras
-    <a name="extras" title="Permalink to this headline" href="#extras">
-    <img src="{{ url_for('static', filename='images/link.png') }}" />
-    </a>
-</h2>
-
-<div class="accordion">
-{% for html in extras %}
-{{ html | InsertDiv |safe }}
-{% endfor %}
-</div>
-
 {% endblock %}
 
 {% block jscripts %}
 {{ super() }}
 <script type="text/javascript">
 
-    $(function(){
-        $('.accordion').accordion({
-            active: false,
-            collapsible: true,
-            heightStyle: "content",
-            create: function (event, ui) {
-                $(this).children('h3').each(function (i) {
-                    // set id here because jQuery UI sets them as "ui-accordion-#-header-#"
-                    this.id = this.textContent.toLowerCase().replace(/\s+/g, '_');
-                    // add the anchor
-                    $(this).before('<a class="accordion-link link" data-index="' + i +
-                     '" href="#' + this.id + '"></a>');
-                });
-                $(this).find('.accordion-link').click(function () {
-                    // the active option requires a numeric value (not a string, e.g. "1")
-                    this.accordion( "option", "active", $(this).data('index') );
-                    // uncomment out the return false below to prevent the header jump
-                    return false;
-                });
-            }
-        });
+$(function(){
+  $('.accordion').accordion({
+    active: false,
+    collapsible: true,
+    heightStyle: "content",
+    create: function (event, ui) {
+      $(this).children('h3').each(function (i) {
+        // set id here because jQuery UI sets them as "ui-accordion-#-header-#"
+        this.id = this.textContent.toLowerCase().replace(/\s+/g, '_');
+        // add the anchor
+        $(this).before('<a class="accordion-link link" data-index="' + i +
+         '" href="#' + this.id + '"></a>');
+      });
+      $(this).find('.accordion-link').click(function () {
+        // the active option requires a numeric value (not a string, e.g. "1")
+        this.accordion( "option", "active", $(this).data('index') );
+        // uncomment out the return false below to prevent the header jump
+        return false;
+      });
+    }
+  });
 
-        if (window.location.hash) {
-            $('.accordion').each(function(){
-                var hashId = null;
-                $(this).children('h3').each(function (i) {
-                    var txt = this.textContent.toLowerCase().replace(/\s+/g, '_');
-                    if ( txt === window.location.hash.slice(1) ) {
-                        hashId = i;
-                    }
-                });
-                $(this).accordion( "option", "active", hashId );
-            });
+  if (window.location.hash) {
+    $('.accordion').each(function(){
+      var hashId = null;
+      $(this).children('h3').each(function (i) {
+        var txt = this.textContent.toLowerCase().replace(/\s+/g, '_');
+        if ( txt === window.location.hash.slice(1) ) {
+            hashId = i;
         }
+      });
+      $(this).accordion( "option", "active", hashId );
     });
+  }
+});
 </script>
 {% endblock %}
