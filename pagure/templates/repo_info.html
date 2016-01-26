@@ -218,10 +218,10 @@ git push -u origin master</pre>
                   <form action="{{
                     url_for('.delete_branch',
                             username=username, repo=repo.name, branchname=branch)
-                    }}" method="post" class="inline icon del_icon">
+                    }}" method="post" class="inline icon del_icon"
+                    onsubmit="return confirm('Are you sure you want to remove the branch: {{ branch }}?\nThis cannot be un-done!');">
                     {{ form.csrf_token }}
                     <button class="btn btn-secondary repoinfo-branchlistitem"
-                        onclick="return confirm('Are you sure you want to remove the branch: {{ branch }}?\nThis cannot be un-done!');"
                       title="Remove branch {{ branch }}">
                       <span class="oi" data-glyph="trash"></span>
                     </button>
