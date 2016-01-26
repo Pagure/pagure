@@ -44,5 +44,7 @@ This list is generated using
   git shortlog -s -n -e
 
 
-The pagure logo has been created by ``Micah Denn <micah.denn@gmail.com>``,
-many thanks to him for his work and understanding during the process.
+The old pagure logo has been created by ``Micah Denn <micah.denn@gmail.com>``,
+the new one, as well as the entire version 2 of the user interface (using
+bootstrap) is the work of ``Ryan Lerch <rlerch@redhat.com>`` many thanks
+to them for his work and understanding during the process.
