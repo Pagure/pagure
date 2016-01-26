@@ -345,6 +345,12 @@ def insert_div(content):
     for row in content:
         if row.startswith('<div class="document" id='):
             continue
+        if '<h1 class="title">' in row:
+            row = str(row).replace(
+                '<h1 class="title">',
+                '<h1 class="title">'
+                '<span class="oi" data-glyph="collapse-down"></span> &nbsp;'
+            )
         output.append(row)
     output = "\n".join(output)
     output = output.replace('</h1>', '</h1>\n<div>', 1)
