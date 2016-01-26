@@ -74,7 +74,7 @@
                 {{ user.default_email | avatar(28) | safe }}
                 {{ user.user }}
               </a>
-              {% if authenticated and user != group.creator and member %}
+              {% if authenticated and user != group.creator and (member or admin) %}
                <form class="pull-xs-right" method="POST" style="display: inline-block"
                 action="{{ url_for('group_user_delete',
                     group=group.group_name, user=user.user) }}">
