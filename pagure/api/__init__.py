@@ -449,6 +449,7 @@ def api():
 
     return flask.render_template(
         'api.html',
+        version=__api_version__,
         api_doc=APIDOC,
         projects=[
             api_git_tags_doc,
