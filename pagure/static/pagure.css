@@ -410,3 +410,17 @@ a.notblue {
 .api h3 {
   padding-left: 1em;
 }
+
+.addrem_bar {
+    display: inline-block;
+    width: 100%;
+    padding: 0px !important;
+    text-indent:4px;
+    text-align: left;
+    background-color: #FDD;
+}
+
+.addrem_bar > span {
+    display: block;
+    background-color: #DBFFDB;
+}

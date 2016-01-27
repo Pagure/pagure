@@ -7,18 +7,33 @@
 {% block repo %}
 
 
-  <h2 class="p-b-1">
+  <h2>
     {% if status and status != 'Open' %}
       {{ issues|count }} Closed Issues
     {% else %}
       {{ issues|count }} Open Issues
     {% endif %}
-
     <a class="pull-xs-right" href="{{ url_for('new_issue', username=username, repo=repo.name) }}">
       <button class="btn btn-success btn-sm">New Issue</button>
     </a>
   </h2>
+    {% if oth_issues %}
 
+    <div class="addrem_bar issues_pbar m-b-1">
+
+      {% if (issues | length + oth_issues) %}
+
+        <span style="width: {{ (100.0 * (1 - issues | length / (issues | length + oth_issues)))|round|int }}%">
+
+            {{ (100.0 * (1 - issues | length / (issues | length + oth_issues)))|round|int }}%
+
+        </span>
+
+      {% endif %}
+
+    </div>
+
+    {% endif %}
 
 <section id="tags">
   <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
