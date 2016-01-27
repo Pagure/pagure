@@ -203,7 +203,8 @@ git push -u origin master</pre>
               <div id="branch-{{branch}}" class="repoinfo-branchlistitem row">
                 <div class="branch_name{% if repo_admin %} col-md-8{% endif %}">
                   {% if repo_admin and branch == head %}
-                  <span class="oi text-muted" data-glyph="arrow-right"></span>
+                  <span class="oi text-muted" data-glyph="arrow-right"
+                  title="Default branch"></span>
                   {% else %}
                   <span class="oi text-muted" data-glyph="random"></span>
                   {% endif %}
