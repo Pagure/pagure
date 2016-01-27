@@ -390,6 +390,12 @@ a.notblue {
 .branch_del {
   padding: 0px 0px;
   margin: 0px 0px;
+  text-align: right;
+}
+
+.branch_del #delete_branch_form
+{
+display:inline;
 }
 
 .branch_del .btn-secondary{
