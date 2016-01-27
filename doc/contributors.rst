@@ -3,26 +3,29 @@ Contributors to pagure
 
 Pagure would be nothing without its contributors.
 
-On December 14, 2015 (release 0.1.36), the list looks as follow:
+On January 27, 2016 (release 1.0), the list looks as follow:
 
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  3266              Pierre-Yves Chibon <pingou@pingoured.fr>
+  3597              Pierre-Yves Chibon <pingou@pingoured.fr>
+    85              Ryan Lerch <rlerch@redhat.com>
     59              Johan Cwiklinski <johan@x-tnd.be>
+    47              farhaanbukhsh <farhaan.bukhsh@gmail.com>
     14              Ralph Bean <rbean@redhat.com>
     14              Sayan Chowdhury <sayan.chowdhury2012@gmail.com>
     13              Ghost-script <subho.prp@gmail.com>
     13              Mathieu Bridon <bochecha@fedoraproject.org>
+    12              Patrick Uiterwijk <puiterwijk@redhat.com>
      8              Lei Yang <yltt1234512@gmail.com>
-     6              Patrick Uiterwijk <puiterwijk@redhat.com>
      5              Gaurav Kumar <aavrug@gmail.com>
      5              yangl1996 <yltt1234512@gmail.com>
      4              Maciej Lasyk <maciek@lasyk.info>
+     4              Vivek Anand <vivekanand1101@gmail.com>
      3              Dhriti Shikhar <dhriti.shikhar.rokz@gmail.com>
      3              Kushal Khandelwal <kushal124@gmail.com>
-     3              farhaanbukhsh <farhaan.bukhsh@gmail.com>
      2              Daniel Mach <dmach@redhat.com>
+     2              Lubomír Sedlář <lsedlar@redhat.com>
      2              Ricky Elrod <ricky@elrod.me>
      2              Simo Sorce <simo@redhat.com>
      2              Till Maas <opensource@till.name>
@@ -30,7 +33,10 @@ Number of commits  Contributor
      1              David Caro <dcaroest@redhat.com>
      1              Jan Pokorný <jpokorny@redhat.com>
      1              Kunaal Jain <kunaalus@gmail.com>
+     1              Paul W. Frields <stickster@gmail.com>
+     1              Rahul Bajaj <rahulrb0509@gmail.com>
      1              Stanislav Ochotnicky <sochotnicky@redhat.com>
+     1              Yves Martin <ymartin1040@gmail.com>
      1              abhishek <abhishekarora12@gmail.com>
      1              jcvicelli <jcvicelli@gmail.com>
      1              pingou <pingou@fedoraproject.org>
