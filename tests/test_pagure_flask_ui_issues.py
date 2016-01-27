@@ -233,7 +233,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             'div class="projectinfo m-t-1 m-b-1">\ntest project #1        '
             '</div>', output.data)
         self.assertTrue(
-            '<h2 class="p-b-1">\n      0 Open Issues' in output.data)
+            '<h2>\n      0 Open Issues' in output.data)
 
         # Create issues to play with
         repo = pagure.lib.get_project(self.session, 'test')
@@ -253,21 +253,21 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn('<title>Issues - test - Pagure</title>', output.data)
         self.assertTrue(
-            '<h2 class="p-b-1">\n      1 Open Issues' in output.data)
+            '<h2>\n      1 Open Issues' in output.data)
 
         # Status = closed
         output = self.app.get('/test/issues?status=cloSED')
         self.assertEqual(output.status_code, 200)
         self.assertIn('<title>Issues - test - Pagure</title>', output.data)
         self.assertTrue(
-            '<h2 class="p-b-1">\n      0 Closed Issues' in output.data)
+            '<h2>\n      0 Closed Issues' in output.data)
 
         # Status = fixed
         output = self.app.get('/test/issues?status=fixed')
         self.assertEqual(output.status_code, 200)
         self.assertIn('<title>Issues - test - Pagure</title>', output.data)
         self.assertTrue(
-            '<h2 class="p-b-1">\n      0 Closed Issues' in output.data)
+            '<h2>\n      0 Closed Issues' in output.data)
 
         # Project w/o issue tracker
         repo = pagure.lib.get_project(self.session, 'test')
