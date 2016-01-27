@@ -393,9 +393,12 @@ a.notblue {
   text-align: right;
 }
 
-.branch_del #delete_branch_form
-{
-display:inline;
+.branch_del .label{
+  padding: 0.25em 0.3em;
+}
+
+.branch_del #delete_branch_form {
+  display:inline;
 }
 
 .branch_del .btn-secondary{
