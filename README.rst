@@ -24,7 +24,7 @@ Playground version: https://stg.pagure.io
 Get it running
 ==============
 
-* Install the system libraries needed::
+* Install the needed system libraries::
 
     sudo dnf install git python-virtualenv libgit2-devel \
                      libjpeg-devel gcc libffi-devel redhat-rpm-config
@@ -78,4 +78,4 @@ Get it running
     ./runserver.py --profile
 
 
-This will launch the application at http://0.0.0.0:5000
+This will launch the application at http://0.0.0.0:5000 or http://localhost:5000
