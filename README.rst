@@ -1,20 +1,21 @@
 Pagure
 ======
 
-:Author: Pierre-Yves Chibon <pingou@pingoured.fr>
+:Author:  Pierre-Yves Chibon <pingou@pingoured.fr>
 
 
-Pagure is a light-weight git-centered forge based on pygit2.
+Pagure is a git-centered forge, python based using pygit2.
 
-Currently, Pagure offers a decent web-interface for git repositories, a
-simplistic ticket system (that needs improvements) and possibilities to create
-new projects, fork existing ones and create/merge pull-requests across or
-within projects.
+With pagure you can host your project with its documentation, let your users
+report issues or request enhancements using the ticketing system and build your
+community of contributors by allowing them to fork your projects and contribute
+to it via the now-popular pull-request mechanism.
 
 
 Homepage: https://pagure.io/pagure
 
 See it at work: https://pagure.io
+
 
 Playground version: https://stg.pagure.io
 
@@ -23,53 +24,58 @@ Playground version: https://stg.pagure.io
 Get it running
 ==============
 
+* Install the system libraries needed::
+
+    sudo dnf install git python-virtualenv libgit2-devel \
+                     libjpeg-devel gcc libffi-devel redhat-rpm-config
+
+  .. note:: Do note the version of libgit2 that you install, for example in
+    ``libgit2-0.23.4-1`` you need to keep in mind the ``0.23``
+
 * Retrieve the sources::
 
     git clone https://pagure.io/pagure.git
     cd pagure
 
-
 * Install dependencies
 
-  * development virtualenv::
+  * create the virtualenv::
 
-      dnf install libgit2-devel
-      virtualenv devel
-      devel/bin/pip install -r requirements.txt
+      virtualenv pagure_env
+      source ./pagure_env/bin/activate
 
-  * Fedora RPMs::
+  * Install the correct version of pygit2::
 
-      dnf install $(cat requirements-fedora.txt)
+      pip install pygit2==<version of libgit2 found>.*
+
+    So in our example::
+
+      pip install pygit2==0.23.*
+
+  * Install the rest of the dependencies::
+
+      pip install -r requirements.txt
 
 
-* Create the folder that will receive the projects, forks, docs and tickets'
-  git repo::
+* Create the folder that will receive the projects, forks, docs, requests and
+  tickets' git repo::
 
-    mkdir {repos,docs,forks,tickets}
+    mkdir {repos,docs,forks,tickets,requests}
 
 
 * Create the inital database scheme::
-
-    # development virtualenv only
-    source devel/bin/activate
 
     python createdb.py
 
 
 * Run it::
 
-    # development virtualenv only
-    source devel/bin/activate
-
     ./runserver.py
 
 
 * To get some profiling information you can also run it as::
 
-    # development virtualenv only
-    source devel/bin/activate
-
     ./runserver.py --profile
 
 
-This will launch the application at http://127.0.0.1:5000
+This will launch the application at http://0.0.0.0:5000
