@@ -78,4 +78,4 @@ Get it running
     ./runserver.py --profile
 
 
-This will launch the application at http://0.0.0.0:5000 or http://localhost:5000
+This will launch the application at http://127.0.0.1:5000
