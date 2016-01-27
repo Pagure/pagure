@@ -824,8 +824,8 @@ function updateHighlight(onload) {
         $('[href="#request_diff"]').addClass('active');
         $('[href="#comments"]').removeClass('active');
     }
-    var file = location.hash.substr(2).split(',')[0];
-    var lines = location.hash.substr(4).split('-').map(function (x) { return parseInt(x, 10) });
+    var file = parseInt(location.hash.substr(2).split(',')[0], 10);
+    var lines = location.hash.split(',')[1].split('-').map(function (x) { return parseInt(x, 10) });
     for (var i = lines[lines.length - 1]; i >= lines[0]; i--) {
       $('#' + file + '_' + i).closest('tr').addClass(cls);
     }
