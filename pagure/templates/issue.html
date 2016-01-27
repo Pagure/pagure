@@ -385,6 +385,7 @@ function try_async_comment(form) {
       $(form).off('submit');
       form.submit();
     })
+  $(form).find('input[type="submit"]').removeAttr("disabled");
   return false;
 };
 {% endif %}
