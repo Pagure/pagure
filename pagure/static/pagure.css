@@ -23,6 +23,8 @@ html
 .code_table {
     background: #FDF6E3;
     min-width: 100%;
+    display:block;
+    overflow-x: auto;
 }
 
 .code_table tr td{
@@ -261,7 +263,7 @@ position:relative;
 }
 
 .prc {
-    width: 13px;
+    min-width: 13px;
 }
 
 .prc p {
