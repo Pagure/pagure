@@ -504,20 +504,21 @@ $( document ).ready(function() {
     }
   );
 
-    var available_tags = [];
-    {%for tog in tag_list %}
-      available_tags.push("{{tog.tag}}");
-    {%endfor%}
-    var items = available_tags.map(function(x) { return { item: x }; });
+  var available_tags = [];
+  {%for tog in tag_list %}
+    available_tags.push("{{tog.tag}}");
+  {%endfor%}
+  var items = available_tags.map(function(x) { return { item: x }; });
 
-    $('#tag').selectize({
-        delimiter: ',',
-        options: items,
-        persist: false,
-        create: true,
+  $('#tag').selectize({
+    delimiter: ',',
+    options: items,
+    persist: false,
+    create: true,
     labelField: "item",
-    valueField: "item"
-    });
+    valueField: "item",
+  });
+
   $( "#preview" ).hide();
   $( "#previewinmarkdown" ).click(
     function(event, ui) {
