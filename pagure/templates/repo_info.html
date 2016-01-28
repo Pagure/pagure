@@ -93,39 +93,39 @@ git push -u origin master</pre>
           {% endfor %}
         </div>
 
-       </div>
+      </div>
       {% endif %}
 
-        <div class="list-group m-t-1">
-          {% for commit in last_commits %}
-            <a href="{{ url_for('view_commit', username=username, repo=repo.name, commitid=commit.hex) }}"
-                class="list-group-item {%
-                  if diff_commits and commit.oid.hex in diff_commits %}p-l-3{%
-                  endif %}" style="position:relative;">
-              {% if diff_commits and commit.oid.hex in diff_commits %}
-                <div title="This commit is not in the main branch of this Repo"
-                    style="position:absolute; left:0; top:0; padding:5px;
-                           padding-top:20px; height:100%; background:#eee;
-                           vertical-align:middle;">
-                  <span class="oi" data-glyph="arrow-thick-right"></span>
-                </div>
-              {% endif %}
-              <h5>
-                <strong>{{ commit.message.split('\n')[0] }}</strong>
-                <div class="pull-xs-right">
-                  <span class="commitdate" title="{{ commit.commit_time|format_ts }}">
-                    {{ commit.commit_time|humanize }}
-                  </span>
-                </div>
-              </h5>
-              {{ commit.author | author2avatar(20) | safe }} {{ commit.author.name }}
-              <div class="pull-xs-right">
-                <span class="label label-default">{{ commit.hex|short }}</span>
+      <div class="list-group m-t-1">
+        {% for commit in last_commits %}
+          <a href="{{ url_for('view_commit', username=username, repo=repo.name, commitid=commit.hex) }}"
+              class="list-group-item {%
+                if diff_commits and commit.oid.hex in diff_commits %}p-l-3{%
+                endif %}" style="position:relative;">
+            {% if diff_commits and commit.oid.hex in diff_commits %}
+              <div title="This commit is not in the main branch of this Repo"
+                  style="position:absolute; left:0; top:0; padding:5px;
+                         padding-top:20px; height:100%; background:#eee;
+                         vertical-align:middle;">
+                <span class="oi" data-glyph="arrow-thick-right"></span>
               </div>
-            </a>
-          {% endfor %}
-        </div>
-      {% endif %}
+            {% endif %}
+            <h5>
+              <strong>{{ commit.message.split('\n')[0] }}</strong>
+              <div class="pull-xs-right">
+                <span class="commitdate" title="{{ commit.commit_time|format_ts }}">
+                  {{ commit.commit_time|humanize }}
+                </span>
+              </div>
+            </h5>
+            {{ commit.author | author2avatar(20) | safe }} {{ commit.author.name }}
+            <div class="pull-xs-right">
+              <span class="label label-default">{{ commit.hex|short }}</span>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    {% endif %}
 
       {% if total_page %}
         <nav class="text-center">
@@ -364,9 +364,9 @@ git push -u origin master</pre>
         </div>
         {% endif %}
       </div>
+  {% endif %}
     </div>
 
-  {% endif %}
 
 {% endblock %}
 
