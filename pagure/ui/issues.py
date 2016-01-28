@@ -427,6 +427,7 @@ def new_issue(repo, username=None):
         flask.abort(404, 'No issue tracker found for this project')
 
     status = pagure.lib.get_issue_statuses(SESSION)
+    status.remove('Fixed')
     form = pagure.forms.IssueForm(status=status)
     if form.validate_on_submit():
         title = form.title.data
