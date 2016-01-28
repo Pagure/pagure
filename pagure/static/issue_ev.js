@@ -14,10 +14,11 @@ clean_entry= function(text, element) {
 
 add_tags = function(data, _issues_url) {
   console.log('adding ' + data.added_tags);
-  var field = $('#taglist');
+
   var $select = $('#tag').selectize();
   var selectize = $select[0].selectize;
 
+  var field = $('#taglist');
   for (i=0; i<data.added_tags.length; i++ ){
     tag = data.added_tags[i]
     var html = '\n<a id="tag-' + tag + '" class="label label-default" href="'
@@ -140,15 +141,16 @@ add_comment = function(data) {
       </section> \
       <div class="issue_actions m-t-2"> \
         <aside class="issue_action icon pull-xs-right p-b-1"> \
-          <a class="reply btn btn-secondary btn-sm" data-toggle="tooltip" title="Reply to this comment - loose formating"> \
-            reply \
+        <div class="btn-group" aria-label="Basic example" role="group"> \
+        <a class="reply btn btn-secondary btn-sm" title="" data-toggle="tooltip" data-original-title="Reply to this comment - loose formating"> \
+            <span class="oi" data-glyph="share-boxed"></span> \
           </a> \
-          <a class="edit_btn" data-objid="' + data.issue_id
+          <a class="btn btn-secondary btn-sm" data-objid="' + data.issue_id
           + '" data-comment="' + data.comment_id
           + '" href="/test/issue/' + data.issue_id + '/comment/' + data.comment_id + '/edit"> \
-            <span class="icon icon-edit blue"></span> \
+            <span class="oi" data-glyph="pencil"></span> \
           </a> \
-          <button class="btn btn-danger btn-sm" \
+          <button class="btn btn-secondary btn-sm" \
             title="Remove comment" \
             name="drop_comment" value="' + data.comment_id + '" type="submit"  \
             onclick="return confirm(\'Do you really want to remove this comment?\');" \
