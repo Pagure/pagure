@@ -872,6 +872,7 @@ def edit_comment(session, parent, comment, user,
         topic=topic,
         msg={
             key: parent.to_json(public=True, with_comments=False),
+            'project': parent.project.to_json(public=True),
             'comment': comment.to_json(public=True),
             'agent': user_obj.username,
         },
