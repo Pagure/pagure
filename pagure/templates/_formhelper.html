@@ -167,7 +167,7 @@
 
 {% macro show_initial_comment(comment, username, repo, issueid, repo_admin) %}
 <div class="clearfix p-b-3">
-    <section class="issue_comment">
+    <section class="issue_comment" id="comment-0">
       <div class="comment_body">
         {% autoescape false %}
         {{ comment.content | markdown }}
