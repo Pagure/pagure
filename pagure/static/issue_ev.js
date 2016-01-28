@@ -15,43 +15,29 @@ clean_entry= function(text, element) {
 add_tags = function(data, _issues_url) {
   console.log('adding ' + data.added_tags);
   var field = $('#taglist');
-
+  var $select = $('#tag').selectize();
+  var selectize = $select[0].selectize;
 
   for (i=0; i<data.added_tags.length; i++ ){
     tag = data.added_tags[i]
     var html = '\n<a id="tag-' + tag + '" class="label label-default" href="'
                + _issues_url + '?tags=' + tag + '"> ' + tag + ' </a>';
     field.append(html);
+    selectize.createItem(tag);
   }
-
-  var input_field = $('#tag');
-  var _curval = input_field.val().split(',');
-  var _values = $.unique($.merge(data.added_tags, _curval));
-  var _out = '';
-
-  for (i=0; i<_values.length; i++ ){
-    tag = _values[i]
-    if (_out && _out != ',') {
-      _out += ',';
-    }
-    _out += tag;
-  }
-  input_field.val(_out);
-
 }
 
 remove_tags = function(data, _issues_url) {
   console.log('removing ' + data.removed_tags);
 
-  var input_field = $('#tag');
-  var _out = input_field.val();
+  var $select = $('#tag').selectize();
+  var selectize = $select[0].selectize;
 
   for (var i=0; i<data.removed_tags.length; i++ ){
     tag = data.removed_tags[i]
-    _out = clean_entry(_out, tag).join();
+    selectize.removeItem(tag);
     $('#tag-' + tag).remove();
   }
-  input_field.val(_out);
 }
 
 assigne_issue = function(data, _issues_url) {
