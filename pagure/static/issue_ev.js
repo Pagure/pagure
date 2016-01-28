@@ -41,24 +41,38 @@ remove_tags = function(data, _issues_url) {
 }
 
 assigne_issue = function(data, _issues_url) {
-  console.log('assigning ' + data.assigned);
-  var field = $('#assigneduser');
-  var _url = _issues_url + '?assignee=' + data.assigned.name + '">' + data.assigned.name + '</a>';
+  console.log('assigning ' + data.assigned.name);
+
+  var $select = $('#assignee').selectize();
+  var selectize = $select[0].selectize;
+  selectize.settings.create = true;
+  selectize.createItem(data.assigned.name);
+  selectize.settings.create = false;
+
+  var field = $('#assignee_plain');
+  var _url = '\n<a href="'
+        + _issues_url + '?assignee=' + data.assigned.name + '">'
+        + data.assigned.name + '</a>';
   field.html(_url);
-  field = $('#assignee');
-  field.val(data.assigned.name);
 }
 
 unassigne_issue = function(data) {
   console.log('un-assigning ');
-  var field = $('#assigneduser');
-  field.html(' ');
-  field = $('#assignee');
-  field.val('');
+
+  var $select = $('#assignee').selectize();
+  var selectize = $select[0].selectize;
+  selectize.setValue(null);
+
+  var field = $('#assignee_plain');
+  field.html('unassigned');
 }
 
 add_deps = function(data, issue_uid, _issue_url) {
   console.log('adding ' + data.added_dependency);
+
+  var $select = $('#depends').selectize();
+  var selectize = $select[0].selectize;
+
   if (data.issue_uid == issue_uid){
     if (data.type == "children"){
       var field = $('#blockers');

@@ -138,7 +138,7 @@
 
           <fieldset class="form-group issue-metadata-display">
             <label><strong>Assignee</strong></label>
-            <div>
+            <div id="assignee_plain">
               {% if issue.assignee %}
                   <a href="{{ url_for('view_issues', username=username, repo=repo.name, assignee=issue.assignee.username) }}">{{ issue.assignee.username }}</a>
               {% else %}
