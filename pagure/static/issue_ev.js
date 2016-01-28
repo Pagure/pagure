@@ -70,55 +70,51 @@ unassigne_issue = function(data) {
 add_deps = function(data, issue_uid, _issue_url) {
   console.log('adding ' + data.added_dependency);
 
-  var $select = $('#depends').selectize();
-  var selectize = $select[0].selectize;
-
+  var dep = data.added_dependency;
   if (data.issue_uid == issue_uid){
     if (data.type == "children"){
-      var field = $('#blockers');
-      var field2 = $('#blocks');
+      var $select = $('#blocks').selectize();
+      var field = $('#blocklist');
+      var _id = 'block';
     } else {
-      var field = $('#dependencies');
-      var field2 = $('#depends');
+      var $select = $('#depends').selectize();
+      var field = $('#dependlist');
+      var _id = 'depend';
     }
   }
-  var dep = data.added_dependency;
-  var _data = $.trim(field.html());
-  var _url = _issue_url.replace('/-123456789', '/' + dep) + dep + '</a>';
-  if (_data && _data != ',') {
-    _data += ',';
-  }
-  _data += _url;
-  field.html(_data);
 
-  var _curval = field2.val().split(',');
-  var _values = $.unique($.merge(data.added_dependency, _curval));
-  var _out = [];
+  var selectize = $select[0].selectize;
+  selectize.settings.create = true;
+  selectize.items.push(String(dep));
+  selectize.createItem(String(dep));
+  selectize.settings.create = false;
 
-  if (_out && _out != ',') {
-    _out += ',';
-  }
-  field2.val(_out + dep);
+  var input_field = $('#' + _id + 's');
+  input_field.val(selectize.items.join(','));
+
+  var html = '\n<a id="' + _id + '-' + dep + '" class="label label-default" href="'
+               + _issue_url.replace('/-123456789', '/' + dep) + '">#' + dep + '</a>';
+
+  field.append(html);
 }
 
 remove_deps = function(data, issue_uid, _issue_url) {
   console.log('Removing ' + data.removed_dependency);
   if (data.issue_uid == issue_uid){
     if (data.type == "children"){
-      var field = $('#dependencies');
-      var field2 = $('#depends');
+      var $select = $('#depends').selectize();
+      var _id = 'depend';
     } else {
-      var field = $('#blockers');
-      var field2 = $('#blocks');
+      var $select = $('#blocks').selectize();
+      var _id = 'block';
     }
   }
+
+  var selectize = $select[0].selectize;
+
   var dep = data.removed_dependency;
-  // Set links
-  var _data = $.trim(field.html()).split(',');
-  var _url = _issue_url.replace('/-123456789', '/' + dep) + dep + '</a>';
-  field.html(clean_entry(field.html(), _url).join());
-  // Set the value in the input field
-  field2.val(clean_entry(field2.val(), dep).join());
+  $('#' + _id + '-' + dep).remove();
+  selectize.removeItem(dep);
 }
 
 add_comment = function(data) {

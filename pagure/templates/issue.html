@@ -158,11 +158,12 @@
 
           <fieldset class="form-group issue-metadata-display">
             <label><strong>Blocked</strong></label>
-            <div>
+            <div id="blocklist">
               {% for ticket in issue.parents %}
-                  <a href="{{ url_for('view_issue', username=username,
+                <a id="block-{{ ticket.id }}" class="label label-default"
+                  href="{{ url_for('view_issue', username=username,
                             repo=repo.name, issueid=ticket.id)
-                  }}">{{ ticket.id }}</a>{%- if not loop.last -%},{%- endif -%}
+                  }}" >#{{ ticket.id }}</a>
               {% endfor %}
             </div>
           </fieldset>
@@ -177,11 +178,12 @@
 
           <fieldset class="form-group issue-metadata-display">
             <label><strong>Depends on</strong></label>
-            <div>
+            <div id="dependlist">
               {% for ticket in issue.children %}
-                  <a href="{{ url_for('view_issue', username=username,
+                <a id="depend-{{ ticket.id }}" class="label label-default"
+                  href="{{ url_for('view_issue', username=username,
                             repo=repo.name, issueid=ticket.id)
-                    }}">{{ ticket.id }}</a>{%- if not loop.last -%},{%- endif -%}
+                    }}">#{{ ticket.id }}</a>
               {% endfor %}
             </div>
           </fieldset>
@@ -346,9 +348,9 @@ source.addEventListener('message', function(e) {
   var _api_issues_url ='{{
     url_for('api_ns.api_view_issue', username=username,
             repo=repo.name, issueid='-123456789')}}';
-  var _issue_url ='<a href="{{
+  var _issue_url ='{{
     url_for('view_issue', username=username,
-            repo=repo.name, issueid='-123456789')}}">';
+            repo=repo.name, issueid='-123456789')}}';
   process_event(data, "{{ issue.uid }}", _issue_url,
                 _issues_url, _api_issues_url);
   setup_edit_btns();
@@ -432,68 +434,68 @@ $( document ).ready(function() {
       maxItems: 1,
       create: false,
       load: function(query, callback) {
-          if (!query.length) return callback();
-          $.getJSON(
-            "{{ url_for('api_ns.api_users') }}", {
-              pattern: query.term
-            },
-            function( data ) {
-              callback( data.users.map(function(x) { return { user: x }; }) );
-            }
-          );
+        if (!query.length) return callback();
+        $.getJSON(
+          "{{ url_for('api_ns.api_users') }}", {
+            pattern: query.term
+          },
+          function( data ) {
+            callback( data.users.map(function(x) { return { user: x }; }) );
+          }
+        );
       }
   });
 
   $('#blocks').selectize({
-      plugins: ['remove_button'],
-      valueField: 'id',
-      labelField: 'id',
-      searchField: ['id', 'title'],
-      preload: 'focus',
-      render: {
-          option: function(item, escape) {
-              return '<div><span>'+escape(item.id)+'</span> <span>'+escape(item.title)+'</span></div>';
-          },
-          item: function(item, escape) {
-              return '<div><span>#'+escape(item.id)+'</span></div>';
-          },
+    plugins: ['remove_button'],
+    valueField: 'id',
+    labelField: 'id',
+    searchField: ['id', 'title'],
+    preload: 'focus',
+    render: {
+      option: function(item, escape) {
+        return '<div><span>'+escape(item.id)+'</span> <span>'+escape(item.title)+'</span></div>';
       },
-      create: false,
-      load: function(query, callback) {
-          $.getJSON(
-            "{{ url_for('api_ns.api_view_issues', username=username, repo=repo.name) }}",
-            function( data ) {
-              console.log(data.issues);
-              callback(data.issues);
-            }
-          );
-      }
+      item: function(item, escape) {
+        return '<div><span>#'+escape(item.id)+'</span></div>';
+      },
+    },
+    create: false,
+    load: function(query, callback) {
+      $.getJSON(
+        "{{ url_for('api_ns.api_view_issues', username=username, repo=repo.name) }}",
+        function( data ) {
+          //console.log(data.issues);
+          callback(data.issues);
+        }
+      );
+    }
   });
 
   $('#depends').selectize({
-      plugins: ['remove_button'],
-      valueField: 'id',
-      labelField: 'id',
-      searchField: ['id', 'title'],
-      preload: 'focus',
-      render: {
-          option: function(item, escape) {
-              return '<div><span>'+escape(item.id)+'</span> <span>'+escape(item.title)+'</span></div>';
-          },
-          item: function(item, escape) {
-              return '<div><span>#'+escape(item.id)+'</span></div>';
-          },
+    plugins: ['remove_button'],
+    valueField: 'id',
+    labelField: 'id',
+    searchField: ['id', 'title'],
+    preload: 'focus',
+    render: {
+      option: function(item, escape) {
+        return '<div><span>'+escape(item.id)+'</span> <span>'+escape(item.title)+'</span></div>';
       },
-      create: false,
-      load: function(query, callback) {
-          $.getJSON(
-            "{{ url_for('api_ns.api_view_issues', username=username, repo=repo.name) }}",
-            function( data ) {
-              console.log(data.issues);
-              callback(data.issues);
-            }
-          );
-      }
+      item: function(item, escape) {
+        return '<div><span>#'+escape(item.id)+'</span></div>';
+      },
+    },
+    create: false,
+    load: function(query, callback) {
+      $.getJSON(
+        "{{ url_for('api_ns.api_view_issues', username=username, repo=repo.name) }}",
+        function( data ) {
+          //console.log(data.issues);
+          callback(data.issues);
+        }
+      );
+    }
   });
 
   $( "#clear_comment").click(
@@ -523,23 +525,23 @@ $( document ).ready(function() {
         var _text = $( "#comment" ).val();
         var _url = "{{ url_for('markdown_preview') }}";
           $.ajax({
-              url: _url ,
-              type: 'POST',
-              data: {
-                content: _text,
-                csrf_token: "{{ form.csrf_token.current_token }}",
-              },
-              dataType: 'html',
-              success: function(res) {
-                  $( "#preview" ).html(res);
-                  $( "#previewinmarkdown" ).removeClass("inactive");
-                  $( "#previewinmarkdown" ).addClass("active");
-                  $( "#comment" ).hide();
-                  $( "#preview" ).show();
-              },
-              error: function() {
-                  alert('Unable to generate preview!');
-              }
+            url: _url ,
+            type: 'POST',
+            data: {
+              content: _text,
+              csrf_token: "{{ form.csrf_token.current_token }}",
+            },
+            dataType: 'html',
+            success: function(res) {
+              $( "#preview" ).html(res);
+              $( "#previewinmarkdown" ).removeClass("inactive");
+              $( "#previewinmarkdown" ).addClass("active");
+              $( "#comment" ).hide();
+              $( "#preview" ).show();
+            },
+            error: function() {
+              alert('Unable to generate preview!');
+            }
           });
           return false;
         } else if ($( "#previewinmarkdown" ).hasClass("active")){
