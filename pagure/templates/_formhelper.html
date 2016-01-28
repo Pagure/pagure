@@ -113,12 +113,12 @@
   <div class="card-block">
 
     <section class="issue_comment">
-      <div class="comment_body">
+      <div>
         <span class="edit_date" title="{{
             comment.edited_on.strftime('%Y-%m-%d %H:%M:%S') if comment.edited_on
         }}">
         </span>
-        <span class="comment_text">
+        <span class="comment_text comment_body">
         {%- autoescape false %}
         {%- if id == 0 -%}
 {{ comment.content | markdown }}
@@ -169,13 +169,14 @@
 <div class="clearfix p-b-3">
     <section class="issue_comment" id="comment-0">
       <div class="comment_body">
-        {% autoescape false %}
-        {{ comment.content | markdown }}
-        {% endautoescape %}
+        {%- autoescape false -%}
+{{ comment.content | markdown }}
+        {%- endautoescape -%}
       </div>
     </section>
         <aside class="issue_action icon pull-xs-right">
-          <a class="btn btn-secondary btn-sm" title="Reply to this comment - loose formating">
+          <a class="btn btn-secondary btn-sm reply"
+            title="Reply to this comment - loose formating">
             reply
           </a>
       {% if repo_admin or (

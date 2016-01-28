@@ -279,12 +279,16 @@ function setup_reply_btns() {
   $(".reply").unbind();
   $( ".reply" ).click(
     function() {
-      var _section = $(this).parent().parent().parent();
+      if ($(this).attr('data-toggle')){
+        var _section = $(this).closest('.card-block');
+      } else {
+        var _section = $(this).closest('.clearfix');
+      }
       var _comment = _section.find('.comment_body');
       var _text = _comment.text().split("\n");
       var _output = new Array();
-      for (cnt = 0; cnt < _text.length - 1; cnt ++) {
-          _output[cnt] = '> ' + jQuery.trim(_text[cnt + 1]);
+      for (cnt = 0; cnt < _text.length ; cnt ++) {
+          _output[cnt] = '> ' + jQuery.trim(_text[cnt]);
       }
       $( "#comment" ).val(_output.join("\n"));
     }
@@ -318,9 +322,7 @@ $(document).ready(function() {
 
 });
 </script>
-    <script type="text/javascript">
 
-    </script>
 {% if config['EVENTSOURCE_SOURCE'] and not issue.private %}
 <script type="text/javascript"
   src="{{ url_for('static', filename='issue_ev.js') }}"></script>
@@ -400,7 +402,7 @@ function try_async_comment(form) {
 
 </script>
 {% endif %}
-<script>
+<script type="text/javascript">
 $( document ).ready(function() {
   var emojiStrategy;
   $.getJSON(
