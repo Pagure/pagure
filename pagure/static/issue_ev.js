@@ -186,8 +186,8 @@ update_issue = function(data) {
   for (i=0; i<data.fields.length; i++){
     var _f = data.fields[i];
     if (_f == 'status') {
-      var field = $('#status');
-      field.val(data.issue.status);
+      var field = $('#status').find('span');
+      field.html(data.issue.status);
     } else if (_f == 'title'){
       var field = $('#issuetitle');
       field.html(data.issue.title);
