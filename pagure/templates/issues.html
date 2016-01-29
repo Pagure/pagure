@@ -92,12 +92,16 @@
         <tr>
             <td>
               <span class="label label-default">#{{ issue.id }}</span>
+              {% if issue.private %}
+              <span class="oi red-icon" data-glyph="lock-locked" title="Private issue"></span>
+              {% endif %}
               <a href="{{ url_for('view_issue', username=username,
                          repo=repo.name, issueid=issue.id) }}">
                 {{ issue.title | noJS("img") | safe }}
               </a>
-              {% if issue.private %}
-              <span class="oi red-icon" data-glyph="lock-locked" title="Private issue"></span>
+               &nbsp;&nbsp;
+              {% if issue.comments|count > 0 %}
+              <span class="text-muted"><span class="oi" data-glyph="comment-square" title="Private issue"></span> {{issue.comments|count}}</span>
               {% endif %}
               {% for tag in issue.tags%}
                 <span class="label label-info">{{tag.tag}}</span>
