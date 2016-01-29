@@ -71,8 +71,7 @@
 <table id="pagure-issues-list" class="table table-hover table-striped m-b-0">
     <thead class="thead-default">
         <tr>
-            <th>#</th>
-            <th id="issue-title">Title</th>
+            <th id="issue-title">Issue</th>
             <th class="open_by">
                 Reporter&nbsp;(<a href="{{ url_for('view_issues', username=username,
                 repo=repo.name, tags=tags, assignee=assignee,
@@ -91,10 +90,8 @@
     <tbody>
     {% for issue in issues %}
         <tr>
-            <td sorttable_customkey={{issue.id}}>
-              #{{ issue.id }}
-            </td>
             <td>
+              <span class="label label-default">#{{ issue.id }}</span>
               <a href="{{ url_for('view_issue', username=username,
                          repo=repo.name, issueid=issue.id) }}">
                 {{ issue.title | noJS("img") | safe }}
