@@ -434,7 +434,7 @@ a.notblue {
     background-color: #DBFFDB;
 }
 
-.comment_body .comment_text img {
+.comment_body img {
     max-width: 100%;
     border: 5px solid #fff;
     box-shadow: 0 0 5px #999;
