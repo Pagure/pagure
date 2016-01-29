@@ -22,7 +22,7 @@ PROJECT_NAME_REGEX = '^[a-zA-z0-9_][a-zA-Z0-9-_]+$'
 class ProjectFormSimplified(wtf.Form):
     ''' Form to edit the description of a project. '''
     description = wtforms.TextField(
-        'description <span class="error">*</span>',
+        'Description <span class="error">*</span>',
         [wtforms.validators.Required()]
     )
     url = wtforms.TextField(
