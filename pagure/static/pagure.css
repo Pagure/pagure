@@ -433,3 +433,9 @@ a.notblue {
     display: block;
     background-color: #DBFFDB;
 }
+
+.comment_body .comment_text img {
+    max-width: 100%;
+    border: 5px solid #fff;
+    box-shadow: 0 0 5px #999;
+}
