@@ -12,18 +12,24 @@
   {% if repo.forks %}
   <div class="list-group">
     {% for fork in repo.forks %}
-      <a class="list-group-item" href="{{ url_for('view_repo', username=fork.user.user,
-                  repo=fork.name) }}">
+      <div class="list-group-item">
         <h5>
-          <strong>{{ fork.user.user }}/{{ fork.name }}</strong>
+          <strong><a href="{{ url_for('view_repo', username=fork.user.user,repo=fork.name) }}">
+              <span class="oi text-muted" data-glyph="fork"></span>
+              {{ fork.user.user }}/{{ fork.name }}
+          </a></strong>
           <div class="pull-xs-right">
+            <span>
+              <a href="{{ url_for('view_user', username=fork.user.user)}}">{{ fork.user.default_email | avatar(20) | safe }}
+                  {{ fork.user.fullname }}</a> forked this project
+            </span>
             <span class="commitdate" data-toggle="tooltip" title="{{
                 fork.date_created.strftime('%Y-%m-%d %H:%M:%S') }}">
-              Forked {{ fork.date_created|humanize }}
+                <strong>{{ fork.date_created|humanize }}</strong>
             </span>
           </div>
         </h5>
-      </a>
+      </div>
 
     {% endfor %}
   </div>
