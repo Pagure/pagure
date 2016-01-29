@@ -29,8 +29,8 @@ Get it running
     sudo dnf install git python-virtualenv libgit2-devel \
                      libjpeg-devel gcc libffi-devel redhat-rpm-config
 
-  .. note:: Do note the version of libgit2 that you install, for example in
-    ``libgit2-0.23.4-1`` you need to keep in mind the ``0.23``
+  .. note:: Do note the version of libgit2 that you install, for example
+            in ``libgit2-0.23.4-1`` you need to keep in mind the ``0.23``
 
 * Retrieve the sources::
 

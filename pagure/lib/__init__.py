@@ -2533,7 +2533,7 @@ def clean_input(text, ignore=None):
 
     tags = bleach.ALLOWED_TAGS + [
         'p', 'br', 'div', 'h1', 'h2', 'h3', 'table', 'td', 'tr', 'th',
-        'col', 'tbody', 'pre', 'img', 'hr', 'dl', 'dt', 'dd',
+        'col', 'tbody', 'pre', 'img', 'hr', 'dl', 'dt', 'dd', 'span',
     ]
     if ignore:
         for tag in ignore:
