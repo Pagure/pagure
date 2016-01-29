@@ -48,16 +48,19 @@
     {% for tag in tag_list %}
       {% if tag.tag in tags %}
         {% if status and status != 'Open' %}
-        <a class="btn btn-secondary btn-sm {% if tag.tag in tags%}active{%endif%}" href="{{ url_for('view_issues', username=username,
+        <a class="btn btn-secondary btn-sm {% if tag.tag in tags%}active{% endif %}"
+            href="{{ url_for('view_issues', username=username,
                  repo=repo.name, status='Closed') }}"
                    title="Filter issues by tag">
          {% else %}
-        <a class="btn btn-secondary btn-sm {% if tag.tag in tags%}active{%endif%}" href="{{ url_for('view_issues', username=username,
+        <a class="btn btn-secondary btn-sm {% if tag.tag in tags%}active{% endif %}"
+            href="{{ url_for('view_issues', username=username,
                  repo=repo.name) }}"
                    title="Filter issues by tag">
          {% endif %}
       {% else %}
-        <a class="btn btn-secondary btn-sm {% if tag.tag in tags%}active{%endif%}" href="{{ url_for('view_issues', username=username,
+        <a class="btn btn-secondary btn-sm {% if tag.tag in tags%}active{%endif%}"
+            href="{{ url_for('view_issues', username=username,
                    repo=repo.name, tags=tag.tag,
                    author=author, assignee=assignee, status=status) }}"
                    title="Filter issues by tag">
@@ -101,7 +104,11 @@
               </a>
                &nbsp;&nbsp;
               {% if issue.comments|count > 0 %}
-              <span class="text-muted"><span class="oi" data-glyph="comment-square" title="Private issue"></span> {{issue.comments|count}}</span>
+              <span class="text-muted">
+                <span class="oi" data-glyph="comment-square"
+                    title="Comments on the ticket"></span>
+                  {{issue.comments|count}}
+            </span>
               {% endif %}
               {% for tag in issue.tags%}
                 <span class="label label-info">{{tag.tag}}</span>
