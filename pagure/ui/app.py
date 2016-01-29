@@ -151,6 +151,8 @@ def view_users(username=None):
     page = flask.request.args.get('page', 1)
     try:
         page = int(page)
+        if page < 1:
+            page = 1
     except ValueError:
         page = 1
 
@@ -206,6 +208,8 @@ def view_projects(pattern=None):
 
     try:
         page = int(page)
+        if page < 1:
+            page = 1
     except ValueError:
         page = 1
 
@@ -261,12 +265,16 @@ def view_user(username):
     repopage = flask.request.args.get('repopage', 1)
     try:
         repopage = int(repopage)
+        if repopage < 1:
+            repopage = 1
     except ValueError:
         repopage = 1
 
     forkpage = flask.request.args.get('forkpage', 1)
     try:
         forkpage = int(forkpage)
+        if forkpage < 1:
+            forkpage = 1
     except ValueError:
         forkpage = 1
 
