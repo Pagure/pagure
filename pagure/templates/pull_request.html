@@ -814,10 +814,33 @@ function try_async_comment(form, inline) {
 </script>
 
 <script type="text/javascript">
+var cur_hash = null;
+
+function highlight_comment() {
+  var _hash = window.location.hash;
+  if (_hash != cur_hash) {
+    $( cur_hash ).css(
+      "background", "linear-gradient(to bottom, #ededed 0%, #fff 100%)"
+    );
+  };
+  cur_hash = _hash;
+  if ( _hash ) {
+    $( _hash ).css(
+      "background", "linear-gradient(to bottom, #eded98 0%, #fff 100%)"
+    );
+  };
+  return false;
+};
+
 function updateHighlight(onload) {
   var cls = "highlighted-line";
   $('.' + cls).removeClass(cls)
-  if (location.hash !== '') {
+  if (location.hash === '') {
+    return
+  }
+  if (location.hash.indexOf("comment-") > -1) {
+    highlight_comment();
+  } else {
     if (onload) {
         $('#request_diff').addClass('active');
         $('#comments').removeClass('active');
