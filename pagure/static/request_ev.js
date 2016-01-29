@@ -92,7 +92,7 @@ add_comment = function(data) {
   } else {
     // Generic comment
     console.log('generic');
-    var field = $($('#request_comment').find('form'));
+    var field = $('#request_comment');
     field.html(field.html() + _data);
   }
 }
