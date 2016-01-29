@@ -99,6 +99,9 @@
               {% if issue.private %}
               <span class="oi red-icon" data-glyph="lock-locked" title="Private issue"></span>
               {% endif %}
+              {% for tag in issue.tags%}
+                <span class="label label-info">{{tag.tag}}</span>
+              {% endfor%}
             </td>
             <td class="nowrap">
                 <a href="{{ url_for('view_issues', username=username,
