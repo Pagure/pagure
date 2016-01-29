@@ -72,12 +72,12 @@
     <thead class="thead-default">
         <tr>
             <th id="issue-title">Issue</th>
+            <th class="open_date">Opened</th>
             <th class="open_by">
                 Reporter&nbsp;(<a href="{{ url_for('view_issues', username=username,
                 repo=repo.name, tags=tags, assignee=assignee,
                 status=status) }}">reset</a>)
             </th>
-            <th class="open_date">Opened</th>
             <th class="assigned">
               Assignee&nbsp;(<a href="{{ url_for('view_issues', username=username,
                 repo=repo.name, tags=tags, author=author,
@@ -107,6 +107,10 @@
                 <span class="label label-info">{{tag.tag}}</span>
               {% endfor%}
             </td>
+            <td class="td-open_date nowrap">
+                <span title="{{issue.date_created.strftime('%Y-%m-%d %H:%M:%S')}}">{{
+                        issue.date_created | humanize}}</span>
+            </td>
             <td class="nowrap">
                 <a href="{{ url_for('view_issues', username=username,
                     repo=repo.name, author=issue.user.user,
@@ -115,9 +119,6 @@
                     {{ issue.user.default_email | avatar(16) | safe }}
                     {{ issue.user.user }}
                 </a>
-            </td>
-            <td class="td-open_date nowrap">
-                {{ issue.date_created.strftime('%Y-%m-%d %H:%M:%S') }}
             </td>
             <td class="nowrap">
               {% if issue.assignee %}
