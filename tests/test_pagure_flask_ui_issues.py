@@ -504,8 +504,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output.data)
             self.assertTrue(
                 '<p>Woohoo a second comment !</p>' in output.data)
-            self.assertEqual(
-                output.data.count('<div class="comment_body">'), 2)
+            self.assertEqual(output.data.count('comment_body">'), 2)
             self.assertTrue(
                 '<option selected value="Fixed">Fixed</option>'
                 in output.data)
@@ -532,8 +531,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output.data)
             self.assertTrue(
                 '<p>Woohoo a second comment !</p>' in output.data)
-            self.assertEqual(
-                output.data.count('<div class="comment_body">'), 2)
+            self.assertEqual(output.data.count('comment_body">'), 2)
             self.assertTrue(
                 '<option selected value="Fixed">Fixed</option>'
                 in output.data)
@@ -557,8 +555,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output.data)
             self.assertTrue(
                 '<p>Woohoo a second comment !</p>' in output.data)
-            self.assertEqual(
-                output.data.count('<div class="comment_body">'), 2)
+            self.assertEqual(output.data.count('comment_body">'), 2)
             self.assertTrue(
                 '<option selected value="Fixed">Fixed</option>'
                 in output.data)
@@ -584,8 +581,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<a href="/test/issues?assignee=pingou">' in output.data)
             self.assertTrue(
                 '<p>Woohoo a second comment !</p>' in output.data)
-            self.assertEqual(
-                output.data.count('<div class="comment_body">'), 2)
+            self.assertEqual(output.data.count('comment_body">'), 2)
             self.assertTrue(
                 '<option selected value="Fixed">Fixed</option>'
                 in output.data)
@@ -722,8 +718,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output.data)
             self.assertTrue(
                 '<p>Woohoo a second comment !</p>' in output.data)
-            self.assertEqual(
-                output.data.count('<div class="comment_body">'), 2)
+            self.assertEqual(output.data.count('comment_body">'), 2)
 
         repo = pagure.lib.get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
@@ -1205,9 +1200,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output.data)
             self.assertEqual(output.data.count(
                 '<option selected value="Open">Open</option>'), 1)
+            self.assertEqual(output.data.count('comment_body">'), 1)
             self.assertEqual(output.data.count(
-                '<div class="comment_body">\n'
-                '        <p>We should work on this!</p>'), 1)
+                '<p>We should work on this!</p>'), 1)
 
         # Project w/o issue tracker
         repo = pagure.lib.get_project(self.session, 'test')
@@ -1516,8 +1511,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output.data)
             self.assertTrue(
                 '<p>Woohoo a second comment !</p>' in output.data)
-            self.assertEqual(
-                output.data.count('<div class="comment_body">'), 2)
+            self.assertEqual(output.data.count('comment_body">'), 2)
 
         repo = pagure.lib.get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)

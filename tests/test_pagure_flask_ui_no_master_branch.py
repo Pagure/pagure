@@ -186,7 +186,7 @@ class PagureFlaskNoMasterBranchtests(tests.Modeltests):
         output = self.app.get('/test/commits')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<div class="list-group m-t-1">\n        </div>', output.data)
+            '<div class="list-group m-t-1">\n      </div>', output.data)
         self.assertNotIn(
             '<div class="btn-group pull-xs-right">', output.data)
 
@@ -198,7 +198,7 @@ class PagureFlaskNoMasterBranchtests(tests.Modeltests):
         self.assertIn('Add sources file for testing', output.data)
         self.assertIn('Add .gitignore file for testing', output.data)
         self.assertNotIn(
-            '<div class="list-group m-t-1">\n        </div>', output.data)
+            '<div class="list-group m-t-1">\n      </div>', output.data)
         self.assertEqual(
             output.data.count('class="list-group-item p-l-3"'), 2)
 
