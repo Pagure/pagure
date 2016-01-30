@@ -209,9 +209,9 @@ color: #bbb;
 
 .projecticon-search .oi
 {
-font-size: 2.5rem;
-line-height: 3rem;
-color: #bbb;
+  font-size: 2.5rem;
+  line-height: 3rem;
+  color: #bbb;
 }
 
 .repo_desc
@@ -233,9 +233,12 @@ color: #bbb;
 
 .project_wrapper
 {
-border:1px solid #ddd;
-position:relative;
+  border:1px solid #ddd;
+  position:relative;
+  border-radius: .25rem;
+  overflow: hidden;
 }
+
 .project_metadata
 {
 
@@ -244,6 +247,7 @@ position:relative;
    width:100%;
   margin-top:2px;
 }
+
 /*@media (min-width:768px) {
     .container {
         max-width:55pc
