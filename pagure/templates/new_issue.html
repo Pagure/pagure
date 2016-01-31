@@ -6,6 +6,11 @@
     %}Edit issue #{{ issueid }} {% endif %} - {{ repo.name }}{% endblock %}
 {% set tag = "home" %}
 
+{% block header %}
+<link href="{{ url_for('static', filename='emoji/emojione.sprites.css') }}"
+  rel="stylesheet" />
+{% endblock %}
+
 
 {% block repo %}
 <div class="row">
@@ -93,6 +98,12 @@
 
 {% block jscripts %}
 {{ super() }}
+<script type="text/javascript"
+    src="{{ url_for('static', filename='emoji/jquery.textcomplete.min.js') }}">
+</script>
+<script type="text/javascript"
+    src="{{ url_for('static', filename='emoji/emojione.min.js') }}">
+</script>
 <script type="text/javascript">
 {% if authenticated and form %}
 $(document).ready(function() {
@@ -107,6 +118,19 @@ $(document).ready(function() {
 
     $("#issue_content").val(_txt + '<!!image>');
   });
+
+  var emojiStrategy;
+  $.getJSON(
+    '{{ url_for("static", filename="emoji/emoji_strategy.json") }}',
+    function( data ) {
+      emojiStrategy =  data;
+    }
+  );
+
+  var folder = '{{url_for("static", filename="emoji/png/") }}';
+  var json_url = '{{ url_for("static", filename="emoji/emoji_strategy.json") }}';
+  emoji_complete(json_url, folder);
+
 });
 {% endif %}
 
@@ -125,7 +149,8 @@ $(function() {
                 },
                 dataType: 'html',
                 success: function(res) {
-                    $( "#preview" ).html(res);
+                    var preview = emojione.toImage(res);
+                    $( "#preview" ).html(preview);
                     $( "#previewinmarkdown" ).removeClass("inactive");
                     $( "#previewinmarkdown" ).addClass("active");
                     $( "#issue_content" ).hide();
