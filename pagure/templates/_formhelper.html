@@ -25,6 +25,10 @@
                     <span class="c-indicator"></span>
                     <strong>{{ field.label }}</strong>
                   </label>
+                  </br>
+                  {% if field_description %}
+                    <small class="text-muted">{{ field_description }}</small>
+                  {% endif %}
               {% else %}
                 <strong>{{ field.label }}</strong>
                 {{ field(class_=formclasses)|safe }}

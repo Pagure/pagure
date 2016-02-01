@@ -29,7 +29,7 @@ def same_password(form, field):
     ''' Check if the data in the field is the same as in the password field.
     '''
     if field.data != form.password.data:
-        raise wtf.ValidationError('Both password fields should be equal')
+        raise wtforms.validators.ValidationError('Both password fields should be equal')
 
 
 class LostPasswordForm(wtf.Form):
