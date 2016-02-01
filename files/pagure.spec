@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        1.0
+Version:        1.0.1
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -249,6 +249,28 @@ install -m 644 webhook-server/pagure_webhook.service \
 
 
 %changelog
+* Mon Feb 01 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 1.0.1-1
+- Update to 1.0.1
+- Improve the fork list (Ryan Lerch)
+- Make sure the images on comments do not exceed the size of the comment
+  box/area (Ryan Lerch)
+- Improve the page listing all issues (Ryan Lerch)
+- Include the project information when sending a fedmsg message about editing a
+  comment
+- Allow <span> tags in rst files so that the README shows fine
+- Fix linking directly to a specific comment in a PR
+- Fix adding comment in a PR via SSE
+- Fix updating issue information via SSE
+- Fix the reply buttons on the issue page
+- Remove the choice for a status when creating a new ticket (Farhaandukhsh)
+- Fix deleting a branch from the UI
+- Make the cards have rounded corners (Sayan Chowdhury)
+- Fix showing the description of form field (Vivek Anand)
+- Fix checking if the passwords added are the same (for local accounts)
+  (Vivek Anand)
+- Fix displaying emojis when previewing a comment on a ticket (Clement Verna)
+- Add support for emojis when creating a new ticket (Clement Verna)
+
 * Wed Jan 27 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 1.0-1
 - Update to 1.0
 - Entirely new UI thanks to the hard work on Ryan Lerch

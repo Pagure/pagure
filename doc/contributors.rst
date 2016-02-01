@@ -3,27 +3,28 @@ Contributors to pagure
 
 Pagure would be nothing without its contributors.
 
-On January 27, 2016 (release 1.0), the list looks as follow:
+On February 1, 2016 (release 1.0.1), the list looks as follow:
 
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  3597              Pierre-Yves Chibon <pingou@pingoured.fr>
-    85              Ryan Lerch <rlerch@redhat.com>
+  3618              Pierre-Yves Chibon <pingou@pingoured.fr>
+    94              Ryan Lerch <rlerch@redhat.com>
     59              Johan Cwiklinski <johan@x-tnd.be>
-    47              farhaanbukhsh <farhaan.bukhsh@gmail.com>
+    50              farhaanbukhsh <farhaan.bukhsh@gmail.com>
+    16              Sayan Chowdhury <sayan.chowdhury2012@gmail.com>
     14              Ralph Bean <rbean@redhat.com>
-    14              Sayan Chowdhury <sayan.chowdhury2012@gmail.com>
     13              Ghost-script <subho.prp@gmail.com>
     13              Mathieu Bridon <bochecha@fedoraproject.org>
     12              Patrick Uiterwijk <puiterwijk@redhat.com>
      8              Lei Yang <yltt1234512@gmail.com>
+     6              Vivek Anand <vivekanand1101@gmail.com>
      5              Gaurav Kumar <aavrug@gmail.com>
      5              yangl1996 <yltt1234512@gmail.com>
      4              Maciej Lasyk <maciek@lasyk.info>
-     4              Vivek Anand <vivekanand1101@gmail.com>
      3              Dhriti Shikhar <dhriti.shikhar.rokz@gmail.com>
      3              Kushal Khandelwal <kushal124@gmail.com>
+     2              Clement Verna <cverna@tutanota.com>
      2              Daniel Mach <dmach@redhat.com>
      2              Lubomír Sedlář <lsedlar@redhat.com>
      2              Ricky Elrod <ricky@elrod.me>
@@ -34,6 +35,7 @@ Number of commits  Contributor
      1              Jan Pokorný <jpokorny@redhat.com>
      1              Kunaal Jain <kunaalus@gmail.com>
      1              Paul W. Frields <stickster@gmail.com>
+     1              Pierre-YvesChibon <pingou@fedoraproject.org>
      1              Rahul Bajaj <rahulrb0509@gmail.com>
      1              Stanislav Ochotnicky <sochotnicky@redhat.com>
      1              Yves Martin <ymartin1040@gmail.com>
