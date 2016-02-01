@@ -536,7 +536,8 @@ $( document ).ready(function() {
             },
             dataType: 'html',
             success: function(res) {
-              $( "#preview" ).html(res);
+              var preview = emojione.toImage(res)
+              $( "#preview" ).html(preview);
               $( "#previewinmarkdown" ).removeClass("inactive");
               $( "#previewinmarkdown" ).addClass("active");
               $( "#comment" ).hide();
@@ -559,4 +560,3 @@ $( document ).ready(function() {
 });
 </script>
 {% endblock %}
-
