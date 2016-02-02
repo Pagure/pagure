@@ -100,8 +100,8 @@
                 {{ request.assignee.user }}
               </a>
               {% else %}
-              <a href="{{ url_for('request_pulls', username=username,
-                repo=repo.name, author=author, status=status) }}">(unassigned)</a>
+              <a class="text-muted" href="{{ url_for('request_pulls', username=username,
+                repo=repo.name, author=author, status=status) }}">unassigned</a>
               {% endif %}
             </td>
         </tr>
