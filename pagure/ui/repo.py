@@ -723,13 +723,14 @@ def view_tags(repo, username=None):
         flask.abort(404, 'Project not found')
 
     tags = pagure.lib.git.get_git_tags_objects(repo)
+    sorted_tags = sorted(tags, key=lambda tag: tag.name, reverse=True)
 
     return flask.render_template(
         'releases.html',
         select='tags',
         username=username,
         repo=repo,
-        tags=tags,
+        tags=sorted_tags,
         repo_admin=is_repo_admin(repo),
     )
 
