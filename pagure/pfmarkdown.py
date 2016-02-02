@@ -95,11 +95,18 @@ class ImplicitIssuePattern(markdown.inlinepatterns.Pattern):
 
         root = flask.request.url_root
         url = flask.request.url
-        user = None
-        if 'fork/' in flask.request.url:
-            user, repo = url.split('fork/')[1].split('/', 2)[:2]
-        else:
-            repo = url.split(root)[1].split('/', 1)[0]
+        repo = user = None
+
+        if flask.request.args.get('user'):
+            user = flask.request.args.get('user')
+        if flask.request.args.get('repo'):
+            repo = flask.request.args.get('repo')
+
+        if not user and not repo:
+            if 'fork/' in flask.request.url:
+                user, repo = url.split('fork/')[1].split('/', 2)[:2]
+            else:
+                repo = url.split(root)[1].split('/', 1)[0]
 
         if not _issue_exists(user, repo, idx):
             return text
