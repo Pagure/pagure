@@ -36,6 +36,8 @@ def index():
     page = flask.request.args.get('page', 1)
     try:
         page = int(page)
+        if page < 1:
+            page = 1
     except ValueError:
         page = 1
 
@@ -78,12 +80,16 @@ def index_auth():
     repopage = flask.request.args.get('repopage', 1)
     try:
         repopage = int(repopage)
+        if repopage < 1:
+            page = 1
     except ValueError:
         repopage = 1
 
     forkpage = flask.request.args.get('forkpage', 1)
     try:
         forkpage = int(forkpage)
+        if forkpage < 1:
+            page = 1
     except ValueError:
         forkpage = 1
 
@@ -130,6 +136,8 @@ def search():
     page = flask.request.args.get('page', 1)
     try:
         page = int(page)
+        if page < 1:
+            page = 1
     except ValueError:
         page = 1
 
