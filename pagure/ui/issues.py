@@ -469,7 +469,6 @@ def new_issue(repo, username=None):
                 SESSION.add(issue)
                 SESSION.commit()
 
-            flask.flash('Issue created')
             return flask.redirect(flask.url_for(
                 '.view_issue', username=username, repo=repo.name,
                 issueid=issue.id))

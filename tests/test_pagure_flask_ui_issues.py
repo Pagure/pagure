@@ -127,8 +127,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/new_issue', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '</button>\n                      Issue created', output.data)
-            self.assertIn(
                 '<title>Issue #1 - test - Pagure</title>', output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
@@ -185,8 +183,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             stream.close()
 
             self.assertEqual(output.status_code, 200)
-            self.assertIn(
-                '</button>\n                      Issue created', output.data)
             self.assertIn(
                 '<title>Issue #1 - test - Pagure</title>', output.data)
             self.assertIn(

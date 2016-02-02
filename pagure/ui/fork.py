@@ -931,7 +931,6 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
             )
             try:
                 SESSION.commit()
-                flask.flash('Request created')
             except SQLAlchemyError as err:  # pragma: no cover
                 SESSION.rollback()
                 APP.logger.exception(err)

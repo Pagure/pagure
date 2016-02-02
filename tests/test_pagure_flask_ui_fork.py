@@ -1359,9 +1359,6 @@ index 0000000..2a552bb
             self.assertIn(
                 '<title>PR#2: foo bar PR - test\n - Pagure</title>',
                 output.data)
-            self.assertIn(
-                '</button>\n                      Request created',
-                output.data)
 
     @patch('pagure.lib.notify.send_email')
     def test_new_request_pull_empty_repo(self, send_email):
