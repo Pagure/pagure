@@ -443,3 +443,9 @@ a.notblue {
     border: 5px solid #fff;
     box-shadow: 0 0 5px #999;
 }
+
+pre.softwrap
+{
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
