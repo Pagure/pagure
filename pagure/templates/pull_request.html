@@ -26,8 +26,11 @@
 <div class="row">
   <div class="{% if pull_request %}col-md-8{% elif form and (repo_admin or remote_git) %}col-md-12{%endif%}">
 {% if pull_request %}
-<h2><span class="label label-default">PR#{{requestid}}</span> {{ pull_request.title | noJS(ignore="img") | safe
-  }}
+<h3><span class="label label-default">PR#{{requestid}}</span>
+  {% if pull_request.status != 'Open'%}
+  <span class="label {{'label-success' if pull_request.status == 'Merged' else 'label-danger'}}">{{pull_request.status}}</span>
+  {% endif %}
+  {{ pull_request.title | noJS(ignore="img") | safe}}
   {% if authenticated and (g.fas_user.username == pull_request.user.username
     or repo_admin) and pull_request.status == 'Open'%}
      <span class="pull-xs-right">
@@ -54,7 +57,7 @@
     {% endif %}
     </span>
   {% endif %}
-</h2>
+</h3>
 
   <h5 class="text-muted">
     Proposed <a href="#" data-toggle="tooltip" title="{{ pull_request.date_created.strftime('%b %d %Y %H:%M:%S') }}">{{ pull_request.date_created |humanize }}</a>
@@ -86,17 +89,6 @@
     </a>
     </span>
 
-<div class="header">
-  <div class="btn-group" role="group" >
-    {% if pull_request.status != 'Open' %}
-     <span class="btn btn-default">{{ pull_request.status }} by
-        <a href="{{ url_for('view_user', username=pull_request.closed_by.user)}} ">
-          {{ pull_request.closed_by.user if pull_request.closed_by else ''}}
-        </a>
-     </span>
-    {% endif %}
-  </div>
-</div>
 {% elif form and (repo_admin or remote_git) %}
 <h2>Create pull request</h2>
 {% else %}
@@ -386,6 +378,16 @@
       {% endif %}
         <small id="merge-alert-message"></small>
       </div>
+      {% if pull_request.status != 'Open'%}
+      <div class="alert {{'alert-success' if pull_request.status == 'Merged' else 'alert-danger'}}
+                  text-xs-center" role="alert">
+       <div>{{ pull_request.status }} by
+          <a href="{{ url_for('view_user', username=pull_request.closed_by.user)}} ">
+            {{ pull_request.closed_by.user if pull_request.closed_by else ''}}
+          </a> {{pull_request.closed_at|humanize}}
+       </div>
+      </div>
+      {% endif %}
 
     {% if pull_request.flags %}
     <div class="card" id="pr_flags">
