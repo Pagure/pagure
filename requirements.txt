@@ -28,3 +28,4 @@ straight.plugin==1.4.0-post-1
 trollius-redis
 wtforms
 py-bcrypt
+html5lib # required by bleach
