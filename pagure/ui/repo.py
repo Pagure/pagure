@@ -38,6 +38,7 @@ import pagure
 import pagure.ui.plugins
 from pagure import (APP, SESSION, LOG, __get_file_in_tree, login_required,
                     is_repo_admin, admin_session_timedout)
+import re
 
 # pylint: disable=E1101
 
@@ -723,7 +724,23 @@ def view_tags(repo, username=None):
         flask.abort(404, 'Project not found')
 
     tags = pagure.lib.git.get_git_tags_objects(repo)
-    sorted_tags = sorted(tags, key=lambda tag: tag.name, reverse=True)
+
+    sorting_tuple = ()
+    sorted_tags = []
+    tags_sort = {}
+
+    for tag in tags:
+        splitted_tag = re.split('\W+',tag.name)
+        for item in splitted_tag :
+            if item.isdigit():
+                sorting_tuple +=(int(item),)
+            else:
+                sorting_tuple += (item,)
+        tags_sort [sorting_tuple] = tag
+        sorting_tuple = ()
+
+    for tag in sorted(tags_sort, reverse = True):
+        sorted_tags.append(tags_sort[tag])
 
     return flask.render_template(
         'releases.html',
