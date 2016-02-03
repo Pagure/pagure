@@ -157,7 +157,7 @@ def send_email(text, subject, to_mail,
         print 'in_reply_to: %s' % in_reply_to
         print 'mail_id: %s' % mail_id
         print 'Contents:'
-        print text
+        print text.encode('utf-8')
         print '*****/EMAIL******'
         return
 
