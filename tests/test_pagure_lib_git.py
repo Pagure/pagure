@@ -1313,6 +1313,115 @@ index 0000000..60f7480
             os.path.join(tests.HERE, 'forks', 'pingou', 'foo.test.git'))
         self.assertEqual(repo_name, 'pingou')
 
+    def test_get_git_tags_objects(self):
+        """ Test the get_git_tags_objects method of pagure.lib.git. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(tests.HERE, 'repos'), bare=True)
+        project = pagure.lib.get_project(self.session, 'test')
+
+        def get_tag_name(tags):
+            """ Return a list of the tag names """
+            output = []
+            for tag in tags:
+                output.append(tag.name)
+            return output
+
+        #Case 1 - project does not contains tags
+        exp = []
+        tags = pagure.lib.git.get_git_tags_objects(project)
+        self.assertEqual(exp,get_tag_name(tags))
+
+        #Case 2 - Simple sort
+        exp = ['0.1.0', '0.0.21', '0.0.12', '0.0.11', '0.0.3', '0.0.2', '0.0.1']
+
+        tests.add_readme_git_repo(os.path.join(os.path.join(tests.HERE, 'repos'), 'test.git'))
+        repo = pygit2.Repository(os.path.join(os.path.join(tests.HERE, 'repos'), 'test.git'))
+        first_commit = repo.revparse_single('HEAD')
+        tagger = pygit2.Signature('Alice Doe', 'adoe@example.com', 12347, 0)
+        repo.create_tag(
+            "0.0.1", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
+            "Release 0.0.1")
+        repo.create_tag(
+            "0.1.0", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
+            "Release 0.1.0")
+        repo.create_tag(
+            "0.0.2", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
+            "Release 0.0.2")
+        repo.create_tag(
+            "0.0.3", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
+            "Release 0.0.3")
+        repo.create_tag(
+            "0.0.11", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
+            "Release 0.0.11")
+        repo.create_tag(
+            "0.0.12", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
+            "Release 0.0.12")
+        repo.create_tag(
+            "0.0.21", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
+            "Release 0.0.21")
+
+        tags = pagure.lib.git.get_git_tags_objects(project)
+        self.assertEqual(exp,get_tag_name(tags))
+
+        #Case 3 Sorting with alpha and beta
+        exp = ['0.1.0', '0.0.21', '0.0.12-beta', '0.0.12-alpha', '0.0.12', '0.0.11', '0.0.3', '0.0.2', '0.0.1']
+
+        repo.create_tag(
+            "0.0.12-alpha", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
+            "Release 0.0.12")
+        repo.create_tag(
+            "0.0.12-beta", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
+            "Release 0.0.12")
+
+        tags = pagure.lib.git.get_git_tags_objects(project)
+        self.assertEqual(exp,get_tag_name(tags))
+
+        #Case 4 - Sorting with different splitting characters
+        project = pagure.lib.get_project(self.session, 'test2')
+        exp = ['15.1-0_0', '1.0-0_14', '1.0-0_2', '1.0-0_1', '0.1-1_0', '0.1-0_0', '0.0-2_0', '0.0-1_34', '0.0-1_11', '0.0-1_3', '0.0-1_2', '0.0-1_1']
+        tests.add_readme_git_repo(os.path.join(os.path.join(tests.HERE, 'repos'), 'test2.git'))
+        repo = pygit2.Repository(os.path.join(os.path.join(tests.HERE, 'repos'), 'test2.git'))
+        first_commit = repo.revparse_single('HEAD')
+        tagger = pygit2.Signature('Alice Doe', 'adoe@example.com', 12347, 0)
+        repo.create_tag(
+            "0.0-1_1", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
+            "Release 0.0-1_1")
+        repo.create_tag(
+            "0.0-1_3", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
+            "Release 0.0-1_3")
+        repo.create_tag(
+            "0.0-1_11", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
+            "Release 0.0-1_11")
+        repo.create_tag(
+            "0.0-1_2", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
+            "Release 0.0-1_2")
+        repo.create_tag(
+            "0.1-0_0", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
+            "Release 0.1-0_0")
+        repo.create_tag(
+            "0.1-1_0", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
+            "Release 0.1-1_0")
+        repo.create_tag(
+            "0.0-1_34", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
+            "Release 0.0-1_34")
+        repo.create_tag(
+            "0.0-2_0", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
+            "Release 0.0-2_0")
+        repo.create_tag(
+            "1.0-0_1", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
+            "Release 1.0-0_1")
+        repo.create_tag(
+            "1.0-0_14", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
+            "Release 1.0-0_14")
+        repo.create_tag(
+            "1.0-0_2", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
+            "Release 1.0-0_2")
+        repo.create_tag(
+            "15.1-0_0", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
+            "Release 15.1-0_0")
+
+        tags = pagure.lib.git.get_git_tags_objects(project)
+        self.assertEqual(exp,get_tag_name(tags))
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibGittests)

@@ -16,6 +16,7 @@ import os
 import shutil
 import subprocess
 import tempfile
+import re
 
 import pygit2
 import werkzeug
@@ -1194,6 +1195,8 @@ def get_git_tags(project):
 def get_git_tags_objects(project):
     """ Returns the list of references of the tags created in the git
     repositorie the specified project.
+    The list is sorted using the tag name and returns the highest release
+    version first.
     """
     repopath = pagure.get_repo_path(project)
     repo_obj = PagureRepo(repopath)
@@ -1203,4 +1206,23 @@ def get_git_tags_objects(project):
         if 'refs/tags/' in tag and repo_obj.lookup_reference(tag)
     ]
 
-    return tags
+    sorted_tags = []
+    tags_sort = {}
+
+    for tag in tags:
+        #Split the git tag name using any non-alphanumeric character
+        #and store each element returned in a tuple.
+        splitted_tag = re.split('[^a-zA-Z0-9]+', tag.name)
+        sorting_tuple = ()
+        for item in splitted_tag:
+            #Cast the result to an integer when possible
+            if item.isdigit():
+                sorting_tuple += (int(item),)
+            else:
+                sorting_tuple += (item,)
+        tags_sort[sorting_tuple] = tag
+
+    for tag in sorted(tags_sort, reverse = True):
+        sorted_tags.append(tags_sort[tag])
+
+    return sorted_tags
