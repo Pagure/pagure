@@ -208,7 +208,8 @@ def notify_new_comment(comment, user=None):
     ''' Notify the people following an issue that a new comment was added
     to the issue.
     '''
-    text = """
+
+    text = u"""
 %s added a new comment to an issue you are following:
 ``
 %s
@@ -244,7 +245,7 @@ def notify_new_issue(issue, user=None):
     ''' Notify the people following a project that a new issue was added
     to it.
     '''
-    text = """
+    text = u"""
 %s reported a new issue against the project: `%s` that you are following:
 ``
 %s
@@ -279,7 +280,7 @@ def notify_assigned_issue(issue, new_assignee, user):
     action = 'reset'
     if new_assignee:
         action = 'assigned to `%s`' % new_assignee.user
-    text = """
+    text = u"""
 The issue: `%s` of project: `%s` has been %s by %s.
 
 %s
@@ -315,7 +316,7 @@ def notify_assigned_request(request, new_assignee, user):
     action = 'reset'
     if new_assignee:
         action = 'assigned to `%s`' % new_assignee.user
-    text = """
+    text = u"""
 The pull-request: `%s` of project: `%s` has been %s by %s.
 
 %s
@@ -349,7 +350,7 @@ def notify_new_pull_request(request):
     ''' Notify the people following a project that a new pull-request was
     added to it.
     '''
-    text = """
+    text = u"""
 %s opened a new pull-request against the project: `%s` that you are following:
 ``
 %s
@@ -381,7 +382,7 @@ def notify_merge_pull_request(request, user):
     ''' Notify the people following a project that a pull-request was merged
     in it.
     '''
-    text = """
+    text = u"""
 %s merged a pull-request against the project: `%s` that you are following.
 
 Merged pull-request:
@@ -416,7 +417,7 @@ def notify_cancelled_pull_request(request, user):
     ''' Notify the people following a project that a pull-request was
     cancelled in it.
     '''
-    text = """
+    text = u"""
 %s canceled a pull-request against the project: `%s` that you are following.
 
 Cancelled pull-request:
@@ -451,7 +452,7 @@ def notify_pull_request_comment(comment, user):
     ''' Notify the people following a pull-request that a new comment was
     added to it.
     '''
-    text = """
+    text = u"""
 %s commented on the pull-request: `%s` that you are following:
 ``
 %s
@@ -495,7 +496,7 @@ def notify_new_email(email, user):
         flask.url_for('confirm_email', token=email.token),
     )
 
-    text = """Dear %(username)s,
+    text = u"""Dear %(username)s,
 
 You have registered a new email on pagure at %(root_url)s.
 
