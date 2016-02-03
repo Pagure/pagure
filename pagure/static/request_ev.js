@@ -1,9 +1,9 @@
-add_comment = function(data) {
+add_comment = function(data, username) {
   console.log('Adding comment ' + data.comment_added);
   var field = $('#comments');
-  var edit_btn = '<a class="btn btn-secondary btn-sm" \
-        " href="/test/pull-request/' + data.request_id + '/comment/' + data.comment_id + '/edit" \
-        class="edit_btn" data-comment="' + data.comment_id + '" \
+  var edit_btn = '<a class="btn btn-secondary btn-sm edit_btn" \
+        href="/test/pull-request/' + data.request_id + '/comment/' + data.comment_id + '/edit" \
+        data-comment="' + data.comment_id + '" \
         data-objid="' + data.request_id + '"> \
         <span class="oi" data-glyph="pencil"></span> \
     </a>';
@@ -35,14 +35,16 @@ add_comment = function(data) {
             <div class="btn-group" role="group" aria-label="Basic example"> \
               <a class="reply btn btn-secondary btn-sm" data-toggle="tooltip" title="Reply to this comment - loose formating"> \
                 <span class="oi" data-glyph="share-boxed"></span> \
-              </a>'
-              + edit_btn +
+              </a>';
+        if ( data.comment_user == username) {
+          _data += edit_btn +
               '<button class="btn btn-secondary btn-sm" type="submit" name="drop_comment" value="' + data.comment_id + '" \
                   onclick="return confirm(\'Do you really want to remove this comment?\');" \
                   title="Remove comment"> \
                   <span class="oi" data-glyph="trash"></span> \
-                </button> \
-            </div> \
+                </button>';
+            }
+        _data += '</div> \
         </aside> \
         </div></div></div> \
         </td></tr>';
@@ -70,14 +72,16 @@ add_comment = function(data) {
           <div class="btn-group" role="group" aria-label="Basic example"> \
             <a class="reply btn btn-secondary btn-sm" data-toggle="tooltip" title="Reply to this comment - loose formating"> \
               <span class="oi" data-glyph="share-boxed"></span> \
-            </a>'
-            + edit_btn
-            + '<button class="btn btn-secondary btn-sm" type="submit" name="drop_comment" value="' + data.comment_id + '" \
+            </a>';
+    if ( data.comment_user == username) {
+        _data += edit_btn +
+            '<button class="btn btn-secondary btn-sm" type="submit" name="drop_comment" value="' + data.comment_id + '" \
                 onclick="return confirm(\'Do you really want to remove this comment?\');" \
                 title="Remove comment"> \
                 <span class="oi" data-glyph="trash"></span> \
-            </button> \
-          </div> \
+            </button>';
+    }
+    _data += '</div> \
         </div> \
     </div>';
   }
@@ -113,12 +117,12 @@ update_comment = function(data) {
   field.find('.issue_comment').show();
 }
 
-process_event = function(data, requestid){
+process_event = function(data, requestid, username){
   console.log(data);
   var category = null;
   var originalTitle = document.title;
   if (data.comment_added){
-    add_comment(data);
+    add_comment(data, username);
     category = 'comment';
   } else if (data.comment_updated){
     update_comment(data);

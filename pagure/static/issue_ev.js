@@ -118,7 +118,7 @@ remove_deps = function(data, issue_uid, _issue_url) {
   selectize.removeItem(dep);
 }
 
-add_comment = function(data) {
+add_comment = function(data, username) {
   console.log('Adding comment ' + data.comment_added);
   var field = $('#comments');
   var _data = '<div class="card clearfix"> \
@@ -144,8 +144,9 @@ add_comment = function(data) {
         <div class="btn-group" aria-label="Basic example" role="group"> \
         <a class="reply btn btn-secondary btn-sm" title="" data-toggle="tooltip" data-original-title="Reply to this comment - loose formating"> \
             <span class="oi" data-glyph="share-boxed"></span> \
-          </a> \
-          <a class="btn btn-secondary btn-sm" data-objid="' + data.issue_id
+        </a>';
+    if ( data.comment_user == username) {
+          _data += '<a class="btn btn-secondary btn-sm" data-objid="' + data.issue_id
           + '" data-comment="' + data.comment_id
           + '" href="/test/issue/' + data.issue_id + '/comment/' + data.comment_id + '/edit"> \
             <span class="oi" data-glyph="pencil"></span> \
@@ -155,11 +156,13 @@ add_comment = function(data) {
             name="drop_comment" value="' + data.comment_id + '" type="submit"  \
             onclick="return confirm(\'Do you really want to remove this comment?\');" \
             ><span class="oi" data-glyph="trash"></span> \
-          </button> \
-        </aside> \
+          </button>';
+    }
+    _data += '</aside> \
       </div> \
     </div> \
     </div>';
+
   field.html(field.html() + _data);
 }
 
@@ -241,7 +244,7 @@ private_issue_update = function(data, _api_issue_url, issue_uid) {
 }
 
 process_event = function(
-      data, issue_uid, _issue_url, _issues_url, _api_issue_url)
+      data, issue_uid, _issue_url, _issues_url, _api_issue_url, username)
 {
   console.log(data);
   var category = null;
@@ -279,7 +282,7 @@ process_event = function(
     category = 'Dependency removed';
   }
   else if (data.comment_added){
-    add_comment(data);
+    add_comment(data, username);
     category = 'Comment added';
   }
   else if (data.comment_updated){

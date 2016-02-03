@@ -902,7 +902,7 @@ window.onbeforeunload = function() {
 source.addEventListener('message', function(e) {
   console.log(e.data);
   var data = $.parseJSON(e.data);
-  process_event(data, "{{ request.uid }}");
+  process_event(data, "{{ request.uid }}", "{{ g.fas_user.username }}");
   setup_edit_btns();
   setup_reply_btns();
   }, false);

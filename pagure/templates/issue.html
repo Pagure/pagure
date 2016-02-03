@@ -354,7 +354,8 @@ source.addEventListener('message', function(e) {
     url_for('view_issue', username=username,
             repo=repo.name, issueid='-123456789')}}';
   process_event(data, "{{ issue.uid }}", _issue_url,
-                _issues_url, _api_issues_url);
+                _issues_url, _api_issues_url,
+                "{{ g.fas_user.username }}");
   setup_edit_btns();
   setup_reply_btns();
 
