@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        1.0.1
+Version:        1.0.2
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -249,6 +249,20 @@ install -m 644 webhook-server/pagure_webhook.service \
 
 
 %changelog
+* Thu Feb 04 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 1.0.2-1
+- Update to 1.0.2
+- Rework the PR page (Ryan Lerch)
+- Add ssh_info to blacklist in default config (Ryan Lerch)
+- Restyle the ssh_info page (Ryan Lerch)
+- Fix hiding the preview pane when creating an issue (Ryan Lerch)
+- Indicate the number of comments on the PR when listing them (Ryan Lerch)
+- Fix showing the links to issues when previewing a comment
+- Ensure some more that the page number isn't below 1
+- Do not show the edit and delete buttons to everyone when adding a comment via
+  SSE
+- Update the requirements.txt for a missing dependency on Ubuntu (vanzhiganov)
+- Improving sorting the release tags in the release page (Clement Verna)
+
 * Mon Feb 01 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 1.0.1-1
 - Update to 1.0.1
 - Improve the fork list (Ryan Lerch)
