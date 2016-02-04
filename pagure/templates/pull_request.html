@@ -164,12 +164,14 @@
       </span>
     </a>
   </li>
+  {% if pull_request %}
   <li class="nav-item pull-xs-right">
     <a class="nav-link" href="{{ url_for('request_pull_patch', username=username,
             repo=repo.name, requestid=requestid) }}">
       <span class="hidden-sm-down">Patch</span>
     </a>
   </li>
+  {% endif %}
 </ul>
 
 <div class="tab-content">
