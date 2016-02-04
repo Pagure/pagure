@@ -1210,19 +1210,19 @@ def get_git_tags_objects(project):
     tags_sort = {}
 
     for tag in tags:
-        #Split the git tag name using any non-alphanumeric character
-        #and store each element returned in a tuple.
+        # Split the git tag name using any non-alphanumeric character
+        # and store each element returned in a tuple.
         splitted_tag = re.split('[^a-zA-Z0-9]+', tag.name)
         sorting_tuple = ()
         for item in splitted_tag:
-            #Cast the result to an integer when possible
+            # Cast the result to an integer when possible
             if item.isdigit():
                 sorting_tuple += (int(item),)
             else:
                 sorting_tuple += (item,)
         tags_sort[sorting_tuple] = tag
 
-    for tag in sorted(tags_sort, reverse = True):
+    for tag in sorted(tags_sort, reverse=True):
         sorted_tags.append(tags_sort[tag])
 
     return sorted_tags

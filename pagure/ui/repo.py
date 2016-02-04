@@ -724,7 +724,6 @@ def view_tags(repo, username=None):
         flask.abort(404, 'Project not found')
 
     tags = pagure.lib.git.get_git_tags_objects(repo)
-    
     return flask.render_template(
         'releases.html',
         select='tags',
