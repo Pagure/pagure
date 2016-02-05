@@ -589,6 +589,39 @@ def set_default_email():
     return flask.redirect(flask.url_for('.user_settings'))
 
 
+@APP.route('/settings/email/resend', methods=['POST'])
+@login_required
+def reconfirm_email():
+    """ Re-send the email address of the user.
+    """
+    if admin_session_timedout():
+        return flask.redirect(
+            flask.url_for('auth_login', next=flask.request.url))
+
+    user = pagure.lib.search_user(
+        SESSION, username=flask.g.fas_user.username)
+    if not user:
+        flask.abort(404, 'User not found')
+
+    form = pagure.forms.UserEmailForm()
+    if form.validate_on_submit():
+        email = form.email.data
+
+        try:
+            pagure.lib.resend_pending_email(SESSION, user, email)
+            SESSION.commit()
+            flask.flash('Confirmation email re-sent')
+        except pagure.exceptions.PagureException as err:
+            flask.flash(str(err), 'error')
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash('Confirmation email could not be re-sent', 'error')
+
+    return flask.redirect(flask.url_for('.user_settings'))
+
+
+
 @APP.route('/settings/email/confirm/<token>/')
 @APP.route('/settings/email/confirm/<token>')
 def confirm_email(token):
