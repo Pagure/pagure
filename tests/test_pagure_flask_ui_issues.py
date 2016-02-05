@@ -127,7 +127,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/new_issue', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
                 'href="/test/issue/1/edit">', output.data)
@@ -184,7 +185,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
                 'href="/test/issue/1/edit">', output.data)
@@ -308,9 +310,10 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertNotIn(
             '<a class="btn btn-secondary btn-sm" href="/test/issue/1/edit">',
             output.data)
+        print output.data
         self.assertTrue(
-            '<p><a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1'
-            '">Login</a> to comment on this ticket.</p>'
+            '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
+            'Login</a>\n            to comment on this ticket.'
             in output.data)
 
         user = tests.FakeUser()
@@ -322,7 +325,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             '<a class="btn btn-secondary btn-sm" href="/test/issue/1/edit">',
             output.data)
             self.assertFalse(
-                '<p><a href="/login/">Login</a> to comment on this ticket.</p>'
+                '<a href="/login/">Login</a> to comment on this ticket.'
                 in output.data)
 
         user.username = 'pingou'
@@ -366,7 +369,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.get('/test/issue/2')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #2 - test - Pagure</title>', output.data)
+                '<title>Issue #2: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<span class="oi red-icon" data-glyph="lock-locked" '
                 'title="Private issue"></span>', output.data)
@@ -417,7 +421,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
                 'href="/test/issue/1/edit">', output.data)
@@ -441,7 +446,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
                 'href="/test/issue/1/edit">', output.data)
@@ -454,7 +460,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
                 'href="/test/issue/1/edit">', output.data)
@@ -467,7 +474,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
                 'href="/test/issue/1/edit">', output.data)
@@ -488,7 +496,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
                 'href="/test/issue/1/edit">', output.data)
@@ -515,7 +524,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
                 'href="/test/issue/1/edit">', output.data)
@@ -542,7 +552,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
                 'href="/test/issue/1/edit">', output.data)
@@ -566,7 +577,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
                 'href="/test/issue/1/edit">', output.data)
@@ -613,7 +625,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/2/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #2 - test - Pagure</title>', output.data)
+                '<title>Issue #2: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
                 'href="/test/issue/2/edit">', output.data)
@@ -688,7 +701,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
                 'href="/test/issue/1/edit">', output.data)
@@ -705,7 +719,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
                 'href="/test/issue/1/edit">', output.data)
@@ -745,7 +760,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
                 'href="/test/issue/1/edit">', output.data)
@@ -802,7 +818,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
                 'href="/test/issue/1/edit">', output.data)
@@ -819,7 +836,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
                 'href="/test/issue/1/edit">', output.data)
@@ -836,7 +854,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
                 'href="/test/issue/1/edit">', output.data)
@@ -888,7 +907,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
                 'href="/test/issue/1/edit">', output.data)
@@ -905,7 +925,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
                 'href="/test/issue/1/edit">', output.data)
@@ -922,7 +943,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
                 'href="/test/issue/1/edit">', output.data)
@@ -965,7 +987,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
                 'href="/test/issue/1/edit">', output.data)
@@ -1418,7 +1441,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/1/drop', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -1431,7 +1455,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/1/drop', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
 
             data['csrf_token'] = csrf_token
             output = self.app.post(
@@ -1481,7 +1506,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
                 'href="/test/issue/1/edit">', output.data)
@@ -1498,7 +1524,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
                 'href="/test/issue/1/edit">', output.data)
@@ -1540,7 +1567,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
                 'href="/test/issue/1/edit">', output.data)
@@ -1576,7 +1604,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1 - test - Pagure</title>', output.data)
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
             self.assertIn(
                 '<a class="btn btn-secondary btn-sm" '
                 'href="/test/issue/1/edit">', output.data)
