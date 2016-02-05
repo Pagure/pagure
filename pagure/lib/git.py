@@ -1195,9 +1195,7 @@ def get_git_tags(project):
 def get_git_tags_objects(project):
     """ Returns the list of references of the tags created in the git
     repositorie the specified project.
-    The list is sorted using the tag name and returns the highest release
-    version first.
-    """
+    The list is sorted using the time of the commit associated to the tag """
     repopath = pagure.get_repo_path(project)
     repo_obj = PagureRepo(repopath)
     tags = [
@@ -1210,17 +1208,14 @@ def get_git_tags_objects(project):
     tags_sort = {}
 
     for tag in tags:
-        # Split the git tag name using any non-alphanumeric character
-        # and store each element returned in a tuple.
-        splitted_tag = re.split('[^a-zA-Z0-9]+', tag.name)
-        sorting_tuple = ()
-        for item in splitted_tag:
-            # Cast the result to an integer when possible
-            if item.isdigit():
-                sorting_tuple += (int(item),)
-            else:
-                sorting_tuple += (item,)
-        tags_sort[sorting_tuple] = tag
+        # If the object is a tag, get his associated commit time
+        if tag.type == pygit2.GIT_OBJ_TAG:
+            tags_sort[tag.get_object().commit_time] = tag
+        elif tag.type == pygit2.GIT_OBJ_COMMIT:
+            tags_sort[tag.commit_time] = tag
+        # If object is neither a tag or commit return an unsorted list
+        else:
+            return tags
 
     for tag in sorted(tags_sort, reverse=True):
         sorted_tags.append(tags_sort[tag])
