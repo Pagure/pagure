@@ -65,7 +65,7 @@
               </span>
             </small>
             <textarea class="form-control" rows=8 id="comment" name="comment"
-            placeholder="Enter your comment here" tabindex=1></textarea>
+                placeholder="Enter your comment here" tabindex=1></textarea>
 
             <div id="preview">
             </div>
@@ -100,12 +100,12 @@
     <div class="card">
       <div class="card-block">
       {% if authenticated and form %}
-  <form action="{{ url_for('update_issue', username=username,
+        <form action="{{ url_for('update_issue', username=username,
            repo=repo.name, issueid=issueid) }}" method="post"
            onsubmit="return try_async_comment(this)"
            enctype="multipart/form-data">
-  {{ form.csrf_token }}
-          {% endif %}
+        {{ form.csrf_token }}
+      {% endif %}
 
           <fieldset class="form-group issue-metadata-display">
             <label><strong>Status</strong></label>
@@ -189,10 +189,10 @@
           </fieldset>
 
           {% if authenticated and repo_admin %}
-                <fieldset class="form-group issue-metadata-form">
-                  <label for="depends"><strong>Depends on</strong></label>
-                  <input class="form-control" id="depends" type="text" placeholder="issue depending" name="depends" value="{{ issue.depends_text | join(',') }}">
-                </fieldset>
+            <fieldset class="form-group issue-metadata-form">
+              <label for="depends"><strong>Depends on</strong></label>
+              <input class="form-control" id="depends" type="text" placeholder="issue depending" name="depends" value="{{ issue.depends_text | join(',') }}">
+            </fieldset>
           {% endif%}
 
           <input type="submit" class="btn btn-primary issue-metadata-form" value="Update">
