@@ -1209,9 +1209,9 @@ def get_git_tags_objects(project):
 
     for tag in tags:
         # If the object is a tag, get his associated commit time
-        if tag.type == pygit2.GIT_OBJ_TAG:
+        if isinstance(tag, pygit2.Tag):
             tags_sort[tag.get_object().commit_time] = tag
-        elif tag.type == pygit2.GIT_OBJ_COMMIT:
+        elif isinstance(tag, pygit2.Commit):
             tags_sort[tag.commit_time] = tag
         # If object is neither a tag or commit return an unsorted list
         else:
