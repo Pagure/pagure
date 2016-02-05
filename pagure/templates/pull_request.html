@@ -110,29 +110,33 @@
     repo=repo.name, commitid=commitid, branch_from=branch_from,
     branch_to=branch_to) }}" method="post">
   {% endif %}
-  <div class="p-b-1">
-  Pull from
-    <span class="pr-toplabel">{%
-      if remote_git -%}{{ remote_git }}{%-
-      else -%}
-        <span class="oi" data-glyph="fork"></span> {{ repo.fullname }} {%-
-      endif -%}
-    </span>
-    <span class="pr-toplabel">
-      <span class="oi" data-glyph="random">
-    </span> {{ branch_from }} </span>
-  into
-<span class="pr-toplabel">{% if repo.is_fork -%}{{ repo.parent.fullname }}{% else %}{{ repo.fullname }}{% endif %}</span>
-          <select class="pr-toplabel-select" id="branch_select" name="branch_to">
-              <option value="{{ branch_to }}">{{ branch_to }}</option>
-            {% for branch in branches |reverse %}
-              {% if branch != branch_to %}
-              <option value="{{ branch }}">{{ branch }}</option>
-              {% endif %}
-            {% endfor %}
-          </select>
+    <div class="p-b-1">
+    Pull from
+      <span class="pr-toplabel">{%
+        if remote_git -%}{{ remote_git }}{%-
+        else -%}
+          <span class="oi" data-glyph="fork"></span> {{ repo.fullname }} {%-
+        endif -%}
+      </span>
+      <span class="pr-toplabel">
+        <span class="oi" data-glyph="random"></span>
+        {{ branch_from }}
+      </span>
+      into
+      <span class="pr-toplabel">
+        {% if repo.is_fork -%}{{ repo.parent.fullname }}{%
+           else %}{{ repo.fullname }}{% endif %}
+      </span> &nbsp;
+      <select class="pr-toplabel-select" id="branch_select" name="branch_to">
+          <option value="{{ branch_to }}">{{ branch_to }}</option>
+        {% for branch in branches |reverse %}
+          {% if branch != branch_to %}
+          <option value="{{ branch }}">{{ branch }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
     </div>
-      {{ render_bootstrap_field(form.title) }}
+    {{ render_bootstrap_field(form.title) }}
     <p class="buttons indent">
       <input type="submit" class="btn btn-primary" value="Create">
       {{ form.csrf_token }}
