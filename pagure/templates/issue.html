@@ -1,7 +1,7 @@
 {% extends "repo_master.html" %}
 {% from "_formhelper.html" import render_field, render_bootstrap_field, show_comment, show_initial_comment %}
 
-{% block title %}Issue #{{ issueid }} - {{ repo.name }}{% endblock %}
+{% block title %}Issue #{{ issueid }}: {{issue.title | noJS("img") | safe }} - {{ repo.name }}{% endblock %}
 {% set tag = "home"%}
 
 {% block header %}
@@ -92,7 +92,10 @@
             </div>
         </form>
         {% else %}
-          <p><a href="{{ url_for('auth_login', next=request.url) }}">Login</a> to comment on this ticket.</p>
+          <p>
+            <a href="{{ url_for('auth_login', next=request.url) }}">Login</a>
+            to comment on this ticket.
+          </p>
         {% endif %}
         </section>
 

@@ -3,7 +3,7 @@
 
 {% block title %}
   {%- if pull_request -%}
-    PR#{{ requestid }}: {{ pull_request.title }} - {{ repo.name }}
+    PR#{{ requestid }}: {{ pull_request.title | noJS(ignore="img")}} - {{ repo.name }}
   {% elif form and (repo_admin or remote_git) %}
     Create new Pull Request for {{ branch_to }} - {{ repo.name }}
   {%- else -%}
