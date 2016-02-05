@@ -4,12 +4,12 @@
 {% block title %}{{ user.user }}'s settings{% endblock %}
 {% set tag = "users"%}
 
-{% macro render_email(email, form=None) %}
-<div class="list-group-item {% if not form %}disabled{% endif %}">
+{% macro render_email(email, form, validated=True) %}
+<div class="list-group-item {% if not validated %}disabled{% endif %}">
   <span class="oi" data-glyph="envelope-closed"></span> &nbsp;{{ email.email }}
-  {% if form %}
+  {% if validated %}
     <form class="pull-xs-right" method="POST"
-      action="{{ url_for('remove_user_email') }}">
+        action="{{ url_for('remove_user_email') }}">
       <input type="hidden" value="{{ email.email }}" name="email" />
       {{ form.csrf_token }}
       <button
@@ -19,19 +19,35 @@
       </button>
     </form>
     {% if email.email == user.default_email %}
-    <span class="text-muted pull-xs-right p-r-1"><span class="oi" data-glyph="star" title="default email address" data-toggle="tooltip"></span></span>
+    <span class="text-muted pull-xs-right p-r-1">
+      <span class="oi" data-glyph="star" title="default email address" data-toggle="tooltip"></span>
+    </span>
     {% else %}
     <form style="display:inline;" method="POST"
-      action="{{ url_for('set_default_email') }}">
+      action="{{ url_for('set_default_email') }}" id="default_mail">
       <input type="hidden" value="{{ email.email }}" name="email" />
       {{ form.csrf_token }}
-      <a class="pull-xs-right p-r-1" href="javascript:void(0);" onclick="$(this).closest('form').submit();" title="Set default email address">
+      <a class="pull-xs-right p-r-1" href="javascript:void(0);"
+         onclick="$(this).closest('form').submit();"
+         title="Set default email address">
         <small>set as default</small>
       </a>
     </form>
     {% endif %}
   {% else %}
-        <div class="pull-xs-right"><small>pending verification via email</small></div>
+    <div class="pull-xs-right">
+      <small>pending verification via email</small>
+      <form style="display:inline;" method="POST"
+        action="{{ url_for('reconfirm_email') }}" id="reconfirm_mail">
+        <input type="hidden" value="{{ email.email }}" name="email" />
+        {{ form.csrf_token }}
+        <button
+          onclick="$(this).closest('form').submit();"
+          title="Resend validation email" class="btn btn-sm btn-warning">
+          <span class="oi" data-glyph="loop-circular"></span>
+        </button>
+      </form>
+    </div>
   {% endif %}
 </div>
 {% endmacro %}
@@ -68,7 +84,7 @@
           {{ render_email(email, form) }}
         {% endfor %}
         {% for email in user.emails_pending %}
-          {{ render_email(email) }}
+          {{ render_email(email, form, validated=False) }}
         {% endfor %}
       </div>
     </div>
