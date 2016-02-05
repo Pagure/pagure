@@ -467,8 +467,8 @@ class PagureFlaskApptests(tests.Modeltests):
                 '</button>\n                      Email pending validation',
                 output.data)
             self.assertEqual(output.data.count('foo@pingou.com'), 4)
-            self.assertEqual(output.data.count('bar@pingou.com'), 4)
-            self.assertEqual(output.data.count('foobar@pingou.com'), 1)
+            self.assertEqual(output.data.count('bar@pingou.com'), 5)
+            self.assertEqual(output.data.count('foobar@pingou.com'), 2)
 
             # User already has this email
             data = {
@@ -582,6 +582,97 @@ class PagureFlaskApptests(tests.Modeltests):
 
             ast.return_value = True
             output = self.app.post('/settings/email/default', data=data)
+            self.assertEqual(output.status_code, 302)
+
+    @patch('pagure.lib.notify.send_email')
+    @patch('pagure.ui.app.admin_session_timedout')
+    def test_reconfirm_email(self, ast, send_email):
+        """ Test the reconfirm_email endpoint. """
+        send_email.return_value = True
+        ast.return_value = False
+        self.test_new_project()
+
+        # Add a pending email to pingou
+        userobj = pagure.lib.search_user(self.session, username='pingou')
+
+        self.assertEqual(len(userobj.emails), 2)
+
+        email_pend = pagure.lib.model.UserEmailPending(
+            user_id=userobj.id,
+            email='foo@fp.o',
+            token='abcdef',
+        )
+        self.session.add(email_pend)
+        self.session.commit()
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/settings/email/resend')
+            self.assertEqual(output.status_code, 404)
+            self.assertTrue('<h2>Page not found (404)</h2>' in output.data)
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/settings/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
+            self.assertIn(
+                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
+                '</textarea>', output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+                'email': 'foo@pingou.com',
+            }
+
+            output = self.app.post(
+                '/settings/email/resend', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
+            self.assertEqual(output.data.count('foo@pingou.com'), 4)
+
+            # Set invalid default email
+            data = {
+                'csrf_token':  csrf_token,
+                'email': 'foobar@pingou.com',
+            }
+
+            output = self.app.post(
+                '/settings/email/resend', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
+            self.assertEqual(output.data.count('foo@pingou.com'), 4)
+            self.assertIn(
+                '</button>\n                      This email has already '
+                'been confirmed', output.data)
+
+            # Validate a non-validated email
+            data = {
+                'csrf_token':  csrf_token,
+                'email': 'foo@fp.o',
+            }
+
+            output = self.app.post(
+                '/settings/email/resend', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
+            self.assertEqual(output.data.count('foo@pingou.com'), 4)
+            self.assertIn(
+                '</button>\n                      Confirmation email re-sent',
+                output.data)
+
+            ast.return_value = True
+            output = self.app.post('/settings/email/resend', data=data)
             self.assertEqual(output.status_code, 302)
 
     @patch('pagure.ui.app.admin_session_timedout')
