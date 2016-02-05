@@ -341,14 +341,18 @@
                   </span>
                 </small>
                 <textarea class="form-control" rows=8 id="comment" name="comment"
-                placeholder="Enter your comment here"></textarea>
+                placeholder="Enter your comment here" tabindex=1></textarea>
                 <div id="preview">
                 </div>
               </fieldset>
 
+              <a href="http://daringfireball.net/projects/markdown/syntax"
+                 target="_blank">Markdown Syntax</a>
               <div>
-                <input type="submit" class="btn btn-primary" value="Update Issue">
-                <input type="button" class="btn btn-secondary" value="Clear" id="clear_comment" />
+                <input type="submit" class="btn btn-primary"
+                  value="Update Issue" tabindex=2 />
+                <input type="button" class="btn btn-secondary" value="Clear"
+                  id="clear_comment" tabindex=3 />
               </div>
             </form>
           {% else %}
