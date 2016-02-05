@@ -310,7 +310,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertNotIn(
             '<a class="btn btn-secondary btn-sm" href="/test/issue/1/edit">',
             output.data)
-        print output.data
         self.assertTrue(
             '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
             'Login</a>\n            to comment on this ticket.'
