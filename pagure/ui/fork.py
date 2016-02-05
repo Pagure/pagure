@@ -980,11 +980,11 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
     contributing = None
     requestrepopath = _get_parent_request_repo_path(repo)
     if os.path.exists(requestrepopath):
-        requestepo = pygit2.Repository(requestrepopath)
-        if not requestepo.is_empty and not requestepo.head_is_unborn:
-            commit = requestepo[requestepo.head.target]
+        requestrepo = pygit2.Repository(requestrepopath)
+        if not requestrepo.is_empty and not requestrepo.head_is_unborn:
+            commit = requestrepo[requestrepo.head.target]
             contributing = __get_file_in_tree(
-                requestepo, commit.tree, ['templates', 'contributing.md'],
+                requestrepo, commit.tree, ['templates', 'contributing.md'],
                 bail_on_tree=True)
             if contributing:
                 contributing, safe = pagure.doc_utils.convert_readme(
