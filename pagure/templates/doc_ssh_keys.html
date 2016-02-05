@@ -21,20 +21,14 @@ instance:
   </p>
 
 {% for cert in config.get('SSH_KEYS') %}
-<div class="card">
-  <div class="card-header">
-    <strong>{{ cert }} Fingerprint</strong>
+  {% for type in config['SSH_KEYS'][cert] %}
+  <div class="card">
+    <div class="card-header">
+      <strong>{{ cert }} {{ type | title }}</strong>
+    </div>
+    <pre class="softwrap">{{ config['SSH_KEYS'][cert][type] }}</pre>
   </div>
-  <pre>{{ config['SSH_KEYS'][cert]['fingerprint'] }}</pre>
-</div>
-
-<div class="card">
-  <div class="card-header">
-    <strong>{{ cert }} Hostkey</strong>
-  </div>
-  <pre class="softwrap">{{ config['SSH_KEYS'][cert]['pubkey'] }}</pre>
-</div>
-
+  {% endfor %}
 {% endfor %}
 
 {% else %}
