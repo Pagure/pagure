@@ -136,6 +136,11 @@
         {% endfor %}
       </select>
     </div>
+    {% if contributing %}
+    <div id="contributing">
+      {{ contributing | markdown | noJS | safe}}
+    </div>
+    {% endif %}
     {{ render_bootstrap_field(form.title) }}
     <p class="buttons indent">
       <input type="submit" class="btn btn-primary" value="Create">

@@ -21,7 +21,8 @@ import pagure.exceptions
 import pagure.lib
 import pagure.lib.git
 import pagure.forms
-from pagure import (APP, SESSION, LOG, login_required, is_repo_admin)
+from pagure import (APP, SESSION, LOG, login_required, is_repo_admin,
+                    __get_file_in_tree)
 
 
 # pylint: disable=E1101
@@ -39,6 +40,18 @@ def _get_parent_repo_path(repo):
         parentpath = os.path.join(APP.config['FORK_FOLDER'], repo.path)
     else:
         parentpath = os.path.join(APP.config['GIT_FOLDER'], repo.path)
+
+    return parentpath
+
+
+def _get_parent_request_repo_path(repo):
+    """ Return the path of the parent git repository corresponding to the
+    provided Repository object from the DB.
+    """
+    if repo.parent:
+        parentpath = os.path.join(APP.config['REQUESTS_FOLDER'], repo.parent.path)
+    else:
+        parentpath = os.path.join(APP.config['REQUESTS_FOLDER'], repo.path)
 
     return parentpath
 
@@ -963,6 +976,21 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
     if len(diff_commits) == 1 and form:
         form.title.data=diff_commits[0].message.strip().split('\n')[0]
 
+    # Get the contributing templates from the requests git repo
+    contributing = None
+    requestrepopath = _get_parent_request_repo_path(repo)
+    if os.path.exists(requestrepopath):
+        requestepo = pygit2.Repository(requestrepopath)
+        if not requestepo.is_empty and not requestepo.head_is_unborn:
+            commit = requestepo[requestepo.head.target]
+            contributing = __get_file_in_tree(
+                requestepo, commit.tree, ['templates', 'contributing.md'],
+                bail_on_tree=True)
+            if contributing:
+                contributing, safe = pagure.doc_utils.convert_readme(
+                    contributing.data, 'md')
+                output_type = 'markup'
+
     return flask.render_template(
         'pull_request.html',
         select='requests',
@@ -977,6 +1005,7 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
         branch_to=branch_to,
         branch_from=branch_from,
         repo_admin=repo_admin,
+        contributing=contributing,
     )
 
 
