@@ -161,23 +161,24 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn('<strong>Create new Project</strong>', output.data)
             self.assertIn(
-                '<small>\n                      This field is required.'
-                '&nbsp;\n                    </small>', output.data)
+                '<small>\n            This field is required.&nbsp;\n'
+                '          </small>', output.data)
 
             data['name'] = 'project-1'
             output = self.app.post('/new/', data=data)
             self.assertEqual(output.status_code, 200)
             self.assertIn('<strong>Create new Project</strong>', output.data)
             self.assertNotIn(
-                '<small>\n                      This field is required.'
-                '&nbsp;\n                    </small>', output.data)
+                '<small>\n            This field is required.&nbsp;\n'
+                '          </small>', output.data)
 
             data['csrf_token'] =  csrf_token
             output = self.app.post('/new/', data=data)
             self.assertEqual(output.status_code, 200)
             self.assertIn('<strong>Create new Project</strong>', output.data)
             self.assertIn(
-                '</button>\n                      No user &#34;username&#34; found',
+                '</button>\n                      No user '
+                '&#34;username&#34; found\n                    </div>',
                 output.data)
 
         user.username = 'foo'

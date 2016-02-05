@@ -1163,11 +1163,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<div class="card-header">\n        Edit '
                 'issue #1\n      </div>' in output.data)
             self.assertEqual(output.data.count(
-                '<small>\n                      This field is required'
-                '.&nbsp;\n                    </small>'), 1)
+                '<small>\n            This field is required.&nbsp;\n'
+                '          </small>'), 1)
             self.assertEqual(output.data.count(
-                '<small>\n                      Not a valid choice'
-                '&nbsp;\n                    </small>'), 1)
+                '<small>\n            Not a valid choice&nbsp;'
+                '\n          </small>'), 1)
 
             data['status'] = 'Open'
             data['title'] = 'Test issue #1'
@@ -1177,11 +1177,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<div class="card-header">\n        Edit '
                 'issue #1\n      </div>' in output.data)
             self.assertEqual(output.data.count(
-                '<small>\n                      This field is required'
-                '.&nbsp;\n                    </small>'), 0)
+                '<small>\n            This field is required.&nbsp;\n'
+                '          </small>'), 0)
             self.assertEqual(output.data.count(
-                '<small>\n                      Not a valid choice'
-                '.&nbsp;\n                    </small>'), 0)
+                '<small>\n            Not a valid choice&nbsp;'
+                '\n          </small>'), 0)
 
             data['csrf_token'] = csrf_token
             output = self.app.post(
