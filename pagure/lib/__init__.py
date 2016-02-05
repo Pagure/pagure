@@ -2188,6 +2188,29 @@ def add_user_pending_email(session, userobj, email):
     pagure.lib.notify.notify_new_email(tmpemail, user=userobj)
 
 
+def resend_pending_email(session, userobj, email):
+    ''' Resend to the user the confirmation email for the provided email
+    address.
+    '''
+    other_user = search_user(session, email=email)
+    if other_user and other_user != userobj:
+        raise pagure.exceptions.PagureException(
+            'Someone else has already registered this email'
+        )
+
+    pending_email = search_pending_email(session, email=email)
+    if not pending_email:
+        raise pagure.exceptions.PagureException(
+            'This email has already been confirmed'
+        )
+
+    pending_email.token=pagure.lib.login.id_generator(40)
+    session.add(pending_email)
+    session.flush()
+
+    pagure.lib.notify.notify_new_email(pending_email, user=userobj)
+
+
 def search_pending_email(session, email=None, token=None):
     ''' Searches the database for the pending email matching the given
     criterias.
