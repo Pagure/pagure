@@ -1,7 +1,7 @@
 {% extends "repo_master.html" %}
 {% from "_formhelper.html" import render_field, render_bootstrap_field, show_comment, show_initial_comment %}
 
-{% block title %}Issue #{{ issueid }}: {{issue.title | noJS("img") | safe }} - {{ repo.name }}{% endblock %}
+{% block title %}Issue #{{ issueid }}: {{issue.title | noJS(ignore="img") | safe }} - {{ repo.name }}{% endblock %}
 {% set tag = "home"%}
 
 {% block header %}
