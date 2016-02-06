@@ -2193,6 +2193,12 @@ def add_user_pending_email(session, userobj, email):
             'Someone else has already registered this email'
         )
 
+    pending_email = search_pending_email(session, email=email)
+    if pending_email:
+        raise pagure.exceptions.PagureException(
+            'This email is already pending confirmation'
+        )
+
     tmpemail = pagure.lib.model.UserEmailPending(
         user_id=userobj.id,
         token=pagure.lib.login.id_generator(40),
