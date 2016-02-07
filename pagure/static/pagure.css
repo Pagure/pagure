@@ -401,7 +401,7 @@ a.notblue {
   padding: 0.25em 0.3em;
 }
 
-.branch_del #delete_branch_form {
+.branch_del .del_icon {
   display:inline;
 }
 
