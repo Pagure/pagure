@@ -471,6 +471,17 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.data.count('bar@pingou.com'), 5)
             self.assertEqual(output.data.count('foobar@pingou.com'), 2)
 
+            # Email already pending
+            output = self.app.post(
+                '/settings/email/add', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n      '
+                '<strong>Add new email</strong>', output.data)
+            self.assertIn(
+                '</button>\n                      This email is already '
+                'pending confirmation', output.data)
+
             # User already has this email
             data = {
                 'csrf_token':  csrf_token,
@@ -484,8 +495,8 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn(
                 'Invalid value, can&#39;t be any of: bar@pingou.com, '
                 'foo@pingou.com.&nbsp;', output.data)
-            self.assertEqual(output.data.count('foo@pingou.com'), 5)
-            self.assertEqual(output.data.count('bar@pingou.com'), 4)
+            self.assertEqual(output.data.count('foo@pingou.com'), 6)
+            self.assertEqual(output.data.count('bar@pingou.com'), 5)
             self.assertEqual(output.data.count('foobar@pingou.com'), 0)
 
             # Email registered by someone else
