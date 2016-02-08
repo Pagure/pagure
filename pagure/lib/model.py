@@ -346,6 +346,7 @@ class Project(BASE):
             'Minimum_score_to_merge_pull-request': -1,
             'Web-hooks': None,
             'Enforce_signed-off_commits_in_pull-request': False,
+            'always_merge': False,
         }
 
         if self._settings:
