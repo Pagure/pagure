@@ -1064,23 +1064,25 @@ def merge_pull_request(
                 session.commit()
                 return 'CONFLICTS'
 
-        if not domerge:
+        if domerge:
+            head = new_repo.lookup_reference('HEAD').get_object()
+            user_obj = pagure.lib.__get_user(session, username)
+            author = pygit2.Signature(user_obj.fullname, user_obj.default_email)
+            new_repo.create_commit(
+                'refs/heads/%s' % request.branch,
+                author,
+                author,
+                'Merge #%s `%s`' % (request.id, request.title),
+                tree,
+                [head.hex, repo_commit.oid.hex])
+            PagureRepo.push(ori_remote, refname)
+
+        else:
             request.merge_status = 'MERGE'
             session.commit()
             shutil.rmtree(newpath)
             return 'MERGE'
 
-        head = new_repo.lookup_reference('HEAD').get_object()
-        user_obj = pagure.lib.__get_user(session, username)
-        author = pygit2.Signature(user_obj.fullname, user_obj.default_email)
-        new_repo.create_commit(
-            'refs/heads/%s' % request.branch,
-            author,
-            author,
-            'Merge #%s `%s`' % (request.id, request.title),
-            tree,
-            [head.hex, repo_commit.oid.hex])
-        PagureRepo.push(ori_remote, refname)
 
     # Update status
     pagure.lib.close_pull_request(
