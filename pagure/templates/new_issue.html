@@ -41,7 +41,10 @@
         {{ render_bootstrap_field(form.private, field_description="Do you want to keep the issue private?") }}
           <fieldset class="form-group">
             <label for="issue_content"><strong>Description</strong></label>
-            <small class="text-muted pull-xs-right"><span class="btn btn-sm btn-secondary inactive" aria-pressed="false" id="previewinmarkdown">Preview</span></small>
+            <small class="text-muted pull-xs-right">
+              <span class="btn btn-sm btn-secondary inactive"
+                aria-pressed="false" id="previewinmarkdown">Preview</span>
+            </small>
             <textarea class="form-control" rows="8" id="issue_content" name="issue_content"
                 placeholder="Describe your issue">
               {%- if issue %}{{ issue.content }}{% endif -%}
@@ -63,7 +66,6 @@
           </fieldset>
         Attach file <input id="file-picker" type="file" name="filestream" accept="image/*" multiple>
 
-
         <p class="buttons indent">
           {% if not type or type == 'new' %}
           <input type="submit" class="btn btn-primary" value="Create">
@@ -77,19 +79,19 @@
       </div>
     </div>
 
-{% if authenticated and repo_admin and type and type == 'edit' %}
-<form method="post" class="pull-xs-right" action="{{ url_for('.delete_issue',
-                    username=username, repo=repo.name, issueid=issueid) }}">
-  <button class="btn btn-danger" type="submit"
-      onclick="return confirm('Are you sure to delete this ticket? \nThis is final and cannot be un-done.');"
-      title="Delete this ticket">
-    <span class="icon icon-trash blue"></span>
-    Delete issue
-  </button>
-  {{ form.csrf_token }}
-</form>
-{% endif %}
-
+    {% if authenticated and repo_admin and type and type == 'edit' %}
+    <form method="post" class="pull-xs-right" action="{{
+        url_for('.delete_issue',
+                username=username, repo=repo.name, issueid=issueid) }}">
+      <button class="btn btn-danger" type="submit"
+          onclick="return confirm('Are you sure to delete this ticket? \nThis is final and cannot be un-done.');"
+          title="Delete this ticket">
+        <span class="icon icon-trash blue"></span>
+        Delete issue
+      </button>
+      {{ form.csrf_token }}
+    </form>
+    {% endif %}
 
   </div>
 </div>
@@ -132,42 +134,43 @@ $(document).ready(function() {
   emoji_complete(json_url, folder);
 
 });
+
 {% endif %}
 
 $(function() {
   $( "#preview" ).hide();
   $( "#previewinmarkdown" ).click(
     function(event, ui) {
-        if ($( "#previewinmarkdown" ).hasClass("inactive")){
-          var _text = $( "#issue_content" ).val();
-          var _url = "{{ url_for('markdown_preview') }}";
-            $.ajax({
-                url: _url ,
-                type: 'POST',
-                data: {
-                  content: _text,
-                  csrf_token: "{{ form.csrf_token.current_token }}",
-                },
-                dataType: 'html',
-                success: function(res) {
-                    var preview = emojione.toImage(res);
-                    $( "#preview" ).html(preview);
-                    $( "#previewinmarkdown" ).removeClass("inactive");
-                    $( "#previewinmarkdown" ).addClass("active");
-                    $( "#issue_content" ).hide();
-                    $( "#preview" ).show();
-                },
-                error: function() {
-                    alert('Unable to generate preview!'+error);
-                }
-            });
-            return false;
-          } else if ($( "#previewinmarkdown" ).hasClass("active")){
-            $( "#previewinmarkdown" ).addClass("inactive");
-            $( "#previewinmarkdown" ).removeClass("active");
-            $( "#issue_content" ).show();
-            $( "#preview" ).hide();
+      if ($( "#previewinmarkdown" ).hasClass("inactive")){
+        var _text = $( "#issue_content" ).val();
+        var _url = "{{ url_for('markdown_preview') }}";
+        $.ajax({
+          url: _url ,
+          type: 'POST',
+          data: {
+            content: _text,
+            csrf_token: "{{ form.csrf_token.current_token }}",
+          },
+          dataType: 'html',
+          success: function(res) {
+            var preview = emojione.toImage(res);
+            $( "#preview" ).html(preview);
+            $( "#previewinmarkdown" ).removeClass("inactive");
+            $( "#previewinmarkdown" ).addClass("active");
+            $( "#issue_content" ).hide();
+            $( "#preview" ).show();
+          },
+          error: function() {
+            alert('Unable to generate preview!'+error);
           }
+        });
+        return false;
+      } else if ($( "#previewinmarkdown" ).hasClass("active")){
+        $( "#previewinmarkdown" ).addClass("inactive");
+        $( "#previewinmarkdown" ).removeClass("active");
+        $( "#issue_content" ).show();
+        $( "#preview" ).hide();
+      }
     }
   );
 });
