@@ -2195,13 +2195,13 @@ def resend_pending_email(session, userobj, email):
     other_user = search_user(session, email=email)
     if other_user and other_user != userobj:
         raise pagure.exceptions.PagureException(
-            'Someone else has already registered this email'
+            'Someone else has already registered this email address'
         )
 
     pending_email = search_pending_email(session, email=email)
     if not pending_email:
         raise pagure.exceptions.PagureException(
-            'This email has already been confirmed'
+            'This email address has already been confirmed'
         )
 
     pending_email.token=pagure.lib.login.id_generator(40)
