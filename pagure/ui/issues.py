@@ -478,6 +478,27 @@ def new_issue(repo, username=None):
             SESSION.rollback()
             flask.flash(str(err), 'error')
 
+    types = None
+    default = None
+    ticketrepopath = os.path.join(APP.config['TICKETS_FOLDER'], repo.path)
+    if os.path.exists(ticketrepopath):
+        ticketrepo = pygit2.Repository(ticketrepopath)
+        if not ticketrepo.is_empty and not ticketrepo.head_is_unborn:
+            commit = ticketrepo[ticketrepo.head.target]
+            # Get the different ticket types
+            files = __get_file_in_tree(
+                ticketrepo, commit.tree, ['templates'],
+                bail_on_tree=True)
+            if files:
+                types = [f.name.rstrip('.md') for f in files]
+            # Get the default template
+            default_file = __get_file_in_tree(
+                ticketrepo, commit.tree, ['templates', 'default.md'],
+                bail_on_tree=True)
+            if default_file:
+                default, _ = pagure.doc_utils.convert_readme(
+                        default_file.data, 'md')
+
     return flask.render_template(
         'new_issue.html',
         select='issues',
@@ -485,6 +506,8 @@ def new_issue(repo, username=None):
         repo=repo,
         username=username,
         repo_admin=is_repo_admin(repo),
+        types=types,
+        default=default,
     )
 
 
