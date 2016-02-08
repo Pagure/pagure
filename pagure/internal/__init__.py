@@ -318,3 +318,74 @@ def get_pull_request_ready_branch():
             'message': branches,
         }
     )
+
+
+@PV.route('/<repo>/issue/template', methods=['POST'])
+@PV.route('/fork/<username>/<repo>/issue/template',
+           methods=['POST'])
+def get_ticket_template(repo, username=None):
+    """ Return the template asked for the specified project
+    """
+
+    form = pagure.forms.ConfirmationForm()
+    if not form.validate_on_submit():
+        response = flask.jsonify({
+            'code': 'ERROR',
+            'message': 'Invalid input submitted',
+        })
+        response.status_code = 400
+        return response
+
+    template = flask.request.args.get('template', None)
+    if not template:
+        response = flask.jsonify({
+            'code': 'ERROR',
+            'message': 'No template provided',
+        })
+        response.status_code = 400
+        return response
+
+    repo = pagure.lib.get_project(pagure.SESSION, repo, user=username)
+
+    if repo is None:
+        response = flask.jsonify({
+            'code': 'ERROR',
+            'message': 'Project not found',
+        })
+        response.status_code = 404
+        return response
+
+    if not repo.settings.get('issue_tracker', True):
+        response = flask.jsonify({
+            'code': 'ERROR',
+            'message': 'No issue tracker found for this project',
+        })
+        response.status_code = 404
+        return response
+
+    ticketrepopath = os.path.join(
+        pagure.APP.config['TICKETS_FOLDER'], repo.path)
+    content = None
+    if os.path.exists(ticketrepopath):
+        ticketrepo = pygit2.Repository(ticketrepopath)
+        if not ticketrepo.is_empty and not ticketrepo.head_is_unborn:
+            commit = ticketrepo[ticketrepo.head.target]
+            # Get the asked template
+            content_file = pagure.__get_file_in_tree(
+                ticketrepo, commit.tree, ['templates', '%s.md' % template],
+                bail_on_tree=True)
+            if content_file:
+                content, _ = pagure.doc_utils.convert_readme(
+                        content_file.data, 'md')
+    if content:
+        response = flask.jsonify({
+            'code': 'OK',
+            'message': content,
+        })
+    else:
+        response = flask.jsonify({
+            'code': 'ERROR',
+            'message': 'No such template found',
+        })
+        response.status_code = 404
+    return response
