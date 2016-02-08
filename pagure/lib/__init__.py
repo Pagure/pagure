@@ -2559,7 +2559,8 @@ def clean_input(text, ignore=None):
         attrs['img'] = filter_img_src
 
     tags = bleach.ALLOWED_TAGS + [
-        'p', 'br', 'div', 'h1', 'h2', 'h3', 'table', 'td', 'tr', 'th',
+        'p', 'br', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        'table', 'td', 'tr', 'th',
         'col', 'tbody', 'pre', 'img', 'hr', 'dl', 'dt', 'dd', 'span',
     ]
     if ignore:
