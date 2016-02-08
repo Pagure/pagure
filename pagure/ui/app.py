@@ -181,16 +181,16 @@ def view_users(username=None):
 
     for user in users:
         repos_length = pagure.lib.search_projects(
-          SESSION,
-          username=user.user,
-          fork=False,
-          count=True)
+            SESSION,
+            username=user.user,
+            fork=False,
+            count=True)
 
         forks_length = pagure.lib.search_projects(
-          SESSION,
-          username=user.user,
-          fork=True,
-          count=True)
+            SESSION,
+            username=user.user,
+            fork=True,
+            count=True)
         user.repos_length = repos_length
         user.forks_length = forks_length
 
@@ -202,7 +202,6 @@ def view_users(username=None):
         page=page,
         select='users',
     )
-
 
 
 @APP.route('/projects/')
@@ -231,7 +230,6 @@ def view_projects(pattern=None):
 
     limit = APP.config['ITEM_PER_PAGE']
     start = limit * (page - 1)
-
 
     projects = pagure.lib.search_projects(
         SESSION, pattern=pattern, fork=forks, start=start, limit=limit)
