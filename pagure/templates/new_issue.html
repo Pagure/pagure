@@ -148,6 +148,33 @@ $(document).ready(function() {
   var json_url = '{{ url_for("static", filename="emoji/emoji_strategy.json") }}';
   emoji_complete(json_url, folder);
 
+  $("#type").on("change", function() {
+    if ( !confirm('Do you want to load the new template?')){
+      return false;
+    }
+
+    var _type = $("#type").val();
+    var _url = "{{
+      url_for('internal_ns.get_ticket_template',
+              username=repo.username if repo.is_fork else None,
+              repo=repo.name) }}";
+    _url += '?template=' + _type;
+    $.ajax({
+      url: _url ,
+      type: 'POST',
+      data: {
+        csrf_token: "{{ form.csrf_token.current_token }}",
+      },
+      dataType: 'json',
+      success: function(res) {
+        $("#issue_content").val(res.message);
+      },
+      error: function(res) {
+        alert('Unable to get this template');
+      }
+    });
+  });
+
 });
 
 {% endif %}
