@@ -108,10 +108,15 @@ class ImplicitIssuePattern(markdown.inlinepatterns.Pattern):
             else:
                 repo = url.split(root)[1].split('/', 1)[0]
 
-        if not _issue_exists(user, repo, idx):
-            return text
+        issue = _issue_exists(user, repo, idx)
+        if issue:
+            return _obj_anchor_tag(user, repo, issue, text)
 
-        return _issue_anchor_tag(user, repo, idx, text)
+        request = _pr_exists(user, repo, idx)
+        if request:
+            return _obj_anchor_tag(user, repo, request, text)
+
+        return text
 
 
 class PagureExtension(markdown.extensions.Extension):
@@ -153,13 +158,35 @@ def _issue_exists(user, repo, idx):
     if not issue_obj:
         return False
 
-    return True
+    return issue_obj
 
 
-def _issue_anchor_tag(user, repo, idx, text):
+def _pr_exists(user, repo, idx):
+    """ Utility method checking if a given issue exists. """
+    repo_obj = pagure.lib.get_project(
+        pagure.SESSION, name=repo, user=user)
+    if not repo_obj:
+        return False
+
+    pr_obj = pagure.lib.search_pull_requests(
+        pagure.SESSION, project_id=repo_obj.id, requestid=idx)
+    if not pr_obj:
+        return False
+
+    return pr_obj
+
+
+def _obj_anchor_tag(user, repo, obj, text):
     """ Utility method generating the link to an issue. """
+    if obj.isa == 'issue':
+        url = flask.url_for(
+            'view_issue', username=user, repo=repo, issueid=obj.id)
+    else:
+        url = flask.url_for(
+        'request_pull', username=user, repo=repo, requestid=obj.id)
+
     element = markdown.util.etree.Element("a")
-    url = flask.url_for('view_issue', username=user, repo=repo, issueid=idx)
     element.set('href', url)
+    element.set('title', obj.title)
     element.text = text
     return element
