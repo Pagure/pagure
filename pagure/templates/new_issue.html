@@ -38,6 +38,19 @@
         {% if type == 'edit' %}
             {{ render_bootstrap_field(form.status, field_description="bug status") }}
         {% endif %}
+        {% if types %}
+        <fieldset class="form-group  ">
+          <strong><label for="status">Type</label></strong>
+          <select class="form-control c-select" id="type" name="type">
+            {% for type in types %}
+            <option selected value="{{ type }}">{{ type }}</option>
+            {% endfor %}
+          </select>
+          <div>
+            <small class="text-muted">Ticket type</small>
+          </div>
+        </fieldset>
+        {% endif %}
         {{ render_bootstrap_field(form.private, field_description="Do you want to keep the issue private?") }}
           <fieldset class="form-group">
             <label for="issue_content"><strong>Description</strong></label>
