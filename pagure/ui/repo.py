@@ -1459,9 +1459,10 @@ def edit_file(repo, branchname, filename, username=None):
         if not content or isinstance(content, pygit2.Tree):
             flask.abort(404, 'File not found')
 
-        data = repo_obj[content.oid].data.decode('utf-8')
         if is_binary_string(content.data):
             flask.abort(400, 'Cannot edit binary files')
+
+        data = repo_obj[content.oid].data.decode('utf-8')
     else:
         data = form.content.data.decode('utf-8')
 
