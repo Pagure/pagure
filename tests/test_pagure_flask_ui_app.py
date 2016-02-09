@@ -651,8 +651,8 @@ class PagureFlaskApptests(tests.Modeltests):
                 '      </div>', output.data)
             self.assertEqual(output.data.count('foo@pingou.com'), 4)
             self.assertIn(
-                '</button>\n                      This email has already '
-                'been confirmed', output.data)
+                '</button>\n                      This email address has '
+                'already been confirmed', output.data)
 
             # Validate a non-validated email
             data = {
