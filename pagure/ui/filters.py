@@ -330,7 +330,7 @@ def author_to_avatar(author, size=32):
     """
     user = pagure.lib.search_user(SESSION, email=author.email)
     output = user.default_email if user else author.email
-    return avatar(output, size)
+    return avatar(output.encode('utf-8'), size)
 
 
 @APP.template_filter('InsertDiv')
