@@ -177,7 +177,7 @@ def _pr_exists(user, repo, idx):
 
 
 def _obj_anchor_tag(user, repo, obj, text):
-    """ Utility method generating the link to an issue. """
+    """ Utility method generating the link to an issue or a PR. """
     if obj.isa == 'issue':
         url = flask.url_for(
             'view_issue', username=user, repo=repo, issueid=obj.id)
