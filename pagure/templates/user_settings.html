@@ -72,9 +72,11 @@
         <fieldset class="form-group">
           <label for="description"><strong>Avatar</strong></label>
           <div>
-              <a class="btn btn-primary" href="https://www.libravatar.org/account/login/">
-                    Change Avatar
-              </a>
+              <a> {{ g.fas_user.username | avatar(80) | safe }} </a>
+          </div>
+          <div>
+              <a class="btn btn-primary" href="https://www.libravatar.org/account/login/"
+                 style="margin-top:1%"> Change Avatar </a>
           </div>
         </fieldset>
       </div>
