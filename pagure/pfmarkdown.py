@@ -162,7 +162,7 @@ def _issue_exists(user, repo, idx):
 
 
 def _pr_exists(user, repo, idx):
-    """ Utility method checking if a given issue exists. """
+    """ Utility method checking if a given PR exists. """
     repo_obj = pagure.lib.get_project(
         pagure.SESSION, name=repo, user=user)
     if not repo_obj:
