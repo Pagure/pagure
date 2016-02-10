@@ -2266,6 +2266,32 @@ index 0000000..fb7093d
                 '<a class="dropdown-item" href="/test/branch/master">',
                 output.data)
 
+            # Add a branch with a '/' in its name that we can delete
+            path = os.path.join(tests.HERE, 'test.git')
+            tests.add_content_git_repo(path)
+            repo = pygit2.Repository(path)
+            repo.create_branch('feature/foo', repo.head.get_object())
+
+            # Check before deletion
+            output = self.app.post('/test', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<a class="dropdown-item" href="/test/branch/feature/foo">',
+                output.data)
+            self.assertIn(
+                '<a class="dropdown-item" href="/test/branch/master">',
+                output.data)
+
+            # Delete the branch
+            output = self.app.post('/test/feature/foo/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertNotIn(
+                '<a class="dropdown-item" href="/test/branch/feature/foo">',
+                output.data)
+            self.assertIn(
+                '<a class="dropdown-item" href="/test/branch/master">',
+                output.data)
+
     def test_view_docs(self):
         """ Test the view_docs endpoint. """
         output = self.app.get('/docs/foo/')
