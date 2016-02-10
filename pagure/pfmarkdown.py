@@ -127,7 +127,6 @@ class PagureExtension(markdown.extensions.Extension):
             r'<(?:f|ht)tps?://[^>]*>',
             r'\b(?:f|ht)tps?://[^)<>\s]+[^.,)<>\s]',
             r'\bwww\.[^)<>\s]+[^.,)<>\s]',
-            r'[^(<\s]+\.(?:com|net|org)\b',
         ])
 
         md.inlinePatterns['mention'] = MentionPattern(MENTION_RE)
@@ -183,7 +182,7 @@ def _obj_anchor_tag(user, repo, obj, text):
             'view_issue', username=user, repo=repo, issueid=obj.id)
     else:
         url = flask.url_for(
-        'request_pull', username=user, repo=repo, requestid=obj.id)
+            'request_pull', username=user, repo=repo, requestid=obj.id)
 
     element = markdown.util.etree.Element("a")
     element.set('href', url)
