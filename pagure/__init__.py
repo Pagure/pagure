@@ -26,7 +26,6 @@ from logging.handlers import SMTPHandler
 import flask
 import pygit2
 import werkzeug
-from flask_fas_openid import FAS
 from functools import wraps
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -54,8 +53,35 @@ import pagure.login_forms
 import pagure.mail_logging
 import pagure.proxy
 
+# Only import flask_fas_openid if it is needed
+if APP.config.get('PAGURE_AUTH', None) in ['fas', 'openid']:
+    from flask_fas_openid import FAS
+    FAS = FAS(APP)
 
-FAS = FAS(APP)
+    @FAS.postlogin
+    def set_user(return_url):
+        ''' After login method. '''
+        try:
+
+            pagure.lib.set_up_user(
+                session=SESSION,
+                username=flask.g.fas_user.username,
+                fullname=flask.g.fas_user.fullname,
+                default_email=flask.g.fas_user.email,
+                ssh_key=flask.g.fas_user.get('ssh_key'),
+                keydir=APP.config.get('GITOLITE_KEYDIR', None),
+            )
+            SESSION.commit()
+        except SQLAlchemyError as err:
+            SESSION.rollback()
+            LOG.debug(err)
+            LOG.exception(err)
+            flask.flash(
+                'Could not set up you as a user properly, please contact '
+                'an admin', 'error')
+        return flask.redirect(return_url)
+
+
 SESSION = pagure.lib.create_session(APP.config['DB_URL'])
 REDIS = None
 if APP.config['EVENTSOURCE_SOURCE'] or APP.config['WEBHOOK']:
@@ -223,30 +249,6 @@ def inject_variables():
 def set_session():
     """ Set the flask session as permanent. """
     flask.session.permanent = True
-
-
-@FAS.postlogin
-def set_user(return_url):
-    ''' After login method. '''
-    try:
-
-        pagure.lib.set_up_user(
-            session=SESSION,
-            username=flask.g.fas_user.username,
-            fullname=flask.g.fas_user.fullname,
-            default_email=flask.g.fas_user.email,
-            ssh_key=flask.g.fas_user.get('ssh_key'),
-            keydir=APP.config.get('GITOLITE_KEYDIR', None),
-        )
-        SESSION.commit()
-    except SQLAlchemyError as err:
-        SESSION.rollback()
-        LOG.debug(err)
-        LOG.exception(err)
-        flask.flash(
-            'Could not set up you as a user properly, please contact '
-            'an admin', 'error')
-    return flask.redirect(return_url)
 
 
 @APP.errorhandler(404)
