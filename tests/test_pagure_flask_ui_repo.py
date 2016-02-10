@@ -2252,6 +2252,7 @@ index 0000000..fb7093d
             self.assertIn(
                 '<a class="dropdown-item" href="/test/branch/foo">',
                 output.data)
+            self.assertIn('<form id="delete_branch_form-foo"', output.data)
             self.assertIn(
                 '<a class="dropdown-item" href="/test/branch/master">',
                 output.data)
@@ -2262,6 +2263,8 @@ index 0000000..fb7093d
             self.assertNotIn(
                 '<a class="dropdown-item" href="/test/branch/foo">',
                 output.data)
+            self.assertNotIn(
+                '<form id="delete_branch_form-foo"', output.data)
             self.assertIn(
                 '<a class="dropdown-item" href="/test/branch/master">',
                 output.data)
@@ -2279,6 +2282,8 @@ index 0000000..fb7093d
                 '<a class="dropdown-item" href="/test/branch/feature/foo">',
                 output.data)
             self.assertIn(
+                '<form id="delete_branch_form-feature_foo"', output.data)
+            self.assertIn(
                 '<a class="dropdown-item" href="/test/branch/master">',
                 output.data)
 
@@ -2288,6 +2293,8 @@ index 0000000..fb7093d
             self.assertNotIn(
                 '<a class="dropdown-item" href="/test/branch/feature/foo">',
                 output.data)
+            self.assertNotIn(
+                '<form id="delete_branch_form-feature_foo"', output.data)
             self.assertIn(
                 '<a class="dropdown-item" href="/test/branch/master">',
                 output.data)
