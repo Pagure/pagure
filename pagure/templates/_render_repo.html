@@ -7,17 +7,15 @@
         {% endif %}
   <div class="col-lg-4 col-md-6">
     <div class="project_wrapper m-b-1">
-            {% if repo.avatar_email %}
-
-            <img class="projecticon pull-xs-left" src="{{ repo.avatar_email | avatar_url }}" width=60 height=60 />
-
-            {% else %}
-            <div class="projecticon pull-xs-left"><span class="oi" data-glyph="document"></span></div>
-            {% endif %}
-        <a class="project_link logo_link" href="{{ url }}">
-            <div class="repo_name"><strong>{{ repo.name }}</strong></div>
-       </a>
-       <div class="repo_desc" title="{{ repo.description }}" data-toggle="tooltip">
+      {% if repo.avatar_email %}
+        <img class="projecticon pull-xs-left" src="{{ repo.avatar_email | avatar_url }}" width=60 height=60 />
+      {% else %}
+        <div class="projecticon pull-xs-left"><span class="oi" data-glyph="document"></span></div>
+      {% endif %}
+      <a class="project_link logo_link" href="{{ url }}">
+        <div class="repo_name"><strong>{{ repo.name }}</strong></div>
+      </a>
+      <div class="repo_desc" title="{{ repo.description }}" data-toggle="tooltip">
         <small>{% if repo.description %}{{ repo.description }}{%else%}<span class="text-muted">no description<span>{% endif %}</small>
       </div>
       <div class="project_metadata">
