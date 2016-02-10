@@ -41,7 +41,11 @@
                   {% set url = url_for('view_repo', repo=repo.name) %}
                 {% endif %}
                 <a href="{{ url }}">
-                  <span class="oi text-muted" data-glyph="document"></span>
+                  {% if repo.avatar_email %}
+                    <img class="projecticon pull-xs-left" src="{{ repo.avatar_email | avatar_url }}" width=20 height=20 />&nbsp;
+                  {% else %}
+                    <span class="oi text-muted" data-glyph="document"></span>
+                  {% endif %}
                   <strong>{{ repo.name }}</strong>
                 </a>
                   <div class="pull-xs-right">
