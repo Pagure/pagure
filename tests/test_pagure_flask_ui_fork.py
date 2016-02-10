@@ -29,6 +29,25 @@ import tests
 from pagure.lib.repo import PagureRepo
 
 
+def _get_commits(output):
+    ''' Returns the commits message in the output. All commits must have
+    been made by `Alice Author` or `PY C` to be found.
+    '''
+    commits = []
+    save = False
+    cnt = 0
+    for row in output.split('\n'):
+        if row.strip() in ['Alice Author', 'PY C']:
+            save = True
+        if save:
+            cnt += 1
+        if cnt == 7:
+            commits.append(row.strip())
+            save = False
+            cnt = 0
+    return commits
+
+
 class PagureFlaskForktests(tests.Modeltests):
     """ Tests for flask fork controller of pagure """
 
@@ -375,6 +394,19 @@ class PagureFlaskForktests(tests.Modeltests):
             self.assertIn(
                 '</button>\n                      Changes merged!',
                 output.data)
+            self.assertIn(
+                'A commit on branch feature', output.data)
+            self.assertNotIn(
+                'Merge #1 `PR from the feature branch`', output.data)
+            # Ensure we have the new commit
+            commits = _get_commits(output.data)
+            self.assertEqual(
+                commits,
+                [
+                    'A commit on branch feature',
+                    'Add sources file for testing'
+                ]
+            )
 
     @patch('pagure.lib.notify.send_email')
     def test_merge_request_pull_merge(self, send_email):
@@ -1673,6 +1705,92 @@ index 0000000..2a552bb
                 '/test/pull-request/1/comment/edit/1', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 404)
+
+    @patch('pagure.lib.notify.send_email')
+    def test_merge_request_pull_FF_w_merge_commit(self, send_email):
+        """ Test the merge_request_pull endpoint with a FF PR but with a
+        merge commit.
+        """
+        send_email.return_value = True
+
+        self.test_request_pull()
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/pull-request/1')
+            self.assertEqual(output.status_code, 200)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            # No CSRF
+            output = self.app.post(
+                '/test/pull-request/1/merge', data={}, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>PR#1: PR from the feature branch - test\n - '
+                'Pagure</title>', output.data)
+            self.assertIn(
+                '<h3><span class="label label-default">PR#1</span>\n'
+                '  PR from the feature branch\n</h3>', output.data)
+            self.assertIn(
+                'title="View file as of 2a552b">View</a>', output.data)
+
+            # Wrong project
+            data = {
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/foobar/pull-request/100/merge', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+            # Wrong project
+            data = {
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/pull-request/1/merge', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 403)
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+
+            # Wrong request id
+            data = {
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/pull-request/100/merge', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+            # Project requiring a merge commit
+            repo = pagure.lib.get_project(self.session, 'test')
+            settings = repo.settings
+            settings['always_merge'] = True
+            repo.settings = settings
+            self.session.add(repo)
+            self.session.commit()
+
+            # Merge
+            output = self.app.post(
+                '/test/pull-request/1/merge', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Overview - test - Pagure</title>', output.data)
+            self.assertIn(
+                '</button>\n                      Changes merged!',
+                output.data)
+            self.assertIn(
+                'Merge #1 `PR from the feature branch`', output.data)
+            self.assertIn(
+                'A commit on branch feature', output.data)
+            # Ensure we have the merge commit
+            commits = _get_commits(output.data)
+            self.assertEqual(commits, [
+                'Merge #1 `PR from the feature branch`',
+                'Add sources file for testing',
+                'A commit on branch feature',
+            ])
 
 
 if __name__ == '__main__':
