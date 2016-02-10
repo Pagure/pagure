@@ -37,7 +37,7 @@ def _get_commits(output):
     save = False
     cnt = 0
     for row in output.split('\n'):
-        if row.strip() in ['Alice Author', 'PY C']:
+        if row.strip() in ['Alice Author', 'Alice Äuthòr', 'PY C']:
             save = True
         if save:
             cnt += 1
@@ -126,9 +126,9 @@ class PagureFlaskForktests(tests.Modeltests):
             # Commits the files added
             tree = clone_repo.index.write_tree()
             author = pygit2.Signature(
-                'Alice Author', 'alice@authors.tld')
+                'Alice Äuthòr', 'alice@äuthòrs.tld')
             committer = pygit2.Signature(
-                'Cecil Committer', 'cecil@committers.tld')
+                'Cecil Cõmmîttër', 'cecil@cõmmîttërs.tld')
             clone_repo.create_commit(
                 'refs/heads/master',
                 author,
