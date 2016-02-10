@@ -691,7 +691,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,78 @@
+@@ -0,0 +1,80 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
@@ -714,6 +714,7 @@ index 0000000..60f7480
 +            "Minimum_score_to_merge_pull-request": -1,
 +            "Only_assignee_can_merge_pull-request": false,
 +            "Web-hooks": null,
++            "always_merge": false,
 +            "issue_tracker": true,
 +            "project_documentation": true,
 +            "pull_requests": true
@@ -741,6 +742,7 @@ index 0000000..60f7480
 +            "Minimum_score_to_merge_pull-request": -1,
 +            "Only_assignee_can_merge_pull-request": false,
 +            "Web-hooks": null,
++            "always_merge": false,
 +            "issue_tracker": true,
 +            "project_documentation": true,
 +            "pull_requests": true
