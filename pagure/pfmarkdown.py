@@ -126,7 +126,6 @@ class PagureExtension(markdown.extensions.Extension):
         markdown.inlinepatterns.AUTOLINK_RE = '(%s)' % '|'.join([
             r'<(?:f|ht)tps?://[^>]*>',
             r'\b(?:f|ht)tps?://[^)<>\s]+[^.,)<>\s]',
-            r'\bwww\.[^)<>\s]+[^.,)<>\s]',
         ])
 
         md.inlinePatterns['mention'] = MentionPattern(MENTION_RE)
