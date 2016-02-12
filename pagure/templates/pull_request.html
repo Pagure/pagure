@@ -48,7 +48,9 @@
         (repo_admin or g.fas_user.username == pull_request.user.username) %}
         {{ mergeform.csrf_token }}
             <button type="submit" value="Close" id="cancel_pr"
-                    class="btn btn-danger btn-sm"><span class="oi" data-glyph="trash"></span></button>
+                    class="btn btn-danger btn-sm" title="Close PR without merging it">
+              <span class="oi" data-glyph="x"></span>
+            </button>
     {% endif %}
           </div>
     {% if pull_request.status == 'Open' and authenticated and
