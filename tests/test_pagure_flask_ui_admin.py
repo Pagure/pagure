@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015 - Copyright Red Hat Inc
+ (c) 2015-2016 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -38,6 +38,7 @@ class PagureFlaskAdmintests(tests.Modeltests):
         pagure.SESSION = self.session
         pagure.ui.SESSION = self.session
         pagure.ui.app.SESSION = self.session
+        pagure.ui.filters.SESSION = self.session
         pagure.ui.repo.SESSION = self.session
         pagure.ui.admin.SESSION = self.session
 

@@ -49,6 +49,7 @@ class PagureFlaskLogintests(tests.Modeltests):
         pagure.ui.SESSION = self.session
         pagure.ui.app.SESSION = self.session
         pagure.ui.login.SESSION = self.session
+        pagure.ui.filters.SESSION = self.session
 
         self.app = pagure.APP.test_client()
 
