@@ -62,12 +62,17 @@
 </h3>
 
   <h5 class="text-muted">
-    Proposed <a href="#" data-toggle="tooltip" title="{{ pull_request.date_created.strftime('%b %d %Y %H:%M:%S') }}">{{ pull_request.date_created |humanize }}</a>
-    by {{ pull_request.user.default_email | avatar(16) | safe }} {{ pull_request.user.user }}
+    Proposed <a href="#" data-toggle="tooltip" title="{{
+        pull_request.date_created.strftime('%b %d %Y %H:%M:%S')
+      }}">{{ pull_request.date_created |humanize }}</a>
+    by {{ pull_request.user.default_email | avatar(16) | safe
+      }} {{ pull_request.user.user }}
   </h5>
 
   From
-    <span class="pr-toplabel">{{ pull_request.project_from.fullname or pull_request.remote_git}}</span> <span class="pr-toplabel">
+    <span class="pr-toplabel">{{
+        pull_request.project_from.fullname or pull_request.remote_git
+    }}</span> <span class="pr-toplabel">
     <span class="oi" data-glyph="random"> </span>
     <a href="{{ url_for('view_repo_branch',
           username=pull_request.project_from.user.user
@@ -157,10 +162,15 @@
 
 <ul class="nav nav-tabs nav-small" role="tablist" id="pr-tabs">
   {% if pull_request %}
-    <li class="nav-item"><a class="nav-link active" data-toggle="tab" role="tab" href="#comments">Comments</a></li>
+    <li class="nav-item">
+      <a class="nav-link active" data-toggle="tab" role="tab" href="#comments">
+        Comments
+      </a>
+    </li>
   {%endif%}
   <li class="nav-item">
-    <a class="nav-link {% if not pull_request %}active{% endif %}" data-toggle="tab" role="tab" href="#request_diff">
+    <a class="nav-link {% if not pull_request %}active{%
+        endif %}" data-toggle="tab" role="tab" href="#request_diff">
       <span class="hidden-sm-down">Files Changed&nbsp;</span>
       <span class="label label-default label-pill hidden-sm-down">
         {{ diff|length if diff else 0}}
