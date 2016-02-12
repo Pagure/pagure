@@ -30,7 +30,7 @@
     {{ issue.date_created | humanize}} by {{ issue.user.user }}
   </h5>
 
-    {{ show_initial_comment(issue, username, repo,issueid, repo_admin) }}
+    {{ show_initial_comment(issue, username, repo,issueid, repo_admin, form) }}
 
   <form action="{{ url_for('update_issue', username=username,
                repo=repo.name, issueid=issueid) }}" method="post"
