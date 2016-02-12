@@ -1159,7 +1159,7 @@ def diff_pull_request(
             request.commit_stop = diff_commits[0].oid.hex
             session.add(request)
             session.commit()
-            if not request.merge_status:
+            if request.merge_status is None:
                 pagure.lib.add_pull_request_comment(
                     session, request,
                     commit=None, filename=None, row=None,
