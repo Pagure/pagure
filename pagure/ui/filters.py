@@ -295,14 +295,14 @@ def patch_to_diff(patch):
         for line in hunk.lines:
             if hasattr(line, 'content'):
                 origin = line.origin
-                if line.origin in ['<', '>']:
+                if line.origin in ['<', '>', '=']:
                     origin = ''
                 content = content + origin + ' '+ line.content
             else:
                 # Avoid situation where at the end of a file we get:
                 # + foo<
                 # \ No newline at end of file
-                if line[0] == '<':
+                if line[0] in ['<', '>', '=']:
                     line = ('', line[1])
                 content = content + ' '.join(line)
 
