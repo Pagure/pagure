@@ -790,7 +790,8 @@ def add_group_to_project(session, project, new_group, user):
 
 
 def add_pull_request_comment(session, request, commit, filename, row,
-                             comment, user, requestfolder, notify=True):
+                             comment, user, requestfolder, notify=True,
+                             notification=False):
     ''' Add a comment to a pull-request. '''
     user_obj = __get_user(session, user)
 
@@ -801,6 +802,7 @@ def add_pull_request_comment(session, request, commit, filename, row,
         line=row,
         comment=comment,
         user_id=user_obj.id,
+        notification=notification,
     )
     session.add(pr_comment)
     # Make sure we won't have SQLAlchemy error before we continue
