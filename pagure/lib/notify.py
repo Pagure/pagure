@@ -13,6 +13,7 @@ import datetime
 import hashlib
 import json
 import urlparse
+import re
 import smtplib
 import time
 import warnings
@@ -59,6 +60,18 @@ def log(project, topic, msg, redis=None):
                 'topic': topic,
                 'msg': msg,
             }))
+
+
+def _add_mentioned_users(emails, comment):
+    ''' Check the comment to see if an user is mentioned in it and if
+    so add this user to the list of people to notify.
+    '''
+    MENTION_RE = r'@(\w+)'
+    for username in re.findall(MENTION_RE, comment):
+        user = pagure.lib.search_user(pagure.SESSION, username=username)
+        if user:
+            emails.add(user.default_email)
+    return emails
 
 
 def _clean_emails(emails, user):
@@ -229,6 +242,7 @@ def notify_new_comment(comment, user=None):
     if comment.user and comment.user.default_email:
         mail_to.add(comment.user.default_email)
 
+    mail_to = _add_mentioned_users(mail_to, comment.comment)
     mail_to = _clean_emails(mail_to, user)
 
     send_email(
@@ -263,6 +277,7 @@ def notify_new_issue(issue, user=None):
            'issue',
            issue.id))
     mail_to = _get_emails_for_issue(issue)
+    mail_to = _add_mentioned_users(mail_to, issue.content)
     mail_to = _clean_emails(mail_to, user)
 
     send_email(
@@ -470,6 +485,7 @@ def notify_pull_request_comment(comment, user):
            'pull-request',
            comment.pull_request.id))
     mail_to = _get_emails_for_issue(comment.pull_request)
+    mail_to = _add_mentioned_users(mail_to, comment.comment)
     mail_to = _clean_emails(mail_to, user)
 
     send_email(
