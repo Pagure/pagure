@@ -325,8 +325,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             # Not author nor admin = No edit
             self.assertNotIn(
-            '<a class="btn btn-primary btn-sm" href="/test/issue/1/edit" title="Edit this issue">',
-            output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
+            self.assertNotIn(
+                '<button class="btn btn-danger btn-sm" type="submit"',
+                output.data)
+            self.assertNotIn('title="Delete this ticket">', output.data)
             self.assertFalse(
                 '<a href="/login/">Login</a> to comment on this ticket.'
                 in output.data)
@@ -339,6 +344,10 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output.data)
+            self.assertIn(
+                '<button class="btn btn-danger btn-sm" type="submit"',
+                output.data)
+            self.assertIn('title="Delete this ticket">', output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
