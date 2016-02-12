@@ -130,8 +130,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/1/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
 
         # Project w/o issue tracker
         repo = pagure.lib.get_project(self.session, 'test')
@@ -188,8 +189,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/1/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
 
         # Project w/o issue tracker
         repo = pagure.lib.get_project(self.session, 'test')
@@ -308,7 +310,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         # Not authentified = No edit
         self.assertNotIn(
-            '<a class="btn btn-secondary btn-sm" href="/test/issue/1/edit">',
+            '<a class="btn btn-primary btn-sm" href="/test/issue/1/edit" '
+            'title="Edit this issue">',
             output.data)
         self.assertTrue(
             '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
@@ -321,7 +324,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             # Not author nor admin = No edit
             self.assertNotIn(
-            '<a class="btn btn-secondary btn-sm" href="/test/issue/1/edit">',
+            '<a class="btn btn-primary btn-sm" href="/test/issue/1/edit" title="Edit this issue">',
             output.data)
             self.assertFalse(
                 '<a href="/login/">Login</a> to comment on this ticket.'
@@ -332,8 +335,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/1/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -374,8 +378,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<span class="oi red-icon" data-glyph="lock-locked" '
                 'title="Private issue"></span>', output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/2/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/2/edit" title="Edit this issue">',
+                output.data)
 
         # Project w/o issue tracker
         repo = pagure.lib.get_project(self.session, 'test')
@@ -423,8 +428,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/1/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -448,8 +454,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/1/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
             self.assertFalse(
                 '<option selected value="Fixed">Fixed</option>'
                 in output.data)
@@ -462,8 +469,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/1/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
             self.assertFalse(
                 '<option selected value="Fixed">Fixed</option>'
                 in output.data)
@@ -476,8 +484,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/1/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
             self.assertIn(
                 '</button>\n                      Successfully edited issue #1',
                 output.data)
@@ -498,8 +507,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/1/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
             self.assertIn(
                 '</button>\n                      Comment added',
                 output.data)
@@ -526,8 +536,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/1/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
             self.assertIn(
                 '</button>\n                      Tag added: tag2',
                 output.data)
@@ -554,8 +565,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/1/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
             self.assertIn(
                 '</button>\n                      No user &#34;ralph&#34; found',
                 output.data)
@@ -579,8 +591,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/1/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
             self.assertIn(
                 '</button>\n                      Issue assigned',
                 output.data)
@@ -627,8 +640,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #2: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/2/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/2/edit" title="Edit this issue">',
+                output.data)
             self.assertIn(
                 '</button>\n                      You cannot close a ticket '
                 'that has ticket depending that are still open.',
@@ -703,8 +717,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/1/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -721,8 +736,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/1/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
             self.assertIn(
                 '</button>\n                      Comment added',
                 output.data)
@@ -762,8 +778,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/1/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
             self.assertIn(
                 '</button>\n                      Comment removed',
                 output.data)
@@ -820,8 +837,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/1/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -838,8 +856,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/1/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
             self.assertIn(
                 '</button>\n                      Dependency added',
                 output.data)
@@ -856,10 +875,12 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/1/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
             self.assertNotIn(
-                '</button>\n                      Dependency added', output.data)
+                '</button>\n                      Dependency added',
+                output.data)
 
         repo = pagure.lib.get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
@@ -909,8 +930,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/1/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -927,8 +949,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/1/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
             self.assertIn(
                 '</button>\n                      Dependency added',
                 output.data)
@@ -945,8 +968,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/1/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
             self.assertNotIn(
                 '</button>\n                      Dependency added',
                 output.data)
@@ -989,8 +1013,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/1/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -1464,7 +1489,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<title>Issues - test - Pagure</title>', output.data)
             self.assertIn(
-                '</button>\n                      Issue deleted', output.data)
+                '</button>\n                      Issue deleted',
+                output.data)
 
         # Project w/o issue tracker
         repo = pagure.lib.get_project(self.session, 'test')
@@ -1508,8 +1534,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/1/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -1526,8 +1553,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/1/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
             self.assertIn(
                 '</button>\n                      Comment added',
                 output.data)
@@ -1538,7 +1566,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
         repo = pagure.lib.get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 1)
-        self.assertEqual(issue.comments[0].comment, 'Woohoo a second comment !')
+        self.assertEqual(
+            issue.comments[0].comment,
+            'Woohoo a second comment !')
 
         data = {
             'csrf_token': csrf_token,
@@ -1569,8 +1599,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/1/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
             self.assertIn(
                 '</button>\n                      Comment updated',
                 output.data)
@@ -1606,8 +1637,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-secondary btn-sm" '
-                'href="/test/issue/1/edit">', output.data)
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
             self.assertIn(
                 '</button>\n                      Comment updated',
                 output.data)
