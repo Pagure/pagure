@@ -13,7 +13,13 @@ down_revision = '3b441ef4e928'
 from alembic import op
 import sqlalchemy as sa
 import sqlalchemy.orm
-from pagure.lib import model
+
+try:
+    from pagure.lib import model
+except ImportError:
+    import sys
+    sys.path.insert(0, '.')
+    from pagure.lib import model
 
 
 def upgrade():
