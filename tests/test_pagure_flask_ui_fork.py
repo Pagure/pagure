@@ -408,6 +408,13 @@ class PagureFlaskForktests(tests.Modeltests):
                 ]
             )
 
+            # Check if the closing notification was added
+            output = self.app.get('/test/pull-request/1')
+            self.assertIn(
+                '<div>\n                '
+                'Pull-Request has been merged by pingou\n                '
+                '<div class="pull-xs-right text-muted">', output.data)
+
     @patch('pagure.lib.notify.send_email')
     def test_merge_request_pull_merge(self, send_email):
         """ Test the merge_request_pull endpoint with a merge PR. """
@@ -441,6 +448,13 @@ class PagureFlaskForktests(tests.Modeltests):
             self.assertIn(
                 '</button>\n                      Changes merged!',
                 output.data)
+
+            # Check if the closing notification was added
+            output = self.app.get('/test/pull-request/1')
+            self.assertIn(
+                '<div>\n                '
+                'Pull-Request has been merged by pingou\n                '
+                '<div class="pull-xs-right text-muted">', output.data)
 
     @patch('pagure.lib.notify.send_email')
     def test_merge_request_pull_conflicts(self, send_email):
@@ -513,6 +527,13 @@ class PagureFlaskForktests(tests.Modeltests):
             self.assertIn(
                 '</button>\n                      Nothing to do, changes '
                 'were already merged', output.data)
+
+            # Check if the closing notification was added
+            output = self.app.get('/test/pull-request/1')
+            self.assertIn(
+                '<div>\n                '
+                'Pull-Request has been merged by pingou\n                '
+                '<div class="pull-xs-right text-muted">', output.data)
 
     @patch('pagure.lib.notify.send_email')
     def test_request_pull_close(self, send_email):
@@ -1791,6 +1812,13 @@ index 0000000..2a552bb
                 'Add sources file for testing',
                 'A commit on branch feature',
             ])
+
+            # Check if the closing notification was added
+            output = self.app.get('/test/pull-request/1')
+            self.assertIn(
+                '<div>\n                '
+                'Pull-Request has been merged by pingou\n                '
+                '<div class="pull-xs-right text-muted">', output.data)
 
 
 if __name__ == '__main__':
