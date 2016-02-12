@@ -1816,6 +1816,16 @@ def close_pull_request(session, request, user, requestfolder, merged=True):
     pagure.lib.git.update_git(
         request, repo=request.project, repofolder=requestfolder)
 
+    pagure.lib.add_pull_request_comment(
+        session, request,
+        commit=None, filename=None, row=None,
+        comment='Pull-Request has been %s by %s' % (
+            request.status.lower(), user),
+        user=user,
+        requestfolder=requestfolder,
+        notify=False, notification=True
+    )
+
     pagure.lib.notify.log(
         request.project,
         topic='pull-request.closed',
