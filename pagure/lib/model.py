@@ -971,6 +971,7 @@ class PullRequestComment(BASE):
         sa.Integer,
         sa.ForeignKey('pull_request_comments.id', onupdate='CASCADE'),
         nullable=True)
+    notification = sa.Column(sa.Boolean, default=False, nullable=False)
     edited_on = sa.Column(sa.DateTime, nullable=True)
     editor_id = sa.Column(
         sa.Integer,
@@ -1021,6 +1022,7 @@ class PullRequestComment(BASE):
             'user': self.user.to_json(public=public),
             'edited_on': self.edited_on.strftime('%s') if self.edited_on else None,
             'editor': self.editor.to_json(public=public) if self.editor_id else None,
+            'notification': self.notification,
         }
 
 
