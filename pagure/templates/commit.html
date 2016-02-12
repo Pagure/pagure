@@ -41,9 +41,9 @@
       <span data-toggle="tooltip" title="{{commit.commit_time | format_ts}}">{{commit.commit_time | humanize}}</span>
     {% else %}
     <a href="#" id="diff_list_link">{{diff|count}} file{{'s' if diff|count > 1}}</a> Authored by {{ commit.author | author2user |safe }}
-      <span data-toggle="tooltip" title="{{commit.commit_time | format_ts}}">{{commit.commit_time | humanize}}</span>, 
+      <span data-toggle="tooltip" title="{{commit.commit_time | format_ts}}">{{commit.commit_time | humanize}}</span>,
     Committed by {{ commit.committer | author2user |safe }}
-      <span data-toggle="tooltip" title="{{commit.commit_time | format_ts}}">{{commit.commit_time | humanize}}</span>, 
+      <span data-toggle="tooltip" title="{{commit.commit_time | format_ts}}">{{commit.commit_time | humanize}}</span>,
     {% endif%}
   </h5>
 </div>
