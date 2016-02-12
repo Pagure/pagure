@@ -306,10 +306,7 @@
           onsubmit="return try_async_comment(this, null)">
 
       {% for comment in pull_request.comments %}
-        {% if not comment.commit_id %}
-          {{ show_comment(comment, comment.id, repo, username,
-                          requestid, form, repo_admin) }}
-        {% else %}
+        {% if comment.commit_id %}
           <div class="card">
             <div class="card-header">
               <div>
@@ -322,6 +319,20 @@
               </div>
             </div>
           </div>
+        {% elif comment.notification %}
+          <div class="card">
+            <div class="card-header">
+              <div>
+                {{ comment.comment }}
+                <div class="pull-xs-right text-muted">
+                    <span title="{{comment.date_created.strftime('%Y-%m-%d %H:%M:%S')}}">{{
+                        comment.date_created | humanize}}</span></div>
+              </div>
+            </div>
+          </div>
+        {% else %}
+          {{ show_comment(comment, comment.id, repo, username,
+                          requestid, form, repo_admin) }}
         {% endif %}
       {% endfor %}
       {{ mergeform.csrf_token }}
