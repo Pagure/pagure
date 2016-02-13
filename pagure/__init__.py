@@ -33,8 +33,10 @@ from pygments import highlight
 from pygments.lexers.text import DiffLexer
 from pygments.formatters import HtmlFormatter
 
+from flask_multistatic import MultiStaticFlask
+
 # Create the application.
-APP = flask.Flask(__name__)
+APP = MultiStaticFlask(__name__)
 APP.jinja_env.trim_blocks = True
 APP.jinja_env.lstrip_blocks = True
 
@@ -43,6 +45,35 @@ APP.config.from_object('pagure.default_config')
 
 if 'PAGURE_CONFIG' in os.environ:
     APP.config.from_envvar('PAGURE_CONFIG')
+
+
+if APP.config.get('THEME_TEMPLATE_FOLDER', False):
+    # Jinja can be told to look for templates in different folders
+    # That's what we do here
+    template_folder = APP.config['THEME_TEMPLATE_FOLDER']
+    if template_folder[0] != '/':
+        template_folder= os.path.join(
+            APP.root_path, APP.template_folder, template_folder)
+    import jinja2
+    # Jinja looks for the template in the order of the folders specified
+    templ_loaders = [
+        jinja2.FileSystemLoader(template_folder),
+        APP.jinja_loader,
+    ]
+    APP.jinja_loader = jinja2.ChoiceLoader(templ_loaders)
+
+
+if APP.config.get('THEME_STATIC_FOLDER', False):
+    static_folder = APP.config['THEME_STATIC_FOLDER']
+    if static_folder[0] != '/':
+        static_folder= os.path.join(
+            APP.root_path, 'static', static_folder)
+    # Unlike templates, to serve static files from multiples folders we
+    # need flask-multistatic
+    APP.static_folder = [
+        static_folder,
+        os.path.join(APP.root_path, 'static'),
+    ]
 
 
 import pagure.doc_utils
