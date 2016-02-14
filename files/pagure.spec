@@ -26,6 +26,7 @@ BuildRequires:  python-cryptography
 BuildRequires:  python-docutils
 BuildRequires:  python-flask
 BuildRequires:  python-flask-wtf
+BuildRequires:  python-flask-multistatic
 BuildRequires:  python-markdown
 BuildRequires:  python-psutil
 BuildRequires:  python-pygit2 >= 0.20.1
@@ -60,6 +61,7 @@ Requires:  python-docutils
 Requires:  python-enum34
 Requires:  python-flask
 Requires:  python-flask-wtf
+Requires:  python-flask-multistatic
 Requires:  python-markdown
 Requires:  python-psutil
 Requires:  python-pygit2 >= 0.20.1

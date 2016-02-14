@@ -9,6 +9,7 @@ python-enum34
 python-fedora-flask
 python-flask
 python-flask-wtf
+python-flask-multistatic
 python-jinja2
 python-markdown
 python-munch
