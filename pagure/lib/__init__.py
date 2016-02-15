@@ -1228,7 +1228,10 @@ def update_project_settings(session, repo, settings, user):
                 new_settings[key] = settings[key]
         else:
             update.append(key)
-            new_settings[key] = False
+            val = False
+            if key == 'Web-hooks':
+                val = None
+            new_settings[key] = val
 
     if not update:
         return 'No settings to change'
