@@ -211,9 +211,9 @@
                 </div>
               {% else %}
                 <div class="form-inline">
+                  <label for="{{ key }}">Activate {{ key | replace('_', ' ') }} :</label>
                   <input width="4em" class="form-control" id="{{ key }}" type="text" {% if repo.settings[key]
                         %}value="{{ repo.settings[key] }}"{% endif %} name="{{ key }}" />
-                  <label for="{{ key }}">Activate {{ key | replace('_', ' ') }}</label>
                 </div>
               {% endif %}
             {% endif %}
