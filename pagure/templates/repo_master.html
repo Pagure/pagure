@@ -139,6 +139,15 @@
           </li>
         {% endif %}
       {% endif %}
+      {% if endpoint == 'view_docs' %}
+      <li class="nav-item pull-xs-right">
+        <a href="{{ config['DOC_APP_URL'] + url_for('.view_repo',
+                username=username, repo=repo.name, filename=filename)
+          }}" target="_blank" title="Open to a new tab">
+          <span class="oi" data-glyph="external-link"></span>
+        </a>
+      </li>
+      {% endif %}
 
     </ul>
   </div>

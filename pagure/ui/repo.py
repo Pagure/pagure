@@ -1535,4 +1535,5 @@ def view_docs(repo, username=None, filename=None):
         repo=repo_obj,
         username=username,
         filename=filename,
+        endpoint='view_docs',
     )
