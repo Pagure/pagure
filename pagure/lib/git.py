@@ -676,8 +676,8 @@ def add_file_to_git(repo, issue, ticketfolder, user, filename, filestream):
 
     # Author/commiter will always be this one
     author = pygit2.Signature(
-        name=user.username,
-        email=user.email
+        name=user.username.encode('utf-8'),
+        email=user.email.encode('utf-8')
     )
 
     # Actually commit
@@ -768,8 +768,8 @@ def update_file_in_git(
 
     # Author/commiter will always be this one
     author = pygit2.Signature(
-        name=user.username,
-        email=email
+        name=user.username.encode('utf-8'),
+        email=email.encode('utf-8')
     )
 
     # Actually commit
@@ -1049,8 +1049,8 @@ def merge_pull_request(
                 head = new_repo.lookup_reference('HEAD').get_object()
                 user_obj = pagure.lib.__get_user(session, username)
                 author = pygit2.Signature(
-                    user_obj.fullname,
-                    user_obj.default_email)
+                    user_obj.fullname.encode('utf-8'),
+                    user_obj.default_email.encode('utf-8'))
                 new_repo.create_commit(
                     'refs/heads/%s' % request.branch,
                     author,
@@ -1082,7 +1082,9 @@ def merge_pull_request(
         if domerge:
             head = new_repo.lookup_reference('HEAD').get_object()
             user_obj = pagure.lib.__get_user(session, username)
-            author = pygit2.Signature(user_obj.fullname, user_obj.default_email)
+            author = pygit2.Signature(
+                user_obj.fullname.encode('utf-8'),
+                user_obj.default_email.encode('utf-8'))
             new_repo.create_commit(
                 'refs/heads/%s' % request.branch,
                 author,
