@@ -32,7 +32,7 @@ from. So what you want to do is replace this ``master.html`` by your own.
 
 ::
 
-    cp /path/to/your/logo /var/www/mypaguretheme/static
+    cp /path/to/your/my-logo.png /var/www/mypaguretheme/static
 
 * Place in there the original ``master.html``
 
