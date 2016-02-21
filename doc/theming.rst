@@ -15,6 +15,11 @@ look for templates and static files first in these folders, then in its
 usual folders.
 
 
+.. note: The principal is that pagure will look in the folder specified in
+         the configuration file first and then in its usual folder, so the
+         **file names must be identical**.
+
+
 Let's take an example, you wish to replace the pagure logo at the top right
 of all the pages.
 
