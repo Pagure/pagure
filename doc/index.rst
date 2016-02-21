@@ -36,6 +36,7 @@ Contents:
    install_webhooks
    configuration
    development
+   usage
    contributing
    contributors
 
