@@ -19,6 +19,8 @@ usual folders.
          the configuration file first and then in its usual folder, so the
          **file names must be identical**.
 
+Example
+-------
 
 Let's take an example, you wish to replace the pagure logo at the top right
 of all the pages.
