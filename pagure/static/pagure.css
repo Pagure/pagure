@@ -449,3 +449,14 @@ pre.softwrap
   white-space: pre-wrap;
   word-wrap: break-word;
 }
+
+.inline-comments {
+  padding: 1rem 1rem;
+  background-color: white;
+  text-indent:4px;
+  border-radius: 0.25rem 0.25rem 0 0;
+}
+
+.inline-btn {
+  cursor: pointer;
+}

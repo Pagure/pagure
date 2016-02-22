@@ -323,12 +323,17 @@
             <div class="card-header">
               <div>
                 {{comment.user.user}} commented on line
-                    <a href="#c-{{comment.commit_id}}-{{comment.line}}" onclick="showTab()">{{
-                        comment.line}} of {{comment.filename}}</a>
+                    <a href="#c-{{comment.commit_id}}-{{comment.line}}"
+                        onclick="showTab()">{{
+                        comment.line}} of {{comment.filename}}</a>.
                 <div class="pull-xs-right text-muted">
                     <span title="{{comment.date_created.strftime('%Y-%m-%d %H:%M:%S')}}">{{
                         comment.date_created | humanize}}</span></div>
               </div>
+                (<a class="inline-btn small" data-id="{{ index }}">Show</a>)
+                <div class="inline-comments" id="inline-comment-{{ index }}">
+                  {{ comment.comment }}
+                </div>
             </div>
           </div>
         {% elif comment.notification %}
@@ -602,6 +607,17 @@ function setup_reply_btns() {
 
 
  $(document).ready(function() {
+
+  $(".inline-comments").hide();
+  $( ".inline-btn" ).click(function() {
+    var msgid = $( this ).attr('data-id');
+    if ($( this ).html() == 'Show') {
+      $( this ).html('Hide');
+    } else {
+      $( this ).html('Show');
+    }
+    $( '#inline-comment-' + msgid).toggle();
+  });
 
   $( ".commit_msg_txt" ).hide();
   $( ".commit_msg_btn" ).click(function() {
