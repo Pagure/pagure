@@ -149,6 +149,7 @@
     </div>
     {% endif %}
     {{ render_bootstrap_field(form.title) }}
+    {{ render_bootstrap_field(form.initial_comment)}}
     <p class="buttons indent">
       <input type="submit" class="btn btn-primary" value="Create">
       {{ form.csrf_token }}

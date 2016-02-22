@@ -92,6 +92,8 @@ class RequestPullForm(wtf.Form):
         'Title<span class="error">*</span>',
         [wtforms.validators.Required()]
     )
+    initial_comment = wtforms.TextAreaField(
+        'Initial Comment', [wtforms.validators.Optional()])
 
 
 class RemoteRequestPullForm(RequestPullForm):
