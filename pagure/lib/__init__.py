@@ -789,15 +789,16 @@ def add_group_to_project(session, project, new_group, user):
     return 'Group added'
 
 
-def add_pull_request_comment(session, request, commit, filename, row,
-                             comment, user, requestfolder, notify=True,
-                             notification=False):
+def add_pull_request_comment(session, request, commit, tree_id, filename,
+                             row, comment, user, requestfolder,
+                             notify=True, notification=False):
     ''' Add a comment to a pull-request. '''
     user_obj = __get_user(session, user)
 
     pr_comment = model.PullRequestComment(
         pull_request_uid=request.uid,
         commit_id=commit,
+        tree_id=tree_id,
         filename=filename,
         line=row,
         comment=comment,
