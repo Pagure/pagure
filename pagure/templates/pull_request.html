@@ -330,8 +330,8 @@
                     <span title="{{comment.date_created.strftime('%Y-%m-%d %H:%M:%S')}}">{{
                         comment.date_created | humanize}}</span></div>
               </div>
-                (<a class="inline-btn small" data-id="{{ index }}">Show</a>)
-                <div class="inline-comments" id="inline-comment-{{ index }}">
+                (<a class="inline-btn small" data-id="{{ loop.index }}">Show</a>)
+                <div class="inline-comments" id="inline-comment-{{ loop.index }}">
                   {{ comment.comment }}
                 </div>
             </div>
