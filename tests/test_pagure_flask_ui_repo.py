@@ -1515,6 +1515,7 @@ index 0000000..fb7093d
                 session=self.session,
                 request=request,
                 commit='commithash',
+                tree_id=None,
                 filename='file',
                 row=None,
                 comment='This is awesome, I got to remember it!',
