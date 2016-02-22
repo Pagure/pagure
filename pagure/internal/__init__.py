@@ -94,6 +94,7 @@ def pull_request_add_comment():
         flask.abort(400, 'Invalid request')
 
     commit = form.commit.data or None
+    tree_id = form.tree_id.data or None
     filename = form.filename.data or None
     row = form.row.data or None
     comment = form.comment.data
@@ -103,6 +104,7 @@ def pull_request_add_comment():
             pagure.SESSION,
             request=request,
             commit=commit,
+            tree_id=tree_id,
             filename=filename,
             row=row,
             comment=comment,

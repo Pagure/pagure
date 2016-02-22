@@ -1819,7 +1819,7 @@ def close_pull_request(session, request, user, requestfolder, merged=True):
 
     pagure.lib.add_pull_request_comment(
         session, request,
-        commit=None, filename=None, row=None,
+        commit=None, tree_id=None, filename=None, row=None,
         comment='Pull-Request has been %s by %s' % (
             request.status.lower(), user),
         user=user,

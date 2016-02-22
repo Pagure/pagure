@@ -587,6 +587,7 @@ def update_request_from_git(
                 session,
                 request,
                 commit=comment['commit'],
+                tree_id=comment.get('tree_id') or None,
                 filename=comment['filename'],
                 row=comment['line'],
                 comment=comment['comment'],
@@ -1164,7 +1165,7 @@ def diff_pull_request(
             if request.merge_status is None:
                 pagure.lib.add_pull_request_comment(
                     session, request,
-                    commit=None, filename=None, row=None,
+                    commit=None, tree_id=None, filename=None, row=None,
                     comment='Pull-Request has been %s' % verb,
                     user=request.user.username,
                     requestfolder=requestfolder,
