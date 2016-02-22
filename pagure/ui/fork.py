@@ -451,12 +451,14 @@ def pull_request_add_comment(
         flask.abort(404, 'Pull-request not found')
 
     is_js = flask.request.args.get('js', False)
+    tree_id = flask.request.args.get('tree_id') or None
 
     form = pagure.forms.AddPullRequestCommentForm()
     form.commit.data = commit
     form.filename.data = filename
     form.requestid.data = requestid
     form.row.data = row
+    form.tree_id.data = tree_id
 
     if form.validate_on_submit():
         comment = form.comment.data
@@ -466,6 +468,7 @@ def pull_request_add_comment(
                 SESSION,
                 request=request,
                 commit=commit,
+                tree_id=tree_id,
                 filename=filename,
                 row=row,
                 comment=comment,
@@ -498,6 +501,7 @@ def pull_request_add_comment(
         repo=repo,
         username=username,
         commit=commit,
+        tree_id=tree_id,
         filename=filename,
         row=row,
         form=form,

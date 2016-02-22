@@ -206,6 +206,7 @@ class AddPullRequestCommentForm(wtf.Form):
     filename = wtforms.HiddenField('file changed')
     row = wtforms.HiddenField('row')
     requestid = wtforms.HiddenField('requestid')
+    tree_id = wtforms.HiddenField('treeid')
     comment = wtforms.TextAreaField(
         'Comment<span class="error">*</span>',
         [wtforms.validators.Required()]

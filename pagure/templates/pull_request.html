@@ -296,7 +296,8 @@
                   filename=patch_new_file_path,
                   commit=patch_new_id,
                   prequest=pull_request,
-                  index=loop.index)}}
+                  index=loop.index,
+                  tree=diff_commits[0].tree.id)}}
       {% endautoescape %}
 
       </div>
@@ -667,10 +668,14 @@ function setup_reply_btns() {
       var row = $( this ).attr('data-row');
       var commit = $( this ).attr('data-commit');
       var filename = $( this ).attr('data-filename');
+      var tree_id = $( this ).attr('data-tree');
       var url = "{{ url_for(
         'pull_request_add_comment', username=username, repo=repo.name,
         requestid=requestid, commit='', filename='', row='') }}".slice(0, -2);
-      url = url + commit + '/' + filename + '/' + row;
+      url = url + commit + '/' + filename + '/' + row
+      if (tree_id) {
+        url += '?tree_id=' + tree_id;
+      }
       var rowid = $(this).prev().find('a').attr('id');
       var table = $( this ).parent().parent();
       var nextid = rowid.replace('_' + row, '_' + (Number(row) + 1));

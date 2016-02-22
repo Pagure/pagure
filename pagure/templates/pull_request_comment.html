@@ -4,7 +4,8 @@
 
   <form action="{{ url_for(
     'pull_request_add_comment', username=username, repo=repo.name,
-    requestid=requestid, commit=commit, filename=filename, row=row) }}"
+    requestid=requestid, commit=commit, tree_id=tree_id, filename=filename,
+    row=row) }}"
     method="post" onsubmit="return try_async_comment(this, true)">
 
 
