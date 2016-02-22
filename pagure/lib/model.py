@@ -964,6 +964,9 @@ class PullRequestComment(BASE):
     line = sa.Column(
         sa.Integer,
         nullable=True)
+    tree_id = sa.Column(
+        sa.String(40),
+        nullable=True)
     comment = sa.Column(
         sa.Text(),
         nullable=False)
@@ -1014,6 +1017,7 @@ class PullRequestComment(BASE):
         return {
             'id': self.id,
             'commit': self.commit_id,
+            'tree': self.tree_id,
             'filename': self.filename,
             'line': self.line,
             'comment': self.comment,
