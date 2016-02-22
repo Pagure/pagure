@@ -434,6 +434,10 @@ def api_pull_request_add_comment(repo, requestid, username=None):
     |               |         |              |   on a specific row         |
     |               |         |              |   of a file                 |
     +---------------+---------+--------------+-----------------------------+
+    | ``tree_id``   | string  | Optional     | | The identifier of the     |
+    |               |         |              |   git tree as it was when   |
+    |               |         |              |   the comment was added     |
+    +---------------+---------+--------------+-----------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -469,6 +473,7 @@ def api_pull_request_add_comment(repo, requestid, username=None):
         comment = form.comment.data
         commit = form.commit.data or None
         filename = form.filename.data or None
+        tree_id = form.tree_id.data or None
         row = form.row.data or None
         try:
             # New comment
@@ -476,6 +481,7 @@ def api_pull_request_add_comment(repo, requestid, username=None):
                 SESSION,
                 request=request,
                 commit=commit,
+                tree_id=tree_id,
                 filename=filename,
                 row=row,
                 comment=comment,
