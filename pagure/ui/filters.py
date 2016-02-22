@@ -52,7 +52,7 @@ def format_ts(string):
 
 
 @APP.template_filter('format_loc')
-def format_loc(loc, commit=None, filename=None, tree=None, prequest=None,
+def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
                index=None):
     """ Template filter putting the provided lines of code into a table
     """
@@ -90,7 +90,7 @@ def format_loc(loc, commit=None, filename=None, tree=None, prequest=None,
                 '<a id="%(cnt)s" href="#%(cnt)s" data-line-number="%(cnt_lbl)s"></a></td>'
                 '<td class="prc" data-row="%(cnt_lbl)s"'
                 ' data-filename="%(filename)s" data-commit="%(commit)s"'
-                ' data-tree="%(tree)s">'
+                ' data-tree="%(tree_id)s">'
                 '<p>'
                 '<span class="oi prc_img" data-glyph="comment-square" alt="Add comment" title="Add comment"></span>'
                 '</p>'
@@ -101,7 +101,7 @@ def format_loc(loc, commit=None, filename=None, tree=None, prequest=None,
                         'img': flask.url_for('static', filename='users.png'),
                         'filename': filename,
                         'commit': commit,
-                        'tree': tree,
+                        'tree_id': tree_id,
                     }
                 )
             )
