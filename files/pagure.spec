@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        1.0.2
+Version:        1.1
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -253,6 +253,53 @@ install -m 644 webhook-server/pagure_webhook.service \
 
 
 %changelog
+* Tue Feb 23 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 1.1-1
+- Update to 1.1
+- Sort the release by commit time rather than name (Clerment Verna)
+- Add a link to the markdown syntax we support
+- Add the possibility to display custom info when creating a new PR
+- Improve the title of the issue page
+- Make the ssh_info page more flexible so that we can add new info more easily
+- Add the possibility to resend a confirmation email when adding a new email
+  address
+- Encode the email in UTF-8 for domain name supporting it
+- Add a button to easily change your avatar in your settings' page (Clement
+  Verna)
+- Expand our markdown processor to support implicit linking to both PR and
+  issues
+- Fix running the unit-tests on F23
+- Fix deleting in the UI branches containing a slash ('/') in their name
+- Add the possibility to always have a merge commit when merging a PR
+- Add the project's avatar to the list in front page when authenticated
+- Make the dependency on flask-fas-openid (part of python-fedora) optional
+- Prevent our customized markdown to create link on foo.com if it doesn't start
+  with {f,ht}tp(s) (Clement Verna)
+- Bring back the delete ticket button (Ryan Lerch)
+- Add the possibility to notify someone when it is mentioned in a comment via
+  @username
+- Fix setting the default value of the web-hook setting and its display in the
+  settings page
+- Add the possibility to have templates for the issues
+- Add a button on the doc page to open it in a new tab
+- Add the concept of notifications on PR allowing to indicate when a PR is
+  updated or rebased
+- Fix allowing people with non-ascii username to merge PR with a merge commit
+- Add the possibility to theme your pagure instance and customized its layout at
+  will
+- Add the possibility to always see inline-comments even if the file was changed
+  since
+- Improve the error message given to the user upon error 500 (Patrick Uiterwijk)
+- Stop relying on pygit2 to determine if a file is a binary file or not and
+  instead use the python library binaryornot
+- Store in the DB the identifier of the tree when an inline comment is made to a
+  PR, this way it will be simpler to figure out a way to add the context of this
+  comment either by email on in the UI
+- Add styling to blockquotes so that we see what is the quote and what is the
+  answer when replying to someone
+- Prevent users from adding again an email pending confirmation
+- Fix the preview box for long comment (Ryan Lerch)
+- Add the possibility to sort the projects when browsing them (Ryan Lerch)
+
 * Thu Feb 04 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 1.0.2-1
 - Update to 1.0.2
 - Rework the PR page (Ryan Lerch)
