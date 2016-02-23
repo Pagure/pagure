@@ -1442,13 +1442,17 @@ def search_projects(
         model.Project.id.in_(projects.subquery())
     )
 
-    if sort in [None, 'projectname']:
-        query = query.order_by(
-            asc(func.lower(model.Project.name))
-        )
-    elif sort == 'latest':
+    if sort == 'latest':
         query = query.order_by(
             model.Project.date_created.desc()
+        )
+    elif sort == 'oldest':
+        query = query.order_by(
+            model.Project.date_created.asc()
+        )
+    else:
+        query = query.order_by(
+            asc(func.lower(model.Project.name))
         )
 
     if start is not None:
