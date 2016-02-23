@@ -952,6 +952,7 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
                     SESSION,
                     request=request,
                     commit=None,
+                    tree_id=None,
                     filename=None,
                     row=None,
                     comment=form.initial_comment.data,
@@ -1112,6 +1113,20 @@ def new_remote_request_pull(repo, username=None):
                 user=flask.g.fas_user.username,
                 requestfolder=APP.config['REQUESTS_FOLDER'],
             )
+
+            if not form.initial_comment.data == '':
+                pagure.lib.add_pull_request_comment(
+                    SESSION,
+                    request=request,
+                    commit=None,
+                    tree_id=None,
+                    filename=None,
+                    row=None,
+                    comment=form.initial_comment.data,
+                    user=flask.g.fas_user.username,
+                    requestfolder=APP.config['REQUESTS_FOLDER'],
+                )
+
             try:
                 SESSION.commit()
                 flask.flash('Request created')
