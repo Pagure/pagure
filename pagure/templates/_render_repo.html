@@ -81,13 +81,15 @@
                 Sort
               </button>
               <div class="dropdown-menu">
-                <a class="dropdown-item" href="{{ url_for('browse_projects') }}">
+                <a class="dropdown-item" href="{{
+                    url_for('browse_projects') }}">
                   {% if sorting == 'name'%}
                   <span class="oi" data-glyph="check"></span>
                   {%endif%}
                   Name
                 </a>
-                <a class="dropdown-item" href="{{ url_for('browse_projects') }}latest">
+                <a class="dropdown-item" href="{{
+                    url_for('browse_projects', sorting='latest') }}">
                   {% if sorting == 'latest'%}
                   <span class="oi" data-glyph="check"></span>
                   {%endif%}

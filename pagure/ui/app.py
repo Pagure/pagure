@@ -29,11 +29,11 @@ from pagure import (APP, SESSION, login_required,
 
 @APP.route('/browse/projects', endpoint='browse_projects')
 @APP.route('/browse/projects/', endpoint='browse_projects')
-@APP.route('/browse/projects/<sorting>')
 @APP.route('/')
-def index(sorting=None):
+def index():
     """ Front page of the application.
     """
+    sorting = flask.request.args.get('sorting') or None
     page = flask.request.args.get('page', 1)
     try:
         page = int(page)
@@ -64,8 +64,6 @@ def index(sorting=None):
         SESSION,
         fork=False,
         count=True)
-    print "app.py"
-    print sorting
     total_page = int(ceil(num_repos / float(limit)))
 
     if authenticated() and flask.request.path == '/':
