@@ -1353,7 +1353,7 @@ def fork_project(session, user, repo, gitfolder,
 
 def search_projects(
         session, username=None, fork=None, tags=None, pattern=None,
-        start=None, limit=None, count=False):
+        start=None, limit=None, count=False, sort=None):
     '''List existing projects
     '''
     projects = session.query(
@@ -1436,14 +1436,22 @@ def search_projects(
             projects = projects.filter(
                 model.Project.name == pattern
             )
-
-    query = session.query(
-        model.Project
-    ).filter(
-        model.Project.id.in_(projects.subquery())
-    ).order_by(
-        asc(func.lower(model.Project.name))
-    )
+    if sort == None or sort == 'projectname':
+        query = session.query(
+            model.Project
+            ).filter(
+            model.Project.id.in_(projects.subquery())
+            ).order_by(
+            asc(func.lower(model.Project.name))
+            )
+    elif sort == 'date_created':
+        query = session.query(
+            model.Project
+            ).filter(
+            model.Project.id.in_(projects.subquery())
+            ).order_by(
+            model.Project.date_created.desc()
+            )
 
     if start is not None:
         query = query.offset(start)

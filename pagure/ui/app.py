@@ -29,8 +29,9 @@ from pagure import (APP, SESSION, login_required,
 
 @APP.route('/browse/projects', endpoint='browse_projects')
 @APP.route('/browse/projects/', endpoint='browse_projects')
+@APP.route('/browse/projects/<sorting>')
 @APP.route('/')
-def index():
+def index(sorting=None):
     """ Front page of the application.
     """
     page = flask.request.args.get('page', 1)
@@ -44,9 +45,20 @@ def index():
     limit = APP.config['ITEM_PER_PAGE']
     start = limit * (page - 1)
 
-    repos = pagure.lib.search_projects(
-        SESSION,
-        fork=False)
+    if sorting == 'latest':
+        repos = pagure.lib.search_projects(
+            SESSION,
+            fork=False,
+            start=start,
+            limit=limit,
+            sort='date_created')
+    else:
+        repos = pagure.lib.search_projects(
+            SESSION,
+            fork=False,
+            start=start,
+            limit=limit)
+
     num_repos = pagure.lib.search_projects(
         SESSION,
         fork=False,
@@ -62,6 +74,8 @@ def index():
         select="projects",
         repos=repos,
         repos_length=num_repos,
+        total_page=total_page,
+        page=page,
     )
 
 
