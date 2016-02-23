@@ -122,7 +122,7 @@ def _get_pr_info(repo_obj, orig_repo, branch_from, branch_to):
             'Fork is empty, there are no commits to request pulling'
         )
 
-    return  (diff, diff_commits, orig_commit)
+    return(diff, diff_commits, orig_commit)
 
 
 @APP.route('/<repo>/pull-requests/')
@@ -358,7 +358,6 @@ def request_pull_patch(repo, requestid, username=None):
     return flask.Response(patch, content_type="text/plain;charset=UTF-8")
 
 
-
 @APP.route('/<repo>/pull-request/<int:requestid>/edit/',
            methods=('GET', 'POST'))
 @APP.route('/<repo>/pull-request/<int:requestid>/edit',
@@ -390,7 +389,7 @@ def request_pull_edit(repo, requestid, username=None):
         flask.abort(400, 'Pull-request is already closed')
 
     if not is_repo_admin(repo) \
-            and flask.g.fas_user.username != request.user.username :
+            and flask.g.fas_user.username != request.user.username:
         flask.abort(403, 'You are not allowed to edit this pull-request')
 
     form = pagure.forms.RequestPullForm()
@@ -753,10 +752,10 @@ def cancel_request_pull(repo, requestid, username=None):
             flask.abort(404, 'Pull-request not found')
 
         if not is_repo_admin(repo_obj) \
-            and not flask.g.fas_user.username == request.user.username:
-          flask.abort(
-              403,
-              'You are not allowed to cancel pull-request for this project')
+                and not flask.g.fas_user.username == request.user.username:
+            flask.abort(
+                403,
+                'You are not allowed to cancel pull-request for this project')
 
         pagure.lib.close_pull_request(
             SESSION, request, flask.g.fas_user.username,
@@ -992,7 +991,7 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
         form = None
 
     if len(diff_commits) == 1 and form:
-        form.title.data=diff_commits[0].message.strip().split('\n')[0]
+        form.title.data = diff_commits[0].message.strip().split('\n')[0]
 
     # Get the contributing templates from the requests git repo
     contributing = None
