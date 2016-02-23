@@ -46,9 +46,7 @@ def index():
 
     repos = pagure.lib.search_projects(
         SESSION,
-        fork=False,
-        start=start,
-        limit=limit)
+        fork=False)
     num_repos = pagure.lib.search_projects(
         SESSION,
         fork=False,
@@ -64,8 +62,6 @@ def index():
         select="projects",
         repos=repos,
         repos_length=num_repos,
-        total_page=total_page,
-        page=page,
     )
 
 
