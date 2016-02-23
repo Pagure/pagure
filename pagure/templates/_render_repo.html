@@ -19,7 +19,8 @@
         <small>{% if repo.description %}{{ repo.description }}{%else%}<span class="text-muted">no description<span>{% endif %}</small>
       </div>
       <div class="project_metadata">
-        <div style="text-align:right;" class="p-r-1 text-muted"><span title="Forks" data-toggle="tooltip"><span class="oi" data-glyph="fork"></span>{{repo.forks|count}}</span></div>
+        <span class="p-l-1"><small>created {{repo.date_created|humanize}}</small></span>
+        <div style="text-align:right;" class="p-r-1 text-muted pull-xs-right"><span title="Forks" data-toggle="tooltip"><span class="oi" data-glyph="fork"></span>{{repo.forks|count}}</span></div>
       </div>
     </div>
   </div>
