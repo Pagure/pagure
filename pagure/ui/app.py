@@ -53,6 +53,7 @@ def index(sorting=None):
             limit=limit,
             sort='date_created')
     else:
+        sorting = 'name'
         repos = pagure.lib.search_projects(
             SESSION,
             fork=False,
@@ -63,7 +64,8 @@ def index(sorting=None):
         SESSION,
         fork=False,
         count=True)
-
+    print "app.py"
+    print sorting
     total_page = int(ceil(num_repos / float(limit)))
 
     if authenticated() and flask.request.path == '/':
@@ -76,6 +78,7 @@ def index(sorting=None):
         repos_length=num_repos,
         total_page=total_page,
         page=page,
+        sorting=sorting,
     )
 
 

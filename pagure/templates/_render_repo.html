@@ -54,10 +54,10 @@
 
 {% macro render_repos(
         list, total, pagetitle, page, title, count, id,
-        username=None, hide=True) %}
+        username=None, hide=True, sorting=None) %}
 
     <section class="project_list container p-t-2" id="{{ id }}">
-        <h2 class=" m-b-1">{{
+        <h2 class="m-b-1">{{
             title
             }} <span class="label label-default">{{ count }}</span>
             {%- if username -%}
@@ -68,9 +68,37 @@
             </a>
             {%- endif -%}
         </h2>
-        {% if total and total > 1 %}
-        {{ pagination_link(pagetitle, page, total) }}
-        {% endif %}
+        <div class="row">
+          <div class="col-sm-6">
+            {% if total and total > 1 %}
+            {{ pagination_link(pagetitle, page, total) }}
+            {% endif %}
+          </div>
+          <div class="col-sm-6 text-xs-right">
+            <span class="btn-group">
+              <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Sort
+              </button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="{{ url_for('browse_projects') }}">
+                  {% if sorting == 'name'%}
+                  <span class="oi" data-glyph="check"></span>
+                  {%endif%}
+                  Name
+                </a>
+                <a class="dropdown-item" href="{{ url_for('browse_projects') }}latest">
+                  {% if sorting == 'latest'%}
+                  <span class="oi" data-glyph="check"></span>
+                  {%endif%}
+                  Date Created
+                </a>
+                <a class="dropdown-item" href="#">Something else here</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#">Separated link</a>
+              </div>
+            </span>
+          </div>
+        </div>
         <div class="row">
             {{ render_row(list) }}
         </div>
