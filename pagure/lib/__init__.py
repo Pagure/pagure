@@ -1436,22 +1436,20 @@ def search_projects(
             projects = projects.filter(
                 model.Project.name == pattern
             )
-    if sort == None or sort == 'projectname':
-        query = session.query(
-            model.Project
-            ).filter(
-            model.Project.id.in_(projects.subquery())
-            ).order_by(
+    query = session.query(
+        model.Project
+    ).filter(
+        model.Project.id.in_(projects.subquery())
+    )
+
+    if sort in [None, 'projectname']:
+        query = query.order_by(
             asc(func.lower(model.Project.name))
-            )
+        )
     elif sort == 'date_created':
-        query = session.query(
-            model.Project
-            ).filter(
-            model.Project.id.in_(projects.subquery())
-            ).order_by(
+        query = query.order_by(
             model.Project.date_created.desc()
-            )
+        )
 
     if start is not None:
         query = query.offset(start)
