@@ -57,7 +57,7 @@ class PagureFlaskApptests(tests.Modeltests):
         output = self.app.get('/')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<h2 class=" m-b-1">All Projects '
+            '<h2 class="m-b-1">All Projects '
             '<span class="label label-default">0</span></h2>', output.data)
 
         tests.create_projects(self.session)
@@ -65,7 +65,7 @@ class PagureFlaskApptests(tests.Modeltests):
         output = self.app.get('/?page=abc')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<h2 class=" m-b-1">All Projects '
+            '<h2 class="m-b-1">All Projects '
             '<span class="label label-default">2</span></h2>', output.data)
 
         # Add a 3rd project with a long description
