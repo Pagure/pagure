@@ -83,7 +83,7 @@
               <div class="dropdown-menu">
                 <a class="dropdown-item" href="{{
                     url_for('browse_projects') }}">
-                  {% if sorting == 'name'%}
+                  {% if not sorting or sorting == 'name'%}
                   <span class="oi" data-glyph="check"></span>
                   {%endif%}
                   Name

@@ -45,20 +45,12 @@ def index():
     limit = APP.config['ITEM_PER_PAGE']
     start = limit * (page - 1)
 
-    if sorting == 'latest':
-        repos = pagure.lib.search_projects(
-            SESSION,
-            fork=False,
-            start=start,
-            limit=limit,
-            sort='date_created')
-    else:
-        sorting = 'name'
-        repos = pagure.lib.search_projects(
-            SESSION,
-            fork=False,
-            start=start,
-            limit=limit)
+    repos = pagure.lib.search_projects(
+        SESSION,
+        fork=False,
+        start=start,
+        limit=limit,
+        sort=sorting)
 
     num_repos = pagure.lib.search_projects(
         SESSION,

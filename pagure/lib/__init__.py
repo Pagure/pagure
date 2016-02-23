@@ -1446,7 +1446,7 @@ def search_projects(
         query = query.order_by(
             asc(func.lower(model.Project.name))
         )
-    elif sort == 'date_created':
+    elif sort == 'latest':
         query = query.order_by(
             model.Project.date_created.desc()
         )
