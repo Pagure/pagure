@@ -817,9 +817,13 @@ def add_pull_request_comment(session, request, commit, tree_id, filename,
 
     # Send notification for the event-source server
     if REDIS:
+        comment_text = pr_comment.comment
+        if not notification:
+            comment_text = text2markdown(pr_comment.comment)
+
         REDIS.publish('pagure.%s' % request.uid, json.dumps({
             'request_id': request.id,
-            'comment_added': text2markdown(pr_comment.comment),
+            'comment_added': comment_text,
             'comment_user': pr_comment.user.user,
             'comment_id': pr_comment.id,
             'avatar_url': avatar_url_from_openid(
@@ -828,6 +832,7 @@ def add_pull_request_comment(session, request, commit, tree_id, filename,
             'commit_id': commit,
             'filename': filename,
             'line': row,
+            'notification': notification,
         }))
 
     pagure.lib.notify.log(
