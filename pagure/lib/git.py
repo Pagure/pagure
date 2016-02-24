@@ -1152,17 +1152,18 @@ def diff_pull_request(
         if request.status and diff_commits:
             first_commit = repo_obj[diff_commits[-1].oid.hex]
             # Check if we can still rely on the merge_status
-            verb = 'updated'
+            verb = None
             if request.commit_start != first_commit.oid.hex or\
                     request.commit_stop != diff_commits[0].oid.hex:
                 request.merge_status = None
+                verb = 'updated'
                 if request.commit_start != first_commit.oid.hex:
                     verb = 'rebased'
             request.commit_start = first_commit.oid.hex
             request.commit_stop = diff_commits[0].oid.hex
             session.add(request)
             session.commit()
-            if request.merge_status is None:
+            if verb:
                 pagure.lib.add_pull_request_comment(
                     session, request,
                     commit=None, tree_id=None, filename=None, row=None,
