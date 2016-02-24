@@ -946,7 +946,7 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
                 requestfolder=APP.config['REQUESTS_FOLDER'],
             )
 
-            if not form.initial_comment.data == '':
+            if form.initial_comment.data.strip() != '':
                 pagure.lib.add_pull_request_comment(
                     SESSION,
                     request=request,
@@ -1113,7 +1113,7 @@ def new_remote_request_pull(repo, username=None):
                 requestfolder=APP.config['REQUESTS_FOLDER'],
             )
 
-            if not form.initial_comment.data == '':
+            if form.initial_comment.data.strip() != '':
                 pagure.lib.add_pull_request_comment(
                     SESSION,
                     request=request,

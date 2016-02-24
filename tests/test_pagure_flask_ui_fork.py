@@ -1404,6 +1404,7 @@ index 0000000..2a552bb
             data = {
                 'csrf_token': csrf_token,
                 'title': 'foo bar PR',
+                'initial_comment': 'Test Initial Comment',
             }
 
             output = self.app.post(
@@ -1412,6 +1413,7 @@ index 0000000..2a552bb
             self.assertIn(
                 '<title>PR#2: foo bar PR - test\n - Pagure</title>',
                 output.data)
+            self.assertIn('<p>Test Initial Comment</p>', output.data)
 
     @patch('pagure.lib.notify.send_email')
     def test_new_request_pull_empty_repo(self, send_email):
