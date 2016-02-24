@@ -13,7 +13,19 @@ add_comment = function(data, username) {
     edit_btn = '';
   }
 
-  if (inline) {
+  if (data.notification){
+      var _data = '<div class="card"> \
+            <div class="card-header"> \
+              <div> \
+                ' + data.comment_added + '\
+                <div class="pull-xs-right text-muted"> \
+                  <span title="' + data.comment_date + '">\
+                    Just now</span></div>\
+              </div> \
+            </div> \
+          </div>';
+
+  } else if (inline) {
     var _data = '<tr class="inline-pr-comment"><td></td> \
         <td colspan="2"> \
         <div class="card clearfix m-x-1 "> \
