@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        1.1
+Version:        1.1.1
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -253,6 +253,12 @@ install -m 644 webhook-server/pagure_webhook.service \
 
 
 %changelog
+* Wed Feb 24 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 1.1.1-1
+- Update to 1.1.1
+- Fix showing some files where decoding to UTF-8 was failing
+- Avoid adding a notification to a PR for nothing
+- Show notifications correctly on the PR page when received via SSE
+
 * Tue Feb 23 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 1.1-1
 - Update to 1.1
 - Sort the release by commit time rather than name (Clerment Verna)
