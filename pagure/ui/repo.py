@@ -437,7 +437,9 @@ def view_file(repo, identifier, filename, username=None):
             content, safe = pagure.doc_utils.convert_readme(content.data, ext)
             output_type = 'markup'
         elif not is_binary_string(content.data):
-            file_content = content.data.decode('utf-8')
+            file_content = content.data
+            if not isinstance(file_content, basestring):
+                file_content = content.data.decode('utf-8')
             try:
                 lexer = guess_lexer_for_filename(
                     filename,
