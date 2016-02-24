@@ -1172,6 +1172,7 @@ def diff_pull_request(
                     requestfolder=requestfolder,
                     notify=False, notification=True
                 )
+                session.commit()
             pagure.lib.git.update_git(
                 request, repo=request.project,
                 repofolder=requestfolder)
