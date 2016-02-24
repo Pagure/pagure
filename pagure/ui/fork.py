@@ -954,7 +954,7 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
                     tree_id=None,
                     filename=None,
                     row=None,
-                    comment=form.initial_comment.data,
+                    comment=form.initial_comment.data.strip(),
                     user=flask.g.fas_user.username,
                     requestfolder=APP.config['REQUESTS_FOLDER'],
                 )
@@ -1121,7 +1121,7 @@ def new_remote_request_pull(repo, username=None):
                     tree_id=None,
                     filename=None,
                     row=None,
-                    comment=form.initial_comment.data,
+                    comment=form.initial_comment.data.strip(),
                     user=flask.g.fas_user.username,
                     requestfolder=APP.config['REQUESTS_FOLDER'],
                 )
