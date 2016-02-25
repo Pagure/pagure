@@ -1401,6 +1401,7 @@ index 0000000..2a552bb
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
+            # Case 1 - Add an initial comment
             data = {
                 'csrf_token': csrf_token,
                 'title': 'foo bar PR',
@@ -1414,6 +1415,22 @@ index 0000000..2a552bb
                 '<title>PR#2: foo bar PR - test\n - Pagure</title>',
                 output.data)
             self.assertIn('<p>Test Initial Comment</p>', output.data)
+
+
+            # Case 2 - Add an empty initial comment
+            data = {
+                'csrf_token': csrf_token,
+                'title': 'foo bar PR',
+                'initial_comment': '',
+            }
+
+            output = self.app.post(
+                '/test/diff/master..feature', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>PR#3: foo bar PR - test\n - Pagure</title>',
+                output.data)
+            self.assertNotIn('<div id="comment-', output.data)
 
     @patch('pagure.lib.notify.send_email')
     def test_new_request_pull_empty_repo(self, send_email):
