@@ -1156,6 +1156,8 @@ def diff_pull_request(
             if request.commit_start != first_commit.oid.hex or\
                     request.commit_stop != diff_commits[0].oid.hex:
                 request.merge_status = None
+                if request.commit_start:
+                    verb = 'updated'
                 if request.commit_start and \
                         request.commit_start != first_commit.oid.hex:
                     verb = 'rebased'
