@@ -464,5 +464,5 @@ pre.softwrap
 blockquote {
   background: #f3f5f6;
   color: #586e75;
-  padding: 1em 1em 0em 1em;
+  padding: 1em 1em 0.1em 1em;
 }
