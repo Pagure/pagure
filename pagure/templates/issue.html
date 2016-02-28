@@ -117,7 +117,7 @@
           <fieldset class="form-group issue-metadata-display">
             <label><strong>Status</strong></label>
             <h2 id="status">
-              <span class="label label-success">{{ issue.status }}</span>
+              <span class="label {% if issue.status|lower == 'invalid' %}label-danger{%elif issue.status|lower == 'fixed'%}label-success{%elif issue.status|lower == 'insufficient data'%}label-warning{%elif issue.status|lower == 'open'%}label-primary{%endif%}">{{ issue.status }}</span>
             </h2>
           </fieldset>
 
