@@ -95,6 +95,9 @@
         <tr>
             <td>
               <span class="label label-default">#{{ issue.id }}</span>
+              {% if status and status != 'Open' %}
+              <span class="label {% if issue.status|lower == 'invalid' %}label-danger{%elif issue.status|lower == 'fixed'%}label-success{%elif issue.status|lower == 'insufficient data'%}label-warning{%endif%}">{{issue.status}}</span>
+              {% endif %}
               {% if issue.private %}
               <span class="oi red-icon" data-glyph="lock-locked" title="Private issue"></span>
               {% endif %}
