@@ -48,14 +48,19 @@
         <tr>
             <th class="stretch-table-column">Pull Request</th>
             <th class="open_date nowrap">Opened</th>
+            {% if status|lower != 'open' %}
+            <th class="close_date nowrap">Closed</th>
+            {% endif %}
             <th class="open_by">
               Reporter(<a href="{{ url_for('request_pulls', username=username,
                 repo=repo.name, assignee=assignee, status=status) }}">reset</a>)
             </th>
+            {% if status|lower == 'open' %}
             <th class="assigned">
               Assignee(<a href="{{ url_for('request_pulls', username=username,
                 repo=repo.name, author=author, status=status) }}">reset</a>)
             </th>
+            {% endif %}
         </tr>
     </thead>
     <tfoot>
@@ -81,6 +86,12 @@
                     <span title="{{request.date_created.strftime('%Y-%m-%d %H:%M:%S')}}">{{
                         request.date_created | humanize}}</span>
             </td>
+            {% if status|lower != 'open' %}
+            <td class="nowrap">
+                    <span title="{{request.closed_at.strftime('%Y-%m-%d %H:%M:%S')}}">{{
+                        request.closed_at | humanize}}</span>
+            </td>
+            {% endif %}
             <td class="nowrap">
               <a href="{{ url_for('request_pulls', username=username,
                   repo=repo.name, author=request.user.user,
@@ -90,6 +101,7 @@
                 {{ request.user.user }}
               </a>
             </td>
+            {% if status|lower == 'open' %}
             <td class="nowrap">
               {% if request.assignee %}
               <a href="{{ url_for('request_pulls', username=username,
@@ -104,6 +116,7 @@
                 repo=repo.name, author=author, status=status) }}">unassigned</a>
               {% endif %}
             </td>
+            {% endif %}
         </tr>
     {% else %}
         <tr>
