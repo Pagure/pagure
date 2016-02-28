@@ -16,6 +16,7 @@
   <form action="{{ url_for('.view_plugin',
                   username=username, repo=repo.name, plugin=plugin.name,
                   ) }}" method="post">
+  <h6>{{ plugin.description }}</h6>
   <table>
     {% for field in fields %}
       {{ render_field_in_row(field) }}

@@ -96,6 +96,7 @@ class Hook(BaseHook):
     ''' IRC hooks. '''
 
     name = 'IRC'
+    description='This hook sends message to the mention channel regarding the changes made by the pushes to the git repository.'
     form = IrcForm
     db_object = IrcTable
     backref = 'irc_hook'

@@ -41,6 +41,7 @@ class BaseHook(object):
 
     name = None
     form = None
+    description = None
 
     @classmethod
     def set_up(cls, project):

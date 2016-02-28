@@ -61,6 +61,7 @@ class PagureTicketHook(BaseHook):
     ''' Pagure ticket hook. '''
 
     name = 'pagure tickets'
+    description = 'Pagure specific hook to update tickets stored in the database based on the information pushed in the tickets git repository.'
     form = PagureTicketsForm
     db_object = PagureTicketsTable
     backref = 'pagure_hook_tickets'

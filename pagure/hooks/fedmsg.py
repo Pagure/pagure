@@ -59,6 +59,7 @@ class Fedmsg(BaseHook):
     ''' Fedmsg hooks. '''
 
     name = 'Fedmsg'
+    description = 'This hook push the commit messages to the Fedora bus to be consumed by other applications'
     form = FedmsgForm
     db_object = FedmsgTable
     backref = 'fedmsg_hook'
