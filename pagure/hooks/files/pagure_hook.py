@@ -115,6 +115,7 @@ def fixes_relation(commitid, relation, app_url=None):
                 pagure.SESSION,
                 request=relation,
                 commit=None,
+                tree_id=None,
                 filename=None,
                 row=None,
                 comment=comment,
