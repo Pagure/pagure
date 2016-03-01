@@ -198,34 +198,34 @@
 
   <div class="tab-pane" role="tabpanel" id="commit_list">
     <div class="list-group">
-          {% for commit in diff_commits %}
+        {% for commit in diff_commits %}
 
-              {% if pull_request and pull_request.status and pull_request.project_from.is_fork %}
-              <a class="list-group-item" href="{{ url_for('view_commit', username=pull_request.project_from.user.user,
-                        repo=pull_request.project_from.name, commitid=commit.oid.hex)}}">
-              {% elif pull_request and pull_request.remote %}
-              <a>
-              {% else %}
-              <a class="list-group-item" href="{{ url_for('view_commit', username=username,
-                            repo=repo.name, commitid=commit.oid.hex)}}">
-              {% endif %}
+            {% if pull_request and pull_request.status and pull_request.project_from.is_fork %}
+            <a class="list-group-item" href="{{ url_for('view_commit', username=pull_request.project_from.user.user,
+                      repo=pull_request.project_from.name, commitid=commit.oid.hex)}}">
+            {% elif pull_request and pull_request.remote %}
+            <a>
+            {% else %}
+            <a class="list-group-item" href="{{ url_for('view_commit', username=username,
+                          repo=repo.name, commitid=commit.oid.hex)}}">
+            {% endif %}
 
-              <h5>
-                <strong>{{ commit.message.strip().split('\n')[0] }}</strong>
-                <div class="pull-xs-right">
-                  <span class="commitdate" title="{{ commit.commit_time|format_ts }}">
-                    {{ commit.commit_time|humanize }}
-                  </span>
-                </div>
-              </h5>
-              {{ commit.author | author2avatar(20) | safe }} {{ commit.author.name }}
+            <h5>
+              <strong>{{ commit.message.strip().split('\n')[0] }}</strong>
               <div class="pull-xs-right">
-                <span class="label label-default">{{ commit.hex|short }}</span>
+                <span class="commitdate" title="{{ commit.commit_time|format_ts }}">
+                  {{ commit.commit_time|humanize }}
+                </span>
               </div>
-            </a>
-          {% else %}
-          <p class="error"> No commits found </p>
-          {% endfor %}
+            </h5>
+            {{ commit.author | author2avatar(20) | safe }} {{ commit.author.name }}
+            <div class="pull-xs-right">
+              <span class="label label-default">{{ commit.hex|short }}</span>
+            </div>
+          </a>
+        {% else %}
+        <p class="error"> No commits found </p>
+        {% endfor %}
       </div>
   </div>
 
