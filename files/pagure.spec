@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        1.1.1
+Version:        1.2
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -253,6 +253,23 @@ install -m 644 webhook-server/pagure_webhook.service \
 
 
 %changelog
+* Tue Mar 01 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 1.2-1
+- Update to 1.2
+- Add the possibility to create a comment when opening a pull-request (Clement
+  Verna)
+- Fix creating PR from a fork directly from the page listing all the PR on the
+  main project (Ryan Lerch)
+- Color the label showing the issues' status on the issue page and the page
+  listing them (Ryan Lerch)
+- Add a small padding at the bottom of the blockquote (Ryan Lerch)
+- In the list of closed PR, replace the column of the assignee with the date of
+  closing (Ryan Lerch)
+- Drop font awesome since we no longer use it and compress the png of the 
+  current logo (Ryan Lerch)
+- Drop the svg of the old logo from the source (Ryan Lerch)
+- Add descriptions to the git hooks in the settings page (farhaanbukhsh)
+- Fix the pagure git hook
+
 * Wed Feb 24 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 1.1.1-1
 - Update to 1.1.1
 - Fix showing some files where decoding to UTF-8 was failing
