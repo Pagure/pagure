@@ -52,7 +52,7 @@ class IrcTable(BASE):
         backref=backref(
             'irc_hook', cascade="delete, delete-orphan",
             single_parent=True)
-        )
+    )
 
 
 class IrcForm(wtf.Form):
@@ -96,7 +96,8 @@ class Hook(BaseHook):
     ''' IRC hooks. '''
 
     name = 'IRC'
-    description='This hook sends message to the mention channel regarding the changes made by the pushes to the git repository.'
+    description = 'This hook sends message to the mention channel regarding'\
+        ' the changes made by the pushes to the git repository.'
     form = IrcForm
     db_object = IrcTable
     backref = 'irc_hook'
@@ -124,10 +125,10 @@ class Hook(BaseHook):
 
         # Install the hook itself
         #hook_file = os.path.join(hook_files, 'git_irc.py')
-        #if not os.path.exists(hook_file):
-            #os.symlink(
-                #hook_file,
-                #os.path.join(repopath, 'hooks', 'post-receive.irc')
+        # if not os.path.exists(hook_file):
+            # os.symlink(
+                # hook_file,
+                # os.path.join(repopath, 'hooks', 'post-receive.irc')
             #)
 
     @classmethod
@@ -141,5 +142,5 @@ class Hook(BaseHook):
         repopath = get_repo_path(project)
 
         #hook_path = os.path.join(repopath, 'hooks', 'post-receive.irc')
-        #if os.path.exists(hook_path):
-            #os.unlink(hook_path)
+        # if os.path.exists(hook_path):
+            # os.unlink(hook_path)

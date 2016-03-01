@@ -45,7 +45,7 @@ class PagureTable(BASE):
         backref=backref(
             'pagure_hook', cascade="delete, delete-orphan",
             single_parent=True)
-        )
+    )
 
 
 class PagureForm(wtf.Form):
@@ -60,7 +60,8 @@ class PagureHook(BaseHook):
     ''' Pagure hook. '''
 
     name = 'pagure'
-    description='Pagure specific hook to add comment on issues if the commits fixes or relates to an issue.'
+    description = 'Pagure specific hook to add comment on issues'\
+        ' if the commits fixes or relates to an issue.'
     form = PagureForm
     db_object = PagureTable
     backref = 'pagure_hook'

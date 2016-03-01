@@ -47,7 +47,7 @@ class PagureRequestsTable(BASE):
         backref=backref(
             'pagure_hook_requests', cascade="delete, delete-orphan",
             single_parent=True)
-        )
+    )
 
 
 class PagureRequestsForm(wtf.Form):
@@ -62,7 +62,8 @@ class PagureRequestHook(BaseHook):
     ''' Pagure request hook. '''
 
     name = 'pagure requests'
-    description='Pagure specific hook to update pull-requests stored in the database based on the information pushed in the requests git repository.'
+    description = 'Pagure specific hook to update pull-requests stored'\
+        'in the database based on the information pushed in the requests git repository.'
     form = PagureRequestsForm
     db_object = PagureRequestsTable
     backref = 'pagure_hook_requests'

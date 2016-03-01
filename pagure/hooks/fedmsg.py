@@ -44,7 +44,7 @@ class FedmsgTable(BASE):
         backref=backref(
             'fedmsg_hook', cascade="delete, delete-orphan",
             single_parent=True)
-        )
+    )
 
 
 class FedmsgForm(wtf.Form):
@@ -59,7 +59,8 @@ class Fedmsg(BaseHook):
     ''' Fedmsg hooks. '''
 
     name = 'Fedmsg'
-    description = 'This hook push the commit messages to the Fedora bus to be consumed by other applications'
+    description = 'This hook push the commit messages'\
+        ' to the Fedora bus to be consumed by other applications'
     form = FedmsgForm
     db_object = FedmsgTable
     backref = 'fedmsg_hook'
