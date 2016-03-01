@@ -779,6 +779,9 @@ class PullRequest(BASE):
     commit_stop = sa.Column(
         sa.Text(),
         nullable=True)
+    initial_comment = sa.Column(
+        sa.Text(),
+        nullable=True)
     user_id = sa.Column(
         sa.Integer,
         sa.ForeignKey('users.id', onupdate='CASCADE'),
