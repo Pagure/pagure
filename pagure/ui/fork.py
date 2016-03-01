@@ -936,6 +936,7 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
             if orig_commit:
                 orig_commit = orig_commit.oid.hex
 
+            initial_comment = form.initial_comment.data.strip() or None
             request = pagure.lib.new_pull_request(
                 SESSION,
                 repo_to=parent,
@@ -943,22 +944,10 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
                 branch_from=branch_from,
                 repo_from=repo,
                 title=form.title.data,
+                initial_comment=initial_comment,
                 user=flask.g.fas_user.username,
                 requestfolder=APP.config['REQUESTS_FOLDER'],
             )
-
-            if form.initial_comment.data.strip() != '':
-                pagure.lib.add_pull_request_comment(
-                    SESSION,
-                    request=request,
-                    commit=None,
-                    tree_id=None,
-                    filename=None,
-                    row=None,
-                    comment=form.initial_comment.data.strip(),
-                    user=flask.g.fas_user.username,
-                    requestfolder=APP.config['REQUESTS_FOLDER'],
-                )
 
             try:
                 SESSION.commit()
