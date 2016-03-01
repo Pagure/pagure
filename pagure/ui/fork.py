@@ -394,7 +394,8 @@ def request_pull_edit(repo, requestid, username=None):
 
     form = pagure.forms.RequestPullForm()
     if form.validate_on_submit():
-        request.title = form.title.data
+        request.title = form.title.data.strip()
+        request.initial_comment = form.initial_comment.data.strip()
         SESSION.add(request)
         try:
             SESSION.commit()
@@ -410,6 +411,7 @@ def request_pull_edit(repo, requestid, username=None):
             repo=repo.name, requestid=requestid))
     elif flask.request.method == 'GET':
         form.title.data = request.title
+        form.initial_comment.data = request.initial_comment
 
     return flask.render_template(
         'pull_request_title.html',

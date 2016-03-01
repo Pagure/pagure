@@ -25,7 +25,12 @@
                          }}" method="post">
 
           <table>
-            {{ render_bootstrap_field(form.title, field_description="the new title of your pull-request") }}
+            {{ render_bootstrap_field(
+                form.title,
+                field_description="the new title of your pull-request") }}
+            {{ render_bootstrap_field(
+                form.initial_comment,
+                field_description="description of your pull-request") }}
           </table>
           <p class="buttons indent">
             <input type="submit" class="btn btn-primary" value="Edit">
