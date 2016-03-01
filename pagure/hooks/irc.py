@@ -125,10 +125,10 @@ class Hook(BaseHook):
 
         # Install the hook itself
         #hook_file = os.path.join(hook_files, 'git_irc.py')
-        # if not os.path.exists(hook_file):
-            # os.symlink(
-                # hook_file,
-                # os.path.join(repopath, 'hooks', 'post-receive.irc')
+        #if not os.path.exists(hook_file):
+            #os.symlink(
+                #hook_file,
+                #os.path.join(repopath, 'hooks', 'post-receive.irc')
             #)
 
     @classmethod
@@ -142,5 +142,5 @@ class Hook(BaseHook):
         repopath = get_repo_path(project)
 
         #hook_path = os.path.join(repopath, 'hooks', 'post-receive.irc')
-        # if os.path.exists(hook_path):
-            # os.unlink(hook_path)
+        #if os.path.exists(hook_path):
+            #os.unlink(hook_path)
