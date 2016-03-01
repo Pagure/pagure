@@ -1107,7 +1107,8 @@ def drop_issue(session, issue, user, ticketfolder):
 
 def new_pull_request(session, branch_from,
                      repo_to, branch_to, title, user,
-                     requestfolder, repo_from=None, remote_git=None,
+                     requestfolder, initial_comment=None,
+                     repo_from=None, remote_git=None,
                      requestuid=None, requestid=None,
                      status='Open', notify=True):
     ''' Create a new pull request on the specified repo. '''
@@ -1127,6 +1128,7 @@ def new_pull_request(session, branch_from,
         branch=branch_to,
         branch_from=branch_from,
         title=title,
+        initial_comment=initial_comment or None,
         user_id=user_obj.id,
         status=status,
     )
