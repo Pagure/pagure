@@ -124,13 +124,11 @@
         }}">
         </span>
         <span class="comment_text comment_body">
-        {%- autoescape false %}
         {%- if id == 0 -%}
-{{ comment.content | markdown }}
+{{ comment.content | markdown | noJS | safe }}
         {%- else -%}
-{{ comment.comment | markdown }}
+{{ comment.comment | markdown | noJS | safe }}
         {%- endif -%}
-        {% endautoescape -%}
         </span>
       </div>
     </section>
@@ -173,9 +171,7 @@
 <div class="clearfix p-b-3">
   <section class="issue_comment" id="comment-0">
     <div class="comment_body">
-      {%- autoescape false -%}
-{{ comment.content | markdown }}
-      {%- endautoescape -%}
+{{ comment.content | markdown | noJS | safe }}
     </div>
   </section>
   <div class="issue_action icon pull-xs-right">
