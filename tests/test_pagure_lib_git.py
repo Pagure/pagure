@@ -691,7 +691,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,80 @@
+@@ -0,0 +1,81 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
@@ -703,6 +703,7 @@ index 0000000..60f7480
 +    "commit_stop": null,
 +    "date_created": null,
 +    "id": 1,
++    "initial_comment": null,
 +    "project": {
 +        "date_created": null,
 +        "description": "test project for ticket",

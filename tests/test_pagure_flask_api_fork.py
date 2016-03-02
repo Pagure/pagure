@@ -112,6 +112,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                   "commit_stop": None,
                   "date_created": "1431414800",
                   "id": 1,
+                  "initial_comment": None,
                   "project": {
                     "date_created": "1431414800",
                     "description": "test project #1",
@@ -235,6 +236,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
               "commit_stop": None,
               "date_created": "1431414800",
               "id": 1,
+              "initial_comment": None,
               "project": {
                 "date_created": "1431414800",
                 "description": "test project #1",
