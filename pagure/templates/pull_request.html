@@ -94,11 +94,9 @@
     </a>
     </span>
 {%if pull_request and pull_request.initial_comment %}
-<section class="issue_comment m-t-1" id="comment-0">
+<section class="m-t-1" id="comment-0">
   <div class="comment_body">
-    {%- autoescape false -%}
-{{ pull_request.initial_comment | markdown }}
-    {%- endautoescape -%}
+{{ pull_request.initial_comment | markdown | noJS | safe }}
   </div>
 </section>
 {%endif%}
