@@ -93,7 +93,15 @@
     {{ pull_request.branch }}
     </a>
     </span>
-
+{%if pull_request.initial_comment %}
+<section class="issue_comment m-t-1" id="comment-0">
+  <div class="comment_body">
+    {%- autoescape false -%}
+{{ pull_request.initial_comment | markdown }}
+    {%- endautoescape -%}
+  </div>
+</section>
+{%endif%}
 {% elif form and (repo_admin or remote_git) %}
 <h2>Create pull request</h2>
 {% else %}
