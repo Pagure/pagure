@@ -93,7 +93,7 @@
     {{ pull_request.branch }}
     </a>
     </span>
-{%if pull_request.initial_comment %}
+{%if pull_request and pull_request.initial_comment %}
 <section class="issue_comment m-t-1" id="comment-0">
   <div class="comment_body">
     {%- autoescape false -%}
