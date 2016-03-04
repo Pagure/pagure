@@ -886,4 +886,5 @@ def edit_comment_issue(repo, issueid, commentid, username=None):
         form=form,
         comment=comment,
         is_js=is_js,
+        repo_admin=is_repo_admin(project),
     )
