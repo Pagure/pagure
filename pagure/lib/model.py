@@ -897,6 +897,12 @@ class PullRequest(BASE):
         '''
         return self.remote_git is not None
 
+    @property
+    def user_comments(self):
+        ''' Return user comments only, filter it from notifications
+        '''
+        return [comment for comment in self.comments if not comment.notification]
+
     def to_json(self, public=False, api=False, with_comments=True):
         ''' Returns a dictionnary representation of the pull-request.
 

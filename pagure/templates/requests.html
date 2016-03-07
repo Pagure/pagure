@@ -73,12 +73,12 @@
                   repo=repo.name, requestid=request.id) }}">
                 <span class="label label-default">PR#{{ request.id }}</span> {% if status|lower != 'open' %}<span class="label {% if request.status|lower == 'merged' %}label-success{%elif request.status|lower == 'closed'%}label-danger{%endif%}">{{request.status}}</span>{%endif%} {{ request.title | noJS("img") | safe }}
               </a>
-              {% if request.comments|count > 0 %}
+              {% if request.user_comments|count > 0 %}
                &nbsp;&nbsp;
               <span class="text-muted">
                 <span class="oi" data-glyph="comment-square"
                     title="Comments on the Pull Request"></span>
-                  {{request.comments|count}}
+                  {{ request.user_comments|count }}
               </span>
               {% endif %}
             </td>
