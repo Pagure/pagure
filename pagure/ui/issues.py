@@ -879,7 +879,7 @@ def edit_comment_issue(repo, issueid, commentid, username=None):
 
     return flask.render_template(
         'comment_update.html',
-        select='requests',
+        select='issues',
         requestid=issueid,
         repo=project,
         username=username,
