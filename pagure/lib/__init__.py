@@ -1674,9 +1674,16 @@ def search_issues(
         model.Issue.uid.in_(query.subquery())
     ).filter(
         model.Issue.project_id == repo.id
-    ).order_by(
-        model.Issue.id
     )
+
+    if closed:
+        query = query.order_by(
+            model.Issue.date_created.desc()
+        )
+    else:
+        query = query.order_by(
+            model.Issue.id
+        )
 
     if issueid is not None or issueuid is not None:
         output = query.first()
