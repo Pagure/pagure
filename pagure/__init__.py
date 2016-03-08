@@ -246,7 +246,9 @@ def login_required(function):
     @wraps(function)
     def decorated_function(*args, **kwargs):
         """ Decorated function, actually does the work. """
-        if not authenticated():
+        if flask.session.get('_justloggedout', False):
+            return flask.redirect(flask.url_for('.index'))
+        elif not authenticated():
             return flask.redirect(
                 flask.url_for('auth_login', next=flask.request.url))
         elif auth_method == 'fas' and not flask.g.fas_user.cla_done:
@@ -266,6 +268,10 @@ def inject_variables():
     forkbuttonform = None
     if authenticated():
         forkbuttonform = pagure.forms.ConfirmationForm()
+
+    justlogedout = flask.session.get('_justloggedout', False)
+    if justlogedout:
+        flask.session['_justloggedout'] = None
 
     return dict(
         version=__version__,
@@ -346,6 +352,7 @@ def auth_logout():  # pragma: no cover
     elif APP.config.get('PAGURE_AUTH', None) == 'local':
         import pagure.ui.login as login
         login.logout()
+    flask.session['_justloggedout'] = True
     return flask.redirect(return_point)
 
 
