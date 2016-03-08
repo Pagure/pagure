@@ -29,7 +29,6 @@ import tests
 
 class PagureFlaskApiIssuetests(tests.Modeltests):
     """ Tests for the flask API of pagure for issue """
-
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskApiIssuetests, self).setUp()
@@ -371,6 +370,61 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               },
               "total_issues": 0,
               "issues": []
+            }
+        )
+
+        # List all issues
+        output = self.app.get('/api/0/test/issues?status=All', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        data['issues'][0]['date_created'] = '1431414800'
+        data['issues'][1]['date_created'] = '1431414800'
+        self.assertDictEqual(
+            data,
+            {
+                "args": {
+                    "assignee": None,
+                    "author": None,
+                    "status": "All",
+                    "tags": []
+                },
+                "total_issues": 2,
+                "issues": [
+                    {
+                        "assignee": None,
+                        "blocks": [],
+                        "comments": [],
+                        "content": "This issue needs attention",
+                        "date_created": "1431414800",
+                        "depends": [],
+                        "id": 1,
+                        "private": False,
+                        "status": "Open",
+                        "tags": [],
+                        "title": "test issue",
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou"
+                        }
+                    },
+                    {
+                        "assignee": None,
+                        "blocks": [],
+                        "comments": [],
+                        "content": "We should work on this",
+                        "date_created": "1431414800",
+                        "depends": [],
+                        "id": 2,
+                        "private": True,
+                        "status": "Open",
+                        "tags": [],
+                        "title": "Test issue",
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou"
+                        }
+                    }
+                ],
             }
         )
 
