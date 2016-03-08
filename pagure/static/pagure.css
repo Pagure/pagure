@@ -3,6 +3,11 @@ html
     font-size:14px;
 }
 
+.disabled a {
+    pointer-events: none;
+    color: #808080;
+}
+
 .nav-tabs
 {
     border-bottom:none;
