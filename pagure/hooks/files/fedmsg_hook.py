@@ -123,7 +123,7 @@ for line in sys.stdin.readlines():
 
     commits = map(_build_commit, revs)
 
-    print "* Publishing information for %i commits" % len(commits)
+    final_commits = []
     for commit in reversed(commits):
         if commit is None:
             continue
@@ -139,9 +139,17 @@ for line in sys.stdin.readlines():
         else:
             commit['seen'] = False
             seen.append(commit['rev'])
+        final_commits.append(commit)
 
+    if final_commits:
+        print "* Publishing information for %i commits" % len(commits)
         pagure.lib.notify.log(
             project=project,
             topic="git.receive",
-            msg=dict(commit=commit),
+            msg=dict(
+                commits=final_commits,
+                branch=refname,
+                forced=forced,
+                agent=username,
+            ),
         )
