@@ -160,7 +160,9 @@ def api_view_issues(repo, username=None):
     | Key           | Type    | Optionality  | Description               |
     +===============+=========+==============+===========================+
     | ``status``    | string  | Optional     | | Filters the status of   |
-    |               |         |              |   issues. Default:        |
+    |               |         |              |   issues. Fetches all the |
+    |               |         |              |   issues if status is     |
+    |               |         |              |   ``all``. Default:       |
     |               |         |              |   ``Open``                |
     +---------------+---------+--------------+---------------------------+
     | ``tags``      | string  | Optional     | | A list of tags you      |
@@ -246,26 +248,19 @@ def api_view_issues(repo, username=None):
         private = None
 
     if status is not None:
+        params = {
+            'session': SESSION,
+            'repo': repo,
+            'tags': tags,
+            'assignee': assignee,
+            'author': author,
+            'private': private
+        }
         if status.lower() == 'closed':
-            issues = pagure.lib.search_issues(
-                SESSION,
-                repo,
-                closed=True,
-                tags=tags,
-                assignee=assignee,
-                author=author,
-                private=private,
-            )
-        else:
-            issues = pagure.lib.search_issues(
-                SESSION,
-                repo,
-                status=status,
-                tags=tags,
-                assignee=assignee,
-                author=author,
-                private=private,
-            )
+            params.update({'closed': True})
+        elif status.lower() != 'all':
+            params.update({'status': status})
+        issues = pagure.lib.search_issues(**params)
     else:
         issues = pagure.lib.search_issues(
             SESSION, repo, status='Open', tags=tags, assignee=assignee,
