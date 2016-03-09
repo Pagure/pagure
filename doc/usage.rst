@@ -12,3 +12,4 @@ Contents:
 
    theming
    ticket_templates
+   pr_custom_page
