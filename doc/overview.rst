@@ -56,3 +56,14 @@ For pagure this technology is used to allow live-refreshing of a page when
 someone is viewing it. For example, while you are reading a ticket if someone
 comments on it, the comment will automatically show up on the page without
 the need for you to reload the entire page.
+
+
+Pagure web-hook Server
+-------------------------
+
+Sends notifications to third party services using POST http requests.
+
+This is the second notifications system in pagure with `fedmsg <http://fedmsg.com/>`_.
+These notifications are running on their own service to prevent blocking the
+main web application in case the third part service is timing-out or just
+being slow.
