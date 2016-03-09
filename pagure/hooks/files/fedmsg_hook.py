@@ -28,43 +28,6 @@ config['endpoints']['relay_inbound'] = config['relay_inbound']
 fedmsg.init(name='relay_inbound', **config)
 
 
-def build_stats(commit):
-    cmd = ['diff-tree', '--numstat', '%s' % (commit)]
-    output = pagure.lib.git.read_git_lines(cmd, abspath)
-
-    files = {}
-    total = {}
-    for line in output[1:]:
-        additions, deletions, path = line.split('\t')
-        additions, deletions = additions.strip(), deletions.strip()
-
-        try:
-            additions = int(additions)
-        except ValueError:
-            additions = 0
-
-        try:
-            deletions = int(deletions)
-        except ValueError:
-            deletions = 0
-
-        path = path.strip()
-        files[path] = {
-            'additions':  additions,
-            'deletions': deletions,
-            'lines': additions + deletions,
-        }
-
-    total = defaultdict(int)
-    for name, stats in files.items():
-        total['additions'] += stats['additions']
-        total['deletions'] += stats['deletions']
-        total['lines'] += stats['lines']
-        total['files'] += 1
-
-    return files, total
-
-
 seen = []
 
 # Read in all the rev information git-receive-pack hands us.
@@ -93,58 +56,16 @@ for line in sys.stdin.readlines():
     if not project:
         project = project_name
 
-    def _build_commit(rev):
-        files, total = build_stats(rev)
-
-        summary = pagure.lib.git.read_git_lines(
-            ['log', '-1', rev, "--pretty='%s'"],
-            abspath)[0].replace("'", '')
-        message = pagure.lib.git.read_git_lines(
-            ['log', '-1', rev, "--pretty='%B'"],
-            abspath)[0].replace("'", '')
-
-        return dict(
-            name=pagure.lib.git.get_pusher(rev, abspath),
-            email=pagure.lib.git.get_pusher_email(rev, abspath),
-            summary=summary,
-            message=message,
-            stats=dict(
-                files=files,
-                total=total,
-            ),
-            rev=unicode(rev),
-            path=abspath,
-            username=username,
-            agent=os.getlogin(),
-        )
-
-    commits = map(_build_commit, revs)
-
-    final_commits = []
-    for commit in reversed(commits):
-        if commit is None:
-            continue
-
-        # Keep track of whether or not we have already published this commit
-        # on another branch or not.  It is conceivable that someone could
-        # make a commit to a number of branches, and push them all at the
-        # same time.
-        # Make a note in the fedmsg payload so we can try to reduce spam at
-        # a later stage.
-        if commit['rev'] in seen:
-            commit['seen'] = True
-        else:
-            commit['seen'] = False
-            seen.append(commit['rev'])
-        final_commits.append(commit)
-
-    if final_commits:
-        print "* Publishing information for %i commits" % len(commits)
+    if revs:
+        revs.reverse()
+        print "* Publishing information for %i commits" % len(revs)
         pagure.lib.notify.log(
             project=project,
             topic="git.receive",
             msg=dict(
-                commits=final_commits,
+                total_commits=len(revs),
+                start_commit=revs[0],
+                end_commit=revs[-1],
                 branch=refname,
                 forced=forced,
                 agent=username,
