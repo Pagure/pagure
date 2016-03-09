@@ -32,7 +32,7 @@
                        |                        |              |                   |              |         |
                        |                        +--------------+          +------->|   Database   |         |
                        |                                                  |        |              |         |
-   User's web browser--+                                          Updates |        +--------------+         |
+   User's web browser--+ http requests                            Updates |        +--------------+         |
         ^              |                                         & queries|                                 |
         |              |                                                  |                                 |
         |              |                        +--------------+          |                                 |
