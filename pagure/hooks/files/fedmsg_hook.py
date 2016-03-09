@@ -115,9 +115,6 @@ for line in sys.stdin.readlines():
             rev=unicode(rev),
             path=abspath,
             username=username,
-            repo=project.to_json(public=True)
-            if not isinstance(project, basestring) else project,
-            branch=refname,
             agent=os.getlogin(),
         )
 
@@ -151,5 +148,7 @@ for line in sys.stdin.readlines():
                 branch=refname,
                 forced=forced,
                 agent=username,
+                repo=project.to_json(public=True)
+                if not isinstance(project, basestring) else project,
             ),
         )
