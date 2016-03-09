@@ -9,6 +9,12 @@ These components are:
 .. contents::
 
 
+And since a picture is worth thousand words, here is a diagram of all these
+components together:
+
+.. image:: _static/overview.png
+        :target: _static/overview.png
+
 Pagure core application
 -----------------------
 
