@@ -220,7 +220,7 @@ def is_repo_admin(repo_obj):
         for usr in grp.users]
 
     return user == repo_obj.user.user or (
-        user in [user.user for user in repo_obj.users]
+        user in [usr.user for usr in repo_obj.users]
     ) or (user in usergrps)
 
 
