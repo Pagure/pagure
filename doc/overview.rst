@@ -9,8 +9,16 @@ These components are:
 .. contents::
 
 
-And since a picture is worth thousand words, here is a diagram of all these
-components together:
+Before going into the overall picture, one should realize that most of the
+components listed above are optional.
+
+Here is a diagram representing pagure without all the optionals components:
+
+.. image:: _static/overview_simple.png
+        :target: _static/overview_simple.png
+
+
+And here is a diagram of all the components together:
 
 .. image:: _static/overview.png
         :target: _static/overview.png
