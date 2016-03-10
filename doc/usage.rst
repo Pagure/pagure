@@ -10,6 +10,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   theming
+   first_steps
    ticket_templates
    pr_custom_page
+   theming
