@@ -23,6 +23,18 @@ provide a web UI to the git repositories as well as tickets and pull-requests.
 This is the main application for the forge.
 
 
+Gitolite
+--------
+
+Currently pagure uses `gitolite <http://gitolite.com/gitolite/index.html>`_
+to grant or deny `ssh <https://en.wikipedia.org/wiki/Secure_Shell>`_ access
+to the git repositories, in other words to grant or deny read and/or write
+access to the git repositories.
+
+Pagure supports cloning over both ssh and http, but writing can only be done
+via ssh, through gitolite.
+
+
 Pagure doc server
 -----------------
 
