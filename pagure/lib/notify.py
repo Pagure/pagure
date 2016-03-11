@@ -28,7 +28,7 @@ from email.mime.text import MIMEText
 
 REPLY_MSG = 'To reply, visit the link below'
 if pagure.APP.config['EVENTSOURCE_SOURCE']:
-    REPLY_MSG += 'or just reply to this email'
+    REPLY_MSG += ' or just reply to this email'
 
 
 def fedmsg_publish(*args, **kwargs):  # pragma: no cover
