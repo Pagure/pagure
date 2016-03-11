@@ -42,6 +42,7 @@ class BaseHook(object):
     name = None
     form = None
     description = None
+    hook_type = 'post-receive'
 
     @classmethod
     def set_up(cls, project):
@@ -66,10 +67,10 @@ class BaseHook(object):
                 os.makedirs(hookfolder)
 
             # Install the main post-receive file
-            postreceive = os.path.join(hookfolder, 'post-receive')
+            postreceive = os.path.join(hookfolder, cls.hook_type)
             if not os.path.exists(postreceive):
                 shutil.copyfile(
-                    os.path.join(hook_files, 'post-receive'),
+                    os.path.join(hook_files, cls.hook_type),
                     postreceive)
                 os.chmod(postreceive, 0755)
 
