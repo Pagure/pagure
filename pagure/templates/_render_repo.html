@@ -30,19 +30,25 @@
 {%- endmacro %}
 
 
-{% macro pagination_link(pagetitle, page, total) -%}
+{% macro pagination_link(pagetitle, page, total, sorting=None) -%}
+{% set prev_page = "%s?%s=%s" % (request.base_url, pagetitle, page - 1) %}
+{% set next_page = "%s?%s=%s" % (request.base_url, pagetitle, page + 1) %}
+{% if sorting %}
+{% set prev_page = "%s&sorting=%s" % (prev_page, sorting) %}
+{% set next_page = "%s&sorting=%s" % (next_page, sorting) %}
+{% endif %}
 <aside>
     <nav class="text-center">
       <ul class="pagination">
         <li {% if page <= 1%} class="disabled" {% endif %}>
-          <a href="{{ request.base_url }}?{{ pagetitle }}={{page - 1}}">
+          <a href="{{ prev_page }}">
             <span aria-hidden="true">&laquo;</span>
             <span class="sr-only">Newer</span>
           </a>
         </li>
         <li class="active">page {{ page }} of {{ total }}</li>
         <li {% if page >= total %}class="disabled"{%endif%}>
-          <a href="{{ request.base_url }}?{{ pagetitle }}={{page + 1}}">
+          <a href="{{ next_page }}">
             <span aria-hidden="true">&raquo;</span>
             <span class="sr-only">Older</span>
           </a>
@@ -72,7 +78,7 @@
         <div class="row">
           <div class="col-sm-6">
             {% if total and total > 1 %}
-            {{ pagination_link(pagetitle, page, total) }}
+            {{ pagination_link(pagetitle, page, total, sorting) }}
             {% endif %}
           </div>
           <div class="col-sm-6 text-xs-right">
