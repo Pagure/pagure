@@ -858,11 +858,13 @@ def get_revs_between(torev, fromrev, abspath, forced=False):
     return pagure.lib.git.read_git_lines(cmd, abspath)
 
 
-def is_forced_push(torev, fromrev, abspath):
-    """ Returns wether there was a force push between HEAD and BASE. """
+def is_forced_push(oldrev, newrev, abspath):
+    """ Returns wether there was a force push between HEAD and BASE.
+    Doc: http://stackoverflow.com/a/12258773
+    """
 
     # Returns if there was any commits deleted in the changeset
-    cmd = ['rev-list', '%s' % torev, '^%s' % (fromrev)]
+    cmd = ['rev-list', '%s' % oldrev, '^%s' % newrev]
     out = pagure.lib.git.read_git_lines(cmd, abspath)
     return len(out) > 0
 
