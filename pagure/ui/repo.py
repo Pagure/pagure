@@ -433,7 +433,7 @@ def view_file(repo, identifier, filename, username=None):
                     'Failed to load image %s, error: %s', filename, err
                 )
                 output_type = 'binary'
-        elif ext in ('.rst', '.mk', '.md') and not rawtext:
+        elif ext in ('.rst', '.mk', '.md', '.markdown') and not rawtext:
             content, safe = pagure.doc_utils.convert_readme(content.data, ext)
             output_type = 'markup'
         elif not is_binary_string(content.data):
