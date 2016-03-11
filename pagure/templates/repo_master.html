@@ -93,7 +93,8 @@
         </li>
         {% endif %}
 
-        <li class="nav-item">
+        <li class="nav-item{%
+            if repo_obj and repo_obj.is_empty %} disabled{% endif %}">
           <a {%
             if select == 'logs' %}class="active nav-link" {%
             else %}class="nav-link" {%
@@ -104,7 +105,8 @@
             </a>
         </li>
 
-        <li class="nav-item">
+        <li class="nav-item{%
+            if repo_obj and repo_obj.is_empty %} disabled{% endif %}">
           <a {%
             if select == 'tree' %}class="active nav-link" {%
             else %}class="nav-link"{%
