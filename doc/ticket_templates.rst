@@ -7,7 +7,7 @@ ignore it, or even to not follow it, but it also helps structuring the
 ticket opened against a project and highlighting the information that are
 often requested/needed.
 
-The templates are providing in the git repository containing the meta-data
+The templates are provided in the git repository containing the meta-data
 for the tickets.
 They must be placed under a ``templates`` folder in this git repository,
 end with ``.md``and as the extension suggests can be formated as markdown.

@@ -83,6 +83,11 @@ someone is viewing it. For example, while you are reading a ticket if someone
 comments on it, the comment will automatically show up on the page without
 the need for you to reload the entire page.
 
+The flow is: the main pagure server does an action, sends a message over
+redis, the eventsource server picks it up and send it to the browsers waiting
+for it, then javascript code is executed to refresh the page based on the
+information received.
+
 
 Pagure web-hook Server
 -------------------------
@@ -93,3 +98,7 @@ This is the second notifications system in pagure with `fedmsg <http://fedmsg.co
 These notifications are running on their own service to prevent blocking the
 main web application in case the third part service is timing-out or just
 being slow.
+
+The flow is: the main pagure server does an action, sends a message over
+redis, the web-hook server picks it up, build the query and performs the
+POST request to the specified URLs.

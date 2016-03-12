@@ -9,7 +9,7 @@ Login to pagure or create your account
 
 Pagure has its own user account system.
 
-For instances of pagure such as the one in `pagure.io <https://pagure.io>`_
+For instances of pagure such as the one at `pagure.io <https://pagure.io>`_
 where the authentication is delegated to a third party (in the case of
 pagure.io, the Fedora Account System) via OpenID, the local user account
 is created upon login.
@@ -39,7 +39,7 @@ If you have never generated a ssh key, you can do so by running:
 
     ssh-keygen
 
-or for example on GNOME using the application ``seahorse``.
+or alternatively on GNOME using the application ``seahorse``.
 
 This will create two files in ``~/.ssh/`` (``~`` is the symbol for your home
 folder).

@@ -1,7 +1,7 @@
 Customize the PR page
 =====================
 
-Pagure offers the possibility to customize the page to create pull-request
+Pagure offers the possibility to customize the page that creates pull-request
 to add your specific information, such as: please follow the XYZ coding style,
 run the tests or whatever you wish to inform contributors when they open a
 new pull-request.
