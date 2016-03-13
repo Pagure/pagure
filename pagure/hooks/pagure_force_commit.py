@@ -83,27 +83,20 @@ class PagureForceCommitHook(BaseHook):
             should be installed
 
         '''
-        repopaths = [get_repo_path(project)]
-        for folder in [
-                APP.config.get('DOCS_FOLDER'),
-                APP.config.get('REQUESTS_FOLDER')]:
-            repopaths.append(
-                os.path.join(folder, project.path)
-            )
+        repopath = get_repo_path(project)
 
         hook_files = os.path.join(
             os.path.dirname(os.path.realpath(__file__)), 'files')
         hook_file = os.path.join(hook_files, 'pagure_force_commit_hook.py')
 
-        for repopath in repopaths:
-            # Init the git repo in case
-            pygit2.Repository(repopath)
+        # Init the git repo in case
+        pygit2.Repository(repopath)
 
-            # Install the hook itself
-            hook_path = os.path.join(
-                repopath, 'hooks', 'pre-receive.pagureforcecommit')
-            if not os.path.exists(hook_path):
-                os.symlink(hook_file, hook_path)
+        # Install the hook itself
+        hook_path = os.path.join(
+            repopath, 'hooks', 'pre-receive.pagureforcecommit')
+        if not os.path.exists(hook_path):
+            os.symlink(hook_file, hook_path)
 
     @classmethod
     def remove(cls, project):
