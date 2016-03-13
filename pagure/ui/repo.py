@@ -727,6 +727,9 @@ def view_tags(repo, username=None):
     if not repo:
         flask.abort(404, 'Project not found')
 
+    reponame = pagure.get_repo_path(repo)
+    repo_obj = pygit2.Repository(reponame)
+
     tags = pagure.lib.git.get_git_tags_objects(repo)
     return flask.render_template(
         'releases.html',
@@ -735,6 +738,7 @@ def view_tags(repo, username=None):
         repo=repo,
         tags=tags,
         repo_admin=is_repo_admin(repo),
+        repo_obj=repo_obj,
     )
 
 
@@ -863,6 +867,7 @@ def view_settings(repo, username=None):
         select='settings',
         username=username,
         repo=repo,
+        repo_obj=repo_obj,
         form=form,
         tag_form=tag_form,
         branches_form=branches_form,

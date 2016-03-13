@@ -394,6 +394,9 @@ def view_issues(repo, username=None):
 
     tag_list = pagure.lib.get_tags_of_project(SESSION, repo)
 
+    reponame = pagure.get_repo_path(repo)
+    repo_obj = pygit2.Repository(reponame)
+
     return flask.render_template(
         'issues.html',
         select='issues',
@@ -407,6 +410,7 @@ def view_issues(repo, username=None):
         assignee=assignee,
         author=author,
         repo_admin=is_repo_admin(repo),
+        repo_obj=repo_obj,
     )
 
 
@@ -538,6 +542,9 @@ def view_issue(repo, issueid, username=None):
         flask.abort(
             403, 'This issue is private and you are not allowed to view it')
 
+    reponame = pagure.get_repo_path(repo)
+    repo_obj = pygit2.Repository(reponame)
+
     status = pagure.lib.get_issue_statuses(SESSION)
 
     form = pagure.forms.UpdateIssueForm(status=status)
@@ -548,6 +555,7 @@ def view_issue(repo, issueid, username=None):
         select='issues',
         repo=repo,
         username=username,
+        repo_obj=repo_obj,
         tag_list=tag_list,
         issue=issue,
         issueid=issueid,
