@@ -69,8 +69,11 @@ class PagureFlaskPluginstests(tests.Modeltests):
         names = pagure.ui.plugins.get_plugin_names()
         self.assertEqual(
             sorted(names),
-            ['Block non fast-forward pushes', 'Fedmsg', 'IRC', 'Mail',
-             'pagure', 'pagure requests', 'pagure tickets'])
+            [
+                'Block non fast-forward pushes', 'Fedmsg', 'IRC', 'Mail',
+                'Read the Doc', 'pagure', 'pagure requests', 'pagure tickets'
+            ]
+        )
 
     def test_get_plugin(self):
         """ Test the get_plugin function. """
