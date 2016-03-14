@@ -49,6 +49,7 @@ assigne_issue = function(data, _issues_url) {
   selectize.settings.create = true;
   selectize.createItem(data.assigned.name);
   selectize.settings.create = false;
+  $('#assignee').val(data.assigned.name);
 
   var field = $('#assignee_plain');
   var _url = '\n<a href="'
