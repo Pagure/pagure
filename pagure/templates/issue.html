@@ -15,8 +15,12 @@
 
 {% block repo %}
 <div class="row m-t-2">
-  <div class="col-md-8">
+  <form action="{{ url_for('update_issue', username=username,
+               repo=repo.name, issueid=issueid) }}" method="post"
+               onsubmit="return try_async_comment(this)">
+  {{ form.csrf_token }}
 
+  <div class="col-md-8">
   <h2>
     <span class="issueid label label-default">#{{ issueid }}</span>
     <span id="issuetitle">{{issue.title | noJS("img") | safe }}</span>
@@ -32,10 +36,6 @@
 
     {{ show_initial_comment(issue, username, repo,issueid, repo_admin, form) }}
 
-  <form action="{{ url_for('update_issue', username=username,
-               repo=repo.name, issueid=issueid) }}" method="post"
-               onsubmit="return try_async_comment(this)">
-      {{ form.csrf_token }}
     <section id="comments">
       {% if issue.comments %}
         {% for comment in issue.comments %}
@@ -43,19 +43,12 @@
         {% endfor %}
       {% endif %}
     </section>
-  </form>
 
     <div class="card">
       <div class="card-header">
 
         <section class="issue_comment add_comment">
         {% if authenticated and form %}
-
-          <form action="{{ url_for('update_issue', username=username,
-                   repo=repo.name, issueid=issueid) }}" method="post"
-                   onsubmit="return try_async_comment(this)"
-                   enctype="multipart/form-data">
-          {{ form.csrf_token }}
 
           <fieldset class="form-group">
             <label for="comment"><strong>Add new comment</strong></label>
@@ -72,7 +65,8 @@
           </fieldset>
 
           Select files OR drag them into the comment field below.
-          <input id="file-picker" type="file" name="file" accept="image/*" multiple tabindex=3 />
+          <input id="file-picker" type="file" name="file" accept="image/*"
+            multiple tabindex=3 />
           <fieldset id="progress" style="display: none">
             <div class="progress-trough">
               <div id="progress-bar" class="progress-bar">0%</div>
@@ -80,17 +74,12 @@
           </fieldset>
           <a href="http://daringfireball.net/projects/markdown/syntax"
              target="_blank">Markdown Syntax</a>
-          <input type="hidden" name="tag" value="{{ issue.tags_text | join(',') }}" >
-          <input type="hidden" name="assignee" value="{{ issue.assignee.username or '' }}" >
-          <input type="hidden" name="blocks" value="{{ issue.blocks_text | join(',') }}">
-          <input type="hidden" name="depends" value="{{ issue.depends_text | join(',') }}">
-            <div>
-              <input type="submit" class="btn btn-primary"
-                value="Update Issue" tabindex=2 />
-              <input type="button" class="btn btn-secondary"
-                value="Clear" id="clear_comment" tabindex=4 />
-            </div>
-        </form>
+          <div>
+            <input type="submit" class="btn btn-primary"
+              value="Update Issue" tabindex=2 />
+            <input type="button" class="btn btn-secondary"
+              value="Clear" id="clear_comment" tabindex=4 />
+          </div>
         {% else %}
           <p>
             <a href="{{ url_for('auth_login', next=request.url) }}">Login</a>
@@ -101,18 +90,11 @@
 
       </div>
     </div>
-
   </div>
+
   <div class="col-md-4">
     <div class="card">
       <div class="card-block">
-      {% if authenticated and form %}
-        <form action="{{ url_for('update_issue', username=username,
-           repo=repo.name, issueid=issueid) }}" method="post"
-           onsubmit="return try_async_comment(this)"
-           enctype="multipart/form-data">
-        {{ form.csrf_token }}
-      {% endif %}
 
           <fieldset class="form-group issue-metadata-display">
             <label><strong>Status</strong></label>
@@ -146,7 +128,9 @@
           {% if authenticated and repo_admin %}
           <fieldset class="form-group issue-metadata-form">
             <label for="tag"><strong>Tags</strong></label>
-             <input id="tag" type="text" value="{{ issue.tags_text | join(',') }}" placeholder="tag1, tag2" name="tag" title="comma separated list of tags">
+             <input id="tag" type="text" placeholder="tag1, tag2" name="tag"
+                title="comma separated list of tags"
+                value="{{ issue.tags_text | join(',') }}" />
           </fieldset>
           {% endif%}
 
@@ -154,7 +138,11 @@
             <label><strong>Assignee</strong></label>
             <div id="assignee_plain">
               {% if issue.assignee %}
-                  <a href="{{ url_for('view_issues', username=username, repo=repo.name, assignee=issue.assignee.username) }}">{{ issue.assignee.username }}</a>
+                  <a href="{{ url_for(
+                    'view_issues', username=username, repo=repo.name,
+                    assignee=issue.assignee.username) }}">
+                    {{ issue.assignee.username }}
+                  </a>
               {% else %}
                 unassigned
               {% endif %}
@@ -164,7 +152,9 @@
           {% if authenticated and repo_admin %}
                 <fieldset class="form-group issue-metadata-form">
                   <label for="assignee"><strong>Assignee</strong></label>
-                  <input class="form-control" value="{{ issue.assignee.username or '' }}" name="assignee" id="assignee" placeholder="username" >
+                  <input class="form-control" name="assignee" id="assignee"
+                    placeholder="username"
+                    value="{{ issue.assignee.username or '' }}" />
                 </fieldset>
           {% endif%}
 
@@ -183,7 +173,9 @@
           {% if authenticated and repo_admin %}
                 <fieldset class="form-group issue-metadata-form">
                   <label for="blocks"><strong>Blocked</strong></label>
-                  <input class="form-control" id="blocks" type="text" placeholder="issue blocked" name="blocks" value="{{ issue.blocks_text | join(',') }}">
+                  <input class="form-control" id="blocks" type="text"
+                    placeholder="issue blocked" name="blocks"
+                    value="{{ issue.blocks_text | join(',') }}" />
                 </fieldset>
           {% endif%}
 
@@ -203,21 +195,26 @@
           {% if authenticated and repo_admin %}
             <fieldset class="form-group issue-metadata-form">
               <label for="depends"><strong>Depends on</strong></label>
-              <input class="form-control" id="depends" type="text" placeholder="issue depending" name="depends" value="{{ issue.depends_text | join(',') }}">
+              <input class="form-control" id="depends" type="text"
+                placeholder="issue depending" name="depends"
+                value="{{ issue.depends_text | join(',') }}" />
             </fieldset>
           {% endif%}
 
           <input type="submit" class="btn btn-primary issue-metadata-form" value="Update">
-            <a class="btn btn-secondary issue-metadata-form editmetadatatoggle" >cancel</a>
-          {% if authenticated and form %}
-            </form>
-          {% endif %}
+            <a class="btn btn-secondary issue-metadata-form editmetadatatoggle">
+              cancel
+            </a>
           {% if authenticated and repo_admin %}
-            <a class="btn btn-secondary issue-metadata-display editmetadatatoggle" >Edit Metadata</a>
+            <a class="btn btn-secondary issue-metadata-display editmetadatatoggle">
+              Edit Metadata
+            </a>
           {% endif %}
       </div>
     </div>
   </div>
+
+  </form>
 </div>
 
 {% endblock %}
@@ -326,6 +323,27 @@ $(document).ready(function() {
     return false;
   };
 
+  {% if repo_admin %}
+  $('#closeticket').click(function(event){
+    event.preventDefault();
+    var closeForm = jQuery('<form>', {
+        'method': 'POST',
+        'action': '{{
+        url_for('.delete_issue',
+                 username=username, repo=repo.name, issueid=issueid) }}',
+    }).append(jQuery('<input>', {
+        'name': 'csrf_token',
+        'value': '{{ form.csrf_token.current_token }}',
+        'type': 'hidden'
+    })).appendTo('body');
+    console.log(closeForm);
+    if (confirm('Are you sure to delete this ticket? \nThis is final and cannot be un-done.')){
+      console.log(closeForm.submit());
+    }
+    return false;
+  });
+  {% endif %}
+
   $(window.onload=highlight_comment());
   $(window).on('hashchange', highlight_comment);
   cancel_edit_btn();
@@ -375,7 +393,8 @@ source.addEventListener('message', function(e) {
 
 {% if authenticated and form %}
 function try_async_comment(form) {
-  $(form).find('input[type="submit"]').attr("disabled", "disabled");
+  console.log(form)
+  $('body').find('input[type="submit"]').attr("disabled", "disabled");
   var _data = $(form).serialize();
   var btn = $(document.activeElement);
   if (btn[0].name == 'drop_comment'){
@@ -408,7 +427,7 @@ function try_async_comment(form) {
       $(form).off('submit');
       form.submit();
     })
-  $(form).find('input[type="submit"]').removeAttr("disabled");
+  $('body').find('input[type="submit"]').removeAttr("disabled");
   return false;
 };
 {% endif %}
