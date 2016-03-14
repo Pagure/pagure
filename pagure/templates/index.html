@@ -33,6 +33,12 @@
 <script src="{{ url_for('static', filename='jquery.dotdotdot.min.js') }}" type="text/javascript"></script>
 <script type="text/javascript">
 $(document).ready(function() {
+  $('#headerSearch').on('keypress keydown keyup', function(e) {
+    if (e.which == 13) {
+        e.preventDefault();
+        return false;
+    }
+});
   $('#term').selectize({
     valueField: 'name',
     labelField: 'name',
