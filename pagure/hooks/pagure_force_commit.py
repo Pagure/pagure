@@ -106,16 +106,8 @@ class PagureForceCommitHook(BaseHook):
             should be installed
 
         '''
-        repopaths = [get_repo_path(project)]
-        for folder in [
-                APP.config.get('DOCS_FOLDER'),
-                APP.config.get('REQUESTS_FOLDER')]:
-            repopaths.append(
-                os.path.join(folder, project.path)
-            )
-
-        for repopath in repopaths:
-            hook_path = os.path.join(
-                repopath, 'hooks', 'pre-receive.pagureforcecommit')
-            if os.path.exists(hook_path):
-                os.unlink(hook_path)
+        repopaths = get_repo_path(project)
+        hook_path = os.path.join(
+            repopath, 'hooks', 'pre-receive.pagureforcecommit')
+        if os.path.exists(hook_path):
+            os.unlink(hook_path)
