@@ -1135,23 +1135,6 @@ class PagureLibtests(tests.Modeltests):
         self.assertTrue(os.path.exists(ticketrepo))
         self.assertTrue(os.path.exists(requestrepo))
 
-        # Fail to fork
-
-        # Cannot fail your own project
-        self.assertRaises(
-            pagure.exceptions.PagureException,
-            pagure.lib.fork_project,
-            session=self.session,
-            user='pingou',
-            repo=repo,
-            gitfolder=gitfolder,
-            forkfolder=forkfolder,
-            docfolder=docfolder,
-            ticketfolder=ticketfolder,
-            requestfolder=requestfolder,
-        )
-        self.session.rollback()
-
         # Git repo exists
         grepo = '%s.git' % os.path.join(forkfolder, 'foo', 'testproject')
         os.makedirs(grepo)

@@ -1319,13 +1319,6 @@ index 0000000..2a552bb
                 '/do_fork/foo', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
-            output = self.app.post(
-                '/do_fork/test', data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 200)
-            self.assertIn(
-                '</button>\n                      You may not fork your '
-                'own repo', output.data)
-
         user.username = 'foo'
         with tests.user_set(pagure.APP, user):
             output = self.app.post('/do_fork/test')
