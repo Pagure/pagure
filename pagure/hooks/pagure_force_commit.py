@@ -106,7 +106,7 @@ class PagureForceCommitHook(BaseHook):
             should be installed
 
         '''
-        repopaths = get_repo_path(project)
+        repopath = get_repo_path(project)
         hook_path = os.path.join(
             repopath, 'hooks', 'pre-receive.pagureforcecommit')
         if os.path.exists(hook_path):
