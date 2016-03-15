@@ -717,7 +717,7 @@ index 0000000..60f7480
 +            "Web-hooks": null,
 +            "always_merge": false,
 +            "issue_tracker": true,
-+            "project_documentation": true,
++            "project_documentation": false,
 +            "pull_requests": true
 +        },
 +        "tags": [],
@@ -745,7 +745,7 @@ index 0000000..60f7480
 +            "Web-hooks": null,
 +            "always_merge": false,
 +            "issue_tracker": true,
-+            "project_documentation": true,
++            "project_documentation": false,
 +            "pull_requests": true
 +        },
 +        "tags": [],

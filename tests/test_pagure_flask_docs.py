@@ -74,6 +74,12 @@ class PagureFlaskDocstests(tests.Modeltests):
         """
         tests.create_projects(self.session)
 
+        # Turn on the docs project since it's off by default
+        repo = pagure.lib.get_project(self.session, 'test')
+        repo.settings = {'project_documentation': True}
+        self.session.add(repo)
+        self.session.commit()
+
         output = self.app.get('/test/docs', follow_redirects=True)
         self.assertEqual(output.status_code, 404)
         self.assertTrue(
@@ -150,6 +156,12 @@ class PagureFlaskDocstests(tests.Modeltests):
             'origin', os.path.join(tests.HERE, 'docs', 'test.git'))
 
         PagureRepo.push(remote, 'refs/heads/master:refs/heads/master')
+
+        # Turn on the docs project since it's off by default
+        repo = pagure.lib.get_project(self.session, 'test')
+        repo.settings = {'project_documentation': True}
+        self.session.add(repo)
+        self.session.commit()
 
         # Now check the UI
 

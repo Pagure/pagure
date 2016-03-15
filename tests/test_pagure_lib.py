@@ -874,14 +874,14 @@ class PagureLibtests(tests.Modeltests):
         # Before
         repo = pagure.lib.get_project(self.session, 'test2')
         self.assertTrue(repo.settings['issue_tracker'])
-        self.assertTrue(repo.settings['project_documentation'])
+        self.assertFalse(repo.settings['project_documentation'])
 
         msg = pagure.lib.update_project_settings(
             session=self.session,
             repo=repo,
             settings={
                 'issue_tracker': True,
-                'project_documentation': True,
+                'project_documentation': False,
                 'pull_requests': True,
                 'Only_assignee_can_merge_pull-request': False,
                 'Minimum_score_to_merge_pull-request': -1,
@@ -898,7 +898,7 @@ class PagureLibtests(tests.Modeltests):
             repo=repo,
             settings={
                 'issue_tracker': False,
-                'project_documentation': False,
+                'project_documentation': True,
                 'pull_requests': False,
                 'Only_assignee_can_merge_pull-request': None,
                 'Minimum_score_to_merge_pull-request': None,
@@ -912,7 +912,7 @@ class PagureLibtests(tests.Modeltests):
         # After
         repo = pagure.lib.get_project(self.session, 'test2')
         self.assertFalse(repo.settings['issue_tracker'])
-        self.assertFalse(repo.settings['project_documentation'])
+        self.assertTrue(repo.settings['project_documentation'])
         self.assertFalse(repo.settings['pull_requests'])
 
     def test_search_projects(self):
