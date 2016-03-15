@@ -297,7 +297,7 @@ function setup_reply_btns() {
       var _text = _comment.text().split("\n");
       var _output = new Array();
       for (cnt = 0; cnt < _text.length ; cnt ++) {
-          _output[cnt] = '> ' + jQuery.trim(_text[cnt]);
+          _output[cnt] = '> ' + $.trim(_text[cnt]);
       }
       $( "#comment" ).val(_output.join("\n"));
     }
@@ -326,19 +326,18 @@ $(document).ready(function() {
   {% if repo_admin %}
   $('#closeticket').click(function(event){
     event.preventDefault();
-    var closeForm = jQuery('<form>', {
+    var closeForm = $('<form>', {
         'method': 'POST',
         'action': '{{
         url_for('.delete_issue',
                  username=username, repo=repo.name, issueid=issueid) }}',
-    }).append(jQuery('<input>', {
+    }).append($('<input>', {
         'name': 'csrf_token',
         'value': '{{ form.csrf_token.current_token }}',
         'type': 'hidden'
     })).appendTo('body');
-    console.log(closeForm);
     if (confirm('Are you sure to delete this ticket? \nThis is final and cannot be un-done.')){
-      console.log(closeForm.submit());
+      closeForm.submit();
     }
     return false;
   });
