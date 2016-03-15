@@ -110,6 +110,11 @@
 <script src="{{ url_for('static', filename='selectize.min.js') }}" type="text/javascript"> </script>
 <script type="text/javascript">
 $(document).ready(function() {
+  $('#headerSearch').on('keypress keydown keyup', function(e) {
+    if (e.which == 13) {
+        e.preventDefault();
+        return false;
+    }
 
   $('#add_group').on(
     'shown.bs.modal', function () {
