@@ -864,7 +864,13 @@ function try_async_comment(form, inline) {
     form.submit();
     return false;
   }
-  $.post( form.action + "?js=1", $(form).serialize() )
+  var _url = form.action;
+  if (_url.indexOf('?') != -1){
+      _url += "&js=1";
+  } else {
+    _url += "?js=1";
+  }
+  $.post( _url, $(form).serialize() )
     .done(function(data) {
       if(data == 'ok') {
         $('#comment').val('');
