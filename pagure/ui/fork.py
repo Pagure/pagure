@@ -984,8 +984,12 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
     if not is_repo_admin(repo):
         form = None
 
+    # if the pull request we are creating only has one commit,
+    # we automatically fill out the form fields for the PR with
+    # the commit title and bodytext
     if len(diff_commits) == 1 and form:
         form.title.data = diff_commits[0].message.strip().split('\n')[0]
+        form.initial_comment.data = diff_commits[0].message.partition('\n')[2]
 
     # Get the contributing templates from the requests git repo
     contributing = None
