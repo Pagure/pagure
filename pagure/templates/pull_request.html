@@ -346,10 +346,11 @@
           <div class="card">
             <div class="card-header">
               <div>
-                {{ comment.comment }}
                 <div class="pull-xs-right text-muted">
                     <span title="{{comment.date_created.strftime('%Y-%m-%d %H:%M:%S')}}">{{
-                        comment.date_created | humanize}}</span></div>
+                        comment.date_created | humanize}}</span>
+                </div>
+                <small>{{ comment.comment | markdown | noJS | safe}}</small>
               </div>
             </div>
           </div>

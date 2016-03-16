@@ -1154,24 +1154,34 @@ def diff_pull_request(
         if request.status and diff_commits:
             first_commit = repo_obj[diff_commits[-1].oid.hex]
             # Check if we can still rely on the merge_status
-            verb = None
+            commenttext = None
             if request.commit_start != first_commit.oid.hex or\
                     request.commit_stop != diff_commits[0].oid.hex:
                 request.merge_status = None
                 if request.commit_start:
-                    verb = 'updated'
+                    new_commits_count = 0
+                    commenttext = ""
+                    for i in diff_commits:
+                        if i.oid.hex == request.commit_stop:
+                            break
+                        new_commits_count = new_commits_count + 1
+                        commenttext = '%s * %s\n' % (commenttext, i.message.strip().split('\n')[0])
+                    if new_commits_count == 1:
+                        commenttext = "**%d new commit added**\n\n%s" % (new_commits_count, commenttext)
+                    else:
+                        commenttext = "**%d new commits added**\n\n%s" % (new_commits_count, commenttext)
                 if request.commit_start and \
                         request.commit_start != first_commit.oid.hex:
-                    verb = 'rebased'
+                    commenttext = 'rebased'
             request.commit_start = first_commit.oid.hex
             request.commit_stop = diff_commits[0].oid.hex
             session.add(request)
             session.commit()
-            if verb:
+            if commenttext:
                 pagure.lib.add_pull_request_comment(
                     session, request,
                     commit=None, tree_id=None, filename=None, row=None,
-                    comment='Pull-Request has been %s' % verb,
+                    comment='%s' % commenttext,
                     user=request.user.username,
                     requestfolder=requestfolder,
                     notify=False, notification=True
