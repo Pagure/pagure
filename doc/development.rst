@@ -104,6 +104,64 @@ so you can see your change immediatly.
 
 
 
+Create a pull-request for testing
+----------------------------------
+
+When working on pagure, it is pretty often that one wanted to work on a
+feature or a bug related to pull-requests needs to create one.
+
+Making a pull-request for development purposes isn't hard, if you remember
+that since you're running a local instance, the git repos created in your
+pagure instance are also local.
+
+So here are in a few steps what one could do to create a pull-request in a
+local pagure instance.
+
+* Create a project on your pagure instance, let's say it will be called ``test``
+
+* Create a folder ``clones`` somewhere in your system::
+
+    mkdir clones
+
+* Clone the repo of the ``test`` project into this ``clones`` folder::
+
+    cd clones
+    git clone ~/path/to/pagure/repos/test.git
+
+* Add and commit some files::
+
+    echo "*~" > .gitignore
+    git add .gitignore
+    git commit -m "Add a .gitignore file"
+    echo "BSD" > LICENSE
+    git add LICENSE
+    git commit -m "Add a LICENSE file"
+
+* Push these changes::
+
+    git push origin master
+
+* Create a new branch and add a commit in it::
+
+    git branch new_branch
+    git checkout new_branch
+    touch test
+    git add test
+    git commit -m "Add file: test"
+
+* Push this new branch::
+
+    git push origin new_branch
+
+
+Then go back to your pagure instance running in your web-browser, check the
+``test`` project and you should see two branches: ``master`` and ``new_branch``
+from there you should be able to open a new pull-request, either from the
+front page or via the ``File Pull Request`` button in the ``Pull Requests``
+page.
+
+
+
 Coding standards
 ----------------
 
