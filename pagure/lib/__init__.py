@@ -2783,3 +2783,35 @@ def update_watch_status(session, project, user, watch):
     if not int(watch):
         msg_success = 'You are no longer watching this repo.'
     return msg_success
+
+def is_watching(session, user, project):
+    ''' Check user watching the project. '''
+
+    user_obj = __get_user(session, user)
+    if not user_obj:
+        raise pagure.exceptions.PagureException(
+            'No user with username: %s' % user)
+
+    watcher = session.query(
+        model.Watcher
+    ).filter(
+        sqlalchemy.and_(
+            model.Watcher.project_id == project.id,
+            model.Watcher.user_id == user_obj.id,
+        )
+    ).first()
+
+    if watcher:
+        return watcher.watch
+
+    if user == project.user.user:
+        return True
+
+    watch=False
+    for group in project.groups:
+        for guser in group.users:
+            if user == guser.username:
+                watch=True
+                break
+
+    return watch

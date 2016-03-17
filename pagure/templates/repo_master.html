@@ -27,8 +27,6 @@
                     id="fork_project"><span class="oi" data-glyph="fork"></span> Fork</Button>
                 {{ forkbuttonform.csrf_token }}
               </form>
-<<<<<<< 8e8c5a2fffb08f092e660188ae889367a5523ddd
-=======
              {% endif %}
 
           {% if authenticated %}
@@ -38,13 +36,10 @@
                 <span class="sr-only">Toggle Dropdown</span>
               </button>
               <div class="dropdown-menu watch-menu">
-                <form method="POST" id="watch_project" name="watch_project" action="{{ url_for('watch_repo') }}">
-                <input name="repo_name" type="hidden" value="{{ repo.name }}">
-                <input name="repo_user" type="hidden" value="{{ repo.user.user if repo.is_fork }}">
-                <input id="watch" name="watch" type="hidden" value="0">
-                <a class="dropdown-item" id="watching_button">Unwatch</a>
-                <a class="dropdown-item" id="unwatching_button">Watch</a>
-                {{ forkbuttonform.csrf_token }}
+                <form method="POST" id="watch_project" name="watch_project" action="{{ url_for('.watch_repo', repo=repo.name, watch=0, user=repo.user.user if repo.is_fork) }}">
+                  <a class="dropdown-item" id="watching_button">Unwatch</a>
+                  <a class="dropdown-item" id="unwatching_button">Watch</a>
+                  {{ forkbuttonform.csrf_token }}
                 </form>
               </div>
             </div>
@@ -81,7 +76,6 @@
                   {% endif %}
                 {% endfor %}
               </div>
->>>>>>> Added watch feature.
             </div>
             {% endif %}
         </h2>
@@ -248,12 +242,14 @@ $(document).ready(function() {
   $(".watch-menu a").click(function(){
     var selectedValue = $(this).text();
     var currentValue = $("#watch-button").text();
+    var action = $("#watch_project").attr('action');
     if (currentValue == selectedValue) {
       if (selectedValue != "Watch") {
-        $("#watch").val('0');
         $("#watch-button").html("Watch");
       } else {
         $("#watch").val('1');
+        action = action.replace('/0/', '/1/');
+        $('#watch_project').attr('action', action);
         $("#watch-button").html("Unwatch");
       }
       $('#watch_project').submit();

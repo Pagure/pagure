@@ -2925,8 +2925,9 @@ index 0000000..fb7093d
     def test_watch_repo(self):
         """ Test the  watch_repo endpoint. """
 
-        output = self.app.get('/foo/watch')
-        self.assertEqual(output.status_code, 404)
+        output = self.app.post('/watch/')
+        self.assertEqual(output.status_code, 405)
+
         tests.create_projects(self.session)
 
         user = tests.FakeUser()
@@ -2941,38 +2942,53 @@ index 0000000..fb7093d
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
-                'csrf_token': csrf_token
+                'csrf_token':csrf_token
             }
-            data['repo_name'] = 'test'
-            data['watch'] = 1
+            output = self.app.post(
+                '/watch', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
 
             output = self.app.post(
-                '/watch/', data=data)
-            self.assertEqual(output.status_code, 302)
-            repo = pagure.lib.get_project(self.session, 'test')
-            msg = pagure.lib.update_watch_status(
-                session=self.session,
-                project=repo,
-                user=user.username,
-                watch=data['watch'],
-            )
-            self.session.commit()
-            self.assertEqual(msg, 'From now you are watching this repo.')
-
-            data['watch'] = 0
+                '/watch/foo', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
 
             output = self.app.post(
-                '/watch/', data=data)
-            self.assertEqual(output.status_code, 302)
-            repo = pagure.lib.get_project(self.session, 'test')
-            msg = pagure.lib.update_watch_status(
-                session=self.session,
-                project=repo,
-                user=user.username,
-                watch=data['watch'],
+                '/watch/test/2/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 400)
+
+            output = self.app.post(
+                '/watch/test/0/', data=data, follow_redirects=True)
+            self.assertIn(
+                '</button>\n                      You are no longer'
+                ' watching this repo.', output.data)
+
+            output = self.app.post(
+                '/watch/test/1/', data=data, follow_redirects=True)
+            self.assertIn(
+                '</button>\n                      From now you are'
+                ' watching this repo.', output.data)
+
+            item = pagure.lib.model.Project(
+                user_id=2,  # foo
+                name='test',
+                description='test project #1',
+                hook_token='aaabbb',
+                parent_id=1,
             )
+            self.session.add(item)
             self.session.commit()
-            self.assertEqual(msg, 'You are no longer watching this repo.')
+
+            output = self.app.post(
+                '/watch/test/0/foo', data=data, follow_redirects=True)
+            self.assertIn(
+                '</button>\n                      You are no longer'
+                ' watching this repo.', output.data)
+
+            output = self.app.post(
+                '/watch/test/1/foo', data=data, follow_redirects=True)
+            self.assertIn(
+                '</button>\n                      From now you are'
+                ' watching this repo.', output.data)
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskRepotests)

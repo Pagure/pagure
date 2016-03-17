@@ -1832,35 +1832,38 @@ def view_project_activity(repo):
         repo=repo_obj,
     )
 
-@APP.route('/watch', methods=['POST'])
-@APP.route('/watch/', methods=['POST'])
-def watch_repo():
+@APP.route('/watch/<repo>/<watch>/', methods=['POST'])
+@APP.route('/watch/<repo>/<watch>/<user>', methods=['POST'])
+def watch_repo(repo, watch, user=None):
     """ Marked for watching or Unwatching
     """
-    previous_url = flask.request.referrer
-    form = pagure.forms.WatchForm()
-    if form.validate_on_submit():
-        watch        = form.watch.data
-        repo_name    = form.repo_name.data
-        repo_user    = form.repo_user.data
-        username     = flask.g.fas_user.username
-        if repo_user:
-            repo_obj = pagure.lib.get_project(SESSION, repo_name, repo_user)
-        else:
-            repo_obj = pagure.lib.get_project(SESSION, repo_name)
+    return_point = flask.url_for('index')
+    if pagure.is_safe_url(flask.request.referrer):
+        return_point = flask.request.referrer
 
-        if not repo_obj:
-            flask.abort(404, 'Project not found')
+    form = pagure.forms.ConfirmationForm()
+    if not form.validate_on_submit():
+        flask.abort(400)
 
-        try:
-            msg = pagure.lib.update_watch_status(
-                SESSION, repo_obj,
-                username, watch
-                )
-            SESSION.commit()
-            flask.flash(msg)
-        except pagure.exceptions.PagureException as msg:
-            SESSION.rollback()
-            flask.flash(msg, 'error')
+    if str(watch) not in ['0', '1']:
+        flask.abort(400)
 
-    return flask.redirect(previous_url)
+    username = flask.g.fas_user.username
+    repo_obj = pagure.lib.get_project(SESSION, repo)
+    if user is not None:
+        repo_obj = pagure.lib.get_project(SESSION, repo, user)
+
+    if not repo_obj:
+        flask.abort(404, 'Project not found')
+
+    try:
+        msg = pagure.lib.update_watch_status(
+            SESSION, repo_obj,
+            username, watch
+            )
+        SESSION.commit()
+        flask.flash(msg)
+    except pagure.exceptions.PagureException as msg:
+        flask.flash(msg, 'error')
+
+    return flask.redirect(return_point)

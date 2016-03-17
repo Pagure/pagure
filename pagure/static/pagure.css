@@ -538,7 +538,6 @@ th[data-sort] {
     cursor: pointer;
 }
 
-<<<<<<< 8e8c5a2fffb08f092e660188ae889367a5523ddd
 .pr-changes-description
 {
   font-size: 0.8em;
@@ -561,8 +560,7 @@ th[data-sort] {
 }
 @media (min-width:1200px) {
 .pr_comment_form .card, .inline-pr-comment .card{max-width:680px}
-=======
+
 #watch_project a {
   cursor: pointer;
->>>>>>> Added watch feature.
 }
