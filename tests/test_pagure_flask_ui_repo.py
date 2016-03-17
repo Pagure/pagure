@@ -1125,6 +1125,90 @@ class PagureFlaskRepotests(tests.Modeltests):
             'test project #3        </div>', output.data)
         self.assertIn('Forked from', output.data)
 
+    def test_compare_commits(self):
+        """ Test the compare_commits endpoint. """
+        output = self.app.get('/foo/bar')
+        # No project registered in the DB
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+
+        output = self.app.get('/test/bar')
+        # No git repo associated
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects_git(tests.HERE, bare=True)
+
+        output = self.app.get('/test/bar')
+        self.assertEqual(output.status_code, 404)
+
+        # Add a README to the git repo - First commit
+        tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
+        repo = pygit2.Repository(os.path.join(tests.HERE, 'test.git'))
+        c1 = repo.revparse_single('HEAD')
+
+        # Add some content to the git repo
+        tests.add_content_git_repo(os.path.join(tests.HERE, 'test.git'))
+
+        repo = pygit2.Repository(os.path.join(tests.HERE, 'test.git'))
+        c2 = repo.revparse_single('HEAD')
+
+        # View commits comparison
+        output = self.app.get('/test/c/%s..%s' % (c1.oid.hex, c2.oid.hex))
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(
+            '<h5 class="text-muted">%s .. %s</h5>' % (c1.oid.hex, c2.oid.hex),
+            output.data)
+        self.assertIn(
+            '<span style="color: #800080; font-weight: bold">@@ -0,0 +1,3 @@</span>',
+            output.data)
+        self.assertIn('<span style="color: #00A000">+ foo</span>', output.data)
+        self.assertIn('<span style="color: #00A000">+  bar</span>', output.data)
+        self.assertIn('<span style="color: #00A000">+ baz </span>', output.data)
+
+        # View inverse commits comparison
+        output = self.app.get(
+            '/test/c/%s..%s' % (c2.oid.hex, c1.oid.hex))
+        self.assertIn(
+            '<h5 class="text-muted">%s .. %s</h5>' % (c2.oid.hex, c1.oid.hex),
+            output.data)
+        self.assertIn(
+            '<span style="color: #800080; font-weight: bold">@@ -1,3 +0,0 @@</span>',
+            output.data)
+        self.assertIn('<span style="color: #a40000">- foo</span>', output.data)
+        self.assertIn('<span style="color: #a40000">-  bar</span>', output.data)
+        self.assertIn('<span style="color: #a40000">- baz </span>', output.data)
+
+        user = tests.FakeUser()
+
+        # Set user logged in
+        with tests.user_set(pagure.APP, user):
+            # View commits comparison
+            output = self.app.get('/test/c/%s..%s' % (c1.oid.hex, c2.oid.hex))
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<h5 class="text-muted">%s .. %s</h5>' % (c1.oid.hex, c2.oid.hex),
+                output.data)
+            self.assertIn(
+                '<span style="color: #800080; font-weight: bold">@@ -0,0 +1,3 @@</span>',
+                output.data)
+            self.assertIn('<span style="color: #00A000">+ foo</span>', output.data)
+            self.assertIn('<span style="color: #00A000">+  bar</span>', output.data)
+            self.assertIn('<span style="color: #00A000">+ baz </span>', output.data)
+
+            # View inverse commits comparison
+            output = self.app.get(
+                '/test/c/%s..%s' % (c2.oid.hex, c1.oid.hex))
+            self.assertIn(
+                '<h5 class="text-muted">%s .. %s</h5>' % (c2.oid.hex, c1.oid.hex),
+                output.data)
+            self.assertIn(
+                '<span style="color: #800080; font-weight: bold">@@ -1,3 +0,0 @@</span>',
+                output.data)
+            self.assertIn('<span style="color: #a40000">- foo</span>', output.data)
+            self.assertIn('<span style="color: #a40000">-  bar</span>', output.data)
+            self.assertIn('<span style="color: #a40000">- baz </span>', output.data)
+
     def test_view_file(self):
         """ Test the view_file endpoint. """
         output = self.app.get('/foo/blob/foo/f/sources')

@@ -379,6 +379,57 @@ def view_commits(repo, branchname=None, username=None):
     )
 
 
+@APP.route('/<repo>/c/<commit1>..<commit2>/')
+@APP.route('/<repo>/c/<commit1>..<commit2>')
+@APP.route('/fork/<username>/<repo>/c/<commit1>..<commit2>/')
+@APP.route('/fork/<username>/<repo>/c/<commit1>..<commit2>')
+def compare_commits(repo, commit1, commit2, username=None):
+    """ Compares two commits for specified repo
+    """
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    reponame = pagure.get_repo_path(repo)
+
+    repo_obj = pygit2.Repository(reponame)
+
+    if not repo_obj.is_empty and not repo_obj.head_is_unborn:
+        head = repo_obj.head.shorthand
+    else:
+        head = None
+
+    # Check commit1 and commit2 existence
+    commit1_obj = repo_obj.get(commit1)
+    commit2_obj = repo_obj.get(commit2)
+    if commit1_obj is None:
+        flask.abort(404, 'First commit does not exist')
+    if commit2_obj is None:
+        flask.abort(404, 'Second commit does not exist')
+
+    # Get commit1 and commit2 diff data
+    diff_commits = [commit1_obj, commit2_obj]
+    diff = repo_obj.diff(commit1, commit2)
+
+    return flask.render_template(
+        'pull_request.html',
+        select='logs',
+        origin='compare_commits',
+        repo=repo,
+        username=username,
+        head=head,
+        commit1=commit1,
+        commit2=commit2,
+        commit1_obj=commit1_obj,
+        commit2_obj=commit2_obj,
+        diff=diff,
+        diff_commits=diff_commits,
+        branches=sorted(repo_obj.listall_branches()),
+        repo_admin=is_repo_admin(repo),
+    )
+
+
 @APP.route('/<repo:repo>/blob/<path:identifier>/f/<path:filename>')
 @APP.route('/fork/<username>/<repo:repo>/blob/<path:identifier>/f/<path:filename>')
 def view_file(repo, identifier, filename, username=None):
