@@ -55,9 +55,44 @@ Run the server:
 
     ./runserver
 
+If you want to change some configuration key you can create a file, place
+the configuration change in it and use it with
+
+::
+
+    ./runserver -c <config_file>
+
+For example, create the file ``config`` with in it:
+
+::
+
+    from datetime import timedelta
+    # Makes the admin session longer
+    ADMIN_SESSION_LIFETIME = timedelta(minutes=20000000)
+
+    # Use a postgresql database instead of sqlite
+    DB_URL = 'postgresql://user:pass@localhost/pagure'
+    # Change the OpenID endpoint
+    FAS_OPENID_ENDPOINT = 'https://id.stg.fedoraproject.org'
+
+    APP_URL = '*'
+    EVENTSOURCE_SOURCE = 'http://localhost:8080'
+    EVENTSOURCE_PORT = '8080'
+    DOC_APP_URL = '*'
+
+    # Avoid sending email when developping
+    EMAIL_SEND = False
+
+and run the server with:
+
+::
+
+    ./runserver -c config
+
 To get some profiling information you can also run it as:
 
 ::
+
     ./runserver.py --profile
 
 
