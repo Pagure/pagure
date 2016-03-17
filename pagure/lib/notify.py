@@ -122,6 +122,11 @@ def _get_emails_for_issue(issue):
     if issue.assignee and issue.assignee.default_email:
         emails.add(issue.assignee.default_email)
 
+    # Remove the person list in unwatch
+    for unwatcher in issue.project.unwatchers:
+        if unwatcher.user.default_email in emails:
+            emails.delete(unwatcher.user.default_email)
+
     # Drop the email used by pagure when sending
     emails = _clean_emails(
         emails, pagure.APP.config.get(pagure.APP.config.get(

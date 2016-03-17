@@ -20,6 +20,21 @@ PROJECT_NAME_REGEX = \
     '^[a-zA-z0-9_][a-zA-Z0-9-_]*(/?[a-zA-z0-9_][a-zA-Z0-9-_]+)?$'
 
 
+class WatchForm(wtf.Form):
+    ''' Form to update the watch status of a project for the requested user. '''
+    repo_name = wtforms.TextField(
+        'Repo name',
+        [wtforms.validators.Required()]
+    )
+    repo_user = wtforms.TextField(
+        'Repo User',
+        [wtforms.validators.optional()]
+    )
+    watch = wtforms.TextField(
+        'Watch',
+        [wtforms.validators.Required()]
+    )
+
 class ProjectFormSimplified(wtf.Form):
     ''' Form to edit the description of a project. '''
     description = wtforms.TextField(

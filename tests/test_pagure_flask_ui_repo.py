@@ -2922,6 +2922,57 @@ index 0000000..fb7093d
         output = self.app.get('/foo/activity/')
         self.assertEqual(output.status_code, 404)
 
+    def test_watch_repo(self):
+        """ Test the  watch_repo endpoint. """
+
+        output = self.app.get('/foo/watch')
+        self.assertEqual(output.status_code, 404)
+        tests.create_projects(self.session)
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+
+            output = self.app.get('/new/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<strong>Create new Project</strong>', output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+                'csrf_token': csrf_token
+            }
+            data['repo_name'] = 'test'
+            data['watch'] = 1
+
+            output = self.app.post(
+                '/watch/', data=data)
+            self.assertEqual(output.status_code, 302)
+            repo = pagure.lib.get_project(self.session, 'test')
+            msg = pagure.lib.update_watch_status(
+                session=self.session,
+                project=repo,
+                user=user.username,
+                watch=data['watch'],
+            )
+            self.session.commit()
+            self.assertEqual(msg, 'From now you are watching this repo.')
+
+            data['watch'] = 0
+
+            output = self.app.post(
+                '/watch/', data=data)
+            self.assertEqual(output.status_code, 302)
+            repo = pagure.lib.get_project(self.session, 'test')
+            msg = pagure.lib.update_watch_status(
+                session=self.session,
+                project=repo,
+                user=user.username,
+                watch=data['watch'],
+            )
+            self.session.commit()
+            self.assertEqual(msg, 'You are no longer watching this repo.')
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskRepotests)

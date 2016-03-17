@@ -332,6 +332,10 @@ class Project(BASE):
         backref="projects",
     )
 
+    unwatchers = relation("Watcher",
+                    primaryjoin="and_(Project.id==Watcher.project_id, "
+                        "Watcher.watch=='1')")
+
     @property
     def path(self):
         ''' Return the name of the git repo on the filesystem. '''
@@ -481,6 +485,31 @@ class Project(BASE):
             output['settings'] = self.settings
 
         return output
+
+    @property
+    def watchers_list(self):
+        ''' Return the list of username of users watching this project.
+        '''
+
+        watchers = set([self.user.user])
+        for user in self.users:
+            if user.default_email:
+                watchers.add(user.user)
+
+        for group in self.groups:
+            if group.creator.default_email:
+                watchers.add(group.creator.user)
+            for user in group.users:
+                if user.default_email:
+                    watchers.add(user.default_email)
+
+        for watcher in self.watchers:
+            if watcher.user.default_email and not watcher.watch:
+                watchers.delete(watcher.user.user)
+            if watcher.user.user not in watchers:
+                watchers.add(watcher.user.user)
+
+        return watchers
 
 
 class ProjectUser(BASE):
@@ -1294,6 +1323,45 @@ class ProjectGroup(BASE):
     __table_args__ = (
         sa.UniqueConstraint(
             'project_id', 'group_id'),
+    )
+
+class Watcher(BASE):
+    """ Stores the user of a projects.
+
+    Table -- watchers
+    """
+
+    __tablename__ = 'watchers'
+    __table_args__ = (
+        sa.UniqueConstraint('project_id', 'user_id'),
+    )
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    project_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey('projects.id', onupdate='CASCADE'),
+        nullable=False)
+    user_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey('users.id', onupdate='CASCADE'),
+        nullable=False,
+        index=True)
+    watch = sa.Column(
+        sa.Boolean,
+        nullable=False)
+
+    user = relation(
+        'User', foreign_keys=[user_id], remote_side=[User.id],
+        backref=backref(
+            'watchers', cascade="delete, delete-orphan"
+        ),
+    )
+
+    project = relation(
+        'Project', foreign_keys=[project_id], remote_side=[Project.id],
+        backref=backref(
+            'watchers', cascade="delete, delete-orphan",
+        ),
     )
 
 #

@@ -27,6 +27,61 @@
                     id="fork_project"><span class="oi" data-glyph="fork"></span> Fork</Button>
                 {{ forkbuttonform.csrf_token }}
               </form>
+<<<<<<< 8e8c5a2fffb08f092e660188ae889367a5523ddd
+=======
+             {% endif %}
+
+          {% if authenticated %}
+            <div class="btn-group pull-xs-right">
+              <button type="button" class="btn btn-default" id="watch-button">{% if g.fas_user.username in repo.watchers_list %}Unwatch{% else %}Watch{% endif %}</button>
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                <span class="sr-only">Toggle Dropdown</span>
+              </button>
+              <div class="dropdown-menu watch-menu">
+                <form method="POST" id="watch_project" name="watch_project" action="{{ url_for('watch_repo') }}">
+                <input name="repo_name" type="hidden" value="{{ repo.name }}">
+                <input name="repo_user" type="hidden" value="{{ repo.user.user if repo.is_fork }}">
+                <input id="watch" name="watch" type="hidden" value="0">
+                <a class="dropdown-item" id="watching_button">Unwatch</a>
+                <a class="dropdown-item" id="unwatching_button">Watch</a>
+                {{ forkbuttonform.csrf_token }}
+                </form>
+              </div>
+            </div>
+          {% endif %}
+          {% if branchname %}
+            <div class="btn-group pull-xs-right">
+              <button type="button" class="btn btn-default">{{ branchname }}</button>
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="sr-only">Toggle Dropdown</span>
+              </button>
+              <div class="dropdown-menu">
+                {% for branch in branches %}
+                  {% if origin == 'view_commits' %}
+                    <a class="dropdown-item" href="{{ url_for('view_commits',
+                                username=username, repo=repo.name, branchname=branch) }}">
+                      {{ branch }}
+                    </a>
+                  {% elif origin == 'view_repo_branch' or origin == 'view_repo' %}
+                    <a class="dropdown-item" href="{{ url_for('view_repo_branch',
+                                username=username, repo=repo.name, branchname=branch) }}">
+                      {{ branch }}
+                    </a>
+                  {% elif origin == 'view_tree' %}
+                    <a class="dropdown-item" href="{{ url_for('view_tree',
+                                username=username, repo=repo.name, identifier=branch) }}">
+                      {{ branch }}
+                    </a>
+                  {% elif origin == 'view_file' %}
+                    <a class="dropdown-item" href="{{ url_for('view_file',
+                                username=username, repo=repo.name, identifier=branch,
+                                filename=filename) }}">
+                      {{ branch }}
+                    </a>
+                  {% endif %}
+                {% endfor %}
+              </div>
+>>>>>>> Added watch feature.
             </div>
             {% endif %}
         </h2>
@@ -184,4 +239,26 @@
 {% block repo %}
 {% endblock %}
 </div>
+{% endblock %}
+
+{% block jscripts %}
+{{ super() }}
+<script type="text/javascript">
+$(document).ready(function() {
+  $(".watch-menu a").click(function(){
+    var selectedValue = $(this).text();
+    var currentValue = $("#watch-button").text();
+    if (currentValue == selectedValue) {
+      if (selectedValue != "Watch") {
+        $("#watch").val('0');
+        $("#watch-button").html("Watch");
+      } else {
+        $("#watch").val('1');
+        $("#watch-button").html("Unwatch");
+      }
+      $('#watch_project').submit();
+    }
+  });
+});
+</script>
 {% endblock %}

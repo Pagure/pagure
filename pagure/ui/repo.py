@@ -1831,3 +1831,36 @@ def view_project_activity(repo):
         'activity.html',
         repo=repo_obj,
     )
+
+@APP.route('/watch', methods=['POST'])
+@APP.route('/watch/', methods=['POST'])
+def watch_repo():
+    """ Marked for watching or Unwatching
+    """
+    previous_url = flask.request.referrer
+    form = pagure.forms.WatchForm()
+    if form.validate_on_submit():
+        watch        = form.watch.data
+        repo_name    = form.repo_name.data
+        repo_user    = form.repo_user.data
+        username     = flask.g.fas_user.username
+        if repo_user:
+            repo_obj = pagure.lib.get_project(SESSION, repo_name, repo_user)
+        else:
+            repo_obj = pagure.lib.get_project(SESSION, repo_name)
+
+        if not repo_obj:
+            flask.abort(404, 'Project not found')
+
+        try:
+            msg = pagure.lib.update_watch_status(
+                SESSION, repo_obj,
+                username, watch
+                )
+            SESSION.commit()
+            flask.flash(msg)
+        except pagure.exceptions.PagureException as msg:
+            SESSION.rollback()
+            flask.flash(msg, 'error')
+
+    return flask.redirect(previous_url)

@@ -2748,3 +2748,38 @@ def get_pull_request_of_user(session, username):
     )
 
     return query.all()
+
+def update_watch_status(session, project, user, watch):
+    ''' Update the user status for watching a project.
+    '''
+    user_obj = __get_user(session, user)
+
+    if not user_obj:
+        raise pagure.exceptions.PagureException(
+            'No user with username: %s' % user)
+
+    watcher = session.query(
+        model.Watcher
+    ).filter(
+        sqlalchemy.and_(
+            model.Watcher.project_id == project.id,
+            model.Watcher.user_id == user_obj.id,
+        )
+    ).first()
+
+    if not watcher:
+        watcher = model.Watcher(
+            project_id=project.id,
+            user_id=user_obj.id,
+            watch=watch
+        )
+    else:
+        watcher.watch = watch
+
+    session.add(watcher)
+    session.flush()
+
+    msg_success = 'From now you are watching this repo.'
+    if not int(watch):
+        msg_success = 'You are no longer watching this repo.'
+    return msg_success
