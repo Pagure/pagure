@@ -144,6 +144,16 @@ def authenticated():
     return hasattr(flask.g, 'fas_user') and flask.g.fas_user is not None
 
 
+def logout():
+    auth = APP.config.get('PAGURE_AUTH', None)
+    if auth in ['fas', 'openid']:
+        if hasattr(flask.g, 'fas_user') and flask.g.fas_user is not None:
+            FAS.logout()
+    elif auth == 'local':
+        import pagure.ui.login as login
+        login.logout()
+
+
 def api_authenticated():
     ''' Utility function checking if the current user is logged in or not
     in the API.
@@ -171,7 +181,7 @@ def admin_session_timedout():
             APP.config.get('ADMIN_SESSION_LIFETIME',
                            datetime.timedelta(minutes=15)):
         timedout = True
-        FAS.logout()
+        logout()
     return timedout
 
 
@@ -345,13 +355,8 @@ def auth_logout():  # pragma: no cover
     if not authenticated():
         return flask.redirect(return_point)
 
-    if APP.config.get('PAGURE_AUTH', None) in ['fas', 'openid']:
-        if hasattr(flask.g, 'fas_user') and flask.g.fas_user is not None:
-            FAS.logout()
-            flask.flash("You are no longer logged-in")
-    elif APP.config.get('PAGURE_AUTH', None) == 'local':
-        import pagure.ui.login as login
-        login.logout()
+    logout()
+    flask.flash("You have been logged out")
     flask.session['_justloggedout'] = True
     return flask.redirect(return_point)
 

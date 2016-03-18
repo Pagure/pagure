@@ -409,8 +409,6 @@ def logout():
     flask.g.fas_session_id = None
     flask.g.fas_user = None
 
-    flask.flash('You have been logged out')
-
 
 def _check_session_cookie():
     """ Set the user into flask.g if the user is logged in.

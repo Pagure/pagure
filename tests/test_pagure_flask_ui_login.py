@@ -27,7 +27,6 @@ from mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-
 import pagure.lib
 import tests
 from pagure.lib.repo import PagureRepo
@@ -547,6 +546,45 @@ class PagureFlaskLogintests(tests.Modeltests):
             self.assertIn(
                 '<a href="/logout/?next=http://localhost/">log out</a>',
                 output.data)
+
+    def test_settings_admin_session_timedout(self):
+        """ Test the admin_session_timedout with settings endpoint. """
+        lifetime = pagure.APP.config.get('ADMIN_SESSION_LIFETIME',
+                                         datetime.timedelta(minutes=15))
+        td1 = datetime.timedelta(minutes=1)
+        # session already expired
+        user = tests.FakeUser(username='foo')
+        user.login_time = datetime.datetime.now() - lifetime - td1
+        with tests.user_set(pagure.APP, user):
+            # not following the redirect because user_set contextmanager
+            # will run again for the login page and set back the user
+            # which results in a loop, since admin_session_timedout will
+            # redirect again for the login page
+            output = self.app.get('/settings/')
+            self.assertEqual(output.status_code, 302)
+            self.assertIn('http://localhost/login/', output.location)
+        # session did not expire
+        user.login_time = datetime.datetime.now() - lifetime + td1
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/settings/')
+            self.assertEqual(output.status_code, 200)
+
+    @patch('flask.flash')
+    @patch('flask.g')
+    def test_admin_session_timedout(self, g, flash):
+        """ Test the call to admin_session_timedout. """
+        lifetime = pagure.APP.config.get('ADMIN_SESSION_LIFETIME',
+                                         datetime.timedelta(minutes=15))
+        td1 = datetime.timedelta(minutes=1)
+        # session already expired
+        user = tests.FakeUser(username='foo')
+        user.login_time = datetime.datetime.now() - lifetime - td1
+        g.fas_user = user
+        self.assertTrue(pagure.admin_session_timedout())
+        # session did not expire
+        user.login_time = datetime.datetime.now() - lifetime + td1
+        g.fas_user = user
+        self.assertFalse(pagure.admin_session_timedout())
 
 
 if __name__ == '__main__':
