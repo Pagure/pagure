@@ -1806,6 +1806,7 @@ def view_docs(repo, username=None, filename=None):
 
     return flask.render_template(
         'docs.html',
+        select='docs',
         repo=repo_obj,
         username=username,
         filename=filename,
