@@ -1833,8 +1833,8 @@ def view_project_activity(repo):
         repo=repo_obj,
     )
 
-@APP.route('/watch/<repo>/<watch>/', methods=['POST'])
-@APP.route('/watch/<repo>/<watch>/<user>', methods=['POST'])
+@APP.route('/watch/<repo>/settings/<watch>', methods=['POST'])
+@APP.route('/watch/fork/<user>/<repo>/settings/<watch>', methods=['POST'])
 def watch_repo(repo, watch, user=None):
     """ Marked for watching or Unwatching
     """

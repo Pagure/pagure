@@ -2953,17 +2953,17 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 404)
 
             output = self.app.post(
-                '/watch/test/2/', data=data, follow_redirects=True)
+                '/watch/test/settings/2', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 400)
 
             output = self.app.post(
-                '/watch/test/0/', data=data, follow_redirects=True)
+                '/watch/test/settings/0', data=data, follow_redirects=True)
             self.assertIn(
                 '</button>\n                      You are no longer'
                 ' watching this repo.', output.data)
 
             output = self.app.post(
-                '/watch/test/1/', data=data, follow_redirects=True)
+                '/watch/test/settings/1', data=data, follow_redirects=True)
             self.assertIn(
                 '</button>\n                      From now you are'
                 ' watching this repo.', output.data)
@@ -2979,13 +2979,13 @@ index 0000000..fb7093d
             self.session.commit()
 
             output = self.app.post(
-                '/watch/test/0/foo', data=data, follow_redirects=True)
+                '/watch/fork/foo/test/settings/0', data=data, follow_redirects=True)
             self.assertIn(
                 '</button>\n                      You are no longer'
                 ' watching this repo.', output.data)
 
             output = self.app.post(
-                '/watch/test/1/foo', data=data, follow_redirects=True)
+                '/watch/fork/foo/test/settings/1', data=data, follow_redirects=True)
             self.assertIn(
                 '</button>\n                      From now you are'
                 ' watching this repo.', output.data)
