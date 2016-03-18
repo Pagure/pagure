@@ -236,6 +236,13 @@ color: #bbb;
   text-overflow: ellipsis;
 }
 
+.repo_date
+{
+  background-color: #eee;
+  padding-left: 1.25rem;
+  font-size: 90%;
+}
+
 .project_wrapper
 {
   border:1px solid #ddd;
