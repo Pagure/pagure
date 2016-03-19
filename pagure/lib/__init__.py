@@ -2804,14 +2804,13 @@ def is_watching(session, user, project):
     if watcher:
         return watcher.watch
 
+    watch=False
     if user == project.user.user:
         return True
 
-    watch=False
     for group in project.groups:
-        for guser in group.users:
-            if user == guser.username:
-                watch=True
-                break
+        if user in group.users:
+            watch=True
+            break
 
     return watch

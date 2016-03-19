@@ -31,7 +31,7 @@
 
           {% if authenticated %}
             <div class="btn-group pull-xs-right">
-              <button type="button" class="btn btn-default" id="watch-button">{% if g.fas_user.username in repo.watchers_list %}Unwatch{% else %}Watch{% endif %}</button>
+              <button type="button" class="btn btn-default" id="watch-button">{% if watch %}Unwatch{% else %}Watch{% endif %}</button>
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                 <span class="sr-only">Toggle Dropdown</span>
               </button>

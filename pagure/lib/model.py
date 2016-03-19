@@ -334,7 +334,7 @@ class Project(BASE):
 
     unwatchers = relation("Watcher",
                     primaryjoin="and_(Project.id==Watcher.project_id, "
-                        "Watcher.watch=='1')")
+                        "Watcher.watch=='0')")
 
     @property
     def path(self):
@@ -485,31 +485,6 @@ class Project(BASE):
             output['settings'] = self.settings
 
         return output
-
-    @property
-    def watchers_list(self):
-        ''' Return the list of username of users watching this project.
-        '''
-
-        watchers = set([self.user.user])
-        for user in self.users:
-            if user.default_email:
-                watchers.add(user.user)
-
-        for group in self.groups:
-            if group.creator.default_email:
-                watchers.add(group.creator.user)
-            for user in group.users:
-                if user.default_email:
-                    watchers.add(user.default_email)
-
-        for watcher in self.watchers:
-            if watcher.user.default_email and not watcher.watch:
-                watchers.delete(watcher.user.user)
-            if watcher.user.user not in watchers:
-                watchers.add(watcher.user.user)
-
-        return watchers
 
 
 class ProjectUser(BASE):
