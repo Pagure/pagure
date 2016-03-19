@@ -411,6 +411,11 @@ function try_async_comment(form) {
       if(data == 'ok') {
         {# The event-source server will automatically refresh the UI #}
         $('#comment').val('');
+        $('#preview').html('');
+        $('#previewinmarkdown').addClass('inactive');
+        $('#previewinmarkdown').removeClass('active');
+        $('#preview').hide();
+        $('#comment').show();
         $('#comments').find('.comment_body').show();
         $('#comments').find('.edit_comment').remove();
         $( ".issue-metadata-form" ).hide();
