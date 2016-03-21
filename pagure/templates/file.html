@@ -55,7 +55,7 @@
 
     {% if output_type=='file' %}
         {% autoescape false %}
-        {{ content | format_loc}}
+        {{ content | format_loc }}
         {% endautoescape %}
     {% elif output_type == 'markup' %}
         {% autoescape false %}
@@ -80,7 +80,7 @@
       <div class="card-block p-a-0">
           <table class="table table-sm">
         <tbody>
-                    {% for entry in content %}
+          {% for entry in content %}
             <tr>
                 <td class="pagure-table-icon">
                 {% if entry.filemode == 16384 %}
@@ -100,9 +100,9 @@
                 </a>{% if entry.filemode == 16384 %}</strong>{% endif%}
             </td>
             <td class-"pagure-table-filehex">
-                            {{ entry.hex|short }}
+                {{ entry.hex|short }}
             </td>
-            {% endfor %}
+          {% endfor %}
         </tbody>
       </table>
       </div>
