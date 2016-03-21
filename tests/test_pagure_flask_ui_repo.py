@@ -1091,6 +1091,14 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertTrue('</a> Authored by Alice Author' in output.data)
         self.assertTrue('Committed by Cecil Committer' in output.data)
         self.assertTrue(
+            # new version of pygments
+            '<div class="highlight" style="background: #f8f8f8">'
+            '<pre style="line-height: 125%">'
+            '<span></span>'
+            '<span style="color: #800080; font-weight: bold">'
+            '@@ -0,0 +1,3 @@</span>' in output.data
+            or
+            # old version of pygments
             '<div class="highlight" style="background: #f8f8f8">'
             '<pre style="line-height: 125%">'
             '<span style="color: #800080; font-weight: bold">'
