@@ -293,7 +293,7 @@ class PagureFlaskNoMasterBranchtests(tests.Modeltests):
         self.assertIn('<a href="/test/blob/feature/f/sources">', output.data)
         self.assertIn(
             '<td class-"pagure-table-filehex">\n'
-            '                            9f4435\n            </td>',
+            '                9f4435\n            </td>',
             output.data)
 
         output = self.app.get('/test/tree/feature/sources')
