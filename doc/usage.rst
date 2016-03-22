@@ -11,6 +11,7 @@ Contents:
    :maxdepth: 2
 
    first_steps
+   using_doc
    ticket_templates
    pr_custom_page
    theming
