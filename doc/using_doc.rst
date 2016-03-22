@@ -36,6 +36,10 @@ Pagure will convert them to html on the fly and display them as such.
 Pagure will simply show them as such.
 
 
+.. note: By default the `Docs` tab in the project's menu is off, you will
+         have to visit the project's settings page to turn it on.
+
+
 Example
 -------
 
