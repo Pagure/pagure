@@ -103,6 +103,7 @@ used:
     cp -r _build/html/* $1/
     (
         cd $1
+        git add .
         git commit -av
         git push
     )
