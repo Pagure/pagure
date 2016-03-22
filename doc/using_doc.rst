@@ -9,18 +9,18 @@ GIT URLs`, `Issues GIT URLs` and `Pull Requests GIT URLs`.
 Each section correspond to one of the four git repositories created for each
 project:
 
-* 1 git repository containing the source code, displayed in the main section
+* A git repository containing the source code, displayed in the main section
   of the pagure project.
-* 1 git repository for the documentation
-* 1 git repository for the issues and their metadata
-* 1 git repository for the metadata for pull-requests
+* A git repository for the documentation
+* A git repository for the issues and their metadata
+* A git repository for the metadata for pull-requests
 
-In this section of the documentation, we are intersting in the doc repository.
+In this section of the documentation, we are interested in the doc repository.
 
 The doc repository is a simple git repo, whose content will appear under the
-`Docs` tab in pagure and in https://docs.pagure.org/<project>/.
+`Docs` tab in pagure and on https://docs.pagure.org/<project>/.
 
-There are few ways you can put your documentation in this repo:
+There are a few ways you can put your documentation in this repo:
 
 * Simple text files
 
@@ -30,14 +30,17 @@ it will be presented as the front page.
 * rst or markdown files
 
 Pagure will convert them to html on the fly and display them as such.
+The rst files must end with `.rst` and the markdown ones must end with
+``.mk``, ``.md`` or simply ``.markdown``.
 
 * html files
 
 Pagure will simply show them as such.
 
 
-.. note: By default the `Docs` tab in the project's menu is off, you will
-         have to visit the project's settings page to turn it on.
+.. note: By default the `Docs` tab in the project's menu is disabled, you
+         will have to visit the project's settings page and turn it on
+         in the ``Project options`` section.
 
 
 Example
@@ -48,10 +51,10 @@ You can see it at: `https://pagure.io/pagure/blob/master/f/doc
 <https://pagure.io/pagure/blob/master/f/doc>`_. This doc can be built with
 `sphinx <http://sphinx-doc.org/>`_ to make it html and prettier.
 
-The output of this building is at: `https://docs.pagure.org/pagure/
+The built documentation is available at: `https://docs.pagure.org/pagure/
 <https://docs.pagure.org/pagure/>`_.
 
-This is how it is built/updated.
+This is how it is built/updated:
 
 * Clone pagure's sources::
 
