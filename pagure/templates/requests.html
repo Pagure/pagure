@@ -18,7 +18,9 @@
         </span>
 
     <div class="dropdown pull-xs-right" id="PR-dropdown">
-      <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <button class="btn btn-primary btn-sm dropdown-toggle"
+        type="button" id="dropdownMenu1" data-toggle="dropdown"
+        aria-haspopup="true" aria-expanded="false">
         File Pull Request
       </button>
       <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
@@ -33,9 +35,15 @@
 
 <div>
   <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
-      <a class="btn {% if status|lower == 'open' %}btn-primary{%else%}btn-secondary{%endif%} btn-sm" href="{{ url_for('request_pulls', username=username,
+      <a class="btn {%
+            if status|lower in ['open', 'true'] %}btn-primary{%
+            else %}btn-secondary{%
+            endif %} btn-sm" href="{{ url_for('request_pulls', username=username,
                  repo=repo.name) }}">Open</a>
-      <a class="btn {% if status|lower == 'open' %}btn-secondary{%else%}btn-primary{%endif%} btn-sm" href="{{ url_for('request_pulls', username=username,
+      <a class="btn {%
+        if status|lower in ['open', 'true'] %}btn-secondary{%
+        else %}btn-primary{%
+        endif %} btn-sm" href="{{ url_for('request_pulls', username=username,
                repo=repo.name) }}?status=0">Closed</a>
   </span>
   <a class="btn btn-secondary btn-sm pull-xs-right" href="{{ url_for('request_pulls',
@@ -71,7 +79,12 @@
             <td>
               <a href="{{ url_for('request_pull', username=username,
                   repo=repo.name, requestid=request.id) }}">
-                <span class="label label-default">PR#{{ request.id }}</span> {% if status|lower != 'open' %}<span class="label {% if request.status|lower == 'merged' %}label-success{%elif request.status|lower == 'closed'%}label-danger{%endif%}">{{request.status}}</span>{%endif%} {{ request.title | noJS("img") | safe }}
+                <span class="label label-default">PR#{{ request.id }}</span>
+                {% if status|lower not in ['open', 'true'] %}<span class="label {%
+                    if request.status|lower == 'merged' %}label-success{%
+                    elif request.status|lower == 'closed'%}label-danger{%
+                    endif %}">{{request.status}}</span>{%
+                  endif %} {{ request.title | noJS("img") | safe }}
               </a>
               {% if request.user_comments|count > 0 %}
                &nbsp;&nbsp;
@@ -83,13 +96,17 @@
               {% endif %}
             </td>
             <td class="nowrap">
-                    <span title="{{request.date_created.strftime('%Y-%m-%d %H:%M:%S')}}">{{
-                        request.date_created | humanize}}</span>
+              <span title="{{request.date_created.strftime('%Y-%m-%d %H:%M:%S')}}">{{
+                request.date_created | humanize}}</span>
             </td>
-            {% if status|lower != 'open' %}
+            {% if status|lower not in ['open', 'true'] %}
             <td class="nowrap">
-                    <span title="{{request.closed_at.strftime('%Y-%m-%d %H:%M:%S')}}">{{
-                        request.closed_at | humanize}}</span>
+              <span title="{{
+                request.closed_at.strftime('%Y-%m-%d %H:%M:%S')
+                if request.closed_at
+              }}">{{
+                request.closed_at | humanize
+                if request.closed_at }}</span>
             </td>
             {% endif %}
             <td class="nowrap">
@@ -101,7 +118,7 @@
                 {{ request.user.user }}
               </a>
             </td>
-            {% if status|lower == 'open' %}
+            {% if status|lower in ['open', 'true'] %}
             <td class="nowrap">
               {% if request.assignee %}
               <a href="{{ url_for('request_pulls', username=username,
