@@ -101,10 +101,11 @@ used:
 
     git clone "ssh://git@pagure.io/docs/$1.git"
     cp -r _build/html/* $1/
-    pushd $1
-    git commit -av
-    git push
-    popd
+    (
+        cd $1
+        git commit -av
+        git push
+    )
 
     rm -rfI _build
     rm -rfI $1
