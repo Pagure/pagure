@@ -1274,17 +1274,15 @@ def update_project_settings(session, repo, settings, user):
 
 
 def fork_project(session, user, repo, gitfolder,
-                 forkfolder, docfolder, ticketfolder, requestfolder):
+                 docfolder, ticketfolder, requestfolder):
     ''' Fork a given project into the user's forks. '''
-    if repo.is_fork:
-        reponame = os.path.join(forkfolder, repo.path)
-    else:
-        reponame = os.path.join(gitfolder, repo.path)
-    forkreponame = '%s.git' % os.path.join(forkfolder, user, repo.name)
+    reponame = os.path.join(gitfolder, repo.path)
+    forkreponame = '%s.git' % os.path.join(
+        gitfolder, 'forks', user, repo.name)
 
     if os.path.exists(forkreponame):
         raise pagure.exceptions.RepoExistsException(
-            'Repo "%s/%s" already exists' % (user, repo.name))
+            'Repo "forks/%s/%s" already exists' % (user, repo.name))
 
     user_obj = __get_user(session, user)
 

@@ -34,10 +34,6 @@ def _get_parent_repo_path(repo):
     """
     if repo.parent:
         parentpath = os.path.join(APP.config['GIT_FOLDER'], repo.parent.path)
-        if repo.parent.is_fork:
-            parentpath = os.path.join(APP.config['FORK_FOLDER'], repo.parent.path)
-    elif repo.is_fork:
-        parentpath = os.path.join(APP.config['FORK_FOLDER'], repo.path)
     else:
         parentpath = os.path.join(APP.config['GIT_FOLDER'], repo.path)
 
@@ -859,7 +855,6 @@ def fork_project(repo, username=None):
             session=SESSION,
             repo=repo,
             gitfolder=APP.config['GIT_FOLDER'],
-            forkfolder=APP.config['FORK_FOLDER'],
             docfolder=APP.config['DOCS_FOLDER'],
             ticketfolder=APP.config['TICKETS_FOLDER'],
             requestfolder=APP.config['REQUESTS_FOLDER'],

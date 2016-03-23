@@ -326,7 +326,7 @@ class Project(BASE):
         '''
         str_name = self.name
         if self.parent_id:
-            str_name = "%s/%s" % (self.user.user, str_name)
+            str_name = "forks/%s/%s" % (self.user.user, str_name)
         return str_name
 
     @property

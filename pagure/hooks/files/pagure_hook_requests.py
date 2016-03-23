@@ -88,7 +88,6 @@ def run_as_post_receive_hook():
                 request_uid=filename,
                 json_data=json_data,
                 gitfolder=pagure.APP.config['GIT_FOLDER'],
-                forkfolder=pagure.APP.config['FORK_FOLDER'],
                 docfolder=pagure.APP.config['DOCS_FOLDER'],
                 ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
                 requestfolder=pagure.APP.config['REQUESTS_FOLDER'],
