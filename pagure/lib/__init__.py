@@ -2809,8 +2809,9 @@ def is_watching(session, user, project):
         return True
 
     for group in project.groups:
-        if user in group.users:
-            watch=True
-            break
+        for guser in group.users:
+            if user == guser.username:
+                watch=True
+                break
 
     return watch

@@ -2233,6 +2233,126 @@ class PagureLibtests(tests.Modeltests):
             user='pingou',
         )
 
+    def test_update_watch_status(self):
+        """ Test the update_watch_status method of pagure.lib. """
+        tests.create_projects(self.session)
+
+        project = pagure.lib.get_project(self.session, 'test')
+
+        # User does not exist
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.update_watch_status,
+            session=self.session,
+            project=project,
+            user='aavrug',
+            watch='1',
+        )
+
+        # All good and when user seleted watch option.
+        msg = pagure.lib.update_watch_status(
+            session=self.session,
+            project=project,
+            user='pingou',
+            watch='1',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'From now you are watching this repo.')
+
+        # All good and when user selected unwatch option.
+        msg = pagure.lib.update_watch_status(
+            session=self.session,
+            project=project,
+            user='pingou',
+            watch='0',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'You are no longer watching this repo.')
+
+    def test_is_watching(self):
+        """ Test the is_watching method of pagure.lib. """
+        tests.create_projects(self.session)
+        self.test_add_group()
+
+        project = pagure.lib.get_project(self.session, 'test')
+
+        # User does not exist
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.is_watching,
+            session=self.session,
+            user='aavrug',
+            project=project,
+        )
+
+        pagure.lib.add_group_to_project(
+            session=self.session,
+            project=project,
+            new_group='foo',
+            user='pingou',
+        )
+        self.session.commit()
+
+        group = pagure.lib.search_groups(self.session, group_name='foo')
+        pagure.lib.add_user_to_group(
+            self.session,
+            username='foo',
+            group=group,
+            user='pingou',
+            is_admin=False,
+        )
+        self.session.commit()
+
+        # If user belongs to any group of that project
+        watch = pagure.lib.is_watching(
+            session=self.session,
+            user='foo',
+            project=project,
+        )
+        self.assertTrue(watch)
+
+        # If user is the creator
+        watch = pagure.lib.is_watching(
+            session=self.session,
+            user='pingou',
+            project=project,
+        )
+        self.assertTrue(watch)
+
+        # Entry into watchers table
+        pagure.lib.update_watch_status(
+            session=self.session,
+            project=project,
+            user='pingou',
+            watch='1',
+        )
+        self.session.commit()
+
+        # From watchers table
+        watch = pagure.lib.is_watching(
+            session=self.session,
+            user='pingou',
+            project=project,
+        )
+        self.assertTrue(watch)
+
+        # Entry into watchers table
+        pagure.lib.update_watch_status(
+            session=self.session,
+            project=project,
+            user='pingou',
+            watch='0',
+        )
+        self.session.commit()
+
+        # From watchers table
+        watch = pagure.lib.is_watching(
+            session=self.session,
+            user='pingou',
+            project=project,
+        )
+        self.assertFalse(watch)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibtests)
