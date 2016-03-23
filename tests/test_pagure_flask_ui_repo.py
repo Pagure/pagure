@@ -496,13 +496,13 @@ class PagureFlaskRepotests(tests.Modeltests):
     def test_view_forks(self):
         """ Test the view_forks endpoint. """
 
-        output = self.app.get('/foo/forks')
+        output = self.app.get('/foo/forks', follow_redirects=True)
         self.assertEqual(output.status_code, 404)
 
         tests.create_projects(self.session)
         tests.create_projects_git(tests.HERE, bare=True)
 
-        output = self.app.get('/test/forks')
+        output = self.app.get('/test/forks', follow_redirects=True)
         self.assertEqual(output.status_code, 200)
         self.assertTrue('This project has not been forked.' in output.data)
 
@@ -1043,19 +1043,19 @@ class PagureFlaskRepotests(tests.Modeltests):
 
     def test_view_commit(self):
         """ Test the view_commit endpoint. """
-        output = self.app.get('/foo/bar')
+        output = self.app.get('/foo/c/bar')
         # No project registered in the DB
         self.assertEqual(output.status_code, 404)
 
         tests.create_projects(self.session)
 
-        output = self.app.get('/test/bar')
+        output = self.app.get('/test/c/bar')
         # No git repo associated
         self.assertEqual(output.status_code, 404)
 
         tests.create_projects_git(tests.HERE, bare=True)
 
-        output = self.app.get('/test/bar')
+        output = self.app.get('/test/c/bar')
         self.assertEqual(output.status_code, 404)
 
         # Add a README to the git repo - First commit
@@ -1064,7 +1064,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         commit = repo.revparse_single('HEAD')
 
         # View first commit
-        output = self.app.get('/test/%s' % commit.oid.hex)
+        output = self.app.get('/test/c/%s' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
         self.assertTrue(
             '<div class="list-group" id="diff_list" style="display:none;">'
@@ -1083,7 +1083,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         commit = repo.revparse_single('HEAD')
 
         # View another commit
-        output = self.app.get('/test/%s' % commit.oid.hex)
+        output = self.app.get('/test/c/%s' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
         self.assertTrue(
             '<div class="list-group" id="diff_list" style="display:none;">'
@@ -1124,11 +1124,12 @@ class PagureFlaskRepotests(tests.Modeltests):
         commit = repo.revparse_single('HEAD')
 
         # Commit does not exist in anothe repo :)
-        output = self.app.get('/test/%s' % commit.oid.hex)
+        output = self.app.get('/test/c/%s' % commit.oid.hex)
         self.assertEqual(output.status_code, 404)
 
         # View commit of fork
-        output = self.app.get('/fork/pingou/test3/%s' % commit.oid.hex)
+        output = self.app.get(
+            '/fork/pingou/test3/c/%s' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
         self.assertTrue(
             '<div class="list-group" id="diff_list" style="display:none;">'
@@ -1142,19 +1143,20 @@ class PagureFlaskRepotests(tests.Modeltests):
 
     def test_view_commit_patch(self):
         """ Test the view_commit_patch endpoint. """
-        output = self.app.get('/foo/bar.patch')
+
         # No project registered in the DB
+        output = self.app.get('/foo/c/bar.patch')
         self.assertEqual(output.status_code, 404)
 
         tests.create_projects(self.session)
 
-        output = self.app.get('/test/bar.patch')
+        output = self.app.get('/test/c/bar.patch')
         # No git repo associated
         self.assertEqual(output.status_code, 404)
 
         tests.create_projects_git(tests.HERE, bare=True)
 
-        output = self.app.get('/test/bar.patch')
+        output = self.app.get('/test/c/bar.patch')
         self.assertEqual(output.status_code, 404)
 
         # Add a README to the git repo - First commit
@@ -1163,7 +1165,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         commit = repo.revparse_single('HEAD')
 
         # View first commit
-        output = self.app.get('/test/%s.patch' % commit.oid.hex)
+        output = self.app.get('/test/c/%s.patch' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
         self.assertTrue('''diff --git a/README.rst b/README.rst
 new file mode 100644
@@ -1197,7 +1199,7 @@ index 0000000..fb7093d
         commit = repo.revparse_single('HEAD')
 
         # View another commit
-        output = self.app.get('/test/%s.patch' % commit.oid.hex)
+        output = self.app.get('/test/c/%s.patch' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
         self.assertTrue(
             'Subject: Add some directory and a file for more testing'
@@ -1233,11 +1235,12 @@ index 0000000..11980b1
         commit = repo.revparse_single('HEAD')
 
         # Commit does not exist in anothe repo :)
-        output = self.app.get('/test/%s.patch' % commit.oid.hex)
+        output = self.app.get('/test/c/%s.patch' % commit.oid.hex)
         self.assertEqual(output.status_code, 404)
 
         # View commit of fork
-        output = self.app.get('/fork/pingou/test3/%s.patch' % commit.oid.hex)
+        output = self.app.get(
+            '/fork/pingou/test3/c/%s.patch' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
         self.assertTrue('''diff --git a/README.rst b/README.rst
 new file mode 100644
@@ -2219,7 +2222,7 @@ index 0000000..fb7093d
 
     def test_delete_branch(self):
         """ Test the delete_branch endpoint. """
-        output = self.app.post('/foo/master/delete')
+        output = self.app.post('/foo/b/master/delete')
         # No project registered in the DB
         self.assertEqual(output.status_code, 302)
 
@@ -2227,16 +2230,16 @@ index 0000000..fb7093d
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
-            output = self.app.post('/foo/master/delete')
+            output = self.app.post('/foo/b/master/delete')
             # Unknown repo
             self.assertEqual(output.status_code, 404)
 
-            output = self.app.post('/test/master/delete')
+            output = self.app.post('/test/b/master/delete')
             self.assertEqual(output.status_code, 403)
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
-            output = self.app.post('/test/master/delete')
+            output = self.app.post('/test/b/master/delete')
             self.assertEqual(output.status_code, 403)
             self.assertIn(
                 '<p>You are not allowed to delete the master branch</p>',
@@ -2244,7 +2247,7 @@ index 0000000..fb7093d
 
             tests.create_projects_git(tests.HERE, bare=True)
 
-            output = self.app.post('/test/bar/delete')
+            output = self.app.post('/test/b/bar/delete')
             self.assertEqual(output.status_code, 404)
             self.assertIn('<p>Branch no found</p>', output.data)
 
@@ -2255,7 +2258,7 @@ index 0000000..fb7093d
             repo.create_branch('foo', repo.head.get_object())
 
             # Check before deletion
-            output = self.app.post('/test', follow_redirects=True)
+            output = self.app.get('/test')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<a class="dropdown-item" href="/test/branch/foo">',
@@ -2266,7 +2269,7 @@ index 0000000..fb7093d
                 output.data)
 
             # Delete the branch
-            output = self.app.post('/test/foo/delete', follow_redirects=True)
+            output = self.app.post('/test/b/foo/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertNotIn(
                 '<a class="dropdown-item" href="/test/branch/foo">',
@@ -2284,7 +2287,7 @@ index 0000000..fb7093d
             repo.create_branch('feature/foo', repo.head.get_object())
 
             # Check before deletion
-            output = self.app.post('/test', follow_redirects=True)
+            output = self.app.get('/test')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<a class="dropdown-item" href="/test/branch/feature/foo">',
@@ -2296,7 +2299,7 @@ index 0000000..fb7093d
                 output.data)
 
             # Delete the branch
-            output = self.app.post('/test/feature/foo/delete', follow_redirects=True)
+            output = self.app.post('/test/b/feature/foo/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertNotIn(
                 '<a class="dropdown-item" href="/test/branch/feature/foo">',

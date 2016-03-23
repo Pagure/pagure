@@ -1096,7 +1096,6 @@ class PagureLibtests(tests.Modeltests):
         docfolder = os.path.join(self.path, 'docs')
         ticketfolder = os.path.join(self.path, 'tickets')
         requestfolder = os.path.join(self.path, 'requests')
-        forkfolder = os.path.join(self.path, 'forks')
 
         os.mkdir(gitfolder)
         os.mkdir(docfolder)
@@ -1136,7 +1135,8 @@ class PagureLibtests(tests.Modeltests):
         self.assertTrue(os.path.exists(requestrepo))
 
         # Git repo exists
-        grepo = '%s.git' % os.path.join(forkfolder, 'foo', 'testproject')
+        grepo = '%s.git' % os.path.join(
+            gitfolder, 'forks', 'foo', 'testproject')
         os.makedirs(grepo)
         self.assertRaises(
             pagure.exceptions.PagureException,
@@ -1145,7 +1145,6 @@ class PagureLibtests(tests.Modeltests):
             user='foo',
             repo=repo,
             gitfolder=gitfolder,
-            forkfolder=forkfolder,
             docfolder=docfolder,
             ticketfolder=ticketfolder,
             requestfolder=requestfolder,
@@ -1154,7 +1153,8 @@ class PagureLibtests(tests.Modeltests):
         shutil.rmtree(grepo)
 
         # Doc repo exists
-        grepo = '%s.git' % os.path.join(docfolder, 'foo', 'testproject')
+        grepo = '%s.git' % os.path.join(
+            docfolder, 'forks', 'foo', 'testproject')
         os.makedirs(grepo)
         self.assertRaises(
             pagure.exceptions.PagureException,
@@ -1163,7 +1163,6 @@ class PagureLibtests(tests.Modeltests):
             user='foo',
             repo=repo,
             gitfolder=gitfolder,
-            forkfolder=forkfolder,
             docfolder=docfolder,
             ticketfolder=ticketfolder,
             requestfolder=requestfolder,
@@ -1172,7 +1171,8 @@ class PagureLibtests(tests.Modeltests):
         shutil.rmtree(grepo)
 
         # Ticket repo exists
-        grepo = '%s.git' % os.path.join(ticketfolder, 'foo', 'testproject')
+        grepo = '%s.git' % os.path.join(
+            ticketfolder, 'forks', 'foo', 'testproject')
         os.makedirs(grepo)
         self.assertRaises(
             pagure.exceptions.PagureException,
@@ -1181,7 +1181,6 @@ class PagureLibtests(tests.Modeltests):
             user='foo',
             repo=repo,
             gitfolder=gitfolder,
-            forkfolder=forkfolder,
             docfolder=docfolder,
             ticketfolder=ticketfolder,
             requestfolder=requestfolder,
@@ -1190,7 +1189,8 @@ class PagureLibtests(tests.Modeltests):
         shutil.rmtree(grepo)
 
         # Request repo exists
-        grepo = '%s.git' % os.path.join(requestfolder, 'foo', 'testproject')
+        grepo = '%s.git' % os.path.join(
+            requestfolder, 'forks', 'foo', 'testproject')
         os.makedirs(grepo)
         self.assertRaises(
             pagure.exceptions.PagureException,
@@ -1199,7 +1199,6 @@ class PagureLibtests(tests.Modeltests):
             user='foo',
             repo=repo,
             gitfolder=gitfolder,
-            forkfolder=forkfolder,
             docfolder=docfolder,
             ticketfolder=ticketfolder,
             requestfolder=requestfolder,
@@ -1217,7 +1216,6 @@ class PagureLibtests(tests.Modeltests):
             user='foo',
             repo=repo,
             gitfolder=gitfolder,
-            forkfolder=forkfolder,
             docfolder=docfolder,
             ticketfolder=ticketfolder,
             requestfolder=requestfolder,
@@ -1239,7 +1237,6 @@ class PagureLibtests(tests.Modeltests):
             user='pingou',
             repo=repo,
             gitfolder=gitfolder,
-            forkfolder=forkfolder,
             docfolder=docfolder,
             ticketfolder=ticketfolder,
             requestfolder=requestfolder,
