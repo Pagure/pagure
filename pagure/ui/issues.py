@@ -29,11 +29,11 @@ from pagure import (APP, SESSION, LOG, __get_file_in_tree,
 
 # URLs
 
-@APP.route('/<repo>/issue/<int:issueid>/update/', methods=['GET', 'POST'])
-@APP.route('/<repo>/issue/<int:issueid>/update', methods=['GET', 'POST'])
-@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/update/',
+@APP.route('/<repo:repo>/issue/<int:issueid>/update/', methods=['GET', 'POST'])
+@APP.route('/<repo:repo>/issue/<int:issueid>/update', methods=['GET', 'POST'])
+@APP.route('/fork/<username>/<repo:repo>/issue/<int:issueid>/update/',
            methods=['GET', 'POST'])
-@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/update',
+@APP.route('/fork/<username>/<repo:repo>/issue/<int:issueid>/update',
            methods=['GET', 'POST'])
 @login_required
 def update_issue(repo, issueid, username=None):
@@ -250,10 +250,10 @@ def update_issue(repo, issueid, username=None):
             'view_issue', username=username, repo=repo.name, issueid=issueid))
 
 
-@APP.route('/<repo>/tag/<tag>/edit/', methods=('GET', 'POST'))
-@APP.route('/<repo>/tag/<tag>/edit', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/tag/<tag>/edit/', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/tag/<tag>/edit', methods=('GET', 'POST'))
+@APP.route('/<repo:repo>/tag/<tag>/edit/', methods=('GET', 'POST'))
+@APP.route('/<repo:repo>/tag/<tag>/edit', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo:repo>/tag/<tag>/edit/', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo:repo>/tag/<tag>/edit', methods=('GET', 'POST'))
 @login_required
 def edit_tag(repo, tag, username=None):
     """ Edit the specified tag of a project.
@@ -299,8 +299,8 @@ def edit_tag(repo, tag, username=None):
     )
 
 
-@APP.route('/<repo>/droptag/', methods=['POST'])
-@APP.route('/fork/<username>/<repo>/droptag/', methods=['POST'])
+@APP.route('/<repo:repo>/droptag/', methods=['POST'])
+@APP.route('/fork/<username>/<repo:repo>/droptag/', methods=['POST'])
 @login_required
 def remove_tag(repo, username=None):
     """ Remove the specified tag from the project.
@@ -341,10 +341,10 @@ def remove_tag(repo, username=None):
     )
 
 
-@APP.route('/<repo>/issues/')
-@APP.route('/<repo>/issues')
-@APP.route('/fork/<username>/<repo>/issues/')
-@APP.route('/fork/<username>/<repo>/issues')
+@APP.route('/<repo:repo>/issues/')
+@APP.route('/<repo:repo>/issues')
+@APP.route('/fork/<username>/<repo:repo>/issues/')
+@APP.route('/fork/<username>/<repo:repo>/issues')
 def view_issues(repo, username=None):
     """ List all issues associated to a repo
     """
@@ -444,10 +444,10 @@ def view_issues(repo, username=None):
     )
 
 
-@APP.route('/<repo>/new_issue/', methods=('GET', 'POST'))
-@APP.route('/<repo>/new_issue', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/new_issue/', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/new_issue', methods=('GET', 'POST'))
+@APP.route('/<repo:repo>/new_issue/', methods=('GET', 'POST'))
+@APP.route('/<repo:repo>/new_issue', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo:repo>/new_issue/', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo:repo>/new_issue', methods=('GET', 'POST'))
 @login_required
 def new_issue(repo, username=None):
     """ Create a new issue
@@ -545,10 +545,10 @@ def new_issue(repo, username=None):
     )
 
 
-@APP.route('/<repo>/issue/<int:issueid>/')
-@APP.route('/<repo>/issue/<int:issueid>')
-@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/')
-@APP.route('/fork/<username>/<repo>/issue/<int:issueid>')
+@APP.route('/<repo:repo>/issue/<int:issueid>/')
+@APP.route('/<repo:repo>/issue/<int:issueid>')
+@APP.route('/fork/<username>/<repo:repo>/issue/<int:issueid>/')
+@APP.route('/fork/<username>/<repo:repo>/issue/<int:issueid>')
 def view_issue(repo, issueid, username=None):
     """ List all issues associated to a repo
     """
@@ -595,8 +595,8 @@ def view_issue(repo, issueid, username=None):
     )
 
 
-@APP.route('/<repo>/issue/<int:issueid>/drop', methods=['POST'])
-@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/drop',
+@APP.route('/<repo:repo>/issue/<int:issueid>/drop', methods=['POST'])
+@APP.route('/fork/<username>/<repo:repo>/issue/<int:issueid>/drop',
            methods=['POST'])
 def delete_issue(repo, issueid, username=None):
     """ Delete the specified issue
@@ -641,11 +641,11 @@ def delete_issue(repo, issueid, username=None):
         'view_issue', username=username, repo=repo.name, issueid=issueid))
 
 
-@APP.route('/<repo>/issue/<int:issueid>/edit/', methods=('GET', 'POST'))
-@APP.route('/<repo>/issue/<int:issueid>/edit', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/edit/',
+@APP.route('/<repo:repo>/issue/<int:issueid>/edit/', methods=('GET', 'POST'))
+@APP.route('/<repo:repo>/issue/<int:issueid>/edit', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo:repo>/issue/<int:issueid>/edit/',
            methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/edit',
+@APP.route('/fork/<username>/<repo:repo>/issue/<int:issueid>/edit',
            methods=('GET', 'POST'))
 @login_required
 def edit_issue(repo, issueid, username=None):
@@ -744,8 +744,8 @@ def edit_issue(repo, issueid, username=None):
     )
 
 
-@APP.route('/<repo>/issue/<int:issueid>/upload', methods=['POST'])
-@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/upload',
+@APP.route('/<repo:repo>/issue/<int:issueid>/upload', methods=['POST'])
+@APP.route('/fork/<username>/<repo:repo>/issue/<int:issueid>/upload',
            methods=['POST'])
 @login_required
 def upload_issue(repo, issueid, username=None):
@@ -790,8 +790,8 @@ def upload_issue(repo, issueid, username=None):
         return flask.jsonify({'output': 'notok'})
 
 
-@APP.route('/<repo>/issue/raw/<path:filename>')
-@APP.route('/fork/<username>/<repo>/issue/raw/<path:filename>')
+@APP.route('/<repo:repo>/issue/raw/<path:filename>')
+@APP.route('/fork/<username>/<repo:repo>/issue/raw/<path:filename>')
 def view_issue_raw_file(repo, filename=None, username=None):
     """ Displays the raw content of a file of a commit for the specified
     ticket repo.
@@ -847,9 +847,9 @@ def view_issue_raw_file(repo, filename=None, username=None):
     return (data, 200, headers)
 
 
-@APP.route('/<repo>/issue/<int:issueid>/comment/<int:commentid>/edit',
+@APP.route('/<repo:repo>/issue/<int:issueid>/comment/<int:commentid>/edit',
            methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/comment'
+@APP.route('/fork/<username>/<repo:repo>/issue/<int:issueid>/comment'
            '/<int:commentid>/edit', methods=('GET', 'POST'))
 @login_required
 def edit_comment_issue(repo, issueid, commentid, username=None):

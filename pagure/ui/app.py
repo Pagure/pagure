@@ -622,7 +622,6 @@ def reconfirm_email():
     return flask.redirect(flask.url_for('.user_settings'))
 
 
-
 @APP.route('/settings/email/confirm/<token>/')
 @APP.route('/settings/email/confirm/<token>')
 def confirm_email(token):

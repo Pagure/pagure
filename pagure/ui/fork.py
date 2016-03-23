@@ -125,10 +125,10 @@ def _get_pr_info(repo_obj, orig_repo, branch_from, branch_to):
     return(diff, diff_commits, orig_commit)
 
 
-@APP.route('/<repo>/pull-requests/')
-@APP.route('/<repo>/pull-requests')
-@APP.route('/fork/<username>/<repo>/pull-requests/')
-@APP.route('/fork/<username>/<repo>/pull-requests')
+@APP.route('/<repo:repo>/pull-requests/')
+@APP.route('/<repo:repo>/pull-requests')
+@APP.route('/fork/<username>/<repo:repo>/pull-requests/')
+@APP.route('/fork/<username>/<repo:repo>/pull-requests')
 def request_pulls(repo, username=None):
     """ Request pulling the changes from the fork into the project.
     """
@@ -200,10 +200,10 @@ def request_pulls(repo, username=None):
     )
 
 
-@APP.route('/<repo>/pull-request/<int:requestid>/')
-@APP.route('/<repo>/pull-request/<int:requestid>')
-@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/')
-@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>')
+@APP.route('/<repo:repo>/pull-request/<int:requestid>/')
+@APP.route('/<repo:repo>/pull-request/<int:requestid>')
+@APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/')
+@APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>')
 def request_pull(repo, requestid, username=None):
     """ Request pulling the changes from the fork into the project.
     """
@@ -289,12 +289,11 @@ def request_pull(repo, requestid, username=None):
     )
 
 
-@APP.route('/<repo>/pull-request/<int:requestid>.patch')
-@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>.patch')
+@APP.route('/<repo:repo>/pull-request/<int:requestid>.patch')
+@APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>.patch')
 def request_pull_patch(repo, requestid, username=None):
     """ Returns the commits from the specified pull-request as patches.
     """
-
     repo = pagure.lib.get_project(SESSION, repo, user=username)
 
     if not repo:
@@ -360,13 +359,13 @@ def request_pull_patch(repo, requestid, username=None):
     return flask.Response(patch, content_type="text/plain;charset=UTF-8")
 
 
-@APP.route('/<repo>/pull-request/<int:requestid>/edit/',
+@APP.route('/<repo:repo>/pull-request/<int:requestid>/edit/',
            methods=('GET', 'POST'))
-@APP.route('/<repo>/pull-request/<int:requestid>/edit',
+@APP.route('/<repo:repo>/pull-request/<int:requestid>/edit',
            methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/edit/',
+@APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/edit/',
            methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/edit',
+@APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/edit',
            methods=('GET', 'POST'))
 @login_required
 def request_pull_edit(repo, requestid, username=None):
@@ -425,13 +424,13 @@ def request_pull_edit(repo, requestid, username=None):
     )
 
 
-@APP.route('/<repo>/pull-request/<int:requestid>/comment',
+@APP.route('/<repo:repo>/pull-request/<int:requestid>/comment',
            methods=['POST'])
-@APP.route('/<repo>/pull-request/<int:requestid>/comment/<commit>/'
+@APP.route('/<repo:repo>/pull-request/<int:requestid>/comment/<commit>/'
            '<path:filename>/<row>', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/comment',
+@APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/comment',
            methods=['POST'])
-@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/comment/'
+@APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/comment/'
            '<commit>/<path:filename>/<row>', methods=('GET', 'POST'))
 @login_required
 def pull_request_add_comment(
@@ -511,9 +510,9 @@ def pull_request_add_comment(
     )
 
 
-@APP.route('/<repo>/pull-request/<int:requestid>/comment/drop',
+@APP.route('/<repo:repo>/pull-request/<int:requestid>/comment/drop',
            methods=['POST'])
-@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/comment/drop',
+@APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/comment/drop',
            methods=['POST'])
 @login_required
 def pull_request_drop_comment(repo, requestid, username=None):
@@ -574,9 +573,9 @@ def pull_request_drop_comment(repo, requestid, username=None):
         repo=repo.name, requestid=requestid))
 
 
-@APP.route('/<repo>/pull-request/<int:requestid>/comment/<int:commentid>/edit',
+@APP.route('/<repo:repo>/pull-request/<int:requestid>/comment/<int:commentid>/edit',
            methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/comment'
+@APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/comment'
            '/<int:commentid>/edit', methods=('GET', 'POST'))
 @login_required
 def pull_request_edit_comment(repo, requestid, commentid, username=None):
@@ -656,8 +655,8 @@ def pull_request_edit_comment(repo, requestid, commentid, username=None):
     )
 
 
-@APP.route('/<repo>/pull-request/<int:requestid>/merge', methods=['POST'])
-@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/merge',
+@APP.route('/<repo:repo>/pull-request/<int:requestid>/merge', methods=['POST'])
+@APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/merge',
            methods=['POST'])
 @login_required
 def merge_request_pull(repo, requestid, username=None):
@@ -730,9 +729,9 @@ def merge_request_pull(repo, requestid, username=None):
     return flask.redirect(flask.url_for('view_repo', repo=repo.name))
 
 
-@APP.route('/<repo>/pull-request/cancel/<int:requestid>',
+@APP.route('/<repo:repo>/pull-request/cancel/<int:requestid>',
            methods=['POST'])
-@APP.route('/fork/<username>/<repo>/pull-request/cancel/<int:requestid>',
+@APP.route('/fork/<username>/<repo:repo>/pull-request/cancel/<int:requestid>',
            methods=['POST'])
 @login_required
 def cancel_request_pull(repo, requestid, username=None):
@@ -781,8 +780,8 @@ def cancel_request_pull(repo, requestid, username=None):
     return flask.redirect(flask.url_for('view_repo', repo=repo))
 
 
-@APP.route('/<repo>/pull-request/<int:requestid>/assign', methods=['POST'])
-@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/assign',
+@APP.route('/<repo:repo>/pull-request/<int:requestid>/assign', methods=['POST'])
+@APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/assign',
            methods=['POST'])
 @login_required
 def set_assignee_requests(repo, requestid, username=None):
@@ -833,8 +832,8 @@ def set_assignee_requests(repo, requestid, username=None):
 # Specific actions
 
 
-@APP.route('/do_fork/<repo>', methods=['POST'])
-@APP.route('/do_fork/<username>/<repo>', methods=['POST'])
+@APP.route('/do_fork/<repo:repo>', methods=['POST'])
+@APP.route('/do_fork/fork/<username>/<repo:repo>', methods=['POST'])
 @login_required
 def fork_project(repo, username=None):
     """ Fork the project specified into the user's namespace
@@ -884,15 +883,15 @@ def fork_project(repo, username=None):
     return flask.redirect(flask.url_for('view_repo', repo=repo.name))
 
 
-@APP.route('/<repo>/diff/<path:branch_to>..<path:branch_from>/',
+@APP.route('/<repo:repo>/diff/<path:branch_to>..<path:branch_from>/',
            methods=('GET', 'POST'))
-@APP.route('/<repo>/diff/<path:branch_to>..<path:branch_from>',
+@APP.route('/<repo:repo>/diff/<path:branch_to>..<path:branch_from>',
            methods=('GET', 'POST'))
 @APP.route(
-    '/fork/<username>/<repo>/diff/<path:branch_to>..<path:branch_from>/',
+    '/fork/<username>/<repo:repo>/diff/<path:branch_to>..<path:branch_from>/',
     methods=('GET', 'POST'))
 @APP.route(
-    '/fork/<username>/<repo>/diff/<path:branch_to>..<path:branch_from>',
+    '/fork/<username>/<repo:repo>/diff/<path:branch_to>..<path:branch_from>',
     methods=('GET', 'POST'))
 def new_request_pull(repo, branch_to, branch_from, username=None):
     """ Request pulling the changes from the fork into the project.
@@ -1024,12 +1023,12 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
     )
 
 
-@APP.route('/<repo>/diff/remote/', methods=('GET', 'POST'))
-@APP.route('/<repo>/diff/remote', methods=('GET', 'POST'))
+@APP.route('/<repo:repo>/diff/remote/', methods=('GET', 'POST'))
+@APP.route('/<repo:repo>/diff/remote', methods=('GET', 'POST'))
 @APP.route(
-    '/fork/<username>/<repo>/diff/remote/', methods=('GET', 'POST'))
+    '/fork/<username>/<repo:repo>/diff/remote/', methods=('GET', 'POST'))
 @APP.route(
-    '/fork/<username>/<repo>/diff/remote', methods=('GET', 'POST'))
+    '/fork/<username>/<repo:repo>/diff/remote', methods=('GET', 'POST'))
 @login_required
 def new_remote_request_pull(repo, username=None):
     """ Request pulling the changes from a remote fork into the project.

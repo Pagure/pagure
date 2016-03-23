@@ -35,6 +35,8 @@ from pygments.formatters import HtmlFormatter
 
 from flask_multistatic import MultiStaticFlask
 
+from werkzeug.routing import BaseConverter
+
 # Create the application.
 APP = MultiStaticFlask(__name__)
 APP.jinja_env.trim_blocks = True
@@ -75,6 +77,18 @@ if APP.config.get('THEME_STATIC_FOLDER', False):
         os.path.join(APP.root_path, 'static'),
     ]
 
+
+class RepoConverter(BaseConverter):
+
+    """Like the default :class:`UnicodeConverter`, but it allows matching
+    a single slash.
+    :param map: the :class:`Map`.
+    """
+    regex = '[^/]*/?[^/]*'
+    #weight = 200
+
+
+APP.url_map.converters['repo'] = RepoConverter
 
 import pagure.doc_utils
 import pagure.forms
@@ -407,10 +421,7 @@ def get_repo_path(repo):
     """ Return the path of the git repository corresponding to the provided
     Repository object from the DB.
     """
-    if repo.is_fork:
-        repopath = os.path.join(APP.config['FORK_FOLDER'], repo.path)
-    else:
-        repopath = os.path.join(APP.config['GIT_FOLDER'], repo.path)
+    repopath = os.path.join(APP.config['GIT_FOLDER'], repo.path)
 
     if not os.path.exists(repopath):
         flask.abort(404, 'No git repo found')

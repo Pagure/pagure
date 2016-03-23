@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2015 - Copyright Red Hat Inc
+ (c) 2014-2016 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -45,10 +45,10 @@ from pagure import (APP, SESSION, LOG, __get_file_in_tree, login_required,
 # pylint: disable=E1101
 
 
-@APP.route('/<repo>/')
-@APP.route('/<repo>')
-@APP.route('/fork/<username>/<repo>/')
-@APP.route('/fork/<username>/<repo>')
+@APP.route('/<repo:repo>/')
+@APP.route('/<repo:repo>')
+@APP.route('/fork/<username>/<repo:repo>/')
+@APP.route('/fork/<username>/<repo:repo>')
 def view_repo(repo, username=None):
     """ Front page of a specific repo.
     """
@@ -153,8 +153,8 @@ def view_repo(repo, username=None):
     )
 
 
-@APP.route('/<repo>/branch/<path:branchname>')
-@APP.route('/fork/<username>/<repo>/branch/<path:branchname>')
+@APP.route('/<repo:repo>/branch/<path:branchname>')
+@APP.route('/fork/<username>/<repo:repo>/branch/<path:branchname>')
 def view_repo_branch(repo, branchname, username=None):
     ''' Returns the list of branches in the repo. '''
 
@@ -255,12 +255,12 @@ def view_repo_branch(repo, branchname, username=None):
     )
 
 
-@APP.route('/<repo>/commits/')
-@APP.route('/<repo>/commits')
-@APP.route('/<repo>/commits/<path:branchname>')
-@APP.route('/fork/<username>/<repo>/commits/')
-@APP.route('/fork/<username>/<repo>/commits')
-@APP.route('/fork/<username>/<repo>/commits/<path:branchname>')
+@APP.route('/<repo:repo>/commits/')
+@APP.route('/<repo:repo>/commits')
+@APP.route('/<repo:repo>/commits/<path:branchname>')
+@APP.route('/fork/<username>/<repo:repo>/commits/')
+@APP.route('/fork/<username>/<repo:repo>/commits')
+@APP.route('/fork/<username>/<repo:repo>/commits/<path:branchname>')
 def view_commits(repo, branchname=None, username=None):
     """ Displays the commits of the specified repo.
     """
@@ -372,8 +372,8 @@ def view_commits(repo, branchname=None, username=None):
     )
 
 
-@APP.route('/<repo>/blob/<path:identifier>/f/<path:filename>')
-@APP.route('/fork/<username>/<repo>/blob/<path:identifier>/f/<path:filename>')
+@APP.route('/<repo:repo>/blob/<path:identifier>/f/<path:filename>')
+@APP.route('/fork/<username>/<repo:repo>/blob/<path:identifier>/f/<path:filename>')
 def view_file(repo, identifier, filename, username=None):
     """ Displays the content of a file or a tree for the specified repo.
     """
@@ -477,9 +477,9 @@ def view_file(repo, identifier, filename, username=None):
     )
 
 
-@APP.route('/<repo>/raw/<path:identifier>', defaults={'filename': None})
-@APP.route('/<repo>/raw/<path:identifier>/f/<path:filename>')
-@APP.route('/fork/<username>/<repo>/raw/<path:identifier>',
+@APP.route('/<repo:repo>/raw/<path:identifier>', defaults={'filename': None})
+@APP.route('/<repo:repo>/raw/<path:identifier>/f/<path:filename>')
+@APP.route('/fork/<username>/<repo:repo>/raw/<path:identifier>',
            defaults={'filename': None})
 @APP.route('/fork/<username>/<repo>/raw/<path:identifier>/f/<path:filename>')
 def view_raw_file(repo, identifier, filename=None, username=None):
@@ -561,10 +561,26 @@ def view_raw_file(repo, identifier, filename=None, username=None):
     return (data, 200, headers)
 
 
-@APP.route('/<repo>/<commitid>/')
-@APP.route('/<repo>/<commitid>')
-@APP.route('/fork/<username>/<repo>/<commitid>/')
-@APP.route('/fork/<username>/<repo>/<commitid>')
+#@APP.route('/<repo>/<commitid>/')
+#@APP.route('/<repo>/<commitid>')
+#@APP.route('/fork/<username>/<repo>/<commitid>/')
+#@APP.route('/fork/<username>/<repo>/<commitid>')
+#def view_commit_old(repo, commitid, username=None):
+    #""" Render a commit in a repo
+    #"""
+    #print repo, commitid, username
+    #tmp = '%s/%s' % (repo, commitid)
+    #if not pagure.lib.get_project(SESSION, tmp, user=username):
+        #return flask.redirect(flask.url_for(
+            #'view_commit', repo=repo, commitid=commitid, username=username))
+    #else:
+        #return view_repo(tmp, username=username)
+
+
+@APP.route('/<repo:repo>/c/<commitid>/')
+@APP.route('/<repo:repo>/c/<commitid>')
+@APP.route('/fork/<username>/<repo>/c/<commitid>/')
+@APP.route('/fork/<username>/<repo>/c/<commitid>')
 def view_commit(repo, commitid, username=None):
     """ Render a commit in a repo
     """
@@ -606,8 +622,8 @@ def view_commit(repo, commitid, username=None):
     )
 
 
-@APP.route('/<repo>/<commitid>.patch')
-@APP.route('/fork/<username>/<repo>/<commitid>.patch')
+@APP.route('/<repo:repo>/c/<commitid>.patch')
+@APP.route('/fork/<username>/<repo:repo>/c/<commitid>.patch')
 def view_commit_patch(repo, commitid, username=None):
     """ Render a commit in a repo as patch
     """
@@ -633,12 +649,12 @@ def view_commit_patch(repo, commitid, username=None):
     return flask.Response(patch, content_type="text/plain;charset=UTF-8")
 
 
-@APP.route('/<repo>/tree/')
-@APP.route('/<repo>/tree')
-@APP.route('/<repo>/tree/<path:identifier>')
-@APP.route('/fork/<username>/<repo>/tree/')
-@APP.route('/fork/<username>/<repo>/tree')
-@APP.route('/fork/<username>/<repo>/tree/<path:identifier>')
+@APP.route('/<repo:repo>/tree/')
+@APP.route('/<repo:repo>/tree')
+@APP.route('/<repo:repo>/tree/<path:identifier>')
+@APP.route('/fork/<username>/<repo:repo>/tree/')
+@APP.route('/fork/<username>/<repo:repo>/tree')
+@APP.route('/fork/<username>/<repo:repo>/tree/<path:identifier>')
 def view_tree(repo, identifier=None, username=None):
     """ Render the tree of the repo
     """
@@ -694,10 +710,10 @@ def view_tree(repo, identifier=None, username=None):
     )
 
 
-@APP.route('/<repo>/forks/')
-@APP.route('/<repo>/forks')
-@APP.route('/fork/<username>/<repo>/forks/')
-@APP.route('/fork/<username>/<repo>/forks')
+@APP.route('/<repo:repo>/forks/')
+@APP.route('/<repo:repo>/forks')
+@APP.route('/fork/<username>/<repo:repo>/forks/')
+@APP.route('/fork/<username>/<repo:repo>/forks')
 def view_forks(repo, username=None):
     """ Presents all the forks of the project.
     """
@@ -715,10 +731,10 @@ def view_forks(repo, username=None):
     )
 
 
-@APP.route('/<repo>/releases/')
-@APP.route('/<repo>/releases')
-@APP.route('/fork/<username>/<repo>/releases/')
-@APP.route('/fork/<username>/<repo>/releases')
+@APP.route('/<repo:repo>/releases/')
+@APP.route('/<repo:repo>/releases')
+@APP.route('/fork/<username>/<repo:repo>/releases/')
+@APP.route('/fork/<username>/<repo:repo>/releases')
 def view_tags(repo, username=None):
     """ Presents all the tags of the project.
     """
@@ -742,10 +758,10 @@ def view_tags(repo, username=None):
     )
 
 
-@APP.route('/<repo>/upload/', methods=('GET', 'POST'))
-@APP.route('/<repo>/upload', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/upload/', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/upload', methods=('GET', 'POST'))
+@APP.route('/<repo:repo>/upload/', methods=('GET', 'POST'))
+@APP.route('/<repo:repo>/upload', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo:repo>/upload/', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo:repo>/upload', methods=('GET', 'POST'))
 @login_required
 def new_release(repo, username=None):
     """ Upload a new release.
@@ -792,10 +808,10 @@ def new_release(repo, username=None):
     )
 
 
-@APP.route('/<repo>/settings/', methods=('GET', 'POST'))
-@APP.route('/<repo>/settings', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/settings/', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/settings', methods=('GET', 'POST'))
+@APP.route('/<repo:repo>/settings/', methods=('GET', 'POST'))
+@APP.route('/<repo:repo>/settings', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo:repo>/settings/', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo:repo>/settings', methods=('GET', 'POST'))
 @login_required
 def view_settings(repo, username=None):
     """ Presents the settings of the project.
@@ -878,8 +894,8 @@ def view_settings(repo, username=None):
     )
 
 
-@APP.route('/<repo>/update', methods=['POST'])
-@APP.route('/fork/<username>/<repo>/update', methods=['POST'])
+@APP.route('/<repo:repo>/update', methods=['POST'])
+@APP.route('/fork/<username>/<repo:repo>/update', methods=['POST'])
 @login_required
 def update_project(repo, username=None):
     """ Update the description of a project.
@@ -1015,8 +1031,8 @@ def update_priorities(repo, username=None):
         'view_settings', username=username, repo=repo.name))
 
 
-@APP.route('/<repo>/default/branch/', methods=['POST'])
-@APP.route('/fork/<username>/<repo>/default/branch/', methods=['POST'])
+@APP.route('/<repo:repo>/default/branch/', methods=['POST'])
+@APP.route('/fork/<username>/<repo:repo>/default/branch/', methods=['POST'])
 @login_required
 def change_ref_head(repo, username=None):
     """ Change HEAD reference
@@ -1055,8 +1071,8 @@ def change_ref_head(repo, username=None):
                 'view_settings', username=username, repo=repo.name))
 
 
-@APP.route('/<repo>/delete', methods=['POST'])
-@APP.route('/fork/<username>/<repo>/delete', methods=['POST'])
+@APP.route('/<repo:repo>/delete', methods=['POST'])
+@APP.route('/fork/<username>/<repo:repo>/delete', methods=['POST'])
 @login_required
 def delete_repo(repo, username=None):
     """ Delete the present project.
@@ -1115,8 +1131,8 @@ def delete_repo(repo, username=None):
         flask.url_for('view_user', username=flask.g.fas_user.username))
 
 
-@APP.route('/<repo>/hook_token', methods=['POST'])
-@APP.route('/fork/<username>/<repo>/hook_token', methods=['POST'])
+@APP.route('/<repo:repo>/hook_token', methods=['POST'])
+@APP.route('/fork/<username>/<repo:repo>/hook_token', methods=['POST'])
 @login_required
 def new_repo_hook_token(repo, username=None):
     """ Re-generate a hook token for the present project.
@@ -1158,8 +1174,8 @@ def new_repo_hook_token(repo, username=None):
         flask.url_for('view_settings', repo=repo.name, username=username))
 
 
-@APP.route('/<repo>/dropuser/<userid>', methods=['POST'])
-@APP.route('/fork/<username>/<repo>/dropuser/<userid>', methods=['POST'])
+@APP.route('/<repo:repo>/dropuser/<userid>', methods=['POST'])
+@APP.route('/fork/<username>/<repo:repo>/dropuser/<userid>', methods=['POST'])
 @login_required
 def remove_user(repo, userid, username=None):
     """ Remove the specified user from the project.
@@ -1211,10 +1227,10 @@ def remove_user(repo, userid, username=None):
     )
 
 
-@APP.route('/<repo>/adduser/', methods=('GET', 'POST'))
-@APP.route('/<repo>/adduser', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/adduser/', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/adduser', methods=('GET', 'POST'))
+@APP.route('/<repo:repo>/adduser/', methods=('GET', 'POST'))
+@APP.route('/<repo:repo>/adduser', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo:repo>/adduser/', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo:repo>/adduser', methods=('GET', 'POST'))
 @login_required
 def add_user(repo, username=None):
     """ Add the specified user from the project.
@@ -1270,10 +1286,10 @@ def add_user(repo, username=None):
     )
 
 
-@APP.route('/<repo>/addgroup/', methods=('GET', 'POST'))
-@APP.route('/<repo>/addgroup', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/addgroup/', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/addgroup', methods=('GET', 'POST'))
+@APP.route('/<repo:repo>/addgroup/', methods=('GET', 'POST'))
+@APP.route('/<repo:repo>/addgroup', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo:repo>/addgroup/', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo:repo>/addgroup', methods=('GET', 'POST'))
 @login_required
 def add_group_project(repo, username=None):
     """ Add the specified group from the project.
@@ -1329,8 +1345,8 @@ def add_group_project(repo, username=None):
     )
 
 
-@APP.route('/<repo>/regenerate', methods=['POST'])
-@APP.route('/fork/<username>/<repo>/regenerate', methods=['POST'])
+@APP.route('/<repo:repo>/regenerate', methods=['POST'])
+@APP.route('/fork/<username>/<repo:repo>/regenerate', methods=['POST'])
 @login_required
 def regenerate_git(repo, username=None):
     """ Regenerate the specified git repo with the content in the project.
@@ -1377,10 +1393,10 @@ def regenerate_git(repo, username=None):
     )
 
 
-@APP.route('/<repo>/token/new/', methods=('GET', 'POST'))
-@APP.route('/<repo>/token/new', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/token/new/', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/token/new', methods=('GET', 'POST'))
+@APP.route('/<repo:repo>/token/new/', methods=('GET', 'POST'))
+@APP.route('/<repo:repo>/token/new', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo:repo>/token/new/', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo:repo>/token/new', methods=('GET', 'POST'))
 @login_required
 def add_token(repo, username=None):
     """ Add a token to a specified project.
@@ -1435,8 +1451,8 @@ def add_token(repo, username=None):
     )
 
 
-@APP.route('/<repo>/token/revoke/<token_id>', methods=['POST'])
-@APP.route('/fork/<username>/<repo>/token/revoke/<token_id>',
+@APP.route('/<repo:repo>/token/revoke/<token_id>', methods=['POST'])
+@APP.route('/fork/<username>/<repo:repo>/token/revoke/<token_id>',
            methods=['POST'])
 @login_required
 def revoke_api_token(repo, token_id, username=None):
@@ -1487,10 +1503,10 @@ def revoke_api_token(repo, token_id, username=None):
 
 
 @APP.route(
-    '/<repo>/edit/<path:branchname>/f/<path:filename>',
+    '/<repo:repo>/edit/<path:branchname>/f/<path:filename>',
     methods=('GET', 'POST'))
 @APP.route(
-    '/fork/<username>/<repo>/edit/<path:branchname>/f/<path:filename>',
+    '/fork/<username>/<repo:repo>/edit/<path:branchname>/f/<path:filename>',
     methods=('GET', 'POST'))
 @login_required
 def edit_file(repo, branchname, filename, username=None):
@@ -1577,8 +1593,8 @@ def edit_file(repo, branchname, filename, username=None):
     )
 
 
-@APP.route('/<repo>/<path:branchname>/delete', methods=['POST'])
-@APP.route('/fork/<username>/<repo>/<path:branchname>/delete',
+@APP.route('/<repo:repo>/b/<path:branchname>/delete', methods=['POST'])
+@APP.route('/fork/<username>/<repo:repo>/b/<path:branchname>/delete',
            methods=['POST'])
 @login_required
 def delete_branch(repo, branchname, username=None):
@@ -1615,10 +1631,10 @@ def delete_branch(repo, branchname, username=None):
         flask.url_for('view_repo', repo=repo, username=username))
 
 
-@APP.route('/docs/<repo>/')
-@APP.route('/docs/<repo>/<path:filename>')
-@APP.route('/docs/fork/<username>/<repo>/')
-@APP.route('/docs/fork/<username>/<repo>/<path:filename>')
+@APP.route('/docs/<repo:repo>/')
+@APP.route('/docs/<repo:repo>/<path:filename>')
+@APP.route('/docs/fork/<username>/<repo:repo>/')
+@APP.route('/docs/fork/<username>/<repo:repo>/<path:filename>')
 def view_docs(repo, username=None, filename=None):
     """ Display the documentation
     """
