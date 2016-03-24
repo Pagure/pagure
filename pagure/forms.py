@@ -189,6 +189,11 @@ class UpdateIssueForm(wtf.Form):
         [wtforms.validators.Optional()],
         choices=[(item, item) for item in []]
     )
+    priority = wtforms.SelectField(
+        'Priority',
+        [wtforms.validators.Optional()],
+        choices=[(item, item) for item in []]
+    )
 
     def __init__(self, *args, **kwargs):
         """ Calls the default constructor with the normal argument but
@@ -199,6 +204,11 @@ class UpdateIssueForm(wtf.Form):
         if 'status' in kwargs:
             self.status.choices = [
                 (status, status) for status in kwargs['status']
+            ]
+
+        if 'priorities' in kwargs:
+            self.priority.choices = [
+                (key, val) for key, val in kwargs['priorities'].iteritems()
             ]
 
 
