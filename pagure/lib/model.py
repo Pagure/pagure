@@ -284,6 +284,7 @@ class Project(BASE):
         sa.Integer,
         sa.ForeignKey('projects.id', onupdate='CASCADE'),
         nullable=True)
+    _priorities = sa.Column(sa.Text, nullable=True)
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
@@ -367,6 +368,23 @@ class Project(BASE):
     def settings(self, settings):
         ''' Ensures the settings are properly saved. '''
         self._settings = json.dumps(settings)
+
+    @property
+    def priorities(self):
+        """ Return the dict stored as string in the database as an actual
+        dict object.
+        """
+        priorities = {}
+
+        if self._priorities:
+            priorities = json.loads(self._priorities)
+
+        return priorities
+
+    @priorities.setter
+    def priorities(self, priorities):
+        ''' Ensures the priorities are properly saved. '''
+        self._priorities = json.dumps(priorities)
 
     @property
     def open_requests(self):
@@ -485,6 +503,7 @@ class Issue(BASE):
         default='Open',
         nullable=False)
     private = sa.Column(sa.Boolean, nullable=False, default=False)
+    priority = sa.Column(sa.Integer, nullable=True, default=None)
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
