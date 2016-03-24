@@ -1156,7 +1156,8 @@ def new_pull_request(session, branch_from,
 
 
 def edit_issue(session, issue, ticketfolder, user,
-               title=None, content=None, status=None, private=False):
+               title=None, content=None, status=None,
+               priority=None, private=False):
     ''' Edit the specified issue.
     '''
     user_obj = __get_user(session, user)
@@ -1178,6 +1179,9 @@ def edit_issue(session, issue, ticketfolder, user,
     if status and status != issue.status:
         issue.status = status
         edit.append('status')
+    if priority and priority != issue.priority:
+        issue.priority = priority
+        edit.append('priority')
     if private in [True, False] and private != issue.private:
         issue.private = private
         edit.append('private')
