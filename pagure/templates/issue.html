@@ -109,7 +109,8 @@
           </fieldset>
 
           {% if authenticated and repo_admin %}
-            {{ render_bootstrap_field(form.status, formclass="issue-metadata-form") }}
+            {{ render_bootstrap_field(form.status,
+              formclass="issue-metadata-form") }}
           {% endif%}
 
           <fieldset class="form-group issue-metadata-display">
@@ -150,12 +151,12 @@
           </fieldset>
 
           {% if authenticated and repo_admin %}
-                <fieldset class="form-group issue-metadata-form">
-                  <label for="assignee"><strong>Assignee</strong></label>
-                  <input class="form-control" name="assignee" id="assignee"
-                    placeholder="username"
-                    value="{{ issue.assignee.username or '' }}" />
-                </fieldset>
+          <fieldset class="form-group issue-metadata-form">
+            <label for="assignee"><strong>Assignee</strong></label>
+            <input class="form-control" name="assignee" id="assignee"
+              placeholder="username"
+              value="{{ issue.assignee.username or '' }}" />
+          </fieldset>
           {% endif%}
 
           <fieldset class="form-group issue-metadata-display">
@@ -200,6 +201,22 @@
                 value="{{ issue.depends_text | join(',') }}" />
             </fieldset>
           {% endif%}
+
+          {% if repo.priorities %}
+          <fieldset class="form-group issue-metadata-display">
+            <label><strong>Priority</strong></label>
+            <div id="priority_plain">
+              {% if issue.priority %}
+              <span >{{ repo.priorities[issue.priority | string] }}</span>
+              {% endif %}
+            </div>
+          </fieldset>
+          {% if authenticated and repo_admin %}
+            {{ render_bootstrap_field(form.priority,
+              formclass="issue-metadata-form") }}
+          {% endif%}
+
+          {% endif %}
 
           <input type="submit" class="btn btn-primary issue-metadata-form" value="Update">
             <a class="btn btn-secondary issue-metadata-form editmetadatatoggle">

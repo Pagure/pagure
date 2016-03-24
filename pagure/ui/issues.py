@@ -73,7 +73,8 @@ def update_issue(repo, issueid, username=None):
                 repo.name, issueid, commentid, username=username)
 
     status = pagure.lib.get_issue_statuses(SESSION)
-    form = pagure.forms.UpdateIssueForm(status=status)
+    form = pagure.forms.UpdateIssueForm(
+        status=status, priorities=repo.priorities)
 
     if form.validate_on_submit():
         repo_admin = is_repo_admin(repo)
@@ -133,6 +134,11 @@ def update_issue(repo, issueid, username=None):
 
         assignee = form.assignee.data
         new_status = form.status.data
+        new_priority = None
+        try:
+            new_priority = int(form.priority.data)
+        except:
+            pass
         tags = [
             tag.strip()
             for tag in form.tag.data.split(',')
@@ -183,6 +189,20 @@ def update_issue(repo, issueid, username=None):
                         SESSION,
                         issue=issue,
                         status=new_status,
+                        private=issue.private,
+                        user=flask.g.fas_user.username,
+                        ticketfolder=APP.config['TICKETS_FOLDER'],
+                    )
+                    SESSION.commit()
+                    if message:
+                        flask.flash(message)
+
+                # Update priority
+                if str(new_priority) in repo.priorities:
+                    message = pagure.lib.edit_issue(
+                        SESSION,
+                        issue=issue,
+                        priority=new_priority,
                         private=issue.private,
                         user=flask.g.fas_user.username,
                         ticketfolder=APP.config['TICKETS_FOLDER'],
@@ -547,7 +567,8 @@ def view_issue(repo, issueid, username=None):
 
     status = pagure.lib.get_issue_statuses(SESSION)
 
-    form = pagure.forms.UpdateIssueForm(status=status)
+    form = pagure.forms.UpdateIssueForm(
+        status=status, priorities=repo.priorities)
     form.status.data = issue.status
     tag_list = pagure.lib.get_tags_of_project(SESSION, repo)
     return flask.render_template(
