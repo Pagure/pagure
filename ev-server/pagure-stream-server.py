@@ -139,11 +139,12 @@ def handle_client(client_reader, client_writer):
         "Access-Control-Allow-Origin: %s\n\n" % origin
     ).encode())
 
+    connection = yield trollius.From(trollius_redis.Connection.create(
+        host=pagure.APP.config['REDIS_HOST'],
+        port=pagure.APP.config['REDIS_PORT'],
+        db=pagure.APP.config['REDIS_DB']))
+
     try:
-        connection = yield trollius.From(trollius_redis.Connection.create(
-            host=pagure.APP.config['REDIS_HOST'],
-            port=pagure.APP.config['REDIS_PORT'],
-            db=pagure.APP.config['REDIS_DB']))
 
         # Create subscriber.
         subscriber = yield trollius.From(connection.start_subscribe())
@@ -160,8 +161,12 @@ def handle_client(client_reader, client_writer):
             client_writer.write(('data: %s\n\n' % reply.value).encode())
             yield trollius.From(client_writer.drain())
 
-    except trollius.ConnectionResetError:
-        pass
+    except trollius.ConnectionResetError as err:
+        log.info("ERROR: ConnectionResetError %s", err)
+        log.exception(err)
+    except Exception as err:
+        log.info("ERROR: Exception %s", err)
+        log.exception(err)
     finally:
         # Wathever happens, close the connection.
         connection.close()
