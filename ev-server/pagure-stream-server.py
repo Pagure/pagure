@@ -162,10 +162,10 @@ def handle_client(client_reader, client_writer):
             yield trollius.From(client_writer.drain())
 
     except trollius.ConnectionResetError as err:
-        log.info("ERROR: ConnectionResetError %s", err)
+        log.info("ERROR: ConnectionResetError - handle_client: %s", err)
         log.exception(err)
     except Exception as err:
-        log.info("ERROR: Exception %s", err)
+        log.info("ERROR: Exception - handle_client: %s", err)
         log.exception(err)
     finally:
         # Wathever happens, close the connection.
@@ -217,17 +217,21 @@ def main():
         loop.run_forever()
     except KeyboardInterrupt:
         pass
-    except trollius.ConnectionResetError:
-        pass
-
-    # Close the server
-    SERVER.close()
-    if pagure.APP.config.get('EV_STATS_PORT'):
-        stats_server.close()
-    log.info("End Connection")
-    loop.run_until_complete(SERVER.wait_closed())
-    loop.close()
-    log.info("End")
+    except trollius.ConnectionResetError as err:
+        log.info("ERROR: ConnectionResetError - main: %s", err)
+        log.exception(err)
+    except Exception as err:
+        log.info("ERROR: Exception - main: %s", err)
+        log.exception(err)
+    finally:
+        # Close the server
+        SERVER.close()
+        if pagure.APP.config.get('EV_STATS_PORT'):
+            stats_server.close()
+        log.info("End Connection")
+        loop.run_until_complete(SERVER.wait_closed())
+        loop.close()
+        log.info("End")
 
 
 if __name__ == '__main__':
