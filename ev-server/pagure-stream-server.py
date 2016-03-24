@@ -162,11 +162,9 @@ def handle_client(client_reader, client_writer):
             yield trollius.From(client_writer.drain())
 
     except trollius.ConnectionResetError as err:
-        log.info("ERROR: ConnectionResetError - handle_client: %s", err)
-        log.exception(err)
+        log.exception("ERROR: ConnectionResetError in handle_client")
     except Exception as err:
-        log.info("ERROR: Exception - handle_client: %s", err)
-        log.exception(err)
+        log.exception("ERROR: Exception in handle_client")
     finally:
         # Wathever happens, close the connection.
         connection.close()
@@ -218,11 +216,9 @@ def main():
     except KeyboardInterrupt:
         pass
     except trollius.ConnectionResetError as err:
-        log.info("ERROR: ConnectionResetError - main: %s", err)
-        log.exception(err)
+        log.exception("ERROR: ConnectionResetError in main")
     except Exception as err:
-        log.info("ERROR: Exception - main: %s", err)
-        log.exception(err)
+        log.exception("ERROR: Exception in main")
     finally:
         # Close the server
         SERVER.close()
