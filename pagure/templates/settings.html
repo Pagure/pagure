@@ -278,7 +278,7 @@
                 add group
             </a>
           </p>
-          </div>
+        </div>
           <ul class="list-group list-group-flush">
             <li class="list-group-item">
               <a href="{{ url_for('.view_user', username=repo.user.user) }}"><span class="oi" data-glyph="person"></span>&nbsp; {{ repo.user.user }}</a>
@@ -353,6 +353,61 @@
     <div class="col-md-8 col-md-offset-2">
       <div class="card">
         <div class="card-header">
+          <strong>Priorities</strong>
+        </div>
+        <div class="card-block">
+          <p>
+            Here below are the priorities you may assign to a ticket, allowing
+            you to sort them with it.
+            <span class="italic">
+              The heavier the weight of the priority, the lower in the list
+              it will show by default.
+            </span>
+          </p>
+        </div>
+        <div class="card-block">
+        <form action="{{ url_for('.update_priorities',
+                          username=username, repo=repo.name) }}"
+            method="post" class="icon">
+          {{ tag_form.csrf_token }}
+          <ul class="list-group list-group-flush" id="priorities">
+            <li class="list-group-item clearfix">
+              Weigth
+            <div class="pull-xs-right">title</div>
+            </li>
+          {% for priority in repo.priorities | sort %}
+            <li class="list-group-item clearfix">
+              <input type="text" name="priority_weigth"
+                value="{{ priority }}" size="3"/>
+              <div class="pull-xs-right">
+                <input type="text" name="priority_title"
+                  value="{{ repo.priorities[priority] }}" />
+                <button
+                  onclick="return confirm('Do you really want to remove this priority?');"
+                  title="Remove tag" class="btn btn-danger btn-sm">
+                  <span class="oi" data-glyph="trash"></span>
+                </button>
+              </div>
+            </li>
+          {% endfor %}
+          </ul>
+          <p>
+          <button class="btn btn-primary" type="submit"
+              title="Update the priorities">
+            Update
+          </button>
+          <a class="btn btn-primary" id="new_priority">
+              add priority
+            </a>
+          </p>
+        </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-8 col-md-offset-2">
+      <div class="card">
+        <div class="card-header">
           <strong>Issue Tags</strong>
         </div>
         <div class="card-block">
@@ -414,68 +469,75 @@
     </div>
     {% endif %}
 
-
   </div>
 </section>
-
-
-
-
-
-
-
-<section class="delete">
-
-</section>
-
 
 {% endblock %}
 
 {% block jscripts %}
 {{ super() }}
 <script>
-  function show_acls(acls) {
-    var _txt = '<div title="ACLs details" id="show_meeting">'
-      + '<ul>';
+function show_acls(acls) {
+  var _txt = '<div title="ACLs details" id="show_meeting">'
+    + '<ul>';
 
-    for (i = 0; i < acls.length; i++) {
-        _txt += '<li>' + acls[i] + '</li>';
-    }
+  for (i = 0; i < acls.length; i++) {
+      _txt += '<li>' + acls[i] + '</li>';
+  }
 
-    _txt += '</ul>' + '</div>';
-    var _elt = $(_txt);
-    var _height = $(window).height() * 0.8;
-    _elt.dialog({
-        height: 250,
-        width: 250,
-        modal: true,
-        cache: false,
-    });
-    }
+  _txt += '</ul>' + '</div>';
+  var _elt = $(_txt);
+  var _height = $(window).height() * 0.8;
+  _elt.dialog({
+      height: 250,
+      width: 250,
+      modal: true,
+      cache: false,
+  });
+}
+
 $('#accordions').on('shown.bs.collapse', function (e) {
-        var _plugin = $(e.target).attr('data-plugin');
-        $(e.target).siblings().find("#dropdowncaret").attr('data-glyph', "caret-bottom");
-        if (!_plugin) {
-          return false;
-        }
-        var _url = "{{ url_for('.view_plugin', repo=repo.name, username=username, plugin='') }}";
-        _url += _plugin + '/0';
-        console.log(_url);
-        $.ajax({
-            url: _url ,
-            type: 'GET',
-            dataType: 'html',
-            success: function(res) {
-                $("#"+e.target.id).html(res);
-            },
-        });
-        return false;
+  var _plugin = $(e.target).attr('data-plugin');
+  $(e.target).siblings().find("#dropdowncaret").attr('data-glyph', "caret-bottom");
+  if (!_plugin) {
+    return false;
+  }
+  var _url = "{{ url_for('.view_plugin', repo=repo.name, username=username, plugin='') }}";
+  _url += _plugin + '/0';
+  console.log(_url);
+  $.ajax({
+      url: _url ,
+      type: 'GET',
+      dataType: 'html',
+      success: function(res) {
+          $("#"+e.target.id).html(res);
+      },
+  });
+  return false;
 })
-
 
 $('#accordions').on('hide.bs.collapse', function (e) {
-        $(e.target).siblings().find("#dropdowncaret").attr('data-glyph', "caret-right");
+  $(e.target).siblings().find("#dropdowncaret").attr('data-glyph', "caret-right");
 })
+
+$('#new_priority').click(function(e) {
+  console.log('new priority');
+  console.log($('#priorities'));
+  $('#priorities').append(
+    '<li class="list-group-item clearfix"> \
+      <input type="text" name="priority_weigth" value="" size="3"/> \
+      <div class="pull-xs-right"> \
+        <input type="text" name="priority_title" value=""/> \
+        <button \
+          onclick="return confirm(\'Do you really want to remove this priority option?\');" \
+          title="Remove tag" class="btn btn-danger btn-sm"> \
+          <span class="oi" data-glyph="trash"></span> \
+        </button> \
+      </div> \
+    </li>'
+  );
+  console.log($('#priorities'));
+});
 
 </script>
 {% endblock %}

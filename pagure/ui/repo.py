@@ -925,6 +925,72 @@ def update_project(repo, username=None):
         'view_settings', username=username, repo=repo.name))
 
 
+@APP.route('/<repo>/update/priorities', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/update/priorities', methods=['POST'])
+@login_required
+def update_priorities(repo, username=None):
+    """ Update the priorities of a project.
+    """
+    if admin_session_timedout():
+        flask.flash('Action canceled, try it again', 'error')
+        url = flask.url_for(
+            'view_settings', username=username, repo=repo)
+        return flask.redirect(
+            flask.url_for('auth_login', next=url))
+
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    if not is_repo_admin(repo):
+        flask.abort(
+            403,
+            'You are not allowed to change the settings for this project')
+
+    form = pagure.forms.ConfirmationForm()
+
+    error = False
+    if form.validate_on_submit():
+        weights = [
+            w.strip() for w in flask.request.form.getlist('priority_weigth')
+            if w.strip()
+        ]
+        try:
+            weights = [int(w) for w in weights]
+        except:
+            flask.flash(
+                'Priorities weights must be numbers',
+                'error')
+            error = True
+
+        titles = [
+            p.strip() for p in flask.request.form.getlist('priority_title')
+            if p.strip()
+        ]
+
+        if len(weights) != len(titles):
+            flask.flash(
+                'Priorities weights and titles are not of the same length',
+                'error')
+            error = True
+
+        if not error:
+            priorities = {}
+            for cnt in range(len(weights)):
+                priorities[weights[cnt]] = titles[cnt]
+            try:
+                repo.priorities = priorities
+                SESSION.add(repo)
+                SESSION.commit()
+                flask.flash('Priorities updated')
+            except SQLAlchemyError as err:  # pragma: no cover
+                SESSION.rollback()
+                flask.flash(str(err), 'error')
+
+    return flask.redirect(flask.url_for(
+        'view_settings', username=username, repo=repo.name))
+
 @APP.route('/<repo>/default/branch/', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/default/branch/', methods=['POST'])
 @login_required
