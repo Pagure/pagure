@@ -349,6 +349,7 @@ def view_issues(repo, username=None):
     """ List all issues associated to a repo
     """
     status = flask.request.args.get('status', None)
+    priority = flask.request.args.get('priority', None)
     tags = flask.request.args.getlist('tags')
     tags = [tag.strip() for tag in tags if tag.strip()]
     assignee = flask.request.args.get('assignee', None)
@@ -361,6 +362,11 @@ def view_issues(repo, username=None):
 
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
+
+    try:
+        priority = int(priority)
+    except:
+        priority = None
 
     # Hide private tickets
     private = False
@@ -382,6 +388,7 @@ def view_issues(repo, username=None):
                 assignee=assignee,
                 author=author,
                 private=private,
+                priority=priority,
             )
             oth_issues = pagure.lib.search_issues(
                 SESSION,
@@ -391,6 +398,7 @@ def view_issues(repo, username=None):
                 assignee=assignee,
                 author=author,
                 private=private,
+                priority=priority,
                 count=True,
             )
         else:
@@ -402,15 +410,16 @@ def view_issues(repo, username=None):
                 assignee=assignee,
                 author=author,
                 private=private,
+                priority=priority,
             )
 
     else:
         issues = pagure.lib.search_issues(
             SESSION, repo, status='Open', tags=tags, assignee=assignee,
-            author=author, private=private)
+            author=author, private=private, priority=priority)
         oth_issues = pagure.lib.search_issues(
             SESSION, repo, closed=True, tags=tags, assignee=assignee,
-            author=author, private=private, count=True)
+            author=author, private=private, priority=priority, count=True)
 
     tag_list = pagure.lib.get_tags_of_project(SESSION, repo)
 
@@ -429,6 +438,7 @@ def view_issues(repo, username=None):
         tags=tags,
         assignee=assignee,
         author=author,
+        priority=priority,
         repo_admin=is_repo_admin(repo),
         repo_obj=repo_obj,
     )
