@@ -554,7 +554,7 @@ class PagureFlaskLogintests(tests.Modeltests):
         td1 = datetime.timedelta(minutes=1)
         # session already expired
         user = tests.FakeUser(username='foo')
-        user.login_time = datetime.datetime.now() - lifetime - td1
+        user.login_time = datetime.datetime.utcnow() - lifetime - td1
         with tests.user_set(pagure.APP, user):
             # not following the redirect because user_set contextmanager
             # will run again for the login page and set back the user
@@ -564,7 +564,7 @@ class PagureFlaskLogintests(tests.Modeltests):
             self.assertEqual(output.status_code, 302)
             self.assertIn('http://localhost/login/', output.location)
         # session did not expire
-        user.login_time = datetime.datetime.now() - lifetime + td1
+        user.login_time = datetime.datetime.utcnow() - lifetime + td1
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 200)
@@ -578,11 +578,11 @@ class PagureFlaskLogintests(tests.Modeltests):
         td1 = datetime.timedelta(minutes=1)
         # session already expired
         user = tests.FakeUser(username='foo')
-        user.login_time = datetime.datetime.now() - lifetime - td1
+        user.login_time = datetime.datetime.utcnow() - lifetime - td1
         g.fas_user = user
         self.assertTrue(pagure.admin_session_timedout())
         # session did not expire
-        user.login_time = datetime.datetime.now() - lifetime + td1
+        user.login_time = datetime.datetime.utcnow() - lifetime + td1
         g.fas_user = user
         self.assertFalse(pagure.admin_session_timedout())
 
