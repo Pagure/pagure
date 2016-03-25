@@ -1076,6 +1076,20 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertTrue(
             '<span style="color: #00A000">+ ======</span>' in output.data)
 
+        # View first commit - with the old URL scheme
+        output = self.app.get(
+            '/test/%s' % commit.oid.hex, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue(
+            '<div class="list-group" id="diff_list" style="display:none;">'
+            in output.data)
+        self.assertTrue('</a> Authored by Alice Author' in output.data)
+        self.assertTrue('Committed by Cecil Committer' in output.data)
+        self.assertTrue(
+            '<span style="color: #00A000">+ Pagure</span>' in output.data)
+        self.assertTrue(
+            '<span style="color: #00A000">+ ======</span>' in output.data)
+
         # Add some content to the git repo
         tests.add_content_git_repo(os.path.join(tests.HERE, 'test.git'))
 
@@ -1140,6 +1154,27 @@ class PagureFlaskRepotests(tests.Modeltests):
             '<span style="color: #00A000">+ Pagure</span>' in output.data)
         self.assertTrue(
             '<span style="color: #00A000">+ ======</span>' in output.data)
+
+        # View commit of fork - With the old URL scheme
+        output = self.app.get(
+            '/fork/pingou/test3/%s' % commit.oid.hex, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue(
+            '<div class="list-group" id="diff_list" style="display:none;">'
+            in output.data)
+        self.assertTrue('</a> Authored by Alice Author' in output.data)
+        self.assertTrue('Committed by Cecil Committer' in output.data)
+        self.assertTrue(
+            '<span style="color: #00A000">+ Pagure</span>' in output.data)
+        self.assertTrue(
+            '<span style="color: #00A000">+ ======</span>' in output.data)
+
+        # Try the old URL scheme with a short hash
+        output = self.app.get(
+            '/fork/pingou/test3/%s' % commit.oid.hex[:10],
+            follow_redirects=True)
+        self.assertEqual(output.status_code, 404)
+        self.assertIn('<p>Project not found</p>', output.data)
 
     def test_view_commit_patch(self):
         """ Test the view_commit_patch endpoint. """
