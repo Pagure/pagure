@@ -553,25 +553,26 @@ def view_raw_file(repo, identifier, filename=None, username=None):
     return (data, 200, headers)
 
 
-@APP.route('/<repo>/<string(length=40):commitid>/')
-@APP.route('/<repo>/<string(length=40):commitid>')
-@APP.route('/fork/<username>/<repo>/<string(length=40):commitid>/')
-@APP.route('/fork/<username>/<repo>/<string(length=40):commitid>')
-def view_commit_old(repo, commitid, username=None):
-    """ Redirect from the old view_commit to the new one.
+if APP.config.get('OLD_VIEW_COMMIT_ENABLED', False):
+    @APP.route('/<repo>/<string(length=40):commitid>/')
+    @APP.route('/<repo>/<string(length=40):commitid>')
+    @APP.route('/fork/<username>/<repo>/<string(length=40):commitid>/')
+    @APP.route('/fork/<username>/<repo>/<string(length=40):commitid>')
+    def view_commit_old(repo, commitid, username=None):
+        """ Redirect from the old view_commit to the new one.
 
-    This method aims to provide backward compatibility with the old URL
-    scheme where the commit id was right after the repo name.
-    This is problematic since we now allow up to one slash ('/') in the
-    project name, making the url parsing a little trickier.
-    So if the element after the '/' is exactly 40 characters long, then we
-    consider it's a commit hash and redirect to the new URL scheme for
-    viewing commits.
-    If the element is more (not possible) or less than 40 characters, then
-    the other URLs should catch it.
+        This method aims to provide backward compatibility with the old URL
+        scheme where the commit id was right after the repo name.
+        This is problematic since we now allow up to one slash ('/') in the
+        project name, making the url parsing a little trickier.
+        So if the element after the '/' is exactly 40 characters long, then we
+        consider it's a commit hash and redirect to the new URL scheme for
+        viewing commits.
+        If the element is more (not possible) or less than 40 characters, then
+        the other URLs should catch it.
 
-    """
-    return flask.redirect(flask.url_for(
+        """
+        return flask.redirect(flask.url_for(
             'view_commit', repo=repo, commitid=commitid, username=username))
 
 
