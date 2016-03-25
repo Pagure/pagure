@@ -1076,6 +1076,14 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertTrue(
             '<span style="color: #00A000">+ ======</span>' in output.data)
 
+        # View first commit - with the old URL scheme disabled
+        pagure.APP.config['OLD_VIEW_COMMIT_ENABLED'] = False
+        output = self.app.get(
+            '/test/%s' % commit.oid.hex, follow_redirects=True)
+        self.assertEqual(output.status_code, 404)
+        self.assertIn('<p>Project not found</p>', output.data)
+        pagure.APP.config['OLD_VIEW_COMMIT_ENABLED'] = True
+
         # View first commit - with the old URL scheme
         output = self.app.get(
             '/test/%s' % commit.oid.hex, follow_redirects=True)
