@@ -431,3 +431,21 @@ this pagure instance. This can be useful to turn off when developing on
 pagure, or for test or pre-production instances.
 
 Defaults to: ``True``.
+
+
+OLD_VIEW_COMMIT_ENABLED
+~~~~~~~~~~~~~~~~~~~~~~~
+
+In version 1.3, pagure changed its URL scheme to view the commit of a
+project in order to add support for pseudo-namespaced projects.
+
+For pagure instances older than 1.3, who care about backward compatibility,
+we added an endpoint ``view_commit_old`` that brings URL backward
+compatibility for URLs using the complete git hash (the 40 characters).
+For URLs using a shorter hash, the URLs will remain broken.
+
+This configuration key allows turning on or off this backward compatibility
+which is useful for pagure instances running since before 1.3 but is not
+for newer instances.
+
+Defaults to: ``False``.
