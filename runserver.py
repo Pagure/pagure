@@ -10,10 +10,10 @@ import os
 
 
 parser = argparse.ArgumentParser(
-    description='Run the packages2 app')
+    description='Run the Pagure app')
 parser.add_argument(
     '--config', '-c', dest='config',
-    help='Configuration file to use for packages.')
+    help='Configuration file to use for pagure.')
 parser.add_argument(
     '--debug', dest='debug', action='store_true',
     default=False,
@@ -21,10 +21,13 @@ parser.add_argument(
 parser.add_argument(
     '--profile', dest='profile', action='store_true',
     default=False,
-    help='Profile the packages2 application.')
+    help='Profile Pagure.')
 parser.add_argument(
     '--port', '-p', default=5000,
-    help='Port for the flask application.')
+    help='Port for the Pagure to run on.')
+parser.add_argument(
+    '--host', default="127.0.0.1",
+    help='Hostname to listen on. When set to 0.0.0.0 the server is available externally. Defaults to 127.0.0.1 making the it only visable on localhost')
 
 args = parser.parse_args()
 
@@ -43,4 +46,4 @@ if args.config:
     os.environ['PAGURE_CONFIG'] = config
 
 APP.debug = True
-APP.run(host='127.0.0.1', port=int(args.port))
+APP.run(host=args.host, port=int(args.port))
