@@ -1546,4 +1546,5 @@ def view_docs(repo, username=None, filename=None):
         username=username,
         filename=filename,
         endpoint='view_docs',
+        select='docs',
     )
