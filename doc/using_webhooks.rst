@@ -26,3 +26,21 @@ that just occured. For example ``issue.edit``.
 
 ``X-Pagure-Signature`` contains the signature of the message allowing to
 check that the message comes from pagure.
+
+
+Pagure relies on ``hmac`` to sign the content of its messages. If you want
+to validate the message, in python you can simply do something like this:
+
+::
+
+    import hmac
+
+    payload =  # content you received in the POST request
+    headers =  # headers of the POST request
+    project_web_hook_key =  # private web-hook key of the project
+
+    hashhex = hmac.new(
+        str(project_web_hook_key), payload, hashlib.sha1).hexdigest()
+
+    if hashhex != headers.get('X-Pagure-Signature'):
+        raise Exception('Message received with an invalid signature')
