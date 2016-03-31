@@ -29,7 +29,7 @@ check that the message comes from pagure.
 
 
 Pagure relies on ``hmac`` to sign the content of its messages. If you want
-to validate the message, in python you can simply do something like this:
+to validate the message, in python, you can do something like the following:
 
 ::
 
