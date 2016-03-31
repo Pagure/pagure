@@ -34,6 +34,7 @@ to validate the message, in python you can simply do something like this:
 ::
 
     import hmac
+    import hashlib
 
     payload =  # content you received in the POST request
     headers =  # headers of the POST request
