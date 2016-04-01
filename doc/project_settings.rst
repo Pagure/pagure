@@ -28,6 +28,22 @@ If the `Activate always merge` option is on, then the `fast-forward` option
 above is disabled in favor of the `merge` option.
 
 
+`Activate comment editing`
+--------------------------
+
+This boolean enables or disables editing comments.
+
+After commenting on a ticket or a pull-request, the admins of the project
+and the author of the comment may be allowed to edit the comment.
+This allows them to adjust the wording or the style as they wish.
+
+.. note:: notification about a comment is only sent once with the original
+          text, changes performed later will not trigger a new notification.
+
+Some project may not want to allow editing comments after they were posted
+and this setting allows turning it on or off.
+
+
 Issue tracker
 -------------
 
