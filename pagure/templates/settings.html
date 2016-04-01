@@ -365,43 +365,57 @@
             </span>
           </p>
         </div>
-        <div class="card-block">
         <form action="{{ url_for('.update_priorities',
                           username=username, repo=repo.name) }}"
             method="post" class="icon">
           {{ tag_form.csrf_token }}
-          <ul class="list-group list-group-flush" id="priorities">
-            <li class="list-group-item clearfix">
-              Weigth
-            <div class="pull-xs-right">title</div>
-            </li>
-          {% for priority in repo.priorities | sort %}
-            <li class="list-group-item clearfix">
-              <input type="text" name="priority_weigth"
-                value="{{ priority }}" size="3"/>
-              <div class="pull-xs-right">
-                <input type="text" name="priority_title"
-                  value="{{ repo.priorities[priority] }}" />
-                <button
-                  onclick="return confirm('Do you really want to remove this priority?');"
-                  title="Remove tag" class="btn btn-danger btn-sm">
-                  <span class="oi" data-glyph="trash"></span>
-                </button>
+          <div class="card-block">
+            <div class="row">
+              <div class="col-sm-2">
+                <strong>Weight</strong>
               </div>
-            </li>
+              <div class="col-sm-10">
+                <strong>Title</strong>
+              </div>
+            </div>
+            <div id="priorities">
+          {% for priority in repo.priorities | sort %}
+              <div class="row p-t-1">
+                <div class="col-sm-2 p-r-0">
+                  <input type="text" name="priority_weigth"
+                    value="{{ priority }}" size="3" class="form-control"/>
+                </div>
+                <div class="col-sm-9 p-r-0">
+                  <input type="text" name="priority_title"
+                    value="{{ repo.priorities[priority] }}" class="form-control"/>
+                </div>
+                <div class="col-sm-1">
+                  <button
+                    onclick="return confirm('Do you really want to remove this priority?');"
+                    title="Remove tag" class="btn btn-danger">
+                    <span class="oi" data-glyph="trash"></span>
+                  </button>
+                </div>
+              </div>
           {% endfor %}
-          </ul>
-          <p>
-          <button class="btn btn-primary" type="submit"
-              title="Update the priorities">
-            Update
-          </button>
-          <a class="btn btn-primary" id="new_priority">
-              add priority
-            </a>
-          </p>
-        </form>
+          </div>
+          <div class="row p-t-1">
+            <div class="col-sm-12">
+              <a class="btn btn-secondary btn-sm btn-block" id="new_priority">
+                  add new priority
+              </a>
+            </div>
+          </div>
+          <div class="row p-t-1">
+            <div class="col-sm-12">
+              <button class="btn btn-primary" type="submit"
+                  title="Update the priorities">
+                Update
+              </button>
+            </div>
+          </div>
         </div>
+        </form>
       </div>
     </div>
 
@@ -524,17 +538,23 @@ $('#new_priority').click(function(e) {
   console.log('new priority');
   console.log($('#priorities'));
   $('#priorities').append(
-    '<li class="list-group-item clearfix"> \
-      <input type="text" name="priority_weigth" value="" size="3"/> \
-      <div class="pull-xs-right"> \
-        <input type="text" name="priority_title" value=""/> \
-        <button \
-          onclick="return confirm(\'Do you really want to remove this priority option?\');" \
-          title="Remove tag" class="btn btn-danger btn-sm"> \
-          <span class="oi" data-glyph="trash"></span> \
-        </button> \
-      </div> \
-    </li>'
+    '<div class="row p-t-1"> \
+        <div class="col-sm-2 p-r-0">\
+          <input type="text" name="priority_weigth"\
+            value="" size="3" class="form-control"/>\
+        </div>\
+        <div class="col-sm-9 p-r-0">\
+          <input type="text" name="priority_title"\
+            value="" class="form-control"/>\
+        </div>\
+        <div class="col-sm-1">\
+          <button\
+            onclick="return confirm("Do you really want to remove this priority?");"\
+            title="Remove tag" class="btn btn-danger">\
+            <span class="oi" data-glyph="trash"></span>\
+          </button>\
+        </div>\
+    </div>'
   );
   console.log($('#priorities'));
 });
