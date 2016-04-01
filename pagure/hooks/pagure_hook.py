@@ -59,7 +59,7 @@ class PagureForm(wtf.Form):
 class PagureHook(BaseHook):
     ''' Pagure hook. '''
 
-    name = 'pagure'
+    name = 'Pagure'
     description = 'Pagure specific hook to add comment on issues'\
         ' if the commits fixes or relates to an issue.'
     form = PagureForm

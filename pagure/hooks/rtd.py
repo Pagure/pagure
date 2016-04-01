@@ -58,7 +58,7 @@ class RtdForm(wtf.Form):
         [RequiredIf('active')]
     )
     branches = wtforms.TextField(
-        'Restrict build to these branches only (coma separated)',
+        'Restrict build to these branches only (comma separated)',
         [wtforms.validators.Optional()]
     )
 
