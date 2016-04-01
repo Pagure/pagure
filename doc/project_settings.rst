@@ -8,6 +8,26 @@ to the project.
 This page presents the different settings and there effect.
 
 
+`Activate always merge`
+------------------------
+
+This boolean enables or disables always making a merge commit when merging
+a pull-request.
+
+When merging a pull-request in pagure there are three states:
+
+* fast-forward: when the commits in the pull-request can be fast-forwarded
+pagure signals it and just fast-forward the commit, keeping the history linear.
+* merge: when the commits in the pull-request cannot be merged without a merge
+commit, pagure signals it and performs this merge commit.
+* conflicts: when the commits in the pull-request cannot be merged at all
+automatically due to one or more conflicts. Then pagure signals it and prevent
+merging.
+
+If the `Activate always merge` option is on, then the `fast-forward` option
+above is disabled in favor of the `merge` option.
+
+
 Issue tracker
 -------------
 
