@@ -1,0 +1,140 @@
+{% extends "repo_master.html" %}
+
+{% block title %}Activity - {{ repo.name }}{% endblock %}
+{% set tag = "home" %}
+
+
+{% block repo %}
+<div class="list-group" id="messages">
+</div>
+<div class="text-xs-center"><span id="noactivity" style="display:none;">No activity reported on the {{repo.name}} project</span><button class="btn btn-secondary" style="display:none;" id='loadmore'>Load more</button><img id="spinnergif" src="{{ url_for('static', filename='images/spinner.gif') }}"></div>
+{% endblock %}
+
+{% block jscripts %}
+{{ super() }}
+<script>
+function processMessages(item, lastitem) {
+  console.log(item["topic"]);
+  console.log(item);
+  if (item["topic"].indexOf("io.pagure.prod.pagure.pull-request") > -1 ){
+    if (lastitem.valueOf() != new String("PR#"+item["msg"]["pullrequest"]["id"]).valueOf())
+    {
+      $("#messages").append("<div class='messagetitle m-t-2 p-t-2'><div class='messageicon'><span class='oi' data-glyph='data-transfer-download'></span></div>New activity on <strong><span class='label label-default'>PR#"+item["msg"]["pullrequest"]["id"]+"</span> "+item["msg"]["pullrequest"]["title"]+"</strong><div class='pull-xs-right'>"+item["meta"]["date"]+"</div></div>");
+    }
+    messagedetail = $("<a href="+item["meta"]["link"]+"><div class='messageitem clearfix'><small>"+item["msg"]["agent"]+" <span class='activity-message'> PR#"+item["msg"]["pullrequest"]["id"]+"</span> <span>"+item["meta"]["date"]+"</span></small></div></a>")
+    if (item["topic"]=="io.pagure.prod.pagure.pull-request.new"){
+        $(messagedetail).find(".activity-message").addClass("text-success").prepend("created");
+    } else if (item['topic']=="io.pagure.prod.pagure.pull-request.comment.added") {
+        $(messagedetail).find(".activity-message").addClass("text-muted").prepend("commented on");
+    } else if (item['topic']=="io.pagure.prod.pagure.pull-request.comment.edited") {
+      $(messagedetail).find(".activity-message").addClass("text-muted").prepend("edited comment on");
+    } else if (item['topic']=="io.pagure.prod.pagure.pull-request.closed") {
+      if (item["msg"]["merged"] == true){
+        $(messagedetail).find(".activity-message").addClass("text-success").prepend("merged");
+      } else if (item["msg"]["merged"] == false){
+        $(messagedetail).find(".activity-message").addClass("text-danger").prepend("closed");
+      }
+    } else {
+      $(messagedetail).html("<div style='background-color:red'>"+item["meta"]["subtitle"]+"</div>");
+    }
+    $("#messages").append(messagedetail);
+    return "PR#"+item["msg"]["pullrequest"]["id"]
+  } else if (item["topic"].indexOf("io.pagure.prod.pagure.issue") > -1 ){
+    if (lastitem.valueOf() != new String("ISSUE#"+item["msg"]["issue"]["id"]).valueOf())
+    {
+      $("#messages").append("<div class='messagetitle m-t-2 p-t-2'><div class='messageicon'><span class='oi' data-glyph='warning'></div></span>New activity on <strong><span class='label label-default'>Issue#"+item["msg"]["issue"]["id"]+"</span> "+item["msg"]["issue"]["title"]+"</strong><div class='pull-xs-right'>"+item["meta"]["date"]+"</div></div>");
+    }
+    messagedetail = $("<a href="+item["meta"]["link"]+"><div class='messageitem clearfix'><small>"+item["msg"]["agent"]+" <span class='activity-message'> Issue #"+item["msg"]["issue"]["id"]+" </span> <span>"+item["meta"]["date"]+"</span></small></div></a>")
+    if (item["topic"]=="io.pagure.prod.pagure.issue.new"){
+      $(messagedetail).find(".activity-message").addClass("text-success").prepend("created");
+    } else if (item['topic']=="io.pagure.prod.pagure.issue.edit") {
+      if (item["msg"]["fields"].length == 1){
+        $(messagedetail).find(".activity-message").addClass("text-muted").prepend("edited the "+item["msg"]["fields"][0]+" field in");
+      } else {
+        var outputstring = "";
+        for (var i in item["msg"]["fields"]){
+          outputstring = outputstring+item["msg"]["fields"][i]
+          if (i < item["msg"]["fields"].length-1){
+          outputstring = outputstring +" & "
+          }
+        }
+        $(messagedetail).find(".activity-message").addClass("text-muted").prepend("edited the "+outputstring+" fields in");
+      }
+
+    } else if (item['topic']=="io.pagure.prod.pagure.issue.comment.added") {
+      $(messagedetail).find(".activity-message").addClass("text-muted").prepend("commented on");
+    } else if (item['topic']=="io.pagure.prod.pagure.issue.comment.edited") {
+      $(messagedetail).find(".activity-message").addClass("text-muted").prepend("edited a comment on");
+    } else if (item['topic']=="io.pagure.prod.pagure.issue.assigned.added") {
+      $(messagedetail).find(".activity-message").addClass("text-muted").prepend("assigned ").append(" to "+item["msg"]["issue"]["assignee"]["name"]);
+    } else {
+      $(messagedetail).html("<div style='background-color:red'>"+item["meta"]["subtitle"]+"</div>");
+    }
+    $("#messages").append(messagedetail);
+    return "ISSUE#"+item["msg"]["issue"]["id"]
+  } else if (item["topic"].indexOf("io.pagure.prod.pagure.project") > -1 ){
+    if (item["topic"]=="io.pagure.prod.pagure.project.forked"){
+      $("#messages").append("<div class='messagetitle m-t-2 p-t-2'><div class='messageicon'><span class='oi' data-glyph='fork'></div></span>"+item["msg"]["agent"]+" forked "+item["msg"]["project"]["name"]+" into <a href='"+item["meta"]["link"]+"'>"+item["msg"]["agent"]+"/"+item["msg"]["project"]["name"]+"</a></strong><div class='pull-xs-right'>"+item["meta"]["date"]+"</div></div>");
+    } else {
+      $("#messages").append("<div style='background-color:red'>"+item["meta"]["subtitle"]+"</div>");
+    }
+    return "";
+  } else {
+    $("#messages").append("<div style='background-color:pink'>"+item["meta"]["subtitle"]+"</div>");
+    return "";
+  }
+}
+
+$(document).ready(function() {
+  var page = null;
+  pants = $.ajax({
+   type: 'GET',
+  url: "{{ config.get('DATAGREPPER_URL') }}/raw?category={{ config.get('DATAGREPPER_CATEGORY') }}&contains=%22name%22:%22{{repo.name}}%22&meta=link&meta=date&meta=subtitle",
+  async: false,
+  contentType: "application/json",
+  dataType: 'jsonp',
+  success:function(data) {
+  if(data) {
+      console.log(data)
+      if (data["count"] == 0){
+        $("#noactivity").show();
+        $("#spinnergif").hide();
+      } else {
+        var last_item = ""
+        for (var i=0; i<data['raw_messages'].length; i++) {
+          last_item = processMessages(data['raw_messages'][i], last_item)
+        }
+        /*data['raw_messages'].forEach(processMessages(lastitem));*/
+        page = 2
+        $("#loadmore").show();
+        $("#spinnergif").hide();
+        $("#loadmore").click(function(){
+          $("#spinnergif").show();
+          $("#loadmore").hide();
+          $.ajax({
+            type: 'GET',
+            url: "{{ config.get('DATAGREPPER_URL') }}/raw?category={{ config.get('DATAGREPPER_CATEGORY') }}&contains=%22name%22:%22{{repo.name}}%22&meta=link&meta=date&meta=subtitle&page="+page,
+            async: false,
+            contentType: "application/json",
+            dataType: 'jsonp',
+            success:function(data) {
+              if(data) {
+                page = page+1;
+                console.log(data)
+                var last_item = ""
+                for (var i=0; i<data['raw_messages'].length; i++) {
+                  last_item = processMessages(data['raw_messages'][i], last_item)
+                }
+                $("#loadmore").show();
+                $("#spinnergif").hide();
+              }
+            }
+          });
+        });
+      }
+  }
+}
+});
+});
+</script>
+{% endblock %}

@@ -478,3 +478,19 @@ blockquote {
   color: #586e75;
   padding: 1em 1em 0.1em 1em;
 }
+
+.messagetitle{
+  border-top: 1px solid #eee;
+}
+
+.messageitem{
+  padding-left: 2em;
+}
+
+.messageicon{
+float: left;
+font-size: 1.5em;
+padding-right: 0.5em;
+margin-top: -4px;
+color: #999;
+}

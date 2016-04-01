@@ -1548,3 +1548,20 @@ def view_docs(repo, username=None, filename=None):
         endpoint='view_docs',
         select='docs',
     )
+
+@APP.route('/<repo>/activity/')
+@APP.route('/<repo>/activity')
+def view_project_activity(repo):
+    """ Display the documentation
+    """
+    repo_obj = pagure.lib.get_project(SESSION, repo, user=None)
+
+    if not repo_obj:
+        flask.abort(404, 'Project not found')
+    if not APP.config.get('DATAGREPPER_URL'):
+        flask.abort(404)
+
+    return flask.render_template(
+        'activity.html',
+        repo=repo_obj,
+    )
