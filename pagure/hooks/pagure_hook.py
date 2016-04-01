@@ -56,12 +56,32 @@ class PagureForm(wtf.Form):
     )
 
 
+DESCRIPTION = '''
+Pagure specific hook to add a comment to issues if the pushed commits fix them
+or relate to them. This is determined based on the commit message.
+
+To reference an issue you need to use one of recognized keywords followed by an
+issue number. The number can optionally be preceded by `#` symbol.
+Capitalization does not matter; neither does the colon between keyword and
+number.
+
+ * fix
+ * fixed
+ * fixes
+ * relate
+ * related
+ * relates
+
+Instead of an issue number, you can use full URL of the issue. This way it is
+possible to reference issues in other projects.
+'''
+
+
 class PagureHook(BaseHook):
     ''' Pagure hook. '''
 
     name = 'Pagure'
-    description = 'Pagure specific hook to add comment on issues'\
-        ' if the commits fixes or relates to an issue.'
+    description = DESCRIPTION
     form = PagureForm
     db_object = PagureTable
     backref = 'pagure_hook'
