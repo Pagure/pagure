@@ -499,3 +499,7 @@ color: #999;
   background-color:#eee;
   color:#777;
 }
+
+th[data-sort] {
+    cursor: pointer;
+}

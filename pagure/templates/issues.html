@@ -76,7 +76,7 @@
         <tr>
             <th id="issue-title">Issue</th>
             <th class="open_date">Opened</th>
-            <th class="priority">
+            <th class="priority" data-sort="int">
                 Priority&nbsp;(<a href="{{ url_for('view_issues', username=username,
                 repo=repo.name, tags=tags, author=author, assignee=assignee,
                 status=status) }}">reset</a>)
@@ -130,8 +130,9 @@
                 <span title="{{issue.date_created.strftime('%Y-%m-%d %H:%M:%S')}}">{{
                         issue.date_created | humanize}}</span>
             </td>
-            <td class="td-priority nowrap">
+            <td class="td-priority nowrap" data-sort-value="{{issue.priority if issue.priority != None else repo.priorities|increment_largest_priority|string()}}">
               {% if issue.priority %}
+
                 <a href="{{ url_for('view_issues', username=username,
                     repo=repo.name, author=author,
                     tags=tags, assignee=assignee, status=status,
@@ -174,4 +175,16 @@
     </tbody>
 </table>
 </div>
+{% endblock %}
+{% block jscripts %}
+{{ super() }}
+
+<script type="text/javascript"
+  src="{{ url_for('static', filename='stupidtable.min.js') }}">
+</script>
+<script>
+$(document).ready(function() {
+  $("#pagure-issues-list").stupidtable();
+});
+</script>
 {% endblock %}
