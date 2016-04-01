@@ -40,6 +40,7 @@ Contents:
 
    first_steps
    using_doc
+   using_webhooks
    ticket_templates
    pr_custom_page
    theming
