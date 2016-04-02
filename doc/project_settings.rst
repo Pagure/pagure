@@ -57,16 +57,16 @@ button, allowing project admin to request the PR to be updated.
           line to be pushed directly, it only work at the pull-request level.
 
 
-Issue tracker
--------------
+`Activate issue tracker`
+------------------------
 
 This boolean simply enables or disables the issue tracker for the project.
 So if you are tracking your ticket on a different system, you can simply
 disable reporting issue on pagure by un-checking this option.
 
 
-Project documentation
----------------------
+`Activate project documentation`
+--------------------------------
 
 Pagure offers the option to have a git repository specific for the
 documentation of the project.
@@ -79,8 +79,8 @@ the sources of the project, you can disable the ``Docs`` tab by un-checking
 this option.
 
 
-Pull-request
-------------
+`Activate pull requests`
+------------------------
 
 Pagure offers the option to fork a project, make changes to it and then ask
 the developer to merge these changes into the project. This is similar to
@@ -94,8 +94,8 @@ prevent anyone from opening a pull-request against this project.
 .. note:: disabling pull-requests does *not* disable forking the projects.
 
 
-Only assignee can merge pull-request
-------------------------------------
+`Activate Only assignee can merge pull-request`
+-----------------------------------------------
 
 This option can be used for project wishing to institute a strong review
 workflow where pull-request are first assigned then merged.
@@ -104,8 +104,8 @@ If this option is enabled, only the person assigned to the pull-request
 can merge it.
 
 
-Minimum score to merge pull-request
------------------------------------
+`Activate Minimum score to merge pull-request`
+----------------------------------------------
 
 This option can be used for project wishing to enforce having a minimum
 number of people reviewing a pull-request before it can be merged.
@@ -131,8 +131,8 @@ To vote against a pull-request, use either:
 .. note:: Anyone can vote on the pull-request, not only the contributors.
 
 
-Web-hooks
----------
+`Activate Web-hooks`
+--------------------
 
 Pagure offers the option of sending notification about event happening on a
 project via [web-hooks|https://en.wikipedia.org/wiki/Webhook]. This option
