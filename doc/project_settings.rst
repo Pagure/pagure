@@ -44,6 +44,19 @@ Some project may not want to allow editing comments after they were posted
 and this setting allows turning it on or off.
 
 
+`Activate Enforce signed-off commits in pull-request`
+-----------------------------------------------------
+
+This boolean enables or disables checking for a 'Signed-off-by' line (case
+insensitive) in the commit messages of the pull-requests.
+
+If this line is missing, pagure will display a message near the `Merge`
+button, allowing project admin to request the PR to be updated.
+
+.. note:: This setting does not prevent commits without this 'signed-off-by'
+          line to be pushed directly, it only work at the pull-request level.
+
+
 Issue tracker
 -------------
 
