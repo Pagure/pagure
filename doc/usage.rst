@@ -39,6 +39,7 @@ Contents:
    :maxdepth: 2
 
    first_steps
+   project_settings
    using_doc
    using_webhooks
    ticket_templates
