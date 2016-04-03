@@ -65,6 +65,43 @@ So if you are tracking your ticket on a different system, you can simply
 disable reporting issue on pagure by un-checking this option.
 
 
+`Activate Minimum score to merge pull-request`
+----------------------------------------------
+
+This option can be used for project wishing to enforce having a minimum
+number of people reviewing a pull-request before it can be merged.
+
+If this option is enabled, anyone can vote in favor or against a pull-request
+and the sum of the votes in favor minus the sum of the votes againsts give
+the pull-request a score that should be equal or great to the value
+entered in this option for the pull-request to be allowed to be merged.
+
+.. note:: Only the main comments (ie: not in-line) are taken into account
+          to calculate the score of the pull-request.
+
+To vote in favor of a pull-request, use either:
+* ``+1``
+* ``:thumbsup:``
+
+To vote against a pull-request, use either:
+* ``-1``
+* ``:thumbsdown:``
+
+.. note:: Pull-Request reaching the minimum score are not automatically merged
+
+.. note:: Anyone can vote on the pull-request, not only the contributors.
+
+
+`Activate Only assignee can merge pull-request`
+-----------------------------------------------
+
+This option can be used for project wishing to institute a strong review
+workflow where pull-request are first assigned then merged.
+
+If this option is enabled, only the person assigned to the pull-request
+can merge it.
+
+
 `Activate project documentation`
 --------------------------------
 
@@ -92,43 +129,6 @@ pull-request mechanism at all. Un-checking this option will therefore
 prevent anyone from opening a pull-request against this project.
 
 .. note:: disabling pull-requests does *not* disable forking the projects.
-
-
-`Activate Only assignee can merge pull-request`
------------------------------------------------
-
-This option can be used for project wishing to institute a strong review
-workflow where pull-request are first assigned then merged.
-
-If this option is enabled, only the person assigned to the pull-request
-can merge it.
-
-
-`Activate Minimum score to merge pull-request`
-----------------------------------------------
-
-This option can be used for project wishing to enforce having a minimum
-number of people reviewing a pull-request before it can be merged.
-
-If this option is enabled, anyone can vote in favor or against a pull-request
-and the sum of the votes in favor minus the sum of the votes againsts give
-the pull-request a score that should be equal or great to the value
-entered in this option for the pull-request to be allowed to be merged.
-
-.. note:: Only the main comments (ie: not in-line) are taken into account
-          to calculate the score of the pull-request.
-
-To vote in favor of a pull-request, use either:
-* ``+1``
-* ``:thumbsup:``
-
-To vote against a pull-request, use either:
-* ``-1``
-* ``:thumbsdown:``
-
-.. note:: Pull-Request reaching the minimum score are not automatically merged
-
-.. note:: Anyone can vote on the pull-request, not only the contributors.
 
 
 `Activate Web-hooks`
