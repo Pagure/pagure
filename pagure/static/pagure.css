@@ -494,3 +494,8 @@ padding-right: 0.5em;
 margin-top: -4px;
 color: #999;
 }
+.msg-git-hash{
+  font-family:monospace;
+  background-color:#eee;
+  color:#777;
+}

@@ -74,7 +74,24 @@ function processMessages(item, lastitem) {
     return "ISSUE#"+item["msg"]["issue"]["id"]
   } else if (item["topic"].indexOf("io.pagure.prod.pagure.project") > -1 ){
     if (item["topic"]=="io.pagure.prod.pagure.project.forked"){
-      $("#messages").append("<div class='messagetitle m-t-2 p-t-2'><div class='messageicon'><span class='oi' data-glyph='fork'></div></span>"+item["msg"]["agent"]+" forked "+item["msg"]["project"]["name"]+" into <a href='"+item["meta"]["link"]+"'>"+item["msg"]["agent"]+"/"+item["msg"]["project"]["name"]+"</a></strong><div class='pull-xs-right'>"+item["meta"]["date"]+"</div></div>");
+      $("#messages").append("<div class='messagetitle m-t-2 p-t-2'><div class='messageicon'><span class='oi' data-glyph='fork'></span></div>"+item["msg"]["agent"]+" forked "+item["msg"]["project"]["name"]+" into <a href='"+item["meta"]["link"]+"'>"+item["msg"]["agent"]+"/"+item["msg"]["project"]["name"]+"</a></strong><div class='pull-xs-right'>"+item["meta"]["date"]+"</div></div>");
+    } else {
+      $("#messages").append("<div style='background-color:red'>"+item["meta"]["subtitle"]+"</div>");
+    }
+    return "";
+  } else if (item["topic"].indexOf("io.pagure.prod.pagure.git") > -1 ){
+    if (lastitem.valueOf() != new String("GITCOMMIT#"+item["msg"]["commit"]["branch"]).valueOf())
+    {
+      $("#messages").append("<div class='messagetitle m-t-2 p-t-2'><div class='messageicon'><span class='oi' data-glyph='spreadsheet'></div></span>New commits to <strong><span class='pr-toplabel'> <span class='oi' data-glyph='random'> </span> "+item['msg']['commit']['branch'].replace("refs/heads/","")+"</span></strong><div class='pull-xs-right'>"+item["meta"]["date"]+"</div></div>");
+    }
+    if (item["topic"]=="io.pagure.prod.pagure.git.receive"){
+      $("#messages").append("\
+      <a href="+item["meta"]["link"]+">\
+        <div class='messageitem'>\
+          <small>"+item["msg"]["commit"]["name"]+" <span class='activity-message text-muted'> committed </span></small><span class='label label-default msg-git-hash'>"+item["msg"]["commit"]["rev"].substring(0,6)+"</span><small> <span class='text-muted'>"+item["msg"]["commit"]["message"]+"</span> </small>\
+        </div>\
+      </a>");
+      return "GITCOMMIT#"+item["msg"]["commit"]["branch"];
     } else {
       $("#messages").append("<div style='background-color:red'>"+item["meta"]["subtitle"]+"</div>");
     }
@@ -89,7 +106,7 @@ $(document).ready(function() {
   var page = null;
   pants = $.ajax({
    type: 'GET',
-  url: "{{ config.get('DATAGREPPER_URL') }}/raw?category={{ config.get('DATAGREPPER_CATEGORY') }}&contains=%22name%22:%22{{repo.name}}%22&meta=link&meta=date&meta=subtitle",
+  url: "{{ config.get('DATAGREPPER_URL') }}/raw?delta=2592000&category={{ config.get('DATAGREPPER_CATEGORY') }}&category=git&contains=%22name%22:%22{{repo.name}}%22&meta=link&meta=date&meta=subtitle",
   async: false,
   contentType: "application/json",
   dataType: 'jsonp',
@@ -113,7 +130,7 @@ $(document).ready(function() {
           $("#loadmore").hide();
           $.ajax({
             type: 'GET',
-            url: "{{ config.get('DATAGREPPER_URL') }}/raw?category={{ config.get('DATAGREPPER_CATEGORY') }}&contains=%22name%22:%22{{repo.name}}%22&meta=link&meta=date&meta=subtitle&page="+page,
+            url: "{{ config.get('DATAGREPPER_URL') }}/raw?delta=2592000&category={{ config.get('DATAGREPPER_CATEGORY') }}&category=git&contains=%22name%22:%22{{repo.name}}%22&meta=link&meta=date&meta=subtitle&page="+page,
             async: false,
             contentType: "application/json",
             dataType: 'jsonp',
