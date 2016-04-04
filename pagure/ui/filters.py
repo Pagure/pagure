@@ -404,4 +404,7 @@ def return_md5(text):
 def text_wraps(dictionary):
     """ Template filter to return the largest priority +1
     """
-    return int(max(dictionary.keys(), key=int))+1
+    if dictionary:
+        return int(max(dictionary.keys(), key=int)) + 1
+    else:
+        return 1
