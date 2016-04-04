@@ -34,15 +34,22 @@
   <div class="list-group">
     {% for tag in tags %}
       <a class="list-group-item" href="{{ url_for('.view_tree', username=username, repo=repo.name,
-                          identifier=tag[0].oid) }}">
-        {% if tag|length == 1 %}
-          {% if tag[0].message %}
-            {{tag[0].name}} -- {{ tag[0].message.split('\n')[0] }}
+                          identifier=tag[1].oid) }}">
+        <div class="pull-xs-right">{{tag[0] | humanize }} <span class="label label-default">{{ tag[1].oid | short }}</span> </div>
+        {% if tag|length == 2 %}
+          {% if tag[1].message %}
+            <strong>{{tag[1].name}}</strong>
+            {{ tag[1].message.split('\n')[0] }}
+            {% set detailtext = tag[1].message.partition('\n')[2] %}
+            {% if detailtext != "" %}
+            <div style="white-space:pre-wrap">
+              {{ detailtext }}
+            </div>
+            {% endif %}
           {% endif %}
         {% else %}
-            {{tag[1]}}
+            <strong>{{tag[2]}}</strong>
         {% endif %}
-      <span class="tagid">{{ tag[0].oid | short }}</span>
       </a>
     {% endfor %}
   </div>
