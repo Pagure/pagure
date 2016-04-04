@@ -1247,7 +1247,7 @@ def get_git_tags_objects(project):
     repopath = pagure.get_repo_path(project)
     repo_obj = PagureRepo(repopath)
     tags = [
-        repo_obj[repo_obj.lookup_reference(tag).target]
+        [repo_obj[repo_obj.lookup_reference(tag).target], tag.replace("refs/tags/","")]
         for tag in repo_obj.listall_references()
         if 'refs/tags/' in tag and repo_obj.lookup_reference(tag)
     ]
@@ -1257,10 +1257,10 @@ def get_git_tags_objects(project):
 
     for tag in tags:
         # If the object is a tag, get his associated commit time
-        if isinstance(tag, pygit2.Tag):
-            tags_sort[tag.get_object().commit_time] = tag
-        elif isinstance(tag, pygit2.Commit):
-            tags_sort[tag.commit_time] = tag
+        if isinstance(tag[0], pygit2.Tag):
+            tags_sort[tag[0].get_object().commit_time] = [tag[0]]
+        elif isinstance(tag[0], pygit2.Commit):
+            tags_sort[tag[0].commit_time] = tag
         # If object is neither a tag or commit return an unsorted list
         else:
             return tags
@@ -1268,4 +1268,5 @@ def get_git_tags_objects(project):
     for tag in sorted(tags_sort, reverse=True):
         sorted_tags.append(tags_sort[tag])
 
+    print sorted_tags
     return sorted_tags
