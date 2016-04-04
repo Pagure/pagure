@@ -138,7 +138,7 @@
       {% endif %}
       <div class="issue_action icon pull-xs-right p-b-1">
         <div class="btn-group" role="group" aria-label="Basic example">
-          {% if id != 0 and g.fas_user and comment.parent.status in [True, 'Open'] or repo_admin %}
+          {% if id != 0 and g.fas_user and comment.parent.status in [True, 'Open'] %}
             <a class="reply btn btn-secondary btn-sm" data-toggle="tooltip" title="Reply to this comment - loose formating">
               <span class="oi" data-glyph="share-boxed"></span>
             </a>
@@ -178,7 +178,7 @@
   </section>
   <div class="issue_action icon pull-xs-right">
     <div class="btn-group" role="group">
-      {% if repo_admin or g.fas_user %}
+      {% if g.fas_user %}
         <a class="btn btn-secondary btn-sm reply"
           title="Reply to the initial comment - loose formatting">
           <span class="oi" data-glyph="share-boxed"></span>
