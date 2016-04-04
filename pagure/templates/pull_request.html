@@ -207,13 +207,16 @@
         {% for commit in diff_commits %}
 
             {% if pull_request and pull_request.status and pull_request.project_from.is_fork %}
-            <a class="list-group-item" href="{{ url_for('view_commit', username=pull_request.project_from.user.user,
-                      repo=pull_request.project_from.name, commitid=commit.oid.hex)}}">
+            <a class="list-group-item" href="{{
+                url_for('view_commit', username=pull_request.project_from.user.user,
+                        repo=pull_request.project_from.name, commitid=commit.oid.hex)
+                }}">
             {% elif pull_request and pull_request.remote %}
             <a>
             {% else %}
-            <a class="list-group-item" href="{{ url_for('view_commit', username=username,
-                          repo=repo.name, commitid=commit.oid.hex)}}">
+            <a class="list-group-item" href="{{
+                url_for('view_commit', username=username,
+                        repo=repo.name, commitid=commit.oid.hex)}}">
             {% endif %}
 
             <h5>
@@ -235,7 +238,9 @@
       </div>
   </div>
 
-  <div class="tab-pane {% if not pull_request %}active{% endif %}" role="tabpanel" id="request_diff">
+  <div class="tab-pane {% 
+      if not pull_request %}active{% 
+      endif %}" role="tabpanel" id="request_diff">
     {% if authenticated and pull_request %}
     <form action="{{ url_for('.pull_request_drop_comment', username=username,
         repo=repo.name, requestid=requestid) }}" method="post" class="icon"
@@ -328,13 +333,13 @@
           <div class="card">
             <div class="card-header">
               <div>
-                {{comment.user.user}} commented on line
-                    <a href="#c-{{comment.commit_id}}-{{comment.line}}"
+                {{ comment.user.user }} commented on line
+                    <a href="#c-{{ comment.commit_id }}-{{ comment.line }}"
                         onclick="showTab()">{{
-                        comment.line}} of {{comment.filename}}</a>.
+                        comment.line }} of {{ comment.filename }}</a>.
                 <div class="pull-xs-right text-muted">
-                    <span title="{{comment.date_created.strftime('%Y-%m-%d %H:%M:%S')}}">{{
-                        comment.date_created | humanize}}</span></div>
+                    <span title="{{ comment.date_created.strftime('%Y-%m-%d %H:%M:%S') }}">{{
+                        comment.date_created | humanize }}</span></div>
               </div>
                 (<a class="inline-btn small" data-id="{{ loop.index }}">Show</a>)
                 <div class="inline-comments" id="inline-comment-{{ loop.index }}">
@@ -347,10 +352,10 @@
             <div class="card-header">
               <div>
                 <div class="pull-xs-right text-muted">
-                    <span title="{{comment.date_created.strftime('%Y-%m-%d %H:%M:%S')}}">{{
-                        comment.date_created | humanize}}</span>
+                    <span title="{{ comment.date_created.strftime('%Y-%m-%d %H:%M:%S') }}">{{
+                        comment.date_created | humanize }}</span>
                 </div>
-                <small>{{ comment.comment | markdown | noJS | safe}}</small>
+                <small>{{ comment.comment | markdown | noJS | safe }}</small>
               </div>
             </div>
           </div>
@@ -400,7 +405,11 @@
               </div>
             </form>
           {% else %}
-            <p><a href="{{ url_for('auth_login', next=request.url) }}">Login</a> to comment on this ticket.</p>
+            <p>
+              <a href="{{ url_for('auth_login', next=request.url) }}">
+                Login
+              </a> to comment on this ticket.
+            </p>
           {% endif %}
         </section>
       </div>
