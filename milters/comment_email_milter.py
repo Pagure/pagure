@@ -125,13 +125,17 @@ class PagureMilter(Milter.Base):
 
         self.log('msg-ig %s' % msg_id)
         self.log('To %s' % msg['to'])
+        self.log('Cc %s' % msg.get('cc'))
         self.log('From %s' % msg['From'])
 
         # Ensure the user replied to his/her own notification, not that
         # they are trying to forge their ID into someone else's
         salt = pagure.APP.config.get('SALT_EMAIL')
         m = hashlib.sha512('%s%s%s' % (msg_id, salt, clean_item(msg['From'])))
-        tohash= msg['to'].split('@')[0].split('+')[-1]
+        email = msg['to']
+        if 'reply+' in msg.get('cc'):
+            email = msg['cc']
+        tohash= email.split('@')[0].split('+')[-1]
         if m.hexdigest() != tohash:
             self.log('hash: %s' % m.hexdigest())
             self.log('tohash:   %s' % tohash)
