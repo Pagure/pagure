@@ -35,7 +35,7 @@ def get_plugin_names(blacklist=None):
         for plugin in plugins
         if plugin.name not in blacklist
     ]
-    return output
+    return sorted(output)
 
 
 def get_plugin_tables():
