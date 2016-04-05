@@ -398,11 +398,13 @@
                   Add new priority
               </a>
             </div>
+            {% if not repo.priorities %}
             <div class="col-sm-6">
               <a class="btn btn-secondary btn-sm btn-block" id="default_priorities">
                   Default priority set
               </a>
             </div>
+            {% endif %}
           </div>
           <div class="row p-t-1">
             <div class="col-sm-12">
@@ -548,7 +550,7 @@ $('#new_priority').click(function(e) {
     </div>'
   );
 });
-
+{% if not repo.priorities %}
 $('#default_priorities').click(function(e) {
   $('#priorities').html('');
   var def_priorities = ['', 'High', 'Normal', 'Low'];
@@ -568,6 +570,7 @@ $('#default_priorities').click(function(e) {
   }
   console.log($('#priorities'));
 });
+{% endif %}
 
 </script>
 {% endblock %}
