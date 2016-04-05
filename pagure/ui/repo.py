@@ -975,6 +975,26 @@ def update_priorities(repo, username=None):
                 'error')
             error = True
 
+        for weight in weights:
+            if weights.count(weight) != 1:
+                flask.flash(
+                    'Priority weight %s is present %s times' % (
+                        weight, weights.count(weight)
+                    ),
+                    'error')
+                error = True
+                break
+
+        for title in titles:
+            if titles.count(title) != 1:
+                flask.flash(
+                    'Priority %s is present %s times' % (
+                        title, titles.count(title)
+                    ),
+                    'error')
+                error = True
+                break
+
         if not error:
             priorities = {}
             for cnt in range(len(weights)):
