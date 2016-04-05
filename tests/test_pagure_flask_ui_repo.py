@@ -2324,6 +2324,18 @@ index 0000000..fb7093d
         output = self.app.get('/docs/test/')
         self.assertEqual(output.status_code, 404)
 
+    def test_view_project_activity(self):
+        """ Test the view_project_activity endpoint. """
+        output = self.app.get('/foo/activity/')
+        # project doesnt exist
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+
+        output = self.app.get('/test/activity/')
+        # Project Exists, but No DATAGREPPER_URL set
+        self.assertEqual(output.status_code, 404)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskRepotests)
