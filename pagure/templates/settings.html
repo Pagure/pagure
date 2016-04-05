@@ -389,13 +389,6 @@
                   <input type="text" name="priority_title"
                     value="{{ repo.priorities[priority] }}" class="form-control"/>
                 </div>
-                <div class="col-sm-1">
-                  <button
-                    onclick="return confirm('Do you really want to remove this priority?');"
-                    title="Remove tag" class="btn btn-danger">
-                    <span class="oi" data-glyph="trash"></span>
-                  </button>
-                </div>
               </div>
           {% endfor %}
           </div>
@@ -546,13 +539,6 @@ $('#new_priority').click(function(e) {
         <div class="col-sm-9 p-r-0">\
           <input type="text" name="priority_title"\
             value="" class="form-control"/>\
-        </div>\
-        <div class="col-sm-1">\
-          <button\
-            onclick="return confirm("Do you really want to remove this priority?");"\
-            title="Remove tag" class="btn btn-danger">\
-            <span class="oi" data-glyph="trash"></span>\
-          </button>\
         </div>\
     </div>'
   );
