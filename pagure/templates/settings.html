@@ -393,9 +393,14 @@
           {% endfor %}
           </div>
           <div class="row p-t-1">
-            <div class="col-sm-12">
+            <div class="col-sm-6">
               <a class="btn btn-secondary btn-sm btn-block" id="new_priority">
-                  add new priority
+                  Add new priority
+              </a>
+            </div>
+            <div class="col-sm-6">
+              <a class="btn btn-secondary btn-sm btn-block" id="default_priorities">
+                  Default priority set
               </a>
             </div>
           </div>
@@ -542,6 +547,25 @@ $('#new_priority').click(function(e) {
         </div>\
     </div>'
   );
+});
+
+$('#default_priorities').click(function(e) {
+  $('#priorities').html('');
+  var def_priorities = ['', 'High', 'Normal', 'Low'];
+  for (var cnt = 1; cnt < def_priorities.length; cnt++) {
+    $('#priorities').append(
+      '<div class="row p-t-1"> \
+          <div class="col-sm-2 p-r-0">\
+            <input type="text" name="priority_weigth"\
+              value="' + cnt + '" size="3" class="form-control"/>\
+          </div>\
+          <div class="col-sm-9 p-r-0">\
+            <input type="text" name="priority_title"\
+              value="' + def_priorities[cnt] + '" class="form-control"/>\
+          </div>\
+      </div>'
+    );
+  }
   console.log($('#priorities'));
 });
 
