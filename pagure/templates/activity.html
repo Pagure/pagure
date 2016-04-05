@@ -7,49 +7,115 @@
 {% block repo %}
 <div class="list-group" id="messages">
 </div>
-<div class="text-xs-center"><span id="noactivity" style="display:none;">No activity reported on the {{repo.name}} project</span><button class="btn btn-secondary" style="display:none;" id='loadmore'>Load more</button><img id="spinnergif" src="{{ url_for('static', filename='images/spinner.gif') }}"></div>
+<div class="text-xs-center">
+  <span id="noactivity" style="display:none;">
+    No activity reported on the {{repo.name}} project
+  </span>
+  <button class="btn btn-secondary" style="display:none;" id='loadmore'>
+    Load more
+  </button>
+  <img id="spinnergif" src="{{ url_for('static', filename='images/spinner.gif') }}">
+</div>
 {% endblock %}
 
 {% block jscripts %}
 {{ super() }}
 <script>
 function processMessages(item, lastitem) {
-  console.log(item["topic"]);
-  console.log(item);
   if (item["topic"].indexOf("io.pagure.prod.pagure.pull-request") > -1 ){
     if (lastitem.valueOf() != new String("PR#"+item["msg"]["pullrequest"]["id"]).valueOf())
     {
-      $("#messages").append("<div class='messagetitle m-t-2 p-t-2'><div class='messageicon'><span class='oi' data-glyph='data-transfer-download'></span></div>New activity on <strong><span class='label label-default'>PR#"+item["msg"]["pullrequest"]["id"]+"</span> "+item["msg"]["pullrequest"]["title"]+"</strong><div class='pull-xs-right'>"+item["meta"]["date"]+"</div></div>");
+      $("#messages").append("\
+      <div class='messagetitle m-t-2 p-t-2'>\
+        <div class='messageicon'>\
+          <span class='oi' data-glyph='data-transfer-download'></span>\
+        </div>\
+        New activity on\
+          <strong>\
+            <span class='label label-default'>\
+              PR#"+item["msg"]["pullrequest"]["id"]+"\
+            </span>\
+            "+item["msg"]["pullrequest"]["title"]+"\
+          </strong>\
+        <div class='pull-xs-right'>"+item["meta"]["date"]+"</div>\
+      </div>");
     }
-    messagedetail = $("<a href="+item["meta"]["link"]+"><div class='messageitem clearfix'><small>"+item["msg"]["agent"]+" <span class='activity-message'> PR#"+item["msg"]["pullrequest"]["id"]+"</span> <span>"+item["meta"]["date"]+"</span></small></div></a>")
+    messagedetail = $("\
+    <a href="+item["meta"]["link"]+">\
+      <div class='messageitem clearfix'>\
+        <small>"+item["msg"]["agent"]+"\
+          <span class='activity-message'> PR#"+item["msg"]["pullrequest"]["id"]+"</span>\
+          <span>"+item["meta"]["date"]+"</span>\
+        </small>\
+      </div>\
+    </a>\
+    ")
     if (item["topic"]=="io.pagure.prod.pagure.pull-request.new"){
-        $(messagedetail).find(".activity-message").addClass("text-success").prepend("created");
+        $(messagedetail).find(".activity-message")
+            .addClass("text-success").prepend("created");
     } else if (item['topic']=="io.pagure.prod.pagure.pull-request.comment.added") {
-        $(messagedetail).find(".activity-message").addClass("text-muted").prepend("commented on");
+        $(messagedetail).find(".activity-message")
+           .addClass("text-muted").prepend("commented on");
+
     } else if (item['topic']=="io.pagure.prod.pagure.pull-request.comment.edited") {
-      $(messagedetail).find(".activity-message").addClass("text-muted").prepend("edited comment on");
+      $(messagedetail).find(".activity-message")
+           .addClass("text-muted").prepend("edited comment on");
+
     } else if (item['topic']=="io.pagure.prod.pagure.pull-request.closed") {
       if (item["msg"]["merged"] == true){
-        $(messagedetail).find(".activity-message").addClass("text-success").prepend("merged");
+        $(messagedetail).find(".activity-message")
+           .addClass("text-success").prepend("merged");
       } else if (item["msg"]["merged"] == false){
-        $(messagedetail).find(".activity-message").addClass("text-danger").prepend("closed");
+        $(messagedetail).find(".activity-message")
+           .addClass("text-danger").prepend("closed");
       }
     } else {
-      $(messagedetail).html("<div style='background-color:red'>"+item["meta"]["subtitle"]+"</div>");
+      $(messagedetail).html("\
+      <div style='background-color:red'>\
+        "+item["meta"]["subtitle"]+"\
+      </div>");
     }
     $("#messages").append(messagedetail);
     return "PR#"+item["msg"]["pullrequest"]["id"]
   } else if (item["topic"].indexOf("io.pagure.prod.pagure.issue") > -1 ){
     if (lastitem.valueOf() != new String("ISSUE#"+item["msg"]["issue"]["id"]).valueOf())
     {
-      $("#messages").append("<div class='messagetitle m-t-2 p-t-2'><div class='messageicon'><span class='oi' data-glyph='warning'></div></span>New activity on <strong><span class='label label-default'>Issue#"+item["msg"]["issue"]["id"]+"</span> "+item["msg"]["issue"]["title"]+"</strong><div class='pull-xs-right'>"+item["meta"]["date"]+"</div></div>");
+      $("#messages").append("\
+      <div class='messagetitle m-t-2 p-t-2'>\
+        <div class='messageicon'>\
+          <span class='oi' data-glyph='warning'></span>\
+        </div>\
+        New activity on \
+        <strong>\
+          <span class='label label-default'>\
+            Issue#"+item["msg"]["issue"]["id"]+"\
+          </span> \
+          "+item["msg"]["issue"]["title"]+"\
+        </strong>\
+        <div class='pull-xs-right'>"+item["meta"]["date"]+"</div>\
+      </div>\
+      ");
     }
-    messagedetail = $("<a href="+item["meta"]["link"]+"><div class='messageitem clearfix'><small>"+item["msg"]["agent"]+" <span class='activity-message'> Issue #"+item["msg"]["issue"]["id"]+" </span> <span>"+item["meta"]["date"]+"</span></small></div></a>")
+    messagedetail = $("\
+    <a href="+item["meta"]["link"]+">\
+      <div class='messageitem clearfix'>\
+        <small>"+item["msg"]["agent"]+"\
+         <span class='activity-message'> \
+          Issue #"+item["msg"]["issue"]["id"]+" \
+         </span> \
+         <span>"+item["meta"]["date"]+"</span>\
+        </small>\
+      </div>\
+    </a>\
+    ");
     if (item["topic"]=="io.pagure.prod.pagure.issue.new"){
-      $(messagedetail).find(".activity-message").addClass("text-success").prepend("created");
+      $(messagedetail).find(".activity-message")
+         .addClass("text-success").prepend("created");
     } else if (item['topic']=="io.pagure.prod.pagure.issue.edit") {
       if (item["msg"]["fields"].length == 1){
-        $(messagedetail).find(".activity-message").addClass("text-muted").prepend("edited the "+item["msg"]["fields"][0]+" field in");
+        $(messagedetail).find(".activity-message")
+           .addClass("text-muted")
+           .prepend("edited the "+item["msg"]["fields"][0]+" field in");
       } else {
         var outputstring = "";
         for (var i in item["msg"]["fields"]){
@@ -58,46 +124,93 @@ function processMessages(item, lastitem) {
           outputstring = outputstring +" & "
           }
         }
-        $(messagedetail).find(".activity-message").addClass("text-muted").prepend("edited the "+outputstring+" fields in");
+        $(messagedetail).find(".activity-message")
+           .addClass("text-muted")
+           .prepend("edited the "+outputstring+" fields in");
       }
 
     } else if (item['topic']=="io.pagure.prod.pagure.issue.comment.added") {
-      $(messagedetail).find(".activity-message").addClass("text-muted").prepend("commented on");
+      $(messagedetail).find(".activity-message")
+         .addClass("text-muted").prepend("commented on");
     } else if (item['topic']=="io.pagure.prod.pagure.issue.comment.edited") {
-      $(messagedetail).find(".activity-message").addClass("text-muted").prepend("edited a comment on");
+      $(messagedetail).find(".activity-message")
+         .addClass("text-muted").prepend("edited a comment on");
     } else if (item['topic']=="io.pagure.prod.pagure.issue.assigned.added") {
-      $(messagedetail).find(".activity-message").addClass("text-muted").prepend("assigned ").append(" to "+item["msg"]["issue"]["assignee"]["name"]);
+      $(messagedetail).find(".activity-message")
+         .addClass("text-muted")
+         .prepend("assigned ")
+         .append(" to "+item["msg"]["issue"]["assignee"]["name"]);
     } else {
-      $(messagedetail).html("<div style='background-color:red'>"+item["meta"]["subtitle"]+"</div>");
+      $(messagedetail).html("\
+        <div style='background-color:red'>\
+          "+item["meta"]["subtitle"]+"\
+        </div>\
+        ");
     }
     $("#messages").append(messagedetail);
     return "ISSUE#"+item["msg"]["issue"]["id"]
   } else if (item["topic"].indexOf("io.pagure.prod.pagure.project") > -1 ){
     if (item["topic"]=="io.pagure.prod.pagure.project.forked"){
-      $("#messages").append("<div class='messagetitle m-t-2 p-t-2'><div class='messageicon'><span class='oi' data-glyph='fork'></span></div>"+item["msg"]["agent"]+" forked "+item["msg"]["project"]["name"]+" into <a href='"+item["meta"]["link"]+"'>"+item["msg"]["agent"]+"/"+item["msg"]["project"]["name"]+"</a></strong><div class='pull-xs-right'>"+item["meta"]["date"]+"</div></div>");
+      $("#messages").append("\
+        <div class='messagetitle m-t-2 p-t-2'>\
+          <div class='messageicon'>\
+            <span class='oi' data-glyph='fork'></span>\
+          </div>\
+          "+item["msg"]["agent"]+" forked "+item["msg"]["project"]["name"]+"\
+           into <a href='"+item["meta"]["link"]+"'>"+item["msg"]["agent"]+"\
+           /"+item["msg"]["project"]["name"]+"</a>\
+           <div class='pull-xs-right'>"+item["meta"]["date"]+"</div>\
+        </div>");
     } else {
-      $("#messages").append("<div style='background-color:red'>"+item["meta"]["subtitle"]+"</div>");
+      $("#messages").append("\
+        <div style='background-color:red'>\
+          "+item["meta"]["subtitle"]+"\
+        </div>");
     }
     return "";
   } else if (item["topic"].indexOf("io.pagure.prod.pagure.git") > -1 ){
     if (lastitem.valueOf() != new String("GITCOMMIT#"+item["msg"]["commit"]["branch"]).valueOf())
     {
-      $("#messages").append("<div class='messagetitle m-t-2 p-t-2'><div class='messageicon'><span class='oi' data-glyph='spreadsheet'></div></span>New commits to <strong><span class='pr-toplabel'> <span class='oi' data-glyph='random'> </span> "+item['msg']['commit']['branch'].replace("refs/heads/","")+"</span></strong><div class='pull-xs-right'>"+item["meta"]["date"]+"</div></div>");
+      $("#messages").append("\
+        <div class='messagetitle m-t-2 p-t-2'>\
+          <div class='messageicon'>\
+            <span class='oi' data-glyph='spreadsheet'></span>\
+          </div>\
+          New commits to <strong><span class='pr-toplabel'> \
+          <span class='oi' data-glyph='random'> </span> \
+          "+item['msg']['commit']['branch'].replace("refs/heads/","")+"\
+          </span></strong>\
+          <div class='pull-xs-right'>"+item["meta"]["date"]+"</div>\
+        </div>\
+        ");
     }
     if (item["topic"]=="io.pagure.prod.pagure.git.receive"){
       $("#messages").append("\
       <a href="+item["meta"]["link"]+">\
         <div class='messageitem'>\
-          <small>"+item["msg"]["commit"]["name"]+" <span class='activity-message text-muted'> committed </span></small><span class='label label-default msg-git-hash'>"+item["msg"]["commit"]["rev"].substring(0,6)+"</span><small> <span class='text-muted'>"+item["msg"]["commit"]["message"]+"</span> </small>\
+          <small>"+item["msg"]["commit"]["name"]+" \
+          <span class='activity-message text-muted'> committed </span></small>\
+          <span class='label label-default msg-git-hash'>\
+            "+item["msg"]["commit"]["rev"].substring(0,6)+"\
+          </span>\
+          <small> \
+          <span class='text-muted'>"+item["msg"]["commit"]["message"]+"</span> \
+          </small>\
         </div>\
       </a>");
       return "GITCOMMIT#"+item["msg"]["commit"]["branch"];
     } else {
-      $("#messages").append("<div style='background-color:red'>"+item["meta"]["subtitle"]+"</div>");
+      $("#messages").append("\
+      <div style='background-color:red'>\
+      "+item["meta"]["subtitle"]+"\
+      </div>");
     }
     return "";
   } else {
-    $("#messages").append("<div style='background-color:pink'>"+item["meta"]["subtitle"]+"</div>");
+    $("#messages").append("\
+    <div style='background-color:pink'>\
+    "+item["meta"]["subtitle"]+"\
+    </div>");
     return "";
   }
 }
