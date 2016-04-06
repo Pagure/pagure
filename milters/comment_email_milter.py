@@ -135,7 +135,7 @@ class PagureMilter(Milter.Base):
         email = msg['to']
         if 'reply+' in msg.get('cc'):
             email = msg['cc']
-        tohash= email.split('@')[0].split('+')[-1]
+        tohash = email.split('@')[0].split('+')[-1]
         if m.hexdigest() != tohash:
             self.log('hash: %s' % m.hexdigest())
             self.log('tohash:   %s' % tohash)
