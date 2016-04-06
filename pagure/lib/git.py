@@ -1256,7 +1256,7 @@ def get_git_tags_objects(project):
             if isinstance(theobject, pygit2.Tag):
                 commit_time = theobject.get_object().commit_time
                 objecttype = "tag"
-            elif isinstance(reference, pygit2.Commit):
+            elif isinstance(theobject, pygit2.Commit):
                 commit_time = theobject.commit_time
                 objecttype = "commit"
 

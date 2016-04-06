@@ -36,12 +36,12 @@
       <a class="list-group-item" href="{{ url_for('.view_tree',
                     username=username, repo=repo.name,
                     identifier=tag['object'].oid) }}">
-        <div class="pull-xs-right">{{tag['date'] }}
+        <div class="pull-xs-right">{{tag['date'] | humanize}}
           <span class="label label-default">{{ tag['object'].oid | short }}</span>
         </div>
         {% if tag['objecttype'] == "tag" %}
           {% if tag['object'].message %}
-            <strong>{{tag['name']}}</strong>
+            <strong>{{tag['tagname']}}</strong>
             {{ tag['object'].message.split('\n')[0] }}
             {% set detailtext = tag['object'].message.partition('\n')[2] %}
             {% if detailtext != "" %}
@@ -51,7 +51,7 @@
             {% endif %}
           {% endif %}
         {% else %}
-            <strong>{{tag['name']}}</strong>
+            <strong>{{tag['tagname']}}</strong>
         {% endif %}
       </a>
     {% endfor %}
