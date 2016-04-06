@@ -58,12 +58,12 @@ class PagureFlaskPluginPagureRequestHooktests(tests.Modeltests):
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
-            output = self.app.get('/test/settings/pagure requests')
+            output = self.app.get('/test/settings/Pagure requests')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
                 'test project #1        </div>', output.data)
-            self.assertTrue('<h3>pagure requests settings</h3>' in output.data)
+            self.assertTrue('<h3>Pagure requests settings</h3>' in output.data)
             self.assertTrue(
                 '<input id="active" name="active" type="checkbox" value="y">'
                 in output.data)
@@ -73,19 +73,19 @@ class PagureFlaskPluginPagureRequestHooktests(tests.Modeltests):
 
             data = {}
 
-            output = self.app.post('/test/settings/pagure requests', data=data)
+            output = self.app.post('/test/settings/Pagure requests', data=data)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
                 'test project #1        </div>', output.data)
-            self.assertTrue('<h3>pagure requests settings</h3>' in output.data)
+            self.assertTrue('<h3>Pagure requests settings</h3>' in output.data)
             self.assertTrue(
                 '<input id="active" name="active" type="checkbox" value="y">'
                 in output.data)
 
             data['csrf_token'] = csrf_token
             # No git found
-            output = self.app.post('/test/settings/pagure requests', data=data)
+            output = self.app.post('/test/settings/Pagure requests', data=data)
             self.assertEqual(output.status_code, 404)
 
             # Create both the requests repo
@@ -94,22 +94,22 @@ class PagureFlaskPluginPagureRequestHooktests(tests.Modeltests):
             # With the git repo
             tests.create_projects_git(tests.HERE)
             output = self.app.post(
-                '/test/settings/pagure requests', data=data,
+                '/test/settings/Pagure requests', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<section class="settings">\n  <h3>Settings for test</h3>',
                 output.data)
             self.assertTrue(
-                '</button>\n                      Hook pagure requests inactived'
+                '</button>\n                      Hook Pagure requests inactived'
                 in output.data)
 
-            output = self.app.get('/test/settings/pagure requests')
+            output = self.app.get('/test/settings/Pagure requests')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
                 'test project #1        </div>', output.data)
-            self.assertTrue('<h3>pagure requests settings</h3>' in output.data)
+            self.assertTrue('<h3>Pagure requests settings</h3>' in output.data)
             self.assertTrue(
                 '<input id="active" name="active" type="checkbox" value="y">'
                 in output.data)
@@ -125,22 +125,22 @@ class PagureFlaskPluginPagureRequestHooktests(tests.Modeltests):
             }
 
             output = self.app.post(
-                '/test/settings/pagure requests', data=data,
+                '/test/settings/Pagure requests', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<section class="settings">\n  <h3>Settings for test</h3>',
                 output.data)
             self.assertTrue(
-                '</button>\n                      Hook pagure requests activated'
+                '</button>\n                      Hook Pagure requests activated'
                 in output.data)
 
-            output = self.app.get('/test/settings/pagure requests')
+            output = self.app.get('/test/settings/Pagure requests')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
                 'test project #1        </div>', output.data)
-            self.assertTrue('<h3>pagure requests settings</h3>' in output.data)
+            self.assertTrue('<h3>Pagure requests settings</h3>' in output.data)
             self.assertTrue(
                 '<input checked id="active" name="active" type="checkbox" '
                 'value="y">' in output.data)
@@ -152,22 +152,22 @@ class PagureFlaskPluginPagureRequestHooktests(tests.Modeltests):
             # De-Activate hook
             data = {'csrf_token': csrf_token}
             output = self.app.post(
-                '/test/settings/pagure requests', data=data,
+                '/test/settings/Pagure requests', data=data,
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<section class="settings">\n  <h3>Settings for test</h3>',
                 output.data)
             self.assertTrue(
-                '</button>\n                      Hook pagure requests inactived'
+                '</button>\n                      Hook Pagure requests inactived'
                 in output.data)
 
-            output = self.app.get('/test/settings/pagure requests')
+            output = self.app.get('/test/settings/Pagure requests')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
                 'test project #1        </div>', output.data)
-            self.assertTrue('<h3>pagure requests settings</h3>' in output.data)
+            self.assertTrue('<h3>Pagure requests settings</h3>' in output.data)
             self.assertTrue(
                 '<input id="active" name="active" type="checkbox" '
                 'value="y">' in output.data)
@@ -183,7 +183,7 @@ class PagureFlaskPluginPagureRequestHooktests(tests.Modeltests):
             }
             shutil.rmtree(os.path.join(tests.HERE, 'requests', 'test.git'))
 
-            output = self.app.post('/test/settings/pagure requests', data=data)
+            output = self.app.post('/test/settings/Pagure requests', data=data)
             self.assertEqual(output.status_code, 404)
 
 

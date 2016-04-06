@@ -71,7 +71,7 @@ class PagureFlaskPluginstests(tests.Modeltests):
             sorted(names),
             [
                 'Block non fast-forward pushes', 'Fedmsg', 'IRC', 'Mail',
-                'Read the Doc', 'pagure', 'pagure requests', 'pagure tickets'
+                'Pagure', 'Pagure requests', 'Pagure tickets', 'Read the Doc',
             ]
         )
 
