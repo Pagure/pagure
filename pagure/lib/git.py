@@ -1246,26 +1246,30 @@ def get_git_tags_objects(project):
     The list is sorted using the time of the commit associated to the tag """
     repopath = pagure.get_repo_path(project)
     repo_obj = PagureRepo(repopath)
-    tags = [
-        [repo_obj[repo_obj.lookup_reference(tag).target], tag.replace("refs/tags/","")]
-        for tag in repo_obj.listall_references()
-        if 'refs/tags/' in tag and repo_obj.lookup_reference(tag)
-    ]
+    tags = {}
+    for tag in repo_obj.listall_references():
+        if 'refs/tags/' in tag and repo_obj.lookup_reference(tag):
+            commit_time = ""
+            theobject = repo_obj[repo_obj.lookup_reference(tag).target]
+            objecttype = ""
+            print theobject
+            if isinstance(theobject, pygit2.Tag):
+                commit_time = theobject.get_object().commit_time
+                objecttype = "tag"
+            elif isinstance(reference, pygit2.Commit):
+                commit_time = theobject.commit_time
+                objecttype = "commit"
 
+            tags[commit_time] = {
+                "object":repo_obj[repo_obj.lookup_reference(tag).target],
+                "tagname":tag.replace("refs/tags/",""),
+                "date":commit_time,
+                "objecttype": objecttype
+                }
+            print tags
     sorted_tags = []
-    tags_sort = {}
 
-    for tag in tags:
-        # If the object is a tag, get his associated commit time
-        if isinstance(tag[0], pygit2.Tag):
-            tags_sort[tag[0].get_object().commit_time] = [tag[0].get_object().commit_time, tag[0]]
-        elif isinstance(tag[0], pygit2.Commit):
-            tags_sort[tag[0].commit_time] = [tag[0].commit_time, tag[0], tag[1]]
-        # If object is neither a tag or commit return an unsorted list
-        else:
-            return tags
-
-    for tag in sorted(tags_sort, reverse=True):
-        sorted_tags.append(tags_sort[tag])
+    for tag in sorted(tags, reverse=True):
+        sorted_tags.append(tags[tag])
 
     return sorted_tags

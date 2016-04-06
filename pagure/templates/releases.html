@@ -33,14 +33,17 @@
   {% if tags %}
   <div class="list-group">
     {% for tag in tags %}
-      <a class="list-group-item" href="{{ url_for('.view_tree', username=username, repo=repo.name,
-                          identifier=tag[1].oid) }}">
-        <div class="pull-xs-right">{{tag[0] | humanize }} <span class="label label-default">{{ tag[1].oid | short }}</span> </div>
-        {% if tag|length == 2 %}
-          {% if tag[1].message %}
-            <strong>{{tag[1].name}}</strong>
-            {{ tag[1].message.split('\n')[0] }}
-            {% set detailtext = tag[1].message.partition('\n')[2] %}
+      <a class="list-group-item" href="{{ url_for('.view_tree',
+                    username=username, repo=repo.name,
+                    identifier=tag['object'].oid) }}">
+        <div class="pull-xs-right">{{tag['date'] }}
+          <span class="label label-default">{{ tag['object'].oid | short }}</span>
+        </div>
+        {% if tag['objecttype'] == "tag" %}
+          {% if tag['object'].message %}
+            <strong>{{tag['name']}}</strong>
+            {{ tag['object'].message.split('\n')[0] }}
+            {% set detailtext = tag['object'].message.partition('\n')[2] %}
             {% if detailtext != "" %}
             <div style="white-space:pre-wrap">
               {{ detailtext }}
@@ -48,7 +51,7 @@
             {% endif %}
           {% endif %}
         {% else %}
-            <strong>{{tag[2]}}</strong>
+            <strong>{{tag['name']}}</strong>
         {% endif %}
       </a>
     {% endfor %}
