@@ -1252,7 +1252,6 @@ def get_git_tags_objects(project):
             commit_time = ""
             theobject = repo_obj[repo_obj.lookup_reference(tag).target]
             objecttype = ""
-            print theobject
             if isinstance(theobject, pygit2.Tag):
                 commit_time = theobject.get_object().commit_time
                 objecttype = "tag"
@@ -1266,7 +1265,6 @@ def get_git_tags_objects(project):
                 "date":commit_time,
                 "objecttype": objecttype
                 }
-            print tags
     sorted_tags = []
 
     for tag in sorted(tags, reverse=True):
