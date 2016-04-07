@@ -37,7 +37,7 @@
                     username=username, repo=repo.name,
                     identifier=tag['object'].oid) }}">
         <div class="pull-xs-right">{{tag['date'] | humanize}}
-          <span class="label label-default">{{ tag['object'].oid | short }}</span>
+          <span id="tagid" class="label label-default">{{ tag['object'].oid | short }}</span>
         </div>
         {% if tag['objecttype'] == "tag" %}
           {% if tag['object'].message %}

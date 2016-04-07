@@ -26,7 +26,7 @@ def get_tag_name(tags):
     """ Return a list of the tag names """
     output = []
     for tag in tags:
-        output.append(tag.name)
+        output.append(tag['tagname'])
     return output
 
 

@@ -1770,7 +1770,7 @@ index 0000000..fb7093d
         output = self.app.get('/test/releases')
         self.assertEqual(output.status_code, 200)
         self.assertIn('0.0.1', output.data)
-        self.assertIn('<span class="tagid">', output.data)
+        self.assertIn('<span id="tagid" class="label label-default">', output.data)
         self.assertTrue(output.data.count('tagid'), 1)
 
     def test_edit_file(self):
