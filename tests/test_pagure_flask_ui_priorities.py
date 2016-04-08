@@ -329,6 +329,24 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '/test/update/priorities', data=data)
             self.assertEqual(output.status_code, 404)
 
+            # Check for an invalid project
+            output = self.app.post(
+                '/foo/update/priorities', data=data)
+            self.assertEqual(output.status_code, 404)
+
+        # Check for a non-admin user
+        settings = repo.settings
+        settings['issue_tracker'] = True
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        user.username = 'ralph'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post(
+                '/test/update/priorities', data=data)
+            self.assertEqual(output.status_code, 403)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
