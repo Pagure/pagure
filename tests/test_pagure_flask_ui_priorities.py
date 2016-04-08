@@ -150,6 +150,185 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             self.assertIn('<div id="priority_plain">', output.data)
             self.assertIn('<option value="1">High</option>', output.data)
 
+    def test_update_priorities(self):
+        """ Test updating priorities of a repo. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(tests.HERE), bare=True)
+
+        # Set some priorities
+        repo = pagure.lib.get_project(self.session, 'test')
+        self.assertEqual(repo.priorities, {})
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+
+            # Get the CSRF token
+            output = self.app.get('/test/settings')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+                'priority_weigth': 1,
+                'priority_title': 'High',
+            }
+            output = self.app.post(
+                '/test/update/priorities', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            # Check the redirect
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+            # Check the result of the action -- None, no CSRF
+            repo = pagure.lib.get_project(self.session, 'test')
+            self.assertEqual(repo.priorities, {})
+
+            data = {
+                'priority_weigth': 1,
+                'priority_title': 'High',
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/update/priorities', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            # Check the redirect
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+            # Check the result of the action -- Priority recorded
+            repo = pagure.lib.get_project(self.session, 'test')
+            self.assertEqual(repo.priorities, {u'1': u'High'})
+
+            data = {
+                'priority_weigth': [1, 2, 3],
+                'priority_title': ['High', 'Normal', 'Low'],
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/update/priorities', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            # Check the redirect
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+            # Check the result of the action -- Priority recorded
+            repo = pagure.lib.get_project(self.session, 'test')
+            self.assertEqual(
+                repo.priorities,
+                {u'1': u'High', u'2': u'Normal', u'3': u'Low'}
+            )
+
+            # Check error - less weigths than titles
+            data = {
+                'priority_weigth': [1, 2],
+                'priority_title': ['High', 'Normal', 'Low'],
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/update/priorities', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            # Check the redirect
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+            self.assertIn(
+                '</button>\n'
+                '                      Priorities weights and titles are '
+                'not of the same length', output.data)            # Check the result of the action -- Priorities un-changed
+            repo = pagure.lib.get_project(self.session, 'test')
+            self.assertEqual(
+                repo.priorities,
+                {u'1': u'High', u'2': u'Normal', u'3': u'Low'}
+            )
+
+            # Check error - weigths must be integer
+            data = {
+                'priority_weigth': [1, 2, 'c'],
+                'priority_title': ['High', 'Normal', 'Low'],
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/update/priorities', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            # Check the redirect
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+            self.assertIn(
+                '</button>\n'
+                '                      Priorities weights must be numbers',
+                output.data)
+            # Check the result of the action -- Priorities un-changed
+            repo = pagure.lib.get_project(self.session, 'test')
+            self.assertEqual(
+                repo.priorities,
+                {u'1': u'High', u'2': u'Normal', u'3': u'Low'}
+            )
+
+            # Check error - Twice the same priority weigth
+            data = {
+                'priority_weigth': [1, 2, 2],
+                'priority_title': ['High', 'Normal', 'Low'],
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/update/priorities', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            # Check the redirect
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+            self.assertIn(
+                '</button>\n'
+                '                      Priority weight 2 is present 2 times',
+                output.data)
+            # Check the result of the action -- Priorities un-changed
+            repo = pagure.lib.get_project(self.session, 'test')
+            self.assertEqual(
+                repo.priorities,
+                {u'1': u'High', u'2': u'Normal', u'3': u'Low'}
+            )
+
+            # Check error - Twice the same priority title
+            data = {
+                'priority_weigth': [1, 2, 3],
+                'priority_title': ['High', 'Normal', 'Normal'],
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/update/priorities', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            # Check the redirect
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+            self.assertIn(
+                '</button>\n'
+                '                      Priority Normal is present 2 times',
+                output.data)
+            # Check the result of the action -- Priorities un-changed
+            repo = pagure.lib.get_project(self.session, 'test')
+            self.assertEqual(
+                repo.priorities,
+                {u'1': u'High', u'2': u'Normal', u'3': u'Low'}
+            )
+
+            # Check the behavior if the project disabled the issue tracker
+            settings = repo.settings
+            settings['issue_tracker'] = False
+            repo.settings = settings
+            self.session.add(repo)
+            self.session.commit()
+
+            output = self.app.post(
+                '/test/update/priorities', data=data)
+            self.assertEqual(output.status_code, 404)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
