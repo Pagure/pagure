@@ -943,6 +943,9 @@ def update_priorities(repo, username=None):
     if not repo:
         flask.abort(404, 'Project not found')
 
+    if not repo.settings.get('issue_tracker', True):
+        flask.abort(404, 'No issue tracker found for this project')
+
     if not is_repo_admin(repo):
         flask.abort(
             403,
@@ -1010,6 +1013,7 @@ def update_priorities(repo, username=None):
 
     return flask.redirect(flask.url_for(
         'view_settings', username=username, repo=repo.name))
+
 
 @APP.route('/<repo>/default/branch/', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/default/branch/', methods=['POST'])
