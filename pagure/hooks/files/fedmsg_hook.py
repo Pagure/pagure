@@ -63,7 +63,6 @@ for line in sys.stdin.readlines():
         pusher = search_user(pagure.SESSION, email=email) or name
         pushers.add(pusher)
 
-
     if revs:
         revs.reverse()
         print "* Publishing information for %i commits" % len(revs)
