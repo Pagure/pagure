@@ -56,12 +56,12 @@ for line in sys.stdin.readlines():
     if not project:
         project = project_name
 
-    pushers = set()
+    authors = set()
     for rev in revs:
         email = pagure.lib.git.get_pusher_email(rev, abspath)
         name = pagure.lib.git.get_pusher(rev, abspath)
-        pusher = search_user(pagure.SESSION, email=email) or name
-        pushers.add(pusher)
+        author = search_user(pagure.SESSION, email=email) or name
+        authors.add(author)
 
     if revs:
         revs.reverse()
@@ -75,7 +75,7 @@ for line in sys.stdin.readlines():
                 end_commit=revs[-1],
                 branch=refname,
                 forced=forced,
-                users=list(pushers),
+                authors=list(authors),
                 agent=username,
                 repo=project.to_json(public=True)
                 if not isinstance(project, basestring) else project,
