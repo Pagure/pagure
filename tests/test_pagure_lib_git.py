@@ -1260,8 +1260,8 @@ index 0000000..60f7480
             from_hash, to_hash, gitrepo)
         self.assertEqual(output2, [to_hash])
 
-    def test_get_pusher(self):
-        """ Test the get_pusher method of pagure.lib.git. """
+    def test_get_author(self):
+        """ Test the get_author method of pagure.lib.git. """
 
         self.test_update_git()
 
@@ -1271,11 +1271,11 @@ index 0000000..60f7480
         self.assertEqual(len(output), 2)
         for githash in output:
             githash = githash.replace("'", '')
-            output = pagure.lib.git.get_pusher(githash, gitrepo)
+            output = pagure.lib.git.get_author(githash, gitrepo)
             self.assertEqual(output, 'pagure')
 
-    def test_get_pusher_email(self):
-        """ Test the get_pusher_email method of pagure.lib.git. """
+    def get_author_email(self):
+        """ Test the get_author_email method of pagure.lib.git. """
 
         self.test_update_git()
 
@@ -1285,7 +1285,7 @@ index 0000000..60f7480
         self.assertEqual(len(output), 2)
         for githash in output:
             githash = githash.replace("'", '')
-            output = pagure.lib.git.get_pusher_email(githash, gitrepo)
+            output = pagure.lib.git.get_author_email(githash, gitrepo)
             self.assertEqual(output, 'pagure')
 
     def test_get_repo_name(self):
