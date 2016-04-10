@@ -58,8 +58,8 @@ for line in sys.stdin.readlines():
 
     authors = set()
     for rev in revs:
-        email = pagure.lib.git.get_pusher_email(rev, abspath)
-        name = pagure.lib.git.get_pusher(rev, abspath)
+        email = pagure.lib.git.get_author_email(rev, abspath)
+        name = pagure.lib.git.get_author(rev, abspath)
         author = search_user(pagure.SESSION, email=email) or name
         authors.add(author)
 

@@ -74,7 +74,7 @@ def relates_commit(commitid, issue, app_url=None):
             pagure.SESSION,
             issue=issue,
             comment=comment,
-            user=pagure.lib.git.get_pusher_email(commitid, abspath),
+            user=pagure.lib.git.get_author_email(commitid, abspath),
             ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
         )
         pagure.SESSION.commit()
@@ -107,7 +107,7 @@ def fixes_relation(commitid, relation, app_url=None):
                 pagure.SESSION,
                 issue=relation,
                 comment=comment,
-                user=pagure.lib.git.get_pusher_email(commitid, abspath),
+                user=pagure.lib.git.get_author_email(commitid, abspath),
                 ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
             )
         elif relation.isa == 'pull-request':
@@ -119,7 +119,7 @@ def fixes_relation(commitid, relation, app_url=None):
                 filename=None,
                 row=None,
                 comment=comment,
-                user=pagure.lib.git.get_pusher_email(commitid, abspath),
+                user=pagure.lib.git.get_author_email(commitid, abspath),
                 requestfolder=pagure.APP.config['REQUESTS_FOLDER'],
             )
         pagure.SESSION.commit()
@@ -142,14 +142,14 @@ def fixes_relation(commitid, relation, app_url=None):
                     pagure.SESSION,
                     relation,
                     ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
-                    user=pagure.lib.git.get_pusher_email(commitid, abspath),
+                    user=pagure.lib.git.get_author_email(commitid, abspath),
                     status='Fixed')
             elif relation.isa == 'pull-request':
                 pagure.lib.close_pull_request(
                     pagure.SESSION,
                     relation,
                     requestfolder=pagure.APP.config['REQUESTS_FOLDER'],
-                    user=pagure.lib.git.get_pusher_email(commitid, abspath),
+                    user=pagure.lib.git.get_author_email(commitid, abspath),
                     merged=True)
             pagure.SESSION.commit()
         except pagure.exceptions.PagureException as err:

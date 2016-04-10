@@ -887,16 +887,16 @@ def get_default_branch(abspath):
         return 'master'
 
 
-def get_pusher(commit, abspath):
-    ''' Return the name of the person that pushed the commit. '''
+def get_author(commit, abspath):
+    ''' Return the name of the person that authored the commit. '''
     user = pagure.lib.git.read_git_lines(
         ['log', '-1', '--pretty=format:"%an"', commit],
         abspath)[0].replace('"', '')
     return user
 
 
-def get_pusher_email(commit, abspath):
-    ''' Return the email of the person that pushed the commit. '''
+def get_author_email(commit, abspath):
+    ''' Return the email of the person that authored the commit. '''
     user = pagure.lib.git.read_git_lines(
         ['log', '-1', '--pretty=format:"%ae"', commit],
         abspath)[0].replace('"', '')
