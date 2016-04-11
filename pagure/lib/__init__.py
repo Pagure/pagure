@@ -1179,9 +1179,14 @@ def edit_issue(session, issue, ticketfolder, user,
     if status and status != issue.status:
         issue.status = status
         edit.append('status')
-    if priority and priority != issue.priority:
-        issue.priority = priority
-        edit.append('priority')
+    if priority:
+        try:
+            priority = int(priority)
+        except:
+            priority = None
+        if priority != issue.priority:
+            issue.priority = priority
+            edit.append('priority')
     if private in [True, False] and private != issue.private:
         issue.private = private
         edit.append('private')
