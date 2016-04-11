@@ -2326,14 +2326,23 @@ index 0000000..fb7093d
 
     def test_view_project_activity(self):
         """ Test the view_project_activity endpoint. """
-        output = self.app.get('/foo/activity/')
-        # project doesnt exist
-        self.assertEqual(output.status_code, 404)
-
         tests.create_projects(self.session)
 
-        output = self.app.get('/test/activity/')
         # Project Exists, but No DATAGREPPER_URL set
+        output = self.app.get('/test/activity/')
+        self.assertEqual(output.status_code, 404)
+
+        # Project Exists, and DATAGREPPER_URL set
+        pagure.APP.config['DATAGREPPER_URL'] = 'foo'
+        output = self.app.get('/test/activity/')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(
+            '<title>Activity - test - Pagure</title>', output.data)
+        self.assertIn(
+            'No activity reported on the test project', output.data)
+
+        # project doesnt exist
+        output = self.app.get('/foo/activity/')
         self.assertEqual(output.status_code, 404)
 
 
