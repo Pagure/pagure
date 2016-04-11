@@ -17,7 +17,7 @@ if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
-
+import pagure
 import pagure.lib.git
 
 
