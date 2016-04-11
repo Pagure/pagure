@@ -1508,8 +1508,7 @@ def get_project(session, name, user=None):
 def search_issues(
         session, repo, issueid=None, issueuid=None, status=None,
         closed=False, tags=None, assignee=None, author=None, private=None,
-        priority=None,
-        count=False):
+        priority=None, count=False):
     ''' Retrieve one or more issues associated to a project with the given
     criterias.
 
