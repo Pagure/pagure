@@ -95,10 +95,7 @@ def write_gitolite_acls(session, configfile):
 
         for repos in ['repos', 'docs/', 'tickets/', 'requests/']:
             if repos == 'repos':
-                if project.parent_id:
-                    repos = 'forks/'
-                else:
-                    repos = ''
+                repos = ''
 
             config.append('repo %s%s' % (repos, project.fullname))
             if repos not in ['tickets/', 'requests/']:
