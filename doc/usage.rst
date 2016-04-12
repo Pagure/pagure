@@ -38,11 +38,11 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   first_steps
-   project_settings
-   using_doc
-   using_webhooks
-   ticket_templates
-   pr_custom_page
-   theming
-   upgrade_db
+   usage/first_steps
+   usage/project_settings
+   usage/using_doc
+   usage/using_webhooks
+   usage/ticket_templates
+   usage/pr_custom_page
+   usage/theming
+   usage/upgrade_db
