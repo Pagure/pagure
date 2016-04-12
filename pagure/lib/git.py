@@ -732,7 +732,7 @@ def update_file_in_git(
 
     # Write down what changed
     with open(file_path, 'w') as stream:
-        stream.write(content.replace('\r', ''))
+        stream.write(content.replace('\r', '').encode('utf-8'))
 
     # Retrieve the list of files that changed
     diff = new_repo.diff()
