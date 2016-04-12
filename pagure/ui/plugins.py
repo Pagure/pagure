@@ -52,17 +52,17 @@ def get_plugin(plugin_name):
             return plugin
 
 
-@APP.route('/<repo>/settings/<plugin>/', methods=('GET', 'POST'))
-@APP.route('/<repo>/settings/<plugin>', methods=('GET', 'POST'))
-@APP.route('/<repo>/settings/<plugin>/<int:full>/', methods=('GET', 'POST'))
-@APP.route('/<repo>/settings/<plugin>/<int:full>', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/settings/<plugin>/',
+@APP.route('/<repo:repo>/settings/<plugin>/', methods=('GET', 'POST'))
+@APP.route('/<repo:repo>/settings/<plugin>', methods=('GET', 'POST'))
+@APP.route('/<repo:repo>/settings/<plugin>/<int:full>/', methods=('GET', 'POST'))
+@APP.route('/<repo:repo>/settings/<plugin>/<int:full>', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo:repo>/settings/<plugin>/',
            methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/settings/<plugin>',
+@APP.route('/fork/<username>/<repo:repo>/settings/<plugin>',
            methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/settings/<plugin>/<int:full>/',
+@APP.route('/fork/<username>/<repo:repo>/settings/<plugin>/<int:full>/',
            methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/settings/<plugin>/<int:full>',
+@APP.route('/fork/<username>/<repo:repo>/settings/<plugin>/<int:full>',
            methods=('GET', 'POST'))
 @login_required
 def view_plugin(repo, plugin, username=None, full=True):
