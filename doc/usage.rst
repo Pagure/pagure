@@ -45,3 +45,4 @@ Contents:
    ticket_templates
    pr_custom_page
    theming
+   upgrade_db
