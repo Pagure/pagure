@@ -117,17 +117,18 @@ repo forks/pingou/test3
   R   = @all
   RW+ = pingou
 
-repo docs/pingou/test3
+repo docs/forks/pingou/test3
   R   = @all
   RW+ = pingou
 
-repo tickets/pingou/test3
+repo tickets/forks/pingou/test3
   RW+ = pingou
 
-repo requests/pingou/test3
+repo requests/forks/pingou/test3
   RW+ = pingou
 
 """
+        #print data
         self.assertEqual(data, exp)
 
         os.unlink(outputconf)
@@ -251,17 +252,18 @@ repo forks/pingou/test2
   R   = @all
   RW+ = pingou
 
-repo docs/pingou/test2
+repo docs/forks/pingou/test2
   R   = @all
   RW+ = pingou
 
-repo tickets/pingou/test2
+repo tickets/forks/pingou/test2
   RW+ = pingou
 
-repo requests/pingou/test2
+repo requests/forks/pingou/test2
   RW+ = pingou
 
 """
+        #print data
         self.assertEqual(data.split('\n'), exp.split('\n'))
 
         os.unlink(outputconf)
