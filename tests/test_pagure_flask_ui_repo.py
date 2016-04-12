@@ -1077,7 +1077,6 @@ class PagureFlaskRepotests(tests.Modeltests):
             '<span style="color: #00A000">+ ======</span>' in output.data)
 
         # View first commit - with the old URL scheme disabled - default
-        pagure.APP.config['OLD_VIEW_COMMIT_ENABLED'] = False
         output = self.app.get(
             '/test/%s' % commit.oid.hex, follow_redirects=True)
         self.assertEqual(output.status_code, 404)
