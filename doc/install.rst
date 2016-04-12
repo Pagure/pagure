@@ -229,3 +229,31 @@ For example:
 
 This will tell ``/usr/share/pagure/pagure_createdb.py`` to use the database
 information specified in the file ``/etc/pagure/pagure.cfg``.
+
+* Stamp the alembic revision
+
+For changes to existing tables, we rely on `Alembic <http://alembic.readthedocs.org/>`_.
+It uses `revisions` to perform the upgrades, but to know which upgrades are
+needed and which are already done, the current revision needs to be saved
+in the database. This will allow alembic to know apply the new revision when
+running it.
+
+You can save the current revision in the database using the following command:
+::
+
+    cd /etc/pagure
+    alembic stamp $(alembic heads |awk '{ print $1 }')
+
+The ``cd /etc/pagure`` is needed as the command must be run in the folder
+where is the file ``alembic.ini``. This file contains two important
+information:
+
+* ``sqlalchemy.url`` which is the URL used to connect to the database, likely
+the same URL as the one in ``pagure.cfg``.
+* ``script_location`` which is the path to the ``versions`` folder containing
+all the alembic migration files.
+
+The ``alembic stamp`` command is the one actually saving the current revision
+into the database. This current revision is found using ``alembic heads``
+which returns the most recent revision found by alembic, and since the
+database was just created, it is at the latest revision.
