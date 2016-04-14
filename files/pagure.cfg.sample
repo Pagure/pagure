@@ -200,6 +200,6 @@ APPLICATION_ROOT = '/'
 
 # Allow the backward compatiblity endpoints for the old URLs schema to
 # see the commits of a repo. This is only interesting if you pagure instance
-# was running since before version 1.3 and if you can about backward
+# was running since before version 1.3 and if you care about backward
 # compatibility in your URLs.
 OLD_VIEW_COMMIT_ENABLED = False
