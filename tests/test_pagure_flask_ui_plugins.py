@@ -70,8 +70,9 @@ class PagureFlaskPluginstests(tests.Modeltests):
         self.assertEqual(
             sorted(names),
             [
-                'Block non fast-forward pushes', 'Fedmsg', 'IRC', 'Mail',
-                'Pagure', 'Pagure requests', 'Pagure tickets', 'Read the Doc',
+                'Block Un-Signed commits',  'Block non fast-forward pushes',
+                'Fedmsg', 'IRC', 'Mail', 'Pagure', 'Pagure requests',
+                'Pagure tickets', 'Read the Doc',
             ]
         )
 
