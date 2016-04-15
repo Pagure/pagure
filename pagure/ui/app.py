@@ -380,6 +380,7 @@ def new_project():
                 avatar_email=avatar_email,
                 user=flask.g.fas_user.username,
                 blacklist=APP.config['BLACKLISTED_PROJECTS'],
+                allowed_prefix=APP.config['ALLOWED_PREFIX'],
                 gitfolder=APP.config['GIT_FOLDER'],
                 docfolder=APP.config['DOCS_FOLDER'],
                 ticketfolder=APP.config['TICKETS_FOLDER'],

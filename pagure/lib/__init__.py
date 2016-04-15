@@ -951,7 +951,7 @@ def add_pull_request_flag(session, request, username, percent, comment, url,
     return 'Flag %s' % action
 
 
-def new_project(session, user, name, blacklist,
+def new_project(session, user, name, blacklist, allowed_prefix,
                 gitfolder, docfolder, ticketfolder, requestfolder,
                 description=None, url=None, avatar_email=None,
                 parent_id=None):
@@ -963,7 +963,14 @@ def new_project(session, user, name, blacklist,
             'conflicts in URLs with pagure itself' % name
         )
 
-    second_part = name.partition('/')[2]
+    user_obj = __get_user(session, user)
+    allowed_prefix += [user] + [grp.name for grp in user_obj.groups]
+
+    first_part, _, second_part = name.partition('/')
+    if first_part not in allowed_prefix:
+        raise pagure.exceptions.PagureException(
+            'Your project name may not start with `forks/`.'
+        )
     if len(second_part) == 40:
         raise pagure.exceptions.PagureException(
             'Your project name cannot have exactly 40 characters after '
@@ -975,8 +982,6 @@ def new_project(session, user, name, blacklist,
         raise pagure.exceptions.RepoExistsException(
             'The project repo "%s" already exists' % name
         )
-
-    user_obj = __get_user(session, user)
 
     project = model.Project(
         name=name,

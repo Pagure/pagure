@@ -184,6 +184,9 @@ BLACKLISTED_PROJECTS = [
     'static', 'pv', 'releases', 'new', 'api', 'settings',
     'logout', 'login', 'users', 'groups', 'projects', 'ssh_info']
 
+# List of prefix allowed in project names
+ALLOWED_PREFIX = []
+
 ACLS = {
     'issue_create': 'Create a new ticket against this project',
     'issue_change_status': 'Change the status of a ticket of this project',
