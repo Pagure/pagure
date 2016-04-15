@@ -964,12 +964,14 @@ def new_project(session, user, name, blacklist, allowed_prefix,
         )
 
     user_obj = __get_user(session, user)
-    allowed_prefix = allowed_prefix + [user] + [grp.name for grp in user_obj.groups]
+    allowed_prefix = allowed_prefix + [grp.name for grp in user_obj.groups]
 
     first_part, _, second_part = name.partition('/')
     if second_part and first_part not in allowed_prefix:
         raise pagure.exceptions.PagureException(
-            'The prefix of you project must be in `%s`.' % allowed_prefix
+            'The prefix of you project must be in the list of allowed '
+            'prefix set by the admins of this pagure instance, or the name '
+            'of a group that you are part of.'
         )
     if len(second_part) == 40:
         raise pagure.exceptions.PagureException(
