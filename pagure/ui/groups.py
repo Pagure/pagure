@@ -231,6 +231,7 @@ def add_group():
                 group_type=form.group_type.data,
                 user=flask.g.fas_user.username,
                 is_admin=pagure.is_admin(),
+                blacklist=pagure.APP.config['BLACKLISTED_GROUPS'],
             )
             pagure.SESSION.commit()
             flask.flash('Group `%s` created.' % group_name)
