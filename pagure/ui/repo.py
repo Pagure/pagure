@@ -473,7 +473,7 @@ def view_file(repo, identifier, filename, username=None):
 @APP.route('/<repo:repo>/raw/<path:identifier>/f/<path:filename>')
 @APP.route('/fork/<username>/<repo:repo>/raw/<path:identifier>',
            defaults={'filename': None})
-@APP.route('/fork/<username>/<repo>/raw/<path:identifier>/f/<path:filename>')
+@APP.route('/fork/<username>/<repo:repo>/raw/<path:identifier>/f/<path:filename>')
 def view_raw_file(repo, identifier, filename=None, username=None):
     """ Displays the raw content of a file of a commit for the specified repo.
     """
@@ -578,8 +578,8 @@ if APP.config.get('OLD_VIEW_COMMIT_ENABLED', False):
 
 @APP.route('/<repo:repo>/c/<commitid>/')
 @APP.route('/<repo:repo>/c/<commitid>')
-@APP.route('/fork/<username>/<repo>/c/<commitid>/')
-@APP.route('/fork/<username>/<repo>/c/<commitid>')
+@APP.route('/fork/<username>/<repo:repo>/c/<commitid>/')
+@APP.route('/fork/<username>/<repo:repo>/c/<commitid>')
 def view_commit(repo, commitid, username=None):
     """ Render a commit in a repo
     """
@@ -940,8 +940,8 @@ def update_project(repo, username=None):
         'view_settings', username=username, repo=repo.name))
 
 
-@APP.route('/<repo>/update/priorities', methods=['POST'])
-@APP.route('/fork/<username>/<repo>/update/priorities', methods=['POST'])
+@APP.route('/<repo:repo>/update/priorities', methods=['POST'])
+@APP.route('/fork/<username>/<repo:repo>/update/priorities', methods=['POST'])
 @login_required
 def update_priorities(repo, username=None):
     """ Update the priorities of a project.
@@ -1654,8 +1654,8 @@ def view_docs(repo, username=None, filename=None):
         select='docs',
     )
 
-@APP.route('/<repo>/activity/')
-@APP.route('/<repo>/activity')
+@APP.route('/<repo:repo>/activity/')
+@APP.route('/<repo:repo>/activity')
 def view_project_activity(repo):
     """ Display the activity feed
     """
