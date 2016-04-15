@@ -149,6 +149,7 @@ repo requests/forks/pingou/test3
             group_type='user',
             user='pingou',
             is_admin=False,
+            blacklist=[],
         )
         self.session.commit()
         self.assertEqual(msg, 'User `pingou` added to the group `sysadmin`.')
@@ -158,6 +159,7 @@ repo requests/forks/pingou/test3
             group_type='user',
             user='pingou',
             is_admin=False,
+            blacklist=[],
         )
         self.session.commit()
         self.assertEqual(msg, 'User `pingou` added to the group `devs`.')

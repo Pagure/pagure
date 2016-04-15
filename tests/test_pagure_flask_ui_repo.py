@@ -172,6 +172,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             group_type='bar',
             user='pingou',
             is_admin=False,
+            blacklist=pagure.APP.config['BLACKLISTED_GROUPS'],
         )
         self.session.commit()
         self.assertEqual(msg, 'User `pingou` added to the group `foo`.')

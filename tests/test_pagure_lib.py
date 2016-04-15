@@ -1860,6 +1860,7 @@ class PagureLibtests(tests.Modeltests):
             group_type='bar',
             user='pingou',
             is_admin=True,
+            blacklist=[],
         )
         groups = pagure.lib.search_groups(self.session)
         self.assertEqual(len(groups), 0)
@@ -1874,6 +1875,7 @@ class PagureLibtests(tests.Modeltests):
             group_type='user',
             user='test',
             is_admin=False,
+            blacklist=[],
         )
         groups = pagure.lib.search_groups(self.session)
         self.assertEqual(len(groups), 0)
@@ -1885,6 +1887,7 @@ class PagureLibtests(tests.Modeltests):
             group_type='bar',
             user='pingou',
             is_admin=False,
+            blacklist=[],
         )
         self.session.commit()
         self.assertEqual(msg, 'User `pingou` added to the group `foo`.')
@@ -1902,6 +1905,19 @@ class PagureLibtests(tests.Modeltests):
             group_type='bar',
             user='pingou',
             is_admin=False,
+            blacklist=[],
+        )
+
+        # Group with this name is blacklisted exists
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.add_group,
+            self.session,
+            group_name='forks',
+            group_type='bar',
+            user='pingou',
+            is_admin=False,
+            blacklist=['forks'],
         )
 
     def test_add_user_to_group(self):
@@ -2021,6 +2037,7 @@ class PagureLibtests(tests.Modeltests):
             group_type='bar',
             user='pingou',
             is_admin=False,
+            blacklist=[],
         )
         self.session.commit()
         self.assertEqual(msg, 'User `pingou` added to the group `foo`.')
@@ -2035,6 +2052,7 @@ class PagureLibtests(tests.Modeltests):
             group_type='admin',
             user='pingou',
             is_admin=True,
+            blacklist=[],
         )
         self.session.commit()
         self.assertEqual(msg, 'User `pingou` added to the group `bar`.')
