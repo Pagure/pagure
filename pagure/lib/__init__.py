@@ -963,6 +963,13 @@ def new_project(session, user, name, blacklist,
             'conflicts in URLs with pagure itself' % name
         )
 
+    second_part = name.partition('/')[2]
+    if len(second_part) == 40:
+        raise pagure.exceptions.PagureException(
+            'Your project name cannot have exactly 40 characters after '
+            'the `/`'
+        )
+
     gitrepo = os.path.join(gitfolder, '%s.git' % name)
     if os.path.exists(gitrepo):
         raise pagure.exceptions.RepoExistsException(
