@@ -119,8 +119,10 @@ class PagureFlaskSlashInNametests(tests.Modeltests):
             '<p>The Project Creator has not pushed any code yet</p>',
             output.data)
 
-        # Create the project `forks/test`
-        message = pagure.lib.new_project(
+        # We can't create the project `forks/test` the normal way
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.new_project,
             self.session,
             name='forks/test',
             description='test project forks/test',
@@ -128,13 +130,26 @@ class PagureFlaskSlashInNametests(tests.Modeltests):
             avatar_email='',
             user='pingou',
             blacklist=pagure.APP.config['BLACKLISTED_PROJECTS'],
+            allowed_prefix=pagure.APP.config['ALLOWED_PREFIX'],
             gitfolder=pagure.APP.config['GIT_FOLDER'],
             docfolder=pagure.APP.config['DOCS_FOLDER'],
             ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
             requestfolder=pagure.APP.config['REQUESTS_FOLDER'],
         )
+
+        # So just put it in the DB
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='forks/test',
+            description='test project forks/test',
+            hook_token='aaabbbcccddd',
+        )
+        self.session.add(item)
         self.session.commit()
-        self.assertEqual(message, 'Project "forks/test" created')
+
+        # Create a git repo to play with
+        gitrepo = os.path.join(tests.HERE, 'repos', 'forks/test.git')
+        repo = pygit2.init_repository(gitrepo, bare=True)
 
         output = self.app.get('/forks/test')
         self.assertEqual(output.status_code, 200)
