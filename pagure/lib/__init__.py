@@ -2461,7 +2461,8 @@ def add_group(session, group_name, group_type, user, is_admin, blacklist):
 
     if group_name in blacklist:
         raise pagure.exceptions.PagureException(
-            'The group names are forbidden: %s' % blacklist)
+            'This group name has been blacklisted, '
+            'please choose another one')
 
     group_types = ['user']
     if is_admin:
