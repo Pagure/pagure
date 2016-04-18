@@ -1908,7 +1908,7 @@ class PagureLibtests(tests.Modeltests):
             blacklist=[],
         )
 
-        # Group with this name is blacklisted exists
+        # Group with a blacklisted prefix
         self.assertRaises(
             pagure.exceptions.PagureException,
             pagure.lib.add_group,
