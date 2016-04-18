@@ -964,7 +964,7 @@ def new_project(session, user, name, blacklist, allowed_prefix,
         )
 
     user_obj = __get_user(session, user)
-    allowed_prefix = allowed_prefix + [grp.name for grp in user_obj.groups]
+    allowed_prefix = allowed_prefix + [grp for grp in user_obj.groups]
 
     first_part, _, second_part = name.partition('/')
     if second_part and first_part not in allowed_prefix:
