@@ -16,8 +16,8 @@ import wtforms
 
 STRICT_REGEX = '^[a-zA-Z0-9-_]+$'
 TAGS_REGEX = '^[a-zA-Z0-9-_, .]+$'
-PROJECT_NAME_REGEX = '^[a-zA-z0-9_][a-zA-Z0-9-_]*/'\
-    '?[a-zA-z0-9_][a-zA-Z0-9-_]+$'
+PROJECT_NAME_REGEX = \
+    '^[a-zA-z0-9_][a-zA-Z0-9-_]*(/?[a-zA-z0-9_][a-zA-Z0-9-_]+)?$'
 
 
 class ProjectFormSimplified(wtf.Form):
