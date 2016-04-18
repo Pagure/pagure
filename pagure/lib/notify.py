@@ -93,8 +93,8 @@ def _get_emails_for_issue(issue):
     '''
     emails = set()
     # Add project creator/owner
-    if issue.project.user.emails:
-        emails.add(issue.project.user.emails[0].email)
+    if issue.project.user.default_email:
+        emails.add(issue.project.user.default_email)
 
     # Add project maintainers
     for user in issue.project.users:
