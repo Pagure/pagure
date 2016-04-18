@@ -974,6 +974,12 @@ def new_project(session, user, name, blacklist, allowed_prefix,
             'of a group that you are part of.'
         )
     if len(second_part) == 40:
+        # We must block project with a name <foo>/<bar> where the length
+        # of <bar> is exactly 40 characters long as this would otherwise
+        # conflict with the old URL schema used for commit that was
+        # <foo>/<commit hash>. To keep backward compatibility, we have an
+        # endpoint redirecting <foo>/<commit hash> to <foo>/c/<commit hash>
+        # available as an option.
         raise pagure.exceptions.PagureException(
             'Your project name cannot have exactly 40 characters after '
             'the `/`'
