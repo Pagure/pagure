@@ -27,9 +27,9 @@ that just occured. For example ``issue.edit``.
 ``X-Pagure-Signature`` contains the signature of the message allowing to
 check that the message comes from pagure.
 
-.. note:: These headers are present for convenience only, they are not signed
-          and therefore should not be trusted. Rely on the payload after
-          checking the signature to make any decision.
+.. warning:: These headers are present for convenience only, they are not
+        signed and therefore should not be trusted. Rely on the payload
+        after checking the signature to make any decision.
 
 Pagure relies on ``hmac`` to sign the content of its messages. If you want
 to validate the message, in python, you can do something like the following:
