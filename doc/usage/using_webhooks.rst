@@ -45,3 +45,10 @@ to validate the message, in python, you can do something like the following:
 
     if hashhex != headers.get('X-Pagure-Signature'):
         raise Exception('Message received with an invalid signature')
+
+
+The notifications sent via web-hooks have the same payload as what is sent
+via `fedmsg <http://www.fedmsg.com/en/latest/>`_. Therefore, the list of
+pagure topics as well as example messages can be found in the
+`fedmsg documentation about pagure
+<https://fedora-fedmsg.readthedocs.org/en/latest/topics.html#id532>`_
