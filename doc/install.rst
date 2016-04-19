@@ -230,6 +230,11 @@ For example:
 This will tell ``/usr/share/pagure/pagure_createdb.py`` to use the database
 information specified in the file ``/etc/pagure/pagure.cfg``.
 
+.. warning:: Pagure's default configuration is using sqlite. This is fine
+        for development purpose but not for production use as sqlite does
+        not support all the operations needed when updating the database
+        schema. Do use PostgreSQL, MySQL or MariaDB in production.
+
 * Stamp the alembic revision
 
 For changes to existing tables, we rely on `Alembic <http://alembic.readthedocs.org/>`_.
