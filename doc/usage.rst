@@ -23,13 +23,7 @@ overview page of the project. On the menu on the right side, there is a menu
 you will be given the URLs to the other three git repos.
 
 Each section correspond to one of the four git repositories created for each
-project:
-
-* A git repository containing the source code, displayed in the main section
-  of the pagure project.
-* A git repository for the documentation
-* A git repository for the issues and their metadata
-* A git repository for the metadata for pull-requests
+project.
 
 
 

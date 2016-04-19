@@ -245,8 +245,8 @@ You can save the current revision in the database using the following command:
     alembic stamp $(alembic heads |awk '{ print $1 }')
 
 The ``cd /etc/pagure`` is needed as the command must be run in the folder
-where is the file ``alembic.ini``. This file contains two important
-information:
+where the file ``alembic.ini`` is. This file contains two important pieces
+of information:
 
 * ``sqlalchemy.url`` which is the URL used to connect to the database, likely
 the same URL as the one in ``pagure.cfg``.
