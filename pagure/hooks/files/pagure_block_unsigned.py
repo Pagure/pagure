@@ -54,7 +54,7 @@ def run_as_pre_receive_hook():
             signed = False
             for line in pagure.lib.git.read_git_lines(
                 ['log', '--no-walk', commit], abspath):
-                if 'signed-off-by' in line.lower():
+                if line.lower().strip().startswith('signed-off-by'):
                     signed = True
                     break
             if pagure.APP.config.get('HOOK_DEBUG', False):
