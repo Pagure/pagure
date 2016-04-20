@@ -278,7 +278,7 @@ class Project(BASE):
         sa.ForeignKey('users.id', onupdate='CASCADE'),
         nullable=False,
         index=True)
-    name = sa.Column(sa.String(32), nullable=False, index=True)
+    name = sa.Column(sa.String(255), nullable=False, index=True)
     description = sa.Column(sa.Text, nullable=True)
     url = sa.Column(sa.Text, nullable=True)
     _settings = sa.Column(sa.Text, nullable=True)
