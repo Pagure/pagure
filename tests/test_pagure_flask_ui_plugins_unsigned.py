@@ -51,7 +51,7 @@ class PagureFlaskPluginUnsignedtests(tests.Modeltests):
             tests.HERE, 'docs')
         self.app = pagure.APP.test_client()
 
-    def test_plugin_noff(self):
+    def test_plugin_unsigned(self):
         """ Test the noff plugin on/off endpoint. """
 
         tests.create_projects(self.session)

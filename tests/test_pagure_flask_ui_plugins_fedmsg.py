@@ -51,7 +51,7 @@ class PagureFlaskPluginFedmsgtests(tests.Modeltests):
             tests.HERE, 'docs')
         self.app = pagure.APP.test_client()
 
-    def test_plugin_mail(self):
+    def test_plugin_fedmsg(self):
         """ Test the fedmsg plugin on/off endpoint. """
 
         tests.create_projects(self.session)
