@@ -25,7 +25,10 @@ So the structure changes from: ::
     └── bar.git
 
     forks/
-    └── user/
+    ├── patrick/
+    │   ├── test.git
+    │   └── ipsilon.git
+    └── pingou/
         ├── foo.git
         └── bar.git
 
@@ -34,8 +37,11 @@ to: ::
     repos/
     ├── foo.git
     ├── bar.git
-    └── forks
-        └── user
+    └── forks/
+        ├── patrick/
+        │   ├── test.git
+        │   └── ipsilon.git
+        └── pingou/
             ├── foo.git
             └── bar.git
 
@@ -49,7 +55,10 @@ structure changes from: ::
     tickets/
     ├── foo.git
     ├── bar.git
-    └── user
+    ├── patrick/
+    │   ├── test.git
+    │   └── ipsilon.git
+    └── pingou/
         ├── foo.git
         └── bar.git
 
@@ -58,8 +67,11 @@ to: ::
     tickets/
     ├── foo.git
     ├── bar.git
-    └── forks
-        └── user
+    └── forks/
+        ├── patrick/
+        │   ├── test.git
+        │   └── ipsilon.git
+        └── pingou/
             ├── foo.git
             └── bar.git
 
