@@ -91,3 +91,19 @@ This can be done using something like: ::
 
 This can be done via the ``Re-generate gitolite ACLs file`` button in the
 admin page.
+
+* Keep URLs backward compatible
+
+The support of pseudo-namespace in pagure 2.0 has required some changes made
+to the URL schema:
+https://pagure.io/pagure/053d8cc95fcd50c23a8b0a7f70e55f8d1cc7aebb
+became:
+https://pagure.io/pagure/c/053d8cc95fcd50c23a8b0a7f70e55f8d1cc7aebb
+(Note the added /c/ in it)
+
+We introduced a backward compatibility fix for this.
+
+This fix is however *disabled* by default so if you wish to keep the URLs
+valid, you will need to adjust you configuration file to include: ::
+
+    OLD_VIEW_COMMIT_ENABLED = True
