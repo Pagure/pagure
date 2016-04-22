@@ -25,19 +25,22 @@ So the structure changes from: ::
     └── bar.git
 
     forks/
-    ├── user/foo.git
-    └── user/bar.git
+    └── user/
+        ├── foo.git
+        └── bar.git
 
 to: ::
 
     repos/
     ├── foo.git
-    ├── forks/user/foo.git
-    ├── forks/user/bar.git
-    └── bar.git
+    ├── bar.git
+    └── forks
+        └── user
+            ├── foo.git
+            └── bar.git
 
-So the entire ``forks`` folder is moved under the ``repos`` folder where are
-the other repositories containing the sources of the projects.
+So the entire ``forks`` folder is moved under the ``repos`` folder where
+the other repositories are, containing the sources of the projects.
 
 
 Git repos for ``tickets`` and ``requests`` will be trickier to move as the
@@ -45,23 +48,27 @@ structure changes from: ::
 
     tickets/
     ├── foo.git
-    ├── user/foo.git
-    ├── user/bar.git
-    └── bar.git
+    ├── bar.git
+    └── user
+        ├── foo.git
+        └── bar.git
 
 to: ::
 
     tickets/
     ├── foo.git
-    ├── forks/user/foo.git
-    ├── forks/user/bar.git
-    └── bar.git
+    ├── bar.git
+    └── forks
+        └── user
+            ├── foo.git
+            └── bar.git
 
 Same for the ``requests`` git repos.
 
-For these, the folders are moved into a subfolder ``forks/`` while the folder
-containing the git repositories (ie: folders ending with ``.git``) remains
-un-touched.
+As you can see in the ``tickets`` and the ``requests`` folders there are two
+types of folders, git repos which are folder with a name ending with ``.git``,
+and folder corresponding to usernames. These last ones are the ones to be
+moved into a subfolder ``forks/``.
 
 * Re-generate the gitolite configuration.
 
