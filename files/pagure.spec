@@ -218,7 +218,7 @@ install -m 644 webhook-server/pagure_webhook.service \
 
 
 %files
-%doc README.rst
+%doc README.rst UPGRADING.rst
 %license LICENSE
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/pagure.conf
 %config(noreplace) %{_sysconfdir}/pagure/pagure.cfg
