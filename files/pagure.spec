@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        1.2
+Version:        2.0
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -253,6 +253,81 @@ install -m 644 webhook-server/pagure_webhook.service \
 
 
 %changelog
+* Fri Apr 22 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.0-1
+- Update to 2.0
+- Rework the initial comment of a PR, making it less a comment and more
+  something that belong to the PR itself
+- Fix showing or not the fork button when editing a comment on an issue or a PR
+  and fix the highlighted tab when editing comment of an issue (Oliver
+  Gutierrez)
+- Fix the count of comments shown on the page listing all the PRs to include
+  only the comments and not the notifications (farhaanbukhsh)
+- In the settings page explain that API keys are personal (Lubomír Sedlář)
+- Rework the fedmsg message sent upon pushing commits, one message per push
+  instead of one message per commit
+- Mark the page next/previous as disabled when they are (on browse pages)
+- Avoid the logout/login loop when logging out
+- Support rendering file with a `.markdown` extension
+- Fix the layout of the password change branch
+- Improve the documentation, add overview graphs, expand the usage section,
+  improve the overview description
+- Fix checking if the user is an admin of a project or not (which was making the
+  user experience confusing as they sometime had the fork button and sometime
+  not)
+- Fix the pagination on the browse pages when the results are sorted
+- Disable the Commit and Files tabs if a repo is new
+- Update the pagure logo to look better (Ryan Lerch)
+- Allow anyone to fork any project (Ryan Lerch)
+- Fix searching on the browse pages by preventing submission of the 'enter' key
+  (Ryan Lerch)
+- Rework the issue page to be a single, large form allowing to update the
+  meta-data and comment in one action and fixing updating the page via SSE
+- Turn off the project's documentation by default to empty `Docs` tab leading to
+  nothing
+- Fill the initial comment with the body of the commit message if the PR only
+  has one commit (Ryan Lerch)
+- Add a plugin/git hook allowing to disable non fast-forward pushes on a branch
+  basis
+- Fix asynchronous inline comments in PR by fixing the URL to which the form is
+  submitted
+- Add a plugin/git hook allowing to trigger build on readthedocs.org upon git
+  push, with the possibility to restrict the trigger to only certain branches
+- Automatically scroll to the highlighted range when viewing a file with a
+  selection (Lubomír Sedlář)
+- Indicate the project's creation date in the overview page (Anthony Lackey)
+- Clear the `preview` field after adding a comment via SSE
+- Adjust the unit-tests for the change in behavior in pygments 2.1.3
+- Fix listing all the request when the status is True and do not convert to text
+  request.closed_at if it is in fact None
+- Improved documentation
+- Attempt to fix the error `too many open files` on the EventSource Server
+- Add a new param to runserver.py to set the host (Ryan Lerch)
+- Fix the of the Docs tab and the Fork button with rounded corners (Pedro Lima)
+- Expand the information in the notifications message when a PR is updated (Ryan
+  Lerch)
+- Fix hidding the reply buttons when users are not authenticated (Paul W. Frields)
+- Improve the description of the git hooks (Lubomír Sedlář)
+- Allow reply to a notification of pagure and setting the reply email address as
+  Cc
+- In the fedmsg git hook, publish the username of all the users who authored the
+  commits pushed
+- Add an activity page/feed for each project using the information retrieved
+  from datagrepper (Ryan Lerch)
+- Fix showing lightweight tags in the releases page (Ryan Lerch)
+- Fix showing the list of branches when viewing a file
+- Add priorities to issues, with the possibility to filter or sort them by it in
+  the page listing them.
+- Add support for pseudo-namespace to pagure (ie: allow one '/' in project name
+  with a limited set of prefix allowed)
+- Add a new plugin/hook to block push containing commits missing the
+  'Signed-off-by' line
+- Ensure we always use the default email address when sending notification to
+  avoid potentially sending twice a notification
+- Add support for using the keyword Merge(s|d) to close a ticket or pull-request
+  via a commit message (Patrick Uiterwijk)
+- Add an UPGRADING.rst documentation file explaining how to upgrade between
+  pagure releases
+
 * Tue Mar 01 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 1.2-1
 - Update to 1.2
 - Add the possibility to create a comment when opening a pull-request (Clement
