@@ -11,6 +11,9 @@ When upgrading to 2.0 you will have to:
 
 * Update the database schema using alembic: ``alembic upgrade head``
 
+* Create the new DB tables so that the new plugins work using the
+  ``createdb.py`` script
+
 * Move the forks git repo
 
 Forked git repos are now located under the same folder as the regular git
