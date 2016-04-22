@@ -19,6 +19,10 @@ FIXES = [
     re.compile(r'.*\s*fixe?[sd]?:?\s*?#(\d+)', re.I),
     re.compile(r'fixe?[sd]?:?\s*?https?://.*/(\w+)/issue/(\d+)', re.I),
     re.compile(r'.*\s*?fixe?[sd]?:?\s*?https?://.*/(\w+)/issue/(\d+)', re.I),
+    re.compile(r'merge?[sd]?:?\s*?#(\d+)', re.I),
+    re.compile(r'.*\s*merge?[sd]?:?\s*?#(\d+)', re.I),
+    re.compile(r'merge?[sd]?:?\s*?https?://.*/(\w+)/issue/(\d+)', re.I),
+    re.compile(r'.*\s*?merge?[sd]?:?\s*?https?://.*/(\w+)/issue/(\d+)', re.I),
 ]
 
 RELATES = [
