@@ -49,8 +49,8 @@ So the entire ``forks`` folder is moved under the ``repos`` folder where
 the other repositories are, containing the sources of the projects.
 
 
-Git repos for ``tickets`` and ``requests`` will be trickier to move as the
-structure changes from: ::
+Git repos for ``tickets``, ``requests`` and ``docs`` will be trickier to
+move as the structure changes from: ::
 
     tickets/
     ├── foo.git
@@ -75,12 +75,17 @@ to: ::
             ├── foo.git
             └── bar.git
 
-Same for the ``requests`` git repos.
+Same for the ``requests`` and the ``docs`` git repos.
 
-As you can see in the ``tickets`` and the ``requests`` folders there are two
-types of folders, git repos which are folder with a name ending with ``.git``,
-and folder corresponding to usernames. These last ones are the ones to be
-moved into a subfolder ``forks/``.
+As you can see in the ``tickets``, ``requests`` and ``docs`` folders there
+are two types of folders, git repos which are folder with a name ending
+with ``.git``, and folder corresponding to usernames. These last ones are
+the ones to be moved into a subfolder ``forks/``.
+
+This can be done using something like: ::
+
+    mkdir forks
+    for i in `ls -1 |grep -v '\.git'`; do mv $i forks/; done
 
 * Re-generate the gitolite configuration.
 
