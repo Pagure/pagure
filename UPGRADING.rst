@@ -94,7 +94,7 @@ admin page.
 
 * Keep URLs backward compatible
 
-The support of pseudo-namespace in pagure 2.0 has required some changes made
+The support of pseudo-namespace in pagure 2.0 has required some changes
 to the URL schema:
 https://pagure.io/pagure/053d8cc95fcd50c23a8b0a7f70e55f8d1cc7aebb
 became:
