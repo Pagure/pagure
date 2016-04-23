@@ -391,6 +391,12 @@ a.notblue {
     background-repeat: no-repeat;
     min-height: 150px;
 }
+.content-loading {
+    background-image: url("images/spinner.gif");
+    background-position: center center;
+    background-repeat: no-repeat;
+    min-height: 150px;
+}
 
 .repoinfo-branchlistitem
 {
