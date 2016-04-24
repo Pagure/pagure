@@ -816,6 +816,7 @@ function setup_reply_btns() {
         }
       },
       error: function(res) {
+        $('#merge-load').hide();
         var _obj = $('#pr_flags').find('tbody');
         if (res.responseJSON.message) {
           _obj.append(
