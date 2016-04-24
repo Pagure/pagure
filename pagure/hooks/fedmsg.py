@@ -74,7 +74,8 @@ class Fedmsg(BaseHook):
             should be installed
 
         '''
-        BaseHook.install(project, dbobj, 'fedmsg_hook.py')
+        repopaths = [get_repo_path(project)]
+        BaseHook.install(repopaths, dbobj, 'fedmsg', 'fedmsg_hook.py')
 
     @classmethod
     def remove(cls, project):
@@ -84,4 +85,5 @@ class Fedmsg(BaseHook):
             should be installed
 
         '''
-        BaseHook.remove(project, 'fedmsg_hook.py')
+        repopaths = [get_repo_path(project)]
+        BaseHook.remove(repopaths, 'fedmsg')

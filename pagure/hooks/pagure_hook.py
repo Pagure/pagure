@@ -103,20 +103,7 @@ class PagureHook(BaseHook):
                 os.path.join(folder, project.path)
             )
 
-        hook_files = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), 'files')
-        hook_file = os.path.join(hook_files, 'pagure_hook.py')
-
-        for repopath in repopaths:
-            # Init the git repo in case
-            pygit2.Repository(repopath)
-
-            # Install the hook itself
-            hook_path = os.path.join(
-                repopath, 'hooks', 'post-receive.pagure')
-            hook_file = os.path.join(hook_files, 'pagure_hook.py')
-            if not os.path.exists(hook_path):
-                os.symlink(hook_file, hook_path)
+        BaseHook.install(repopaths, dbobj, 'pagure', 'pagure_hook.py')
 
     @classmethod
     def remove(cls, project):
@@ -134,8 +121,4 @@ class PagureHook(BaseHook):
                 os.path.join(folder, project.path)
             )
 
-        for repopath in repopaths:
-            hook_path = os.path.join(
-                repopath, 'hooks', 'post-receive.pagure')
-            if os.path.exists(hook_path):
-                os.unlink(hook_path)
+        BaseHook.remove(repopaths, 'pagure')

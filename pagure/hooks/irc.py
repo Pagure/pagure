@@ -114,22 +114,15 @@ class Hook(BaseHook):
             should be installed
 
         '''
-        repopath = get_repo_path(project)
+        repopaths = [get_repo_path(project)]
 
-        hook_files = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), 'files')
-        repo_obj = pygit2.Repository(repopath)
+        repo_obj = pygit2.Repository(repopaths[0])
 
         # Configure the hook
         # repo_obj.config.set_multivar()
 
         # Install the hook itself
-        #hook_file = os.path.join(hook_files, 'git_irc.py')
-        #if not os.path.exists(hook_file):
-            #os.symlink(
-                #hook_file,
-                #os.path.join(repopath, 'hooks', 'post-receive.irc')
-            #)
+        # BaseHook.install(repopaths, dbobj, 'irc', 'git_irc.py')
 
     @classmethod
     def remove(cls, project):
@@ -139,8 +132,6 @@ class Hook(BaseHook):
             should be installed
 
         '''
-        repopath = get_repo_path(project)
+        repopaths = [get_repo_path(project)]
 
-        #hook_path = os.path.join(repopath, 'hooks', 'post-receive.irc')
-        #if os.path.exists(hook_path):
-            #os.unlink(hook_path)
+        # BaseHook.remove(repopaths, 'irc')

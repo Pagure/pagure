@@ -99,24 +99,10 @@ class PagureTicketHook(BaseHook):
             should be installed
 
         '''
-        repopath = os.path.join(APP.config['TICKETS_FOLDER'], project.path)
-        if not os.path.exists(repopath):  # pragma: no cover
-            # We cannot test this as un-existing repo should be catched
-            # at the set_up() stage
-            flask.abort(404, 'No git repo found')
+        repopaths = [os.path.join(APP.config['TICKETS_FOLDER'], project.path)]
 
-        hook_files = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), 'files')
-        pygit2.Repository(repopath)
-
-        # Install the hook itself
-        hook_path = os.path.join(
-            repopath, 'hooks', 'post-receive.pagure-ticket')
-        if not os.path.exists(hook_path):
-            os.symlink(
-                os.path.join(hook_files, 'pagure_hook_tickets.py'),
-                hook_path
-            )
+        BaseHook.install(repopaths, dbobj, 'pagure-ticket',
+                         'pagure_hook_tickets.py')
 
     @classmethod
     def remove(cls, project):
@@ -126,11 +112,6 @@ class PagureTicketHook(BaseHook):
             should be installed
 
         '''
-        repopath = os.path.join(APP.config['TICKETS_FOLDER'], project.path)
-        if not os.path.exists(repopath):
-            flask.abort(404, 'No git repo found')
+        repopaths = [os.path.join(APP.config['TICKETS_FOLDER'], project.path)]
 
-        hook_path = os.path.join(
-            repopath, 'hooks', 'post-receive.pagure-ticket')
-        if os.path.exists(hook_path):
-            os.unlink(hook_path)
+        BaseHook.remove(repopaths, 'pagure-ticket')

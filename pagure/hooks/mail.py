@@ -80,11 +80,8 @@ class Mail(BaseHook):
             should be installed
 
         '''
-        repopath = get_repo_path(project)
-
-        hook_files = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), 'files')
-        repo_obj = pygit2.Repository(repopath)
+        repopaths = [get_repo_path(project)]
+        repo_obj = pygit2.Repository(repopaths[0])
 
         # Configure the hook
         repo_obj.config.set_multivar(
@@ -96,12 +93,7 @@ class Mail(BaseHook):
             'multimailhook.environment', '', 'gitolite')
 
         # Install the hook itself
-        hook_file = os.path.join(repopath, 'hooks', 'post-receive.mail')
-        if not os.path.exists(hook_file):
-            os.symlink(
-                os.path.join(hook_files, 'git_multimail.py'),
-                hook_file
-            )
+        BaseHook.install(repopaths, dbobj, 'mail', 'git_multimail.py')
 
     @classmethod
     def remove(cls, project):
@@ -111,8 +103,5 @@ class Mail(BaseHook):
             should be installed
 
         '''
-        repopath = get_repo_path(project)
-
-        hook_path = os.path.join(repopath, 'hooks', 'post-receive.mail')
-        if os.path.exists(hook_path):
-            os.unlink(hook_path)
+        repopaths = [get_repo_path(project)]
+        BaseHook.remove(repopaths, 'mail')

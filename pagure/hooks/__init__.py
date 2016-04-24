@@ -15,14 +15,6 @@ import wtforms
 from pagure import APP, get_repo_path
 
 
-def _get_hook_name(filename):
-    hook_file_words = [word for word in filename.replace('_hook.py', '').split('_')]
-    hook_file_name = ''
-    for word in hook_file_words:
-        hook_file_name += word
-    return hook_file_name
-
-
 class RequiredIf(wtforms.validators.Required):
     """ Wtforms validator setting a field as required if another field
     has a value.
@@ -83,7 +75,7 @@ class BaseHook(object):
                 os.chmod(postreceive, 0755)
 
     @classmethod
-    def install(cls, project, dbobj, filein):  # pragma: no cover
+    def install(cls, repopaths, dbobj, hook_name, filein):  # pragma: no cover
         ''' Method called to install the hook for a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
@@ -92,42 +84,36 @@ class BaseHook(object):
             information.
 
         '''
-        repopath = get_repo_path(project)
-        if not os.path.exists(repopath):
-            flask.abort(404, 'No git repo found')
+        for repopath in repopaths:
+            if not os.path.exists(repopath):
+                flask.abort(404, 'No git repo found')
 
-        hook_files = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), 'files')
+            hook_files = os.path.join(
+                os.path.dirname(os.path.realpath(__file__)), 'files')
 
-        # Make sure the hooks folder exists
-        hookfolder = os.path.join(repopath, 'hooks')
-        if not os.path.exists(hookfolder):
-            os.makedirs(hookfolder)
+            # Make sure the hooks folder exists
+            hookfolder = os.path.join(repopath, 'hooks')
+            if not os.path.exists(hookfolder):
+                os.makedirs(hookfolder)
 
-        # Install the hook itself
+            # Install the hook itself
+            hook_file = os.path.join(repopath, 'hooks', 'post-receive.' + hook_name)
 
-        hook_file_name = _get_hook_name(filein)
-        hook_file = os.path.join(repopath, 'hooks', 'post-receive.' +
-                                 hook_file_name)
-
-        if not os.path.exists(hook_file):
-            os.symlink(
-                os.path.join(hook_files, filein),
-                hook_file
-            )
+            if not os.path.exists(hook_file):
+                os.symlink(
+                    os.path.join(hook_files, filein),
+                    hook_file
+                )
 
     @classmethod
-    def remove(cls, project, fileout):  # pragma: no cover
+    def remove(cls, repopaths, hook_name):  # pragma: no cover
         ''' Method called to remove the hook of a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
             should be installed
 
         '''
-        repopath = get_repo_path(project)
-
-        hook_file_name = _get_hook_name(fileout)
-        hook_path = os.path.join(repopath, 'hooks', 'post-receive.' +
-                                 hook_file_name)
-        if os.path.exists(hook_path):
-            os.unlink(hook_path)
+        for repopath in repopaths:
+            hook_path = os.path.join(repopath, 'hooks', 'post-receive.' + hook_name)
+            if os.path.exists(hook_path):
+                os.unlink(hook_path)
