@@ -74,25 +74,7 @@ class Fedmsg(BaseHook):
             should be installed
 
         '''
-        repopath = get_repo_path(project)
-        if not os.path.exists(repopath):
-            flask.abort(404, 'No git repo found')
-
-        hook_files = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), 'files')
-
-        # Make sure the hooks folder exists
-        hookfolder = os.path.join(repopath, 'hooks')
-        if not os.path.exists(hookfolder):
-            os.makedirs(hookfolder)
-
-        # Install the hook itself
-        hook_file = os.path.join(repopath, 'hooks', 'post-receive.fedmsg')
-        if not os.path.exists(hook_file):
-            os.symlink(
-                os.path.join(hook_files, 'fedmsg_hook.py'),
-                hook_file
-            )
+        BaseHook.install(project, dbobj, 'fedmsg_hook.py')
 
     @classmethod
     def remove(cls, project):
@@ -102,8 +84,4 @@ class Fedmsg(BaseHook):
             should be installed
 
         '''
-        repopath = get_repo_path(project)
-
-        hook_path = os.path.join(repopath, 'hooks', 'post-receive.fedmsg')
-        if os.path.exists(hook_path):
-            os.unlink(hook_path)
+        BaseHook.remove(project, 'fedmsg_hook.py')
