@@ -264,14 +264,14 @@ git push -u origin master</pre>
                 <div class="input-group input-group-sm">
                   <div class="input-group-addon">SSH</div>
                   <input class="form-control" type="text" value="{{
-                    config.get('GIT_URL_SSH') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git" readonly>
+                    config.get('GIT_URL_SSH') }}{{ repo.fullname }}.git" readonly>
                 </div>
               </div>
               <div class="form-group">
                 <div class="input-group input-group-sm">
                   <div class="input-group-addon">GIT</div>
                   <input class="form-control" type="text" value="{{
-                    config.get('GIT_URL_GIT') }}{% if repo.parent %}forks/{% endif %}{{ repo.fullname }}.git" readonly>
+                    config.get('GIT_URL_GIT') }}{{ repo.fullname }}.git" readonly>
                 </div>
               </div>
               <div class="collapse" id="moregiturls">
