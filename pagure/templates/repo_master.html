@@ -10,7 +10,12 @@
     <header>
         <h2 class="repo-name m-b-0">
             <a href="{{ url_for('view_repo', username=username, repo=repo.name)}}">
-                {% if repo.is_fork %}<span class="oi" data-glyph="fork"></span>{% endif %}{{ repo.fullname }}
+              {% if repo.is_fork -%}
+                <span class="oi" data-glyph="fork"></span>
+                {{ repo.user.user }}/{{ repo.name}}
+              {%- else -%}
+                {{ repo.name }}
+              {%- endif -%}
             </a>
             {% if authenticated and not repo.is_fork %}
               <form method="POST" name="fork_project"
