@@ -70,10 +70,8 @@ class BaseHook(object):
             # Install the main post-receive file
             postreceive = os.path.join(hookfolder, cls.hook_type)
             if not os.path.exists(postreceive):
-                shutil.copyfile(
-                    os.path.join(hook_files, cls.hook_type),
-                    postreceive)
-                os.chmod(postreceive, 0755)
+                os.symlink(os.path.join(hook_files, cls.hook_type),
+                           postreceive)
 
     @classmethod
     def install(cls, repopaths, dbobj, hook_name, filein):  # pragma: no cover
