@@ -56,12 +56,20 @@ for line in sys.stdin.readlines():
     if not project:
         project = project_name
 
-    authors = set()
+    auths = set()
     for rev in revs:
         email = pagure.lib.git.get_author_email(rev, abspath)
         name = pagure.lib.git.get_author(rev, abspath)
         author = pagure.lib.search_user(pagure.SESSION, email=email) or name
-        authors.add(author)
+        auths.add(author)
+
+    authors = []
+    for author in auths:
+        if isinstance(author, basestring):
+            author = author
+        else:
+            author = author.to_json(public=True)
+        authors.append(author)
 
     if revs:
         revs.reverse()
