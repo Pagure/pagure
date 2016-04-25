@@ -84,7 +84,7 @@ for line in sys.stdin.readlines():
                 branch=refname,
                 forced=forced,
                 authors=list(authors),
-                agent=username,
+                agent=os.environ['GL_USER'],
                 repo=project.to_json(public=True)
                 if not isinstance(project, basestring) else project,
             ),
