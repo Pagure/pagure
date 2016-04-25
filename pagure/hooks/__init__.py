@@ -97,7 +97,12 @@ class BaseHook(object):
                 os.makedirs(hookfolder)
 
             # Install the hook itself
-            hook_file = os.path.join(repopath, 'hooks', 'post-receive.' + hook_name)
+            if hook_name in ['pagureforcecommit', 'pagureunsignedcommit']:
+                hook_file = os.path.join(repopath, 'hooks', 'pre-receive.'
+                                         + hook_name)
+            else:
+                hook_file = os.path.join(repopath, 'hooks', 'post-receive.'
+                                         + hook_name)
 
             if not os.path.exists(hook_file):
                 os.symlink(
@@ -114,6 +119,11 @@ class BaseHook(object):
 
         '''
         for repopath in repopaths:
-            hook_path = os.path.join(repopath, 'hooks', 'post-receive.' + hook_name)
+            if hook_name in ['pagureforcecommit', 'pagureunsignedcommit']:
+                hook_path = os.path.join(repopath, 'hooks', 'pre-receive.'
+                                         + hook_name)
+            else:
+                hook_path = os.path.join(repopath, 'hooks', 'post-receive.'
+                                         + hook_name)
             if os.path.exists(hook_path):
                 os.unlink(hook_path)
