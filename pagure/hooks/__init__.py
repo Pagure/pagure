@@ -11,6 +11,7 @@
 import os
 import shutil
 import wtforms
+import flask
 
 from pagure import APP, get_repo_path
 
@@ -119,6 +120,9 @@ class BaseHook(object):
 
         '''
         for repopath in repopaths:
+            if not os.path.exists(repopath):
+                flask.abort(404, 'No git repo found')
+
             if hook_name in ['pagureforcecommit', 'pagureunsignedcommit']:
                 hook_path = os.path.join(repopath, 'hooks', 'pre-receive.'
                                          + hook_name)
