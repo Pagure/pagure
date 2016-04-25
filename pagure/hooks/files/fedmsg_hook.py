@@ -60,7 +60,7 @@ for line in sys.stdin.readlines():
     for rev in revs:
         email = pagure.lib.git.get_author_email(rev, abspath)
         name = pagure.lib.git.get_author(rev, abspath)
-        author = search_user(pagure.SESSION, email=email) or name
+        author = pagure.lib.search_user(pagure.SESSION, email=email) or name
         authors.add(author)
 
     if revs:
