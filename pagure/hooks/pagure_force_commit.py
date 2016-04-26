@@ -87,7 +87,7 @@ class PagureForceCommitHook(BaseHook):
         repopaths = [get_repo_path(project)]
         pygit2.Repository(repopaths[0])
 
-        BaseHook.install(repopaths, dbobj, 'pagureforcecommit',
+        BaseHook.install(repopaths, dbobj, 'pre-receive.pagureforcecommit',
                          'pagure_force_commit_hook.py')
 
     @classmethod
@@ -99,4 +99,4 @@ class PagureForceCommitHook(BaseHook):
 
         '''
         repopaths = [get_repo_path(project)]
-        BaseHook.remove(repopaths, 'pagureforcecommit')
+        BaseHook.remove(repopaths, 'pre-receive.pagureforcecommit')

@@ -88,7 +88,7 @@ class RtdHook(BaseHook):
         '''
         repopaths = [get_repo_path(project)]
 
-        BaseHook.install(repopaths, dbobj, 'rtd', 'rtd_hook.py')
+        BaseHook.install(repopaths, dbobj, 'post-receive.rtd', 'rtd_hook.py')
 
     @classmethod
     def remove(cls, project):
@@ -100,4 +100,4 @@ class RtdHook(BaseHook):
         '''
         repopaths = [get_repo_path(project)]
 
-        BaseHook.remove(repopaths, 'rtd')
+        BaseHook.remove(repopaths, 'post-receive.rtd')

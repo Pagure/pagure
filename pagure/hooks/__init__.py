@@ -12,8 +12,12 @@ import os
 import shutil
 import wtforms
 import flask
+import logging
+
 
 from pagure import APP, get_repo_path
+
+log = logging.getLogger(__name__)
 
 
 class RequiredIf(wtforms.validators.Required):
@@ -86,6 +90,7 @@ class BaseHook(object):
         for repopath in repopaths:
             if not os.path.exists(repopath):
                 flask.abort(404, 'No git repo found')
+                log.debug('Hook install repo %s not found' % repopath)
 
             hook_files = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)), 'files')
@@ -96,12 +101,7 @@ class BaseHook(object):
                 os.makedirs(hookfolder)
 
             # Install the hook itself
-            if hook_name in ['pagureforcecommit', 'pagureunsignedcommit']:
-                hook_file = os.path.join(repopath, 'hooks', 'pre-receive.'
-                                         + hook_name)
-            else:
-                hook_file = os.path.join(repopath, 'hooks', 'post-receive.'
-                                         + hook_name)
+            hook_file = os.path.join(repopath, 'hooks', hook_name)
 
             if not os.path.exists(hook_file):
                 os.symlink(
@@ -120,12 +120,8 @@ class BaseHook(object):
         for repopath in repopaths:
             if not os.path.exists(repopath):
                 flask.abort(404, 'No git repo found')
+                log.debug('Hook remove repo %s not found' % repopath)
 
-            if hook_name in ['pagureforcecommit', 'pagureunsignedcommit']:
-                hook_path = os.path.join(repopath, 'hooks', 'pre-receive.'
-                                         + hook_name)
-            else:
-                hook_path = os.path.join(repopath, 'hooks', 'post-receive.'
-                                         + hook_name)
+            hook_path = os.path.join(repopath, 'hooks', hook_name)
             if os.path.exists(hook_path):
                 os.unlink(hook_path)

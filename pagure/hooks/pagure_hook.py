@@ -103,7 +103,8 @@ class PagureHook(BaseHook):
                 os.path.join(folder, project.path)
             )
 
-        BaseHook.install(repopaths, dbobj, 'pagure', 'pagure_hook.py')
+        BaseHook.install(repopaths, dbobj, 'post-receive.pagure',
+                         'pagure_hook.py')
 
     @classmethod
     def remove(cls, project):
@@ -121,4 +122,4 @@ class PagureHook(BaseHook):
                 os.path.join(folder, project.path)
             )
 
-        BaseHook.remove(repopaths, 'pagure')
+        BaseHook.remove(repopaths, 'post-receive.pagure')

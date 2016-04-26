@@ -102,7 +102,7 @@ class PagureRequestHook(BaseHook):
         '''
         repopaths = [os.path.join(APP.config['REQUESTS_FOLDER'], project.path)]
 
-        BaseHook.install(repopaths, dbobj, 'pagure-requests',
+        BaseHook.install(repopaths, dbobj, 'post-receive.pagure-requests',
                          'pagure_hook_requests.py')
 
     @classmethod
@@ -115,4 +115,4 @@ class PagureRequestHook(BaseHook):
         '''
         repopaths = [os.path.join(APP.config['REQUESTS_FOLDER'], project.path)]
 
-        BaseHook.remove(repopaths, 'pagure-requests')
+        BaseHook.remove(repopaths, 'post-receive.pagure-requests')
