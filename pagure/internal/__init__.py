@@ -235,7 +235,7 @@ def mergeable_request_pull():
         'message': MERGE_OPTIONS[merge_status]['message']})
 
 
-@PV.route('pull-request/ready', methods=['POST'])
+@PV.route('/pull-request/ready', methods=['POST'])
 def get_pull_request_ready_branch():
     """ Return the list of branches that have commits not in the main
     branch/repo (thus for which one could open a PR) and the number of
