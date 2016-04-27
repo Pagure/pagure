@@ -12,8 +12,6 @@ import os
 import shutil
 import wtforms
 import flask
-import logging
-
 
 from pagure import APP, get_repo_path
 
