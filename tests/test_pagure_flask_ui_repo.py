@@ -529,6 +529,13 @@ class PagureFlaskRepotests(tests.Modeltests):
             '<div class="projectinfo m-t-1 m-b-1">\n'
             'test project #1        </div>', output.data)
 
+        output = self.app.get('/test/')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue('<p>This repo is brand new!</p>' in output.data)
+        self.assertIn(
+            '<div class="projectinfo m-t-1 m-b-1">\n'
+            'test project #1        </div>', output.data)
+
         # Add some content to the git repo
         tests.add_content_git_repo(os.path.join(tests.HERE, 'test.git'))
         tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
