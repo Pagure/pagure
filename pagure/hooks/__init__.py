@@ -17,8 +17,6 @@ import logging
 
 from pagure import APP, get_repo_path
 
-log = logging.getLogger(__name__)
-
 
 class RequiredIf(wtforms.validators.Required):
     """ Wtforms validator setting a field as required if another field
@@ -89,8 +87,8 @@ class BaseHook(object):
         '''
         for repopath in repopaths:
             if not os.path.exists(repopath):
+                APP.logger.debug('Hook install repo %s not found', repopath)
                 flask.abort(404, 'No git repo found')
-                log.debug('Hook install repo %s not found' % repopath)
 
             hook_files = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)), 'files')
@@ -119,8 +117,8 @@ class BaseHook(object):
         '''
         for repopath in repopaths:
             if not os.path.exists(repopath):
+                APP.logger.debug('Hook remove repo %s not found', repopath)
                 flask.abort(404, 'No git repo found')
-                log.debug('Hook remove repo %s not found' % repopath)
 
             hook_path = os.path.join(repopath, 'hooks', hook_name)
             if os.path.exists(hook_path):
