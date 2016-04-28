@@ -425,6 +425,7 @@
   <div class="col-md-4">
   {% if pull_request %}
     <section class="pr_info">
+      <div id="merge-load" class="content-loading" style="display:none"></div>
       <div id="merge-alert" class="alert text-xs-center" style="display:none;" role="alert">
       {% if pull_request.status == 'Open' and repo_admin %}
        <div>
@@ -436,7 +437,6 @@
        </div>
       {% endif %}
       <small id="merge-alert-message">
-        <div id="merge-load" class="content-loading" style="display:none"></div>
       </small>
       </div>
       {% if pull_request.status != 'Open'%}
@@ -779,7 +779,6 @@ function setup_reply_btns() {
 
   {% if pull_request.status == 'Open' %}
   $(function(){
-    $('#merge-alert').show();
     $('#merge-load').show();
     $.ajax({
       url: '{{ url_for("internal_ns.mergeable_request_pull") }}' ,
@@ -791,7 +790,6 @@ function setup_reply_btns() {
       dataType: 'json',
       success: function(res) {
         $('#merge-load').hide();
-        $('#merge-alert').hide();
         if (res.code == 'FFORWARD'){
           $('#merge_btn').addClass("btn-success");
           $('#merge-alert').addClass("alert-success");
