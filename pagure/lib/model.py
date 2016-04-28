@@ -47,8 +47,8 @@ def create_tables(db_url, alembic_ini=None, acls=None, debug=False):
     :return a session that can be used to query the database.
 
     """
-    if db_url.partition(":")[0] == "sqlite":
-        engine = create_engine(db_url, echo=debug)
+    if db_url.startswith('sqlite'):    
+	engine = create_engine(db_url, echo=debug)
     else:
         engine = create_engine(db_url, echo=debug, client_encoding='utf8')
 
