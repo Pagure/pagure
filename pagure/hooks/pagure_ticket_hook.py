@@ -101,7 +101,7 @@ class PagureTicketHook(BaseHook):
         '''
         repopaths = [os.path.join(APP.config['TICKETS_FOLDER'], project.path)]
 
-        BaseHook.install(repopaths, dbobj, 'post-receive.pagure-ticket',
+        cls.base_install(repopaths, dbobj, 'pagure-ticket',
                          'pagure_hook_tickets.py')
 
     @classmethod
@@ -114,4 +114,4 @@ class PagureTicketHook(BaseHook):
         '''
         repopaths = [os.path.join(APP.config['TICKETS_FOLDER'], project.path)]
 
-        BaseHook.remove(repopaths, 'post-receive.pagure-ticket')
+        cls.base_remove(repopaths, 'pagure-ticket')

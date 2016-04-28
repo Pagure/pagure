@@ -93,7 +93,7 @@ class Mail(BaseHook):
             'multimailhook.environment', '', 'gitolite')
 
         # Install the hook itself
-        BaseHook.install(repopaths, dbobj, 'post-receive.mail', 'git_multimail.py')
+        cls.base_install(repopaths, dbobj, 'mail', 'git_multimail.py')
 
     @classmethod
     def remove(cls, project):
@@ -104,4 +104,4 @@ class Mail(BaseHook):
 
         '''
         repopaths = [get_repo_path(project)]
-        BaseHook.remove(repopaths, 'post-receive.mail')
+        cls.base_remove(repopaths, 'mail')

@@ -74,7 +74,7 @@ class BaseHook(object):
                            postreceive)
 
     @classmethod
-    def install(cls, repopaths, dbobj, hook_name, filein):  # pragma: no cover
+    def base_install(cls, repopaths, dbobj, hook_name, filein):  # pragma: no cover
         ''' Method called to install the hook for a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
@@ -97,7 +97,8 @@ class BaseHook(object):
                 os.makedirs(hookfolder)
 
             # Install the hook itself
-            hook_file = os.path.join(repopath, 'hooks', hook_name)
+            hook_file = os.path.join(repopath, 'hooks', cls.hook_type + '.'
+                                     + hook_name)
 
             if not os.path.exists(hook_file):
                 os.symlink(
@@ -106,7 +107,7 @@ class BaseHook(object):
                 )
 
     @classmethod
-    def remove(cls, repopaths, hook_name):  # pragma: no cover
+    def base_remove(cls, repopaths, hook_name):  # pragma: no cover
         ''' Method called to remove the hook of a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
@@ -118,6 +119,7 @@ class BaseHook(object):
                 APP.logger.debug('Hook remove repo %s not found', repopath)
                 flask.abort(404, 'No git repo found')
 
-            hook_path = os.path.join(repopath, 'hooks', hook_name)
+            hook_path = os.path.join(repopath, 'hooks', cls.hook_type + '.'
+                                     + hook_name)
             if os.path.exists(hook_path):
                 os.unlink(hook_path)

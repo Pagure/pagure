@@ -122,7 +122,7 @@ class Hook(BaseHook):
         # repo_obj.config.set_multivar()
 
         # Install the hook itself
-        # BaseHook.install(repopaths, dbobj, 'post-receive.irc', 'git_irc.py')
+        # cls.base_install(repopaths, dbobj, 'irc', 'git_irc.py')
 
     @classmethod
     def remove(cls, project):
@@ -134,4 +134,4 @@ class Hook(BaseHook):
         '''
         repopaths = [get_repo_path(project)]
 
-        # BaseHook.remove(repopaths, 'post-receive.irc')
+        # cls.base_remove(repopaths, 'irc')

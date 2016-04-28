@@ -79,7 +79,7 @@ class PagureUnsignedCommitHook(BaseHook):
         '''
         repopaths = [get_repo_path(project)]
 
-        BaseHook.install(repopaths, dbobj, 'pre-receive.pagureunsignedcommit',
+        cls.base_install(repopaths, dbobj, 'pagureunsignedcommit',
                          'pagure_block_unsigned.py')
 
     @classmethod
@@ -92,4 +92,4 @@ class PagureUnsignedCommitHook(BaseHook):
         '''
         repopaths = [get_repo_path(project)]
 
-        BaseHook.remove(repopaths, 'pre-receive.pagureunsignedcommit')
+        cls.base_remove(repopaths, 'pagureunsignedcommit')

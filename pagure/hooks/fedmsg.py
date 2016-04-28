@@ -75,7 +75,7 @@ class Fedmsg(BaseHook):
 
         '''
         repopaths = [get_repo_path(project)]
-        BaseHook.install(repopaths, dbobj, 'post-receive.fedmsg', 'fedmsg_hook.py')
+        cls.base_install(repopaths, dbobj, 'fedmsg', 'fedmsg_hook.py')
 
     @classmethod
     def remove(cls, project):
@@ -86,4 +86,4 @@ class Fedmsg(BaseHook):
 
         '''
         repopaths = [get_repo_path(project)]
-        BaseHook.remove(repopaths, 'post-receive.fedmsg')
+        cls.base_remove(repopaths, 'fedmsg')
