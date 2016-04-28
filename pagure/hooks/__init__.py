@@ -11,7 +11,6 @@
 import os
 import shutil
 import wtforms
-import flask
 
 from pagure.exceptions import FileNotFoundException
 from pagure import APP, get_repo_path

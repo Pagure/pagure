@@ -19,7 +19,7 @@ import pagure.lib
 import pagure.forms
 from pagure import APP, SESSION, login_required, is_repo_admin
 from pagure.lib.model import BASE
-
+from pagure.exceptions import FileNotFoundException
 # pylint: disable=E1101
 
 
@@ -127,11 +127,19 @@ def view_plugin(repo, plugin, username=None, full=True):
             # Set up the main script if necessary
             plugin.set_up(repo)
             # Install the plugin itself
-            plugin.install(repo, dbobj)
-            flask.flash('Hook %s activated' % plugin.name)
+            try:
+                plugin.install(repo, dbobj)
+                flask.flash('Hook %s activated' % plugin.name)
+            except FileNotFoundException as err:
+                pagure.APP.logger.exception(err)
+                flask.abort(404, 'No git repo found')
         else:
-            plugin.remove(repo)
-            flask.flash('Hook %s inactived' % plugin.name)
+            try:
+                plugin.remove(repo)
+                flask.flash('Hook %s inactived' % plugin.name)
+            except FileNotFoundException as err:
+                pagure.APP.logger.exception(err)
+                flask.abort(404, 'No git repo found')
 
         SESSION.commit()
 

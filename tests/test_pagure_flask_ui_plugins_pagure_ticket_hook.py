@@ -86,7 +86,8 @@ class PagureFlaskPluginPagureTicketHooktests(tests.Modeltests):
 
             data['csrf_token'] = csrf_token
             # No git found
-            self.assertRaises(pagure.exceptions.FileNotFoundException)
+            output = self.app.post('/test/settings/Pagure tickets', data=data)
+            self.assertEqual(output.status_code, 404)
 
             # Create both the tickets repo
             tests.create_projects_git(os.path.join(tests.HERE, 'tickets'))
