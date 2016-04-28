@@ -17,8 +17,10 @@ import shutil
 import sys
 import os
 
+
 import pygit2
 from mock import patch
+from pagure.exceptions import FileNotFoundException
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -85,8 +87,7 @@ class PagureFlaskPluginPagureRequestHooktests(tests.Modeltests):
 
             data['csrf_token'] = csrf_token
             # No git found
-            output = self.app.post('/test/settings/Pagure requests', data=data)
-            self.assertEqual(output.status_code, 404)
+            self.assertRaises(pagure.exceptions.FileNotFoundException)
 
             # Create both the requests repo
             tests.create_projects_git(os.path.join(tests.HERE, 'requests'))

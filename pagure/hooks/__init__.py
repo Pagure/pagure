@@ -13,6 +13,7 @@ import shutil
 import wtforms
 import flask
 
+from pagure.exceptions import FileNotFoundException
 from pagure import APP, get_repo_path
 
 
@@ -85,8 +86,7 @@ class BaseHook(object):
         '''
         for repopath in repopaths:
             if not os.path.exists(repopath):
-                APP.logger.debug('Hook install repo %s not found', repopath)
-                flask.abort(404, 'No git repo found')
+                raise FileNotFoundException('Repo %s not found' % repopath)
 
             hook_files = os.path.join(
                 os.path.dirname(os.path.realpath(__file__)), 'files')
@@ -116,8 +116,7 @@ class BaseHook(object):
         '''
         for repopath in repopaths:
             if not os.path.exists(repopath):
-                APP.logger.debug('Hook remove repo %s not found', repopath)
-                flask.abort(404, 'No git repo found')
+                raise FileNotFoundException('Repo %s not found' % repopath)
 
             hook_path = os.path.join(repopath, 'hooks', cls.hook_type + '.'
                                      + hook_name)
