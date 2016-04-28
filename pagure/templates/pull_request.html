@@ -425,7 +425,7 @@
   <div class="col-md-4">
   {% if pull_request %}
     <section class="pr_info">
-      <div id="merge-load" class="content-loading" style="display:none"></div>
+      <div id="spinner" class="content-loading" style="display:none"></div>
       <div id="merge-alert" class="alert text-xs-center" style="display:none;" role="alert">
       {% if pull_request.status == 'Open' and repo_admin %}
        <div>
@@ -436,8 +436,7 @@
         </form>
        </div>
       {% endif %}
-      <small id="merge-alert-message">
-      </small>
+      <small id="merge-alert-message"></small>
       </div>
       {% if pull_request.status != 'Open'%}
       <div class="alert {{'alert-success' if pull_request.status == 'Merged' else 'alert-danger'}}
@@ -779,7 +778,7 @@ function setup_reply_btns() {
 
   {% if pull_request.status == 'Open' %}
   $(function(){
-    $('#merge-load').show();
+    $('#spinner').show();
     $.ajax({
       url: '{{ url_for("internal_ns.mergeable_request_pull") }}' ,
       type: 'POST',
@@ -789,7 +788,7 @@ function setup_reply_btns() {
       },
       dataType: 'json',
       success: function(res) {
-        $('#merge-load').hide();
+        $('#spinner').hide();
         if (res.code == 'FFORWARD'){
           $('#merge_btn').addClass("btn-success");
           $('#merge-alert').addClass("alert-success");
@@ -816,7 +815,7 @@ function setup_reply_btns() {
         }
       },
       error: function(res) {
-        $('#merge-load').hide();
+        $('#spinner').hide();
         var _obj = $('#pr_flags').find('tbody');
         if (res.responseJSON.message) {
           _obj.append(
