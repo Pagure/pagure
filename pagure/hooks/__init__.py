@@ -74,7 +74,7 @@ class BaseHook(object):
                            postreceive)
 
     @classmethod
-    def base_install(cls, repopaths, dbobj, hook_name, filein):  # pragma: no cover
+    def base_install(cls, repopaths, dbobj, hook_name, filein):
         ''' Method called to install the hook for a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
@@ -106,7 +106,7 @@ class BaseHook(object):
                 )
 
     @classmethod
-    def base_remove(cls, repopaths, hook_name):  # pragma: no cover
+    def base_remove(cls, repopaths, hook_name):
         ''' Method called to remove the hook of a project.
 
         :arg project: a ``pagure.model.Project`` object to which the hook
