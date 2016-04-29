@@ -238,8 +238,8 @@
       </div>
   </div>
 
-  <div class="tab-pane {% 
-      if not pull_request %}active{% 
+  <div class="tab-pane {%
+      if not pull_request %}active{%
       endif %}" role="tabpanel" id="request_diff">
     {% if authenticated and pull_request %}
     <form action="{{ url_for('.pull_request_drop_comment', username=username,
@@ -505,43 +505,77 @@
       <div class="card-header">
         <h5><strong>Changes summary</strong></h5>
       </div>
+
+
+    {% macro changeschangedfile(filepath, added, removed) -%}
+        <div class="clearfix" style="margin-left:-4px;">
+          <div class="pull-xs-right"><span class="label label-success">+{{added}}</span> <span class="label label-danger">-{{removed}}</span></div>
+          <div class="pull-xs-left pr-changes-description"><strong>file <span class="text-primary">changed</span></strong></div>
+        </div>
+        <div class="ellipsis pr-changes-description">
+          {{filepath}}
+        </div>
+    {%- endmacro %}
+    {% macro changesrenamedfile(oldfilepath, newfilepath, added, removed) -%}
+        <div class="clearfix" style="margin-left:-4px;">
+          <div class="pull-xs-right"><span class="label label-success">+{{added}}</span> <span class="label label-danger">-{{removed}}</span></div>
+          <div class="pull-xs-left pr-changes-description"><strong>file <span class="text-warning">renamed</span></strong></div>
+        </div>
+        <div class="ellipsis pr-changes-description">
+          <strike class="text-muted">{{oldfilepath}}</strike> <br/> {{newfilepath}}
+        </div>
+    {%- endmacro %}
+    {% macro changesdeletedfile(filepath, added, removed) -%}
+        <div class="clearfix" style="margin-left:-4px;">
+          <div class="pull-xs-right"><span class="label label-danger">-{{removed}}</span></div>
+          <div class="pull-xs-left pr-changes-description"><strong>file <span class="text-danger">deleted</span></strong></div>
+        </div>
+        <div class="ellipsis pr-changes-description">
+          {{filepath}}
+        </div>
+    {%- endmacro %}
+    {% macro changesaddedfile(filepath, added, removed) -%}
+        <div class="clearfix" style="margin-left:-4px;">
+          <div class="pull-xs-right"><span class="label label-success">+{{added}}</span></div>
+          <div class="pull-xs-left pr-changes-description"><strong>file <span class="text-success">added</span></strong></div>
+        </div>
+        <div class="ellipsis pr-changes-description">
+          {{filepath}}
+        </div>
+    {%- endmacro %}
     <div class="list-group list-group-flush">
     {% for patch in diff %}
         <div class="list-group-item">
-          <span>
-            {%- if patch | hasattr('new_file_path') -%}
-              {%- if patch.new_file_path == patch.old_file_path -%}
-              {{ patch.new_file_path }}
-              {%- else -%}
-              {{ patch.new_file_path }} (Renamed from "{{ patch.old_file_path }}")
-              {%- endif -%}
-            {%- elif patch | hasattr('delta') -%}
-              {%- if patch.delta.new_file.path == patch.delta.old_file.path -%}
-              {{ patch.delta.new_file.path }}
-              {%- else -%}
-              {{ patch.delta.new_file.path }} (Renamed from "{{ patch.delta.old_file.path }}")
-              {%- endif -%}
+
+          {% if patch | hasattr('additions') %}
+          {# Version of pygit2 -0.21.4 -- F21/EL7 #}
+              {% set linesadded = patch.additions %}
+              {% set linesremoved = patch.deletions %}
+          {% else %}
+          {# Version of pygit2 -0.23.0 -- F23 #}
+              {% set linesadded = patch.line_stats[1] %}
+              {% set linesremoved = patch.line_stats[2] %}
+          {% endif %}
+
+          {% if patch | hasattr('new_file_path') %}
+            {%- if patch.new_file_path == patch.old_file_path -%}
+              {{ changeschangedfile(patch.new_file_path, linesadded, linesremoved) }}
+            {%- else -%}
+              {{changesrenamedfile(patch.old_file_path, patch.new_file_path, linesadded, linesremoved)}}
             {%- endif -%}
-          </span>
-          <div class="pull-right">
-            {% if patch | hasattr('additions') %}
-            {# Version of pygit2 -0.21.4 -- F21/EL7 #}
-            {% if (patch.additions + patch.deletions) %}
-              <span style="width: {{ (100.0 * patch.additions / (patch.additions + patch.deletions))|round|int }}%">
-                {% if patch.additions > 0 %}+{{ patch.additions }}{% endif %}
-                {% if patch.deletions > 0 %}-{{ patch.deletions }}{% endif %}
-              </span>
-            {% endif %}
-            {% else %}
-            {# Version of pygit2 -0.23.0 -- F23 #}
-            {% if (patch.line_stats[1] + patch.line_stats[2]) %}
-              <span style="width: {{ (100.0 * patch.line_stats[1] / (patch.line_stats[1] + patch.line_stats[2]))|round|int }}%">
-                {% if patch.line_stats[1] > 0 %}+{{ patch.line_stats[1] }}{% endif %}
-                {% if patch.line_stats[2] > 0 %}-{{ patch.line_stats[2] }}{% endif %}
-              </span>
-            {% endif %}
-            {% endif %}
-          </div>
+          {%- elif patch | hasattr('delta') -%}
+            {%- if patch.delta.new_file.path == patch.delta.old_file.path -%}
+              {%- if patch.delta.new_file.mode == 0 and patch.delta.old_file.mode == 33188 -%}
+                {{ changesdeletedfile(patch.delta.new_file.path, linesadded, linesremoved) }}
+              {%-elif patch.delta.new_file.mode == 33188 and patch.delta.old_file.mode == 0 -%}
+                {{ changesaddedfile(patch.delta.new_file.path, linesadded, linesremoved) }}
+              {%-elif patch.delta.new_file.mode == 33188 and patch.delta.old_file.mode == 33188 -%}
+                {{ changeschangedfile(patch.delta.new_file.path, linesadded, linesremoved) }}
+              {%-endif-%}
+            {%- else -%}
+              {{changesrenamedfile(patch.delta.old_file.path, patch.delta.new_file.path, linesadded, linesremoved)}}
+            {%- endif -%}
+          {%- endif -%}
         </div>
     {% endfor %}
       </div>

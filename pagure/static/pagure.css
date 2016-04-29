@@ -204,6 +204,11 @@ right:6px!important;
   text-overflow: ellipsis;
 }
 
+.ellipsis-left
+{
+  direction:rtl;
+}
+
 .projecticon .oi
 {
 font-size: 3.5rem;
@@ -508,4 +513,9 @@ color: #999;
 
 th[data-sort] {
     cursor: pointer;
+}
+
+.pr-changes-description
+{
+  font-size: 0.8em;
 }
