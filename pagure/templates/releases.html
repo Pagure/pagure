@@ -45,10 +45,13 @@
             {% set msg_head_tail = tag['object'].message.split('\n', 1) %}
             {{ msg_head_tail[0] }}
             {% set detailtext = msg_head_tail.pop().strip() %}
-            {% if msg_head_tail and detailtext %}
-            <div style="white-space:pre-wrap">
-              {{ detailtext }}
-            </div>
+            {% if msg_head_tail and detailtext.endswith('\n-----END PGP SIGNATURE-----') %}
+              {% set detailtext = detailtext.rsplit('\n-----BEGIN PGP SIGNATURE-----\n', 1)[0] %}
+              {% if detailtext %}
+              <div style="white-space:pre-wrap">
+                {{ detailtext }}
+              </div>
+              {% endif %}
             {% endif %}
           {% endif %}
         {% else %}
