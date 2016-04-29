@@ -42,9 +42,10 @@
         {% if tag['objecttype'] == "tag" %}
           {% if tag['object'].message %}
             <strong>{{tag['tagname']}}</strong>
-            {{ tag['object'].message.split('\n')[0] }}
-            {% set detailtext = tag['object'].message.partition('\n')[2] %}
-            {% if detailtext != "" %}
+            {% set msg_head_tail = tag['object'].message.split('\n', 1) %}
+            {{ msg_head_tail[0] }}
+            {% set detailtext = msg_head_tail.pop().strip() %}
+            {% if msg_head_tail and detailtext %}
             <div style="white-space:pre-wrap">
               {{ detailtext }}
             </div>
