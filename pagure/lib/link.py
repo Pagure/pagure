@@ -15,21 +15,17 @@ import pagure.exceptions
 
 
 FIXES = [
-    re.compile(r'fixe?[sd]?:?\s*?#(\d+)', re.I),
-    re.compile(r'.*\s*fixe?[sd]?:?\s*?#(\d+)', re.I),
-    re.compile(r'fixe?[sd]?:?\s*?https?://.*/(\w+)/issue/(\d+)', re.I),
-    re.compile(r'.*\s*?fixe?[sd]?:?\s*?https?://.*/(\w+)/issue/(\d+)', re.I),
-    re.compile(r'merge?[sd]?:?\s*?#(\d+)', re.I),
-    re.compile(r'.*\s*merge?[sd]?:?\s*?#(\d+)', re.I),
-    re.compile(r'merge?[sd]?:?\s*?https?://.*/(\w+)/issue/(\d+)', re.I),
-    re.compile(r'.*\s*?merge?[sd]?:?\s*?https?://.*/(\w+)/issue/(\d+)', re.I),
+    re.compile(r'(?:.*\s+)?fixe?[sd]?:?\s*?#(\d+)', re.I),
+    re.compile(r'(?:.*\s+)?fixe?[sd]?:?\s*?https?://.*/(\w+)/issue/(\d+)', re.I),
+    re.compile(r'(?:.*\s+)?merge?[sd]?:?\s*?#(\d+)', re.I),
+    re.compile(r'(?:.*\s+)?merge?[sd]?:?\s*?https?://.*/(\w+)/issue/(\d+)', re.I),
 ]
 
 RELATES = [
-    re.compile(r'.*\s*relate[sd]?:?\s*?(?:to)?\s*?#(\d+)', re.I),
-    re.compile(r'.*\s*relate[sd]?:?\s?#(\d+)', re.I),
+    re.compile(r'(?:.*\s+)?relate[sd]?:?\s*?(?:to)?\s*?#(\d+)', re.I),
+    re.compile(r'(?:.*\s+)?relate[sd]?:?\s?#(\d+)', re.I),
     re.compile(
-        r'.*\s*relate[sd]?:?\s*?(?:to)?\s*?https?://.*/(\w+)/issue/(\d+)',
+        r'(?:.*\s+)?relate[sd]?:?\s*?(?:to)?\s*?https?://.*/(\w+)/issue/(\d+)',
         re.I),
 ]
 
