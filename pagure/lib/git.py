@@ -847,11 +847,11 @@ def get_revs_between(oldrev, newrev, abspath, forced=False):
     if forced:
         head = get_default_branch(abspath)
         cmd.append('^%s' % head)
-    if set(newrev) == set('0'):
-        cmd = ['rev-list', '%s' % oldrev]
-    elif set(oldrev) == set('0') or set(oldrev) == set('^0'):
+    if set(oldrev) == set('0'):
+        cmd = ['rev-list', '%s' % newrev]
+    elif set(newrev) == set('0') or set(newrev) == set('^0'):
         head = get_default_branch(abspath)
-        cmd = ['rev-list', '%s' % newrev, '^%s' % head]
+        cmd = ['rev-list', '%s' % oldrev, '^%s' % head]
     return pagure.lib.git.read_git_lines(cmd, abspath)
 
 
