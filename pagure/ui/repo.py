@@ -1031,6 +1031,88 @@ def update_priorities(repo, username=None):
         'view_settings', username=username, repo=repo.name))
 
 
+@APP.route('/<repo:repo>/update/milestones', methods=['POST'])
+@APP.route('/fork/<username>/<repo:repo>/update/milestones', methods=['POST'])
+@login_required
+def update_milestones(repo, username=None):
+    """ Update the milestones of a project.
+    """
+    if admin_session_timedout():
+        flask.flash('Action canceled, try it again', 'error')
+        url = flask.url_for(
+            'view_settings', username=username, repo=repo)
+        return flask.redirect(
+            flask.url_for('auth_login', next=url))
+
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    if not repo.settings.get('issue_tracker', True):
+        flask.abort(404, 'No issue tracker found for this project')
+
+    if not is_repo_admin(repo):
+        flask.abort(
+            403,
+            'You are not allowed to change the settings for this project')
+
+    form = pagure.forms.ConfirmationForm()
+
+    error = False
+    if form.validate_on_submit():
+        milestones = [
+            w.strip() for w in flask.request.form.getlist('milestones')
+            if w.strip()
+        ]
+
+        milestone_dates = [
+            p.strip() for p in flask.request.form.getlist('milestone_dates')
+        ]
+
+        if len(milestones) != len(milestone_dates):
+            flask.flash(
+                'Milestones and dates are not of the same length',
+                'error')
+            error = True
+
+        for milestone in milestones:
+            if milestones.count(milestone) != 1:
+                flask.flash(
+                    'Milestone %s is present %s times' % (
+                        milestone, milestones.count(milestone)
+                    ),
+                    'error')
+                error = True
+                break
+
+        for milestone_date in milestone_dates:
+            if milestone_dates.count(milestone_date) != 1:
+                flask.flash(
+                    'Date %s is present %s times' % (
+                        milestone_date, milestone_dates.count(milestone_date)
+                    ),
+                    'error')
+                error = True
+                break
+
+        if not error:
+            miles = {}
+            for cnt in range(len(milestones)):
+                miles[milestones[cnt]] = milestone_dates[cnt]
+            try:
+                repo.milestones = miles
+                SESSION.add(repo)
+                SESSION.commit()
+                flask.flash('Milestones updated')
+            except SQLAlchemyError as err:  # pragma: no cover
+                SESSION.rollback()
+                flask.flash(str(err), 'error')
+
+    return flask.redirect(flask.url_for(
+        'view_settings', username=username, repo=repo.name))
+
+
 @APP.route('/<repo:repo>/default/branch/', methods=['POST'])
 @APP.route('/fork/<username>/<repo:repo>/default/branch/', methods=['POST'])
 @login_required
