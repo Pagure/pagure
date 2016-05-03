@@ -10,6 +10,7 @@
 
 import flask
 import os
+from collections import defaultdict
 
 import pygit2
 from sqlalchemy.exc import SQLAlchemyError
@@ -444,6 +445,88 @@ def view_issues(repo, username=None):
         repo_admin=is_repo_admin(repo),
         repo_obj=repo_obj,
     )
+
+
+@APP.route('/<repo:repo>/roadmap/')
+@APP.route('/<repo:repo>/roadmap')
+@APP.route('/fork/<username>/<repo:repo>/roadmap/')
+@APP.route('/fork/<username>/<repo:repo>/roadmap')
+def view_roadmap(repo, username=None):
+    """ List all issues associated to a repo as roadmap
+    """
+    status = flask.request.args.get('status', 'Open')
+    if status.lower() == 'all':
+        status = None
+    milestone = flask.request.args.getlist('milestone', None)
+
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+
+    if repo is None:
+        flask.abort(404, 'Project not found')
+
+    if not repo.settings.get('issue_tracker', True):
+        flask.abort(404, 'No issue tracker found for this project')
+
+    # Hide private tickets
+    private = False
+    # If user is authenticated, show him/her his/her private tickets
+    if authenticated():
+        private = flask.g.fas_user.username
+    # If user is repo admin, show all tickets included the private ones
+    if is_repo_admin(repo):
+        private = None
+
+    milestones = milestone or list(repo.milestones.keys())
+    tags = ['roadmap'] + milestones
+
+    issues = pagure.lib.search_issues(
+        SESSION,
+        repo,
+        tags=tags,
+        private=private,
+    )
+
+    # Change from a list of issues to a dict of milestone/issues
+    milestone_issues = defaultdict(list)
+    for cnt in range(len(issues)):
+        saved = False
+        for milestone in sorted(milestones):
+            if milestone in issues[cnt].tags_text:
+                milestone_issues[milestone].append(issues[cnt])
+                saved = True
+                break
+        if saved:
+            continue
+        milestone_issues['unplaned'].append(issues[cnt])
+
+    if status:
+        for key in milestone_issues.keys():
+            active = False
+            for issue in milestone_issues[key]:
+                if issue.status == 'Open':
+                    active = True
+                    break
+            if not active:
+                del(milestone_issues[key])
+
+    tag_list = pagure.lib.get_tags_of_project(SESSION, repo)
+
+    reponame = pagure.get_repo_path(repo)
+    repo_obj = pygit2.Repository(reponame)
+
+    return flask.render_template(
+        'roadmap.html',
+        select='issues',
+        repo=repo,
+        username=username,
+        tag_list=tag_list,
+        status=status,
+        issues=milestone_issues,
+        tags=tags,
+        repo_admin=is_repo_admin(repo),
+        repo_obj=repo_obj,
+    )
+
 
 
 @APP.route('/<repo:repo>/new_issue/', methods=('GET', 'POST'))
