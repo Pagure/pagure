@@ -207,10 +207,12 @@ class UpdateIssueForm(wtf.Form):
                 (status, status) for status in kwargs['status']
             ]
 
+        self.priority.choices = []
         if 'priorities' in kwargs:
-            self.priority.choices = [
-                (key, val) for key, val in kwargs['priorities'].iteritems()
-            ]
+            for key in sorted(kwargs['priorities']):
+                self.priority.choices.append(
+                    (key, kwargs['priorities'][key])
+                )
 
 
 class AddPullRequestCommentForm(wtf.Form):
