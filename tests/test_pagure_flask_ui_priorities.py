@@ -202,7 +202,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             self.assertIn('<h3>Settings for test</h3>', output.data)
             # Check the result of the action -- Priority recorded
             repo = pagure.lib.get_project(self.session, 'test')
-            self.assertEqual(repo.priorities, {u'1': u'High'})
+            self.assertEqual(repo.priorities, {u'': u'', u'1': u'High'})
 
             data = {
                 'priority_weigth': [1, 2, 3],
@@ -220,7 +220,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             repo = pagure.lib.get_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
-                {u'1': u'High', u'2': u'Normal', u'3': u'Low'}
+                {u'': u'', u'1': u'High', u'2': u'Normal', u'3': u'Low'}
             )
 
             # Check error - less weigths than titles
@@ -243,7 +243,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             repo = pagure.lib.get_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
-                {u'1': u'High', u'2': u'Normal', u'3': u'Low'}
+                {u'': u'', u'1': u'High', u'2': u'Normal', u'3': u'Low'}
             )
 
             # Check error - weigths must be integer
@@ -267,7 +267,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             repo = pagure.lib.get_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
-                {u'1': u'High', u'2': u'Normal', u'3': u'Low'}
+                {u'': u'', u'1': u'High', u'2': u'Normal', u'3': u'Low'}
             )
 
             # Check error - Twice the same priority weigth
@@ -291,7 +291,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             repo = pagure.lib.get_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
-                {u'1': u'High', u'2': u'Normal', u'3': u'Low'}
+                {u'': u'', u'1': u'High', u'2': u'Normal', u'3': u'Low'}
             )
 
             # Check error - Twice the same priority title
@@ -315,7 +315,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             repo = pagure.lib.get_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
-                {u'1': u'High', u'2': u'Normal', u'3': u'Low'}
+                {u'': u'', u'1': u'High', u'2': u'Normal', u'3': u'Low'}
             )
 
             # Check the behavior if the project disabled the issue tracker
