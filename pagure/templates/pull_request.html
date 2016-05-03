@@ -248,7 +248,9 @@
     {% endif %}
 
     {% if diff %}
+      {% set count = 0 %}
       {% for patch in diff %}
+        {% set count = count+1 %}
         {% if patch |hasattr('new_id') %}
           {% set patch_new_id = patch.new_id %}
         {% elif patch |hasattr('delta') %}
@@ -256,7 +258,6 @@
         {% else %}
           {% set patch_new_id = patch.new_oid %}
         {% endif %}
-
         {% if patch | hasattr('new_file_path') %}
           {% set patch_new_file_path = patch.new_file_path -%}
           {% if patch.new_file_path != patch.old_file_path %}
@@ -269,38 +270,101 @@
           {%- endif -%}
         {%- endif -%}
 
-      <section class="commit_diff">
-      <div class="card clearfix">
+
+    <section class="commit_diff">
+      <div class="card clearfix" id="_{{count}}">
         <div class="card-header">
             <h5>
-              {%- if patch_new_file_path == patch_old_file_path -%}
-                {{ patch_new_file_path }} (Renamed from "{{ patch_old_file_path }}")
-              {%- else -%}
-                {{ patch_new_file_path }}
-              {%- endif -%}
+              {% if patch | hasattr('additions') %}
+              {# Version of pygit2 -0.21.4 -- F21/EL7 #}
+                  {% set linesadded = patch.additions %}
+                  {% set linesremoved = patch.deletions %}
+              {% else %}
+              {# Version of pygit2 -0.23.0 -- F23 #}
+                  {% set linesadded = patch.line_stats[1] %}
+                  {% set linesremoved = patch.line_stats[2] %}
+              {% endif %}
 
+              {% macro lineschanged(added, removed) -%}
+                {%if added%}
+                  <span class="label label-success pull-xs-right text-mono">+{{linesadded}}</span>
+                {%endif%}
+                {%if removed%}
+                  <span class="label label-danger pull-xs-right">-{{linesremoved}}</span>
+                {%endif%}
+              {%endmacro%}
+
+              {% macro viewfilelink(filepath)%}
               {% if pull_request %}
-              <a class="button small view headerlink pull-xs-right" href="{{
+              <a href="{{
                   url_for(
                       'view_file',
                       username=pull_request.project_from.user.username
                           if pull_request.project_from.is_fork else None,
                       repo=pull_request.project_from.name,
                       identifier=pull_request.branch_from,
-                      filename=patch_new_file_path) }}"
+                      filename=filepath) }}"
               {% else %}
-              <a class="button small view headerlink pull-xs-right" href="{{
+              <a href="{{
                   url_for(
                       'view_file',
                       username=username,
                       repo=repo.name,
                       identifier=branch_from,
-                      filename=patch_new_file_path) }}"
+                      filename=filepath) }}"
               {% endif %}
-              title="View file as of {{ patch_new_id|short }}">View</a>
+              title="View file as of {{ patch_new_id|short }}">{{filepath}}</a>
+              {% endmacro %}
+
+              {% if patch | hasattr('new_file_path') %}
+                {%- if patch.new_file_path == patch.old_file_path -%}
+                  {{ viewfilelink(patch.new_file_path)}} {{lineschanged(True, True)}}
+                {%- else -%}
+                  {{lineschanged(True, True)}}
+                  <div class="clearfix">
+                    <strike>{{patch.old_file_path}}</strike><br/>
+                    {{viewfilelink(patch.new_file_path)}}
+                  </div>
+                  <div><small>file removed</small></div>
+                {%- endif -%}
+              {%- elif patch | hasattr('delta') -%}
+                {%- if patch.delta.new_file.path == patch.delta.old_file.path -%}
+                  {%- if patch.delta.new_file.mode == 0 and patch.delta.old_file.mode == 33188 -%}
+                    {% set patchtype = "removed"%}
+                    <div class="clearfix">{{viewfilelink(patch.delta.new_file.path)}} {{lineschanged(False, True)}}</div>
+                    <div><small>file removed</small></div>
+                  {%-elif patch.delta.new_file.mode == 33188 and patch.delta.old_file.mode == 0 -%}
+                    {% set patchtype = "added"%}
+                    <div class="clearfix">{{viewfilelink(patch.delta.new_file.path)}} {{lineschanged(True, False)}}</div>
+                    <div><small>file added</small></div>
+                  {%-elif patch.delta.new_file.mode == 33188 and patch.delta.old_file.mode == 33188 -%}
+                    {% set patchtype = "changed"%}
+                    <div class="clearfix">
+                      {{ viewfilelink(patch.delta.new_file.path)}} {{lineschanged(True, True)}}
+                    </div>
+                    <div><small>file changed</small></div>
+                  {%-endif-%}
+                {%- else -%}
+                  {% set patchtype = "moved"%}
+                  {{lineschanged(True, True)}}
+                  <div class="clearfix">
+                    <strike>{{patch.delta.old_file.path}}</strike><br/>
+                    {{viewfilelink(patch.delta.new_file.path)}}
+                  </div>
+                  <div><small>file moved</small></div>
+                {%- endif -%}
+              {%- endif -%}
             </h5>
         </div>
-
+      {% if patchtype == "moved" and linesadded == 0 and linesremoved == 0%}
+        <div class="card-block">
+          <div class="text-muted text-xs-center">file was moved with no change to the file</div>
+        </div>
+      {% elif patchtype == "added" and linesadded == 0 %}
+        <div class="card-block">
+          <div class="text-muted text-xs-center">empty file added</div>
+        </div>
+      {% else %}
       {% autoescape false %}
           {{ patch | patch_to_diff | html_diff | format_loc(
                   filename=patch_new_file_path,
@@ -309,6 +373,7 @@
                   index=loop.index,
                   tree_id=diff_commits[0].tree.id)}}
       {% endautoescape %}
+      {% endif %}
 
       </div>
       </section>
@@ -505,46 +570,47 @@
       <div class="card-header">
         <h5><strong>Changes summary</strong></h5>
       </div>
-
-
-    {% macro changeschangedfile(filepath, added, removed) -%}
+    {% macro changeschangedfile(filepath, added, removed, diffanchor) -%}
         <div class="clearfix" style="margin-left:-4px;">
           <div class="pull-xs-right"><span class="label label-success">+{{added}}</span> <span class="label label-danger">-{{removed}}</span></div>
           <div class="pull-xs-left pr-changes-description"><strong>file <span class="text-primary">changed</span></strong></div>
         </div>
         <div class="ellipsis pr-changes-description">
-          {{filepath}}
+          <a href="#_{{diffanchor}}">{{filepath}}</a>
         </div>
     {%- endmacro %}
-    {% macro changesrenamedfile(oldfilepath, newfilepath, added, removed) -%}
+    {% macro changesrenamedfile(oldfilepath, newfilepath, added, removed, diffanchor) -%}
         <div class="clearfix" style="margin-left:-4px;">
           <div class="pull-xs-right"><span class="label label-success">+{{added}}</span> <span class="label label-danger">-{{removed}}</span></div>
           <div class="pull-xs-left pr-changes-description"><strong>file <span class="text-warning">renamed</span></strong></div>
         </div>
         <div class="ellipsis pr-changes-description">
-          <strike class="text-muted">{{oldfilepath}}</strike> <br/> {{newfilepath}}
+          <strike class="text-muted">{{oldfilepath}}</strike> <br/>
+          <a href="#_{{diffanchor}}">{{newfilepath}}</a>
         </div>
     {%- endmacro %}
-    {% macro changesdeletedfile(filepath, added, removed) -%}
+    {% macro changesdeletedfile(filepath, added, removed, diffanchor) -%}
         <div class="clearfix" style="margin-left:-4px;">
           <div class="pull-xs-right"><span class="label label-danger">-{{removed}}</span></div>
-          <div class="pull-xs-left pr-changes-description"><strong>file <span class="text-danger">deleted</span></strong></div>
+          <div class="pull-xs-left pr-changes-description"><strong>file <span class="text-danger">removed</span></strong></div>
         </div>
         <div class="ellipsis pr-changes-description">
-          {{filepath}}
+          <a href="#_{{diffanchor}}">{{filepath}}</a>
         </div>
     {%- endmacro %}
-    {% macro changesaddedfile(filepath, added, removed) -%}
+    {% macro changesaddedfile(filepath, added, removed, diffanchor) -%}
         <div class="clearfix" style="margin-left:-4px;">
           <div class="pull-xs-right"><span class="label label-success">+{{added}}</span></div>
           <div class="pull-xs-left pr-changes-description"><strong>file <span class="text-success">added</span></strong></div>
         </div>
         <div class="ellipsis pr-changes-description">
-          {{filepath}}
+          <a href="#_{{diffanchor}}">{{filepath}}</a>
         </div>
     {%- endmacro %}
     <div class="list-group list-group-flush">
+    {% set count = 0 %}
     {% for patch in diff %}
+        {% set count = count+1 %}
         <div class="list-group-item">
 
           {% if patch | hasattr('additions') %}
@@ -559,21 +625,21 @@
 
           {% if patch | hasattr('new_file_path') %}
             {%- if patch.new_file_path == patch.old_file_path -%}
-              {{ changeschangedfile(patch.new_file_path, linesadded, linesremoved) }}
+              {{ changeschangedfile(patch.new_file_path, linesadded, linesremoved, count) }}
             {%- else -%}
-              {{changesrenamedfile(patch.old_file_path, patch.new_file_path, linesadded, linesremoved)}}
+              {{changesrenamedfile(patch.old_file_path, patch.new_file_path, linesadded, linesremoved, count)}}
             {%- endif -%}
           {%- elif patch | hasattr('delta') -%}
             {%- if patch.delta.new_file.path == patch.delta.old_file.path -%}
               {%- if patch.delta.new_file.mode == 0 and patch.delta.old_file.mode == 33188 -%}
-                {{ changesdeletedfile(patch.delta.new_file.path, linesadded, linesremoved) }}
+                {{ changesdeletedfile(patch.delta.new_file.path, linesadded, linesremoved, count) }}
               {%-elif patch.delta.new_file.mode == 33188 and patch.delta.old_file.mode == 0 -%}
-                {{ changesaddedfile(patch.delta.new_file.path, linesadded, linesremoved) }}
+                {{ changesaddedfile(patch.delta.new_file.path, linesadded, linesremoved, count) }}
               {%-elif patch.delta.new_file.mode == 33188 and patch.delta.old_file.mode == 33188 -%}
-                {{ changeschangedfile(patch.delta.new_file.path, linesadded, linesremoved) }}
+                {{ changeschangedfile(patch.delta.new_file.path, linesadded, linesremoved, count) }}
               {%-endif-%}
             {%- else -%}
-              {{changesrenamedfile(patch.delta.old_file.path, patch.delta.new_file.path, linesadded, linesremoved)}}
+              {{changesrenamedfile(patch.delta.old_file.path, patch.delta.new_file.path, linesadded, linesremoved, count)}}
             {%- endif -%}
           {%- endif -%}
         </div>
