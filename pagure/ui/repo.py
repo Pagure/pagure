@@ -1017,6 +1017,7 @@ def update_priorities(repo, username=None):
             priorities = {}
             for cnt in range(len(weights)):
                 priorities[weights[cnt]] = titles[cnt]
+            priorities[''] = ''
             try:
                 repo.priorities = priorities
                 SESSION.add(repo)
