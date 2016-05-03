@@ -252,7 +252,7 @@ class PagureFlaskForktests(tests.Modeltests):
             '<h3><span class="label label-default">PR#1</span>\n'
             '  PR from the feature branch\n</h3>', output.data)
         self.assertIn(
-            'title="View file as of 2a552b">View</a>', output.data)
+            'title="View file as of 2a552b">sources</a>', output.data)
 
     @patch('pagure.lib.notify.send_email')
     def test_merge_request_pull_FF(self, send_email):
@@ -280,7 +280,7 @@ class PagureFlaskForktests(tests.Modeltests):
                 '<h3><span class="label label-default">PR#1</span>\n'
                 '  PR from the feature branch\n</h3>', output.data)
             self.assertIn(
-                'title="View file as of 2a552b">View</a>', output.data)
+                'title="View file as of 2a552b">sources</a>', output.data)
 
             # Wrong project
             data = {
@@ -545,7 +545,7 @@ class PagureFlaskForktests(tests.Modeltests):
             '  <span class="label label-success">', output.data)
         self.assertIn('<div>Merged by\n', output.data)
         self.assertIn(
-            'title="View file as of 2a552b">View</a>', output.data)
+            'title="View file as of 2a552b">sources</a>', output.data)
 
     @patch('pagure.lib.notify.send_email')
     def test_request_pull_disabled(self, send_email):
@@ -1768,7 +1768,7 @@ index 0000000..2a552bb
                 '<h3><span class="label label-default">PR#1</span>\n'
                 '  PR from the feature branch\n</h3>', output.data)
             self.assertIn(
-                'title="View file as of 2a552b">View</a>', output.data)
+                'title="View file as of 2a552b">sources</a>', output.data)
 
             # Wrong project
             data = {

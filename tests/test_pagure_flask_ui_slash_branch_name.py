@@ -361,7 +361,11 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertEqual(
             output.data.count('<span class="commitdate" title='), 1)
-        self.assertIn('<h5>.gitignore', output.data)
+        self.assertIn(
+            '<span class="label label-success pull-xs-right text-mono">'
+            '+1</span>', output.data)
+        self.assertIn(
+            '<div><small>file added</small></div></h5>', output.data)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
@@ -369,7 +373,11 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertEqual(
                 output.data.count('<span class="commitdate" title='), 1)
-            self.assertIn('<h5>.gitignore', output.data)
+            self.assertIn(
+                '<span class="label label-success pull-xs-right text-mono">'
+                '+1</span>', output.data)
+            self.assertIn(
+                '<div><small>file added</small></div></h5>', output.data)
 
 
 if __name__ == '__main__':
