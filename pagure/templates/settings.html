@@ -440,6 +440,65 @@
     <div class="col-md-8 col-md-offset-2">
       <div class="card">
         <div class="card-header">
+          <strong>Roadmap</strong>
+        </div>
+        <div class="card-block">
+          <p>
+            Below are the milestons you may assign to a ticket, allowing
+            you to build a roadmap using the `roadmap` tag and a tag
+            corresponding to one of the milestones defined here.
+          </p>
+        </div>
+        <form action="{{ url_for('.update_milestones',
+                          username=username, repo=repo.name) }}"
+            method="post" class="icon">
+          {{ tag_form.csrf_token }}
+          <div class="card-block">
+            <div class="row">
+              <div class="col-sm-6">
+                <strong>Milestone</strong>
+              </div>
+              <div class="col-sm-6">
+                <strong>Date (optional)</strong>
+              </div>
+            </div>
+            <div id="milestones">
+          {% for milestone in repo.milestones | sort %}
+              <div class="row p-t-1">
+                <div class="col-sm-6 p-r-0">
+                  <input type="text" name="milestones"
+                    value="{{ milestone }}" size="3" class="form-control"/>
+                </div>
+                <div class="col-sm-6 p-r-0">
+                  <input type="text" name="milestone_dates"
+                    value="{{ repo.milestones[milestone] }}" class="form-control"/>
+                </div>
+              </div>
+          {% endfor %}
+          </div>
+          <div class="row p-t-1">
+            <div class="col-sm-6">
+              <a class="btn btn-secondary btn-sm btn-block" id="new_milestone">
+                  Add new priority
+              </a>
+            </div>
+          </div>
+          <div class="row p-t-1">
+            <div class="col-sm-12">
+              <button class="btn btn-primary" type="submit"
+                  title="Update the milestones">
+                Update
+              </button>
+            </div>
+          </div>
+        </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-md-8 col-md-offset-2">
+      <div class="card">
+        <div class="card-header">
           <strong>Issue Tags</strong>
         </div>
         <div class="card-block">
@@ -568,6 +627,7 @@ $('#new_priority').click(function(e) {
     </div>'
   );
 });
+
 {% if not repo.priorities %}
 $('#default_priorities').click(function(e) {
   $('#priorities').html('');
@@ -589,6 +649,23 @@ $('#default_priorities').click(function(e) {
   console.log($('#priorities'));
 });
 {% endif %}
+
+$('#new_milestone').click(function(e) {
+  console.log('new milestone');
+  console.log($('#milestones'));
+  $('#milestones').append(
+    '<div class="row p-t-1"> \
+        <div class="col-sm-6 p-r-0">\
+          <input type="text" name="milestones"\
+            value="" size="3" class="form-control"/>\
+        </div>\
+        <div class="col-sm-6 p-r-0">\
+          <input type="text" name="milestone_dates"\
+            value="" class="form-control"/>\
+        </div>\
+    </div>'
+  );
+});
 
 </script>
 {% endblock %}
