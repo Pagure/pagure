@@ -289,6 +289,7 @@ class Project(BASE):
         sa.ForeignKey('projects.id', onupdate='CASCADE'),
         nullable=True)
     _priorities = sa.Column(sa.Text, nullable=True)
+    _milestones = sa.Column(sa.Text, nullable=True)
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
@@ -372,6 +373,23 @@ class Project(BASE):
     def settings(self, settings):
         ''' Ensures the settings are properly saved. '''
         self._settings = json.dumps(settings)
+
+    @property
+    def milestones(self):
+        """ Return the dict stored as string in the database as an actual
+        dict object.
+        """
+        milestones = {}
+
+        if self._milestones:
+            milestones = json.loads(self._milestones)
+
+        return milestones
+
+    @milestones.setter
+    def milestones(self, milestones):
+        ''' Ensures the milestones are properly saved. '''
+        self._milestones = json.dumps(milestones)
 
     @property
     def priorities(self):
