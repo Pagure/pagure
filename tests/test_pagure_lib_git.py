@@ -1253,16 +1253,24 @@ index 0000000..60f7480
         output = pagure.lib.git.read_git_lines(
             ['log', '-3', "--pretty='%H'"], gitrepo)
         self.assertEqual(len(output), 2)
-        to_hash = output[0].replace("'", '')
         from_hash = output[1].replace("'", '')
 
+        # Case 1, repo BASE is null and HEAD is equal to from_hash
+        to_hash = '0'
         output1 = pagure.lib.git.get_revs_between(
             to_hash, from_hash, gitrepo)
-        self.assertEqual(output1, [to_hash])
+        self.assertEqual(output1, [from_hash])
 
+        # Case 2, get revs between two commits (to_hash, from_hash)
+        to_hash = output[0].replace("'", '')
         output2 = pagure.lib.git.get_revs_between(
-            from_hash, to_hash, gitrepo)
+            to_hash, from_hash, gitrepo)
         self.assertEqual(output2, [to_hash])
+
+        # Case 3, get revs between two commits (from_hash, to_hash)
+        output3 = pagure.lib.git.get_revs_between(
+            from_hash, to_hash, gitrepo)
+        self.assertEqual(output3, [to_hash])
 
     def test_get_author(self):
         """ Test the get_author method of pagure.lib.git. """
