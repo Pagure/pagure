@@ -31,19 +31,19 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-from pagure import APP
-
-if args.profile:
-    from werkzeug.contrib.profiler import ProfilerMiddleware
-    APP.config['PROFILE'] = True
-    APP.wsgi_app = ProfilerMiddleware(APP.wsgi_app, restrictions=[30])
-
 if args.config:
     config = args.config
     if not config.startswith('/'):
         here = os.path.join(os.path.dirname(os.path.abspath(__file__)))
         config = os.path.join(here, config)
     os.environ['PAGURE_CONFIG'] = config
+
+from pagure import APP
+
+if args.profile:
+    from werkzeug.contrib.profiler import ProfilerMiddleware
+    APP.config['PROFILE'] = True
+    APP.wsgi_app = ProfilerMiddleware(APP.wsgi_app, restrictions=[30])
 
 APP.debug = True
 APP.run(host=args.host, port=int(args.port))
