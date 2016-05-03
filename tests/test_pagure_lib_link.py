@@ -191,34 +191,65 @@ class PagureLibLinktests(tests.Modeltests):
 
     def test_fixes_regex(self):
         ''' Test the fixes regex present in pagure.lib.link. '''
-        text = 'fixes     http://localhost/fork/pingou/test/issue/1'
-        for index, regex in enumerate(pagure.lib.link.FIXES):
-            if index in [2, 3]:
-                self.assertNotEqual(regex.match(text), None)
-            else:
-                self.assertEqual(regex.match(text), None)
 
-        text = 'fix http://209.132.184.222/fork/pingou/test/issue/1'
-        for index, regex in enumerate(pagure.lib.link.FIXES):
-            if index in [2, 3]:
-                self.assertNotEqual(regex.match(text), None)
-            else:
-                self.assertEqual(regex.match(text), None)
+        # project/issue matches
+        def project_match(text, groups):
+            match = None
+            for regex in pagure.lib.link.FIXES:
+                match = regex.match(text)
+                if match:
+                    break
+            self.assertNotEqual(match, None)
+            self.assertEqual(len(match.groups()), 2)
+            self.assertEqual(match.groups(), groups)
 
-        text = 'This fixed  #5'
-        for index, regex in enumerate(pagure.lib.link.FIXES):
-            if index == 1:
-                self.assertNotEqual(regex.match(text), None)
-            else:
-                self.assertEqual(regex.match(text), None)
+        data = [
+            # [string, groups]
+        ]
 
-        text = 'Could this be fixes  '\
-            ' https://fedorahosted.org/pagure/tests2/issue/6'
-        for index, regex in enumerate(pagure.lib.link.FIXES):
-            if index == 3:
-                self.assertNotEqual(regex.match(text), None)
-            else:
-                self.assertEqual(regex.match(text), None)
+        project_match('fixes     http://localhost/fork/pingou/test/issue/1',
+            ('test', '1'))
+        project_match('fix http://209.132.184.222/fork/pingou/test/issue/1',
+            ('test', '1'))
+        project_match('Could this be fixes  '
+            ' https://fedorahosted.org/pagure/tests2/issue/6',
+            ('tests2', '6'))
+        project_match('merged https://pagure.io/myproject/pull-request/70',
+            ('myproject', '70'))
+        project_match('Now we merge https://pagure.io/myproject/pull-request/99',
+            ('myproject', '99'))
+
+        # issue matches
+        def issue_match(text, issue):
+            match = None
+            for regex in pagure.lib.link.FIXES:
+                match = regex.match(text)
+                if match:
+                    break
+            self.assertNotEqual(match, None)
+            self.assertEqual(len(match.groups()), 1)
+            self.assertEqual(match.group(1), issue)
+
+        issue_match('This fixed  #5', '5')
+        issue_match('Merged  #17', '17')
+        issue_match('Fixed:  #23', '23')
+        issue_match('This commit fixes:  #42', '42')
+        issue_match('Merge #137', '137')
+
+        # no match
+        def no_match(text):
+            match = None
+            for regex in pagure.lib.link.FIXES:
+                match = regex.match(text)
+                if match:
+                    break
+            self.assertEqual(match, None)
+
+        no_match('nowhitespacemerge: #47')
+        no_match('This commit unmerges #45')
+        no_match('Fixed 45 typos')
+        no_match('Fixed 4 typos')
+        no_match("Merge branch 'work'")
 
 
 if __name__ == '__main__':
