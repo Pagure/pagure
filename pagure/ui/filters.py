@@ -400,11 +400,12 @@ def return_md5(text):
     m.update(text)
     return pagure.lib.clean_input(m.hexdigest())
 
+
 @APP.template_filter('increment_largest_priority')
 def text_wraps(dictionary):
     """ Template filter to return the largest priority +1
     """
     if dictionary:
-        return int(max(dictionary.keys(), key=int)) + 1
+        return max([int(k) for k in dictionary if k]) + 1
     else:
         return 1
