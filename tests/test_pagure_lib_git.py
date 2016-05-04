@@ -696,7 +696,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,81 @@
+@@ -0,0 +1,83 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
@@ -715,6 +715,7 @@ index 0000000..60f7480
 +        "id": 1,
 +        "name": "test_ticket_repo",
 +        "parent": null,
++        "priorities": {},
 +        "settings": {
 +            "Enforce_signed-off_commits_in_pull-request": false,
 +            "Minimum_score_to_merge_pull-request": -1,
@@ -743,6 +744,7 @@ index 0000000..60f7480
 +        "id": 1,
 +        "name": "test_ticket_repo",
 +        "parent": null,
++        "priorities": {},
 +        "settings": {
 +            "Enforce_signed-off_commits_in_pull-request": false,
 +            "Minimum_score_to_merge_pull-request": -1,

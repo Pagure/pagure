@@ -147,6 +147,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                   "id": 1,
                   "name": "test",
                   "parent": None,
+                  "priorities": {},
                   "tags": ["infra"],
                   "user": {
                     "fullname": "PY C",
@@ -172,6 +173,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                   "id": 1,
                   "name": "test",
                   "parent": None,
+                  "priorities": {},
                   "tags": ["infra"],
                   "user": {
                     "fullname": "PY C",
@@ -184,6 +186,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                   "id": 2,
                   "name": "test2",
                   "parent": None,
+                  "priorities": {},
                   "tags": [],
                   "user": {
                     "fullname": "PY C",
@@ -208,6 +211,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                   "id": 1,
                   "name": "test",
                   "parent": None,
+                  "priorities": {},
                   "tags": ["infra"],
                   "user": {
                     "fullname": "PY C",

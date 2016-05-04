@@ -119,6 +119,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                     "id": 1,
                     "name": "test",
                     "parent": None,
+                    "priorities": {},
                     "tags": [],
                     "user": {
                       "fullname": "PY C",
@@ -132,6 +133,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                     "id": 1,
                     "name": "test",
                     "parent": None,
+                    "priorities": {},
                     "tags": [],
                     "user": {
                       "fullname": "PY C",
@@ -243,6 +245,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                 "id": 1,
                 "name": "test",
                 "parent": None,
+                "priorities": {},
                 "tags": [],
                 "user": {
                   "fullname": "PY C",
@@ -256,6 +259,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                 "id": 1,
                 "name": "test",
                 "parent": None,
+                "priorities": {},
                 "tags": [],
                 "user": {
                   "fullname": "PY C",

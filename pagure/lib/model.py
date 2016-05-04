@@ -439,6 +439,7 @@ class Project(BASE):
             'date_created': self.date_created.strftime('%s'),
             'user': self.user.to_json(public=public),
             'tags': self.tags_text,
+            'priorities': self.priorities,
         }
         if not api:
             output['settings'] = self.settings
