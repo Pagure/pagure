@@ -468,7 +468,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,22 @@
+@@ -0,0 +1,23 @@
 +{
 +    "assignee": null,
 +    "blocks": [],
@@ -477,6 +477,7 @@ index 0000000..60f7480
 +    "date_created": null,
 +    "depends": [],
 +    "id": 1,
++    "priority": null,
 +    "private": false,
 +    "status": "Open",
 +    "tags": [],

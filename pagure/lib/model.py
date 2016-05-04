@@ -580,6 +580,7 @@ class Issue(BASE):
             'blocks': [str(item) for item in self.blocks_text],
             'assignee': self.assignee.to_json(
                 public=public) if self.assignee else None,
+            'priority': self.priority,
         }
 
         comments = []
