@@ -34,6 +34,7 @@ MENTION_RE = r'@(\w+)'
 EXPLICIT_FORK_ISSUE_RE = r'(\w+)/(\w+)#([0-9]+)'
 EXPLICIT_MAIN_ISSUE_RE = r'[^|\w](?<!\/)(\w+)#([0-9]+)'
 IMPLICIT_ISSUE_RE = r'[^|\w](?<!\w)#([0-9]+)'
+IMPLICIT_PR_RE = r'[^|\w](?<!\w)PR#([0-9]+)'
 
 
 class MentionPattern(markdown.inlinepatterns.Pattern):
@@ -121,6 +122,40 @@ class ImplicitIssuePattern(markdown.inlinepatterns.Pattern):
         return text
 
 
+class ImplicitPRPattern(markdown.inlinepatterns.Pattern):
+    """ Implicit pull-request pattern. """
+
+    def handleMatch(self, m):
+        """ When the pattern matches, update the text. """
+        idx = markdown.util.AtomicString(m.group(2))
+        text = ' PR#%s' % idx
+
+        root = flask.request.url_root
+        url = flask.request.url
+        repo = user = None
+
+        if flask.request.args.get('user'):
+            user = flask.request.args.get('user')
+        if flask.request.args.get('repo'):
+            repo = flask.request.args.get('repo')
+
+        if not user and not repo:
+            if 'fork/' in flask.request.url:
+                user, repo = url.split('fork/')[1].split('/', 2)[:2]
+            else:
+                repo = url.split(root)[1].split('/', 1)[0]
+
+        issue = _issue_exists(user, repo, idx)
+        if issue:
+            return _obj_anchor_tag(user, repo, issue, text)
+
+        request = _pr_exists(user, repo, idx)
+        if request:
+            return _obj_anchor_tag(user, repo, request, text)
+
+        return text
+
+
 class PagureExtension(markdown.extensions.Extension):
 
     def extendMarkdown(self, md, md_globals):
@@ -132,6 +167,8 @@ class PagureExtension(markdown.extensions.Extension):
 
         md.inlinePatterns['mention'] = MentionPattern(MENTION_RE)
         if pagure.APP.config.get('ENABLE_TICKETS', True):
+            md.inlinePatterns['implicit_pr'] = \
+                ImplicitPRPattern(IMPLICIT_PR_RE)
             md.inlinePatterns['explicit_fork_issue'] = \
                 ExplicitForkIssuePattern(EXPLICIT_FORK_ISSUE_RE)
             md.inlinePatterns['explicit_main_issue'] = \
