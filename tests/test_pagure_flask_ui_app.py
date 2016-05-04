@@ -149,7 +149,8 @@ class PagureFlaskApptests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/new/')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<strong>Create new Project</strong>', output.data)
+            self.assertIn(
+                u'<strong>Create new Project</strong>', output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -160,9 +161,10 @@ class PagureFlaskApptests(tests.Modeltests):
 
             output = self.app.post('/new/', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<strong>Create new Project</strong>', output.data)
             self.assertIn(
-                '<small>\n            This field is required.&nbsp;\n'
+                u'<strong>Create new Project</strong>', output.data)
+            self.assertIn(
+                u'<small>\n            This field is required.&nbsp;\n'
                 '          </small>', output.data)
 
             data['name'] = 'project-1'
@@ -170,7 +172,7 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn('<strong>Create new Project</strong>', output.data)
             self.assertNotIn(
-                '<small>\n            This field is required.&nbsp;\n'
+                u'<small>\n            This field is required.&nbsp;\n'
                 '          </small>', output.data)
 
             data['csrf_token'] =  csrf_token
@@ -178,7 +180,7 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn('<strong>Create new Project</strong>', output.data)
             self.assertIn(
-                '</button>\n                      No user '
+                u'</button>\n                      No user '
                 '&#34;username&#34; found\n                    </div>',
                 output.data)
 
@@ -188,11 +190,11 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.post('/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\nProject #1        </div>',
+                u'<div class="projectinfo m-t-1 m-b-1">\nProject #1        </div>',
                 output.data)
+            self.assertIn(u'<p>This repo is brand new!</p>', output.data)
             self.assertIn(
-                '</button>\n                      Project &#34;project-1&#34; created',
-                output.data)
+                u'<title>Overview - project-1 - Pagure</title>', output.data)
 
         # After
         projects = pagure.lib.search_projects(self.session)
