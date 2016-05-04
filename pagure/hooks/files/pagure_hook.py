@@ -64,7 +64,7 @@ def relates_commit(commitid, issue, app_url=None):
         project = issue.project.fullname
         if issue.project.is_fork:
             project = 'fork/%s' % project
-        url = '%s/%s/%s' % (app_url, project, commitid[:8])
+        url = '%s/%s/c/%s' % (app_url, project, commitid[:8])
 
     comment = ''' Commit [%s](%s) relates to this ticket''' % (
         commitid[:8], url)
