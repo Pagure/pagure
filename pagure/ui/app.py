@@ -388,7 +388,6 @@ def new_project():
             )
             SESSION.commit()
             pagure.lib.git.generate_gitolite_acls()
-            flask.flash(message)
             return flask.redirect(flask.url_for('view_repo', repo=name))
         except pagure.exceptions.PagureException as err:
             flask.flash(str(err), 'error')
