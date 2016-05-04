@@ -47,21 +47,17 @@
   <span class="btn-group btn-group-sm issues-tagbar" role="group">
     {% for tag in tag_list %}
       {% if tag.tag in tags %}
-        {% if status and status != 'Open' %}
         <a class="btn btn-secondary btn-sm {% if tag.tag in tags%}active{% endif %}"
             href="{{ url_for('view_roadmap', username=username,
-                             repo=repo.name, status='All') }}"
-                   title="Filter issues by tag">
-         {% else %}
-        <a class="btn btn-secondary btn-sm {% if tag.tag in tags%}active{% endif %}"
-            href="{{ url_for('view_roadmap', username=username, repo=repo.name) }}"
-                   title="Filter issues by tag">
-         {% endif %}
+                             repo=repo.name, milestone=tag.tag,
+                             status='All' if not status else None) }}"
+                   title="Filter issues by milestone">
       {% else %}
         <a class="btn btn-secondary btn-sm {% if tag.tag in tags%}active{%endif%}"
             href="{{ url_for('view_roadmap', username=username,
-                   repo=repo.name, tags=tag.tag) }}"
-                   title="Filter issues by tag">
+                             repo=repo.name, milestone=tag.tag,
+                             status='All' if not status else None) }}"
+                   title="Filter issues by milestone">
       {% endif %}
 
         {{ tag.tag }}</a>

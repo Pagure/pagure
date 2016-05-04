@@ -490,14 +490,15 @@ def view_roadmap(repo, username=None):
     milestone_issues = defaultdict(list)
     for cnt in range(len(issues)):
         saved = False
-        for milestone in sorted(milestones):
-            if milestone in issues[cnt].tags_text:
-                milestone_issues[milestone].append(issues[cnt])
+        for mlstone in sorted(milestones):
+            if mlstone in issues[cnt].tags_text:
+                milestone_issues[mlstone].append(issues[cnt])
                 saved = True
                 break
         if saved:
             continue
-        milestone_issues['unplaned'].append(issues[cnt])
+        if not milestone:
+            milestone_issues['unplaned'].append(issues[cnt])
 
     if status:
         for key in milestone_issues.keys():
@@ -528,7 +529,7 @@ def view_roadmap(repo, username=None):
         status=status,
         milestones=milestones_ordered,
         issues=milestone_issues,
-        tags=tags,
+        tags=milestone,
         repo_admin=is_repo_admin(repo),
         repo_obj=repo_obj,
     )
