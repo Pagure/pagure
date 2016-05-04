@@ -64,10 +64,11 @@ class ExplicitForkIssuePattern(markdown.inlinepatterns.Pattern):
         idx = markdown.util.AtomicString(m.group(4))
         text = '%s/%s#%s' % (user, repo, idx)
 
-        if not _issue_exists(user, repo, idx):
+        issue = _issue_exists(user, repo, idx)
+        if not issue:
             return text
 
-        return _issue_anchor_tag(user, repo, idx, text)
+        return _obj_anchor_tag(user, repo, issue, text)
 
 
 class ExplicitMainIssuePattern(markdown.inlinepatterns.Pattern):
@@ -79,10 +80,11 @@ class ExplicitMainIssuePattern(markdown.inlinepatterns.Pattern):
         idx = markdown.util.AtomicString(m.group(3))
         text = ' %s#%s' % (repo, idx)
 
-        if not _issue_exists(None, repo, idx):
+        issue = _issue_exists(None, repo, idx)
+        if not issue:
             return text
 
-        return _issue_anchor_tag(None, repo, idx, text)
+        return _obj_anchor_tag(None, repo, issue, text)
 
 
 class ImplicitIssuePattern(markdown.inlinepatterns.Pattern):
