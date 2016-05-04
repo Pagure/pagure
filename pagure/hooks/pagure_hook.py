@@ -57,23 +57,36 @@ class PagureForm(wtf.Form):
 
 
 DESCRIPTION = '''
-Pagure specific hook to add a comment to issues if the pushed commits fix them
+Pagure specific hook to add a comment to issues or pull requests if the pushed
+commits fix them
 or relate to them. This is determined based on the commit message.
 
-To reference an issue you need to use one of recognized keywords followed by an
-issue number. The number can optionally be preceded by `#` symbol.
+To reference an issue/PR you need to use one of recognized keywords followed by
+a reference to the issue or PR, separated by whitespace and and optional colon.
+Such references can be either:
+
+ * The issue/PR number preceded by the `#` symbol
+ * The full URL of the issue or PR
+
+If using the full URL, it is possible to reference issues in other projects.
+
+The recognized keywords are:
+
+ * fix/fixed/fixes
+ * relate/related/relates
+ * merge/merges/merged
+
+Examples:
+
+ * Fixes #21
+ * related: https://pagure.io/myproject/issue/32
+ * this commit merges #74
+ * Merged: https://pagure.io/myproject/pull-request/74
+
 Capitalization does not matter; neither does the colon between keyword and
 number.
 
- * fix
- * fixed
- * fixes
- * relate
- * related
- * relates
 
-Instead of an issue number, you can use full URL of the issue. This way it is
-possible to reference issues in other projects.
 '''
 
 
