@@ -510,6 +510,11 @@ def view_roadmap(repo, username=None):
             if not active:
                 del(milestone_issues[key])
 
+    if milestone:
+        for mlstone in milestone:
+            if mlstone not in milestone_issues:
+                milestone_issues[mlstone] = []
+
     tag_list = pagure.lib.get_tags_of_project(SESSION, repo)
 
     reponame = pagure.get_repo_path(repo)
