@@ -513,6 +513,11 @@ def view_roadmap(repo, username=None):
 
     reponame = pagure.get_repo_path(repo)
     repo_obj = pygit2.Repository(reponame)
+    milestones_ordered = sorted(list(milestone_issues.keys()))
+    if 'unplaned' in milestones_ordered:
+        index = milestones_ordered.index('unplaned')
+        cnt = len(milestones_ordered)
+        milestones_ordered.insert(cnt, milestones_ordered.pop(index))
 
     return flask.render_template(
         'roadmap.html',
@@ -521,6 +526,7 @@ def view_roadmap(repo, username=None):
         username=username,
         tag_list=tag_list,
         status=status,
+        milestones=milestones_ordered,
         issues=milestone_issues,
         tags=tags,
         repo_admin=is_repo_admin(repo),
