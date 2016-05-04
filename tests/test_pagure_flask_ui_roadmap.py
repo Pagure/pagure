@@ -72,7 +72,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             output = self.app.get('/test/new_issue')
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
-                '<div class="card-header">\n        New issue'
+                u'<div class="card-header">\n        New issue'
                 in output.data)
 
             csrf_token = output.data.split(
@@ -90,10 +90,10 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                 '/test/new_issue', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issue #1: Test issue - test - Pagure</title>',
+                u'<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
             self.assertIn(
-                '<a class="btn btn-primary btn-sm" '
+                u'<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output.data)
 
@@ -182,8 +182,8 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             output = self.app.get('/test/settings')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                u'<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn(u'<h3>Settings for test</h3>', output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -197,7 +197,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             # Check the redirect
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
+                u'<title>Settings - test - Pagure</title>', output.data)
             self.assertIn('<h3>Settings for test</h3>', output.data)
             # Check the result of the action -- None, no CSRF
             repo = pagure.lib.get_project(self.session, 'test')
@@ -213,9 +213,9 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             # Check the redirect
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
-            self.assertIn('Milestones updated', output.data)
+                u'<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn(u'<h3>Settings for test</h3>', output.data)
+            self.assertIn(u'Milestones updated', output.data)
             # Check the result of the action -- Milestones recorded
             repo = pagure.lib.get_project(self.session, 'test')
             self.assertEqual(repo.milestones, {u'1': u'Tomorrow'})
@@ -230,9 +230,9 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             # Check the redirect
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
-            self.assertIn('Milestones updated', output.data)
+                u'<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn(u'<h3>Settings for test</h3>', output.data)
+            self.assertIn(u'Milestones updated', output.data)
             # Check the result of the action -- Milestones recorded
             repo = pagure.lib.get_project(self.session, 'test')
             self.assertEqual(
@@ -250,10 +250,10 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             # Check the redirect
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                u'<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn(u'<h3>Settings for test</h3>', output.data)
             self.assertIn(
-                '</button>\n'
+                u'</button>\n'
                 '                      Milestones and dates are not of the '
                 'same length', output.data)
             # Check the result of the action -- Milestones un-changed
@@ -273,10 +273,10 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             # Check the redirect
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                u'<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn(u'<h3>Settings for test</h3>', output.data)
             self.assertIn(
-                '</button>\n'
+                u'</button>\n'
                 '                      Milestone v2.0 is present 2 times',
                 output.data)
             # Check the result of the action -- Milestones un-changed
@@ -296,10 +296,10 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             # Check the redirect
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
-            self.assertIn('<h3>Settings for test</h3>', output.data)
+                u'<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn(u'<h3>Settings for test</h3>', output.data)
             self.assertIn(
-                '</button>\n'
+                u'</button>\n'
                 '                      Date Next week is present 2 times',
                 output.data)
             # Check the result of the action -- Milestones un-changed
