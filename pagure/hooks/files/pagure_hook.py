@@ -89,14 +89,14 @@ def fixes_relation(commitid, relation, app_url=None):
     ''' Add a comment to an issue or PR that this commit fixes it and update
     the status if the commit is in the master branch. '''
 
-    url = '../%s' % commitid[:8]
+    url = '../c/%s' % commitid[:8]
     if app_url:
         if app_url.endswith('/'):
             app_url = app_url[:-1]
         project = relation.project.fullname
         if relation.project.is_fork:
             project = 'fork/%s' % project
-        url = '%s/%s/%s' % (app_url, project, commitid[:8])
+        url = '%s/%s/c/%s' % (app_url, project, commitid[:8])
 
     comment = ''' Commit [%s](%s) fixes this %s''' % (
         commitid[:8], url, relation.isa)
