@@ -72,7 +72,7 @@ class IssueForm(IssueFormSimplied):
     status = wtforms.SelectField(
         'Status',
         [wtforms.validators.Required()],
-        choices=[(item, item) for item in []]
+        choices=[]
     )
 
     def __init__(self, *args, **kwargs):
@@ -129,7 +129,7 @@ class StatusForm(wtf.Form):
     status = wtforms.SelectField(
         'Status',
         [wtforms.validators.Required()],
-        choices=[(item, item) for item in []]
+        choices=[]
     )
 
     def __init__(self, *args, **kwargs):
@@ -149,7 +149,7 @@ class NewTokenForm(wtf.Form):
     acls = wtforms.SelectMultipleField(
         'ACLs',
         [wtforms.validators.Required()],
-        choices=[(item, item) for item in []]
+        choices=[]
     )
 
     def __init__(self, *args, **kwargs):
@@ -188,12 +188,12 @@ class UpdateIssueForm(wtf.Form):
     status = wtforms.SelectField(
         'Status',
         [wtforms.validators.Optional()],
-        choices=[(item, item) for item in []]
+        choices=[]
     )
     priority = wtforms.SelectField(
         'Priority',
         [wtforms.validators.Optional()],
-        choices=[(item, item) for item in []]
+        choices=[]
     )
 
     def __init__(self, *args, **kwargs):
@@ -330,7 +330,7 @@ class NewGroupForm(wtf.Form):
     group_type = wtforms.SelectField(
         'Group type',
         [wtforms.validators.Required()],
-        choices=[(item, item) for item in []]
+        choices=[]
     )
 
     def __init__(self, *args, **kwargs):
@@ -355,7 +355,7 @@ class EditFileForm(wtf.Form):
         'Commit message', [wtforms.validators.optional()])
     email = wtforms.SelectField(
         'Email', [wtforms.validators.Required()],
-        choices=[(item, item) for item in []]
+        choices=[]
     )
     branch = wtforms.TextField(
         'Branch', [wtforms.validators.Required()])
@@ -377,7 +377,7 @@ class DefaultBranchForm(wtf.Form):
     branches = wtforms.SelectField(
         'default_branch',
         [wtforms.validators.Required()],
-        choices=[(item, item) for item in []]
+        choices=[]
     )
 
     def __init__(self, *args, **kwargs):
