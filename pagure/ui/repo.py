@@ -406,11 +406,33 @@ def compare_commits(repo, commit1, commit2, username=None):
     if commit1_obj is None:
         flask.abort(404, 'First commit does not exist')
     if commit2_obj is None:
-        flask.abort(404, 'Second commit does not exist')
+        flask.abort(404, 'Last commit does not exist')
 
-    # Get commit1 and commit2 diff data
-    diff_commits = [commit1_obj, commit2_obj]
+    # Get commits diff data
     diff = repo_obj.diff(commit1, commit2)
+
+    # Get commits list
+    diff_commits = []
+    order = pygit2.GIT_SORT_TIME
+    first_commit = commit1
+    last_commit = commit2
+
+    commits = map(lambda x: x.oid.hex[:len(first_commit)],
+                  repo_obj.walk(last_commit, pygit2.GIT_SORT_TIME))
+
+    if first_commit not in commits:
+        first_commit = commit2
+        last_commit = commit1
+
+    for commit in repo_obj.walk(last_commit, order):
+        diff_commits.append(commit)
+
+        if commit.oid.hex == first_commit \
+                or commit.oid.hex.startswith(first_commit):
+            break
+
+    if first_commit == commit2:
+        diff_commits.reverse()
 
     return flask.render_template(
         'pull_request.html',
@@ -421,8 +443,6 @@ def compare_commits(repo, commit1, commit2, username=None):
         head=head,
         commit1=commit1,
         commit2=commit2,
-        commit1_obj=commit1_obj,
-        commit2_obj=commit2_obj,
         diff=diff,
         diff_commits=diff_commits,
         branches=sorted(repo_obj.listall_branches()),

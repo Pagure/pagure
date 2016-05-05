@@ -1127,6 +1127,111 @@ class PagureFlaskRepotests(tests.Modeltests):
 
     def test_compare_commits(self):
         """ Test the compare_commits endpoint. """
+
+        # First two commits comparison
+        def compare_first_two(c1, c2):
+            # View commits comparison
+            output = self.app.get('/test/c/%s..%s' % (c2.oid.hex, c1.oid.hex))
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Diff from %s to %s - test - Pagure</title>'
+                % (c2.oid.hex, c1.oid.hex),
+                output.data)
+            self.assertIn(
+                '<h5 class="text-muted">%s .. %s</h5>'
+                % (c2.oid.hex, c1.oid.hex),
+                output.data)
+            self.assertIn(
+                '<span class="hidden-sm-down">Commits&nbsp;</span>\n      ' +
+                '<span ' +
+                'class="label label-default label-pill hidden-sm-down">' +
+                '\n        2\n      </span>',
+                output.data)
+            self.assertIn(
+                '<span style="color: #800080; font-weight: bold">' +
+                '@@ -1,2 +1,1 @@</span>',
+                output.data)
+            self.assertIn(
+                '<span style="color: #a40000">- Row 0</span>', output.data)
+            # View inverse commits comparison
+            output = self.app.get('/test/c/%s..%s' % (c1.oid.hex, c2.oid.hex))
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Diff from %s to %s - test - Pagure</title>' %
+                (c1.oid.hex, c2.oid.hex),
+                output.data)
+            self.assertIn(
+                '<span class="hidden-sm-down">Commits&nbsp;</span>\n      ' +
+                '<span ' +
+                'class="label label-default label-pill hidden-sm-down">' +
+                '\n        2\n      </span>',
+                output.data)
+            self.assertIn(
+                '<h5 class="text-muted">%s .. %s</h5>' %
+                (c1.oid.hex, c2.oid.hex),
+                output.data)
+            self.assertIn(
+                '<span style="color: #800080; font-weight: bold">' +
+                '@@ -1,1 +1,2 @@</span>',
+                output.data)
+            self.assertIn(
+                '<span style="color: #00A000">+ Row 0</span>',
+                output.data)
+
+        def compare_all(c1, c3):
+            # View commits comparison
+            output = self.app.get('/test/c/%s..%s' % (c1.oid.hex, c3.oid.hex))
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Diff from %s to %s - test - Pagure</title>' %
+                (c1.oid.hex, c3.oid.hex), output.data)
+            self.assertIn(
+                '<h5 class="text-muted">%s .. %s</h5>' %
+                (c1.oid.hex, c3.oid.hex),
+                output.data)
+            self.assertIn(
+                '<span style="color: #800080; font-weight: bold">' +
+                '@@ -1,1 +1,3 @@</span>',
+                output.data)
+            self.assertIn(
+                '<span style="color: #00A000">+ Row 0</span>', output.data)
+            self.assertEqual(
+                output.data.count(
+                    '<span style="color: #00A000">+ Row 0</span>'), 2)
+            self.assertIn(
+                '<span class="hidden-sm-down">Commits&nbsp;</span>\n      ' +
+                '<span ' +
+                'class="label label-default label-pill hidden-sm-down">' +
+                '\n        3\n      </span>',
+                output.data)
+            # View inverse commits comparison
+            output = self.app.get(
+                '/test/c/%s..%s' % (c3.oid.hex, c1.oid.hex))
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Diff from %s to %s - test - Pagure</title>' %
+                (c3.oid.hex, c1.oid.hex), output.data)
+            self.assertIn(
+                '<h5 class="text-muted">%s .. %s</h5>' %
+                (c3.oid.hex, c1.oid.hex),
+                output.data)
+            self.assertIn(
+                '<span style="color: #800080; font-weight: bold">' +
+                '@@ -1,3 +1,1 @@</span>',
+                output.data)
+            self.assertIn(
+                '<span style="color: #a40000">- Row 0</span>',
+                output.data)
+            self.assertEqual(
+                output.data.count(
+                    '<span style="color: #a40000">- Row 0</span>'), 2)
+            self.assertIn(
+                '<span class="hidden-sm-down">Commits&nbsp;</span>\n      ' +
+                '<span ' +
+                'class="label label-default label-pill hidden-sm-down">' +
+                '\n        3\n      </span>',
+                output.data)
+
         output = self.app.get('/foo/bar')
         # No project registered in the DB
         self.assertEqual(output.status_code, 404)
@@ -1142,72 +1247,31 @@ class PagureFlaskRepotests(tests.Modeltests):
         output = self.app.get('/test/bar')
         self.assertEqual(output.status_code, 404)
 
-        # Add a README to the git repo - First commit
-        tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
         repo = pygit2.Repository(os.path.join(tests.HERE, 'test.git'))
+
+        # Add one commit to git repo
+        tests.add_commit_git_repo(
+            os.path.join(tests.HERE, 'test.git'), ncommits=1)
         c1 = repo.revparse_single('HEAD')
 
-        # Add some content to the git repo
-        tests.add_content_git_repo(os.path.join(tests.HERE, 'test.git'))
-
-        repo = pygit2.Repository(os.path.join(tests.HERE, 'test.git'))
+        # Add another commit to git repo
+        tests.add_commit_git_repo(
+            os.path.join(tests.HERE, 'test.git'), ncommits=1)
         c2 = repo.revparse_single('HEAD')
 
-        # View commits comparison
-        output = self.app.get('/test/c/%s..%s' % (c1.oid.hex, c2.oid.hex))
-        self.assertEqual(output.status_code, 200)
-        self.assertIn(
-            '<h5 class="text-muted">%s .. %s</h5>' % (c1.oid.hex, c2.oid.hex),
-            output.data)
-        self.assertIn(
-            '<span style="color: #800080; font-weight: bold">@@ -0,0 +1,3 @@</span>',
-            output.data)
-        self.assertIn('<span style="color: #00A000">+ foo</span>', output.data)
-        self.assertIn('<span style="color: #00A000">+  bar</span>', output.data)
-        self.assertIn('<span style="color: #00A000">+ baz </span>', output.data)
+        # Add one more commit to git repo
+        tests.add_commit_git_repo(
+            os.path.join(tests.HERE, 'test.git'), ncommits=1)
+        c3 = repo.revparse_single('HEAD')
 
-        # View inverse commits comparison
-        output = self.app.get(
-            '/test/c/%s..%s' % (c2.oid.hex, c1.oid.hex))
-        self.assertIn(
-            '<h5 class="text-muted">%s .. %s</h5>' % (c2.oid.hex, c1.oid.hex),
-            output.data)
-        self.assertIn(
-            '<span style="color: #800080; font-weight: bold">@@ -1,3 +0,0 @@</span>',
-            output.data)
-        self.assertIn('<span style="color: #a40000">- foo</span>', output.data)
-        self.assertIn('<span style="color: #a40000">-  bar</span>', output.data)
-        self.assertIn('<span style="color: #a40000">- baz </span>', output.data)
+        compare_first_two(c1, c2)
+        compare_all(c1, c3)
 
         user = tests.FakeUser()
-
         # Set user logged in
         with tests.user_set(pagure.APP, user):
-            # View commits comparison
-            output = self.app.get('/test/c/%s..%s' % (c1.oid.hex, c2.oid.hex))
-            self.assertEqual(output.status_code, 200)
-            self.assertIn(
-                '<h5 class="text-muted">%s .. %s</h5>' % (c1.oid.hex, c2.oid.hex),
-                output.data)
-            self.assertIn(
-                '<span style="color: #800080; font-weight: bold">@@ -0,0 +1,3 @@</span>',
-                output.data)
-            self.assertIn('<span style="color: #00A000">+ foo</span>', output.data)
-            self.assertIn('<span style="color: #00A000">+  bar</span>', output.data)
-            self.assertIn('<span style="color: #00A000">+ baz </span>', output.data)
-
-            # View inverse commits comparison
-            output = self.app.get(
-                '/test/c/%s..%s' % (c2.oid.hex, c1.oid.hex))
-            self.assertIn(
-                '<h5 class="text-muted">%s .. %s</h5>' % (c2.oid.hex, c1.oid.hex),
-                output.data)
-            self.assertIn(
-                '<span style="color: #800080; font-weight: bold">@@ -1,3 +0,0 @@</span>',
-                output.data)
-            self.assertIn('<span style="color: #a40000">- foo</span>', output.data)
-            self.assertIn('<span style="color: #a40000">-  bar</span>', output.data)
-            self.assertIn('<span style="color: #a40000">- baz </span>', output.data)
+            compare_first_two(c1, c2)
+            compare_all(c1, c3)
 
     def test_view_file(self):
         """ Test the view_file endpoint. """

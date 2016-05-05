@@ -6,6 +6,8 @@
     PR#{{ requestid }}: {{ pull_request.title | noJS(ignore="img")}} - {{ repo.name }}
   {% elif form and (repo_admin or remote_git) %}
     Create new Pull Request for {{ branch_to }} - {{ repo.name }}
+  {%- elif origin == 'compare_commits' -%}
+    Diff from {{ commit1 }} to {{ commit2 }} - {{ repo.name }}
   {%- else -%}
     Diff from {{ branch_from }} to {{ branch_to }} - {{ repo.name }}
   {%- endif -%}
