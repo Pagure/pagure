@@ -580,6 +580,7 @@ def view_issue(repo, issueid, username=None):
     form = pagure.forms.UpdateIssueForm(
         status=status, priorities=repo.priorities)
     form.status.data = issue.status
+    form.priority.data = str(issue.priority)
     tag_list = pagure.lib.get_tags_of_project(SESSION, repo)
     return flask.render_template(
         'issue.html',
