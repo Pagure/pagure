@@ -14,7 +14,9 @@
 
       <div id="edit">
         <textarea class="form-control" id="comment" name="comment"
-            title="comment" style="width:100%;"></textarea>
+            title="comment" style="width:100%;">
+          {{- form.comment.data if form.comment.data else '' -}}
+        </textarea>
       </div>
 
     <div>
