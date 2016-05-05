@@ -170,19 +170,21 @@ def update_issue(repo, issueid, username=None):
                     for message in messages:
                         flask.flash(message)
 
-            # Assign or update assignee of the ticket
-            message = pagure.lib.add_issue_assignee(
-                SESSION,
-                issue=issue,
-                assignee=assignee or None,
-                user=flask.g.fas_user.username,
-                ticketfolder=APP.config['TICKETS_FOLDER'],
-            )
-            if message and not is_js:
-                SESSION.commit()
-                flask.flash(message)
-
+            # The meta-data can only be changed by admins, which means they
+            # will be missing for non-admin and thus reset if we let them
             if repo_admin:
+                # Assign or update assignee of the ticket
+                message = pagure.lib.add_issue_assignee(
+                    SESSION,
+                    issue=issue,
+                    assignee=assignee or None,
+                    user=flask.g.fas_user.username,
+                    ticketfolder=APP.config['TICKETS_FOLDER'],
+                )
+                SESSION.commit()
+                if message and not is_js:
+                    flask.flash(message)
+
                 # Update status
                 if new_status in status:
                     message = pagure.lib.edit_issue(
