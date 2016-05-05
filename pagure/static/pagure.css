@@ -519,3 +519,7 @@ th[data-sort] {
 {
   font-size: 0.8em;
 }
+
+.readme dd{
+	margin-left:2em;
+}
