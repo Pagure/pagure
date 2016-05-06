@@ -151,10 +151,12 @@
                 {{ form.csrf_token }}
               </form>
             {% endif %}
-              <button type="button" class="btn btn-link" data-toggle="modal" data-target="#acls{{ token.id }}">
+              <button type="button" class="btn btn-link"
+                data-toggle="modal" data-target="#acls{{ token.id }}">
                 ACLs
               </button>
-              <div class="modal fade" id="acls{{ token.id }}" tabindex="-1" role="dialog" aria-labelledby="ACLs" aria-hidden="true">
+              <div class="modal fade" id="acls{{ token.id }}" tabindex="-1"
+                    role="dialog" aria-labelledby="ACLs" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                   <div class="modal-content">
                     <div class="modal-header">
@@ -283,12 +285,18 @@
         </div>
           <ul class="list-group list-group-flush">
             <li class="list-group-item">
-              <a href="{{ url_for('.view_user', username=repo.user.user) }}"><span class="oi" data-glyph="person"></span>&nbsp; {{ repo.user.user }}</a>
+              <a href="{{ url_for('.view_user', username=repo.user.user) }}">
+                <span class="oi" data-glyph="person"></span>
+                &nbsp; {{ repo.user.user }}
+              </a>
               (owner)
             </li>
           {% for user in repo.users %}
             <li class="list-group-item">
-              <a href="{{ url_for('.view_user', username=user.user) }}"><span class="oi" data-glyph="person"></span>&nbsp; {{ user.user }}</a>
+              <a href="{{ url_for('.view_user', username=user.user) }}">
+                <span class="oi" data-glyph="person"></span>
+                &nbsp; {{ user.user }}
+              </a>
               <form class="pull-xs-right" method="POST"
                 action="{{ url_for('.remove_user', username=username, repo=repo.name, userid=user.id) }}">
                 <button
@@ -302,9 +310,12 @@
           {% endfor %}
           {% for group in repo.groups %}
             <li class="list-group-item">
-              <a href="{{ url_for('.view_group', group=group.group_name) }}"><span class="oi" data-glyph="people"></span>&nbsp; {{ group.group_name }}</a>
+              <a href="{{ url_for('.view_group', group=group.group_name) }}">
+                <span class="oi" data-glyph="people"></span>
+                &nbsp; {{ group.group_name }}
+              </a>
               <form class="pull-xs-right" method="POST"
-                action="">
+                action="{{ url_for('.remove_group_project', username=username, repo=repo.name, groupid=group.id) }}">
                 <button
                   onclick="return confirm('You sure you want to remove this group from this project?');"
                   title="Remove group" class="btn btn-danger btn-sm pull-xs-right">
@@ -333,12 +344,16 @@
             <div class="panel panel-default" >
               <div class="panel-heading" role="tab" id="pluginheading{{idcount}}">
                 <h4 class="panel-title">
-                  <a data-toggle="collapse" data-parent="#accordions" href="#plugincollapse{{idcount}}" aria-expanded="true" aria-controls="plugincollapse{{idcount}}">
+                  <a data-toggle="collapse" data-parent="#accordions"
+                      href="#plugincollapse{{idcount}}" aria-expanded="true"
+                      aria-controls="plugincollapse{{idcount}}">
                     <span id="dropdowncaret" class="oi" data-glyph="caret-right"></span>&nbsp;{{ plugin }}
                   </a>
                 </h4>
               </div>
-              <div id="plugincollapse{{ idcount }}" data-plugin="{{ plugin }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="pluginheading{{ idcount }}">
+              <div id="plugincollapse{{ idcount }}" data-plugin="{{ plugin }}"
+                  class="panel-collapse collapse" role="tabpanel"
+                  aria-labelledby="pluginheading{{ idcount }}">
                 <span class="oi oi-spin pull-left" data-glyph="loop-circular"></span>
               </div>
             </div>
