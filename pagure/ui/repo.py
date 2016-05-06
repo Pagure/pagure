@@ -1316,7 +1316,7 @@ def remove_group_project(repo, groupid, username=None):
 
         if groupid not in grpids:
             flask.flash(
-                'Group does not seem to be part of this group', 'error')
+                'Group does not seem to be part of this project', 'error')
             return flask.redirect(
                 flask.url_for(
                     '.view_settings', repo=repo.name, username=username)
