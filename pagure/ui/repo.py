@@ -1287,6 +1287,59 @@ def add_user(repo, username=None):
     )
 
 
+@APP.route('/<repo:repo>/dropgroup/<int:groupid>', methods=['POST'])
+@APP.route('/fork/<username>/<repo:repo>/dropgroup/<int:groupid>', methods=['POST'])
+@login_required
+def remove_group_project(repo, groupid, username=None):
+    """ Remove the specified group from the project.
+    """
+    if admin_session_timedout():
+        flask.flash('Action canceled, try it again', 'error')
+        url = flask.url_for(
+            'view_settings', username=username, repo=repo)
+        return flask.redirect(
+            flask.url_for('auth_login', next=url))
+
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+
+    if not repo:
+        flask.abort(404, 'Project not found')
+
+    if not is_repo_admin(repo):
+        flask.abort(
+            403,
+            'You are not allowed to change the users for this project')
+
+    form = pagure.forms.ConfirmationForm()
+    if form.validate_on_submit():
+        grpids = [grp.id for grp in repo.groups]
+
+        if groupid not in grpids:
+            flask.flash(
+                'Group does not seem to be part of this group', 'error')
+            return flask.redirect(
+                flask.url_for(
+                    '.view_settings', repo=repo.name, username=username)
+            )
+
+        for grp in repo.groups:
+            if grp.id == groupid:
+                repo.groups.remove(grp)
+                break
+        try:
+            SESSION.commit()
+            pagure.lib.git.generate_gitolite_acls()
+            flask.flash('Group removed')
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash('Group could not be removed', 'error')
+
+    return flask.redirect(
+        flask.url_for('.view_settings', repo=repo.name, username=username)
+    )
+
+
 @APP.route('/<repo:repo>/addgroup/', methods=('GET', 'POST'))
 @APP.route('/<repo:repo>/addgroup', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo:repo>/addgroup/', methods=('GET', 'POST'))
