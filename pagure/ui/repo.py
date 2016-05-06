@@ -1174,8 +1174,9 @@ def new_repo_hook_token(repo, username=None):
         flask.url_for('view_settings', repo=repo.name, username=username))
 
 
-@APP.route('/<repo:repo>/dropuser/<userid>', methods=['POST'])
-@APP.route('/fork/<username>/<repo:repo>/dropuser/<userid>', methods=['POST'])
+@APP.route('/<repo:repo>/dropuser/<int:userid>', methods=['POST'])
+@APP.route('/fork/<username>/<repo:repo>/dropuser/<int:userid>',
+           methods=['POST'])
 @login_required
 def remove_user(repo, userid, username=None):
     """ Remove the specified user from the project.
