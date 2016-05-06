@@ -287,6 +287,94 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '</button>\n                      User removed', output.data)
 
     @patch('pagure.ui.repo.admin_session_timedout')
+    def test_remove_group_project(self, ast):
+        """ Test the remove_group_project endpoint. """
+        ast.return_value = False
+
+        output = self.app.post('/foo/dropgroup/1')
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/foo/dropgroup/1')
+            self.assertEqual(output.status_code, 404)
+
+            tests.create_projects(self.session)
+
+            output = self.app.post('/test/dropgroup/1')
+            self.assertEqual(output.status_code, 403)
+
+            ast.return_value = True
+            output = self.app.post('/test/dropgroup/1')
+            self.assertEqual(output.status_code, 302)
+            ast.return_value = False
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            tests.create_projects_git(tests.HERE)
+            output = self.app.post('/test/settings')
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {'csrf_token': csrf_token}
+
+            output = self.app.post(
+                '/test/dropgroup/2', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+            self.assertIn(
+                '</button>\n                      '
+                'Group does not seem to be part of this project',
+                output.data)
+
+        # Create the new group
+        msg = pagure.lib.add_group(
+            session=self.session,
+            group_name='testgrp',
+            group_type='user',
+            user='pingou',
+            is_admin=False,
+            blacklist=[],
+        )
+        self.assertEqual(msg, 'User `pingou` added to the group `testgrp`.')
+        self.session.commit()
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        # Add the group to a project
+        msg = pagure.lib.add_group_to_project(
+            session=self.session,
+            project=repo,
+            new_group='testgrp',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Group added')
+
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/test/dropgroup/1', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+            self.assertNotIn(
+                '</button>\n                      Group removed',
+                output.data)
+
+            data = {'csrf_token': csrf_token}
+            output = self.app.post(
+                '/test/dropgroup/1', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+            self.assertIn(
+                '</button>\n                      Group removed',
+                output.data)
+
+    @patch('pagure.ui.repo.admin_session_timedout')
     def test_update_project(self, ast):
         """ Test the update_project endpoint. """
         ast.return_value = True
