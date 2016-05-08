@@ -16,9 +16,10 @@ import unittest
 import shutil
 import sys
 import os
-
+import tempfile
 import pygit2
 from mock import patch
+from pagure.lib.repo import PagureRepo
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -1271,6 +1272,45 @@ index 0000000..60f7480
         output3 = pagure.lib.git.get_revs_between(
             from_hash, to_hash, gitrepo)
         self.assertEqual(output3, [to_hash])
+
+        # Case 4, get revs between two commits on two different branches
+        newgitrepo = tempfile.mkdtemp(prefix='pagure-')
+        newrepo = pygit2.clone_repository(gitrepo, newgitrepo)
+        newrepo.create_branch('feature', newrepo.head.get_object())
+
+        with open(os.path.join(newgitrepo, 'sources'), 'w') as stream:
+            stream.write('foo\n bar')
+        newrepo.index.add('sources')
+        newrepo.index.write()
+
+        # Commits the files added
+        tree = newrepo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        newrepo.create_commit(
+            'refs/heads/feature',  # the name of the reference to update
+            author,
+            committer,
+            'Add sources file for testing',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            [to_hash]
+        )
+        branch_commit = newrepo.revparse_single('refs/heads/feature')
+
+        # Push to origin
+        ori_remote = newrepo.remotes[0]
+        PagureRepo.push(ori_remote, 'refs/heads/feature')
+
+        # Remove the clone
+        shutil.rmtree(newgitrepo)
+
+        output4 = pagure.lib.git.get_revs_between(
+            'feature', '0', gitrepo)
+        self.assertEqual(output4, [branch_commit.oid.hex])
 
     def test_get_author(self):
         """ Test the get_author method of pagure.lib.git. """
