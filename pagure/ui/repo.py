@@ -1193,8 +1193,6 @@ def delete_repo(repo, username=None):
         flask.flash('Could not delete the project', 'error')
 
     repopath = os.path.join(APP.config['GIT_FOLDER'], repo.path)
-    if repo.is_fork:
-        repopath = os.path.join(APP.config['FORK_FOLDER'], repo.path)
     docpath = os.path.join(APP.config['DOCS_FOLDER'], repo.path)
     ticketpath = os.path.join(APP.config['TICKETS_FOLDER'], repo.path)
     requestpath = os.path.join(APP.config['REQUESTS_FOLDER'], repo.path)
