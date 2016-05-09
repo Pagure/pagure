@@ -498,7 +498,7 @@ def view_roadmap(repo, username=None):
         if saved:
             continue
         if not milestone:
-            milestone_issues['unplaned'].append(issues[cnt])
+            milestone_issues['unplanned'].append(issues[cnt])
 
     if status:
         for key in milestone_issues.keys():
@@ -520,8 +520,8 @@ def view_roadmap(repo, username=None):
     reponame = pagure.get_repo_path(repo)
     repo_obj = pygit2.Repository(reponame)
     milestones_ordered = sorted(list(milestone_issues.keys()))
-    if 'unplaned' in milestones_ordered:
-        index = milestones_ordered.index('unplaned')
+    if 'unplanned' in milestones_ordered:
+        index = milestones_ordered.index('unplanned')
         cnt = len(milestones_ordered)
         milestones_ordered.insert(cnt, milestones_ordered.pop(index))
 

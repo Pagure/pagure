@@ -424,7 +424,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn(u'2 Milestones', output.data)
         self.assertIn(u'Milestone: v2.0', output.data)
-        self.assertIn(u'Milestone: unplaned', output.data)
+        self.assertIn(u'Milestone: unplanned', output.data)
         self.assertEqual(
             output.data.count(u'<span class="label label-default">#'), 5)
 
@@ -434,7 +434,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
         self.assertIn(u'3 Milestones', output.data)
         self.assertIn(u'Milestone: v1.0', output.data)
         self.assertIn(u'Milestone: v2.0', output.data)
-        self.assertIn(u'Milestone: unplaned', output.data)
+        self.assertIn(u'Milestone: unplanned', output.data)
         self.assertEqual(
             output.data.count(u'<span class="label label-default">#'), 6)
 
