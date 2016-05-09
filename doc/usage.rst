@@ -34,6 +34,7 @@ Contents:
 
    usage/first_steps
    usage/project_settings
+   usage/roadmap
    usage/using_doc
    usage/using_webhooks
    usage/ticket_templates
