@@ -206,7 +206,7 @@ def create_user_ssh_keys_on_disk(user, gitolite_keydir):
 
 
 def add_issue_comment(session, issue, comment, user, ticketfolder,
-                      notify=True):
+                      notify=True, date_created=None):
     ''' Add a comment to an issue. '''
     user_obj = __get_user(session, user)
 
@@ -214,6 +214,7 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
         issue_uid=issue.uid,
         comment=comment,
         user_id=user_obj.id,
+        date_created=date_created,
     )
     session.add(issue_comment)
     # Make sure we won't have SQLAlchemy error before we continue
@@ -1060,7 +1061,7 @@ def new_project(session, user, name, blacklist, allowed_prefix,
 
 def new_issue(session, repo, title, content, user, ticketfolder,
               issue_id=None, issue_uid=None, private=False, status=None,
-              notify=True):
+              notify=True, date_created=None):
     ''' Create a new issue for the specified repo. '''
     user_obj = __get_user(session, user)
 
@@ -1072,6 +1073,7 @@ def new_issue(session, repo, title, content, user, ticketfolder,
         user_id=user_obj.id,
         uid=issue_uid or uuid.uuid4().hex,
         private=private,
+        date_created=date_created,
     )
 
     if status is not None:
