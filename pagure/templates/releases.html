@@ -44,13 +44,13 @@
         {% if tag['objecttype'] == "tag" %}
           {% if tag['object'].message %}
             <strong>{{tag['tagname']}}</strong>
-            {% set msg_head_tail = tag['object'].message.split('\n', 1) %}
-            {{ msg_head_tail[0] }}
-            {% set detailtext = msg_head_tail.pop() %}
+            {% set msg_head_tail, _, detailtext = tag[
+                    'object'].message.partition('\n') %}
+            {{ msg_head_tail }}
             {% if msg_head_tail and detailtext.endswith(
                 '\n-----END PGP SIGNATURE-----') %}
               {% set detailtext = detailtext.rsplit(
-                '\n-----BEGIN PGP SIGNATURE-----\n', 1)[0] %}
+                '\n-----BEGIN PGP SIGNATURE-----', 1)[0] %}
               {% if detailtext %}
               <div style="white-space:pre-wrap">
                 {{ detailtext }}
