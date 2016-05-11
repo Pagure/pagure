@@ -1271,6 +1271,9 @@ def get_git_tags_objects(project):
             if objecttype == 'tag':
                 head_msg, _, body_msg = tags[commit_time][
                     "object"].message.partition('\n')
+                if body_msg.strip().endswith('\n-----END PGP SIGNATURE-----'):
+                    body_msg = body_msg.rsplit(
+                        '-----BEGIN PGP SIGNATURE-----', 1)[0].strip()
                 tags[commit_time]["head_msg"] = head_msg
                 tags[commit_time]["body_msg"] = body_msg
     sorted_tags = []
