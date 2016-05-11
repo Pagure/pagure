@@ -44,12 +44,10 @@
         {% if tag['objecttype'] == "tag" %}
           {% if tag['object'].message %}
             <strong>{{tag['tagname']}}</strong>
-            {% set msg_head_tail, _, detailtext = tag[
-                    'object'].message.partition('\n') %}
-            {{ msg_head_tail }}
-            {% if msg_head_tail and detailtext.endswith(
+            {{ tag['head_msg'] }}
+            {% if tag['head_msg'] and tag['body_msg'].endswith(
                 '\n-----END PGP SIGNATURE-----') %}
-              {% set detailtext = detailtext.rsplit(
+              {% set detailtext = tag['body_msg'].rsplit(
                 '\n-----BEGIN PGP SIGNATURE-----', 1)[0] %}
               {% if detailtext %}
               <div style="white-space:pre-wrap">

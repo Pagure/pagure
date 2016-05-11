@@ -1261,11 +1261,18 @@ def get_git_tags_objects(project):
                 objecttype = "commit"
 
             tags[commit_time] = {
-                "object":repo_obj[repo_obj.lookup_reference(tag).target],
-                "tagname":tag.replace("refs/tags/",""),
-                "date":commit_time,
-                "objecttype": objecttype
-                }
+                "object": repo_obj[repo_obj.lookup_reference(tag).target],
+                "tagname": tag.replace("refs/tags/",""),
+                "date": commit_time,
+                "objecttype": objecttype,
+                "head_msg": None,
+                "body_msg": None,
+            }
+            if objecttype == 'tag':
+                head_msg, _, body_msg = tags[commit_time][
+                    "object"].message.partition('\n')
+                tags[commit_time]["head_msg"] = head_msg
+                tags[commit_time]["body_msg"] = body_msg
     sorted_tags = []
 
     for tag in sorted(tags, reverse=True):
