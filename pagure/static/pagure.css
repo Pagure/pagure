@@ -523,3 +523,18 @@ th[data-sort] {
 .readme dd{
 	margin-left:2em;
 }
+
+/*Our specific responsive overrides*/
+
+@media (min-width:544px) {
+.pr_comment_form .card, .inline-pr-comment .card{max-width:500px}
+}
+@media (min-width:768px) {
+.pr_comment_form .card, .inline-pr-comment .card{max-width:400px}
+}
+@media (min-width:992px) {
+.pr_comment_form .card, .inline-pr-comment .card{max-width:550px}
+}
+@media (min-width:1200px) {
+.pr_comment_form .card, .inline-pr-comment .card{max-width:680px}
+}
