@@ -318,15 +318,31 @@
 
               {% if patch | hasattr('new_file_path') %}
                 {%- if patch.new_file_path == patch.old_file_path -%}
-                  {{ viewfilelink(patch.new_file_path)}} {{lineschanged(True, True)}}
-                {%- else -%}
-                  {{lineschanged(True, True)}}
+                {{ lineschanged(True, True) }}
                   <div class="clearfix">
                     <strike>{{patch.old_file_path}}</strike><br/>
-                    {{viewfilelink(patch.new_file_path)}}
+                    {{ viewfilelink(patch.new_file_path) }}
+                  </div>
+                  <div><small>file moved</small></div>
+                {%- elif patch.status == 'D' -%}
+                  {% set patchtype = "removed"%}
+                  <div class="clearfix">
+                    {{ viewfilelink(patch.new_file_path) }} {{ lineschanged(False, True) }}
                   </div>
                   <div><small>file removed</small></div>
-                {%- endif -%}
+                {%-elif patch.status == 'A' -%}
+                  {% set patchtype = "added"%}
+                  <div class="clearfix">
+                    {{ viewfilelink(patch.new_file_path) }} {{ lineschanged(True, False) }}
+                  </div>
+                  <div><small>file added</small></div>
+                {%-elif patch.status == 'M' -%}
+                  {% set patchtype = "changed"%}
+                  <div class="clearfix">
+                    {{ viewfilelink(patch.new_file_path) }} {{ lineschanged(True, True) }}
+                  </div>
+                  <div><small>file changed</small></div>
+                {%-endif-%}
               {%- elif patch | hasattr('delta') -%}
                 {%- if patch.delta.new_file.path == patch.delta.old_file.path -%}
                   {%- if patch.delta.new_file.mode == 0 and patch.delta.old_file.mode == 33188 -%}
