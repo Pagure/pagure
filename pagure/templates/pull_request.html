@@ -317,14 +317,7 @@
               {% endmacro %}
 
               {% if patch | hasattr('new_file_path') %}
-                {%- if patch.new_file_path == patch.old_file_path and patch.status != 'M' -%}
-                {{ lineschanged(True, True) }}
-                  <div class="clearfix">
-                    <strike>{{ patch.old_file_path }}</strike><br/>
-                    {{ viewfilelink(patch.new_file_path) }}
-                  </div>
-                  <div><small>file moved</small></div>
-                {%- elif patch.status == 'D' -%}
+                {%- if patch.status == 'D' -%}
                   {% set patchtype = "removed"%}
                   <div class="clearfix">
                     {{ viewfilelink(patch.new_file_path) }} {{ lineschanged(False, True) }}
@@ -360,14 +353,6 @@
                     </div>
                     <div><small>file changed</small></div>
                   {%-endif-%}
-                {%- else -%}
-                  {% set patchtype = "moved"%}
-                  {{lineschanged(True, True)}}
-                  <div class="clearfix">
-                    <strike>{{patch.delta.old_file.path}}</strike><br/>
-                    {{viewfilelink(patch.delta.new_file.path)}}
-                  </div>
-                  <div><small>file moved</small></div>
                 {%- endif -%}
               {%- endif -%}
             </h5>
