@@ -317,10 +317,10 @@
               {% endmacro %}
 
               {% if patch | hasattr('new_file_path') %}
-                {%- if patch.new_file_path == patch.old_file_path -%}
+                {%- if patch.new_file_path == patch.old_file_path and patch.status != 'M' -%}
                 {{ lineschanged(True, True) }}
                   <div class="clearfix">
-                    <strike>{{patch.old_file_path}}</strike><br/>
+                    <strike>{{ patch.old_file_path }}</strike><br/>
                     {{ viewfilelink(patch.new_file_path) }}
                   </div>
                   <div><small>file moved</small></div>
