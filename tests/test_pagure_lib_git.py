@@ -1311,7 +1311,7 @@ index 0000000..60f7480
         shutil.rmtree(newgitrepo)
 
         output4 = pagure.lib.git.get_revs_between(
-            'feature', '0', gitrepo)
+            '0', 'feature', gitrepo)
         self.assertEqual(output4, [branch_commit.oid.hex])
 
     def test_get_author(self):
