@@ -148,6 +148,7 @@ SHANDLER.setLevel(APP.config.get('LOG_LEVEL', 'INFO'))
 APP.logger.addHandler(SHANDLER)
 
 LOG = APP.logger
+LOG.setLevel(APP.config.get('LOG_LEVEL', 'INFO'))
 
 APP.wsgi_app = pagure.proxy.ReverseProxied(APP.wsgi_app)
 
