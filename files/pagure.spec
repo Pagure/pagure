@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        2.0.1
+Version:        2.1
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -253,6 +253,43 @@ install -m 644 webhook-server/pagure_webhook.service \
 
 
 %changelog
+* Fri May 13 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.1-1
+- Update to 2.1
+- Fix the milter to get it working (hotfixed in prod)
+- Fix the fedmsg hook so that it works fine (hotfixed in prod)
+- Fix the path of one of the internal API endpoint
+- Pass client_encoding utf8 when connecting to the DB (Richard Marko)
+- Do not use client_encoding if using sqlite (Ryan Lerch)
+- Allow project names up to 255 characters (Richard Marko)
+- Add a spinner showing we're working on retrieve the PR status on the PR page
+  (farhaanbukhsh)
+- Rework installing and removing git hooks (Clement Verna)
+- Rework the summary of the changes on the PR page (Ryan Lerch)
+- Improve the description of the priority system (Lubomír Sedlář)
+- Fix commit url in the pagure hook (Mike McLean)
+- Improve the regex when fixing/relating a commit to a ticket or a PR (Mike
+  McLean)
+- Improve the description of the pagure hook (Mike McLean)
+- Fix the priority system to support tickets without priority
+- Fix the ordering of the priority in the drop-down list of priorities
+- Ensure the drop-down list of priorities defaults to the current priority
+- Adjust the runserver.py script to setup PAGURE_CONFIG before importing pagure
+- Remove flashed message when creating a new project
+- Add markdown support for making of PR# a link to the corresponding PR
+- Include the priority in the JSON representation of a ticket
+- Include the priorities in the JSON representation of a project
+- Do not update the assignee if the person who commented isn't an admin
+- When adding a comment fails, include the comment text in the form if there was
+  one
+- Add support to remove a group from a project
+- Add a roadmap feature with corresponding documentation
+- Allow 'kbd' and 'var' html tags to render properly
+- Fix deleting a project on disk as well as in the DB
+- Allow setting the date_created field when importing ticket from git (Clement
+  Verna)
+- Strip GPG signature from the release message on the release page (Jan Pokorný)
+- Make comment on PR diffs fit the parent, and not overflow horiz (Ryan Lerch)
+
 * Sun Apr 24 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.0.1-1
 - Update to 2.0.1
 - Fixes to the UPGRADING documentation

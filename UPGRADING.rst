@@ -1,6 +1,17 @@
 Upgrading Pagure
 ================
 
+From 2.0 to 2.1
+---------------
+
+2.1 brings its usual flow of improvements and bug fixes.
+
+When upgrading from 2.0.x to 2.1 all you will have to:
+
+* Update the database schame using alembic: ``alembic upgrade head``
+
+
+
 From 1.x to 2.0
 ---------------
 
