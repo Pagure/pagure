@@ -96,8 +96,8 @@ class ImplicitIssuePattern(markdown.inlinepatterns.Pattern):
         idx = markdown.util.AtomicString(m.group(2))
         text = ' #%s' % idx
 
-        root = pagure.APP.config['APP_URL']
         try:
+            root = flask.request.url_root
             url = flask.request.url
         except RuntimeError:
             return text
@@ -133,8 +133,8 @@ class ImplicitPRPattern(markdown.inlinepatterns.Pattern):
         idx = markdown.util.AtomicString(m.group(2))
         text = ' PR#%s' % idx
 
-        root = pagure.APP.config['APP_URL']
         try:
+            root = flask.request.url_root
             url = flask.request.url
         except RuntimeError:
             return text
