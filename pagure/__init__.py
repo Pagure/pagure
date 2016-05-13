@@ -144,7 +144,7 @@ if not APP.debug:
 
 # Send classic logs into syslog
 SHANDLER = logging.StreamHandler()
-SHANDLER.setLevel(APP.config.get('log_level', 'INFO'))
+SHANDLER.setLevel(APP.config.get('LOG_LEVEL', 'INFO'))
 APP.logger.addHandler(SHANDLER)
 
 LOG = APP.logger
