@@ -96,8 +96,11 @@ class ImplicitIssuePattern(markdown.inlinepatterns.Pattern):
         idx = markdown.util.AtomicString(m.group(2))
         text = ' #%s' % idx
 
-        root = flask.request.url_root
-        url = flask.request.url
+        root = pagure.APP.config['APP_URL']
+        try:
+            url = flask.request.url
+        except RuntimeError:
+            return text
         repo = user = None
 
         if flask.request.args.get('user'):
@@ -106,7 +109,7 @@ class ImplicitIssuePattern(markdown.inlinepatterns.Pattern):
             repo = flask.request.args.get('repo')
 
         if not user and not repo:
-            if 'fork/' in flask.request.url:
+            if 'fork/' in url:
                 user, repo = url.split('fork/')[1].split('/', 2)[:2]
             else:
                 repo = url.split(root)[1].split('/', 1)[0]
@@ -130,8 +133,11 @@ class ImplicitPRPattern(markdown.inlinepatterns.Pattern):
         idx = markdown.util.AtomicString(m.group(2))
         text = ' PR#%s' % idx
 
-        root = flask.request.url_root
-        url = flask.request.url
+        root = pagure.APP.config['APP_URL']
+        try:
+            url = flask.request.url
+        except RuntimeError:
+            return text
         repo = user = None
 
         if flask.request.args.get('user'):
@@ -140,7 +146,7 @@ class ImplicitPRPattern(markdown.inlinepatterns.Pattern):
             repo = flask.request.args.get('repo')
 
         if not user and not repo:
-            if 'fork/' in flask.request.url:
+            if 'fork/' in url:
                 user, repo = url.split('fork/')[1].split('/', 2)[:2]
             else:
                 repo = url.split(root)[1].split('/', 1)[0]
