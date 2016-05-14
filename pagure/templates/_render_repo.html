@@ -99,14 +99,14 @@
                   {% if sorting == 'latest'%}
                   <span class="oi" data-glyph="check"></span>
                   {%endif%}
-                  Date Created (most recent first)
+                  Recent Projects First
                 </a>
                 <a class="dropdown-item" href="{{
                     url_for('browse_projects', sorting='oldest') }}">
                   {% if sorting == 'oldest'%}
                   <span class="oi" data-glyph="check"></span>
                   {%endif%}
-                  Date Created (oldest first)
+                  Oldest Projects First
                 </a>
               </div>
             </span>
