@@ -33,7 +33,7 @@ class MailTable(BASE):
     id = sa.Column(sa.Integer, primary_key=True)
     project_id = sa.Column(
         sa.Integer,
-        sa.ForeignKey('projects.id', onupdate='CASCADE'),
+        sa.ForeignKey('projects.id', onupdate='CASCADE', ondelete='CASCADE'),
         nullable=False,
         unique=True,
         index=True)
