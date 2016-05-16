@@ -592,7 +592,7 @@
     {% macro changeschangedfile(filepath, added, removed, diffanchor) -%}
         <div class="clearfix" style="margin-left:-4px;">
           <div class="pull-xs-right"><span class="label label-success">+{{added}}</span> <span class="label label-danger">-{{removed}}</span></div>
-          <div class="pull-xs-left pr-changes-description"><strong>file <span class="text-primary">changed</span></strong></div>
+          <div class="pull-xs-left pr-changes-description"><strong>file <span class="text-muted">changed</span></strong></div>
         </div>
         <div class="ellipsis pr-changes-description">
           <a href="#_{{diffanchor}}">{{filepath}}</a>
@@ -641,10 +641,15 @@
               {% set linesadded = patch.line_stats[1] %}
               {% set linesremoved = patch.line_stats[2] %}
           {% endif %}
-
           {% if patch | hasattr('new_file_path') %}
             {%- if patch.new_file_path == patch.old_file_path -%}
-              {{ changeschangedfile(patch.new_file_path, linesadded, linesremoved, count) }}
+              {%- if patch.status == 'D' -%}
+                {{ changesdeletedfile(patch.new_file_path, linesadded, linesremoved, count) }}
+              {%-elif patch.status == 'A' -%}
+                {{ changesaddedfile(patch.new_file_path, linesadded, linesremoved, count) }}
+              {%-elif patch.status == 'M' -%}
+                {{ changeschangedfile(patch.new_file_path, linesadded, linesremoved, count) }}
+              {%-endif-%}
             {%- else -%}
               {{changesrenamedfile(patch.old_file_path, patch.new_file_path, linesadded, linesremoved, count)}}
             {%- endif -%}
