@@ -1682,6 +1682,37 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(issue.comments[0].comment, 'Second update')
 
 
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_git_urls(self,  p_send_email, p_ugt):
+        """ Check that the url to the git repo for issues is present/absent when
+        it should.
+        """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        self.test_view_issues()
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            # Check that the git issue URL is present
+            output = self.app.get('/test')
+            self.assertNotIn(
+                '<h5><strong>Issues GIT URLs</strong></h5>', output.data)
+
+            # Project w/o issue tracker
+            repo = pagure.lib.get_project(self.session, 'test')
+            repo.settings = {'issue_tracker': True}
+            self.session.add(repo)
+            self.session.commit()
+
+            # Check that the git issue URL is gone
+            output = self.app.get('/test')
+            self.assertIn(
+                '<h5><strong>Issues GIT URLs</strong></h5>', output.data)
+
+
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskIssuestests)
     unittest.TextTestRunner(verbosity=2).run(SUITE)
