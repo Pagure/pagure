@@ -327,7 +327,8 @@ def add_tag_obj(session, obj, tags, user, ticketfolder):
         return 'Nothing to add'
 
 
-def add_issue_assignee(session, issue, assignee, user, ticketfolder):
+def add_issue_assignee(session, issue, assignee, user, ticketfolder,
+                       notify=True):
     ''' Add an assignee to an issue, in other words, assigned an issue. '''
     user_obj = __get_user(session, user)
 
@@ -338,25 +339,26 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder):
         pagure.lib.git.update_git(
             issue, repo=issue.project, repofolder=ticketfolder)
 
-        pagure.lib.notify.notify_assigned_issue(issue, None, user_obj)
-        if not issue.private:
-            pagure.lib.notify.log(
-                issue.project,
-                topic='issue.assigned.reset',
-                msg=dict(
-                    issue=issue.to_json(public=True),
-                    project=issue.project.to_json(public=True),
-                    agent=user_obj.username,
-                ),
-                redis=REDIS,
-            )
+        if notify:
+            pagure.lib.notify.notify_assigned_issue(issue, None, user_obj)
+            if not issue.private:
+                pagure.lib.notify.log(
+                    issue.project,
+                    topic='issue.assigned.reset',
+                    msg=dict(
+                        issue=issue.to_json(public=True),
+                        project=issue.project.to_json(public=True),
+                        agent=user_obj.username,
+                    ),
+                    redis=REDIS,
+                )
 
-        # Send notification for the event-source server
-        if REDIS:
-            REDIS.publish('pagure.%s' % issue.uid, json.dumps(
-                {'unassigned': '-'}))
+            # Send notification for the event-source server
+            if REDIS:
+                REDIS.publish('pagure.%s' % issue.uid, json.dumps(
+                    {'unassigned': '-'}))
 
-        return 'Assignee reset'
+            return 'Assignee reset'
     elif assignee is None and issue.assignee is None:
         return
 
