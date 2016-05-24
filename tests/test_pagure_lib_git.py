@@ -1260,9 +1260,7 @@ index 0000000..60f7480
         to_hash = '0'
         output1 = pagure.lib.git.get_revs_between(
             to_hash, from_hash, gitrepo)
-        # test fails with current version of get_revs_between, if BASE = 0
-        # on the master branch get_revs_between returns an empty list.
-        # self.assertEqual(output1, [from_hash])
+        self.assertEqual(output1, [from_hash])
 
         # Case 2, get revs between two commits (to_hash, from_hash)
         to_hash = output[0].replace("'", '')
