@@ -11,11 +11,13 @@
     {{ issues|count }} Milestones
     <span class="btn-group btn-group-sm pull-xs-right" role="group">
       <a href="{{ url_for(
-          'view_issues', username=username, repo=repo.name) }}">
-        <button class="btn btn-default btn-sm">List</button>
+          'view_issues', username=username, repo=repo.name) }}"
+         class="btn btn-secondary btn-sm">
+        List
       </a>
-      <a href="{{ url_for('new_issue', username=username, repo=repo.name) }}">
-        <button class="btn btn-success btn-sm">New Issue</button>
+      <a href="{{ url_for('new_issue', username=username, repo=repo.name) }}"
+          class="btn btn-success btn-sm">
+        New Issue
       </a>
     </span>
   </h2>
