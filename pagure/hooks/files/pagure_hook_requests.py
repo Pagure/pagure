@@ -62,7 +62,7 @@ def run_as_post_receive_hook():
             return
 
         tmp = set(get_files_to_load(
-            pagure.lib.git.get_revs_between(oldrev, newrev, abspath)))
+            pagure.lib.git.get_revs_between(oldrev, newrev, abspath, refname)))
         file_list = file_list.union(tmp)
 
     reponame = pagure.lib.git.get_repo_name(abspath)

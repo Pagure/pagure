@@ -47,7 +47,8 @@ def run_as_pre_receive_hook():
                 "hook to block unsigned commits"
             return
 
-        commits = pagure.lib.git.get_revs_between(oldrev, newrev, abspath)
+        commits = pagure.lib.git.get_revs_between(
+            oldrev, newrev, abspath, refname)
         for commit in commits:
             if pagure.APP.config.get('HOOK_DEBUG', False):
                 print 'Processing commit: %s' % commit
