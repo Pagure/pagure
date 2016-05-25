@@ -1259,18 +1259,18 @@ index 0000000..60f7480
         # Case 1, repo BASE is null and HEAD is equal to from_hash
         to_hash = '0'
         output1 = pagure.lib.git.get_revs_between(
-            to_hash, from_hash, gitrepo)
+            to_hash, from_hash, gitrepo, 'refs/heads/master')
         self.assertEqual(output1, [from_hash])
 
         # Case 2, get revs between two commits (to_hash, from_hash)
         to_hash = output[0].replace("'", '')
         output2 = pagure.lib.git.get_revs_between(
-            to_hash, from_hash, gitrepo)
+            to_hash, from_hash, gitrepo, 'refs/heads/master')
         self.assertEqual(output2, [to_hash])
 
         # Case 3, get revs between two commits (from_hash, to_hash)
         output3 = pagure.lib.git.get_revs_between(
-            from_hash, to_hash, gitrepo)
+            from_hash, to_hash, gitrepo, 'refs/heads/master')
         self.assertEqual(output3, [to_hash])
 
         # Case 4, get revs between two commits on two different branches
@@ -1309,7 +1309,7 @@ index 0000000..60f7480
         shutil.rmtree(newgitrepo)
 
         output4 = pagure.lib.git.get_revs_between(
-            '0', 'feature', gitrepo)
+            '0', branch_commit.oid.hex, gitrepo, 'refs/heads/feature')
         self.assertEqual(output4, [branch_commit.oid.hex])
 
     def test_get_author(self):

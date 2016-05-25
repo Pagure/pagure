@@ -844,7 +844,7 @@ def read_git_lines(args, abspath, keepends=False, **kw):
     ).splitlines(keepends)
 
 
-def get_revs_between(oldrev, newrev, abspath, forced=False):
+def get_revs_between(oldrev, newrev, abspath, refname, forced=False):
     """ Yield revisions between HEAD and BASE. """
 
     cmd = ['rev-list', '%s...%s' % (oldrev, newrev)]
@@ -856,6 +856,8 @@ def get_revs_between(oldrev, newrev, abspath, forced=False):
     elif set(oldrev) == set('0') or set(oldrev) == set('^0'):
         head = get_default_branch(abspath)
         cmd = ['rev-list', '%s' % newrev, '^%s' % head]
+        if head in refname:
+            cmd = ['rev-list', '%s' % newrev]
     return pagure.lib.git.read_git_lines(cmd, abspath)
 
 
