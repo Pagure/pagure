@@ -339,6 +339,38 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
+    def test_milestones_without_dates(self, p_send_email, p_ugt):
+        """ Test creating two milestones with no dates. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(tests.HERE), bare=True)
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            # Get the CSRF token
+            output = self.app.get('/test/settings')
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+                'milestones': ['v1.0', 'v2.0'],
+                'milestone_dates': ['', ''],
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/update/milestones', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            # Check the redirect
+            self.assertIn(
+                u'<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn(u'<h3>Settings for test</h3>', output.data)
+            self.assertIn(u'Milestones updated', output.data)
+            # Check the result of the action -- Milestones recorded
+            repo = pagure.lib.get_project(self.session, 'test')
+            self.assertEqual(repo.milestones, {u'v1.0': u'', u'v2.0': u''})
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_roadmap_ui(self, p_send_email, p_ugt):
         """ Test viewing the roadmap of a repo. """
         p_send_email.return_value = True

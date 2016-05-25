@@ -1087,7 +1087,7 @@ def update_milestones(repo, username=None):
                 break
 
         for milestone_date in milestone_dates:
-            if milestone_dates.count(milestone_date) != 1:
+            if milestone_date and milestone_dates.count(milestone_date) != 1:
                 flask.flash(
                     'Date %s is present %s times' % (
                         milestone_date, milestone_dates.count(milestone_date)
