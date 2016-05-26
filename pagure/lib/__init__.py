@@ -341,24 +341,25 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder,
 
         if notify:
             pagure.lib.notify.notify_assigned_issue(issue, None, user_obj)
-            if not issue.private:
-                pagure.lib.notify.log(
-                    issue.project,
-                    topic='issue.assigned.reset',
-                    msg=dict(
-                        issue=issue.to_json(public=True),
-                        project=issue.project.to_json(public=True),
-                        agent=user_obj.username,
-                    ),
-                    redis=REDIS,
-                )
 
-            # Send notification for the event-source server
-            if REDIS:
-                REDIS.publish('pagure.%s' % issue.uid, json.dumps(
-                    {'unassigned': '-'}))
+        if not issue.private:
+            pagure.lib.notify.log(
+                issue.project,
+                topic='issue.assigned.reset',
+                msg=dict(
+                    issue=issue.to_json(public=True),
+                    project=issue.project.to_json(public=True),
+                    agent=user_obj.username,
+                ),
+                redis=REDIS,
+            )
 
-            return 'Assignee reset'
+        # Send notification for the event-source server
+        if REDIS:
+            REDIS.publish('pagure.%s' % issue.uid, json.dumps(
+                {'unassigned': '-'}))
+
+        return 'Assignee reset'
     elif assignee is None and issue.assignee is None:
         return
 
@@ -371,9 +372,9 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder,
         session.flush()
         pagure.lib.git.update_git(
             issue, repo=issue.project, repofolder=ticketfolder)
-
-        pagure.lib.notify.notify_assigned_issue(
-            issue, assignee_obj, user_obj)
+        if notify:
+            pagure.lib.notify.notify_assigned_issue(
+                issue, assignee_obj, user_obj)
 
         if not issue.private:
             pagure.lib.notify.log(
