@@ -49,6 +49,7 @@ Requires:  python-sqlalchemy0.8
 %else
 BuildRequires:  python-sqlalchemy > 0.8
 Requires:  python-sqlalchemy > 0.8
+BuildRequires:  systemd
 %endif
 
 Requires:  py-bcrypt
