@@ -1339,6 +1339,10 @@ class PagureFlaskIssuestests(tests.Modeltests):
         # Edit tag
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
+            #Edit a tag that doesn't exit
+            output = self.app.get('/test/tag/does_not_exist/edit')
+            self.assertEqual(output.status_code, 404)
+
             output = self.app.get('/test/tag/tag1/edit')
             self.assertEqual(output.status_code, 200)
             self.assertTrue('<h2>Edit tag: tag1</h2>' in output.data)

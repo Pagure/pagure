@@ -275,6 +275,11 @@ def edit_tag(repo, tag, username=None):
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
 
+    tags = pagure.lib.get_tags_of_project(SESSION, repo)
+
+    if not tags or tag not in [t.tag for t in tags]:
+        flask.abort(404, 'Tag %s not found in this project' % tag )
+
     form = pagure.forms.AddIssueTagForm()
     if form.validate_on_submit():
         new_tag = form.tag.data
