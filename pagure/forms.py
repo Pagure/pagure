@@ -49,6 +49,10 @@ class ProjectForm(ProjectFormSimplified):
             wtforms.validators.Regexp(PROJECT_NAME_REGEX, flags=re.IGNORECASE)
         ]
     )
+    create_readme = wtforms.BooleanField(
+        'Create README',
+        [wtforms.validators.optional()],
+    )
 
 
 class IssueFormSimplied(wtf.Form):

@@ -361,6 +361,8 @@ def view_user_requests(username):
 def new_project():
     """ Form to create a new project.
     """
+    user = pagure.lib.search_user(SESSION, username=flask.g.fas_user.username)
+
     if not pagure.APP.config.get('ENABLE_NEW_PROJECTS', True):
         flask.abort(404)
 
@@ -370,6 +372,7 @@ def new_project():
         description = form.description.data
         url = form.url.data
         avatar_email = form.avatar_email.data
+        create_readme = form.create_readme.data
 
         try:
             message = pagure.lib.new_project(
@@ -385,6 +388,8 @@ def new_project():
                 docfolder=APP.config['DOCS_FOLDER'],
                 ticketfolder=APP.config['TICKETS_FOLDER'],
                 requestfolder=APP.config['REQUESTS_FOLDER'],
+                add_readme=create_readme,
+                userobj=user,
             )
             SESSION.commit()
             pagure.lib.git.generate_gitolite_acls()

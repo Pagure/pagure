@@ -963,7 +963,7 @@ def add_pull_request_flag(session, request, username, percent, comment, url,
 def new_project(session, user, name, blacklist, allowed_prefix,
                 gitfolder, docfolder, ticketfolder, requestfolder,
                 description=None, url=None, avatar_email=None,
-                parent_id=None):
+                parent_id=None, add_readme=False, userobj=None):
     ''' Create a new project based on the information provided.
     '''
     if name in blacklist:
@@ -1013,7 +1013,22 @@ def new_project(session, user, name, blacklist, allowed_prefix,
     # Make sure we won't have SQLAlchemy error before we create the repo
     session.commit()
 
-    pygit2.init_repository(gitrepo, bare=True)
+    if not add_readme:
+        pygit2.init_repository(gitrepo, bare=True)
+    else:
+        temp_gitrepo_path = os.path.join(gitfolder, '%s' % name)
+        temp_gitrepo = pygit2.init_repository(temp_gitrepo_path, bare=False)
+        author = pygit2.Signature(userobj.fullname, userobj.default_email)
+        f = open(os.path.join(temp_gitrepo.workdir,"README.md"), 'w')
+        f.write("# %s\n\n%s" % (name, description))
+        f.close()
+        temp_gitrepo.index.add_all()
+        temp_gitrepo.index.write()
+        tree = temp_gitrepo.index.write_tree()
+        temp_gitrepo.create_commit('HEAD', author,author, 'Added the README', tree, [])
+        pygit2.clone_repository(temp_gitrepo_path, gitrepo, bare=True)
+        shutil.rmtree(temp_gitrepo_path)
+
     http_clone_file = os.path.join(gitrepo, 'git-daemon-export-ok')
     if not os.path.exists(http_clone_file):
         with open(http_clone_file, 'w') as stream:
