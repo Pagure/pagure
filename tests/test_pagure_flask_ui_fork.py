@@ -1173,10 +1173,10 @@ index 0000000..2a552bb
             os.path.join(tests.HERE, 'requests'), bare=True)
         self.set_up_git_repo(new_project=None, branch_from='feature')
 
-        # No such project
         user = tests.FakeUser()
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
+            # No such project
             output = self.app.post('/foo/pull-request/1/assign')
             self.assertEqual(output.status_code, 404)
 
@@ -1248,6 +1248,15 @@ index 0000000..2a552bb
                 'user': 'pingou',
             }
 
+        user.username = 'foo'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post(
+                '/test/pull-request/1/assign', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 403)
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
             output = self.app.post(
                 '/test/pull-request/1/assign', data=data,
                 follow_redirects=True)
