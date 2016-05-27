@@ -556,7 +556,7 @@
 
     <div class="card">
       <div class="card-block">
-        {% if authenticated and mergeform and pull_request.status == 'Open' %}
+        {% if authenticated and mergeform and pull_request.status == 'Open' and repo_admin %}
           <form method="POST" action="{{ url_for('.set_assignee_requests',
               username=username, repo=repo.name, requestid=requestid) }}">
             <fieldset class="form-group issue-metadata-form">
@@ -571,10 +571,10 @@
               <fieldset class="form-group issue-metadata-display">
                 <label><strong>Assignee</strong></label>
                 <div>
-                  {{ pull_request.assignee.username or '' }}
+                  {{ pull_request.assignee.username or 'Unassigned' }}
                 </div>
               </fieldset>
-        {% if authenticated and mergeform and pull_request.status == 'Open' %}
+        {% if authenticated and mergeform and pull_request.status == 'Open' and repo_admin %}
               <input type="submit" class="btn btn-primary issue-metadata-form" value="Update">
               <a class="btn btn-secondary issue-metadata-form editmetadatatoggle" >cancel</a>
             </form>

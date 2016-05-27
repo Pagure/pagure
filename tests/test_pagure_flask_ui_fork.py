@@ -1175,7 +1175,7 @@ index 0000000..2a552bb
 
         # No such project
         user = tests.FakeUser()
-        user.username = 'foo'
+        user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
             output = self.app.post('/foo/pull-request/1/assign')
             self.assertEqual(output.status_code, 404)
@@ -1192,7 +1192,7 @@ index 0000000..2a552bb
                 'Pagure</title>', output.data)
             self.assertIn(
                 '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n</h3>', output.data)
+                '  PR from the feature branch\n', output.data)
             self.assertNotIn(
                 '</button>\n                      Request assigned',
                 output.data)
@@ -1217,7 +1217,7 @@ index 0000000..2a552bb
                 'Pagure</title>', output.data)
             self.assertIn(
                 '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n</h3>', output.data)
+                '  PR from the feature branch\n', output.data)
             self.assertNotIn(
                 '</button>\n                      Request assigned',
                 output.data)
@@ -1237,7 +1237,7 @@ index 0000000..2a552bb
                 'Pagure</title>', output.data)
             self.assertIn(
                 '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n</h3>', output.data)
+                '  PR from the feature branch\n', output.data)
             self.assertIn(
                 '</button>\n                      No user &#34;bar&#34; found',
                 output.data)
@@ -1257,7 +1257,7 @@ index 0000000..2a552bb
                 'Pagure</title>', output.data)
             self.assertIn(
                 '<h3><span class="label label-default">PR#1</span>\n'
-                '  PR from the feature branch\n</h3>', output.data)
+                '  PR from the feature branch\n', output.data)
             self.assertIn(
                 '</button>\n                      Request assigned',
                 output.data)

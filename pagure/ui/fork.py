@@ -799,6 +799,9 @@ def set_assignee_requests(repo, requestid, username=None):
     if request.status != 'Open':
         flask.abort(403, 'Pull-request closed')
 
+    if not is_repo_admin(repo):
+        flask.abort(403, 'You are not allowed to assign this pull-request')
+
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
         try:
