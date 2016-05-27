@@ -137,7 +137,7 @@ add_comment = function(data, username) {
         <div class="comment_body"> \
           <span class="edit_date" title=""> \
           </span>\
-      ' + data.comment_added + '\
+      ' + emojione.toImage(data.comment_added) + '\
         </div> \
       </section> \
       <div class="issue_actions m-t-2"> \

@@ -17,7 +17,7 @@ add_comment = function(data, username) {
       var _data = '<div class="card"> \
             <div class="card-header"> \
               <div> \
-                ' + data.comment_added + '\
+                ' + emojione.toImage(data.comment_added) + '\
                 <div class="pull-xs-right text-muted"> \
                   <span title="' + data.comment_date + '">\
                     Just now</span></div>\
@@ -39,7 +39,7 @@ add_comment = function(data, username) {
         </a></div></small> \
         <section class="issue_comment"> \
         <div class="comment_body"> \
-        ' + data.comment_added + ' \
+        ' + emojione.toImage(data.comment_added) + ' \
         </div> \
         </section> \
         <div class="issue_actions m-t-2"> \
@@ -76,7 +76,7 @@ add_comment = function(data, username) {
         <div class="comment_body"> \
           <span class="edit_date" title=""> \
           </span>'
-        + data.comment_added + '\
+        + emojione.toImage(data.comment_added) + '\
         </div> \
       </section> \
       <div class="issue_actions m-t-2"> \
