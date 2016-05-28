@@ -49,7 +49,7 @@
                   <strong>{{ repo.name }}</strong>
                 </a>
                   <div class="pull-xs-right">
-                      {% if config.get('ENABLE_TICKETS', True) %}
+                      {% if config.get('ENABLE_TICKETS', True) and repo.settings.get('issue_tracker', True) %}
                         {% if repo.open_tickets_public == 0 %}
                         <span class="text-muted" data-toggle="tooltip"
                             title="{{ repo.open_tickets_public }} open issues against {{repo.name}}">
