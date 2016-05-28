@@ -27,6 +27,15 @@ class PagureCI(BASE):
     __tablename__ = 'hook_pagure_ci'
     __table_args__ = {'extend_existing': True}
 
+    id = sa.Column(sa.Integer, primary_key=True)
+    project_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey('projects.id', onupdate='CASCADE'),
+        nullable=False,
+        unique=True,
+        index=True)
+
+
     name = sa.Column(sa.String(64), primary_key=True, unique=True)
     display_name = sa.Column(sa.String(64), nullable=False, default='Jenkins')
     owner = sa.Column(sa.String(64))
@@ -41,52 +50,12 @@ class PagureCI(BASE):
 
     hook_token = sa.Column(sa.String(64))
 
-    '''def __init__(self, name, display_name, owner,
-                 pagure_name, pagure_url, pagure_token,
-                 jenkins_name, jenkins_url, jenkins_token,
-                 hook_token):
-        self.name = name
-        self.display_name = display_name
-        self.owner = owner
-        self.pagure_name = pagure_name
-        self.pagure_url = pagure_url
-        self.pagure_token = pagure_token
-
-        self.jenkins_name = jenkins_name
-        self.jenkins_url = jenkins_url
-        self.jenkins_token = jenkins_token
-
-        self.hook_token = hook_token'''
-
-    def __repr__(self):
-        return '<Project {.name}>'.format(self)
-
-
-def init_db(db):
-    from sqlalchemy import create_engine
-    engine = create_engine(db, convert_unicode=True)
-    Base.metadata.create_all(bind=engine)
-
-
-class ConfigNotFound(Exception):
-    pass
-
-
-class Service(object):
-    PAGURE = PagureCI.pagure_name
-    JENKINS = PagureCI.jenkins_name
-
-
-def get_configs(project_name, service):
-    """Returns all configurations with given name on a service.
-
-    :raises ConfigNotFound: when no configuration matches
-    """
-    cfg = PagureCI.query.filter(service == project_name).all()
-    if len(cfg) == 0:
-        raise ConfigNotFound(project_name)
-    return cfg
-
+    project = relation(
+        'Project', remote_side=[Project.id],
+        backref=backref(
+            'jenkins_hook', cascade="delete, delete-orphan",
+            single_parent=True)
+    )
 
 
 class JenkinsForm(wtf.Form):
@@ -128,7 +97,7 @@ class Hook(BaseHook):
         ' the changes made by the pushes to the git repository.'
     form = JenkinsForm
     db_object = PagureCI
-    backref = 'pagure_ci'
+    backref = 'jenkins_hook'
     form_fields = [
         'name', 'pagure_name', 'pagure_url', 'pagure_token', 'jenkins_name', 
         'jenkins_url', 'jenkins_token'
@@ -149,15 +118,15 @@ class Hook(BaseHook):
         repo_obj = pygit2.Repository(repopath)
 
         # Configure the hook
-        # repo_obj.config.set_multivar()
+        #repo_obj.config.set_multivar(dbobj)
 
         # Install the hook itself
-        #hook_file = os.path.join(hook_files, 'git_irc.py')
-        #if not os.path.exists(hook_file):
-            #os.symlink(
-                #hook_file,
-                #os.path.join(repopath, 'hooks', 'post-receive.irc')
-            #)
+        hook_file = os.path.join(hook_files, 'jenkins_hook.py')
+        if not os.path.exists(hook_file):
+            os.symlink(
+                hook_file,
+                os.path.join(repopath, 'hooks', 'post-receive.irc')
+            )
 
     @classmethod
     def remove(cls, project):
