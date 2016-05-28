@@ -1269,6 +1269,10 @@ def new_repo_hook_token(repo, username=None):
 def remove_user(repo, userid, username=None):
     """ Remove the specified user from the project.
     """
+
+    if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
+        flask.abort(404, 'User management not allowed in the pagure instance')
+
     if admin_session_timedout():
         flask.flash('Action canceled, try it again', 'error')
         url = flask.url_for(
@@ -1324,8 +1328,9 @@ def remove_user(repo, userid, username=None):
 def add_user(repo, username=None):
     """ Add the specified user from the project.
     """
+
     if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
-        flask.abort(404)
+        flask.abort(404, 'User management is not allowed in this pagure instance')
 
     if admin_session_timedout():
         if flask.request.method == 'POST':
@@ -1381,6 +1386,10 @@ def add_user(repo, username=None):
 def remove_group_project(repo, groupid, username=None):
     """ Remove the specified group from the project.
     """
+
+    if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
+        flask.abort(404, 'User management is not allowed in this pagure instance')
+
     if admin_session_timedout():
         flask.flash('Action canceled, try it again', 'error')
         url = flask.url_for(
@@ -1436,8 +1445,9 @@ def remove_group_project(repo, groupid, username=None):
 def add_group_project(repo, username=None):
     """ Add the specified group from the project.
     """
+
     if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
-        flask.abort(404)
+        flask.abort(404, 'User management is not allowed in this pagure instance')
 
     if admin_session_timedout():
         if flask.request.method == 'POST':
