@@ -61,6 +61,7 @@
             <textarea class="form-control" rows="8" id="issue_content" name="issue_content"
                 placeholder="Describe your issue">
               {%- if issue %}{{ issue.content }}{%
+                  elif form.issue_content.data %}{{ form.issue_content.data }}{%
                   elif default %}{{ default }}{%
               endif -%}
             </textarea>
