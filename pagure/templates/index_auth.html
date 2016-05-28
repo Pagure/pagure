@@ -49,34 +49,36 @@
                   <strong>{{ repo.name }}</strong>
                 </a>
                   <div class="pull-xs-right">
-                    {% if repo.open_tickets_public == 0 %}
-                      <span class="text-muted" data-toggle="tooltip"
-                        title="{{ repo.open_tickets_public }} open issues against {{repo.name}}">
-                        <span class="oi" data-glyph="warning"></span>
-                        {{- repo.open_tickets_public }}
-                      </span>
-                    {% else %}
-                      <a class="notblue" data-toggle="tooltip"
-                        href="{{ url_for('.view_issues', repo=repo.name) }}"
-                        title="{{ repo.open_tickets_public }} open issues against {{repo.name}}">
-                        <span class="oi" data-glyph="warning"></span>
-                        {{- repo.open_tickets_public }}
-                      </a>
-                    {% endif %}
+                      {% if config.get('ENABLE_TICKETS', True) %}
+                        {% if repo.open_tickets_public == 0 %}
+                        <span class="text-muted" data-toggle="tooltip"
+                            title="{{ repo.open_tickets_public }} open issues against {{repo.name}}">
+                            <span class="oi" data-glyph="warning"></span>
+                            {{- repo.open_tickets_public }}
+                        </span>
+                        {% else %}
+                        <a class="notblue" data-toggle="tooltip"
+                            href="{{ url_for('.view_issues', repo=repo.name) }}"
+                            title="{{ repo.open_tickets_public }} open issues against {{repo.name}}">
+                            <span class="oi" data-glyph="warning"></span>
+                            {{- repo.open_tickets_public }}
+                        </a>
+                        {% endif %}
+                      {% endif %}
 
                     {% if repo.open_requests == 0 %}
-                      <span class="text-muted" data-toggle="tooltip"
+                        <span class="text-muted" data-toggle="tooltip"
                         title="{{repo.open_requests}} open pull requests in {{repo.name}}">
                         <span class="oi" data-glyph="arrow-thick-bottom"></span>
                         {{- repo.open_requests}}
-                      </span>
+                        </span>
                     {% else %}
-                      <a class="notblue" data-toggle="tooltip"
+                        <a class="notblue" data-toggle="tooltip"
                         href="{{ url_for('.request_pulls', repo=repo.name) }}"
                         title="{{repo.open_requests}} open pull requests in {{repo.name}}">
                         <span class="oi" data-glyph="arrow-thick-bottom"></span>
                         {{- repo.open_requests}}
-                      </a>
+                        </a>
                     {% endif %}
 
                   </div>
