@@ -259,7 +259,7 @@ def update_issue(repo, issueid, username=None):
 @APP.route('/fork/<username>/<repo:repo>/tag/<tag>/edit', methods=('GET', 'POST'))
 @login_required
 def edit_tag(repo, tag, username=None):
-    """ Edit the specified tag of a project.
+    """ Edit the specified tag associated with the issues of a project.
     """
     repo = pagure.lib.get_project(SESSION, repo, user=username)
 
@@ -269,7 +269,11 @@ def edit_tag(repo, tag, username=None):
     if not is_repo_admin(repo):
         flask.abort(
             403,
-            'You are not allowed to edt tags of this project')
+            'You are not allowed to edit tags associated with the issues of \
+            this project')
+
+    if not repo.settings.get('issue_tracker', True):
+        flask.abort(404, 'No issue tracker found for this project')
 
     form = pagure.forms.AddIssueTagForm()
     if form.validate_on_submit():
@@ -306,7 +310,7 @@ def edit_tag(repo, tag, username=None):
 @APP.route('/fork/<username>/<repo:repo>/droptag/', methods=['POST'])
 @login_required
 def remove_tag(repo, username=None):
-    """ Remove the specified tag from the project.
+    """ Remove the specified tag, associated with the issues, from the project.
     """
     repo = pagure.lib.get_project(SESSION, repo, user=username)
 
@@ -316,7 +320,11 @@ def remove_tag(repo, username=None):
     if not is_repo_admin(repo):
         flask.abort(
             403,
-            'You are not allowed to remove tags of this project')
+            'You are not allowed to remove tags associated with the issues \
+            of this project')
+
+    if not repo.settings.get('issue_tracker', True):
+        flask.abort(404, 'No issue tracker found for this project')
 
     form = pagure.forms.AddIssueTagForm()
     if form.validate_on_submit():
