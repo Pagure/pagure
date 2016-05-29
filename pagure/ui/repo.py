@@ -411,6 +411,7 @@ def view_file(repo, identifier, filename, username=None):
     if not content:
         flask.abort(404, 'File not found')
 
+    encoding = None
     if isinstance(content, pygit2.Blob):
         rawtext = str(flask.request.args.get('text')).lower() in ['1', 'true']
         ext = filename[filename.rfind('.'):]
@@ -429,9 +430,8 @@ def view_file(repo, identifier, filename, username=None):
             content, safe = pagure.doc_utils.convert_readme(content.data, ext)
             output_type = 'markup'
         elif not is_binary_string(content.data):
+            encoding = chardet.detect(ktc.to_bytes(content.data))['encoding']
             file_content = content.data
-            if not isinstance(file_content, basestring):
-                file_content = content.data.decode('utf-8')
             try:
                 lexer = guess_lexer_for_filename(
                     filename,
@@ -454,18 +454,26 @@ def view_file(repo, identifier, filename, username=None):
         content = sorted(content, key=lambda x: x.filemode)
         output_type = 'tree'
 
-    return flask.render_template(
-        'file.html',
-        select='tree',
-        repo=repo,
-        origin='view_file',
-        username=username,
-        branches=sorted(repo_obj.listall_branches()),
-        branchname=branchname,
-        filename=filename,
-        content=content,
-        output_type=output_type,
-        repo_admin=is_repo_admin(repo),
+    headers = {}
+    if encoding:
+        headers['Content-Encoding'] = encoding
+
+    return (
+            flask.render_template(
+            'file.html',
+            select='tree',
+            repo=repo,
+            origin='view_file',
+            username=username,
+            branches=sorted(repo_obj.listall_branches()),
+            branchname=branchname,
+            filename=filename,
+            content=content,
+            output_type=output_type,
+            repo_admin=is_repo_admin(repo),
+        ),
+        200,
+        headers
     )
 
 
