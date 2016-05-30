@@ -32,7 +32,9 @@ class FedmsgTable(BASE):
     id = sa.Column(sa.Integer, primary_key=True)
     project_id = sa.Column(
         sa.Integer,
-        sa.ForeignKey('projects.id', onupdate='CASCADE', ondelete='CASCADE'),
+        sa.ForeignKey(
+            'projects.id', onupdate='CASCADE', ondelete='CASCADE'
+            name='hook_fedmsg_project_id_fkey'),
         nullable=False,
         unique=True,
         index=True)

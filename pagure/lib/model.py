@@ -1217,10 +1217,14 @@ class ProjectGroup(BASE):
 
     project_id = sa.Column(
         sa.Integer,
-        sa.ForeignKey('projects.id', onupdate='CASCADE', ondelete='CASCADE'),
+        sa.ForeignKey(
+            'projects.id', onupdate='CASCADE', ondelete='CASCADE',
+            name='projects_groups_project_id_fkey'),
         primary_key=True)
     group_id = sa.Column(
-        sa.Integer, sa.ForeignKey('pagure_group.id'), primary_key=True)
+        sa.Integer, sa.ForeignKey(
+            'pagure_group.id', name='projects_groups_pagure_group_id_fkey'),
+        primary_key=True)
 
     # Constraints
     __table_args__ = (
