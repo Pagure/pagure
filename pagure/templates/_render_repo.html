@@ -116,7 +116,7 @@
             {{ render_row(list) }}
         </div>
         {% if total and total > 1 %}
-        {{ pagination_link(pagetitle, page, total) }}
+        {{ pagination_link(pagetitle, page, total, sorting) }}
         {% endif %}
     </section>
 {% endmacro %}
