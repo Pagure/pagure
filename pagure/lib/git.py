@@ -274,10 +274,8 @@ def clean_git(obj, repo, repofolder):
 
     # See if there is a parent to this commit
     parent = None
-    try:
+    if not new_repo.is_empty:
         parent = new_repo.head.get_object().oid
-    except pygit2.GitError:
-        pass
 
     parents = []
     if parent:
