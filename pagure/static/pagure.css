@@ -107,9 +107,14 @@ white-space: nowrap;
 #preview
 {
     min-height: 16rem;
-    background:#ddd;
+    background:#efefef;
     padding:1em;
     border:1px solid #aaa;
+}
+
+.form-control#initial_comment
+{
+  min-height: 16rem;
 }
 
 

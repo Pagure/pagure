@@ -153,7 +153,29 @@
     </div>
     {% endif %}
     {{ render_bootstrap_field(form.title) }}
-    {{ render_bootstrap_field(form.initial_comment)}}
+    <fieldset class="form-group">
+      <label for="initial_comment"><strong>Inital Comment</strong></label>
+      <small class="text-muted pull-xs-right">
+        <span class="btn btn-sm btn-secondary inactive"
+          aria-pressed="false" id="previewinmarkdown">Preview</span>
+      </small>
+      <textarea class="form-control" id="initial_comment" name="initial_comment"
+          placeholder="Describe your Pull Request"></textarea>
+      <div>
+
+        {% if form.initial_comment.errors %}
+        <span class="pull-xs-right text-danger">
+          <small>
+          {% for error in form.initial_comment.errors %}
+            {{ error }}&nbsp;
+          {% endfor %}
+          </small>
+        </span>
+        {% endif %}
+      </div>
+      <div id="preview" style="display:none;">
+      </div>
+    </fieldset>
     <p class="buttons indent">
       <input type="submit" class="btn btn-primary" value="Create">
       {{ form.csrf_token }}
@@ -1086,7 +1108,46 @@ function updateHighlight(onload) {
     }
   }
 }
-$(document).ready(function () { updateHighlight(true) } );
+$(document).ready(function () {
+  updateHighlight(true)
+ {% if form %}
+  $( "#previewinmarkdown" ).click(
+    function(event, ui) {
+      if ($( "#previewinmarkdown" ).hasClass("inactive")){
+        var _text = $( "#initial_comment" ).val();
+        var _url = "{{ url_for('markdown_preview') }}";
+        $.ajax({
+          url: _url ,
+          type: 'POST',
+          data: {
+            content: _text,
+            csrf_token: "{{ form.csrf_token.current_token }}",
+          },
+          dataType: 'html',
+          success: function(res) {
+            var preview = emojione.toImage(res);
+            $( "#preview" ).html(preview);
+            $( "#previewinmarkdown" ).removeClass("inactive");
+            $( "#previewinmarkdown" ).addClass("active");
+            $( "#initial_comment" ).hide();
+            $( "#preview" ).show();
+          },
+          error: function() {
+            alert('Unable to generate preview!'+error);
+          }
+        });
+        return false;
+      } else if ($( "#previewinmarkdown" ).hasClass("active")){
+        $( "#previewinmarkdown" ).addClass("inactive");
+        $( "#previewinmarkdown" ).removeClass("active");
+        $( "#initial_comment" ).show();
+        $( "#preview" ).hide();
+      }
+    }
+  );
+  {% endif %}
+
+} );
 $(window).on('hashchange', updateHighlight);
 var selected = [];
 $("[data-line-number]").click(function (ev) {
