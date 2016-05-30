@@ -34,7 +34,7 @@ class PagureTable(BASE):
     project_id = sa.Column(
         sa.Integer,
         sa.ForeignKey(
-            'projects.id', onupdate='CASCADE', ondelete='CASCADE'
+            'projects.id', onupdate='CASCADE', ondelete='CASCADE',
             name='hook_pagure_project_id_fkey'),
         nullable=False,
         unique=True,
