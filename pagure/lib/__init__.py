@@ -1016,7 +1016,7 @@ def new_project(session, user, name, blacklist, allowed_prefix,
     if not add_readme:
         pygit2.init_repository(gitrepo, bare=True)
     else:
-        temp_gitrepo_path = os.path.join(gitfolder, '%s' % name)
+        temp_gitrepo_path = tempfile.mkdtemp(prefix='pagure-')
         temp_gitrepo = pygit2.init_repository(temp_gitrepo_path, bare=False)
         author = pygit2.Signature(userobj.fullname, userobj.default_email)
         f = open(os.path.join(temp_gitrepo.workdir,"README.md"), 'w')
