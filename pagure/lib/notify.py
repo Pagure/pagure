@@ -252,7 +252,7 @@ def notify_new_comment(comment, user=None):
 
     send_email(
         text,
-        'Update to issue #%s `%s`' % (comment.issue.id, comment.issue.title),
+        'Issue #%s `%s`' % (comment.issue.id, comment.issue.title),
         ','.join(mail_to),
         mail_id=comment.mail_id,
         in_reply_to=comment.issue.mail_id,
@@ -287,7 +287,7 @@ def notify_new_issue(issue, user=None):
 
     send_email(
         text,
-        'New issue `%s`' % issue.title,
+        'Issue #%s `%s`' % (issue.id, issue.title),
         ','.join(mail_to),
         mail_id=issue.mail_id,
         project_name=issue.project.name,
@@ -322,7 +322,7 @@ The issue: `%s` of project: `%s` has been %s by %s.
     uid = time.mktime(datetime.datetime.now().timetuple())
     send_email(
         text,
-        'Issue `%s` assigned' % issue.title,
+        'Issue #%s `%s`' % (issue.id, issue.title),
         ','.join(mail_to),
         mail_id='%s/assigned/%s' % (issue.mail_id, uid),
         in_reply_to=issue.mail_id,
@@ -358,7 +358,7 @@ The pull-request: `%s` of project: `%s` has been %s by %s.
     uid = time.mktime(datetime.datetime.now().timetuple())
     send_email(
         text,
-        'Pull-request `%s` assigned' % request.title,
+        'PR #%s `%s`' % (request.id, request.title),
         ','.join(mail_to),
         mail_id='%s/assigned/%s' % (request.mail_id, uid),
         in_reply_to=request.mail_id,
@@ -391,7 +391,7 @@ def notify_new_pull_request(request):
 
     send_email(
         text,
-        'Pull-Request #%s `%s`' % (request.id, request.title),
+        'PR #%s `%s`' % (request.id, request.title),
         ','.join(mail_to),
         mail_id=request.mail_id,
         project_name=request.project.name,
@@ -425,7 +425,7 @@ Merged pull-request:
     uid = time.mktime(datetime.datetime.now().timetuple())
     send_email(
         text,
-        'Pull-Request #%s `%s`' % (request.id, request.title),
+        'PR #%s `%s`' % (request.id, request.title),
         ','.join(mail_to),
         mail_id='%s/close/%s' % (request.mail_id, uid),
         in_reply_to=request.mail_id,
@@ -460,7 +460,7 @@ Cancelled pull-request:
     uid = time.mktime(datetime.datetime.now().timetuple())
     send_email(
         text,
-        'Pull-Request #%s `%s`' % (request.id, request.title),
+        'PR #%s `%s`' % (request.id, request.title),
         ','.join(mail_to),
         mail_id='%s/close/%s' % (request.mail_id, uid),
         in_reply_to=request.mail_id,
@@ -495,10 +495,7 @@ def notify_pull_request_comment(comment, user):
 
     send_email(
         text,
-        'Update to %s pull-Request #%s `%s`' % (
-            comment.pull_request.project.name,
-            comment.pull_request.id,
-            comment.pull_request.title),
+        'PR #%s `%s`' % (comment.pull_request.id, comment.pull_request.title),
         ','.join(mail_to),
         mail_id=comment.mail_id,
         in_reply_to=comment.pull_request.mail_id,
