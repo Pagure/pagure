@@ -36,8 +36,7 @@ class PagureRequestsTable(BASE):
     project_id = sa.Column(
         sa.Integer,
         sa.ForeignKey(
-            'projects.id', onupdate='CASCADE', ondelete='CASCADE',
-            name='hook_pagure_requests_project_id_fkey'),
+            'projects.id', onupdate='CASCADE', ondelete='CASCADE'),
         nullable=False,
         unique=True,
         index=True)
