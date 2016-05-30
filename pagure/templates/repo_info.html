@@ -149,23 +149,27 @@ git push -u origin master</pre>
 
     {% if origin == 'view_repo' or origin == 'view_repo_branch' %}
 
-      {% if readme %}
         <div class="col-md-8">
-          <section class="readme">
-            {% if safe %}
-              {{ readme | noJS |safe }}
+            {% if readme %}
+            <section class="readme">
+              {% if safe %}
+                {{ readme | noJS |safe }}
+              {% else %}
+                {{ readme | noJS }}
+              {% endif %}
+            </section>
             {% else %}
-              {{ readme | noJS }}
+            <section class="no-readme">
+              <div class="card">
+                <div class="card-header text-xs-center text-muted p-t-2 p-b-2">
+                  The {{repo.name}} project has not checked in a README file yet
+                </div>
+              </div>
+            </section>
             {% endif %}
-          </section>
         </div>
-      {% endif %}
 
-      {% if readme or (repo_obj and repo_obj.is_empty) %}
       <div class="col-md-4">
-      {% else %}
-      <div class="col-md-12">
-      {% endif %}
         <div class="card">
           <div class="card-block">
             <h5><strong>Owners</strong></h5>
