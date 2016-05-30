@@ -1216,7 +1216,9 @@ class ProjectGroup(BASE):
     __tablename__ = 'projects_groups'
 
     project_id = sa.Column(
-        sa.Integer, sa.ForeignKey('projects.id'), primary_key=True)
+        sa.Integer,
+        sa.ForeignKey('projects.id', onupdate='CASCADE', ondelete='CASCADE'),
+        primary_key=True)
     group_id = sa.Column(
         sa.Integer, sa.ForeignKey('pagure_group.id'), primary_key=True)
 
