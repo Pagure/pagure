@@ -17,7 +17,7 @@ import json
 
 import sqlalchemy as sa
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, MetaData
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref
@@ -25,7 +25,17 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import relation
 
-BASE = declarative_base()
+
+CONVENTION = {
+    "ix": 'ix_%(table_name)s_%(column_0_label)s',
+    # Checks are currently buggy and prevent us from naming them correctly
+    #"ck": "ck_%(table_name)s_%(constraint_name)s",
+    "fk": "%(table_name)s_%(column_0_name)s_fkey",
+    "pk": "%(table_name)s_pkey",
+    "uq": "%(table_name)s_%(column_0_name)s_key",
+}
+
+BASE = declarative_base(metadata=MetaData(naming_convention=CONVENTION))
 
 ERROR_LOG = logging.getLogger('pagure.model')
 
@@ -223,7 +233,7 @@ class UserEmail(BASE):
         sa.Integer,
         sa.ForeignKey(
             'users.id', onupdate='CASCADE',
-            name='user_emails_user_id_fkey'),
+        ),
         nullable=False,
         index=True)
     email = sa.Column(sa.String(255), nullable=False, unique=True)
@@ -248,7 +258,7 @@ class UserEmailPending(BASE):
         sa.Integer,
         sa.ForeignKey(
             'users.id', onupdate='CASCADE',
-            name='user_emails_pending_user_id_fkey'),
+        ),
         nullable=False,
         index=True)
     email = sa.Column(sa.String(255), nullable=False, unique=True)
@@ -281,7 +291,7 @@ class Project(BASE):
         sa.Integer,
         sa.ForeignKey(
             'users.id', onupdate='CASCADE',
-            name='projects_user_id_fkey'),
+        ),
         nullable=False,
         index=True)
     name = sa.Column(sa.String(255), nullable=False, index=True)
@@ -293,8 +303,8 @@ class Project(BASE):
     parent_id = sa.Column(
         sa.Integer,
         sa.ForeignKey(
-            'projects.id', onupdate='CASCADE'
-            name='projects_parent_id_fkey'),
+            'projects.id', onupdate='CASCADE',
+        ),
         nullable=True)
     _priorities = sa.Column(sa.Text, nullable=True)
     _milestones = sa.Column(sa.Text, nullable=True)
@@ -489,13 +499,13 @@ class ProjectUser(BASE):
         sa.Integer,
         sa.ForeignKey(
             'projects.id', onupdate='CASCADE',
-            name='user_projects_project_id_fkey'),
+        ),
         nullable=False)
     user_id = sa.Column(
         sa.Integer,
         sa.ForeignKey(
             'users.id', onupdate='CASCADE',
-            name='user_projects_user_id_fkey'),
+        ),
         nullable=False,
         index=True)
 
@@ -514,7 +524,7 @@ class Issue(BASE):
         sa.Integer,
         sa.ForeignKey(
             'projects.id', onupdate='CASCADE',
-            name='issues_project_id_fkey'),
+        ),
         primary_key=True)
     title = sa.Column(
         sa.Text,
@@ -526,21 +536,21 @@ class Issue(BASE):
         sa.Integer,
         sa.ForeignKey(
             'users.id', onupdate='CASCADE',
-            name='issues_user_id_fkey'),
+        ),
         nullable=False,
         index=True)
     assignee_id = sa.Column(
         sa.Integer,
         sa.ForeignKey(
             'users.id', onupdate='CASCADE',
-            name='issues_assignee_id_fkey'),
+        ),
         nullable=True,
         index=True)
     status = sa.Column(
         sa.String(255),
         sa.ForeignKey(
             'status_issue.status', onupdate='CASCADE',
-            name='issues_status_fkey'),
+        ),
         default='Open',
         nullable=False)
     private = sa.Column(sa.Boolean, nullable=False, default=False)
@@ -642,13 +652,13 @@ class IssueToIssue(BASE):
         sa.String(32),
         sa.ForeignKey(
             'issues.uid', ondelete='CASCADE', onupdate='CASCADE',
-            name='issue_to_issue_parent_issue_id_fkey'),
+        ),
         primary_key=True)
     child_issue_id = sa.Column(
         sa.String(32),
         sa.ForeignKey(
             'issues.uid', ondelete='CASCADE', onupdate='CASCADE',
-            name='issue_to_issue_child_issue_id_fkey'),
+        ),
         primary_key=True)
 
 
@@ -665,7 +675,7 @@ class IssueComment(BASE):
         sa.String(32),
         sa.ForeignKey(
             'issues.uid', ondelete='CASCADE', onupdate='CASCADE',
-            name='issue_comments_issue_uid_fkey'),
+        ),
         index=True)
     comment = sa.Column(
         sa.Text(),
@@ -674,13 +684,13 @@ class IssueComment(BASE):
         sa.Integer,
         sa.ForeignKey(
             'issue_comments.id', onupdate='CASCADE',
-            name='issue_comments_parent_id_fkey'),
+        ),
         nullable=True)
     user_id = sa.Column(
         sa.Integer,
         sa.ForeignKey(
             'users.id', onupdate='CASCADE',
-            name='issue_comments_user_id_fkey'),
+        ),
         nullable=False,
         index=True)
     edited_on = sa.Column(sa.DateTime, nullable=True)
@@ -688,7 +698,7 @@ class IssueComment(BASE):
         sa.Integer,
         sa.ForeignKey(
             'users.id', onupdate='CASCADE',
-            name='issue_comments_editor_id_fkey'),
+        ),
         nullable=True)
 
     date_created = sa.Column(sa.DateTime, nullable=False,
@@ -760,13 +770,13 @@ class TagIssue(BASE):
         sa.String(255),
         sa.ForeignKey(
             'tags.tag', ondelete='CASCADE', onupdate='CASCADE',
-            name='tags_issues_tag_fkey'),
+        ),
         primary_key=True)
     issue_uid = sa.Column(
         sa.String(32),
         sa.ForeignKey(
             'issues.uid', ondelete='CASCADE', onupdate='CASCADE',
-            name='tags_issues_issue_uid_fkey'),
+        ),
         primary_key=True)
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
@@ -793,13 +803,13 @@ class TagProject(BASE):
         sa.String(255),
         sa.ForeignKey(
             'tags.tag', ondelete='CASCADE', onupdate='CASCADE',
-            name='tags_projects_tag_fkey'),
+        ),
         primary_key=True)
     project_id = sa.Column(
         sa.Integer,
         sa.ForeignKey(
             'projects.id', ondelete='CASCADE', onupdate='CASCADE',
-            name='tags_projects_project_id_fkey'),
+        ),
         primary_key=True)
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
@@ -832,7 +842,7 @@ class PullRequest(BASE):
         sa.Integer,
         sa.ForeignKey(
             'projects.id', ondelete='CASCADE', onupdate='CASCADE',
-            name='pull_requests_project_id_fkey'),
+        ),
         primary_key=True)
     branch = sa.Column(
         sa.Text(),
@@ -841,7 +851,7 @@ class PullRequest(BASE):
         sa.Integer,
         sa.ForeignKey(
             'projects.id', ondelete='CASCADE', onupdate='CASCADE',
-            name='pull_requests_project_id_from_fkey'),
+        ),
         nullable=True)
     remote_git = sa.Column(
         sa.Text(),
@@ -862,34 +872,35 @@ class PullRequest(BASE):
         sa.Integer,
         sa.ForeignKey(
             'users.id', onupdate='CASCADE',
-            name='pull_requests_user_id_fkey'),
+        ),
         nullable=False,
         index=True)
     assignee_id = sa.Column(
         sa.Integer,
         sa.ForeignKey(
             'users.id', onupdate='CASCADE',
-            name='pull_requests_assignee_id_fkey'),
+        ),
         nullable=True,
         index=True)
     merge_status = sa.Column(
         sa.Enum(
             'NO_CHANGE', 'FFORWARD', 'CONFLICTS', 'MERGE',
-            name='merge_status_enum'),
+            name='merge_status_enum',
+        ),
         nullable=True)
 
     status = sa.Column(
         sa.String(255),
         sa.ForeignKey(
             'status_pull_requests.status', onupdate='CASCADE',
-            name='pull_requests__status_fkey'),
+        ),
         default='Open',
         nullable=False)
     closed_by_id = sa.Column(
         sa.Integer,
         sa.ForeignKey(
             'users.id', onupdate='CASCADE',
-            name='pull_requests_closed_by_id_fkey'),
+        ),
         nullable=True)
     closed_at = sa.Column(
         sa.DateTime,
@@ -905,7 +916,7 @@ class PullRequest(BASE):
 
     __table_args__ = (
         sa.CheckConstraint(
-            'NOT(project_id_from IS NULL AND remote_git IS NULL)'
+            'NOT(project_id_from IS NULL AND remote_git IS NULL)',
         ),
     )
 
@@ -1040,8 +1051,8 @@ class PullRequestComment(BASE):
     pull_request_uid = sa.Column(
         sa.String(32),
         sa.ForeignKey(
-            'pull_requests.uid', ondelete='CASCADE', onupdate='CASCADE'
-            name='pull_request_comments_pull_requests_uid_fkey'),
+            'pull_requests.uid', ondelete='CASCADE', onupdate='CASCADE',
+        ),
         nullable=False)
     commit_id = sa.Column(
         sa.String(40),
@@ -1051,7 +1062,7 @@ class PullRequestComment(BASE):
         sa.Integer,
         sa.ForeignKey(
             'users.id', onupdate='CASCADE',
-            name='pull_request_comments_users_id_fkey'),
+        ),
         nullable=False,
         index=True)
     filename = sa.Column(
@@ -1070,7 +1081,7 @@ class PullRequestComment(BASE):
         sa.Integer,
         sa.ForeignKey(
             'pull_request_comments.id', onupdate='CASCADE',
-            name='pull_request_comments_parent_id_fkey'),
+        ),
         nullable=True)
     notification = sa.Column(sa.Boolean, default=False, nullable=False)
     edited_on = sa.Column(sa.DateTime, nullable=True)
@@ -1142,13 +1153,13 @@ class PullRequestFlag(BASE):
         sa.String(32),
         sa.ForeignKey(
             'pull_requests.uid', ondelete='CASCADE', onupdate='CASCADE',
-            name='pull_request_flags_pull_requests_uid_fkey'),
+        ),
         nullable=False)
     user_id = sa.Column(
         sa.Integer,
         sa.ForeignKey(
             'users.id', onupdate='CASCADE',
-            name='pull_request_flags_user_id_fkey'),
+        ),
         nullable=False,
         index=True)
     username = sa.Column(
@@ -1233,14 +1244,14 @@ class PagureGroup(BASE):
         sa.String(16),
         sa.ForeignKey(
             'pagure_group_type.group_type',
-            name='pagure_group_grp_type_fkey'),
+        ),
         default='user',
         nullable=False)
     user_id = sa.Column(
         sa.Integer,
         sa.ForeignKey(
             'users.id', onupdate='CASCADE',
-            name='pagure_group_user_id_fkey'),
+        ),
         nullable=False,
         index=True)
     created = sa.Column(
@@ -1271,12 +1282,12 @@ class ProjectGroup(BASE):
         sa.Integer,
         sa.ForeignKey(
             'projects.id', onupdate='CASCADE', ondelete='CASCADE',
-            name='projects_groups_project_id_fkey'),
+        ),
         primary_key=True)
     group_id = sa.Column(
         sa.Integer, sa.ForeignKey(
             'pagure_group.id',
-            name='projects_groups_group_id_fkey'),
+        ),
         primary_key=True)
 
     # Constraints
@@ -1321,14 +1332,14 @@ class Token(BASE):
         sa.Integer,
         sa.ForeignKey(
             'users.id', onupdate='CASCADE',
-            name='tokens_user_id_fkey'),
+        ),
         nullable=False,
         index=True)
     project_id = sa.Column(
         sa.Integer,
         sa.ForeignKey(
             'projects.id', onupdate='CASCADE',
-            name='tokens_project_id_fkey'),
+        ),
         nullable=False,
         index=True)
     expiration = sa.Column(
@@ -1391,12 +1402,12 @@ class TokenAcl(BASE):
     token_id = sa.Column(
         sa.String(64), sa.ForeignKey(
             'tokens.id',
-            name='tokens_acls_token_id_fkey'),
+        ),
         primary_key=True)
     acl_id = sa.Column(
         sa.Integer, sa.ForeignKey(
             'acls.id',
-            name='tokens_acls_acl_id_fkey'),
+        ),
         primary_key=True)
 
     # Constraints
@@ -1423,7 +1434,7 @@ class PagureUserVisit(BASE):
     user_id = sa.Column(
         sa.Integer, sa.ForeignKey(
             'users.id',
-            name='pagure_user_visit_user_id_fkey'),
+        ),
         nullable=False)
     visit_key = sa.Column(
         sa.String(40), nullable=False, unique=True, index=True)
@@ -1444,12 +1455,12 @@ class PagureUserGroup(BASE):
     user_id = sa.Column(
         sa.Integer, sa.ForeignKey(
             'users.id',
-            name='pagure_user_group_user_id_fkey'),
+        ),
         primary_key=True)
     group_id = sa.Column(
         sa.Integer, sa.ForeignKey(
             'pagure_group.id',
-            name='pagure_user_group_pkey'),
+        ),
         primary_key=True)
 
     # Constraints
