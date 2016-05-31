@@ -280,6 +280,15 @@
         {% else %}
           {% set patch_new_id = patch.new_oid %}
         {% endif %}
+
+        {% if patch |hasattr('old_id') %}
+          {% set patch_old_id = patch.old_id %}
+        {% elif patch |hasattr('delta') %}
+          {% set patch_old_id = patch.delta.old_file.id %}
+        {% else %}
+          {% set patch_old_id = patch.old_oid %}
+        {% endif %}
+
         {% if patch | hasattr('new_file_path') %}
           {% set patch_new_file_path = patch.new_file_path -%}
           {% if patch.new_file_path != patch.old_file_path %}
@@ -316,23 +325,29 @@
                 {%endif%}
               {%endmacro%}
 
-              {% macro viewfilelink(filepath)%}
+              {% macro viewfilelink(filepath, identifier=False)%}
               {% if pull_request %}
+              {% if not identifier %}
+                {% set identifier = pull_request.branch_from %}
+              {% endif %}
               <a href="{{
                   url_for(
                       'view_file',
                       username=pull_request.project_from.user.username
                           if pull_request.project_from.is_fork else None,
                       repo=pull_request.project_from.name,
-                      identifier=pull_request.branch_from,
+                      identifier=identifier,
                       filename=filepath) }}"
               {% else %}
+              {% if identifier == False %}
+                {% set identifier = branch_from %}
+              {% endif %}
               <a href="{{
                   url_for(
                       'view_file',
                       username=username,
                       repo=repo.name,
-                      identifier=branch_from,
+                      identifier=identifier,
                       filename=filepath) }}"
               {% endif %}
               title="View file as of {{ patch_new_id|short }}">{{filepath}}</a>
@@ -406,14 +421,24 @@
           <div class="text-muted text-xs-center">empty file added</div>
         </div>
       {% else %}
-      {% autoescape false %}
-          {{ patch | patch_to_diff | html_diff | format_loc(
-                  filename=patch_new_file_path,
-                  commit=patch_new_id,
-                  prequest=pull_request,
-                  index=loop.index,
-                  tree_id=diff_commits[0].tree.id)}}
-      {% endautoescape %}
+        {% if patchtype == "added" and patch.line_stats[1] > 100 %}
+          <div class="card-block">
+            <div class="text-muted text-xs-center">View the large added file {{ viewfilelink(patch_new_file_path) }}</div>
+          </div>
+        {% elif patchtype == "removed" %}
+          <div class="card-block">
+            <div class="text-muted text-xs-center">view the removed file {{ viewfilelink(patch_new_file_path, patch_old_id) }}</div>
+          </div>
+        {% else %}
+          {% autoescape false %}
+              {{ patch | patch_to_diff | html_diff | format_loc(
+                      filename=patch_new_file_path,
+                      commit=patch_new_id,
+                      prequest=pull_request,
+                      index=loop.index,
+                      tree_id=diff_commits[0].tree.id)}}
+          {% endautoescape %}
+        {% endif %}
       {% endif %}
 
       </div>
