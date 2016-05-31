@@ -421,13 +421,21 @@
           <div class="text-muted text-xs-center">empty file added</div>
         </div>
       {% else %}
-        {% if patchtype == "added" and patch.line_stats[1] > 1000 %}
+        {% if patchtype == "added" %}
+          {% if (patch| hasattr('line_stats') and patch.line_stats[1] > 1000)
+              or (patch| hasattr('additions') and patch.additions > 1000) %}
           <div class="card-block">
-            <div class="text-muted text-xs-center">View the large added file {{ viewfilelink(patch_new_file_path) }}</div>
+            <div class="text-muted text-xs-center">
+                The added file is too large to be shown here, see it at:
+                {{ viewfilelink(patch_new_file_path) }}
+            </div>
           </div>
         {% elif patchtype == "removed" %}
           <div class="card-block">
-            <div class="text-muted text-xs-center">view the removed file {{ viewfilelink(patch_new_file_path, patch_old_id) }}</div>
+            <div class="text-muted text-xs-center">
+                The removed file is too large to be shown here, see it at:
+                {{ viewfilelink(patch_new_file_path, patch_old_id) }}
+            </div>
           </div>
         {% else %}
           {% autoescape false %}
