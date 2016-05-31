@@ -421,7 +421,7 @@
           <div class="text-muted text-xs-center">empty file added</div>
         </div>
       {% else %}
-        {% if patchtype == "added" and patch.line_stats[1] > 100 %}
+        {% if patchtype == "added" and patch.line_stats[1] > 1000 %}
           <div class="card-block">
             <div class="text-muted text-xs-center">View the large added file {{ viewfilelink(patch_new_file_path) }}</div>
           </div>
