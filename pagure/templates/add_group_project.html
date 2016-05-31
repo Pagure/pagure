@@ -2,48 +2,69 @@
 {% from "_formhelper.html" import render_field_in_row %}
 
 {% set tag = "groups" %}
-{% block title %}Add user - {{ repo.name }}{% endblock %}
+
+{% block header %}
+<link href="{{ url_for('static', filename='selectize.bootstrap3.css') }}"
+  rel="stylesheet" />
+{% endblock %}
+
+{% block title %}Add group - {{ repo.name }}{% endblock %}
 
 
 {% block repo %}
 
-<h2>Add group</h2>
+<div class="row col-sm-6 col-sm-offset-3">
+  <div class="card">
+    <div class="card-header">
+      <strong>Add group to the {{repo.name}} project</strong>
+    </div>
+    <div class="card-block">
+      <form action="{{ url_for('.add_group_project',
+                       username=username, repo=repo.name) }}" method="post">
 
-<section class="new_group">
-    <form action="{{ url_for('.add_group_project',
-                     username=username, repo=repo.name) }}" method="post">
+      <fieldset class="form-group">
+        <label for="group"><strong>Username</strong></label>
+        <input class="form-control" name="group" id="group"
+          placeholder="Start typing to search groups"
+          value="" />
+      </fieldset>
 
-    <table>
-      {{ render_field_in_row(form.group) }}
-    </table>
-    <p class="buttons indent">
-      <input type="submit" class="submit positive button" value="Add">
-      <input type="button" value="Cancel" class="button" onclick="history.back();">
-      {{ form.csrf_token }}
-    </p>
-  </form>
-</section>
+      <p class="buttons indent">
+        <input type="button" value="Cancel" class="btn btn-secondary" onclick="history.back();">
+        <input type="submit" class="btn btn-primary" value="Add">
+        {{ form.csrf_token }}
+      </p>
+    </form>
+    </div>
+  </div>
+</div>
 
 {% endblock %}
 
 {% block jscripts %}
 {{ super() }}
+<script type="text/javascript"
+        src="{{ url_for('static', filename='selectize.min.js') }}"></script>
 <script type="text/javascript">
-  $(function() {
-    $('#group').autocomplete({
-      source: function( request, response ) {
+$( document ).ready(function() {
+  $('#group').selectize({
+      valueField: 'group',
+      labelField: 'group',
+      searchField: 'group',
+      maxItems: 1,
+      create: false,
+      load: function(query, callback) {
+        if (!query.length) return callback();
         $.getJSON(
           "{{ url_for('api_ns.api_groups') }}", {
-            pattern: request.term
+            pattern: query.term
           },
           function( data ) {
-            response( data.groups );
+            callback( data.groups.map(function(x) { return { group: x }; }) );
           }
         );
-      },
-      minLength: 2,
-      delay: 200,
-    });
+      }
   });
+});
 </script>
 {% endblock %}

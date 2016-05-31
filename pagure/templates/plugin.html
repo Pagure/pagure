@@ -23,8 +23,8 @@
     {% endfor %}
   </table>
   <p class="buttons indent">
-      <input type="submit" class="submit positive button" value="Update">
-      <input type="button" value="Cancel" class="button" onclick="history.back();">
+      <input type="button" value="Cancel" class="btn btn-secondary" onclick="history.back();">
+      <input type="submit" class="btn btn-primary" value="Update">
       {{ form.csrf_token }}
     </p>
   </form>

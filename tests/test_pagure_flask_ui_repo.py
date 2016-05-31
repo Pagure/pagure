@@ -98,7 +98,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/adduser')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<h2>Add user</h2>', output.data)
+            self.assertIn('<strong>Add user to the', output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -109,12 +109,12 @@ class PagureFlaskRepotests(tests.Modeltests):
 
             output = self.app.post('/test/adduser', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>Add user</h2>' in output.data)
+            self.assertTrue('<strong>Add user to the' in output.data)
 
             data['csrf_token'] = csrf_token
             output = self.app.post('/test/adduser', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<h2>Add user</h2>', output.data)
+            self.assertIn('<strong>Add user to the', output.data)
             self.assertIn(
                 '</button>\n                      No user &#34;ralph&#34; '
                 'found', output.data)
@@ -181,7 +181,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/addgroup')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>Add group</h2>' in output.data)
+            self.assertTrue('<strong>Add group to the' in output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -192,12 +192,12 @@ class PagureFlaskRepotests(tests.Modeltests):
 
             output = self.app.post('/test/addgroup', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>Add group</h2>' in output.data)
+            self.assertTrue('<strong>Add group to the' in output.data)
 
             data['csrf_token'] = csrf_token
             output = self.app.post('/test/addgroup', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>Add group</h2>' in output.data)
+            self.assertTrue('<strong>Add group to the' in output.data)
             self.assertIn(
                 '</button>\n                      No group ralph found.',
                 output.data)

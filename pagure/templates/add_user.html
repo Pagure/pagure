@@ -2,47 +2,67 @@
 {% from "_formhelper.html" import render_field_in_row %}
 
 {% set tag = "home" %}
+
+{% block header %}
+<link href="{{ url_for('static', filename='selectize.bootstrap3.css') }}"
+  rel="stylesheet" />
+{% endblock %}
+
 {% block title %}Add user - {{ repo.name }}{% endblock %}
 
 {% block repo %}
+<div class="row col-sm-6 col-sm-offset-3">
+  <div class="card">
+    <div class="card-header">
+      <strong>Add user to the {{repo.name}} project</strong>
+    </div>
+    <div class="card-block">
+      <form action="{{ url_for('.add_user',
+                       username=username, repo=repo.name) }}" method="post">
 
-<h2>Add user</h2>
+      <fieldset class="form-group">
+        <label for="user"><strong>Username</strong></label>
+        <input class="form-control" name="user" id="user"
+          placeholder="Start typing to search users"
+          value="" />
+      </fieldset>
 
-<section class="new_user">
-    <form action="{{ url_for('.add_user',
-                     username=username, repo=repo.name) }}" method="post">
-
-    <table>
-      {{ render_field_in_row(form.user) }}
-    </table>
-    <p class="buttons indent">
-      <input type="submit" class="submit positive button" value="Add">
-      <input type="button" value="Cancel" class="button" onclick="history.back();">
-      {{ form.csrf_token }}
-    </p>
-  </form>
-</section>
+      <p class="buttons indent">
+        <input type="button" value="Cancel" class="btn btn-secondary" onclick="history.back();">
+        <input type="submit" class="btn btn-primary" value="Add">
+        {{ form.csrf_token }}
+      </p>
+    </form>
+    </div>
+  </div>
+</div>
 
 {% endblock %}
 
 {% block jscripts %}
 {{ super() }}
+<script type="text/javascript"
+        src="{{ url_for('static', filename='selectize.min.js') }}"></script>
 <script type="text/javascript">
-  $(function() {
-    $('#user').autocomplete({
-      source: function( request, response ) {
+$( document ).ready(function() {
+  $('#user').selectize({
+      valueField: 'user',
+      labelField: 'user',
+      searchField: 'user',
+      maxItems: 1,
+      create: false,
+      load: function(query, callback) {
+        if (!query.length) return callback();
         $.getJSON(
           "{{ url_for('api_ns.api_users') }}", {
-            pattern: request.term
+            pattern: query.term
           },
           function( data ) {
-            response( data.users );
+            callback( data.users.map(function(x) { return { user: x }; }) );
           }
         );
-      },
-      minLength: 2,
-      delay: 200,
-    });
+      }
   });
+});
 </script>
 {% endblock %}
