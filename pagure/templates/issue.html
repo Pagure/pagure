@@ -147,6 +147,9 @@
               {% else %}
                 unassigned
               {% endif %}
+              {% if authenticated and repo_admin %}
+              <button class="btn btn-sm pull-xs-right" title="assign this issue to you" onclick="$('#assignee').val('{{g.fas_user.username}}')">Take</button>
+              {% endif %}
             </div>
           </fieldset>
 
