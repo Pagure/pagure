@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        2.1.1
+Version:        2.2
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -254,6 +254,43 @@ install -m 644 webhook-server/pagure_webhook.service \
 
 
 %changelog
+* Tue May 31 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.2-1
+- Update to 2.2
+- Fix retrieving the log level from the configuration file (Nuno Maltez)
+- Rework the labels used when sorting projects (Ankush Behl)
+- Fix spelling error in sample config (Bruno)
+- Hide the URL to the git repo for issues if these are disabled
+- Do not notify about tickets being assigned when loaded from the issue git repo
+  (Clément Verna)
+- Adjust get_revs_between so that if the push is in the main branch we still get
+  the list of changes (Clément Verna)
+- Fix display of files moved on both old and new pygit2 (Ryan Lerch)
+- Fix changes summary sidebar for older versions of pygit (Ryan Lerch)
+- Fix the label on the button to add a new milestone to a project (Lubomír
+  Sedlář)
+- Allow the roadmap feature to have multiple milestone without dates (Lubomír
+  Sedlář)
+- Fix the link to switch the roadmap/list views (Lubomír Sedlář)
+- Render the emoji when adding a comment to a ticket or PR via SSE (Clément
+  Verna)
+- Always allow adming to edit/delete comments on issues
+- Build Require systemd to get macros defined in the spec file (Bruno)
+- Upon creating a ticket if the form already has data, show that data
+- Add a readme placeholder for projects without a readme (Ryan Lerch)
+- Enable markdown preview on create pull request (Ryan Lerch)
+- Make bottom pagination links on project list respect the sorting filter (Ryan
+  Lerch)
+- Add the ability to create a README when creating a project (Ryan Lerch)
+- Try to prevent pushing commits without a parent when there should be one
+- Fix the configuration keys to turn off ticket or user/group management for an
+  entire instance (Vivek Anand)
+- Fix deleting project (propagate the deletion to the plugins tables)
+- Do not render the diffs of large added and removed files (more than 1000
+  lines) (Ryan Lerch)
+- Adjust the UI on the template to add/remove a group or an user to a project in
+  the settings page (Ryan Lerch)
+- Check if a tag exists on a project before allowing to edit it (skrzepto)
+
 * Fri May 13 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.1.1-1
 - Update to 2.1.1
 - Do not render the comment as markdown when importing tickets via the ticket

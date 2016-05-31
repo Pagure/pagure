@@ -1,6 +1,25 @@
 Upgrading Pagure
 ================
 
+From 2.1 to 2.2
+---------------
+
+2.2 brings a number of bug fixes and a few improvements.
+
+One of the major changes impacts the databases where we must change some of the
+table so that the foreign key cascade on delete (fixes deleting a project when a
+few plugins were activated).
+
+When upgrading for 2.1 to 2.2 all you will have to do is:
+
+* Update the database scheme using alembic: ``alembic upgrade head``
+
+.. note:: If you run another database system than PostgreSQL the alembic
+  revision ``317a285e04a8_delete_hooks.py`` will require adjustment as the
+  foreign key constraints are named and the names are driver dependant.
+
+
+
 From 2.0 to 2.1
 ---------------
 
