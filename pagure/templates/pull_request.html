@@ -159,8 +159,7 @@
         <span class="btn btn-sm btn-secondary inactive"
           aria-pressed="false" id="previewinmarkdown">Preview</span>
       </small>
-      <textarea class="form-control" id="initial_comment" name="initial_comment"
-          placeholder="Describe your Pull Request"></textarea>
+      {{ form.initial_comment(class_="form-control")|safe }}
       <div>
 
         {% if form.initial_comment.errors %}
