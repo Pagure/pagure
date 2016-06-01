@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        2.2
+Version:        2.2.1
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -254,6 +254,15 @@ install -m 644 webhook-server/pagure_webhook.service \
 
 
 %changelog
+* Wed Jun 01 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.2.1-1
+- Update to 2.2.1
+- Fix showing the inital comment on PR having only one commit (Ryan Lerch)
+- Fix diffs not showing for additions/deletions for files under 1000 lines (Ryan
+  Lerch)
+- Split out the commits page to a template of its own (Ryan Lerch)
+- Fix hightlighting the commits tab on commit view
+- Fix the fact that the no readme box show on empty repo (Ryan Lerch)
+
 * Tue May 31 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.2-1
 - Update to 2.2
 - Fix retrieving the log level from the configuration file (Nuno Maltez)

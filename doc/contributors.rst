@@ -3,13 +3,13 @@ Contributors to pagure
 
 Pagure would be nothing without its contributors.
 
-On May 31, 2016 (release 2.2), the list looks as follow:
+On June 1, 2016 (release 2.2.1), the list looks as follow:
 
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  4001              Pierre-Yves Chibon <pingou@pingoured.fr>
-   166              Ryan Lerch <rlerch@redhat.com>
+  4003              Pierre-Yves Chibon <pingou@pingoured.fr>
+   170              Ryan Lerch <rlerch@redhat.com>
     61              farhaanbukhsh <farhaan.bukhsh@gmail.com>
     59              Johan Cwiklinski <johan@x-tnd.be>
     48              Clement Verna <cverna@tutanota.com>
