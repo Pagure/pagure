@@ -619,7 +619,7 @@ def view_commit(repo, commitid, username=None):
 
     return flask.render_template(
         'commit.html',
-        select='logs',
+        select='commits',
         repo=repo,
         username=username,
         repo_admin=is_repo_admin(repo),
