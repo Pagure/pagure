@@ -9,6 +9,7 @@
 """
 
 import flask
+import uuid
 
 from sqlalchemy.exc import SQLAlchemyError
 from straight.plugin import load
@@ -94,12 +95,18 @@ def view_plugin(repo, plugin, username=None, full=True):
         else:
             dbobj = plugin.db_object()
 
+    print dir(dbobj)
+
+
     form = plugin.form(obj=dbobj)
     for field in plugin.form_fields:
         fields.append(getattr(form, field))
-
+    print "validate:", form.validate_on_submit(), dir(form), form.errors
     if form.validate_on_submit():
         form.populate_obj(obj=dbobj)
+        if dbobj.__tablename__ == 'hook_pagure_ci':
+            dbobj.hook_token = uuid.uuid4().hex
+            
         if new:
             dbobj.project_id = repo.id
             SESSION.add(dbobj)
@@ -121,6 +128,7 @@ def view_plugin(repo, plugin, username=None, full=True):
                 username=username,
                 plugin=plugin,
                 form=form,
+                dbobj=dbobj,
                 fields=fields)
 
         if form.active.data:
@@ -154,4 +162,5 @@ def view_plugin(repo, plugin, username=None, full=True):
         username=username,
         plugin=plugin,
         form=form,
+        dbobj=dbobj,
         fields=fields)

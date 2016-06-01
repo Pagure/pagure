@@ -12,34 +12,32 @@ import os
 
 import sqlalchemy as sa
 import pygit2
-from wtforms import validators, TextField
+from wtforms import validators, TextField, BooleanField
 from flask.ext import wtf
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
+from sqlalchemy.ext.declarative import declarative_base
 
 from pagure.hooks import BaseHook, RequiredIf
-from pagure.lib.model import BASE, Project
+from pagure.lib.model import BASE, Project, User
 from pagure import get_repo_path
 
 
-
 class PagureCI(BASE):
+
     __tablename__ = 'hook_pagure_ci'
-    __table_args__ = {'extend_existing': True}
 
     id = sa.Column(sa.Integer, primary_key=True)
     project_id = sa.Column(
-        sa.Integer,
+            sa.Integer,
         sa.ForeignKey('projects.id', onupdate='CASCADE'),
         nullable=False,
-        unique=True,
+        unique=False,
         index=True)
 
+    active = sa.Column(sa.Boolean, nullable=False, default=False)
 
-    name = sa.Column(sa.String(64), primary_key=True, unique=True)
-    display_name = sa.Column(sa.String(64), nullable=False, default='Jenkins')
-    owner = sa.Column(sa.String(64))
-
+    name = sa.Column(sa.String(64))
     pagure_name = sa.Column(sa.String(255))
     pagure_url = sa.Column(sa.String(255))
     pagure_token = sa.Column(sa.String(64))
@@ -47,19 +45,67 @@ class PagureCI(BASE):
     jenkins_name = sa.Column(sa.String(255))
     jenkins_url = sa.Column(sa.String(255))
     jenkins_token = sa.Column(sa.String(64))
-
-    hook_token = sa.Column(sa.String(64))
+    hook_token = sa.Column(sa.String(64),
+            nullable=True,
+            unique=True,
+            index=True)
 
     project = relation(
-        'Project', remote_side=[Project.id],
+        'Project',
+        foreign_keys=[project_id],
+        remote_side=[Project.id],
         backref=backref(
-            'jenkins_hook', cascade="delete, delete-orphan",
+            'hook_pagure_ci', cascade="delete, delete-orphan",
             single_parent=True)
     )
+    def __init__(self, name = None, display_name = None, owner = None,
+                 pagure_name = None, pagure_url = None, pagure_token = None,
+                 jenkins_name = None, jenkins_url = None, jenkins_token = None,
+                 hook_token = None, active = False):
+        self.name = name
+        self.display_name = display_name
+        self.owner = owner
+        self.pagure_name = pagure_name
+        self.pagure_url = pagure_url
+        self.pagure_token = pagure_token
+
+        self.jenkins_name = jenkins_name
+        self.jenkins_url = jenkins_url
+        self.jenkins_token = jenkins_token
+
+        self.hook_token = hook_token
+        self.active = active
+
+    def __repr__(self):
+        return '<PagureCI {.name}>'.format(self)
+
+def init_db(db):
+    from sqlalchemy import create_engine
+    engine = create_engine(db, convert_unicode=True)
+    BASE.metadata.create_all(bind=engine)
+
+class ConfigNotFound(Exception):
+    pass
+
+
+class Service(object):
+    PAGURE = PagureCI.pagure_name
+    JENKINS = PagureCI.jenkins_name
+
+
+def get_configs(project_name, service):
+    """Returns all configurations with given name on a service.
+
+    :raises ConfigNotFound: when no configuration matches
+    """
+    cfg = BASE.query(PagureCI).filter(service == project_name).all()
+    if len(cfg) == 0:
+        raise ConfigNotFound(project_name)
+    return cfg
 
 
 class JenkinsForm(wtf.Form):
-    
+
     '''Form to configure Jenkins hook'''
     name = TextField('Name',
                      [validators.Required(),
@@ -86,7 +132,8 @@ class JenkinsForm(wtf.Form):
                              validators.Length(max=255)],
                             default='http://jenkins.fedorainfracloud.org/')
     jenkins_token = TextField('Jenkins token',
-                              [validators.Required()]) 
+                              [validators.Required()])
+    active = BooleanField('Active',[validators.Optional()])
 
 
 class Hook(BaseHook):
@@ -97,10 +144,10 @@ class Hook(BaseHook):
         ' the changes made by the pushes to the git repository.'
     form = JenkinsForm
     db_object = PagureCI
-    backref = 'jenkins_hook'
+    backref = 'pagure_ci_hook'
     form_fields = [
-        'name', 'pagure_name', 'pagure_url', 'pagure_token', 'jenkins_name', 
-        'jenkins_url', 'jenkins_token'
+        'display_name','name', 'pagure_name', 'pagure_url', 'pagure_token', 'jenkins_name',
+        'jenkins_url', 'jenkins_token','active'
     ]
 
     @classmethod
@@ -125,7 +172,7 @@ class Hook(BaseHook):
         if not os.path.exists(hook_file):
             os.symlink(
                 hook_file,
-                os.path.join(repopath, 'hooks', 'post-receive.irc')
+                os.path.join(repopath, 'hooks', 'jenkins_hook.py')
             )
 
     @classmethod
