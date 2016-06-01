@@ -344,8 +344,8 @@ def view_commits(repo, branchname=None, username=None):
                 diff_commits_full.append(commit)
 
     return flask.render_template(
-        'repo_info.html',
-        select='logs',
+        'commits.html',
+        select='commits',
         origin='view_commits',
         repo_obj=repo_obj,
         repo=repo,

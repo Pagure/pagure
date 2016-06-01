@@ -26,129 +26,7 @@ git push -u origin master</pre>
             {% endif %}
         </div>
       </div>
-    {% else %}
-      {% if origin == 'view_commits' %}
-      <h3>Commits <span class="label label-default"> {{number_of_commits}}</span></h3>
-      <div class="m-b-1">
-        Displaying {{number_of_commits}} commits in
-        <span class="pr-toplabel">{%
-            if repo.is_fork %}<span class="oi" data-glyph="fork"></span> {%
-            else %}<span class="oi" data-glyph="document"></span> {%
-            endif %}{{ repo.fullname }}</span>
-        <span class="pr-toplabel">
-          <span class="oi" data-glyph="random"> </span>
-          {{branchname}}
-        </span>
-      </div>
-
-      {% if diff_commits|count > 0 %}
-      <div class="alert alert-info" role="alert">
-        This branch contains <a href="#" id="diff_commits_link">{{
-            diff_commits|count }} commits</a> not in {%
-            if repo.is_fork %}the upstream project
-              <span class="pr-toplabel">
-                <span class="oi" data-glyph="document"></span>
-                {{ repo.name }}
-              </span> {%
-            else %}the main branch{%
-            endif %}
-            <span class="pr-toplabel">
-              <span class="oi" data-glyph="random"> </span>
-              {{head}}
-            </span>
-
-        {% if diff_commits and authenticated and (repo.is_fork or repo.settings.get('pull_requests', True)) %}
-        <div id="request_pull" class="pull-xs-right">
-            <a class="btn btn-primary btn-sm" href="{{ url_for('new_request_pull',
-        username=username, repo=repo.name,
-        branch_to=head, branch_from=branchname or 'master') }}">
-        {% if repo_admin %}Request pull{% else %}Compare{% endif %}
-            </a>
-        </div>
-        {% endif %}
-        <div id="diff_commits" class="list-group m-t-1" style="display:none;">
-          {% for diff_commit_full in diff_commits_full %}
-             <a href="{{ url_for('view_commit', username=username,
-                        repo=repo.name, commitid=diff_commit_full.hex)
-                }}" class="list-group-item">
-              <h5>
-                <strong>{{ diff_commit_full.message.split('\n')[0] }}</strong>
-                <div class="pull-xs-right">
-                  <span class="commitdate" title="{{ diff_commit_full.commit_time|format_ts }}">
-                    {{ diff_commit_full.commit_time|humanize }}
-                  </span>
-                </div>
-              </h5>
-              {{ diff_commit_full.author | author2avatar(20) | safe }}
-              {{ diff_commit_full.author.name }}
-              <div class="pull-xs-right">
-                <span class="label label-default">{{ diff_commit_full.hex|short }}</span>
-              </div>
-            </a>
-          {% endfor %}
-        </div>
-
-      </div>
-      {% endif %}
-
-      <div class="list-group m-t-1">
-        {% for commit in last_commits %}
-          <a href="{{ url_for('view_commit', username=username, repo=repo.name, commitid=commit.hex) }}"
-              class="list-group-item {%
-                if diff_commits and commit.oid.hex in diff_commits %}p-l-3{%
-                endif %}" style="position:relative;">
-            {% if diff_commits and commit.oid.hex in diff_commits %}
-              <div title="This commit is not in the main branch of this Repo"
-                  style="position:absolute; left:0; top:0; padding:5px;
-                         padding-top:20px; height:100%; background:#eee;
-                         vertical-align:middle;">
-                <span class="oi" data-glyph="arrow-thick-right"></span>
-              </div>
-            {% endif %}
-            <h5>
-              <strong>{{ commit.message.split('\n')[0] }}</strong>
-              <div class="pull-xs-right">
-                <span class="commitdate" title="{{ commit.commit_time|format_ts }}">
-                  {{ commit.commit_time|humanize }}
-                </span>
-              </div>
-            </h5>
-            {{ commit.author | author2avatar(20) | safe }} {{ commit.author.name }}
-            <div class="pull-xs-right">
-              <span class="label label-default">{{ commit.hex|short }}</span>
-            </div>
-          </a>
-        {% endfor %}
-      </div>
     {% endif %}
-
-      {% if total_page %}
-        <nav class="text-center">
-          <ul class="pagination">
-            <li {% if page <= 1%} class="disabled" {% endif %}>
-              <a href="{{ url_for('.%s' % origin, username=username,
-                          repo=repo.name, branchname=branchname, page=page-1)
-                }}" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-                <span class="sr-only">Newer</span>
-              </a>
-            </li>
-            <li class="active">page {{ page }} of {{total_page}}</li>
-            <li {% if page >= total_page %}class="disabled"{%endif%}>
-              <a href="{{ url_for('.%s' % origin, username=username,
-                          repo=repo.name, branchname=branchname, page=page+1)
-                }}" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-                <span class="sr-only">Older</span>
-              </a>
-            </li>
-          </ul>
-        </nav>
-      {% endif %}
-    {% endif %}
-
-    {% if origin == 'view_repo' or origin == 'view_repo_branch' %}
-
         <div class="col-md-8">
             {% if readme %}
             <section class="readme">
@@ -368,7 +246,6 @@ git push -u origin master</pre>
           </div>
         {% endif %}
       </div>
-  {% endif %}
     </div>
 
 
@@ -443,15 +320,4 @@ $(function() {
   {% endif %}
 });
 </script>
-
-{% if origin == 'view_commits' %}
-<script type="text/javascript">
-  $(function(){
-    $('#diff_commits_link').click(function(){
-      $('#diff_commits').toggle();
-    });
-  });
-</script>
-{% endif %}
-
 {% endblock %}

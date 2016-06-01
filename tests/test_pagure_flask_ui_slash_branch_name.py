@@ -192,7 +192,7 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
 
         output = self.app.get('/test/commits/maxamilion/feature')
         self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Logs - test - Pagure</title>', output.data)
+        self.assertIn('<title>Commits - test - Pagure</title>', output.data)
         self.assertIn('Add sources file for testing', output.data)
         self.assertIn('Add .gitignore file for testing', output.data)
         self.assertEqual(output.data.count('<span class="commitdate"'), 3)

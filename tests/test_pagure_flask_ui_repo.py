@@ -848,7 +848,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertIn(
             '<div class="projectinfo m-t-1 m-b-1">\n'
             'test project #1        </div>', output.data)
-        self.assertIn('<title>Logs - test - Pagure</title>', output.data)
+        self.assertIn('<title>Commits - test - Pagure</title>', output.data)
 
         output = self.app.get('/test/commits/master')
         self.assertEqual(output.status_code, 200)
@@ -1989,7 +1989,7 @@ index 0000000..fb7093d
                 follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Logs - test - Pagure</title>', output.data)
+                '<title>Commits - test - Pagure</title>', output.data)
             self.assertIn(
                 '</button>\n                      Changes committed',
                 output.data)
