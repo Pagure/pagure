@@ -420,16 +420,13 @@
           <div class="text-muted text-xs-center">empty file added</div>
         </div>
       {% else %}
-        {% if patchtype == "added" %}
-          {% if (patch| hasattr('line_stats') and patch.line_stats[1] > 1000)
-              or (patch| hasattr('additions') and patch.additions > 1000) %}
+        {% if patchtype == "added" and linesadded > 1000 %}
           <div class="card-block">
             <div class="text-muted text-xs-center">
                 The added file is too large to be shown here, see it at:
                 {{ viewfilelink(patch_new_file_path) }}
             </div>
           </div>
-          {% endif %}
         {% elif patchtype == "removed" %}
           <div class="card-block">
             <div class="text-muted text-xs-center">
