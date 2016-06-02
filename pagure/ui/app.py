@@ -671,21 +671,3 @@ def ssh_hostkey():
     return flask.render_template(
         'doc_ssh_keys.html',
     )
-
-
-@APP.route('/hooks/<token>/build-finished', methods=['POST'])
-def hook_finished(token):
-    print "Hello"
-    try:
-        data = json.loads(flask.request.get_data())
-        cfg = jenkins_hook.get_configs(data['name'], jenkins_hook.Service.JENKINS)[0]
-        build_id = data['build']['number']
-        print data , cfg, build_id
-        if token != cfg.hook_token:
-            raise ValueError('Token mismatch')
-    except (TypeError, ValueError, KeyError, jenkins_hook.ConfigNotFound) as exc:
-        APP.logger.error('Error processing jenkins notification', exc_info=exc)
-        return ('Bad request...\n', 400, {'Content-Type': 'text/plain'})
-    APP.logger.info('Received jenkins notification')
-    pagure_ci.process_build(APP.logger, cfg, build_id)
-    return ('', 204)

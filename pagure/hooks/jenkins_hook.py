@@ -9,6 +9,7 @@
 """
 
 import os
+import uuid
 
 import sqlalchemy as sa
 import pygit2
@@ -29,26 +30,28 @@ class PagureCI(BASE):
 
     id = sa.Column(sa.Integer, primary_key=True)
     project_id = sa.Column(
-            sa.Integer,
+        sa.Integer,
         sa.ForeignKey('projects.id', onupdate='CASCADE'),
         nullable=False,
         unique=False,
         index=True)
 
     active = sa.Column(sa.Boolean, nullable=False, default=False)
-
+    display_name = sa.Column(sa.String(64), nullable=False, default='Jenkins')
     name = sa.Column(sa.String(64))
     pagure_name = sa.Column(sa.String(255))
-    pagure_url = sa.Column(sa.String(255))
+    pagure_url = sa.Column(sa.String(255), nullable=False,
+                           default='https://pagure.io/')
     pagure_token = sa.Column(sa.String(64))
 
     jenkins_name = sa.Column(sa.String(255))
-    jenkins_url = sa.Column(sa.String(255))
+    jenkins_url = sa.Column(sa.String(255), nullable=False,
+                            default='http://jenkins.fedorainfracloud.org/')
     jenkins_token = sa.Column(sa.String(64))
     hook_token = sa.Column(sa.String(64),
-            nullable=True,
-            unique=True,
-            index=True)
+                           nullable=True,
+                           unique=True,
+                           index=True)
 
     project = relation(
         'Project',
@@ -58,26 +61,13 @@ class PagureCI(BASE):
             'hook_pagure_ci', cascade="delete, delete-orphan",
             single_parent=True)
     )
-    def __init__(self, name = None, display_name = None, owner = None,
-                 pagure_name = None, pagure_url = None, pagure_token = None,
-                 jenkins_name = None, jenkins_url = None, jenkins_token = None,
-                 hook_token = None, active = False):
-        self.name = name
-        self.display_name = display_name
-        self.owner = owner
-        self.pagure_name = pagure_name
-        self.pagure_url = pagure_url
-        self.pagure_token = pagure_token
 
-        self.jenkins_name = jenkins_name
-        self.jenkins_url = jenkins_url
-        self.jenkins_token = jenkins_token
-
-        self.hook_token = hook_token
-        self.active = active
+    def __init__(self):
+        self.hook_token = uuid.uuid4().hex
 
     def __repr__(self):
         return '<PagureCI {.name}>'.format(self)
+
 
 class ConfigNotFound(Exception):
     pass
@@ -93,7 +83,8 @@ def get_configs(project_name, service):
 
     :raises ConfigNotFound: when no configuration matches
     """
-    cfg = BASE.metadata.bind.query(PagureCI).filter(service == project_name).all()
+    cfg = BASE.metadata.bind.query(PagureCI).filter(
+        service == project_name).all()
     if len(cfg) == 0:
         raise ConfigNotFound(project_name)
     return cfg
@@ -128,21 +119,21 @@ class JenkinsForm(wtf.Form):
                             default='http://jenkins.fedorainfracloud.org/')
     jenkins_token = TextField('Jenkins token',
                               [validators.Required()])
-    active = BooleanField('Active',[validators.Optional()])
+    active = BooleanField('Active', [validators.Optional()])
 
 
 class Hook(BaseHook):
     ''' Jenkins hooks. '''
 
-    name = 'Jenkins Hook'
+    name = 'Pagure CI'
     description = 'This hook help to set up CI for the project'\
         ' the changes made by the pushes to the git repository.'
     form = JenkinsForm
     db_object = PagureCI
     backref = 'pagure_ci_hook'
     form_fields = [
-        'display_name','name', 'pagure_name', 'pagure_url', 'pagure_token', 'jenkins_name',
-        'jenkins_url', 'jenkins_token','active'
+        'display_name', 'name', 'pagure_name', 'pagure_url', 'pagure_token', 'jenkins_name',
+        'jenkins_url', 'jenkins_token', 'active'
     ]
 
     @classmethod
@@ -160,7 +151,7 @@ class Hook(BaseHook):
         repo_obj = pygit2.Repository(repopath)
 
         # Configure the hook
-        #repo_obj.config.set_multivar(dbobj)
+        # repo_obj.config.set_multivar(dbobj)
 
         # Install the hook itself
         hook_file = os.path.join(hook_files, 'jenkins_hook.py')
@@ -181,5 +172,5 @@ class Hook(BaseHook):
         repopath = get_repo_path(project)
 
         #hook_path = os.path.join(repopath, 'hooks', 'post-receive.irc')
-        #if os.path.exists(hook_path):
-            #os.unlink(hook_path)
+        # if os.path.exists(hook_path):
+        # os.unlink(hook_path)

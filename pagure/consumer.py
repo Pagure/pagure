@@ -44,7 +44,6 @@ class Integrator(fedmsg.consumers.FedmsgConsumer):
 
         for cfg in jenkins_hook.get_configs(project, jenkins_hook.Service.PAGURE):
             repo = msg['pullrequest'].get('remote_git') or get_repo(cfg, msg)
-            print repo
             self.log.info("Trigger on %s PR #%s from %s: %s",
                           project, pr_id, repo, branch)
 

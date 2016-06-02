@@ -1,32 +1,27 @@
-{% from "_formhelper.html" import render_field_in_row %}
-
-{% if full %}
-{% extends "repo_master.html" %}
-
-{% block title %}{{ select.capitalize() }} {{ plugin.name }} - {{ repo.name }}{% endblock %}
-{% set tag = "home" %}
+{% from "_formhelper.html" import render_field_in_row %} {% if full %} {% extends "repo_master.html" %} {% block title %}{{ select.capitalize() }} {{ plugin.name }} - {{ repo.name }}{% endblock %} {% set tag = "home" %} {% endif %} {% block repo %} {%
+if full %}
+<h3>{{ plugin.name }} settings</h3>
 {% endif %}
 
-
-{% block repo %}
-{% if full %}
-   <h3>{{ plugin.name }} settings</h3>
-{% endif %}
-
-  <form action="{{ url_for('.view_plugin',
+<form action="{{ url_for('.view_plugin',
                   username=username, repo=repo.name, plugin=plugin.name,
                   ) }}" method="post">
-  {{ plugin.description | markdown | noJS | safe }}
+  {{ plugin.description | markdown | noJS | safe }} {% if post_token and (plugin.name == 'Pagure CI') %}
+  <div class="form-group">
+    <label>Report results via
+      <code>POST</code> to this URL</label>
+    <input class="form-control" readonly type="text" value="https://pagure.io{{ url_for('hook_finished', token= post_token) }}">
+  </div>
+  {% endif %}
   <table>
-    {% for field in fields %}
-      {{ render_field_in_row(field) }}
-    {% endfor %}
+    {% for field in fields %} {{ render_field_in_row(field) }} {% endfor %}
   </table>
   <p class="buttons indent">
       <input type="button" value="Cancel" class="btn btn-secondary" onclick="history.back();">
       <input type="submit" class="btn btn-primary" value="Update">
       {{ form.csrf_token }}
     </p>
-  </form>
+</form>
+
 
 {% endblock %}

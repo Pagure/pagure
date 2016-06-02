@@ -21,6 +21,8 @@ import pagure.forms
 from pagure import APP, SESSION, login_required, is_repo_admin
 from pagure.lib.model import BASE
 from pagure.exceptions import FileNotFoundException
+from pagure.hooks.jenkins_hook import PagureCI
+
 # pylint: disable=E1101
 
 
@@ -85,7 +87,15 @@ def view_plugin(repo, plugin, username=None, full=True):
     plugin = get_plugin(plugin)
     fields = []
     new = True
+    post_token = None
     dbobj = plugin.db_object()
+
+    post_token_obj = BASE.metadata.bind.query(PagureCI).filter(
+        PagureCI.pagure_name == repo.name).first()
+
+    if hasattr(post_token_obj, 'hook_token'):
+        post_token = getattr(post_token_obj, 'hook_token')
+
     if hasattr(repo, plugin.backref):
         dbobj = getattr(repo, plugin.backref)
         # There should always be only one, but let's double check
@@ -95,18 +105,13 @@ def view_plugin(repo, plugin, username=None, full=True):
         else:
             dbobj = plugin.db_object()
 
-    print dir(dbobj)
-
-
     form = plugin.form(obj=dbobj)
     for field in plugin.form_fields:
         fields.append(getattr(form, field))
-    print "validate:", form.validate_on_submit(), dir(form), form.errors
+
     if form.validate_on_submit():
         form.populate_obj(obj=dbobj)
-        if dbobj.__tablename__ == 'hook_pagure_ci':
-            dbobj.hook_token = uuid.uuid4().hex
-            
+
         if new:
             dbobj.project_id = repo.id
             SESSION.add(dbobj)
@@ -128,7 +133,7 @@ def view_plugin(repo, plugin, username=None, full=True):
                 username=username,
                 plugin=plugin,
                 form=form,
-                dbobj=dbobj,
+                post_token=post_token,
                 fields=fields)
 
         if form.active.data:
@@ -162,5 +167,5 @@ def view_plugin(repo, plugin, username=None, full=True):
         username=username,
         plugin=plugin,
         form=form,
-        dbobj=dbobj,
+        post_token=post_token,
         fields=fields)

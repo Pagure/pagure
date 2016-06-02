@@ -55,4 +55,8 @@ setup(
     packages=['pagure'],
     include_package_data=True,
     install_requires=get_requirements(),
+    entry_points="""
+    [moksha.consumer]
+    integrator = pagure.consumer:Integrator
+    """
 )
