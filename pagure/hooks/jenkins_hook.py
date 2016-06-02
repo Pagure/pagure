@@ -19,7 +19,7 @@ from sqlalchemy.orm import backref
 from sqlalchemy.ext.declarative import declarative_base
 
 from pagure.hooks import BaseHook, RequiredIf
-from pagure.lib.model import BASE, Project, User
+from pagure.lib.model import BASE, Project
 from pagure import get_repo_path
 
 
@@ -79,11 +79,6 @@ class PagureCI(BASE):
     def __repr__(self):
         return '<PagureCI {.name}>'.format(self)
 
-def init_db(db):
-    from sqlalchemy import create_engine
-    engine = create_engine(db, convert_unicode=True)
-    BASE.metadata.create_all(bind=engine)
-
 class ConfigNotFound(Exception):
     pass
 
@@ -98,7 +93,7 @@ def get_configs(project_name, service):
 
     :raises ConfigNotFound: when no configuration matches
     """
-    cfg = BASE.query(PagureCI).filter(service == project_name).all()
+    cfg = BASE.metadata.bind.query(PagureCI).filter(service == project_name).all()
     if len(cfg) == 0:
         raise ConfigNotFound(project_name)
     return cfg

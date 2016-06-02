@@ -5,6 +5,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy import create_engine
 from pagure.hooks import jenkins_hook
 from pagure.lib import model
+from pagure import APP
 
 import json
 import logging
@@ -67,7 +68,7 @@ def process_build(logger, cfg, build_id):
     # Comment in Pagure
     logger.info('Updating %s PR %d: %s', cfg.pagure_name, pr_id, result)
     try:
-        post_flag(logger, cfg.display_name, cfg.pagure_url, cfg.pagure_token,
+        post_flag(logger, "Jenkins", cfg.pagure_url, cfg.pagure_token,
                   cfg.pagure_name, pr_id, result, url)
     except KeyError as exc:
         logger.warning('Unknown build status', exc_info=exc)
@@ -93,23 +94,6 @@ def post_data(logger, *args, **kwargs):
     logger.debug('Received response status %s', resp.status_code)
     if resp.status_code < 200 or resp.status_code >= 300:
         logger.error('Network request failed: %d: %s', resp.status_code, resp.text)
-
-
-@app.route('/hooks/<token>/build-finished', methods=['POST'])
-def hook_finished(token):
-    try:
-        data = json.loads(flask.request.get_data())
-        cfg = jenkins_hook.get_configs(data['name'], jenkins_hook.Service.JENKINS)[0]
-        build_id = data['build']['number']
-        if token != cfg.hook_token:
-            raise ValueError('Token mismatch')
-    except (TypeError, ValueError, KeyError, models.ConfigNotFound) as exc:
-        app.logger.error('Error processing jenkins notification', exc_info=exc)
-        return ('Bad request...\n', 400, {'Content-Type': 'text/plain'})
-    app.logger.info('Received jenkins notification')
-    process_build(app.logger, cfg, build_id)
-    return ('', 204)
-
 
 @app.errorhandler(403)
 def forbidden(e):
