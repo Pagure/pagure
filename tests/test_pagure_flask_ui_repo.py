@@ -58,6 +58,50 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.app = pagure.APP.test_client()
 
     @patch('pagure.ui.repo.admin_session_timedout')
+    def test_add_user_when_user_mngt_off(self, ast):
+        """ Test the add_user endpoint when user management is turned off
+        in the pagure instance """
+        pagure.APP.config['ENABLE_USER_MNGT'] = False
+        ast.return_value = False
+
+        output = self.app.get('/foo/adduser')
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            tests.create_projects(self.session)
+            output = self.app.get('/test/adduser')
+            self.assertEqual(output.status_code, 404)
+
+            #just get the csrf token
+            pagure.APP.config['ENABLE_USER_MNGT'] = True
+            output = self.app.get('/test/adduser')
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            pagure.APP.config['ENABLE_USER_MNGT'] = False
+
+            data = {
+                'user': 'ralph',
+            }
+
+            output = self.app.post('/test/adduser', data=data)
+            self.assertEqual(output.status_code, 404)
+
+            data['csrf_token'] = csrf_token
+            output = self.app.post('/test/adduser', data=data)
+            self.assertEqual(output.status_code, 404)
+
+            data['user'] = 'foo'
+            tests.create_projects_git(tests.HERE)
+            output = self.app.post(
+                '/test/adduser', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+        pagure.APP.config['ENABLE_USER_MNGT'] = True
+
+
+    @patch('pagure.ui.repo.admin_session_timedout')
     def test_add_user(self, ast):
         """ Test the add_user endpoint. """
         ast.return_value = False
@@ -129,6 +173,61 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn('<h3>Settings for test</h3>', output.data)
             self.assertIn(
                 '</button>\n                      User added', output.data)
+
+
+    @patch('pagure.ui.repo.admin_session_timedout')
+    def test_add_group_project_when_user_mngt_off(self, ast):
+        """ Test the add_group_project endpoint  when user management is
+        turned off in the pagure instance"""
+        pagure.APP.config['ENABLE_USER_MNGT'] = False
+        ast.return_value = False
+
+        output = self.app.get('/foo/addgroup')
+        self.assertEqual(output.status_code, 302)
+
+        msg = pagure.lib.add_group(
+            self.session,
+            group_name='foo',
+            group_type='bar',
+            user='pingou',
+            is_admin=False,
+            blacklist=pagure.APP.config['BLACKLISTED_GROUPS'],
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User `pingou` added to the group `foo`.')
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/addgroup')
+            self.assertEqual(output.status_code, 404)
+
+            #just get the csrf token
+            pagure.APP.config['ENABLE_USER_MNGT'] = True
+            tests.create_projects(self.session)
+            output = self.app.get('/test/addgroup')
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+            pagure.APP.config['ENABLE_USER_MNGT'] = False
+
+            data = {
+                'group': 'ralph',
+            }
+
+            output = self.app.post('/test/addgroup', data=data)
+            self.assertEqual(output.status_code, 404)
+
+            data['csrf_token'] = csrf_token
+            output = self.app.post('/test/addgroup', data=data)
+            self.assertEqual(output.status_code, 404)
+
+            data['group'] = 'foo'
+            tests.create_projects_git(tests.HERE)
+            output = self.app.post(
+                '/test/addgroup', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+        pagure.APP.config['ENABLE_USER_MNGT'] = True
+
 
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_add_group_project(self, ast):
@@ -213,6 +312,55 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
                 '</button>\n                      Group added', output.data)
 
+
+    @patch('pagure.ui.repo.admin_session_timedout')
+    def test_remove_user_when_user_mngt_off(self, ast):
+        """ Test the remove_user endpoint when user management is turned
+        off in the pagure instance"""
+        pagure.APP.config['ENABLE_USER_MNGT'] = False
+        ast.return_value = False
+
+        output = self.app.post('/foo/dropuser/1')
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            tests.create_projects(self.session)
+            tests.create_projects_git(tests.HERE)
+            output = self.app.post('/test/settings')
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {'csrf_token': csrf_token}
+
+            output = self.app.post(
+                '/test/dropuser/2', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+        # Add an user to a project
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.add_user_to_project(
+            session=self.session,
+            project=repo,
+            new_user='foo',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User added')
+
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/test/dropuser/2', follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+            data = {'csrf_token': csrf_token}
+            output = self.app.post(
+                '/test/dropuser/2', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+        pagure.APP.config['ENABLE_USER_MNGT'] = True
+
+
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_remove_user(self, ast):
         """ Test the remove_user endpoint. """
@@ -285,6 +433,70 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn('<h3>Settings for test</h3>', output.data)
             self.assertIn(
                 '</button>\n                      User removed', output.data)
+
+
+    @patch('pagure.ui.repo.admin_session_timedout')
+    def test_remove_group_project_when_user_mngt_off(self, ast):
+        """ Test the remove_group_project endpoint when user management is
+        turned off in the pagure instance"""
+        pagure.APP.config['ENABLE_USER_MNGT'] = False
+        ast.return_value = False
+
+        output = self.app.post('/foo/dropgroup/1')
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            tests.create_projects(self.session)
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            tests.create_projects_git(tests.HERE)
+            output = self.app.post('/test/settings')
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {'csrf_token': csrf_token}
+
+            output = self.app.post(
+                '/test/dropgroup/2', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+        # Create the new group
+        msg = pagure.lib.add_group(
+            session=self.session,
+            group_name='testgrp',
+            group_type='user',
+            user='pingou',
+            is_admin=False,
+            blacklist=[],
+        )
+        self.assertEqual(msg, 'User `pingou` added to the group `testgrp`.')
+        self.session.commit()
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        # Add the group to a project
+        msg = pagure.lib.add_group_to_project(
+            session=self.session,
+            project=repo,
+            new_group='testgrp',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Group added')
+
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/test/dropgroup/1', follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+            data = {'csrf_token': csrf_token}
+            output = self.app.post(
+                '/test/dropgroup/1', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+        pagure.APP.config['ENABLE_USER_MNGT'] = True
+
 
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_remove_group_project(self, ast):
@@ -373,6 +585,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
                 '</button>\n                      Group removed',
                 output.data)
+
 
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_update_project(self, ast):
@@ -1452,6 +1665,215 @@ index 0000000..fb7093d
             in output.data)
         self.assertFalse(
             'No content found in this repository' in output.data)
+
+
+    @patch('pagure.lib.notify.send_email')
+    @patch('pagure.ui.repo.admin_session_timedout')
+    def test_delete_repo_when_turned_off(self, ast, send_email):
+        """ Test the delete_repo endpoint when deletion of a repo is
+        turned off in the pagure instance """
+        ast.return_value = False
+        send_email.return_value = True
+        pagure.APP.config['ENABLE_DEL_PROJECTS'] = False
+
+        output = self.app.post('/foo/delete')
+        # User not logged in
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            tests.create_projects(self.session)
+            output = self.app.post('/test/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+            # Only git repo
+            item = pagure.lib.model.Project(
+                user_id=1,  # pingou
+                name='test',
+                description='test project #1',
+                hook_token='aaabbbggg',
+            )
+            self.session.add(item)
+            self.session.commit()
+            tests.create_projects_git(tests.HERE)
+            output = self.app.post('/test/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+            # Only git and doc repo
+            item = pagure.lib.model.Project(
+                user_id=1,  # pingou
+                name='test',
+                description='test project #1',
+                hook_token='aaabbbhhh',
+            )
+            self.session.add(item)
+            self.session.commit()
+            tests.create_projects_git(tests.HERE)
+            tests.create_projects_git(os.path.join(tests.HERE, 'docs'))
+            output = self.app.post('/test/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+            # All repo there
+            item = pagure.lib.model.Project(
+                user_id=1,  # pingou
+                name='test',
+                description='test project #1',
+                hook_token='aaabbbiii',
+            )
+            self.session.add(item)
+            self.session.commit()
+
+            # Create all the git repos
+            tests.create_projects_git(tests.HERE)
+            tests.create_projects_git(os.path.join(tests.HERE, 'docs'))
+            tests.create_projects_git(
+                os.path.join(tests.HERE, 'tickets'), bare=True)
+            tests.create_projects_git(
+                os.path.join(tests.HERE, 'requests'), bare=True)
+
+            # Check repo was created
+            output = self.app.get('/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n            My Projects <span '
+                'class="label label-default">5</span>', output.data)
+            self.assertIn(
+                'Forks <span class="label label-default">0</span>',
+                output.data)
+
+            # add issues
+            repo = pagure.lib.get_project(self.session, 'test')
+            msg = pagure.lib.new_issue(
+                session=self.session,
+                repo=repo,
+                title='Test issue',
+                content='We should work on this',
+                user='pingou',
+                ticketfolder=os.path.join(tests.HERE, 'tickets')
+            )
+            self.session.commit()
+            self.assertEqual(msg.title, 'Test issue')
+
+            msg = pagure.lib.new_issue(
+                session=self.session,
+                repo=repo,
+                title='Test issue #2',
+                content='We should work on this, really',
+                user='pingou',
+                ticketfolder=os.path.join(tests.HERE, 'tickets')
+            )
+            self.session.commit()
+            self.assertEqual(msg.title, 'Test issue #2')
+
+            # Add a comment to an issue
+            issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+            msg = pagure.lib.add_issue_comment(
+                session=self.session,
+                issue=issue,
+                comment='Hey look a comment!',
+                user='foo',
+                ticketfolder=None
+            )
+            self.session.commit()
+            self.assertEqual(msg, 'Comment added')
+
+            # add pull-requests
+            req = pagure.lib.new_pull_request(
+                session=self.session,
+                repo_from=repo,
+                branch_from='feature',
+                repo_to=repo,
+                branch_to='master',
+                title='test pull-request',
+                user='pingou',
+                requestfolder=os.path.join(tests.HERE, 'requests'),
+            )
+            self.session.commit()
+            self.assertEqual(req.id, 3)
+            self.assertEqual(req.title, 'test pull-request')
+
+            req = pagure.lib.new_pull_request(
+                session=self.session,
+                repo_from=repo,
+                branch_from='feature2',
+                repo_to=repo,
+                branch_to='master',
+                title='test pull-request',
+                user='pingou',
+                requestfolder=os.path.join(tests.HERE, 'requests'),
+            )
+            self.session.commit()
+            self.assertEqual(req.id, 4)
+            self.assertEqual(req.title, 'test pull-request')
+
+            # Add comment on a pull-request
+            request = pagure.lib.search_pull_requests(
+                self.session, requestid=3)
+
+            msg = pagure.lib.add_pull_request_comment(
+                session=self.session,
+                request=request,
+                commit='commithash',
+                tree_id=None,
+                filename='file',
+                row=None,
+                comment='This is awesome, I got to remember it!',
+                user='foo',
+                requestfolder=None,
+            )
+            self.assertEqual(msg, 'Comment added')
+
+            # Check before deleting the project
+            output = self.app.get('/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n            My Projects <span '
+                'class="label label-default">5</span>', output.data)
+            self.assertIn(
+                'Forks <span class="label label-default">0</span>',
+                output.data)
+
+            output = self.app.post('/test/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+            repo = pagure.lib.get_project(self.session, 'test')
+            self.assertNotEqual(repo, None)
+            repo = pagure.lib.get_project(self.session, 'test2')
+            self.assertNotEqual(repo, None)
+
+            # Add a fork of a fork
+            item = pagure.lib.model.Project(
+                user_id=1,  # pingou
+                name='test3',
+                description='test project #3',
+                parent_id=2,
+                hook_token='aaabbbjjj',
+            )
+            self.session.add(item)
+            self.session.commit()
+            tests.add_content_git_repo(
+                os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'))
+            tests.add_content_git_repo(
+                os.path.join(tests.HERE, 'docs', 'pingou', 'test3.git'))
+            tests.add_content_git_repo(
+                os.path.join(tests.HERE, 'tickets', 'pingou', 'test3.git'))
+
+            # Check before deleting the fork
+            output = self.app.get('/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n            My Projects <span '
+                'class="label label-default">5</span>', output.data)
+            self.assertIn(
+                'Forks <span class="label label-default">1</span>',
+                output.data)
+
+            output = self.app.post(
+                '/fork/pingou/test3/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+        pagure.APP.config['ENABLE_DEL_PROJECTS'] = True
+
 
     @patch('pagure.lib.notify.send_email')
     @patch('pagure.ui.repo.admin_session_timedout')

@@ -131,6 +131,64 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertIn(
             'Forks <span class="label label-default">0</span>', output.data)
 
+
+    def test_new_project_when_turned_off(self):
+        """ Test the new_project endpoint when new project creation is
+        not allowed in the pagure instance. """
+
+        #turn the project creation off
+        pagure.APP.config['ENABLE_NEW_PROJECTS'] = False
+
+        # Before
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+        self.assertFalse(os.path.exists(
+            os.path.join(tests.HERE, 'project-1.git')))
+        self.assertFalse(os.path.exists(
+            os.path.join(tests.HERE, 'tickets', 'project-1.git')))
+        self.assertFalse(os.path.exists(
+            os.path.join(tests.HERE, 'docs', 'project-1.git')))
+        self.assertFalse(os.path.exists(
+            os.path.join(tests.HERE, 'requests', 'project-1.git')))
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/new/')
+            self.assertEqual(output.status_code, 404)
+
+            #just get the csrf token
+            pagure.APP.config['ENABLE_NEW_PROJECTS'] = True
+            output = self.app.get('/new/')
+            pagure.APP.config['ENABLE_NEW_PROJECTS'] = False
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+                'description': 'Project #1',
+                'name': 'project-1',
+            }
+
+        user.username = 'foo'
+        with tests.user_set(pagure.APP, user):
+            data['csrf_token'] =  csrf_token
+            output = self.app.post('/new/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+        #After
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+        self.assertFalse(os.path.exists(
+            os.path.join(tests.HERE, 'project-1.git')))
+        self.assertFalse(os.path.exists(
+            os.path.join(tests.HERE, 'tickets', 'project-1.git')))
+        self.assertFalse(os.path.exists(
+            os.path.join(tests.HERE, 'docs', 'project-1.git')))
+        self.assertFalse(os.path.exists(
+            os.path.join(tests.HERE, 'requests', 'project-1.git')))
+
+        pagure.APP.config['ENABLE_NEW_PROJECTS'] = True
+
     def test_new_project(self):
         """ Test the new_project endpoint. """
         # Before
