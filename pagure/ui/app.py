@@ -13,10 +13,6 @@ from math import ceil
 
 from sqlalchemy.exc import SQLAlchemyError
 
-from pagure.hooks import jenkins_hook
-import json
-from pagure.lib import pagure_ci
-
 import pagure.exceptions
 import pagure.lib
 import pagure.lib.git
