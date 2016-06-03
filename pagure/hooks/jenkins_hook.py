@@ -1,12 +1,5 @@
 # -*- coding: utf-8 -*-
 
-"""
- (c) 2014 - Copyright Red Hat Inc
-
- Authors:
-   Pierre-Yves Chibon <pingou@pingoured.fr>
-
-"""
 
 import os
 import uuid
@@ -15,13 +8,13 @@ import sqlalchemy as sa
 import pygit2
 from wtforms import validators, TextField, BooleanField
 from flask.ext import wtf
-from sqlalchemy.orm import relation
-from sqlalchemy.orm import backref
+from sqlalchemy.orm import relation, backref
 from sqlalchemy.ext.declarative import declarative_base
 
 from pagure.hooks import BaseHook, RequiredIf
 from pagure.lib.model import BASE, Project
 from pagure import get_repo_path
+from pagure import APP
 
 
 class PagureCI(BASE):
@@ -31,7 +24,7 @@ class PagureCI(BASE):
     id = sa.Column(sa.Integer, primary_key=True)
     project_id = sa.Column(
         sa.Integer,
-        sa.ForeignKey('projects.id', onupdate='CASCADE'),
+        sa.ForeignKey('projects.id', onupdate='CASCADE',ondelete='CASCADE'),
         nullable=False,
         unique=False,
         index=True)
@@ -40,8 +33,7 @@ class PagureCI(BASE):
     display_name = sa.Column(sa.String(64), nullable=False, default='Jenkins')
     name = sa.Column(sa.String(64))
     pagure_name = sa.Column(sa.String(255))
-    pagure_url = sa.Column(sa.String(255), nullable=False,
-                           default='https://pagure.io/')
+
     pagure_token = sa.Column(sa.String(64))
 
     jenkins_name = sa.Column(sa.String(255))
@@ -64,6 +56,7 @@ class PagureCI(BASE):
 
     def __init__(self):
         self.hook_token = uuid.uuid4().hex
+        self.display_name = 'Jenkins'
 
     def __repr__(self):
         return '<PagureCI {.name}>'.format(self)
@@ -96,17 +89,11 @@ class JenkinsForm(wtf.Form):
     name = TextField('Name',
                      [validators.Required(),
                       validators.Length(max=64)])
-    display_name = TextField('Display name',
-                             [validators.Required(),
-                              validators.Length(max=64)],
-                             default='Jenkins')
+
     pagure_name = TextField('Name of project in Pagure',
                             [validators.Required(),
                              validators.Length(max=255)])
-    pagure_url = TextField('Pagure URL',
-                           [validators.Required(),
-                            validators.Length(max=255)],
-                           default='https://pagure.io/')
+
     pagure_token = TextField('Pagure token',
                              [validators.Required()])
 
@@ -122,7 +109,7 @@ class JenkinsForm(wtf.Form):
     active = BooleanField('Active', [validators.Optional()])
 
 
-class Hook(BaseHook):
+class PagureCiHook(BaseHook):
     ''' Jenkins hooks. '''
 
     name = 'Pagure CI'
@@ -130,11 +117,18 @@ class Hook(BaseHook):
         ' the changes made by the pushes to the git repository.'
     form = JenkinsForm
     db_object = PagureCI
-    backref = 'pagure_ci_hook'
+    backref = 'hook_pagure_ci'
     form_fields = [
-        'display_name', 'name', 'pagure_name', 'pagure_url', 'pagure_token', 'jenkins_name',
+        'name', 'pagure_name', 'pagure_token', 'jenkins_name',
         'jenkins_url', 'jenkins_token', 'active'
     ]
+
+    @classmethod
+    def set_up(cls, project):
+        ''' Install the generic post-receive hook that allow us to call
+        multiple post-receive hooks as set per plugin.
+        '''
+        pass
 
     @classmethod
     def install(cls, project, dbobj):
@@ -144,22 +138,7 @@ class Hook(BaseHook):
             should be installed
 
         '''
-        repopath = get_repo_path(project)
-
-        hook_files = os.path.join(
-            os.path.dirname(os.path.realpath(__file__)), 'files')
-        repo_obj = pygit2.Repository(repopath)
-
-        # Configure the hook
-        # repo_obj.config.set_multivar(dbobj)
-
-        # Install the hook itself
-        hook_file = os.path.join(hook_files, 'jenkins_hook.py')
-        if not os.path.exists(hook_file):
-            os.symlink(
-                hook_file,
-                os.path.join(repopath, 'hooks', 'jenkins_hook.py')
-            )
+        pass
 
     @classmethod
     def remove(cls, project):
@@ -169,8 +148,4 @@ class Hook(BaseHook):
             should be installed
 
         '''
-        repopath = get_repo_path(project)
-
-        #hook_path = os.path.join(repopath, 'hooks', 'post-receive.irc')
-        # if os.path.exists(hook_path):
-        # os.unlink(hook_path)
+        pass

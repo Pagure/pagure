@@ -9,7 +9,6 @@
 """
 
 import flask
-import uuid
 
 from sqlalchemy.exc import SQLAlchemyError
 from straight.plugin import load
@@ -22,6 +21,10 @@ from pagure import APP, SESSION, login_required, is_repo_admin
 from pagure.lib.model import BASE
 from pagure.exceptions import FileNotFoundException
 from pagure.hooks.jenkins_hook import PagureCI
+from pagure.hooks import jenkins_hook
+from pagure.lib import model, pagure_ci
+
+import json
 
 # pylint: disable=E1101
 
@@ -90,18 +93,16 @@ def view_plugin(repo, plugin, username=None, full=True):
     post_token = None
     dbobj = plugin.db_object()
 
-    post_token_obj = BASE.metadata.bind.query(PagureCI).filter(
-        PagureCI.pagure_name == repo.name).first()
-
-    if hasattr(post_token_obj, 'hook_token'):
-        post_token = getattr(post_token_obj, 'hook_token')
-
     if hasattr(repo, plugin.backref):
         dbobj = getattr(repo, plugin.backref)
+
         # There should always be only one, but let's double check
         if dbobj and len(dbobj) > 0:
             dbobj = dbobj[0]
             new = False
+            # hook_token of pagure shouldn't leak so to put a check on it
+            if hasattr(dbobj, "hook_token") and plugin.backref == "hook_pagure_ci":
+                post_token = dbobj.hook_token
         else:
             dbobj = plugin.db_object()
 
@@ -169,3 +170,20 @@ def view_plugin(repo, plugin, username=None, full=True):
         form=form,
         post_token=post_token,
         fields=fields)
+
+
+@APP.route('/hooks/<token>/build-finished', methods=['POST'])
+def hook_finished(token):
+    try:
+        data = json.loads(flask.request.get_data())
+        cfg = jenkins_hook.get_configs(
+            data['name'], jenkins_hook.Service.JENKINS)[0]
+        build_id = data['build']['number']
+        if token != cfg.hook_token:
+            raise ValueError('Token mismatch')
+    except (TypeError, ValueError, KeyError, jenkins_hook.ConfigNotFound) as exc:
+        APP.logger.error('Error processing jenkins notification', exc_info=exc)
+        return ('Bad request...\n', 400, {'Content-Type': 'text/plain'})
+    APP.logger.info('Received jenkins notification')
+    pagure_ci.process_build(APP.logger, cfg, build_id)
+    return ('', 204)

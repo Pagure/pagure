@@ -57,6 +57,6 @@ setup(
     install_requires=get_requirements(),
     entry_points="""
     [moksha.consumer]
-    integrator = pagure.consumer:Integrator
+    integrator = pagure.pagureCI.consumer:Integrator
     """
 )

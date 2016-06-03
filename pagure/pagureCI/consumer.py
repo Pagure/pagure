@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import fedmsg.consumers
 from pagure.hooks import jenkins_hook
+import pagure.lib
 from pagure.lib import pagure_ci
 from pagure.lib.model import BASE, Project, User
+from pagure import APP
 PAGURE_MAIN_REPO = '{base}{name}.git'
 PAGURE_FORK_REPO = '{base}forks/{user}/{name}.git'
 
@@ -10,17 +12,17 @@ PAGURE_FORK_REPO = '{base}forks/{user}/{name}.git'
 class Integrator(fedmsg.consumers.FedmsgConsumer):
     topic = [
         'io.pagure.prod.pagure.pull-request.comment.added',
-        'org.fedoraproject.dev.pagure.pull-request.new',
-        'org.fedoraproject.dev.pagure.pull-request.comment.added',
         'io.pagure.prod.pagure.pull-request.new',
         'org.fedoraproject.prod.jenkins.build',
     ]
 
     config_key = 'integrator.enabled'
 
+    SESSION = None
+
     def __init__(self, hub):
         super(Integrator, self).__init__(hub)
-        pagure_ci.connect_db()
+        SESSION = pagure.lib.create_session(APP.config['DB_URL'])
 
     def consume(self, msg):
         topic, msg = msg['topic'], msg['body']
@@ -59,7 +61,7 @@ def get_repo(cfg, msg):
     if msg['pullrequest']['repo_from']['parent']:
         url = PAGURE_FORK_REPO
     return url.format(
-        base=cfg.pagure_url,
+        base=APP.config['APP_URL'],
         user=msg['pullrequest']['repo_from']['user']['name'],
         name=msg['pullrequest']['repo_from']['name'])
 
@@ -68,6 +70,7 @@ def is_rebase(msg):
     if msg['pullrequest']['status'] != 'Open':
         return False
     try:
+        print msg
         return msg['pullrequest']['comments'][-1]['notification']
     except (IndexError, KeyError):
         return False
