@@ -4,7 +4,7 @@
 {% set tag = "home" %}
 
 {% block repo %}
-  <div class="row">
+  <div class="row m-b-1">
     {% if repo_obj and repo_obj.is_empty %}
     <div class="col-md-12">
       <div class="alert alert-info" role="alert">
@@ -13,25 +13,42 @@
       </div>
     </div>
     {% else %}
+    <div class="col-sm-6">
     <h3>
       Commits <span class="label label-default"> {{number_of_commits}}</span>
     </h3>
+    </div>
 
-    <div class="m-b-1">
-      Displaying {{number_of_commits}} commits in
-      <span class="pr-toplabel">
+    <div class="col-sm-6">
+      <div class="pull-xs-right">
+      <div class="button-label button-label-default">
         {% if repo.is_fork %}
         <span class="oi" data-glyph="fork"></span>
+        {{ repo.user.user }}/{{ repo.name }}
         {% else %}
-        <span class="oi" data-glyph="document"></span>
+        <span class="oi" data-glyph="document"></span> {{ repo.name }}
         {% endif %}
-        {{ repo.fullname }}
-      </span>
-      <span class="pr-toplabel">
-        <span class="oi" data-glyph="random"> </span>
-        {{branchname}}
-      </span>
+
+      </div>
+      {% if branchname %}
+        <div class="btn-group">
+          <button type="button" class="btn btn-secondary btn-sm dropdown-toggle"
+                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <span class="oi" data-glyph="random"> </span> {{ branchname }}
+          </button>
+          <div class="dropdown-menu dropdown-menu-right">
+            {% for branch in branches %}
+                <a class="dropdown-item" href="{{ url_for('view_commits',
+                            username=username, repo=repo.name, branchname=branch) }}">
+                  {{ branch }}
+                </a>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
     </div>
+  </div>
+  </div>
 
     {% if diff_commits|count > 0 %}
     <div class="alert alert-info" role="alert">

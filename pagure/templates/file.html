@@ -5,6 +5,51 @@
 
 
 {% block repo %}
+  <div class="row m-b-1">
+    <div class="col-sm-6">
+    <h3>
+      Files
+    </h3>
+    </div>
+
+    <div class="col-sm-6">
+      <div class="pull-xs-right">
+      <div class="button-label button-label-default">
+        {% if repo.is_fork %}
+        <span class="oi" data-glyph="fork"></span>
+        {{ repo.user.user }}/{{ repo.name }}
+        {% else %}
+        <span class="oi" data-glyph="document"></span> {{ repo.name }}
+        {% endif %}
+
+      </div>
+      {% if branchname %}
+        <div class="btn-group">
+          <button type="button" class="btn btn-secondary btn-sm dropdown-toggle"
+                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <span class="oi" data-glyph="random"> </span> {{ branchname }}
+          </button>
+          <div class="dropdown-menu dropdown-menu-right">
+            {% for branch in branches %}
+              {% if origin == 'view_tree' %}
+                <a class="dropdown-item" href="{{ url_for('view_tree',
+                            username=username, repo=repo.name, identifier=branch) }}">
+                  {{ branch }}
+                </a>
+              {% elif origin == 'view_file' %}
+                <a class="dropdown-item" href="{{ url_for('view_file',
+                            username=username, repo=repo.name, identifier=branch,
+                            filename=filename) }}">
+                  {{ branch }}
+                </a>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  </div>
     <div class="card">
       <div class="card-header">
           <ol class="breadcrumb">

@@ -164,9 +164,6 @@ class PagureFlaskNoMasterBranchtests(tests.Modeltests):
         self.assertIn(
             '<div class="container p-t-3">\n  <div class="row">',
             output.data)
-        self.assertEqual(
-            output.data.count('<a class="dropdown-item" href="/test/branch/'),
-            1)
 
     @patch('pagure.lib.notify.send_email')
     def test_view_commits(self, send_email):
@@ -193,7 +190,7 @@ class PagureFlaskNoMasterBranchtests(tests.Modeltests):
         output = self.app.get('/test/commits/feature')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<div class="container p-t-3">\n  <div class="row">',
+            '<div class="container p-t-3">\n  <div class="row m-b-1">',
             output.data)
         self.assertIn('Add sources file for testing', output.data)
         self.assertIn('Add .gitignore file for testing', output.data)

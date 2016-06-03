@@ -2792,23 +2792,23 @@ index 0000000..fb7093d
             output = self.app.get('/test')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<a class="dropdown-item" href="/test/branch/foo">',
+                'data-toggle="tooltip">foo',
                 output.data)
             self.assertIn('<form id="delete_branch_form-foo"', output.data)
             self.assertIn(
-                '<a class="dropdown-item" href="/test/branch/master">',
+                '<strong title="Currently viewing branch master"',
                 output.data)
 
             # Delete the branch
             output = self.app.post('/test/b/foo/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertNotIn(
-                '<a class="dropdown-item" href="/test/branch/foo">',
+                'data-toggle="tooltip">foo',
                 output.data)
             self.assertNotIn(
                 '<form id="delete_branch_form-foo"', output.data)
             self.assertIn(
-                '<a class="dropdown-item" href="/test/branch/master">',
+                '<strong title="Currently viewing branch master"',
                 output.data)
 
             # Add a branch with a '/' in its name that we can delete
@@ -2821,24 +2821,24 @@ index 0000000..fb7093d
             output = self.app.get('/test')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<a class="dropdown-item" href="/test/branch/feature/foo">',
+                'data-toggle="tooltip">feature/foo',
                 output.data)
             self.assertIn(
                 '<form id="delete_branch_form-feature_foo"', output.data)
             self.assertIn(
-                '<a class="dropdown-item" href="/test/branch/master">',
+                '<strong title="Currently viewing branch master"',
                 output.data)
 
             # Delete the branch
             output = self.app.post('/test/b/feature/foo/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertNotIn(
-                '<a class="dropdown-item" href="/test/branch/feature/foo">',
+                'data-toggle="tooltip">feature/foo',
                 output.data)
             self.assertNotIn(
                 '<form id="delete_branch_form-feature_foo"', output.data)
             self.assertIn(
-                '<a class="dropdown-item" href="/test/branch/master">',
+                '<strong title="Currently viewing branch master"',
                 output.data)
 
     def test_view_docs(self):

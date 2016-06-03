@@ -143,9 +143,6 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
         self.assertIn(
             '<div class="card-block">\n            '
             '<h5><strong>Owners</strong></h5>', output.data)
-        self.assertEqual(output.data.count(
-            '<a class="dropdown-item" href="/test/branch/maxamilion/feature'),
-            1)
 
     @patch('pagure.lib.notify.send_email')
     def test_view_repo_branch(self, send_email):
@@ -167,9 +164,6 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
         self.assertIn(
             '<div class="card-block">\n            '
             '<h5><strong>Owners</strong></h5>', output.data)
-        self.assertEqual(output.data.count(
-            '<a class="dropdown-item" href="/test/branch/maxamilion/feature'),
-            1)
 
     @patch('pagure.lib.notify.send_email')
     def test_view_commits(self, send_email):

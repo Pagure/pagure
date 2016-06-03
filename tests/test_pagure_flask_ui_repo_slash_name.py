@@ -188,9 +188,6 @@ class PagureFlaskSlashInNametests(tests.Modeltests):
         self.assertIn(
             '<div class="card-block">\n            '
             '<h5><strong>Owners</strong></h5>', output.data)
-        self.assertEqual(output.data.count(
-            '<a class="dropdown-item" href="/test/branch/master'),
-            1)
 
         # We can't create the project `forks/test` the normal way
         self.assertRaises(
