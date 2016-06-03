@@ -8,7 +8,7 @@ new pull-request.
 
 The customization is done via a file in the git repository containing the
 meta-data for the pull-requests. This file must be placed under a ``templates``
-folder, be named ``contributing.md`` and can be formated as you wish using
+folder, be named ``contributing.md`` and can be formatted as you wish using
 markdown.
 
 
@@ -21,7 +21,7 @@ For a project named ``test`` on ``pagure.io``.
 
 ::
 
-    git clone ssh://git@pagure.org/requests/test.git
+    git clone ssh://git@pagure.io/requests/test.git
     cd test
 
 * Create the templates folder
