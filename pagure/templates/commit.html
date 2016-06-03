@@ -54,10 +54,10 @@
       {% set filecount = filecount + 1 %}
       {% if patch | hasattr('new_file_path') %}
         <a class="list-group-item" href="#diff-file-{{filecount}}">
-          {{  patch.new_file_path }}
+          {{  patch.new_file_path | unicode}}
       {% elif patch | hasattr('delta') %}
         <a class="list-group-item" href="#diff-file-{{filecount}}">
-          {{  patch.delta.new_file.path }}
+          {{  patch.delta.new_file.path | unicode }}
       {% endif %}
       <div class="pull-xs-right">
         {% if not patch.is_binary  %}
@@ -102,13 +102,13 @@
       <a href="{{ url_for('view_file', username=username,
                 repo=repo.name, identifier=commitid,
                 filename=patch.new_file_path) }}" title="View file as of {{ commitid|short }}">
-        {{  patch.new_file_path }}
+        {{  patch.new_file_path | unicode }}
       </a>
     {% elif patch | hasattr('delta') %}
       <a href="{{ url_for('view_file', username=username,
                 repo=repo.name, identifier=commitid,
                 filename=patch.delta.new_file.path) }}" title="View file as of {{ commitid|short }}">
-        {{  patch.delta.new_file.path }}
+        {{  patch.delta.new_file.path | unicode }}
       </a>
     {% endif %}
         {% if not patch.is_binary  %}

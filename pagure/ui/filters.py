@@ -409,3 +409,7 @@ def text_wraps(dictionary):
         return max([int(k) for k in dictionary if k]) + 1
     else:
         return 1
+
+@APP.template_filter('unicode')
+def convert_unicode(text):
+    return unicode(text, "utf8")

@@ -349,7 +349,7 @@
                       identifier=identifier,
                       filename=filepath) }}"
               {% endif %}
-              title="View file as of {{ patch_new_id|short }}">{{filepath}}</a>
+              title="View file as of {{ patch_new_id|short }}">{{filepath | unicode}}</a>
               {% endmacro %}
 
               {% if patch | hasattr('new_file_path') %}
