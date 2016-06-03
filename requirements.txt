@@ -35,3 +35,7 @@ python-fedora
 # Required only for the `local` authentication backend
 cryptography
 py-bcrypt
+
+#Required for Pagure CI
+moksha
+python-jenkins
