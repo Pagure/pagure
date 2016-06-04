@@ -34,8 +34,6 @@ class PagureCI(BASE):
     name = sa.Column(sa.String(64))
     pagure_name = sa.Column(sa.String(255))
 
-    pagure_token = sa.Column(sa.String(64))
-
     jenkins_name = sa.Column(sa.String(255))
     jenkins_url = sa.Column(sa.String(255), nullable=False,
                             default='http://jenkins.fedorainfracloud.org/')
@@ -94,18 +92,18 @@ class JenkinsForm(wtf.Form):
                             [validators.Required(),
                              validators.Length(max=255)])
 
-    pagure_token = TextField('Pagure token',
-                             [validators.Required()])
-
     jenkins_name = TextField('Name of project in Jenkins',
                              [validators.Required(),
                               validators.Length(max=255)])
+
     jenkins_url = TextField('Jenkins URL',
                             [validators.Required(),
                              validators.Length(max=255)],
                             default='http://jenkins.fedorainfracloud.org/')
+
     jenkins_token = TextField('Jenkins token',
                               [validators.Required()])
+
     active = BooleanField('Active', [validators.Optional()])
 
 
@@ -119,7 +117,7 @@ class PagureCiHook(BaseHook):
     db_object = PagureCI
     backref = 'hook_pagure_ci'
     form_fields = [
-        'name', 'pagure_name', 'pagure_token', 'jenkins_name',
+        'name', 'pagure_name', 'jenkins_name',
         'jenkins_url', 'jenkins_token', 'active'
     ]
 

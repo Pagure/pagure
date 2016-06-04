@@ -20,7 +20,6 @@ import pagure.forms
 from pagure import APP, SESSION, login_required, is_repo_admin
 from pagure.lib.model import BASE
 from pagure.exceptions import FileNotFoundException
-from pagure.hooks.jenkins_hook import PagureCI
 from pagure.hooks import jenkins_hook
 from pagure.lib import model, pagure_ci
 
