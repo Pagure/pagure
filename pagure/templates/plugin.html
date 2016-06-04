@@ -3,16 +3,16 @@
 {% if full %}
 {% extends "repo_master.html" %}
 
-{% block title %}{{ select.capitalize() }} {{ plugin.name }} - {{ repo.name }}
-{% endblock %} {% set tag = "home" %}
+{% block title %}{{ select.capitalize() }} {{ plugin.name }} - {{ repo.name }}{% endblock %}
+{% set tag = "home" %}
 {% endif %}
 
 {% block repo %}
 {% if full %}
-    <h3>{{ plugin.name }} settings</h3>
+  <h3>{{ plugin.name }} settings</h3>
 {% endif %}
 
-<form action="{{ url_for('.view_plugin',
+  <form action="{{ url_for('.view_plugin',
                   username=username, repo=repo.name, plugin=plugin.name,
                   ) }}" method="post">
   {{ plugin.description | markdown | noJS | safe }}
@@ -35,7 +35,6 @@
       <input type="submit" class="btn btn-primary" value="Update">
       {{ form.csrf_token }}
     </p>
-</form>
-
+  </form>
 
 {% endblock %}

@@ -37,5 +37,5 @@ cryptography
 py-bcrypt
 
 #Required for Pagure CI
-moksha
+fedmsg
 python-jenkins

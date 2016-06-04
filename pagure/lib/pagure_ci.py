@@ -2,10 +2,14 @@
 import os
 import flask
 from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import create_engine
+
 from pagure.hooks import jenkins_hook
+import pagure.lib
 from pagure.lib import model
 from pagure import APP, SESSION
+import pagure.exceptions
 
 import json
 import logging
@@ -13,7 +17,6 @@ import logging
 import requests
 import jenkins
 
-APP.config.from_envvar('INTEGRATOR_SETTINGS', silent=True)
 APP.logger.setLevel(logging.INFO)
 
 PAGURE_URL = '{base}api/0/{repo}/pull-request/{pr}/flag'
@@ -64,14 +67,9 @@ def post_flag(logger, name, base, token, repo, pr, result, url):
         'SUCCESS': ('Build successful', 100),
         'FAILURE': ('Build failed', 0),
     }[result]
-    payload = {
-        'username': name,
-        'percent': percent,
-        'comment': comment,
-        'url': url,
-    }
-    post_data(logger, PAGURE_URL.format(base=base, repo=repo, pr=pr), payload,
-              headers={'Authorization': 'token ' + token})
+
+    pagure_ci_flag(logger, repo=repo, username=name, percent=percent, comment=comment,
+                   url=url, requestid=pr)
 
 
 def post_data(logger, *args, **kwargs):
@@ -80,3 +78,38 @@ def post_data(logger, *args, **kwargs):
     if resp.status_code < 200 or resp.status_code >= 300:
         logger.error('Network request failed: %d: %s',
                      resp.status_code, resp.text)
+
+
+def pagure_ci_flag(logger, repo, username, percent, comment, url, requestid):
+
+    repo = pagure.lib.get_project(SESSION, repo, user=None)
+    output = {}
+
+    if repo is None:
+        raise pagure.exceptions.FileNotFoundException('Repo not found')
+
+    request = pagure.lib.search_pull_requests(
+        SESSION, project_id=repo.id, requestid=requestid)
+
+    if not request:
+        raise pagure.exceptions.FileNotFoundException('Request not found')
+
+    try:
+        message = pagure.lib.add_pull_request_flag(
+            SESSION,
+            request=request,
+            username=username,
+            percent=percent,
+            comment=comment,
+            url=url,
+            uid=None,
+            user=repo.user.username,
+            requestfolder=APP.config['REQUESTS_FOLDER'],
+        )
+        SESSION.commit()
+        logger.debug('Received response status: %s', message)
+        output['message'] = message
+
+    except SQLAlchemyError as err:  # pragma: no cover
+        logger.exception(err)
+        SESSION.rollback()

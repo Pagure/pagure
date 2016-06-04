@@ -4,7 +4,7 @@ from pagure.hooks import jenkins_hook
 import pagure.lib
 from pagure.lib import pagure_ci
 from pagure.lib.model import BASE, Project, User
-from pagure import APP
+from pagure import APP, SESSION
 PAGURE_MAIN_REPO = '{base}{name}.git'
 PAGURE_FORK_REPO = '{base}forks/{user}/{name}.git'
 
@@ -18,11 +18,9 @@ class Integrator(fedmsg.consumers.FedmsgConsumer):
 
     config_key = 'integrator.enabled'
 
-    SESSION = None
 
     def __init__(self, hub):
         super(Integrator, self).__init__(hub)
-        SESSION = pagure.lib.create_session(APP.config['DB_URL'])
 
     def consume(self, msg):
         topic, msg = msg['topic'], msg['body']

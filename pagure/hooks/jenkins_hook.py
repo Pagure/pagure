@@ -78,7 +78,7 @@ def get_configs(project_name, service):
     """
     cfg = BASE.metadata.bind.query(PagureCI).filter(
         service == project_name).all()
-    if len(cfg) == 0:
+    if not cfg:
         raise ConfigNotFound(project_name)
     return cfg
 
