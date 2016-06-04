@@ -130,6 +130,12 @@ class ProjectFormSimplified(PagureForm):
             wtforms.validators.Length(max=255),
         ]
     )
+    private = wtforms.BooleanField(
+        'Private',
+        [wtforms.validators.Optional()]
+    )
+
+
 
 
 class ProjectForm(ProjectFormSimplified):

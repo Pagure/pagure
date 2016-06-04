@@ -418,11 +418,13 @@ def new_project():
         namespace = form.namespace.data
         if namespace:
             namespace = namespace.strip()
+        private = form.private.data
 
         try:
             pagure.lib.new_project(
                 SESSION,
                 name=name,
+                private = private,
                 description=description,
                 namespace=namespace,
                 url=url,
