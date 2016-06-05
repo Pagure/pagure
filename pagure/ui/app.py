@@ -42,12 +42,17 @@ def index():
     limit = APP.config['ITEM_PER_PAGE']
     start = limit * (page - 1)
 
+    if authenticated():
+        private = flask.g.fas_user.username
+    else:
+        private = False
+
     repos = pagure.lib.search_projects(
         SESSION,
         fork=False,
         start=start,
         limit=limit,
-        private=False,
+        private=private,
         sort=sorting)
 
     num_repos = pagure.lib.search_projects(
@@ -177,6 +182,11 @@ def view_users(username=None):
 
     users = pagure.lib.search_user(SESSION, pattern=username)
 
+    if authenticated():
+        private = flask.g.fas_user.username
+    else:
+        private = False
+
     if len(users) == 1:
         flask.flash('Only one result found, redirecting you to it')
         return flask.redirect(
@@ -195,7 +205,7 @@ def view_users(username=None):
             SESSION,
             username=user.user,
             fork=False,
-            count=True)
+            count=True, private=private)
 
         forks_length = pagure.lib.search_projects(
             SESSION,
@@ -240,12 +250,17 @@ def view_projects(pattern=None, namespace=None):
     else:
         forks = False
 
+    if authenticated():
+        private = flask.g.fas_user.username
+    else:
+        private = False
+
     limit = APP.config['ITEM_PER_PAGE']
     start = limit * (page - 1)
 
     projects = pagure.lib.search_projects(
         SESSION, pattern=pattern, namespace=namespace,
-        fork=forks, start=start, limit=limit)
+        fork=forks, start=start, limit=limit, private=private)
 
     if len(projects) == 1:
         flask.flash('Only one result found, redirecting you to it')
@@ -301,19 +316,26 @@ def view_user(username):
     repo_start = limit * (repopage - 1)
     fork_start = limit * (forkpage - 1)
 
+    if authenticated():
+        private = flask.g.fas_user.username
+    else:
+        private = False
+
     repos = pagure.lib.search_projects(
         SESSION,
         username=username,
         fork=False,
         exclude_groups=APP.config.get('EXCLUDE_GROUP_INDEX'),
         start=repo_start,
-        limit=limit)
+        limit=limit,
+        private=private)
     repos_length = pagure.lib.search_projects(
         SESSION,
         username=username,
         fork=False,
         exclude_groups=APP.config.get('EXCLUDE_GROUP_INDEX'),
-        count=True)
+        count=True,
+        private=private)
 
     forks = pagure.lib.search_projects(
         SESSION,
@@ -426,7 +448,7 @@ def new_project():
             pagure.lib.new_project(
                 SESSION,
                 name=name,
-                private = private,
+                private=private,
                 description=description,
                 namespace=namespace,
                 url=url,
