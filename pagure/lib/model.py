@@ -96,7 +96,7 @@ def create_default_status(session, acls=None):
     """ Insert the defaults status in the status tables.
     """
 
-    for status in ['Open', 'Invalid', 'Insufficient data', 'Fixed']:
+    for status in ['Open', 'Invalid', 'Insufficient data', 'Fixed', 'Duplicate']:
         ticket_stat = StatusIssue(status=status)
         session.add(ticket_stat)
         try:
