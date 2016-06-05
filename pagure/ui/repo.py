@@ -600,6 +600,20 @@ def view_commit(repo, commitid, username=None):
 
     repo_obj = pygit2.Repository(reponame)
 
+    branchname = flask.request.args.get('branch', None)
+
+    if branchname and branchname not in repo_obj.listall_branches():
+        flask.abort(404, 'Branch no found')
+
+    if branchname:
+        branch = repo_obj.lookup_branch(branchname)
+    elif not repo_obj.is_empty and not repo_obj.head_is_unborn:
+        branch = repo_obj.lookup_branch(repo_obj.head.shorthand)
+        branchname = branch.branch_name
+    else:
+        branch = None
+        branchname = None
+
     try:
         commit = repo_obj.get(commitid)
     except ValueError:
@@ -621,6 +635,7 @@ def view_commit(repo, commitid, username=None):
         'commit.html',
         select='commits',
         repo=repo,
+        branchname=branchname,
         username=username,
         repo_admin=is_repo_admin(repo),
         commitid=commitid,
