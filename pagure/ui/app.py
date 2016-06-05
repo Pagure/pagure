@@ -211,7 +211,7 @@ def view_users(username=None):
             SESSION,
             username=user.user,
             fork=True,
-            count=True)
+            count=True, private=private)
         user.repos_length = repos_length
         user.forks_length = forks_length
 
@@ -342,12 +342,14 @@ def view_user(username):
         username=username,
         fork=True,
         start=fork_start,
-        limit=limit)
+        limit=limit,
+        private=private)
     forks_length = pagure.lib.search_projects(
         SESSION,
         username=username,
         fork=True,
-        count=True)
+        count=True,
+        private=private)
 
     total_page_repos = int(ceil(repos_length / float(limit)))
     total_page_forks = int(ceil(forks_length / float(limit)))

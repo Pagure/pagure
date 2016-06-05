@@ -1140,6 +1140,7 @@ def update_project(repo, username=None, namespace=None):
             repo.description = form.description.data
             repo.avatar_email = form.avatar_email.data.strip()
             repo.url = form.url.data.strip()
+            repo.private = form.private.data
             pagure.lib.update_tags(
                 SESSION, repo,
                 tags=[t.strip() for t in form.tags.data.split(',')],
