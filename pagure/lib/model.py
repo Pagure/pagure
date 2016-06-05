@@ -376,6 +376,7 @@ class Project(BASE):
     parent = relation('Project', remote_side=[id], backref='forks')
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id], backref='projects')
+    private = sa.Column(sa.Boolean, nullable=False, default=False)
 
     users = relation(
         'User',

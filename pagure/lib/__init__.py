@@ -1328,6 +1328,7 @@ def new_project(session, user, name, blacklist, allowed_prefix,
         avatar_email=avatar_email if avatar_email else None,
         user_id=user_obj.id,
         parent_id=parent_id,
+        private=private,
         hook_token=pagure.lib.login.id_generator(40)
     )
     session.add(project)
@@ -1897,7 +1898,7 @@ def search_projects(
         session, username=None,
         fork=None, tags=None, namespace=None, pattern=None,
         start=None, limit=None, count=False, sort=None,
-        exclude_groups=None):
+        exclude_groups=None, private=None):
     '''List existing projects
     '''
     projects = session.query(
@@ -2014,6 +2015,24 @@ def search_projects(
     ).filter(
         model.Project.id.in_(projects.subquery())
     )
+
+    if private is False:
+        query = query.filter(
+            model.Project.private == False
+        )
+    elif isinstance(private, basestring):
+        user2 = aliased(model.User)
+        query = query.filter(
+            sqlalchemy.or_(
+                model.Project.private == False,
+                sqlalchemy.and_(
+                    model.Project.private == True,
+                    model.Project.user_id == user2.id,
+                    user2.user == private,
+                )
+            )
+        )
+
 
     if sort == 'latest':
         query = query.order_by(

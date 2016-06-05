@@ -47,6 +47,7 @@ def index():
         fork=False,
         start=start,
         limit=limit,
+        private=False,
         sort=sorting)
 
     num_repos = pagure.lib.search_projects(
@@ -93,27 +94,28 @@ def index_auth():
     except ValueError:
         forkpage = 1
 
+    private = flask.g.fas_user.username
     repos = pagure.lib.search_projects(
         SESSION,
         username=flask.g.fas_user.username,
         exclude_groups=APP.config.get('EXCLUDE_GROUP_INDEX'),
-        fork=False)
+        fork=False, private=private)
     repos_length = pagure.lib.search_projects(
         SESSION,
         username=flask.g.fas_user.username,
         exclude_groups=APP.config.get('EXCLUDE_GROUP_INDEX'),
         fork=False,
-        count=True)
+        count=True, private=private)
 
     forks = pagure.lib.search_projects(
         SESSION,
         username=flask.g.fas_user.username,
-        fork=True)
+        fork=True, private=private)
     forks_length = pagure.lib.search_projects(
         SESSION,
         username=flask.g.fas_user.username,
         fork=True,
-        count=True)
+        count=True, private=private)
 
     watch_list = pagure.lib.user_watch_list(
         SESSION,
