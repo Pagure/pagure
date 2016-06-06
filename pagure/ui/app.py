@@ -110,17 +110,20 @@ def index_auth():
         username=flask.g.fas_user.username,
         exclude_groups=APP.config.get('EXCLUDE_GROUP_INDEX'),
         fork=False,
-        count=True, private=private)
+        count=True,
+        private=private)
 
     forks = pagure.lib.search_projects(
         SESSION,
         username=flask.g.fas_user.username,
-        fork=True, private=private)
+        fork=True,
+        private=private)
     forks_length = pagure.lib.search_projects(
         SESSION,
         username=flask.g.fas_user.username,
         fork=True,
-        count=True, private=private)
+        count=True,
+        private=private)
 
     watch_list = pagure.lib.user_watch_list(
         SESSION,
@@ -205,13 +208,15 @@ def view_users(username=None):
             SESSION,
             username=user.user,
             fork=False,
-            count=True, private=private)
+            count=True,
+            private=private)
 
         forks_length = pagure.lib.search_projects(
             SESSION,
             username=user.user,
             fork=True,
-            count=True, private=private)
+            count=True,
+            private=private)
         user.repos_length = repos_length
         user.forks_length = forks_length
 
@@ -261,6 +266,7 @@ def view_projects(pattern=None, namespace=None):
     projects = pagure.lib.search_projects(
         SESSION, pattern=pattern, namespace=namespace,
         fork=forks, start=start, limit=limit, private=private)
+
 
     if len(projects) == 1:
         flask.flash('Only one result found, redirecting you to it')

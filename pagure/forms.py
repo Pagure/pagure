@@ -136,8 +136,6 @@ class ProjectFormSimplified(PagureForm):
     )
 
 
-
-
 class ProjectForm(ProjectFormSimplified):
     ''' Form to create or edit project. '''
     name = wtforms.TextField(
