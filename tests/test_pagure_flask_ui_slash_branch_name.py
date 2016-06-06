@@ -209,11 +209,19 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
         output = self.app.get('/test/blob/master/f/sources')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<li><a href="/test/tree/master"><span class="oi" '
-            'data-glyph="random"></span>&nbsp; master</a></li>'
-            '<li class="active"><span class="oi" data-glyph="file">'
-            '</span>&nbsp; sources</li>',
-            output.data)
+            '''
+        <ol class="breadcrumb">
+          <li>
+            <a href="/test/tree/master">
+              <span class="oi" data-glyph="random">
+              </span>&nbsp; master
+            </a>
+          </li>
+          <li class="active">
+            <span class="oi" data-glyph="file">
+            </span>&nbsp; sources
+          </li>
+        </ol>''', output.data)
 
         output = self.app.get('/test/blob/master/f/.gitignore')
         self.assertEqual(output.status_code, 404)
@@ -221,12 +229,19 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
         output = self.app.get('/test/blob/maxamilion/feature/f/.gitignore')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<li><a href="/test/tree/maxamilion/feature">'
-            '<span class="oi" data-glyph="random"></span>'
-            '&nbsp; maxamilion/feature</a></li>'
-            '<li class="active"><span class="oi" data-glyph="file">'
-            '</span>&nbsp; .gitignore</li>',
-            output.data)
+            '''
+        <ol class="breadcrumb">
+          <li>
+            <a href="/test/tree/maxamilion/feature">
+              <span class="oi" data-glyph="random">
+              </span>&nbsp; maxamilion/feature
+            </a>
+          </li>
+          <li class="active">
+            <span class="oi" data-glyph="file">
+            </span>&nbsp; .gitignore
+          </li>
+        </ol>''', output.data)
         self.assertTrue(
             # new version of pygments
             '<td class="cell2"><pre><span></span>*~</pre></td>' in output.data

@@ -1604,9 +1604,16 @@ index 0000000..fb7093d
 
         output = self.app.get('/test/tree/')
         self.assertEqual(output.status_code, 200)
-        self.assertTrue(
-            '<li><a href="/test/tree"><span class="oi" data-glyph="random">'
-            '</span>&nbsp; None</a></li>        </ol>' in output.data)
+        self.assertIn(
+            '''
+        <ol class="breadcrumb">
+          <li>
+            <a href="/test/tree">
+              <span class="oi" data-glyph="random">
+              </span>&nbsp; None
+            </a>
+          </li>
+        </ol>''', output.data)
         self.assertTrue(
             'No content found in this repository' in output.data)
 
@@ -1665,6 +1672,13 @@ index 0000000..fb7093d
             in output.data)
         self.assertFalse(
             'No content found in this repository' in output.data)
+
+        output = self.app.get(
+            '/fork/pingou/test3/blob/master/f/folder1/folder2')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue(
+            '<a href="/fork/pingou/test3/blob/master/'
+            'f/folder1/folder2/file%C5%A0">' in output.data)
 
 
     @patch('pagure.lib.notify.send_email')

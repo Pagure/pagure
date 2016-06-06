@@ -220,13 +220,19 @@ class PagureFlaskNoMasterBranchtests(tests.Modeltests):
         output = self.app.get('/test/blob/feature/f/sources')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<a href="/test/tree/feature">'
-            '<span class="oi" data-glyph="random"></span>&nbsp; feature</a>',
-            output.data)
-        self.assertIn(
-            '</li><li class="active"><span class="oi" data-glyph="file">'
-            '</span>&nbsp; sources</li>',
-            output.data)
+            '''
+        <ol class="breadcrumb">
+          <li>
+            <a href="/test/tree/feature">
+              <span class="oi" data-glyph="random">
+              </span>&nbsp; feature
+            </a>
+          </li>
+          <li class="active">
+            <span class="oi" data-glyph="file">
+            </span>&nbsp; sources
+          </li>
+        </ol>''',  output.data)
         self.assertTrue(
             # new version of pygments
             '<td class="cell2"><pre><span></span>foo</pre></td>' in output.data

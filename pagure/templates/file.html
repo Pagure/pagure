@@ -32,14 +32,16 @@
           <div class="dropdown-menu dropdown-menu-right">
             {% for branch in branches %}
               {% if origin == 'view_tree' %}
-                <a class="dropdown-item" href="{{ url_for('view_tree',
-                            username=username, repo=repo.name, identifier=branch) }}">
+                <a class="dropdown-item" href="{{ url_for(
+                    'view_tree',
+                    username=username, repo=repo.name, identifier=branch) }}">
                   {{ branch }}
                 </a>
               {% elif origin == 'view_file' %}
-                <a class="dropdown-item" href="{{ url_for('view_file',
-                            username=username, repo=repo.name, identifier=branch,
-                            filename=filename) }}">
+                <a class="dropdown-item" href="{{ url_for(
+                    'view_file',
+                    username=username, repo=repo.name, identifier=branch,
+                    filename=filename | unicode ) }}">
                   {{ branch }}
                 </a>
               {% endif %}
@@ -52,11 +54,16 @@
   </div>
     <div class="card">
       <div class="card-header">
-          <ol class="breadcrumb">
-          <li><a href="{{ url_for('view_tree', username=username,
+        <ol class="breadcrumb">
+          <li>
+            <a href="{{ url_for('view_tree', username=username,
                       repo=repo.name, identifier=branchname)
-          }}"><span class="oi" data-glyph="random"></span>&nbsp; {{ branchname }}</a></li>{%
-        for file in filename.split('/') %}
+          }}">
+              <span class="oi" data-glyph="random">
+              </span>&nbsp; {{ branchname }}
+            </a>
+          </li>
+        {% for file in filename.split('/') %}
           {% if loop.first %}
           {% set path = file %}
           {% else %}
@@ -65,8 +72,15 @@
           {% if loop.index != loop.length %}<li><a
           href="{{ url_for('view_file', username=username,
                   repo=repo.name, identifier=branchname,
-                  filename=path)}}"
-            ><span class="oi" data-glyph="folder"></span>&nbsp; {{ file }}</a></li>{% elif file %}<li class="active"><span class="oi" data-glyph="{% if output_type == 'tree' %}folder{% else %}file{% endif %}"></span>&nbsp; {{ file }}</li>{% endif %}
+                  filename=path | unicode)}}">
+            <span class="oi" data-glyph="folder"></span>&nbsp; {{ file }}</a>
+          </li>
+          {% elif file %}
+          <li class="active">
+            <span class="oi" data-glyph="{% if output_type == 'tree' %}folder{% else %}file{% endif %}">
+            </span>&nbsp; {{ file }}
+          </li>
+          {% endif %}
         {% endfor %}
         </ol>
       </div>
@@ -78,22 +92,27 @@
           {% if output_type in ('file','binary','image','markup') %}
             <div class="file-button-bar">
                 {% if output_type in ('file','markup') and repo_admin %}
-                <a class="btn btn-sm btn-secondary" href="{{ url_for('edit_file', username=username,
-                            repo=repo.name, branchname=branchname,
-                            filename=filename) }}" title="Edit file">Edit</a>
+                <a class="btn btn-sm btn-secondary" href="{{ url_for(
+                    'edit_file', username=username,
+                    repo=repo.name, branchname=branchname,
+                    filename=filename | unicode) }}" title="Edit file">Edit</a>
                 {% endif %}
                 {% if output_type == 'markup'  %}
-                <a class="btn btn-sm btn-secondary" href="{{ url_for('view_file', username=username,
-                            repo=repo.name, identifier=branchname,
-                            filename=filename, text=True) }}" title="View as text">Text</a>
+                <a class="btn btn-sm btn-secondary" href="{{ url_for(
+                    'view_file', username=username,
+                    repo=repo.name, identifier=branchname,
+                    filename=filename | unicode, text=True) }}"
+                    title="View as text">Text</a>
                 {% else %}
-                <a class="btn btn-secondary btn-sm" href="{{ url_for('view_file', username=username,
-                            repo=repo.name, identifier=branchname,
-                            filename=filename) }}" title="View as blob">Blob</a>
+                <a class="btn btn-secondary btn-sm" href="{{ url_for(
+                    'view_file', username=username,
+                    repo=repo.name, identifier=branchname,
+                    filename=filename | unicode) }}" title="View as blob">Blob</a>
                 {% endif %}
-                <a class="btn btn-secondary btn-sm" href="{{ url_for('view_raw_file', username=username,
-                            repo=repo.name, identifier=branchname,
-                            filename=filename) }}" title="View as raw">Raw</a>
+                <a class="btn btn-secondary btn-sm" href="{{ url_for(
+                    'view_raw_file', username=username,
+                    repo=repo.name, identifier=branchname,
+                    filename=filename) | unicode }}" title="View as raw">Raw</a>
             </div>
           {% endif %}
         {% endif %}
@@ -109,14 +128,14 @@
     {% elif output_type == 'image' %}
         <img src="{{ url_for('view_raw_file', username=username,
                     repo=repo.name, identifier=branchname,
-                    filename=filename) }}"/>
+                    filename=filename | unicode) }}"/>
     {% elif output_type == 'binary' %}
         <p class="noresult">
           Binary files cannot be rendered.<br/>
           Please
           <a href="{{ url_for('view_raw_file', username=username,
                     repo=repo.name, identifier=branchname,
-                    filename=filename) }}">view the raw version
+                    filename=filename | unicode) }}">view the raw version
           </a>
         </p>
     {% endif %}
@@ -139,9 +158,9 @@
                 <a href="{{ url_for(
                     'view_file', username=username,repo=repo.name,
                     identifier=branchname,
-                    filename=filename + '/' +
-                    entry.name if filename else entry.name) }}">
-                   {{ entry.name }}
+                    filename=filename | unicode + '/' +
+                    entry.name | unicode if filename else entry.name) }}">
+                   {{ entry.name | unicode }}
                 </a>{% if entry.filemode == 16384 %}</strong>{% endif%}
             </td>
             <td class-"pagure-table-filehex">
