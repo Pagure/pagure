@@ -141,7 +141,7 @@
           {% if id != 0 and g.fas_user and comment.parent.status in [True, 'Open'] %}
             <a class="reply btn btn-secondary btn-sm" data-toggle="tooltip"
                 title="Reply to this comment - loose formating">
-              <span class="oi" data-glyph="share-boxed"></span>
+              <span class="oi" data-glyph="share-boxed" title="Reply to this comment"></span>
             </a>
           {% endif %}
           {% if id != 0 and g.fas_user and repo_admin or (
@@ -150,7 +150,7 @@
           <a class="btn btn-secondary btn-sm edit_btn" href="{{
               '%s/comment/%s/edit' % (request.base_url, comment.id) }}"
               data-comment="{{ comment.id }}" data-objid="{{ issueid }}">
-            <span class="oi" data-glyph="pencil"></span>
+            <span class="oi" data-glyph="pencil" title="Edit comment"></span>
           </a>
           {% endif %}
           {% if id != 0 and g.fas_user and repo_admin or (
