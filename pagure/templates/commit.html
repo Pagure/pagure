@@ -78,7 +78,7 @@
         {% endif %}
         {% endif %}
       </div>
-      {{ patch.new_file_path }}
+      {{ patch.new_file_path | unicode }}
     </a>
   {% endfor %}
 </div>
