@@ -79,6 +79,20 @@ def view_repo(repo, username=None, namespace=None):
     repo_db = flask.g.repo
     repo_obj = flask.g.repo_obj
 
+    if authenticated():
+        private = flask.g.fas_user.username
+    else:
+        private = False
+
+    repo = pagure.lib.get_project(SESSION, repo, user=username, private=private)
+
+    if repo is None:
+        flask.abort(404, 'Project not found')
+
+    reponame = pagure.get_repo_path(repo)
+
+    repo_obj = pygit2.Repository(reponame)
+
     if not repo_obj.is_empty and not repo_obj.head_is_unborn:
         head = repo_obj.head.shorthand
     else:
@@ -140,9 +154,14 @@ def view_repo(repo, username=None, namespace=None):
 @APP.route('/fork/<username>/<namespace>/<repo>/branch/<path:branchname>')
 def view_repo_branch(repo, branchname, username=None, namespace=None):
     ''' Returns the list of branches in the repo. '''
+    if authenticated():
+        private = flask.g.fas_user.username
+    else:
+        private = False
 
     repo = flask.g.repo
     repo_obj = flask.g.repo_obj
+
 
     if branchname not in repo_obj.listall_branches():
         flask.abort(404, 'Branch not found')
