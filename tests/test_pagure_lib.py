@@ -1001,7 +1001,7 @@ class PagureLibtests(tests.Modeltests):
         statuses = pagure.lib.get_issue_statuses(self.session)
         self.assertEqual(
             sorted(statuses),
-            ['Fixed', 'Insufficient data', 'Invalid', 'Open'])
+            ['Duplicate', 'Fixed', 'Insufficient data', 'Invalid', 'Open'])
 
     def test_set_up_user(self):
         """ Test the set_up_user of pagure.lib. """
