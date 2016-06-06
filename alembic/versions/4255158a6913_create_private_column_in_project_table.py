@@ -19,9 +19,15 @@ def upgrade():
     '''
     op.add_column(
         'projects',
-        sa.Column('private', sa.Boolean, nullable=False, default=False)
+        sa.Column('_private', sa.Boolean, nullable=True, default=False)
     )
+    op.execute('''UPDATE "projects" '''
+               '''SET _private=False;''')
 
+    op.alter_column(
+        'projects',
+        column_name='_private', new_column_name='private',
+        nullable=False, existing_nullable=True)
 
 
 def downgrade():
