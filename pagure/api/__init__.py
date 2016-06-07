@@ -174,7 +174,7 @@ def api_method(function):
                 response = flask.jsonify(
                     {
                         'error': e.error,
-                        'error_code': e.error_code
+                        'error_code': e.error_code.name
                     }
                 )
             else:
