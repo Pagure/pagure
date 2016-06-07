@@ -44,8 +44,15 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         pagure.api.project.SESSION = self.session
         pagure.lib.SESSION = self.session
 
-        pagure.APP.config['REQUESTS_FOLDER'] = None
-        pagure.APP.config['GIT_FOLDER'] =  os.path.join(tests.HERE, 'repos')
+        pagure.APP.config['GIT_FOLDER'] = os.path.join(tests.HERE, 'repos')
+        pagure.APP.config['FORK_FOLDER'] = os.path.join(
+            tests.HERE, 'forks')
+        pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
+            tests.HERE, 'requests')
+        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
+            tests.HERE, 'tickets')
+        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
+            tests.HERE, 'docs')
 
         self.app = pagure.APP.test_client()
 
@@ -220,6 +227,95 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                 }
               ]
             }
+        )
+
+    @patch('pagure.lib.git.generate_gitolite_acls')
+    def test_api_new_project(self, p_gga):
+        """ Test the api_new_project method of the flask api. """
+        p_gga.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(tests.HERE, 'tickets'))
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token foo_token'}
+
+        # Invalid token
+        output = self.app.post('/api/0/new', headers=headers)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                "error": "Invalid or expired token. Please visit " \
+                "https://pagure.org/ to get or renew your API token.",
+                "error_code": "EINVALIDTOK"
+            }
+        )
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # No input
+        output = self.app.post('/api/0/new', headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid or incomplete input submited",
+              "error_code": "EINVALIDREQ",
+            }
+        )
+
+        data = {
+            'name': 'test',
+        }
+
+        # Incomplete request
+        output = self.app.post(
+            '/api/0/new', data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid or incomplete input submited",
+              "error_code": "EINVALIDREQ",
+            }
+        )
+
+        data = {
+            'name': 'test',
+            'description': 'Just a small test project',
+        }
+
+        # Valid request but repo already exists
+        output = self.app.post(
+            '/api/0/new/', data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                "error": "The tickets repo \"test.git\" already exists",
+                "error_code": "ENOCODE"
+            }
+        )
+
+        data = {
+            'name': 'test_42',
+            'description': 'Just another small test project',
+        }
+
+        # Valid request
+        output = self.app.post(
+            '/api/0/new/', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'Project "test_42" created'}
         )
 
 
