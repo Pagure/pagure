@@ -123,7 +123,7 @@ def create_default_status(session, acls=None):
             session.rollback()
             ERROR_LOG.debug('Type %s could not be added', grptype)
 
-    for acl in acls or {}:
+    for acl in sorted(acls) or {}:
         item = ACL(
             name=acl,
             description=acls[acl]
