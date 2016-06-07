@@ -605,15 +605,6 @@ def view_commit(repo, commitid, username=None):
     if branchname and branchname not in repo_obj.listall_branches():
         branchname = None
 
-    if branchname:
-        branch = repo_obj.lookup_branch(branchname)
-    elif not repo_obj.is_empty and not repo_obj.head_is_unborn:
-        branch = repo_obj.lookup_branch(repo_obj.head.shorthand)
-        branchname = branch.branch_name
-    else:
-        branch = None
-        branchname = None
-
     try:
         commit = repo_obj.get(commitid)
     except ValueError:
