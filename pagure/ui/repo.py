@@ -603,7 +603,7 @@ def view_commit(repo, commitid, username=None):
     branchname = flask.request.args.get('branch', None)
 
     if branchname and branchname not in repo_obj.listall_branches():
-        flask.abort(404, 'Branch no found')
+        branchname = None
 
     if branchname:
         branch = repo_obj.lookup_branch(branchname)
