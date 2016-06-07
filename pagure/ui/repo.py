@@ -147,7 +147,7 @@ def view_repo(repo, username=None):
         diff_commits=diff_commits,
         repo_admin=is_repo_admin(repo),
         form=pagure.forms.ConfirmationForm(),
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user.username, repo),
+        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo),
     )
 
 
@@ -248,7 +248,7 @@ def view_repo_branch(repo, branchname, username=None):
         diff_commits=diff_commits,
         repo_admin=is_repo_admin(repo),
         form=pagure.forms.ConfirmationForm(),
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user.username, repo),
+        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo),
     )
 
 
@@ -363,7 +363,7 @@ def view_commits(repo, branchname=None, username=None):
         total_page=total_page,
         repo_admin=is_repo_admin(repo),
         form=pagure.forms.ConfirmationForm(),
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user.username, repo),
+        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo),
     )
 
 
@@ -474,7 +474,7 @@ def view_file(repo, identifier, filename, username=None):
             content=content,
             output_type=output_type,
             repo_admin=is_repo_admin(repo),
-            watch=pagure.lib.is_watching(SESSION, flask.g.fas_user.username, repo),
+            watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo),
         ),
         200,
         headers
@@ -636,7 +636,7 @@ def view_commit(repo, commitid, username=None):
         commitid=commitid,
         commit=commit,
         diff=diff,
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user.username, repo),
+        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo),
     )
 
 
@@ -725,7 +725,7 @@ def view_tree(repo, identifier=None, username=None):
         content=content,
         output_type=output_type,
         repo_admin=is_repo_admin(repo),
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user.username, repo),
+        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo),
     )
 
 
@@ -747,7 +747,7 @@ def view_forks(repo, username=None):
         username=username,
         repo=repo,
         repo_admin=is_repo_admin(repo),
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user.username, repo),
+        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo),
     )
 
 
@@ -775,7 +775,7 @@ def view_tags(repo, username=None):
         tags=tags,
         repo_admin=is_repo_admin(repo),
         repo_obj=repo_obj,
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user.username, repo),
+        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo),
     )
 
 
@@ -826,7 +826,7 @@ def new_release(repo, username=None):
         username=username,
         repo=repo,
         form=form,
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user.username, repo),
+        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo),
     )
 
 
@@ -913,7 +913,7 @@ def view_settings(repo, username=None):
         plugins=plugins,
         repo_admin=repo_admin,
         branchname = branchname,
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user.username, repo),
+        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo),
     )
 
 
@@ -1510,7 +1510,7 @@ def add_group_project(repo, username=None):
         form=form,
         username=username,
         repo=repo,
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user.username, repo),
+        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo),
     )
 
 
@@ -1617,7 +1617,7 @@ def add_token(repo, username=None):
         repo_admin=repo_admin,
         username=username,
         repo=repo,
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user.username, repo),
+        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo),
     )
 
 
@@ -1760,7 +1760,7 @@ def edit_file(repo, branchname, filename, username=None):
         form=form,
         user=user,
         branches=repo_obj.listall_branches(),
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user.username, repo),
+        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo),
     )
 
 
@@ -1824,8 +1824,7 @@ def view_docs(repo, username=None, filename=None):
         username=username,
         filename=filename,
         endpoint='view_docs',
-        select='docs',
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user.username, repo_obj),
+        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo_obj),
     )
 
 @APP.route('/<repo:repo>/activity/')

@@ -2276,12 +2276,22 @@ class PagureLibtests(tests.Modeltests):
 
         project = pagure.lib.get_project(self.session, 'test')
 
+        # If user not logged in
+        watch = pagure.lib.is_watching(
+            session=self.session,
+            user=None,
+            project=project,
+        )
+        self.assertFalse(watch)
+
         # User does not exist
+        user = tests.FakeUser()
+        user.username = 'aavrug'
         self.assertRaises(
             pagure.exceptions.PagureException,
             pagure.lib.is_watching,
             session=self.session,
-            user='aavrug',
+            user=user,
             project=project,
         )
 
@@ -2304,17 +2314,19 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
 
         # If user belongs to any group of that project
+        user.username = 'foo'
         watch = pagure.lib.is_watching(
             session=self.session,
-            user='foo',
+            user=user,
             project=project,
         )
         self.assertTrue(watch)
 
         # If user is the creator
+        user.username = 'pingou'
         watch = pagure.lib.is_watching(
             session=self.session,
-            user='pingou',
+            user=user,
             project=project,
         )
         self.assertTrue(watch)
@@ -2331,7 +2343,7 @@ class PagureLibtests(tests.Modeltests):
         # From watchers table
         watch = pagure.lib.is_watching(
             session=self.session,
-            user='pingou',
+            user=user,
             project=project,
         )
         self.assertTrue(watch)
@@ -2348,7 +2360,7 @@ class PagureLibtests(tests.Modeltests):
         # From watchers table
         watch = pagure.lib.is_watching(
             session=self.session,
-            user='pingou',
+            user=user,
             project=project,
         )
         self.assertFalse(watch)

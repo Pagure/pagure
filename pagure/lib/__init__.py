@@ -2787,6 +2787,10 @@ def update_watch_status(session, project, user, watch):
 def is_watching(session, user, project):
     ''' Check user watching the project. '''
 
+    if user is None:
+        return False
+
+    user = user.username
     user_obj = __get_user(session, user)
     if not user_obj:
         raise pagure.exceptions.PagureException(
