@@ -1419,6 +1419,13 @@ class PagureFlaskRepotests(tests.Modeltests):
             '<span style="color: #800080; font-weight: bold">'
             '@@ -0,0 +1,3 @@</span>' in output.data)
 
+        #View the commit when branch name is provided
+        output = self.app.get('/test/c/%s?branch=master' % commit.oid.hex)
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue(
+            '<a class="active nav-link" href="/test/commits/master">'
+            in output.data)
+
         # Add a fork of a fork
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
@@ -1462,6 +1469,14 @@ class PagureFlaskRepotests(tests.Modeltests):
             follow_redirects=True)
         self.assertEqual(output.status_code, 404)
         self.assertIn('<p>Project not found</p>', output.data)
+
+        #View the commit of the fork when branch name is provided
+        output = self.app.get('/fork/pingou/test3/c/%s?branch=master' % commit.oid.hex)
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue(
+            '<a class="active nav-link" href="/fork/pingou/test3/commits/master">'
+            in output.data)
+
 
     def test_view_commit_patch(self):
         """ Test the view_commit_patch endpoint. """
