@@ -1430,7 +1430,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         output = self.app.get('/test/c/%s?branch=abcxyz' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
         self.assertTrue(
-            '<a class="active nav-link" href="/test/commits/master">'
+            '<a class="active nav-link" href="/test/commits">'
             in output.data)
 
         # Add a fork of a fork
@@ -1488,7 +1488,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         output = self.app.get('/fork/pingou/test3/c/%s?branch=abcxyz' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
         self.assertTrue(
-            '<a class="active nav-link" href="/fork/pingou/test3/commits/master">'
+            '<a class="active nav-link" href="/fork/pingou/test3/commits">'
             in output.data)
 
 
