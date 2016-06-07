@@ -2088,23 +2088,6 @@ def get_project(session, name, user=None, namespace=None):
             model.Project.is_fork == False
         )
 
-    if private is False:
-        query = query.filter(
-            model.Project.private == False
-        )
-    elif isinstance(private, basestring):
-        user2 = aliased(model.User)
-        query = query.filter(
-            sqlalchemy.or_(
-                model.Project.private == False,
-                sqlalchemy.and_(
-                    model.Project.private == True,
-                    model.Project.user_id == user2.id,
-                    user2.user == private,
-                )
-            )
-        )
-
     return query.first()
 
 

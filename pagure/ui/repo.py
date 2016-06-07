@@ -79,15 +79,22 @@ def view_repo(repo, username=None, namespace=None):
     repo_db = flask.g.repo
     repo_obj = flask.g.repo_obj
 
-    if authenticated():
-        private = flask.g.fas_user.username
-    else:
-        private = False
-
-    repo = pagure.lib.get_project(SESSION, repo, user=username, private=private)
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
 
     if repo is None:
         flask.abort(404, 'Project not found')
+
+    users = []
+    users.append(repo.user.username)
+    for user in repo.users:
+        users.append(user.username)
+
+    auth_user = None
+    if authenticated():
+        auth_user = flask.g.fas_user.username
+
+    if repo.private and auth_user not in users:
+        flask.abort(403, 'Forbidden')
 
     reponame = pagure.get_repo_path(repo)
 
@@ -154,14 +161,9 @@ def view_repo(repo, username=None, namespace=None):
 @APP.route('/fork/<username>/<namespace>/<repo>/branch/<path:branchname>')
 def view_repo_branch(repo, branchname, username=None, namespace=None):
     ''' Returns the list of branches in the repo. '''
-    if authenticated():
-        private = flask.g.fas_user.username
-    else:
-        private = False
 
     repo = flask.g.repo
     repo_obj = flask.g.repo_obj
-
 
     if branchname not in repo_obj.listall_branches():
         flask.abort(404, 'Branch not found')
@@ -899,6 +901,9 @@ def view_forks(repo, username=None, namespace=None):
     """ Presents all the forks of the project.
     """
     repo = flask.g.repo
+
+    if not repo:
+        flask.abort(404, 'Project not found')
 
     return flask.render_template(
         'forks.html',
