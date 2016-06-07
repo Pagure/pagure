@@ -921,10 +921,11 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.session.add(item)
         self.session.commit()
 
-        # Give `change_status_issue` to this token
+        # Give `issue_change_status` to this token when `issue_comment`
+        # is required
         item = pagure.lib.model.TokenAcl(
             token_id='pingou_foo',
-            acl_id=1,
+            acl_id=2,
         )
         self.session.add(item)
         self.session.commit()
