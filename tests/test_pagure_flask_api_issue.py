@@ -779,13 +779,14 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         # Un-authorized issue
         output = self.app.post(
             '/api/0/foo/issue/1/status', data=data, headers=headers)
-        self.assertEqual(output.status_code, 403)
+        self.assertEqual(output.status_code, 401)
         data = json.loads(output.data)
         self.assertDictEqual(
             data,
             {
-              "error": "You are not allowed to view this issue",
-              "error_code": "EISSUENOTALLOWED",
+                "error": "Invalid or expired token. Please "
+                "visit https://pagure.org/ to get or renew your API token.",
+                "error_code": "EINVALIDTOK"
             }
         )
 
@@ -958,13 +959,14 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         # Valid request but un-authorized
         output = self.app.post(
             '/api/0/foo/issue/1/comment', data=data, headers=headers)
-        self.assertEqual(output.status_code, 403)
+        self.assertEqual(output.status_code, 401)
         data = json.loads(output.data)
         self.assertDictEqual(
             data,
             {
-              "error": "You are not allowed to view this issue",
-              "error_code": "EISSUENOTALLOWED",
+                "error": "Invalid or expired token. Please "
+                "visit https://pagure.org/ to get or renew your API token.",
+                "error_code": "EINVALIDTOK"
             }
         )
 
