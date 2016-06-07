@@ -72,6 +72,8 @@ class APIERROR(enum.Enum):
     ENOTASSIGNED = 'This request must be assigned to be merged'
     ENOUSER = 'No such user found'
     ENOCOMMENT = 'Comment not found'
+    ENEWPROJECTDISABLED = 'Creating project have been disabled for this '\
+        'instance'
 
 
 def check_api_acls(acls, optional=False):

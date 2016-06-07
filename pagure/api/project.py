@@ -10,11 +10,13 @@
 
 import flask
 
+from sqlalchemy.exc import SQLAlchemyError
+
 import pagure
 import pagure.exceptions
 import pagure.lib
-from pagure import SESSION
-from pagure.api import API, api_method, APIERROR
+from pagure import SESSION, APP
+from pagure.api import API, api_method, APIERROR, api_login_required
 
 
 @API.route('/<repo>/git/tags')
@@ -162,4 +164,105 @@ def api_projects():
         'total_projects': len(projects),
         'projects': [p.to_json(api=True, public=True) for p in projects]
     })
+    return jsonout
+
+
+@API.route('/new/', methods=['POST'])
+@API.route('/new', methods=['POST'])
+@api_login_required(acls=['create_project'])
+@api_method
+def api_new_project():
+    """
+    Create a new project
+    --------------------
+    Create a new project on this pagure instance.
+
+    ::
+
+        POST /api/0/<repo>/new
+
+
+    Input
+    ^^^^^
+
+    +------------------+---------+--------------+---------------------------+
+    | Key              | Type    | Optionality  | Description               |
+    +==================+=========+==============+===========================+
+    | ``name``         | string  | Mandatory    | | The name of the new     |
+    |                  |         |              |   project.                |
+    +------------------+---------+--------------+---------------------------+
+    | ``description``  | string  | Mandatory    | | A short description of  |
+    |                  |         |              |   the new project.        |
+    +------------------+---------+--------------+---------------------------+
+    | ``url``          | string  | Optional     | | An url providing more   |
+    |                  |         |              |   information about the   |
+    |                  |         |              |   project.                |
+    +------------------+---------+--------------+---------------------------+
+    | ``avatar_email`` | string  | Optional     | | An email address for the|
+    |                  |         |              |   avatar of the project.  |
+    +------------------+---------+--------------+---------------------------+
+    | ``create_readme``| boolean | Optional     | | A boolean to specify if |
+    |                  |         |              |   there should be a readme|
+    |                  |         |              |   added to the project on |
+    |                  |         |              |   creation.               |
+    +------------------+---------+--------------+---------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          'message': 'Project "foo" created'
+        }
+
+    """
+    user = pagure.lib.search_user(SESSION, username=flask.g.fas_user.username)
+    output = {}
+
+    if not pagure.APP.config.get('ENABLE_NEW_PROJECTS', True):
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.ENEWPROJECTDISABLED)
+
+    form = pagure.forms.ProjectForm(csrf_enabled=False)
+    if form.validate_on_submit():
+        name = form.name.data
+        description = form.description.data
+        url = form.url.data
+        avatar_email = form.avatar_email.data
+        create_readme = form.create_readme.data
+
+        try:
+            message = pagure.lib.new_project(
+                SESSION,
+                name=name,
+                description=description,
+                url=url,
+                avatar_email=avatar_email,
+                user=flask.g.fas_user.username,
+                blacklist=APP.config['BLACKLISTED_PROJECTS'],
+                allowed_prefix=APP.config['ALLOWED_PREFIX'],
+                gitfolder=APP.config['GIT_FOLDER'],
+                docfolder=APP.config['DOCS_FOLDER'],
+                ticketfolder=APP.config['TICKETS_FOLDER'],
+                requestfolder=APP.config['REQUESTS_FOLDER'],
+                add_readme=create_readme,
+                userobj=user,
+            )
+            SESSION.commit()
+            pagure.lib.git.generate_gitolite_acls()
+            output['message'] = message
+        except pagure.exceptions.PagureException as err:
+            print err, str(err)
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.ENOCODE, error=str(err))
+        except SQLAlchemyError as err:  # pragma: no cover
+            print err
+            APP.logger.exception(err)
+            SESSION.rollback()
+            raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
+    else:
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
+
+    jsonout = flask.jsonify(output)
     return jsonout
