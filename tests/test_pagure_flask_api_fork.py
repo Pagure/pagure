@@ -368,7 +368,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         self.session.commit()
         item = pagure.lib.model.TokenAcl(
             token_id='foobar_token',
-            acl_id=2,
+            acl_id=5,
         )
         self.session.add(item)
         self.session.commit()
@@ -480,7 +480,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         self.session.commit()
         item = pagure.lib.model.TokenAcl(
             token_id='foobar_token',
-            acl_id=3,
+            acl_id=8,
         )
         self.session.add(item)
         self.session.commit()
