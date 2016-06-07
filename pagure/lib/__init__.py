@@ -1994,6 +1994,7 @@ def search_projects(
             model.TagProject.tag.in_(tags)
         )
 
+
     if pattern:
         pattern = pattern.replace('*', '%')
         if '%' in pattern:
@@ -2015,7 +2016,6 @@ def search_projects(
     ).filter(
         model.Project.id.in_(projects.subquery())
     )
-
     if private is False:
         query = query.filter(
             model.Project.private == False
@@ -2029,6 +2029,11 @@ def search_projects(
                     model.Project.private == True,
                     model.Project.user_id == user2.id,
                     user2.user == private,
+                    ),
+                sqlalchemy.and_(
+                    model.Project.private == True,
+                    model.Project.id == model.ProjectUser.project_id,
+                    model.ProjectUser.user_id == user2.id,
                 )
             )
         )

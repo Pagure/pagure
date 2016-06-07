@@ -84,17 +84,8 @@ def view_repo(repo, username=None, namespace=None):
     if repo is None:
         flask.abort(404, 'Project not found')
 
-    users = []
-    users.append(repo.user.username)
-    for user in repo.users:
-        users.append(user.username)
-
-    auth_user = None
-    if authenticated():
-        auth_user = flask.g.fas_user.username
-
-    if repo.private and auth_user not in users:
-        flask.abort(403, 'Forbidden')
+    if repo.private and not is_repo_admin(repo):
+        flask.abort(401, 'Forbidden')
 
     reponame = pagure.get_repo_path(repo)
 
@@ -902,8 +893,11 @@ def view_forks(repo, username=None, namespace=None):
     """
     repo = flask.g.repo
 
-    if not repo:
+    if repo is None:
         flask.abort(404, 'Project not found')
+
+    if repo.private and not is_repo_admin(repo):
+        flask.abort(401, 'Forbidden')
 
     return flask.render_template(
         'forks.html',
@@ -1150,7 +1144,6 @@ def update_project(repo, username=None, namespace=None):
             flask.url_for('auth_login', next=url))
 
     repo = flask.g.repo
-
     if not flask.g.repo_admin:
         flask.abort(
             403,
@@ -1202,6 +1195,9 @@ def update_priorities(repo, username=None, namespace=None):
             flask.url_for('auth_login', next=url))
 
     repo = flask.g.repo
+
+    if repo.private and not is_repo_admin(repo):
+        flask.abort(401, 'Forbidden')
 
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
@@ -2238,6 +2234,9 @@ def view_docs(repo, username=None, filename=None, namespace=None):
     """
     repo = flask.g.repo
 
+    if repo.private and not is_repo_admin(repo):
+        flask.abort(401, 'Forbidden')
+
     if not APP.config.get('DOC_APP_URL'):
         flask.abort(404, 'This pagure instance has no doc server')
 
@@ -2263,6 +2262,9 @@ def view_project_activity(repo, namespace=None):
         flask.abort(404)
 
     repo = flask.g.repo
+
+    if repo.private and not is_repo_admin(repo):
+        flask.abort(401, 'Forbidden')
 
     return flask.render_template(
         'activity.html',

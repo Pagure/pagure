@@ -20,7 +20,7 @@ import pagure.lib.git
 import pagure.forms
 import pagure.ui.filters
 from pagure import (APP, SESSION, login_required,
-                    authenticated,
+                    authenticated, is_repo_admin,
                     admin_session_timedout)
 
 
@@ -42,10 +42,7 @@ def index():
     limit = APP.config['ITEM_PER_PAGE']
     start = limit * (page - 1)
 
-    if authenticated():
-        private = flask.g.fas_user.username
-    else:
-        private = False
+    private = False
 
     repos = pagure.lib.search_projects(
         SESSION,
@@ -99,31 +96,30 @@ def index_auth():
     except ValueError:
         forkpage = 1
 
-    private = flask.g.fas_user.username
     repos = pagure.lib.search_projects(
         SESSION,
         username=flask.g.fas_user.username,
         exclude_groups=APP.config.get('EXCLUDE_GROUP_INDEX'),
-        fork=False, private=private)
+        fork=False, private=flask.g.fas_user.username)
+
     repos_length = pagure.lib.search_projects(
         SESSION,
         username=flask.g.fas_user.username,
         exclude_groups=APP.config.get('EXCLUDE_GROUP_INDEX'),
         fork=False,
-        count=True,
-        private=private)
+        count=True)
 
     forks = pagure.lib.search_projects(
         SESSION,
         username=flask.g.fas_user.username,
         fork=True,
-        private=private)
+        private=flask.g.fas_user.username)
+
     forks_length = pagure.lib.search_projects(
         SESSION,
         username=flask.g.fas_user.username,
         fork=True,
-        count=True,
-        private=private)
+        count=True)
 
     watch_list = pagure.lib.user_watch_list(
         SESSION,
@@ -185,10 +181,9 @@ def view_users(username=None):
 
     users = pagure.lib.search_user(SESSION, pattern=username)
 
+    private = False
     if authenticated():
         private = flask.g.fas_user.username
-    else:
-        private = False
 
     if len(users) == 1:
         flask.flash('Only one result found, redirecting you to it')
@@ -254,11 +249,10 @@ def view_projects(pattern=None, namespace=None):
         select = 'projects_forks'
     else:
         forks = False
+    private = False
 
     if authenticated():
         private = flask.g.fas_user.username
-    else:
-        private = False
 
     limit = APP.config['ITEM_PER_PAGE']
     start = limit * (page - 1)
@@ -322,10 +316,9 @@ def view_user(username):
     repo_start = limit * (repopage - 1)
     fork_start = limit * (forkpage - 1)
 
+    private = False
     if authenticated():
         private = flask.g.fas_user.username
-    else:
-        private = False
 
     repos = pagure.lib.search_projects(
         SESSION,
