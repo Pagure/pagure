@@ -433,6 +433,8 @@ def api():
         fork.api_pull_request_add_comment)
     api_pull_request_add_flag_doc = load_doc(fork.api_pull_request_add_flag)
 
+    api_new_project_doc = load_doc(project.api_new_project)
+
     api_version_doc = load_doc(api_version)
     api_users_doc = load_doc(api_users)
     api_view_user_doc = load_doc(user.api_view_user)
@@ -454,6 +456,7 @@ def api():
         version=__api_version__.split('.'),
         api_doc=APIDOC,
         projects=[
+            api_new_project_doc,
             api_git_tags_doc,
             api_projects_doc,
         ],
