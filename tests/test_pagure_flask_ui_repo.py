@@ -1426,6 +1426,13 @@ class PagureFlaskRepotests(tests.Modeltests):
             '<a class="active nav-link" href="/test/commits/master">'
             in output.data)
 
+        #View the commit when branch name is wrong, show the commit
+        output = self.app.get('/test/c/%s?branch=abcxyz' % commit.oid.hex)
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue(
+            '<a class="active nav-link" href="/test/commits/master">'
+            in output.data)
+
         # Add a fork of a fork
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
@@ -1472,6 +1479,13 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         #View the commit of the fork when branch name is provided
         output = self.app.get('/fork/pingou/test3/c/%s?branch=master' % commit.oid.hex)
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue(
+            '<a class="active nav-link" href="/fork/pingou/test3/commits/master">'
+            in output.data)
+
+        #View the commit of the fork when branch name is wrong
+        output = self.app.get('/fork/pingou/test3/c/%s?branch=abcxyz' % commit.oid.hex)
         self.assertEqual(output.status_code, 200)
         self.assertTrue(
             '<a class="active nav-link" href="/fork/pingou/test3/commits/master">'
