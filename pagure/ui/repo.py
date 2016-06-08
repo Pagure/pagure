@@ -81,7 +81,7 @@ def view_repo(repo, username=None, namespace=None):
 
     repo = pagure.lib.get_project(SESSION, repo, user=username)
 
-    if repo is None:
+    if not repo:
         flask.abort(404, 'Project not found')
 
     if repo.private and not is_repo_admin(repo):
@@ -893,7 +893,7 @@ def view_forks(repo, username=None, namespace=None):
     """
     repo = flask.g.repo
 
-    if repo is None:
+    if not repo:
         flask.abort(404, 'Project not found')
 
     if repo.private and not is_repo_admin(repo):
@@ -1144,6 +1144,7 @@ def update_project(repo, username=None, namespace=None):
             flask.url_for('auth_login', next=url))
 
     repo = flask.g.repo
+
     if not flask.g.repo_admin:
         flask.abort(
             403,
@@ -1714,9 +1715,10 @@ def add_user(repo, username=None, namespace=None):
     repo = flask.g.repo
 
     if not flask.g.repo_admin:
-        flask.abort(
-            403,
-            'You are not allowed to add users to this project')
+        flask.abort(404, 'Project not found')
+
+    if repo.private and not is_repo_admin(repo):
+        flask.abort(401, 'Forbidden')
 
     user_to_update = flask.request.args.get('user', '').strip()
     user_to_update_obj = None
@@ -2120,6 +2122,9 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
             403,
             'You are not allowed to change the settings for this project')
 
+    if repo.private and not is_repo_admin(repo):
+        flask.abort(401, 'Forbidden')
+
     user = pagure.lib.search_user(
         SESSION, username=flask.g.fas_user.username)
 
@@ -2234,7 +2239,7 @@ def view_docs(repo, username=None, filename=None, namespace=None):
     """
     repo = flask.g.repo
 
-    if repo.private and not is_repo_admin(repo):
+    if repo.private and not is_repo_admin(repo_obj):
         flask.abort(401, 'Forbidden')
 
     if not APP.config.get('DOC_APP_URL'):

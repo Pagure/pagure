@@ -42,14 +42,11 @@ def index():
     limit = APP.config['ITEM_PER_PAGE']
     start = limit * (page - 1)
 
-    private = False
-
     repos = pagure.lib.search_projects(
         SESSION,
         fork=False,
         start=start,
         limit=limit,
-        private=private,
         sort=sorting)
 
     num_repos = pagure.lib.search_projects(
@@ -107,7 +104,8 @@ def index_auth():
         username=flask.g.fas_user.username,
         exclude_groups=APP.config.get('EXCLUDE_GROUP_INDEX'),
         fork=False,
-        count=True)
+        count=True,
+        private=flask.g.fas_user.usernam)
 
     forks = pagure.lib.search_projects(
         SESSION,
@@ -119,7 +117,8 @@ def index_auth():
         SESSION,
         username=flask.g.fas_user.username,
         fork=True,
-        count=True)
+        count=True,
+        private=flask.g.fas_user.username)
 
     watch_list = pagure.lib.user_watch_list(
         SESSION,
