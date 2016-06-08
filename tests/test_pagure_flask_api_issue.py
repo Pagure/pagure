@@ -1247,10 +1247,6 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
 
         # Give `issue_change_status` to this token when `issue_comment`
         # is required
-        print [
-            (t.id, t.name)
-            for t in self.session.query(pagure.lib.model.ACL).all()
-        ]
         item = pagure.lib.model.TokenAcl(
             token_id='pingou_foo',
             acl_id=3,
