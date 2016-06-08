@@ -2239,7 +2239,7 @@ def view_docs(repo, username=None, filename=None, namespace=None):
     """
     repo = flask.g.repo
 
-    if repo.private and not is_repo_admin(repo_obj):
+    if repo_obj.private and not is_repo_admin(repo_obj):
         flask.abort(401, 'Forbidden')
 
     if not APP.config.get('DOC_APP_URL'):
@@ -2268,7 +2268,7 @@ def view_project_activity(repo, namespace=None):
 
     repo = flask.g.repo
 
-    if repo.private and not is_repo_admin(repo):
+    if repo_obj.private and not is_repo_admin(repo_obj):
         flask.abort(401, 'Forbidden')
 
     return flask.render_template(
