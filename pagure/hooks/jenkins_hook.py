@@ -14,7 +14,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from pagure.hooks import BaseHook, RequiredIf
 from pagure.lib.model import BASE, Project
 from pagure import get_repo_path
-from pagure import APP
+from pagure import APP, SESSION
 
 
 class PagureCI(BASE):
@@ -54,7 +54,6 @@ class PagureCI(BASE):
 
     def __init__(self):
         self.hook_token = uuid.uuid4().hex
-        self.display_name = 'Jenkins'
 
     def __repr__(self):
         return '<PagureCI {.name}>'.format(self)
@@ -74,7 +73,7 @@ def get_configs(project_name, service):
 
     :raises ConfigNotFound: when no configuration matches
     """
-    cfg = BASE.metadata.bind.query(PagureCI).filter(
+    cfg = SESSION.query(PagureCI).filter(
         service == project_name).all()
     if not cfg:
         raise ConfigNotFound(project_name)

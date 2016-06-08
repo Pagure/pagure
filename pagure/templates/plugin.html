@@ -21,7 +21,7 @@
   <div class="form-group">
     <label>Report results via
       <code>POST</code> to this URL</label>
-    <input class="form-control" readonly type="text" value="https://pagure.io{{ url_for('hook_finished', token= post_token) }}">
+    <input class="form-control" readonly type="text" value="{{app_url}}{{ url_for('hook_finished', token= post_token)}}">
   </div>
   {% endif %}
 

@@ -91,6 +91,8 @@ def view_plugin(repo, plugin, username=None, full=True):
     new = True
     post_token = None
     dbobj = plugin.db_object()
+    # Omit trailing '/'
+    app_url = APP.config['APP_URL'][:-1]
 
     if hasattr(repo, plugin.backref):
         dbobj = getattr(repo, plugin.backref)
@@ -133,6 +135,7 @@ def view_plugin(repo, plugin, username=None, full=True):
                 username=username,
                 plugin=plugin,
                 form=form,
+                app_url=app_url,
                 post_token=post_token,
                 fields=fields)
 
@@ -167,6 +170,7 @@ def view_plugin(repo, plugin, username=None, full=True):
         username=username,
         plugin=plugin,
         form=form,
+        app_url=app_url,
         post_token=post_token,
         fields=fields)
 
