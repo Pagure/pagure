@@ -633,3 +633,91 @@ def api_comment_issue(repo, issueid, username=None):
 
     jsonout = flask.jsonify(output)
     return jsonout
+
+
+@API.route('/<repo>/issue/<int:issueid>/assign', methods=['POST'])
+@API.route('/fork/<username>/<repo>/issue/<int:issueid>/assign', methods=['POST'])
+@api_login_required(acls=['issue_assign'])
+@api_method
+def api_assign_issue(repo, issueid, username=None):
+    """
+    Assign an issue
+    ---------------
+    Assign an issue to someone.
+
+    ::
+
+        POST /api/0/<repo>/issue/<issue id>/assign
+
+    ::
+
+        POST /api/0/fork/<username>/<repo>/issue/<issue id>/assign
+
+    Input
+    ^^^^^
+
+    +--------------+----------+---------------+---------------------------+
+    | Key          | Type     | Optionality   | Description               |
+    +==============+==========+===============+===========================+
+    | ``assignee`` | string   | Mandatory     | | The username of the user|
+    |              |          |               |   to assign the issue to. |
+    +--------------+----------+---------------+---------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "message": "Issue assigned"
+        }
+
+    """
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    output = {}
+
+    if repo is None:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    if not repo.settings.get('issue_tracker', True):
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.ETRACKERDISABLED)
+
+    if repo.fullname != flask.g.token.project.fullname:
+        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
+
+    issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
+
+    if issue is None or issue.project != repo:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOISSUE)
+
+    if issue.private and not is_repo_admin(repo) \
+            and (not api_authenticated() or
+                 not issue.user.user == flask.g.fas_user.username):
+        raise pagure.exceptions.APIError(
+            403, error_code=APIERROR.EISSUENOTALLOWED)
+
+    form = pagure.forms.AssigneIssueForm(csrf_enabled=False)
+    if form.validate_on_submit():
+        assignee = form.assignee.data
+        try:
+            # New comment
+            message = pagure.lib.add_issue_assignee(
+                SESSION,
+                issue=issue,
+                assignee=assignee,
+                user=flask.g.fas_user.username,
+                ticketfolder=APP.config['TICKETS_FOLDER'],
+            )
+            SESSION.commit()
+            output['message'] = message
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
+
+    else:
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
+
+    jsonout = flask.jsonify(output)
+    return jsonout

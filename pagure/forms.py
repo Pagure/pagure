@@ -262,6 +262,13 @@ class AddUserForm(wtf.Form):
     )
 
 
+class AssigneIssueForm(wtf.Form):
+    ''' Form to asiggn an user to an issue. '''
+    assignee = wtforms.TextField(
+        'Assignee <span class="error">*</span>',
+        [wtforms.validators.Required()]
+    )
+
 class AddGroupForm(wtf.Form):
     ''' Form to add a group to a project. '''
     group = wtforms.TextField(
