@@ -893,12 +893,6 @@ def view_forks(repo, username=None, namespace=None):
     """
     repo = flask.g.repo
 
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    if repo.private and not is_repo_admin(repo):
-        flask.abort(401, 'Forbidden')
-
     return flask.render_template(
         'forks.html',
         select='forks',
@@ -931,7 +925,6 @@ def view_tags(repo, username=None, namespace=None):
 
 
 @APP.route('/<repo>/upload/', methods=('GET', 'POST'))
-@APP.route('/<repo>/upload', methods=('GET', 'POST'))
 @APP.route('/<namespace>/<repo>/upload/', methods=('GET', 'POST'))
 @APP.route('/<namespace>/<repo>/upload', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/upload/', methods=('GET', 'POST'))
@@ -1196,9 +1189,6 @@ def update_priorities(repo, username=None, namespace=None):
             flask.url_for('auth_login', next=url))
 
     repo = flask.g.repo
-
-    if repo.private and not is_repo_admin(repo):
-        flask.abort(401, 'Forbidden')
 
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
@@ -1715,10 +1705,9 @@ def add_user(repo, username=None, namespace=None):
     repo = flask.g.repo
 
     if not flask.g.repo_admin:
-        flask.abort(404, 'Project not found')
-
-    if repo.private and not is_repo_admin(repo):
-        flask.abort(401, 'Forbidden')
+        flask.abort(
+            403,
+            'You are not allowed to add users to this project')
 
     user_to_update = flask.request.args.get('user', '').strip()
     user_to_update_obj = None
@@ -2239,9 +2228,6 @@ def view_docs(repo, username=None, filename=None, namespace=None):
     """
     repo = flask.g.repo
 
-    if repo_obj.private and not is_repo_admin(repo_obj):
-        flask.abort(401, 'Forbidden')
-
     if not APP.config.get('DOC_APP_URL'):
         flask.abort(404, 'This pagure instance has no doc server')
 
@@ -2267,9 +2253,6 @@ def view_project_activity(repo, namespace=None):
         flask.abort(404)
 
     repo = flask.g.repo
-
-    if repo_obj.private and not is_repo_admin(repo_obj):
-        flask.abort(401, 'Forbidden')
 
     return flask.render_template(
         'activity.html',
