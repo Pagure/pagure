@@ -92,6 +92,7 @@ class ContextInjector(logging.Filter):  # pragma: no cover
         record.url = '-'
         record.args = '-'
         record.form = '-'
+        record.username = '-'
         try:
             record.url = flask.request.url
         except RuntimeError:
@@ -105,6 +106,10 @@ class ContextInjector(logging.Filter):  # pragma: no cover
             if 'csrf_token' in record.form:
                 record.form['csrf_token'] = 'Was present, is cleaned up'
         except RuntimeError:
+            pass
+        try:
+            record.username = flask.g.fas_user.username
+        except:
             pass
 
         return True
@@ -161,6 +166,7 @@ Time:               %(asctime)s
 URL:    %(url)s
 args:   %(args)s
 form:   %(form)s
+user:   %(username)s
 
 
 Message:
