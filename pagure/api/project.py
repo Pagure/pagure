@@ -266,3 +266,83 @@ def api_new_project():
 
     jsonout = flask.jsonify(output)
     return jsonout
+
+
+@API.route('/fork/', methods=['POST'])
+@API.route('/fork', methods=['POST'])
+@api_login_required(acls=['fork_project'])
+@api_method
+def api_fork_project():
+    """
+    Fork a project
+    --------------------
+    Fork a project on this pagure instance.
+
+    ::
+
+        POST /api/0/<repo>/fork
+
+
+    Input
+    ^^^^^
+
+    +------------------+---------+--------------+---------------------------+
+    | Key              | Type    | Optionality  | Description               |
+    +==================+=========+==============+===========================+
+    | ``repo``         | string  | Mandatory    | | The name of the project |
+    |                  |         |              |   to fork.                |
+    +------------------+---------+--------------+---------------------------+
+    | ``username``     | string  | Optional     | | The username of the user|
+    |                  |         |              |   of the fork.            |
+    +------------------+---------+--------------+---------------------------+
+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "message": 'Repo "test" cloned to "pingou/test"'
+        }
+
+    """
+    output = {}
+
+    form = pagure.forms.ForkRepoForm(csrf_enabled=False)
+    if form.validate_on_submit():
+        repo = form.repo.data
+        username = form.username.data or None
+
+        repo = pagure.lib.get_project(SESSION, repo, user=username)
+        if repo is None:
+            raise pagure.exceptions.APIError(
+                404, error_code=APIERROR.ENOPROJECT)
+
+        try:
+            message = pagure.lib.fork_project(
+                SESSION,
+                user=flask.g.fas_user.username,
+                repo=repo,
+                gitfolder=APP.config['GIT_FOLDER'],
+                docfolder=APP.config['DOCS_FOLDER'],
+                ticketfolder=APP.config['TICKETS_FOLDER'],
+                requestfolder=APP.config['REQUESTS_FOLDER'],
+            )
+            SESSION.commit()
+            pagure.lib.git.generate_gitolite_acls()
+            output['message'] = message
+        except pagure.exceptions.PagureException as err:
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.ENOCODE, error=str(err))
+        except SQLAlchemyError as err:  # pragma: no cover
+            APP.logger.exception(err)
+            SESSION.rollback()
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.EDBERROR)
+    else:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ)
+
+    jsonout = flask.jsonify(output)
+    return jsonout
