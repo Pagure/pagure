@@ -193,6 +193,7 @@ BLACKLISTED_GROUPS = ['forks']
 
 ACLS = {
     'create_project': 'Create a new project',
+    'fork_project': 'Fork a project',
     'issue_assign': 'Assign issue to someone',
     'issue_create': 'Create a new ticket against this project',
     'issue_change_status': 'Change the status of a ticket of this project',
