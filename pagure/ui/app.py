@@ -106,7 +106,7 @@ def index_auth():
         exclude_groups=APP.config.get('EXCLUDE_GROUP_INDEX'),
         fork=False,
         count=True,
-        private=flask.g.fas_user.usernam)
+        private=flask.g.fas_user.username)
 
     forks = pagure.lib.search_projects(
         SESSION,
