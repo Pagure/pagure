@@ -253,11 +253,9 @@ def api_new_project():
             pagure.lib.git.generate_gitolite_acls()
             output['message'] = message
         except pagure.exceptions.PagureException as err:
-            print err, str(err)
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.ENOCODE, error=str(err))
         except SQLAlchemyError as err:  # pragma: no cover
-            print err
             APP.logger.exception(err)
             SESSION.rollback()
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
