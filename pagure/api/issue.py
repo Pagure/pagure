@@ -697,7 +697,7 @@ def api_assign_issue(repo, issueid, username=None):
         raise pagure.exceptions.APIError(
             403, error_code=APIERROR.EISSUENOTALLOWED)
 
-    form = pagure.forms.AssigneIssueForm(csrf_enabled=False)
+    form = pagure.forms.AssignIssueForm(csrf_enabled=False)
     if form.validate_on_submit():
         assignee = form.assignee.data
         try:
