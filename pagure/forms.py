@@ -269,6 +269,7 @@ class AssignIssueForm(wtf.Form):
         [wtforms.validators.Required()]
     )
 
+
 class AddGroupForm(wtf.Form):
     ''' Form to add a group to a project. '''
     group = wtforms.TextField(
