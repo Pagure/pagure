@@ -2965,7 +2965,7 @@ index 0000000..fb7093d
             output = self.app.post(
                 '/watch/test/settings/1', data=data, follow_redirects=True)
             self.assertIn(
-                '</button>\n                      From now you are'
+                '</button>\n                      You are now'
                 ' watching this repo.', output.data)
 
             item = pagure.lib.model.Project(
@@ -2987,7 +2987,7 @@ index 0000000..fb7093d
             output = self.app.post(
                 '/watch/fork/foo/test/settings/1', data=data, follow_redirects=True)
             self.assertIn(
-                '</button>\n                      From now you are'
+                '</button>\n                      You are now'
                 ' watching this repo.', output.data)
 
 if __name__ == '__main__':

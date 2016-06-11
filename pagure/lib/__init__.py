@@ -2779,7 +2779,7 @@ def update_watch_status(session, project, user, watch):
     session.add(watcher)
     session.flush()
 
-    msg_success = 'From now you are watching this repo.'
+    msg_success = 'You are now watching this repo.'
     if not int(watch):
         msg_success = 'You are no longer watching this repo.'
     return msg_success
