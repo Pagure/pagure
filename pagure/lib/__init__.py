@@ -1975,6 +1975,31 @@ def search_projects(
 
         projects = projects.union(sub_q2).union(sub_q3).union(sub_q4)
 
+    if private is False:
+        projects = projects.filter(
+            model.Project.private == False
+        )
+    elif username == private:
+        projects = projects.filter(
+            sqlalchemy.or_(
+                model.Project.private == False,
+                model.Project.private == True,
+            )
+        )
+    elif isinstance(private, basestring):
+        projects = projects.filter(
+                sqlalchemy.or_(
+                    model.Project.private == False,
+                    sqlalchemy.and_(
+                        model.User.user == private,
+                        model.User.id == model.ProjectUser.user_id,
+                        model.ProjectUser.project_id == model.Project.id,
+                        model.Project.private == True,
+                    )
+                )
+
+        )
+
     if fork is not None:
         if fork is True:
             projects = projects.filter(
@@ -2017,28 +2042,6 @@ def search_projects(
     ).filter(
         model.Project.id.in_(projects.subquery())
     )
-    if private is False:
-        query = query.filter(
-            model.Project.private == False
-        )
-    elif isinstance(private, basestring):
-        user2 = aliased(model.User)
-        query = query.filter(
-            sqlalchemy.or_(
-                model.Project.private == False,
-                sqlalchemy.and_(
-                    model.Project.private == True,
-                    model.Project.user_id == user2.id,
-                    user2.user == private,
-                    ),
-                sqlalchemy.and_(
-                    model.Project.private == True,
-                    model.Project.id == model.ProjectUser.project_id,
-                    model.ProjectUser.user_id == user2.id,
-                )
-            )
-        )
-
 
     if sort == 'latest':
         query = query.order_by(
