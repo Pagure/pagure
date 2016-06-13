@@ -314,6 +314,15 @@ def get_pull_request_ready_branch():
         if diff_commits:
             branches[branchname] = diff_commits
 
+    prs = pagure.lib.search_pull_requests(
+        pagure.SESSION,
+        project_id=repo.id,
+        status='Open'
+    )
+    for pr in prs:
+        if pr.branch_from in branches:
+            del(branches[pr.branch_from])
+
     return flask.jsonify(
         {
             'code': 'OK',
