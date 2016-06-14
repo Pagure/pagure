@@ -2303,15 +2303,6 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
 
         group = pagure.lib.search_groups(self.session, group_name='foo')
-        pagure.lib.set_up_user(
-            session=self.session,
-            username='foo',
-            fullname='foo bar',
-            default_email='foo@bar.com',
-            ssh_key=None,
-            keydir=None,
-        )
-        self.session.commit()
         pagure.lib.add_user_to_group(
             self.session,
             username='foo',
