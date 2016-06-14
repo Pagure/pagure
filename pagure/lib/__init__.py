@@ -1975,7 +1975,7 @@ def search_projects(
 
         projects = projects.union(sub_q2).union(sub_q3).union(sub_q4)
 
-    if  not private:
+    if not private:
         projects = projects.filter(
             model.Project.private == False
         )
