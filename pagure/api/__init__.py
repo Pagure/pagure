@@ -24,7 +24,7 @@ API = flask.Blueprint('api_ns', __name__, url_prefix='/api/0')
 
 import pagure
 import pagure.lib
-from pagure import __api_version__, APP, SESSION
+from pagure import __api_version__, APP, SESSION, authenticated
 from pagure.doc_utils import load_doc, modify_rst, modify_html
 from pagure.exceptions import APIError
 
@@ -80,11 +80,14 @@ def check_api_acls(acls, optional=False):
     ''' Checks if the user provided an API token with its request and if
     this token allows the user to access the endpoint desired.
     '''
-
     flask.g.token = None
     flask.g.user = None
     token = None
     token_str = None
+
+    if authenticated():
+        return
+
     if 'Authorization' in flask.request.headers:
         authorization = flask.request.headers['Authorization']
         if 'token' in authorization:
