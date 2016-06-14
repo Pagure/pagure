@@ -147,8 +147,12 @@
               {% else %}
                 unassigned
               {% endif %}
-              {% if authenticated and repo_admin %}
-              <button class="btn btn-sm pull-xs-right" title="assign this issue to you" onclick="$('#assignee').val('{{g.fas_user.username}}')">Take</button>
+              {% if authenticated and repo_admin
+                and (not issue.assignee or issue.assignee.username != g.fas_user.username) %}
+              <button class="btn btn-sm pull-xs-right" id="take-btn"
+                title="assign this issue to you">
+                  Take
+              </button>
               {% endif %}
             </div>
           </fieldset>
@@ -614,6 +618,25 @@ $( document ).ready(function() {
       }
     }
   );
+
+  {% if authenticated and repo_admin %}
+    $("#take-btn").click(function(){
+      var _url = "{{ url_for(
+        'api_ns.api_assign_issue', repo=repo.name, username=username, issueid=issueid
+        ) }}";
+      var _data = {assignee: "{{ g.fas_user.username }}"};
+      $.post( _url, _data ).done(
+        function(data) {
+          var _user_url = '\n<a href="{{ url_for("view_issues", repo=repo.name, username=username) }}'
+            + '?assignee={{ g.fas_user.username }}">'
+            + '{{ g.fas_user.username }}</a>';
+          $('#assignee_plain').html(_user_url);
+          $('#assignee').val("{{ g.fas_user.username }}");
+        }
+      )
+      return false;
+    });
+  {% endif %}
 
 });
 </script>
