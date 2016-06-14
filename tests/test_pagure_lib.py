@@ -2257,7 +2257,7 @@ class PagureLibtests(tests.Modeltests):
             watch='1',
         )
         self.session.commit()
-        self.assertEqual(msg, 'From now you are watching this repo.')
+        self.assertEqual(msg, 'You are now watching this repo.')
 
         # All good and when user selected unwatch option.
         msg = pagure.lib.update_watch_status(
@@ -2287,13 +2287,12 @@ class PagureLibtests(tests.Modeltests):
         # User does not exist
         user = tests.FakeUser()
         user.username = 'aavrug'
-        self.assertRaises(
-            pagure.exceptions.PagureException,
-            pagure.lib.is_watching,
+        watch = pagure.lib.is_watching(
             session=self.session,
             user=user,
             project=project,
         )
+        self.assertFalse(watch)
 
         pagure.lib.add_group_to_project(
             session=self.session,
@@ -2304,6 +2303,15 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
 
         group = pagure.lib.search_groups(self.session, group_name='foo')
+        pagure.lib.set_up_user(
+            session=self.session,
+            username='foo',
+            fullname='foo bar',
+            default_email='foo@bar.com',
+            ssh_key=None,
+            keydir=None,
+        )
+        self.session.commit()
         pagure.lib.add_user_to_group(
             self.session,
             username='foo',
@@ -2312,6 +2320,7 @@ class PagureLibtests(tests.Modeltests):
             is_admin=False,
         )
         self.session.commit()
+        group = pagure.lib.search_groups(self.session, group_name='foo')
 
         # If user belongs to any group of that project
         user.username = 'foo'
