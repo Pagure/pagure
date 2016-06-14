@@ -2784,17 +2784,16 @@ def update_watch_status(session, project, user, watch):
         msg_success = 'You are no longer watching this repo.'
     return msg_success
 
+
 def is_watching(session, user, project):
     ''' Check user watching the project. '''
 
     if user is None:
         return False
 
-    user = user.username
-    user_obj = __get_user(session, user)
+    user_obj = search_user(session, username=user.username)
     if not user_obj:
-        raise pagure.exceptions.PagureException(
-            'No user with username: %s' % user)
+        return False
 
     watcher = session.query(
         model.Watcher
@@ -2809,12 +2808,12 @@ def is_watching(session, user, project):
         return watcher.watch
 
     watch=False
-    if user == project.user.user:
+    if user.username == project.user.username:
         return True
 
     for group in project.groups:
         for guser in group.users:
-            if user == guser.username:
+            if user.username == guser.username:
                 watch=True
                 break
 
