@@ -332,9 +332,11 @@ class Project(BASE):
         backref="projects",
     )
 
-    unwatchers = relation("Watcher",
-                    primaryjoin="and_(Project.id==Watcher.project_id, "
-                        "Watcher.watch=='0')")
+    unwatchers = relation(
+        "Watcher",
+        primaryjoin="and_(Project.id==Watcher.project_id, "
+        "Watcher.watch=='0')"
+    )
 
     @property
     def path(self):
