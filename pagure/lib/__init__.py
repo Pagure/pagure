@@ -1975,11 +1975,11 @@ def search_projects(
 
         projects = projects.union(sub_q2).union(sub_q3).union(sub_q4)
 
-    if private is False:
+    if  not private:
         projects = projects.filter(
             model.Project.private == False
         )
-    elif username == private:
+    elif private == username:
         projects = projects.filter(
             sqlalchemy.or_(
                 model.Project.private == False,
