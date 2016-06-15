@@ -132,7 +132,7 @@ def view_repo(repo, username=None):
 
     watch = False
     if authenticated():
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
+        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
 
     return flask.render_template(
         'repo_info.html',
@@ -238,7 +238,7 @@ def view_repo_branch(repo, branchname, username=None):
 
     watch = False
     if authenticated():
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
+        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
 
     return flask.render_template(
         'repo_info.html',
@@ -355,7 +355,7 @@ def view_commits(repo, branchname=None, username=None):
 
     watch = False
     if authenticated():
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
+        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
 
     return flask.render_template(
         'commits.html',
@@ -475,7 +475,7 @@ def view_file(repo, identifier, filename, username=None):
 
     watch = False
     if authenticated():
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
+        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
 
     return (
             flask.render_template(
@@ -644,7 +644,7 @@ def view_commit(repo, commitid, username=None):
 
     watch = False
     if authenticated():
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
+        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
 
     return flask.render_template(
         'commit.html',
@@ -734,7 +734,7 @@ def view_tree(repo, identifier=None, username=None):
 
     watch = False
     if authenticated():
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
+        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
 
     return flask.render_template(
         'file.html',
@@ -767,7 +767,7 @@ def view_forks(repo, username=None):
 
     watch = False
     if authenticated():
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
+        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
 
     return flask.render_template(
         'forks.html',
@@ -798,7 +798,7 @@ def view_tags(repo, username=None):
 
     watch = False
     if authenticated():
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
+        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
 
     return flask.render_template(
         'releases.html',
@@ -855,7 +855,7 @@ def new_release(repo, username=None):
 
     watch = False
     if authenticated():
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
+        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
 
     return flask.render_template(
         'new_release.html',
@@ -939,7 +939,7 @@ def view_settings(repo, username=None):
 
     watch = False
     if authenticated():
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
+        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
 
     return flask.render_template(
         'settings.html',
@@ -1431,7 +1431,7 @@ def add_user(repo, username=None):
 
     watch = False
     if authenticated():
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
+        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
 
     return flask.render_template(
         'add_user.html',
@@ -1553,7 +1553,7 @@ def add_group_project(repo, username=None):
 
     watch = False
     if authenticated():
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
+        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
 
     return flask.render_template(
         'add_group_project.html',
@@ -1661,7 +1661,7 @@ def add_token(repo, username=None):
 
     watch = False
     if authenticated():
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
+        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
 
     return flask.render_template(
         'add_token.html',
@@ -1805,7 +1805,7 @@ def edit_file(repo, branchname, filename, username=None):
 
     watch = False
     if authenticated():
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
+        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
 
     return flask.render_template(
         'edit_file.html',
@@ -1877,7 +1877,7 @@ def view_docs(repo, username=None, filename=None):
 
     watch = False
     if authenticated():
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
+        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
 
     return flask.render_template(
         'docs.html',
@@ -1886,7 +1886,7 @@ def view_docs(repo, username=None, filename=None):
         username=username,
         filename=filename,
         endpoint='view_docs',
-        watch=watch2,
+        watch=watch,
     )
 
 
@@ -1906,7 +1906,7 @@ def view_project_activity(repo):
 
     watch = False
     if authenticated():
-        watch=pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
+        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
 
     return flask.render_template(
         'activity.html',
