@@ -1018,7 +1018,9 @@ def new_project(session, user, name, blacklist, allowed_prefix,
     else:
         temp_gitrepo_path = tempfile.mkdtemp(prefix='pagure-')
         temp_gitrepo = pygit2.init_repository(temp_gitrepo_path, bare=False)
-        author = pygit2.Signature(userobj.fullname, userobj.default_email)
+        author = pygit2.Signature(
+            userobj.fullname.encode('utf-8'),
+            userobj.default_email.encode('utf-8'))
         f = open(os.path.join(temp_gitrepo.workdir,"README.md"), 'w')
         f.write("# %s\n\n%s" % (name, description))
         f.close()
