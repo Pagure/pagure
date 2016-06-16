@@ -89,7 +89,6 @@ def view_plugin(repo, plugin, username=None, full=True):
     plugin = get_plugin(plugin)
     fields = []
     new = True
-    post_token = None
     dbobj = plugin.db_object()
 
     if hasattr(repo, plugin.backref):
