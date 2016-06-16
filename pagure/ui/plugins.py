@@ -91,7 +91,7 @@ def view_plugin(repo, plugin, username=None, full=True):
     new = True
     post_token = None
     dbobj = plugin.db_object()
-    
+
     if hasattr(repo, plugin.backref):
         dbobj = getattr(repo, plugin.backref)
 
@@ -99,9 +99,6 @@ def view_plugin(repo, plugin, username=None, full=True):
         if dbobj and len(dbobj) > 0:
             dbobj = dbobj[0]
             new = False
-            # hook_token of pagure shouldn't leak so to put a check on it
-            if hasattr(dbobj, "hook_token") and plugin.backref == "hook_pagure_ci":
-                post_token = dbobj.hook_token
         else:
             dbobj = plugin.db_object()
 
@@ -133,7 +130,6 @@ def view_plugin(repo, plugin, username=None, full=True):
                 username=username,
                 plugin=plugin,
                 form=form,
-                post_token=post_token,
                 fields=fields)
 
         if form.active.data:
@@ -167,19 +163,18 @@ def view_plugin(repo, plugin, username=None, full=True):
         username=username,
         plugin=plugin,
         form=form,
-        post_token=post_token,
         fields=fields)
 
 
-@APP.route('/hooks/<token>/build-finished', methods=['POST'])
-def hook_finished(token):
+@APP.route('/hooks/<repo_id>/build-finished', methods=['POST'])
+def hook_finished(repo_id):
     try:
         data = json.loads(flask.request.get_data())
         cfg = jenkins_hook.get_configs(
             data['name'], jenkins_hook.Service.JENKINS)[0]
         build_id = data['build']['number']
-        if token != cfg.hook_token:
-            raise ValueError('Token mismatch')
+        if repo_id != str(cfg.project_id):
+            raise ValueError('Project ID mismatch')
     except (TypeError, ValueError, KeyError, jenkins_hook.ConfigNotFound) as exc:
         APP.logger.error('Error processing jenkins notification', exc_info=exc)
         return ('Bad request...\n', 400, {'Content-Type': 'text/plain'})

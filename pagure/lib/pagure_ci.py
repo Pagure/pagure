@@ -56,20 +56,15 @@ def process_build(logger, cfg, build_id):
     # Comment in Pagure
     logger.info('Updating %s PR %d: %s', cfg.pagure_name, pr_id, result)
     try:
-        post_flag(logger, cfg.display_name, APP.config['APP_URL'], cfg.pagure_token,
-                  cfg.pagure_name, pr_id, result, url)
+        pagure_ci_flag(logger,
+                    username=cfg.display_name,
+                    repo=cfg.pagure_name,
+                    requestid=pr_id,
+                    result=result,
+                    url=url)
+
     except KeyError as exc:
         logger.warning('Unknown build status', exc_info=exc)
-
-
-def post_flag(logger, name, base, token, repo, pr, result, url):
-    comment, percent = {
-        'SUCCESS': ('Build successful', 100),
-        'FAILURE': ('Build failed', 0),
-    }[result]
-
-    pagure_ci_flag(logger, repo=repo, username=name, percent=percent, comment=comment,
-                   url=url, requestid=pr)
 
 
 def post_data(logger, *args, **kwargs):
@@ -80,7 +75,12 @@ def post_data(logger, *args, **kwargs):
                      resp.status_code, resp.text)
 
 
-def pagure_ci_flag(logger, repo, username, percent, comment, url, requestid):
+def pagure_ci_flag(logger, repo, username, url, result, requestid):
+
+    comment, percent = {
+        'SUCCESS': ('Build successful', 100),
+        'FAILURE': ('Build failed', 0),
+    }[result]
 
     repo = pagure.lib.get_project(SESSION, repo, user=None)
     output = {}

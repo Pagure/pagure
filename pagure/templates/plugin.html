@@ -17,11 +17,11 @@
                   ) }}" method="post">
   {{ plugin.description | markdown | noJS | safe }}
 
-  {% if post_token and (plugin.name == 'Pagure CI') %}
+  {% if plugin.name == 'Pagure CI' %}
   <div class="form-group">
     <label>Report results via
       <code>POST</code> to this URL</label>
-    <input class="form-control" readonly type="text" value="{{config.get('APP_URL')[:-1]}}{{ url_for('hook_finished', token= post_token)}}">
+    <input class="form-control" readonly type="text" value="{{config.get('APP_URL')[:-1]}}{{ url_for('hook_finished', repo_id=repo.id)}}">
   </div>
   {% endif %}
 

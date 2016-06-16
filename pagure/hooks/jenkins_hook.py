@@ -2,7 +2,6 @@
 
 
 import os
-import uuid
 
 import sqlalchemy as sa
 import pygit2
@@ -38,10 +37,6 @@ class PagureCI(BASE):
     jenkins_url = sa.Column(sa.String(255), nullable=False,
                             default='http://jenkins.fedorainfracloud.org/')
     jenkins_token = sa.Column(sa.String(64))
-    hook_token = sa.Column(sa.String(64),
-                           nullable=True,
-                           unique=True,
-                           index=True)
 
     project = relation(
         'Project',
@@ -51,9 +46,6 @@ class PagureCI(BASE):
             'hook_pagure_ci', cascade="delete, delete-orphan",
             single_parent=True)
     )
-
-    def __init__(self):
-        self.hook_token = uuid.uuid4().hex
 
     def __repr__(self):
         return '<PagureCI {.name}>'.format(self)
