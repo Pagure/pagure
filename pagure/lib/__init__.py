@@ -1011,7 +1011,7 @@ def new_project(session, user, name, blacklist, allowed_prefix,
     )
     session.add(project)
     # Make sure we won't have SQLAlchemy error before we create the repo
-    session.commit()
+    session.flush()
 
     if not add_readme:
         pygit2.init_repository(gitrepo, bare=True)
@@ -1066,6 +1066,9 @@ def new_project(session, user, name, blacklist, allowed_prefix,
     pygit2.init_repository(
         requestrepo, bare=True,
         mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
+
+    #create the project in the db
+    session.commit()
 
     pagure.lib.notify.log(
         project,
