@@ -188,7 +188,9 @@ $(function() {
     function(event, ui) {
       if ($( "#previewinmarkdown" ).hasClass("inactive")){
         var _text = $( "#issue_content" ).val();
-        var _url = "{{ url_for('markdown_preview') }}";
+        var _url = "{{ url_for('markdown_preview',
+                        user=repo.user.user if repo.is_fork,
+                        repo=repo.name) | safe}}";
         $.ajax({
           url: _url ,
           type: 'POST',
