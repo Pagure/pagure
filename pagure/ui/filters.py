@@ -413,7 +413,7 @@ def text_wraps(dictionary):
 
 @APP.template_filter('unicode')
 def convert_unicode(text):
-    if isinstance(text, basestring):
+    if isinstance(text, str):
         return text.decode("utf8")
     else:
         return text

@@ -385,7 +385,8 @@ def __get_file_in_tree(repo_obj, tree, filepath, bail_on_tree=False):
     if isinstance(tree, pygit2.Blob):
         return
     for entry in tree:
-        if entry.name == filename:
+        fname = entry.name.decode('utf-8')
+        if fname == filename:
             if len(filepath) == 1:
                 blob = repo_obj.get(entry.id)
                 # If we can't get the content (for example: an empty folder)
