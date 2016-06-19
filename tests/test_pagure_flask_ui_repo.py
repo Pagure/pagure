@@ -1191,7 +1191,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 output.data)
             self.assertIn(
                 '<span style="color: #800080; font-weight: bold">' +
-                '@@ -1,1 +1,3 @@</span>',
+                '@@ -1,1 +1,2 @@</span>',
                 output.data)
             self.assertIn(
                 '<span style="color: #00A000">+ Row 0</span>', output.data)
@@ -1204,6 +1204,11 @@ class PagureFlaskRepotests(tests.Modeltests):
                 'class="label label-default label-pill hidden-sm-down">' +
                 '\n        3\n      </span>',
                 output.data)
+            self.assertIn(
+                'title="View file as of 4829cf">Šource</a>', output.data)
+            self.assertIn(
+                '<div><small>file added</small></div></h5>', output.data)
+
             # View inverse commits comparison
             output = self.app.get(
                 '/test/c/%s..%s' % (c3.oid.hex, c1.oid.hex))
@@ -1217,20 +1222,24 @@ class PagureFlaskRepotests(tests.Modeltests):
                 output.data)
             self.assertIn(
                 '<span style="color: #800080; font-weight: bold">' +
-                '@@ -1,3 +1,1 @@</span>',
+                '@@ -1,2 +1,1 @@</span>',
                 output.data)
             self.assertIn(
                 '<span style="color: #a40000">- Row 0</span>',
                 output.data)
             self.assertEqual(
                 output.data.count(
-                    '<span style="color: #a40000">- Row 0</span>'), 2)
+                    '<span style="color: #a40000">- Row 0</span>'), 1)
             self.assertIn(
                 '<span class="hidden-sm-down">Commits&nbsp;</span>\n      ' +
                 '<span ' +
                 'class="label label-default label-pill hidden-sm-down">' +
                 '\n        3\n      </span>',
                 output.data)
+            self.assertIn(
+                'title="View file as of 000000">Šource</a>', output.data)
+            self.assertIn(
+                '<div><small>file removed</small></div></h5>', output.data)
 
         output = self.app.get('/foo/bar')
         # No project registered in the DB

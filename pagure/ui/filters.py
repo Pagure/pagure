@@ -99,7 +99,7 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
                         'cnt': '%s_%s' % (index, cnt),
                         'cnt_lbl': cnt,
                         'img': flask.url_for('static', filename='users.png'),
-                        'filename': filename,
+                        'filename': filename.decode('UTF-8'),
                         'commit': commit,
                         'tree_id': tree_id,
                     }
