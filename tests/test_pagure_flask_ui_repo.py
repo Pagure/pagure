@@ -1261,7 +1261,8 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         # Add one more commit to git repo
         tests.add_commit_git_repo(
-            os.path.join(tests.HERE, 'test.git'), ncommits=1)
+            os.path.join(tests.HERE, 'test.git'),
+            ncommits=1, filename='Šource')
         c3 = repo.revparse_single('HEAD')
 
         compare_first_two(c1, c2)
