@@ -431,7 +431,7 @@ Dev instance: http://209.132.184.222/ (/!\\ May change unexpectedly, it's a dev 
     shutil.rmtree(newfolder)
 
 
-def add_commit_git_repo(folder, ncommits=10):
+def add_commit_git_repo(folder, ncommits=10, filename='sources'):
     """ Create some more commits for the specified git repo. """
     if not os.path.exists(folder):
         os.makedirs(folder)
@@ -442,9 +442,9 @@ def add_commit_git_repo(folder, ncommits=10):
 
     for index in range(ncommits):
         # Create a file in that git repo
-        with open(os.path.join(newfolder, 'sources'), 'a') as stream:
+        with open(os.path.join(newfolder, filename), 'a') as stream:
             stream.write('Row %s\n' % index)
-        repo.index.add('sources')
+        repo.index.add(filename)
         repo.index.write()
 
         parents = []
@@ -466,7 +466,7 @@ def add_commit_git_repo(folder, ncommits=10):
             'refs/heads/master',  # the name of the reference to update
             author,
             committer,
-            'Add row %s to sources file' % index,
+            'Add row %s to %s file' % (index, filename),
             # binary string representing the tree object ID
             tree,
             # list of binary strings representing parents of the new commit
