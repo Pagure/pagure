@@ -1371,6 +1371,21 @@ class PagureFlaskRepotests(tests.Modeltests):
         output = self.app.get('/test/blob/master/f/folder1/testfoo.jpg')
         self.assertEqual(output.status_code, 404)
 
+        # View file with a non-ascii name
+        tests.add_commit_git_repo(
+            os.path.join(tests.HERE, 'test.git'),
+            ncommits=1, filename='Šource')
+        output = self.app.get('/test/blob/master/f/Šource')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('</span>&nbsp; Šource', output.data)
+        self.assertIn('<table class="code_table">', output.data)
+        self.assertIn(
+            '<tr><td class="cell1"><a id="_1" href="#_1" '
+            'data-line-number="1"></a></td>', output.data)
+        self.assertIn(
+            '<td class="cell2"><pre><span></span>Row 0</pre></td>',
+            output.data)
+
         # Add a fork of a fork
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
