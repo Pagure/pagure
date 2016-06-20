@@ -26,6 +26,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         super(PagurePrivateRepotest, self).setUp()
 
         pagure.APP.config['TESTING'] = True
+        pagure.APP.config['DATAGREPPER_URL'] = None
         pagure.SESSION = self.session
         pagure.ui.SESSION = self.session
         pagure.ui.app.SESSION = self.session
@@ -84,9 +85,9 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         user = tests.FakeUser(username='foo')
         with tests.user_set(pagure.APP, user):
-            output = self.app.get('/?repopage=abc&forkpage=def')
+            output = self.app.get('/')
             self.assertIn(
-                'Projects <span class="label label-default">2</span>',
+                'My Projects <span class="label label-default">2</span>',
                 output.data)
             self.assertIn(
                 'Forks <span class="label label-default">0</span>',
@@ -133,7 +134,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.gitrepos = tests.create_projects_git(
             pagure.APP.config['GIT_FOLDER'])
 
-        output = self.app.get('/user/foo?repopage=abc&forkpage=def')
+        output = self.app.get('/user/foo')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             'Projects <span class="label label-default">1</span>',
@@ -143,7 +144,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         user = tests.FakeUser(username='foo')
         with tests.user_set(pagure.APP, user):
-            output = self.app.get('/user/foo?repopage=abc&forkpage=def')
+            output = self.app.get('/user/foo')
             self.assertIn(
                 'Projects <span class="label label-default">2</span>',
                 output.data)
@@ -157,7 +158,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         user.username='pingou'
         with tests.user_set(pagure.APP, user):
-            output = self.app.get('/user/foo?repopage=abc&forkpage=def')
+            output = self.app.get('/user/foo')
             self.assertIn(
                 'Projects <span class="label label-default">1</span>',
                 output.data)
@@ -168,6 +169,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                 output.data.count('<p>No group found</p>'), 1)
             self.assertEqual(
                 output.data.count('<div class="card-header">'), 3)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagurePrivateRepotest)

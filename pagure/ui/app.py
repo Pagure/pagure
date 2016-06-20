@@ -182,7 +182,7 @@ def view_users(username=None):
     users = pagure.lib.search_user(SESSION, pattern=username)
 
     private = False
-    if authenticated():
+    if authenticated() and username == flask.g.fas_user.username:
         private = flask.g.fas_user.username
 
     if len(users) == 1:
@@ -317,7 +317,7 @@ def view_user(username):
     fork_start = limit * (forkpage - 1)
 
     private = False
-    if authenticated():
+    if authenticated() and username == flask.g.fas_user.username:
         private = flask.g.fas_user.username
 
     repos = pagure.lib.search_projects(
