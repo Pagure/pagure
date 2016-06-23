@@ -441,7 +441,16 @@ def get_branches_of_commit():
         response.status_code = 404
         return response
 
-    reponame = pagure.get_repo_path(repo)
+    reponame = os.path.join(pagure.APP.config['GIT_FOLDER'], repo.path)
+
+    if not os.path.exists(reponame):
+        response = flask.jsonify({
+            'code': 'ERROR',
+            'message': 'No git repo found with the information provided',
+        })
+        response.status_code = 404
+        return response
+
     repo_obj = pygit2.Repository(reponame)
 
     branches = []
