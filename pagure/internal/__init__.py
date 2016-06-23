@@ -504,6 +504,6 @@ def get_branches_of_commit():
     return flask.jsonify(
         {
             'code': 'OK',
-            'message': branches,
+            'branches': branches,
         }
     )

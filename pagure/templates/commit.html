@@ -164,15 +164,15 @@
         },
         dataType: 'json',
         success: function(res) {
-            if (res.message.length == 0){
+            if (res.branches.length == 0){
                 return;
             }
             var _br = '';
-            for (var i = 0; i < res.message.length; ++i) {
+            for (var i = 0; i < res.branches.length; ++i) {
                 if (_br.length > 0){
                     _br += ', ';
                 }
-                _br += res.message[i]
+                _br += res.branches[i]
             }
             var el = $('#diff-file-1');
             if (!el){
