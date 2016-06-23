@@ -175,6 +175,9 @@
                 _br += res.message[i]
             }
             var el = $('#diff-file-1');
+            if (!el){
+                return;
+            }
             el.before(
                 '<div class=""><span class="oi" data-glyph="fork"></span> '
                 + _br + '</div>');
