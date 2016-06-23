@@ -453,6 +453,16 @@ def get_branches_of_commit():
 
     repo_obj = pygit2.Repository(reponame)
 
+    try:
+        commit_id in repo_obj
+    except:
+        response = flask.jsonify({
+            'code': 'ERROR',
+            'message': 'This commit could not be found in this repo',
+        })
+        response.status_code = 404
+        return response
+
     branches = []
     if not repo_obj.head_is_unborn:
         compare_branch = repo_obj.lookup_branch(
