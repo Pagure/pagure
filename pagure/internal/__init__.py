@@ -403,3 +403,88 @@ def get_ticket_template(repo, username=None):
         })
         response.status_code = 404
     return response
+
+
+@PV.route('/branches/commit/', methods=['POST'])
+@localonly
+def get_branches_of_commit():
+    """ Return the list of branches that have the specified commit in
+    """
+    form = pagure.forms.ConfirmationForm()
+    if not form.validate_on_submit():
+        response = flask.jsonify({
+            'code': 'ERROR',
+            'message': 'Invalid input submitted',
+        })
+        response.status_code = 400
+        return response
+
+    commit_id = flask.request.form.get('commit_id', '').strip() or None
+    if not commit_id:
+        response = flask.jsonify({
+            'code': 'ERROR',
+            'message': 'No commit id submitted',
+        })
+        response.status_code = 400
+        return response
+
+    repo = pagure.lib.get_project(
+        pagure.SESSION,
+        flask.request.form.get('repo', '').strip() or None,
+        user=flask.request.form.get('repouser', '').strip() or None)
+
+    if not repo:
+        response = flask.jsonify({
+            'code': 'ERROR',
+            'message': 'No repo found with the information provided',
+        })
+        response.status_code = 404
+        return response
+
+    reponame = pagure.get_repo_path(repo)
+    repo_obj = pygit2.Repository(reponame)
+
+    branches = []
+    if not repo_obj.head_is_unborn:
+        compare_branch = repo_obj.lookup_branch(
+            repo_obj.head.shorthand)
+    else:
+        compare_branch = None
+
+    for branchname in repo_obj.listall_branches():
+        branch = repo_obj.lookup_branch(branchname)
+
+        diff_commits = []
+
+        if not repo_obj.is_empty and repo_obj.listall_branches() > 1:
+
+
+            merge_commit = None
+
+            if compare_branch:
+                merge_commit = repo_obj.merge_base(
+                    compare_branch.get_object().hex,
+                    branch.get_object().hex
+                ).hex
+
+            repo_commit = repo_obj[branch.get_object().hex]
+
+            for commit in repo_obj.walk(
+                    repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
+                if commit.oid.hex == merge_commit:
+                    break
+                if commit.oid.hex == commit_id:
+                    branches.append(branchname)
+                    break
+
+    # If we didn't find the commit in any branch and there is one, then it
+    # is in the default branch.
+    if not branches and compare_branch:
+        branches.append(compare_branch.branch_name)
+
+    return flask.jsonify(
+        {
+            'code': 'OK',
+            'message': branches,
+        }
+    )
