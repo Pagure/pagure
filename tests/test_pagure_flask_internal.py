@@ -812,6 +812,190 @@ class PagureFlaskInternaltests(tests.Modeltests):
             js_data = json.loads(output.data)
             self.assertDictEqual(js_data, exp)
 
+    def test_get_branches_of_commit(self):
+        ''' Test the get_branches_of_commit from the internal API. '''
+        tests.create_projects(self.session)
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/adduser')
+            csrf_token = output.data.split(
+                b'name="csrf_token" type="hidden" value="')[1].split(b'">')[0]
+
+        # No CSRF token
+        data = {
+            'repo': 'fakerepo',
+            'commit_id': 'foo',
+        }
+        output = self.app.post('/pv/branches/commit/', data=data)
+        self.assertEqual(output.status_code, 400)
+        js_data = json.loads(output.data.decode('utf-8'))
+        self.assertDictEqual(
+            js_data,
+            {u'code': u'ERROR', u'message': u'Invalid input submitted'}
+        )
+
+        # Invalid repo
+        data = {
+            'repo': 'fakerepo',
+            'commit_id': 'foo',
+            'csrf_token': csrf_token,
+        }
+        output = self.app.post('/pv/branches/commit/', data=data)
+        self.assertEqual(output.status_code, 404)
+        js_data = json.loads(output.data.decode('utf-8'))
+        self.assertDictEqual(
+            js_data,
+            {
+                u'code': u'ERROR',
+                u'message': u'No repo found with the information provided'
+            }
+        )
+
+        # Rigth repo, no commit
+        data = {
+            'repo': 'test',
+            'csrf_token': csrf_token,
+        }
+
+        output = self.app.post('/pv/branches/commit/', data=data)
+        self.assertEqual(output.status_code, 400)
+        js_data = json.loads(output.data.decode('utf-8'))
+        self.assertDictEqual(
+            js_data,
+            {u'code': u'ERROR', u'message': u'No commit id submitted'}
+        )
+
+        # Request is fine, but git repo doesn't exist
+        data = {
+            'repo': 'test',
+            'commit_id': 'foo',
+            'csrf_token': csrf_token,
+        }
+        output = self.app.post('/pv/branches/commit/', data=data)
+        self.assertEqual(output.status_code, 404)
+        js_data = json.loads(output.data.decode('utf-8'))
+        self.assertDictEqual(
+            js_data,
+            {
+                u'code': u'ERROR',
+                u'message': u'No git repo found with the information provided'
+            }
+        )
+
+        # Create a git repo to play with
+        gitrepo = os.path.join(tests.HERE, 'test.git')
+        self.assertFalse(os.path.exists(gitrepo))
+        os.makedirs(gitrepo)
+        repo = pygit2.init_repository(gitrepo)
+
+        # Create a file in that git repo
+        with open(os.path.join(gitrepo, 'sources'), 'w') as stream:
+            stream.write('foo\n bar')
+        repo.index.add('sources')
+        repo.index.write()
+
+        # Commits the files added
+        tree = repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        repo.create_commit(
+            'refs/heads/master',  # the name of the reference to update
+            author,
+            committer,
+            'Add sources file for testing',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            []
+        )
+
+        first_commit = repo.revparse_single('HEAD')
+
+        # Edit the sources file again
+        with open(os.path.join(gitrepo, 'sources'), 'w') as stream:
+            stream.write('foo\n bar\nbaz\n boose')
+        repo.index.add('sources')
+        repo.index.write()
+
+        # Commits the files added
+        tree = repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        repo.create_commit(
+            'refs/heads/feature',  # the name of the reference to update
+            author,
+            committer,
+            'Add baz and boose to the sources\n\n There are more objects to '
+            'consider',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            [first_commit.oid.hex]
+        )
+
+        # Create another file in the master branch
+        with open(os.path.join(gitrepo, '.gitignore'), 'w') as stream:
+            stream.write('*~')
+        repo.index.add('.gitignore')
+        repo.index.write()
+
+        # Commits the files added
+        tree = repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        commit_hash = repo.create_commit(
+            'refs/heads/feature_branch',  # the name of the reference to update
+            author,
+            committer,
+            'Add .gitignore file for testing',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            [first_commit.oid.hex]
+        )
+
+        # All good but the commit id
+        data = {
+            'repo': 'test',
+            'commit_id': 'foo',
+            'csrf_token': csrf_token,
+        }
+        output = self.app.post('/pv/branches/commit/', data=data)
+        self.assertEqual(output.status_code, 404)
+        js_data = json.loads(output.data.decode('utf-8'))
+        self.assertDictEqual(
+            js_data,
+            {
+                u'code': u'ERROR',
+                u'message': 'This commit could not be found in this repo'
+            }
+        )
+
+        # All good
+        data = {
+            'repo': 'test',
+            'commit_id': commit_hash,
+            'csrf_token': csrf_token,
+        }
+        output = self.app.post('/pv/branches/commit/', data=data)
+        self.assertEqual(output.status_code, 200)
+        js_data = json.loads(output.data.decode('utf-8'))
+        self.assertDictEqual(
+            js_data,
+            {
+                u'code': u'OK',
+                u'branches': ['feature_branch'],
+            }
+        )
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
