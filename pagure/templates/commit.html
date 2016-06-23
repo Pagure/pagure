@@ -153,5 +153,32 @@
           $('#diff_list').toggle();
         });
       });
+      $.ajax({
+        url: '{{ url_for("internal_ns.get_branches_of_commit") }}' ,
+        type: 'POST',
+        data: {
+          repo: "{{ repo.name }}",
+          repouser: "{{ repo.user.user if repo.is_fork else '' }}",
+          commit_id: "{{ commitid }}",
+          csrf_token: "{{ form.csrf_token.current_token }}",
+        },
+        dataType: 'json',
+        success: function(res) {
+            if (res.message.length == 0){
+                return;
+            }
+            var _br = '';
+            for (var i = 0; i < res.message.length; ++i) {
+                if (_br.length > 0){
+                    _br += ', ';
+                }
+                _br += res.message[i]
+            }
+            var el = $('#diff-file-1');
+            el.before(
+                '<div class=""><span class="oi" data-glyph="fork"></span> '
+                + _br + '</div>');
+        }
+      });
     </script>
 {% endblock %}

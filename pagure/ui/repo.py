@@ -728,6 +728,7 @@ def view_commit(repo, commitid, username=None):
         commit=commit,
         diff=diff,
         watch=watch,
+        form=pagure.forms.ConfirmationForm(),
     )
 
 
