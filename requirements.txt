@@ -11,6 +11,7 @@ enum34
 flask
 flask-wtf
 flask-multistatic
+python-gnupg
 kitchen
 markdown
 munch

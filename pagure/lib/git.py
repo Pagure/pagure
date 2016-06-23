@@ -11,6 +11,7 @@
 
 import datetime
 import hashlib
+import gnupg
 import json
 import os
 import shutil
@@ -1243,6 +1244,56 @@ def get_git_tags(project):
     return tags
 
 
+def _check_signature(message, signature):
+    """ This function performs the actual signature checking. """
+    gpg = gnupg.GPG(gnupghome=pagure.APP.config['GPG_HOMEDIR'],
+                    gpgbinary=pagure.APP.config['GPG_BINARY'])
+    with tempfile.NamedTemporaryFile() as sigfile:
+        sigfile.write(signature)
+        sigfile.flush()
+        verified = gpg.verify_data(sigfile.name, message)
+        return {'valid': verified.valid,
+                'signer': verified.username,
+                'keyid': verified.key_id}
+    return None
+
+
+def check_signature(raw, is_simple):
+    """ Returns signature state.
+
+    is_simple is a flag whether this is a simple signature (case with tags)
+    where the signature is just at the end of the raw string, or if it's a
+    complicated (case with commit) format where we need to parse it."""
+    if not 'BEGIN PGP SIGNATURE' in raw:
+        return None
+
+    if is_simple:
+        message, line, sig = raw.partition('-----BEGIN PGP SIGNATURE-----')
+        sig = line + sig
+    else:
+        message = ''
+        sig = ''
+        in_sig = False
+        for line in raw.split('\n'):
+            if line.startswith('gpgsig -----BEGIN PGP SIGNATURE-----'):
+                in_sig = True
+            if in_sig:
+                # The lines are all indented with a single space, remove those
+                # We also remove the remaining part of the "gpgsig" indicator
+                sig += line[1:].replace('pgsig ', '')
+                sig += '\n'
+            else:
+                message += line
+                message += '\n'
+
+            if in_sig and line.startswith(' -----END PGP SIGNATURE-----'):
+                in_sig = False
+        # Remove the final newline, which is duplicate and breaks signature
+        message = message[:-1]
+
+    return _check_signature(message, sig)
+
+
 def get_git_tags_objects(project):
     """ Returns the list of references of the tags created in the git
     repositorie the specified project.
@@ -1278,6 +1329,8 @@ def get_git_tags_objects(project):
                         '-----BEGIN PGP SIGNATURE-----', 1)[0].strip()
                 tags[commit_time]["head_msg"] = head_msg
                 tags[commit_time]["body_msg"] = body_msg
+                tags[commit_time]["signed"] = check_signature(
+                    tags[commit_time]["object"].read_raw(), True)
     sorted_tags = []
 
     for tag in sorted(tags, reverse=True):

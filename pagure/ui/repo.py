@@ -723,6 +723,9 @@ def view_commit(repo, commitid, username=None):
         # First commit in the repo
         diff = commit.tree.diff_to_tree(swap=True)
 
+    # Get signature info
+    signature = pagure.lib.git.check_signature(commit.read_raw(), False)
+
     return flask.render_template(
         'commit.html',
         select='commits',
@@ -734,6 +737,7 @@ def view_commit(repo, commitid, username=None):
         commit=commit,
         diff=diff,
         form=pagure.forms.ConfirmationForm(),
+        signature=signature,
     )
 
 

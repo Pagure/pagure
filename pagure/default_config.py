@@ -206,6 +206,10 @@ ALLOWED_PREFIX = []
 # List of blacklisted group names
 BLACKLISTED_GROUPS = ['forks']
 
+# GnuPG configuration
+GPG_BINARY = 'gpg2'
+GPG_HOMEDIR = 'gpghome'
+
 
 ACLS = {
     'create_project': 'Create a new project',
