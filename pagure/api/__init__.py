@@ -271,7 +271,13 @@ def api_users():
     return flask.jsonify(
         {
             'total_users': len(users),
-            'users': [user.username for user in users]
+            'users': [user.username for user in users],
+            'mention': [{
+                'username': user.username,
+                'name': user.fullname,
+                'image': pagure.lib.avatar_url_from_openid(user.default_email,
+                                                           size=32)
+            } for user in users]
         }
     )
 

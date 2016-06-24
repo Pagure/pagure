@@ -18,7 +18,9 @@
 {% block header %}
 <link href="{{ url_for('static', filename='emoji/emojione.sprites.css') }}"
   rel="stylesheet" />
-  <link href="{{ url_for('static', filename='selectize.bootstrap3.css') }}"
+<link href="{{ url_for('static', filename='selectize.bootstrap3.css') }}"
+  rel="stylesheet" />
+<link href="{{ url_for('static', filename='mention/recommended-styles.css') }}"
   rel="stylesheet" />
 {% endblock %}
 
@@ -749,6 +751,8 @@
     src="{{ url_for('static', filename='emoji/emojione.min.js') }}">
 </script>
 <script src="{{ url_for('static', filename='selectize.min.js') }}" type="text/javascript"> </script>
+<script type="text/javascript" src="{{ url_for('static', filename='mention/mention.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='mention/bootstrap-typeahead.js') }}"></script>
 
 <script type="text/javascript">
 function cancel_edit_btn() {
@@ -1182,6 +1186,13 @@ $(document).ready(function () {
       }
     }
   );
+  $.get("{{ url_for('api_ns.api_users') }}", {
+    pattern: '*'
+  }).done(function(resp) {
+    $("#comment").mention({
+      data: resp['mention']
+    });
+  });
   {% endif %}
 
 } );

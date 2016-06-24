@@ -11,6 +11,8 @@
   rel="stylesheet" />
 <link href="{{ url_for('static', filename='selectize.bootstrap3.css') }}"
   rel="stylesheet" />
+<link href="{{ url_for('static', filename='mention/recommended-styles.css') }}"
+  rel="stylesheet" />
 {% endblock %}
 
 {% block repo %}
@@ -259,6 +261,9 @@
 </script>
 
 <script type="text/javascript" src="{{ url_for('static', filename='selectize.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='mention/mention.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='mention/bootstrap-typeahead.js') }}"></script>
+
 <script type="text/javascript">
 
 {% if authenticated and form %}
@@ -269,6 +274,13 @@ $(document).ready(function() {
   // Set up the handler for the file input box.
   $("#file-picker").on("change", function() {
     doUpload("{{ form.csrf_token.current_token }}", this.files);
+  });
+  $.get("{{ url_for('api_ns.api_users') }}", {
+    pattern: '*'
+  }).done(function(resp) {
+    $("#comment").mention({
+      users: resp['mention']
+    });
   });
 });
 {% endif %}
@@ -464,6 +476,8 @@ function try_async_comment(form) {
 {% endif %}
 <script type="text/javascript">
 $( document ).ready(function() {
+
+
   var emojiStrategy;
   $.getJSON(
     '{{ url_for("static", filename="emoji/emoji_strategy.json") }}',
