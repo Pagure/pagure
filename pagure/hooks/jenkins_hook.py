@@ -30,9 +30,8 @@ class PagureCI(BASE):
 
     active = sa.Column(sa.Boolean, nullable=False, default=False)
     display_name = sa.Column(sa.String(64), nullable=False, default='Jenkins')
-    name = sa.Column(sa.String(64))
     pagure_name = sa.Column(sa.String(255))
-
+    
     jenkins_name = sa.Column(sa.String(255))
     jenkins_url = sa.Column(sa.String(255), nullable=False,
                             default='http://jenkins.fedorainfracloud.org/')
@@ -46,10 +45,6 @@ class PagureCI(BASE):
             'hook_pagure_ci', cascade="delete, delete-orphan",
             single_parent=True)
     )
-
-    def __repr__(self):
-        return '<PagureCI {.name}>'.format(self)
-
 
 class ConfigNotFound(Exception):
     pass
@@ -75,9 +70,6 @@ def get_configs(project_name, service):
 class JenkinsForm(wtf.Form):
 
     '''Form to configure Jenkins hook'''
-    name = TextField('Name',
-                     [validators.Required(),
-                      validators.Length(max=64)])
 
     pagure_name = TextField('Name of project in Pagure',
                             [validators.Required(),
@@ -108,7 +100,7 @@ class PagureCiHook(BaseHook):
     db_object = PagureCI
     backref = 'hook_pagure_ci'
     form_fields = [
-        'name', 'pagure_name', 'jenkins_name',
+        'pagure_name', 'jenkins_name',
         'jenkins_url', 'jenkins_token', 'active'
     ]
 
