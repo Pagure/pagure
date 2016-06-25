@@ -441,9 +441,9 @@ def get_branches_of_commit():
         response.status_code = 404
         return response
 
-    reponame = os.path.join(pagure.APP.config['GIT_FOLDER'], repo.path)
+    repopath = os.path.join(pagure.APP.config['GIT_FOLDER'], repo.path)
 
-    if not os.path.exists(reponame):
+    if not os.path.exists(repopath):
         response = flask.jsonify({
             'code': 'ERROR',
             'message': 'No git repo found with the information provided',
@@ -451,7 +451,7 @@ def get_branches_of_commit():
         response.status_code = 404
         return response
 
-    repo_obj = pygit2.Repository(reponame)
+    repo_obj = pygit2.Repository(repopath)
 
     try:
         commit_id in repo_obj
@@ -473,10 +473,7 @@ def get_branches_of_commit():
     for branchname in repo_obj.listall_branches():
         branch = repo_obj.lookup_branch(branchname)
 
-        diff_commits = []
-
         if not repo_obj.is_empty and repo_obj.listall_branches() > 1:
-
 
             merge_commit = None
 
