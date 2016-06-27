@@ -276,7 +276,7 @@ def api_users():
                 'username': user.username,
                 'name': user.fullname,
                 'image': pagure.lib.avatar_url_from_openid(user.default_email,
-                                                           size=32)
+                                                           size=16)
             } for user in users]
         }
     )

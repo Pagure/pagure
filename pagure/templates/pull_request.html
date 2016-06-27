@@ -20,7 +20,7 @@
   rel="stylesheet" />
 <link href="{{ url_for('static', filename='selectize.bootstrap3.css') }}"
   rel="stylesheet" />
-<link href="{{ url_for('static', filename='mention/recommended-styles.css') }}"
+<link href="{{ url_for('static', filename='atwho/jquery.atwho.min.css') }}"
   rel="stylesheet" />
 {% endblock %}
 
@@ -751,8 +751,8 @@
     src="{{ url_for('static', filename='emoji/emojione.min.js') }}">
 </script>
 <script src="{{ url_for('static', filename='selectize.min.js') }}" type="text/javascript"> </script>
-<script type="text/javascript" src="{{ url_for('static', filename='mention/mention.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='mention/bootstrap-typeahead.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='atwho/jquery.caret.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='atwho/jquery.atwho.min.js') }}"></script>
 
 <script type="text/javascript">
 function cancel_edit_btn() {
@@ -1187,13 +1187,36 @@ $(document).ready(function () {
     }
   );
   {% endif %}
-  $.get("{{ url_for('api_ns.api_users') }}", {
-    pattern: '*'
-  }).done(function(resp) {
-    $("#comment").mention({
-      users: resp['mention']
+   $.get("{{ url_for('api_ns.api_users') }}", {
+     pattern: '*'
+   }).done(function(resp) {
+     var userConfig = {
+       at: '@',
+       data: resp['mention'],
+       insertTpl: '@${username}',
+       displayTpl: "<li><img src=\"${image}\"> ${username} <small>${name}</small></li>",
+     }
+     $("#comment").atwho(userConfig);
+   });
+   $.when($.get("{{ url_for('api_ns.api_view_issues', repo=repo.name, username=username, status='all') }}"),
+          $.get("{{ url_for('api_ns.api_pull_request_views', repo=repo.name, username=username, status='all') }}")
+   ).done(function(issuesResp, prResp) {
+     // 0 is the api response
+     var issuesAndPrs = issuesResp[0]['issues'].concat(prResp[0]['requests']);
+     var data = $.map(issuesAndPrs, function(ticket, idx) {
+       return {
+         name: ticket.id.toString(),
+         title: $('<div>').text(ticket.title).html()
+       }
+     });
+     var issueAndPrConfig = {
+       at: '#',
+       data: data,
+       insertTpl: '#${name}',
+       displayTpl: "<li>#${name}<small> ${title}</small></li>",
+     }
+     $("#comment").atwho(issueAndPrConfig);
     });
-  });
 } );
 $(window).on('hashchange', updateHighlight);
 var selected = [];

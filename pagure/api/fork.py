@@ -49,6 +49,8 @@ def api_pull_request_views(repo, username=None):
     |               |          |              |   or ``closed`` for closed |
     |               |          |              |   requests or ``Merged``   |
     |               |          |              |   for merged requests.     |
+    |               |          |              |   ``All`` returns closed,  |
+    |               |          |              |   merged and open requests.|
     +---------------+----------+--------------+----------------------------+
     | ``assignee``  | string   | Optional     | | Filter the assignee of   |
     |               |          |              |   pull requests            |
@@ -138,6 +140,15 @@ def api_pull_request_views(repo, username=None):
             status=False,
             assignee=assignee,
             author=author)
+
+    elif str(status).lower() == 'all':
+        requests = pagure.lib.search_pull_requests(
+            SESSION,
+            project_id=repo.id,
+            status=None,
+            assignee=assignee,
+            author=author)
+
     else:
         requests = pagure.lib.search_pull_requests(
             SESSION,
