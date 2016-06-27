@@ -481,6 +481,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<option selected value="Fixed">Fixed</option>'
                 in output.data)
 
+            # Right status, wrong csrf
             data['status'] = 'Fixed'
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
@@ -496,6 +497,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<option selected value="Fixed">Fixed</option>'
                 in output.data)
 
+            # working status update
             data['csrf_token'] = csrf_token
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
@@ -513,6 +515,10 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertTrue(
                 '<option selected value="Fixed">Fixed</option>'
                 in output.data)
+            self.assertIn(
+                '<small><p><a href="/user/pingou"> @pingou</a> '
+                'changed the status to <code>Fixed</code></p></small>',
+                output.data)
 
             # Add new comment
             data = {
