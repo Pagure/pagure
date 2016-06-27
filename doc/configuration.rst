@@ -286,6 +286,26 @@ communicate with the EventSource server.
 Defaults to: ``0``.
 
 
+Authentication options
+----------------------
+
+ADMIN_GROUP
+~~~~~~~~~~~
+
+List of groups, local or remotes (if the openid server used supports the
+group extension), that are site admin. These admins can regenerate the
+gitolite configuration, the ssh key files, the hook-token for every project
+as well as manage users and groups.
+
+
+PAGURE_ADMIN_USERS
+~~~~~~~~~~~~~~~~~~
+
+List of usernames that are site admin. These admins have the same rights as
+the user in the admin groups (listed above) as well as admin rights to
+every projects hosted on this pagure instance.
+
+
 Optional options
 ----------------
 
