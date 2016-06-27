@@ -699,6 +699,8 @@ class IssueComment(BASE):
         ),
         nullable=False,
         index=True)
+
+    notification = sa.Column(sa.Boolean, default=False, nullable=False)
     edited_on = sa.Column(sa.DateTime, nullable=True)
     editor_id = sa.Column(
         sa.Integer,
