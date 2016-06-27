@@ -149,7 +149,7 @@ add_comment = function(data, username) {
     if ( data.comment_user == username) {
           _data += '<a class="btn btn-secondary btn-sm" data-objid="' + data.issue_id
           + '" data-comment="' + data.comment_id
-          + '" href="/test/issue/' + data.issue_id + '/comment/' + data.comment_id + '/edit"> \
+          + '" href="/' + data.project + '/issue/' + data.issue_id + '/comment/' + data.comment_id + '/edit"> \
             <span class="oi" data-glyph="pencil"></span> \
           </a> \
           <button class="btn btn-secondary btn-sm" \
