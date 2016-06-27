@@ -41,7 +41,21 @@
     <section id="comments">
       {% if issue.comments %}
         {% for comment in issue.comments %}
+        {% if comment.notification %}
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="pull-xs-right text-muted">
+                    <span title="{{ comment.date_created.strftime('%Y-%m-%d %H:%M:%S') }}">{{
+                        comment.date_created | humanize }}</span>
+                </div>
+                <small>{{ comment.comment | markdown | noJS | safe }}</small>
+              </div>
+            </div>
+          </div>
+        {% else %}
           {{ show_comment(comment, comment.id, repo, username, issueid, form, repo_admin) }}
+        {% endif %}
         {% endfor %}
       {% endif %}
     </section>
