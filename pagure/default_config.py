@@ -28,6 +28,9 @@ DB_URL = 'sqlite:////var/tmp/pagure_dev.sqlite'
 # The FAS group in which the admin of pagure are
 ADMIN_GROUP = 'sysadmin-main'
 
+# Hard-code a list of users that are global admins
+PAGURE_ADMIN_USERS = []
+
 # Whether or not to send emails
 EMAIL_SEND = False
 

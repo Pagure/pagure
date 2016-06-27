@@ -107,7 +107,6 @@ if APP.config.get('PAGURE_AUTH', None) in ['fas', 'openid']:
     def set_user(return_url):
         ''' After login method. '''
         try:
-
             pagure.lib.set_up_user(
                 session=SESSION,
                 username=flask.g.fas_user.username,
@@ -223,6 +222,12 @@ def is_admin():
         if not user.cla_done or len(user.groups) < 1:
             return False
 
+    admin_users = APP.config.get('PAGURE_ADMIN_USERS', [])
+    if not isinstance(admin_users, list):
+        admin_users = [admin_users]
+    if user.username in admin_users:
+        return True
+
     admins = APP.config['ADMIN_GROUP']
     if isinstance(admins, basestring):
         admins = [admins]
@@ -238,6 +243,12 @@ def is_repo_admin(repo_obj):
         return False
 
     user = flask.g.fas_user.username
+
+    admin_users = APP.config.get('PAGURE_ADMIN_USERS', [])
+    if not isinstance(admin_users, list):
+        admin_users = [admin_users]
+    if user in admin_users:
+        return True
 
     usergrps = [
         usr.user
