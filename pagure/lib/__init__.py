@@ -1247,6 +1247,17 @@ def edit_issue(session, issue, ticketfolder, user,
     pagure.lib.git.update_git(
         issue, repo=issue.project, repofolder=ticketfolder)
 
+    if 'status' in edit:
+        add_issue_comment(
+            session,
+            issue,
+            comment='@%s changed the status to ``%s``' % (user, status),
+            user=user,
+            ticketfolder=ticketfolder,
+            notify=False,
+            notification=True,
+        )
+
     if not issue.private and edit:
         pagure.lib.notify.log(
             issue.project,
