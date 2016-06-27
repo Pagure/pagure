@@ -125,11 +125,11 @@
                 {{ issue.title | noJS("img") | safe }}
               </a>
                &nbsp;&nbsp;
-              {% if issue.comments|count > 0 %}
+              {% if issue.user_comments|count > 0 %}
               <span class="text-muted">
                 <span class="oi" data-glyph="comment-square"
                     title="Comments on the ticket"></span>
-                  {{issue.comments|count}}
+                  {{issue.user_comments|count}}
             </span>
               {% endif %}
               {% for tag in issue.tags%}

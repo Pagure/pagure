@@ -616,6 +616,12 @@ class Issue(BASE):
         ''' Return the list of issue this issue blocks on in simple text. '''
         return [issue.id for issue in self.parents]
 
+    @property
+    def user_comments(self):
+        ''' Return user comments only, filter it from notifications
+        '''
+        return [comment for comment in self.comments if not comment.notification]
+
     def to_json(self, public=False, with_comments=True):
         ''' Returns a dictionary representation of the issue.
 
