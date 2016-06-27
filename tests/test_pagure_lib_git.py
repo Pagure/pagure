@@ -19,13 +19,14 @@ import os
 import tempfile
 import pygit2
 from mock import patch
-from pagure.lib.repo import PagureRepo
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
 import pagure.lib.git
 import tests
+
+from pagure.lib.repo import PagureRepo
 
 
 class PagureLibGittests(tests.Modeltests):
@@ -549,7 +550,7 @@ diff --git a/123 b/456
 index 458821a..77674a8
 --- a/123
 +++ b/456
-@@ -1,7 +1,24 @@
+@@ -1,7 +1,25 @@
  {
      "assignee": null,
      "blocks": [],
@@ -561,6 +562,7 @@ index 458821a..77674a8
 +            "edited_on": null,
 +            "editor": null,
 +            "id": 1,
++            "notification": false,
 +            "parent": null,
 +            "user": {
 +                "default_email": "foo@bar.com",

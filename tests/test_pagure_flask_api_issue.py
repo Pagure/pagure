@@ -1034,6 +1034,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "date_created": "1435821770",
               "edited_on": None,
               "editor": None,
+              "notification": False,
               "id": 1,
               "parent": None,
               "user": {
@@ -1059,6 +1060,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "date_created": "1435821770",
               "edited_on": None,
               "editor": None,
+              "notification": False,
               "id": 1,
               "parent": None,
               "user": {
@@ -1104,6 +1106,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "date_created": "1435821770",
               "edited_on": None,
               "editor": None,
+              "notification": False,
               "id": 2,
               "parent": None,
               "user": {
