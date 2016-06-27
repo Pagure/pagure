@@ -19,7 +19,7 @@
 <div class="container p-t-2">
   <h2 class="m-b-1">
     Groups <span class="label label-default">{{ groups | length }}</span>
-    {% if authenticated %}
+    {% if authenticated and config.get('ENABLE_GROUP_MNGT', False) %}
 
       <button type="button" id="new_user_btn" data-target="#add_group"
         class="btn btn-success pull-xs-right" data-toggle="modal">
@@ -115,12 +115,14 @@ $(document).ready(function() {
         e.preventDefault();
         return false;
     }
-});
+  });
+  {% if config.get('ENABLE_GROUP_MNGT') %}
   $('#add_group').on(
     'shown.bs.modal', function () {
       $('#group_name').focus()
     }
   );
+  {% endif %}
 
   $('#term').selectize({
     valueField: 'group',
