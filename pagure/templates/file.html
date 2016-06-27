@@ -163,9 +163,6 @@
                    {{ entry.name | unicode }}
                 </a>{% if entry.filemode == 16384 %}</strong>{% endif%}
             </td>
-            <td class-"pagure-table-filehex">
-                {{ entry.hex|short }}
-            </td>
           {% endfor %}
         </tbody>
       </table>
