@@ -315,9 +315,6 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
         output = self.app.get('/test/tree/feature')
         self.assertEqual(output.status_code, 200)
         self.assertIn('<a href="/test/blob/master/f/sources">', output.data)
-        self.assertIn(
-            '<td class-"pagure-table-filehex">\n'
-            '                9f4435', output.data)
         self.assertEqual(
             output.data.count('<span class="oi text-muted" data-glyph="file">'), 1)
 
@@ -326,12 +323,6 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
         self.assertIn(
             '<a href="/test/blob/maxamilion/feature/f/sources">',
             output.data)
-        self.assertIn(
-            '<td class-"pagure-table-filehex">\n'
-            '                9f4435', output.data)
-        self.assertIn(
-            '<td class-"pagure-table-filehex">\n'
-            '                e4e5f6', output.data)
         self.assertEqual(
             output.data.count('<span class="oi text-muted" data-glyph="file">'), 2)
 
@@ -339,9 +330,6 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
         output = self.app.get('/test/tree/maxamilion/feature/f/.gitignore')
         self.assertEqual(output.status_code, 200)
         self.assertIn('<a href="/test/blob/master/f/sources">', output.data)
-        self.assertIn(
-            '<td class-"pagure-table-filehex">\n'
-            '                9f4435', output.data)
         self.assertEqual(
             output.data.count('<span class="oi text-muted" data-glyph="file">'), 1)
 
