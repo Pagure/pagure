@@ -70,7 +70,7 @@ def view_group(group):
     # Add new user to the group if asked
     form = pagure.forms.AddUserForm()
     if pagure.authenticated() and form.validate_on_submit() \
-        and APP.config.get('ENABLE_GROUP_MNGT', False):
+        and pagure.APP.config.get('ENABLE_GROUP_MNGT', False):
 
         username = form.user.data
 
@@ -122,7 +122,7 @@ def group_user_delete(user, group):
     if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
         flask.abort(404)
 
-    if APP.config.get('ENABLE_GROUP_MNGT', False):
+    if not pagure.APP.config.get('ENABLE_GROUP_MNGT', False):
         flask.abort(404)
 
     form = pagure.forms.ConfirmationForm()
@@ -167,7 +167,7 @@ def group_delete(group):
     if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
         flask.abort(404)
 
-    if APP.config.get('ENABLE_GROUP_MNGT', False):
+    if not pagure.APP.config.get('ENABLE_GROUP_MNGT', False):
         flask.abort(404)
 
     form = pagure.forms.ConfirmationForm()
@@ -208,7 +208,7 @@ def add_group():
     if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
         flask.abort(404)
 
-    if APP.config.get('ENABLE_GROUP_MNGT', False):
+    if not pagure.APP.config.get('ENABLE_GROUP_MNGT', False):
         flask.abort(404)
 
     user = pagure.lib.search_user(
