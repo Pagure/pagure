@@ -360,7 +360,14 @@ def auth_login():  # pragma: no cover
         admins = set([admins])
 
     if APP.config.get('PAGURE_AUTH', None) in ['fas', 'openid']:
-        return FAS.login(return_url=return_point, groups=admins)
+        groups = set()
+        if not APP.config.get('ENABLE_GROUP_MNGT', False):
+            groups = [
+                group.group_name
+                for group in pagure.lib.search_groups(SESSION, group_type='user')
+            ]
+        groups = set(groups).union(admins)
+        return FAS.login(return_url=return_point, groups=groups)
     elif APP.config.get('PAGURE_AUTH', None) == 'local':
         form = pagure.login_forms.LoginForm()
         return flask.render_template(
