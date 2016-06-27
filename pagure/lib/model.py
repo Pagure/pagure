@@ -749,6 +749,7 @@ class IssueComment(BASE):
             'user': self.user.to_json(public=public),
             'edited_on': self.edited_on.strftime('%s') if self.edited_on else None,
             'editor': self.editor.to_json(public=public) if self.editor_id else None,
+            'notification': self.notification,
         }
         return output
 
