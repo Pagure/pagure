@@ -15,7 +15,7 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    ''' Add the column merge_status to the table projects.
+    ''' Add the column notification to the table pull_request_comments.
     '''
     op.add_column(
         'pull_request_comments',
@@ -28,6 +28,6 @@ def upgrade():
 
 
 def downgrade():
-    ''' Remove the column merge_status from the table projects.
+    ''' Remove the column notification from the table pull_request_comments.
     '''
     op.drop_column('pull_request_comments', 'notification')
