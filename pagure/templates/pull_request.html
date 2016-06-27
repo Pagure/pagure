@@ -1186,15 +1186,14 @@ $(document).ready(function () {
       }
     }
   );
+  {% endif %}
   $.get("{{ url_for('api_ns.api_users') }}", {
     pattern: '*'
   }).done(function(resp) {
     $("#comment").mention({
-      data: resp['mention']
+      users: resp['mention']
     });
   });
-  {% endif %}
-
 } );
 $(window).on('hashchange', updateHighlight);
 var selected = [];

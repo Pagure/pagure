@@ -54,14 +54,14 @@ class PagureFlaskApitests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         self.assertEqual(sorted(data['users']), ['foo', 'pingou'])
-        self.assertEqual(sorted(data.keys()), ['total_users', 'users'])
+        self.assertEqual(sorted(data.keys()), ['mention', 'total_users', 'users'])
         self.assertEqual(data['total_users'], 2)
 
         output = self.app.get('/api/0/users?pattern=p')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         self.assertEqual(data['users'], ['pingou'])
-        self.assertEqual(sorted(data.keys()), ['total_users', 'users'])
+        self.assertEqual(sorted(data.keys()), ['mention', 'total_users', 'users'])
         self.assertEqual(data['total_users'], 1)
 
     def test_api_project_tags(self):
