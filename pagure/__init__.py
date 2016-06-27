@@ -37,6 +37,8 @@ from flask_multistatic import MultiStaticFlask
 
 from werkzeug.routing import BaseConverter
 
+import pagure.exceptions
+
 # Create the application.
 APP = MultiStaticFlask(__name__)
 APP.jinja_env.trim_blocks = True
@@ -115,6 +117,25 @@ if APP.config.get('PAGURE_AUTH', None) in ['fas', 'openid']:
                 ssh_key=flask.g.fas_user.get('ssh_key'),
                 keydir=APP.config.get('GITOLITE_KEYDIR', None),
             )
+
+            # If groups are managed outside pagure, set up the user at login
+            if not APP.config.get('ENABLE_GROUP_MNGT', False):
+                for group in flask.g.fas_user.groups:
+                    group = pagure.lib.search_groups(
+                        SESSION, group_name=group)
+                    if not group:
+                        continue
+                    try:
+                        pagure.lib.add_user_to_group(
+                            session=SESSION,
+                            username=flask.g.fas_user.username,
+                            group=group,
+                            user=flask.g.fas_user.username,
+                            is_admin=is_admin(),
+                        )
+                    except pagure.exceptions.PagureException:
+                        pass
+
             SESSION.commit()
         except SQLAlchemyError as err:
             SESSION.rollback()
