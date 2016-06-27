@@ -1607,6 +1607,8 @@ def add_group_project(repo, username=None):
                 SESSION, repo,
                 new_group=form.group.data,
                 user=flask.g.fas_user.username,
+                create=not pagure.APP.config.get('ENABLE_GROUP_MNGT', False),
+                is_admin=pagure.is_admin(),
             )
             SESSION.commit()
             pagure.lib.git.generate_gitolite_acls()

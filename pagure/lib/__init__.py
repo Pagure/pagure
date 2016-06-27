@@ -753,22 +753,34 @@ def add_user_to_project(session, project, new_user, user):
     return 'User added'
 
 
-def add_group_to_project(session, project, new_group, user):
+def add_group_to_project(
+        session, project, new_group, user, create=False, is_admin=False):
     ''' Add a specified group to a specified project. '''
-    group_obj = search_groups(session, group_name=new_group)
-
-    if not group_obj:
-        raise pagure.exceptions.PagureException(
-            'No group %s found.' % new_group
-        )
-
     user_obj = search_user(session, username=user)
     if not user_obj:
         raise pagure.exceptions.PagureException(
             'No user %s found.' % user
         )
 
-    if user_obj not in project.users and user_obj != project.user:
+    group_obj = search_groups(session, group_name=new_group)
+
+    if not group_obj:
+        if create:
+            group_obj = pagure.lib.model.PagureGroup(
+                group_name=new_group,
+                group_type='user',
+                user_id=user_obj.id,
+            )
+            session.add(group_obj)
+            session.flush()
+        else:
+            raise pagure.exceptions.PagureException(
+                'No group %s found.' % new_group
+            )
+
+    if user_obj not in project.users \
+            and user_obj != project.user \
+            and not is_admin:
         raise pagure.exceptions.PagureException(
             'You are not allowed to add a group of users to this project'
         )

@@ -52,7 +52,7 @@ $( document ).ready(function() {
       labelField: 'group',
       searchField: 'group',
       maxItems: 1,
-      create: false,
+      create: true,
       load: function(query, callback) {
         if (!query.length) return callback();
         $.getJSON(
