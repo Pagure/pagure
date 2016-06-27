@@ -53,6 +53,9 @@ ENABLE_DEL_PROJECTS = True
 # Enables / Disables managing access to the repos
 ENABLE_USER_MNGT = True
 
+# Enables / Disables managing groups via the UI
+ENABLE_GROUP_MNGT = True
+
 # Enables / Disables showing all the projects by default on the front page
 SHOW_PROJECTS_INDEX = ['repos', 'myrepos', 'myforks']
 
