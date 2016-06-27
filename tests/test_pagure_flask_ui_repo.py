@@ -1382,9 +1382,12 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertIn(
             '<tr><td class="cell1"><a id="_1" href="#_1" '
             'data-line-number="1"></a></td>', output.data)
-        self.assertIn(
-            '<td class="cell2"><pre><span></span>Row 0</pre></td>',
-            output.data)
+        self.assertTrue(
+            '<td class="cell2"><pre><span></span>Row 0</pre></td>'
+            in output.data
+            or
+            '<td class="cell2"><pre>Row 0</pre></td>' in output.data
+        )
 
         # Add a fork of a fork
         item = pagure.lib.model.Project(
