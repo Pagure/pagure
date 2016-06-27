@@ -354,10 +354,10 @@ def auth_login():  # pragma: no cover
         return flask.redirect(return_point)
 
     admins = APP.config['ADMIN_GROUP']
-    if isinstance(admins, basestring):
-        admins = set([admins])
-    else:  # pragma: no cover
+    if isinstance(admins, list):
         admins = set(admins)
+    else:  # pragma: no cover
+        admins = set([admins])
 
     if APP.config.get('PAGURE_AUTH', None) in ['fas', 'openid']:
         return FAS.login(return_url=return_point, groups=admins)
