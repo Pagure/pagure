@@ -565,6 +565,8 @@ class Issue(BASE):
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
 
+    closed_at = sa.Column(sa.DateTime, nullable=True)
+
     project = relation(
         'Project', foreign_keys=[project_id], remote_side=[Project.id],
         backref=backref(
@@ -632,6 +634,8 @@ class Issue(BASE):
             'content': self.content,
             'status': self.status,
             'date_created': self.date_created.strftime('%s'),
+            'closed_at': self.closed_at.strftime(
+                '%s') if self.closed_at else None,
             'user': self.user.to_json(public=public),
             'private': self.private,
             'tags': self.tags_text,
