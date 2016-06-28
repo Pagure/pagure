@@ -1,17 +1,18 @@
-"""add_closed_at_in_issues
+"""add_closed_at_attribute_in_issues
 
-Revision ID: ee8d5b76e817
-Revises: 317a285e04a8
-Create Date: 2016-06-28 18:04:05.539319
+Revision ID: 43df5e588a87
+Revises: 22db0a833d35
+Create Date: 2016-06-28 22:59:36.653905
 
 """
 
 # revision identifiers, used by Alembic.
-revision = 'ee8d5b76e817'
-down_revision = '317a285e04a8'
+revision = '43df5e588a87'
+down_revision = '22db0a833d35'
 
 from alembic import op
 import sqlalchemy as sa
+
 
 def upgrade():
     ''' Add closed_at column in issues table '''
