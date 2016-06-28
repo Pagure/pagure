@@ -1231,6 +1231,8 @@ def edit_issue(session, issue, ticketfolder, user,
         edit.append('content')
     if status and status != issue.status:
         issue.status = status
+        if status.lower() != 'open':
+            issue.closed_at = datetime.datetime.utcnow()
         edit.append('status')
     if priority:
         try:

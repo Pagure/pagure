@@ -86,6 +86,9 @@
         <tr>
             <th id="issue-title">Issue</th>
             <th class="open_date">Opened</th>
+            {% if status and status|lower != 'open' %}
+            <th class="close_date">Closed</th>
+            {% endif %}
             <th class="priority" data-sort="int">
                 Priority&nbsp;(<a href="{{ url_for('view_issues', username=username,
                 repo=repo.name, tags=tags, author=author, assignee=assignee,
@@ -140,6 +143,14 @@
                 <span title="{{issue.date_created.strftime('%Y-%m-%d %H:%M:%S')}}">{{
                         issue.date_created | humanize}}</span>
             </td>
+            {% if status|lower != 'open' %}
+            <td class="nowrap">
+                {% if issue.closed_at != None %}
+                <span title="{{issue.closed_at.strftime('%Y-%m-%d %H:%M:%S')}}">{{
+                        issue.closed_at | humanize}}</span>
+                {% endif %}
+            </td>
+            {% endif %}
             <td class="td-priority nowrap" data-sort-value="{{
               issue.priority
               if issue.priority
