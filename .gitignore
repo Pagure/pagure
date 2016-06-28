@@ -24,3 +24,6 @@ clones/
 
 # Ignore the git repos in unit tests
 tests/*.git
+
+# Don't track alembic.ini
+alembic.ini
