@@ -470,10 +470,11 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,23 @@
+@@ -0,0 +1,24 @@
 +{
 +    "assignee": null,
 +    "blocks": [],
++    "closed_at": null,
 +    "comments": [],
 +    "content": "We should work on this",
 +    "date_created": null,
@@ -515,6 +516,9 @@ index 0000000..60f7480
             elif 'date_created' in row:
                 t = row.split(': ')[0]
                 row = '%s: null,' % t
+            elif 'closed_at' in row:
+                t = row.split(': ')[0]
+                row = '%s: null,' % t
             elif row.startswith('index 00'):
                 row = 'index 0000000..60f7480'
             elif row.startswith('+++ b/'):
@@ -550,10 +554,10 @@ diff --git a/123 b/456
 index 458821a..77674a8
 --- a/123
 +++ b/456
-@@ -1,7 +1,25 @@
- {
+@@ -2,7 +2,25 @@
      "assignee": null,
      "blocks": [],
+     "closed_at": null,
 -    "comments": [],
 +    "comments": [
 +        {
@@ -595,6 +599,9 @@ index 458821a..77674a8
                 row[3] = '<hash>:'
                 row = ' '.join(row)
             elif 'date_created' in row:
+                t = row.split(': ')[0]
+                row = '%s: null,' % t
+            elif 'closed_at' in row:
                 t = row.split(': ')[0]
                 row = '%s: null,' % t
             elif row.startswith('index'):
