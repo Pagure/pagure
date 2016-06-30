@@ -138,8 +138,8 @@ if APP.config.get('PAGURE_AUTH', None) in ['fas', 'openid']:
                             user=flask.g.fas_user.username,
                             is_admin=is_admin(),
                         )
-                    except pagure.exceptions.PagureException:
-                        pass
+                    except pagure.exceptions.PagureException as err:
+                        LOG.debug(err)
                 # Remove the old groups
                 for group in groups - fas_groups:
                     try:
@@ -151,8 +151,8 @@ if APP.config.get('PAGURE_AUTH', None) in ['fas', 'openid']:
                             is_admin=is_admin(),
                             force=True,
                         )
-                    except pagure.exceptions.PagureException:
-                        pass
+                    except pagure.exceptions.PagureException as err:
+                        LOG.debug(err)
 
             SESSION.commit()
         except SQLAlchemyError as err:
