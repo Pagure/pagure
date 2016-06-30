@@ -54,7 +54,8 @@
             Group Members <span class="label label-default">{{group.users|count}}</span>
             {% if authenticated and (member or admin) and config.get('ENABLE_GROUP_MNGT') %}
               <div id="add_user_button" class="btn btn-secondary btn-sm pull-xs-right">
-                  <span class="oi" data-glyph="plus"></span></div>
+                <span class="oi" data-glyph="plus"></span>
+              </div>
             {% endif %}
           </div>
           <div class="list-group list-group-flush">
