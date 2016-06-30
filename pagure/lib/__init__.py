@@ -2472,7 +2472,8 @@ def add_user_to_group(session, username, group, user, is_admin):
         new_user.username, group.group_name)
 
 
-def delete_user_of_group(session, username, groupname, user, is_admin):
+def delete_user_of_group(session, username, groupname, user, is_admin,
+                         force=False):
     ''' Removes the specified user from the given group.
     '''
     group_obj = search_groups(session, group_name=groupname)
@@ -2496,7 +2497,7 @@ def delete_user_of_group(session, username, groupname, user, is_admin):
         raise pagure.exceptions.PagureException(
             'You are not allowed to remove user from this group')
 
-    if drop_user.username == group_obj.creator.username:
+    if drop_user.username == group_obj.creator.username and not force:
         raise pagure.exceptions.PagureException(
             'The creator of a group cannot be removed')
 

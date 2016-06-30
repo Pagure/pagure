@@ -120,7 +120,12 @@ if APP.config.get('PAGURE_AUTH', None) in ['fas', 'openid']:
 
             # If groups are managed outside pagure, set up the user at login
             if not APP.config.get('ENABLE_GROUP_MNGT', False):
-                for group in flask.g.fas_user.groups:
+                user = pagure.lib.search_user(
+                    SESSION, username=flask.g.fas_user.username)
+                groups = set(user.groups)
+                fas_groups = set(flask.g.fas_user.groups)
+                # Add the new groups
+                for group in fas_groups - groups:
                     group = pagure.lib.search_groups(
                         SESSION, group_name=group)
                     if not group:
@@ -132,6 +137,19 @@ if APP.config.get('PAGURE_AUTH', None) in ['fas', 'openid']:
                             group=group,
                             user=flask.g.fas_user.username,
                             is_admin=is_admin(),
+                        )
+                    except pagure.exceptions.PagureException:
+                        pass
+                # Remove the old groups
+                for group in groups - fas_groups:
+                    try:
+                        pagure.lib.delete_user_of_group(
+                            session=SESSION,
+                            username=flask.g.fas_user.username,
+                            groupname=group,
+                            user=flask.g.fas_user.username,
+                            is_admin=is_admin(),
+                            force=True,
                         )
                     except pagure.exceptions.PagureException:
                         pass
