@@ -22,8 +22,8 @@ SECRET_KEY = '<insert here your own key>'
 DB_URL = 'sqlite:////var/tmp/pagure_dev.sqlite'
 
 # url to datagrepper (optional):
-#DATAGREPPER_URL = 'https://apps.fedoraproject.org/datagrepper'
-#DATAGREPPER_CATEGORY = 'pagure'
+# DATAGREPPER_URL = 'https://apps.fedoraproject.org/datagrepper'
+# DATAGREPPER_CATEGORY = 'pagure'
 
 # The FAS group in which the admin of pagure are
 ADMIN_GROUP = 'sysadmin-main'
@@ -150,9 +150,15 @@ GL_BINDIR = None
 
 # Default SMTP server to use for sending emails
 SMTP_SERVER = 'localhost'
+SMTP_PORT = 25
+SMTP_SSL = False
+# Specify SMTP_USERNAME and SMTP_PASSWORD for enabling SMTP auth
+SMTP_USERNAME = None
+SMTP_PASSWORD = None
 
 # Email used to sent emails
 FROM_EMAIL = 'pagure@pagure.org'
+
 DOMAIN_EMAIL_NOTIFICATIONS = 'pagure.org'
 SALT_EMAIL = '<secret key to be changed>'
 

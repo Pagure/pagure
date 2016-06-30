@@ -22,6 +22,8 @@ _build/
 # Just a local folder I use for testing
 clones/
 
+# IdeaIDE
+.idea/
 # Ignore the git repos in unit tests
 tests/*.git
 
