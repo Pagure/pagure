@@ -54,11 +54,11 @@ class PagurePrivateRepotest(tests.Modeltests):
         """
 
         # Create a git repo to play with
-        gitrepo = os.path.join(tests.HERE, 'repos', 'test.git')
+        gitrepo = os.path.join(tests.HERE, 'repos', 'pmc.git')
         repo = pygit2.init_repository(gitrepo, bare=True)
 
-        newpath = tempfile.mkdtemp(prefix='pagure-fork-test')
-        repopath = os.path.join(newpath, 'test')
+        newpath = tempfile.mkdtemp(prefix='pagure-private-test')
+        repopath = os.path.join(newpath, 'pmc')
         clone_repo = pygit2.clone_repository(gitrepo, repopath)
 
         # Create a file in that git repo
@@ -371,9 +371,11 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertIn(
                 '<input id="private" name="private" type="checkbox" value="y">', output.data)
 
-    def test_private_pr(self):
+    @patch('pagure.lib.notify.send_email')
+    def test_private_pr(self, send_email):
         """Test pull request made to the private repo"""
 
+        send_email.return_value = True
         # Add a private project
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
