@@ -52,7 +52,7 @@ $( document ).ready(function() {
       labelField: 'group',
       searchField: 'group',
       maxItems: 1,
-      create: true,
+      create: {{ (not config.get('ENABLE_GROUP_MNGT', False)) | lower }},
       load: function(query, callback) {
         if (!query.length) return callback();
         $.getJSON(
