@@ -327,6 +327,23 @@ class PagurePrivateRepotest(tests.Modeltests):
     def test_private_settings_ui(self, ast):
         """ Test UI for private repo"""
 
+        #Add private repo
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test4',
+            description='test project description',
+            hook_token='aaabbbeeeceee',
+            private=True,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        # Add a git repo
+        repo_path = os.path.join(tests.HERE, 'test4.git')
+        if not os.path.exists(repo_path):
+            os.makedirs(repo_path)
+        pygit2.init_repository(repo_path)
+
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
             tests.create_projects(self.session)
@@ -335,9 +352,19 @@ class PagurePrivateRepotest(tests.Modeltests):
             ast.return_value = False
             output = self.app.post('/test/settings')
 
+            # Check for a public repo
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<input type="checkbox" value="private" name="private"', output.data)
+
+            ast.return_value = False
+            output = self.app.post('/test4/settings')
+
+            # Check for private repo
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<input type="checkbox" value="private" name="private" checked=""/>', output.data)
+
 
     def test_private_pr(self):
         """Test pull request made to the private repo"""
