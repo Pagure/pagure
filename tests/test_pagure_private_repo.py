@@ -365,6 +365,11 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertIn(
                 '<input type="checkbox" value="private" name="private" checked=""/>', output.data)
 
+            # Check the new project form has 'private' checkbox
+            output = self.app.get('/new')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<input id="private" name="private" type="checkbox" value="y">', output.data)
 
     def test_private_pr(self):
         """Test pull request made to the private repo"""
