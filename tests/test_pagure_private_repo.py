@@ -6,9 +6,11 @@ import pkg_resources
 import unittest
 import shutil
 import sys
+import tempfile
 import os
 
 import json
+import pygit2
 from mock import patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(
@@ -16,6 +18,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 
 import pagure.lib
 import tests
+from pagure.lib.repo import PagureRepo
 
 
 class PagurePrivateRepotest(tests.Modeltests):
@@ -43,6 +46,156 @@ class PagurePrivateRepotest(tests.Modeltests):
         pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
             tests.HERE, 'requests')
         self.app = pagure.APP.test_client()
+
+    def set_up_git_repo(
+            self, new_project=None, branch_from='feature', mtype='FF'):
+        """ Set up the git repo and create the corresponding PullRequest
+        object.
+        """
+
+        # Create a git repo to play with
+        gitrepo = os.path.join(tests.HERE, 'repos', 'test.git')
+        repo = pygit2.init_repository(gitrepo, bare=True)
+
+        newpath = tempfile.mkdtemp(prefix='pagure-fork-test')
+        repopath = os.path.join(newpath, 'test')
+        clone_repo = pygit2.clone_repository(gitrepo, repopath)
+
+        # Create a file in that git repo
+        with open(os.path.join(repopath, 'sources'), 'w') as stream:
+            stream.write('foo\n bar')
+        clone_repo.index.add('sources')
+        clone_repo.index.write()
+
+        # Commits the files added
+        tree = clone_repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        clone_repo.create_commit(
+            'refs/heads/master',  # the name of the reference to update
+            author,
+            committer,
+            'Add sources file for testing',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            []
+        )
+        refname = 'refs/heads/master:refs/heads/master'
+        ori_remote = clone_repo.remotes[0]
+        PagureRepo.push(ori_remote, refname)
+
+        first_commit = repo.revparse_single('HEAD')
+
+        if mtype == 'merge':
+            with open(os.path.join(repopath, '.gitignore'), 'w') as stream:
+                stream.write('*~')
+            clone_repo.index.add('.gitignore')
+            clone_repo.index.write()
+
+            # Commits the files added
+            tree = clone_repo.index.write_tree()
+            author = pygit2.Signature(
+                'Alice Äuthòr', 'alice@äuthòrs.tld')
+            committer = pygit2.Signature(
+                'Cecil Cõmmîttër', 'cecil@cõmmîttërs.tld')
+            clone_repo.create_commit(
+                'refs/heads/master',
+                author,
+                committer,
+                'Add .gitignore file for testing',
+                # binary string representing the tree object ID
+                tree,
+                # list of binary strings representing parents of the new commit
+                [first_commit.oid.hex]
+            )
+            refname = 'refs/heads/master:refs/heads/master'
+            ori_remote = clone_repo.remotes[0]
+            PagureRepo.push(ori_remote, refname)
+
+        if mtype == 'conflicts':
+            with open(os.path.join(repopath, 'sources'), 'w') as stream:
+                stream.write('foo\n bar\nbaz')
+            clone_repo.index.add('sources')
+            clone_repo.index.write()
+
+            # Commits the files added
+            tree = clone_repo.index.write_tree()
+            author = pygit2.Signature(
+                'Alice Author', 'alice@authors.tld')
+            committer = pygit2.Signature(
+                'Cecil Committer', 'cecil@committers.tld')
+            clone_repo.create_commit(
+                'refs/heads/master',
+                author,
+                committer,
+                'Add sources conflicting',
+                # binary string representing the tree object ID
+                tree,
+                # list of binary strings representing parents of the new commit
+                [first_commit.oid.hex]
+            )
+            refname = 'refs/heads/master:refs/heads/master'
+            ori_remote = clone_repo.remotes[0]
+            PagureRepo.push(ori_remote, refname)
+
+        # Set the second repo
+
+        new_gitrepo = repopath
+        if new_project:
+            # Create a new git repo to play with
+            new_gitrepo = os.path.join(newpath, new_project.fullname)
+            if not os.path.exists(new_gitrepo):
+                os.makedirs(new_gitrepo)
+                new_repo = pygit2.clone_repository(gitrepo, new_gitrepo)
+
+        repo = pygit2.Repository(new_gitrepo)
+
+        if mtype != 'nochanges':
+            # Edit the sources file again
+            with open(os.path.join(new_gitrepo, 'sources'), 'w') as stream:
+                stream.write('foo\n bar\nbaz\n boose')
+            repo.index.add('sources')
+            repo.index.write()
+
+            # Commits the files added
+            tree = repo.index.write_tree()
+            author = pygit2.Signature(
+                'Alice Author', 'alice@authors.tld')
+            committer = pygit2.Signature(
+                'Cecil Committer', 'cecil@committers.tld')
+            repo.create_commit(
+                'refs/heads/%s' % branch_from,
+                author,
+                committer,
+                'A commit on branch %s' % branch_from,
+                tree,
+                [first_commit.oid.hex]
+            )
+            refname = 'refs/heads/%s' % (branch_from)
+            ori_remote = repo.remotes[0]
+            PagureRepo.push(ori_remote, refname)
+
+        # Create a PR for these changes
+        project = pagure.lib.get_project(self.session, 'pmc')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=project,
+            branch_from=branch_from,
+            repo_to=project,
+            branch_to='master',
+            title='PR from the %s branch' % branch_from,
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'PR from the %s branch' % branch_from)
+
+        shutil.rmtree(newpath)
+
 
     def test_index(self):
         """ Test the index endpoint. """
@@ -169,6 +322,73 @@ class PagurePrivateRepotest(tests.Modeltests):
                 output.data.count('<p>No group found</p>'), 1)
             self.assertEqual(
                 output.data.count('<div class="card-header">'), 3)
+
+    @patch('pagure.ui.repo.admin_session_timedout')
+    def test_private_settings_ui(self, ast):
+        """ Test UI for private repo"""
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            tests.create_projects(self.session)
+            tests.create_projects_git(tests.HERE)
+
+            ast.return_value = False
+            output = self.app.post('/test/settings')
+
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<input type="checkbox" value="private" name="private"', output.data)
+
+    def test_private_pr(self):
+        """Test pull request made to the private repo"""
+
+        # Add a private project
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='pmc',
+            description='test project description',
+            hook_token='aaabbbeeeceee',
+            private=True,
+        )
+
+        self.session.add(item)
+        self.session.commit()
+
+        # Create all the git repos
+        tests.create_projects_git(
+            os.path.join(tests.HERE, 'requests'), bare=True)
+
+        # Check repo was created
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+
+            output = self.app.get('/user/pingou/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n            Projects <span '
+                'class="label label-default">1</span>', output.data)
+            self.assertIn(
+                'Forks <span class="label label-default">0</span>',
+                output.data)
+
+            self.set_up_git_repo(new_project=None, branch_from='feature')
+            project = pagure.lib.get_project(self.session, 'pmc')
+            self.assertEqual(len(project.requests), 1)
+
+
+            output = self.app.get('/pmc/pull-request/1')
+            self.assertEqual(output.status_code, 200)
+
+        # Check repo was created
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/pmc/pull-requests')
+            self.assertEqual(output.status_code, 401)
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/pmc/pull-requests')
+            self.assertEqual(output.status_code, 401)
 
 
 if __name__ == '__main__':
