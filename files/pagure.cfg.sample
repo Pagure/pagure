@@ -27,6 +27,11 @@ EMAIL_ERROR = 'pingou@pingoured.fr'
 
 ### Default SMTP server to use for sending emails
 SMTP_SERVER = 'localhost'
+SMTP_PORT = 25
+SMTP_SSL = False
+# Specify SMTP_USERNAME and SMTP_PASSWORD for enabling SMTP auth
+SMTP_USERNAME = None
+SMTP_PASSWORD = None
 
 ### Information used to sent notifications
 FROM_EMAIL = 'pagure@pagure.io'

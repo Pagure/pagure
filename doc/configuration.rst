@@ -343,6 +343,42 @@ sending emails.
 
 Defaults to: ``localhost``.
 
+SMTP_PORT
+~~~~~~~~~
+
+This configuration key allow to define the SMTP server port.
+
+SMTP by default uses TCP port 25. The protocol for mail submission is
+the same, but uses port 587.
+SMTP connections secured by SSL, known as SMTPS, default to port 465
+(nonstandard, but sometimes used for legacy reasons).
+
+Defaults to: ``25``
+
+SMTP_SSL
+~~~~~~~~
+
+This configuration key to define using SMTP connections secured by SSL
+
+Defaults to: ``False``
+
+SMTP_USERNAME
+~~~~~~~~~~~~~
+
+This configuration key allow to use SMTP authentication
+
+Note: Specify SMTP_USERNAME and SMTP_PASSWORD for using SMTP auth
+
+Defaults to: ``None``
+
+SMTP_PASSWORD
+~~~~~~~~~~~~~
+
+This configuration key allow to use SMTP authentication
+
+Note: Specify SMTP_USERNAME and SMTP_PASSWORD for using SMTP auth
+
+Defaults to: ``None``
 
 SHORT_LENGTH
 ~~~~~~~~~~~~
