@@ -292,6 +292,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.session.add(item)
         self.session.commit()
 
+
         self.gitrepos = tests.create_projects_git(
             pagure.APP.config['GIT_FOLDER'])
 
@@ -331,6 +332,30 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertEqual(
                 output.data.count('<div class="card-header">'), 3)
 
+        repo = pagure.lib.get_project(self.session, 'test3')
+	msg = pagure.lib.add_user_to_project(
+            session=self.session,
+            project=repo,
+            new_user='pingou',
+            user='foo',
+        )
+	self.assertEqual(msg, 'User added')
+
+        # New user added to private projects
+        user.username='pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/')
+            self.assertIn(
+                'My Projects <span class="label label-default">1</span>',
+                output.data)
+            self.assertIn(
+                'Forks <span class="label label-default">0</span>',
+                output.data)
+            self.assertEqual(
+                output.data.count('<p>No group found</p>'), 1)
+            self.assertEqual(
+                output.data.count('<div class="card-header">'), 3)
+
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_private_settings_ui(self, ast):
         """ Test UI for private repo"""
@@ -351,6 +376,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         if not os.path.exists(repo_path):
             os.makedirs(repo_path)
         pygit2.init_repository(repo_path)
+
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
