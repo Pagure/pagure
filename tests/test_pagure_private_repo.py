@@ -400,6 +400,12 @@ class PagurePrivateRepotest(tests.Modeltests):
         tests.create_projects_git(
             os.path.join(tests.HERE, 'requests'), bare=True)
 
+        # Add a git repo
+        repo_path = os.path.join(pagure.APP.config.get('REQUESTS_FOLDER'), 'pmc.git')
+        if not os.path.exists(repo_path):
+            os.makedirs(repo_path)
+        pygit2.init_repository(repo_path, bare=True)
+
         # Check repo was created
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
@@ -430,7 +436,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/pmc/pull-requests')
-            self.assertEqual(output.status_code, 401)
+            self.assertEqual(output.status_code, 200)
 
 
 if __name__ == '__main__':
