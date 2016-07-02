@@ -28,7 +28,6 @@ class PagurePrivateRepotest(tests.Modeltests):
         """ Set up the environnment, ran before every tests. """
         super(PagurePrivateRepotest, self).setUp()
 
-
         pagure.APP.config['TESTING'] = True
         pagure.SESSION = self.session
         pagure.lib.SESSION = self.session
@@ -199,7 +198,6 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         shutil.rmtree(newpath)
 
-
     def test_index(self):
         """ Test the index endpoint. """
 
@@ -287,7 +285,6 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.session.add(item)
         self.session.commit()
 
-
         self.gitrepos = tests.create_projects_git(
             pagure.APP.config['GIT_FOLDER'])
 
@@ -313,7 +310,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertEqual(
                 output.data.count('<div class="card-header">'), 3)
 
-        user.username='pingou'
+        user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/user/foo')
             self.assertIn(
@@ -328,16 +325,17 @@ class PagurePrivateRepotest(tests.Modeltests):
                 output.data.count('<div class="card-header">'), 3)
 
         repo = pagure.lib.get_project(self.session, 'test3')
-	msg = pagure.lib.add_user_to_project(
+
+        msg = pagure.lib.add_user_to_project(
             session=self.session,
             project=repo,
             new_user='pingou',
             user='foo',
         )
-	self.assertEqual(msg, 'User added')
+        self.assertEqual(msg, 'User added')
 
         # New user added to private projects
-        user.username='pingou'
+        user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/')
             self.assertIn(
@@ -355,7 +353,7 @@ class PagurePrivateRepotest(tests.Modeltests):
     def test_private_settings_ui(self, ast):
         """ Test UI for private repo"""
 
-        #Add private repo
+        # Add private repo
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
             name='test4',
@@ -367,11 +365,11 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.session.commit()
 
         # Add a git repo
-        repo_path = os.path.join(pagure.APP.config.get('GIT_FOLDER'), 'test4.git')
+        repo_path = os.path.join(
+            pagure.APP.config.get('GIT_FOLDER'), 'test4.git')
         if not os.path.exists(repo_path):
             os.makedirs(repo_path)
         pygit2.init_repository(repo_path)
-
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
@@ -422,7 +420,8 @@ class PagurePrivateRepotest(tests.Modeltests):
             os.path.join(tests.HERE, 'requests'), bare=True)
 
         # Add a git repo
-        repo_path = os.path.join(pagure.APP.config.get('REQUESTS_FOLDER'), 'pmc.git')
+        repo_path = os.path.join(
+            pagure.APP.config.get('REQUESTS_FOLDER'), 'pmc.git')
         if not os.path.exists(repo_path):
             os.makedirs(repo_path)
         pygit2.init_repository(repo_path, bare=True)
@@ -443,7 +442,6 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.set_up_git_repo(new_project=None, branch_from='feature')
             project = pagure.lib.get_project(self.session, 'pmc')
             self.assertEqual(len(project.requests), 1)
-
 
             output = self.app.get('/pmc/pull-request/1')
             self.assertEqual(output.status_code, 200)
