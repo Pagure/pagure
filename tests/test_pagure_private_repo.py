@@ -28,11 +28,6 @@ class PagurePrivateRepotest(tests.Modeltests):
         """ Set up the environnment, ran before every tests. """
         super(PagurePrivateRepotest, self).setUp()
 
-        pagure.APP.config['TESTING'] = True
-        pagure.SESSION = self.session
-        pagure.ui.SESSION = self.session
-        pagure.ui.repo.SESSION = self.session
-        pagure.ui.fork.SESSION = self.session
 
         pagure.APP.config['TESTING'] = True
         pagure.SESSION = self.session
