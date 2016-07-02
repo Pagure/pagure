@@ -29,14 +29,22 @@ class PagurePrivateRepotest(tests.Modeltests):
         super(PagurePrivateRepotest, self).setUp()
 
         pagure.APP.config['TESTING'] = True
-        pagure.APP.config['DATAGREPPER_URL'] = None
         pagure.SESSION = self.session
+        pagure.ui.SESSION = self.session
+        pagure.ui.repo.SESSION = self.session
+        pagure.ui.fork.SESSION = self.session
+
+        pagure.APP.config['TESTING'] = True
+        pagure.SESSION = self.session
+        pagure.lib.SESSION = self.session
         pagure.ui.SESSION = self.session
         pagure.ui.app.SESSION = self.session
         pagure.ui.filters.SESSION = self.session
+        pagure.ui.fork.SESSION = self.session
         pagure.ui.repo.SESSION = self.session
+        pagure.ui.issues.SESSION = self.session
 
-        pagure.APP.config['GIT_FOLDER'] = tests.HERE
+        pagure.APP.config['GIT_FOLDER'] = os.path.join(tests.HERE, 'repos')
         pagure.APP.config['FORK_FOLDER'] = os.path.join(
             tests.HERE, 'forks')
         pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
@@ -58,7 +66,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         repo = pygit2.init_repository(gitrepo, bare=True)
 
         newpath = tempfile.mkdtemp(prefix='pagure-private-test')
-        repopath = os.path.join(newpath, 'pmc')
+        repopath = os.path.join(newpath, 'test')
         clone_repo = pygit2.clone_repository(gitrepo, repopath)
 
         # Create a file in that git repo
@@ -339,7 +347,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.session.commit()
 
         # Add a git repo
-        repo_path = os.path.join(tests.HERE, 'test4.git')
+        repo_path = os.path.join(pagure.APP.config.get('GIT_FOLDER'), 'test4.git')
         if not os.path.exists(repo_path):
             os.makedirs(repo_path)
         pygit2.init_repository(repo_path)
@@ -347,7 +355,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
             tests.create_projects(self.session)
-            tests.create_projects_git(tests.HERE)
+            tests.create_projects_git(pagure.APP.config.get('GIT_FOLDER'))
 
             ast.return_value = False
             output = self.app.post('/test/settings')
