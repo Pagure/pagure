@@ -457,6 +457,82 @@ class PagurePrivateRepotest(tests.Modeltests):
             output = self.app.get('/pmc/pull-requests')
             self.assertEqual(output.status_code, 200)
 
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_private_repo_issues_ui(self, p_send_email, p_ugt):
+        """ Test issues made to private repo"""
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        # Add private repo
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test4',
+            description='test project description',
+            hook_token='aaabbbeeeceee',
+            private=True,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        # Add a git repo
+        repo_path = os.path.join(
+            pagure.APP.config.get('GIT_FOLDER'), 'test4.git')
+        if not os.path.exists(repo_path):
+            os.makedirs(repo_path)
+        pygit2.init_repository(repo_path)
+
+        # Add a git repo
+        repo_path = os.path.join(
+            pagure.APP.config.get('TICKETS_FOLDER'), 'test4.git')
+        if not os.path.exists(repo_path):
+            os.makedirs(repo_path)
+        pygit2.init_repository(repo_path, bare=True)
+
+        # Check if the private repo issues are publicly accesible
+        output = self.app.get('/test4/issues')
+        self.assertEqual(output.status_code, 401)
+
+        # Create issues to play with
+        repo = pagure.lib.get_project(self.session, 'test4')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+
+            # Whole list
+            output = self.app.get('/test4/issues')
+            self.assertEqual(output.status_code, 401)
+
+            # Check single issue
+            output = self.app.get('/test4/issue/1')
+            self.assertEqual(output.status_code, 401)
+
+
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+
+            # Whole list
+            output = self.app.get('/test4/issues')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<title>Issues - test4 - Pagure</title>', output.data)
+            self.assertTrue(
+            '<h2>\n      1 Open Issues' in output.data)
+
+            # Check single issue
+            output = self.app.get('/test4/issue/1')
+            self.assertEqual(output.status_code, 200)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagurePrivateRepotest)
