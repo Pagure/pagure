@@ -73,6 +73,9 @@ def update_issue(repo, issueid, username=None, namespace=None):
 
     repo = flask.g.repo
 
+    if repo.private and not is_repo_admin(repo):
+        flask.abort(401, 'Forbidden')
+
     if flask.request.method == 'GET':
         if not is_js:
             flask.flash('Invalid method: GET', 'error')
@@ -625,6 +628,9 @@ def view_issues(repo, username=None, namespace=None):
 
     repo = flask.g.repo
 
+    if repo.private and not is_repo_admin(repo):
+        flask.abort(401, 'Forbidden')
+
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
 
@@ -759,6 +765,9 @@ def view_roadmap(repo, username=None, namespace=None):
 
     repo = flask.g.repo
 
+    if repo.private and is_repo_admin(repo):
+        flask.abort(401, 'Forbidden')
+
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
 
@@ -876,6 +885,9 @@ def new_issue(repo, username=None, namespace=None):
     """ Create a new issue
     """
     repo = flask.g.repo
+
+    if repo.private and is_repo_admin(repo):
+        flask.abort(401, 'Forbidden')
 
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
@@ -1000,6 +1012,9 @@ def view_issue(repo, issueid, username=None, namespace=None):
 
     repo = flask.g.repo
 
+    if repo.private and not is_repo_admin(repo):
+        flask.abort(401, 'Forbidden')
+
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
 
@@ -1064,6 +1079,9 @@ def delete_issue(repo, issueid, username=None, namespace=None):
 
     repo = flask.g.repo
 
+    if repo.private and not is_repo_admin(repo):
+        flask.abort(401, 'Forbidden')
+
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
 
@@ -1121,6 +1139,9 @@ def edit_issue(repo, issueid, username=None, namespace=None):
     """ Edit the specified issue
     """
     repo = flask.g.repo
+
+    if repo.private and not is_repo_admin(repo):
+        flask.abort(401, 'Forbidden')
 
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
@@ -1247,6 +1268,9 @@ def upload_issue(repo, issueid, username=None, namespace=None):
     '''
     repo = flask.g.repo
 
+    if repo.private and not is_repo_admin(repo):
+        flask.abort(401, 'Forbidden')
+
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
 
@@ -1311,6 +1335,9 @@ def view_issue_raw_file(
     raw = str(raw).lower() in ['1', 'true', 't']
 
     repo = flask.g.repo
+
+    if repo.private and not is_repo_admin(repo):
+        flask.abort(401, 'Forbidden')
 
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
@@ -1398,6 +1425,9 @@ def edit_comment_issue(
     is_js = flask.request.args.get('js', False)
 
     project = flask.g.repo
+
+    if project.private and not is_repo_admin(project):
+        flask.abort(401, 'Forbidden')
 
     if not project.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')

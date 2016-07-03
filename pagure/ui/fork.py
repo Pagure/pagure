@@ -260,6 +260,9 @@ def request_pull_patch(repo, requestid, username=None, namespace=None):
     """
     repo = flask.g.repo
 
+    if repo.private and not is_repo_admin(repo):
+        flask.abort(401, 'Forbidden')
+
     if not repo.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-requests found for this project')
 
@@ -350,6 +353,9 @@ def request_pull_edit(repo, requestid, username=None, namespace=None):
 
     repo = flask.g.repo
 
+    if repo.private and not is_repo_admin(repo):
+        flask.abort(401, 'Forbidden')
+
     if not repo.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-requests found for this project')
 
@@ -423,6 +429,9 @@ def pull_request_add_comment(
     """ Add a comment to a commit in a pull-request.
     """
     repo = flask.g.repo
+
+    if repo.private and not is_repo_admin(repo):
+        flask.abort(401, 'Forbidden')
 
     if not repo.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-requests found for this project')
@@ -519,6 +528,9 @@ def pull_request_drop_comment(
     """
     repo = flask.g.repo
 
+    if repo.private and not is_repo_admin(repo):
+        flask.abort(401, 'Forbidden')
+
     if not repo.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-requests found for this project')
 
@@ -590,6 +602,9 @@ def pull_request_edit_comment(
     is_js = flask.request.args.get('js', False)
 
     project = flask.g.repo
+
+    if project.private and not is_repo_admin(project):
+        flask.abort(401, 'Forbidden')
 
     if not project.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-requests found for this project')
@@ -690,6 +705,9 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
             username=username, namespace=namespace))
 
     repo = flask.g.repo
+
+    if repo.private and not is_repo_admin(repo):
+        flask.abort(401, 'Forbidden')
 
     if not repo.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-requests found for this project')
@@ -822,6 +840,9 @@ def set_assignee_requests(repo, requestid, username=None, namespace=None):
     ''' Assign a pull-request. '''
     repo = flask.g.repo
 
+    if repo.private and not is_repo_admin(repo):
+        flask.abort(401, 'Forbidden')
+
     if not repo.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-request allowed on this project')
 
@@ -951,6 +972,9 @@ def new_request_pull(
     branch_to = flask.request.values.get('branch_to', branch_to)
 
     repo = flask.g.repo
+
+    if repo.private and not is_repo_admin(repo):
+        flask.abort(401, 'Forbidden')
 
     parent = repo
     if repo.parent:
@@ -1103,6 +1127,9 @@ def new_remote_request_pull(repo, username=None, namespace=None):
     confirm = flask.request.values.get('confirm', False)
 
     repo = flask.g.repo
+
+    if repo.private and not is_repo_admin(repo):
+        flask.abort(401, 'Forbidden')
 
     if not repo.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-request allowed on this project')
