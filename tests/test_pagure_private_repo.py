@@ -415,6 +415,17 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.session.add(item)
         self.session.commit()
 
+        repo = pagure.lib.get_project(self.session, 'pmc')
+
+        msg = pagure.lib.add_user_to_project(
+            session=self.session,
+            project=repo,
+            new_user='foo',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User added')
+
         # Create all the git repos
         tests.create_projects_git(
             os.path.join(tests.HERE, 'requests'), bare=True)
@@ -453,6 +464,11 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertEqual(output.status_code, 401)
 
         user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/pmc/pull-requests')
+            self.assertEqual(output.status_code, 200)
+
+        user = tests.FakeUser(username='foo')
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/pmc/pull-requests')
             self.assertEqual(output.status_code, 200)
@@ -520,6 +536,31 @@ class PagurePrivateRepotest(tests.Modeltests):
 
 
         user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+
+            # Whole list
+            output = self.app.get('/test4/issues')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<title>Issues - test4 - Pagure</title>', output.data)
+            self.assertTrue(
+            '<h2>\n      1 Open Issues' in output.data)
+
+            # Check single issue
+            output = self.app.get('/test4/issue/1')
+            self.assertEqual(output.status_code, 200)
+
+        repo = pagure.lib.get_project(self.session, 'test4')
+
+        msg = pagure.lib.add_user_to_project(
+            session=self.session,
+            project=repo,
+            new_user='foo',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User added')
+
+        user.username='foo'
         with tests.user_set(pagure.APP, user):
 
             # Whole list
