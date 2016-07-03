@@ -3,6 +3,7 @@
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
+import datetime
 import unittest
 import shutil
 import sys
@@ -37,6 +38,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         pagure.ui.fork.SESSION = self.session
         pagure.ui.repo.SESSION = self.session
         pagure.ui.issues.SESSION = self.session
+        pagure.api.SESSION = self.session
+        pagure.api.project.SESSION = self.session
 
         pagure.APP.config['GIT_FOLDER'] = os.path.join(tests.HERE, 'repos')
         pagure.APP.config['FORK_FOLDER'] = os.path.join(
@@ -574,6 +577,95 @@ class PagurePrivateRepotest(tests.Modeltests):
             output = self.app.get('/test4/issue/1')
             self.assertEqual(output.status_code, 200)
 
+    def test_api_private_repo(self):
+        """ Test api points for private repo"""
+
+        # Add private repo
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test4',
+            description='test project description',
+            hook_token='aaabbbeeeceee',
+            private=True,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        # Create a git repo to play with
+        gitrepo = os.path.join(tests.HERE, 'repos', 'test4.git')
+        repo = pygit2.init_repository(gitrepo, bare=True)
+
+        newpath = tempfile.mkdtemp(prefix='pagure-fork-test')
+        repopath = os.path.join(newpath, 'test4')
+        clone_repo = pygit2.clone_repository(gitrepo, repopath)
+
+        # Create a file in that git repo
+        with open(os.path.join(repopath, 'sources'), 'w') as stream:
+            stream.write('foo\n bar')
+        clone_repo.index.add('sources')
+        clone_repo.index.write()
+
+        # Commits the files added
+        tree = clone_repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        clone_repo.create_commit(
+            'refs/heads/master',  # the name of the reference to update
+            author,
+            committer,
+            'Add sources file for testing',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            []
+        )
+        refname = 'refs/heads/master:refs/heads/master'
+        ori_remote = clone_repo.remotes[0]
+        PagureRepo.push(ori_remote, refname)
+
+        # Tag our first commit
+        first_commit = repo.revparse_single('HEAD')
+        tagger = pygit2.Signature('Alice Doe', 'adoe@example.com', 12347, 0)
+        repo.create_tag(
+            "0.0.1", first_commit.oid.hex, pygit2.GIT_OBJ_COMMIT, tagger,
+            "Release 0.0.1")
+
+        # Create a token for foo for this project
+        item = pagure.lib.model.Token(
+            id='foobar_token',
+            user_id=1,
+            project_id=1,
+            expiration=datetime.datetime.utcnow() + datetime.timedelta(
+                days=30)
+        )
+        self.session.add(item)
+        self.session.commit()
+        item = pagure.lib.model.TokenAcl(
+            token_id='foobar_token',
+            acl_id=3,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+
+        # Check tags
+        output = self.app.get('/api/0/test4/git/tags')
+        self.assertEqual(output.status_code, 403)
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+
+            output = self.app.get('/api/0/test4/git/tags')
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.data)
+            self.assertDictEqual(
+                data,
+                {'tags': ['0.0.1'], 'total_tags': 1}
+            )
+
+        shutil.rmtree(newpath)
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagurePrivateRepotest)

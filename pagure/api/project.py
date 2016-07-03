@@ -15,7 +15,7 @@ from sqlalchemy.exc import SQLAlchemyError
 import pagure
 import pagure.exceptions
 import pagure.lib
-from pagure import SESSION, APP
+from pagure import SESSION, APP, is_repo_admin
 from pagure.api import API, api_method, APIERROR, api_login_required
 
 
@@ -53,6 +53,9 @@ def api_git_tags(repo, username=None, namespace=None):
     """
     repo = pagure.lib.get_project(
         SESSION, repo, user=username, namespace=namespace)
+
+    if repo.private and not is_repo_admin(repo):
+        raise pagure.exceptions.APIError(403, error_code=APIERROR.EPROJECTNOTALLOWED)
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
