@@ -54,10 +54,10 @@ def api_git_tags(repo, username=None, namespace=None):
     repo = pagure.lib.get_project(
         SESSION, repo, user=username, namespace=namespace)
 
-    if repo.private and not is_repo_admin(repo):
-        raise pagure.exceptions.APIError(403, error_code=APIERROR.EPROJECTNOTALLOWED)
-
     if repo is None:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    if repo.private and not is_repo_admin(repo):
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
     tags = pagure.lib.git.get_git_tags(repo)

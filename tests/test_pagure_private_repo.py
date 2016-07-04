@@ -327,6 +327,21 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertEqual(
                 output.data.count('<div class="card-header">'), 3)
 
+        # Check pingou has 0 projects
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/')
+            self.assertIn(
+                'My Projects <span class="label label-default">0</span>',
+                output.data)
+            self.assertIn(
+                'Forks <span class="label label-default">0</span>',
+                output.data)
+            self.assertEqual(
+                output.data.count('<p>No group found</p>'), 1)
+            self.assertEqual(
+                output.data.count('<div class="card-header">'), 3)
+
         repo = pagure.lib.get_project(self.session, 'test3')
 
         msg = pagure.lib.add_user_to_project(
@@ -494,19 +509,13 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.session.add(item)
         self.session.commit()
 
-        # Add a git repo
-        repo_path = os.path.join(
-            pagure.APP.config.get('GIT_FOLDER'), 'test4.git')
-        if not os.path.exists(repo_path):
-            os.makedirs(repo_path)
-        pygit2.init_repository(repo_path)
-
-        # Add a git repo
-        repo_path = os.path.join(
-            pagure.APP.config.get('TICKETS_FOLDER'), 'test4.git')
-        if not os.path.exists(repo_path):
-            os.makedirs(repo_path)
-        pygit2.init_repository(repo_path, bare=True)
+        for repo in ['GIT_FOLDER', 'TICKETS_FOLDER']:
+            # Add a git repo
+            repo_path = os.path.join(
+                pagure.APP.config.get(repo), 'test4.git')
+            if not os.path.exists(repo_path):
+                os.makedirs(repo_path)
+            pygit2.init_repository(repo_path)
 
         # Check if the private repo issues are publicly accesible
         output = self.app.get('/test4/issues')
@@ -536,17 +545,16 @@ class PagurePrivateRepotest(tests.Modeltests):
             output = self.app.get('/test4/issue/1')
             self.assertEqual(output.status_code, 401)
 
-
-
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
 
             # Whole list
             output = self.app.get('/test4/issues')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<title>Issues - test4 - Pagure</title>', output.data)
+            self.assertIn(
+                '<title>Issues - test4 - Pagure</title>', output.data)
             self.assertTrue(
-            '<h2>\n      1 Open Issues' in output.data)
+                '<h2>\n      1 Open Issues' in output.data)
 
             # Check single issue
             output = self.app.get('/test4/issue/1')
@@ -563,15 +571,16 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'User added')
 
-        user.username='foo'
+        user.username = 'foo'
         with tests.user_set(pagure.APP, user):
 
             # Whole list
             output = self.app.get('/test4/issues')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<title>Issues - test4 - Pagure</title>', output.data)
+            self.assertIn(
+                '<title>Issues - test4 - Pagure</title>', output.data)
             self.assertTrue(
-            '<h2>\n      1 Open Issues' in output.data)
+                '<h2>\n      1 Open Issues' in output.data)
 
             # Check single issue
             output = self.app.get('/test4/issue/1')
@@ -644,26 +653,26 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.session.commit()
         item = pagure.lib.model.TokenAcl(
             token_id='foobar_token',
-            acl_id=3,
+            acl_id=1,
         )
         self.session.add(item)
         self.session.commit()
 
-
+        # Check if you are admin
+        headers = {'Authorization': 'token foobar_token'}
         # Check tags
-        output = self.app.get('/api/0/test4/git/tags')
+        output = self.app.get('/api/0/test4/git/tags', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'tags': ['0.0.1'], 'total_tags': 1}
+        )
+
+        # Check with wrong token
+        headers = {'Authorization': 'token hello'}
+        output = self.app.get('/api/0/test4/git/tags', headers=headers)
         self.assertEqual(output.status_code, 403)
-
-        user = tests.FakeUser(username='pingou')
-        with tests.user_set(pagure.APP, user):
-
-            output = self.app.get('/api/0/test4/git/tags')
-            self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
-            self.assertDictEqual(
-                data,
-                {'tags': ['0.0.1'], 'total_tags': 1}
-            )
 
         shutil.rmtree(newpath)
 
