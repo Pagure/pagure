@@ -21,6 +21,7 @@ import pagure.lib
 import tests
 from pagure.lib.repo import PagureRepo
 
+
 class PagurePrivateRepotest(tests.Modeltests):
     """ Tests for private repo in pagure """
 
@@ -657,21 +658,26 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.session.add(item)
         self.session.commit()
 
-        # Check if you are admin
-        headers = {'Authorization': 'token foobar_token'}
-        # Check tags
-        output = self.app.get('/api/0/test4/git/tags', headers=headers)
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {'tags': ['0.0.1'], 'total_tags': 1}
-        )
+        # Check if the admin requests
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            # Check tags
+            output = self.app.get('/api/0/test4/git/tags')
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.data)
+            self.assertDictEqual(
+                data,
+                {'tags': ['0.0.1'], 'total_tags': 1}
+            )
 
-        # Check with wrong token
-        headers = {'Authorization': 'token hello'}
-        output = self.app.get('/api/0/test4/git/tags', headers=headers)
-        self.assertEqual(output.status_code, 403)
+        output = self.app.get('/api/0/test4/git/tags')
+        self.assertEqual(output.status_code, 404)
+
+        # Chekc if user is not admin
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/api/0/test4/git/tags')
+            self.assertEqual(output.status_code, 404)
 
         shutil.rmtree(newpath)
 
