@@ -1017,7 +1017,7 @@ def new_project(session, user, name, blacklist, allowed_prefix,
 
     project = model.Project(
         name=name,
-        description=description if description else None,
+        description=description.encode('utf-8') if description else None,
         url=url if url else None,
         avatar_email=avatar_email if avatar_email else None,
         user_id=user_obj.id,
@@ -1037,7 +1037,7 @@ def new_project(session, user, name, blacklist, allowed_prefix,
             userobj.fullname.encode('utf-8'),
             userobj.default_email.encode('utf-8'))
         f = open(os.path.join(temp_gitrepo.workdir,"README.md"), 'w')
-        f.write("# %s\n\n%s" % (name, description))
+        f.write("# %s\n\n%s" % (name.encode('utf-8'), description.encode('utf-8')))
         f.close()
         temp_gitrepo.index.add_all()
         temp_gitrepo.index.write()
@@ -1082,7 +1082,7 @@ def new_project(session, user, name, blacklist, allowed_prefix,
         requestrepo, bare=True,
         mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
 
-    #create the project in the db
+    # create the project in the db
     session.commit()
 
     pagure.lib.notify.log(
