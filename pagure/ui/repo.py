@@ -80,18 +80,6 @@ def view_repo(repo, username=None, namespace=None):
     repo_db = flask.g.repo
     repo_obj = flask.g.repo_obj
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    if repo.private and not is_repo_admin(repo):
-        flask.abort(401, 'Forbidden')
-
-    reponame = pagure.get_repo_path(repo)
-
-    repo_obj = pygit2.Repository(reponame)
-
     if not repo_obj.is_empty and not repo_obj.head_is_unborn:
         head = repo_obj.head.shorthand
     else:

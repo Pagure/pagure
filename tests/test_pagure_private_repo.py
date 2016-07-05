@@ -21,7 +21,6 @@ import pagure.lib
 import tests
 from pagure.lib.repo import PagureRepo
 
-
 class PagurePrivateRepotest(tests.Modeltests):
     """ Tests for private repo in pagure """
 
@@ -479,7 +478,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/pmc/pull-requests')
-            self.assertEqual(output.status_code, 401)
+            self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
@@ -519,7 +518,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         # Check if the private repo issues are publicly accesible
         output = self.app.get('/test4/issues')
-        self.assertEqual(output.status_code, 401)
+        self.assertEqual(output.status_code, 404)
 
         # Create issues to play with
         repo = pagure.lib.get_project(self.session, 'test4')
@@ -539,11 +538,11 @@ class PagurePrivateRepotest(tests.Modeltests):
 
             # Whole list
             output = self.app.get('/test4/issues')
-            self.assertEqual(output.status_code, 401)
+            self.assertEqual(output.status_code, 404)
 
             # Check single issue
             output = self.app.get('/test4/issue/1')
-            self.assertEqual(output.status_code, 401)
+            self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):

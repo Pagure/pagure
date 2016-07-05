@@ -2097,7 +2097,13 @@ def get_project(session, name, user=None, namespace=None):
             model.Project.is_fork == False
         )
 
-    return query.first()
+    project = query.first()
+
+    if project and is_repo_admin:
+        if project.private and not is_repo_admin(project):
+            return None
+
+    return project
 
 
 def search_issues(
