@@ -374,6 +374,16 @@ def is_repo_user(repo_obj):
     ) or (user in usergrps)
 
 
+def get_authorized_project(session, repo, user=None):
+    """ Return the projects for which the logged in user is authorize to view. """
+    repo = pagure.lib.get_project(session, repo, user)
+
+    if repo and repo.private and not is_repo_admin(repo):
+        return None
+
+    return repo
+
+
 def generate_user_key_files():
     """ Regenerate the key files used by gitolite.
     """
