@@ -586,8 +586,9 @@ class PagurePrivateRepotest(tests.Modeltests):
             output = self.app.get('/test4/issue/1')
             self.assertEqual(output.status_code, 200)
 
-    def test_api_private_repo(self):
-        """ Test api points for private repo"""
+    # API checks
+    def test_api_private_repo_projects(self):
+        """ Test api points for private repo for projects"""
 
         # Add private repo
         item = pagure.lib.model.Project(
@@ -680,6 +681,99 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
         shutil.rmtree(newpath)
+
+        # Check before adding
+        repo = pagure.lib.get_project(self.session, 'test4')
+        self.assertEqual(repo.tags, [])
+
+        # Adding a tag
+        output = pagure.lib.update_tags(
+            self.session, repo, 'infra', 'pingou',
+            ticketfolder=None)
+        self.assertEqual(output, ['Tag added: infra'])
+
+        # Check after adding
+        repo = pagure.lib.get_project(self.session, 'test4')
+        self.assertEqual(len(repo.tags), 1)
+        self.assertEqual(repo.tags_text, ['infra'])
+
+        # Check the API
+        output = self.app.get('/api/0/projects?tags=inf')
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'error_code': 'ENOPROJECTS', 'error': 'No projects found'}
+        )
+
+        # Request by not a loggged in user
+        output = self.app.get('/api/0/projects?tags=infra')
+        self.assertEqual(output.status_code, 404)
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            # Request by a non authorized user
+            output = self.app.get('/api/0/projects?tags=infra')
+            self.assertEqual(output.status_code, 404)
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            # Private repo username is compulsion to pass
+            output = self.app.get('/api/0/projects?tags=infra')
+            self.assertEqual(output.status_code, 404)
+
+            output = self.app.get('/api/0/projects?username=pingou')
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.data)
+            data['projects'][0]['date_created'] = "1436527638"
+            self.assertDictEqual(
+                data,
+                {
+                    "total_projects": 1,
+                    "projects": [
+                        {
+                            "date_created": "1436527638",
+                            "description": "test project description",
+                            "id": 1,
+                            "name": "test4",
+                            "parent": None,
+                            "priorities": {},
+                            "tags": ["infra"],
+                            "user": {
+                                "fullname": "PY C",
+                                "name": "pingou"
+                            }
+                        },
+                    ]
+                }
+            )
+
+            output = self.app.get('/api/0/projects?username=pingou&tags=infra')
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.data)
+            data['projects'][0]['date_created'] = "1436527638"
+            self.assertDictEqual(
+                data,
+                {
+                    "total_projects": 1,
+                    "projects": [
+                        {
+                            "date_created": "1436527638",
+                            "description": "test project description",
+                            "id": 1,
+                            "name": "test4",
+                            "parent": None,
+                            "priorities": {},
+                            "tags": ["infra"],
+                            "user": {
+                                "fullname": "PY C",
+                                "name": "pingou"
+                            }
+                        }
+                    ]
+                }
+            )
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagurePrivateRepotest)

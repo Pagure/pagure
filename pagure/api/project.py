@@ -15,7 +15,7 @@ from sqlalchemy.exc import SQLAlchemyError
 import pagure
 import pagure.exceptions
 import pagure.lib
-from pagure import SESSION, APP, is_repo_admin
+from pagure import SESSION, APP, is_repo_admin, authenticated
 from pagure.api import API, api_method, APIERROR, api_login_required
 
 
@@ -55,9 +55,6 @@ def api_git_tags(repo, username=None, namespace=None):
         SESSION, repo, user=username, namespace=namespace)
 
     if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if repo.private and not is_repo_admin(repo):
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
     tags = pagure.lib.git.get_git_tags(repo)
@@ -164,8 +161,12 @@ def api_projects():
     elif str(fork).lower() in ['0', 'false']:
         fork = False
 
+    private = False
+    if authenticated() and username == flask.g.fas_user.username:
+        private = flask.g.fas_user.username
+
     projects = pagure.lib.search_projects(
-        SESSION, username=username, fork=fork, tags=tags, pattern=pattern)
+        SESSION, username=username, fork=fork, tags=tags, pattern=pattern, private=private)
 
     if not projects:
         raise pagure.exceptions.APIError(
