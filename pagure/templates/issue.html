@@ -119,6 +119,7 @@
                 if issue.status|lower == 'invalid' %}label-danger{%
                 elif issue.status|lower == 'fixed' %}label-success{%
                 elif issue.status|lower == 'insufficient data' %}label-warning{%
+                elif issue.status|lower == 'duplicate' %}label-default{%
                 elif issue.status|lower == 'open' %}label-primary{%
                 endif %}">{{ issue.status }}</span>
             </h2>
