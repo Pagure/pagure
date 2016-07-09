@@ -151,13 +151,15 @@ GL_RC = None
 GL_BINDIR = None
 
 
-# Default SMTP server to use for sending emails
+#SMTP settings
 SMTP_SERVER = 'localhost'
 SMTP_PORT = 25
 SMTP_SSL = False
-# Specify SMTP_USERNAME and SMTP_PASSWORD for enabling SMTP auth
+
+# Specify both for enabling SMTP auth
 SMTP_USERNAME = None
 SMTP_PASSWORD = None
+
 
 # Email used to sent emails
 FROM_EMAIL = 'pagure@pagure.org'

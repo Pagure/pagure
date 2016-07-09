@@ -358,14 +358,15 @@ Defaults to: ``25``
 SMTP_SSL
 ~~~~~~~~
 
-This configuration key to define using SMTP connections secured by SSL
+This configuration key allows to specify whether the SMTP connections
+should secured over SSL
 
 Defaults to: ``False``
 
 SMTP_USERNAME
 ~~~~~~~~~~~~~
 
-This configuration key allow to use SMTP authentication
+This configuration key allows usage of SMTP with auth
 
 Note: Specify SMTP_USERNAME and SMTP_PASSWORD for using SMTP auth
 
@@ -374,7 +375,7 @@ Defaults to: ``None``
 SMTP_PASSWORD
 ~~~~~~~~~~~~~
 
-This configuration key allow to use SMTP authentication
+This configuration key allows usage of SMTP with auth
 
 Note: Specify SMTP_USERNAME and SMTP_PASSWORD for using SMTP auth
 
