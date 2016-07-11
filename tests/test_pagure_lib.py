@@ -2280,7 +2280,7 @@ class PagureLibtests(tests.Modeltests):
         watch = pagure.lib.is_watching(
             session=self.session,
             user=None,
-            project=project,
+            reponame='test',
         )
         self.assertFalse(watch)
 
@@ -2290,7 +2290,7 @@ class PagureLibtests(tests.Modeltests):
         watch = pagure.lib.is_watching(
             session=self.session,
             user=user,
-            project=project,
+            reponame='test',
         )
         self.assertFalse(watch)
 
@@ -2318,7 +2318,7 @@ class PagureLibtests(tests.Modeltests):
         watch = pagure.lib.is_watching(
             session=self.session,
             user=user,
-            project=project,
+            reponame='test',
         )
         self.assertTrue(watch)
 
@@ -2327,7 +2327,7 @@ class PagureLibtests(tests.Modeltests):
         watch = pagure.lib.is_watching(
             session=self.session,
             user=user,
-            project=project,
+            reponame='test',
         )
         self.assertTrue(watch)
 
@@ -2344,7 +2344,7 @@ class PagureLibtests(tests.Modeltests):
         watch = pagure.lib.is_watching(
             session=self.session,
             user=user,
-            project=project,
+            reponame='test',
         )
         self.assertTrue(watch)
 
@@ -2361,7 +2361,7 @@ class PagureLibtests(tests.Modeltests):
         watch = pagure.lib.is_watching(
             session=self.session,
             user=user,
-            project=project,
+            reponame='test',
         )
         self.assertFalse(watch)
 
