@@ -918,6 +918,80 @@ class PagurePrivateRepotest(tests.Modeltests):
             data2['requests'][0]['uid'] = '1431414800'
             self.assertDictEqual(data, data2)
 
+
+            # Valid issue
+            output = self.app.get('/api/0/test4/pull-request/1')
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.data)
+            data['date_created'] = '1431414800'
+            data['updated_on'] = '1431414800'
+            data['project']['date_created'] = '1431414800'
+            data['repo_from']['date_created'] = '1431414800'
+            data['uid'] = '1431414800'
+            self.assertDictEqual(
+                data,
+                {
+                  "assignee": None,
+                  "branch": "master",
+                  "branch_from": "master",
+                  "closed_at": None,
+                  "closed_by": None,
+                  "comments": [],
+                  "commit_start": None,
+                  "commit_stop": None,
+                  "date_created": "1431414800",
+                  "id": 1,
+                  "initial_comment": None,
+                  "project": {
+                    "date_created": "1431414800",
+                    "description": "test project description",
+                    "id": 1,
+                    "name": "test4",
+                    "parent": None,
+                    "priorities": {},
+                    "tags": [],
+                    "user": {
+                      "fullname": "PY C",
+                      "name": "pingou"
+                    }
+                  },
+                  "remote_git": None,
+                  "repo_from": {
+                    "date_created": "1431414800",
+                    "description": "test project description",
+                    "id": 1,
+                    "name": "test4",
+                    "parent": None,
+                    "priorities": {},
+                    "tags": [],
+                    "user": {
+                      "fullname": "PY C",
+                      "name": "pingou"
+                    }
+                  },
+                  "status": 'Open',
+                  "title": "test pull-request",
+                  "uid": "1431414800",
+                  "updated_on": "1431414800",
+                  "user": {
+                    "fullname": "PY C",
+                    "name": "pingou"
+                  }
+                }
+            )
+
+            # Access Pull-Request authenticated
+            output = self.app.get('/api/0/test4/pull-request/1', headers=headers)
+            self.assertEqual(output.status_code, 200)
+            data2 = json.loads(output.data)
+            data2['date_created'] = '1431414800'
+            data2['project']['date_created'] = '1431414800'
+            data2['repo_from']['date_created'] = '1431414800'
+            data2['uid'] = '1431414800'
+            data2['date_created'] = '1431414800'
+            data2['updated_on'] = '1431414800'
+            self.assertDictEqual(data, data2)
+
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagurePrivateRepotest)
     unittest.TextTestRunner(verbosity=2).run(SUITE)
