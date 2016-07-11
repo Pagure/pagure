@@ -12,8 +12,8 @@
 __requires__ = ['SQLAlchemy >= 0.8', 'jinja2 >= 2.4']
 import pkg_resources
 
-__version__ = '2.2.1'
-__api_version__ = '0.6'
+__version__ = '2.3'
+__api_version__ = '0.7'
 
 
 import datetime

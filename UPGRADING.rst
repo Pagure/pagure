@@ -1,6 +1,45 @@
 Upgrading Pagure
 ================
 
+From 2.2 to 2.3
+---------------
+
+2.3 brings a few changes impacting the database scheme, including a new
+`duplicate` status for tickets, a feature allowing one to `watch` or
+`unwatch` a project and notifications on tickets as exist on pull-requests.
+
+Therefore, when upgrading from 2.2.x to 2.3, you will have to :
+
+* Create the new DB tables and the new status field using the ``createdb.py`` script.
+
+* Update the database schame using alembic: ``alembic upgrade head``
+
+This update also brings a new configuration key:
+
+* ``PAGURE_ADMIN_USERS`` allows to mark some users as instance-wide admins, giving
+  them full access to every projects, private or not. This feature can then be
+  used as a way to clean spams.
+* ``SMTP_PORT`` allows to specify the port to use when contacting the SMTP
+  server
+* ``SMTP_SSL`` allows to specify whether to use SSL when contacting the SMTP
+  server
+* ``SMTP_USERNAME`` and ``SMTP_PASSWORD`` if provided together allow to contact
+  an SMTP requiring authentication.
+
+In this update is also added the script ``api_key_expire_mail.py`` meant to be
+run by a daily cron job and warning users when their API token is nearing its
+expiration date.
+
+
+
+2.2.2
+-----
+
+Release 2.2.2 contains an important security fix, blocking a source of XSS
+attack.
+
+
+
 From 2.1 to 2.2
 ---------------
 

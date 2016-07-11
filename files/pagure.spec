@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        2.2.1
+Version:        2.3
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -160,9 +160,13 @@ install -m 644 files/pagure.cfg.sample $RPM_BUILD_ROOT/%{_sysconfdir}/pagure/pag
 # Install WSGI file
 mkdir -p $RPM_BUILD_ROOT/%{_datadir}/pagure
 install -m 644 files/pagure.wsgi $RPM_BUILD_ROOT/%{_datadir}/pagure/pagure.wsgi
+install -m 644 files/doc_pagure.wsgi $RPM_BUILD_ROOT/%{_datadir}/pagure/doc_pagure.wsgi
 
 # Install the createdb script
 install -m 644 createdb.py $RPM_BUILD_ROOT/%{_datadir}/pagure/pagure_createdb.py
+
+# Install the api_key_expire_mail.py script
+install -m 644 createdb.py $RPM_BUILD_ROOT/%{_datadir}/pagure/api_key_expire_mail.py
 
 # Install the alembic configuration file
 install -m 644 files/alembic.ini $RPM_BUILD_ROOT/%{_sysconfdir}/pagure/alembic.ini
@@ -226,7 +230,8 @@ install -m 644 webhook-server/pagure_webhook.service \
 %config(noreplace) %{_sysconfdir}/pagure/alembic.ini
 %dir %{_sysconfdir}/pagure/
 %dir %{_datadir}/pagure/
-%{_datadir}/pagure/pagure*
+%config(noreplace) %{_datadir}/pagure/*.wsgi
+%{_datadir}/pagure/*.py*
 %{_datadir}/pagure/alembic/
 %{python_sitelib}/pagure/
 %{python_sitelib}/pagure*.egg-info
@@ -254,6 +259,53 @@ install -m 644 webhook-server/pagure_webhook.service \
 
 
 %changelog
+* Mon Jul 11 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.3-1
+- Update to 2.3
+- Fix typos in pr_custom_page.rst (Lubomír Sedlář)
+- Improve the unit-test suite (Vivek Anand)
+- Remove the branch chooser from the repoheader and rework the fork button (Ryan
+  Lerch)
+- Add support for non utf-8 file names (Ryan Lerch)
+- Add a 'Duplicate' status for issues (Vivek Anand)
+- Add title attribute for replying to comment and editing the comment in issues
+  and PRs (Vivek Anand)
+- Include the user when reporting error by email
+- Add an API endpoint to create projects
+- Add an API endpoint to assign someone to a ticket
+- Add small script to be ran as cron to send reminder of expiring tokens (Vivek
+  Anand)
+- Do not show the PR button on branches for which a PR is already opened
+- Add an API endpoint to fork projects
+- Add the possibility to watch/unwatch a project (Gaurav Kumar)
+- Add a 'Take' button on the issue page (Ryan Lerch and I)
+- Add a dev-data script to input some test data in the DB for testing/dev
+  purposes (skrzepto)
+- Fix links to ticket/pull-request in the preview of a new ticket
+- Add the possibility to diff two or more commits (Oliver Gutierrez)
+- Fix viewing a file having a non-ascii name
+- Fix viewing the diff between two commits having a file with a non-ascii name
+- On the commit detail page, specify on which branch(es) the commit is
+- Add the possibility to have instance-wide admins will full access to every
+  projects (set in the configuration file)
+- Drop the hash to the blob of the file when listing the files in the repo
+- Add autocomple/suggestion on typing @<username> on a ticket or a pull-request
+  (Eric Barbour)
+- Fix the edit link when adding a comment to a ticket via SSE
+- Add notifications to issues as we have for pull-requests
+- Record in the db the date at which a ticket was closed (Vivek Anand)
+- Add the possibility for pagure to rely on external groups provided by the auth
+  service
+- Add the possibility for pagure to use an SMTP server requiring auth
+  (Vyacheslav Anzhiganov)
+- Add autocomple/suggestion on typing #<id> for tickets and pull-requests (Eric
+  Barbour)
+- With creating a README when project's description has non-ascii characters
+  (vanzhiganov)
+- Add colored label for duplicate status of issues (Vivek Anand)
+- Ship working wsgi files so that they can be used directly from the RPM
+- Mark the wsgi files provided with the RPM as %%config(noreplace)
+- Install the api_key_expire_mail.py script next to the createdb one
+
 * Wed Jun 01 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.2.1-1
 - Update to 2.2.1
 - Fix showing the inital comment on PR having only one commit (Ryan Lerch)
