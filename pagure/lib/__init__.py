@@ -1036,8 +1036,9 @@ def new_project(session, user, name, blacklist, allowed_prefix,
         author = pygit2.Signature(
             userobj.fullname.encode('utf-8'),
             userobj.default_email.encode('utf-8'))
-        f = open(os.path.join(temp_gitrepo.workdir,"README.md"), 'w')
-        f.write("# %s\n\n%s" % (name.encode('utf-8'), description.encode('utf-8')))
+        content = u"# %s\n\n%s" % (name, description)
+        f = open(os.path.join(temp_gitrepo.workdir,"README.md"), 'wb')
+        f.write(content.encode('utf-8'))
         f.close()
         temp_gitrepo.index.add_all()
         temp_gitrepo.index.write()
