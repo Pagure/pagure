@@ -23,6 +23,7 @@ import uuid
 
 import bleach
 import redis
+import six
 import sqlalchemy
 import sqlalchemy.schema
 from datetime import timedelta
@@ -1034,8 +1035,9 @@ def new_project(session, user, name, blacklist, allowed_prefix,
         temp_gitrepo_path = tempfile.mkdtemp(prefix='pagure-')
         temp_gitrepo = pygit2.init_repository(temp_gitrepo_path, bare=False)
         author = pygit2.Signature(
-            userobj.fullname.encode('utf-8'),
-            userobj.default_email.encode('utf-8'))
+            userobj.fullname.encode('utf-8') if six.PY2 else userobj.fullname,
+            userobj.default_email.encode('utf-8') if six.PY2 else userobj.fullname
+        )
         content = u"# %s\n\n%s" % (name, description)
         f = open(os.path.join(temp_gitrepo.workdir,"README.md"), 'wb')
         f.write(content.encode('utf-8'))
