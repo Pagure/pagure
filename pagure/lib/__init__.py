@@ -2822,7 +2822,7 @@ def update_watch_status(session, project, user, watch):
     return msg_success
 
 
-def is_watching(session, user, project):
+def is_watching(session, user, reponame, repouser=None):
     ''' Check user watching the project. '''
 
     if user is None:
@@ -2832,14 +2832,30 @@ def is_watching(session, user, project):
     if not user_obj:
         return False
 
-    watcher = session.query(
+    query = session.query(
         model.Watcher
     ).filter(
-        sqlalchemy.and_(
-            model.Watcher.project_id == project.id,
-            model.Watcher.user_id == user_obj.id,
+        model.Watcher.user_id == user_obj.id
+    ).filter(
+        model.Watcher.project_id == model.Project.id
+    ).filter(
+        model.Project.name == reponame
+    )
+
+    if repouser is not None:
+        query = query.filter(
+            model.User.user == repouser
+        ).filter(
+            model.User.id == model.Project.user_id
+        ).filter(
+            model.Project.parent_id != None
         )
-    ).first()
+    else:
+        query = query.filter(
+            model.Project.parent_id == None
+        )
+
+    watcher = query.first()
 
     if watcher:
         return watcher.watch
