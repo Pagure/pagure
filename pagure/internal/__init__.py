@@ -473,7 +473,7 @@ def get_branches_of_commit():
     for branchname in repo_obj.listall_branches():
         branch = repo_obj.lookup_branch(branchname)
 
-        if not repo_obj.is_empty and repo_obj.listall_branches() > 1:
+        if not repo_obj.is_empty and len(repo_obj.listall_branches()) > 1:
 
             merge_commit = None
 
