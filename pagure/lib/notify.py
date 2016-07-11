@@ -122,6 +122,11 @@ def _get_emails_for_issue(issue):
     if issue.assignee and issue.assignee.default_email:
         emails.add(issue.assignee.default_email)
 
+    # Add the person watching this project, if the issue is public
+    if issue.isa == 'issue' and not issue.private:
+        for watcher in issue.project.watchers:
+            emails.add(watcher.user.default_email)
+
     # Remove the person list in unwatch
     for unwatcher in issue.project.unwatchers:
         if unwatcher.user.default_email in emails:
