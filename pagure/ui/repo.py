@@ -130,10 +130,6 @@ def view_repo(repo, username=None):
                     break
                 diff_commits.append(commit.oid.hex)
 
-    watch = False
-    if authenticated():
-        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
-
     return flask.render_template(
         'repo_info.html',
         select='overview',
@@ -151,7 +147,6 @@ def view_repo(repo, username=None):
         diff_commits=diff_commits,
         repo_admin=is_repo_admin(repo),
         form=pagure.forms.ConfirmationForm(),
-        watch=watch,
     )
 
 
@@ -236,10 +231,6 @@ def view_repo_branch(repo, branchname, username=None):
                         'view_raw_file', username=username,
                         repo=repo.name, identifier=branchname, filename=''))
 
-    watch = False
-    if authenticated():
-        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
-
     return flask.render_template(
         'repo_info.html',
         select='overview',
@@ -256,7 +247,6 @@ def view_repo_branch(repo, branchname, username=None):
         diff_commits=diff_commits,
         repo_admin=is_repo_admin(repo),
         form=pagure.forms.ConfirmationForm(),
-        watch=watch,
     )
 
 
@@ -353,10 +343,6 @@ def view_commits(repo, branchname=None, username=None):
                 diff_commits.append(commit.oid.hex)
                 diff_commits_full.append(commit)
 
-    watch = False
-    if authenticated():
-        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
-
     return flask.render_template(
         'commits.html',
         select='commits',
@@ -375,7 +361,6 @@ def view_commits(repo, branchname=None, username=None):
         total_page=total_page,
         repo_admin=is_repo_admin(repo),
         form=pagure.forms.ConfirmationForm(),
-        watch=watch,
     )
 
 
@@ -544,10 +529,6 @@ def view_file(repo, identifier, filename, username=None):
     if encoding:
         headers['Content-Encoding'] = encoding
 
-    watch = False
-    if authenticated():
-        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
-
     return (
             flask.render_template(
             'file.html',
@@ -561,7 +542,6 @@ def view_file(repo, identifier, filename, username=None):
             content=content,
             output_type=output_type,
             repo_admin=is_repo_admin(repo),
-            watch=watch,
         ),
         200,
         headers
@@ -717,10 +697,6 @@ def view_commit(repo, commitid, username=None):
         # First commit in the repo
         diff = commit.tree.diff_to_tree(swap=True)
 
-    watch = False
-    if authenticated():
-        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
-
     return flask.render_template(
         'commit.html',
         select='commits',
@@ -731,7 +707,6 @@ def view_commit(repo, commitid, username=None):
         commitid=commitid,
         commit=commit,
         diff=diff,
-        watch=watch,
         form=pagure.forms.ConfirmationForm(),
     )
 
@@ -808,10 +783,6 @@ def view_tree(repo, identifier=None, username=None):
             content = sorted(commit.tree, key=lambda x: x.filemode)
         output_type = 'tree'
 
-    watch = False
-    if authenticated():
-        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
-
     return flask.render_template(
         'file.html',
         select='tree',
@@ -825,7 +796,6 @@ def view_tree(repo, identifier=None, username=None):
         content=content,
         output_type=output_type,
         repo_admin=is_repo_admin(repo),
-        watch=watch,
     )
 
 
@@ -841,17 +811,12 @@ def view_forks(repo, username=None):
     if not repo:
         flask.abort(404, 'Project not found')
 
-    watch = False
-    if authenticated():
-        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
-
     return flask.render_template(
         'forks.html',
         select='forks',
         username=username,
         repo=repo,
         repo_admin=is_repo_admin(repo),
-        watch=watch,
     )
 
 
@@ -872,10 +837,6 @@ def view_tags(repo, username=None):
 
     tags = pagure.lib.git.get_git_tags_objects(repo)
 
-    watch = False
-    if authenticated():
-        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
-
     return flask.render_template(
         'releases.html',
         select='tags',
@@ -884,7 +845,6 @@ def view_tags(repo, username=None):
         tags=tags,
         repo_admin=is_repo_admin(repo),
         repo_obj=repo_obj,
-        watch=watch,
     )
 
 
@@ -929,17 +889,12 @@ def new_release(repo, username=None):
         return flask.redirect(
             flask.url_for('view_tags', repo=repo.name, username=username))
 
-    watch = False
-    if authenticated():
-        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
-
     return flask.render_template(
         'new_release.html',
         select='tags',
         username=username,
         repo=repo,
         form=form,
-        watch=watch,
     )
 
 
@@ -1013,10 +968,6 @@ def view_settings(repo, username=None):
     if flask.request.method == 'GET' and branchname:
         branches_form.branches.data = branchname
 
-    watch = False
-    if authenticated():
-        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
-
     return flask.render_template(
         'settings.html',
         select='settings',
@@ -1030,7 +981,6 @@ def view_settings(repo, username=None):
         plugins=plugins,
         repo_admin=repo_admin,
         branchname = branchname,
-        watch=watch,
     )
 
 
@@ -1505,16 +1455,11 @@ def add_user(repo, username=None):
             APP.logger.exception(err)
             flask.flash('User could not be added', 'error')
 
-    watch = False
-    if authenticated():
-        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
-
     return flask.render_template(
         'add_user.html',
         form=form,
         username=username,
         repo=repo,
-        watch=watch,
     )
 
 
@@ -1629,16 +1574,11 @@ def add_group_project(repo, username=None):
             APP.logger.exception(err)
             flask.flash('Group could not be added', 'error')
 
-    watch = False
-    if authenticated():
-        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
-
     return flask.render_template(
         'add_group_project.html',
         form=form,
         username=username,
         repo=repo,
-        watch=watch,
     )
 
 
@@ -1737,10 +1677,6 @@ def add_token(repo, username=None):
             APP.logger.exception(err)
             flask.flash('User could not be added', 'error')
 
-    watch = False
-    if authenticated():
-        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
-
     return flask.render_template(
         'add_token.html',
         select='settings',
@@ -1749,7 +1685,6 @@ def add_token(repo, username=None):
         repo_admin=repo_admin,
         username=username,
         repo=repo,
-        watch=watch,
     )
 
 
@@ -1881,10 +1816,6 @@ def edit_file(repo, branchname, filename, username=None):
     else:
         data = form.content.data.decode('utf-8')
 
-    watch = False
-    if authenticated():
-        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
-
     return flask.render_template(
         'edit_file.html',
         select='tree',
@@ -1896,7 +1827,6 @@ def edit_file(repo, branchname, filename, username=None):
         form=form,
         user=user,
         branches=repo_obj.listall_branches(),
-        watch=watch,
     )
 
 
@@ -1953,10 +1883,6 @@ def view_docs(repo, username=None, filename=None):
     if not APP.config.get('DOC_APP_URL'):
         flask.abort(404, 'This pagure instance has no doc server')
 
-    watch = False
-    if authenticated():
-        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
-
     return flask.render_template(
         'docs.html',
         select='docs',
@@ -1964,7 +1890,6 @@ def view_docs(repo, username=None, filename=None):
         username=username,
         filename=filename,
         endpoint='view_docs',
-        watch=watch,
     )
 
 
@@ -1982,14 +1907,9 @@ def view_project_activity(repo):
     if not repo_obj:
         flask.abort(404, 'Project not found')
 
-    watch = False
-    if authenticated():
-        watch = pagure.lib.is_watching(SESSION, flask.g.fas_user, repo)
-
     return flask.render_template(
         'activity.html',
         repo=repo_obj,
-        watch=watch,
     )
 
 
