@@ -1017,7 +1017,7 @@ def new_project(session, user, name, blacklist, allowed_prefix,
 
     project = model.Project(
         name=name,
-        description=description.encode('utf-8') if description else None,
+        description=description if description else None,
         url=url if url else None,
         avatar_email=avatar_email if avatar_email else None,
         user_id=user_obj.id,
