@@ -16,6 +16,7 @@ import shutil
 import sys
 import os
 
+import six
 import json
 from mock import patch
 
@@ -253,6 +254,57 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn(u'<p>This repo is brand new!</p>', output.data)
             self.assertIn(
                 u'<title>Overview - project-1 - Pagure</title>', output.data)
+
+        # After
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 1)
+        self.assertTrue(os.path.exists(
+            os.path.join(tests.HERE, 'project-1.git')))
+        self.assertTrue(os.path.exists(
+            os.path.join(tests.HERE, 'tickets', 'project-1.git')))
+        self.assertTrue(os.path.exists(
+            os.path.join(tests.HERE, 'docs', 'project-1.git')))
+        self.assertTrue(os.path.exists(
+            os.path.join(tests.HERE, 'requests', 'project-1.git')))
+
+    def test_non_ascii_new_project(self):
+        """ Test the new_project endpoint with a non-ascii project. """
+        # Before
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+        self.assertFalse(os.path.exists(
+            os.path.join(tests.HERE, 'project-1.git')))
+        self.assertFalse(os.path.exists(
+            os.path.join(tests.HERE, 'tickets', 'project-1.git')))
+        self.assertFalse(os.path.exists(
+            os.path.join(tests.HERE, 'docs', 'project-1.git')))
+        self.assertFalse(os.path.exists(
+            os.path.join(tests.HERE, 'requests', 'project-1.git')))
+
+        user = tests.FakeUser()
+        user.username = 'foo'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/new/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                b'<strong>Create new Project</strong>', output.data)
+
+            csrf_token = output.data.decode('utf-8').split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+                'description': 'Prõjéctö #1',
+                'name': 'project-1',
+                'csrf_token':  csrf_token,
+            }
+            output = self.app.post('/new/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)1
+            self.assertIn(
+                '<div class="projectinfo m-t-1 m-b-1">\nPrõjéctö #1        </div>',
+                output.data if six.PY2 else output.data.decode('utf-8'))
+            self.assertIn(b'<p>This repo is brand new!</p>', output.data)
+            self.assertIn(
+                b'<title>Overview - project-1 - Pagure</title>', output.data)
 
         # After
         projects = pagure.lib.search_projects(self.session)
