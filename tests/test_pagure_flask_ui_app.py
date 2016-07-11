@@ -309,17 +309,35 @@ class PagureFlaskApptests(tests.Modeltests):
 <p>Prõjéctö #1</p>
             </section>''', output.data if six.PY2 else output.data.decode('utf-8'))
 
+            data = {
+                'description': 'Мой первый суперский репозиторий',
+                'name': 'project-2',
+                'csrf_token':  csrf_token,
+                'create_readme': True,
+            }
+            output = self.app.post('/new/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="projectinfo m-t-1 m-b-1">\nМой первый суперский репозиторий        </div>',
+                output.data if six.PY2 else output.data.decode('utf-8'))
+            self.assertIn(
+                '''<section class="readme">
+                <h1>project-2</h1>
+<p>Мой первый суперский репозиторий</p>
+            </section>''', output.data if six.PY2 else output.data.decode('utf-8'))
+
         # After
         projects = pagure.lib.search_projects(self.session)
-        self.assertEqual(len(projects), 1)
-        self.assertTrue(os.path.exists(
-            os.path.join(tests.HERE, 'project-1.git')))
-        self.assertTrue(os.path.exists(
-            os.path.join(tests.HERE, 'tickets', 'project-1.git')))
-        self.assertTrue(os.path.exists(
-            os.path.join(tests.HERE, 'docs', 'project-1.git')))
-        self.assertTrue(os.path.exists(
-            os.path.join(tests.HERE, 'requests', 'project-1.git')))
+        self.assertEqual(len(projects), 2)
+        for project in ['project-1', 'project-2']:
+            self.assertTrue(os.path.exists(
+                os.path.join(tests.HERE, '%s.git' % project)))
+            self.assertTrue(os.path.exists(
+                os.path.join(tests.HERE, 'tickets', '%s.git' % project)))
+            self.assertTrue(os.path.exists(
+                os.path.join(tests.HERE, 'docs', '%s.git' % project)))
+            self.assertTrue(os.path.exists(
+                os.path.join(tests.HERE, 'requests', '%s.git' % project)))
 
     @patch('pagure.ui.app.admin_session_timedout')
     def test_user_settings(self, ast):
