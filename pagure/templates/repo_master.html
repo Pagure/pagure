@@ -31,12 +31,20 @@
 
           {% if authenticated %}
             <div class="btn-group pull-xs-right">
-              <button type="button" class="btn btn-default" id="watch-button">{% if watch %}Unwatch{% else %}Watch{% endif %}</button>
-              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+              <button type="button" class="btn btn-default" id="watch-button">
+                {%- if is_watching(repo.name, repo.user.user if repo.is_fork else None)
+                %}Unwatch{%
+                else %}Watch{%
+                endif -%}
+              </button>
+              <button type="button" class="btn btn-default dropdown-toggle"
+                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                 <span class="sr-only">Toggle Dropdown</span>
               </button>
               <div class="dropdown-menu watch-menu">
-                <form method="POST" id="watch_project" name="watch_project" action="{{ url_for('.watch_repo', user=repo.user.user if repo.is_fork else None, repo=repo.name, watch=0) }}">
+                <form method="POST" id="watch_project" name="watch_project"
+                    action="{{ url_for('.watch_repo', user=repo.user.user if repo.is_fork else None,
+                                       repo=repo.name, watch=0) }}">
                   <a class="dropdown-item" id="watching_button">Unwatch</a>
                   <a class="dropdown-item" id="unwatching_button">Watch</a>
                   {{ forkbuttonform.csrf_token }}
@@ -47,7 +55,8 @@
           {% if branchname %}
             <div class="btn-group pull-xs-right">
               <button type="button" class="btn btn-default">{{ branchname }}</button>
-              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <button type="button" class="btn btn-default dropdown-toggle"
+                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <span class="sr-only">Toggle Dropdown</span>
               </button>
               <div class="dropdown-menu">
