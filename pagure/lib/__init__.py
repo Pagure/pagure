@@ -2859,6 +2859,11 @@ def is_watching(session, user, reponame, repouser=None):
 
     if watcher:
         return watcher.watch
+
+    project = pagure.lib.get_project(session, reponame, user=repouser)
+    if not project:
+        return False
+
     if user.username == project.user.username:
         return True
 
