@@ -296,15 +296,18 @@ class PagureFlaskApptests(tests.Modeltests):
                 'description': 'Prõjéctö #1',
                 'name': 'project-1',
                 'csrf_token':  csrf_token,
+                'create_readme': True,
             }
             output = self.app.post('/new/', data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 200)1
+            self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\nPrõjéctö #1        </div>',
                 output.data if six.PY2 else output.data.decode('utf-8'))
-            self.assertIn(b'<p>This repo is brand new!</p>', output.data)
             self.assertIn(
-                b'<title>Overview - project-1 - Pagure</title>', output.data)
+                '''<section class="readme">
+                <h1>project-1</h1>
+<p>Prõjéctö #1</p>
+            </section>''', output.data if six.PY2 else output.data.decode('utf-8'))
 
         # After
         projects = pagure.lib.search_projects(self.session)
