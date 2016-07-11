@@ -500,6 +500,7 @@ def api_pull_request_add_comment(
     """  # noqa
     repo = pagure.lib.get_project(
         SESSION, repo, user=username, namespace=namespace)
+
     output = {}
 
     if repo is None:
@@ -643,6 +644,7 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
     """  # noqa
     repo = pagure.lib.get_project(
         SESSION, repo, user=username, namespace=namespace)
+
     output = {}
 
     if repo is None:

@@ -40,6 +40,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         pagure.ui.issues.SESSION = self.session
         pagure.api.SESSION = self.session
         pagure.api.project.SESSION = self.session
+        pagure.api.fork.SESSION = self.session
 
         pagure.APP.config['GIT_FOLDER'] = os.path.join(tests.HERE, 'repos')
         pagure.APP.config['FORK_FOLDER'] = os.path.join(
@@ -210,7 +211,6 @@ class PagurePrivateRepotest(tests.Modeltests):
             '<h2 class="m-b-1">All Projects '
             '<span class="label label-default">0</span></h2>', output.data)
 
-        tests.create_projects(self.session)
 
         # Add a private project
         item = pagure.lib.model.Project(
@@ -238,7 +238,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             '<h2 class="m-b-1">All Projects '
-            '<span class="label label-default">3</span></h2>', output.data)
+            '<span class="label label-default">1</span></h2>', output.data)
 
         user = tests.FakeUser(username='foo')
         with tests.user_set(pagure.APP, user):
@@ -517,7 +517,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                 os.makedirs(repo_path)
             pygit2.init_repository(repo_path)
 
-        # Check if the private repo issues are publicly accesible
+        # Check if the private repo issues are publicly not accesible
         output = self.app.get('/test4/issues')
         self.assertEqual(output.status_code, 404)
 
@@ -543,6 +543,13 @@ class PagurePrivateRepotest(tests.Modeltests):
 
             # Check single issue
             output = self.app.get('/test4/issue/1')
+            self.assertEqual(output.status_code, 404)
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+
+            # Whole list
+            output = self.app.get('/test4/issues')
             self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser(username='pingou')
@@ -774,6 +781,142 @@ class PagurePrivateRepotest(tests.Modeltests):
                 }
             )
 
+
+    # Api pull-request views
+    @patch('pagure.lib.notify.send_email')
+    def test_api_private_repo_fork(self,send_email):
+        """ Test api endpoints in api/fork"""
+
+        send_email.return_value = True
+        # Add private repo
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test4',
+            description='test project description',
+            hook_token='aaabbbeeeceee',
+            private=True,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        # Create a token for pingou for this project
+        item = pagure.lib.model.Token(
+            id='foobar_token',
+            user_id=1,
+            project_id=1,
+            expiration=datetime.datetime.utcnow() + datetime.timedelta(
+                days=30)
+        )
+        self.session.add(item)
+        self.session.commit()
+        item = pagure.lib.model.TokenAcl(
+            token_id='foobar_token',
+            acl_id=1,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        # Create a pull-request
+        repo = pagure.lib.get_project(self.session, 'test4')
+        forked_repo = pagure.lib.get_project(self.session, 'test4')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+        output = self.app.get('/api/0/test4/pull-requests')
+        self.assertEqual(output.status_code, 404)
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            # List pull-requests
+            output = self.app.get('/api/0/test4/pull-requests')
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.data)
+            data['requests'][0]['date_created'] = '1431414800'
+            data['requests'][0]['updated_on'] = '1431414800'
+            data['requests'][0]['project']['date_created'] = '1431414800'
+            data['requests'][0]['repo_from']['date_created'] = '1431414800'
+            data['requests'][0]['uid'] = '1431414800'
+            self.assertDictEqual(
+                data,
+                {
+                    'args': {
+                             'assignee': None,
+                             'author': None,
+                             'status': True
+                        },
+                         'requests': [{
+                             'assignee': None,
+                             'branch':  'master',
+                             'branch_from':  'master',
+                             'closed_at': None,
+                             'closed_by': None,
+                             'comments': [],
+                             'commit_start': None,
+                             'commit_stop': None,
+                             'date_created': '1431414800',
+                             'id': 1,
+                             'initial_comment': None,
+                             'project': {
+                                 'date_created': '1431414800',
+                                 'description':  'test project description',
+                                 'id': 1,
+                                 'name':  'test4',
+                                 'parent': None,
+                                 'priorities': {},
+                                 'tags': [],
+                                 'user': {
+                                     'fullname':  'PY C',
+                                     'name':  'pingou'
+                                }
+                            },
+                             'remote_git': None,
+                             'repo_from': {
+                                 'date_created': '1431414800',
+                                 'description':  'test project description',
+                                 'id': 1,
+                                 'name':  'test4',
+                                 'parent': None,
+                                 'priorities': {},
+                                 'tags': [],
+                                 'user': {
+                                     'fullname':  'PY C',
+                                     'name':  'pingou'
+                                }
+                            },
+                             'status':  'Open',
+                             'title':  'test pull-request',
+                             'uid': '1431414800',
+                             'updated_on': '1431414800',
+                             'user': {
+                                 'fullname':  'PY C',
+                                 'name':  'pingou'
+                            }
+                        }],
+                         'total_requests': 1
+                }
+            )
+            headers = {'Authorization': 'token foobar_token'}
+
+            # Access Pull-Request authenticated
+            output = self.app.get('/api/0/test4/pull-requests', headers=headers)
+            self.assertEqual(output.status_code, 200)
+            data2 = json.loads(output.data)
+            data2['requests'][0]['date_created'] = '1431414800'
+            data2['requests'][0]['updated_on'] = '1431414800'
+            data2['requests'][0]['project']['date_created'] = '1431414800'
+            data2['requests'][0]['repo_from']['date_created'] = '1431414800'
+            data2['requests'][0]['uid'] = '1431414800'
+            self.assertDictEqual(data, data2)
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagurePrivateRepotest)
