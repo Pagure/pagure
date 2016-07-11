@@ -348,11 +348,19 @@ def inject_variables():
     if justlogedout:
         flask.session['_justloggedout'] = None
 
+    def is_watching(reponame, username=None):
+        watch = False
+        if authenticated():
+            watch = pagure.lib.is_watching(
+                SESSION, flask.g.fas_user, reponame, repouser=username)
+        return watch
+
     return dict(
         version=__version__,
         admin=user_admin,
         authenticated=authenticated(),
         forkbuttonform=forkbuttonform,
+        is_watching=is_watching,
     )
 
 
