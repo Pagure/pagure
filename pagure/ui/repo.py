@@ -53,7 +53,7 @@ def view_repo(repo, username=None):
     """ Front page of a specific repo.
     """
     if '.' in repo:
-        repo_dot_split = rsplit('.',1)
+        repo_dot_split = repo.rsplit('.',1)
         repo = repo_dot_split[0]
         
     repo = pagure.lib.get_project(SESSION, repo, user=username)
