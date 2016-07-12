@@ -1240,6 +1240,271 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertEqual(request.flags[0].comment, 'Tests passed')
         self.assertEqual(request.flags[0].percent, 100)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_api_private_repo_pr_close(self, send_email):
+        """ Test the api_pull_request_close method of the flask api. """
+        send_email.return_value = True
+
+        pagure.APP.config['REQUESTS_FOLDER'] = None
+
+        # Add private repo
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test4',
+            description='test project description',
+            hook_token='aaabbbeeeceee',
+            private=True,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Add private repo
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test2',
+            description='test project description',
+            hook_token='foo_bar',
+            private=True,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        # Create the pull-request to close
+        repo = pagure.lib.get_project(self.session, 'test4')
+        forked_repo = pagure.lib.get_project(self.session, 'test4')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Invalid project
+        output = self.app.post(
+            '/api/0/foo/pull-request/1/close', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Project not found",
+              "error_code": "ENOPROJECT",
+            }
+        )
+
+        # Valid token, wrong project
+        output = self.app.post(
+            '/api/0/test2/pull-request/1/close', headers=headers)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid or expired token. Please visit " \
+                  "https://pagure.org/ to get or renew your API token.",
+              "error_code": "EINVALIDTOK",
+            }
+        )
+
+        # Invalid PR
+        output = self.app.post(
+            '/api/0/test4/pull-request/2/close', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'error': 'Pull-Request not found', 'error_code': "ENOREQ"}
+        )
+
+        # Create a token for foo for this project
+        item = pagure.lib.model.Token(
+            id='foobar_token',
+            user_id=2,
+            project_id=1,
+            expiration=datetime.datetime.utcnow() + datetime.timedelta(
+                days=30)
+        )
+        self.session.add(item)
+        self.session.commit()
+        item = pagure.lib.model.TokenAcl(
+            token_id='foobar_token',
+            acl_id=2,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        headers = {'Authorization': 'token foobar_token'}
+
+        # User not admin
+        output = self.app.post(
+            '/api/0/test4/pull-request/1/close', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Project not found",
+              "error_code": "ENOPROJECT",
+            }
+        )
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Close PR
+        output = self.app.post(
+            '/api/0/test4/pull-request/1/close', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {"message": "Pull-request closed!"}
+        )
+
+    @patch('pagure.lib.notify.send_email')
+    @patch('pagure.lib.git.merge_pull_request')
+    def test_api_pull_request_merge(self, mpr, send_email):
+        """ Test the api_pull_request_merge method of the flask api. """
+        mpr.return_value = 'Changes merged!'
+        send_email.return_value = True
+
+        pagure.APP.config['REQUESTS_FOLDER'] = None
+
+        # Add private repo
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test4',
+            description='test project description',
+            hook_token='aaabbbeeeceee',
+            private=True,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Add private repo
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test2',
+            description='test project description',
+            hook_token='foo_bar',
+            private=True,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        # Create the pull-request to close
+        repo = pagure.lib.get_project(self.session, 'test4')
+        forked_repo = pagure.lib.get_project(self.session, 'test4')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Invalid project
+        output = self.app.post(
+            '/api/0/foo/pull-request/1/merge', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Project not found",
+              "error_code": "ENOPROJECT",
+            }
+        )
+
+        # Valid token, wrong project
+        output = self.app.post(
+            '/api/0/test2/pull-request/1/merge', headers=headers)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid or expired token. Please visit " \
+                  "https://pagure.org/ to get or renew your API token.",
+              "error_code": "EINVALIDTOK",
+            }
+        )
+
+        # Invalid PR
+        output = self.app.post(
+            '/api/0/test4/pull-request/2/merge', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'error': 'Pull-Request not found', 'error_code': "ENOREQ"}
+        )
+
+        # Create a token for foo for this project
+        item = pagure.lib.model.Token(
+            id='foobar_token',
+            user_id=2,
+            project_id=1,
+            expiration=datetime.datetime.utcnow() + datetime.timedelta(
+                days=30)
+        )
+        self.session.add(item)
+        self.session.commit()
+        item = pagure.lib.model.TokenAcl(
+            token_id='foobar_token',
+            acl_id=3,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        headers = {'Authorization': 'token foobar_token'}
+
+        # User not admin
+        output = self.app.post(
+            '/api/0/test4/pull-request/1/merge', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Project not found",
+              "error_code": "ENOPROJECT",
+            }
+        )
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Merge PR
+        output = self.app.post(
+            '/api/0/test4/pull-request/1/merge', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {"message": "Changes merged!"}
+        )
 
 
 if __name__ == '__main__':
