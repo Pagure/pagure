@@ -26,6 +26,8 @@ from pygments.lexers import guess_lexer_for_filename
 from pygments.lexers.special import TextLexer
 from pygments.util import ClassNotFound
 from sqlalchemy.exc import SQLAlchemyError
+from werkzeug.routing import BaseConverter
+from flask import redirect
 
 import mimetypes
 import chardet
@@ -44,6 +46,22 @@ from pagure import (APP, SESSION, LOG, __get_file_in_tree, login_required,
 
 # pylint: disable=E1101
 
+class RegexConverter(BaseConverter):
+    def __init__(self,url_map,*items):
+        super(RegexConverter,self).__init__(url_map)
+        self.regex = items[0]
+
+APP.url_map.converters['regex'] = RegexConverter
+
+
+@APP.route("/<regex('.*\.git$'):repo>/")
+@APP.route("/<regex('.*\.git$'):repo>")
+def redirect_to_repo(repo):
+    repo_dot_split = repo.rsplit('.',1)
+    repo = repo_dot_split[0]
+    redirect_repo_url = '/' + repo
+    return redirect(redirect_repo_url)
+
 
 @APP.route('/<repo:repo>/')
 @APP.route('/<repo:repo>')
@@ -51,11 +69,7 @@ from pagure import (APP, SESSION, LOG, __get_file_in_tree, login_required,
 @APP.route('/fork/<username>/<repo:repo>')
 def view_repo(repo, username=None):
     """ Front page of a specific repo.
-    """
-    if '.' in repo:
-        repo_dot_split = repo.rsplit('.',1)
-        repo = repo_dot_split[0]
-        
+    """    
     repo = pagure.lib.get_project(SESSION, repo, user=username)
 
     if repo is None:
