@@ -176,7 +176,6 @@ def ticket_add_comment():
 
 
 @PV.route('/pull-request/merge', methods=['POST'])
-@localonly
 def mergeable_request_pull():
     """ Returns if the specified pull-request can be merged or not.
     """
@@ -237,7 +236,6 @@ def mergeable_request_pull():
 
 
 @PV.route('/pull-request/ready', methods=['POST'])
-@localonly
 def get_pull_request_ready_branch():
     """ Return the list of branches that have commits not in the main
     branch/repo (thus for which one could open a PR) and the number of
@@ -336,7 +334,6 @@ def get_pull_request_ready_branch():
 @PV.route('/<repo>/issue/template', methods=['POST'])
 @PV.route('/fork/<username>/<repo>/issue/template',
            methods=['POST'])
-@localonly
 def get_ticket_template(repo, username=None):
     """ Return the template asked for the specified project
     """
