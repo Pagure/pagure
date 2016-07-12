@@ -1070,6 +1070,176 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.session, project_id=1, requestid=1)
         self.assertEqual(len(request.comments), 1)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_api_private_repo_pr_add_flag(self, mockemail):
+        """ Test the api_pull_request_add_flag method of the flask api. """
+        mockemail.return_value = True
+        pagure.APP.config['REQUESTS_FOLDER'] = None
+
+        # Add private repo
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test4',
+            description='test project description',
+            hook_token='aaabbbeeeceee',
+            private=True,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        # Add private repo
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test2',
+            description='test project description',
+            hook_token='foo_bar',
+            private=True,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Invalid project
+        output = self.app.post(
+            '/api/0/foo/pull-request/1/flag', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Project not found",
+              "error_code": "ENOPROJECT",
+            }
+        )
+
+        # Valid token, wrong project
+        output = self.app.post(
+            '/api/0/test2/pull-request/1/flag', headers=headers)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid or expired token. Please visit " \
+                  "https://pagure.org/ to get or renew your API token.",
+              "error_code": "EINVALIDTOK",
+            }
+        )
+
+        # No input
+        output = self.app.post(
+            '/api/0/test4/pull-request/1/flag', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Pull-Request not found",
+              "error_code": "ENOREQ",
+            }
+        )
+
+        # Create a pull-request
+        repo = pagure.lib.get_project(self.session, 'test4')
+        forked_repo = pagure.lib.get_project(self.session, 'test4')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+
+        # Check comments before
+        request = pagure.lib.search_pull_requests(
+            self.session, project_id=1, requestid=1)
+        self.assertEqual(len(request.flags), 0)
+
+        data = {
+            'username': 'Jenkins',
+            'percent': 100,
+            'url': 'http://jenkins.cloud.fedoraproject.org/',
+            'uid': 'jenkins_build_pagure_100+seed',
+        }
+
+        # Incomplete request
+        output = self.app.post(
+            '/api/0/test4/pull-request/1/flag', data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid or incomplete input submited",
+              "error_code": "EINVALIDREQ",
+            }
+        )
+
+        # No change
+        request = pagure.lib.search_pull_requests(
+            self.session, project_id=1, requestid=1)
+        self.assertEqual(len(request.flags), 0)
+
+        data = {
+            'username': 'Jenkins',
+            'percent': 0,
+            'comment': 'Tests failed',
+            'url': 'http://jenkins.cloud.fedoraproject.org/',
+            'uid': 'jenkins_build_pagure_100+seed',
+        }
+
+        # Valid request
+        output = self.app.post(
+            '/api/0/test4/pull-request/1/flag', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'Flag added'}
+        )
+
+        # One flag added
+        request = pagure.lib.search_pull_requests(
+            self.session, project_id=1, requestid=1)
+        self.assertEqual(len(request.flags), 1)
+        self.assertEqual(request.flags[0].comment, 'Tests failed')
+        self.assertEqual(request.flags[0].percent, 0)
+
+        # Update flag
+        data = {
+            'username': 'Jenkins',
+            'percent': 100,
+            'comment': 'Tests passed',
+            'url': 'http://jenkins.cloud.fedoraproject.org/',
+            'uid': 'jenkins_build_pagure_100+seed',
+        }
+
+        output = self.app.post(
+            '/api/0/test4/pull-request/1/flag', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'Flag updated'}
+        )
+
+        # One flag added
+        request = pagure.lib.search_pull_requests(
+            self.session, project_id=1, requestid=1)
+        self.assertEqual(len(request.flags), 1)
+        self.assertEqual(request.flags[0].comment, 'Tests passed')
+        self.assertEqual(request.flags[0].percent, 100)
+
 
 
 if __name__ == '__main__':
