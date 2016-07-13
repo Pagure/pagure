@@ -298,6 +298,7 @@ $(document).ready(function() {
       data: resp['mention'],
       insertTpl: '@${username}',
       displayTpl: "<li><img src=\"${image}\"> ${username} <small>${name}</small></li>",
+      searchKey: "username"
     }
     $("#comment").atwho(userConfig);
   });
