@@ -212,7 +212,6 @@ class PagurePrivateRepotest(tests.Modeltests):
             '<h2 class="m-b-1">All Projects '
             '<span class="label label-default">0</span></h2>', output.data)
 
-
         # Add a private project
         item = pagure.lib.model.Project(
             user_id=2,  # foo
@@ -784,7 +783,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
     # Api pull-request views
     @patch('pagure.lib.notify.send_email')
-    def test_api_private_repo_fork(self,send_email):
+    def test_api_private_repo_fork(self, send_email):
         """ Test api endpoints in api/fork"""
 
         send_email.return_value = True
@@ -844,23 +843,23 @@ class PagurePrivateRepotest(tests.Modeltests):
                 data,
                 {
                     'args': {
-                             'assignee': None,
-                             'author': None,
-                             'status': True
-                        },
-                         'requests': [{
-                             'assignee': None,
-                             'branch':  'master',
-                             'branch_from':  'master',
-                             'closed_at': None,
-                             'closed_by': None,
-                             'comments': [],
-                             'commit_start': None,
-                             'commit_stop': None,
-                             'date_created': '1431414800',
-                             'id': 1,
-                             'initial_comment': None,
-                             'project': {
+                        'assignee': None,
+                        'author': None,
+                        'status': True
+                    },
+                    'requests': [{
+                        'assignee': None,
+                        'branch':  'master',
+                        'branch_from':  'master',
+                        'closed_at': None,
+                        'closed_by': None,
+                        'comments': [],
+                        'commit_start': None,
+                        'commit_stop': None,
+                        'date_created': '1431414800',
+                        'id': 1,
+                        'initial_comment': None,
+                        'project': {
                                  'date_created': '1431414800',
                                  'description':  'test project description',
                                  'id': 1,
@@ -871,38 +870,39 @@ class PagurePrivateRepotest(tests.Modeltests):
                                  'user': {
                                      'fullname':  'PY C',
                                      'name':  'pingou'
-                                }
-                            },
-                             'remote_git': None,
-                             'repo_from': {
-                                 'date_created': '1431414800',
-                                 'description':  'test project description',
-                                 'id': 1,
-                                 'name':  'test4',
-                                 'parent': None,
-                                 'priorities': {},
-                                 'tags': [],
-                                 'user': {
-                                     'fullname':  'PY C',
-                                     'name':  'pingou'
-                                }
-                            },
-                             'status':  'Open',
-                             'title':  'test pull-request',
-                             'uid': '1431414800',
-                             'updated_on': '1431414800',
-                             'user': {
-                                 'fullname':  'PY C',
-                                 'name':  'pingou'
+                                 }
+                                 },
+                        'remote_git': None,
+                        'repo_from': {
+                            'date_created': '1431414800',
+                            'description':  'test project description',
+                            'id': 1,
+                            'name':  'test4',
+                            'parent': None,
+                            'priorities': {},
+                            'tags': [],
+                            'user': {
+                                'fullname':  'PY C',
+                                'name':  'pingou'
                             }
-                        }],
-                         'total_requests': 1
+                        },
+                        'status':  'Open',
+                        'title':  'test pull-request',
+                        'uid': '1431414800',
+                        'updated_on': '1431414800',
+                        'user': {
+                            'fullname':  'PY C',
+                            'name':  'pingou'
+                        }
+                    }],
+                    'total_requests': 1
                 }
             )
             headers = {'Authorization': 'token foobar_token'}
 
             # Access Pull-Request authenticated
-            output = self.app.get('/api/0/test4/pull-requests', headers=headers)
+            output = self.app.get(
+                '/api/0/test4/pull-requests', headers=headers)
             self.assertEqual(output.status_code, 200)
             data2 = json.loads(output.data)
             data2['requests'][0]['date_created'] = '1431414800'
@@ -911,7 +911,6 @@ class PagurePrivateRepotest(tests.Modeltests):
             data2['requests'][0]['repo_from']['date_created'] = '1431414800'
             data2['requests'][0]['uid'] = '1431414800'
             self.assertDictEqual(data, data2)
-
 
             # For single PR
             output = self.app.get('/api/0/test4/pull-request/1')
@@ -925,57 +924,58 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertDictEqual(
                 data,
                 {
-                  "assignee": None,
-                  "branch": "master",
-                  "branch_from": "master",
-                  "closed_at": None,
-                  "closed_by": None,
-                  "comments": [],
-                  "commit_start": None,
-                  "commit_stop": None,
-                  "date_created": "1431414800",
-                  "id": 1,
-                  "initial_comment": None,
-                  "project": {
+                    "assignee": None,
+                    "branch": "master",
+                    "branch_from": "master",
+                    "closed_at": None,
+                    "closed_by": None,
+                    "comments": [],
+                    "commit_start": None,
+                    "commit_stop": None,
                     "date_created": "1431414800",
-                    "description": "test project description",
                     "id": 1,
-                    "name": "test4",
-                    "parent": None,
-                    "priorities": {},
-                    "tags": [],
+                    "initial_comment": None,
+                    "project": {
+                        "date_created": "1431414800",
+                        "description": "test project description",
+                        "id": 1,
+                        "name": "test4",
+                        "parent": None,
+                        "priorities": {},
+                        "tags": [],
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou"
+                        }
+                    },
+                    "remote_git": None,
+                    "repo_from": {
+                        "date_created": "1431414800",
+                        "description": "test project description",
+                        "id": 1,
+                        "name": "test4",
+                        "parent": None,
+                        "priorities": {},
+                        "tags": [],
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou"
+                        }
+                    },
+                    "status": 'Open',
+                    "title": "test pull-request",
+                    "uid": "1431414800",
+                    "updated_on": "1431414800",
                     "user": {
-                      "fullname": "PY C",
-                      "name": "pingou"
+                        "fullname": "PY C",
+                        "name": "pingou"
                     }
-                  },
-                  "remote_git": None,
-                  "repo_from": {
-                    "date_created": "1431414800",
-                    "description": "test project description",
-                    "id": 1,
-                    "name": "test4",
-                    "parent": None,
-                    "priorities": {},
-                    "tags": [],
-                    "user": {
-                      "fullname": "PY C",
-                      "name": "pingou"
-                    }
-                  },
-                  "status": 'Open',
-                  "title": "test pull-request",
-                  "uid": "1431414800",
-                  "updated_on": "1431414800",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
                 }
             )
 
             # Access Pull-Request authenticated
-            output = self.app.get('/api/0/test4/pull-request/1', headers=headers)
+            output = self.app.get(
+                '/api/0/test4/pull-request/1', headers=headers)
             self.assertEqual(output.status_code, 200)
             data2 = json.loads(output.data)
             data2['date_created'] = '1431414800'
@@ -1040,8 +1040,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or incomplete input submited",
-              "error_code": "EINVALIDREQ",
+                "error": "Invalid or incomplete input submited",
+                "error_code": "EINVALIDREQ",
             }
         )
 
@@ -1110,8 +1110,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Project not found",
-              "error_code": "ENOPROJECT",
+                "error": "Project not found",
+                "error_code": "ENOPROJECT",
             }
         )
 
@@ -1123,9 +1123,9 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or expired token. Please visit " \
-                  "https://pagure.org/ to get or renew your API token.",
-              "error_code": "EINVALIDTOK",
+                "error": "Invalid or expired token. Please visit "
+                "https://pagure.org/ to get or renew your API token.",
+                "error_code": "EINVALIDTOK",
             }
         )
 
@@ -1137,8 +1137,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Pull-Request not found",
-              "error_code": "ENOREQ",
+                "error": "Pull-Request not found",
+                "error_code": "ENOREQ",
             }
         )
 
@@ -1179,8 +1179,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or incomplete input submited",
-              "error_code": "EINVALIDREQ",
+                "error": "Invalid or incomplete input submited",
+                "error_code": "EINVALIDREQ",
             }
         )
 
@@ -1298,8 +1298,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Project not found",
-              "error_code": "ENOPROJECT",
+                "error": "Project not found",
+                "error_code": "ENOPROJECT",
             }
         )
 
@@ -1311,9 +1311,9 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or expired token. Please visit " \
-                  "https://pagure.org/ to get or renew your API token.",
-              "error_code": "EINVALIDTOK",
+                "error": "Invalid or expired token. Please visit "
+                "https://pagure.org/ to get or renew your API token.",
+                "error_code": "EINVALIDTOK",
             }
         )
 
@@ -1354,8 +1354,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Project not found",
-              "error_code": "ENOPROJECT",
+                "error": "Project not found",
+                "error_code": "ENOPROJECT",
             }
         )
 
@@ -1432,8 +1432,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Project not found",
-              "error_code": "ENOPROJECT",
+                "error": "Project not found",
+                "error_code": "ENOPROJECT",
             }
         )
 
@@ -1445,9 +1445,9 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or expired token. Please visit " \
-                  "https://pagure.org/ to get or renew your API token.",
-              "error_code": "EINVALIDTOK",
+                "error": "Invalid or expired token. Please visit "
+                "https://pagure.org/ to get or renew your API token.",
+                "error_code": "EINVALIDTOK",
             }
         )
 
@@ -1488,8 +1488,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Project not found",
-              "error_code": "ENOPROJECT",
+                "error": "Project not found",
+                "error_code": "ENOPROJECT",
             }
         )
 
@@ -1549,9 +1549,9 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or expired token. Please visit " \
-                  "https://pagure.org/ to get or renew your API token.",
-              "error_code": "EINVALIDTOK",
+                "error": "Invalid or expired token. Please visit "
+                "https://pagure.org/ to get or renew your API token.",
+                "error_code": "EINVALIDTOK",
             }
         )
 
@@ -1562,8 +1562,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or incomplete input submited",
-              "error_code": "EINVALIDREQ",
+                "error": "Invalid or incomplete input submited",
+                "error_code": "EINVALIDREQ",
             }
         )
 
@@ -1579,8 +1579,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Project not found",
-              "error_code": "ENOPROJECT",
+                "error": "Project not found",
+                "error_code": "ENOPROJECT",
             }
         )
 
@@ -1592,8 +1592,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or incomplete input submited",
-              "error_code": "EINVALIDREQ",
+                "error": "Invalid or incomplete input submited",
+                "error_code": "EINVALIDREQ",
             }
         )
 
@@ -1623,8 +1623,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Project not found",
-              "error_code": "ENOPROJECT",
+                "error": "Project not found",
+                "error_code": "ENOPROJECT",
             }
         )
 
@@ -1638,33 +1638,33 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertDictEqual(
                 data,
                 {
-                  "args": {
-                    "assignee": None,
-                    "author": None,
-                    "status": None,
-                    "tags": []
-                  },
-                  "total_issues": 1,
-                  "issues": [
-                    {
-                      "assignee": None,
-                      "blocks": [],
-                      "comments": [],
-                      "content": "This issue needs attention",
-                      "date_created": "1431414800",
-                      "depends": [],
-                      "id": 1,
-                      "priority": None,
-                      "private": False,
-                      "status": "Open",
-                      "tags": [],
-                      "title": "test issue",
-                      "user": {
-                        "fullname": "PY C",
-                        "name": "pingou"
-                      }
-                    }
-                  ]
+                    "args": {
+                        "assignee": None,
+                        "author": None,
+                        "status": None,
+                        "tags": []
+                    },
+                    "total_issues": 1,
+                    "issues": [
+                        {
+                            "assignee": None,
+                            "blocks": [],
+                            "comments": [],
+                            "content": "This issue needs attention",
+                            "date_created": "1431414800",
+                            "depends": [],
+                            "id": 1,
+                            "priority": None,
+                            "private": False,
+                            "status": "Open",
+                            "tags": [],
+                            "title": "test issue",
+                            "user": {
+                                "fullname": "PY C",
+                                "name": "pingou"
+                            }
+                        }
+                    ]
                 }
             )
 
@@ -1693,35 +1693,35 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertDictEqual(
                 data,
                 {'args':
-                {'assignee': None, 'author': None, 'status': None, 'tags': []},
-              'issues': [{u'assignee': None,
-                    'blocks': [],
-                    'comments': [],
-                    'content': 'This issue needs attention',
-                    'date_created': '1431414800',
-                    'depends': [],
-                    'id': 1,
-                    'priority': None,
-                    'private': False,
-                    'status': 'Open',
-                    'tags': [],
-                    'title': u'test issue',
-                    'user': {'fullname': 'PY C', 'name': 'pingou'}},
-                        {'assignee': None,
-                        'blocks': [],
-                        'comments': [],
-                        'content': 'We should work on this',
-                        'date_created': '1431414800',
-                        'depends': [],
-                        'id': 2,
-                        'priority': None,
-                        'private': True,
-                        'status': 'Open',
-                        'tags': [],
-                        'title': 'Test issue',
-                    'user': {'fullname': 'PY C', 'name': 'pingou'}}],
+                 {'assignee': None, 'author': None, 'status': None, 'tags': []},
+                 'issues': [{u'assignee': None,
+                             'blocks': [],
+                             'comments': [],
+                             'content': 'This issue needs attention',
+                             'date_created': '1431414800',
+                             'depends': [],
+                             'id': 1,
+                             'priority': None,
+                             'private': False,
+                             'status': 'Open',
+                             'tags': [],
+                             'title': u'test issue',
+                             'user': {'fullname': 'PY C', 'name': 'pingou'}},
+                            {'assignee': None,
+                             'blocks': [],
+                             'comments': [],
+                             'content': 'We should work on this',
+                             'date_created': '1431414800',
+                             'depends': [],
+                             'id': 2,
+                             'priority': None,
+                             'private': True,
+                             'status': 'Open',
+                             'tags': [],
+                             'title': 'Test issue',
+                             'user': {'fullname': 'PY C', 'name': 'pingou'}}],
                     'total_issues': 2}
-                    )
+            )
 
         # Access issues authenticated but non-existing token
         headers = {'Authorization': 'token aaabbbccc'}
@@ -1739,92 +1739,95 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "args": {
-                "assignee": None,
-                "author": None,
-                "status": None,
-                "tags": []
-              },
-              "total_issues": 2,
-              "issues": [
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 1,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
+                "args": {
+                    "assignee": None,
+                    "author": None,
+                    "status": None,
+                    "tags": []
                 },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "comments": [],
-                  "content": "We should work on this",
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 2,
-                  "priority": None,
-                  "private": True,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "Test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                }
-              ]
+                "total_issues": 2,
+                "issues": [
+                    {
+                        "assignee": None,
+                        "blocks": [],
+                        "comments": [],
+                        "content": "This issue needs attention",
+                        "date_created": "1431414800",
+                        "depends": [],
+                        "id": 1,
+                        "priority": None,
+                        "private": False,
+                        "status": "Open",
+                        "tags": [],
+                        "title": "test issue",
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou"
+                        }
+                    },
+                    {
+                        "assignee": None,
+                        "blocks": [],
+                        "comments": [],
+                        "content": "We should work on this",
+                        "date_created": "1431414800",
+                        "depends": [],
+                        "id": 2,
+                        "priority": None,
+                        "private": True,
+                        "status": "Open",
+                        "tags": [],
+                        "title": "Test issue",
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou"
+                        }
+                    }
+                ]
             }
         )
 
         # List closed issue
-        output = self.app.get('/api/0/test4/issues?status=Closed', headers=headers)
+        output = self.app.get(
+            '/api/0/test4/issues?status=Closed', headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         self.assertDictEqual(
             data,
             {
-              "args": {
-                "assignee": None,
-                "author": None,
-                "status": "Closed",
-                "tags": []
-              },
-              "total_issues": 0,
-              "issues": []
+                "args": {
+                    "assignee": None,
+                    "author": None,
+                    "status": "Closed",
+                    "tags": []
+                },
+                "total_issues": 0,
+                "issues": []
             }
         )
 
         # List closed issue
-        output = self.app.get('/api/0/test4/issues?status=Invalid', headers=headers)
+        output = self.app.get(
+            '/api/0/test4/issues?status=Invalid', headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         self.assertDictEqual(
             data,
             {
-              "args": {
-                "assignee": None,
-                "author": None,
-                "status": "Invalid",
-                "tags": []
-              },
-              "total_issues": 0,
-              "issues": []
+                "args": {
+                    "assignee": None,
+                    "author": None,
+                    "status": "Invalid",
+                    "tags": []
+                },
+                "total_issues": 0,
+                "issues": []
             }
         )
 
         # List all issues
-        output = self.app.get('/api/0/test4/issues?status=All', headers=headers)
+        output = self.app.get(
+            '/api/0/test4/issues?status=All', headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['issues'][0]['date_created'] = '1431414800'
@@ -1891,8 +1894,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Project not found",
-              "error_code": "ENOPROJECT",
+                "error": "Project not found",
+                "error_code": "ENOPROJECT",
             }
         )
 
@@ -1903,8 +1906,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Project not found",
-              "error_code": "ENOPROJECT",
+                "error": "Project not found",
+                "error_code": "ENOPROJECT",
             }
         )
 
@@ -1917,8 +1920,8 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertDictEqual(
                 data,
                 {
-                  "error": "Project not found",
-                  "error_code": "ENOPROJECT",
+                    "error": "Project not found",
+                    "error_code": "ENOPROJECT",
                 }
             )
 
@@ -1932,25 +1935,24 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertDictEqual(
                 data,
                 {
-                  "assignee": None,
-                  "blocks": [],
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 1,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
+                    "assignee": None,
+                    "blocks": [],
+                    "comments": [],
+                    "content": "This issue needs attention",
+                    "date_created": "1431414800",
+                    "depends": [],
+                    "id": 1,
+                    "priority": None,
+                    "private": False,
+                    "status": "Open",
+                    "tags": [],
+                    "title": "test issue",
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou"
+                    }
                 }
             )
-
 
         headers = {'Authorization': 'token aaabbbccc'}
 
@@ -1961,8 +1963,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or expired token. Please visit https://pagure.org/ to get or renew your API token.",
-              "error_code": "EINVALIDTOK"
+                "error": "Invalid or expired token. Please visit https://pagure.org/ to get or renew your API token.",
+                "error_code": "EINVALIDTOK"
             }
         )
 
@@ -1976,22 +1978,22 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "assignee": None,
-              "blocks": [],
-              "comments": [],
-              "content": "This issue needs attention",
-              "date_created": "1431414800",
-              "depends": [],
-              "id": 1,
-              "priority": None,
-              "private": False,
-              "status": "Open",
-              "tags": [],
-              "title": "test issue",
-              "user": {
-                "fullname": "PY C",
-                "name": "pingou"
-              }
+                "assignee": None,
+                "blocks": [],
+                "comments": [],
+                "content": "This issue needs attention",
+                "date_created": "1431414800",
+                "depends": [],
+                "id": 1,
+                "priority": None,
+                "private": False,
+                "status": "Open",
+                "tags": [],
+                "title": "test issue",
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou"
+                }
             }
         )
 
@@ -2027,22 +2029,23 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Project not found",
-              "error_code": "ENOPROJECT",
+                "error": "Project not found",
+                "error_code": "ENOPROJECT",
             }
         )
 
         # Valid token, wrong project
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
-            output = self.app.post('/api/0/test2/issue/1/status', headers=headers)
+            output = self.app.post(
+                '/api/0/test2/issue/1/status', headers=headers)
             self.assertEqual(output.status_code, 404)
             data = json.loads(output.data)
             self.assertDictEqual(
                 data,
                 {
-                  "error": "Project not found",
-                  "error_code": "ENOPROJECT",
+                    "error": "Project not found",
+                    "error_code": "ENOPROJECT",
                 }
             )
 
@@ -2053,8 +2056,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Issue not found",
-              "error_code": "ENOISSUE",
+                "error": "Issue not found",
+                "error_code": "ENOISSUE",
             }
         )
 
@@ -2071,7 +2074,6 @@ class PagurePrivateRepotest(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #1')
-
 
         # Check status before
         repo = pagure.lib.get_project(self.session, 'test4')
@@ -2092,8 +2094,8 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertDictEqual(
                 data,
                 {
-                  "error": "Invalid or incomplete input submited",
-                  "error_code": "EINVALIDREQ",
+                    "error": "Invalid or incomplete input submited",
+                    "error_code": "EINVALIDREQ",
                 }
             )
 
@@ -2163,8 +2165,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Project not found",
-              "error_code": "ENOPROJECT",
+                "error": "Project not found",
+                "error_code": "ENOPROJECT",
             }
         )
 
@@ -2176,9 +2178,9 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or expired token. Please visit " \
-                  "https://pagure.org/ to get or renew your API token.",
-              "error_code": "EINVALIDTOK",
+                "error": "Invalid or expired token. Please visit "
+                "https://pagure.org/ to get or renew your API token.",
+                "error_code": "EINVALIDTOK",
             }
         )
 
@@ -2190,8 +2192,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Issue not found",
-              "error_code": "ENOISSUE",
+                "error": "Issue not found",
+                "error_code": "ENOISSUE",
             }
         )
 
@@ -2227,8 +2229,8 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "error": "Invalid or incomplete input submited",
-              "error_code": "EINVALIDREQ",
+                "error": "Invalid or incomplete input submited",
+                "error_code": "EINVALIDREQ",
             }
         )
 
@@ -2279,7 +2281,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
-            output = self.app.get('/api/0/test/issue/1/comment/1')
+            output = self.app.get('/api/0/test4/issue/1/comment/1')
             self.assertEqual(output.status_code, 200)
             data = json.loads(output.data)
             data['date_created'] = '1435821770'
@@ -2288,46 +2290,45 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertDictEqual(
                 data,
                 {
-                  "avatar_url": "https://seccdn.libravatar.org/avatar/...",
-                  "comment": "This is a very interesting question",
-                  "comment_date": "2015-07-02 09:22",
-                  "date_created": "1435821770",
-                  "edited_on": None,
-                  "editor": None,
-                  "id": 1,
-                  "parent": None,
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
+                    "avatar_url": "https://seccdn.libravatar.org/avatar/...",
+                    "comment": "This is a very interesting question",
+                    "comment_date": "2015-07-02 09:22",
+                    "date_created": "1435821770",
+                    "edited_on": None,
+                    "editor": None,
+                    "id": 1,
+                    "parent": None,
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou"
+                    }
                 }
             )
 
-        # Issue and comment exists, using UID
-        output = self.app.get('/api/0/test/issue/aaabbbccc#1/comment/1')
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        data['date_created'] = '1435821770'
-        data["comment_date"] = "2015-07-02 09:22"
-        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
-        self.assertDictEqual(
-            data,
-            {
-              "avatar_url": "https://seccdn.libravatar.org/avatar/...",
-              "comment": "This is a very interesting question",
-              "comment_date": "2015-07-02 09:22",
-              "date_created": "1435821770",
-              "edited_on": None,
-              "editor": None,
-              "id": 1,
-              "parent": None,
-              "user": {
-                "fullname": "PY C",
-                "name": "pingou"
-              }
-            }
-        )
-
+            # Issue and comment exists, using UID
+            output = self.app.get('/api/0/test4/issue/aaabbbccc#1/comment/1')
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.data)
+            data['date_created'] = '1435821770'
+            data["comment_date"] = "2015-07-02 09:22"
+            data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
+            self.assertDictEqual(
+                data,
+                {
+                    "avatar_url": "https://seccdn.libravatar.org/avatar/...",
+                    "comment": "This is a very interesting question",
+                    "comment_date": "2015-07-02 09:22",
+                    "date_created": "1435821770",
+                    "edited_on": None,
+                    "editor": None,
+                    "id": 1,
+                    "parent": None,
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou"
+                    }
+                }
+            )
 
 
 if __name__ == '__main__':
