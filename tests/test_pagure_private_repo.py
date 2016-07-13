@@ -41,6 +41,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         pagure.api.SESSION = self.session
         pagure.api.project.SESSION = self.session
         pagure.api.fork.SESSION = self.session
+        pagure.api.issue.SESSION = self.session
 
         pagure.APP.config['GIT_FOLDER'] = os.path.join(tests.HERE, 'repos')
         pagure.APP.config['FORK_FOLDER'] = os.path.join(
@@ -781,7 +782,6 @@ class PagurePrivateRepotest(tests.Modeltests):
                 }
             )
 
-
     # Api pull-request views
     @patch('pagure.lib.notify.send_email')
     def test_api_private_repo_fork(self,send_email):
@@ -985,7 +985,6 @@ class PagurePrivateRepotest(tests.Modeltests):
             data2['date_created'] = '1431414800'
             data2['updated_on'] = '1431414800'
             self.assertDictEqual(data, data2)
-
 
     @patch('pagure.lib.notify.send_email')
     def test_api_pr_private_repo_add_comment(self, mockemail):
@@ -1374,7 +1373,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
     @patch('pagure.lib.notify.send_email')
     @patch('pagure.lib.git.merge_pull_request')
-    def test_api_pull_request_merge(self, mpr, send_email):
+    def test_api_private_repo_pr_merge(self, mpr, send_email):
         """ Test the api_pull_request_merge method of the flask api. """
         mpr.return_value = 'Changes merged!'
         send_email.return_value = True
@@ -1506,6 +1505,495 @@ class PagurePrivateRepotest(tests.Modeltests):
             {"message": "Changes merged!"}
         )
 
+    def test_api_private_repo_new_issue(self):
+        """ Test the api_new_issue method of the flask api. """
+        # Add private repo
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test4',
+            description='test project description',
+            hook_token='aaabbbeeeceee',
+            private=True,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        for repo in ['GIT_FOLDER', 'TICKETS_FOLDER']:
+            # Add a git repo
+            repo_path = os.path.join(
+                pagure.APP.config.get(repo), 'test4.git')
+            if not os.path.exists(repo_path):
+                os.makedirs(repo_path)
+            pygit2.init_repository(repo_path, bare=True)
+
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Add private repo
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test2',
+            description='test project description',
+            hook_token='foo_bar',
+            private=True,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Valid token, wrong project
+        output = self.app.post('/api/0/test2/new_issue', headers=headers)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid or expired token. Please visit " \
+                  "https://pagure.org/ to get or renew your API token.",
+              "error_code": "EINVALIDTOK",
+            }
+        )
+
+        # No input
+        output = self.app.post('/api/0/test4/new_issue', headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid or incomplete input submited",
+              "error_code": "EINVALIDREQ",
+            }
+        )
+
+        data = {
+            'title': 'test issue',
+        }
+
+        # Invalid repo
+        output = self.app.post(
+            '/api/0/foo/new_issue', data=data, headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Project not found",
+              "error_code": "ENOPROJECT",
+            }
+        )
+
+        # Incomplete request
+        output = self.app.post(
+            '/api/0/test4/new_issue', data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid or incomplete input submited",
+              "error_code": "EINVALIDREQ",
+            }
+        )
+
+        data = {
+            'title': 'test issue',
+            'issue_content': 'This issue needs attention',
+        }
+
+        # Valid request
+        output = self.app.post(
+            '/api/0/test4/new_issue', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'Issue created'}
+        )
+
+    def test_api_priavte_repo_view_issues(self):
+        """ Test the api_view_issues method of the flask api. """
+        self.test_api_private_repo_new_issue()
+
+        # Invalid repo
+        output = self.app.get('/api/0/foo/issues')
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Project not found",
+              "error_code": "ENOPROJECT",
+            }
+        )
+
+        # List all opened issues
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/api/0/test4/issues')
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.data)
+            data['issues'][0]['date_created'] = '1431414800'
+            self.assertDictEqual(
+                data,
+                {
+                  "args": {
+                    "assignee": None,
+                    "author": None,
+                    "status": None,
+                    "tags": []
+                  },
+                  "total_issues": 1,
+                  "issues": [
+                    {
+                      "assignee": None,
+                      "blocks": [],
+                      "comments": [],
+                      "content": "This issue needs attention",
+                      "date_created": "1431414800",
+                      "depends": [],
+                      "id": 1,
+                      "priority": None,
+                      "private": False,
+                      "status": "Open",
+                      "tags": [],
+                      "title": "test issue",
+                      "user": {
+                        "fullname": "PY C",
+                        "name": "pingou"
+                      }
+                    }
+                  ]
+                }
+            )
+
+        # Create private issue
+        repo = pagure.lib.get_project(self.session, 'test4')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None,
+            private=True,
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        # Private issues are retrieved
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/api/0/test4/issues')
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.data)
+            data['issues'][0]['date_created'] = '1431414800'
+            data['issues'][1]['date_created'] = '1431414800'
+            self.assertDictEqual(
+                data,
+                {'args':
+                {'assignee': None, 'author': None, 'status': None, 'tags': []},
+              'issues': [{u'assignee': None,
+                    'blocks': [],
+                    'comments': [],
+                    'content': 'This issue needs attention',
+                    'date_created': '1431414800',
+                    'depends': [],
+                    'id': 1,
+                    'priority': None,
+                    'private': False,
+                    'status': 'Open',
+                    'tags': [],
+                    'title': u'test issue',
+                    'user': {'fullname': 'PY C', 'name': 'pingou'}},
+                        {'assignee': None,
+                        'blocks': [],
+                        'comments': [],
+                        'content': 'We should work on this',
+                        'date_created': '1431414800',
+                        'depends': [],
+                        'id': 2,
+                        'priority': None,
+                        'private': True,
+                        'status': 'Open',
+                        'tags': [],
+                        'title': 'Test issue',
+                    'user': {'fullname': 'PY C', 'name': 'pingou'}}],
+                    'total_issues': 2}
+                    )
+
+        # Access issues authenticated but non-existing token
+        headers = {'Authorization': 'token aaabbbccc'}
+        output = self.app.get('/api/0/test4/issues', headers=headers)
+        self.assertEqual(output.status_code, 401)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Access issues authenticated correctly
+        output = self.app.get('/api/0/test4/issues', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        data['issues'][0]['date_created'] = '1431414800'
+        data['issues'][1]['date_created'] = '1431414800'
+        self.assertDictEqual(
+            data,
+            {
+              "args": {
+                "assignee": None,
+                "author": None,
+                "status": None,
+                "tags": []
+              },
+              "total_issues": 2,
+              "issues": [
+                {
+                  "assignee": None,
+                  "blocks": [],
+                  "comments": [],
+                  "content": "This issue needs attention",
+                  "date_created": "1431414800",
+                  "depends": [],
+                  "id": 1,
+                  "priority": None,
+                  "private": False,
+                  "status": "Open",
+                  "tags": [],
+                  "title": "test issue",
+                  "user": {
+                    "fullname": "PY C",
+                    "name": "pingou"
+                  }
+                },
+                {
+                  "assignee": None,
+                  "blocks": [],
+                  "comments": [],
+                  "content": "We should work on this",
+                  "date_created": "1431414800",
+                  "depends": [],
+                  "id": 2,
+                  "priority": None,
+                  "private": True,
+                  "status": "Open",
+                  "tags": [],
+                  "title": "Test issue",
+                  "user": {
+                    "fullname": "PY C",
+                    "name": "pingou"
+                  }
+                }
+              ]
+            }
+        )
+
+        # List closed issue
+        output = self.app.get('/api/0/test4/issues?status=Closed', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "args": {
+                "assignee": None,
+                "author": None,
+                "status": "Closed",
+                "tags": []
+              },
+              "total_issues": 0,
+              "issues": []
+            }
+        )
+
+        # List closed issue
+        output = self.app.get('/api/0/test4/issues?status=Invalid', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "args": {
+                "assignee": None,
+                "author": None,
+                "status": "Invalid",
+                "tags": []
+              },
+              "total_issues": 0,
+              "issues": []
+            }
+        )
+
+        # List all issues
+        output = self.app.get('/api/0/test4/issues?status=All', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        data['issues'][0]['date_created'] = '1431414800'
+        data['issues'][1]['date_created'] = '1431414800'
+        self.assertDictEqual(
+            data,
+            {
+                "args": {
+                    "assignee": None,
+                    "author": None,
+                    "status": "All",
+                    "tags": []
+                },
+                "total_issues": 2,
+                "issues": [
+                    {
+                        "assignee": None,
+                        "blocks": [],
+                        "comments": [],
+                        "content": "This issue needs attention",
+                        "date_created": "1431414800",
+                        "depends": [],
+                        "id": 1,
+                        "priority": None,
+                        "private": False,
+                        "status": "Open",
+                        "tags": [],
+                        "title": "test issue",
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou"
+                        }
+                    },
+                    {
+                        "assignee": None,
+                        "blocks": [],
+                        "comments": [],
+                        "content": "We should work on this",
+                        "date_created": "1431414800",
+                        "depends": [],
+                        "id": 2,
+                        "priority": None,
+                        "private": True,
+                        "status": "Open",
+                        "tags": [],
+                        "title": "Test issue",
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou"
+                        }
+                    }
+                ],
+            }
+        )
+
+    def test_api_pivate_repo_view_issue(self):
+        """ Test the api_view_issue method of the flask api. """
+        self.test_api_private_repo_new_issue()
+
+        # Invalid repo
+        output = self.app.get('/api/0/foo/issue/1')
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Project not found",
+              "error_code": "ENOPROJECT",
+            }
+        )
+
+        # Invalid issue for this repo
+        output = self.app.get('/api/0/test4/issue/1')
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Project not found",
+              "error_code": "ENOPROJECT",
+            }
+        )
+
+        # Un-authorized user
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/api/0/test4/issue/1')
+            self.assertEqual(output.status_code, 404)
+            data = json.loads(output.data)
+            self.assertDictEqual(
+                data,
+                {
+                  "error": "Project not found",
+                  "error_code": "ENOPROJECT",
+                }
+            )
+
+        # Valid issue
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/api/0/test4/issue/1')
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.data)
+            data['date_created'] = '1431414800'
+            self.assertDictEqual(
+                data,
+                {
+                  "assignee": None,
+                  "blocks": [],
+                  "comments": [],
+                  "content": "This issue needs attention",
+                  "date_created": "1431414800",
+                  "depends": [],
+                  "id": 1,
+                  "priority": None,
+                  "private": False,
+                  "status": "Open",
+                  "tags": [],
+                  "title": "test issue",
+                  "user": {
+                    "fullname": "PY C",
+                    "name": "pingou"
+                  }
+                }
+            )
+
+
+        headers = {'Authorization': 'token aaabbbccc'}
+
+        # Access issue authenticated but non-existing token
+        output = self.app.get('/api/0/test4/issue/1', headers=headers)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid or expired token. Please visit https://pagure.org/ to get or renew your API token.",
+              "error_code": "EINVALIDTOK"
+            }
+        )
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Access issue authenticated correctly
+        output = self.app.get('/api/0/test4/issue/1', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        data['date_created'] = '1431414800'
+        self.assertDictEqual(
+            data,
+            {
+              "assignee": None,
+              "blocks": [],
+              "comments": [],
+              "content": "This issue needs attention",
+              "date_created": "1431414800",
+              "depends": [],
+              "id": 1,
+              "priority": None,
+              "private": False,
+              "status": "Open",
+              "tags": [],
+              "title": "test issue",
+              "user": {
+                "fullname": "PY C",
+                "name": "pingou"
+              }
+            }
+        )
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagurePrivateRepotest)
