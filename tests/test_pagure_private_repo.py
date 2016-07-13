@@ -2256,6 +2256,78 @@ class PagurePrivateRepotest(tests.Modeltests):
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 1)
 
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_api_view_issue_comment(self, p_send_email, p_ugt):
+        """ Test the api_view_issue_comment endpoint. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        self.test_api_private_repo_comment_issue()
+
+        # View a comment that does not exist
+        output = self.app.get('/api/0/foo/issue/100/comment/2')
+        self.assertEqual(output.status_code, 404)
+
+        # Issue exists but not the comment
+        output = self.app.get('/api/0/test/issue/1/comment/2')
+        self.assertEqual(output.status_code, 404)
+
+        # Issue and comment exists
+        output = self.app.get('/api/0/test/issue/1/comment/1')
+        self.assertEqual(output.status_code, 404)
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/api/0/test/issue/1/comment/1')
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.data)
+            data['date_created'] = '1435821770'
+            data["comment_date"] = "2015-07-02 09:22"
+            data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
+            self.assertDictEqual(
+                data,
+                {
+                  "avatar_url": "https://seccdn.libravatar.org/avatar/...",
+                  "comment": "This is a very interesting question",
+                  "comment_date": "2015-07-02 09:22",
+                  "date_created": "1435821770",
+                  "edited_on": None,
+                  "editor": None,
+                  "id": 1,
+                  "parent": None,
+                  "user": {
+                    "fullname": "PY C",
+                    "name": "pingou"
+                  }
+                }
+            )
+
+        # Issue and comment exists, using UID
+        output = self.app.get('/api/0/test/issue/aaabbbccc#1/comment/1')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        data['date_created'] = '1435821770'
+        data["comment_date"] = "2015-07-02 09:22"
+        data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
+        self.assertDictEqual(
+            data,
+            {
+              "avatar_url": "https://seccdn.libravatar.org/avatar/...",
+              "comment": "This is a very interesting question",
+              "comment_date": "2015-07-02 09:22",
+              "date_created": "1435821770",
+              "edited_on": None,
+              "editor": None,
+              "id": 1,
+              "parent": None,
+              "user": {
+                "fullname": "PY C",
+                "name": "pingou"
+              }
+            }
+        )
+
 
 
 if __name__ == '__main__':
