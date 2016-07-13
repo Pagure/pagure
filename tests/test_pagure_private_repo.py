@@ -1995,6 +1995,147 @@ class PagurePrivateRepotest(tests.Modeltests):
             }
         )
 
+    def test_api_change_status_issue(self):
+        """ Test the api_change_status_issue method of the flask api. """
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test4',
+            description='test project description',
+            hook_token='aaabbbeeeceee',
+            private=True,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        for repo in ['GIT_FOLDER', 'TICKETS_FOLDER']:
+            # Add a git repo
+            repo_path = os.path.join(
+                pagure.APP.config.get(repo), 'test4.git')
+            if not os.path.exists(repo_path):
+                os.makedirs(repo_path)
+            pygit2.init_repository(repo_path, bare=True)
+
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Invalid project
+        output = self.app.post('/api/0/foo/issue/1/status', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Project not found",
+              "error_code": "ENOPROJECT",
+            }
+        )
+
+        # Valid token, wrong project
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/api/0/test2/issue/1/status', headers=headers)
+            self.assertEqual(output.status_code, 404)
+            data = json.loads(output.data)
+            self.assertDictEqual(
+                data,
+                {
+                  "error": "Project not found",
+                  "error_code": "ENOPROJECT",
+                }
+            )
+
+        # No input
+        output = self.app.post('/api/0/test4/issue/1/status', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Issue not found",
+              "error_code": "ENOISSUE",
+            }
+        )
+
+        # Create normal issue
+        repo = pagure.lib.get_project(self.session, 'test4')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #1',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None,
+            private=False,
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #1')
+
+
+        # Check status before
+        repo = pagure.lib.get_project(self.session, 'test4')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(issue.status, 'Open')
+
+        data = {
+            'title': 'test issue',
+        }
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            # Incomplete request
+            output = self.app.post(
+                '/api/0/test4/issue/1/status', data=data, headers=headers)
+            self.assertEqual(output.status_code, 400)
+            data = json.loads(output.data)
+            self.assertDictEqual(
+                data,
+                {
+                  "error": "Invalid or incomplete input submited",
+                  "error_code": "EINVALIDREQ",
+                }
+            )
+
+            # No change
+            repo = pagure.lib.get_project(self.session, 'test4')
+            issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+            self.assertEqual(issue.status, 'Open')
+
+            data = {
+                'status': 'Open',
+            }
+
+            # Valid request but no change
+            output = self.app.post(
+                '/api/0/test4/issue/1/status', data=data, headers=headers)
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.data)
+            self.assertDictEqual(
+                data,
+                {'message': 'No changes'}
+            )
+
+            # No change
+            repo = pagure.lib.get_project(self.session, 'test4')
+            issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+            self.assertEqual(issue.status, 'Open')
+
+            data = {
+                'status': 'Fixed',
+            }
+
+            # Valid request
+            output = self.app.post(
+                '/api/0/test4/issue/1/status', data=data, headers=headers)
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.data)
+            self.assertDictEqual(
+                data,
+                {'message': 'Successfully edited issue #1'}
+            )
+
+
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagurePrivateRepotest)
     unittest.TextTestRunner(verbosity=2).run(SUITE)
