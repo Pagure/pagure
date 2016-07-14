@@ -49,10 +49,11 @@ import pagure.lib.plugins
 import pagure.forms
 import pagure
 import pagure.ui.plugins
-from pagure.lib import encoding_utils
 from pagure import (APP, SESSION, LOG, __get_file_in_tree, login_required,
                     is_repo_admin, admin_session_timedout, authenticated,
                     get_authorized_project)
+from pagure.lib import encoding_utils
+
 
 
 @APP.route('/<repo>.git')
