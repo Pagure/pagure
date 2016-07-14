@@ -151,6 +151,8 @@
                     <span class="oi text-muted" data-glyph="folder"></span>
                 {% elif entry.filemode == 40960 %}
                     <span class="oi text-muted" data-glyph="link-broken"></span>
+                {% elif entry.filemode == 57344 %}
+                    <span class="oi text-muted" data-glyph="layers"></span>
                 {% else %}
                     <span class="oi text-muted" data-glyph="file"></span>
                 {% endif %}
