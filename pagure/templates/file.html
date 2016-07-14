@@ -149,6 +149,8 @@
                 <td class="pagure-table-icon">
                 {% if entry.filemode == 16384 %}
                     <span class="oi text-muted" data-glyph="folder"></span>
+                {% elif entry.filemode == 40960 %}
+                    <span class="oi text-muted" data-glyph="link-broken"></span>
                 {% else %}
                     <span class="oi text-muted" data-glyph="file"></span>
                 {% endif %}
