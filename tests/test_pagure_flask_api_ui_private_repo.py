@@ -30,6 +30,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         super(PagurePrivateRepotest, self).setUp()
 
         pagure.APP.config['TESTING'] = True
+        pagure.APP.config['DATAGREPPER_URL'] = None
         pagure.SESSION = self.session
         pagure.lib.SESSION = self.session
         pagure.ui.SESSION = self.session
@@ -210,7 +211,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             '<h2 class="m-b-1">All Projects '
-            '<span class="label label-default">0</span></h2>', output.data)
+            '<span class="label label-default">0</span></h2>', output.get_data(as_text=True))
 
         # Add a private project
         item = pagure.lib.model.Project(
@@ -238,21 +239,21 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             '<h2 class="m-b-1">All Projects '
-            '<span class="label label-default">1</span></h2>', output.data)
+            '<span class="label label-default">1</span></h2>', output.get_data(as_text=True))
 
         user = tests.FakeUser(username='foo')
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/')
             self.assertIn(
                 'My Projects <span class="label label-default">2</span>',
-                output.data)
+                output.get_data(as_text=True))
             self.assertIn(
                 'Forks <span class="label label-default">0</span>',
-                output.data)
+                output.get_data(as_text=True))
             self.assertEqual(
-                output.data.count('<p>No group found</p>'), 1)
+                output.get_data(as_text=True).count('<p>No group found</p>'), 1)
             self.assertEqual(
-                output.data.count('<div class="card-header">'), 3)
+                output.get_data(as_text=True).count('<div class="card-header">'), 3)
 
     def test_view_user(self):
         """ Test the view_user endpoint. """
@@ -261,10 +262,10 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             'Projects <span class="label label-default">0</span>',
-            output.data)
+            output.get_data(as_text=True))
         self.assertIn(
             'Forks <span class="label label-default">0</span>',
-            output.data)
+            output.get_data(as_text=True))
 
         # Add a private project
         item = pagure.lib.model.Project(
@@ -295,37 +296,37 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             'Projects <span class="label label-default">1</span>',
-            output.data)
+            output.get_data(as_text=True))
         self.assertIn(
-            'Forks <span class="label label-default">0</span>', output.data)
+            'Forks <span class="label label-default">0</span>', output.get_data(as_text=True))
 
         user = tests.FakeUser(username='foo')
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/user/foo')
             self.assertIn(
                 'Projects <span class="label label-default">2</span>',
-                output.data)
+                output.get_data(as_text=True))
             self.assertIn(
                 'Forks <span class="label label-default">0</span>',
-                output.data)
+                output.get_data(as_text=True))
             self.assertEqual(
-                output.data.count('<p>No group found</p>'), 1)
+                output.get_data(as_text=True).count('<p>No group found</p>'), 1)
             self.assertEqual(
-                output.data.count('<div class="card-header">'), 3)
+                output.get_data(as_text=True).count('<div class="card-header">'), 3)
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/user/foo')
             self.assertIn(
                 'Projects <span class="label label-default">1</span>',
-                output.data)
+                output.get_data(as_text=True))
             self.assertIn(
                 'Forks <span class="label label-default">0</span>',
-                output.data)
+                output.get_data(as_text=True))
             self.assertEqual(
-                output.data.count('<p>No group found</p>'), 1)
+                output.get_data(as_text=True).count('<p>No group found</p>'), 1)
             self.assertEqual(
-                output.data.count('<div class="card-header">'), 3)
+                output.get_data(as_text=True).count('<div class="card-header">'), 3)
 
         # Check pingou has 0 projects
         user.username = 'pingou'
@@ -333,14 +334,14 @@ class PagurePrivateRepotest(tests.Modeltests):
             output = self.app.get('/')
             self.assertIn(
                 'My Projects <span class="label label-default">0</span>',
-                output.data)
+                output.get_data(as_text=True))
             self.assertIn(
                 'Forks <span class="label label-default">0</span>',
-                output.data)
+                output.get_data(as_text=True))
             self.assertEqual(
-                output.data.count('<p>No group found</p>'), 1)
+                output.get_data(as_text=True).count('<p>No group found</p>'), 1)
             self.assertEqual(
-                output.data.count('<div class="card-header">'), 3)
+                output.get_data(as_text=True).count('<div class="card-header">'), 3)
 
         repo = pagure.lib.get_project(self.session, 'test3')
 
@@ -358,14 +359,14 @@ class PagurePrivateRepotest(tests.Modeltests):
             output = self.app.get('/')
             self.assertIn(
                 'My Projects <span class="label label-default">1</span>',
-                output.data)
+                output.get_data(as_text=True))
             self.assertIn(
                 'Forks <span class="label label-default">0</span>',
-                output.data)
+                output.get_data(as_text=True))
             self.assertEqual(
-                output.data.count('<p>No group found</p>'), 1)
+                output.get_data(as_text=True).count('<p>No group found</p>'), 1)
             self.assertEqual(
-                output.data.count('<div class="card-header">'), 3)
+                output.get_data(as_text=True).count('<div class="card-header">'), 3)
 
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_private_settings_ui(self, ast):
@@ -400,7 +401,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             # Check for a public repo
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<input type="checkbox" value="private" name="private"', output.data)
+                '<input type="checkbox" value="private" name="private"', output.get_data(as_text=True))
 
             ast.return_value = False
             output = self.app.post('/test4/settings')
@@ -408,13 +409,13 @@ class PagurePrivateRepotest(tests.Modeltests):
             # Check for private repo
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<input type="checkbox" value="private" name="private" checked=""/>', output.data)
+                '<input type="checkbox" value="private" name="private" checked=""/>', output.get_data(as_text=True))
 
             # Check the new project form has 'private' checkbox
             output = self.app.get('/new')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<input id="private" name="private" type="checkbox" value="y">', output.data)
+                '<input id="private" name="private" type="checkbox" value="y">', output.get_data(as_text=True))
 
     @patch('pagure.lib.notify.send_email')
     def test_private_pr(self, send_email):
@@ -463,10 +464,10 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
-                'class="label label-default">1</span>', output.data)
+                'class="label label-default">1</span>', output.get_data(as_text=True))
             self.assertIn(
                 'Forks <span class="label label-default">0</span>',
-                output.data)
+                output.get_data(as_text=True))
 
             self.set_up_git_repo(new_project=None, branch_from='feature')
             project = pagure.lib.get_project(self.session, 'pmc')
@@ -559,9 +560,9 @@ class PagurePrivateRepotest(tests.Modeltests):
             output = self.app.get('/test4/issues')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issues - test4 - Pagure</title>', output.data)
+                '<title>Issues - test4 - Pagure</title>', output.get_data(as_text=True))
             self.assertTrue(
-                '<h2>\n      1 Open Issues' in output.data)
+                '<h2>\n      1 Open Issues' in output.get_data(as_text=True))
 
             # Check single issue
             output = self.app.get('/test4/issue/1')
@@ -585,9 +586,9 @@ class PagurePrivateRepotest(tests.Modeltests):
             output = self.app.get('/test4/issues')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Issues - test4 - Pagure</title>', output.data)
+                '<title>Issues - test4 - Pagure</title>', output.get_data(as_text=True))
             self.assertTrue(
-                '<h2>\n      1 Open Issues' in output.data)
+                '<h2>\n      1 Open Issues' in output.get_data(as_text=True))
 
             # Check single issue
             output = self.app.get('/test4/issue/1')
@@ -672,7 +673,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             # Check tags
             output = self.app.get('/api/0/test4/git/tags')
             self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             self.assertDictEqual(
                 data,
                 {'tags': ['0.0.1'], 'total_tags': 1}
@@ -707,7 +708,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         # Check the API
         output = self.app.get('/api/0/projects?tags=inf')
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'error_code': 'ENOPROJECTS', 'error': 'No projects found'}
@@ -731,7 +732,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
             output = self.app.get('/api/0/projects?username=pingou')
             self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             data['projects'][0]['date_created'] = "1436527638"
             self.assertDictEqual(
                 data,
@@ -757,7 +758,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
             output = self.app.get('/api/0/projects?username=pingou&tags=infra')
             self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             data['projects'][0]['date_created'] = "1436527638"
             self.assertDictEqual(
                 data,
@@ -833,7 +834,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             # List pull-requests
             output = self.app.get('/api/0/test4/pull-requests')
             self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             data['requests'][0]['date_created'] = '1431414800'
             data['requests'][0]['updated_on'] = '1431414800'
             data['requests'][0]['project']['date_created'] = '1431414800'
@@ -904,7 +905,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             output = self.app.get(
                 '/api/0/test4/pull-requests', headers=headers)
             self.assertEqual(output.status_code, 200)
-            data2 = json.loads(output.data)
+            data2 = json.loads(output.get_data(as_text=True))
             data2['requests'][0]['date_created'] = '1431414800'
             data2['requests'][0]['updated_on'] = '1431414800'
             data2['requests'][0]['project']['date_created'] = '1431414800'
@@ -915,7 +916,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             # For single PR
             output = self.app.get('/api/0/test4/pull-request/1')
             self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             data['date_created'] = '1431414800'
             data['updated_on'] = '1431414800'
             data['project']['date_created'] = '1431414800'
@@ -977,7 +978,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             output = self.app.get(
                 '/api/0/test4/pull-request/1', headers=headers)
             self.assertEqual(output.status_code, 200)
-            data2 = json.loads(output.data)
+            data2 = json.loads(output.get_data(as_text=True))
             data2['date_created'] = '1431414800'
             data2['project']['date_created'] = '1431414800'
             data2['repo_from']['date_created'] = '1431414800'
@@ -1036,7 +1037,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.post(
             '/api/0/test4/pull-request/1/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1058,7 +1059,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.post(
             '/api/0/test4/pull-request/1/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Comment added'}
@@ -1106,7 +1107,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.post(
             '/api/0/foo/pull-request/1/flag', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1119,7 +1120,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.post(
             '/api/0/test2/pull-request/1/flag', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1133,7 +1134,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.post(
             '/api/0/test4/pull-request/1/flag', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1175,7 +1176,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.post(
             '/api/0/test4/pull-request/1/flag', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1201,7 +1202,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.post(
             '/api/0/test4/pull-request/1/flag', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Flag added'}
@@ -1226,7 +1227,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.post(
             '/api/0/test4/pull-request/1/flag', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Flag updated'}
@@ -1294,7 +1295,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.post(
             '/api/0/foo/pull-request/1/close', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1307,7 +1308,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.post(
             '/api/0/test2/pull-request/1/close', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1321,7 +1322,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.post(
             '/api/0/test4/pull-request/2/close', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'error': 'Pull-Request not found', 'error_code': "ENOREQ"}
@@ -1350,7 +1351,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.post(
             '/api/0/test4/pull-request/1/close', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1365,7 +1366,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.post(
             '/api/0/test4/pull-request/1/close', headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {"message": "Pull-request closed!"}
@@ -1428,7 +1429,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.post(
             '/api/0/foo/pull-request/1/merge', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1441,7 +1442,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.post(
             '/api/0/test2/pull-request/1/merge', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1455,7 +1456,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.post(
             '/api/0/test4/pull-request/2/merge', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'error': 'Pull-Request not found', 'error_code': "ENOREQ"}
@@ -1484,7 +1485,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.post(
             '/api/0/test4/pull-request/1/merge', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1499,7 +1500,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.post(
             '/api/0/test4/pull-request/1/merge', headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {"message": "Changes merged!"}
@@ -1545,7 +1546,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         # Valid token, wrong project
         output = self.app.post('/api/0/test2/new_issue', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1558,7 +1559,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         # No input
         output = self.app.post('/api/0/test4/new_issue', headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1575,7 +1576,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.post(
             '/api/0/foo/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1588,7 +1589,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.post(
             '/api/0/test4/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1606,7 +1607,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.post(
             '/api/0/test4/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Issue created'}
@@ -1619,7 +1620,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         # Invalid repo
         output = self.app.get('/api/0/foo/issues')
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1633,7 +1634,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/api/0/test4/issues')
             self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             data['issues'][0]['date_created'] = '1431414800'
             self.assertDictEqual(
                 data,
@@ -1687,7 +1688,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/api/0/test4/issues')
             self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             data['issues'][0]['date_created'] = '1431414800'
             data['issues'][1]['date_created'] = '1431414800'
             self.assertDictEqual(
@@ -1733,7 +1734,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         # Access issues authenticated correctly
         output = self.app.get('/api/0/test4/issues', headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['issues'][0]['date_created'] = '1431414800'
         data['issues'][1]['date_created'] = '1431414800'
         self.assertDictEqual(
@@ -1791,7 +1792,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.get(
             '/api/0/test4/issues?status=Closed', headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1810,7 +1811,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.get(
             '/api/0/test4/issues?status=Invalid', headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1829,7 +1830,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.get(
             '/api/0/test4/issues?status=All', headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['issues'][0]['date_created'] = '1431414800'
         data['issues'][1]['date_created'] = '1431414800'
         self.assertDictEqual(
@@ -1890,7 +1891,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         # Invalid repo
         output = self.app.get('/api/0/foo/issue/1')
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1902,7 +1903,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         # Invalid issue for this repo
         output = self.app.get('/api/0/test4/issue/1')
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1916,7 +1917,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/api/0/test4/issue/1')
             self.assertEqual(output.status_code, 404)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             self.assertDictEqual(
                 data,
                 {
@@ -1930,7 +1931,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/api/0/test4/issue/1')
             self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             data['date_created'] = '1431414800'
             self.assertDictEqual(
                 data,
@@ -1959,7 +1960,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         # Access issue authenticated but non-existing token
         output = self.app.get('/api/0/test4/issue/1', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -1973,7 +1974,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         # Access issue authenticated correctly
         output = self.app.get('/api/0/test4/issue/1', headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         data['date_created'] = '1431414800'
         self.assertDictEqual(
             data,
@@ -2025,7 +2026,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         # Invalid project
         output = self.app.post('/api/0/foo/issue/1/status', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2040,7 +2041,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             output = self.app.post(
                 '/api/0/test2/issue/1/status', headers=headers)
             self.assertEqual(output.status_code, 404)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             self.assertDictEqual(
                 data,
                 {
@@ -2052,7 +2053,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         # No input
         output = self.app.post('/api/0/test4/issue/1/status', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2090,7 +2091,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             output = self.app.post(
                 '/api/0/test4/issue/1/status', data=data, headers=headers)
             self.assertEqual(output.status_code, 400)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             self.assertDictEqual(
                 data,
                 {
@@ -2112,7 +2113,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             output = self.app.post(
                 '/api/0/test4/issue/1/status', data=data, headers=headers)
             self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             self.assertDictEqual(
                 data,
                 {'message': 'No changes'}
@@ -2131,7 +2132,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             output = self.app.post(
                 '/api/0/test4/issue/1/status', data=data, headers=headers)
             self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             self.assertDictEqual(
                 data,
                 {'message': 'Successfully edited issue #1'}
@@ -2161,7 +2162,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         # Invalid project
         output = self.app.post('/api/0/foo/issue/1/comment', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2174,7 +2175,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         headers = {'Authorization': 'token aaabbbccc'}
         output = self.app.post('/api/0/test4/issue/1/comment', headers=headers)
         self.assertEqual(output.status_code, 401)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2188,7 +2189,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         # No input
         output = self.app.post('/api/0/test4/issue/1/comment', headers=headers)
         self.assertEqual(output.status_code, 404)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2225,7 +2226,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.post(
             '/api/0/test4/issue/1/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {
@@ -2247,7 +2248,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = self.app.post(
             '/api/0/test4/issue/1/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
+        data = json.loads(output.get_data(as_text=True))
         self.assertDictEqual(
             data,
             {'message': 'Comment added'}
@@ -2283,7 +2284,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/api/0/test4/issue/1/comment/1')
             self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             data['date_created'] = '1435821770'
             data["comment_date"] = "2015-07-02 09:22"
             data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
@@ -2308,7 +2309,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             # Issue and comment exists, using UID
             output = self.app.get('/api/0/test4/issue/aaabbbccc#1/comment/1')
             self.assertEqual(output.status_code, 200)
-            data = json.loads(output.data)
+            data = json.loads(output.get_data(as_text=True))
             data['date_created'] = '1435821770'
             data["comment_date"] = "2015-07-02 09:22"
             data["avatar_url"] = "https://seccdn.libravatar.org/avatar/..."
