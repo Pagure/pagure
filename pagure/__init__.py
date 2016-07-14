@@ -375,7 +375,10 @@ def is_repo_user(repo_obj):
 
 
 def get_authorized_project(session, repo, user=None):
-    """ Return the projects for which the logged in user is authorize to view. """
+    """ Return repo object if repo is public,
+        if repo is private and user is authorized to
+        view repo object is returned else None
+    """
     repo = pagure.lib.get_project(session, repo, user)
 
     if repo and repo.private and not is_repo_admin(repo):
