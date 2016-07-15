@@ -392,6 +392,8 @@ def get_project_from_json(
                 docfolder=docfolder,
                 ticketfolder=ticketfolder,
                 requestfolder=requestfolder,
+                prevent_40_chars=pagure.APP.config.get(
+                    'OLD_VIEW_COMMIT_ENABLED', False),
             )
 
         session.commit()

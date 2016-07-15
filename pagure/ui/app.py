@@ -391,6 +391,8 @@ def new_project():
                 requestfolder=APP.config['REQUESTS_FOLDER'],
                 add_readme=create_readme,
                 userobj=user,
+                prevent_40_chars=APP.config.get(
+                    'OLD_VIEW_COMMIT_ENABLED', False),
             )
             SESSION.commit()
             pagure.lib.git.generate_gitolite_acls()

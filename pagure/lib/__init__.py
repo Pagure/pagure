@@ -979,7 +979,8 @@ def add_pull_request_flag(session, request, username, percent, comment, url,
 def new_project(session, user, name, blacklist, allowed_prefix,
                 gitfolder, docfolder, ticketfolder, requestfolder,
                 description=None, url=None, avatar_email=None,
-                parent_id=None, add_readme=False, userobj=None):
+                parent_id=None, add_readme=False, userobj=None,
+                prevent_40_chars=False):
     ''' Create a new project based on the information provided.
     '''
     if name in blacklist:
@@ -998,7 +999,8 @@ def new_project(session, user, name, blacklist, allowed_prefix,
             'prefix set by the admins of this pagure instance, or the name '
             'of a group that you are part of.'
         )
-    if len(second_part) == 40:
+
+    if len(second_part) == 40 and not prevent_40_chars:
         # We must block project with a name <foo>/<bar> where the length
         # of <bar> is exactly 40 characters long as this would otherwise
         # conflict with the old URL schema used for commit that was
