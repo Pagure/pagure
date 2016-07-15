@@ -749,6 +749,23 @@ class PagureLibtests(tests.Modeltests):
             parent_id=None,
         )
 
+        # Try creating a 40 chars project
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.new_project,
+            session=self.session,
+            user='pingou',
+            name='pingou/' + 's' * 40,
+            blacklist=['static'],
+            allowed_prefix=['pingou'],
+            gitfolder=gitfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
+            description='description for 40 chars length project',
+            parent_id=None,
+        )
+
         # Create a new project
         msg = pagure.lib.new_project(
             session=self.session,
@@ -871,6 +888,27 @@ class PagureLibtests(tests.Modeltests):
         self.assertFalse(os.path.exists(docrepo))
         self.assertFalse(os.path.exists(ticketrepo))
         self.assertTrue(os.path.exists(requestrepo))
+
+        # Re-Try creating a 40 chars project this time allowing it
+        msg = pagure.lib.new_project(
+            session=self.session,
+            user='pingou',
+            name='pingou/' + 's' * 40,
+            blacklist=['static'],
+            allowed_prefix=['pingou'],
+            gitfolder=gitfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
+            description='description for 40 chars length project',
+            parent_id=None,
+            prevent_40_chars=True,
+        )
+        self.session.commit()
+        self.assertEqual(
+            msg,
+            'Project "pingou/ssssssssssssssssssssssssssssssssssssssss" '
+            'created')
 
     def test_update_project_settings(self):
         """ Test the update_project_settings of pagure.lib. """
