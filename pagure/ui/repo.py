@@ -45,6 +45,12 @@ from pagure import (APP, SESSION, LOG, __get_file_in_tree, login_required,
 # pylint: disable=E1101
 
 
+@APP.route('/<repo:repo>.git')
+@APP.route('/fork/<username>/<repo:repo>.git')
+def redirect_to_repo(repo, username=None):
+    return flask.redirect(flask.url_for('view_repo',repo=repo,username=username))
+
+
 @APP.route('/<repo:repo>/')
 @APP.route('/<repo:repo>')
 @APP.route('/fork/<username>/<repo:repo>/')
