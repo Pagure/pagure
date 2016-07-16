@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015 - Copyright Red Hat Inc
+ (c) 2015-2016 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -764,6 +764,7 @@ class PagureLibtests(tests.Modeltests):
             requestfolder=requestfolder,
             description='description for 40 chars length project',
             parent_id=None,
+            prevent_40_chars=True,
         )
 
         # Create a new project
@@ -902,7 +903,6 @@ class PagureLibtests(tests.Modeltests):
             requestfolder=requestfolder,
             description='description for 40 chars length project',
             parent_id=None,
-            prevent_40_chars=True,
         )
         self.session.commit()
         self.assertEqual(

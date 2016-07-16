@@ -1000,7 +1000,7 @@ def new_project(session, user, name, blacklist, allowed_prefix,
             'of a group that you are part of.'
         )
 
-    if len(second_part) == 40 and not prevent_40_chars:
+    if len(second_part) == 40 and prevent_40_chars:
         # We must block project with a name <foo>/<bar> where the length
         # of <bar> is exactly 40 characters long as this would otherwise
         # conflict with the old URL schema used for commit that was
