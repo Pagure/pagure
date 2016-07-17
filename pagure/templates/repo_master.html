@@ -67,7 +67,7 @@
             </div>
           {% endif %}
         </h2>
-        {% if repo.is_fork %}
+        {% if repo.is_fork and repo.parent %}
         <div class="m-t-0">
             Forked from
             {% if repo.parent.is_fork %}

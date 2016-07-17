@@ -308,6 +308,7 @@ class Project(BASE):
     # The hook_token is used to sign the notification sent via web-hook
     hook_token = sa.Column(sa.String(40), nullable=False, unique=True)
     avatar_email = sa.Column(sa.Text, nullable=True)
+    _is_fork = sa.Column(sa.Boolean, default=False, nullable=False)
     parent_id = sa.Column(
         sa.Integer,
         sa.ForeignKey(
@@ -354,7 +355,7 @@ class Project(BASE):
     @property
     def is_fork(self):
         ''' Return a boolean specifying if the project is a fork or not '''
-        return self.parent_id is not None
+        return self._is_fork
 
     @property
     def fullname(self):
@@ -362,7 +363,7 @@ class Project(BASE):
         project forked, otherwise it returns the project name.
         '''
         str_name = self.name
-        if self.parent_id:
+        if self._is_fork:
             str_name = "forks/%s/%s" % (self.user.user, str_name)
         return str_name
 
