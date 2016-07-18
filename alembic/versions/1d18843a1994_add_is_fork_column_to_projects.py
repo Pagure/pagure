@@ -20,19 +20,18 @@ def upgrade():
     op.add_column(
         'projects',
         sa.Column(
-            '_is_fork', sa.Boolean,
+            'is_fork', sa.Boolean,
             default=False,
             nullable=True)
     )
 
     op.execute('''UPDATE "projects" '''
-               '''SET _is_fork=TRUE WHERE parent_id IS NOT NULL;''')
+               '''SET is_fork=TRUE WHERE parent_id IS NOT NULL;''')
     op.execute('''UPDATE "projects" '''
-               '''SET _is_fork=FALSE WHERE parent_id IS NULL;''')
+               '''SET is_fork=FALSE WHERE parent_id IS NULL;''')
 
     op.alter_column(
-        'projects',
-        column_name='_is_fork', new_column_name='is_fork',
+        'projects', 'is_fork',
         nullable=False, existing_nullable=True)
 
 def downgrade():

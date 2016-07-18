@@ -1412,7 +1412,7 @@ def fork_project(session, user, repo, gitfolder,
         description=repo.description,
         user_id=user_obj.id,
         parent_id=repo.id,
-        is_fork = True,
+        is_fork=True,
         hook_token=pagure.lib.login.id_generator(40)
     )
 
