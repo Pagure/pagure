@@ -308,7 +308,7 @@ class Project(BASE):
     # The hook_token is used to sign the notification sent via web-hook
     hook_token = sa.Column(sa.String(40), nullable=False, unique=True)
     avatar_email = sa.Column(sa.Text, nullable=True)
-    _is_fork = sa.Column(sa.Boolean, default=False, nullable=False)
+    is_fork = sa.Column(sa.Boolean, default=False, nullable=False)
     parent_id = sa.Column(
         sa.Integer,
         sa.ForeignKey(
@@ -353,17 +353,12 @@ class Project(BASE):
         return '%s.git' % self.fullname
 
     @property
-    def is_fork(self):
-        ''' Return a boolean specifying if the project is a fork or not '''
-        return self._is_fork
-
-    @property
     def fullname(self):
         ''' Return the name of the git repo as user/project if it is a
         project forked, otherwise it returns the project name.
         '''
         str_name = self.name
-        if self._is_fork:
+        if self.is_fork:
             str_name = "forks/%s/%s" % (self.user.user, str_name)
         return str_name
 
