@@ -1412,7 +1412,7 @@ def fork_project(session, user, repo, gitfolder,
         description=repo.description,
         user_id=user_obj.id,
         parent_id=repo.id,
-        _is_fork = True,
+        is_fork = True,
         hook_token=pagure.lib.login.id_generator(40)
     )
 
@@ -1543,11 +1543,11 @@ def search_projects(
     if fork is not None:
         if fork is True:
             projects = projects.filter(
-                model.Project._is_fork == True
+                model.Project.is_fork == True
             )
         elif fork is False:
             projects = projects.filter(
-                model.Project._is_fork == False
+                model.Project.is_fork == False
             )
 
     if tags:
@@ -1616,11 +1616,11 @@ def get_project(session, name, user=None):
         ).filter(
             model.User.id == model.Project.user_id
         ).filter(
-            model.Project._is_fork == True
+            model.Project.is_fork == True
         )
     else:
         query = query.filter(
-            model.Project._is_fork == False
+            model.Project.is_fork == False
         )
 
     return query.first()
@@ -2940,11 +2940,11 @@ def is_watching(session, user, reponame, repouser=None):
         ).filter(
             model.User.id == model.Project.user_id
         ).filter(
-            model.Project._is_fork == True
+            model.Project.is_fork == True
         )
     else:
         query = query.filter(
-            model.Project._is_fork == False
+            model.Project.is_fork == False
         )
 
     watcher = query.first()

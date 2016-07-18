@@ -273,7 +273,7 @@ def get_pull_request_ready_branch():
         branch = repo_obj.lookup_branch(branchname)
 
         diff_commits = []
-        if repo.is_fork:
+        if repo.is_fork and repo.parent:
             parentpath = os.path.join(
                 pagure.APP.config['GIT_FOLDER'], repo.parent.path)
             if repo.parent.is_fork:

@@ -20,7 +20,7 @@ def upgrade():
     op.add_column(
         'projects',
         sa.Column(
-            '__is_fork', sa.Boolean,
+            '_is_fork', sa.Boolean,
             default=False,
             nullable=True)
     )
