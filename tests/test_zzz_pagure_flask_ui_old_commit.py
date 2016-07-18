@@ -152,6 +152,7 @@ class PagureFlaskRepoOldUrltests(tests.Modeltests):
             user_id=1,  # pingou
             name='test3',
             description='test project #3',
+            is_fork=True,
             parent_id=1,
             hook_token='aaabbbkkk',
         )

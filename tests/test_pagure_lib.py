@@ -996,6 +996,7 @@ class PagureLibtests(tests.Modeltests):
             user_id=2,  # foo
             name='test',
             description='test project #1',
+            is_fork=True,
             parent_id=1,
             hook_token='aaabbbttt',
         )
@@ -1005,6 +1006,7 @@ class PagureLibtests(tests.Modeltests):
             user_id=2,  # foo
             name='test2',
             description='test project #2',
+            is_fork=True,
             parent_id=2,
             hook_token='aaabbbuuu',
         )
@@ -1305,6 +1307,7 @@ class PagureLibtests(tests.Modeltests):
             user_id=1,  # pingou
             name='test',
             description='test project #1',
+            is_fork=True,
             parent_id=1,
             hook_token='aaabbbrrr',
         )

@@ -579,6 +579,7 @@ class PagureFlaskForktests(tests.Modeltests):
             name='test',
             description='test project #1',
             hook_token='aaabbb',
+            is_fork=True,
             parent_id=1,
         )
         self.session.add(item)
@@ -662,6 +663,7 @@ class PagureFlaskForktests(tests.Modeltests):
             name='test',
             description='test project #1',
             hook_token='aaabbb',
+            is_fork=True,
             parent_id=1,
         )
         self.session.add(item)
@@ -918,6 +920,7 @@ index 9f44358..2a552bb 100644
             name='test',
             description='test project #1',
             hook_token='aaabbb',
+            is_fork=True,
             parent_id=1,
         )
         self.session.add(item)
@@ -1032,6 +1035,7 @@ index 0000000..2a552bb
             name='test',
             description='test project #1',
             hook_token='aaabbb',
+            is_fork=True,
             parent_id=1,
         )
         self.session.add(item)

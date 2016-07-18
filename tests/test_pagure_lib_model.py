@@ -76,6 +76,7 @@ class PagureLibModeltests(tests.Modeltests):
             user_id=1,  # pingou
             name='test',
             description='test project #1',
+            is_fork=True,
             parent_id=1,
             hook_token='aaabbbyyy',
         )

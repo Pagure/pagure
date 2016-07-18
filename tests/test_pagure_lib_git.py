@@ -67,6 +67,7 @@ class PagureLibGittests(tests.Modeltests):
             user_id=1,  # pingou
             name='test3',
             description='test project #2',
+            is_fork=True,
             parent_id=1,
             hook_token='aaabbbvvv',
         )
@@ -202,6 +203,7 @@ repo requests/forks/pingou/test3
             user_id=1,  # pingou
             name='test2',
             description='test project #2',
+            is_fork=True,
             parent_id=1,
             hook_token='aaabbbvvv',
         )

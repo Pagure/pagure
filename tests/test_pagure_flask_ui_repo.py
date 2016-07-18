@@ -860,6 +860,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         # Turn that repo into a fork
         repo = pagure.lib.get_project(self.session, 'test')
         repo.parent_id = 2
+        repo.is_fork = True
         self.session.add(repo)
         self.session.commit()
 
@@ -886,6 +887,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             user_id=1,  # pingou
             name='test3',
             description='test project #3',
+            is_fork=True,
             parent_id=1,
             hook_token='aaabbbmmm',
         )
@@ -989,6 +991,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         # Turn that repo into a fork
         repo = pagure.lib.get_project(self.session, 'test')
         repo.parent_id = 2
+        repo.is_fork = True
         self.session.add(repo)
         self.session.commit()
 
@@ -1015,6 +1018,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             user_id=1,  # pingou
             name='test3',
             description='test project #3',
+            is_fork=True,
             parent_id=1,
             hook_token='aaabbbnnn',
         )
@@ -1082,6 +1086,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         # Turn that repo into a fork
         repo = pagure.lib.get_project(self.session, 'test')
         repo.parent_id = 2
+        repo.is_fork = True
         self.session.add(repo)
         self.session.commit()
 
@@ -1108,6 +1113,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             user_id=1,  # pingou
             name='test3',
             description='test project #3',
+            is_fork=True,
             parent_id=1,
             hook_token='aaabbbooo',
         )
@@ -1402,6 +1408,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             user_id=1,  # pingou
             name='test3',
             description='test project #3',
+            is_fork=True,
             parent_id=1,
             hook_token='aaabbbppp',
         )
@@ -1516,6 +1523,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             user_id=1,  # pingou
             name='test3',
             description='test project #3',
+            is_fork=True,
             parent_id=1,
             hook_token='aaabbbqqq',
         )
@@ -1622,6 +1630,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             user_id=1,  # pingou
             name='test3',
             description='test project #3',
+            is_fork=True,
             parent_id=1,
             hook_token='aaabbbkkk',
         )
@@ -1756,6 +1765,7 @@ index 0000000..11980b1
             user_id=1,  # pingou
             name='test3',
             description='test project #3',
+            is_fork=True,
             parent_id=1,
             hook_token='aaabbblll',
         )
@@ -1862,6 +1872,7 @@ index 0000000..fb7093d
             user_id=1,  # pingou
             name='test3',
             description='test project #3',
+            is_fork=True,
             parent_id=1,
             hook_token='aaabbbfff',
         )
@@ -2073,6 +2084,7 @@ index 0000000..fb7093d
                 user_id=1,  # pingou
                 name='test3',
                 description='test project #3',
+                is_fork=True,
                 parent_id=2,
                 hook_token='aaabbbjjj',
             )
@@ -2322,6 +2334,7 @@ index 0000000..fb7093d
                 user_id=1,  # pingou
                 name='test3',
                 description='test project #3',
+                is_fork=True,
                 parent_id=2,
                 hook_token='aaabbbjjj',
             )
@@ -2653,6 +2666,7 @@ index 0000000..fb7093d
                 user_id=1,  # pingou
                 name='test3',
                 description='test project #3',
+                is_fork=True,
                 parent_id=1,
                 hook_token='aaabbbppp',
             )
@@ -3157,6 +3171,7 @@ index 0000000..fb7093d
                 name='test',
                 description='test project #1',
                 hook_token='aaabbb',
+                is_fork=True,
                 parent_id=1,
             )
             self.session.add(item)
