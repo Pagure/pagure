@@ -31,5 +31,38 @@
   </form>
 
 </section>
+<script>
+  $.get("{{ url_for('api_ns.api_users') }}", {
+    pattern: '*'
+  }).done(function(resp) {
+    var userConfig = {
+      at: '@',
+      data: resp['mention'],
+      insertTpl: '@${username}',
+      displayTpl: "<li><img src=\"${image}\"> ${username} <small>${name}</small></li>",
+      searchKey: "username"
+    }
+    $("#update_comment").atwho(userConfig);
+  });
+   $.when($.get("{{ url_for('api_ns.api_view_issues', repo=repo.name, username=username, status='all') }}"),
+          $.get("{{ url_for('api_ns.api_pull_request_views', repo=repo.name, username=username, status='all') }}")
+   ).done(function(issuesResp, prResp) {
+     // 0 is the api response
+     var issuesAndPrs = issuesResp[0]['issues'].concat(prResp[0]['requests']);
+     var data = $.map(issuesAndPrs, function(ticket, idx) {
+       return {
+         name: ticket.id.toString(),
+         title: $('<div>').text(ticket.title).html()
+       }
+     });
+     var issueAndPrConfig = {
+       at: '#',
+       data: data,
+       insertTpl: '#${name}',
+       displayTpl: "<li>#${name}<small> ${title}</small></li>",
+     }
+     $("#update_comment").atwho(issueAndPrConfig);
+   })
+</script>
 
 {% endblock %}
