@@ -564,3 +564,9 @@ th[data-sort] {
 #watch_project a {
   cursor: pointer;
 }
+
+.btn-align {
+    padding: 6px 0;
+    line-height: 1.42857143;
+    vertical-align: middle;
+}

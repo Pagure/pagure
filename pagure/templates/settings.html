@@ -135,9 +135,9 @@
                 </div>
               </div>
             {% if token.expired %}
-              <span class="text-danger"><strong>Expired</strong> since {{ token.expiration.date() }}</span>
+              <span class="text-danger btn-align"><strong>Expired</strong> since {{ token.expiration.date() }}</span>
             {% else %}
-              <span class="text-success"><strong>Valid</strong> until: {{ token.expiration.date() }}</span>
+              <span class="text-success btn-align"><strong>Valid</strong> until: {{ token.expiration.date() }}</span>
               <form class="pull-xs-right" action="{{ url_for('.revoke_api_token',
                     username=username, repo=repo.name, token_id=token.id) }}"
                 method="post" class="icon">

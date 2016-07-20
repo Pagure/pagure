@@ -2888,7 +2888,7 @@ index 0000000..fb7093d
                 '<title>Settings - test - Pagure</title>', output.data)
             self.assertIn('<h3>Settings for test</h3>', output.data)
             self.assertIn(
-                '<span class="text-success"><strong>Valid</strong> until: ',
+                '<span class="text-success btn-align"><strong>Valid</strong> until: ',
                 output.data)
 
     @patch('pagure.ui.repo.admin_session_timedout')
