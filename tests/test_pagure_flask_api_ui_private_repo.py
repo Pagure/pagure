@@ -1340,7 +1340,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.session.commit()
         item = pagure.lib.model.TokenAcl(
             token_id='foobar_token',
-            acl_id=2,
+            acl_id=7,
         )
         self.session.add(item)
         self.session.commit()
@@ -1474,7 +1474,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.session.commit()
         item = pagure.lib.model.TokenAcl(
             token_id='foobar_token',
-            acl_id=3,
+            acl_id=10,
         )
         self.session.add(item)
         self.session.commit()
@@ -1650,6 +1650,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                         {
                             "assignee": None,
                             "blocks": [],
+                            "closed_at": None,
                             "comments": [],
                             "content": "This issue needs attention",
                             "date_created": "1431414800",
@@ -1697,6 +1698,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                  {'assignee': None, 'author': None, 'status': None, 'tags': []},
                  'issues': [{u'assignee': None,
                              'blocks': [],
+                             'closed_at': None,
                              'comments': [],
                              'content': 'This issue needs attention',
                              'date_created': '1431414800',
@@ -1710,6 +1712,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                              'user': {'fullname': 'PY C', 'name': 'pingou'}},
                             {'assignee': None,
                              'blocks': [],
+                             'closed_at': None,
                              'comments': [],
                              'content': 'We should work on this',
                              'date_created': '1431414800',
@@ -1751,6 +1754,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     {
                         "assignee": None,
                         "blocks": [],
+                        "closed_at": None,
                         "comments": [],
                         "content": "This issue needs attention",
                         "date_created": "1431414800",
@@ -1769,6 +1773,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     {
                         "assignee": None,
                         "blocks": [],
+                        "closed_at": None,
                         "comments": [],
                         "content": "We should work on this",
                         "date_created": "1431414800",
@@ -1847,6 +1852,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     {
                         "assignee": None,
                         "blocks": [],
+                        "closed_at": None,
                         "comments": [],
                         "content": "This issue needs attention",
                         "date_created": "1431414800",
@@ -1865,6 +1871,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     {
                         "assignee": None,
                         "blocks": [],
+                        "closed_at": None,
                         "comments": [],
                         "content": "We should work on this",
                         "date_created": "1431414800",
@@ -1938,6 +1945,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                 {
                     "assignee": None,
                     "blocks": [],
+                    "closed_at":None,
                     "comments": [],
                     "content": "This issue needs attention",
                     "date_created": "1431414800",
@@ -1981,6 +1989,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             {
                 "assignee": None,
                 "blocks": [],
+                "closed_at":None,
                 "comments": [],
                 "content": "This issue needs attention",
                 "date_created": "1431414800",
@@ -2294,6 +2303,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "avatar_url": "https://seccdn.libravatar.org/avatar/...",
                     "comment": "This is a very interesting question",
                     "comment_date": "2015-07-02 09:22",
+                    "notification":False,
                     "date_created": "1435821770",
                     "edited_on": None,
                     "editor": None,
@@ -2319,6 +2329,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "avatar_url": "https://seccdn.libravatar.org/avatar/...",
                     "comment": "This is a very interesting question",
                     "comment_date": "2015-07-02 09:22",
+                    "notification":False,
                     "date_created": "1435821770",
                     "edited_on": None,
                     "editor": None,

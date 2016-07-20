@@ -1265,7 +1265,7 @@ def new_project(session, user, name, blacklist, allowed_prefix,
                 description=None, url=None, avatar_email=None,
                 parent_id=None, add_readme=False, userobj=None,
                 prevent_40_chars=False, namespace=None, user_ns=False,
-                ignore_existing_repo=False):
+                ignore_existing_repo=False, private=False):
     ''' Create a new project based on the information provided.
     '''
     if (not namespace and name in blacklist) \
