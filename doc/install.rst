@@ -262,3 +262,20 @@ The ``alembic stamp`` command is the one actually saving the current revision
 into the database. This current revision is found using ``alembic heads``
 which returns the most recent revision found by alembic, and since the
 database was just created, it is at the latest revision.
+
+
+Set up virus scannining
+-----------------------
+Pagure can automatically scan uploaded attachments for viruses using Clam.
+To set this up, first install clamav-data-empty, clamav-server,
+clamav-server-systemd and clamav-update.
+
+Then edit /etc/freshclam.conf, removing the Example line and run freshclam once
+to get an up to date database.
+
+Copy /usr/share/doc/clamav-server/clamd.conf to /etc/clamd.conf and edit that
+too, again making sure to remove the Example line. Make sure to set LocalSocket
+to a file in a directory that exists, and set User to an existing system user.
+
+Then start the clamd service and set VIRUS_SCAN_ATTACHMENTS = True in the
+Pagure configuration.

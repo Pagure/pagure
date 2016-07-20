@@ -123,6 +123,8 @@ REMOTE_GIT_FOLDER = os.path.join(
     'remotes'
 )
 
+### Whether to enable scanning for viruses in attachments
+VIRUS_SCAN_ATTACHMENTS = False
 
 # Configuration file for gitolite
 GITOLITE_CONFIG = os.path.join(

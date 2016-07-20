@@ -171,6 +171,15 @@ when building the ``msg-id`` header of the emails sent.
 Defaults to: ``pagure.org``
 
 
+VIRUS_SCAN_ATTACHMENTS
+~~~~~~~~~~~~~~~~~~~~~~
+
+This setting configures whether attachments are scanned for viruses on
+upload. For more information, see the install.rst guide.
+
+Defaults to: ``False``
+
+
 Configure Gitolite
 ------------------
 

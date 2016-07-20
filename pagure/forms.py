@@ -10,14 +10,44 @@
 
 import re
 from flask.ext import wtf
+import flask
 import wtforms
+import tempfile
 # pylint: disable=R0903,W0232,E1002
+
+import pagure
 
 
 STRICT_REGEX = '^[a-zA-Z0-9-_]+$'
 TAGS_REGEX = '^[a-zA-Z0-9-_, .]+$'
 PROJECT_NAME_REGEX = \
     '^[a-zA-z0-9_][a-zA-Z0-9-_]*(/?[a-zA-z0-9_][a-zA-Z0-9-_]+)?$'
+
+
+def file_virus_validator(form, field):
+    if not pagure.APP.config['VIRUS_SCAN_ATTACHMENTS']:
+        return
+    from pyclamd import ClamdUnixSocket
+
+    if not field.name in flask.request.files or \
+            flask.request.files[field.name].filename == '':
+        # If no file was uploaded, this field is correct
+        return
+    uploaded = flask.request.files[field.name]
+    clam = ClamdUnixSocket()
+    if not clam.ping():
+        raise wtforms.ValidationError('Unable to communicate with virus scanner')
+    results = clam.scan_stream(uploaded.stream.read())
+    if results is None:
+        uploaded.stream.seek(0)
+        return
+    else:
+        result = results.values()
+        res_type, res_msg = result
+        if res_type == 'FOUND':
+            raise wtforms.ValidationError('Virus found: %s' % res_msg)
+        else:
+            raise wtforms.ValidationError('Error scanning uploaded file')
 
 
 class ProjectFormSimplified(wtf.Form):
@@ -290,7 +320,7 @@ class UploadFileForm(wtf.Form):
     ''' Form to upload a file. '''
     filestream = wtforms.FileField(
         'File',
-        [wtforms.validators.Required()])
+        [wtforms.validators.Required(), file_virus_validator])
 
 
 class UserEmailForm(wtf.Form):
@@ -326,7 +356,7 @@ class CommentForm(wtf.Form):
     ''' Form to upload a file. '''
     comment = wtforms.FileField(
         'Comment',
-        [wtforms.validators.Required()])
+        [wtforms.validators.Required(), file_virus_validator])
 
 
 class NewGroupForm(wtf.Form):
