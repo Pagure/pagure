@@ -14,6 +14,7 @@ import pkg_resources
 import datetime
 import logging
 import json
+import operator
 
 import sqlalchemy as sa
 
@@ -1447,6 +1448,14 @@ class Token(BASE):
         ''' Return a list containing the name of each ACLs this token has.
         '''
         return sorted([str(acl.name) for acl in self.acls])
+
+    @property
+    def acls_list_pretty(self):
+        '''
+        Return a list containing the description of each ACLs this token has.
+        '''
+        return [acl.description for acl in sorted(
+            self.acls, key=operator.attrgetter('name'))]
 
 
 class TokenAcl(BASE):

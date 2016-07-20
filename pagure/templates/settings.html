@@ -167,7 +167,11 @@
                       <h4 class="modal-title" id="myModalLabel">ACLs</h4>
                     </div>
                     <div class="modal-body">
-                      {{ token.acls_list |safe }}
+                      <ul>
+                        {% for acl in token.acls_list_pretty %}
+                          <li>{{ acl }}</li>
+                        {% endfor %}
+                      </ul>
                     </div>
                   </div>
                 </div>
