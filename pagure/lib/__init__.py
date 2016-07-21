@@ -44,6 +44,7 @@ from sqlalchemy.orm import scoped_session
 
 import pygit2
 
+import pagure
 import pagure.exceptions
 import pagure.lib.git
 import pagure.lib.login

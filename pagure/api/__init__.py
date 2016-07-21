@@ -341,7 +341,7 @@ def api_project_tags(repo, username=None):
     if pattern is not None and not pattern.endswith('*'):
         pattern += '*'
 
-    project_obj = pagure.lib.get_project(SESSION, repo, username)
+    project_obj = pagure.get_authorized_project(SESSION, repo, username)
     if not project_obj:
         output = {'output': 'notok', 'error': 'Project not found'}
         jsonout = flask.jsonify(output)

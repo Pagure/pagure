@@ -26,6 +26,7 @@ from mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
+import pagure
 import pagure.lib.git
 import tests
 
@@ -54,7 +55,7 @@ class PagureLibGittests(tests.Modeltests):
         when the new uesr is an made an admin """
         tests.create_projects(self.session)
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         # Add an user to a project
         # The user will be an admin of the project
         msg = pagure.lib.add_user_to_project(
@@ -484,7 +485,7 @@ repo requests/forks/pingou/test3
         """
         tests.create_projects(self.session)
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
 
         # Add a couple of groups
         # They would be admins
@@ -1317,7 +1318,7 @@ index 9f44358..2a552bb 100644
         os.makedirs(self.gitrepo)
         repo_obj = pygit2.init_repository(self.gitrepo, bare=True)
 
-        repo = pagure.lib.get_project(self.session, 'test_ticket_repo')
+        repo = pagure.get_authorized_project(self.session, 'test_ticket_repo')
         # Create an issue to play with
         msg = pagure.lib.new_issue(
             session=self.session,
@@ -1538,7 +1539,7 @@ index 458821a..77674a8
         files = [entry.name for entry in commit.tree]
         self.assertEqual(files, [hash_file])
 
-        repo = pagure.lib.get_project(self.session, 'test_ticket_repo')
+        repo = pagure.get_authorized_project(self.session, 'test_ticket_repo')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         pagure.lib.git.clean_git(issue, repo, self.path)
 
@@ -1567,8 +1568,9 @@ index 458821a..77674a8
         os.makedirs(self.gitrepo)
         repo_obj = pygit2.init_repository(self.gitrepo, bare=True)
 
-        repo = pagure.lib.get_project(self.session, 'test_ticket_repo')
         # Create a PR to play with
+        repo = pagure.get_authorized_project(self.session, 'test_ticket_repo')
+        # Create an issue to play with
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=repo,
@@ -1848,7 +1850,7 @@ index 0000000..60f7480
         """ Test the update_ticket_from_git method from pagure.lib.git. """
         tests.create_projects(self.session)
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         # Set some priorities to the project
         repo.priorities = {'1': 'High', '2': 'Normal'}
         self.session.add(repo)

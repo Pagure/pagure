@@ -20,6 +20,7 @@ from mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
+import pagure
 import pagure.lib
 import tests
 
@@ -43,7 +44,7 @@ class PagureLibModeltests(tests.Modeltests):
         p_ugt.return_value = True
 
         tests.create_projects(self.session)
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
 
         # Create an issue
         msg = pagure.lib.new_issue(
@@ -82,8 +83,8 @@ class PagureLibModeltests(tests.Modeltests):
         self.session.commit()
         self.session.add(item)
 
-        repo = pagure.lib.get_project(self.session, 'test')
-        forked_repo = pagure.lib.get_project(
+        repo = pagure.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.get_authorized_project(
             self.session, 'test', user='pingou')
 
         # Create an pull-request
@@ -127,7 +128,7 @@ class PagureLibModeltests(tests.Modeltests):
     def test_tagissue__repr__(self):
         """ Test the TagIssue.__repr__ function of pagure.lib.model. """
         self.test_issue__repr__()
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         issues = pagure.lib.search_issues(self.session, repo)
         self.assertEqual(len(issues), 1)
 

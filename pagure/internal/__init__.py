@@ -249,7 +249,7 @@ def get_pull_request_ready_branch():
         response.status_code = 400
         return response
 
-    repo = pagure.lib.get_project(
+    repo = pagure.get_authorized_project(
         pagure.SESSION,
         flask.request.form.get('repo', '').strip() or None,
         namespace=flask.request.form.get('namespace', '').strip() or None,
@@ -336,7 +336,7 @@ def get_ticket_template(repo, username=None):
         response.status_code = 400
         return response
 
-    repo = pagure.lib.get_project(pagure.SESSION, repo, user=username)
+    repo = pagure.get_authorized_project(pagure.SESSION, repo, user=username)
 
     if repo is None:
         response = flask.jsonify({
@@ -405,7 +405,7 @@ def get_branches_of_commit():
         response.status_code = 400
         return response
 
-    repo = pagure.lib.get_project(
+    repo = pagure.get_authorized_project(
         pagure.SESSION,
         flask.request.form.get('repo', '').strip() or None,
         user=flask.request.form.get('repouser', '').strip() or None)

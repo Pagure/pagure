@@ -16,6 +16,7 @@ import pygit2
 
 from binaryornot.helpers import is_binary_string
 
+import pagure
 import pagure.doc_utils
 import pagure.exceptions
 import pagure.lib
@@ -139,8 +140,8 @@ def view_docs(repo, username=None, namespace=None, filename=None):
     if '.' in repo:
         namespace, repo = repo.split('.', 1)
 
-    repo = pagure.lib.get_project(
-        SESSION, repo, user=username, namespace=namespace)
+    repo = pagure.get_authorized_project(SESSION, repo, user=username,
+            namespace=namespace)
 
     if not repo:
         flask.abort(404, 'Project not found')

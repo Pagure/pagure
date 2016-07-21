@@ -12,7 +12,7 @@
 
 
 import re
-
+import pagure
 import pagure.exceptions
 
 

@@ -18,6 +18,7 @@ import pygit2
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
+import pagure
 import pagure.lib.git
 import tests
 
@@ -89,7 +90,7 @@ class PagureLibGitGetTagstests(tests.Modeltests):
         self.assertEqual(exp, get_tag_name(tags))
 
         # Case 4 - Sorting with different splitting characters
-        project = pagure.lib.get_project(self.session, 'test2')
+        project = pagure.get_authorized_project(self.session, 'test2')
         tests.add_readme_git_repo(os.path.join(os.path.join(
             self.path, 'repos'), 'test2.git'))
         repo = pygit2.Repository(os.path.join(os.path.join(

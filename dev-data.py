@@ -257,7 +257,7 @@ def insert_data(session, username, user_email):
     # projects_groups
     group = pagure.lib.search_groups(session, pattern=None,
                                      group_name="rel-eng", group_type=None)
-    repo = pagure.lib.get_project(session, 'test')
+    repo = pagure.get_authorized_project(session, 'test')
     item = pagure.lib.model.ProjectGroup(
         project_id=repo.id,
         group_id=group.id
@@ -267,7 +267,7 @@ def insert_data(session, username, user_email):
 
     group = pagure.lib.search_groups(session, pattern=None,
                                      group_name="admin", group_type=None)
-    repo = pagure.lib.get_project(session, 'test2')
+    repo = pagure.get_authorized_project(session, 'test2')
     item = pagure.lib.model.ProjectGroup(
         project_id=repo.id,
         group_id=group.id
@@ -277,8 +277,8 @@ def insert_data(session, username, user_email):
 
     ######################################
     # pull_requests
-    repo = pagure.lib.get_project(session, 'test')
-    forked_repo = pagure.lib.get_project(session, 'test')
+    repo = pagure.get_authorized_project(session, 'test')
+    forked_repo = pagure.get_authorized_project(session, 'test')
     req = pagure.lib.new_pull_request(
         session=session,
         repo_from=forked_repo,
@@ -298,7 +298,7 @@ def insert_data(session, username, user_email):
     ######################################
     # user_projects
     user = pagure.lib.search_user(session, username='foo')
-    repo = pagure.lib.get_project(session, 'test')
+    repo = pagure.get_authorized_project(session, 'test')
     item = pagure.lib.model.ProjectUser(
         project_id=repo.id,
         user_id=user.id
@@ -307,7 +307,7 @@ def insert_data(session, username, user_email):
     session.commit()
 
     user = pagure.lib.search_user(session, username=username)
-    repo = pagure.lib.get_project(session, 'test2')
+    repo = pagure.get_authorized_project(session, 'test2')
     item = pagure.lib.model.ProjectUser(
         project_id=repo.id,
         user_id=user.id
@@ -327,8 +327,7 @@ def insert_data(session, username, user_email):
 
     ######################################
     # issue_to_issue
-    repo = pagure.lib.get_project(session, 'test')
-
+    repo = pagure.get_authorized_project(session, 'test')
     all_issues = pagure.lib.search_issues(session, repo)
     pagure.lib.add_issue_dependency(session, all_issues[0],
                                     all_issues[1], 'pingou',
@@ -367,7 +366,7 @@ def insert_data(session, username, user_email):
 
     ######################################
     # tags_issues
-    repo = pagure.lib.get_project(session, 'test')
+    repo = pagure.get_authorized_project(session, 'test')
     issues = pagure.lib.search_issues(session, repo)
     item = pagure.lib.model.TagIssue(
         issue_uid=issues[0].uid,
@@ -408,7 +407,7 @@ def insert_data(session, username, user_email):
     except:
         print('requests folder already deleted')
 
-    repo = pagure.lib.get_project(session, 'test')
+    repo = pagure.get_authorized_project(session, 'test')
     result = pagure.lib.fork_project(session, 'foo', repo,
                                      pagure.APP.config['GIT_FOLDER'],
                                      pagure.APP.config['DOCS_FOLDER'],

@@ -115,7 +115,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.create_projects(self.session)
 
         # Check before adding
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         self.assertEqual(repo.tags, [])
 
         # Adding a tag
@@ -125,7 +125,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(output, ['Issue tagged with: infra'])
 
         # Check after adding
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.tags), 1)
         self.assertEqual(repo.tags_text, ['infra'])
 

@@ -24,6 +24,7 @@ from mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
+import pagure
 import pagure.lib
 import tests
 
@@ -67,7 +68,7 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         os.makedirs(self.gitrepo)
         repo_obj = pygit2.init_repository(self.gitrepo, bare=True)
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         # Create an issue to play with
         msg = pagure.lib.new_issue(
             session=self.session,
@@ -208,7 +209,7 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         )
 
         # Post loading
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.issues), 1)
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 

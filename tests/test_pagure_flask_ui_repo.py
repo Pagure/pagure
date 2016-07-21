@@ -25,6 +25,7 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
+import pagure
 import pagure.lib
 import tests
 from pagure.lib.repo import PagureRepo
@@ -499,7 +500,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         # Add an user to a project
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         msg = pagure.lib.add_user_to_project(
             session=self.session,
             project=repo,
@@ -646,7 +647,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 'access on the repo', output.data)
 
         # Add an user to a project
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         msg = pagure.lib.add_user_to_project(
             session=self.session,
             project=repo,
@@ -722,7 +723,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(msg, 'User `pingou` added to the group `testgrp`.')
         self.session.commit()
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         # Add the group to a project
         msg = pagure.lib.add_group_to_project(
             session=self.session,
@@ -808,7 +809,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(msg, 'User `pingou` added to the group `testgrp`.')
         self.session.commit()
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         # Add the group to a project
         msg = pagure.lib.add_group_to_project(
             session=self.session,
@@ -1310,7 +1311,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.perfReset()
 
         # Turn that repo into a fork
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         repo.parent_id = 2
         repo.is_fork = True
         self.session.add(repo)
@@ -1445,7 +1446,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             'test project #1        </div>', output.data)
 
         # Turn that repo into a fork
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         repo.parent_id = 2
         repo.is_fork = True
         self.session.add(repo)
@@ -1540,7 +1541,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             'test project #1        </div>', output.data)
 
         # Turn that repo into a fork
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         repo.parent_id = 2
         repo.is_fork = True
         self.session.add(repo)
@@ -2598,7 +2599,7 @@ index 0000000..fb7093d
                 output.data)
 
             # add issues
-            repo = pagure.lib.get_project(self.session, 'test')
+            repo = pagure.get_authorized_project(self.session, 'test')
             msg = pagure.lib.new_issue(
                 session=self.session,
                 repo=repo,
@@ -2692,9 +2693,9 @@ index 0000000..fb7093d
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
-            repo = pagure.lib.get_project(self.session, 'test')
+            repo = pagure.get_authorized_project(self.session, 'test')
             self.assertNotEqual(repo, None)
-            repo = pagure.lib.get_project(self.session, 'test2')
+            repo = pagure.get_authorized_project(self.session, 'test2')
             self.assertNotEqual(repo, None)
 
             # Add a fork of a fork
@@ -2849,7 +2850,7 @@ index 0000000..fb7093d
                 output.data)
 
             # add issues
-            repo = pagure.lib.get_project(self.session, 'test')
+            repo = pagure.get_authorized_project(self.session, 'test')
             msg = pagure.lib.new_issue(
                 session=self.session,
                 repo=repo,
@@ -2949,9 +2950,9 @@ index 0000000..fb7093d
                 'Forks <span class="label label-default">0</span>',
                 output.data)
 
-            repo = pagure.lib.get_project(self.session, 'test')
+            repo = pagure.get_authorized_project(self.session, 'test')
             self.assertEqual(repo, None)
-            repo = pagure.lib.get_project(self.session, 'test2')
+            repo = pagure.get_authorized_project(self.session, 'test2')
             self.assertNotEqual(repo, None)
 
             # Add a fork of a fork
@@ -3267,7 +3268,7 @@ index 0000000..fb7093d
         tests.create_projects(self.session)
         tests.create_projects_git(self.path)
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         self.assertEqual(repo.hook_token, 'aaabbbccc')
 
         user = tests.FakeUser()
@@ -3293,7 +3294,7 @@ index 0000000..fb7093d
 
             pagure.APP.config['WEBHOOK'] = False
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         self.assertEqual(repo.hook_token, 'aaabbbccc')
 
         user.username = 'pingou'
@@ -3304,7 +3305,7 @@ index 0000000..fb7093d
 
             data = {'csrf_token': csrf_token}
 
-            repo = pagure.lib.get_project(self.session, 'test')
+            repo = pagure.get_authorized_project(self.session, 'test')
             self.assertEqual(repo.hook_token, 'aaabbbccc')
 
             output = self.app.post(
@@ -3315,7 +3316,7 @@ index 0000000..fb7093d
                 output.data)
             pagure.APP.config['WEBHOOK'] = False
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         self.assertNotEqual(repo.hook_token, 'aaabbbccc')
 
     @patch('pagure.lib.notify.send_email')
@@ -3364,7 +3365,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 400)
 
             # Create an issue to play with
-            repo = pagure.lib.get_project(self.session, 'test')
+            repo = pagure.get_authorized_project(self.session, 'test')
             msg = pagure.lib.new_issue(
                 session=self.session,
                 repo=repo,
@@ -3385,7 +3386,7 @@ index 0000000..fb7093d
                 output.data)
 
             # Create a request to play with
-            repo = pagure.lib.get_project(self.session, 'test')
+            repo = pagure.get_authorized_project(self.session, 'test')
             msg = pagure.lib.new_pull_request(
                 session=self.session,
                 repo_from=repo,
@@ -3925,7 +3926,7 @@ index 0000000..fb7093d
                 output.data)
 
             # Existing token will expire in 60 days
-            repo = pagure.lib.get_project(self.session, 'test')
+            repo = pagure.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.tokens[0].expiration.date(),
                 datetime.datetime.utcnow().date() + datetime.timedelta(days=60))
@@ -3942,7 +3943,7 @@ index 0000000..fb7093d
                 output.data)
 
             # Existing token has been expired
-            repo = pagure.lib.get_project(self.session, 'test')
+            repo = pagure.get_authorized_project(self.session, 'test')
             self.assertEqual(
                 repo.tokens[0].expiration.date(),
                 repo.tokens[0].created.date())
