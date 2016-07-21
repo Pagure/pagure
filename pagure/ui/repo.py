@@ -1326,7 +1326,6 @@ def delete_repo(repo, username=None):
             'You are not allowed to change the settings for this project')
 
     try:
-        reponame = repo.fullname
         for issue in repo.issues:
             for comment in issue.comments:
                 SESSION.delete(comment)
@@ -1334,17 +1333,6 @@ def delete_repo(repo, username=None):
             SESSION.delete(issue)
         SESSION.delete(repo)
         SESSION.commit()
-
-        projects = pagure.lib.search_projects(SESSION, fork=True, pattern=reponame)
-
-        if projects:
-            for project in projects:
-                project_settings = project.settings
-                project_settings['pull_requests'] = True
-                project_settings['issue_tracker'] = True
-                project.settings = project_settings
-                SESSION.add(project)
-            SESSION.commit()
 
     except SQLAlchemyError as err:  # pragma: no cover
         SESSION.rollback()
