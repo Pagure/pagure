@@ -19,6 +19,8 @@
             </a>
             {% if authenticated %}
             <div class="pull-xs-right">
+		<a href="{{ url_for('new_issue', username=username, repo=repo.name) }}"
+		   class="btn btn-success btn-sm">New Issue</a>
               <div class="btn-group">
               {% if not repo.is_fork %}
                 <form method="POST" name="fork_project" id="fork_project"
