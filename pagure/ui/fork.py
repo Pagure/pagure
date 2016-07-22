@@ -1161,3 +1161,62 @@ def new_remote_request_pull(repo, username=None):
         repo_admin=repo_admin,
         branch_to=orig_repo.head.shorthand,
     )
+
+
+@APP.route(
+    '/fork_edit/<repo:repo>/edit/<path:branchname>/f/<path:filename>',
+    methods=('GET', 'POST'))
+@APP.route(
+    '/fork_edit/fork/<username>/<repo:repo>/edit/<path:branchname>/f/<path:filename>',
+    methods=('GET', 'POST'))
+@login_required
+def fork_edit_file(repo, branchname, filename, username=None):
+    """ Fork the project specified and open the specific file to edit
+    """
+    repo = pagure.lib.get_project(SESSION, repo, user=username)
+
+    form = pagure.forms.ConfirmationForm()
+    if not form.validate_on_submit():
+        flask.abort(400)
+
+    if repo is None:
+        flask.abort(404)
+
+    if pagure.lib.get_project(
+            SESSION, repo.name, user=flask.g.fas_user.username):
+        flask.flash('You had already forked this project')
+        return flask.redirect(flask.url_for(
+            'edit_file',
+            username=flask.g.fas_user.username,
+            repo=repo.name,
+            branchname=branchname,
+            filename=filename
+        ))
+
+    try:
+        message = pagure.lib.fork_project(
+            session=SESSION,
+            repo=repo,
+            gitfolder=APP.config['GIT_FOLDER'],
+            docfolder=APP.config['DOCS_FOLDER'],
+            ticketfolder=APP.config['TICKETS_FOLDER'],
+            requestfolder=APP.config['REQUESTS_FOLDER'],
+            user=flask.g.fas_user.username)
+
+        SESSION.commit()
+        pagure.lib.git.generate_gitolite_acls()
+        flask.flash(message)
+        return flask.redirect(flask.url_for(
+            'edit_file',
+            username=flask.g.fas_user.username,
+            repo=repo.name,
+            branchname=branchname,
+            filename=filename
+        ))
+    except pagure.exceptions.PagureException as err:
+        flask.flash(str(err), 'error')
+    except SQLAlchemyError as err:  # pragma: no cover
+        SESSION.rollback()
+        flask.flash(str(err), 'error')
+
+    return flask.redirect(flask.url_for('view_repo', repo=repo.name))
