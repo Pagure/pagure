@@ -11,7 +11,6 @@ enum34
 flask
 flask-wtf
 flask-multistatic
-html5lib  # required by bleach
 kitchen
 markdown
 munch
