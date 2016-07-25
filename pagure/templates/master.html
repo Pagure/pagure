@@ -23,7 +23,7 @@
       <div class="container">
         <div class="row">
           <div class="col-sm-3">
-            <a href="/">
+            <a href="{{ url_for('index') }}">
               <img height=40px src="{{ url_for('static', filename='pagure-logo.png') }}"
                 alt="pagure Logo" id="pagureLogo"/>
             </a>
@@ -35,7 +35,7 @@
       <div class="container">
         <ul class="nav navbar-nav nav-underline pull-xs-right">
           <li class="nav-item">
-            <a class="nav-link" href="/browse/projects/">Browse</a>
+            <a class="nav-link" href="{{ url_for('browse_projects') }}">Browse</a>
           </li>
           {% if admin %}
           <li class="nav-item">
