@@ -224,7 +224,6 @@
 $(document).ready(function() {
   $(".watch-menu a").click(function(){
     var selectedValue = $(this).attr('id');
-    console.log(selectedValue)
     var action = $("#watch_project").attr('action');
       if (selectedValue != "unwatch_button") {
         action = action.replace('/0', '/1');
