@@ -942,16 +942,20 @@ def view_issue_raw_file(repo, filename=None, username=None):
     if not mimetype and data[:2] == '#!':
         mimetype = 'text/plain'
 
+    headers = {}
     if not mimetype:
         if '\0' in data:
             mimetype = 'application/octet-stream'
         else:
             mimetype = 'text/plain'
+    elif 'html' in mimetype:
+        mimetype = 'application/octet-stream'
+        headers['Content-Disposition'] = 'attachment'
 
     if mimetype.startswith('text/') and not encoding:
         encoding = chardet.detect(ktc.to_bytes(data))['encoding']
 
-    headers = {'Content-Type': mimetype}
+    headers['Content-Type'] = mimetype
     if encoding:
         headers['Content-Encoding'] = encoding
 
