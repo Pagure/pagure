@@ -1165,10 +1165,10 @@ def new_remote_request_pull(repo, username=None):
 
 @APP.route(
     '/fork_edit/<repo:repo>/edit/<path:branchname>/f/<path:filename>',
-    methods=('GET', 'POST'))
+    methods=['POST'])
 @APP.route(
     '/fork_edit/fork/<username>/<repo:repo>/edit/<path:branchname>/f/<path:filename>',
-    methods=('GET', 'POST'))
+    methods=['POST'])
 @login_required
 def fork_edit_file(repo, branchname, filename, username=None):
     """ Fork the project specified and open the specific file to edit
