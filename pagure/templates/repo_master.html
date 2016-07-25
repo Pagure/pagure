@@ -17,39 +17,48 @@
                 {{ repo.name }}
               {%- endif -%}
             </a>
-            {% if authenticated and not repo.is_fork %}
+            {% if authenticated %}
             <div class="pull-xs-right">
-              <form method="POST" name="fork_project"
-                action="{{ url_for(
-                  '.fork_project', repo=repo.name, username=username) }}">
-                  <button class="btn btn-sm btn-secondary"
-                    onclick="fork_project.submit();"
-                    id="fork_project"><span class="oi" data-glyph="fork"></span> Fork</Button>
-                {{ forkbuttonform.csrf_token }}
-              </form>
-             {% endif %}
+              <div class="btn-group">
+              {% if not repo.is_fork %}
+                <form method="POST" name="fork_project" id="fork_project"
+                  action="{{ url_for(
+                    '.fork_project', repo=repo.name, username=username) }}">
+                  {{ forkbuttonform.csrf_token }}
+                </form>
+                <button class="btn btn-sm btn-secondary"
+                  onclick="$('#fork_project').submit();">
+                  <span class="oi" data-glyph="fork"></span> Fork</button>
+              {% endif %}
+                <button title="{%- if is_watching(repo.name, repo.user.user if repo.is_fork else None)
+                %}You are watching this project{% else %}
+                You are not watching this project{% endif -%}"
+                type="button" class="btn btn-sm dropdown-toggle
+                {%- if is_watching(repo.name, repo.user.user if repo.is_fork else None)
+                %} btn-primary{% else %} btn-secondary{% endif -%}"
+                data-toggle="dropdown" id="watch-button">
+                  <span class="oi" data-glyph="eye"></span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-right watch-menu">
+                  <form method="POST" id="watch_project" name="watch_project"
+                      action="{{ url_for('.watch_repo', user=repo.user.user if repo.is_fork else None,
+                                         repo=repo.name, watch=0) }}">
+                   {%- if is_watching(repo.name, repo.user.user if repo.is_fork else None)
+                   %}
+                   <a class="dropdown-item" id="unwatch_button">Stop watching {{repo.name}}</a>
+                   {% else %}
+                   <a class="dropdown-item" id="watch_button">Watch {{repo.name}}</a>
+                   {% endif -%}
+
+                    {{ forkbuttonform.csrf_token }}
+                  </form>
+                </div>
+              </div>
+            </div>
+            {% endif %}
 
           {% if authenticated %}
             <div class="btn-group pull-xs-right">
-              <button type="button" class="btn btn-default" id="watch-button">
-                {%- if is_watching(repo.name, repo.user.user if repo.is_fork else None)
-                %}Unwatch{%
-                else %}Watch{%
-                endif -%}
-              </button>
-              <button type="button" class="btn btn-default dropdown-toggle"
-                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                <span class="sr-only">Toggle Dropdown</span>
-              </button>
-              <div class="dropdown-menu watch-menu">
-                <form method="POST" id="watch_project" name="watch_project"
-                    action="{{ url_for('.watch_repo', user=repo.user.user if repo.is_fork else None,
-                                       repo=repo.name, watch=0) }}">
-                  <a class="dropdown-item" id="watching_button">Unwatch</a>
-                  <a class="dropdown-item" id="unwatching_button">Watch</a>
-                  {{ forkbuttonform.csrf_token }}
-                </form>
-              </div>
             </div>
           {% endif %}
         </h2>
@@ -214,20 +223,15 @@
 <script type="text/javascript">
 $(document).ready(function() {
   $(".watch-menu a").click(function(){
-    var selectedValue = $(this).text();
-    var currentValue = $("#watch-button").text();
+    var selectedValue = $(this).attr('id');
+    console.log(selectedValue)
     var action = $("#watch_project").attr('action');
-    if (currentValue == selectedValue) {
-      if (selectedValue != "Watch") {
-        $("#watch-button").html("Watch");
-      } else {
-        $("#watch").val('1');
+      if (selectedValue != "unwatch_button") {
         action = action.replace('/0', '/1');
         $('#watch_project').attr('action', action);
-        $("#watch-button").html("Unwatch");
       }
       $('#watch_project').submit();
-    }
+
   });
 });
 </script>
