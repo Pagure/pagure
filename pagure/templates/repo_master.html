@@ -52,41 +52,6 @@
               </div>
             </div>
           {% endif %}
-          {% if branchname %}
-            <div class="btn-group pull-xs-right">
-              <button type="button" class="btn btn-default">{{ branchname }}</button>
-              <button type="button" class="btn btn-default dropdown-toggle"
-                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="sr-only">Toggle Dropdown</span>
-              </button>
-              <div class="dropdown-menu">
-                {% for branch in branches %}
-                  {% if origin == 'view_commits' %}
-                    <a class="dropdown-item" href="{{ url_for('view_commits',
-                                username=username, repo=repo.name, branchname=branch) }}">
-                      {{ branch }}
-                    </a>
-                  {% elif origin == 'view_repo_branch' or origin == 'view_repo' %}
-                    <a class="dropdown-item" href="{{ url_for('view_repo_branch',
-                                username=username, repo=repo.name, branchname=branch) }}">
-                      {{ branch }}
-                    </a>
-                  {% elif origin == 'view_tree' %}
-                    <a class="dropdown-item" href="{{ url_for('view_tree',
-                                username=username, repo=repo.name, identifier=branch) }}">
-                      {{ branch }}
-                    </a>
-                  {% elif origin == 'view_file' %}
-                    <a class="dropdown-item" href="{{ url_for('view_file',
-                                username=username, repo=repo.name, identifier=branch,
-                                filename=filename) }}">
-                      {{ branch }}
-                    </a>
-                  {% endif %}
-                {% endfor %}
-              </div>
-            </div>
-            {% endif %}
         </h2>
         {% if repo.is_fork %}
         <div class="m-t-0">
