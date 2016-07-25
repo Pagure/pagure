@@ -23,48 +23,58 @@ PAGURE_URL = '{base}api/0/{repo}/pull-request/{pr}/flag'
 JENKINS_TRIGGER_URL = '{base}job/{project}/buildWithParameters'
 
 
+class HookInactive(Exception):
+    pass
+
+
 def process_pr(logger, cfg, pr_id, repo, branch):
-    post_data(logger,
-              JENKINS_TRIGGER_URL.format(
-                  base=cfg.jenkins_url, project=cfg.jenkins_name),
-              {'token': cfg.jenkins_token,
-               'cause': pr_id,
-               'REPO': repo,
-               'BRANCH': branch})
+    if cfg.active:
+        post_data(logger,
+                  JENKINS_TRIGGER_URL.format(
+                      base=cfg.jenkins_url, project=cfg.jenkins_name),
+                  {'token': cfg.jenkins_token,
+                   'cause': pr_id,
+                   'REPO': repo,
+                   'BRANCH': branch})
+    else:
+        raise HookInactive(cfg.pagure_name)
 
 
 def process_build(logger, cfg, build_id):
-    #  Get details from Jenkins
-    jenk = jenkins.Jenkins(cfg.jenkins_url)
-    build_info = jenk.get_build_info(cfg.jenkins_name, build_id)
-    result = build_info['result']
-    url = build_info['url']
+    if cfg.active:
+        #  Get details from Jenkins
+        jenk = jenkins.Jenkins(cfg.jenkins_url)
+        build_info = jenk.get_build_info(cfg.jenkins_name, build_id)
+        result = build_info['result']
+        url = build_info['url']
 
-    pr_id = None
+        pr_id = None
 
-    for action in build_info['actions']:
-        for cause in action.get('causes', []):
-            try:
-                pr_id = int(cause['note'])
-            except (KeyError, ValueError):
-                continue
+        for action in build_info['actions']:
+            for cause in action.get('causes', []):
+                try:
+                    pr_id = int(cause['note'])
+                except (KeyError, ValueError):
+                    continue
 
-    if not pr_id:
-        logger.info('Not a PR check')
-        return
+        if not pr_id:
+            logger.info('Not a PR check')
+            return
 
-    # Comment in Pagure
-    logger.info('Updating %s PR %d: %s', cfg.pagure_name, pr_id, result)
-    try:
-        pagure_ci_flag(logger,
-                    username=cfg.display_name,
-                    repo=cfg.pagure_name,
-                    requestid=pr_id,
-                    result=result,
-                    url=url)
+        # Comment in Pagure
+        logger.info('Updating %s PR %d: %s', cfg.pagure_name, pr_id, result)
+        try:
+            pagure_ci_flag(logger,
+                        username=cfg.display_name,
+                        repo=cfg.pagure_name,
+                        requestid=pr_id,
+                        result=result,
+                        url=url)
 
-    except KeyError as exc:
-        logger.warning('Unknown build status', exc_info=exc)
+        except KeyError as exc:
+            logger.warning('Unknown build status', exc_info=exc)
+    else:
+        raise HookInactive(cfg.pagure_name)
 
 
 def post_data(logger, *args, **kwargs):

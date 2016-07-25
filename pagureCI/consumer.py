@@ -38,6 +38,8 @@ class Integrator(fedmsg.consumers.FedmsgConsumer):
                 self.process_build(msg)
         except jenkins_hook.ConfigNotFound as exc:
             self.log.info('Unconfigured project %r', str(exc))
+        except pagure_ci.HookInactive as exc:
+            self.log.info('Hook Inactive for project %r', str(exc))
 
     def trigger_build(self, msg):
         pr_id = msg['pullrequest']['id']

@@ -2,9 +2,11 @@
 
 
 import os
+import uuid
 
 import sqlalchemy as sa
 import pygit2
+
 from wtforms import validators, TextField, BooleanField
 from flask.ext import wtf
 from sqlalchemy.orm import relation, backref
@@ -27,11 +29,13 @@ class PagureCI(BASE):
         nullable=False,
         unique=False,
         index=True)
+    pagure_ci_token = sa.Column(sa.String(64), nullable=True, unique=True,
+                            index=True)
 
     active = sa.Column(sa.Boolean, nullable=False, default=False)
     display_name = sa.Column(sa.String(64), nullable=False, default='Jenkins')
     pagure_name = sa.Column(sa.String(255))
-    
+
     jenkins_name = sa.Column(sa.String(255))
     jenkins_url = sa.Column(sa.String(255), nullable=False,
                             default='http://jenkins.fedorainfracloud.org/')
@@ -45,6 +49,10 @@ class PagureCI(BASE):
             'hook_pagure_ci', cascade="delete, delete-orphan",
             single_parent=True)
     )
+
+    def __init__(self):
+        self.pagure_ci_token = uuid.uuid4().hex
+
 
 class ConfigNotFound(Exception):
     pass

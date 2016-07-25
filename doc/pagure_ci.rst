@@ -22,10 +22,12 @@ How to enable Pagure CI
 	
         All of which are required field.
 
-* The jenkins token is any string that you give here. The only thing that should be
-  kept in mind that  this token should be same through out.
+* The jenkins token is any string that you give here. The only thing that should
+  be kept in mind that this token should be same through out.
 		
 * This will give a POST URL which will be used for Job Notification in Jenkins
+
+* The POST url will only appear only after you successfully submitted the form.
 
 
 Configuring Jenkins
@@ -36,6 +38,10 @@ after you login to your Jenkins Instance.
 
 * Go to Manage Jenkins -> Configuire Global Security and under that select
   `Project-based Matrix Authorization Strategy`
+
+* Add your username here and make sure to give that username all the permissions.
+  You should give all the permissions possible so that you save your self from
+  getting locked in Jenkins.
 
 * Download the following plugins:
 
@@ -61,7 +67,7 @@ after you login to your Jenkins Instance.
 
 		FORMAT: JSON
 		PROTOCOL: HTTP
-		EVENT: All Event
+		EVENT: Job Finalized
 		URL: <The POST URL that Jenkins form returned>
 		TIMEOUT: 3000
 		LOG: 1
@@ -72,7 +78,7 @@ after you login to your Jenkins Instance.
 
 * Two string parameters need to be created REPO and BRANCH
 
-* Source Code Management select Git  and give the URL of the pagure project
+* Source Code Management select Git and give the URL of the pagure project
 
 * Under Build Trigger click on Trigger build remotely and give the same token
   that you gave in the Pagure CI form.

@@ -90,6 +90,7 @@ def view_plugin(repo, plugin, username=None, full=True):
     fields = []
     new = True
     dbobj = plugin.db_object()
+    pagure_ci_token = None
 
     if hasattr(repo, plugin.backref):
         dbobj = getattr(repo, plugin.backref)
@@ -98,6 +99,9 @@ def view_plugin(repo, plugin, username=None, full=True):
         if dbobj and len(dbobj) > 0:
             dbobj = dbobj[0]
             new = False
+            # To populate the pagure CI token if generated
+            if hasattr(dbobj, "pagure_ci_token") and plugin.backref == "hook_pagure_ci":
+                pagure_ci_token = dbobj.pagure_ci_token
         else:
             dbobj = plugin.db_object()
 
@@ -129,6 +133,7 @@ def view_plugin(repo, plugin, username=None, full=True):
                 username=username,
                 plugin=plugin,
                 form=form,
+                pagure_ci_token=pagure_ci_token,
                 fields=fields)
 
         if form.active.data:
@@ -162,21 +167,22 @@ def view_plugin(repo, plugin, username=None, full=True):
         username=username,
         plugin=plugin,
         form=form,
+        pagure_ci_token=pagure_ci_token,
         fields=fields)
 
 
-@APP.route('/hooks/<repo_id>/build-finished', methods=['POST'])
-def hook_finished(repo_id):
+@APP.route('/hooks/<pagure_ci_token>/build-finished', methods=['POST'])
+def hook_finished(pagure_ci_token):
     try:
         data = json.loads(flask.request.get_data())
         cfg = jenkins_hook.get_configs(
             data['name'], jenkins_hook.Service.JENKINS)[0]
         build_id = data['build']['number']
-        if repo_id != str(cfg.project_id):
-            raise ValueError('Project ID mismatch')
+        if pagure_ci_token != cfg.pagure_ci_token:
+            raise ValueError('Token mismatch')
     except (TypeError, ValueError, KeyError, jenkins_hook.ConfigNotFound) as exc:
         APP.logger.error('Error processing jenkins notification', exc_info=exc)
-        return ('Bad request...\n', 400, {'Content-Type': 'text/plain'})
+        flask.abort(400, "Bad Request")
     APP.logger.info('Received jenkins notification')
     pagure_ci.process_build(APP.logger, cfg, build_id)
     return ('', 204)
