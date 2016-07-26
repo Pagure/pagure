@@ -29,7 +29,7 @@ class PagureCI(BASE):
         nullable=False,
         unique=False,
         index=True)
-    pagure_ci_token = sa.Column(sa.String(64), nullable=True, unique=True,
+    pagure_ci_token = sa.Column(sa.String(32), nullable=True, unique=True,
                             index=True)
 
     active = sa.Column(sa.Boolean, nullable=False, default=False)

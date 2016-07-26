@@ -13,8 +13,6 @@ class Integrator(fedmsg.consumers.FedmsgConsumer):
     topic = [
         'io.pagure.prod.pagure.pull-request.comment.added',
         'io.pagure.prod.pagure.pull-request.new',
-        'org.fedoraproject.dev.pagure.pull-request.new',
-        'org.fedoraproject.dev.pagure.pull-request.comment.added',
         'org.fedoraproject.prod.jenkins.build',
     ]
 
