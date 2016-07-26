@@ -24,6 +24,8 @@ from pagure.hooks import jenkins_hook
 from pagure.lib import model, pagure_ci
 
 import json
+from kitchen.text.converters import to_bytes
+from cryptography.hazmat.primitives import constant_time
 
 # pylint: disable=E1101
 
@@ -173,16 +175,23 @@ def view_plugin(repo, plugin, username=None, full=True):
 
 @APP.route('/hooks/<pagure_ci_token>/build-finished', methods=['POST'])
 def hook_finished(pagure_ci_token):
+    """ Flags the Pull-request after getting notification from Jenkins
+    """
+
     try:
         data = json.loads(flask.request.get_data())
         cfg = jenkins_hook.get_configs(
             data['name'], jenkins_hook.Service.JENKINS)[0]
         build_id = data['build']['number']
-        if pagure_ci_token != cfg.pagure_ci_token:
-            raise ValueError('Token mismatch')
+
+        if not constant_time.bytes_eq(
+                  to_bytes(pagure_ci_token), to_bytes(cfg.pagure_ci_token)):
+            return ('Token mismatch', 401)
+
     except (TypeError, ValueError, KeyError, jenkins_hook.ConfigNotFound) as exc:
         APP.logger.error('Error processing jenkins notification', exc_info=exc)
         flask.abort(400, "Bad Request")
+
     APP.logger.info('Received jenkins notification')
     pagure_ci.process_build(APP.logger, cfg, build_id)
     return ('', 204)
