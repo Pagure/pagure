@@ -76,6 +76,7 @@ The recognized keywords are:
  * fix/fixed/fixes
  * relate/related/relates
  * merge/merges/merged
+ * close/closes/closed
 
 Examples:
 

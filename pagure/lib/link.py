@@ -19,6 +19,8 @@ FIXES = [
     re.compile(r'(?:.*\s+)?fixe?[sd]?:?\s*?https?://.*/(\w+)/(?:issue|pull-request)/(\d+)', re.I),
     re.compile(r'(?:.*\s+)?merge?[sd]?:?\s*?#(\d+)', re.I),
     re.compile(r'(?:.*\s+)?merge?[sd]?:?\s*?https?://.*/(\w+)/(?:issue|pull-request)/(\d+)', re.I),
+    re.compile(r'(?:.*\s+)?close?[sd]?:?\s*?#(\d+)', re.I),
+    re.compile(r'(?:.*\s+)?close?[sd]?:?\s*?https?://.*/(\w+)/(?:issue|pull-request)/(\d+)', re.I),
 ]
 
 RELATES = [
