@@ -316,7 +316,7 @@ def get_pull_request_ready_branch():
 
     prs = pagure.lib.search_pull_requests(
         pagure.SESSION,
-        project_id=repo.id,
+        project_id_from=repo.id,
         status='Open'
     )
     for pr in prs:
