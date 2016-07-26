@@ -54,7 +54,7 @@ after you login to your Jenkins Instance.
 
 		FORMAT: JSON
 		PROTOCOL: HTTP
-		EVENT: All Event
+		EVENT: Job Finalized
 		URL: <The POST URL that Jenkins form returned>
 		TIMEOUT: 3000
 		LOG: 1
