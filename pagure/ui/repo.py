@@ -47,7 +47,10 @@ from pagure import (APP, SESSION, LOG, __get_file_in_tree, login_required,
 
 @APP.route('/<repo:repo>.git')
 @APP.route('/fork/<username>/<repo:repo>.git')
-def redirect_to_repo(repo, username=None):
+def view_repo_git(repo, username=None):
+    ''' Redirect to the project index page when user wants to view
+    the git repo of the project
+    '''
     return flask.redirect(flask.url_for('view_repo',repo=repo,username=username))
 
 
