@@ -24,9 +24,9 @@ JENKINS_TRIGGER_URL = '{base}job/{project}/buildWithParameters'
 
 
 def process_pr(logger, cfg, pr_id, repo, branch):
-    """Function to process the PR, it POST the
-    data to the Jenkins URL to trigger build
-    """
+    ''' Function to process the PR, it POST the
+    data to the Jenkins URL to trigger build.
+    '''
     if cfg.active:
         post_data(logger,
                   JENKINS_TRIGGER_URL.format(
@@ -36,13 +36,13 @@ def process_pr(logger, cfg, pr_id, repo, branch):
                    'REPO': repo,
                    'BRANCH': branch})
     else:
-        raise pagure.exceptions.HookInactive(cfg.pagure_name)
+        raise pagure.exceptions.HookInactiveException(cfg.pagure_name)
 
 
 def process_build(logger, cfg, build_id):
-    """Function is used to get the build info
-    from jenkins and flag that particular PR
-    """
+    ''' Function is used to get the build info
+    from jenkins and flag that particular pull-request.
+    '''
     if cfg.active:
         jenk = jenkins.Jenkins(cfg.jenkins_url)
         build_info = jenk.get_build_info(cfg.jenkins_name, build_id)
@@ -75,11 +75,11 @@ def process_build(logger, cfg, build_id):
         except KeyError as exc:
             logger.warning('Unknown build status', exc_info=exc)
     else:
-        raise pagure.exceptions.HookInactive(cfg.pagure_name)
+        raise pagure.exceptions.HookInactiveException(cfg.pagure_name)
 
 
 def post_data(logger, *args, **kwargs):
-    """POST data to jenkins and reports a response"""
+    ''' POST data to jenkins and reports a response. '''
     resp = requests.post(*args, **kwargs)
     logger.debug('Received response status %s', resp.status_code)
     if resp.status_code < 200 or resp.status_code >= 300:
@@ -88,7 +88,7 @@ def post_data(logger, *args, **kwargs):
 
 
 def pagure_ci_flag(logger, repo, username, url, result, requestid):
-    """Flag the pull-request in pagure"""
+    ''' Flag the pull-request in pagure. '''
 
     comment, percent = {
         'SUCCESS': ('Build successful', 100),
