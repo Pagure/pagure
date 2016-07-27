@@ -226,7 +226,7 @@ $(document).ready(function() {
     var selectedValue = $(this).attr('id');
     var action = $("#watch_project").attr('action');
       if (selectedValue != "unwatch_button") {
-        action = action.replace('/0', '/1');
+        action = action.replace('/settings/0', '/settings/1');
         $('#watch_project').attr('action', action);
       }
       $('#watch_project').submit();
