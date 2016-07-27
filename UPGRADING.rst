@@ -1,6 +1,15 @@
 Upgrading Pagure
 ================
 
+
+2.3.4
+-----
+
+Release 2.3.4 contains an important security fix, blocking a source of XSS
+attack. (CVE-2016-1000037)
+
+
+
 From 2.2 to 2.3
 ---------------
 

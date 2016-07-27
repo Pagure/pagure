@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:           pagure
-Version:        2.3.3
+Version:        2.3.4
 Release:        1%{?dist}
 Summary:        A git-centered forge
 
@@ -259,6 +259,12 @@ install -m 644 webhook-server/pagure_webhook.service \
 
 
 %changelog
+* Wed Jul 27 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.3.4-1
+- Update to 2.3.4
+- Security fix release blocking all html related mimetype when displaying the
+  raw files in issues and forces the browser to download them instead (Thanks to
+  Patrick Uiterwijk for finding this issue) - CVE: CVE-2016-1000037
+
 * Fri Jul 15 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.3.3-1
 - Update to 2.3.3
 - Fix redering the release page when the tag message contain only spaces (Vivek
