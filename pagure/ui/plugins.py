@@ -21,7 +21,12 @@ from pagure import APP, SESSION, login_required, is_repo_admin
 from pagure.lib.model import BASE
 from pagure.exceptions import FileNotFoundException
 from pagure.hooks import jenkins_hook
-from pagure.lib import model, pagure_ci
+from pagure.lib import model
+
+try:
+    from pagure.lib import pagure_ci
+except ImportError:
+    pagure_ci = None
 
 import json
 from kitchen.text.converters import to_bytes
@@ -37,6 +42,10 @@ def get_plugin_names(blacklist=None):
         blacklist = []
     elif not isinstance(blacklist, list):
         blacklist = [blacklist]
+
+    if pagure_ci is None and 'Pagure CI' not in blacklist:
+        blacklist.append('Pagure CI')
+
     output = [
         plugin.name
         for plugin in plugins
@@ -172,26 +181,26 @@ def view_plugin(repo, plugin, username=None, full=True):
         pagure_ci_token=pagure_ci_token,
         fields=fields)
 
+if pagure_ci is not None:
+    @APP.route('/hooks/<pagure_ci_token>/build-finished', methods=['POST'])
+    def hook_finished(pagure_ci_token):
+        """ Flags the Pull-request after getting notification from Jenkins
+        """
 
-@APP.route('/hooks/<pagure_ci_token>/build-finished', methods=['POST'])
-def hook_finished(pagure_ci_token):
-    """ Flags the Pull-request after getting notification from Jenkins
-    """
+        try:
+            data = json.loads(flask.request.get_data())
+            cfg = jenkins_hook.get_configs(
+                data['name'], jenkins_hook.Service.JENKINS)[0]
+            build_id = data['build']['number']
 
-    try:
-        data = json.loads(flask.request.get_data())
-        cfg = jenkins_hook.get_configs(
-            data['name'], jenkins_hook.Service.JENKINS)[0]
-        build_id = data['build']['number']
+            if not constant_time.bytes_eq(
+                      to_bytes(pagure_ci_token), to_bytes(cfg.pagure_ci_token)):
+                return ('Token mismatch', 401)
 
-        if not constant_time.bytes_eq(
-                  to_bytes(pagure_ci_token), to_bytes(cfg.pagure_ci_token)):
-            return ('Token mismatch', 401)
+        except (TypeError, ValueError, KeyError, jenkins_hook.ConfigNotFound) as exc:
+            APP.logger.error('Error processing jenkins notification', exc_info=exc)
+            flask.abort(400, "Bad Request")
 
-    except (TypeError, ValueError, KeyError, jenkins_hook.ConfigNotFound) as exc:
-        APP.logger.error('Error processing jenkins notification', exc_info=exc)
-        flask.abort(400, "Bad Request")
-
-    APP.logger.info('Received jenkins notification')
-    pagure_ci.process_build(APP.logger, cfg, build_id)
-    return ('', 204)
+        APP.logger.info('Received jenkins notification')
+        pagure_ci.process_build(APP.logger, cfg, build_id)
+        return ('', 204)
