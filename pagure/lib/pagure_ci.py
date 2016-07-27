@@ -24,10 +24,14 @@ JENKINS_TRIGGER_URL = '{base}job/{project}/buildWithParameters'
 
 
 class HookInactive(Exception):
+    """To handle when the hook is inactive"""
     pass
 
 
 def process_pr(logger, cfg, pr_id, repo, branch):
+    """Function to process the PR, it POST the
+    data to the Jenkins URL to trigger build
+    """
     if cfg.active:
         post_data(logger,
                   JENKINS_TRIGGER_URL.format(
@@ -41,8 +45,10 @@ def process_pr(logger, cfg, pr_id, repo, branch):
 
 
 def process_build(logger, cfg, build_id):
+    """Function is used to get the build info
+    from jenkins and flag that particular PR
+    """
     if cfg.active:
-        #  Get details from Jenkins
         jenk = jenkins.Jenkins(cfg.jenkins_url)
         build_info = jenk.get_build_info(cfg.jenkins_name, build_id)
         result = build_info['result']
@@ -78,6 +84,7 @@ def process_build(logger, cfg, build_id):
 
 
 def post_data(logger, *args, **kwargs):
+    """POST data to jenkins and reports a response"""
     resp = requests.post(*args, **kwargs)
     logger.debug('Received response status %s', resp.status_code)
     if resp.status_code < 200 or resp.status_code >= 300:
@@ -86,6 +93,7 @@ def post_data(logger, *args, **kwargs):
 
 
 def pagure_ci_flag(logger, repo, username, url, result, requestid):
+    """Flag the pull-request in pagure"""
 
     comment, percent = {
         'SUCCESS': ('Build successful', 100),
