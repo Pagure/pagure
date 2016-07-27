@@ -23,11 +23,6 @@ PAGURE_URL = '{base}api/0/{repo}/pull-request/{pr}/flag'
 JENKINS_TRIGGER_URL = '{base}job/{project}/buildWithParameters'
 
 
-class HookInactive(Exception):
-    """To handle when the hook is inactive"""
-    pass
-
-
 def process_pr(logger, cfg, pr_id, repo, branch):
     """Function to process the PR, it POST the
     data to the Jenkins URL to trigger build
@@ -41,7 +36,7 @@ def process_pr(logger, cfg, pr_id, repo, branch):
                    'REPO': repo,
                    'BRANCH': branch})
     else:
-        raise HookInactive(cfg.pagure_name)
+        raise pagure.exceptions.HookInactive(cfg.pagure_name)
 
 
 def process_build(logger, cfg, build_id):
@@ -80,7 +75,7 @@ def process_build(logger, cfg, build_id):
         except KeyError as exc:
             logger.warning('Unknown build status', exc_info=exc)
     else:
-        raise HookInactive(cfg.pagure_name)
+        raise pagure.exceptions.HookInactive(cfg.pagure_name)
 
 
 def post_data(logger, *args, **kwargs):

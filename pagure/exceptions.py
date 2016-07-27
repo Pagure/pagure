@@ -57,3 +57,8 @@ class GitConflictsException(PagureException):
     conflicts.
     '''
     pass
+
+
+class HookInactive(PagureException):
+    """Exception raised then the hook is inactive"""
+    pass
