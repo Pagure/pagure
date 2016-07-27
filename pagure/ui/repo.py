@@ -1922,8 +1922,8 @@ def view_project_activity(repo):
     )
 
 
-@APP.route('/watch/<repo>/settings/<watch>', methods=['POST'])
-@APP.route('/watch/fork/<user>/<repo>/settings/<watch>', methods=['POST'])
+@APP.route('/watch/<repo:repo>/settings/<watch>', methods=['POST'])
+@APP.route('/watch/fork/<user>/<repo:repo>/settings/<watch>', methods=['POST'])
 @login_required
 def watch_repo(repo, watch, user=None):
     """ Marked for watching or Unwatching
