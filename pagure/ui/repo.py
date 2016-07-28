@@ -786,6 +786,9 @@ def view_tree(repo, identifier=None, username=None):
     content = None
     output_type = None
     commit = None
+    readme = None
+    safe = False
+    readme_ext = None
     if not repo_obj.is_empty:
         if identifier in repo_obj.listall_branches():
             branchname = identifier
@@ -807,9 +810,6 @@ def view_tree(repo, identifier=None, username=None):
 
         if commit:
             content = sorted(commit.tree, key=lambda x: x.filemode)
-            readme = None
-            safe = False
-            readme_ext = None
             for i in commit.tree:
                 name, ext = os.path.splitext(i.name)
                 if name == 'README':
