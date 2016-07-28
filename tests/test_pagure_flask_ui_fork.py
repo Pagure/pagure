@@ -1858,6 +1858,7 @@ index 0000000..2a552bb
         user = tests.FakeUser()
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
+            # No csrf_token
             output = self.app.post('fork_edit/test/edit/master/f/source')
             self.assertEqual(output.status_code, 400)
 
@@ -1872,6 +1873,7 @@ index 0000000..2a552bb
                 'csrf_token': csrf_token,
             }
 
+            # No files added
             output = self.app.post('fork_edit/test/edit/master/f/sources',
                         data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 404)
@@ -1884,10 +1886,12 @@ index 0000000..2a552bb
                 'csrf_token': csrf_token,
             }
 
+            # No csrf_token
             output = self.app.post('fork_edit/test/edit/master/f/sources',
                             follow_redirects=True)
             self.assertEqual(output.status_code, 400)
 
+            # Add content to the repo
             tests.add_content_git_repo(os.path.join(
                 pagure.APP.config['GIT_FOLDER'], 'test.git'))
 
@@ -1898,15 +1902,21 @@ index 0000000..2a552bb
                 os.path.join(
                     pagure.APP.config['GIT_FOLDER'], 'test.git'), 'test.jpg')
 
-            tests.add_binary_git_repo(
-                os.path.join(
-                    pagure.APP.config['GIT_FOLDER'], 'test.git'), 'test_binary')
-
+            # Check if button exists
             output = self.app.get('/test/blob/master/f/sources')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 'Fork and Edit\n                    </button>\n',
                 output.data)
+
+            # Check fork-edit doesn't come
+            output = self.app.get('/test/blob/master/f/test.jpg')
+            self.assertEqual(output.status_code, 200)
+            self.assertNotIn(
+                'Fork and Edit\n                    </button>\n',
+                output.data)
+
+            # Check for edit panel
             output = self.app.post('fork_edit/test/edit/master/f/sources',
                             data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
