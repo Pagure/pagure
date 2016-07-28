@@ -1902,6 +1902,11 @@ index 0000000..2a552bb
                 os.path.join(
                     pagure.APP.config['GIT_FOLDER'], 'test.git'), 'test_binary')
 
+            output = self.app.get('/test/blob/master/f/sources')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                'Fork and Edit\n                    </button>\n',
+                output.data)
             output = self.app.post('fork_edit/test/edit/master/f/sources',
                             data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
