@@ -21,7 +21,9 @@
   <div class="form-group">
     <label>Report results via
       <code>POST</code> to this URL</label>
-    <input class="form-control" readonly type="text" value="{{config.get('APP_URL')[:-1]}}{{ url_for('hook_finished', pagure_ci_token=pagure_ci_token)}}">
+    <input class="form-control" readonly type="text" value="{{
+        config.get('APP_URL')[:-1]}}{{
+        url_for('hook_finished', pagure_ci_token=pagure_ci_token)}}">
   </div>
   {% endif %}
 

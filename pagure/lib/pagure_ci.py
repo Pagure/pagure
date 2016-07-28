@@ -24,7 +24,7 @@ JENKINS_TRIGGER_URL = '{base}job/{project}/buildWithParameters'
 
 
 def process_pr(logger, cfg, pr_id, repo, branch):
-    ''' Function to process the PR, it POST the
+    ''' Process the pull-request, it POST the
     data to the Jenkins URL to trigger build.
     '''
     if cfg.active:
@@ -40,8 +40,8 @@ def process_pr(logger, cfg, pr_id, repo, branch):
 
 
 def process_build(logger, cfg, build_id):
-    ''' Function is used to get the build info
-    from jenkins and flag that particular pull-request.
+    '''  Gets the build info from jenkins
+    and flags that particular pull-request.
     '''
     if cfg.active:
         jenk = jenkins.Jenkins(cfg.jenkins_url)
