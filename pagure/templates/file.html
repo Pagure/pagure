@@ -122,9 +122,11 @@
         {{ content | format_loc }}
         {% endautoescape %}
     {% elif output_type == 'markup' %}
+        <div class="m-a-2">
         {% autoescape false %}
         {{ content | noJS }}
         {% endautoescape %}
+      </div>
     {% elif output_type == 'image' %}
         <img src="{{ url_for('view_raw_file', username=username,
                     repo=repo.name, identifier=branchname,
@@ -176,6 +178,21 @@
 No content found in this repository
 {% endif %}
  </div> <!-- end .card-->
+
+ {% if readme %}
+ <div class="card">
+   <div class="card-header">
+     <strong>README{{readme_ext}}</strong>
+   </div>
+   <div class="card-block">
+   {% if safe %}
+     {{ readme | noJS |safe }}
+   {% else %}
+     {{ readme | noJS }}
+   {% endif %}
+ </div>
+ </div>
+ {% endif %}
 
 {% endblock %}
 

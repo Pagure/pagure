@@ -492,6 +492,10 @@ def view_file(repo, identifier, filename, username=None):
         flask.abort(404, 'File not found')
 
     encoding = None
+    readme = None
+    safe = False
+    readme_ext = None
+
     if isinstance(content, pygit2.Blob):
         rawtext = str(flask.request.args.get('text')).lower() in ['1', 'true']
         ext = filename[filename.rfind('.'):]
@@ -532,6 +536,16 @@ def view_file(repo, identifier, filename, username=None):
             output_type = 'binary'
     else:
         content = sorted(content, key=lambda x: x.filemode)
+        for i in content:
+            name, ext = os.path.splitext(i.name)
+            if name == 'README':
+                readme_file = __get_file_in_tree(
+                    repo_obj, content, [i.name]).data
+
+                readme, safe = pagure.doc_utils.convert_readme(
+                    readme_file, ext)
+
+                readme_ext = ext
         output_type = 'tree'
 
     headers = {}
@@ -551,6 +565,9 @@ def view_file(repo, identifier, filename, username=None):
             content=content,
             output_type=output_type,
             repo_admin=is_repo_admin(repo),
+            readme=readme,
+            readme_ext=readme_ext,
+            safe=safe,
         ),
         200,
         headers
@@ -790,6 +807,19 @@ def view_tree(repo, identifier=None, username=None):
 
         if commit:
             content = sorted(commit.tree, key=lambda x: x.filemode)
+            readme = None
+            safe = False
+            readme_ext = None
+            for i in commit.tree:
+                name, ext = os.path.splitext(i.name)
+                if name == 'README':
+                    readme_file = __get_file_in_tree(
+                        repo_obj, commit.tree, [i.name]).data
+
+                    readme, safe = pagure.doc_utils.convert_readme(
+                        readme_file, ext)
+
+                    readme_ext = ext
         output_type = 'tree'
 
     return flask.render_template(
@@ -805,6 +835,9 @@ def view_tree(repo, identifier=None, username=None):
         content=content,
         output_type=output_type,
         repo_admin=is_repo_admin(repo),
+        readme=readme,
+        readme_ext=readme_ext,
+        safe=safe,
     )
 
 
