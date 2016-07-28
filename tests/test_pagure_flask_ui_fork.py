@@ -1841,6 +1841,88 @@ index 0000000..2a552bb
                 '<small><p>Pull-Request has been merged by pingou</p></small>',
                 output.data)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_fork_edit_file(self, send_email):
+        """ Test the fork_edit file endpoint. """
+
+        send_email.return_value = True
+
+        output = self.app.post('fork_edit/test/edit/master/f/sources')
+        self.assertEqual(output.status_code, 302)
+
+        tests.create_projects(self.session)
+        for folder in ['docs', 'tickets', 'requests', 'repos']:
+            tests.create_projects_git(
+                os.path.join(tests.HERE, folder), bare=True)
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('fork_edit/test/edit/master/f/source')
+            self.assertEqual(output.status_code, 400)
+
+            output = self.app.get('/new/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<strong>Create new Project</strong>', output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post('fork_edit/test/edit/master/f/sources',
+                        data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 404)
+
+        user = tests.FakeUser()
+        user.username = 'foo'
+        with tests.user_set(pagure.APP, user):
+
+            data = {
+                'csrf_token': csrf_token,
+            }
+
+            output = self.app.post('fork_edit/test/edit/master/f/sources',
+                            follow_redirects=True)
+            self.assertEqual(output.status_code, 400)
+
+            tests.add_content_git_repo(os.path.join(
+                pagure.APP.config['GIT_FOLDER'], 'test.git'))
+
+            tests.add_readme_git_repo(os.path.join(
+                pagure.APP.config['GIT_FOLDER'], 'test.git'))
+
+            tests.add_binary_git_repo(
+                os.path.join(
+                    pagure.APP.config['GIT_FOLDER'], 'test.git'), 'test.jpg')
+
+            tests.add_binary_git_repo(
+                os.path.join(
+                    pagure.APP.config['GIT_FOLDER'], 'test.git'), 'test_binary')
+
+            output = self.app.post('fork_edit/test/edit/master/f/sources',
+                            data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li><a href="/fork/foo/test/tree/master">'
+                '<span class="oi" data-glyph="random"></span>&nbsp; master</a>'
+                '</li><li class="active"><span class="oi" data-glyph="file">'
+                '</span>&nbsp; sources</li>',
+                output.data)
+            self.assertIn(
+                '<textarea id="textareaCode" name="content">foo\n bar</textarea>',
+                output.data)
+            self.assertIn(
+                '</button>\n                      Repo &#34;test&#34; '
+                'cloned to &#34;foo/test&#34;', output.data)
+
+            # View what's supposed to be an image
+            output = self.app.post('fork_edit/test/edit/master/f/test.jpg',
+                        data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 400)
+            self.assertIn('<p>Cannot edit binary files</p>', output.data)
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskForktests)
