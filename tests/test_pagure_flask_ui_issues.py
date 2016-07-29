@@ -276,6 +276,15 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertTrue(
             '<h2>\n      0 Closed Issues' in output.data)
 
+        # New issue button is shown
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                'class="btn btn-success btn-sm">New Issue</a>',
+                output.data)
+
         # Project w/o issue tracker
         repo = pagure.lib.get_project(self.session, 'test')
         repo.settings = {'issue_tracker': False}
@@ -284,6 +293,15 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         output = self.app.get('/test/issues')
         self.assertEqual(output.status_code, 404)
+
+        # New issue button is hidden
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test')
+            self.assertEqual(output.status_code, 200)
+            self.assertNotIn(
+                'class="btn btn-success btn-sm">New Issue</a>',
+                output.data)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
