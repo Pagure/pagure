@@ -36,8 +36,8 @@
                   <span class="oi" data-glyph="fork"></span> Fork</button>
               {% endif %}
                 <button title="{%- if is_watching(repo.name, repo.user.user if repo.is_fork else None)
-                %}You are watching this project{% else %}
-                You are not watching this project{% endif -%}"
+                %}You are watching this project{% else
+                %}You are not watching this project{% endif -%}"
                 type="button" class="btn btn-sm dropdown-toggle
                 {%- if is_watching(repo.name, repo.user.user if repo.is_fork else None)
                 %} btn-primary{% else %} btn-secondary{% endif -%}"
