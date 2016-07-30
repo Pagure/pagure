@@ -12,6 +12,8 @@ if 'PAGURE_CONFIG' not in os.environ \
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
 import pagure
+import pagure.lib
+import pagure.lib.model
 
 
 def get_poc_of_pkgs(debug=False):
@@ -20,7 +22,7 @@ def get_poc_of_pkgs(debug=False):
     """
     if debug:
         print 'Querying pkgdb'
-    PKGDB_URL = 'https://admin.fedoraproject.org/pkgdb/api/'
+    PKGDB_URL = 'https://admin.stg.fedoraproject.org/pkgdb/api/'
     req = requests.get(PKGDB_URL + 'bugzilla').text
     if debug:
         print 'Pkgdb data retrieved, getting POC'
@@ -81,16 +83,82 @@ def main(folder, debug=False):
 
         try:
             name = project.split('.git')[0]
-            pagure.lib.new_project(
-                session=pagure.SESSION,
-                user=pocs[name],
+            orig_name = name
+            name = 'rpms/%s' % name
+            if name in pagure.APP.config['BLACKLISTED_PROJECTS']:
+                raise pagure.exceptions.RepoExistsException(
+                    'No project "%s" are allowed to be created due to potential '
+                    'conflicts in URLs with pagure itself' % name
+                )
+
+            user_obj = pagure.lib.__get_user(pagure.SESSION, pocs[orig_name])
+            allowed_prefix = pagure.APP.config[
+                'ALLOWED_PREFIX'] + [grp for grp in user_obj.groups]
+
+            first_part, _, second_part = name.partition('/')
+            if second_part and first_part not in pagure.APP.config['ALLOWED_PREFIX']:
+                raise pagure.exceptions.PagureException(
+                    'The prefix of you project must be in the list of allowed '
+                    'prefix set by the admins of this pagure instance, or the name '
+                    'of a group that you are part of.'
+                )
+
+            gitfolder = pagure.APP.config['GIT_FOLDER']
+            docfolder = pagure.APP.config['DOCS_FOLDER']
+            ticketfolder = pagure.APP.config['TICKETS_FOLDER']
+            requestfolder = pagure.APP.config['REQUESTS_FOLDER']
+
+            gitrepo = os.path.join(gitfolder, '%s.git' % name)
+
+            project = pagure.lib.model.Project(
                 name=name,
-                blacklist=pagure.APP.config['BLACKLISTED_PROJECTS'],
-                gitfolder=pagure.APP.config['GIT_FOLDER'],
-                docfolder=pagure.APP.config['DOCS_FOLDER'],
-                ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
-                requestfolder=pagure.APP.config['REQUESTS_FOLDER'],
+                description=None,
+                url=None,
+                avatar_email=None,
+                user_id=user_obj.id,
+                parent_id=None,
+                hook_token=pagure.lib.login.id_generator(40)
             )
+            pagure.SESSION.add(project)
+            # Make sure we won't have SQLAlchemy error before we create the repo
+            pagure.SESSION.flush()
+
+            http_clone_file = os.path.join(gitrepo, 'git-daemon-export-ok')
+            if not os.path.exists(http_clone_file):
+                with open(http_clone_file, 'w') as stream:
+                    pass
+
+            docrepo = os.path.join(docfolder, project.path)
+            if os.path.exists(docrepo):
+                shutil.rmtree(gitrepo)
+                raise pagure.exceptions.RepoExistsException(
+                    'The docs repo "%s" already exists' % project.path
+                )
+            pygit2.init_repository(docrepo, bare=True)
+
+            ticketrepo = os.path.join(ticketfolder, project.path)
+            if os.path.exists(ticketrepo):
+                shutil.rmtree(gitrepo)
+                shutil.rmtree(docrepo)
+                raise pagure.exceptions.RepoExistsException(
+                    'The tickets repo "%s" already exists' % project.path
+                )
+            pygit2.init_repository(
+                ticketrepo, bare=True,
+                mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
+
+            requestrepo = os.path.join(requestfolder, project.path)
+            if os.path.exists(requestrepo):
+                shutil.rmtree(gitrepo)
+                shutil.rmtree(docrepo)
+                shutil.rmtree(ticketrepo)
+                raise pagure.exceptions.RepoExistsException(
+                    'The requests repo "%s" already exists' % project.path
+                )
+            pygit2.init_repository(
+                requestrepo, bare=True,
+                mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
+
             pagure.SESSION.commit()
         except pagure.exceptions.PagureException as err:
             print 'ERROR with project %s' % project
