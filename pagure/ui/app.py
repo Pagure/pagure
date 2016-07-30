@@ -209,7 +209,7 @@ def view_users(username=None):
 
 @APP.route('/projects/')
 @APP.route('/projects')
-@APP.route('/projects/<pattern>')
+@APP.route('/projects/<repo:pattern>')
 def view_projects(pattern=None):
     """ Present the list of projects.
     """
