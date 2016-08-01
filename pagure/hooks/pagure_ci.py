@@ -18,7 +18,7 @@ from sqlalchemy.orm import backref
 
 from pagure.hooks import BaseHook, RequiredIf
 from pagure.lib.model import BASE, Project, TypeCi
-from pagure import get_repo_path, SESSION
+from pagure import get_repo_path, SESSION, APP
 
 
 class PagureCITable(BASE):
@@ -89,9 +89,9 @@ class PagureCiForm(wtf.Form):
         """
         super(PagureCiForm, self).__init__(*args, **kwargs)
 
-        types = SESSION.query(TypeCi).order_by(TypeCi.type).all()
+        types = APP.config.get('PAGURE_CI_SERVICES', [])
         self.type_ci.choices = [
-            (ci_type.type, ci_type.type) for ci_type in types
+            (ci_type, ci_type) for ci_type in types
         ]
 
 
