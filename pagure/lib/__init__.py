@@ -48,13 +48,17 @@ from pagure.lib import model
 
 
 REDIS = None
-
+PAGURE_CI = None
 
 def set_redis(host, port, db):
     """ Set the redis connection with the specified information. """
     global REDIS
     pool = redis.ConnectionPool(host=host, port=port, db=db)
     REDIS = redis.StrictRedis(connection_pool=pool)
+
+def set_pagure_ci(services):
+    """ Set the list of CI services supported by this pagure instance. """
+    PAGURE_CI = services
 
 
 def __get_user(session, key):
