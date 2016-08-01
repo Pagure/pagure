@@ -217,3 +217,7 @@ ACLS = {
     'pull_request_flag': 'Flag a pull-request of this project',
     'pull_request_merge': 'Merge a pull-request of this project',
 }
+
+# Bootstrap URLS
+BOOTSTRAP_URLS_CSS = 'https://apps.fedoraproject.org/global/fedora-bootstrap-1.0.1/fedora-bootstrap.css'
+BOOTSTRAP_URLS_JS = 'https://apps.fedoraproject.org/global/fedora-bootstrap-1.0.1/fedora-bootstrap.js'
