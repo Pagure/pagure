@@ -299,6 +299,7 @@ class Project(BASE):
     description = sa.Column(sa.Text, nullable=True)
     url = sa.Column(sa.Text, nullable=True)
     _settings = sa.Column(sa.Text, nullable=True)
+    # The hook_token is used to sign the notification sent via web-hook
     hook_token = sa.Column(sa.String(40), nullable=False, unique=True)
     avatar_email = sa.Column(sa.Text, nullable=True)
     parent_id = sa.Column(
