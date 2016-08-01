@@ -16,8 +16,9 @@ from flask.ext import wtf
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
+import pagure.lib
 from pagure.hooks import BaseHook, RequiredIf
-from pagure.lib.model import BASE, Project, TypeCi
+from pagure.lib.model import BASE, Project
 from pagure import get_repo_path, SESSION, APP
 
 
@@ -40,14 +41,14 @@ class PagureCITable(BASE):
     pagure_ci_token = sa.Column(
         sa.String(32),
         nullable=True,
-        unique=True,
         index=True)
-    type_id = sa.Column(
-        sa.Integer,
-        sa.ForeignKey(
-            'type_ci.id', onupdate='CASCADE', ondelete='CASCADE'),
-        nullable=False,
-        unique=True)
+    ci_type = sa.Column(
+        sa.String(255),
+        nullable=True)
+    ci_url = sa.Column(
+        sa.String(255),
+        nullable=True,
+        unique=False)
     active = sa.Column(sa.Boolean, nullable=False, default=False)
 
     project = relation(
@@ -57,25 +58,36 @@ class PagureCITable(BASE):
             single_parent=True)
     )
 
-    type_ci = relation(
-        'TypeCi', remote_side=[TypeCi.id],
-    )
+
+tmpl = """
+{% if repo | hasattr('ci_hook') and repo.ci_hook and repo.ci_hook[0].pagure_ci_token %}
+The URL to be used to POST the results of your build
+is:
+
+<pre>
+{{ (config['APP_URL'][:-1] if config['APP_URL'].endswith('/')
+  else config['APP_URL'])
+  + url_for('api_ns.%s_ci_notification' % repo.ci_hook[0].ci_type,
+    pagure_ci_token=repo.ci_hook[0].pagure_ci_token) }}
+</pre>
+
+{% else %}
+Once this plugin has been activated, reload this tab or this page to access
+the URL to which your CI service should send its info.
+{% endif %}
+"""
 
 
 class PagureCiForm(wtf.Form):
     ''' Form to configure the CI hook. '''
-    type_ci = wtforms.SelectField(
+    ci_type = wtforms.SelectField(
         'Type of CI service',
         [RequiredIf('active')],
         choices=[]
     )
-    jenkins_url = wtforms.TextField(
+    ci_url = wtforms.TextField(
         'URL to the project on the CI service',
         [RequiredIf('active'), wtforms.validators.Length(max=255)],
-    )
-    jenkins_token = wtforms.TextField(
-        'CI token',
-        [RequiredIf('active')],
     )
     active = wtforms.BooleanField(
         'Active',
@@ -90,7 +102,7 @@ class PagureCiForm(wtf.Form):
         super(PagureCiForm, self).__init__(*args, **kwargs)
 
         types = APP.config.get('PAGURE_CI_SERVICES', [])
-        self.type_ci.choices = [
+        self.ci_type.choices = [
             (ci_type, ci_type) for ci_type in types
         ]
 
@@ -99,19 +111,25 @@ class PagureCi(BaseHook):
     ''' Mail hooks. '''
 
     name = 'Pagure CI'
-    description = 'Generate notification emails for pushes to a git repository. '\
-        'This hook sends emails describing changes introduced by pushes to a git repository.'
+    description = 'Integrate continuous integration (CI) services into your '\
+        'pagure project, providing you notifications for every pull-request '\
+        'opened in the project.'
+    extra_info = tmpl
     form = PagureCiForm
     db_object = PagureCITable
     backref = 'ci_hook'
-    form_fields = ['type_ci', 'jenkins_url', 'jenkins_token', 'active']
+    form_fields = ['ci_type', 'ci_url', 'active']
 
     @classmethod
     def set_up(cls, project):
         ''' Install the generic post-receive hook that allow us to call
         multiple post-receive hooks as set per plugin.
         '''
-        pass
+        hook = project.ci_hook[0]
+        if not hook.pagure_ci_token:
+            hook.pagure_ci_token = pagure.lib.login.id_generator(32)
+            SESSION.add(project)
+            SESSION.commit()
 
     @classmethod
     def install(cls, project, dbobj):
@@ -131,4 +149,7 @@ class PagureCi(BaseHook):
             should be installed
 
         '''
-        pass
+        for hook in project.ci_hook:
+            hook.pagure_ci_token = None
+        SESSION.add(project)
+        SESSION.commit()
