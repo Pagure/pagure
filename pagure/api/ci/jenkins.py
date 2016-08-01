@@ -22,14 +22,23 @@ from pagure.api import API, APIERROR
 
 @API.route('/ci/jenkins/<pagure_ci_token>/build-finished', methods=['POST'])
 def jenkins_ci_notification(pagure_ci_token):
-    """ Flag a pull-request based on the info provided by the CI service.
+    """
+    Jenkins Build Notification
+    --------------------------
+    At the end of a build on Jenkins, this URL is used (if the project is
+    rightly configured) to flag a pull-request with the result of the build.
+
+    ::
+
+        POST /api/0/ci/jenkins/<token>/build-finished
+
     """
 
     project = lib_ci.get_project_by_ci_token(SESSION, pagure_ci_token)
     if not project:
         flask.abort(404, 'No project corresponding to this CI token')
 
-    data = flask.request.json()
+    data = flask.request.get_json()
     if not data:
         flask.abort(400, "Bad Request: No JSON retrived")
 
