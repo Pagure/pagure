@@ -443,7 +443,9 @@ def new_project():
         namespace = form.namespace.data
         if namespace:
             namespace = namespace.strip()
-        private = form.private.data
+        private = False
+        if pagure.APP.config.get('PRIVATE_PROJECTS', False):
+            private = form.private.data
 
         try:
             pagure.lib.new_project(
