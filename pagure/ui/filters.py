@@ -36,6 +36,13 @@ def jinja_hasattr(obj, string):
     return hasattr(obj, string)
 
 
+@APP.template_filter('render')
+def jinja_render(tmpl, **kwargs):
+    """ Render the tiven template with the provided arguments
+    """
+    return flask.render_template_string(tmpl, **kwargs)
+
+
 @APP.template_filter('humanize')
 def humanize_date(date):
     """ Template filter returning the last commit date of the provided repo.
