@@ -76,6 +76,20 @@
         {% endfor %}
         </div>
 
+        {% if config.get('PAGURE_CI_SERVICES') %}
+        <h2>
+            Continous Integration Services
+            <a name="ci" title="Permalink to this headline" href="#ci">
+              <span class="oi" data-glyph="link-intact"></span>
+            </a>
+        </h2>
+
+        <div class="accordion">
+        {% for html in ci %}
+        {{ html | InsertDiv |safe }}
+        {% endfor %}
+        {% endif %}
+
         <h2>
             Extras
             <a name="extras" title="Permalink to this headline" href="#extras">
