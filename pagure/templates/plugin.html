@@ -22,6 +22,10 @@
       {{ render_field_in_row(field) }}
     {% endfor %}
   </table>
+
+  {% if plugin.extra_info %}
+  {{ plugin.extra_info | render(repo=repo) | safe }}
+  {% endif %}
   <p class="buttons indent">
       <input type="button" value="Cancel" class="btn btn-secondary" onclick="history.back();">
       <input type="submit" class="btn btn-primary" value="Update">
