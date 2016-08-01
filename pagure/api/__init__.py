@@ -202,6 +202,9 @@ from pagure.api import fork
 from pagure.api import project
 from pagure.api import user
 
+if pagure.APP.config.get('PAGURE_CI', False):
+    from pagure.api.ci import jenkins
+
 
 @API.route('/version/')
 @API.route('/version')
