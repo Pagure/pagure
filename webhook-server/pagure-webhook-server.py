@@ -114,10 +114,11 @@ def handle_messages():
                 repr(reply.value), reply.channel)
             data = json.loads(reply.value)
             username = None
-            if '/' in data['project']:
-                username, projectname = data['project'].split('/', 1)
+            if data['project'].startswith('forks'):
+                _, username, projectname = data['project'].split('/', 2)
             else:
                 projectname = data['project']
+
             project = pagure.lib.get_project(
                 session=pagure.SESSION, name=projectname, user=username)
             log.info('Got the project, going to the webhooks')
