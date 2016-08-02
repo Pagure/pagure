@@ -439,7 +439,7 @@ def api():
 
     ci = []
     if pagure.APP.config.get('PAGURE_CI_SERVICES', True):
-        if 'jenkins' in pagure.APP.config[('PAGURE_CI_SERVICES']:
+        if 'jenkins' in pagure.APP.config['PAGURE_CI_SERVICES']:
             ci.append(load_doc(jenkins.jenkins_ci_notification))
 
     api_pull_request_views_doc = load_doc(fork.api_pull_request_views)
