@@ -31,6 +31,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         pagure.APP.config['TESTING'] = True
         pagure.APP.config['DATAGREPPER_URL'] = None
+        pagure.APP.config['PRIVATE_PROJECTS'] = True
         pagure.SESSION = self.session
         pagure.lib.SESSION = self.session
         pagure.ui.SESSION = self.session
