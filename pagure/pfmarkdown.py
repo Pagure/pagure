@@ -63,6 +63,10 @@ class ExplicitForkIssuePattern(markdown.inlinepatterns.Pattern):
         user = markdown.util.AtomicString(m.group(2))
         repo = markdown.util.AtomicString(m.group(3))
         idx = markdown.util.AtomicString(m.group(4))
+        try:
+            idx = int(idx)
+        except:
+            return text
         text = '%s/%s#%s' % (user, repo, idx)
 
         issue = _issue_exists(user, repo, idx)
@@ -79,6 +83,10 @@ class ExplicitMainIssuePattern(markdown.inlinepatterns.Pattern):
         """ When the pattern matches, update the text. """
         repo = markdown.util.AtomicString(m.group(2))
         idx = markdown.util.AtomicString(m.group(3))
+        try:
+            idx = int(idx)
+        except:
+            return text
         text = ' %s#%s' % (repo, idx)
 
         issue = _issue_exists(None, repo, idx)
@@ -95,6 +103,10 @@ class ImplicitIssuePattern(markdown.inlinepatterns.Pattern):
         """ When the pattern matches, update the text. """
         idx = markdown.util.AtomicString(m.group(2))
         text = ' #%s' % idx
+        try:
+            idx = int(idx)
+        except:
+            return text
 
         try:
             root = flask.request.url_root
@@ -132,6 +144,10 @@ class ImplicitPRPattern(markdown.inlinepatterns.Pattern):
         """ When the pattern matches, update the text. """
         idx = markdown.util.AtomicString(m.group(2))
         text = ' PR#%s' % idx
+        try:
+            idx = int(idx)
+        except:
+            return text
 
         try:
             root = flask.request.url_root
