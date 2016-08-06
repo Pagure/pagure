@@ -63,11 +63,11 @@ class ExplicitForkIssuePattern(markdown.inlinepatterns.Pattern):
         user = markdown.util.AtomicString(m.group(2))
         repo = markdown.util.AtomicString(m.group(3))
         idx = markdown.util.AtomicString(m.group(4))
+        text = '%s/%s#%s' % (user, repo, idx)
         try:
             idx = int(idx)
         except:
             return text
-        text = '%s/%s#%s' % (user, repo, idx)
 
         issue = _issue_exists(user, repo, idx)
         if not issue:
@@ -83,11 +83,11 @@ class ExplicitMainIssuePattern(markdown.inlinepatterns.Pattern):
         """ When the pattern matches, update the text. """
         repo = markdown.util.AtomicString(m.group(2))
         idx = markdown.util.AtomicString(m.group(3))
+        text = ' %s#%s' % (repo, idx)
         try:
             idx = int(idx)
         except:
             return text
-        text = ' %s#%s' % (repo, idx)
 
         issue = _issue_exists(None, repo, idx)
         if not issue:
