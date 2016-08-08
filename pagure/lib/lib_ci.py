@@ -38,7 +38,8 @@ def process_jenkins_build(session, project, build_id, requestfolder):
     pull-request.
     """
     import jenkins
-    jenk = jenkins.Jenkins(project.ci_hook[0].ci_url)
+    # Jenkins Base URL
+    jenk = jenkins.Jenkins(project.ci_hook[0].ci_url.split('/job/')[0])
     jenkins_name = project.ci_hook[0].ci_url.split('/job/', 1)[1].split('/', 1)[0]
     build_info = jenk.get_build_info(jenkins_name, build_id)
     result = build_info['result']
@@ -61,7 +62,7 @@ def process_jenkins_build(session, project, build_id, requestfolder):
             'Unknown build status: %s' % result)
 
     request = pagure.lib.search_pull_requests(
-        session, project_id=project.id, requestid=requestid)
+        session, project_id=project.id, requestid=pr_id)
 
     if not request:
         raise pagure.exceptions.PagureException('Request not found')
@@ -71,7 +72,7 @@ def process_jenkins_build(session, project, build_id, requestfolder):
     message = pagure.lib.add_pull_request_flag(
         session,
         request=request,
-        username=username,
+        username=project.ci_hook[0].ci_type,
         percent=percent,
         comment=comment,
         url=url,
