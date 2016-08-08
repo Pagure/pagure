@@ -86,7 +86,7 @@ class RepoConverter(BaseConverter):
     a single slash.
     :param map: the :class:`Map`.
     """
-    regex = '[^/]*(/[^/]+)?'
+    regex = r'[^/]*(/[^/]+)?'
     #weight = 200
 
 
