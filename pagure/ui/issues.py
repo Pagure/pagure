@@ -576,6 +576,13 @@ def new_issue(repo, username=None):
         content = form.issue_content.data
         private = form.private.data
 
+        user_obj = pagure.lib.__get_user(
+            SESSION, flask.g.fas_user.username)
+        if not user_obj:
+            flask.abort(
+                404, 'No such user found in the database: %s' %
+                    flask.g.fas_user.username)
+
         try:
             issue = pagure.lib.new_issue(
                 SESSION,
@@ -594,7 +601,7 @@ def new_issue(repo, username=None):
                     repo=repo,
                     issue=issue,
                     ticketfolder=APP.config['TICKETS_FOLDER'],
-                    user=flask.g.fas_user,
+                    user=user_obj,
                     filename=filestream.filename,
                     filestream=filestream.stream,
                 )
@@ -788,6 +795,13 @@ def edit_issue(repo, issueid, username=None):
         status = form.status.data
         private = form.private.data
 
+        user_obj = pagure.lib.__get_user(
+            SESSION, flask.g.fas_user.username)
+        if not user_obj:
+            flask.abort(
+                404, 'No such user found in the database: %s' %
+                    flask.g.fas_user.username)
+
         try:
             message = pagure.lib.edit_issue(
                 SESSION,
@@ -808,7 +822,7 @@ def edit_issue(repo, issueid, username=None):
                     repo=repo,
                     issue=issue,
                     ticketfolder=APP.config['TICKETS_FOLDER'],
-                    user=flask.g.fas_user,
+                    user=user_obj,
                     filename=filestream.filename,
                     filestream=filestream.stream,
                 )
@@ -875,6 +889,13 @@ def upload_issue(repo, issueid, username=None):
     if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
 
+    user_obj = pagure.lib.__get_user(
+        SESSION, flask.g.fas_user.username)
+    if not user_obj:
+        flask.abort(
+            404, 'No such user found in the database: %s' %
+                flask.g.fas_user.username)
+
     form = pagure.forms.UploadFileForm()
     # pylint: disable=E1101
     if form.validate_on_submit():
@@ -883,7 +904,7 @@ def upload_issue(repo, issueid, username=None):
             repo=repo,
             issue=issue,
             ticketfolder=APP.config['TICKETS_FOLDER'],
-            user=flask.g.fas_user,
+            user=user_obj,
             filename=filestream.filename,
             filestream=filestream.stream,
         )

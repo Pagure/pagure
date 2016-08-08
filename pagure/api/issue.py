@@ -78,6 +78,11 @@ def api_new_issue(repo, username=None):
     if repo != flask.g.token.project:
         raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
+    user_obj = pagure.lib.__get_user(
+        SESSION, flask.g.fas_user.username)
+    if not user_obj:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOUSER)
+
     form = pagure.forms.IssueFormSimplied(csrf_enabled=False)
     if form.validate_on_submit():
         title = form.title.data
@@ -102,7 +107,7 @@ def api_new_issue(repo, username=None):
                     repo=repo,
                     issue=issue,
                     ticketfolder=APP.config['TICKETS_FOLDER'],
-                    user=flask.g.fas_user,
+                    user=user_obj,
                     filename=filestream.filename,
                     filestream=filestream.stream,
                 )

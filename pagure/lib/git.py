@@ -679,7 +679,7 @@ def add_file_to_git(repo, issue, ticketfolder, user, filename, filestream):
     # Author/commiter will always be this one
     author = pygit2.Signature(
         name=user.username.encode('utf-8'),
-        email=user.email.encode('utf-8')
+        email=user.default_email.encode('utf-8')
     )
 
     # Actually commit
