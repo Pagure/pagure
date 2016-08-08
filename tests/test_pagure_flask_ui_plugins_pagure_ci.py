@@ -56,18 +56,12 @@ class PagureFlaskPluginPagureCItests(tests.Modeltests):
                 '<div class="projectinfo m-t-1 m-b-1">\n'
                 'test project #1        </div>', output.data)
             self.assertTrue('<h3>Pagure CI settings</h3>' in output.data)
-            self.assertTrue(
-                '<td><label for="jenkins_name">Name of project in Jenkins</label></td>'
-                in output.data)
-            self.assertTrue(
-                '<td><label for="jenkins_url">Jenkins URL</label></td>'
-                in output.data)
-            self.assertTrue(
-                '<td><label for="jenkins_token">Jenkins token</label></td>'
-                in output.data)
-            self.assertTrue(
-                '<input id="active" name="active" type="checkbox" value="y">'
-                in output.data)
+            self.assertIn(
+                '<td><label for="ci_url">URL to the project on the CI '
+                'service</label></td>' , output.data)
+            self.assertIn(
+                '<input id="active" name="active" type="checkbox" value="y">',
+                output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -80,56 +74,55 @@ class PagureFlaskPluginPagureCItests(tests.Modeltests):
                 '<div class="projectinfo m-t-1 m-b-1">\n'
                 'test project #1        </div>', output.data)
             self.assertTrue('<h3>Pagure CI settings</h3>' in output.data)
-            self.assertTrue(
-                '<td><label for="pagure_name">Name of project in Pagure</label></td>'
-                in output.data)
-            self.assertTrue(
-                '<td><label for="jenkins_name">Name of project in Jenkins</label></td>'
-                in output.data)
-            self.assertTrue(
-                '<td><label for="jenkins_url">Jenkins URL</label></td>'
-                in output.data)
-            self.assertTrue(
-                '<td><label for="jenkins_token">Jenkins token</label></td>'
-                in output.data)
-            self.assertTrue(
-                '<input id="active" name="active" type="checkbox" value="y">'
-                in output.data)
+            self.assertIn(
+                '<td><label for="ci_url">URL to the project on the CI '
+                'service</label></td>' , output.data)
+            self.assertIn(
+                '<input id="active" name="active" type="checkbox" value="y">',
+                output.data)
 
             # Activate hook
             data = {
-                'csrf_token': csrf_token,
                 'active': 'y',
-                'pagure_name': 'test',
-                'jenkins_name': 'jenkins_test',
-                'jenkins_url': 'https://jenkins.fedoraproject.org',
-                'jenkins_token': 'BEEFCAFE'
+                'ci_url': 'https://jenkins.fedoraproject.org',
+                'ci_type': 'jenkins',
             }
-            # No git found
-            output = self.app.post(
-                '/test/settings/Pagure CI', data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 404)
-
-            tests.create_projects_git(tests.HERE)
-
-            data = {'csrf_token': csrf_token}
-            # With the git repo
+            # CSRF Token missing
             output = self.app.post(
                 '/test/settings/Pagure CI', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
                 'test project #1        </div>', output.data)
             self.assertTrue('<h3>Pagure CI settings</h3>' in output.data)
-            self.assertFalse(
-                '</button>\n                      Hook activated' in output.data)
-            self.assertTrue(
-                '<td><input id="pagure_name" name="pagure_name" type="text" value=""></td>'
-                '\n<td class="errors">This field is required.</td>'
-                in output.data)
-            self.assertTrue(
-                '<input id="active" name="active" type="checkbox" value="y">' in output.data)
+            self.assertIn(
+                '<td><label for="ci_url">URL to the project on the CI '
+                'service</label></td>' , output.data)
+            self.assertIn(
+                '<input checked id="active" name="active" type="checkbox" '
+                'value="y">', output.data)
+
+            data['csrf_token'] = csrf_token
+
+            # No git found
+            output = self.app.post('/test/settings/Pagure', data=data)
+            self.assertEqual(output.status_code, 404)
+
+            tests.create_projects_git(tests.HERE)
+
+            # Activate hook
+            output = self.app.post(
+                '/test/settings/Pagure CI', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="projectinfo m-t-1 m-b-1">\n'
+                'test project #1        </div>', output.data)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+            self.assertIn(
+                '</button>\n                      Hook Pagure CI activated',
+                output.data)
 
             output = self.app.get('/test/settings/Pagure CI')
             self.assertEqual(output.status_code, 200)
@@ -137,23 +130,41 @@ class PagureFlaskPluginPagureCItests(tests.Modeltests):
                 '<div class="projectinfo m-t-1 m-b-1">\n'
                 'test project #1        </div>', output.data)
             self.assertTrue('<h3>Pagure CI settings</h3>' in output.data)
-            self.assertTrue(
-                '<td><label for="pagure_name">Name of project in Pagure</label></td>'
-                in output.data)
-            self.assertTrue(
-                '<td><label for="jenkins_name">Name of project in Jenkins</label></td>'
-                in output.data)
-            self.assertTrue(
-                '<td><label for="jenkins_url">Jenkins URL</label></td>'
-                in output.data)
-            self.assertTrue(
-                '<td><label for="jenkins_token">Jenkins token</label></td>'
-                in output.data)
+            self.assertIn(
+                '<td><label for="ci_url">URL to the project on the CI '
+                'service</label></td>' , output.data)
             self.assertTrue(
                 '<input checked id="active" name="active" type="checkbox" value="y">'
                 in output.data)
 
-            # Missing the required
+            # De-activate the hook
+            data = {
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/settings/Pagure CI', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '</button>\n                      Hook Pagure CI inactived',
+                output.data)
+            self.assertIn(
+                '<section class="settings">\n  <h3>Settings for test</h3>',
+                output.data)
+
+            output = self.app.get('/test/settings/Pagure CI')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="projectinfo m-t-1 m-b-1">\n'
+                'test project #1        </div>', output.data)
+            self.assertTrue('<h3>Pagure CI settings</h3>' in output.data)
+            self.assertIn(
+                '<td><label for="ci_url">URL to the project on the CI '
+                'service</label></td>' , output.data)
+            self.assertIn(
+                '<input id="active" name="active" type="checkbox" '
+                'value="y">', output.data)
+
+            # Missing the required ci_url
             data = {'csrf_token': csrf_token, 'active': 'y'}
 
             output = self.app.post(
@@ -162,74 +173,17 @@ class PagureFlaskPluginPagureCItests(tests.Modeltests):
             self.assertIn(
                 '<div class="projectinfo m-t-1 m-b-1">\n'
                 'test project #1        </div>', output.data)
-            self.assertTrue('<h3>Pagure CI settings</h3>' in output.data)
+            self.assertIn('<h3>Pagure CI settings</h3>', output.data)
             self.assertFalse(
                 '</button>\n                      Hook activated' in output.data)
-            self.assertTrue(
-                '<td><input id="pagure_name" name="pagure_name" type="text" value=""></td>'
-                '\n<td class="errors">This field is required.</td>'
-                in output.data)
-            self.assertTrue(
+            print output.data
+            self.assertIn(
+                '<td><input id="ci_url" name="ci_url" type="text" value="">'
+                '</td>\n<td class="errors">This field is required.</td>',
+                output.data)
+            self.assertIn(
                 '<input checked id="active" name="active" type="checkbox" '
-                'value="y">' in output.data)
-
-            # Activate hook
-            data = {
-                'csrf_token': csrf_token,
-                'active': 'y',
-                'pagure_name': 'test',
-                'jenkins_name': 'jenkins_test',
-                'jenkins_url': 'https://jenkins.fedoraproject.org',
-                'jenkins_token': 'BEEFCAFE'
-            }
-
-            output = self.app.post(
-                '/test/settings/Pagure CI', data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 200)
-            self.assertIn(
-                '<section class="settings">\n  <h3>Settings for test</h3>',
-                output.data)
-            self.assertTrue(
-                '</button>\n                      Hook Pagure CI activated' in output.data)
-
-            output = self.app.get('/test/settings/Pagure CI')
-            self.assertIn(
-                '<div class="projectinfo m-t-1 m-b-1">\n'
-                'test project #1        </div>', output.data)
-            self.assertTrue('<h3>Pagure CI settings</h3>' in output.data)
-            self.assertTrue(
-                '<td><label for="pagure_name">Name of project in Pagure</label></td>'
-                in output.data)
-            self.assertTrue(
-                '<td><input id="pagure_name" name="pagure_name" type="text" value="test"></td>'
-                in output.data)
-            self.assertTrue(
-                '<td><label for="jenkins_name">Name of project in Jenkins</label></td>'
-                in output.data)
-            self.assertTrue(
-                '<td><input id="jenkins_name" name="jenkins_name" type="text" value="jenkins_test"></td>'
-                in output.data)
-            self.assertTrue(
-                '<input checked id="active" name="active" type="checkbox" value="y">'
-                in output.data)
-
-            # De-Activate hook
-            data = {
-                'csrf_token': csrf_token,
-                'pagure_name': 'test',
-                'jenkins_name': 'jenkins_test',
-                'jenkins_url': 'https://jenkins.fedoraproject.org',
-                'jenkins_token': 'BEEFCAFE'
-            }
-            output = self.app.post(
-                '/test/settings/Pagure CI', data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '</button>\n                      Hook Pagure CI inactived' in output.data)
-
-            self.assertIn(
-                '<section class="settings">\n  <h3>Settings for test</h3>',
-                output.data)
+                'value="y">', output.data)
 
 
 if __name__ == '__main__':
