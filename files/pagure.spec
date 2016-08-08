@@ -1,86 +1,86 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
-Name:           pagure
-Version:        2.3.3
-Release:        1%{?dist}
-Summary:        A git-centered forge
+Name:               pagure
+Version:            2.3.3
+Release:            1%{?dist}
+Summary:            A git-centered forge
 
-License:        GPLv2+
-URL:            https://pagure.io/pagure
-Source0:        https://pagure.io/releases/pagure/%{name}-%{version}.tar.gz
+License:            GPLv2+
+URL:                https://pagure.io/pagure
+Source0:            https://pagure.io/releases/pagure/%{name}-%{version}.tar.gz
 
-BuildArch:      noarch
+BuildArch:          noarch
 
-BuildRequires:  python2-devel
-BuildRequires:  python-setuptools
-BuildRequires:  python-nose
+BuildRequires:      python2-devel
+BuildRequires:      python-setuptools
+BuildRequires:      python-nose
 
-BuildRequires:  py-bcrypt
-BuildRequires:  python-alembic
-BuildRequires:  python-arrow
-BuildRequires:  python-binaryornot
-BuildRequires:  python-bleach
-BuildRequires:  python-blinker
-BuildRequires:  python-chardet
-BuildRequires:  python-cryptography
-BuildRequires:  python-docutils
-BuildRequires:  python-flask
-BuildRequires:  python-flask-wtf
-BuildRequires:  python-flask-multistatic
-BuildRequires:  python-markdown
-BuildRequires:  python-psutil
-BuildRequires:  python-pygit2 >= 0.20.1
-BuildRequires:  python-pygments
-BuildRequires:  python-fedora
-BuildRequires:  python-openid
-BuildRequires:  python-openid-cla
-BuildRequires:  python-openid-teams
-BuildRequires:  python-straight-plugin
-BuildRequires:  python-wtforms
-BuildRequires:  python-munch
-BuildRequires:  python-enum34
-BuildRequires:  python-redis
+BuildRequires:      py-bcrypt
+BuildRequires:      python-alembic
+BuildRequires:      python-arrow
+BuildRequires:      python-binaryornot
+BuildRequires:      python-bleach
+BuildRequires:      python-blinker
+BuildRequires:      python-chardet
+BuildRequires:      python-cryptography
+BuildRequires:      python-docutils
+BuildRequires:      python-flask
+BuildRequires:      python-flask-wtf
+BuildRequires:      python-flask-multistatic
+BuildRequires:      python-markdown
+BuildRequires:      python-psutil
+BuildRequires:      python-pygit2 >= 0.20.1
+BuildRequires:      python-pygments
+BuildRequires:      python-fedora
+BuildRequires:      python-openid
+BuildRequires:      python-openid-cla
+BuildRequires:      python-openid-teams
+BuildRequires:      python-straight-plugin
+BuildRequires:      python-wtforms
+BuildRequires:      python-munch
+BuildRequires:      python-enum34
+BuildRequires:      python-redis
 
 # EPEL6
 %if ( 0%{?rhel} && 0%{?rhel} == 6 )
-BuildRequires:  python-sqlalchemy0.8
-Requires:  python-sqlalchemy0.8
+BuildRequires:      python-sqlalchemy0.8
+Requires:           python-sqlalchemy0.8
 %else
-BuildRequires:  python-sqlalchemy > 0.8
-Requires:  python-sqlalchemy > 0.8
-BuildRequires:  systemd
+BuildRequires:      python-sqlalchemy > 0.8
+Requires:           python-sqlalchemy > 0.8
+BuildRequires:      systemd
 %endif
 
-Requires:  py-bcrypt
-Requires:  python-alembic
-Requires:  python-arrow
-Requires:  python-binaryornot
-Requires:  python-bleach
-Requires:  python-blinker
-Requires:  python-chardet
-Requires:  python-cryptography
-Requires:  python-docutils
-Requires:  python-enum34
-Requires:  python-flask
-Requires:  python-flask-wtf
-Requires:  python-flask-multistatic
-Requires:  python-markdown
-Requires:  python-psutil
-Requires:  python-pygit2 >= 0.20.1
-Requires:  python-pygments
-Requires:  python-fedora
-Requires:  python-openid
-Requires:  python-openid-cla
-Requires:  python-openid-teams
-Requires:  python-straight-plugin
-Requires:  python-wtforms
-Requires:  python-munch
-Requires:  python-redis
-Requires:  mod_wsgi
+Requires:           py-bcrypt
+Requires:           python-alembic
+Requires:           python-arrow
+Requires:           python-binaryornot
+Requires:           python-bleach
+Requires:           python-blinker
+Requires:           python-chardet
+Requires:           python-cryptography
+Requires:           python-docutils
+Requires:           python-enum34
+Requires:           python-flask
+Requires:           python-flask-wtf
+Requires:           python-flask-multistatic
+Requires:           python-markdown
+Requires:           python-psutil
+Requires:           python-pygit2 >= 0.20.1
+Requires:           python-pygments
+Requires:           python-fedora
+Requires:           python-openid
+Requires:           python-openid-cla
+Requires:           python-openid-teams
+Requires:           python-straight-plugin
+Requires:           python-wtforms
+Requires:           python-munch
+Requires:           python-redis
+Requires:           mod_wsgi
 
 # No dependency of the app per se, but required to make it working.
-Requires:  gitolite3
+Requires:           gitolite3
 
 %description
 Pagure is a light-weight git-centered forge based on pygit2.
@@ -90,7 +90,7 @@ system and possibilities to create new projects, fork existing ones and
 create/merge pull-requests across or within projects.
 
 
-%package milters
+%package            milters
 Summary:            Milter to integrate pagure with emails
 BuildArch:          noarch
 BuildRequires:      systemd-devel
@@ -101,39 +101,39 @@ Requires(postun):   systemd
 # It would work with sendmail but we configure things (like the tempfile)
 # to work with postfix
 Requires:           postfix
-%description milters
+%description        milters
 Milters (Mail filters) allowing the integration of pagure and emails.
 This is useful for example to allow commenting on a ticket by email.
 
 
-%package ev
-Summary:   EventSource server for pagure
-BuildArch: noarch
+%package            ev
+Summary:            EventSource server for pagure
+BuildArch:          noarch
 
 BuildRequires:      systemd-devel
-Requires:  python-redis
-Requires:  python-trollius
-Requires:  python-trollius-redis
-Requires(post): systemd
-Requires(preun): systemd
-Requires(postun): systemd
-%description ev
+Requires:           python-redis
+Requires:           python-trollius
+Requires:           python-trollius-redis
+Requires(post):     systemd
+Requires(preun):    systemd
+Requires(postun):   systemd
+%description        ev
 Pagure comes with an eventsource server allowing live update of the pages
 supporting it. This package provides it.
 
 
-%package webhook
-Summary:   Web-Hook server for pagure
-BuildArch: noarch
+%package            webhook
+Summary:            Web-Hook server for pagure
+BuildArch:          noarch
 
 BuildRequires:      systemd-devel
-Requires:  python-redis
-Requires:  python-trollius
-Requires:  python-trollius-redis
-Requires(post): systemd
-Requires(preun): systemd
-Requires(postun): systemd
-%description webhook
+Requires:           python-redis
+Requires:           python-trollius
+Requires:           python-trollius-redis
+Requires(post):     systemd
+Requires(preun):    systemd
+Requires(postun):   systemd
+%description        webhook
 Pagure comes with an webhook server allowing http callbacks for any action
 done on a project. This package provides it.
 
@@ -505,7 +505,7 @@ install -m 644 webhook-server/pagure_webhook.service \
 - Add a small padding at the bottom of the blockquote (Ryan Lerch)
 - In the list of closed PR, replace the column of the assignee with the date of
   closing (Ryan Lerch)
-- Drop font awesome since we no longer use it and compress the png of the 
+- Drop font awesome since we no longer use it and compress the png of the
   current logo (Ryan Lerch)
 - Drop the svg of the old logo from the source (Ryan Lerch)
 - Add descriptions to the git hooks in the settings page (farhaanbukhsh)
