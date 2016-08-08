@@ -94,7 +94,7 @@ def handle_messages():
         log.info("Trigger on %s PR #%s from %s: %s",
                       project.fullname, pr_id, repo, branch)
 
-        url = project.ci_hook.ci_url
+        url = project.ci_hook[0].ci_url
         if url.endswith('/'):
             url = url[:-1]
 
