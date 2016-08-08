@@ -125,11 +125,7 @@ class PagureCi(BaseHook):
         ''' Install the generic post-receive hook that allow us to call
         multiple post-receive hooks as set per plugin.
         '''
-        hook = project.ci_hook[0]
-        if not hook.pagure_ci_token:
-            hook.pagure_ci_token = pagure.lib.login.id_generator(32)
-            SESSION.add(project)
-            SESSION.commit()
+        pass
 
     @classmethod
     def install(cls, project, dbobj):
@@ -139,7 +135,10 @@ class PagureCi(BaseHook):
             should be installed
 
         '''
-        pass
+        if not dbobj.pagure_ci_token:
+            dbobj.pagure_ci_token = pagure.lib.login.id_generator(32)
+            SESSION.add(dbobj)
+            SESSION.commit()
 
     @classmethod
     def remove(cls, project):
