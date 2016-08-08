@@ -142,7 +142,6 @@ class PagureCi(BaseHook):
         '''
         if not dbobj.pagure_ci_token:
             dbobj.pagure_ci_token = pagure.lib.login.id_generator(32)
-            SESSION.add(dbobj)
             SESSION.commit()
 
     @classmethod
@@ -155,5 +154,4 @@ class PagureCi(BaseHook):
         '''
         for hook in project.ci_hook:
             hook.pagure_ci_token = None
-        SESSION.add(project)
         SESSION.commit()
