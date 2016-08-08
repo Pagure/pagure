@@ -61,8 +61,13 @@ class PagureCITable(BASE):
 
 tmpl = """
 {% if repo | hasattr('ci_hook') and repo.ci_hook and repo.ci_hook[0].pagure_ci_token %}
-The URL to be used to POST the results of your build
-is:
+
+The token to be used by jenkins to trigger the build is:
+<pre>
+{{ repo.ci_hook[0].pagure_ci_token}}
+</pre>
+
+The URL to be used to POST the results of your build is:
 
 <pre>
 {{ (config['APP_URL'][:-1] if config['APP_URL'].endswith('/')
