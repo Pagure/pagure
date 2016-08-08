@@ -43,7 +43,7 @@ def jenkins_ci_notification(pagure_ci_token):
         flask.abort(400, "Bad Request: No JSON retrived")
 
     build_id = data.get('build', {}).get('number')
-    if not build_it:
+    if not build_id:
         flask.abort(400, "Bad Request: No build ID retrived")
 
     try:
