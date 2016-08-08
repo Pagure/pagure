@@ -57,9 +57,6 @@ class PagureFlaskPluginPagureCItests(tests.Modeltests):
                 'test project #1        </div>', output.data)
             self.assertTrue('<h3>Pagure CI settings</h3>' in output.data)
             self.assertTrue(
-                '<td><label for="pagure_name">Name of project in Pagure</label></td>'
-                in output.data)
-            self.assertTrue(
                 '<td><label for="jenkins_name">Name of project in Jenkins</label></td>'
                 in output.data)
             self.assertTrue(
