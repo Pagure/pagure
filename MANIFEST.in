@@ -1,6 +1,7 @@
 include LICENSE README.rst requirements.txt UPGRADING.rst
 include createdb.py
 recursive-include pagure *
+recursive-include pagure-ci *
 recursive-include files *
 recursive-include milters *
 recursive-include tests *
