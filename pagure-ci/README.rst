@@ -2,20 +2,12 @@ Pagure CI
 =========
 
 This is to setup Pagure CI for development. It is assumed that all the
-dependencies are resolved. It is advised to use a virtual envivironment
-for development.
+dependencies are resolved.
 
  * Run::
 
-        python setup.py develop
+        PAGURE_CONFIG=/path/to/config python pagure-ci/pagure_ci_server.py
 
-
-Now in pagureCI/consumer.py add the following elements in `topic` list
-
-::
-
-    'org.fedoraproject.dev.pagure.pull-request.new',
-    'org.fedoraproject.dev.pagure.pull-request.comment.added',
 
 
 Configuring Jenkins
@@ -52,12 +44,12 @@ after you login to your Jenkins Instance.
 
 ::
 
-		FORMAT: JSON
-		PROTOCOL: HTTP
-		EVENT: Job Finalized
-		URL: <The POST URL that Jenkins form returned>
-		TIMEOUT: 3000
-		LOG: 1
+        FORMAT: JSON
+        PROTOCOL: HTTP
+        EVENT: Job Finalized
+        URL: <The POST URL that Jenkins form returned>
+        TIMEOUT: 3000
+        LOG: 1
 
 * Tick the build is parameterized
 
@@ -94,25 +86,4 @@ Example Script
   information. Which on submiting should give you a POST url.
 
 * Copy and paste the URL in the Notification section under the Jenkins project
-  you want the CI to work,
-
-
-Get It Running:
-===============
-
-In one terminal window run:
-
-::
-
-    fedmsg-relay
-
-Another window:
-
-::
-
-    fedmsg-hub
-
-* Now clone the project locally and make a branch. make some changes and push it
-  to the repo and try to make a PR. You will notice if everything works fine a lot
-  of logs in the server console and `build fail` flag on the PR.
-  Build fail because there is no git server running.
+  you want the CI to work.
