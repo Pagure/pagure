@@ -138,6 +138,25 @@ Pagure comes with an webhook server allowing http callbacks for any action
 done on a project. This package provides it.
 
 
+%package            ci
+Summary:            A CI service for pagure
+BuildArch:          noarch
+
+BuildRequires:      systemd-devel
+Requires:           python-redis
+Requires:           python-trollius
+Requires:           python-trollius-redis
+Requires:           python-jenkins
+Requires(post):     systemd
+Requires(preun):    systemd
+Requires(postun):   systemd
+%description        ci
+Pagure comes with a continuous integration service, currently supporting
+only jenkins but extendable to others.
+With this service, your CI server will be able to report the results of the
+build on the pull-requests opened to your project.
+
+
 %prep
 %setup -q
 
@@ -200,12 +219,22 @@ install -m 755 webhook-server/pagure-webhook-server.py \
 install -m 644 webhook-server/pagure_webhook.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_webhook.service
 
+# Install the ci service
+mkdir -p $RPM_BUILD_ROOT/%{_libexecdir}/pagure-ci
+install -m 755 pagure-ci/pagure_ci_server.py \
+    $RPM_BUILD_ROOT/%{_libexecdir}/pagure-ci/pagure_ci_server.py
+install -m 644 pagure-ci/pagure-ci.service \
+    $RPM_BUILD_ROOT/%{_unitdir}/pagure-ci.service
+
+
 %post milters
 %systemd_post pagure_milter.service
 %post ev
 %systemd_post pagure_ev.service
 %post webhook
 %systemd_post pagure_webhook.service
+%post ci
+%systemd_post pagure_ci.service
 
 %preun milters
 %systemd_preun pagure_milter.service
@@ -213,6 +242,8 @@ install -m 644 webhook-server/pagure_webhook.service \
 %systemd_preun pagure_ev.service
 %preun webhook
 %systemd_preun pagure_webhook.service
+%preun ci
+%systemd_preun pagure_ci.service
 
 %postun milters
 %systemd_postun_with_restart pagure_milter.service
@@ -220,6 +251,8 @@ install -m 644 webhook-server/pagure_webhook.service \
 %systemd_postun_with_restart pagure_ev.service
 %postun webhook
 %systemd_postun_with_restart pagure_webhook.service
+%postun ci
+%systemd_postun_with_restart pagure_ci.service
 
 
 %files
@@ -256,6 +289,12 @@ install -m 644 webhook-server/pagure_webhook.service \
 %license LICENSE
 %{_libexecdir}/pagure-webhook/
 %{_unitdir}/pagure_webhook.service
+
+
+%files ci
+%license LICENSE
+%{_libexecdir}/pagure-ci/
+%{_unitdir}/pagure_ci.service
 
 
 %changelog
