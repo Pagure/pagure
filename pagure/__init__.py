@@ -167,7 +167,9 @@ if APP.config.get('PAGURE_AUTH', None) in ['fas', 'openid']:
 
 SESSION = pagure.lib.create_session(APP.config['DB_URL'])
 REDIS = None
-if APP.config['EVENTSOURCE_SOURCE'] or APP.config['WEBHOOK']:
+if APP.config['EVENTSOURCE_SOURCE'] \
+        or APP.config['WEBHOOK'] \
+        or APP.config['PAGURE_CI_SERVICES']:
     pagure.lib.set_redis(
         host=APP.config['REDIS_HOST'],
         port=APP.config['REDIS_PORT'],
