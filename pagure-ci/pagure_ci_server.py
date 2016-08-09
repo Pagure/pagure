@@ -100,6 +100,7 @@ def handle_messages():
 
         if data['ci_type'] == 'jenkins':
             url += '/buildWithParameters'
+            log.info('Triggering the build at: %s', url)
             request.post(
                 url,
                 data={
