@@ -223,4 +223,4 @@ BOOTSTRAP_URLS_CSS = 'https://apps.fedoraproject.org/global/fedora-bootstrap-1.0
 BOOTSTRAP_URLS_JS = 'https://apps.fedoraproject.org/global/fedora-bootstrap-1.0.1/fedora-bootstrap.js'
 
 # List of the type of CI service supported by this pagure instance
-PAGURE_CI_SERVICES = ['jenkins']
+PAGURE_CI_SERVICES = []
