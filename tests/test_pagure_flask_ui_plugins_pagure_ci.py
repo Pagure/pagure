@@ -110,6 +110,9 @@ class PagureFlaskPluginPagureCItests(tests.Modeltests):
 
             tests.create_projects_git(tests.HERE)
 
+            if APP.config.get('PAGURE_CI_SERVICES', None) is None:
+                return
+
             # Activate hook
             output = self.app.post(
                 '/test/settings/Pagure CI', data=data, follow_redirects=True)
