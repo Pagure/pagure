@@ -88,7 +88,7 @@ def process_jenkins_build(session, project, build_id, requestfolder):
         comment=comment,
         url=url,
         uid=None,
-        user=repo.user.username,
+        user=project.user.username,
         requestfolder=requestfolder,
     )
-    SESSION.commit()
+    session.commit()
