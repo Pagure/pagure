@@ -33,7 +33,7 @@ def get_project_by_ci_token(session, ci_token):
     return query.first()
 
 
-def process_jenkins_build(project, build_id):
+def process_jenkins_build(session, project, build_id, requestfolder):
     """  Gets the build info from jenkins and flags that particular
     pull-request.
     """
@@ -77,6 +77,6 @@ def process_jenkins_build(project, build_id):
         url=url,
         uid=None,
         user=repo.user.username,
-        requestfolder=APP.config['REQUESTS_FOLDER'],
+        requestfolder=requestfolder,
     )
     SESSION.commit()

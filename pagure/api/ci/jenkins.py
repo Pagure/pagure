@@ -47,7 +47,12 @@ def jenkins_ci_notification(pagure_ci_token):
         flask.abort(400, "Bad Request: No build ID retrived")
 
     try:
-        lib_ci.process_jenkins_build(project, build_id)
+        lib_ci.process_jenkins_build(
+            SESSION,
+            project,
+            build_id,
+            requestfolder=APP.config['REQUESTS_FOLDER']
+        )
     except pagure.exceptions.PagureException as err:
         APP.logger.error('Error processing jenkins notification', exc_info=err)
         flask.abort(400, "Bad Request: %s" % err)
