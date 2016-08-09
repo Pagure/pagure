@@ -1,4 +1,15 @@
 # -*- coding: utf-8 -*-
+
+"""
+ (c) 2016 - Copyright Red Hat Inc
+
+ Authors:
+   Lubomír Sedlář <lubomir.sedlar@gmail.com>
+   Farhaan Bukhsh <farhaan.bukhsh@gmail.com>
+   Pierre-Yves Chibon <pingou@pingoured.fr>
+
+"""
+
 import json
 import logging
 
