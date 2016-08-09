@@ -72,7 +72,7 @@ def handle_messages():
         branch = data['pr']['branch_from']
 
         username = None
-        projectname = data['pr']['project']
+        projectname = data['pr']['project']['name']
         if data['pr'].get('parent'):
             username, data['pr']['project']['user']['user']
 
