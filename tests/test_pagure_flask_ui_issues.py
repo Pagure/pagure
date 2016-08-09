@@ -114,15 +114,10 @@ class PagureFlaskIssuestests(tests.Modeltests):
             # Invalid user
             data['csrf_token'] = csrf_token
             output = self.app.post('/test/new_issue', data=data)
-            self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '<div class="card-header">\n        New issue'
-                in output.data)
-            self.assertEqual(output.data.count(
-                '<td class="errors">This field is required.</td>'), 0)
-            self.assertTrue(
-                '</button>\n                      No user &#34;username&#34; found'
-                in output.data)
+            self.assertEqual(output.status_code, 404)
+            self.assertIn(
+                '<p>No such user found in the database: username</p>',
+                output.data)
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
