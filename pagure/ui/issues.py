@@ -20,6 +20,7 @@ import kitchen.text.converters as ktc
 import mimetypes
 
 import pagure.doc_utils
+import pagure.exceptions
 import pagure.lib
 import pagure.forms
 from pagure import (APP, SESSION, LOG, __get_file_in_tree,
@@ -576,9 +577,10 @@ def new_issue(repo, username=None):
         content = form.issue_content.data
         private = form.private.data
 
-        user_obj = pagure.lib.__get_user(
-            SESSION, flask.g.fas_user.username)
-        if not user_obj:
+        try:
+            user_obj = pagure.lib.__get_user(
+                SESSION, flask.g.fas_user.username)
+        except pagure.exceptions.PagureException:
             flask.abort(
                 404, 'No such user found in the database: %s' %
                     flask.g.fas_user.username)
@@ -795,9 +797,10 @@ def edit_issue(repo, issueid, username=None):
         status = form.status.data
         private = form.private.data
 
-        user_obj = pagure.lib.__get_user(
-            SESSION, flask.g.fas_user.username)
-        if not user_obj:
+        try:
+            user_obj = pagure.lib.__get_user(
+                SESSION, flask.g.fas_user.username)
+        except pagure.exceptions.PagureException:
             flask.abort(
                 404, 'No such user found in the database: %s' %
                     flask.g.fas_user.username)
@@ -889,9 +892,10 @@ def upload_issue(repo, issueid, username=None):
     if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
 
-    user_obj = pagure.lib.__get_user(
-        SESSION, flask.g.fas_user.username)
-    if not user_obj:
+    try:
+        user_obj = pagure.lib.__get_user(
+            SESSION, flask.g.fas_user.username)
+    except pagure.exceptions.PagureException:
         flask.abort(
             404, 'No such user found in the database: %s' %
                 flask.g.fas_user.username)
