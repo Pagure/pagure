@@ -864,6 +864,15 @@ def add_pull_request_comment(session, request, commit, tree_id, filename,
             'notification': notification,
         }))
 
+        # Send notification to the CI server, if the comment added was a
+        # notification and the PR is still open
+        if notification and request.status == 'Open' \
+                and request.project.ci_hook and PAGURE_CI:
+            REDIS.publish('pagure.ci', json.dumps({
+                'ci_type': request.project.ci_hook.type_ci.type,
+                'pr': request.to_json(public=True, with_comments=False)
+            }))
+
     pagure.lib.notify.log(
         request.project,
         topic='pull-request.comment.added',
@@ -1225,6 +1234,13 @@ def new_pull_request(session, branch_from,
         ),
         redis=REDIS,
     )
+
+    # Send notification to the CI server
+    if request.project.ci_hook and PAGURE_CI:
+        REDIS.publish('pagure.ci', json.dumps({
+            'ci_type': request.project.ci_hook.type_ci.type,
+            'pr': request.to_json(public=True, with_comments=False)
+        }))
 
     return request
 
