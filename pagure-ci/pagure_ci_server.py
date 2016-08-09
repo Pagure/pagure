@@ -101,17 +101,19 @@ def handle_messages():
         if data['ci_type'] == 'jenkins':
             url += '/buildWithParameters'
             log.info('Triggering the build at: %s', url)
-            request.post(
+            requests.post(
                 url,
                 data={
-                    'token': cfg.jenkins_token,
+                    'token': project.ci_hook[0].pagure_ci_token,
                     'cause': pr_id,
-                    'REPO': repo.fullname,
+                    'REPO': project.fullname,
                     'BRANCH': branch
                 }
             )
         else:
             log.warning('Un-supported CI type')
+
+        log.info('Ready for another')
 
 
 def main():
