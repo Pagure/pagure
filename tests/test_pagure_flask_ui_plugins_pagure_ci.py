@@ -176,7 +176,6 @@ class PagureFlaskPluginPagureCItests(tests.Modeltests):
             self.assertIn('<h3>Pagure CI settings</h3>', output.data)
             self.assertFalse(
                 '</button>\n                      Hook activated' in output.data)
-            print output.data
             self.assertIn(
                 '<td><input id="ci_url" name="ci_url" type="text" value="">'
                 '</td>\n<td class="errors">This field is required.</td>',
