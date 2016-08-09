@@ -174,6 +174,11 @@ if APP.config['EVENTSOURCE_SOURCE'] or APP.config['WEBHOOK']:
         db=APP.config['REDIS_DB']
     )
 
+
+if APP.config['PAGURE_CI_SERVICES']:
+    pagure.lib.set_pagure_ci(APP.config['PAGURE_CI_SERVICES'])
+
+
 if not APP.debug:
     APP.logger.addHandler(pagure.mail_logging.get_mail_handler(
         smtp_server=APP.config.get('SMTP_SERVER', '127.0.0.1'),

@@ -58,6 +58,7 @@ def set_redis(host, port, db):
 
 def set_pagure_ci(services):
     """ Set the list of CI services supported by this pagure instance. """
+    global PAGURE_CI
     PAGURE_CI = services
 
 
