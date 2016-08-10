@@ -11,7 +11,7 @@ How to enable Pagure CI
 * Enable the Fedmsg plugin in pagure project setting . This will emit the message
   to for consumer to consume it.
 
-* Fill in the Pagure CI form with the required details. 
+* Fill in the Pagure CI form with the required details.
 
 ::
 
@@ -19,12 +19,12 @@ How to enable Pagure CI
 		Jenkins Project Name
 		Jenkins Token
 		Jenkins Url
-	
+
         All of which are required field.
 
 * The jenkins token is any string that you give here. The only thing that should
   be kept in mind that this token should be same through out.
-		
+
 * This will give a POST URL which will be used for Job Notification in Jenkins
 
 * The POST url will only appear only after you successfully submitted the form.
@@ -130,6 +130,3 @@ Run the service:
     `sudo systemctl enable fedmsg-hub.service`
 
     `sudo systemctl start fedmsg-hub.service`
-
-
-
