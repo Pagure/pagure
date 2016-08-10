@@ -42,21 +42,7 @@ class PagureFlaskRepoOldUrltests(tests.Modeltests):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskRepoOldUrltests, self).setUp()
 
-        # We need to reload pagure as otherwise the configuration file will
-        # not be taken into account
-        pagure.APP.view_functions = {}
-        os.environ['PAGURE_CONFIG'] = CONFIG
-
-        reload(pagure)
-        reload(pagure.lib)
-        reload(pagure.lib.model)
-        reload(pagure.ui.admin)
-        reload(pagure.ui.app)
-        reload(pagure.ui.groups)
-        reload(pagure.ui.repo)
-        reload(pagure.ui.filters)
-        reload(pagure.ui.issues)
-        reload(pagure.ui.fork)
+        tests.reload_pagure(CONFIG)
 
         pagure.APP.config['TESTING'] = True
         pagure.SESSION = self.session
@@ -83,33 +69,8 @@ class PagureFlaskRepoOldUrltests(tests.Modeltests):
     def tearDown(self):
         """ Tear down the environnment, after every tests. """
         super(PagureFlaskRepoOldUrltests, self).tearDown()
-        if 'PAGURE_CONFIG' in os.environ:
-            del os.environ['PAGURE_CONFIG']
 
-        # We need to reload pagure as otherwise the configuration file will
-        # remain set for the other tests
-        pagure.APP.view_functions = {}
-
-        reload(pagure)
-        reload(pagure.lib)
-        reload(pagure.lib.model)
-        reload(pagure.hooks)
-        reload(pagure.hooks.mail)
-        reload(pagure.hooks.irc)
-        reload(pagure.hooks.fedmsg)
-        reload(pagure.hooks.pagure_force_commit)
-        reload(pagure.hooks.pagure_hook)
-        reload(pagure.hooks.pagure_request_hook)
-        reload(pagure.hooks.pagure_ticket_hook)
-        reload(pagure.hooks.rtd)
-        reload(pagure.ui.admin)
-        reload(pagure.ui.app)
-        reload(pagure.ui.groups)
-        reload(pagure.ui.repo)
-        reload(pagure.ui.filters)
-        reload(pagure.ui.plugins)
-        reload(pagure.ui.issues)
-        reload(pagure.ui.fork)
+        tests.reload_pagure(CONFIG)
 
         pagure.APP.config['EMAIL_SEND'] = False
         pagure.LOG.handlers = []
