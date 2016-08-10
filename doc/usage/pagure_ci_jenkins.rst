@@ -8,7 +8,7 @@ This document describe the steps needed to make it work.
 
 
 How to enable Pagure CI
-=======================
+-----------------------
 
 * Visit the settings page of your project
 
@@ -31,7 +31,7 @@ Keep these two available when configuring jenkins for your project.
 
 
 Configure Jenkins
-=================
+-----------------
 
 These steps can only be made by the admins of your jenkins instance, but
 they only need to be made once.
@@ -43,7 +43,7 @@ they only need to be made once.
 
 
 Configure your project on Jenkins
-=================================
+---------------------------------
 
 * Go to the `Configure` page of your project
 
