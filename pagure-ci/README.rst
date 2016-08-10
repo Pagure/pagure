@@ -6,12 +6,12 @@ dependencies are resolved.
 
  * Run::
 
-        PAGURE_CONFIG=/path/to/config python pagure-ci/pagure_ci_server.py
+    PAGURE_CONFIG=/path/to/config PYTHONPATH=. python pagure-ci/pagure_ci_server.py
 
 
 
-Configuring Jenkins
-===================
+Configure Jenkins
+=================
 
 Jenkins configuration is the most important part of how the Pagure CI works,
 after you login to your Jenkins Instance.
@@ -24,43 +24,42 @@ after you login to your Jenkins Instance.
 
 * Download the following plugins:
 
-::
-
-      Build Authorization Root Plugin
-      Git Plugins
-      Notification Plugin
+  * Build Authorization Root Plugin
+  * `Git Plugin <https://wiki.jenkins-ci.org/display/JENKINS/Git+Plugin>`_
+  * `Notification Plugin <https://wiki.jenkins-ci.org/display/JENKINS/Notification+Plugin>`_
 
 
-* Click on the New Item
+Configure your project on Jenkins
+=================================
 
-* Select Freestyle Project
+* Start by enabling the `Pagure CI` hook in the settings of your project on
+  pagure. This will provide you two values needed to configure your project
+  on jenkins: a token and an URL that jenkins calls to return the results
+  of a build.
 
-* Click OK and enter the name of the project, make sure the project name you
-  filled in the Pagure CI form should match the name you entered here.
+* Go to the `Configure` page of your project
 
-* Under 'Job Notification'  click 'Add Endpoint'
+* Under `Job Notification`  click `Add Endpoint`
 
 * Fields in Endpoint will be :
 
 ::
 
-        FORMAT: JSON
-        PROTOCOL: HTTP
-        EVENT: Job Finalized
-        URL: <The POST URL that Jenkins form returned>
-        TIMEOUT: 3000
-        LOG: 1
+    FORMAT: JSON
+    PROTOCOL: HTTP
+    EVENT: Job Finalized
+    URL: <The URL provided in the Pagure CI hook on pagure>
+    TIMEOUT: 3000
+    LOG: 1
 
-* Tick the build is parameterized
+* Tick the checkbox `This build is parameterized`
 
-* From the Add Parameter drop down select String Parameter
-
-* Two string parameters need to be created REPO and BRANCH
+* Add two `String Parameters` named REPO and BRANCH
 
 * Source Code Management select Git  and give the URL of the pagure project
 
-* Under Build Trigger click on Trigger build remotely and give the same token
-  that you gave in the Pagure CI form.
+* Under Build Trigger click on Trigger build remotely and specify the token
+  given by pagure.
 
 * Under Build -> Add build step -> Execute Shell
 
@@ -71,19 +70,15 @@ Example Script
 
 ::
 
-        if [ -n "$REPO" -a -n "$BRANCH" ]; then
-        git remote rm proposed || true
-        git remote add proposed "$REPO"
-        git fetch proposed
-        git checkout origin/master
-        git config --global user.email "you@example.com"
-        git config --global user.name "Your Name"
-        git merge --no-ff "proposed/$BRANCH" -m "Merge PR"
-        fi
-
-* After all the configuration done, go to the dev instance of pagure running
-  and under project settings in `Plugin` select Pagure CI and fill the appropriate
-  information. Which on submiting should give you a POST url.
-
-* Copy and paste the URL in the Notification section under the Jenkins project
-  you want the CI to work.
+    # Script specific for Pull-Request build
+    if [ -n "$REPO" -a -n "$BRANCH" ]; then
+    git remote rm proposed || true
+    git remote add proposed "$REPO"
+    git fetch proposed
+    git checkout origin/master
+    git config --global user.email "you@example.com"
+    git config --global user.name "Your Name"
+    git merge --no-ff "proposed/$BRANCH" -m "Merge PR"
+    fi
+    
+    # Part of the script specific to how you run the tests on your project
