@@ -1730,9 +1730,12 @@ index 0000000..2a552bb
                 '  PR from the feature branch\n     <span class="pull-xs-right">',
                 output.data)
             # Checking if Edited by User is there or not
-            self.assertIn(
-                '<small class="text-muted">Edited just now by pingou </small>',
-                output.data)
+            self.assertTrue(
+                '<small class="text-muted">Edited just now by pingou </small>'
+                in output.data
+                or
+                '<small class="text-muted">Edited seconds ago by pingou </small>'
+                in output.data)
             self.assertIn(
                 '</button>\n                      Comment updated', output.data)
 
