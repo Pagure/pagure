@@ -46,13 +46,14 @@ import pagure
 import pagure.lib
 from pagure.exceptions import PagureEvException
 
-_i = 0
-
 
 @trollius.coroutine
 def handle_messages():
+    host = pagure.APP.config.get('REDIS_HOST', '0.0.0.0')
+    port = pagure.APP.config.get('REDIS_PORT', 6379)
+    db = pagure.APP.config.get('REDIS_DB', 0)
     connection = yield trollius.From(trollius_redis.Connection.create(
-        host='0.0.0.0', port=6379, db=0))
+        host=host, port=port, db=db))
 
     # Create subscriber.
     subscriber = yield trollius.From(connection.start_subscribe())
