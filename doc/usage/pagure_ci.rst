@@ -16,4 +16,4 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   usage/pagure_ci_jenkins
+   pagure_ci_jenkins
