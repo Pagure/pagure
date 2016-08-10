@@ -515,3 +515,18 @@ which is useful for pagure instances running since before 1.3 but is not
 for newer instances.
 
 Defaults to: ``False``.
+
+
+PAGURE_CI_SERVICES
+~~~~~~~~~~~~~~~~~~
+
+Pagure can be configure to integrate results of a Continuous Integration (CI)
+service to pull-requests open against a project.
+
+To enable this integration, follow the documentation on how to install
+pagure-ci and set this configuration key to ``['jenkins']`` (Jenkins being
+the only CI service supported at the moment).
+
+Defaults to: ``None``.
+
+.. warning:: Requires `Redis` to be configured and running.
