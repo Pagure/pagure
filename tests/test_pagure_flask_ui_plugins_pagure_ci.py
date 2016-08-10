@@ -110,7 +110,7 @@ class PagureFlaskPluginPagureCItests(tests.Modeltests):
 
             tests.create_projects_git(tests.HERE)
 
-            if pagure.APP.config.get('PAGURE_CI_SERVICES', None) is None:
+            if not pagure.APP.config.get('PAGURE_CI_SERVICES'):
                 return
 
             # Activate hook
