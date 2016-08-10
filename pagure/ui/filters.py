@@ -38,7 +38,7 @@ def jinja_hasattr(obj, string):
 
 @APP.template_filter('render')
 def jinja_render(tmpl, **kwargs):
-    """ Render the tiven template with the provided arguments
+    """ Render the given template with the provided arguments
     """
     return flask.render_template_string(tmpl, **kwargs)
 
