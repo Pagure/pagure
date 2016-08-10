@@ -24,7 +24,7 @@
   </table>
 
   {% if plugin.extra_info %}
-  {{ plugin.extra_info | render(repo=repo) | safe }}
+  {{ plugin.extra_info | render(repo=repo, username=username) | safe }}
   {% endif %}
   <p class="buttons indent">
       <input type="button" value="Cancel" class="btn btn-secondary" onclick="history.back();">

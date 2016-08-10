@@ -68,11 +68,11 @@ The token to be used by jenkins to trigger the build is:
 </pre>
 
 The URL to be used to POST the results of your build is:
-
 <pre>
 {{ (config['APP_URL'][:-1] if config['APP_URL'].endswith('/')
   else config['APP_URL'])
   + url_for('api_ns.%s_ci_notification' % repo.ci_hook[0].ci_type,
+    repo=repo.name, username=username,
     pagure_ci_token=repo.ci_hook[0].pagure_ci_token) }}
 </pre>
 

@@ -10,6 +10,8 @@
 
 import flask
 
+from cryptography.hazmat.primitives import constant_time
+from kitchen.text.converters import to_bytes
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure
@@ -20,8 +22,10 @@ from pagure import APP, SESSION
 from pagure.api import API, APIERROR
 
 
-@API.route('/ci/jenkins/<pagure_ci_token>/build-finished', methods=['POST'])
-def jenkins_ci_notification(pagure_ci_token):
+
+@API.route('/ci/jenkins/<repo:repo>/<pagure_ci_token>/build-finished', methods=['POST'])
+@API.route('/ci/jenkins/forks/<username>/<repo:repo>/<pagure_ci_token>/build-finished', methods=['POST'])
+def jenkins_ci_notification(repo, pagure_ci_token, username=None):
     """
     Jenkins Build Notification
     --------------------------
@@ -34,9 +38,14 @@ def jenkins_ci_notification(pagure_ci_token):
 
     """
 
-    project = lib_ci.get_project_by_ci_token(SESSION, pagure_ci_token)
-    if not project:
-        flask.abort(404, 'No project corresponding to this CI token')
+    project = pagure.lib.get_project(SESSION, repo, user=username)
+    if repo is None:
+        flask.abort(404, 'Project not found')
+
+    if not constant_time.bytes_eq(
+          to_bytes(pagure_ci_token),
+          to_bytes(project.ci_hook[0].pagure_ci_token)):
+        return ('Token mismatch', 401)
 
     data = flask.request.get_json()
     if not data:
