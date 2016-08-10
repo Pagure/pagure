@@ -57,6 +57,13 @@ pagure.LOG.handlers = []
 
 
 def reload_pagure(config_file=None):
+    ''' Reload the different component of the pagure app.
+
+    You may want to use this for some tests that require a specific
+    configuration key to include or not a controller (for example the
+    old_commit endpoint that's included or not depending on a value in
+    the configuration file).
+    '''
 
     # We need to reload pagure as otherwise the configuration file will
     # not be taken into account
