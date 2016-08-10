@@ -24,7 +24,6 @@ from pagure.lib import model
 
 import json
 from kitchen.text.converters import to_bytes
-from cryptography.hazmat.primitives import constant_time
 
 # pylint: disable=E1101
 
