@@ -85,7 +85,6 @@ def reload_pagure(config_file=None):
     reload(pagure.api.issue)
     reload(pagure.api.project)
     reload(pagure.api.user)
-    reload(pagure.api.ci.jenkins)
     reload(pagure.ui.admin)
     reload(pagure.ui.app)
     reload(pagure.ui.groups)
