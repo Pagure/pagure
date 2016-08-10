@@ -254,9 +254,10 @@ where the file ``alembic.ini`` is. This file contains two important pieces
 of information:
 
 * ``sqlalchemy.url`` which is the URL used to connect to the database, likely
-the same URL as the one in ``pagure.cfg``.
+  the same URL as the one in ``pagure.cfg``.
+
 * ``script_location`` which is the path to the ``versions`` folder containing
-all the alembic migration files.
+  all the alembic migration files.
 
 The ``alembic stamp`` command is the one actually saving the current revision
 into the database. This current revision is found using ``alembic heads``

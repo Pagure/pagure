@@ -78,4 +78,4 @@ flask here, ie: search in one folder and if you don't find the file look
 in another one.
 
 `An example apache configuration <https://pagure.io/flask-multistatic/blob/master/f/example.conf>`_
-is provided as part of the sources of `flask-multistatic <https://pagure.io/flask-multistatic/>`_.
+is provided as part of the sources of `flask-multistatic`_.
