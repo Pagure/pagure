@@ -24,6 +24,7 @@ import logging
 import os
 import requests
 import time
+import urlparse
 import uuid
 
 import six
@@ -95,11 +96,9 @@ def handle_messages():
                       project.fullname, pr_id, repo, branch)
 
         url = project.ci_hook[0].ci_url
-        if url.endswith('/'):
-            url = url[:-1]
 
         if data['ci_type'] == 'jenkins':
-            url += '/buildWithParameters'
+            url = urlparse.urljoin(url, '/buildWithParameters')
             log.info('Triggering the build at: %s', url)
             requests.post(
                 url,
