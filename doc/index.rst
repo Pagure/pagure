@@ -34,6 +34,7 @@ Contents:
    install_milter
    install_evs
    install_webhooks
+   install_pagure_ci
    configuration
    development
    usage
