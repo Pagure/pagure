@@ -44,6 +44,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         pagure.ui.filters.SESSION = self.session
         pagure.ui.repo.SESSION = self.session
 
+        pagure.APP.config['VIRUS_SCAN_ATTACHMENTS'] = False
         pagure.APP.config['GIT_FOLDER'] = tests.HERE
         pagure.APP.config['FORK_FOLDER'] = os.path.join(
             tests.HERE, 'forks')
