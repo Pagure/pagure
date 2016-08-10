@@ -41,3 +41,4 @@ Contents:
    usage/pr_custom_page
    usage/theming
    usage/upgrade_db
+   usage/pagure_ci
