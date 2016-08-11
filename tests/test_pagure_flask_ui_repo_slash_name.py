@@ -239,10 +239,17 @@ class PagureFlaskSlashInNametests(tests.Modeltests):
             output.data)
 
         # Try accessing the commit
-        gitrepo = os.path.join(tests.HERE, 'repos', 'test.git')
+        gitrepo = os.path.join(tests.HERE, 'repos', 'forks/test.git')
         repo = pygit2.Repository(gitrepo)
         master_branch = repo.lookup_branch('master')
         first_commit = master_branch.get_object().hex
+
+        output = self.app.get('/forks/test/commits')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(first_commit, output.data)
+        self.assertIn(
+            '<a href="/forks/test/c/%s?branch=master"' % first_commit,
+            output.data)
 
         output = self.app.get('/forks/test/c/%s' % first_commit)
         self.assertEqual(output.status_code, 200)
