@@ -1,32 +1,38 @@
 {% extends "master.html" %}
-{% from "_formhelper.html" import render_field_in_row %}
+{% from "_formhelper.html" import render_bootstrap_field %}
 
 {% set tag = "groups" %}
 {% block title %}Edit group: {{ group.group_name }}{% endblock %}
 
-
 {% block content %}
-
-<h2>Edit group: {{ group.group_name }}</h2>
-
-<section class="new_group">
-    <form action="{{ url_for('.edit_group', group=group.group_name)
-      }}" method="post">
-
-    <table>
-      {{ render_field_in_row(form.display_name) }}
-      {{ render_field_in_row(form.description) }}
-      {%- if admin %}
-      {{ render_field_in_row(form.group_type) }}
-      {%- endif %}
-    </table>
-    <p class="buttons indent">
-      <input type="submit" class="submit positive button" value="Edit">
-      <input type="button" value="Cancel" class="button"
-       onclick="history.back();">
-      {{ form.csrf_token }}
-    </p>
-  </form>
-</section>
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2">
+      <div class="card m-t-3">
+        <div class="card-header">
+          <strong>Edit group: {{ group.group_name }}</strong>
+        </div>
+        <div class="card-block">
+          <form action="{{ url_for('.edit_group', group=group.group_name)
+              }}" method="post">
+              <table>
+                {{ render_bootstrap_field(
+                    form.display_name,
+                    field_description="Name of the group that will be displayed in the UI") }}
+                {{ render_bootstrap_field(
+                    form.description,
+                    field_description="Small description of the group") }}
+              </table>
+            <p class="buttons indent">
+              <input type="button" value="Cancel" class="btn btn-secondary" onclick="history.back();">
+              <input type="submit" class="btn btn-primary" value="Edit">
+              {{ form.csrf_token }}
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 {% endblock %}
