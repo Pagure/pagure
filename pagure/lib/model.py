@@ -1292,6 +1292,21 @@ class PagureGroup(BASE):
 
         return 'Group: %s - name %s' % (self.id, self.group_name)
 
+    def to_json(self, public=False):
+        ''' Returns a dictionnary representation of the pull-request.
+
+        '''
+        output = {
+            'name': self.group_name,
+            'display_name': self.display_name,
+            'description': self.description,
+            'group_type': self.group_type,
+            'creator': self.creator.to_json(public=public),
+            'date_created': self.created.strftime('%s'),
+        }
+
+        return output
+
 
 class ProjectGroup(BASE):
     """
