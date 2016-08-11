@@ -362,13 +362,13 @@ class CommentForm(wtf.Form):
 class EditGroupForm(wtf.Form):
     """ Form to ask for a password change. """
     display_name = wtforms.TextField(
-        'Group name to display <span class="error">*</span>',
+        'Group name to display',
         [
             wtforms.validators.Required(),
         ]
     )
     description = wtforms.TextField(
-        'Description <span class="error">*</span>',
+        'Description',
         [
             wtforms.validators.Required(),
         ]
