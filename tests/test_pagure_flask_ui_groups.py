@@ -88,10 +88,12 @@ class PagureFlaskGroupstests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn('<h2>Create group</h2>', output.data)
             self.assertEqual(output.data.count(
-                'This field is required.'), 1)
+                'This field is required.'), 3)
 
             data = {
                 'group_name': 'test_group',
+                'display_name': 'Test Group',
+                'description': 'This is a group for the tests',
             }
 
             # Missing CSRF
@@ -130,6 +132,8 @@ class PagureFlaskGroupstests(tests.Modeltests):
             data = {
                 'group_name': 'test_admin_group',
                 'group_type': 'admin',
+                'display_name': 'Test Admin Group',
+                'description': 'This is another group for the tests',
                 'csrf_token': csrf_token,
             }
 

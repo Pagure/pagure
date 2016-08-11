@@ -148,6 +148,8 @@ repo requests/forks/pingou/test3
         msg = pagure.lib.add_group(
             self.session,
             group_name='sysadmin',
+            display_name='sysadmin group',
+            description=None,
             group_type='user',
             user='pingou',
             is_admin=False,
@@ -158,6 +160,8 @@ repo requests/forks/pingou/test3
         msg = pagure.lib.add_group(
             self.session,
             group_name='devs',
+            display_name='devs group',
+            description=None,
             group_type='user',
             user='pingou',
             is_admin=False,

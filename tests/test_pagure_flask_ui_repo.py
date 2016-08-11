@@ -190,6 +190,8 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.session,
             group_name='foo',
             group_type='bar',
+            display_name='foo group',
+            description=None,
             user='pingou',
             is_admin=False,
             blacklist=pagure.APP.config['BLACKLISTED_GROUPS'],
@@ -269,6 +271,8 @@ class PagureFlaskRepotests(tests.Modeltests):
         msg = pagure.lib.add_group(
             self.session,
             group_name='foo',
+            display_name='foo group',
+            description=None,
             group_type='bar',
             user='pingou',
             is_admin=False,
@@ -312,7 +316,6 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn('<h3>Settings for test</h3>', output.data)
             self.assertIn(
                 '</button>\n                      Group added', output.data)
-
 
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_remove_user_when_user_mngt_off(self, ast):
@@ -469,6 +472,8 @@ class PagureFlaskRepotests(tests.Modeltests):
             session=self.session,
             group_name='testgrp',
             group_type='user',
+            display_name='testgrp group',
+            description=None,
             user='pingou',
             is_admin=False,
             blacklist=[],
@@ -548,6 +553,8 @@ class PagureFlaskRepotests(tests.Modeltests):
             session=self.session,
             group_name='testgrp',
             group_type='user',
+            display_name='testgrp group',
+            description=None,
             user='pingou',
             is_admin=False,
             blacklist=[],

@@ -133,6 +133,7 @@ class PagureFlaskApitests(tests.Modeltests):
         item = pagure.lib.model.PagureGroup(
             group_name='group1',
             group_type='user',
+            display_name='User group',
             user_id=1,  # pingou
         )
         self.session.add(item)
@@ -140,6 +141,7 @@ class PagureFlaskApitests(tests.Modeltests):
         item = pagure.lib.model.PagureGroup(
             group_name='rel-eng',
             group_type='user',
+            display_name='Release engineering group',
             user_id=1,  # pingou
         )
         self.session.add(item)
