@@ -48,11 +48,25 @@ These two files will be named (for example) ``id_rsa`` and ``id_rsa.pub``.
 The first one is the private key that must never be shared. The second is
 the public key that can be uploaded on pagure to give you ssh access.
 
-To upload your public key onto pagure, login and click on the user icon on
+To upload your public key onto pagure:
+
+1. Login into pagure and click on the user icon on
 the top right corner, there, select ``My settings``.
 
 .. image:: _static/pagure_my_settings.png
         :target: _static/pagure_my_settings.png
+
+
+2. In the authentication section of your user settings copy the content of your
+``id_rsa.pub`` file in the Public SSH key text box and save your ssh key settings.
+
+.. image:: _static/pagure_add_ssh_key.png
+        :target: _static/pagure_add_ssh_key.png
+
+.. note:: Pagure support multiple ssh keys per user, to add more than a ssh key
+          to your user account just add your new ssh key in your authentication
+          settings (one key per row), this way you will be able to push commits
+          to your repository from a different computer.
 
 
 Configure the default email address
