@@ -52,7 +52,7 @@ def log(project, topic, msg, redis=None):
     # Send fedmsg notification (if fedmsg is there and set-up)
     fedmsg_publish(topic, msg)
 
-    if redis:
+    if redis and project:
         redis.publish(
             'pagure.hook',
             json.dumps({
