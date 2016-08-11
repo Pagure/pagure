@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015 - Copyright Red Hat Inc
+ (c) 2015-2016 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -234,10 +234,15 @@ def add_group():
     if form.validate_on_submit():
 
         try:
-            group_name = form.group_name.data
+            group_name = form.group_name.data.strip()
+            display_name=form.display_name.data.strip()
+            description=form.description.data.strip()
+
             msg = pagure.lib.add_group(
                 session=pagure.SESSION,
                 group_name=group_name,
+                display_name=display_name,
+                description=description,
                 group_type=form.group_type.data,
                 user=flask.g.fas_user.username,
                 is_admin=pagure.is_admin(),

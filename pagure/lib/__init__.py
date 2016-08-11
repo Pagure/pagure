@@ -2537,7 +2537,9 @@ def delete_user_of_group(session, username, groupname, user, is_admin,
     session.flush()
 
 
-def add_group(session, group_name, group_type, user, is_admin, blacklist):
+def add_group(
+        session, group_name, display_name, description,
+        group_type, user, is_admin, blacklist):
     ''' Creates a new group with the given information.
     '''
     if ' ' in group_name:
@@ -2576,6 +2578,8 @@ def add_group(session, group_name, group_type, user, is_admin, blacklist):
 
     grp = pagure.lib.model.PagureGroup(
         group_name=group_name,
+        display_name=display_name,
+        description=description,
         group_type=group_type,
         user_id=user.id,
     )

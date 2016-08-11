@@ -14,6 +14,8 @@
 
     <table>
       {{ render_field_in_row(form.group_name) }}
+      {{ render_field_in_row(form.display_name) }}
+      {{ render_field_in_row(form.description) }}
       {%- if admin %}
       {{ render_field_in_row(form.group_type) }}
       {%- endif %}
