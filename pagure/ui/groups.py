@@ -162,7 +162,9 @@ def edit_group(group):
             pagure.APP.logger.debug(
                 'Could not edit group `%s`.' % (group.group_name))
             pagure.APP.logger.exception(err)
-
+    elif flask.request.method == 'GET':
+        form.display_name.data = group.display_name
+        form.description.data = group.description
 
     return flask.render_template(
         'edit_group.html',
