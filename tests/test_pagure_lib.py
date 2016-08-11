@@ -2228,6 +2228,71 @@ class PagureLibtests(tests.Modeltests):
         group = pagure.lib.search_groups(self.session, group_name='foo')
         self.assertEqual(len(group.users), 1)
 
+    def test_edit_group_info(self):
+        """ Test the edit_group_info method of pagure.lib. """
+        self.test_add_group()
+        group = pagure.lib.search_groups(self.session, group_name='foo')
+        self.assertNotEqual(group, None)
+        self.assertEqual(group.group_name, 'foo')
+
+        # Invalid new user
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.edit_group_info,
+            self.session,
+            group=group,
+            display_name='edited name',
+            description=None,
+            user='foo',
+            is_admin=False,
+        )
+
+        # Invalid user
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.edit_group_info,
+            self.session,
+            group=group,
+            display_name='edited name',
+            description=None,
+            user='foobar',
+            is_admin=False,
+        )
+
+        # User not allowed
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.edit_group_info,
+            self.session,
+            group=group,
+            display_name='edited name',
+            description=None,
+            user='bar',
+            is_admin=False,
+        )
+
+        msg = pagure.lib.edit_group_info(
+            self.session,
+            group=group,
+            display_name='edited name',
+            description=None,
+            user='pingou',
+            is_admin=False,
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Group "edited name" (foo) edited')
+
+        msg = pagure.lib.edit_group_info(
+            self.session,
+            group=group,
+            display_name='edited name',
+            description=None,
+            user='pingou',
+            is_admin=False,
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Nothing changed')
+
     def test_add_group_to_project(self):
         """ Test the add_group_to_project method of pagure.lib. """
         tests.create_projects(self.session)
