@@ -114,6 +114,63 @@ def view_group(group):
     )
 
 
+@pagure.APP.route('/group/<group>/edit/', methods=['GET', 'POST'])
+@pagure.APP.route('/group/<group>/edit', methods=['GET', 'POST'])
+@pagure.login_required
+def edit_group(group):
+    ''' Allows editing the information about this group. '''
+    if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
+        flask.abort(404)
+
+    group_type = 'user'
+    is_admin = pagure.is_admin()
+    if is_admin:
+        group_type = None
+    group = pagure.lib.search_groups(
+        pagure.SESSION, group_name=group, group_type=group_type)
+
+    if not group:
+        flask.abort(404, 'Group not found')
+
+    # Edit group info
+    form = pagure.forms.EditGroupForm()
+    if form.validate_on_submit():
+
+        try:
+            msg = pagure.lib.edit_group_info(
+                pagure.SESSION,
+                group=group,
+                display_name=form.display_name.data,
+                description=form.description.data,
+                user=flask.g.fas_user.username,
+                is_admin=is_admin,
+            )
+            pagure.SESSION.commit()
+            flask.flash(msg)
+            return flask.redirect(
+                flask.url_for('.view_group', group=group.group_name))
+        except pagure.exceptions.PagureException as err:
+            pagure.SESSION.rollback()
+            flask.flash(err.message, 'error')
+            return flask.redirect(
+                flask.url_for('.view_group', group=group.group_name))
+        except SQLAlchemyError as err:  # pragma: no cover
+            pagure.SESSION.rollback()
+            flask.flash(
+                'Could not edit group `%s`.' % (group.group_name),
+                'error')
+            pagure.APP.logger.debug(
+                'Could not edit group `%s`.' % (group.group_name))
+            pagure.APP.logger.exception(err)
+
+
+    return flask.render_template(
+        'edit_group.html',
+        group=group,
+        form=form,
+    )
+
+
 @pagure.APP.route('/group/<group>/<user>/delete', methods=['POST'])
 @pagure.login_required
 def group_user_delete(user, group):

@@ -2498,6 +2498,51 @@ def add_user_to_group(session, username, group, user, is_admin):
         new_user.username, group.group_name)
 
 
+def edit_group_info(
+        session, group, display_name, description, user, is_admin):
+    ''' Edit the information regarding a given group.
+    '''
+    action_user = user
+    user = search_user(session, username=user)
+    if not user:
+        raise pagure.exceptions.PagureException(
+            'No user `%s` found' % action_user)
+
+    if group.group_name not in user.groups \
+            and not is_admin \
+            and user.username != group.creator.username:
+        raise pagure.exceptions.PagureException(
+            'You are not allowed to edit this group')
+
+    edits = []
+    if display_name and display_name != group.display_name:
+        group.display_name = display_name
+        edits.append('display_name')
+    if description and description != group.description:
+        group.description = description
+        edits.append('description')
+
+    session.add(group)
+    session.flush()
+
+    msg = 'Nothing changed'
+    if edits:
+        pagure.lib.notify.log(
+            None,
+            topic='group.edit',
+            msg=dict(
+                group=group.to_json(public=True),
+                fields=edits,
+                agent=user.username,
+            ),
+            redis=REDIS,
+        )
+        msg = 'Group "%s" (%s) edited' % (
+            group.display_name, group.group_name)
+
+    return msg
+
+
 def delete_user_of_group(session, username, groupname, user, is_admin,
                          force=False):
     ''' Removes the specified user from the given group.

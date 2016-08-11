@@ -1,0 +1,32 @@
+{% extends "master.html" %}
+{% from "_formhelper.html" import render_field_in_row %}
+
+{% set tag = "groups" %}
+{% block title %}Edit group: {{ group.group_name }}{% endblock %}
+
+
+{% block content %}
+
+<h2>Edit group: {{ group.group_name }}</h2>
+
+<section class="new_group">
+    <form action="{{ url_for('.edit_group', group=group.group_name)
+      }}" method="post">
+
+    <table>
+      {{ render_field_in_row(form.display_name) }}
+      {{ render_field_in_row(form.description) }}
+      {%- if admin %}
+      {{ render_field_in_row(form.group_type) }}
+      {%- endif %}
+    </table>
+    <p class="buttons indent">
+      <input type="submit" class="submit positive button" value="Edit">
+      <input type="button" value="Cancel" class="button"
+       onclick="history.back();">
+      {{ form.csrf_token }}
+    </p>
+  </form>
+</section>
+
+{% endblock %}

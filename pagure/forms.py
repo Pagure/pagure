@@ -359,7 +359,23 @@ class CommentForm(wtf.Form):
         [wtforms.validators.Required(), file_virus_validator])
 
 
-class NewGroupForm(wtf.Form):
+class EditGroupForm(wtf.Form):
+    """ Form to ask for a password change. """
+    display_name = wtforms.TextField(
+        'Group name to display <span class="error">*</span>',
+        [
+            wtforms.validators.Required(),
+        ]
+    )
+    description = wtforms.TextField(
+        'Description <span class="error">*</span>',
+        [
+            wtforms.validators.Required(),
+        ]
+    )
+
+
+class NewGroupForm(EditGroupForm):
     """ Form to ask for a password change. """
     group_name = wtforms.TextField(
         'Group name  <span class="error">*</span>',
