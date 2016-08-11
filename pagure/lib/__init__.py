@@ -1132,9 +1132,10 @@ def add_pull_request_comment(session, request, commit, tree_id, filename,
         }))
 
         # Send notification to the CI server, if the comment added was a
-        # notification and the PR is still open
+        # notification and the PR is still open and project is not private
         if notification and request.status == 'Open' \
-                and request.project.ci_hook and PAGURE_CI:
+                and request.project.ci_hook and PAGURE_CI \
+                    and not request.project.private:
             REDIS.publish('pagure.ci', json.dumps({
                 'ci_type': request.project.ci_hook.ci_type,
                 'pr': request.to_json(public=True, with_comments=False)
@@ -1593,7 +1594,8 @@ def new_pull_request(session, branch_from,
         )
 
     # Send notification to the CI server
-    if REDIS and request.project.ci_hook and PAGURE_CI:
+    if REDIS and request.project.ci_hook and PAGURE_CI \
+            and not request.project.private:
         REDIS.publish('pagure.ci', json.dumps({
             'ci_type': request.project.ci_hook.ci_type,
             'pr': request.to_json(public=True, with_comments=False)

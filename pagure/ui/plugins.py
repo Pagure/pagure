@@ -73,6 +73,9 @@ def view_plugin(repo, plugin, username=None, namespace=None, full=True):
             403,
             'You are not allowed to change the settings for this project')
 
+    if repo.private:
+        APP.config.get('DISABLED_PLUGINS', []).append('Pagure CI')
+
     if plugin in APP.config.get('DISABLED_PLUGINS', []):
         flask.abort(404, 'Plugin disabled')
 
