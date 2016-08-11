@@ -1,7 +1,7 @@
 {% extends "master.html" %}
 {% from "_render_repo.html" import render_repos_as_card %}
 
-{% block title %}Group {{ group.name }}{% endblock %}
+{% block title %}Group {{ group.group_name }}{% endblock %}
 {% set tag = "groups" %}
 {% from "_browseheader.html" import browse_header %}
 
@@ -20,23 +20,33 @@
   <div class="container">
     <header>
         <h2 class="repo-name m-b-0">
-            <span class="oi" data-glyph="people"></span> &nbsp;{{ group.group_name }}
+            <span class="oi" data-glyph="people"></span> &nbsp;{{
+                 group.display_name }}
             {% if authenticated and (member or admin)
                 and config.get('ENABLE_GROUP_MNGT') %}
-              <form class="pull-xs-right" method="POST"
-                action="{{ url_for('group_delete',
-                    group=group.group_name) }}">
-                {{ form.csrf_token }}
-                <button
-                  onclick="return confirm('Are you sure you want to delete the group `{{group.group_name}}`?');"
-                  title="Delete group"
-                  class="btn btn-danger">
-                  <span class="oi" data-glyph="trash"></span> &nbsp;Delete group
-                </button>
-              </form>
+              <div class="pull-xs-right btn-group">
+                <a href="{{ url_for('.edit_group', group=group.group_name) }}">
+                  <button class="btn btn-sm btn-secondary">
+                    <span class="oi" data-glyph="pencil" title="Edit group">
+                    </span>  &nbsp;Edit Group </button>
+                </a>
+                <form method="POST" action="{{ url_for('group_delete',
+                      group=group.group_name) }}">
+              {% if admin %}
+              {% endif %}
+                  {{ form.csrf_token }}
+                  <button
+                    onclick="return confirm('Are you sure you want to delete the group `{{group.group_name}}`?');"
+                    title="Delete group"
+                    class="btn btn-sm btn-danger">
+                    <span class="oi" data-glyph="trash"></span> &nbsp;Delete group
+                  </button>
+                </form>
+              </div>
              {% endif %}
         </h2>
         <div class="m-t-0">
+          {% if group.description %}<p>{{ group.description }}</p>{% endif %}
           created {{ group.created |humanize }}
           by {{ group.creator.fullname }} ({{ group.creator.user }})
         </div>
