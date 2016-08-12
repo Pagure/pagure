@@ -78,7 +78,7 @@ need to be configured.
 Installing pagure via setup.py
 ------------------------------
 
-Pagure includes in its sources a ``setup.py`` automatint the installation
+Pagure includes in its sources a ``setup.py`` automating the installation
 of the web applications of pagure (ie: the core + the doc server).
 
 
@@ -159,7 +159,7 @@ You would then create the folders with:
 If installed by RPM, you will find an example apache configuration file
 at: ``/etc/httpd/conf.d/pagure.conf``.
 
-If not installed by RPM, the example files is present in the sources at:
+If not installed by RPM, the example file is present in the sources at:
 ``files/pagure.conf``.
 
 Adjust it for your needs.
@@ -167,8 +167,8 @@ Adjust it for your needs.
 
 * Configure the WSGI file
 
-If you installed by RPM, you will find an example WSGI file at:
-``/usr/share/pagure/pagure.wsgi`` and ``/usr/share/pagure/docs_pagure.wsgi``
+If you installed by RPM, you will find example WSGI files at:
+``/usr/share/pagure/pagure.wsgi`` for the core server and ``/usr/share/pagure/docs_pagure.wsgi``
 for the doc server.
 
 If you did not install by RPM, these files are present in the sources at:
@@ -219,7 +219,7 @@ to the database, and create the database itself, you can now create the
 tables, the database scheme.
 
 To create the database tables, you need to run the script
-``/usr/share/pagure/pagure_createdb.py`` and specify it the configuration
+``/usr/share/pagure/pagure_createdb.py`` and specify the configuration
 file to use via an environment variable.
 
 For example:
