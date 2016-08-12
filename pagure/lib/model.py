@@ -1323,7 +1323,8 @@ class ProjectGroup(BASE):
         ),
         primary_key=True)
     group_id = sa.Column(
-        sa.Integer, sa.ForeignKey(
+        sa.Integer,
+        sa.ForeignKey(
             'pagure_group.id',
         ),
         primary_key=True)
