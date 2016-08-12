@@ -1,7 +1,7 @@
 """Add is_fork column to projects
 
 Revision ID: 1d18843a1994
-Revises: 43df5e588a87
+Revises: 17cd553ebd51
 Create Date: 2016-07-17 22:02:14.495146
 
 """

@@ -322,7 +322,7 @@ def view_commits(repo, branchname=None, username=None):
 
     diff_commits = []
     diff_commits_full = []
-    if repo.is_fork:
+    if repo.is_fork and repo.parent:
         parentname = os.path.join(
             APP.config['GIT_FOLDER'], repo.parent.path)
     else:
