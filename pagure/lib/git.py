@@ -1044,20 +1044,21 @@ def merge_pull_request(
              mergecode & pygit2.GIT_MERGE_ANALYSIS_FASTFORWARD)):
 
         if domerge:
+            head = new_repo.lookup_reference('HEAD').get_object()
             if not request.project.settings.get('always_merge', False):
                 if merge is not None:
                     # This is depending on the pygit2 version
                     branch_ref.target = merge.fastforward_oid
                 elif merge is None and mergecode is not None:
                     branch_ref.set_target(repo_commit.oid.hex)
+                commit = repo_commit.oid.hex
             else:
                 tree = new_repo.index.write_tree()
-                head = new_repo.lookup_reference('HEAD').get_object()
                 user_obj = pagure.lib.__get_user(session, username)
                 author = pygit2.Signature(
                     user_obj.fullname.encode('utf-8'),
                     user_obj.default_email.encode('utf-8'))
-                new_repo.create_commit(
+                commit = new_repo.create_commit(
                     'refs/heads/%s' % request.branch,
                     author,
                     author,
@@ -1066,6 +1067,9 @@ def merge_pull_request(
                     [head.hex, repo_commit.oid.hex])
 
             PagureRepo.push(ori_remote, refname)
+            fork_obj.run_hook(
+                head.hex, commit, 'refs/heads/%s' % request.branch,
+                username)
         else:
             request.merge_status = 'FFORWARD'
             session.commit()
@@ -1091,14 +1095,18 @@ def merge_pull_request(
             author = pygit2.Signature(
                 user_obj.fullname.encode('utf-8'),
                 user_obj.default_email.encode('utf-8'))
-            new_repo.create_commit(
+            commit = new_repo.create_commit(
                 'refs/heads/%s' % request.branch,
                 author,
                 author,
                 'Merge #%s `%s`' % (request.id, request.title),
                 tree,
                 [head.hex, repo_commit.oid.hex])
+
             PagureRepo.push(ori_remote, refname)
+            fork_obj.run_hook(
+                head.hex, commit, 'refs/heads/%s' % request.branch,
+                username)
 
         else:
             request.merge_status = 'MERGE'
