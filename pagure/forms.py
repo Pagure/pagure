@@ -66,7 +66,10 @@ class ProjectFormSimplified(wtf.Form):
     )
     tags = wtforms.TextField(
         'Project tags',
-        [wtforms.validators.optional()]
+        [
+            wtforms.validators.optional(),
+            wtforms.validators.Length(max=255),
+        ]
     )
 
 
@@ -153,7 +156,8 @@ class AddIssueTagForm(wtf.Form):
         'tag',
         [
             wtforms.validators.Optional(),
-            wtforms.validators.Regexp(TAGS_REGEX, flags=re.IGNORECASE)
+            wtforms.validators.Regexp(TAGS_REGEX, flags=re.IGNORECASE),
+            wtforms.validators.Length(max=255),
         ]
     )
 
@@ -204,7 +208,8 @@ class UpdateIssueForm(wtf.Form):
         'tag',
         [
             wtforms.validators.Optional(),
-            wtforms.validators.Regexp(TAGS_REGEX, flags=re.IGNORECASE)
+            wtforms.validators.Regexp(TAGS_REGEX, flags=re.IGNORECASE),
+            wtforms.validators.Length(max=255),
         ]
     )
     depends = wtforms.TextField(
@@ -365,12 +370,14 @@ class EditGroupForm(wtf.Form):
         'Group name to display',
         [
             wtforms.validators.Required(),
+            wtforms.validators.Length(max=255),
         ]
     )
     description = wtforms.TextField(
         'Description',
         [
             wtforms.validators.Required(),
+            wtforms.validators.Length(max=255),
         ]
     )
 
