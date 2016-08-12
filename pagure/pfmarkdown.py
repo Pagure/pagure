@@ -49,7 +49,10 @@ class MentionPattern(markdown.inlinepatterns.Pattern):
             return text
 
         element = markdown.util.etree.Element("a")
-        url = flask.url_for('view_user', username=name)
+        base_url = pagure.APP.config['APP_URL']
+        if base_url.endswith('/'):
+            base_url = base_url[:-1]
+        url = '%s/user/%s' % (base_url, user.username)
         element.set('href', url)
         element.text = text
         return element
