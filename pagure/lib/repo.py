@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015 - Copyright Red Hat Inc
+ (c) 2015-2016 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
 
+import os
+import subprocess
 
 import pygit2
 
@@ -76,3 +78,27 @@ class PagureRepo(pygit2.Repository):
                         'Un-expected merge result: %s' % (
                         pygit2.GIT_MERGE_ANALYSIS_NORMAL))
                     raise AssertionError('Unknown merge analysis result')
+
+    def run_hook(self, old, new, ref, username):
+        ''' Runs the post-update hook on the repo. '''
+        line = '%s %s %s\n' % (old, new, ref)
+        cmd = ['./hooks/post-receive']
+        env = os.environ.copy()
+        env['GIT_DIR'] = self.path
+        env['GL_USER'] = username
+
+        procs = subprocess.Popen(
+            cmd,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd=self.path,
+            env=env,
+        )
+        (out, err) = procs.communicate(line)
+        retcode = procs.wait()
+        if retcode:
+            print 'ERROR: %s =-- %s' % (cmd, retcode)
+            print out
+            print err
+            out = out.rstrip('\n\r')
