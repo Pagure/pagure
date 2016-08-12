@@ -8,6 +8,8 @@ relates to an issue.
 import os
 import sys
 
+import pygit2
+
 from sqlalchemy.exc import SQLAlchemyError
 
 if 'PAGURE_CONFIG' not in os.environ \
@@ -129,34 +131,27 @@ def fixes_relation(commitid, relation, app_url=None):
         pagure.SESSION.rollback()
         pagure.APP.logger.exception(err)
 
-    branches = [
-        item.replace('* ', '')
-        for item in pagure.lib.git.read_git_lines(
-            ['branch', '--contains', commitid], abspath)
-    ]
-
-    if 'master' in branches:
-        try:
-            if relation.isa == 'issue':
-                pagure.lib.edit_issue(
-                    pagure.SESSION,
-                    relation,
-                    ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
-                    user=pagure.lib.git.get_author_email(commitid, abspath),
-                    status='Fixed')
-            elif relation.isa == 'pull-request':
-                pagure.lib.close_pull_request(
-                    pagure.SESSION,
-                    relation,
-                    requestfolder=pagure.APP.config['REQUESTS_FOLDER'],
-                    user=pagure.lib.git.get_author_email(commitid, abspath),
-                    merged=True)
-            pagure.SESSION.commit()
-        except pagure.exceptions.PagureException as err:
-            print err
-        except SQLAlchemyError as err:  # pragma: no cover
-            pagure.SESSION.rollback()
-            pagure.APP.logger.exception(err)
+    try:
+        if relation.isa == 'issue':
+            pagure.lib.edit_issue(
+                pagure.SESSION,
+                relation,
+                ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
+                user=pagure.lib.git.get_author_email(commitid, abspath),
+                status='Fixed')
+        elif relation.isa == 'pull-request':
+            pagure.lib.close_pull_request(
+                pagure.SESSION,
+                relation,
+                requestfolder=pagure.APP.config['REQUESTS_FOLDER'],
+                user=pagure.lib.git.get_author_email(commitid, abspath),
+                merged=True)
+        pagure.SESSION.commit()
+    except pagure.exceptions.PagureException as err:
+        print err
+    except SQLAlchemyError as err:  # pragma: no cover
+        pagure.SESSION.rollback()
+        pagure.APP.logger.exception(err)
 
 
 def run_as_post_receive_hook():
@@ -173,6 +168,17 @@ def run_as_post_receive_hook():
             print newrev
             print '  -- Ref name'
             print refname
+
+        # Retrieve the default branch
+        repo_obj = pygit2.Repository(abspath)
+        default_branch = None
+        if not repo_obj.is_empty and not repo_obj.head_is_unborn:
+            default_branch = repo_obj.head.shorthand
+
+        # Skip all branch but the default one
+        refname = refname.replace('refs/heads/', '')
+        if refname != default_branch:
+            continue
 
         if set(newrev) == set(['0']):
             print "Deleting a reference/branch, so we won't run the "\
