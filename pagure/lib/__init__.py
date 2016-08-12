@@ -1291,7 +1291,8 @@ def edit_issue(session, issue, ticketfolder, user,
         add_issue_comment(
             session,
             issue,
-            comment='@%s changed the status to ``%s``' % (user, status),
+            comment='@%s changed the status to ``%s``' % (
+                user_obj.username, status),
             user=user,
             ticketfolder=ticketfolder,
             notify=False,
