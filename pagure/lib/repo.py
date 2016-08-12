@@ -87,6 +87,10 @@ class PagureRepo(pygit2.Repository):
         env['GIT_DIR'] = self.path
         env['GL_USER'] = username
 
+        hookfile = os.path.join(self.path, 'hooks', 'post-receive')
+        if not os.path.exists(hookfile):
+            return
+
         procs = subprocess.Popen(
             cmd,
             stdin=subprocess.PIPE,
