@@ -24,8 +24,6 @@ import pagure.lib.git
 @pagure.APP.route('/groups')
 def group_lists():
     ''' List all the groups associated with all the projects. '''
-    if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
-        flask.abort(404)
 
     group_type = 'user'
     if pagure.is_admin():
@@ -55,7 +53,8 @@ def group_lists():
 @pagure.APP.route('/group/<group>', methods=['GET', 'POST'])
 def view_group(group):
     ''' Displays information about this group. '''
-    if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
+    if flask.request.method == 'POST' and \
+        not pagure.APP.config.get('ENABLE_USER_MNGT', True):
         flask.abort(404)
 
     group_type = 'user'
