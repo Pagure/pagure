@@ -20,8 +20,23 @@ Contributors:
 Dependencies
 ------------
 
-The dependencies of pagure are listed in the file ``requirements.txt``
+Install the build dependencies of pagure:
+
+::
+
+  sudo dnf install git python-virtualenv libgit2-devel \
+                   libjpeg-devel gcc libffi-devel redhat-rpm-config
+
+
+The python dependencies of pagure are listed in the file ``requirements.txt``
 at the top level of the sources.
+
+::
+
+  virtualenv pagure_env
+  source ./pagure_env/bin/activate
+  pip install pygit2==<version of libgit2 found>.* # e.g. 0.23.*
+  pip install -r requirements.txt
 
 
 .. note:: working in a `virtualenv <http://www.virtualenv.org/en/latest/>`_
@@ -40,7 +55,7 @@ configuration.
 
 Create the database scheme::
 
-  ./createdb
+  ./createdb.py
 
 Create the folder that will receive the different git repositories:
 
@@ -53,14 +68,14 @@ Run the server:
 
 ::
 
-    ./runserver
+    ./runserver.py
 
 If you want to change some configuration key you can create a file, place
 the configuration change in it and use it with
 
 ::
 
-    ./runserver -c <config_file>
+    ./runserver.py -c <config_file>
 
 For example, create the file ``config`` with in it:
 
@@ -87,7 +102,7 @@ and run the server with:
 
 ::
 
-    ./runserver -c config
+    ./runserver.py -c config
 
 To get some profiling information you can also run it as:
 
