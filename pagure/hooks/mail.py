@@ -8,12 +8,10 @@
 
 """
 
-import os
-
+import flask_wtf as wtf
 import sqlalchemy as sa
 import pygit2
-import wtforms
-from flask.ext import wtf
+import wtforms\
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 

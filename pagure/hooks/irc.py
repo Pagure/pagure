@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014 - Copyright Red Hat Inc
+ (c) 2014-2016 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -10,10 +10,10 @@
 
 import os
 
+import flask_wtf as wtf
 import sqlalchemy as sa
 import pygit2
 import wtforms
-from flask.ext import wtf
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 

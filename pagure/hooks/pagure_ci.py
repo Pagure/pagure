@@ -8,18 +8,16 @@
 
 """
 
-import os
-
+import flask_wtf as wtf
 import sqlalchemy as sa
 import wtforms
-from flask.ext import wtf
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
 import pagure.lib
 from pagure.hooks import BaseHook, RequiredIf
 from pagure.lib.model import BASE, Project
-from pagure import get_repo_path, SESSION, APP
+from pagure import SESSION, APP
 
 
 class PagureCITable(BASE):
