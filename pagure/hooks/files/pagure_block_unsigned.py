@@ -54,7 +54,7 @@ def run_as_pre_receive_hook():
                 print 'Processing commit: %s' % commit
             signed = False
             for line in pagure.lib.git.read_git_lines(
-                ['log', '--no-walk', commit], abspath):
+                    ['log', '--no-walk', commit], abspath):
                 if line.lower().strip().startswith('signed-off-by'):
                     signed = True
                     break

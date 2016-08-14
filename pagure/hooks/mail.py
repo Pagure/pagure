@@ -66,8 +66,9 @@ class Mail(BaseHook):
     ''' Mail hooks. '''
 
     name = 'Mail'
-    description = 'Generate notification emails for pushes to a git repository. '\
-        'This hook sends emails describing changes introduced by pushes to a git repository.'
+    description = 'Generate notification emails for pushes to a git '\
+        'repository. This hook sends emails describing changes introduced '\
+        'by pushes to a git repository.'
     form = MailForm
     db_object = MailTable
     backref = 'mail_hook'

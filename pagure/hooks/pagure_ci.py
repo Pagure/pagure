@@ -60,7 +60,8 @@ class PagureCITable(BASE):
 
 
 tmpl = """
-{% if repo | hasattr('ci_hook') and repo.ci_hook and repo.ci_hook[0].pagure_ci_token %}
+{% if repo | hasattr('ci_hook') and repo.ci_hook and
+    repo.ci_hook[0].pagure_ci_token %}
 
 The token to be used by jenkins to trigger the build is:
 <pre>
