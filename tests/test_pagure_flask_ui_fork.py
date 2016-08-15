@@ -1972,6 +1972,50 @@ index 0000000..2a552bb
                 'Fork and Edit\n                    </button>\n',
                 output.data)
 
+    @patch('pagure.lib.notify.send_email')
+    def test_fork_without_main_repo(self, send_email):
+        """ Test the fork without the main repo. """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        item = pagure.lib.model.Project(
+            user_id=2,  # foo
+            name='test',
+            description='test project #1',
+            hook_token='aaabbb',
+            is_fork=True,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        tests.create_projects_git(
+            os.path.join(tests.HERE, 'repos', 'forks', 'foo'), bare=True)
+
+        # Create a git repo to play with
+        gitrepo = os.path.join(tests.HERE, 'repos', 'test.git')
+        self.assertFalse(os.path.exists(gitrepo))
+        os.makedirs(gitrepo)
+        repo = pygit2.init_repository(gitrepo, bare=True)
+
+        # Create a fork of this repo
+        newpath = tempfile.mkdtemp(prefix='pagure-fork-test')
+        gitrepo = os.path.join(tests.HERE, 'repos', 'forks', 'foo', 'test.git')
+        new_repo = pygit2.clone_repository(gitrepo, newpath)
+        tests.add_content_git_repo(gitrepo)
+
+        # UI test for deleted main
+        output = self.app.get('/fork/foo/test')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('Fork from a deleted repository\n', output.data)
+
+        output = self.app.get('/fork/foo/test/pull-requests')
+        self.assertEqual(output.status_code, 200)
+
+        # Testing commit endpoint
+        output = self.app.get('/fork/foo/test/commits/master')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('Commits <span class="label label-default"> 2</span>\n    </h3>\n', output.data)
+        shutil.rmtree(newpath)
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskForktests)
