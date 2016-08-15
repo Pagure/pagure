@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014 - Copyright Red Hat Inc
+ (c) 2014-2016 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -9,8 +9,9 @@
 """
 
 import re
-from flask.ext import wtf
+
 import flask
+import flask_wtf as wtf
 import wtforms
 import tempfile
 # pylint: disable=R0903,W0232,E1002

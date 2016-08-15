@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014 - Copyright Red Hat Inc
+ (c) 2014-2016 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -19,7 +19,7 @@
 # pylint: disable=W0232
 
 
-from flask.ext import wtf
+import flask_wtf as wtf
 import wtforms
 
 from pagure.forms import ConfirmationForm
