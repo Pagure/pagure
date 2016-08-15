@@ -70,7 +70,7 @@ def create_tables(db_url, alembic_ini=None, acls=None, debug=False):
     if db_url.startswith('sqlite:'):
         # Ignore the warning about con_record
         # pylint: disable=W0613
-        def _fk_pragma_on_connect(dbapi_con, con_record):  # pragma: no cover
+        def _fk_pragma_on_connect(dbapi_con, _):  # pragma: no cover
             ''' Tries to enforce referential constraints on sqlite. '''
             dbapi_con.execute('pragma foreign_keys=ON')
         sa.event.listen(engine, 'connect', _fk_pragma_on_connect)
@@ -1144,6 +1144,8 @@ class PullRequestComment(BASE):
         return self.pull_request
 
     def to_json(self, public=False):
+        ''' Return a dict representation of the pull-request comment. '''
+
         return {
             'id': self.id,
             'commit': self.commit_id,
