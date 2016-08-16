@@ -36,7 +36,7 @@
             <fieldset class="form-group">
               <label for="tags">Project tags</label>
               <input class="form-control" name="tags" value="{{ repo.tags_text |join(', ') if repo.tags else '' }}" />
-              <small class="text-muted">tags for project</small>
+              <small class="text-muted">tags for project (separated by commas)</small>
             </fieldset>
             <button class="btn btn-primary" type="submit" title="Update description">
               Update
