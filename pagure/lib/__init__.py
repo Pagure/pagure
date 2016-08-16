@@ -50,10 +50,10 @@ from pagure.lib import model
 REDIS = None
 PAGURE_CI = None
 
-def set_redis(host, port, db):
+def set_redis(host, port, dbname):
     """ Set the redis connection with the specified information. """
     global REDIS
-    pool = redis.ConnectionPool(host=host, port=port, db=db)
+    pool = redis.ConnectionPool(host=host, port=port, db=dbname)
     REDIS = redis.StrictRedis(connection_pool=pool)
 
 def set_pagure_ci(services):
@@ -178,6 +178,10 @@ def search_user(session, username=None, email=None, token=None, pattern=None):
 
 
 def create_user_ssh_keys_on_disk(user, gitolite_keydir):
+    ''' Create the ssh keys for the user on the specific folder.
+
+    This is the method allowing to have multiple ssh keys per user.
+    '''
     if gitolite_keydir:
         # First remove any old keyfiles for the user
         # Assumption: we populated the keydir. This means that files
@@ -1055,13 +1059,14 @@ def new_project(session, user, name, blacklist, allowed_prefix,
             userobj.default_email.encode('utf-8') if six.PY2 else userobj.fullname
         )
         content = u"# %s\n\n%s" % (name, description)
-        f = open(os.path.join(temp_gitrepo.workdir,"README.md"), 'wb')
-        f.write(content.encode('utf-8'))
-        f.close()
+        with open(os.path.join(temp_gitrepo.workdir, "README.md"), 'wb') \
+                as stream:
+            stream.write(content.encode('utf-8'))
         temp_gitrepo.index.add_all()
         temp_gitrepo.index.write()
         tree = temp_gitrepo.index.write_tree()
-        temp_gitrepo.create_commit('HEAD', author,author, 'Added the README', tree, [])
+        temp_gitrepo.create_commit(
+            'HEAD', author,author, 'Added the README', tree, [])
         pygit2.clone_repository(temp_gitrepo_path, gitrepo, bare=True)
         shutil.rmtree(temp_gitrepo_path)
 
@@ -1421,7 +1426,7 @@ def fork_project(session, user, repo, gitfolder,
     # Create the git-daemin-export-ok file on the clone
     http_clone_file = os.path.join(forkreponame, 'git-daemon-export-ok')
     if not os.path.exists(http_clone_file):
-        with open(http_clone_file, 'w') as stream:
+        with open(http_clone_file, 'w'):
             pass
 
     docrepo = os.path.join(docfolder, project.path)
@@ -2365,7 +2370,7 @@ def resend_pending_email(session, userobj, email):
             'This email address has already been confirmed'
         )
 
-    pending_email.token=pagure.lib.login.id_generator(40)
+    pending_email.token = pagure.lib.login.id_generator(40)
     session.add(pending_email)
     session.flush()
 
