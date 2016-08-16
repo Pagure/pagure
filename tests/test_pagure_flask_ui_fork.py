@@ -1978,14 +1978,29 @@ index 0000000..2a552bb
         send_email.return_value = True
 
         tests.create_projects(self.session)
+
+        # Create a fork with no parent i.e parent_id = None
         item = pagure.lib.model.Project(
             user_id=2,  # foo
             name='test',
             description='test project #1',
             hook_token='aaabbb',
             is_fork=True,
+            parent_id=None,
         )
         self.session.add(item)
+        self.session.commit()
+
+        # Get fork project
+        project = pagure.lib.get_project(self.session, 'test', 'foo')
+
+        # Pull-requests and issue-trackers are off for forks
+        # lib function is not used here so mannually turning them off
+        project_settings = project.settings
+        project_settings['pull_requests'] = False
+        project_settings['issue_tracker'] = False
+        project.settings = project_settings
+        self.session.add(project)
         self.session.commit()
 
         tests.create_projects_git(
@@ -2008,13 +2023,19 @@ index 0000000..2a552bb
         self.assertEqual(output.status_code, 200)
         self.assertIn('Fork from a deleted repository\n', output.data)
 
-        output = self.app.get('/fork/foo/test/pull-requests')
-        self.assertEqual(output.status_code, 200)
-
         # Testing commit endpoint
         output = self.app.get('/fork/foo/test/commits/master')
         self.assertEqual(output.status_code, 200)
         self.assertIn('Commits <span class="label label-default"> 2</span>\n    </h3>\n', output.data)
+
+        # Test pull-request endpoint
+        output = self.app.get('/fork/foo/test/pull-requests')
+        self.assertEqual(output.status_code, 404)
+
+        # Test issue-tracker endpoint
+        output = self.app.get('/fork/foo/test/issues')
+        self.assertEqual(output.status_code, 404)
+
         shutil.rmtree(newpath)
 
 if __name__ == '__main__':
