@@ -116,12 +116,17 @@ def index_auth():
         fork=True,
         count=True)
 
+    watch_list = pagure.lib.user_watch_list(
+        SESSION,
+        user=flask.g.fas_user.username)
+
     return flask.render_template(
         'index_auth.html',
         username=flask.g.fas_user.username,
         user=user,
         forks=forks,
         repos=repos,
+        watch_list=watch_list,
         repopage=repopage,
         forkpage=forkpage,
         repos_length=repos_length,

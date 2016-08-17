@@ -189,6 +189,34 @@
             </div>
             {% endfor %}
         </div>
+        <div class="card" id="watch_list">
+            <div class="card-header">
+                My Watch List <span class="label label-default">{{ watch_list | count }}</span>
+            </div>
+            {% for repo in watch_list %}
+              <div class="list-group">
+                {% if repo.is_fork %}
+                  <a class="list-group-item" href="{{ url_for(
+                    'view_repo', username=repo.user.username, repo=repo.name) }}">
+                    <div class=""><strong><span class="oi" data-glyph="fork">
+                            </span> &nbsp;{{ repo.user.username }}/{{ repo.name }}</strong>
+                    </div>
+                  </a>
+                {% else %}
+                  <a class="list-group-item" href="{{ url_for(
+                    'view_repo', repo=repo.name) }}">
+                    <div class=""><strong><span class="oi" data-glyph="document">
+                          </span> &nbsp;{{ repo.name }}</strong>
+                    </div>
+                  </a>
+                {% endif %}
+              </div>
+            {% else %}
+            <div class="card-block">
+                <p>No project in watch list</p>
+            </div>
+            {% endfor %}
+        </div>
       </div>
     </div>
   </div>

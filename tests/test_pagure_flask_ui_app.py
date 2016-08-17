@@ -91,7 +91,36 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(
                 output.data.count('<p>No group found</p>'), 1)
             self.assertEqual(
-                output.data.count('<div class="card-header">'), 3)
+                output.data.count('<div class="card-header">'), 4)
+
+    def test_watch_list(self):
+        ''' Test for watch list of a user '''
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/')
+            self.assertIn(
+                '<div class="text-xs-center">You have no projects</div>',
+                output.data)
+            self.assertIn(
+                '<p>You have no forks</p>',
+                output.data)
+            self.assertIn(
+                '<p>No project in watch list</p>',
+                output.data)
+
+            tests.create_projects(self.session)
+
+            output = self.app.get('/')
+            self.assertIn(
+                'My Projects <span class="label label-default">2</span>',
+                output.data)
+            self.assertIn(
+                'My Forks <span class="label label-default">0</span>',
+                output.data)
+            self.assertIn(
+                'My Watch List <span class="label label-default">2</span>',
+                output.data)
 
     def test_view_users(self):
         """ Test the view_users endpoint. """

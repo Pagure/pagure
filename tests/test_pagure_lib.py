@@ -2483,6 +2483,40 @@ class PagureLibtests(tests.Modeltests):
         self.assertFalse(watch)
 
 
+    def test_user_watch_list(self):
+        ''' test user watch list method of pagure.lib '''
+
+        tests.create_projects(self.session)
+
+        # He should be watching
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        watch_list_objs = pagure.lib.user_watch_list(
+            session=self.session,
+            user='pingou',
+        )
+        watch_list = [obj.name for obj in watch_list_objs]
+        self.assertEqual(watch_list, ['test', 'test2'])
+
+        # He isn't in the db, thus not watching anything
+        user.username = 'vivek'
+        watch_list_objs = pagure.lib.user_watch_list(
+            session=self.session,
+            user='vivek',
+        )
+        watch_list = [obj.name for obj in watch_list_objs]
+        self.assertEqual(watch_list, [])
+
+        # He shouldn't be watching anything
+        user.username = 'foo'
+        watch_list_objs = pagure.lib.user_watch_list(
+            session=self.session,
+            user='foo',
+        )
+        watch_list = [obj.name for obj in watch_list_objs]
+        self.assertEqual(watch_list, [])
+
+
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibtests)
     unittest.TextTestRunner(verbosity=2).run(SUITE)

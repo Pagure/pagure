@@ -2946,3 +2946,44 @@ def is_watching(session, user, reponame, repouser=None):
                 return True
 
     return False
+
+
+def user_watch_list(session, user):
+    ''' Returns list of all the projects which the user is watching '''
+
+    user_obj = search_user(session, username=user)
+    if not user_obj:
+        return []
+
+    unwatched = session.query(
+        model.Watcher
+    ).filter(
+        model.Watcher.user_id == user_obj.id
+    ).filter(
+        model.Watcher.watch == False
+    )
+
+    unwatched_list = []
+    if unwatched:
+        unwatched_list = [unwatch.project for unwatch in unwatched.all()]
+
+    watched = session.query(
+        model.Watcher
+    ).filter(
+        model.Watcher.user_id == user_obj.id
+    ).filter(
+        model.Watcher.watch == True
+    )
+
+    watched_list = []
+    if watched:
+        watched_list = [watch.project for watch in watched.all()]
+
+    user_projects = search_projects(session, username=user_obj.user)
+    watch = set(watched_list + user_projects)
+
+    for project in user_projects:
+        if project in unwatched_list:
+            watch.remove(project)
+
+    return sorted(list(watch), key=lambda proj: proj.name)
