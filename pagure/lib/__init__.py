@@ -44,7 +44,14 @@ import pagure.lib.notify
 import pagure.pfmarkdown
 from pagure.lib import model
 
+# too-many-branches
+# pylint: disable=R0912
+# too-many-arguments
 # pylint: disable=R0913
+# too-many-locals
+# pylint: disable=R0914
+# too-many-statements
+# pylint: disable=R0915
 
 
 REDIS = None
@@ -1059,14 +1066,14 @@ def new_project(session, user, name, blacklist, allowed_prefix,
             userobj.default_email.encode('utf-8') if six.PY2 else userobj.fullname
         )
         content = u"# %s\n\n%s" % (name, description)
-        with open(os.path.join(temp_gitrepo.workdir, "README.md"), 'wb') \
-                as stream:
+        readme_file = os.path.join(temp_gitrepo.workdir, "README.md")
+        with open(readme_file, 'wb') as stream:
             stream.write(content.encode('utf-8'))
         temp_gitrepo.index.add_all()
         temp_gitrepo.index.write()
         tree = temp_gitrepo.index.write_tree()
         temp_gitrepo.create_commit(
-            'HEAD', author,author, 'Added the README', tree, [])
+            'HEAD', author, author, 'Added the README', tree, [])
         pygit2.clone_repository(temp_gitrepo_path, gitrepo, bare=True)
         shutil.rmtree(temp_gitrepo_path)
 
@@ -1417,11 +1424,12 @@ def fork_project(session, user, repo, gitfolder,
     frepo = pygit2.clone_repository(reponame, forkreponame, bare=True)
     # Clone all the branches as well
     for branch in frepo.listall_branches(pygit2.GIT_BRANCH_REMOTE):
-        br = frepo.lookup_branch(branch, pygit2.GIT_BRANCH_REMOTE)
-        name = br.branch_name.replace(br.remote_name, '')[1:]
+        branch_obj = frepo.lookup_branch(branch, pygit2.GIT_BRANCH_REMOTE)
+        name = branch_obj.branch_name.replace(
+            branch_obj.remote_name, '')[1:]
         if name in frepo.listall_branches(pygit2.GIT_BRANCH_LOCAL):
             continue
-        frepo.create_branch(name, frepo.get(br.target.hex))
+        frepo.create_branch(name, frepo.get(branch_obj.target.hex))
 
     # Create the git-daemin-export-ok file on the clone
     http_clone_file = os.path.join(forkreponame, 'git-daemon-export-ok')
@@ -1489,7 +1497,7 @@ def search_projects(
                 model.User.id == model.Project.user_id,
             )
         )
-        q2 = session.query(
+        sub_q2 = session.query(
             model.Project.id
         ).filter(
             # User got commit right
@@ -1499,7 +1507,7 @@ def search_projects(
                 model.ProjectUser.project_id == model.Project.id
             )
         )
-        q3 = session.query(
+        sub_q3 = session.query(
             model.Project.id
         ).filter(
             # User created a group that has commit right
@@ -1511,7 +1519,7 @@ def search_projects(
                 model.Project.id == model.ProjectGroup.project_id,
             )
         )
-        q4 = session.query(
+        sub_q4 = session.query(
             model.Project.id
         ).filter(
             # User is part of a group that has commit right
@@ -1525,7 +1533,7 @@ def search_projects(
             )
         )
 
-        projects = projects.union(q2).union(q3).union(q4)
+        projects = projects.union(sub_q2).union(sub_q3).union(sub_q4)
 
     if fork is not None:
         if fork is True:
@@ -1706,7 +1714,7 @@ def search_issues(
                 ytags.append(tag)
 
         if ytags:
-            q2 = session.query(
+            sub_q2 = session.query(
                 sqlalchemy.distinct(model.Issue.uid)
             ).filter(
                 model.Issue.project_id == repo.id
@@ -1716,7 +1724,7 @@ def search_issues(
                 model.TagIssue.tag.in_(ytags)
             )
         if notags:
-            q3 = session.query(
+            sub_q3 = session.query(
                 sqlalchemy.distinct(model.Issue.uid)
             ).filter(
                 model.Issue.project_id == repo.id
@@ -1727,11 +1735,11 @@ def search_issues(
             )
         # Adjust the main query based on the parameters specified
         if ytags and not notags:
-            query = query.filter(model.Issue.uid.in_(q2))
+            query = query.filter(model.Issue.uid.in_(sub_q2))
         elif not ytags and notags:
-            query = query.filter(~model.Issue.uid.in_(q3))
+            query = query.filter(~model.Issue.uid.in_(sub_q3))
         elif ytags and notags:
-            final_set = set(q2.all()) - set(q3.all())
+            final_set = set(sub_q2.all()) - set(sub_q3.all())
             if final_set:
                 query = query.filter(model.Issue.uid.in_(list(final_set)))
 
@@ -2733,10 +2741,10 @@ def add_token_to_user(session, project, acls, username):
 def text2markdown(text, extended=True):
     """ Simple text to html converter using the markdown library.
     """
-    md = markdown.Markdown(safe_mode="escape")
+    md_processor = markdown.Markdown(safe_mode="escape")
     if extended:
         # Install our markdown modifications
-        md = markdown.Markdown(extensions=['pagure.pfmarkdown'])
+        md_processor = markdown.Markdown(extensions=['pagure.pfmarkdown'])
 
     if text:
         # Hack to allow blockquotes to be marked by ~~~
@@ -2749,7 +2757,7 @@ def text2markdown(text, extended=True):
             if indent:
                 line = '    %s' % line
             ntext.append(line)
-        return clean_input(md.convert('\n'.join(ntext)))
+        return clean_input(md_processor.convert('\n'.join(ntext)))
 
     return ''
 
@@ -2759,8 +2767,8 @@ def filter_img_src(name, value):
     if name in ('alt', 'height', 'width', 'class'):
         return True
     if name == 'src':
-        p = urlparse.urlparse(value)
-        return (not p.netloc) or p.netloc == urlparse.urlparse(
+        parsed = urlparse.urlparse(value)
+        return (not parsed.netloc) or parsed.netloc == urlparse.urlparse(
             pagure.APP.config['APP_URL']).netloc
     return False
 
@@ -2816,7 +2824,7 @@ def get_pull_request_of_user(session, username):
             model.User.id == model.Project.user_id,
         )
     )
-    q2 = session.query(
+    sub_q2 = session.query(
         model.Project.id
     ).filter(
         # User got commit right
@@ -2826,7 +2834,7 @@ def get_pull_request_of_user(session, username):
             model.ProjectUser.project_id == model.Project.id
         )
     )
-    q3 = session.query(
+    sub_q3 = session.query(
         model.Project.id
     ).filter(
         # User created a group that has commit right
@@ -2838,7 +2846,7 @@ def get_pull_request_of_user(session, username):
             model.Project.id == model.ProjectGroup.project_id,
         )
     )
-    q4 = session.query(
+    sub_q4 = session.query(
         model.Project.id
     ).filter(
         # User is part of a group that has commit right
@@ -2852,7 +2860,7 @@ def get_pull_request_of_user(session, username):
         )
     )
 
-    projects = projects.union(q2).union(q3).union(q4)
+    projects = projects.union(sub_q2).union(sub_q3).union(sub_q4)
 
     query = session.query(
         model.PullRequest
