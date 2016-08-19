@@ -10,14 +10,8 @@
 
 """
 
-import json
-import logging
-
-import requests
-
-from sqlalchemy.orm import scoped_session, sessionmaker
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import create_engine
+# too-many-locals
+# pylint: disable=R0914
 
 import pagure.exceptions
 import pagure.lib
@@ -80,7 +74,7 @@ def process_jenkins_build(session, project, build_id, requestfolder):
 
     comment, percent = BUILD_STATS[result]
 
-    message = pagure.lib.add_pull_request_flag(
+    pagure.lib.add_pull_request_flag(
         session,
         request=request,
         username=project.ci_hook[0].ci_type,
