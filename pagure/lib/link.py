@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015 - Copyright Red Hat Inc
+ (c) 2015-2016 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
+
+# too-many-arguments
+# pylint: disable=R0913
 
 
 import re
