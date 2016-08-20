@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015 - Copyright Red Hat Inc
+ (c) 2015-2016 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -16,7 +16,6 @@ import os
 import shutil
 import subprocess
 import tempfile
-import re
 
 import pygit2
 import werkzeug
@@ -30,7 +29,19 @@ import pagure.lib.notify
 from pagure.lib import model
 from pagure.lib.repo import PagureRepo
 
-# pylint: disable=R0913,E1101,R0914
+
+# too-many-branches
+# pylint: disable=R0912
+# too-many-arguments
+# pylint: disable=R0913
+# too-many-locals
+# pylint: disable=R0914
+# too-many-statements
+# pylint: disable=R0915
+# no-member
+# pylint: disable=E1101
+# C0302
+# pylint: disable=C0302
 
 
 def commit_to_patch(repo_obj, commits):
@@ -189,11 +200,11 @@ def update_git(obj, repo, repofolder):
     # Retrieve the list of files that changed
     diff = new_repo.diff()
     files = []
-    for p in diff:
-        if hasattr(p, 'new_file_path'):
-            files.append(p.new_file_path)
-        elif hasattr(p, 'delta'):
-            files.append(p.delta.new_file.path)
+    for patch in diff:
+        if hasattr(patch, 'new_file_path'):
+            files.append(patch.new_file_path)
+        elif hasattr(patch, 'delta'):
+            files.append(patch.delta.new_file.path)
 
     # Add the changes to the index
     if added:
@@ -380,6 +391,8 @@ def get_project_from_json(
                 user=user.username)
 
         else:
+            gitfolder = os.path.join(
+                gitfolder, 'forks', user.username) if parent else gitfolder
             pagure.lib.new_project(
                 session,
                 user=user.username,
@@ -387,8 +400,8 @@ def get_project_from_json(
                 description=jsondata.get('description'),
                 parent_id=parent.id if parent else None,
                 blacklist=pagure.APP.config.get('BLACKLISTED_PROJECTS', []),
-                gitfolder=os.path.join(gitfolder, 'forks', user.username)
-                    if parent else gitfolder,
+                allowed_prefix=pagure.APP.config.get('ALLOWED_PREFIX', []),
+                gitfolder=gitfolder,
                 docfolder=docfolder,
                 ticketfolder=ticketfolder,
                 requestfolder=requestfolder,
@@ -738,11 +751,11 @@ def update_file_in_git(
     # Retrieve the list of files that changed
     diff = new_repo.diff()
     files = []
-    for p in diff:
-        if hasattr(p, 'new_file_path'):
-            files.append(p.new_file_path)
-        elif hasattr(p, 'delta'):
-            files.append(p.delta.new_file.path)
+    for patch in diff:
+        if hasattr(patch, 'new_file_path'):
+            files.append(patch.new_file_path)
+        elif hasattr(patch, 'delta'):
+            files.append(patch.delta.new_file.path)
 
     # Add the changes to the index
     added = False
@@ -1176,11 +1189,14 @@ def diff_pull_request(
                         if i.oid.hex == request.commit_stop:
                             break
                         new_commits_count = new_commits_count + 1
-                        commenttext = '%s * %s\n' % (commenttext, i.message.strip().split('\n')[0])
+                        commenttext = '%s * %s\n' % (
+                            commenttext, i.message.strip().split('\n')[0])
                     if new_commits_count == 1:
-                        commenttext = "**%d new commit added**\n\n%s" % (new_commits_count, commenttext)
+                        commenttext = "**%d new commit added**\n\n%s" % (
+                            new_commits_count, commenttext)
                     else:
-                        commenttext = "**%d new commits added**\n\n%s" % (new_commits_count, commenttext)
+                        commenttext = "**%d new commits added**\n\n%s" % (
+                            new_commits_count, commenttext)
                 if request.commit_start and \
                         request.commit_start != first_commit.oid.hex:
                     commenttext = 'rebased'
@@ -1272,7 +1288,7 @@ def get_git_tags_objects(project):
 
             tags[commit_time] = {
                 "object": repo_obj[repo_obj.lookup_reference(tag).target],
-                "tagname": tag.replace("refs/tags/",""),
+                "tagname": tag.replace("refs/tags/", ""),
                 "date": commit_time,
                 "objecttype": objecttype,
                 "head_msg": None,
