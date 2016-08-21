@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2015 - Copyright Red Hat Inc
+ (c) 2014-2016 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -40,7 +40,16 @@ BASE = declarative_base(metadata=MetaData(naming_convention=CONVENTION))
 
 ERROR_LOG = logging.getLogger('pagure.model')
 
-# pylint: disable=C0103,R0903,W0232,E1101
+# invalid-name  - hit w/ all the id field we use
+# pylint: disable=C0103
+# too-few-public-methods
+# pylint: disable=R0903
+# no-init
+# pylint: disable=W0232
+# no-member
+# pylint: disable=E1101
+# too-many-lines
+# pylint: disable=C0302
 
 
 def create_tables(db_url, alembic_ini=None, acls=None, debug=False):
@@ -731,10 +740,15 @@ class IssueComment(BASE):
             order_by="IssueComment.date_created"
         ),
     )
-    user = relation('User', foreign_keys=[user_id],
-                    remote_side=[User.id], backref='comment_issues')
-    editor = relation('User', foreign_keys=[editor_id],
-                         remote_side=[User.id])
+    user = relation(
+        'User',
+        foreign_keys=[user_id],
+        remote_side=[User.id],
+        backref='comment_issues')
+    editor = relation(
+        'User',
+        foreign_keys=[editor_id],
+        remote_side=[User.id])
 
     @property
     def mail_id(self):
@@ -1122,13 +1136,16 @@ class PullRequestComment(BASE):
     pull_request = relation(
         'PullRequest',
         backref=backref(
-            'comments', cascade="delete, delete-orphan",
+            'comments',
+            cascade="delete, delete-orphan",
             order_by="PullRequestComment.date_created"
         ),
         foreign_keys=[pull_request_uid],
         remote_side=[PullRequest.uid])
-    editor = relation('User', foreign_keys=[editor_id],
-                         remote_side=[User.id])
+    editor = relation(
+        'User',
+        foreign_keys=[editor_id],
+        remote_side=[User.id])
 
     @property
     def mail_id(self):
