@@ -76,7 +76,7 @@ class PagureRepo(pygit2.Repository):
                 else:
                     pagure.LOG.debug(
                         'Un-expected merge result: %s' % (
-                        pygit2.GIT_MERGE_ANALYSIS_NORMAL))
+                            pygit2.GIT_MERGE_ANALYSIS_NORMAL))
                     raise AssertionError('Unknown merge analysis result')
 
     def run_hook(self, old, new, ref, username):

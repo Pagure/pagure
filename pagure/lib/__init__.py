@@ -16,6 +16,8 @@
 # pylint: disable=R0914
 # too-many-statements
 # pylint: disable=R0915
+# too-many-lines
+# pylint: disable=C0302
 
 
 try:

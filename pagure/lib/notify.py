@@ -1,13 +1,19 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2015 - Copyright Red Hat Inc
+ (c) 2014-2016 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
 
 pagure notifications.
 """
+
+# too-many-branches
+# pylint: disable=R0912
+# too-many-arguments
+# pylint: disable=R0913
+
 
 import datetime
 import hashlib
@@ -19,8 +25,6 @@ import time
 import warnings
 
 import flask
-import requests
-import six
 import pagure
 
 from email.mime.text import MIMEText
@@ -66,8 +70,8 @@ def _add_mentioned_users(emails, comment):
     ''' Check the comment to see if an user is mentioned in it and if
     so add this user to the list of people to notify.
     '''
-    MENTION_RE = r'@(\w+)'
-    for username in re.findall(MENTION_RE, comment):
+    mentio_re = r'@(\w+)'
+    for username in re.findall(mentio_re, comment):
         user = pagure.lib.search_user(pagure.SESSION, username=username)
         if user:
             emails.add(user.default_email)
