@@ -8,6 +8,16 @@
 
 """
 
+# too-many-branches
+# pylint: disable=R0912
+# too-many-arguments
+# pylint: disable=R0913
+# too-many-locals
+# pylint: disable=R0914
+# too-many-statements
+# pylint: disable=R0915
+
+
 try:
     import simplejson as json
 except ImportError:
@@ -43,15 +53,6 @@ import pagure.lib.login
 import pagure.lib.notify
 import pagure.pfmarkdown
 from pagure.lib import model
-
-# too-many-branches
-# pylint: disable=R0912
-# too-many-arguments
-# pylint: disable=R0913
-# too-many-locals
-# pylint: disable=R0914
-# too-many-statements
-# pylint: disable=R0915
 
 
 REDIS = None
