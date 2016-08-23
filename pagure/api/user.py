@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015 - Copyright Red Hat Inc
+ (c) 2015-2016 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -13,7 +13,7 @@ import flask
 import pagure
 import pagure.exceptions
 import pagure.lib
-from pagure import APP, SESSION
+from pagure import SESSION
 from pagure.api import API, api_method, APIERROR
 
 
@@ -86,10 +86,6 @@ def api_view_user(username):
         forkpage = int(forkpage)
     except ValueError:
         forkpage = 1
-
-    limit = APP.config['ITEM_PER_PAGE']
-    repo_start = limit * (repopage - 1)
-    fork_start = limit * (forkpage - 1)
 
     repos = pagure.lib.search_projects(
         SESSION,

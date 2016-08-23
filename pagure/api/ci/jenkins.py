@@ -12,7 +12,6 @@ import flask
 
 from cryptography.hazmat.primitives import constant_time
 from kitchen.text.converters import to_bytes
-from sqlalchemy.exc import SQLAlchemyError
 
 import pagure
 import pagure.exceptions
@@ -22,9 +21,10 @@ from pagure import APP, SESSION
 from pagure.api import API, APIERROR
 
 
-
-@API.route('/ci/jenkins/<repo:repo>/<pagure_ci_token>/build-finished', methods=['POST'])
-@API.route('/ci/jenkins/forks/<username>/<repo:repo>/<pagure_ci_token>/build-finished', methods=['POST'])
+@API.route('/ci/jenkins/<repo:repo>/<pagure_ci_token>/build-finished',
+           methods=['POST'])
+@API.route('/ci/jenkins/forks/<username>/<repo:repo>/'
+           '<pagure_ci_token>/build-finished', methods=['POST'])
 def jenkins_ci_notification(repo, pagure_ci_token, username=None):
     """
     Jenkins Build Notification
@@ -40,20 +40,22 @@ def jenkins_ci_notification(repo, pagure_ci_token, username=None):
 
     project = pagure.lib.get_project(SESSION, repo, user=username)
     if repo is None:
-        flask.abort(404, 'Project not found')
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
     if not constant_time.bytes_eq(
-          to_bytes(pagure_ci_token),
-          to_bytes(project.ci_hook[0].pagure_ci_token)):
-        return ('Token mismatch', 401)
+            to_bytes(pagure_ci_token),
+            to_bytes(project.ci_hook[0].pagure_ci_token)):
+        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
     data = flask.request.get_json()
     if not data:
-        flask.abort(400, "Bad Request: No JSON retrived")
+        APP.logger.debug("Bad Request: No JSON retrived")
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
 
     build_id = data.get('build', {}).get('number')
     if not build_id:
-        flask.abort(400, "Bad Request: No build ID retrived")
+        APP.logger.debug("Bad Request: No build ID retrived")
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
 
     try:
         lib_ci.process_jenkins_build(
@@ -64,7 +66,8 @@ def jenkins_ci_notification(repo, pagure_ci_token, username=None):
         )
     except pagure.exceptions.PagureException as err:
         APP.logger.error('Error processing jenkins notification', exc_info=err)
-        flask.abort(400, "Bad Request: %s" % err)
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.ENOCODE, error=str(err))
 
     APP.logger.info('Successfully proccessed jenkins notification')
     return ('', 204)

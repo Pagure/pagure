@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015 - Copyright Red Hat Inc
+ (c) 2015-2016 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -9,6 +9,15 @@
 API namespace version 0.
 
 """
+
+# invalid-name
+# pylint: disable=C0103
+# too-few-public-methods
+# pylint: disable=R0903
+# no-member
+# pylint: disable=E1101
+# too-many-locals
+# pylint: disable=R0914
 
 import codecs
 import functools
@@ -34,8 +43,8 @@ def preload_docs(endpoint):
 
     here = os.path.dirname(os.path.abspath(__file__))
     fname = os.path.join(here, '..', 'doc', endpoint + '.rst')
-    with codecs.open(fname, 'r', 'utf-8') as f:
-        rst = f.read()
+    with codecs.open(fname, 'r', 'utf-8') as stream:
+        rst = stream.read()
 
     rst = modify_rst(rst)
     api_docs = docutils.examples.html_body(rst)
@@ -123,17 +132,17 @@ def api_login_required(acls=None):
     API endpoint.
     '''
 
-    def decorator(fn):
+    def decorator(function):
         ''' The decorator of the function '''
 
-        @functools.wraps(fn)
+        @functools.wraps(function)
         def decorated_function(*args, **kwargs):
             ''' Actually does the job with the arguments provided. '''
 
             response = check_api_acls(acls)
             if response:
                 return response
-            return fn(*args, **kwargs)
+            return function(*args, **kwargs)
 
         return decorated_function
 
@@ -145,17 +154,17 @@ def api_login_optional(acls=None):
     API endpoint.
     '''
 
-    def decorator(fn):
+    def decorator(function):
         ''' The decorator of the function '''
 
-        @functools.wraps(fn)
+        @functools.wraps(function)
         def decorated_function(*args, **kwargs):
             ''' Actually does the job with the arguments provided. '''
 
             response = check_api_acls(acls, optional=True)
             if response:
                 return response
-            return fn(*args, **kwargs)
+            return function(*args, **kwargs)
 
         return decorated_function
 
@@ -167,27 +176,28 @@ def api_method(function):
 
     @functools.wraps(function)
     def wrapper(*args, **kwargs):
+        ''' Actually does the job with the arguments provided. '''
         try:
             result = function(*args, **kwargs)
-        except APIError as e:
-            if e.error_code in [APIERROR.EDBERROR]:
-                APP.logger.exception(e)
+        except APIError as err:
+            if err.error_code in [APIERROR.EDBERROR]:
+                APP.logger.exception(err)
 
-            if e.error_code in [APIERROR.ENOCODE]:
+            if err.error_code in [APIERROR.ENOCODE]:
                 response = flask.jsonify(
                     {
-                        'error': e.error,
-                        'error_code': e.error_code.name
+                        'error': err.error,
+                        'error_code': err.error_code.name
                     }
                 )
             else:
                 response = flask.jsonify(
                     {
-                        'error': e.error_code.value,
-                        'error_code': e.error_code.name,
+                        'error': err.error_code.value,
+                        'error_code': err.error_code.name,
                     }
                 )
-            response.status_code = e.status_code
+            response.status_code = err.status_code
         else:
             response = result
 
@@ -274,13 +284,13 @@ def api_users():
     return flask.jsonify(
         {
             'total_users': len(users),
-            'users': [user.username for user in users],
+            'users': [usr.username for usr in users],
             'mention': [{
-                'username': user.username,
-                'name': user.fullname,
-                'image': pagure.lib.avatar_url_from_openid(user.default_email,
+                'username': usr.username,
+                'name': usr.fullname,
+                'image': pagure.lib.avatar_url_from_openid(usr.default_email,
                                                            size=16)
-            } for user in users]
+            } for usr in users]
         }
     )
 
@@ -437,10 +447,10 @@ def api():
         issues.append(load_doc(issue.api_view_issue_comment))
         issues.append(load_doc(issue.api_comment_issue))
 
-    ci = []
+    ci_doc = []
     if pagure.APP.config.get('PAGURE_CI_SERVICES', True):
         if 'jenkins' in pagure.APP.config['PAGURE_CI_SERVICES']:
-            ci.append(load_doc(jenkins.jenkins_ci_notification))
+            ci_doc.append(load_doc(jenkins.jenkins_ci_notification))
 
     api_pull_request_views_doc = load_doc(fork.api_pull_request_views)
     api_pull_request_view_doc = load_doc(fork.api_pull_request_view)
@@ -491,7 +501,7 @@ def api():
             api_view_user_doc,
             api_groups_doc,
         ],
-        ci=ci,
+        ci=ci_doc,
         extras=extras,
     )
 
