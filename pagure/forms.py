@@ -30,14 +30,15 @@ def file_virus_validator(form, field):
         return
     from pyclamd import ClamdUnixSocket
 
-    if not field.name in flask.request.files or \
+    if field.name not in flask.request.files or \
             flask.request.files[field.name].filename == '':
         # If no file was uploaded, this field is correct
         return
     uploaded = flask.request.files[field.name]
     clam = ClamdUnixSocket()
     if not clam.ping():
-        raise wtforms.ValidationError('Unable to communicate with virus scanner')
+        raise wtforms.ValidationError(
+            'Unable to communicate with virus scanner')
     results = clam.scan_stream(uploaded.stream.read())
     if results is None:
         uploaded.stream.seek(0)
@@ -456,6 +457,7 @@ class DefaultBranchForm(wtf.Form):
             self.branches.choices = [
                 (branch, branch) for branch in kwargs['branches']
             ]
+
 
 class EditCommentForm(wtf.Form):
     """ Form to verify that comment is not empty

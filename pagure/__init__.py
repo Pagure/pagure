@@ -56,7 +56,7 @@ if APP.config.get('THEME_TEMPLATE_FOLDER', False):
     # That's what we do here
     template_folder = APP.config['THEME_TEMPLATE_FOLDER']
     if template_folder[0] != '/':
-        template_folder= os.path.join(
+        template_folder = os.path.join(
             APP.root_path, APP.template_folder, template_folder)
     import jinja2
     # Jinja looks for the template in the order of the folders specified
@@ -70,7 +70,7 @@ if APP.config.get('THEME_TEMPLATE_FOLDER', False):
 if APP.config.get('THEME_STATIC_FOLDER', False):
     static_folder = APP.config['THEME_STATIC_FOLDER']
     if static_folder[0] != '/':
-        static_folder= os.path.join(
+        static_folder = os.path.join(
             APP.root_path, 'static', static_folder)
     # Unlike templates, to serve static files from multiples folders we
     # need flask-multistatic
@@ -87,7 +87,7 @@ class RepoConverter(BaseConverter):
     :param map: the :class:`Map`.
     """
     regex = r'[^/]*(/[^/]+)?'
-    #weight = 200
+    # weight = 200
 
 
 APP.url_map.converters['repo'] = RepoConverter
@@ -418,7 +418,8 @@ def auth_login():  # pragma: no cover
         if not APP.config.get('ENABLE_GROUP_MNGT', False):
             groups = [
                 group.group_name
-                for group in pagure.lib.search_groups(SESSION, group_type='user')
+                for group in pagure.lib.search_groups(
+                    SESSION, group_type='user')
             ]
         groups = set(groups).union(admins)
         return FAS.login(return_url=return_point, groups=groups)

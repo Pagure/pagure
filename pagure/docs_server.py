@@ -135,7 +135,6 @@ def view_docs(repo, username=None, filename=None):
 
     repo_obj = pygit2.Repository(reponame)
 
-
     if not repo_obj.is_empty:
         commit = repo_obj[repo_obj.head.target]
     else:
