@@ -332,8 +332,7 @@ def get_pull_request_ready_branch():
 
 
 @PV.route('/<repo>/issue/template', methods=['POST'])
-@PV.route('/fork/<username>/<repo>/issue/template',
-           methods=['POST'])
+@PV.route('/fork/<username>/<repo>/issue/template', methods=['POST'])
 def get_ticket_template(repo, username=None):
     """ Return the template asked for the specified project
     """
@@ -387,7 +386,7 @@ def get_ticket_template(repo, username=None):
                 bail_on_tree=True)
             if content_file:
                 content, _ = pagure.doc_utils.convert_readme(
-                        content_file.data, 'md')
+                    content_file.data, 'md')
     if content:
         response = flask.jsonify({
             'code': 'OK',
