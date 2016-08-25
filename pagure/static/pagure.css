@@ -560,6 +560,7 @@ th[data-sort] {
 }
 @media (min-width:1200px) {
 .pr_comment_form .card, .inline-pr-comment .card{max-width:680px}
+}
 
 #watch_project a {
   cursor: pointer;
@@ -569,4 +570,8 @@ th[data-sort] {
     padding: 6px 0;
     line-height: 1.42857143;
     vertical-align: middle;
+}
+
+a.nav-link.btn{
+  color:white!important;
 }

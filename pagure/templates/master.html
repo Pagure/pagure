@@ -34,25 +34,25 @@
   <nav class="navbar navbar-light p-t-0 p-b-0">
       <div class="container">
         <ul class="nav navbar-nav nav-underline pull-xs-right">
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('browse_projects') }}">Browse</a>
-          </li>
-          {% if admin %}
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('admin_index') }}">Admin</a>
-          </li>
-          {% endif %}
-          {% if config.get('ENABLE_NEW_PROJECTS', True) %}
-          <li class="nav-item p-l-1">
-            <a class="nav-link" href="{{ url_for('new_project') }}">
-                <span class="oi" data-glyph="plus" title="Create New"
-                    aria-hidden="true">
-                </span>
-            </a>
-          </li>
-          {% endif %}
           {% if not nologin %}
             {% if g.fas_user %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('browse_projects') }}">Browse</a>
+            </li>
+            {% if admin %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('admin_index') }}">Admin</a>
+            </li>
+            {% endif %}
+            {% if config.get('ENABLE_NEW_PROJECTS', True) %}
+            <li class="nav-item p-l-1">
+              <a class="nav-link" href="{{ url_for('new_project') }}">
+                  <span class="oi" data-glyph="plus" title="Create New"
+                      aria-hidden="true">
+                  </span>
+              </a>
+            </li>
+            {% endif %}
             <li class="nav-item dropdown p-l-1">
                   <a class="nav-link dropdown-toggle" data-toggle="dropdown"
                      href="#" role="button" aria-haspopup="true" aria-expanded="false">
@@ -72,9 +72,9 @@
                      <a href="{{ url_for('auth_logout') }}?next={{request.url}}">log out</a> -->
             {% else %}
             <li class="nav-item p-l-1">
-              <a class="nav-link" href="{{ url_for('auth_login') }}?next={{request.url}}">
-              Login
-              </a>
+                <a class="nav-link btn btn-primary" href="{{ url_for('auth_login') }}?next={{request.url}}">
+                Log In
+                </a>
             </li>
             {% endif %}
          {% endif %}
