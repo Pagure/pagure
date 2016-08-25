@@ -60,11 +60,13 @@ from pagure.lib import model
 REDIS = None
 PAGURE_CI = None
 
+
 def set_redis(host, port, dbname):
     """ Set the redis connection with the specified information. """
     global REDIS
     pool = redis.ConnectionPool(host=host, port=port, db=dbname)
     REDIS = redis.StrictRedis(connection_pool=pool)
+
 
 def set_pagure_ci(services):
     """ Set the list of CI services supported by this pagure instance. """
@@ -872,7 +874,8 @@ def add_pull_request_comment(session, request, commit, tree_id, filename,
             'comment_id': pr_comment.id,
             'avatar_url': avatar_url_from_openid(
                 pr_comment.user.default_email, size=16),
-            'comment_date': pr_comment.date_created.strftime('%Y-%m-%d %H:%M:%S'),
+            'comment_date': pr_comment.date_created.strftime(
+                '%Y-%m-%d %H:%M:%S'),
             'commit_id': commit,
             'filename': filename,
             'line': row,
@@ -955,7 +958,8 @@ def edit_comment(session, parent, comment, user,
                 'comment_editor': user_obj.user,
                 'avatar_url': avatar_url_from_openid(
                     comment.user.default_email, size=16),
-                'comment_date': comment.edited_on.strftime('%Y-%m-%d %H:%M:%S'),
+                'comment_date': comment.edited_on.strftime(
+                    '%Y-%m-%d %H:%M:%S'),
             }))
 
     return "Comment updated"
@@ -1065,8 +1069,10 @@ def new_project(session, user, name, blacklist, allowed_prefix,
         temp_gitrepo_path = tempfile.mkdtemp(prefix='pagure-')
         temp_gitrepo = pygit2.init_repository(temp_gitrepo_path, bare=False)
         author = pygit2.Signature(
-            userobj.fullname.encode('utf-8') if six.PY2 else userobj.fullname,
-            userobj.default_email.encode('utf-8') if six.PY2 else userobj.fullname
+            userobj.fullname.encode('utf-8')
+            if six.PY2 else userobj.fullname,
+            userobj.default_email.encode('utf-8')
+            if six.PY2 else userobj.fullname
         )
         content = u"# %s\n\n%s" % (name, description)
         readme_file = os.path.join(temp_gitrepo.workdir, "README.md")
@@ -1414,7 +1420,7 @@ def fork_project(session, user, repo, gitfolder,
         hook_token=pagure.lib.login.id_generator(40)
     )
 
-    #disable issues, PRs in the fork by default
+    # disable issues, PRs in the fork by default
     default_repo_settings = project.settings
     default_repo_settings['issue_tracker'] = False
     default_repo_settings['pull_requests'] = False
@@ -2874,6 +2880,7 @@ def get_pull_request_of_user(session, username):
     )
 
     return query.all()
+
 
 def update_watch_status(session, project, user, watch):
     ''' Update the user status for watching a project.

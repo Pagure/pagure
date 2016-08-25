@@ -1127,7 +1127,6 @@ def merge_pull_request(
             shutil.rmtree(newpath)
             return 'MERGE'
 
-
     # Update status
     pagure.lib.close_pull_request(
         session, request, username,
