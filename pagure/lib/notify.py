@@ -194,14 +194,17 @@ def send_email(text, subject, to_mail,
         subject_tag = 'Pagure'
 
     if pagure.APP.config['SMTP_SSL']:
-        smtp = smtplib.SMTP_SSL(pagure.APP.config['SMTP_SERVER'], pagure.APP.config['SMTP_PORT'])
+        smtp = smtplib.SMTP_SSL(
+            pagure.APP.config['SMTP_SERVER'], pagure.APP.config['SMTP_PORT'])
     else:
-        smtp = smtplib.SMTP(pagure.APP.config['SMTP_SERVER'], pagure.APP.config['SMTP_PORT'])
+        smtp = smtplib.SMTP(
+            pagure.APP.config['SMTP_SERVER'], pagure.APP.config['SMTP_PORT'])
 
     for mailto in to_mail.split(','):
         msg = MIMEText(text.encode('utf-8'), 'plain', 'utf-8')
         msg['Subject'] = '[%s] %s' % (subject_tag, subject)
-        from_email = pagure.APP.config.get('FROM_EMAIL', 'pagure@fedoraproject.org')
+        from_email = pagure.APP.config.get(
+            'FROM_EMAIL', 'pagure@fedoraproject.org')
         msg['From'] = from_email
 
         if mail_id:
@@ -224,8 +227,12 @@ def send_email(text, subject, to_mail,
             mhash.hexdigest(),
             pagure.APP.config['DOMAIN_EMAIL_NOTIFICATIONS'])
         try:
-            if pagure.APP.config['SMTP_USERNAME'] and pagure.APP.config['SMTP_PASSWORD']:
-                smtp.login(pagure.APP.config['SMTP_USERNAME'], pagure.APP.config['SMTP_PASSWORD'])
+            if pagure.APP.config['SMTP_USERNAME'] \
+                    and pagure.APP.config['SMTP_PASSWORD']:
+                smtp.login(
+                    pagure.APP.config['SMTP_USERNAME'],
+                    pagure.APP.config['SMTP_PASSWORD']
+                )
 
             smtp.sendmail(
                 from_email,

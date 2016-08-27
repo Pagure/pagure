@@ -106,7 +106,8 @@ def create_default_status(session, acls=None):
     """ Insert the defaults status in the status tables.
     """
 
-    for status in ['Open', 'Invalid', 'Insufficient data', 'Fixed', 'Duplicate']:
+    statuses = ['Open', 'Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
+    for status in statuses:
         ticket_stat = StatusIssue(status=status)
         session.add(ticket_stat)
         try:
@@ -478,7 +479,6 @@ class Project(BASE):
             Issue.private == False
         ).count()
 
-
     def to_json(self, public=False, api=False):
         ''' Return a representation of the project as JSON.
         '''
@@ -633,7 +633,10 @@ class Issue(BASE):
     def user_comments(self):
         ''' Return user comments only, filter it from notifications
         '''
-        return [comment for comment in self.comments if not comment.notification]
+        return [
+            comment
+            for comment in self.comments
+            if not comment.notification]
 
     def to_json(self, public=False, with_comments=True):
         ''' Returns a dictionary representation of the issue.
@@ -773,8 +776,10 @@ class IssueComment(BASE):
             'parent': self.parent_id,
             'date_created': self.date_created.strftime('%s'),
             'user': self.user.to_json(public=public),
-            'edited_on': self.edited_on.strftime('%s') if self.edited_on else None,
-            'editor': self.editor.to_json(public=public) if self.editor_id else None,
+            'edited_on': self.edited_on.strftime('%s')
+            if self.edited_on else None,
+            'editor': self.editor.to_json(public=public)
+            if self.editor_id else None,
             'notification': self.notification,
         }
         return output
@@ -1033,7 +1038,10 @@ class PullRequest(BASE):
     def user_comments(self):
         ''' Return user comments only, filter it from notifications
         '''
-        return [comment for comment in self.comments if not comment.notification]
+        return [
+            comment
+            for comment in self.comments
+            if not comment.notification]
 
     def to_json(self, public=False, api=False, with_comments=True):
         ''' Returns a dictionnary representation of the pull-request.
@@ -1173,8 +1181,10 @@ class PullRequestComment(BASE):
             'parent': self.parent_id,
             'date_created': self.date_created.strftime('%s'),
             'user': self.user.to_json(public=public),
-            'edited_on': self.edited_on.strftime('%s') if self.edited_on else None,
-            'editor': self.editor.to_json(public=public) if self.editor_id else None,
+            'edited_on': self.edited_on.strftime('%s')
+            if self.edited_on else None,
+            'editor': self.editor.to_json(public=public)
+            if self.editor_id else None,
             'notification': self.notification,
         }
 
@@ -1349,10 +1359,8 @@ class ProjectGroup(BASE):
         primary_key=True)
 
     # Constraints
-    __table_args__ = (
-        sa.UniqueConstraint(
-            'project_id', 'group_id'),
-    )
+    __table_args__ = (sa.UniqueConstraint('project_id', 'group_id'),)
+
 
 class Watcher(BASE):
     """ Stores the user of a projects.
