@@ -84,7 +84,7 @@ def index_auth():
     try:
         repopage = int(repopage)
         if repopage < 1:
-            page = 1
+            repopage = 1
     except ValueError:
         repopage = 1
 
@@ -92,7 +92,7 @@ def index_auth():
     try:
         forkpage = int(forkpage)
         if forkpage < 1:
-            page = 1
+            forkpage = 1
     except ValueError:
         forkpage = 1
 
@@ -381,7 +381,7 @@ def new_project():
         create_readme = form.create_readme.data
 
         try:
-            message = pagure.lib.new_project(
+            pagure.lib.new_project(
                 SESSION,
                 name=name,
                 description=description,

@@ -1,12 +1,20 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014 - Copyright Red Hat Inc
+ (c) 2014-2016 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
+
+# too-many-branches
+# pylint: disable=R0912
+# too-many-arguments
+# pylint: disable=R0913
+# too-many-locals
+# pylint: disable=R0914
+
 
 import datetime
 import textwrap
@@ -94,18 +102,19 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
         if filename and commit:
             output.append(
                 '<tr id="c-%(commit)s-%(cnt_lbl)s"><td class="cell1">'
-                '<a id="%(cnt)s" href="#%(cnt)s" data-line-number="%(cnt_lbl)s"></a></td>'
+                '<a id="%(cnt)s" href="#%(cnt)s" data-line-number='
+                '"%(cnt_lbl)s"></a></td>'
                 '<td class="prc" data-row="%(cnt_lbl)s"'
                 ' data-filename="%(filename)s" data-commit="%(commit)s"'
                 ' data-tree="%(tree_id)s">'
                 '<p>'
-                '<span class="oi prc_img" data-glyph="comment-square" alt="Add comment" title="Add comment"></span>'
+                '<span class="oi prc_img" data-glyph="comment-square" '
+                'alt="Add comment" title="Add comment"></span>'
                 '</p>'
                 '</td>' % (
                     {
                         'cnt': '%s_%s' % (index, cnt),
                         'cnt_lbl': cnt,
-                        'img': flask.url_for('static', filename='users.png'),
                         'filename': filename.decode('UTF-8'),
                         'commit': commit,
                         'tree_id': tree_id,
@@ -115,7 +124,8 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
         else:
             output.append(
                 '<tr><td class="cell1">'
-                '<a id="%(cnt)s" href="#%(cnt)s" data-line-number="%(cnt_lbl)s"></a></td>'
+                '<a id="%(cnt)s" href="#%(cnt)s" data-line-number='
+                '"%(cnt_lbl)s"></a></td>'
                 % (
                     {
                         'cnt': '%s_%s' % (index, cnt),
@@ -154,27 +164,30 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
                 templ_delete = ''
                 templ_edit = ''
                 templ_edited = ''
+                status = str(comment.parent.status).lower()
                 if authenticated() and (
-                        (str(comment.parent.status).lower() in ['true', 'open']
-                         and comment.user.user == flask.g.fas_user.username)
-                         or is_repo_admin(comment.parent.project)):
+                        (
+                            status in ['true', 'open']
+                            and comment.user.user == flask.g.fas_user.username
+                        )
+                        or is_repo_admin(comment.parent.project)):
                     templ_delete = tpl_delete % ({'commentid': comment.id})
-                    templ_edit = tpl_edit %({
+                    templ_edit = tpl_edit % ({
                         'edit_url': flask.url_for(
                             'pull_request_edit_comment',
                             repo=comment.parent.project.name,
                             requestid=comment.parent.id,
                             commentid=comment.id,
-                            username=comment.parent.user.user \
-                                if comment.parent.project.is_fork else None
+                            username=comment.parent.user.user
+                            if comment.parent.project.is_fork else None
                         ),
                         'requestid': comment.parent.id,
                         'commentid': comment.id,
                     })
 
                 if comment.edited_on:
-                    templ_edited = tpl_edited %({
-                        'edit_date':comment.edited_on.strftime(
+                    templ_edited = tpl_edited % ({
+                        'edit_date': comment.edited_on.strftime(
                             '%b %d %Y %H:%M:%S'),
                         'human_edit_date': humanize_date(comment.edited_on),
                         'user': comment.editor.user,
@@ -199,7 +212,8 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
                     '</section>'
                     '<div class="issue_actions m-t-2">'
                     '%(templ_edited)s'
-                    '<aside class="btn-group issue_action icon pull-xs-right p-b-1">'
+                    '<aside class="btn-group issue_action icon '
+                    'pull-xs-right p-b-1">'
                     '%(templ_edit)s'
                     '%(templ_delete)s'
                     '</aside>'
@@ -219,7 +233,6 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
                             'human_date': humanize_date(comment.date_created),
                             'comment': markdown_filter(comment.comment),
                             'commentid': comment.id,
-                            'anchor': u'¶',
                         }
                     )
                 )
@@ -243,11 +256,11 @@ def text_wraps(text, size=10):
 
 
 @APP.template_filter('avatar')
-def avatar(packager, size=64, default="retro"):
+def avatar(packager, size=64):
     """ Template filter sorting the given branches, Fedora first then EPEL,
     then whatever is left.
     """
-    if not '@' in packager:
+    if '@' not in packager:
         user = pagure.lib.search_user(SESSION, username=packager)
         if user:
             packager = user.default_email
@@ -307,7 +320,7 @@ def patch_to_diff(patch):
                 origin = line.origin
                 if line.origin in ['<', '>', '=']:
                     origin = ''
-                content = content + origin + ' '+ line.content
+                content = content + origin + ' ' + line.content
             else:
                 # Avoid situation where at the end of a file we get:
                 # + foo<
@@ -403,13 +416,13 @@ def int_to_rgb(percent):
 def return_md5(text):
     """ Template filter to return an MD5 for a string
     """
-    m = md5.new()
-    m.update(text)
-    return pagure.lib.clean_input(m.hexdigest())
+    hashedtext = md5.new()
+    hashedtext.update(text)
+    return pagure.lib.clean_input(hashedtext.hexdigest())
 
 
 @APP.template_filter('increment_largest_priority')
-def text_wraps(dictionary):
+def largest_priority(dictionary):
     """ Template filter to return the largest priority +1
     """
     if dictionary:
@@ -420,6 +433,9 @@ def text_wraps(dictionary):
 
 @APP.template_filter('unicode')
 def convert_unicode(text):
+    ''' If the provided string is a binary string, this filter converts it
+    to UTF-8 (unicode).
+    '''
     if isinstance(text, str):
         return text.decode("utf8")
     else:

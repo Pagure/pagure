@@ -1,17 +1,20 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2015 - Copyright Red Hat Inc
+ (c) 2014-2016 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
 
+# no-member
+# pylint: disable=E1101
+
+
 from functools import wraps
 
 import flask
-from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.exceptions
 import pagure.forms
@@ -19,8 +22,6 @@ import pagure.lib
 import pagure.lib.git
 from pagure import (APP, SESSION, generate_user_key_files,
                     is_admin, admin_session_timedout)
-
-# pylint: disable=E1101
 
 
 def admin_required(function):

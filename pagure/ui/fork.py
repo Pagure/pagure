@@ -1,16 +1,28 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2015 - Copyright Red Hat Inc
+ (c) 2014-2016 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
 
+# too-many-return-statements
+# pylint: disable=R0911
+# too-many-branches
+# pylint: disable=R0912
+# too-many-arguments
+# pylint: disable=R0913
+# too-many-locals
+# pylint: disable=R0914
+# too-many-statements
+# pylint: disable=R0915
+# too-many-lines
+# pylint: disable=C0302
+
 import flask
 import os
-import datetime
 
 import pygit2
 from sqlalchemy.exc import SQLAlchemyError
@@ -45,7 +57,8 @@ def _get_parent_request_repo_path(repo):
     provided Repository object from the DB.
     """
     if repo.parent:
-        parentpath = os.path.join(APP.config['REQUESTS_FOLDER'], repo.parent.path)
+        parentpath = os.path.join(
+            APP.config['REQUESTS_FOLDER'], repo.parent.path)
     else:
         parentpath = os.path.join(APP.config['REQUESTS_FOLDER'], repo.path)
 
@@ -508,8 +521,9 @@ def pull_request_add_comment(
 
 @APP.route('/<repo:repo>/pull-request/<int:requestid>/comment/drop',
            methods=['POST'])
-@APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/comment/drop',
-           methods=['POST'])
+@APP.route(
+    '/fork/<username>/<repo:repo>/pull-request/<int:requestid>/comment/drop',
+    methods=['POST'])
 @login_required
 def pull_request_drop_comment(repo, requestid, username=None):
     """ Delete a comment of a pull-request.
@@ -569,10 +583,12 @@ def pull_request_drop_comment(repo, requestid, username=None):
         repo=repo.name, requestid=requestid))
 
 
-@APP.route('/<repo:repo>/pull-request/<int:requestid>/comment/<int:commentid>/edit',
-           methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/comment'
-           '/<int:commentid>/edit', methods=('GET', 'POST'))
+@APP.route(
+    '/<repo:repo>/pull-request/<int:requestid>/comment/<int:commentid>/edit',
+    methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<repo:repo>/pull-request/<int:requestid>/comment'
+    '/<int:commentid>/edit', methods=('GET', 'POST'))
 @login_required
 def pull_request_edit_comment(repo, requestid, commentid, username=None):
     """Edit comment of a pull request
@@ -776,9 +792,11 @@ def cancel_request_pull(repo, requestid, username=None):
     return flask.redirect(flask.url_for('view_repo', repo=repo))
 
 
-@APP.route('/<repo:repo>/pull-request/<int:requestid>/assign', methods=['POST'])
-@APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/assign',
-           methods=['POST'])
+@APP.route(
+    '/<repo:repo>/pull-request/<int:requestid>/assign', methods=['POST'])
+@APP.route(
+    '/fork/<username>/<repo:repo>/pull-request/<int:requestid>/assign',
+    methods=['POST'])
 @login_required
 def set_assignee_requests(repo, requestid, username=None):
     ''' Assign a pull-request. '''
@@ -999,9 +1017,8 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
                 requestrepo, commit.tree, ['templates', 'contributing.md'],
                 bail_on_tree=True)
             if contributing:
-                contributing, safe = pagure.doc_utils.convert_readme(
+                contributing, _ = pagure.doc_utils.convert_readme(
                     contributing.data, 'md')
-                output_type = 'markup'
 
     return flask.render_template(
         'pull_request.html',
@@ -1167,8 +1184,8 @@ def new_remote_request_pull(repo, username=None):
     '/fork_edit/<repo:repo>/edit/<path:branchname>/f/<path:filename>',
     methods=['POST'])
 @APP.route(
-    '/fork_edit/fork/<username>/<repo:repo>/edit/<path:branchname>/f/<path:filename>',
-    methods=['POST'])
+    '/fork_edit/fork/<username>/<repo:repo>/edit/<path:branchname>/'
+    'f/<path:filename>', methods=['POST'])
 @login_required
 def fork_edit_file(repo, branchname, filename, username=None):
     """ Fork the project specified and open the specific file to edit
