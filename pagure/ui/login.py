@@ -9,11 +9,12 @@
 
 """
 
+# no-member
+# pylint: disable=E1101
 
-import hashlib
+
 import datetime
 import urlparse
-import bcrypt
 
 import flask
 from sqlalchemy.exc import SQLAlchemyError
@@ -25,8 +26,6 @@ import pagure.lib.model as model
 import pagure.lib.notify
 from pagure import APP, SESSION, login_required
 from pagure.lib.login import generate_hashed_value, check_password
-
-# pylint: disable=E1101
 
 
 @APP.route('/user/new/', methods=['GET', 'POST'])
@@ -199,9 +198,10 @@ def lost_password():
             invalid_period = user_obj.updated_on + \
                 datetime.timedelta(minutes=3)
             if current_time < invalid_period:
-                flask.flash('An email was sent to you less than 3 minutes ago, '
-                            'did you check your spam folder? Otherwise, '
-                            'try again after some time.', 'error')
+                flask.flash(
+                    'An email was sent to you less than 3 minutes ago, '
+                    'did you check your spam folder? Otherwise, '
+                    'try again after some time.', 'error')
                 return flask.redirect(flask.url_for('auth_login'))
 
         token = pagure.lib.login.id_generator(40)

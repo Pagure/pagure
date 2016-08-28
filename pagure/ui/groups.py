@@ -7,6 +7,8 @@
    Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
+# no-member
+# pylint: disable=E1101
 
 import flask
 
@@ -17,8 +19,6 @@ import pagure.forms
 import pagure.lib
 import pagure.lib.git
 
-
-# pylint: disable=E1101
 
 @pagure.APP.route('/groups/')
 @pagure.APP.route('/groups')
@@ -54,7 +54,7 @@ def group_lists():
 def view_group(group):
     ''' Displays information about this group. '''
     if flask.request.method == 'POST' and \
-        not pagure.APP.config.get('ENABLE_USER_MNGT', True):
+            not pagure.APP.config.get('ENABLE_USER_MNGT', True):
         flask.abort(404)
 
     group_type = 'user'
@@ -69,7 +69,7 @@ def view_group(group):
     # Add new user to the group if asked
     form = pagure.forms.AddUserForm()
     if pagure.authenticated() and form.validate_on_submit() \
-        and pagure.APP.config.get('ENABLE_GROUP_MNGT', False):
+            and pagure.APP.config.get('ENABLE_GROUP_MNGT', False):
 
         username = form.user.data
 
@@ -293,8 +293,8 @@ def add_group():
 
         try:
             group_name = form.group_name.data.strip()
-            display_name=form.display_name.data.strip()
-            description=form.description.data.strip()
+            display_name = form.display_name.data.strip()
+            description = form.description.data.strip()
 
             msg = pagure.lib.add_group(
                 session=pagure.SESSION,

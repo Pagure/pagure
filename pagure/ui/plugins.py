@@ -1,12 +1,17 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014 - Copyright Red Hat Inc
+ (c) 2014-2016 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
+
+# too-many-branches
+# pylint: disable=R0912
+# no-member
+# pylint: disable=E1101
 
 import flask
 
@@ -20,12 +25,6 @@ import pagure.forms
 from pagure import APP, SESSION, login_required, is_repo_admin
 from pagure.lib.model import BASE
 from pagure.exceptions import FileNotFoundException
-from pagure.lib import model
-
-import json
-from kitchen.text.converters import to_bytes
-
-# pylint: disable=E1101
 
 
 def get_plugin_names(blacklist=None):
@@ -60,16 +59,24 @@ def get_plugin(plugin_name):
 
 @APP.route('/<repo:repo>/settings/<plugin>/', methods=('GET', 'POST'))
 @APP.route('/<repo:repo>/settings/<plugin>', methods=('GET', 'POST'))
-@APP.route('/<repo:repo>/settings/<plugin>/<int:full>/', methods=('GET', 'POST'))
-@APP.route('/<repo:repo>/settings/<plugin>/<int:full>', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo:repo>/settings/<plugin>/',
-           methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo:repo>/settings/<plugin>',
-           methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo:repo>/settings/<plugin>/<int:full>/',
-           methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo:repo>/settings/<plugin>/<int:full>',
-           methods=('GET', 'POST'))
+@APP.route(
+    '/<repo:repo>/settings/<plugin>/<int:full>/',
+    methods=('GET', 'POST'))
+@APP.route(
+    '/<repo:repo>/settings/<plugin>/<int:full>',
+    methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<repo:repo>/settings/<plugin>/',
+    methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<repo:repo>/settings/<plugin>',
+    methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<repo:repo>/settings/<plugin>/<int:full>/',
+    methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<repo:repo>/settings/<plugin>/<int:full>',
+    methods=('GET', 'POST'))
 @login_required
 def view_plugin(repo, plugin, username=None, full=True):
     """ Presents the settings of the project.

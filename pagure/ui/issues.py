@@ -1,12 +1,24 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2015 - Copyright Red Hat Inc
+ (c) 2014-2016 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
+
+# no-member
+# pylint: disable=E1101
+# too-many-lines
+# pylint: disable=C0302
+# too-many-branches
+# pylint: disable=R0912
+# too-many-locals
+# pylint: disable=R0914
+# too-many-statements
+# pylint: disable=R0915
+
 
 import flask
 import os
@@ -26,8 +38,6 @@ import pagure.forms
 from pagure import (APP, SESSION, LOG, __get_file_in_tree,
                     login_required, is_repo_admin, authenticated)
 
-
-# pylint: disable=E1101
 
 # URLs
 
@@ -256,8 +266,10 @@ def update_issue(repo, issueid, username=None):
 
 @APP.route('/<repo:repo>/tag/<tag>/edit/', methods=('GET', 'POST'))
 @APP.route('/<repo:repo>/tag/<tag>/edit', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo:repo>/tag/<tag>/edit/', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo:repo>/tag/<tag>/edit', methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<repo:repo>/tag/<tag>/edit/', methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<repo:repo>/tag/<tag>/edit', methods=('GET', 'POST'))
 @login_required
 def edit_tag(repo, tag, username=None):
     """ Edit the specified tag associated with the issues of a project.
@@ -279,7 +291,7 @@ def edit_tag(repo, tag, username=None):
     tags = pagure.lib.get_tags_of_project(SESSION, repo)
 
     if not tags or tag not in [t.tag for t in tags]:
-        flask.abort(404, 'Tag %s not found in this project' % tag )
+        flask.abort(404, 'Tag %s not found in this project' % tag)
 
     form = pagure.forms.AddIssueTagForm()
     if form.validate_on_submit():
@@ -522,7 +534,7 @@ def view_roadmap(repo, username=None):
                     active = True
                     break
             if not active:
-                del(milestone_issues[key])
+                del milestone_issues[key]
 
     if milestone:
         for mlstone in milestone:
@@ -554,7 +566,6 @@ def view_roadmap(repo, username=None):
     )
 
 
-
 @APP.route('/<repo:repo>/new_issue/', methods=('GET', 'POST'))
 @APP.route('/<repo:repo>/new_issue', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo:repo>/new_issue/', methods=('GET', 'POST'))
@@ -582,8 +593,9 @@ def new_issue(repo, username=None):
                 SESSION, flask.g.fas_user.username)
         except pagure.exceptions.PagureException:
             flask.abort(
-                404, 'No such user found in the database: %s' %
-                    flask.g.fas_user.username)
+                404,
+                'No such user found in the database: %s' % (
+                    flask.g.fas_user.username))
 
         try:
             issue = pagure.lib.new_issue(
@@ -650,7 +662,7 @@ def new_issue(repo, username=None):
                 bail_on_tree=True)
             if default_file:
                 default, _ = pagure.doc_utils.convert_readme(
-                        default_file.data, 'md')
+                    default_file.data, 'md')
 
     return flask.render_template(
         'new_issue.html',
@@ -802,8 +814,8 @@ def edit_issue(repo, issueid, username=None):
                 SESSION, flask.g.fas_user.username)
         except pagure.exceptions.PagureException:
             flask.abort(
-                404, 'No such user found in the database: %s' %
-                    flask.g.fas_user.username)
+                404, 'No such user found in the database: %s' % (
+                    flask.g.fas_user.username))
 
         try:
             message = pagure.lib.edit_issue(
@@ -897,8 +909,8 @@ def upload_issue(repo, issueid, username=None):
             SESSION, flask.g.fas_user.username)
     except pagure.exceptions.PagureException:
         flask.abort(
-            404, 'No such user found in the database: %s' %
-                flask.g.fas_user.username)
+            404, 'No such user found in the database: %s' % (
+                flask.g.fas_user.username))
 
     form = pagure.forms.UploadFileForm()
     # pylint: disable=E1101

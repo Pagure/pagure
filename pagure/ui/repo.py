@@ -8,6 +8,22 @@
 
 """
 
+# no-member
+# pylint: disable=E1101
+# too-many-lines
+# pylint: disable=C0302
+# too-many-branches
+# pylint: disable=R0912
+# too-many-locals
+# pylint: disable=R0914
+# too-many-statements
+# pylint: disable=R0915
+# bare-except
+# pylint: disable=W0702
+# broad-except
+# pylint: disable=W0703
+
+
 import datetime
 import shutil
 import os
@@ -39,10 +55,7 @@ import pagure.forms
 import pagure
 import pagure.ui.plugins
 from pagure import (APP, SESSION, LOG, __get_file_in_tree, login_required,
-                    is_repo_admin, admin_session_timedout, authenticated)
-
-
-# pylint: disable=E1101
+                    is_repo_admin, admin_session_timedout)
 
 
 @APP.route('/<repo:repo>.git')
@@ -51,7 +64,8 @@ def view_repo_git(repo, username=None):
     ''' Redirect to the project index page when user wants to view
     the git repo of the project
     '''
-    return flask.redirect(flask.url_for('view_repo',repo=repo,username=username))
+    return flask.redirect(flask.url_for(
+        'view_repo', repo=repo, username=username))
 
 
 @APP.route('/<repo:repo>/')
@@ -200,7 +214,7 @@ def view_repo_branch(repo, branchname, username=None):
     orig_repo = pygit2.Repository(parentname)
 
     tree = None
-    safe=False
+    safe = False
     readme = None
     if not repo_obj.is_empty and not orig_repo.is_empty:
 
@@ -209,10 +223,10 @@ def view_repo_branch(repo, branchname, username=None):
         else:
             compare_branch = None
 
-        compare_commits = []
+        commit_list = []
 
         if compare_branch:
-            compare_commits = [
+            commit_list = [
                 commit.oid.hex
                 for commit in orig_repo.walk(
                     compare_branch.get_object().hex,
@@ -223,11 +237,11 @@ def view_repo_branch(repo, branchname, username=None):
 
         for commit in repo_obj.walk(
                 repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
-            if commit.oid.hex in compare_commits:
+            if commit.oid.hex in commit_list:
                 break
             diff_commits.append(commit.oid.hex)
 
-        tree=sorted(last_commits[0].tree, key=lambda x: x.filemode)
+        tree = sorted(last_commits[0].tree, key=lambda x: x.filemode)
         for i in tree:
             name, ext = os.path.splitext(i.name)
             if name == 'README':
@@ -332,10 +346,10 @@ def view_commits(repo, branchname=None, username=None):
         else:
             compare_branch = None
 
-        compare_commits = []
+        commit_list = []
 
         if compare_branch:
-            compare_commits = [
+            commit_list = [
                 commit.oid.hex
                 for commit in orig_repo.walk(
                     compare_branch.get_object().hex,
@@ -347,7 +361,7 @@ def view_commits(repo, branchname=None, username=None):
 
             for commit in repo_obj.walk(
                     repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
-                if commit.oid.hex in compare_commits:
+                if commit.oid.hex in commit_list:
                     break
                 diff_commits.append(commit.oid.hex)
                 diff_commits_full.append(commit)
@@ -411,8 +425,10 @@ def compare_commits(repo, commit1, commit2, username=None):
     first_commit = commit1
     last_commit = commit2
 
-    commits = map(lambda x: x.oid.hex[:len(first_commit)],
-                  repo_obj.walk(last_commit, pygit2.GIT_SORT_TIME))
+    commits = [
+        commit.oid.hex[:len(first_commit)]
+        for commit in repo_obj.walk(last_commit, pygit2.GIT_SORT_TIME)
+    ]
 
     if first_commit not in commits:
         first_commit = commit2
@@ -445,7 +461,8 @@ def compare_commits(repo, commit1, commit2, username=None):
 
 
 @APP.route('/<repo:repo>/blob/<path:identifier>/f/<path:filename>')
-@APP.route('/fork/<username>/<repo:repo>/blob/<path:identifier>/f/<path:filename>')
+@APP.route(
+    '/fork/<username>/<repo:repo>/blob/<path:identifier>/f/<path:filename>')
 def view_file(repo, identifier, filename, username=None):
     """ Displays the content of a file or a tree for the specified repo.
     """
@@ -553,7 +570,7 @@ def view_file(repo, identifier, filename, username=None):
         headers['Content-Encoding'] = encoding
 
     return (
-            flask.render_template(
+        flask.render_template(
             'file.html',
             select='tree',
             repo=repo,
@@ -576,9 +593,11 @@ def view_file(repo, identifier, filename, username=None):
 
 @APP.route('/<repo:repo>/raw/<path:identifier>', defaults={'filename': None})
 @APP.route('/<repo:repo>/raw/<path:identifier>/f/<path:filename>')
-@APP.route('/fork/<username>/<repo:repo>/raw/<path:identifier>',
-           defaults={'filename': None})
-@APP.route('/fork/<username>/<repo:repo>/raw/<path:identifier>/f/<path:filename>')
+@APP.route(
+    '/fork/<username>/<repo:repo>/raw/<path:identifier>',
+    defaults={'filename': None})
+@APP.route(
+    '/fork/<username>/<repo:repo>/raw/<path:identifier>/f/<path:filename>')
 def view_raw_file(repo, identifier, filename=None, username=None):
     """ Displays the raw content of a file of a commit for the specified repo.
     """
@@ -1022,7 +1041,7 @@ def view_settings(repo, username=None):
         tags=tags,
         plugins=plugins,
         repo_admin=repo_admin,
-        branchname = branchname,
+        branchname=branchname,
     )
 
 
@@ -1276,14 +1295,15 @@ def change_ref_head(repo, username=None):
     if form.validate_on_submit():
         branchname = form.branches.data
         try:
-            reference = repo_obj.lookup_reference('refs/heads/%s'%branchname).resolve()
+            reference = repo_obj.lookup_reference(
+                'refs/heads/%s' % branchname).resolve()
             repo_obj.set_head(reference.name)
-            flask.flash('Default branch updated to %s'%branchname)
+            flask.flash('Default branch updated to %s' % branchname)
         except Exception as err:  # pragma: no cover
             APP.logger.exception(err)
 
     return flask.redirect(flask.url_for(
-                'view_settings', username=username, repo=repo.name))
+        'view_settings', username=username, repo=repo.name))
 
 
 @APP.route('/<repo:repo>/delete', methods=['POST'])
@@ -1455,7 +1475,8 @@ def add_user(repo, username=None):
     """
 
     if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
-        flask.abort(404, 'User management is not allowed in this pagure instance')
+        flask.abort(
+            404, 'User management is not allowed in this pagure instance')
 
     if admin_session_timedout():
         if flask.request.method == 'POST':
@@ -1506,14 +1527,16 @@ def add_user(repo, username=None):
 
 
 @APP.route('/<repo:repo>/dropgroup/<int:groupid>', methods=['POST'])
-@APP.route('/fork/<username>/<repo:repo>/dropgroup/<int:groupid>', methods=['POST'])
+@APP.route(
+    '/fork/<username>/<repo:repo>/dropgroup/<int:groupid>', methods=['POST'])
 @login_required
 def remove_group_project(repo, groupid, username=None):
     """ Remove the specified group from the project.
     """
 
     if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
-        flask.abort(404, 'User management is not allowed in this pagure instance')
+        flask.abort(
+            404, 'User management is not allowed in this pagure instance')
 
     if admin_session_timedout():
         flask.flash('Action canceled, try it again', 'error')
@@ -1572,7 +1595,8 @@ def add_group_project(repo, username=None):
     """
 
     if not pagure.APP.config.get('ENABLE_USER_MNGT', True):
-        flask.abort(404, 'User management is not allowed in this pagure instance')
+        flask.abort(
+            404, 'User management is not allowed in this pagure instance')
 
     if admin_session_timedout():
         if flask.request.method == 'POST':
