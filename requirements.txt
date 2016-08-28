@@ -29,14 +29,14 @@ straight.plugin==1.4.0-post-1
 trollius-redis
 wtforms
 
+# Needed only for local authentication and/or Pagure CI
+cryptography
 
 # Required only for the `fas` and `openid` authentication backends
 python-fedora
 
 # Required only for the `local` authentication backend
-cryptography
 py-bcrypt
 
-#Required for Pagure CI
-cryptography
+# Required for Pagure CI
 python-jenkins
