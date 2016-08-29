@@ -94,6 +94,8 @@ def insert_data(session, username, user_email):
     item = pagure.lib.model.PagureGroup(
         group_name='admin',
         user_id=1,
+        display_name='admin',
+        description='Admin Group',
     )
     session.add(item)
     session.commit()
@@ -103,6 +105,8 @@ def insert_data(session, username, user_email):
         group_name='group',
         group_type='user',
         user_id=1,  # pingou
+        display_name='group group',
+        description='this is a group group',
     )
     session.add(item)
     session.commit()
@@ -111,6 +115,8 @@ def insert_data(session, username, user_email):
         group_name='rel-eng',
         group_type='user',
         user_id=1,  # pingou
+        display_name='Release Engineering',
+        description='The group of release engineers',
     )
     session.add(item)
     session.commit()
