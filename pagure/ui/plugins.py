@@ -8,10 +8,8 @@
 
 """
 
-# too-many-branches
-# pylint: disable=R0912
-# no-member
-# pylint: disable=E1101
+# pylint: disable=too-many-branches
+# pylint: disable=no-member
 
 import flask
 

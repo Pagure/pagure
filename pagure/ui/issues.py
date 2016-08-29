@@ -8,16 +8,11 @@
 
 """
 
-# no-member
-# pylint: disable=E1101
-# too-many-lines
-# pylint: disable=C0302
-# too-many-branches
-# pylint: disable=R0912
-# too-many-locals
-# pylint: disable=R0914
-# too-many-statements
-# pylint: disable=R0915
+# pylint: disable=no-member
+# pylint: disable=too-many-lines
+# pylint: disable=too-many-branches
+# pylint: disable=too-many-locals
+# pylint: disable=too-many-statements
 
 
 import flask
@@ -913,7 +908,7 @@ def upload_issue(repo, issueid, username=None):
                 flask.g.fas_user.username))
 
     form = pagure.forms.UploadFileForm()
-    # pylint: disable=E1101
+
     if form.validate_on_submit():
         filestream = flask.request.files['filestream']
         new_filename = pagure.lib.git.add_file_to_git(

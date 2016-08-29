@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015 - Copyright Red Hat Inc
+ (c) 2015-2016 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -9,6 +9,9 @@
 Internal endpoints.
 
 """
+
+# pylint: disable=no-member
+
 
 import shutil
 import tempfile
@@ -48,8 +51,6 @@ MERGE_OPTIONS = {
         'message': 'The pull-request can be merged with a merge commit'
     }
 }
-
-# pylint: disable=E1101
 
 
 def localonly(function):

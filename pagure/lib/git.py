@@ -8,6 +8,13 @@
 
 """
 
+# pylint: disable=too-many-branches
+# pylint: disable=too-many-arguments
+# pylint: disable=too-many-locals
+# pylint: disable=too-many-statements
+# pylint: disable=no-member
+# pylint: disable=too-many-lines
+
 
 import datetime
 import hashlib
@@ -28,20 +35,6 @@ import pagure.lib
 import pagure.lib.notify
 from pagure.lib import model
 from pagure.lib.repo import PagureRepo
-
-
-# too-many-branches
-# pylint: disable=R0912
-# too-many-arguments
-# pylint: disable=R0913
-# too-many-locals
-# pylint: disable=R0914
-# too-many-statements
-# pylint: disable=R0915
-# no-member
-# pylint: disable=E1101
-# C0302
-# pylint: disable=C0302
 
 
 def commit_to_patch(repo_obj, commits):

@@ -10,13 +10,14 @@
 
 
 # # pylint cannot import flask extension correctly
-# pylint: disable=E0611,F0401
+# pylint: disable=no-name-in-module
+# pylint: disable=import-error
 # # The forms here don't have specific methods, they just inherit them.
-# pylint: disable=R0903
+# pylint: disable=too-few-public-methods
 # # We apparently use old style super in our __init__
-# pylint: disable=E1002
+# pylint: disable=super-on-old-class
 # # Couple of our forms do not even have __init__
-# pylint: disable=W0232
+# pylint: disable=no-init
 
 
 import flask_wtf as wtf

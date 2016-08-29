@@ -8,18 +8,14 @@
 
 """
 
-# too-many-return-statements
-# pylint: disable=R0911
-# too-many-branches
-# pylint: disable=R0912
-# too-many-arguments
-# pylint: disable=R0913
-# too-many-locals
-# pylint: disable=R0914
-# too-many-statements
-# pylint: disable=R0915
-# too-many-lines
-# pylint: disable=C0302
+# pylint: disable=too-many-return-statements
+# pylint: disable=too-many-branches
+# pylint: disable=too-many-arguments
+# pylint: disable=too-many-locals
+# pylint: disable=too-many-statements
+# pylint: disable=too-many-lines
+# pylint: disable=no-member
+
 
 import flask
 import os
@@ -37,7 +33,6 @@ from pagure import (APP, SESSION, LOG, login_required, is_repo_admin,
                     __get_file_in_tree)
 
 
-# pylint: disable=E1101
 
 
 def _get_parent_repo_path(repo):

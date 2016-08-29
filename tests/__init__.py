@@ -131,7 +131,7 @@ class Modeltests(unittest.TestCase):
         self.gitrepo = None
         self.gitrepos = None
 
-    # pylint: disable=C0103
+    # pylint: disable=invalid-name
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
         # Clean up eventual git repo left in the present folder.
@@ -184,7 +184,7 @@ class Modeltests(unittest.TestCase):
         # Prevent unit-tests to send email, globally
         pagure.APP.config['EMAIL_SEND'] = False
 
-    # pylint: disable=C0103
+    # pylint: disable=invalid-name
     def tearDown(self):
         """ Remove the test.db database if there is one. """
         self.session.close()
@@ -216,7 +216,7 @@ class FakeGroup(object):
         self.group_type = 'cla'
 
 
-# pylint: disable=R0903
+# pylint: disable=too-few-public-methods
 class FakeUser(object):
     """ Fake user used to test the fedocallib library. """
 

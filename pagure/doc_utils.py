@@ -26,7 +26,7 @@ def modify_rst(rst, view_file_url=None):
         )
 
     # We catch Exception if we want :-p
-    # pylint: disable=W0703
+    # pylint: disable=broad-except
     try:
         # The rst features we need were introduced in this version
         minimum = [0, 9]

@@ -7,8 +7,8 @@
    Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
-# no-member
-# pylint: disable=E1101
+
+# pylint: disable=no-member
 
 import flask
 

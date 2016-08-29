@@ -8,8 +8,7 @@
 
 """
 
-# no-member
-# pylint: disable=E1101
+# pylint: disable=no-member
 
 
 from functools import wraps

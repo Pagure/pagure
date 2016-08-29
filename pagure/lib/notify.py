@@ -9,10 +9,8 @@
 pagure notifications.
 """
 
-# too-many-branches
-# pylint: disable=R0912
-# too-many-arguments
-# pylint: disable=R0913
+# pylint: disable=too-many-branches
+# pylint: disable=too-many-arguments
 
 
 import datetime
@@ -38,9 +36,9 @@ if pagure.APP.config['EVENTSOURCE_SOURCE']:
 def fedmsg_publish(*args, **kwargs):  # pragma: no cover
     ''' Try to publish a message on the fedmsg bus. '''
     # We catch Exception if we want :-p
-    # pylint: disable=W0703
+    # pylint: disable=broad-except
     # Ignore message about fedmsg import
-    # pylint: disable=F0401
+    # pylint: disable=import-error
     kwargs['modname'] = 'pagure'
     try:
         import fedmsg

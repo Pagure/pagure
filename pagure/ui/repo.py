@@ -8,20 +8,13 @@
 
 """
 
-# no-member
-# pylint: disable=E1101
-# too-many-lines
-# pylint: disable=C0302
-# too-many-branches
-# pylint: disable=R0912
-# too-many-locals
-# pylint: disable=R0914
-# too-many-statements
-# pylint: disable=R0915
-# bare-except
-# pylint: disable=W0702
-# broad-except
-# pylint: disable=W0703
+# pylint: disable=no-member
+# pylint: disable=too-many-lines
+# pylint: disable=too-many-branches
+# pylint: disable=too-many-locals
+# pylint: disable=too-many-statements
+# pylint: disable=bare-except
+# pylint: disable=broad-except
 
 
 import datetime

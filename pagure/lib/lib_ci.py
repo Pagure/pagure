@@ -10,8 +10,7 @@
 
 """
 
-# too-many-locals
-# pylint: disable=R0914
+# pylint: disable=too-many-locals
 
 import pagure.exceptions
 import pagure.lib

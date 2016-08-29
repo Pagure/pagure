@@ -40,16 +40,12 @@ BASE = declarative_base(metadata=MetaData(naming_convention=CONVENTION))
 
 ERROR_LOG = logging.getLogger('pagure.model')
 
-# invalid-name  - hit w/ all the id field we use
-# pylint: disable=C0103
-# too-few-public-methods
-# pylint: disable=R0903
-# no-init
-# pylint: disable=W0232
-# no-member
-# pylint: disable=E1101
-# too-many-lines
-# pylint: disable=C0302
+# hit w/ all the id field we use
+# pylint: disable=invalid-name
+# pylint: disable=too-few-public-methods
+# pylint: disable=no-init
+# pylint: disable=no-member
+# pylint: disable=too-many-lines
 
 
 def create_tables(db_url, alembic_ini=None, acls=None, debug=False):
@@ -78,7 +74,7 @@ def create_tables(db_url, alembic_ini=None, acls=None, debug=False):
     # engine.execute(collection_package_create_view(driver=engine.driver))
     if db_url.startswith('sqlite:'):
         # Ignore the warning about con_record
-        # pylint: disable=W0613
+        # pylint: disable=unused-argument
         def _fk_pragma_on_connect(dbapi_con, _):  # pragma: no cover
             ''' Tries to enforce referential constraints on sqlite. '''
             dbapi_con.execute('pragma foreign_keys=ON')
@@ -89,7 +85,7 @@ def create_tables(db_url, alembic_ini=None, acls=None, debug=False):
         # version table, "stamping" it with the most recent rev:
 
         # Ignore the warning missing alembic
-        # pylint: disable=F0401
+        # pylint: disable=import-error
         from alembic.config import Config
         from alembic import command
         alembic_cfg = Config(alembic_ini)

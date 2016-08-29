@@ -24,7 +24,7 @@ from pagure import (APP, SESSION, login_required,
 
 
 # Application
-# pylint: disable=E1101
+# pylint: disable=no-member
 
 
 @APP.route('/browse/projects', endpoint='browse_projects')

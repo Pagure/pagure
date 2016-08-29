@@ -10,14 +10,10 @@ API namespace version 0.
 
 """
 
-# invalid-name
-# pylint: disable=C0103
-# too-few-public-methods
-# pylint: disable=R0903
-# no-member
-# pylint: disable=E1101
-# too-many-locals
-# pylint: disable=R0914
+# pylint: disable=invalid-name
+# pylint: disable=too-few-public-methods
+# pylint: disable=no-member
+# pylint: disable=too-many-locals
 
 import codecs
 import functools

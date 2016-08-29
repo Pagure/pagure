@@ -8,13 +8,16 @@
 
 """
 
+# pylint: disable=too-few-public-methods
+# pylint: disable=no-init
+# pylint: disable=super-on-old-class
+
 import re
 
 import flask
 import flask_wtf as wtf
 import wtforms
 import tempfile
-# pylint: disable=R0903,W0232,E1002
 
 import pagure
 

@@ -371,7 +371,6 @@ def inject_variables():
     )
 
 
-# pylint: disable=W0613
 @APP.before_request
 def set_session():
     """ Set the flask session as permanent. """
@@ -557,7 +556,7 @@ if APP.config.get('PAGURE_AUTH', None) == 'local':
     APP.after_request(login._send_session_cookie)
 
 
-# pylint: disable=W0613
+# pylint: disable=unused-argument
 @APP.teardown_request
 def shutdown_session(exception=None):
     """ Remove the DB session at the end of each request. """

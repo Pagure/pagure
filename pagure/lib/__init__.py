@@ -8,16 +8,11 @@
 
 """
 
-# too-many-branches
-# pylint: disable=R0912
-# too-many-arguments
-# pylint: disable=R0913
-# too-many-locals
-# pylint: disable=R0914
-# too-many-statements
-# pylint: disable=R0915
-# too-many-lines
-# pylint: disable=C0302
+# pylint: disable=too-many-branches
+# pylint: disable=too-many-arguments
+# pylint: disable=too-many-locals
+# pylint: disable=too-many-statements
+# pylint: disable=too-many-lines
 
 
 try:

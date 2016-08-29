@@ -8,8 +8,7 @@
 
 """
 
-# too-many-arguments
-# pylint: disable=R0913
+# pylint: disable=too-many-arguments
 
 
 import re

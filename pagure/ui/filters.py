@@ -8,12 +8,9 @@
 
 """
 
-# too-many-branches
-# pylint: disable=R0912
-# too-many-arguments
-# pylint: disable=R0913
-# too-many-locals
-# pylint: disable=R0914
+# pylint: disable=too-many-branches
+# pylint: disable=too-many-arguments
+# pylint: disable=too-many-locals
 
 
 import datetime
