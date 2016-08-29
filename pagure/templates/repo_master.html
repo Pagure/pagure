@@ -43,9 +43,15 @@
                 namespace=repo.namespace) }}">
               {{ forkbuttonform.csrf_token }}
             </form>
-            <button class="btn btn-sm btn-secondary"
+            {% if repo and repo.forks %}
+              <button class="btn btn-sm btn-secondary"
               onclick="$('#fork_project').submit();">
-              <span class="oi" data-glyph="fork"></span> Fork</button>
+              <span class="oi" data-glyph="fork"></span>View Fork</button>
+            {% else %}
+              <button class="btn btn-sm btn-secondary"
+              onclick="$('#fork_project').submit();">
+              <span class="oi" data-glyph="fork"></span>Fork</button>
+            {% endif %}
           {% endif %}
             <button title="{%-
             if is_watching(

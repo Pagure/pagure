@@ -6,7 +6,7 @@ docs/
 requests/
 releases/
 remotes/
-
+pagure_env/
 # Other python/editor specific files to ignore
 dist/
 build/
