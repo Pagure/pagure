@@ -47,6 +47,7 @@
       </a>
       {% endif -%}
     </h2>
+    <div class="row">
     {% for user in users %}
       <div class="col-lg-4 col-md-6">
         <div class="project_wrapper m-b-1">
@@ -79,6 +80,7 @@
         </div>
       </div>
     {% endfor %}
+    </div>
   </section>
 
   {% if total_page and total_page > 1 %}
