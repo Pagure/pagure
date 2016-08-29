@@ -230,8 +230,8 @@ class PagureFlaskLogintests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn('<title>Home - Pagure</title>', output.data)
         self.assertIn(
-            '<a class="nav-link" href="/login/?next=http://localhost/">',
-            output.data)
+            '<a class="nav-link btn btn-primary" '
+            'href="/login/?next=http://localhost/">', output.data)
         self.assertIn(
             'Could not set the session in the db, please report this error '
             'to an admin', output.data)
@@ -282,8 +282,8 @@ class PagureFlaskLogintests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn('<title>Home - Pagure</title>', output.data)
         self.assertIn(
-            '<a class="nav-link" href="/login/?next=http://localhost/">',
-            output.data)
+            '<a class="nav-link btn btn-primary" '
+            'href="/login/?next=http://localhost/">', output.data)
         self.assertIn(
             'Could not set the session in the db, please report this error '
             'to an admin', output.data)
@@ -532,8 +532,8 @@ class PagureFlaskLogintests(tests.Modeltests):
         self.assertIn('<title>Home - Pagure</title>', output.data)
         self.assertNotIn('You have been logged out', output.data)
         self.assertIn(
-            '<a class="nav-link" href="/login/?next=http://localhost/">',
-            output.data)
+            '<a class="nav-link btn btn-primary" '
+            'href="/login/?next=http://localhost/">', output.data)
 
         user = tests.FakeUser(username='foo')
         with tests.user_set(pagure.APP, user):
