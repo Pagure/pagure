@@ -59,6 +59,8 @@
                     {{ g.fas_user.username | avatar(24) | safe }}
                   </a>
                   <div class="dropdown-menu dropdown-menu-right">
+                    <div class="dropdown-header"><strong>{{ g.fas_user.username }}</strong></div>
+                    <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="{{ url_for('view_user', username=g.fas_user.username)
                       }}">My Public Profile</a>
                 <a class="dropdown-item" href="{{ url_for('user_settings')
