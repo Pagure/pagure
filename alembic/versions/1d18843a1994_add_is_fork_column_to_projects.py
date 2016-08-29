@@ -1,14 +1,14 @@
 """Add is_fork column to projects
 
 Revision ID: 1d18843a1994
-Revises: 17cd553ebd51
+Revises: 32d636cb5e00
 Create Date: 2016-07-17 22:02:14.495146
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '1d18843a1994'
-down_revision = '43df5e588a87'
+down_revision = '32d636cb5e00'
 
 from alembic import op
 import sqlalchemy as sa
