@@ -49,12 +49,12 @@ def jenkins_ci_notification(repo, pagure_ci_token, username=None):
 
     data = flask.request.get_json()
     if not data:
-        APP.logger.debug("Bad Request: No JSON retrived")
+        APP.logger.debug("Bad Request: No JSON retrieved")
         raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
 
     build_id = data.get('build', {}).get('number')
     if not build_id:
-        APP.logger.debug("Bad Request: No build ID retrived")
+        APP.logger.debug("Bad Request: No build ID retrieved")
         raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
 
     try:
