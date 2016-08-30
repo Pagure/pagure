@@ -124,7 +124,8 @@ class PagureFlaskSlashInNametests(tests.Modeltests):
             pagure.exceptions.PagureException,
             pagure.lib.new_project,
             self.session,
-            name='forks/test',
+            name='test',
+            namespace='forks',
             description='test project forks/test',
             url='',
             avatar_email='',
@@ -140,7 +141,8 @@ class PagureFlaskSlashInNametests(tests.Modeltests):
         # So just put it in the DB
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
-            name='forks/test',
+            name='test',
+            namespace='forks',
             description='test project forks/test',
             hook_token='aaabbbcccddd',
         )
@@ -194,7 +196,8 @@ class PagureFlaskSlashInNametests(tests.Modeltests):
             pagure.exceptions.PagureException,
             pagure.lib.new_project,
             self.session,
-            name='forks/test',
+            name='test',
+            namespace='forks',
             description='test project forks/test',
             url='',
             avatar_email='',
@@ -210,7 +213,8 @@ class PagureFlaskSlashInNametests(tests.Modeltests):
         # So just put it in the DB
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
-            name='forks/test',
+            name='test',
+            namespace='forks',
             description='test project forks/test',
             hook_token='aaabbbcccddd',
         )

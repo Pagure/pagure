@@ -1379,16 +1379,16 @@ index 0000000..2a552bb
             output = self.app.get('/test/diff/feature..master')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Diff from master to feature - test - Pagure</title>',
-                output.data)
+                '<title>Diff from master to feature - test\n - '
+                'Pagure</title>', output.data)
             self.assertIn(
                 '<p class="error"> No commits found </p>', output.data)
 
             output = self.app.get('/test/diff/master..feature')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Diff from feature to master - test - Pagure</title>',
-                output.data)
+                '<title>Diff from feature to master - test\n - '
+                'Pagure</title>', output.data)
             self.assertNotIn(
                 '<input type="submit" class="submit positive button" '
                 'value="Create">', output.data)
@@ -1398,7 +1398,7 @@ index 0000000..2a552bb
             output = self.app.get('/test/diff/master..feature')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>    Create new Pull Request for master - test - '
+                '<title>Create new Pull Request for master - test\n - '
                 'Pagure</title>', output.data)
             self.assertIn(
                 '<input type="submit" class="btn btn-primary" value="Create">',

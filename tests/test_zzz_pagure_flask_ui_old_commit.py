@@ -96,8 +96,8 @@ class PagureFlaskRepoOldUrltests(tests.Modeltests):
         self.assertTrue(
             '<div class="list-group" id="diff_list" style="display:none;">'
             in output.data)
-        self.assertTrue('</a> Authored by Alice Author' in output.data)
-        self.assertTrue('Committed by Cecil Committer' in output.data)
+        self.assertTrue('  Authored by Alice Author\n' in output.data)
+        self.assertTrue('  Committed by Cecil Committer\n' in output.data)
         self.assertTrue(
             '<span style="color: #00A000">+ Pagure</span>' in output.data)
         self.assertTrue(
@@ -111,8 +111,8 @@ class PagureFlaskRepoOldUrltests(tests.Modeltests):
         self.assertTrue(
             '<div class="list-group" id="diff_list" style="display:none;">'
             in output.data)
-        self.assertTrue('</a> Authored by Alice Author' in output.data)
-        self.assertTrue('Committed by Cecil Committer' in output.data)
+        self.assertTrue('  Authored by Alice Author\n' in output.data)
+        self.assertTrue('  Committed by Cecil Committer\n' in output.data)
         self.assertTrue(
             '<span style="color: #00A000">+ Pagure</span>' in output.data)
         self.assertTrue(
@@ -131,8 +131,8 @@ class PagureFlaskRepoOldUrltests(tests.Modeltests):
         self.assertTrue(
             '<div class="list-group" id="diff_list" style="display:none;">'
             in output.data)
-        self.assertTrue('</a> Authored by Alice Author' in output.data)
-        self.assertTrue('Committed by Cecil Committer' in output.data)
+        self.assertTrue('  Authored by Alice Author\n' in output.data)
+        self.assertTrue('  Committed by Cecil Committer\n' in output.data)
         self.assertTrue(
             # new version of pygments
             '<div class="highlight" style="background: #f8f8f8">'
@@ -179,8 +179,8 @@ class PagureFlaskRepoOldUrltests(tests.Modeltests):
         self.assertTrue(
             '<div class="list-group" id="diff_list" style="display:none;">'
             in output.data)
-        self.assertTrue('</a> Authored by Alice Author' in output.data)
-        self.assertTrue('Committed by Cecil Committer' in output.data)
+        self.assertTrue('  Authored by Alice Author\n' in output.data)
+        self.assertTrue('  Committed by Cecil Committer\n' in output.data)
         self.assertTrue(
             '<span style="color: #00A000">+ Pagure</span>' in output.data)
         self.assertTrue(
@@ -193,8 +193,8 @@ class PagureFlaskRepoOldUrltests(tests.Modeltests):
         self.assertTrue(
             '<div class="list-group" id="diff_list" style="display:none;">'
             in output.data)
-        self.assertTrue('</a> Authored by Alice Author' in output.data)
-        self.assertTrue('Committed by Cecil Committer' in output.data)
+        self.assertTrue('  Authored by Alice Author\n' in output.data)
+        self.assertTrue('  Committed by Cecil Committer\n' in output.data)
         self.assertTrue(
             '<span style="color: #00A000">+ Pagure</span>' in output.data)
         self.assertTrue(

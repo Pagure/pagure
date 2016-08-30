@@ -1196,7 +1196,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.get('/test/c/%s..%s' % (c2.oid.hex, c1.oid.hex))
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Diff from %s to %s - test - Pagure</title>'
+                '<title>Diff from %s to %s - test\n - Pagure</title>'
                 % (c2.oid.hex, c1.oid.hex),
                 output.data)
             self.assertIn(
@@ -1219,7 +1219,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.get('/test/c/%s..%s' % (c1.oid.hex, c2.oid.hex))
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Diff from %s to %s - test - Pagure</title>' %
+                '<title>Diff from %s to %s - test\n - Pagure</title>' %
                 (c1.oid.hex, c2.oid.hex),
                 output.data)
             self.assertIn(
@@ -1245,7 +1245,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.get('/test/c/%s..%s' % (c1.oid.hex, c3.oid.hex))
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Diff from %s to %s - test - Pagure</title>' %
+                '<title>Diff from %s to %s - test\n - Pagure</title>' %
                 (c1.oid.hex, c3.oid.hex), output.data)
             self.assertIn(
                 '<h5 class="text-muted">%s .. %s</h5>' %
@@ -1276,7 +1276,7 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '/test/c/%s..%s' % (c3.oid.hex, c1.oid.hex))
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Diff from %s to %s - test - Pagure</title>' %
+                '<title>Diff from %s to %s - test\n - Pagure</title>' %
                 (c3.oid.hex, c1.oid.hex), output.data)
             self.assertIn(
                 '<h5 class="text-muted">%s .. %s</h5>' %
@@ -1618,8 +1618,8 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertTrue(
             '<div class="list-group" id="diff_list" style="display:none;">'
             in output.data)
-        self.assertTrue('</a> Authored by Alice Author' in output.data)
-        self.assertTrue('Committed by Cecil Committer' in output.data)
+        self.assertTrue('  Authored by Alice Author\n' in output.data)
+        self.assertTrue('  Committed by Cecil Committer\n' in output.data)
         self.assertTrue(
             '<span style="color: #00A000">+ Pagure</span>' in output.data)
         self.assertTrue(
@@ -1643,8 +1643,8 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertTrue(
             '<div class="list-group" id="diff_list" style="display:none;">'
             in output.data)
-        self.assertTrue('</a> Authored by Alice Author' in output.data)
-        self.assertTrue('Committed by Cecil Committer' in output.data)
+        self.assertTrue('  Authored by Alice Author\n' in output.data)
+        self.assertTrue('  Committed by Cecil Committer\n' in output.data)
         self.assertTrue(
             # new version of pygments
             '<div class="highlight" style="background: #f8f8f8">'
@@ -1704,8 +1704,8 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertTrue(
             '<div class="list-group" id="diff_list" style="display:none;">'
             in output.data)
-        self.assertTrue('</a> Authored by Alice Author' in output.data)
-        self.assertTrue('Committed by Cecil Committer' in output.data)
+        self.assertTrue('  Authored by Alice Author\n' in output.data)
+        self.assertTrue('  Committed by Cecil Committer\n' in output.data)
         self.assertTrue(
             '<span style="color: #00A000">+ Pagure</span>' in output.data)
         self.assertTrue(
@@ -3215,21 +3215,21 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 404)
 
             output = self.app.post(
-                '/watch/foo', data=data, follow_redirects=True)
+                '/foo/watch/settings', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
             output = self.app.post(
-                '/watch/test/settings/2', data=data, follow_redirects=True)
+                '/test/watch/settings/2', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 400)
 
             output = self.app.post(
-                '/watch/test/settings/0', data=data, follow_redirects=True)
+                '/test/watch/settings/0', data=data, follow_redirects=True)
             self.assertIn(
                 '</button>\n                      You are no longer'
                 ' watching this repo.', output.data)
 
             output = self.app.post(
-                '/watch/test/settings/1', data=data, follow_redirects=True)
+                '/test/watch/settings/1', data=data, follow_redirects=True)
             self.assertIn(
                 '</button>\n                      You are now'
                 ' watching this repo.', output.data)
@@ -3248,13 +3248,15 @@ index 0000000..fb7093d
             pygit2.init_repository(gitrepo, bare=True)
 
             output = self.app.post(
-                '/watch/fork/foo/test/settings/0', data=data, follow_redirects=True)
+                '/fork/foo/test/watch/settings/0', data=data,
+                follow_redirects=True)
             self.assertIn(
                 '</button>\n                      You are no longer'
                 ' watching this repo.', output.data)
 
             output = self.app.post(
-                '/watch/fork/foo/test/settings/1', data=data, follow_redirects=True)
+                '/fork/foo/test/watch/settings/1', data=data,
+                follow_redirects=True)
             self.assertIn(
                 '</button>\n                      You are now'
                 ' watching this repo.', output.data)
