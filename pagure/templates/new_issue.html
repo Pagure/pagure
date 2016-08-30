@@ -3,7 +3,8 @@
 
 {% block title %}{% if not type or type == 'new'
     %}New issue{% elif type and type == 'edit'
-    %}Edit issue #{{ issueid }} {% endif %} - {{ repo.name }}{% endblock %}
+    %}Edit issue #{{ issueid }} {% endif %} - {{
+    repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 {% set tag = "home" %}
 
 {% block header %}
@@ -26,12 +27,13 @@
       <div class="card-block">
         {% if not type or type == 'new' %}
           <form action="{{ url_for('.new_issue',
-                           username=username, repo=repo.name) }}" method="post"
-                enctype="multipart/form-data">
+                namespace=repo.namespace, username=username, repo=repo.name)
+            }}" method="post" enctype="multipart/form-data">
 
         {% elif type and type == 'edit' %}
-          <form action="{{ url_for('.edit_issue', username=username,
-                             repo=repo.name, issueid=issueid) }}" method="post"
+          <form action="{{ url_for('.edit_issue',
+                namespace=repo.namespace, username=username,
+                repo=repo.name, issueid=issueid) }}" method="post"
                 enctype="multipart/form-data">
         {% endif %}
         {{ render_bootstrap_field(form.title, field_description="Gist of your issue") }}
@@ -99,7 +101,7 @@
 
     {% if authenticated and g.repo_admin and type and type == 'edit' %}
     <form method="post" class="pull-xs-right" action="{{
-        url_for('.delete_issue',
+        url_for('.delete_issue', namespace=repo.namespace,
                 username=username, repo=repo.name, issueid=issueid) }}">
       <button class="btn btn-danger" type="submit"
           onclick="return confirm('Are you sure to delete this ticket? \nThis is final and cannot be un-done.');"
@@ -134,7 +136,9 @@ $(document).ready(function() {
     if (_txt) {
       _txt += '\n';
     }
-    var _loc = "{{ url_for('view_issue_raw_file', repo=repo.name, username=username, filename='') }}" + this.file;
+    var _loc = "{{ url_for('view_issue_raw_file',
+        namespace=repo.namespace, repo=repo.name,
+        username=username, filename='') }}" + this.file;
 
     $("#issue_content").val(_txt + '<!!image>');
   });
@@ -160,6 +164,7 @@ $(document).ready(function() {
     var _url = "{{
       url_for('internal_ns.get_ticket_template',
               username=repo.username if repo.is_fork else None,
+              namespace=repo.namespace,
               repo=repo.name) }}";
     _url += '?template=' + _type;
     $.ajax({
@@ -189,6 +194,7 @@ $(function() {
       if ($( "#previewinmarkdown" ).hasClass("inactive")){
         var _text = $( "#issue_content" ).val();
         var _url = "{{ url_for('markdown_preview',
+                        namespace=repo.namespace,
                         user=repo.user.user if repo.is_fork,
                         repo=repo.name) | safe}}";
         $.ajax({

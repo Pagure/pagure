@@ -20,14 +20,14 @@
   <nav class="text-center">
     <ul class="pagination">
       <li {% if page <= 1%} class="disabled" {% endif %}>
-      <a href="{{ url_for('view_users') }}?page={{page - 1}}" aria-label="Previous">
+      <a href="{{ url_for('view_users', page=page -1) }}" aria-label="Previous">
           <span aria-hidden="true">&laquo;</span>
           <span class="sr-only">Newer</span>
         </a>
       </li>
       <li class="active">page {{ page }} of {{total_page}}</li>
       <li {% if page >= total_page %}class="disabled"{%endif%}>
-        <a href="{{ url_for('view_users') }}?page={{page + 1}}" aria-label="Next">
+        <a href="{{ url_for('view_users', page=page + 1) }}" aria-label="Next">
           <span aria-hidden="true">&raquo;</span>
           <span class="sr-only">Older</span>
         </a>
@@ -87,14 +87,14 @@
   <nav class="text-center">
     <ul class="pagination">
       <li {% if page <= 1%} class="disabled" {% endif %}>
-      <a href="{{ url_for('view_users') }}?page={{page - 1}}" aria-label="Previous">
+      <a href="{{ url_for('view_users', page=page -1) }}" aria-label="Previous">
           <span aria-hidden="true">&laquo;</span>
           <span class="sr-only">Newer</span>
         </a>
       </li>
       <li class="active">page {{ page }} of {{total_page}}</li>
       <li {% if page >= total_page %}class="disabled"{%endif%}>
-        <a href="{{ url_for('view_users') }}?page={{page + 1}}" aria-label="Next">
+        <a href="{{ url_for('view_users', page=page + 1) }}" aria-label="Next">
           <span aria-hidden="true">&raquo;</span>
           <span class="sr-only">Older</span>
         </a>

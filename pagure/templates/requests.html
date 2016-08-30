@@ -1,6 +1,7 @@
 {% extends "repo_master.html" %}
 
-{% block title %}Pull requests - {{ repo.name }}{% endblock %}
+{% block title %}Pull requests - {{
+    repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 {% set tag = "home" %}
 
 
@@ -24,8 +25,9 @@
         File Pull Request
       </button>
       <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
-        <a class="dropdown-item" href="{{ url_for('new_remote_request_pull',
-        username=username, repo=repo.name) }}">
+        <a class="dropdown-item" href="{{ url_for(
+            'new_remote_request_pull', namespace=repo.namespace,
+            username=username, repo=repo.name) }}">
           <small>Remote pull-request</small>
         </a>
       </div>
@@ -38,16 +40,19 @@
       <a class="btn {%
             if status|lower in ['open', 'true'] %}btn-primary{%
             else %}btn-secondary{%
-            endif %} btn-sm" href="{{ url_for('request_pulls', username=username,
-                 repo=repo.name) }}">Open</a>
+            endif %} btn-sm" href="{{ url_for(
+                'request_pulls', username=username, namespace=repo.namespace,
+                repo=repo.name) }}">Open</a>
       <a class="btn {%
         if status|lower in ['open', 'true'] %}btn-secondary{%
         else %}btn-primary{%
-        endif %} btn-sm" href="{{ url_for('request_pulls', username=username,
-               repo=repo.name) }}?status=0">Closed</a>
+        endif %} btn-sm" href="{{ url_for(
+            'request_pulls', username=username, namespace=repo.namespace,
+            repo=repo.name, status=0) }}">Closed</a>
   </span>
-  <a class="btn btn-secondary btn-sm pull-xs-right" href="{{ url_for('request_pulls',
-  username=username, repo=repo.name) }}">Reset Filters</a>
+  <a class="btn btn-secondary btn-sm pull-xs-right" href="{{ url_for(
+    'request_pulls', namespace=repo.namespace,
+    username=username, repo=repo.name) }}">Reset Filters</a>
 </div>
 </div>
 <div class="card m-t-1">
@@ -60,12 +65,14 @@
             <th class="close_date nowrap">Closed</th>
             {% endif %}
             <th class="open_by">
-              Reporter(<a href="{{ url_for('request_pulls', username=username,
+              Reporter(<a href="{{ url_for(
+                'request_pulls', username=username, namespace=repo.namespace,
                 repo=repo.name, assignee=assignee, status=status) }}">reset</a>)
             </th>
             {% if status|lower == 'open' %}
             <th class="assigned">
-              Assignee(<a href="{{ url_for('request_pulls', username=username,
+              Assignee(<a href="{{ url_for(
+                'request_pulls', username=username, namespace=repo.namespace,
                 repo=repo.name, author=author, status=status) }}">reset</a>)
             </th>
             {% endif %}
@@ -77,7 +84,8 @@
     {% for request in requests %}
         <tr>
             <td>
-              <a href="{{ url_for('request_pull', username=username,
+              <a href="{{ url_for(
+                  'request_pull', username=username, namespace=repo.namespace,
                   repo=repo.name, requestid=request.id) }}">
                 <span class="label label-default">PR#{{ request.id }}</span>
                 {% if status|lower not in ['open', 'true'] %}<span class="label {%
@@ -110,7 +118,9 @@
             </td>
             {% endif %}
             <td class="nowrap">
-              <a href="{{ url_for('request_pulls', username=username,
+              <a href="{{ url_for(
+                  'request_pulls', username=username,
+                  namespace=repo.namespace,
                   repo=repo.name, author=request.user.user,
                   assignee=assignee, status=status) }}"
                   title="Filter requests by reporter">
@@ -121,7 +131,9 @@
             {% if status|lower in ['open', 'true'] %}
             <td class="nowrap">
               {% if request.assignee %}
-              <a href="{{ url_for('request_pulls', username=username,
+              <a href="{{ url_for(
+                'request_pulls', username=username,
+                namespace=repo.namespace,
                 repo=repo.name, assignee=request.assignee.username,
                 author=author, status=status) }}"
                 title="Filter issues by assignee">
@@ -129,7 +141,8 @@
                 {{ request.assignee.user }}
               </a>
               {% else %}
-              <a class="text-muted" href="{{ url_for('request_pulls', username=username,
+              <a class="text-muted" href="{{ url_for(
+                'request_pulls', username=username, namespace=repo.namespace,
                 repo=repo.name, author=author, status=status) }}">unassigned</a>
               {% endif %}
             </td>
@@ -157,6 +170,7 @@ $(function() {
     url: '{{ url_for("internal_ns.get_pull_request_ready_branch") }}' ,
     type: 'POST',
     data: {
+      namespace: "{{ repo.namespace }}",
       repo: "{{ repo.name }}",
       repouser: "{{ g.fas_user.username }}",
       csrf_token: "{{ form.csrf_token.current_token }}",
@@ -171,6 +185,7 @@ $(function() {
         for (branch in res.message){
             var url = "{{ url_for(
             'new_request_pull',
+            namespace=repo.namespace,
             repo=repo.name,
             username=g.fas_user.username,
             branch_to=head,
@@ -209,6 +224,7 @@ $(function() {
         for (branch in res.message){
           var url = "{{ url_for(
             'new_request_pull',
+            namespace=repo.namespace,
             repo=repo.name,
             username=repo.user.user if repo.is_fork else None,
             branch_to=head,

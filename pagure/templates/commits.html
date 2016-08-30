@@ -1,6 +1,7 @@
 {% extends "repo_master.html" %}
 
-{% block title %}{{ select.capitalize() }} - {{ repo.name }}{% endblock %}
+{% block title %}{{ select.capitalize() }} - {{
+    repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 {% set tag = "home" %}
 
 {% block repo %}
@@ -38,8 +39,9 @@
           </button>
           <div class="dropdown-menu dropdown-menu-right">
             {% for branch in g.branches %}
-                <a class="dropdown-item" href="{{ url_for('view_commits',
-                            username=username, repo=repo.name, branchname=branch) }}">
+                <a class="dropdown-item" href="{{ url_for(
+                    'view_commits', namespace=repo.namespace,
+                    username=username, repo=repo.name, branchname=branch) }}">
                   {{ branch }}
                 </a>
             {% endfor %}
@@ -73,7 +75,7 @@
           <div id="request_pull" class="pull-xs-right">
             <a class="btn btn-primary btn-sm"
               href="{{ url_for('new_request_pull',
-                    username=username, repo=repo.name,
+                    username=username, repo=repo.name, namespace=repo.namespace,
                     branch_to=head, branch_from=branchname or 'master') }}">
               {% if g.repo_admin %}Request pull{% else %}Compare{% endif %}
             </a>
@@ -83,7 +85,8 @@
       <div id="diff_commits" class="list-group m-t-1" style="display:none;">
         {% for diff_commit_full in diff_commits_full %}
            <a href="{{ url_for('view_commit', username=username,
-                      repo=repo.name, commitid=diff_commit_full.hex)
+                    namespace=repo.namespace,
+                    repo=repo.name, commitid=diff_commit_full.hex)
               }}" class="list-group-item">
               <h5>
                 <strong>{{ diff_commit_full.message.split('\n')[0] }}</strong>
@@ -110,7 +113,8 @@
       <div class="list-group m-t-1">
         {% for commit in last_commits %}
           <a href="{{ url_for('view_commit', username=username,
-                  repo=repo.name, commitid=commit.hex, branch=branchname) }}"
+                namespace=repo.namespace,
+                repo=repo.name, commitid=commit.hex, branch=branchname) }}"
               class="list-group-item {%
                 if diff_commits and commit.oid.hex in diff_commits %}p-l-3{%
                 endif %}" style="position:relative;">
@@ -144,7 +148,8 @@
           <ul class="pagination">
             <li {% if page <= 1%} class="disabled" {% endif %}>
               <a href="{{ url_for('.%s' % origin, username=username,
-                          repo=repo.name, branchname=branchname, page=page-1)
+                    namespace=repo.namespace,
+                    repo=repo.name, branchname=branchname, page=page-1)
                 }}" aria-label="Previous">
                 <span aria-hidden="true">&laquo;</span>
                 <span class="sr-only">Newer</span>
@@ -153,7 +158,8 @@
             <li class="active">page {{ page }} of {{total_page}}</li>
             <li {% if page >= total_page %}class="disabled"{%endif%}>
               <a href="{{ url_for('.%s' % origin, username=username,
-                          repo=repo.name, branchname=branchname, page=page+1)
+                    namespace=repo.namespace,
+                    repo=repo.name, branchname=branchname, page=page+1)
                 }}" aria-label="Next">
                 <span aria-hidden="true">&raquo;</span>
                 <span class="sr-only">Older</span>

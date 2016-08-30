@@ -8,7 +8,8 @@
   rel="stylesheet" />
 {% endblock %}
 
-{% block title %}Add group - {{ repo.name }}{% endblock %}
+{% block title %}Add group - {{
+    repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 
 
 {% block repo %}
@@ -19,8 +20,10 @@
       <strong>Add group to the {{repo.name}} project</strong>
     </div>
     <div class="card-block">
-      <form action="{{ url_for('.add_group_project',
-                       username=username, repo=repo.name) }}" method="post">
+      <form action="{{
+        url_for('.add_group_project',
+            username=username, repo=repo.name, namespace=repo.namespace)
+        }}" method="post">
 
       <fieldset class="form-group">
         <label for="group"><strong>Username</strong></label>

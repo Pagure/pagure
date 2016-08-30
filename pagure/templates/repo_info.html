@@ -1,6 +1,7 @@
 {% extends "repo_master.html" %}
 
-{% block title %}{{ select.capitalize() }} - {{ repo.name }}{% endblock %}
+{% block title %}{{ select.capitalize() }} - {{
+    repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 {% set tag = "home" %}
 
 {% block repo %}
@@ -87,7 +88,8 @@ git push -u origin master</pre>
                   <span class="oi text-muted" data-glyph="random"
                     title="Default branch"></span>
                   <a href="{{ url_for('view_repo_branch',
-                    username=username, repo=repo.name, branchname=head) }}"
+                    username=username, namespace=repo.namespace,
+                    repo=repo.name, branchname=head) }}"
                     title="{{ head }}" data-toggle="tooltip">
                     {{ head }}
                   </a>
@@ -106,7 +108,8 @@ git push -u origin master</pre>
                   <span class="oi text-muted" data-glyph="random"></span>
                   {% if branchname != branch %}
                   <a class="" href="{{ url_for('view_repo_branch',
-                    username=username, repo=repo.name, branchname=branch) }}"
+                    username=username, repo=repo.name, branchname=branch,
+                    namespace=repo.namespace) }}"
                     title="{{ branch }}" data-toggle="tooltip">{{ branch }}
                   </a>
                   {% else %}
@@ -118,7 +121,8 @@ git push -u origin master</pre>
                   {% if g.repo_admin and branch != head %}
                   <form id="delete_branch_form-{{ branch | replace('/', '_') }}" action="{{
                     url_for('.delete_branch',
-                            username=username, repo=repo.name, branchname=branch)
+                            username=username, repo=repo.name,
+                            namespace=repo.namespace, branchname=branch)
                     }}" method="post" class="inline icon del_icon"
                     onsubmit="return confirm('Are you sure you want to remove the branch: {{ branch }}?\nThis cannot be un-done!');">
                     {{ form.csrf_token }}
@@ -221,6 +225,7 @@ git push -u origin master</pre>
                 {% for commit in last_commits %}
                   <a href="{{
                       url_for('view_commit', username=username,
+                      namespace=repo.namespace,
                       repo=repo.name, commitid=commit.hex) }}" class="list-group-item">
                     <div class="commitdate" title="{{ commit.commit_time|format_ts }}">
                       <small>
@@ -283,6 +288,7 @@ $(function() {
             'new_request_pull',
             repo=repo.name,
             username=repo.user.user if repo.is_fork else None,
+            namespace=repo.namespace,
             branch_to=head or 'master',
             branch_from='') }}";
           html = '<div class="alert alert-info" role="alert"> \

@@ -8,7 +8,8 @@
   rel="stylesheet" />
 {% endblock %}
 
-{% block title %}Add user - {{ repo.name }}{% endblock %}
+{% block title %}Add user - {{
+    repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 
 {% block repo %}
 <div class="row col-sm-6 col-sm-offset-3">
@@ -18,7 +19,8 @@
     </div>
     <div class="card-block">
       <form action="{{ url_for('.add_user',
-                       username=username, repo=repo.name) }}" method="post">
+                       username=username, repo=repo.name,
+                       namespace=repo.namespace) }}" method="post">
 
       <fieldset class="form-group">
         <label for="user"><strong>Username</strong></label>

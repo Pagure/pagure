@@ -1,6 +1,7 @@
 {% extends "repo_master.html" %}
 
-{% block title %}Activity - {{ repo.name }}{% endblock %}
+{% block title %}Activity - {{
+    repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 {% set tag = "home" %}
 
 

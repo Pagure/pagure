@@ -1,10 +1,8 @@
 {% macro render_row(items) -%}
     {% for repo in items %}
-        {% if repo.is_fork %}
-        {% set url = url_for('view_repo', username=repo.user.username, repo=repo.name) %}
-        {% else %}
-        {% set url = url_for('view_repo', repo=repo.name) %}
-        {% endif %}
+      {% set url = url_for('view_repo',
+        username=repo.user.username if repo.is_fork else None,
+        repo=repo.name, namespace=repo.namespace) %}
   <div class="col-lg-4 col-md-6">
     <div class="project_wrapper m-b-1">
       {% if repo.avatar_email %}
@@ -13,14 +11,28 @@
         <div class="projecticon pull-xs-left"><span class="oi" data-glyph="document"></span></div>
       {% endif %}
       <a class="project_link logo_link" href="{{ url }}">
-        <div class="repo_name"><strong>{{ repo.name }}</strong></div>
+        <div class="repo_name">
+          <strong>
+            {{ repo.namespace + '/' if repo.namespace }}{{ repo.name }}
+          </strong>
+        </div>
       </a>
       <div class="repo_desc" title="{{ repo.description }}" data-toggle="tooltip">
-        <small>{% if repo.description %}{{ repo.description }}{%else%}<span class="text-muted">no description<span>{% endif %}</small>
+        <small>
+          {% if repo.description %}{{ repo.description }}{% else %}
+          <span class="text-muted">no description<span>{% endif %}
+        </small>
       </div>
       <div class="project_metadata">
-        <span class="p-l-1"><small>created {{repo.date_created|humanize}}</small></span>
-        <div style="text-align:right;" class="p-r-1 text-muted pull-xs-right"><span title="Forks" data-toggle="tooltip"><span class="oi" data-glyph="fork"></span>{{repo.forks|count}}</span></div>
+        <span class="p-l-1">
+          <small>created {{repo.date_created|humanize}}</small>
+        </span>
+        <div style="text-align:right;" class="p-r-1 text-muted pull-xs-right">
+          <span title="Forks" data-toggle="tooltip">
+            <span class="oi" data-glyph="fork"></span>
+            {{repo.forks|count}}
+          </span>
+        </div>
       </div>
     </div>
   </div>
@@ -137,9 +149,13 @@
                     url_for(
                     'view_repo',
                     username=repo.user.username if repo.is_fork else None,
-                    repo=repo.name)
+                    repo=repo.name, namespace=repo.namespace)
                 }}">
-                    <div><strong>{{ repo.name }}</strong></div>
+                  <div>
+                    <strong>
+                      {{ repo.namespace + '/' if repo.namespace }}{{ repo.name }}
+                    </strong>
+                  </div>
                </a>
             {% else %}
             <p>No projects found</p>
@@ -207,11 +223,9 @@
             <div class="list-group">
             {% for repo in list %}
               <div class="list-group-item">
-                {% if repo.is_fork %}
-                  {% set url = url_for('view_repo', username=repo.user.username, repo=repo.name) %}
-                {% else %}
-                  {% set url = url_for('view_repo', repo=repo.name) %}
-                {% endif %}
+                {% set url = url_for('view_repo',
+                  username=repo.user.username if repo.is_fork else None,
+                  repo=repo.name, namespace=repo.namespace) %}
 
                 {% if repo.avatar_email %}
                   <img class="projecticon pull-xs-left"
@@ -224,7 +238,9 @@
                 {% endif %}
                 <a class="project_link logo_link" href="{{ url }}">
                     <div class="repo_name">
-                      <strong>{{ repo.name }}</strong>
+                      <strong>
+                        {{ repo.namespace + '/' if repo.namespace }}{{ repo.name }}
+                      </strong>
                     </div>
                 </a>
                 <div class="repo_desc" title="{{ repo.description }}"

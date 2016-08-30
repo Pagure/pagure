@@ -1,6 +1,7 @@
 {% extends "repo_master.html" %}
 
-{% block title %}Commit - {{ repo.name }} - {{ commitid }}{% endblock %}
+{% block title %}Commit - {{
+    repo.namespace + '/' if repo.namespace }}{{ repo.name }} - {{ commitid }}{% endblock %}
 {% set tag = "commit"%}
 
 {% block repo %}
@@ -11,24 +12,31 @@
     <span class="label label-default" title="{{ commitid }}">Commit {{ commitid|short }}</span>
     <span>{{ splitted_message[0] }}</span>
     <div class="pull-xs-right btn-group">
-      <a class="btn btn-secondary btn-sm" href="{{ url_for('view_raw_file', username=username,
-            repo=repo.name, identifier=commitid) }}" title="View as raw">raw</a>
-      <a class="btn btn-secondary btn-sm" href="{{ url_for('view_commit_patch', username=username,
-            repo=repo.name, commitid=commitid) }}">patch</a>
-      <a class="btn btn-secondary btn-sm" href="{{ url_for('view_tree', username=username,
-            repo=repo.name, identifier=commitid) }}">tree</a>
+      <a class="btn btn-secondary btn-sm" href="{{ url_for(
+        'view_raw_file', username=username, namespace=repo.namespace,
+        repo=repo.name, identifier=commitid) }}" title="View as raw">raw</a>
+      <a class="btn btn-secondary btn-sm" href="{{ url_for(
+        'view_commit_patch', username=username, namespace=repo.namespace,
+        repo=repo.name, commitid=commitid) }}">patch</a>
+      <a class="btn btn-secondary btn-sm" href="{{ url_for(
+        'view_tree', username=username, namespace=repo.namespace,
+        repo=repo.name, identifier=commitid) }}">tree</a>
       {% if commit.parents|length == 1 %}
-      <a class="btn btn-secondary btn-sm" title={{commit.parents[0].oid.hex}} href="{{ url_for('view_commit', username=username,
-            repo=repo.name, commitid=commit.parents[0].oid.hex) }}">parent</a>
+      <a class="btn btn-secondary btn-sm" title={{commit.parents[0].oid.hex}} href="{{ url_for(
+        'view_commit', username=username, namespace=repo.namespace,
+        repo=repo.name, commitid=commit.parents[0].oid.hex) }}">parent</a>
       {% elif commit.parents|length > 1 %}
       <div class="btn-group" role="group">
-        <button id="parentsDrop" type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <button id="parentsDrop" type="button" class="btn btn-secondary btn-sm dropdown-toggle"
+            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           parents
         </button>
         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="parentsDrop">
           {% for parent in commit.parents %}
-            <a class="dropdown-item" href="{{ url_for('view_commit', username=username,
-                  repo=repo.name, commitid=parent.oid.hex) }}" class="commitid">{{parent.oid.hex}}</a>
+            <a class="dropdown-item" href="{{ url_for(
+                'view_commit', username=username, namespace=repo.namespace,
+                repo=repo.name, commitid=parent.oid.hex)
+            }}" class="commitid">{{parent.oid.hex}}</a>
           {% endfor %}
         </div>
       </div>
@@ -37,13 +45,21 @@
   </h4>
   <h5 class="text-muted">
     {% if commit.author| author2user == commit.committer| author2user %}
-      <a href="#" id="diff_list_link">{{diff|count}} file{{'s' if diff|count > 1}}</a> Authored and Committed by {{ commit.author | author2user |safe }}
-      <span data-toggle="tooltip" title="{{commit.commit_time | format_ts}}">{{commit.commit_time | humanize}}</span>
+      <a href="#" id="diff_list_link">{{ diff|count}} file{{'s' if diff|count > 1 }}</a>
+      Authored and Committed by {{ commit.author | author2user |safe }}
+      <span data-toggle="tooltip" title="{{ commit.commit_time | format_ts }}">
+        {{ commit.commit_time | humanize }}
+      </span>
     {% else %}
-    <a href="#" id="diff_list_link">{{diff|count}} file{{'s' if diff|count > 1}}</a> Authored by {{ commit.author | author2user |safe }}
-      <span data-toggle="tooltip" title="{{commit.commit_time | format_ts}}">{{commit.commit_time | humanize}}</span>,
-    Committed by {{ commit.committer | author2user |safe }}
-      <span data-toggle="tooltip" title="{{commit.commit_time | format_ts}}">{{commit.commit_time | humanize}}</span>,
+      <a href="#" id="diff_list_link">{{ diff|count}} file{{'s' if diff|count > 1 }}</a>
+      Authored by {{ commit.author | author2user |safe }}
+      <span data-toggle="tooltip" title="{{ commit.commit_time | format_ts }}">
+        {{ commit.commit_time | humanize }}
+      </span>,
+      Committed by {{ commit.committer | author2user |safe }}
+      <span data-toggle="tooltip" title="{{ commit.commit_time | format_ts }}">
+        {{ commit.commit_time | humanize }}
+      </span>,
     {% endif%}
   </h5>
 </div>
@@ -99,15 +115,17 @@
 <div class="card" id="diff-file-{{filecount}}">
   <div class="card-header">
     {% if patch | hasattr('new_file_path') %}
-      <a href="{{ url_for('view_file', username=username,
-                repo=repo.name, identifier=commitid,
-                filename=patch.new_file_path) }}" title="View file as of {{ commitid|short }}">
+      <a href="{{ url_for(
+          'view_file', username=username, namespace=repo.namespace,
+          repo=repo.name, identifier=commitid,
+          filename=patch.new_file_path) }}" title="View file as of {{ commitid|short }}">
         {{  patch.new_file_path | unicode }}
       </a>
     {% elif patch | hasattr('delta') %}
-      <a href="{{ url_for('view_file', username=username,
-                repo=repo.name, identifier=commitid,
-                filename=patch.delta.new_file.path) }}" title="View file as of {{ commitid|short }}">
+      <a href="{{ url_for(
+          'view_file', username=username, namespace=repo.namespace,
+          repo=repo.name, identifier=commitid,
+          filename=patch.delta.new_file.path) }}" title="View file as of {{ commitid|short }}">
         {{  patch.delta.new_file.path | unicode }}
       </a>
     {% endif %}
@@ -157,6 +175,7 @@
         url: '{{ url_for("internal_ns.get_branches_of_commit") }}' ,
         type: 'POST',
         data: {
+          namespace: "{{ repo.namespace }}",
           repo: "{{ repo.name }}",
           repouser: "{{ repo.user.user if repo.is_fork else '' }}",
           commit_id: "{{ commitid }}",

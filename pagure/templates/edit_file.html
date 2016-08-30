@@ -1,7 +1,8 @@
 {% extends "repo_master.html" %}
 {% from "_formhelper.html" import render_field %}
 
-{% block title %}Edit - {{ repo.name }}{% endblock %}
+{% block title %}Edit - {{
+    repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 {% set tag = "home" %}
 {% block header %}
 <script src="{{ url_for('static', filename='codemirror/codemirror.js') }}"></script>
@@ -14,7 +15,7 @@
   <div class="card-header">
       <ol class="breadcrumb">
       <li><a href="{{ url_for('view_tree', username=username,
-                  repo=repo.name, identifier=branchname)
+            namespace=repo.namespace, repo=repo.name, identifier=branchname)
       }}"><span class="oi" data-glyph="random"></span>&nbsp; {{ branchname }}</a></li>{%
     for file in filename.split('/') %}
       {% if loop.first %}
@@ -23,17 +24,25 @@
       {% set path = path + '/' + file %}
       {% endif %}
       {% if loop.index != loop.length %}<li><a
-      href="{{ url_for('view_file', username=username,
-              repo=repo.name, identifier=branchname,
-              filename=path)}}"
-        ><span class="oi" data-glyph="folder"></span>&nbsp; {{ file }}</a></li>{% elif file %}<li class="active"><span class="oi" data-glyph="{% if output_type == 'tree' %}folder{% else %}file{% endif %}"></span>&nbsp; {{ file }}</li>{% endif %}
+      href="{{ url_for('view_file',
+            username=username, namespace=repo.namespace,
+            repo=repo.name, identifier=branchname,
+            filename=path)}}"
+        ><span class="oi" data-glyph="folder"></span>&nbsp; {{ file }}</a>
+        </li>{%
+        elif file
+        %}<li class="active"><span class="oi" data-glyph="{%
+            if output_type == 'tree' %}folder{%
+            else %}file{%
+            endif %}"></span>&nbsp; {{ file }}</li>{%
+        endif %}
     {% endfor %}
     </ol>
   </div>
   <div class="card-block p-a-0">
     <form action="{{ url_for(
-          'edit_file', username=username, repo=repo.name,
-          branchname=branchname, filename=filename) }}"
+          'edit_file', username=username, namespace=repo.namespace,
+          repo=repo.name, branchname=branchname, filename=filename) }}"
           method="post">
     {{ form.csrf_token }}
 

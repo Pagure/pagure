@@ -3,14 +3,15 @@
 
 {% block title %}
   {%- if pull_request -%}
-    PR#{{ requestid }}: {{ pull_request.title | noJS(ignore="img")}} - {{ repo.name }}
-  {% elif form and (g.repo_admin or remote_git) %}
-    Create new Pull Request for {{ branch_to }} - {{ repo.name }}
+    PR#{{ requestid }}: {{ pull_request.title | noJS(ignore="img")}}
+  {%- elif form and (g.repo_admin or remote_git) %}
+    Create new Pull Request for {{ branch_to }}
   {%- elif origin == 'compare_commits' -%}
-    Diff from {{ commit1 }} to {{ commit2 }} - {{ repo.name }}
+    Diff from {{ commit1 }} to {{ commit2 }}
   {%- else -%}
-    Diff from {{ branch_from }} to {{ branch_to }} - {{ repo.name }}
-  {%- endif -%}
+    Diff from {{ branch_from }} to {{ branch_to }}
+  {%- endif
+  %} - {{ repo.namespace + '/' if repo.namespace }}{{ repo.name }}
 {% endblock %}
 
 {% set tag = "home" %}
@@ -38,13 +39,17 @@
      <span class="pull-xs-right">
      {% if pull_request.status == 'Open' and authenticated and
         (g.repo_admin or g.fas_user.username == pull_request.user.username) %}
-        <form style="display:inline;" action="{{ url_for('cancel_request_pull', username=username,
+        <form style="display:inline;" action="{{ url_for(
+            'cancel_request_pull', username=username,
+            namespace=repo.namespace,
             repo=repo.name, requestid=requestid) }}" method="POST">
      {% endif %}
           <div class="btn-group" role="group" aria-label="Basic example">
             <a class="btn btn-sm btn-primary"
-               href="{{ url_for('request_pull_edit', username=username,
-               repo=repo.name, requestid=requestid) }}"
+               href="{{ url_for(
+                'request_pull_edit', username=username,
+                namespace=repo.namespace,
+                repo=repo.name, requestid=requestid) }}"
                title="Update title"><span class="oi" data-glyph="pencil"></span></a>
      {% if pull_request.status == 'Open' and authenticated and
         (g.repo_admin or g.fas_user.username == pull_request.user.username) %}
@@ -80,6 +85,7 @@
           username=pull_request.project_from.user.user
             if pull_request.project_from.is_fork else None,
           repo=pull_request.project_from.name,
+          namespace=repo.namespace,
           branchname=pull_request.branch_from)
         }}">
     {{ pull_request.branch_from }}
@@ -92,6 +98,7 @@
           username=pull_request.project.user.user
             if pull_request.project.is_fork else None,
           repo=pull_request.project.name,
+          namespace=repo.namespace,
           branchname=pull_request.branch)
         }}">
     {{ pull_request.branch }}
@@ -109,7 +116,7 @@
 {% else %}
 <h2>Diff
       (<a href="{{ url_for('view_tree', username=username,
-               repo=repo.name, identifier=commitid) }}"
+          namespace=repo.namespace, repo=repo.name, identifier=commitid) }}"
       >tree</a>)</h2>
 
     {% if origin == 'compare_commits' %}
@@ -122,11 +129,12 @@
 <section class="new_project">
   {% if remote_git %}
   <form action="{{ url_for('.new_remote_request_pull', username=username,
-    repo=repo.name, confirm=True) }}" method="post">
+    namespace=repo.namespace, repo=repo.name, confirm=True) }}" method="post">
     <input type="hidden" value="{{ branch_from }}" name="branch_from" />
     <input type="hidden" value="{{ remote_git }}" name="git_repo" />
   {% else %}
   <form action="{{ url_for('.new_request_pull', username=username,
+    namespace=repo.namespace,
     repo=repo.name, commitid=commitid, branch_from=branch_from,
     branch_to=branch_to) }}" method="post">
   {% endif %}
@@ -187,7 +195,9 @@
     <p class="buttons indent">
       <input type="submit" class="btn btn-primary" value="Create">
       {{ form.csrf_token }}
-      <a class="btn btn-secondary" href="{{ url_for('view_repo', username=username, repo=repo.name)}}">
+      <a class="btn btn-secondary" href="{{ url_for(
+        'view_repo', username=username, repo=repo.name,
+        namespace=repo.namespace)}}">
         Cancel
       </a>
     </p>
@@ -222,8 +232,9 @@
   </li>
   {% if pull_request %}
   <li class="nav-item pull-xs-right">
-    <a class="nav-link" href="{{ url_for('request_pull_patch', username=username,
-            repo=repo.name, requestid=requestid) }}">
+    <a class="nav-link" href="{{ url_for(
+        'request_pull_patch', username=username,
+        namespace=repo.namespace, repo=repo.name, requestid=requestid) }}">
       <span class="hidden-sm-down">Patch</span>
     </a>
   </li>
@@ -238,14 +249,19 @@
 
             {% if pull_request and pull_request.status and pull_request.project_from.is_fork %}
             <a class="list-group-item" href="{{
-                url_for('view_commit', username=pull_request.project_from.user.user,
-                        repo=pull_request.project_from.name, commitid=commit.oid.hex)
+                url_for(
+                    'view_commit',
+                    username=pull_request.project_from.user.user,
+                    namespace=repo.namespace,
+                    repo=pull_request.project_from.name,
+                    commitid=commit.oid.hex)
                 }}">
             {% elif pull_request and pull_request.remote %}
             <a>
             {% else %}
             <a class="list-group-item" href="{{
                 url_for('view_commit', username=username,
+                        namespace=repo.namespace,
                         repo=repo.name, commitid=commit.oid.hex)}}">
             {% endif %}
 
@@ -273,7 +289,8 @@
       endif %}" role="tabpanel" id="request_diff">
     {% if authenticated and pull_request %}
     <form action="{{ url_for('.pull_request_drop_comment', username=username,
-        repo=repo.name, requestid=requestid) }}" method="post" class="icon"
+        namespace=repo.namespace, repo=repo.name, requestid=requestid)
+        }}" method="post" class="icon"
         onsubmit="return try_async_comment(this, null)" >
     {% endif %}
 
@@ -344,6 +361,7 @@
                       username=pull_request.project_from.user.username
                           if pull_request.project_from.is_fork else None,
                       repo=pull_request.project_from.name,
+                      namespace=pull_request.project_from.namespace,
                       identifier=identifier,
                       filename=filepath) }}"
               {% else %}
@@ -355,6 +373,7 @@
                       'view_file',
                       username=username,
                       repo=repo.name,
+                      namespace=repo.namespace,
                       identifier=identifier,
                       filename=filepath) }}"
               {% endif %}
@@ -470,7 +489,8 @@
     <section class="request_comment" id="request_comment">
     {% if pull_request.comments %}
       <form action="{{ url_for('.pull_request_drop_comment', username=username,
-          repo=repo.name, requestid=requestid) }}" method="post"
+          namespace=repo.namespace, repo=repo.name, requestid=requestid)
+          }}" method="post"
           onsubmit="return try_async_comment(this, null)">
 
       {% for comment in pull_request.comments %}
@@ -523,7 +543,7 @@
           {% if authenticated %}
             <form action="{{ url_for(
                 'pull_request_add_comment', username=username, repo=repo.name,
-                requestid=requestid) }}"
+                namespace=repo.namespace, requestid=requestid) }}"
                 method="post" onsubmit="return try_async_comment(this, false)">
               {{ mergeform.csrf_token }}
 
@@ -575,7 +595,8 @@
       {% if pull_request.status == 'Open' and g.repo_admin %}
        <div>
         <form action="{{ url_for('merge_request_pull', username=username,
-            repo=repo.name, requestid=requestid) }}" method="POST">
+            namespace=repo.namespace, repo=repo.name, requestid=requestid)
+          }}" method="POST">
           {{ mergeform.csrf_token }}
           <button id="merge_btn" type="submit" class="btn btn-block">Merge</button>
         </form>
@@ -846,8 +867,8 @@ function setup_reply_btns() {
       if (value != ""){
         var sel = $('#branch_select');
         var final_url = "{{ url_for('.new_request_pull', username=username,
-          repo=repo.name, branch_from=branch_from,
-          branch_to='--') }}";
+          namespace=repo.namespace, repo=repo.name,
+          branch_from=branch_from, branch_to='--') }}";
         final_url = final_url.replace('--', sel.val());
         window.location.href = final_url;
       }
@@ -879,6 +900,7 @@ function setup_reply_btns() {
       var tree_id = $( this ).attr('data-tree');
       var url = "{{ url_for(
         'pull_request_add_comment', username=username, repo=repo.name,
+        namespace=repo.namespace,
         requestid=requestid, commit='', filename='', row='') }}".slice(0, -2);
       url = url + commit + '/' + filename + '/' + row
       if (tree_id) {
@@ -923,6 +945,7 @@ function setup_reply_btns() {
           var _text = $( "#comment" ).val();
           var _url = "{{ url_for('markdown_preview',
                         user=repo.user.user if repo.is_fork,
+                        namespace=repo.namespace,
                         repo=repo.name) | safe}}";
           $.ajax({
             url: _url ,
@@ -1201,8 +1224,8 @@ $(document).ready(function () {
    });
 
    {% if config.get('ENABLE_TICKETS', True) %}
-     $.when($.get("{{ url_for('api_ns.api_view_issues', repo=repo.name, username=username, status='all') }}"),
-            $.get("{{ url_for('api_ns.api_pull_request_views', repo=repo.name, username=username, status='all') }}")
+     $.when($.get("{{ url_for('api_ns.api_view_issues', namespace=repo.namespace, repo=repo.name, username=username, status='all') }}"),
+            $.get("{{ url_for('api_ns.api_pull_request_views', namespace=repo.namespace, repo=repo.name, username=username, status='all') }}")
      ).done(function(issuesResp, prResp) {
        // 0 is the api response
        var issuesAndPrs = issuesResp[0]['issues'].concat(prResp[0]['requests']);
@@ -1221,7 +1244,7 @@ $(document).ready(function () {
        $("#comment").atwho(issueAndPrConfig);
       });
    {% else %}
-     $.get("{{ url_for('api_ns.api_pull_request_views', repo=repo.name, username=username, status='all') }}")
+     $.get("{{ url_for('api_ns.api_pull_request_views', namespace=repo.namespace, repo=repo.name, username=username, status='all') }}")
          .done(function(prResp) {
              var data = $.map(prResp['requests'], function(pr, idx) {
                  return {

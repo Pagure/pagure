@@ -35,18 +35,17 @@
             <div class="list-group list-group-flush">
             {% for repo in repos %}
               <div class="list-group-item">
-                {% if repo.is_fork %}
-                  {% set url = url_for('view_repo', username=repo.user.username, repo=repo.name) %}
-                {% else %}
-                  {% set url = url_for('view_repo', repo=repo.name) %}
-                {% endif %}
+                {% set url = url_for(
+                    'view_repo', namespace=repo.namespace,
+                    username=repo.user.username if repo.is_fork else None,
+                    repo=repo.name) %}
                 <a href="{{ url }}">
                   {% if repo.avatar_email %}
                     <img class="projecticon pull-xs-left" src="{{ repo.avatar_email | avatar_url }}" width=20 height=20 />&nbsp;
                   {% else %}
                     <span class="oi text-muted" data-glyph="document"></span>
                   {% endif %}
-                  <strong>{{ repo.name }}</strong>
+                  <strong>{{ repo.namespace + '/' if repo.namespace }}{{ repo.name }}</strong>
                 </a>
                   <div class="pull-xs-right">
                     {% if config.get('ENABLE_TICKETS', True) and repo.settings.get('issue_tracker', True) %}
@@ -74,7 +73,9 @@
                       </span>
                     {% else %}
                       <a class="notblue" data-toggle="tooltip"
-                        href="{{ url_for('.request_pulls', repo=repo.name) }}"
+                        href="{{ url_for('.request_pulls', repo=repo.name,
+                        namespace=repo.namespace,
+                        username=repo.user.username if repo.is_fork else None) }}"
                         title="{{repo.open_requests}} open pull requests in {{repo.name}}">
                         <span class="oi" data-glyph="arrow-thick-bottom"></span>
                         {{- repo.open_requests}}
@@ -109,19 +110,22 @@
             <div class="list-group list-group-flush">
             {% for fork in forks %}
               <div class="list-group-item">
-                {% if fork.is_fork %}
-                  {% set url = url_for('view_repo', username=fork.user.username, repo=fork.name) %}
-                {% else %}
-                  {% set url = url_for('view_repo', repo=fork.name) %}
-                {% endif %}
+                {% set url = url_for(
+                    'view_repo',
+                    username=fork.user.username if fork.is_fork else None,
+                    repo=fork.name, namespace=fork.namespace) %}
+
                 <a href="{{ url }}">
                   <span class="oi text-muted" data-glyph="fork"></span>
-                  <strong>{{username}}/{{ fork.name }}</strong>
+                  <strong>{{username}}/{{ fork.namespace + '/' if fork.namespace }}{{ fork.name }}</strong>
                 </a>
                   <div class="pull-xs-right">
                   <span class="text-muted">forked from</span>
-                  <a href="{{ url_for('view_repo', repo=fork.parent.name) }}">
-                    {{fork.parent.name}}
+                  <a href="{{ url_for(
+                    'view_repo', repo=fork.parent.name,
+                    namespace=fork.parent.namespace) }}">
+                    {{ fork.parent.namespace + '/' if fork.parent.namespace
+                    }}{{fork.parent.name}}
                   </a>
                   {% if fork.settings.get('issue_tracker', True) %}
                     {% if fork.open_tickets_public == 0 %}
@@ -132,7 +136,9 @@
                       </span>
                     {% else %}
                       <a class="notblue" data-toggle="tooltip"
-                        href="{{ url_for('.view_issues', repo=fork.name) }}"
+                        href="{{ url_for(
+                          '.view_issues', repo=fork.name,
+                          namespace=fork.namespace) }}"
                         title="{{ fork.open_tickets_public }} open issues against {{fork.name}}">
                         <span class="oi" data-glyph="warning"></span>
                         {{- fork.open_tickets_public }}
@@ -148,7 +154,9 @@
                       </span>
                     {% else %}
                       <a class="notblue" data-toggle="tooltip"
-                        href="{{ url_for('.request_pulls', repo=fork.name) }}"
+                        href="{{ url_for(
+                            '.request_pulls', repo=fork.name,
+                            namespace=fork.namespace) }}"
                         title="{{fork.open_requests}} open pull requests in {{fork.name}}">
                         <span class="oi" data-glyph="arrow-thick-bottom"></span>
                         {{- fork.open_requests}}
@@ -197,16 +205,26 @@
               <div class="list-group">
                 {% if repo.is_fork %}
                   <a class="list-group-item" href="{{ url_for(
-                    'view_repo', username=repo.user.username, repo=repo.name) }}">
-                    <div class=""><strong><span class="oi" data-glyph="fork">
-                            </span> &nbsp;{{ repo.user.username }}/{{ repo.name }}</strong>
+                    'view_repo', username=repo.user.username, repo=repo.name,
+                    namespace=repo.namespace) }}">
+                    <div class="">
+                      <strong>
+                        <span class="oi" data-glyph="fork"></span>
+                        &nbsp;{{ repo.user.username }}/{{
+                          repo.namespace + '/' if repo.namespace
+                              }}{{ repo.name }}
+                      </strong>
                     </div>
                   </a>
                 {% else %}
                   <a class="list-group-item" href="{{ url_for(
-                    'view_repo', repo=repo.name) }}">
-                    <div class=""><strong><span class="oi" data-glyph="document">
-                          </span> &nbsp;{{ repo.name }}</strong>
+                    'view_repo', repo=repo.name, namespace=repo.namespace) }}">
+                    <div class="">
+                      <strong>
+                        <span class="oi" data-glyph="document"></span>
+                        &nbsp;{{ repo.namespace + '/' if repo.namespace
+                              }}{{ repo.name }}
+                      </strong>
                     </div>
                   </a>
                 {% endif %}

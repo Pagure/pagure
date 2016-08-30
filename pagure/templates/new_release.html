@@ -1,6 +1,7 @@
 {% extends "repo_master.html" %}
 
-{% block title %}New release - {{ repo.name }}{% endblock %}
+{% block title %}New release - {{
+    repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 {% set tag = "home" %}
 
 
@@ -13,7 +14,8 @@
   {{ config['MAX_CONTENT_LENGTH'] / 1024 /1024 }}MB.
 </p>
 
-<form action="{{ url_for('new_release', username=username, repo=repo.name) }}"
+<form action="{{ url_for('new_release',
+    namespace=repo.namespace, username=username, repo=repo.name) }}"
     method="post" enctype="multipart/form-data">
 {{ form.csrf_token }}
 <input id="file-picker" type="file" name="filestream" multiple>

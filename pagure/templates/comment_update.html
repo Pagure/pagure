@@ -44,8 +44,8 @@
     }
     $("#update_comment").atwho(userConfig);
   });
-   $.when($.get("{{ url_for('api_ns.api_view_issues', repo=repo.name, username=username, status='all') }}"),
-          $.get("{{ url_for('api_ns.api_pull_request_views', repo=repo.name, username=username, status='all') }}")
+   $.when($.get("{{ url_for('api_ns.api_view_issues', namespace=repo.namespace, repo=repo.name, username=username, status='all') }}"),
+          $.get("{{ url_for('api_ns.api_pull_request_views', namespace=repo.namespace, repo=repo.name, username=username, status='all') }}")
    ).done(function(issuesResp, prResp) {
      // 0 is the api response
      var issuesAndPrs = issuesResp[0]['issues'].concat(prResp[0]['requests']);

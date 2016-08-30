@@ -3,7 +3,8 @@
 {% if full %}
 {% extends "repo_master.html" %}
 
-{% block title %}{{ select.capitalize() }} {{ plugin.name }} - {{ repo.name }}{% endblock %}
+{% block title %}{{ select.capitalize() }} {{ plugin.name }} - {{
+    repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 {% set tag = "home" %}
 {% endif %}
 
@@ -13,8 +14,8 @@
 {% endif %}
 
   <form action="{{ url_for('.view_plugin',
-                  username=username, repo=repo.name, plugin=plugin.name,
-                  ) }}" method="post">
+        namespace=repo.namespace, username=username, repo=repo.name,
+        plugin=plugin.name) }}" method="post">
   {{ plugin.description | markdown | noJS | safe }}
 
   <table>

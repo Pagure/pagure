@@ -1,7 +1,8 @@
 {% extends "repo_master.html" %}
 {% from "_formhelper.html" import render_field_in_row %}
 
-{% block title %}{{ select.capitalize() }} - {{ repo.name }}{% endblock %}
+{% block title %}{{ select.capitalize() }} - {{
+    repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 {% set tag = "home" %}
 
 {% block repo %}
@@ -15,7 +16,7 @@
           Project Details
         </div>
         <div class="card-block">
-          <form action="{{ url_for('.update_project',
+          <form action="{{ url_for('.update_project', namespace=repo.namespace,
                           username=username, repo=repo.name) }}" method="post">
             <fieldset class="form-group">
               <label for="description">Description</label>
@@ -53,7 +54,8 @@
         </div>
         <div class="card-block">
           <form action="{{ url_for('change_ref_head',
-                 username=username, repo=repo.name) }}" method="post">
+                namespace=repo.namespace,
+                username=username, repo=repo.name) }}" method="post">
             {{ branches_form.csrf_token }}
             {{ branches_form.branches(class_="c-select") }}
             <input class="btn btn-primary" type="submit" value="Make Default"/>
@@ -84,7 +86,7 @@
           </div>
 
           <form action="{{ url_for('.new_repo_hook_token',
-                        username=username, repo=repo.name) }}"
+                namespace=repo.namespace, username=username, repo=repo.name) }}"
               method="post" class="icon">
           <button class="btn btn-primary" type="submit"
             onclick="return confirm('Are you sure to generate a new token for '
@@ -138,8 +140,9 @@
               <span class="text-danger btn-align"><strong>Expired</strong> since {{ token.expiration.date() }}</span>
             {% else %}
               <span class="text-success btn-align"><strong>Valid</strong> until: {{ token.expiration.date() }}</span>
-              <form class="pull-xs-right" action="{{ url_for('.revoke_api_token',
-                    username=username, repo=repo.name, token_id=token.id) }}"
+              <form class="pull-xs-right" action="{{ url_for(
+                  '.revoke_api_token', namespace=repo.namespace,
+                  username=username, repo=repo.name, token_id=token.id) }}"
                 method="post" class="icon">
                 <button class="btn btn-danger" type="submit"
                     onclick="return confirm('Are you sure to revoke this token ?'
@@ -182,7 +185,9 @@
         </ul>
         {% endif %}
         <div class="card-block">
-          <a href="{{ url_for('.add_token', username=username, repo=repo.name) }}"
+          <a href="{{ url_for(
+                '.add_token', namespace=repo.namespace, username=username,
+                repo=repo.name) }}"
               method="post" class="icon">
           <button class="btn btn-primary" type="submit"
             title="Generate a new API token">
@@ -201,7 +206,8 @@
         </div>
         <div class="card-block">
           <form action="{{ url_for('.view_settings',
-                          username=username, repo=repo.name) }}" method="post">
+                namespace=repo.namespace,
+                username=username, repo=repo.name) }}" method="post">
             {% for key in repo.settings | sort %}
             {% if not config.get('ENABLE_TICKETS', True) and key in ['issue_tracker'] %}
             {% elif not config.get('DOC_APP_URL') and key in ['project_documentation'] %}
@@ -241,8 +247,9 @@
           Re-generate git repos
         </div>
         <div class="card-block">
-          <form action="{{ url_for('.regenerate_git',
-                          username=username, repo=repo.name) }}" method="post"
+          <form action="{{ url_for(
+              '.regenerate_git', namespace=repo.namespace,
+              username=username, repo=repo.name) }}" method="post"
                 class="icon">
             <input name="regenerate" value="tickets" type="hidden"/>
             <button class="btn btn-primary" type="submit"
@@ -251,8 +258,9 @@
             </button>
             {{ form.csrf_token }}
           </form>
-          <form class="m-t-2" action="{{ url_for('.regenerate_git',
-                          username=username, repo=repo.name) }}" method="post"
+          <form class="m-t-2" action="{{ url_for(
+              '.regenerate_git', namespace=repo.namespace,
+              username=username, repo=repo.name) }}" method="post"
                 class="icon">
             <input name="regenerate" value="requests" type="hidden"/>
             <button class="btn btn-primary" type="submit"
@@ -276,12 +284,16 @@
           <p>Below is the list of user having commit rights to this repo.</p>
 
           <p>
-            <a href="{{ url_for('.add_user', username=username, repo=repo.name) }}"
+            <a href="{{ url_for(
+                  '.add_user', namespace=repo.namespace,
+                  username=username, repo=repo.name) }}"
                 class="btn btn-primary">
                 add user
             </a>
 
-            <a href="{{ url_for('.add_group_project', username=username, repo=repo.name) }}"
+            <a href="{{ url_for(
+                  '.add_group_project', namespace=repo.namespace,
+                  username=username, repo=repo.name) }}"
                 class="btn btn-primary">
                 add group
             </a>
@@ -302,7 +314,9 @@
                 &nbsp; {{ user.user }}
               </a>
               <form class="pull-xs-right" method="POST"
-                action="{{ url_for('.remove_user', username=username, repo=repo.name, userid=user.id) }}">
+                action="{{ url_for(
+                    '.remove_user', namespace=repo.namespace,
+                    username=username, repo=repo.name, userid=user.id) }}">
                 <button
                   onclick="return confirm('You sure you want to remove this user from this project?');"
                   title="Remove user" class="btn btn-danger btn-sm">
@@ -319,7 +333,9 @@
                 &nbsp; {{ group.group_name }}
               </a>
               <form class="pull-xs-right" method="POST"
-                action="{{ url_for('.remove_group_project', username=username, repo=repo.name, groupid=group.id) }}">
+                action="{{ url_for(
+                    '.remove_group_project', namespace=repo.namespace,
+                    username=username, repo=repo.name, groupid=group.id) }}">
                 <button
                   onclick="return confirm('You sure you want to remove this group from this project?');"
                   title="Remove group" class="btn btn-danger btn-sm pull-xs-right">
@@ -387,8 +403,9 @@
             </span>
           </p>
         </div>
-        <form action="{{ url_for('.update_priorities',
-                          username=username, repo=repo.name) }}"
+        <form action="{{ url_for(
+              '.update_priorities', namespace=repo.namespace,
+              username=username, repo=repo.name) }}"
             method="post" class="icon">
           {{ tag_form.csrf_token }}
           <div class="card-block">
@@ -453,8 +470,9 @@
             corresponding to one of the milestones defined here.
           </p>
         </div>
-        <form action="{{ url_for('.update_milestones',
-                          username=username, repo=repo.name) }}"
+        <form action="{{ url_for(
+              '.update_milestones', namespace=repo.namespace,
+              username=username, repo=repo.name) }}"
             method="post" class="icon">
           {{ tag_form.csrf_token }}
           <div class="card-block">
@@ -514,13 +532,16 @@
         <ul class="list-group list-group-flush">
         {% for tag in tags %}
           <li class="list-group-item clearfix">
-            <a href="{{ url_for('view_issues', username=username,
-              repo=repo.name, tags=tag.tag) }}">
+            <a href="{{ url_for(
+                'view_issues', namespace=repo.namespace, username=username,
+                repo=repo.name, tags=tag.tag) }}">
               <span class="oi" data-glyph="tag"></span>&nbsp; {{ tag.tag }}
             </a>
             <div class="pull-xs-right">
             <form class="icon del_icon pull-xs-right" method="POST"
-              action="{{ url_for('remove_tag', username=username, repo=repo.name) }}">
+              action="{{ url_for(
+                'remove_tag', namespace=repo.namespace, username=username,
+                repo=repo.name) }}">
               <input type="hidden" value="{{ tag.tag }}" name="tag" />
               {{ tag_form.csrf_token }}
               <button
@@ -530,7 +551,8 @@
               </button>
             </form>
             <a href="{{ url_for(
-                  '.edit_tag',username=username, repo=repo.name, tag=tag.tag) }}">
+                  '.edit_tag', namespace=repo.namespace, username=username,
+                  repo=repo.name, tag=tag.tag) }}">
               <button class="btn btn-default btn-sm" title="Edit tag">
                 <span class="oi" data-glyph="pencil"></span>
               </button>
@@ -550,8 +572,9 @@
           Delete Project
         </div>
         <div class="card-block">
-        <form action="{{ url_for('.delete_repo',
-                        username=username, repo=repo.name) }}"
+        <form action="{{ url_for(
+            '.delete_repo', namespace=repo.namespace,
+            username=username, repo=repo.name) }}"
               method="post" class="icon">
           <button class="btn btn-danger" type="submit"
             onclick="return confirm('Are you sure to delete {{repo.name}}? \nThis is final and cannot be un-done.');"
@@ -597,7 +620,9 @@ $('#accordions').on('shown.bs.collapse', function (e) {
   if (!_plugin) {
     return false;
   }
-  var _url = "{{ url_for('.view_plugin', repo=repo.name, username=username, plugin='') }}";
+  var _url = "{{ url_for(
+    '.view_plugin', namespace=repo.namespace, repo=repo.name,
+    username=username, plugin='') }}";
   _url += _plugin + '/0';
   console.log(_url);
   $.ajax({

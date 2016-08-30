@@ -1,7 +1,8 @@
 {% extends "repo_master.html" %}
 {% from "_formhelper.html" import render_bootstrap_field %}
 
-{% block title %}Remote Pull request {{ repo.name }}{% endblock %}
+{% block title %}Remote Pull request {{
+    repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 {% set tag = "home" %}
 
 {% block repo %}
@@ -28,7 +29,8 @@
 </p>
 
 {% if form %}
-  <form action="{{ url_for('.new_remote_request_pull', username=username,
+  <form action="{{ url_for(
+    '.new_remote_request_pull', namespace=repo.namespace, username=username,
     repo=repo.name) }}" method="post">
     <div class="card-block">
       {{ render_bootstrap_field(
@@ -53,7 +55,9 @@
       <input type="submit" class="btn btn-primary" value="Preview">
       {{ form.csrf_token }}
 
-      <a href="{{ url_for('view_repo', username=username, repo=repo.name)}}">
+      <a href="{{ url_for(
+        'view_repo', namespace=repo.namespace,
+        username=username, repo=repo.name)}}">
         <input type="button" class="btn btn-secondary" value="Cancel" />
       </a>
     </p>

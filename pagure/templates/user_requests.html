@@ -49,7 +49,10 @@
                     elif request.status|lower == 'open'%}label-primary{%
                     endif%}">{{request.status}}</span></td>
                 <td class="stretch-table-column">
-                  <a href="{{ url_for('request_pull', username=request.project.username if request.project.is_fork else None,
+                  <a href="{{ url_for(
+                      'request_pull',
+                      username=request.project.username if request.project.is_fork else None,
+                      namespace=request.project.namespace,
                       repo=request.project.name, requestid=request.id) }}">
                     {{ request.title | noJS("img") | safe }}
                   </a>
@@ -62,8 +65,10 @@
                   <a href="{{ url_for(
                     'view_repo',
                     username=request.project.username if request.project.is_fork else None,
+                    namespace=request.project.namespace,
                     repo=request.project.name)}}">
                     {{ request.project.username + '/' if request.project.is_fork }}
+                    {{ request.project.namespace + '/' if request.project.namespace }}
                     {{ request.project.name }}
                   </a>
                 </td>

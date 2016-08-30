@@ -14,7 +14,8 @@
         </div>
         <div class="card-block">
           <form action="{{
-              url_for('.add_token', username=username, repo=repo.name)
+              url_for('.add_token', username=username,
+                      repo=repo.name, namespace=repo.namespace)
           }}" method="post">
             {% for acl in acls %}
             <div>
