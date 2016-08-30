@@ -21,12 +21,17 @@ from pagure import APP, SESSION
 from pagure.api import API, APIERROR, api_method
 
 
-@API.route('/ci/jenkins/<repo:repo>/<pagure_ci_token>/build-finished',
+@API.route('/ci/jenkins/<repo>/<pagure_ci_token>/build-finished',
            methods=['POST'])
-@API.route('/ci/jenkins/forks/<username>/<repo:repo>/'
+@API.route('/ci/jenkins/<namespace>/<repo>/<pagure_ci_token>/build-finished',
+           methods=['POST'])
+@API.route('/ci/jenkins/forks/<username>/<repo>/'
+           '<pagure_ci_token>/build-finished', methods=['POST'])
+@API.route('/ci/jenkins/forks/<username>/<namespace>/<repo>/'
            '<pagure_ci_token>/build-finished', methods=['POST'])
 @api_method
-def jenkins_ci_notification(repo, pagure_ci_token, username=None):
+def jenkins_ci_notification(
+        repo, pagure_ci_token, username=None, namespace=None):
     """
     Jenkins Build Notification
     --------------------------
@@ -35,11 +40,12 @@ def jenkins_ci_notification(repo, pagure_ci_token, username=None):
 
     ::
 
-        POST /api/0/ci/jenkins/<token>/build-finished
+        POST /api/0/ci/jenkins/<repo>/<token>/build-finished
 
     """
 
-    project = pagure.lib.get_project(SESSION, repo, user=username)
+    project = pagure.lib.get_project(
+        SESSION, repo, user=username, namespace=namespace)
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 

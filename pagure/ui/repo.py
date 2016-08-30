@@ -51,26 +51,45 @@ from pagure import (APP, SESSION, LOG, __get_file_in_tree, login_required,
                     admin_session_timedout)
 
 
-@APP.route('/<repo:repo>.git')
-@APP.route('/fork/<username>/<repo:repo>.git')
-def view_repo_git(repo, username=None):
+@APP.route('/<repo>.git')
+@APP.route('/<namespace>/<repo>.git')
+@APP.route('/fork/<username>/<namespace>/<repo>.git')
+@APP.route('/fork/<username>/<namespace>/<repo>.git')
+def view_repo_git(repo, username=None, namespace=None):
     ''' Redirect to the project index page when user wants to view
     the git repo of the project
     '''
     return flask.redirect(flask.url_for(
-        'view_repo', repo=repo, username=username))
+        'view_repo', repo=repo, username=username, namespace=namespace))
 
 
-@APP.route('/<repo:repo>/')
-@APP.route('/<repo:repo>')
-@APP.route('/fork/<username>/<repo:repo>/')
-@APP.route('/fork/<username>/<repo:repo>')
-def view_repo(repo, username=None):
+@APP.route('/<repo>/')
+@APP.route('/<repo>')
+@APP.route('/<namespace>/<repo>/')
+@APP.route('/<namespace>/<repo>')
+@APP.route('/fork/<username>/<repo>/')
+@APP.route('/fork/<username>/<repo>')
+@APP.route('/fork/<username>/<namespace>/<repo>/')
+@APP.route('/fork/<username>/<namespace>/<repo>')
+def view_repo(repo, username=None, namespace=None):
     """ Front page of a specific repo.
     """
-    repo = flask.g.repo
+    repo_db = flask.g.repo
     reponame = flask.g.reponame
     repo_obj = flask.g.repo_obj
+
+    #if not repo_db and not APP.config.get('OLD_VIEW_COMMIT_ENABLED', False):
+        #repo_db = pagure.lib.get_project(
+            #SESSION, namespace, user=username, namespace=None)
+
+    if not repo_db and APP.config.get('OLD_VIEW_COMMIT_ENABLED', False) \
+            and len(repo) == 40:
+        return flask.redirect(flask.url_for(
+            'view_commit', repo=namespace, commitid=repo, username=username,
+            namespace=None))
+
+    if repo_db is None:
+        flask.abort(404, 'Project not found')
 
     if not repo_obj.is_empty and not repo_obj.head_is_unborn:
         head = repo_obj.head.shorthand
@@ -109,14 +128,14 @@ def view_repo(repo, username=None):
                 content, ext,
                 view_file_url=flask.url_for(
                     'view_raw_file', username=username,
-                    repo=repo.name, identifier=branchname, filename=''))
+                    repo=repo_db.name, identifier=branchname, filename=''))
 
     diff_commits = []
-    if repo.is_fork and repo.parent:
+    if repo_db.is_fork and repo_db.parent:
         parentname = os.path.join(
-            APP.config['GIT_FOLDER'], repo.parent.path)
+            APP.config['GIT_FOLDER'], repo_db.parent.path)
     else:
-        parentname = os.path.join(APP.config['GIT_FOLDER'], repo.path)
+        parentname = os.path.join(APP.config['GIT_FOLDER'], repo_db.path)
 
     orig_repo = pygit2.Repository(parentname)
 
@@ -144,7 +163,7 @@ def view_repo(repo, username=None):
     return flask.render_template(
         'repo_info.html',
         select='overview',
-        repo=repo,
+        repo=repo_db,
         username=username,
         head=head,
         readme=readme,
@@ -158,9 +177,11 @@ def view_repo(repo, username=None):
     )
 
 
-@APP.route('/<repo:repo>/branch/<path:branchname>')
-@APP.route('/fork/<username>/<repo:repo>/branch/<path:branchname>')
-def view_repo_branch(repo, branchname, username=None):
+@APP.route('/<repo>/branch/<path:branchname>')
+@APP.route('/<namespace>/<repo>/branch/<path:branchname>')
+@APP.route('/fork/<username>/<repo>/branch/<path:branchname>')
+@APP.route('/fork/<username>/<namespace>/<repo>/branch/<path:branchname>')
+def view_repo_branch(repo, branchname, username=None, namespace=None):
     ''' Returns the list of branches in the repo. '''
 
     repo = flask.g.repo
@@ -251,13 +272,19 @@ def view_repo_branch(repo, branchname, username=None):
     )
 
 
-@APP.route('/<repo:repo>/commits/')
-@APP.route('/<repo:repo>/commits')
-@APP.route('/<repo:repo>/commits/<path:branchname>')
-@APP.route('/fork/<username>/<repo:repo>/commits/')
-@APP.route('/fork/<username>/<repo:repo>/commits')
-@APP.route('/fork/<username>/<repo:repo>/commits/<path:branchname>')
-def view_commits(repo, branchname=None, username=None):
+@APP.route('/<repo>/commits/')
+@APP.route('/<repo>/commits')
+@APP.route('/<repo>/commits/<path:branchname>')
+@APP.route('/<namespace>/<repo>/commits/')
+@APP.route('/<namespace>/<repo>/commits')
+@APP.route('/<namespace>/<repo>/commits/<path:branchname>')
+@APP.route('/fork/<username>/<repo>/commits/')
+@APP.route('/fork/<username>/<repo>/commits')
+@APP.route('/fork/<username>/<repo>/commits/<path:branchname>')
+@APP.route('/fork/<username>/<namespace>/<repo>/commits/')
+@APP.route('/fork/<username>/<namespace>/<repo>/commits')
+@APP.route('/fork/<username>/<namespace>/<repo>/commits/<path:branchname>')
+def view_commits(repo, branchname=None, username=None, namespace=None):
     """ Displays the commits of the specified repo.
     """
     repo = flask.g.repo
@@ -359,9 +386,13 @@ def view_commits(repo, branchname=None, username=None):
 
 @APP.route('/<repo>/c/<commit1>..<commit2>/')
 @APP.route('/<repo>/c/<commit1>..<commit2>')
+@APP.route('/<namespace>/<repo>/c/<commit1>..<commit2>/')
+@APP.route('/<namespace>/<repo>/c/<commit1>..<commit2>')
 @APP.route('/fork/<username>/<repo>/c/<commit1>..<commit2>/')
 @APP.route('/fork/<username>/<repo>/c/<commit1>..<commit2>')
-def compare_commits(repo, commit1, commit2, username=None):
+@APP.route('/fork/<username>/<namespace>/<repo>/c/<commit1>..<commit2>/')
+@APP.route('/fork/<username>/<namespace>/<repo>/c/<commit1>..<commit2>')
+def compare_commits(repo, commit1, commit2, username=None, namespace=None):
     """ Compares two commits for specified repo
     """
     repo = flask.g.repo
@@ -423,10 +454,13 @@ def compare_commits(repo, commit1, commit2, username=None):
     )
 
 
-@APP.route('/<repo:repo>/blob/<path:identifier>/f/<path:filename>')
+@APP.route('/<repo>/blob/<path:identifier>/f/<path:filename>')
+@APP.route('/<namespace>/<repo>/blob/<path:identifier>/f/<path:filename>')
 @APP.route(
-    '/fork/<username>/<repo:repo>/blob/<path:identifier>/f/<path:filename>')
-def view_file(repo, identifier, filename, username=None):
+    '/fork/<username>/<repo>/blob/<path:identifier>/f/<path:filename>')
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/blob/<path:identifier>/f/<path:filename>')
+def view_file(repo, identifier, filename, username=None, namespace=None):
     """ Displays the content of a file or a tree for the specified repo.
     """
     repo = flask.g.repo
@@ -547,14 +581,18 @@ def view_file(repo, identifier, filename, username=None):
     )
 
 
-@APP.route('/<repo:repo>/raw/<path:identifier>', defaults={'filename': None})
-@APP.route('/<repo:repo>/raw/<path:identifier>/f/<path:filename>')
+@APP.route('/<repo>/raw/<path:identifier>',)
+@APP.route('/<namespace>/<repo>/raw/<path:identifier>',)
+@APP.route('/<repo>/raw/<path:identifier>/f/<path:filename>')
+@APP.route('/<namespace>/<repo>/raw/<path:identifier>/f/<path:filename>')
+@APP.route('/fork/<username>/<repo>/raw/<path:identifier>')
+@APP.route('/fork/<username>/<namespace>/<repo>/raw/<path:identifier>')
 @APP.route(
-    '/fork/<username>/<repo:repo>/raw/<path:identifier>',
-    defaults={'filename': None})
+    '/fork/<username>/<repo>/raw/<path:identifier>/f/<path:filename>')
 @APP.route(
-    '/fork/<username>/<repo:repo>/raw/<path:identifier>/f/<path:filename>')
-def view_raw_file(repo, identifier, filename=None, username=None):
+    '/fork/<username>/<namespace>/<repo>/raw/<path:identifier>/f/<path:filename>')
+def view_raw_file(
+        repo, identifier, filename=None, username=None, namespace=None):
     """ Displays the raw content of a file of a commit for the specified repo.
     """
     repo = flask.g.repo
@@ -632,34 +670,15 @@ def view_raw_file(repo, identifier, filename=None, username=None):
     return (data, 200, headers)
 
 
-if APP.config.get('OLD_VIEW_COMMIT_ENABLED', False):
-    @APP.route('/<repo>/<string(length=40):commitid>/')
-    @APP.route('/<repo>/<string(length=40):commitid>')
-    @APP.route('/fork/<username>/<repo>/<string(length=40):commitid>/')
-    @APP.route('/fork/<username>/<repo>/<string(length=40):commitid>')
-    def view_commit_old(repo, commitid, username=None):
-        """ Redirect from the old view_commit to the new one.
-
-        This method aims to provide backward compatibility with the old URL
-        scheme where the commit id was right after the repo name.
-        This is problematic since we now allow up to one slash ('/') in the
-        project name, making the url parsing a little trickier.
-        So if the element after the '/' is exactly 40 characters long, then we
-        consider it's a commit hash and redirect to the new URL scheme for
-        viewing commits.
-        If the element is more (not possible) or less than 40 characters, then
-        the other URLs should catch it.
-
-        """
-        return flask.redirect(flask.url_for(
-            'view_commit', repo=repo, commitid=commitid, username=username))
-
-
-@APP.route('/<repo:repo>/c/<commitid>/')
-@APP.route('/<repo:repo>/c/<commitid>')
-@APP.route('/fork/<username>/<repo:repo>/c/<commitid>/')
-@APP.route('/fork/<username>/<repo:repo>/c/<commitid>')
-def view_commit(repo, commitid, username=None):
+@APP.route('/<repo>/c/<commitid>/')
+@APP.route('/<repo>/c/<commitid>')
+@APP.route('/<namespace>/<repo>/c/<commitid>/')
+@APP.route('/<namespace>/<repo>/c/<commitid>')
+@APP.route('/fork/<username>/<repo>/c/<commitid>/')
+@APP.route('/fork/<username>/<repo>/c/<commitid>')
+@APP.route('/fork/<username>/<namespace>/<repo>/c/<commitid>/')
+@APP.route('/fork/<username>/<namespace>/<repo>/c/<commitid>')
+def view_commit(repo, commitid, username=None, namespace=None):
     """ Render a commit in a repo
     """
     repo = flask.g.repo
@@ -701,9 +720,11 @@ def view_commit(repo, commitid, username=None):
     )
 
 
-@APP.route('/<repo:repo>/c/<commitid>.patch')
-@APP.route('/fork/<username>/<repo:repo>/c/<commitid>.patch')
-def view_commit_patch(repo, commitid, username=None):
+@APP.route('/<repo>/c/<commitid>.patch')
+@APP.route('/<namespace>/<repo>/c/<commitid>.patch')
+@APP.route('/fork/<username>/<repo>/c/<commitid>.patch')
+@APP.route('/fork/<username>/<namespace>/<repo>/c/<commitid>.patch')
+def view_commit_patch(repo, commitid, username=None, namespace=None):
     """ Render a commit in a repo as patch
     """
     repo = flask.g.repo
@@ -723,13 +744,19 @@ def view_commit_patch(repo, commitid, username=None):
     return flask.Response(patch, content_type="text/plain;charset=UTF-8")
 
 
-@APP.route('/<repo:repo>/tree/')
-@APP.route('/<repo:repo>/tree')
-@APP.route('/<repo:repo>/tree/<path:identifier>')
-@APP.route('/fork/<username>/<repo:repo>/tree/')
-@APP.route('/fork/<username>/<repo:repo>/tree')
-@APP.route('/fork/<username>/<repo:repo>/tree/<path:identifier>')
-def view_tree(repo, identifier=None, username=None):
+@APP.route('/<repo>/tree/')
+@APP.route('/<repo>/tree')
+@APP.route('/<namespace>/<repo>/tree/')
+@APP.route('/<namespace>/<repo>/tree')
+@APP.route('/<repo>/tree/<path:identifier>')
+@APP.route('/<namespace>/<repo>/tree/<path:identifier>')
+@APP.route('/fork/<username>/<repo>/tree/')
+@APP.route('/fork/<username>/<repo>/tree')
+@APP.route('/fork/<username>/<namespace>/<repo>/tree/')
+@APP.route('/fork/<username>/<namespace>/<repo>/tree')
+@APP.route('/fork/<username>/<repo>/tree/<path:identifier>')
+@APP.route('/fork/<username>/<namespace>/<repo>/tree/<path:identifier>')
+def view_tree(repo, identifier=None, username=None, namespace=None):
     """ Render the tree of the repo
     """
     repo = flask.g.repo
@@ -792,11 +819,15 @@ def view_tree(repo, identifier=None, username=None):
     )
 
 
-@APP.route('/<repo:repo>/forks/')
-@APP.route('/<repo:repo>/forks')
-@APP.route('/fork/<username>/<repo:repo>/forks/')
-@APP.route('/fork/<username>/<repo:repo>/forks')
-def view_forks(repo, username=None):
+@APP.route('/<repo>/forks/')
+@APP.route('/<repo>/forks')
+@APP.route('/<namespace>/<repo>/forks/')
+@APP.route('/<namespace>/<repo>/forks')
+@APP.route('/fork/<username>/<repo>/forks/')
+@APP.route('/fork/<username>/<repo>/forks')
+@APP.route('/fork/<username>/<namespace>/<repo>/forks/')
+@APP.route('/fork/<username>/<namespace>/<repo>/forks')
+def view_forks(repo, username=None, namespace=None):
     """ Presents all the forks of the project.
     """
     repo = flask.g.repo
@@ -811,11 +842,15 @@ def view_forks(repo, username=None):
     )
 
 
-@APP.route('/<repo:repo>/releases/')
-@APP.route('/<repo:repo>/releases')
-@APP.route('/fork/<username>/<repo:repo>/releases/')
-@APP.route('/fork/<username>/<repo:repo>/releases')
-def view_tags(repo, username=None):
+@APP.route('/<repo>/releases/')
+@APP.route('/<repo>/releases')
+@APP.route('/<namespace>/<repo>/releases/')
+@APP.route('/<namespace>/<repo>/releases')
+@APP.route('/fork/<username>/<repo>/releases/')
+@APP.route('/fork/<username>/<repo>/releases')
+@APP.route('/fork/<username>/<namespace>/<repo>/releases/')
+@APP.route('/fork/<username>/<namespace>/<repo>/releases')
+def view_tags(repo, username=None, namespace=None):
     """ Presents all the tags of the project.
     """
     repo = flask.g.repo
@@ -833,12 +868,18 @@ def view_tags(repo, username=None):
     )
 
 
-@APP.route('/<repo:repo>/upload/', methods=('GET', 'POST'))
-@APP.route('/<repo:repo>/upload', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo:repo>/upload/', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo:repo>/upload', methods=('GET', 'POST'))
+@APP.route('/<repo>/upload/', methods=('GET', 'POST'))
+@APP.route('/<repo>/upload', methods=('GET', 'POST'))
+@APP.route('/<namespace>/<repo>/upload/', methods=('GET', 'POST'))
+@APP.route('/<namespace>/<repo>/upload', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/upload/', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/upload', methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/upload/', methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/upload', methods=('GET', 'POST'))
 @login_required
-def new_release(repo, username=None):
+def new_release(repo, username=None, namespace=None):
     """ Upload a new release.
     """
     if not APP.config.get('UPLOAD_FOLDER_PATH') \
@@ -880,12 +921,18 @@ def new_release(repo, username=None):
     )
 
 
-@APP.route('/<repo:repo>/settings/', methods=('GET', 'POST'))
-@APP.route('/<repo:repo>/settings', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo:repo>/settings/', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo:repo>/settings', methods=('GET', 'POST'))
+@APP.route('/<repo>/settings/', methods=('GET', 'POST'))
+@APP.route('/<repo>/settings', methods=('GET', 'POST'))
+@APP.route('/<namespace>/<repo>/settings/', methods=('GET', 'POST'))
+@APP.route('/<namespace>/<repo>/settings', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/settings/', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/settings', methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/settings/', methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/settings', methods=('GET', 'POST'))
 @login_required
-def view_settings(repo, username=None):
+def view_settings(repo, username=None, namespace=None):
     """ Presents the settings of the project.
     """
     if admin_session_timedout():
@@ -959,16 +1006,19 @@ def view_settings(repo, username=None):
     )
 
 
-@APP.route('/<repo:repo>/update', methods=['POST'])
-@APP.route('/fork/<username>/<repo:repo>/update', methods=['POST'])
+@APP.route('/<repo>/update', methods=['POST'])
+@APP.route('/<namespace>/<repo>/update', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/update', methods=['POST'])
+@APP.route('/fork/<username>/<namespace>/<repo>/update', methods=['POST'])
 @login_required
-def update_project(repo, username=None):
+def update_project(repo, username=None, namespace=None):
     """ Update the description of a project.
     """
     if admin_session_timedout():
         flask.flash('Action canceled, try it again', 'error')
         url = flask.url_for(
-            'view_settings', username=username, repo=repo)
+            'view_settings', username=username, repo=repo,
+            namespace=namespace)
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
@@ -1003,16 +1053,21 @@ def update_project(repo, username=None):
         'view_settings', username=username, repo=repo.name))
 
 
-@APP.route('/<repo:repo>/update/priorities', methods=['POST'])
-@APP.route('/fork/<username>/<repo:repo>/update/priorities', methods=['POST'])
+@APP.route('/<repo>/update/priorities', methods=['POST'])
+@APP.route('/<namespace>/<repo>/update/priorities', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/update/priorities', methods=['POST'])
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/update/priorities',
+    methods=['POST'])
 @login_required
-def update_priorities(repo, username=None):
+def update_priorities(repo, username=None, namespace=None):
     """ Update the priorities of a project.
     """
     if admin_session_timedout():
         flask.flash('Action canceled, try it again', 'error')
         url = flask.url_for(
-            'view_settings', username=username, repo=repo)
+            'view_settings', username=username, repo=repo,
+            namespace=namespace)
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
@@ -1091,16 +1146,21 @@ def update_priorities(repo, username=None):
         'view_settings', username=username, repo=repo.name))
 
 
-@APP.route('/<repo:repo>/update/milestones', methods=['POST'])
-@APP.route('/fork/<username>/<repo:repo>/update/milestones', methods=['POST'])
+@APP.route('/<repo>/update/milestones', methods=['POST'])
+@APP.route('/<namespace>/<repo>/update/milestones', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/update/milestones', methods=['POST'])
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/update/milestones',
+    methods=['POST'])
 @login_required
-def update_milestones(repo, username=None):
+def update_milestones(repo, username=None, namespace=None):
     """ Update the milestones of a project.
     """
     if admin_session_timedout():
         flask.flash('Action canceled, try it again', 'error')
         url = flask.url_for(
-            'view_settings', username=username, repo=repo)
+            'view_settings', username=username, repo=repo,
+            namespace=namespace)
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
@@ -1167,20 +1227,25 @@ def update_milestones(repo, username=None):
                 flask.flash(str(err), 'error')
 
     return flask.redirect(flask.url_for(
-        'view_settings', username=username, repo=repo.name))
+        'view_settings', username=username, repo=repo.name,
+        namespace=namespace))
 
 
-@APP.route('/<repo:repo>/default/branch/', methods=['POST'])
-@APP.route('/fork/<username>/<repo:repo>/default/branch/', methods=['POST'])
+@APP.route('/<repo>/default/branch/', methods=['POST'])
+@APP.route('/<namespace>/<repo>/default/branch/', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/default/branch/', methods=['POST'])
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/default/branch/', methods=['POST'])
 @login_required
-def change_ref_head(repo, username=None):
+def change_ref_head(repo, username=None, namespace=None):
     """ Change HEAD reference
     """
 
     if admin_session_timedout():
         flask.flash('Action canceled, try it again', 'error')
         url = flask.url_for(
-            'view_settings', username=username, repo=repo)
+            'view_settings', username=username, repo=repo,
+            namespace=namespace)
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
@@ -1207,13 +1272,16 @@ def change_ref_head(repo, username=None):
             APP.logger.exception(err)
 
     return flask.redirect(flask.url_for(
-        'view_settings', username=username, repo=repo.name))
+        'view_settings', username=username, repo=repo.name,
+        namespace=namespace))
 
 
-@APP.route('/<repo:repo>/delete', methods=['POST'])
-@APP.route('/fork/<username>/<repo:repo>/delete', methods=['POST'])
+@APP.route('/<repo>/delete', methods=['POST'])
+@APP.route('/<namespace>/<repo>/delete', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/delete', methods=['POST'])
+@APP.route('/fork/<username>/<namespace>/<repo>/delete', methods=['POST'])
 @login_required
-def delete_repo(repo, username=None):
+def delete_repo(repo, username=None, namespace=None):
     """ Delete the present project.
     """
     if not pagure.APP.config.get('ENABLE_DEL_PROJECTS', True):
@@ -1222,7 +1290,8 @@ def delete_repo(repo, username=None):
     if admin_session_timedout():
         flask.flash('Action canceled, try it again', 'error')
         url = flask.url_for(
-            'view_settings', username=username, repo=repo)
+            'view_settings', username=username, repo=repo,
+            namespace=namespace)
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
@@ -1266,10 +1335,13 @@ def delete_repo(repo, username=None):
         flask.url_for('view_user', username=flask.g.fas_user.username))
 
 
-@APP.route('/<repo:repo>/hook_token', methods=['POST'])
-@APP.route('/fork/<username>/<repo:repo>/hook_token', methods=['POST'])
+@APP.route('/<repo>/hook_token', methods=['POST'])
+@APP.route('/<namespace>/<repo>/hook_token', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/hook_token', methods=['POST'])
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/hook_token', methods=['POST'])
 @login_required
-def new_repo_hook_token(repo, username=None):
+def new_repo_hook_token(repo, username=None, namespace=None):
     """ Re-generate a hook token for the present project.
     """
     if not pagure.APP.config.get('WEBHOOK', False):
@@ -1278,7 +1350,8 @@ def new_repo_hook_token(repo, username=None):
     if admin_session_timedout():
         flask.flash('Action canceled, try it again', 'error')
         url = flask.url_for(
-            'view_settings', username=username, repo=repo)
+            'view_settings', username=username, repo=repo,
+            namespace=namespace)
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
@@ -1302,15 +1375,19 @@ def new_repo_hook_token(repo, username=None):
         APP.logger.exception(err)
         flask.flash('Could not generate a new token for this project', 'error')
 
-    return flask.redirect(
-        flask.url_for('view_settings', repo=repo.name, username=username))
+    return flask.redirect(flask.url_for(
+        'view_settings', repo=repo.name, username=username,
+        namespace=namespace))
 
 
-@APP.route('/<repo:repo>/dropuser/<int:userid>', methods=['POST'])
-@APP.route('/fork/<username>/<repo:repo>/dropuser/<int:userid>',
+@APP.route('/<repo>/dropuser/<int:userid>', methods=['POST'])
+@APP.route('/<namespace>/<repo>/dropuser/<int:userid>', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/dropuser/<int:userid>',
+           methods=['POST'])
+@APP.route('/fork/<username>/<namespace>/<repo>/dropuser/<int:userid>',
            methods=['POST'])
 @login_required
-def remove_user(repo, userid, username=None):
+def remove_user(repo, userid, username=None, namespace=None):
     """ Remove the specified user from the project.
     """
 
@@ -1320,7 +1397,8 @@ def remove_user(repo, userid, username=None):
     if admin_session_timedout():
         flask.flash('Action canceled, try it again', 'error')
         url = flask.url_for(
-            'view_settings', username=username, repo=repo)
+            'view_settings', username=username, repo=repo,
+            namespace=namespace)
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
@@ -1356,17 +1434,23 @@ def remove_user(repo, userid, username=None):
             APP.logger.exception(err)
             flask.flash('User could not be removed', 'error')
 
-    return flask.redirect(
-        flask.url_for('.view_settings', repo=repo.name, username=username)
-    )
+    return flask.redirect(flask.url_for(
+        '.view_settings', repo=repo.name, username=username,
+        namespace=namespace))
 
 
-@APP.route('/<repo:repo>/adduser/', methods=('GET', 'POST'))
-@APP.route('/<repo:repo>/adduser', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo:repo>/adduser/', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo:repo>/adduser', methods=('GET', 'POST'))
+@APP.route('/<repo>/adduser/', methods=('GET', 'POST'))
+@APP.route('/<repo>/adduser', methods=('GET', 'POST'))
+@APP.route('/<namespace>/<repo>/adduser/', methods=('GET', 'POST'))
+@APP.route('/<namespace>/<repo>/adduser', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/adduser/', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/adduser', methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/adduser/', methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/adduser', methods=('GET', 'POST'))
 @login_required
-def add_user(repo, username=None):
+def add_user(repo, username=None, namespace=None):
     """ Add the specified user from the project.
     """
 
@@ -1399,10 +1483,9 @@ def add_user(repo, username=None):
             SESSION.commit()
             pagure.lib.git.generate_gitolite_acls()
             flask.flash(msg)
-            return flask.redirect(
-                flask.url_for(
-                    '.view_settings', repo=repo.name, username=username)
-            )
+            return flask.redirect(flask.url_for(
+                '.view_settings', repo=repo.name, username=username,
+                namespace=namespace))
         except pagure.exceptions.PagureException as msg:
             SESSION.rollback()
             flask.flash(msg, 'error')
@@ -1419,11 +1502,15 @@ def add_user(repo, username=None):
     )
 
 
-@APP.route('/<repo:repo>/dropgroup/<int:groupid>', methods=['POST'])
+@APP.route('/<repo>/dropgroup/<int:groupid>', methods=['POST'])
+@APP.route('/<namespace>/<repo>/dropgroup/<int:groupid>', methods=['POST'])
 @APP.route(
-    '/fork/<username>/<repo:repo>/dropgroup/<int:groupid>', methods=['POST'])
+    '/fork/<username>/<repo>/dropgroup/<int:groupid>', methods=['POST'])
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/dropgroup/<int:groupid>',
+    methods=['POST'])
 @login_required
-def remove_group_project(repo, groupid, username=None):
+def remove_group_project(repo, groupid, username=None, namespace=None):
     """ Remove the specified group from the project.
     """
 
@@ -1434,7 +1521,8 @@ def remove_group_project(repo, groupid, username=None):
     if admin_session_timedout():
         flask.flash('Action canceled, try it again', 'error')
         url = flask.url_for(
-            'view_settings', username=username, repo=repo)
+            'view_settings', username=username, repo=repo,
+            namespace=namespace)
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
@@ -1452,10 +1540,9 @@ def remove_group_project(repo, groupid, username=None):
         if groupid not in grpids:
             flask.flash(
                 'Group does not seem to be part of this project', 'error')
-            return flask.redirect(
-                flask.url_for(
-                    '.view_settings', repo=repo.name, username=username)
-            )
+            return flask.redirect(flask.url_for(
+                '.view_settings', repo=repo.name, username=username,
+                namespace=namespace))
 
         for grp in repo.groups:
             if grp.id == groupid:
@@ -1470,17 +1557,23 @@ def remove_group_project(repo, groupid, username=None):
             APP.logger.exception(err)
             flask.flash('Group could not be removed', 'error')
 
-    return flask.redirect(
-        flask.url_for('.view_settings', repo=repo.name, username=username)
-    )
+    return flask.redirect(flask.url_for(
+        '.view_settings', repo=repo.name, username=username,
+        namespace=namespace))
 
 
-@APP.route('/<repo:repo>/addgroup/', methods=('GET', 'POST'))
-@APP.route('/<repo:repo>/addgroup', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo:repo>/addgroup/', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo:repo>/addgroup', methods=('GET', 'POST'))
+@APP.route('/<repo>/addgroup/', methods=('GET', 'POST'))
+@APP.route('/<repo>/addgroup', methods=('GET', 'POST'))
+@APP.route('/<namespace>/<repo>/addgroup/', methods=('GET', 'POST'))
+@APP.route('/<namespace>/<repo>/addgroup', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/addgroup/', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/addgroup', methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/addgroup/', methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/addgroup', methods=('GET', 'POST'))
 @login_required
-def add_group_project(repo, username=None):
+def add_group_project(repo, username=None, namespace=None):
     """ Add the specified group from the project.
     """
 
@@ -1515,10 +1608,9 @@ def add_group_project(repo, username=None):
             SESSION.commit()
             pagure.lib.git.generate_gitolite_acls()
             flask.flash(msg)
-            return flask.redirect(
-                flask.url_for(
-                    '.view_settings', repo=repo.name, username=username)
-            )
+            return flask.redirect(flask.url_for(
+                '.view_settings', repo=repo.name, username=username,
+                namespace=namespace))
         except pagure.exceptions.PagureException as msg:
             SESSION.rollback()
             flask.flash(msg, 'error')
@@ -1535,16 +1627,19 @@ def add_group_project(repo, username=None):
     )
 
 
-@APP.route('/<repo:repo>/regenerate', methods=['POST'])
-@APP.route('/fork/<username>/<repo:repo>/regenerate', methods=['POST'])
+@APP.route('/<repo>/regenerate', methods=['POST'])
+@APP.route('/<namespace>/<repo>/regenerate', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/regenerate', methods=['POST'])
+@APP.route('/fork/<username>/<namespace>/<repo>/regenerate', methods=['POST'])
 @login_required
-def regenerate_git(repo, username=None):
+def regenerate_git(repo, username=None, namespace=None):
     """ Regenerate the specified git repo with the content in the project.
     """
     if admin_session_timedout():
         flask.flash('Action canceled, try it again', 'error')
         url = flask.url_for(
-            'view_settings', username=username, repo=repo)
+            'view_settings', username=username, repo=repo,
+            namespace=namespace)
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
@@ -1575,17 +1670,25 @@ def regenerate_git(repo, username=None):
                     repofolder=APP.config['TICKETS_FOLDER'])
             flask.flash('Tickets git repo updated')
 
-    return flask.redirect(
-        flask.url_for('.view_settings', repo=repo.name, username=username)
-    )
+    return flask.redirect(flask.url_for(
+        '.view_settings', repo=repo.name, username=username,
+        namespace=namespace))
 
 
-@APP.route('/<repo:repo>/token/new/', methods=('GET', 'POST'))
-@APP.route('/<repo:repo>/token/new', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo:repo>/token/new/', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo:repo>/token/new', methods=('GET', 'POST'))
+@APP.route('/<repo>/token/new/', methods=('GET', 'POST'))
+@APP.route('/<repo>/token/new', methods=('GET', 'POST'))
+@APP.route('/<namespace>/<repo>/token/new/', methods=('GET', 'POST'))
+@APP.route('/<namespace>/<repo>/token/new', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/token/new/', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/token/new', methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/token/new/',
+    methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/token/new',
+    methods=('GET', 'POST'))
 @login_required
-def add_token(repo, username=None):
+def add_token(repo, username=None, namespace=None):
     """ Add a token to a specified project.
     """
     if admin_session_timedout():
@@ -1614,10 +1717,9 @@ def add_token(repo, username=None):
             )
             SESSION.commit()
             flask.flash(msg)
-            return flask.redirect(
-                flask.url_for(
-                    '.view_settings', repo=repo.name, username=username)
-            )
+            return flask.redirect(flask.url_for(
+                '.view_settings', repo=repo.name, username=username,
+                namespace=namespace))
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             APP.logger.exception(err)
@@ -1633,17 +1735,22 @@ def add_token(repo, username=None):
     )
 
 
-@APP.route('/<repo:repo>/token/revoke/<token_id>', methods=['POST'])
-@APP.route('/fork/<username>/<repo:repo>/token/revoke/<token_id>',
-           methods=['POST'])
+@APP.route('/<repo>/token/revoke/<token_id>', methods=['POST'])
+@APP.route('/<namespace>/<repo>/token/revoke/<token_id>', methods=['POST'])
+@APP.route(
+    '/fork/<username>/<repo>/token/revoke/<token_id>', methods=['POST'])
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/token/revoke/<token_id>',
+    methods=['POST'])
 @login_required
-def revoke_api_token(repo, token_id, username=None):
+def revoke_api_token(repo, token_id, username=None, namespace=None):
     """ Revokie a token to a specified project.
     """
     if admin_session_timedout():
         flask.flash('Action canceled, try it again', 'error')
         url = flask.url_for(
-            'view_settings', username=username, repo=repo)
+            'view_settings', username=username, repo=repo,
+            namespace=namespace)
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
@@ -1675,20 +1782,25 @@ def revoke_api_token(repo, token_id, username=None):
                 'Token could not be revoked, please contact an admin',
                 'error')
 
-    return flask.redirect(
-        flask.url_for(
-            '.view_settings', repo=repo.name, username=username)
-    )
+    return flask.redirect(flask.url_for(
+        '.view_settings', repo=repo.name, username=username,
+        namespace=namespace))
 
 
 @APP.route(
-    '/<repo:repo>/edit/<path:branchname>/f/<path:filename>',
+    '/<repo>/edit/<path:branchname>/f/<path:filename>',
     methods=('GET', 'POST'))
 @APP.route(
-    '/fork/<username>/<repo:repo>/edit/<path:branchname>/f/<path:filename>',
+    '/<namespace>/<repo>/edit/<path:branchname>/f/<path:filename>',
+    methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<repo>/edit/<path:branchname>/f/<path:filename>',
+    methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/edit/<path:branchname>/f/<path:filename>',
     methods=('GET', 'POST'))
 @login_required
-def edit_file(repo, branchname, filename, username=None):
+def edit_file(repo, branchname, filename, username=None, namespace=None):
     """ Edit a file online.
     """
     repo = flask.g.repo
@@ -1734,7 +1846,7 @@ def edit_file(repo, branchname, filename, username=None):
             return flask.redirect(
                 flask.url_for(
                     '.view_commits', repo=repo.name, username=username,
-                    branchname=form.branch.data)
+                    namespace=namespace, branchname=form.branch.data)
             )
         except pagure.exceptions.PagureException as err:  # pragma: no cover
             APP.logger.exception(err)
@@ -1766,11 +1878,14 @@ def edit_file(repo, branchname, filename, username=None):
     )
 
 
-@APP.route('/<repo:repo>/b/<path:branchname>/delete', methods=['POST'])
-@APP.route('/fork/<username>/<repo:repo>/b/<path:branchname>/delete',
+@APP.route('/<repo>/b/<path:branchname>/delete', methods=['POST'])
+@APP.route('/<namespace>/<repo>/b/<path:branchname>/delete', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/b/<path:branchname>/delete',
+           methods=['POST'])
+@APP.route('/fork/<username>/<namespace>/<repo>/b/<path:branchname>/delete',
            methods=['POST'])
 @login_required
-def delete_branch(repo, branchname, username=None):
+def delete_branch(repo, branchname, username=None, namespace=None):
     """ Delete the branch of a project.
     """
     repo = flask.g.repo
@@ -1796,18 +1911,23 @@ def delete_branch(repo, branchname, username=None):
         APP.logger.exception(err)
         flask.flash('Could not delete `%s`' % branchname, 'error')
 
-    return flask.redirect(
-        flask.url_for('view_repo', repo=repo.name, username=username))
+    return flask.redirect(flask.url_for(
+        'view_repo', repo=repo, username=username, namespace=namespace))
 
 
-@APP.route('/docs/<repo:repo>/')
-@APP.route('/docs/<repo:repo>/<path:filename>')
-@APP.route('/docs/fork/<username>/<repo:repo>/')
-@APP.route('/docs/fork/<username>/<repo:repo>/<path:filename>')
-def view_docs(repo, username=None, filename=None):
+@APP.route('/docs/<repo>/')
+@APP.route('/docs/<repo>/<path:filename>')
+@APP.route('/docs/<namespace>/<repo>/')
+@APP.route('/docs/<namespace>/<repo>/<path:filename>')
+@APP.route('/docs/fork/<username>/<repo>/')
+@APP.route('/docs/fork/<username>/<namespace>/<repo>/<path:filename>')
+@APP.route('/docs/fork/<username>/<repo>/')
+@APP.route('/docs/fork/<username>/<namespace>/<repo>/<path:filename>')
+def view_docs(repo, username=None, filename=None, namespace=None):
     """ Display the documentation
     """
-    repo_obj = pagure.lib.get_project(SESSION, repo, user=username)
+    repo_obj = pagure.lib.get_project(
+        SESSION, repo, user=username, namespace=namespace)
 
     if not repo_obj:
         flask.abort(404, 'Project not found')
@@ -1825,16 +1945,19 @@ def view_docs(repo, username=None, filename=None):
     )
 
 
-@APP.route('/<repo:repo>/activity/')
-@APP.route('/<repo:repo>/activity')
-def view_project_activity(repo):
+@APP.route('/<repo>/activity/')
+@APP.route('/<repo>/activity')
+@APP.route('/<namespace>/<repo>/activity/')
+@APP.route('/<namespace>/<repo>/activity')
+def view_project_activity(repo, namespace=None):
     """ Display the activity feed
     """
 
     if not APP.config.get('DATAGREPPER_URL'):
         flask.abort(404)
 
-    repo_obj = pagure.lib.get_project(SESSION, repo, user=None)
+    repo_obj = pagure.lib.get_project(
+        SESSION, repo, user=None, namespace=namespace)
 
     if not repo_obj:
         flask.abort(404, 'Project not found')
@@ -1845,12 +1968,18 @@ def view_project_activity(repo):
     )
 
 
-@APP.route('/watch/<repo:repo>/settings/<watch>', methods=['POST'])
-@APP.route('/watch/fork/<username>/<repo:repo>/settings/<watch>', methods=['POST'])
+@APP.route('/<repo>/watch/settings/<watch>', methods=['POST'])
+@APP.route('/<namespace>/<repo>/watch/settings/<watch>', methods=['POST'])
+@APP.route(
+    '/fork/<username>/<repo>/watch/settings/<watch>', methods=['POST'])
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/watch/settings/<watch>',
+    methods=['POST'])
 @login_required
-def watch_repo(repo, watch, username=None):
+def watch_repo(repo, watch, username=None, namespace=None):
     """ Marked for watching or Unwatching
     """
+
     return_point = flask.url_for('index')
     if pagure.is_safe_url(flask.request.referrer):
         return_point = flask.request.referrer
@@ -1862,15 +1991,10 @@ def watch_repo(repo, watch, username=None):
     if str(watch) not in ['0', '1']:
         flask.abort(400)
 
-    repo_obj = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if not repo_obj:
-        flask.abort(404, 'Project not found')
-
     try:
         msg = pagure.lib.update_watch_status(
             SESSION,
-            repo_obj,
+            flask.g.repo,
             flask.g.fas_user.username,
             watch)
         SESSION.commit()

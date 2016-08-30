@@ -128,11 +128,15 @@ def _get_pr_info(repo_obj, orig_repo, branch_from, branch_to):
     return(diff, diff_commits, orig_commit)
 
 
-@APP.route('/<repo:repo>/pull-requests/')
-@APP.route('/<repo:repo>/pull-requests')
-@APP.route('/fork/<username>/<repo:repo>/pull-requests/')
-@APP.route('/fork/<username>/<repo:repo>/pull-requests')
-def request_pulls(repo, username=None):
+@APP.route('/<repo>/pull-requests/')
+@APP.route('/<repo>/pull-requests')
+@APP.route('/<namespace>/<repo>/pull-requests/')
+@APP.route('/<namespace>/<repo>/pull-requests')
+@APP.route('/fork/<username>/<repo>/pull-requests/')
+@APP.route('/fork/<username>/<repo>/pull-requests')
+@APP.route('/fork/<username>/<namespace>/<repo>/pull-requests/')
+@APP.route('/fork/<username>/<namespace>/<repo>/pull-requests')
+def request_pulls(repo, username=None, namespace=None):
     """ Request pulling the changes from the fork into the project.
     """
     status = flask.request.args.get('status', 'Open')
@@ -198,11 +202,17 @@ def request_pulls(repo, username=None):
     )
 
 
-@APP.route('/<repo:repo>/pull-request/<int:requestid>/')
-@APP.route('/<repo:repo>/pull-request/<int:requestid>')
-@APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/')
-@APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>')
-def request_pull(repo, requestid, username=None):
+@APP.route('/<repo>/pull-request/<int:requestid>/')
+@APP.route('/<repo>/pull-request/<int:requestid>')
+@APP.route('/<namespace>/<repo>/pull-request/<int:requestid>/')
+@APP.route('/<namespace>/<repo>/pull-request/<int:requestid>')
+@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/')
+@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>')
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/')
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>')
+def request_pull(repo, requestid, username=None, namespace=None):
     """ Request pulling the changes from the fork into the project.
     """
 
@@ -256,7 +266,8 @@ def request_pull(repo, requestid, username=None):
         except pagure.exceptions.PagureException as err:
             flask.flash(err.message, 'error')
             return flask.redirect(flask.url_for(
-                'view_repo', username=username, repo=repo.name))
+                'view_repo', username=username, repo=repo.name,
+                namespace=namespace))
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             APP.logger.exception(err)
@@ -283,9 +294,12 @@ def request_pull(repo, requestid, username=None):
     )
 
 
-@APP.route('/<repo:repo>/pull-request/<int:requestid>.patch')
-@APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>.patch')
-def request_pull_patch(repo, requestid, username=None):
+@APP.route('/<repo>/pull-request/<int:requestid>.patch')
+@APP.route('/<namespace>/<repo>/pull-request/<int:requestid>.patch')
+@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>.patch')
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>.patch')
+def request_pull_patch(repo, requestid, username=None, namespace=None):
     """ Returns the commits from the specified pull-request as patches.
     """
     repo = flask.g.repo
@@ -336,7 +350,8 @@ def request_pull_patch(repo, requestid, username=None):
         except pagure.exceptions.PagureException as err:
             flask.flash(err.message, 'error')
             return flask.redirect(flask.url_for(
-                'view_repo', username=username, repo=repo.name))
+                'view_repo', username=username, repo=repo.name,
+                namespace=namespace))
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             APP.logger.exception(err)
@@ -350,16 +365,30 @@ def request_pull_patch(repo, requestid, username=None):
     return flask.Response(patch, content_type="text/plain;charset=UTF-8")
 
 
-@APP.route('/<repo:repo>/pull-request/<int:requestid>/edit/',
-           methods=('GET', 'POST'))
-@APP.route('/<repo:repo>/pull-request/<int:requestid>/edit',
-           methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/edit/',
-           methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/edit',
-           methods=('GET', 'POST'))
+@APP.route(
+    '/<repo>/pull-request/<int:requestid>/edit/', methods=('GET', 'POST'))
+@APP.route(
+    '/<repo>/pull-request/<int:requestid>/edit', methods=('GET', 'POST'))
+@APP.route(
+    '/<namespace>/<repo>/pull-request/<int:requestid>/edit/',
+    methods=('GET', 'POST'))
+@APP.route(
+    '/<namespace>/<repo>/pull-request/<int:requestid>/edit',
+    methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<repo>/pull-request/<int:requestid>/edit/',
+    methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<repo>/pull-request/<int:requestid>/edit',
+    methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/edit/',
+    methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/edit',
+    methods=('GET', 'POST'))
 @login_required
-def request_pull_edit(repo, requestid, username=None):
+def request_pull_edit(repo, requestid, username=None, namespace=None):
     """ Edit the title of a pull-request.
     """
 
@@ -396,7 +425,7 @@ def request_pull_edit(repo, requestid, username=None):
                 'Could not edit this pull-request in the database',
                 'error')
         return flask.redirect(flask.url_for(
-            'request_pull', username=username,
+            'request_pull', username=username, namespace=namespace,
             repo=repo.name, requestid=requestid))
     elif flask.request.method == 'GET':
         form.title.data = request.title
@@ -412,18 +441,29 @@ def request_pull_edit(repo, requestid, username=None):
     )
 
 
-@APP.route('/<repo:repo>/pull-request/<int:requestid>/comment',
+@APP.route('/<repo>/pull-request/<int:requestid>/comment',
            methods=['POST'])
-@APP.route('/<repo:repo>/pull-request/<int:requestid>/comment/<commit>/'
+@APP.route('/<repo>/pull-request/<int:requestid>/comment/<commit>/'
            '<path:filename>/<row>', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/comment',
+@APP.route('/<namespace>/<repo>/pull-request/<int:requestid>/comment',
            methods=['POST'])
-@APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/comment/'
+@APP.route(
+    '/<namespace>/<repo>/pull-request/<int:requestid>/comment/<commit>/'
+    '<path:filename>/<row>', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/comment',
+           methods=['POST'])
+@APP.route('/fork/<username>/<repo>/pull-request/<int:requestid>/comment/'
            '<commit>/<path:filename>/<row>', methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/'
+    'comment', methods=['POST'])
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/'
+    'comment/<commit>/<path:filename>/<row>', methods=('GET', 'POST'))
 @login_required
 def pull_request_add_comment(
         repo, requestid, commit=None,
-        filename=None, row=None, username=None):
+        filename=None, row=None, username=None, namespace=None):
     """ Add a comment to a commit in a pull-request.
     """
     repo = flask.g.repo
@@ -475,7 +515,7 @@ def pull_request_add_comment(
         if is_js:
             return 'ok'
         return flask.redirect(flask.url_for(
-            'request_pull', username=username,
+            'request_pull', username=username, namespace=namespace,
             repo=repo.name, requestid=requestid))
 
     if is_js and flask.request.method == 'POST':
@@ -495,13 +535,19 @@ def pull_request_add_comment(
     )
 
 
-@APP.route('/<repo:repo>/pull-request/<int:requestid>/comment/drop',
+@APP.route('/<repo>/pull-request/<int:requestid>/comment/drop',
+           methods=['POST'])
+@APP.route('/<namespace>/<repo>/pull-request/<int:requestid>/comment/drop',
            methods=['POST'])
 @APP.route(
-    '/fork/<username>/<repo:repo>/pull-request/<int:requestid>/comment/drop',
+    '/fork/<username>/<repo>/pull-request/<int:requestid>/comment/drop',
     methods=['POST'])
+@APP.route(
+    '/fork/<namespace>/<username>/<repo>/pull-request/<int:requestid>/'
+    'comment/drop', methods=['POST'])
 @login_required
-def pull_request_drop_comment(repo, requestid, username=None):
+def pull_request_drop_comment(
+        repo, requestid, username=None, namespace=None):
     """ Delete a comment of a pull-request.
     """
     repo = flask.g.repo
@@ -552,18 +598,26 @@ def pull_request_drop_comment(repo, requestid, username=None):
                     'Could not remove the comment: %s' % commentid, 'error')
 
     return flask.redirect(flask.url_for(
-        'request_pull', username=username,
+        'request_pull', username=username, namespace=namespace,
         repo=repo.name, requestid=requestid))
 
 
 @APP.route(
-    '/<repo:repo>/pull-request/<int:requestid>/comment/<int:commentid>/edit',
+    '/<repo>/pull-request/<int:requestid>/comment/<int:commentid>/edit',
     methods=('GET', 'POST'))
 @APP.route(
-    '/fork/<username>/<repo:repo>/pull-request/<int:requestid>/comment'
+    '/<namespace>/<repo>/pull-request/<int:requestid>/comment/'
+    '<int:commentid>/edit', methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<repo>/pull-request/<int:requestid>/comment'
     '/<int:commentid>/edit', methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/pull-request/'
+    '<int:requestid>/comment/<int:commentid>/edit',
+    methods=('GET', 'POST'))
 @login_required
-def pull_request_edit_comment(repo, requestid, commentid, username=None):
+def pull_request_edit_comment(
+        repo, requestid, commentid, username=None, namespace=None):
     """Edit comment of a pull request
     """
     is_js = flask.request.args.get('js', False)
@@ -618,7 +672,7 @@ def pull_request_edit_comment(repo, requestid, commentid, username=None):
         if is_js:
             return 'ok'
         return flask.redirect(flask.url_for(
-            'request_pull', username=username,
+            'request_pull', username=username, namespace=namespace,
             repo=project.name, requestid=requestid))
 
     if is_js and flask.request.method == 'POST':
@@ -636,11 +690,18 @@ def pull_request_edit_comment(repo, requestid, commentid, username=None):
     )
 
 
-@APP.route('/<repo:repo>/pull-request/<int:requestid>/merge', methods=['POST'])
-@APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/merge',
-           methods=['POST'])
+@APP.route('/<repo>/pull-request/<int:requestid>/merge', methods=['POST'])
+@APP.route(
+    '/<namespace>/<repo>/pull-request/<int:requestid>/merge',
+    methods=['POST'])
+@APP.route(
+    '/fork/<username>/<repo>/pull-request/<int:requestid>/merge',
+    methods=['POST'])
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/merge',
+    methods=['POST'])
 @login_required
-def merge_request_pull(repo, requestid, username=None):
+def merge_request_pull(repo, requestid, username=None, namespace=None):
     """ Request pulling the changes from the fork into the project.
     """
 
@@ -648,7 +709,8 @@ def merge_request_pull(repo, requestid, username=None):
     if not form.validate_on_submit():
         flask.flash('Invalid input submitted', 'error')
         return flask.redirect(flask.url_for(
-            'request_pull', repo=repo, requestid=requestid, username=username))
+            'request_pull', repo=repo, requestid=requestid,
+            username=username, namespace=namespace))
 
     repo = flask.g.repo
 
@@ -671,12 +733,12 @@ def merge_request_pull(repo, requestid, username=None):
             flask.flash(
                 'This request must be assigned to be merged', 'error')
             return flask.redirect(flask.url_for(
-                'request_pull', username=username,
+                'request_pull', username=username, namespace=namespace,
                 repo=repo.name, requestid=requestid))
         if request.assignee.username != flask.g.fas_user.username:
             flask.flash('Only the assignee can merge this review', 'error')
             return flask.redirect(flask.url_for(
-                'request_pull', username=username,
+                'request_pull', username=username, namespace=namespace,
                 repo=repo.name, requestid=requestid))
 
     threshold = repo.settings.get('Minimum_score_to_merge_pull-request', -1)
@@ -685,7 +747,7 @@ def merge_request_pull(repo, requestid, username=None):
             'This request does not have the minimum review score necessary '
             'to be merged', 'error')
         return flask.redirect(flask.url_for(
-            'request_pull', username=username,
+            'request_pull', username=username, namespace=namespace,
             repo=repo.name, requestid=requestid))
 
     try:
@@ -697,22 +759,28 @@ def merge_request_pull(repo, requestid, username=None):
         flask.flash(str(err.message), 'error')
         return flask.redirect(flask.url_for(
             'request_pull', repo=repo.name, requestid=requestid,
-            username=username))
+            username=username, namespace=namespace))
     except pagure.exceptions.PagureException as err:
         flask.flash(str(err), 'error')
         return flask.redirect(flask.url_for(
             'request_pull', repo=repo.name, requestid=requestid,
-            username=username))
+            username=username, namespace=namespace))
 
-    return flask.redirect(flask.url_for('view_repo', repo=repo.name))
+    return flask.redirect(flask.url_for(
+        'view_repo', repo=repo.name, username=username, namespace=namespace))
 
 
-@APP.route('/<repo:repo>/pull-request/cancel/<int:requestid>',
+@APP.route('/<repo>/pull-request/cancel/<int:requestid>',
            methods=['POST'])
-@APP.route('/fork/<username>/<repo:repo>/pull-request/cancel/<int:requestid>',
+@APP.route('/<namespace>/<repo>/pull-request/cancel/<int:requestid>',
            methods=['POST'])
+@APP.route('/fork/<username>/<repo>/pull-request/cancel/<int:requestid>',
+           methods=['POST'])
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/pull-request/cancel/<int:requestid>',
+   methods=['POST'])
 @login_required
-def cancel_request_pull(repo, requestid, username=None):
+def cancel_request_pull(repo, requestid, username=None, namespace=None):
     """ Cancel request pulling request.
     """
 
@@ -750,16 +818,22 @@ def cancel_request_pull(repo, requestid, username=None):
     else:
         flask.flash('Invalid input submitted', 'error')
 
-    return flask.redirect(flask.url_for('view_repo', repo=repo))
+    return flask.redirect(flask.url_for(
+        'view_repo', repo=repo, username=username, namespace=namespace))
 
 
 @APP.route(
-    '/<repo:repo>/pull-request/<int:requestid>/assign', methods=['POST'])
+    '/<repo>/pull-request/<int:requestid>/assign', methods=['POST'])
 @APP.route(
-    '/fork/<username>/<repo:repo>/pull-request/<int:requestid>/assign',
+    '/<namespace>/<repo>/pull-request/<int:requestid>/assign', methods=['POST'])
+@APP.route(
+    '/fork/<username>/<repo>/pull-request/<int:requestid>/assign',
+    methods=['POST'])
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/assign',
     methods=['POST'])
 @login_required
-def set_assignee_requests(repo, requestid, username=None):
+def set_assignee_requests(repo, requestid, username=None, namespace=None):
     ''' Assign a pull-request. '''
     repo = flask.g.repo
 
@@ -800,17 +874,19 @@ def set_assignee_requests(repo, requestid, username=None):
             flask.flash(str(err), 'error')
 
     return flask.redirect(flask.url_for(
-        'request_pull', username=username,
+        'request_pull', username=username, namespace=namespace,
         repo=repo.name, requestid=requestid))
 
 
 # Specific actions
 
 
-@APP.route('/do_fork/<repo:repo>', methods=['POST'])
-@APP.route('/do_fork/fork/<username>/<repo:repo>', methods=['POST'])
+@APP.route('/do_fork/<repo>', methods=['POST'])
+@APP.route('/do_fork/<namespace>/<repo>', methods=['POST'])
+@APP.route('/do_fork/fork/<username>/<repo>', methods=['POST'])
+@APP.route('/do_fork/fork/<username>/<namespace>/<repo>', methods=['POST'])
 @login_required
-def fork_project(repo, username=None):
+def fork_project(repo, username=None, namespace=None):
     """ Fork the project specified into the user's namespace
     """
     repo = flask.g.repo
@@ -820,11 +896,12 @@ def fork_project(repo, username=None):
         flask.abort(400)
 
     if pagure.lib.get_project(
-            SESSION, repo.name, user=flask.g.fas_user.username):
+            SESSION, repo.name, user=flask.g.fas_user.username,
+            namespace=namespace):
         flask.flash('You had already forked this project')
         return flask.redirect(flask.url_for(
-            'view_repo', repo=repo.name, username=flask.g.fas_user.username
-        ))
+            'view_repo', repo=repo.name, username=flask.g.fas_user.username,
+            namespace=namespace))
 
     try:
         message = pagure.lib.fork_project(
@@ -843,6 +920,7 @@ def fork_project(repo, username=None):
             flask.url_for(
                 'view_repo',
                 username=flask.g.fas_user.username,
+                namespace=namespace,
                 repo=repo.name)
         )
     except pagure.exceptions.PagureException as err:
@@ -851,20 +929,33 @@ def fork_project(repo, username=None):
         SESSION.rollback()
         flask.flash(str(err), 'error')
 
-    return flask.redirect(flask.url_for('view_repo', repo=repo.name))
+    return flask.redirect(flask.url_for(
+        'view_repo', repo=repo.name, username=username, namespace=namespace
+    ))
 
 
-@APP.route('/<repo:repo>/diff/<path:branch_to>..<path:branch_from>/',
+@APP.route('/<repo>/diff/<path:branch_to>..<path:branch_from>/',
            methods=('GET', 'POST'))
-@APP.route('/<repo:repo>/diff/<path:branch_to>..<path:branch_from>',
+@APP.route('/<repo>/diff/<path:branch_to>..<path:branch_from>',
+           methods=('GET', 'POST'))
+@APP.route('/<namespace>/<repo>/diff/<path:branch_to>..<path:branch_from>/',
+           methods=('GET', 'POST'))
+@APP.route('/<namespace>/<repo>/diff/<path:branch_to>..<path:branch_from>',
            methods=('GET', 'POST'))
 @APP.route(
-    '/fork/<username>/<repo:repo>/diff/<path:branch_to>..<path:branch_from>/',
+    '/fork/<username>/<repo>/diff/<path:branch_to>..<path:branch_from>/',
     methods=('GET', 'POST'))
 @APP.route(
-    '/fork/<username>/<repo:repo>/diff/<path:branch_to>..<path:branch_from>',
+    '/fork/<username>/<repo>/diff/<path:branch_to>..<path:branch_from>',
     methods=('GET', 'POST'))
-def new_request_pull(repo, branch_to, branch_from, username=None):
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/diff/'
+    '<path:branch_to>..<path:branch_from>/', methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/diff/'
+    '<path:branch_to>..<path:branch_from>', methods=('GET', 'POST'))
+def new_request_pull(
+        repo, branch_to, branch_from, username=None, namespace=None):
     """ Request pulling the changes from the fork into the project.
     """
     branch_to = flask.request.values.get('branch_to', branch_to)
@@ -890,7 +981,8 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
     except pagure.exceptions.PagureException as err:
         flask.flash(err.message, 'error')
         return flask.redirect(flask.url_for(
-            'view_repo', username=username, repo=repo.name))
+            'view_repo', username=username, repo=repo.name,
+            namespace=namespace))
 
     repo_admin = flask.g.repo_admin
 
@@ -933,11 +1025,12 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
             if not parent.is_fork:
                 url = flask.url_for(
                     'request_pull', requestid=request.id,
-                    username=None, repo=parent.name)
+                    username=None, repo=parent.name, namespace=namespace)
             else:
                 url = flask.url_for(
                     'request_pull', requestid=request.id,
-                    username=parent.user, repo=parent.name)
+                    username=parent.user, repo=parent.name,
+                    namespace=namespace)
 
             return flask.redirect(url)
         except pagure.exceptions.PagureException as err:  # pragma: no cover
@@ -990,14 +1083,22 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
     )
 
 
-@APP.route('/<repo:repo>/diff/remote/', methods=('GET', 'POST'))
-@APP.route('/<repo:repo>/diff/remote', methods=('GET', 'POST'))
+@APP.route('/<repo>/diff/remote/', methods=('GET', 'POST'))
+@APP.route('/<repo>/diff/remote', methods=('GET', 'POST'))
+@APP.route('/<namespace>/<repo>/diff/remote/', methods=('GET', 'POST'))
+@APP.route('/<namespace>/<repo>/diff/remote', methods=('GET', 'POST'))
 @APP.route(
-    '/fork/<username>/<repo:repo>/diff/remote/', methods=('GET', 'POST'))
+    '/fork/<username>/<repo>/diff/remote/', methods=('GET', 'POST'))
 @APP.route(
-    '/fork/<username>/<repo:repo>/diff/remote', methods=('GET', 'POST'))
+    '/fork/<username>/<repo>/diff/remote', methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/diff/remote/',
+    methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/diff/remote',
+    methods=('GET', 'POST'))
 @login_required
-def new_remote_request_pull(repo, username=None):
+def new_remote_request_pull(repo, username=None, namespace=None):
     """ Request pulling the changes from a remote fork into the project.
     """
     confirm = flask.request.values.get('confirm', False)
@@ -1027,7 +1128,8 @@ def new_remote_request_pull(repo, username=None):
         except pagure.exceptions.PagureException as err:
             flask.flash(err.message, 'error')
             return flask.redirect(flask.url_for(
-                'view_repo', username=username, repo=repo.name))
+                'view_repo', username=username, repo=repo.name,
+                namespace=namespace))
 
         if not confirm:
             flask.g.branches = sorted(orig_repo.listall_branches())
@@ -1099,11 +1201,13 @@ def new_remote_request_pull(repo, username=None):
             if not parent.is_fork:
                 url = flask.url_for(
                     'request_pull', requestid=request.id,
-                    username=None, repo=parent.name)
+                    username=None, repo=parent.name,
+                    namespace=namespace)
             else:
                 url = flask.url_for(
                     'request_pull', requestid=request.id,
-                    username=parent.user, repo=parent.name)
+                    username=parent.user, repo=parent.name,
+                    namespace=namespace)
 
             return flask.redirect(url)
         except pagure.exceptions.PagureException as err:  # pragma: no cover
@@ -1129,13 +1233,20 @@ def new_remote_request_pull(repo, username=None):
 
 
 @APP.route(
-    '/fork_edit/<repo:repo>/edit/<path:branchname>/f/<path:filename>',
+    '/fork_edit/<repo>/edit/<path:branchname>/f/<path:filename>',
     methods=['POST'])
 @APP.route(
-    '/fork_edit/fork/<username>/<repo:repo>/edit/<path:branchname>/'
+    '/fork_edit/<namespace>/<repo>/edit/<path:branchname>/f/<path:filename>',
+    methods=['POST'])
+@APP.route(
+    '/fork_edit/fork/<username>/<repo>/edit/<path:branchname>/'
+    'f/<path:filename>', methods=['POST'])
+@APP.route(
+    '/fork_edit/fork/<username>/<namespace>/<repo>/edit/<path:branchname>/'
     'f/<path:filename>', methods=['POST'])
 @login_required
-def fork_edit_file(repo, branchname, filename, username=None):
+def fork_edit_file(
+        repo, branchname, filename, username=None, namespace=None):
     """ Fork the project specified and open the specific file to edit
     """
     repo = flask.g.repo
@@ -1150,6 +1261,7 @@ def fork_edit_file(repo, branchname, filename, username=None):
         return flask.redirect(flask.url_for(
             'edit_file',
             username=flask.g.fas_user.username,
+            namespace=namespace,
             repo=repo.name,
             branchname=branchname,
             filename=filename
@@ -1181,4 +1293,5 @@ def fork_edit_file(repo, branchname, filename, username=None):
         SESSION.rollback()
         flask.flash(str(err), 'error')
 
-    return flask.redirect(flask.url_for('view_repo', repo=repo.name))
+    return flask.redirect(flask.url_for(
+        'view_repo', repo=repo.name, username=username, namespace=namespace))

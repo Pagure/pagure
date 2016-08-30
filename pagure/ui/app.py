@@ -214,8 +214,9 @@ def view_users(username=None):
 
 @APP.route('/projects/')
 @APP.route('/projects')
-@APP.route('/projects/<repo:pattern>')
-def view_projects(pattern=None):
+@APP.route('/projects/<pattern>')
+@APP.route('/projects/<namespace>/<pattern>')
+def view_projects(pattern=None, namespace=None):
     """ Present the list of projects.
     """
     forks = flask.request.args.get('forks')
@@ -240,7 +241,8 @@ def view_projects(pattern=None):
     start = limit * (page - 1)
 
     projects = pagure.lib.search_projects(
-        SESSION, pattern=pattern, fork=forks, start=start, limit=limit)
+        SESSION, pattern=pattern, namespace=namespace,
+        fork=forks, start=start, limit=limit)
 
     if len(projects) == 1:
         flask.flash('Only one result found, redirecting you to it')

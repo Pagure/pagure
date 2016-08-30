@@ -36,14 +36,32 @@ from pagure import (APP, SESSION, LOG, __get_file_in_tree,
 
 # URLs
 
-@APP.route('/<repo:repo>/issue/<int:issueid>/update/', methods=['GET', 'POST'])
-@APP.route('/<repo:repo>/issue/<int:issueid>/update', methods=['GET', 'POST'])
-@APP.route('/fork/<username>/<repo:repo>/issue/<int:issueid>/update/',
-           methods=['GET', 'POST'])
-@APP.route('/fork/<username>/<repo:repo>/issue/<int:issueid>/update',
-           methods=['GET', 'POST'])
+@APP.route(
+    '/<repo>/issue/<int:issueid>/update/',
+    methods=['GET', 'POST'])
+@APP.route(
+    '/<repo>/issue/<int:issueid>/update',
+    methods=['GET', 'POST'])
+@APP.route(
+    '/<namespace>/<repo>/issue/<int:issueid>/update/',
+    methods=['GET', 'POST'])
+@APP.route(
+    '/<namespace>/<repo>/issue/<int:issueid>/update',
+    methods=['GET', 'POST'])
+@APP.route(
+    '/fork/<username>/<repo>/issue/<int:issueid>/update/',
+    methods=['GET', 'POST'])
+@APP.route(
+    '/fork/<username>/<repo>/issue/<int:issueid>/update',
+    methods=['GET', 'POST'])
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/update/',
+    methods=['GET', 'POST'])
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/update',
+    methods=['GET', 'POST'])
 @login_required
-def update_issue(repo, issueid, username=None):
+def update_issue(repo, issueid, username=None, namespace=None):
     ''' Add a comment to an issue. '''
     is_js = flask.request.args.get('js', False)
 
@@ -256,14 +274,24 @@ def update_issue(repo, issueid, username=None):
             'view_issue', username=username, repo=repo.name, issueid=issueid))
 
 
-@APP.route('/<repo:repo>/tag/<tag>/edit/', methods=('GET', 'POST'))
-@APP.route('/<repo:repo>/tag/<tag>/edit', methods=('GET', 'POST'))
+@APP.route('/<repo>/tag/<tag>/edit/', methods=('GET', 'POST'))
+@APP.route('/<repo>/tag/<tag>/edit', methods=('GET', 'POST'))
+@APP.route('/<namespace>/<repo>/tag/<tag>/edit/', methods=('GET', 'POST'))
+@APP.route('/<namespace>/<repo>/tag/<tag>/edit', methods=('GET', 'POST'))
 @APP.route(
-    '/fork/<username>/<repo:repo>/tag/<tag>/edit/', methods=('GET', 'POST'))
+    '/fork/<username>/<repo>/tag/<tag>/edit/',
+    methods=('GET', 'POST'))
 @APP.route(
-    '/fork/<username>/<repo:repo>/tag/<tag>/edit', methods=('GET', 'POST'))
+    '/fork/<username>/<repo>/tag/<tag>/edit',
+    methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/tag/<tag>/edit/',
+    methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/tag/<tag>/edit',
+    methods=('GET', 'POST'))
 @login_required
-def edit_tag(repo, tag, username=None):
+def edit_tag(repo, tag, username=None, namespace=None):
     """ Edit the specified tag associated with the issues of a project.
     """
     repo = flask.g.repo
@@ -313,10 +341,12 @@ def edit_tag(repo, tag, username=None):
     )
 
 
-@APP.route('/<repo:repo>/droptag/', methods=['POST'])
-@APP.route('/fork/<username>/<repo:repo>/droptag/', methods=['POST'])
+@APP.route('/<repo>/droptag/', methods=['POST'])
+@APP.route('/<namespace>/<repo>/droptag/', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/droptag/', methods=['POST'])
+@APP.route('/fork/<username>/<namespace>/<repo>/droptag/', methods=['POST'])
 @login_required
-def remove_tag(repo, username=None):
+def remove_tag(repo, username=None, namespace=None):
     """ Remove the specified tag, associated with the issues, from the project.
     """
     repo = flask.g.repo
@@ -356,11 +386,15 @@ def remove_tag(repo, username=None):
     )
 
 
-@APP.route('/<repo:repo>/issues/')
-@APP.route('/<repo:repo>/issues')
-@APP.route('/fork/<username>/<repo:repo>/issues/')
-@APP.route('/fork/<username>/<repo:repo>/issues')
-def view_issues(repo, username=None):
+@APP.route('/<repo>/issues/')
+@APP.route('/<repo>/issues')
+@APP.route('/<namespace>/<repo>/issues/')
+@APP.route('/<namespace>/<repo>/issues')
+@APP.route('/fork/<username>/<repo>/issues/')
+@APP.route('/fork/<username>/<repo>/issues')
+@APP.route('/fork/<username>/<namespace>/<repo>/issues/')
+@APP.route('/fork/<username>/<namespace>/<repo>/issues')
+def view_issues(repo, username=None, namespace=None):
     """ List all issues associated to a repo
     """
     status = flask.request.args.get('status', None)
@@ -454,11 +488,15 @@ def view_issues(repo, username=None):
     )
 
 
-@APP.route('/<repo:repo>/roadmap/')
-@APP.route('/<repo:repo>/roadmap')
-@APP.route('/fork/<username>/<repo:repo>/roadmap/')
-@APP.route('/fork/<username>/<repo:repo>/roadmap')
-def view_roadmap(repo, username=None):
+@APP.route('/<repo>/roadmap/')
+@APP.route('/<repo>/roadmap')
+@APP.route('/<namespace>/<repo>/roadmap/')
+@APP.route('/<namespace>/<repo>/roadmap')
+@APP.route('/fork/<username>/<repo>/roadmap/')
+@APP.route('/fork/<username>/<repo>/roadmap')
+@APP.route('/fork/<username>/<namespace>/<repo>/roadmap/')
+@APP.route('/fork/<username>/<namespace>/<repo>/roadmap')
+def view_roadmap(repo, username=None, namespace=None):
     """ List all issues associated to a repo as roadmap
     """
     status = flask.request.args.get('status', 'Open')
@@ -542,12 +580,20 @@ def view_roadmap(repo, username=None):
     )
 
 
-@APP.route('/<repo:repo>/new_issue/', methods=('GET', 'POST'))
-@APP.route('/<repo:repo>/new_issue', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo:repo>/new_issue/', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo:repo>/new_issue', methods=('GET', 'POST'))
+@APP.route('/<repo>/new_issue/', methods=('GET', 'POST'))
+@APP.route('/<repo>/new_issue', methods=('GET', 'POST'))
+@APP.route('/<namespace>/<repo>/new_issue/', methods=('GET', 'POST'))
+@APP.route('/<namespace>/<repo>/new_issue', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/new_issue/', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/new_issue', methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/new_issue/',
+    methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/new_issue',
+    methods=('GET', 'POST'))
 @login_required
-def new_issue(repo, username=None):
+def new_issue(repo, username=None, namespace=None):
     """ Create a new issue
     """
     repo = flask.g.repo
@@ -648,11 +694,15 @@ def new_issue(repo, username=None):
     )
 
 
-@APP.route('/<repo:repo>/issue/<int:issueid>/')
-@APP.route('/<repo:repo>/issue/<int:issueid>')
-@APP.route('/fork/<username>/<repo:repo>/issue/<int:issueid>/')
-@APP.route('/fork/<username>/<repo:repo>/issue/<int:issueid>')
-def view_issue(repo, issueid, username=None):
+@APP.route('/<repo>/issue/<int:issueid>/')
+@APP.route('/<repo>/issue/<int:issueid>')
+@APP.route('/<namespace>/<repo>/issue/<int:issueid>/')
+@APP.route('/<namespace>/<repo>/issue/<int:issueid>')
+@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/')
+@APP.route('/fork/<username>/<repo>/issue/<int:issueid>')
+@APP.route('/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/')
+@APP.route('/fork/<username>/<namespace>/<repo>/issue/<int:issueid>')
+def view_issue(repo, issueid, username=None, namespace=None):
     """ List all issues associated to a repo
     """
 
@@ -694,10 +744,13 @@ def view_issue(repo, issueid, username=None):
     )
 
 
-@APP.route('/<repo:repo>/issue/<int:issueid>/drop', methods=['POST'])
-@APP.route('/fork/<username>/<repo:repo>/issue/<int:issueid>/drop',
+@APP.route('/<repo>/issue/<int:issueid>/drop', methods=['POST'])
+@APP.route('/<namespace>/<repo>/issue/<int:issueid>/drop', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/drop',
            methods=['POST'])
-def delete_issue(repo, issueid, username=None):
+@APP.route('/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/drop',
+           methods=['POST'])
+def delete_issue(repo, issueid, username=None, namespace=None):
     """ Delete the specified issue
     """
 
@@ -737,14 +790,24 @@ def delete_issue(repo, issueid, username=None):
         'view_issue', username=username, repo=repo.name, issueid=issueid))
 
 
-@APP.route('/<repo:repo>/issue/<int:issueid>/edit/', methods=('GET', 'POST'))
-@APP.route('/<repo:repo>/issue/<int:issueid>/edit', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo:repo>/issue/<int:issueid>/edit/',
+@APP.route('/<repo>/issue/<int:issueid>/edit/', methods=('GET', 'POST'))
+@APP.route('/<repo>/issue/<int:issueid>/edit', methods=('GET', 'POST'))
+@APP.route(
+    '/<namespace>/<repo>/issue/<int:issueid>/edit/',
+    methods=('GET', 'POST'))
+@APP.route(
+    '/<namespace>/<repo>/issue/<int:issueid>/edit',
+    methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/edit/',
            methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo:repo>/issue/<int:issueid>/edit',
+@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/edit',
+           methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/edit/',
+           methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/edit',
            methods=('GET', 'POST'))
 @login_required
-def edit_issue(repo, issueid, username=None):
+def edit_issue(repo, issueid, username=None, namespace=None):
     """ Edit the specified issue
     """
     repo = flask.g.repo
@@ -844,11 +907,14 @@ def edit_issue(repo, issueid, username=None):
     )
 
 
-@APP.route('/<repo:repo>/issue/<int:issueid>/upload', methods=['POST'])
-@APP.route('/fork/<username>/<repo:repo>/issue/<int:issueid>/upload',
+@APP.route('/<namespace>/<repo>/issue/<int:issueid>/upload', methods=['POST'])
+@APP.route('/<repo>/issue/<int:issueid>/upload', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/upload',
+           methods=['POST'])
+@APP.route('/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/upload',
            methods=['POST'])
 @login_required
-def upload_issue(repo, issueid, username=None):
+def upload_issue(repo, issueid, username=None, namespace=None):
     ''' Upload a file to a ticket.
     '''
     repo = flask.g.repo
@@ -895,9 +961,12 @@ def upload_issue(repo, issueid, username=None):
         return flask.jsonify({'output': 'notok'})
 
 
-@APP.route('/<repo:repo>/issue/raw/<path:filename>')
-@APP.route('/fork/<username>/<repo:repo>/issue/raw/<path:filename>')
-def view_issue_raw_file(repo, filename=None, username=None):
+@APP.route('/<repo>/issue/raw/<path:filename>')
+@APP.route('/<namespace>/<repo>/issue/raw/<path:filename>')
+@APP.route('/fork/<username>/<repo>/issue/raw/<path:filename>')
+@APP.route('/fork/<username>/<namespace>/<repo>/issue/raw/<path:filename>')
+def view_issue_raw_file(
+        repo, filename=None, username=None, namespace=None):
     """ Displays the raw content of a file of a commit for the specified
     ticket repo.
     """
@@ -953,12 +1022,17 @@ def view_issue_raw_file(repo, filename=None, username=None):
     return (data, 200, headers)
 
 
-@APP.route('/<repo:repo>/issue/<int:issueid>/comment/<int:commentid>/edit',
+@APP.route('/<repo>/issue/<int:issueid>/comment/<int:commentid>/edit',
            methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo:repo>/issue/<int:issueid>/comment'
+@APP.route('/<namespace>/<repo>/issue/<int:issueid>/comment/<int:commentid>/edit',
+           methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/issue/<int:issueid>/comment'
+           '/<int:commentid>/edit', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/comment'
            '/<int:commentid>/edit', methods=('GET', 'POST'))
 @login_required
-def edit_comment_issue(repo, issueid, commentid, username=None):
+def edit_comment_issue(
+        repo, issueid, commentid, username=None, namespace=None):
     """Edit comment of an issue
     """
     is_js = flask.request.args.get('js', False)
