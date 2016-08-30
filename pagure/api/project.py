@@ -20,9 +20,11 @@ from pagure.api import API, api_method, APIERROR, api_login_required
 
 
 @API.route('/<repo>/git/tags')
+@API.route('/<namespace>/<repo>/git/tags')
 @API.route('/fork/<username>/<repo>/git/tags')
+@API.route('/fork/<username>/<namespace>/<repo>/git/tags')
 @api_method
-def api_git_tags(repo, username=None):
+def api_git_tags(repo, username=None, namespace=None):
     """
     Project git tags
     ----------------
@@ -31,10 +33,12 @@ def api_git_tags(repo, username=None):
     ::
 
         GET /api/0/<repo>/git/tags
+        GET /api/0/<namespace>/<repo>/git/tags
 
     ::
 
         GET /api/0/fork/<username>/<repo>/git/tags
+        GET /api/0/fork/<username>/<namespace>/<repo>/git/tags
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -47,7 +51,8 @@ def api_git_tags(repo, username=None):
         }
 
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = pagure.lib.get_project(
+        SESSION, repo, user=username, namespace=namespace)
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
@@ -194,6 +199,9 @@ def api_new_project():
     | ``description``  | string  | Mandatory    | | A short description of  |
     |                  |         |              |   the new project.        |
     +------------------+---------+--------------+---------------------------+
+    | ``namespace``    | string  | Optional     | | The namespace of the    |
+    |                  |         |              |   project to fork.        |
+    +------------------+---------+--------------+---------------------------+
     | ``url``          | string  | Optional     | | An url providing more   |
     |                  |         |              |   information about the   |
     |                  |         |              |   project.                |
@@ -228,6 +236,7 @@ def api_new_project():
     if form.validate_on_submit():
         name = form.name.data
         description = form.description.data
+        namespace = form.namespace.data or None
         url = form.url.data
         avatar_email = form.avatar_email.data
         create_readme = form.create_readme.data
@@ -236,6 +245,7 @@ def api_new_project():
             message = pagure.lib.new_project(
                 SESSION,
                 name=name,
+                namespace=namespace,
                 description=description,
                 url=url,
                 avatar_email=avatar_email,
@@ -292,6 +302,9 @@ def api_fork_project():
     | ``repo``         | string  | Mandatory    | | The name of the project |
     |                  |         |              |   to fork.                |
     +------------------+---------+--------------+---------------------------+
+    | ``namespace``    | string  | Optional     | | The namespace of the    |
+    |                  |         |              |   project to fork.        |
+    +------------------+---------+--------------+---------------------------+
     | ``username``     | string  | Optional     | | The username of the user|
     |                  |         |              |   of the fork.            |
     +------------------+---------+--------------+---------------------------+
@@ -313,8 +326,10 @@ def api_fork_project():
     if form.validate_on_submit():
         repo = form.repo.data
         username = form.username.data or None
+        namespace = form.namespace.data or None
 
-        repo = pagure.lib.get_project(SESSION, repo, user=username)
+        repo = pagure.lib.get_project(
+            SESSION, repo, user=username, namespace=namespace)
         if repo is None:
             raise pagure.exceptions.APIError(
                 404, error_code=APIERROR.ENOPROJECT)

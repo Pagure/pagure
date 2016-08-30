@@ -20,9 +20,11 @@ from pagure.api import API, api_method, api_login_required, APIERROR
 
 
 @API.route('/<repo>/pull-requests')
+@API.route('/<namespace>/<repo>/pull-requests')
 @API.route('/fork/<username>/<repo>/pull-requests')
+@API.route('/fork/<username>/<namespace>/<repo>/pull-requests')
 @api_method
-def api_pull_request_views(repo, username=None):
+def api_pull_request_views(repo, username=None, namespace=None):
     """
     List project's Pull-Requests
     ----------------------------
@@ -31,10 +33,12 @@ def api_pull_request_views(repo, username=None):
     ::
 
         GET /api/0/<repo>/pull-requests
+        GET /api/0/<namespace>/<repo>/pull-requests
 
     ::
 
         GET /api/0/fork/<username>/<repo>/pull-requests
+        GET /api/0/fork/<username>/<namespace>/<repo>/pull-requests
 
     Parameters
     ^^^^^^^^^^
@@ -119,7 +123,8 @@ def api_pull_request_views(repo, username=None):
 
     """
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = pagure.lib.get_project(
+        SESSION, repo, user=username, namespace=namespace)
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
@@ -172,9 +177,11 @@ def api_pull_request_views(repo, username=None):
 
 
 @API.route('/<repo>/pull-request/<int:requestid>')
+@API.route('/<namespace>/<repo>/pull-request/<int:requestid>')
 @API.route('/fork/<username>/<repo>/pull-request/<int:requestid>')
+@API.route('/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>')
 @api_method
-def api_pull_request_view(repo, requestid, username=None):
+def api_pull_request_view(repo, requestid, username=None, namespace=None):
     """
     Pull-request information
     ------------------------
@@ -183,10 +190,12 @@ def api_pull_request_view(repo, requestid, username=None):
     ::
 
         GET /api/0/<repo>/pull-request/<request id>
+        GET /api/0/<namespace>/<repo>/pull-request/<request id>
 
     ::
 
         GET /api/0/fork/<username>/<repo>/pull-request/<request id>
+        GET /api/0/fork/<username>/<namespace>/<repo>/pull-request/<request id>
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -238,7 +247,8 @@ def api_pull_request_view(repo, requestid, username=None):
 
     """
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = pagure.lib.get_project(
+        SESSION, repo, user=username, namespace=namespace)
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
@@ -258,11 +268,17 @@ def api_pull_request_view(repo, requestid, username=None):
 
 
 @API.route('/<repo>/pull-request/<int:requestid>/merge', methods=['POST'])
+@API.route(
+    '/<namespace>/<repo>/pull-request/<int:requestid>/merge',
+    methods=['POST'])
 @API.route('/fork/<username>/<repo>/pull-request/<int:requestid>/merge',
            methods=['POST'])
+@API.route(
+    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/merge',
+    methods=['POST'])
 @api_login_required(acls=['pull_request_merge'])
 @api_method
-def api_pull_request_merge(repo, requestid, username=None):
+def api_pull_request_merge(repo, requestid, username=None, namespace=None):
     """
     Merge a pull-request
     --------------------
@@ -271,10 +287,12 @@ def api_pull_request_merge(repo, requestid, username=None):
     ::
 
         POST /api/0/<repo>/pull-request/<request id>/merge
+        POST /api/0/<namespace>/<repo>/pull-request/<request id>/merge
 
     ::
 
         POST /api/0/fork/<username>/<repo>/pull-request/<request id>/merge
+        POST /api/0/fork/<username>/<namespace>/<repo>/pull-request/<request id>/merge
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -288,7 +306,8 @@ def api_pull_request_merge(repo, requestid, username=None):
     """
     output = {}
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = pagure.lib.get_project(
+        SESSION, repo, user=username, namespace=namespace)
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
@@ -336,11 +355,17 @@ def api_pull_request_merge(repo, requestid, username=None):
 
 
 @API.route('/<repo>/pull-request/<int:requestid>/close', methods=['POST'])
+@API.route(
+    '/<namespace>/<repo>/pull-request/<int:requestid>/close',
+    methods=['POST'])
 @API.route('/fork/<username>/<repo>/pull-request/<int:requestid>/close',
            methods=['POST'])
+@API.route(
+    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/close',
+    methods=['POST'])
 @api_login_required(acls=['pull_request_close'])
 @api_method
-def api_pull_request_close(repo, requestid, username=None):
+def api_pull_request_close(repo, requestid, username=None, namespace=None):
     """
     Close a pull-request
     --------------------
@@ -349,10 +374,12 @@ def api_pull_request_close(repo, requestid, username=None):
     ::
 
         POST /api/0/<repo>/pull-request/<request id>/close
+        POST /api/0/<namespace>/<repo>/pull-request/<request id>/close
 
     ::
 
         POST /api/0/fork/<username>/<repo>/pull-request/<request id>/close
+        POST /api/0/fork/<username>/<namespace>/<repo>/pull-request/<request id>/close
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -366,7 +393,8 @@ def api_pull_request_close(repo, requestid, username=None):
     """
     output = {}
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = pagure.lib.get_project(
+        SESSION, repo, user=username, namespace=namespace)
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
@@ -405,11 +433,17 @@ def api_pull_request_close(repo, requestid, username=None):
 
 @API.route('/<repo>/pull-request/<int:requestid>/comment',
            methods=['POST'])
+@API.route('/<namespace>/<repo>/pull-request/<int:requestid>/comment',
+           methods=['POST'])
 @API.route('/fork/<username>/<repo>/pull-request/<int:requestid>/comment',
            methods=['POST'])
+@API.route(
+    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/comment',
+    methods=['POST'])
 @api_login_required(acls=['pull_request_comment'])
 @api_method
-def api_pull_request_add_comment(repo, requestid, username=None):
+def api_pull_request_add_comment(
+        repo, requestid, username=None, namespace=None):
     """
     Comment on a pull-request
     -------------------------
@@ -418,10 +452,12 @@ def api_pull_request_add_comment(repo, requestid, username=None):
     ::
 
         POST /api/0/<repo>/pull-request/<request id>/comment
+        POST /api/0/<namespace>/<repo>/pull-request/<request id>/comment
 
     ::
 
         POST /api/0/fork/<username>/<repo>/pull-request/<request id>/comment
+        POST /api/0/fork/<username>/<namespace>/<repo>/pull-request/<request id>/comment
 
     Input
     ^^^^^
@@ -460,7 +496,8 @@ def api_pull_request_add_comment(repo, requestid, username=None):
         }
 
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = pagure.lib.get_project(
+        SESSION, repo, user=username, namespace=namespace)
     output = {}
 
     if repo is None:
@@ -518,11 +555,16 @@ def api_pull_request_add_comment(repo, requestid, username=None):
 
 @API.route('/<repo>/pull-request/<int:requestid>/flag',
            methods=['POST'])
+@API.route('/<namespace>/<repo>/pull-request/<int:requestid>/flag',
+           methods=['POST'])
 @API.route('/fork/<username>/<repo>/pull-request/<int:requestid>/flag',
            methods=['POST'])
+@API.route(
+    '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>/flag',
+    methods=['POST'])
 @api_login_required(acls=['pull_request_flag'])
 @api_method
-def api_pull_request_add_flag(repo, requestid, username=None):
+def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
     """
     Flag a pull-request
     -------------------
@@ -531,10 +573,12 @@ def api_pull_request_add_flag(repo, requestid, username=None):
     ::
 
         POST /api/0/<repo>/pull-request/<request id>/flag
+        POST /api/0/<namespace>/<repo>/pull-request/<request id>/flag
 
     ::
 
         POST /api/0/fork/<username>/<repo>/pull-request/<request id>/flag
+        POST /api/0/fork/<username>/<namespace>/<repo>/pull-request/<request id>/flag
 
     Input
     ^^^^^
@@ -594,7 +638,8 @@ def api_pull_request_add_flag(repo, requestid, username=None):
         }
 
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = pagure.lib.get_project(
+        SESSION, repo, user=username, namespace=namespace)
     output = {}
 
     if repo is None:

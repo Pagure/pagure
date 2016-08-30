@@ -22,10 +22,12 @@ from pagure.api import (
 
 
 @API.route('/<repo>/new_issue', methods=['POST'])
+@API.route('/<namespace>/<repo>/new_issue', methods=['POST'])
 @API.route('/fork/<username>/<repo>/new_issue', methods=['POST'])
+@API.route('/fork/<username>/<namespace>/<repo>/new_issue', methods=['POST'])
 @api_login_required(acls=['issue_create'])
 @api_method
-def api_new_issue(repo, username=None):
+def api_new_issue(repo, username=None, namespace=None):
     """
     Create a new issue
     ------------------
@@ -34,10 +36,12 @@ def api_new_issue(repo, username=None):
     ::
 
         POST /api/0/<repo>/new_issue
+        POST /api/0/<namespace>/<repo>/new_issue
 
     ::
 
         POST /api/0/fork/<username>/<repo>/new_issue
+        POST /api/0/fork/<username>/<namespace>/<repo>/new_issue
 
     Input
     ^^^^^
@@ -65,7 +69,8 @@ def api_new_issue(repo, username=None):
         }
 
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = pagure.lib.get_project(
+        SESSION, repo, user=username, namespace=namespace)
     output = {}
 
     if repo is None:
@@ -140,11 +145,13 @@ def api_new_issue(repo, username=None):
     return jsonout
 
 
-@API.route('/<repo>/issues')
+@API.route('/<namespace>/<repo>/issues')
 @API.route('/fork/<username>/<repo>/issues')
+@API.route('/<repo>/issues')
+@API.route('/fork/<username>/<namespace>/<repo>/issues')
 @api_login_optional()
 @api_method
-def api_view_issues(repo, username=None):
+def api_view_issues(repo, username=None, namespace=None):
     """
     List project's issues
     ---------------------
@@ -153,10 +160,12 @@ def api_view_issues(repo, username=None):
     ::
 
         GET /api/0/<repo>/issues
+        GET /api/0/<namespace>/<repo>/issues
 
     ::
 
         GET /api/0/fork/<username>/<repo>/issues
+        GET /api/0/fork/<username>/<namespace>/<repo>/issues
 
     Parameters
     ^^^^^^^^^^
@@ -225,7 +234,8 @@ def api_view_issues(repo, username=None):
 
     """
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = pagure.lib.get_project(
+        SESSION, repo, user=username, namespace=namespace)
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
@@ -285,10 +295,12 @@ def api_view_issues(repo, username=None):
 
 
 @API.route('/<repo>/issue/<issueid>')
+@API.route('/<namespace>/<repo>/issue/<issueid>')
 @API.route('/fork/<username>/<repo>/issue/<issueid>')
+@API.route('/fork/<username>/<namespace>/<repo>/issue/<issueid>')
 @api_login_optional()
 @api_method
-def api_view_issue(repo, issueid, username=None):
+def api_view_issue(repo, issueid, username=None, namespace=None):
     """
     Issue information
     -----------------
@@ -297,10 +309,12 @@ def api_view_issue(repo, issueid, username=None):
     ::
 
         GET /api/0/<repo>/issue/<issue id>
+        GET /api/0/<namespace>/<repo>/issue/<issue id>
 
     ::
 
         GET /api/0/fork/<username>/<repo>/issue/<issue id>
+        GET /api/0/fork/<username>/<namespace>/<repo>/issue/<issue id>
 
     The identifier provided can be either the unique identifier or the
     regular identifier used in the UI (for example ``24`` in
@@ -334,7 +348,8 @@ def api_view_issue(repo, issueid, username=None):
     if str(comments).lower() in ['0', 'False']:
         comments = False
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = pagure.lib.get_project(
+        SESSION, repo, user=username, namespace=namespace)
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
@@ -372,10 +387,15 @@ def api_view_issue(repo, issueid, username=None):
 
 
 @API.route('/<repo>/issue/<issueid>/comment/<int:commentid>')
+@API.route('/<namespace>/<repo>/issue/<issueid>/comment/<int:commentid>')
 @API.route('/fork/<username>/<repo>/issue/<issueid>/comment/<int:commentid>')
+@API.route(
+    '/fork/<username>/<namespace>/<repo>/issue/<issueid>/'
+    'comment/<int:commentid>')
 @api_login_optional()
 @api_method
-def api_view_issue_comment(repo, issueid, commentid, username=None):
+def api_view_issue_comment(
+        repo, issueid, commentid, username=None, namespace=None):
     """
     Comment of an issue
     --------------------
@@ -384,10 +404,12 @@ def api_view_issue_comment(repo, issueid, commentid, username=None):
     ::
 
         GET /api/0/<repo>/issue/<issue id>/comment/<comment id>
+        GET /api/0/<namespace>/<repo>/issue/<issue id>/comment/<comment id>
 
     ::
 
         GET /api/0/fork/<username>/<repo>/issue/<issue id>/comment/<comment id>
+        GET /api/0/fork/<username>/<namespace>/<repo>/issue/<issue id>/comment/<comment id>
 
     The identifier provided can be either the unique identifier or the
     regular identifier used in the UI (for example ``24`` in
@@ -413,7 +435,8 @@ def api_view_issue_comment(repo, issueid, commentid, username=None):
 
     """
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = pagure.lib.get_project(
+        SESSION, repo, user=username, namespace=namespace)
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
@@ -460,11 +483,15 @@ def api_view_issue_comment(repo, issueid, commentid, username=None):
 
 
 @API.route('/<repo>/issue/<int:issueid>/status', methods=['POST'])
+@API.route('/<namespace>/<repo>/issue/<int:issueid>/status', methods=['POST'])
 @API.route(
     '/fork/<username>/<repo>/issue/<int:issueid>/status', methods=['POST'])
+@API.route(
+    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/status',
+    methods=['POST'])
 @api_login_required(acls=['issue_change_status'])
 @api_method
-def api_change_status_issue(repo, issueid, username=None):
+def api_change_status_issue(repo, issueid, username=None, namespace=None):
     """
     Change issue status
     -------------------
@@ -473,10 +500,12 @@ def api_change_status_issue(repo, issueid, username=None):
     ::
 
         POST /api/0/<repo>/issue/<issue id>/status
+        POST /api/0/<namespace>/<repo>/issue/<issue id>/status
 
     ::
 
         POST /api/0/fork/<username>/<repo>/issue/<issue id>/status
+        POST /api/0/fork/<username>/<namespace>/<repo>/issue/<issue id>/status
 
     Input
     ^^^^^
@@ -497,7 +526,9 @@ def api_change_status_issue(repo, issueid, username=None):
         }
 
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = pagure.lib.get_project(
+        SESSION, repo, user=username, namespace=namespace)
+
     output = {}
 
     if repo is None:
@@ -556,11 +587,15 @@ def api_change_status_issue(repo, issueid, username=None):
 
 
 @API.route('/<repo>/issue/<int:issueid>/comment', methods=['POST'])
+@API.route('/<namespace>/<repo>/issue/<int:issueid>/comment', methods=['POST'])
 @API.route(
     '/fork/<username>/<repo>/issue/<int:issueid>/comment', methods=['POST'])
+@API.route(
+    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/comment',
+    methods=['POST'])
 @api_login_required(acls=['issue_comment'])
 @api_method
-def api_comment_issue(repo, issueid, username=None):
+def api_comment_issue(repo, issueid, username=None, namespace=None):
     """
     Comment to an issue
     -------------------
@@ -569,10 +604,12 @@ def api_comment_issue(repo, issueid, username=None):
     ::
 
         POST /api/0/<repo>/issue/<issue id>/comment
+        POST /api/0/<namespace>/<repo>/issue/<issue id>/comment
 
     ::
 
         POST /api/0/fork/<username>/<repo>/issue/<issue id>/comment
+        POST /api/0/fork/<username>/<namespace>/<repo>/issue/<issue id>/comment
 
     Input
     ^^^^^
@@ -594,7 +631,8 @@ def api_comment_issue(repo, issueid, username=None):
         }
 
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = pagure.lib.get_project(
+        SESSION, repo, user=username, namespace=namespace)
     output = {}
 
     if repo is None:
@@ -647,11 +685,15 @@ def api_comment_issue(repo, issueid, username=None):
 
 
 @API.route('/<repo>/issue/<int:issueid>/assign', methods=['POST'])
+@API.route('/<namespace>/<repo>/issue/<int:issueid>/assign', methods=['POST'])
 @API.route(
     '/fork/<username>/<repo>/issue/<int:issueid>/assign', methods=['POST'])
+@API.route(
+    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/assign',
+    methods=['POST'])
 @api_login_required(acls=['issue_assign'])
 @api_method
-def api_assign_issue(repo, issueid, username=None):
+def api_assign_issue(repo, issueid, username=None, namespace=None):
     """
     Assign an issue
     ---------------
@@ -660,10 +702,12 @@ def api_assign_issue(repo, issueid, username=None):
     ::
 
         POST /api/0/<repo>/issue/<issue id>/assign
+        POST /api/0/<namespace>/<repo>/issue/<issue id>/assign
 
     ::
 
         POST /api/0/fork/<username>/<repo>/issue/<issue id>/assign
+        POST /api/0/fork/<username>/<namespace>/<repo>/issue/<issue id>/assign
 
     Input
     ^^^^^
@@ -685,7 +729,8 @@ def api_assign_issue(repo, issueid, username=None):
         }
 
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = pagure.lib.get_project(
+        SESSION, repo, user=username, namespace=namespace)
     output = {}
 
     if repo is None:

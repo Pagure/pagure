@@ -474,9 +474,13 @@ class EditCommentForm(wtf.Form):
 class ForkRepoForm(wtf.Form):
     ''' Form to fork a project in the API. '''
     repo = wtforms.TextField(
-        'The project name <span class="error">*</span>',
+        'The project name',
         [wtforms.validators.Required()]
     )
     username = wtforms.TextField(
         'User who forked the project',
         [wtforms.validators.optional()])
+    namespace = wtforms.TextField(
+        'The project namespace',
+        [wtforms.validators.optional()]
+    )
