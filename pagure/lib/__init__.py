@@ -1007,10 +1007,11 @@ def new_project(session, user, name, blacklist, allowed_prefix,
                 gitfolder, docfolder, ticketfolder, requestfolder,
                 description=None, url=None, avatar_email=None,
                 parent_id=None, add_readme=False, userobj=None,
-                prevent_40_chars=False):
+                prevent_40_chars=False, namespace=None):
     ''' Create a new project based on the information provided.
     '''
-    if name in blacklist:
+    if name in blacklist or (
+            namespace and '%s/%s' % (namespace, name) in blacklist):
         raise pagure.exceptions.RepoExistsException(
             'No project "%s" are allowed to be created due to potential '
             'conflicts in URLs with pagure itself' % name
@@ -1019,15 +1020,14 @@ def new_project(session, user, name, blacklist, allowed_prefix,
     user_obj = get_user(session, user)
     allowed_prefix = allowed_prefix + [grp for grp in user_obj.groups]
 
-    first_part, _, second_part = name.partition('/')
-    if second_part and first_part not in allowed_prefix:
+    if namespace and namespace not in allowed_prefix:
         raise pagure.exceptions.PagureException(
-            'The prefix of your project must be in the list of allowed '
-            'prefixes set by the admins of this pagure instance, or the name '
-            'of a group of which you are a member.'
+            'The namespace of your project must be in the list of allowed '
+            'namespaces set by the admins of this pagure instance, or the '
+            'name of a group of which you are a member.'
         )
 
-    if len(second_part) == 40 and prevent_40_chars:
+    if len(name) == 40 and prevent_40_chars:
         # We must block project with a name <foo>/<bar> where the length
         # of <bar> is exactly 40 characters long as this would otherwise
         # conflict with the old URL schema used for commit that was
@@ -1047,6 +1047,7 @@ def new_project(session, user, name, blacklist, allowed_prefix,
 
     project = model.Project(
         name=name,
+        namespace=namespace,
         description=description if description else None,
         url=url if url else None,
         avatar_email=avatar_email if avatar_email else None,
@@ -1486,7 +1487,8 @@ def fork_project(session, user, repo, gitfolder,
 
 
 def search_projects(
-        session, username=None, fork=None, tags=None, pattern=None,
+        session, username=None,
+        fork=None, tags=None, namespace=None, pattern=None,
         start=None, limit=None, count=False, sort=None):
     '''List existing projects
     '''
@@ -1570,6 +1572,12 @@ def search_projects(
             projects = projects.filter(
                 model.Project.name == pattern
             )
+
+    if namespace:
+        projects = project.filter(
+            model.Project.namespace == namespace
+        )
+
     query = session.query(
         model.Project
     ).filter(
@@ -1601,13 +1609,15 @@ def search_projects(
         return query.all()
 
 
-def get_project(session, name, user=None):
+def get_project(session, name, user=None, namespace=None):
     '''Get a project from the database
     '''
     query = session.query(
         model.Project
     ).filter(
         model.Project.name == name
+    ).filter(
+        model.Project.namespace == namespace
     )
 
     if user is not None:

@@ -301,6 +301,7 @@ class Project(BASE):
         ),
         nullable=False,
         index=True)
+    namespace = sa.Column(sa.String(255), nullable=True, index=True)
     name = sa.Column(sa.String(255), nullable=False, index=True)
     description = sa.Column(sa.Text, nullable=True)
     url = sa.Column(sa.Text, nullable=True)
