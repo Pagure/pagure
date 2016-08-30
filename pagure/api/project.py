@@ -236,7 +236,9 @@ def api_new_project():
     if form.validate_on_submit():
         name = form.name.data
         description = form.description.data
-        namespace = form.namespace.data or None
+        namespace = form.namespace.data.strip() or None
+        if namespace == 'None':
+            namespace = None
         url = form.url.data
         avatar_email = form.avatar_email.data
         create_readme = form.create_readme.data
@@ -326,7 +328,9 @@ def api_fork_project():
     if form.validate_on_submit():
         repo = form.repo.data
         username = form.username.data or None
-        namespace = form.namespace.data or None
+        namespace = form.namespace.data.strip() or None
+        if namespace == 'None':
+            namespace = None
 
         repo = pagure.lib.get_project(
             SESSION, repo, user=username, namespace=namespace)

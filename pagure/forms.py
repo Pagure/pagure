@@ -91,6 +91,23 @@ class ProjectForm(ProjectFormSimplified):
         'Create README',
         [wtforms.validators.optional()],
     )
+    namespace = wtforms.SelectField(
+        'The project namespace',
+        [wtforms.validators.optional()],
+        choices=[],
+    )
+
+    def __init__(self, *args, **kwargs):
+        """ Calls the default constructor with the normal argument but
+        uses the list of collection provided to fill the choices of the
+        drop-down list.
+        """
+        super(ProjectForm, self).__init__(*args, **kwargs)
+        if 'namespaces' in kwargs:
+            self.namespace.choices = [
+                (namespace, namespace) for namespace in kwargs['namespaces']
+            ]
+            self.namespace.choices.insert(0, ('', ''))
 
 
 class IssueFormSimplied(wtf.Form):
