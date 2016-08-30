@@ -80,18 +80,6 @@ if APP.config.get('THEME_STATIC_FOLDER', False):
     ]
 
 
-class RepoConverter(BaseConverter):
-
-    """Like the default :class:`UnicodeConverter`, but it allows matching
-    a single slash.
-    :param map: the :class:`Map`.
-    """
-    regex = r'[^/]*(/[^/]+)?'
-    # weight = 200
-
-
-APP.url_map.converters['repo'] = RepoConverter
-
 import pagure.doc_utils
 import pagure.forms
 import pagure.lib
