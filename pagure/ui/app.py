@@ -375,7 +375,8 @@ def new_project():
                 pagure instance')
 
     namespaces = APP.config['ALLOWED_PREFIX'][:]
-    namespaces.extend([grp for grp in user.groups])
+    if user:
+        namespaces.extend([grp for grp in user.groups])
 
     form = pagure.forms.ProjectForm(namespaces=namespaces)
 
