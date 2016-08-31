@@ -92,7 +92,7 @@ class ProjectForm(ProjectFormSimplified):
         [wtforms.validators.optional()],
     )
     namespace = wtforms.SelectField(
-        'The project namespace',
+        'Project Namespace',
         [wtforms.validators.optional()],
         choices=[],
     )
