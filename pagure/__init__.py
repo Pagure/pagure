@@ -277,7 +277,7 @@ def is_admin():
     admins = APP.config['ADMIN_GROUP']
     if isinstance(admins, basestring):
         admins = [admins]
-    admins = set(admins)
+    admins = set(admins or [])
     groups = set(flask.g.fas_user.groups)
 
     return not groups.isdisjoint(admins)
