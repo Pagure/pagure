@@ -173,7 +173,7 @@ if APP.config['EVENTSOURCE_SOURCE'] \
     pagure.lib.set_redis(
         host=APP.config['REDIS_HOST'],
         port=APP.config['REDIS_PORT'],
-        db=APP.config['REDIS_DB']
+        dbname=APP.config['REDIS_DB']
     )
 
 
