@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            2.3.3
+Version:            2.4
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -223,8 +223,8 @@ install -m 644 webhook-server/pagure_webhook.service \
 mkdir -p $RPM_BUILD_ROOT/%{_libexecdir}/pagure-ci
 install -m 755 pagure-ci/pagure_ci_server.py \
     $RPM_BUILD_ROOT/%{_libexecdir}/pagure-ci/pagure_ci_server.py
-install -m 644 pagure-ci/pagure-ci.service \
-    $RPM_BUILD_ROOT/%{_unitdir}/pagure-ci.service
+install -m 644 pagure-ci/pagure_ci.service \
+    $RPM_BUILD_ROOT/%{_unitdir}/pagure_ci.service
 
 
 %post milters
@@ -298,6 +298,61 @@ install -m 644 pagure-ci/pagure-ci.service \
 
 
 %changelog
+* Wed Aug 31 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.4-1
+- Update to 2.4
+- - [Security] Avoid all html related mimetypes and force the download if any
+  (CVE-2016-1000037) -- Fixed in 2.3.4 as well
+- Redirect the URL to projects <foo>.git to <foo> (Abhishek Goswami)
+- Allow creating projects with 40 chars length name on newer pagure instances
+- Fix @<user> and #<id> when editing a comment (Eric Barbour)
+- Display properly and nicely the ACLs of the API tokens (Lubomír Sedlář)
+- Removing html5lib so bleach installation finds what version is best (Tiago M.
+  Vieira)
+- Remove the branchchooser from the repoheader (again) (Ryan Lerch)
+- Fix hard-coded urls in the master template
+- Made the interaction with the watch button clearer (Ryan Lerch)
+- Introduce pagure-ci, a service allowing to integrate pagure with a jenkins
+  instance (Farhaan Bukhsh and I)
+- Accept Close{,s,d} in the same way as Merges and Fixes (Patrick Uiterwijk)
+- Avoid showing the 'New PR' button on the overview page is a PR already exists
+  for this branch, in the main project or a fork (Vivek Anand)
+- Fix presenting the readme file and display the readme in the tree page if
+  there is one in the folder displayed (Ryan Lerch)
+- Move the new issue button to be available on every page (AnjaliPardeshi)
+- Fix pagure for when an user enters a comment containing #<id> where the id
+  isn't found in the db
+- Make the bootstrap URLs configurable (so that they don't necessarily point to
+  the Fedora infra) (Farhaan Bukhsh)
+- Fix how the web-hook server determine the project and its username
+- Replace the login icon with plain text (Ryan Lerch)
+- Fix layout in the doc (Farhaan Bukhsh)
+- Improve the load_from_disk utility script
+- Fix our mardown processor to avoid crashing on #<text> (where we expect #<id>)
+- Fix the search for projects with a / in their names
+- Fix adding a file to a ticket when running pagure with `local` auth
+- Improve the grammar around the allowed prefix in our fake-namespaces (Jason
+  Tibbitts)
+- Implement scanning of attached files for viruses (Patrick Uiterwijk)
+- Document how to set-up multiple ssh keys per user (William Moreno Reyes)
+- Add display_name and description to groups, and allow editing them
+- Add the ability to run the post-receive hook after merging a PR in the UI
+- Fix showing the group page even when user management is turned off (Vivek
+  Anand)
+- Make explicit what the separators for tags is (Farhaan Bukhsh)
+- Include the word setting with icon (tenstormavi)
+- Fix the requirements.txt file (Vivek Anand)
+- Cleaned up the topbar a bit (Ryan Lerch)
+- Fix location of bottom pagination links on user page (Ryan Lerch)
+- Add user's project watch list in index page of the user (Vivek Anand)
+- Fix showing the reporter when listing the closed issues (Vivek Anand)
+- Fix accessing forks once the main repo has been deleted (Farhaan Bukhsh)
+
+* Wed Jul 27 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.3.4-1
+- Update to 2.3.4
+- Security fix release blocking all html related mimetype when displaying the
+  raw files in issues and forces the browser to download them instead (Thanks to
+  Patrick Uiterwijk for finding this issue) - CVE: CVE-2016-1000037
+
 * Fri Jul 15 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.3.3-1
 - Update to 2.3.3
 - Fix redering the release page when the tag message contain only spaces (Vivek

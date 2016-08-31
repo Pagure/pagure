@@ -1,6 +1,26 @@
 Upgrading Pagure
 ================
 
+From 2.3 to 2.4
+---------------
+
+2.4 brings quite a few changes and some of them impacting the database scheme.
+
+Therefore when upgrading from 2.3.x to 2.4, you will have to:
+
+* Update the database schame using alembic: ``alembic upgrade head``
+
+
+This update also brings some new configuration keys:
+
+* ``VIRUS_SCAN_ATTACHMENTS`` allows turning on or off checking attachments for
+  virus using clamav. This requires pyclamd but is entirely optional (and off by
+  default)
+* ``PAGURE_CI_SERVICES`` allows specifying with which CI (Continuous
+  Integration) services this pagure instance can integrate with. Currently, only
+  `Jenkins` is supported, but this configuration key defaults to ``None``.
+
+
 From 2.2 to 2.3
 ---------------
 
