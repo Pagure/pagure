@@ -29,3 +29,6 @@ tests/*.git
 
 # Don't track alembic.ini
 alembic.ini
+
+# Don't track the virtualenv we tell developers to use
+pagure_env/
