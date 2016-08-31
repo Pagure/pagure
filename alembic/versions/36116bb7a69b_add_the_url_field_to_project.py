@@ -24,6 +24,6 @@ def upgrade():
 
 
 def downgrade():
-    ''' Remove the column merge_status from the table projects.
+    ''' Remove the column url from the table projects.
     '''
     op.drop_column('projects', 'url')
