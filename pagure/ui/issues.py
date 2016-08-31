@@ -655,7 +655,7 @@ def new_issue(repo, username=None, namespace=None):
 
             return flask.redirect(flask.url_for(
                 '.view_issue', username=username, repo=repo.name,
-                issueid=issue.id))
+                namespace=namespace, issueid=issue.id))
         except pagure.exceptions.PagureException as err:
             flask.flash(str(err), 'error')
         except SQLAlchemyError as err:  # pragma: no cover
@@ -780,7 +780,8 @@ def delete_issue(repo, issueid, username=None, namespace=None):
             SESSION.commit()
             flask.flash('Issue deleted')
             return flask.redirect(flask.url_for(
-                'view_issues', username=username, repo=repo.name))
+                'view_issues', username=username, repo=repo.name,
+                namespace=namespace))
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             APP.logger.exception(err)
@@ -881,7 +882,7 @@ def edit_issue(repo, issueid, username=None, namespace=None):
                 SESSION.commit()
             flask.flash(message)
             url = flask.url_for(
-                'view_issue', username=username,
+                'view_issue', username=username, namespace=namespace,
                 repo=repo.name, issueid=issueid)
             return flask.redirect(url)
         except pagure.exceptions.PagureException as err:
@@ -1087,7 +1088,7 @@ def edit_comment_issue(
             return 'ok'
 
         return flask.redirect(flask.url_for(
-            'view_issue', username=username,
+            'view_issue', username=username, namespace=namespace,
             repo=project.name, issueid=issueid))
 
     if is_js and flask.request.method == 'POST':
