@@ -387,6 +387,8 @@ def new_project():
         avatar_email = form.avatar_email.data
         create_readme = form.create_readme.data
         namespace = form.namespace.data.strip() or None
+        if namespace == 'None':
+            namespace = None
 
         try:
             pagure.lib.new_project(
