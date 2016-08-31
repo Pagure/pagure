@@ -1039,10 +1039,14 @@ def new_project(session, user, name, blacklist, allowed_prefix,
             'the `/`'
         )
 
-    gitrepo = os.path.join(gitfolder, '%s.git' % name)
+    path = name
+    if namespace:
+        path = '%s/%s' % (namespace, name)
+
+    gitrepo = os.path.join(gitfolder, '%s.git' % path)
     if os.path.exists(gitrepo):
         raise pagure.exceptions.RepoExistsException(
-            'The project repo "%s" already exists' % name
+            'The project repo "%s" already exists' % path
         )
 
     project = model.Project(
