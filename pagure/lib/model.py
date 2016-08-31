@@ -359,6 +359,8 @@ class Project(BASE):
         project forked, otherwise it returns the project name.
         '''
         str_name = self.name
+        if self.namespace:
+            str_name = '%s/%s' % (self.namespace, str_name)
         if self.is_fork:
             str_name = "forks/%s/%s" % (self.user.user, str_name)
         return str_name
