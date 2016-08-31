@@ -1,0 +1,1 @@
+jquery.dotdotdot-1.8.3.js

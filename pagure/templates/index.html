@@ -28,7 +28,7 @@
 
 {% block jscripts %}
     {{ super() }}
-<script src="//cdn.jsdelivr.net/jdenticon/1.3.2/jdenticon.min.js" async></script>
+<script src="{{ url_for('static', filename='jdenticon.min.js') }}" type="text/javascript"></script>
 <script src="{{ url_for('static', filename='selectize.min.js') }}" type="text/javascript"> </script>
 <script src="{{ url_for('static', filename='jquery.dotdotdot.min.js') }}" type="text/javascript"></script>
 <script type="text/javascript">

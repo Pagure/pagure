@@ -1,0 +1,1 @@
+emojione-2.2.6.js
