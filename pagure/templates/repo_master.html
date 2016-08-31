@@ -14,9 +14,11 @@
                 namespace=repo.namespace, username=username, repo=repo.name)}}">
               {% if repo.is_fork -%}
                 <span class="oi" data-glyph="fork"></span>
-                {{ repo.user.user }}/{{ repo.name}}
+                {{ repo.user.user }}/{{
+                    repo.namespace + '/' if repo.namespace
+                }}{{ repo.name}}
               {%- else -%}
-                {{ repo.name }}
+                {{ repo.namespace + '/' if repo.namespace }}{{ repo.name }}
               {%- endif -%}
             </a>
             {% if authenticated %}
