@@ -374,19 +374,25 @@ def new_project():
         flask.abort(404, 'Creation of new project is not allowed on this \
                 pagure instance')
 
-    form = pagure.forms.ProjectForm()
+    namespaces = APP.config['ALLOWED_PREFIX'][:]
+    namespaces.extend([grp for grp in user.groups])
+
+    form = pagure.forms.ProjectForm(namespaces=namespaces)
+
     if form.validate_on_submit():
         name = form.name.data
         description = form.description.data
         url = form.url.data
         avatar_email = form.avatar_email.data
         create_readme = form.create_readme.data
+        namespace = form.namespace.data.strip() or None
 
         try:
             pagure.lib.new_project(
                 SESSION,
                 name=name,
                 description=description,
+                namespace=namespace,
                 url=url,
                 avatar_email=avatar_email,
                 user=flask.g.fas_user.username,
@@ -403,7 +409,8 @@ def new_project():
             )
             SESSION.commit()
             pagure.lib.git.generate_gitolite_acls()
-            return flask.redirect(flask.url_for('view_repo', repo=name))
+            return flask.redirect(flask.url_for(
+                'view_repo', repo=name, namespace=namespace))
         except pagure.exceptions.PagureException as err:
             flask.flash(str(err), 'error')
         except SQLAlchemyError as err:  # pragma: no cover
