@@ -482,6 +482,7 @@ class Project(BASE):
             'id': self.id,
             'name': self.name,
             'description': self.description,
+            'namespace': self.namespace,
             'parent': self.parent.to_json(
                 public=public, api=api) if self.parent else None,
             'date_created': self.date_created.strftime('%s'),
