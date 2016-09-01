@@ -45,7 +45,7 @@ class RtdTable(BASE):
         'Project', remote_side=[Project.id],
         backref=backref(
             'rtd_hook', cascade="delete, delete-orphan",
-            single_parent=True)
+            single_parent=True, uselist=False)
     )
 
 

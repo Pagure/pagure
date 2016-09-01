@@ -45,7 +45,7 @@ class PagureTicketsTable(BASE):
         'Project', remote_side=[Project.id],
         backref=backref(
             'pagure_hook_tickets', cascade="delete, delete-orphan",
-            single_parent=True)
+            single_parent=True, uselist=False)
     )
 
 

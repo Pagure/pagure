@@ -45,7 +45,7 @@ class PagureForceCommitTable(BASE):
         'Project', foreign_keys=[project_id], remote_side=[Project.id],
         backref=backref(
             'pagure_force_commit_hook', cascade="delete, delete-orphan",
-            single_parent=True)
+            single_parent=True, uselist=False)
     )
 
 

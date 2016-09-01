@@ -52,7 +52,7 @@ class IrcTable(BASE):
         'Project', remote_side=[Project.id],
         backref=backref(
             'irc_hook', cascade="delete, delete-orphan",
-            single_parent=True)
+            single_parent=True, uselist=False)
     )
 
 
