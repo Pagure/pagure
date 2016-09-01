@@ -16,22 +16,14 @@ receiving end is offline or so.
 
 """
 
-import datetime
-import hashlib
-import hmac
 import json
 import logging
 import os
 import requests
-import time
-import urlparse
-import uuid
 
-import six
 import trollius
 import trollius_redis
 
-from kitchen.text.converters import to_bytes
 
 
 log = logging.getLogger(__name__)
