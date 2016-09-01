@@ -224,6 +224,7 @@ def send_email(text, subject, to_mail,
         msg['Reply-To'] = 'reply+%s@%s' % (
             mhash.hexdigest(),
             pagure.APP.config['DOMAIN_EMAIL_NOTIFICATIONS'])
+        msg['Mail-Followup-To'] = msg['Reply-To']
         try:
             if pagure.APP.config['SMTP_USERNAME'] \
                     and pagure.APP.config['SMTP_PASSWORD']:
