@@ -18,13 +18,14 @@ import pagure.exceptions
 import pagure.lib
 import pagure.lib.lib_ci as lib_ci
 from pagure import APP, SESSION
-from pagure.api import API, APIERROR
+from pagure.api import API, APIERROR, api_method
 
 
 @API.route('/ci/jenkins/<repo:repo>/<pagure_ci_token>/build-finished',
            methods=['POST'])
 @API.route('/ci/jenkins/forks/<username>/<repo:repo>/'
            '<pagure_ci_token>/build-finished', methods=['POST'])
+@api_method
 def jenkins_ci_notification(repo, pagure_ci_token, username=None):
     """
     Jenkins Build Notification
