@@ -43,7 +43,7 @@ def run_as_post_receive_hook():
     # Get the list of branches
     branches = [
         branch.strip()
-        for branch in repo.rtd_hook[0].branches.split(',')
+        for branch in repo.rtd_hook.branches.split(',')
         if repo.rtd_hook]
 
     # Remove empty branches
@@ -53,7 +53,7 @@ def run_as_post_receive_hook():
         if branch]
 
     url = 'http://readthedocs.org/build/%s' % (
-        repo.rtd_hook[0].project_name.strip()
+        repo.rtd_hook.project_name.strip()
     )
 
     for line in sys.stdin:
@@ -65,11 +65,11 @@ def run_as_post_receive_hook():
         if branches:
             if refname in branches:
                 print 'Starting RTD build for %s' % (
-                    repo.rtd_hook[0].project_name.strip())
+                    repo.rtd_hook.project_name.strip())
                 requests.post(url)
         else:
             print 'Starting RTD build for %s' % (
-                repo.rtd_hook[0].project_name.strip())
+                repo.rtd_hook.project_name.strip())
             requests.post(url)
 
 

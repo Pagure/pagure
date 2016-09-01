@@ -882,7 +882,7 @@ def add_pull_request_comment(session, request, commit, tree_id, filename,
         if notification and request.status == 'Open' \
                 and request.project.ci_hook and PAGURE_CI:
             REDIS.publish('pagure.ci', json.dumps({
-                'ci_type': request.project.ci_hook[0].ci_type,
+                'ci_type': request.project.ci_hook.ci_type,
                 'pr': request.to_json(public=True, with_comments=False)
             }))
 
@@ -1255,7 +1255,7 @@ def new_pull_request(session, branch_from,
     # Send notification to the CI server
     if REDIS and request.project.ci_hook and PAGURE_CI:
         REDIS.publish('pagure.ci', json.dumps({
-            'ci_type': request.project.ci_hook[0].ci_type,
+            'ci_type': request.project.ci_hook.ci_type,
             'pr': request.to_json(public=True, with_comments=False)
         }))
 

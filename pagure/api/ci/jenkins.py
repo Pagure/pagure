@@ -44,7 +44,7 @@ def jenkins_ci_notification(repo, pagure_ci_token, username=None):
 
     if not constant_time.bytes_eq(
             to_bytes(pagure_ci_token),
-            to_bytes(project.ci_hook[0].pagure_ci_token)):
+            to_bytes(project.ci_hook.pagure_ci_token)):
         raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
     data = flask.request.get_json()

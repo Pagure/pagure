@@ -96,7 +96,7 @@ def handle_messages():
         log.info("Trigger on %s PR #%s from %s: %s",
                       project.fullname, pr_id, repo, branch)
 
-        url = project.ci_hook[0].ci_url
+        url = project.ci_hook.ci_url
 
         if data['ci_type'] == 'jenkins':
             url = urlparse.urljoin(url, '/buildWithParameters')
@@ -104,7 +104,7 @@ def handle_messages():
             requests.post(
                 url,
                 data={
-                    'token': project.ci_hook[0].pagure_ci_token,
+                    'token': project.ci_hook.pagure_ci_token,
                     'cause': pr_id,
                     'REPO': project.fullname,
                     'BRANCH': branch

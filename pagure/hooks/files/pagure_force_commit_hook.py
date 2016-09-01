@@ -42,7 +42,7 @@ def run_as_pre_receive_hook():
     # Get the list of branches
     branches = [
         branch.strip()
-        for branch in repo.pagure_force_commit_hook[0].branches.split(',')
+        for branch in repo.pagure_force_commit_hook.branches.split(',')
         if repo.pagure_force_commit_hook]
 
     # Remove empty branches
