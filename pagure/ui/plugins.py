@@ -101,8 +101,7 @@ def view_plugin(repo, plugin, username=None, full=True):
         dbobj = getattr(repo, plugin.backref)
 
         # There should always be only one, but let's double check
-        if dbobj and len(dbobj) > 0:
-            dbobj = dbobj[0]
+        if dbobj:
             new = False
         else:
             dbobj = plugin.db_object()
