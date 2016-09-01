@@ -97,10 +97,10 @@ def handle_messages():
             "Trigger on %s PR #%s from %s: %s",
             project.fullname, pr_id, repo, branch)
 
-        url = project.ci_hook.ci_url
+        url = project.ci_hook.ci_url.rstrip('/')
 
         if data['ci_type'] == 'jenkins':
-            url = urlparse.urljoin(url, '/buildWithParameters')
+            url = url + '/buildWithParameters'
             log.info('Triggering the build at: %s', url)
             requests.post(
                 url,
