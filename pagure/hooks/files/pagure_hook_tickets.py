@@ -30,9 +30,14 @@ def get_files_to_load(new_commits_list):
     file_list = []
     new_commits_list.reverse()
     for commit in new_commits_list:
-        filenames = pagure.lib.git.read_git_lines(
-            ['diff-tree', '--no-commit-id', '--name-only', '-r', commit],
-            abspath)
+        if commit == new_commits_list[0]:
+            filenames = pagure.lib.git.read_git_lines(
+                ['diff-tree', '--no-commit-id', '--name-only', '-r', '--root',
+                    commit], abspath)
+        else:
+            filenames = pagure.lib.git.read_git_lines(
+                ['diff-tree', '--no-commit-id', '--name-only', '-r', commit],
+                abspath)
         for line in filenames:
             if line.strip():
                 file_list.append(line.strip())
