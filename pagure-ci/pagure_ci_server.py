@@ -93,8 +93,9 @@ def handle_messages():
                 base[:-1]
             base += '/%s' % project.path
 
-        log.info("Trigger on %s PR #%s from %s: %s",
-                      project.fullname, pr_id, repo, branch)
+        log.info(
+            "Trigger on %s PR #%s from %s: %s",
+            project.fullname, pr_id, repo, branch)
 
         url = project.ci_hook.ci_url
 
