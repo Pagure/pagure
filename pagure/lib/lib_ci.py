@@ -47,7 +47,7 @@ def process_jenkins_build(session, project, build_id, requestfolder):
     jenkins_name = project.ci_hook.ci_url.split(
         '/job/', 1)[1].split('/', 1)[0]
     build_info = jenk.get_build_info(jenkins_name, build_id)
-    result = build_info['result']
+    result = build_info.get('result')
     url = build_info['url']
 
     pr_id = None
