@@ -820,7 +820,7 @@ def view_tree(repo, identifier=None, username=None):
         if isinstance(commit, pygit2.Tag):
             commit = commit.get_object()
 
-        if commit:
+        if commit and not isinstance(commit, pygit2.Blob):
             content = sorted(commit.tree, key=lambda x: x.filemode)
             for i in commit.tree:
                 name, ext = os.path.splitext(i.name)
