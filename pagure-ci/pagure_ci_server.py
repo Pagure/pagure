@@ -25,8 +25,7 @@ import trollius
 import trollius_redis
 
 
-
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
@@ -36,16 +35,20 @@ if 'PAGURE_CONFIG' not in os.environ \
 
 import pagure
 import pagure.lib
-from pagure.exceptions import PagureEvException
 
 
 @trollius.coroutine
 def handle_messages():
+    ''' Handles connecting to redis and acting upon messages received.
+    In this case, it means triggering a build on jenkins based on the
+    information provided.
+    '''
+
     host = pagure.APP.config.get('REDIS_HOST', '0.0.0.0')
     port = pagure.APP.config.get('REDIS_PORT', 6379)
-    db = pagure.APP.config.get('REDIS_DB', 0)
+    dbname = pagure.APP.config.get('REDIS_DB', 0)
     connection = yield trollius.From(trollius_redis.Connection.create(
-        host=host, port=port, db=db))
+        host=host, port=port, db=dbname))
 
     # Create subscriber.
     subscriber = yield trollius.From(connection.start_subscribe())
@@ -56,7 +59,7 @@ def handle_messages():
     # Inside a while loop, wait for incoming events.
     while True:
         reply = yield trollius.From(subscriber.next_published())
-        log.info(
+        LOG.info(
             'Received: %s on channel: %s',
             repr(reply.value), reply.channel)
         data = json.loads(reply.value)
@@ -74,26 +77,19 @@ def handle_messages():
             session=pagure.SESSION, name=projectname, user=username)
 
         if not project:
-            log.warning(
-                'No project could be found from the message %s' % data)
+            LOG.warning(
+                'No project could be found from the message %s', data)
             continue
 
-        repo = data['pr'].get('remote_git')
-        if not repo:
-            base = pagure.APP.config['APP_URL']
-            if base.endswith('/'):
-                base[:-1]
-            base += '/%s' % project.path
-
-        log.info(
+        LOG.info(
             "Trigger on %s PR #%s from %s: %s",
-            project.fullname, pr_id, repo, branch)
+            project.fullname, pr_id, project.fullname, branch)
 
         url = project.ci_hook.ci_url.rstrip('/')
 
         if data['ci_type'] == 'jenkins':
             url = url + '/buildWithParameters'
-            log.info('Triggering the build at: %s', url)
+            LOG.info('Triggering the build at: %s', url)
             requests.post(
                 url,
                 data={
@@ -104,13 +100,14 @@ def handle_messages():
                 }
             )
         else:
-            log.warning('Un-supported CI type')
+            LOG.warning('Un-supported CI type')
 
-        log.info('Ready for another')
+        LOG.info('Ready for another')
 
 
 def main():
-    server = None
+    ''' Start the main async loop. '''
+
     try:
         loop = trollius.get_event_loop()
         tasks = [
@@ -123,24 +120,23 @@ def main():
     except trollius.ConnectionResetError:
         pass
 
-    log.info("End Connection")
+    LOG.info("End Connection")
     loop.close()
-    log.info("End")
+    LOG.info("End")
 
 
 if __name__ == '__main__':
-    log = logging.getLogger("")
     formatter = logging.Formatter(
         "%(asctime)s %(levelname)s [%(module)s:%(lineno)d] %(message)s")
 
     # setup console logging
-    log.setLevel(logging.DEBUG)
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
+    LOG.setLevel(logging.DEBUG)
+    shellhandler = logging.StreamHandler()
+    shellhandler.setLevel(logging.DEBUG)
 
     aslog = logging.getLogger("asyncio")
     aslog.setLevel(logging.DEBUG)
 
-    ch.setFormatter(formatter)
-    log.addHandler(ch)
+    shellhandler.setFormatter(formatter)
+    LOG.addHandler(shellhandler)
     main()
