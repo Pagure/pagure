@@ -80,7 +80,7 @@ def run_as_post_receive_hook():
         data = ''.join(
             pagure.lib.git.read_git_lines(
                 ['show', 'HEAD:%s' % filename], abspath))
-        if data:
+        if data and 'files' not in filename:
             try:
                 json_data = json.loads(data)
             except:
