@@ -812,9 +812,9 @@ def view_tree(repo, identifier=None, username=None):
                 branchname = identifier
             except (ValueError, TypeError):
                 # If it's not a commit id then it's part of the filename
-                if 'master' in repo_obj.listall_branches():
+                if not repo_obj.head_is_unborn:
                     commit = repo_obj[repo_obj.head.target]
-                    branchname = 'master'
+                    branchname = repo_obj.head.shorthand
         # If we're arriving here from the release page, we may have a Tag
         # where we expected a commit, in this case, get the actual commit
         if isinstance(commit, pygit2.Tag):
