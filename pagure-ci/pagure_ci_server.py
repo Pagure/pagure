@@ -65,11 +65,10 @@ def handle_messages():
         data = json.loads(reply.value)
 
         pr_id = data['pr']['id']
-        project = data['pr']['project']['name']
         branch = data['pr']['branch_from']
+        projectname = data['pr']['project']['name']
 
         username = None
-        projectname = data['pr']['project']['name']
         if data['pr'].get('parent'):
             username = data['pr']['project']['user']['user']
 
