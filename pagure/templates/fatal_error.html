@@ -10,6 +10,12 @@
     <div class="col-md-8">
       <h2>Fatal Error (500)</h2>
       <p>A fatal error has occurred, we're sorry :(</p>
+      {% if error and error.description %}
+      <p>With the message:</p>
+      <div class="card-block">
+      <p>{{ error.description }}</p>
+      </div>
+      {% endif %}
     </div>
   </div>
 </div>
