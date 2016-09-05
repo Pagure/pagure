@@ -71,7 +71,7 @@ def handle_messages():
         username = None
         projectname = data['pr']['project']['name']
         if data['pr'].get('parent'):
-            username, data['pr']['project']['user']['user']
+            username = data['pr']['project']['user']['user']
 
         project = pagure.lib.get_project(
             session=pagure.SESSION, name=projectname, user=username)
