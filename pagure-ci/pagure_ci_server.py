@@ -89,13 +89,16 @@ def handle_messages():
 
         if data['ci_type'] == 'jenkins':
             url = url + '/buildWithParameters'
-            LOG.info('Triggering the build at: %s', url)
+            repo = '%s/%s' % (
+                pagure.APP.config['GIT_URL_GIT'].rstrip('/'), project.path)
+            LOG.info(
+                'Triggering the build at: %s, for repo: %s', url, repo)
             requests.post(
                 url,
                 data={
                     'token': project.ci_hook.pagure_ci_token,
                     'cause': pr_id,
-                    'REPO': project.fullname,
+                    'REPO': repo,
                     'BRANCH': branch
                 }
             )
