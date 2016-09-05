@@ -932,7 +932,7 @@ def new_release(repo, username=None):
             try:
                 folder = os.path.join(
                     APP.config['UPLOAD_FOLDER_PATH'],
-                    werkzeug.secure_filename(repo.fullname))
+                    repo.fullname)
                 if not os.path.exists(folder):
                     os.mkdir(folder)
                 filestream.save(os.path.join(folder, filename))
