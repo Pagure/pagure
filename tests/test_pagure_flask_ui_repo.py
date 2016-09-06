@@ -71,6 +71,8 @@ class PagureFlaskRepotests(tests.Modeltests):
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
             tests.create_projects(self.session)
+            tests.create_projects_git(tests.HERE)
+
             output = self.app.get('/test/adduser')
             self.assertEqual(output.status_code, 404)
 
@@ -117,6 +119,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
+            tests.create_projects_git(tests.HERE)
 
             output = self.app.get('/test/adduser')
             self.assertEqual(output.status_code, 403)
@@ -165,7 +168,6 @@ class PagureFlaskRepotests(tests.Modeltests):
                 'found', output.data)
 
             data['user'] = 'foo'
-            tests.create_projects_git(tests.HERE)
             output = self.app.post(
                 '/test/adduser', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
@@ -207,6 +209,8 @@ class PagureFlaskRepotests(tests.Modeltests):
             #just get the csrf token
             pagure.APP.config['ENABLE_USER_MNGT'] = True
             tests.create_projects(self.session)
+            tests.create_projects_git(tests.HERE)
+
             output = self.app.get('/test/addgroup')
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -224,7 +228,6 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             data['group'] = 'foo'
-            tests.create_projects_git(tests.HERE)
             output = self.app.post(
                 '/test/addgroup', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 404)
@@ -246,6 +249,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
+            tests.create_projects_git(tests.HERE)
 
             output = self.app.get('/test/addgroup')
             self.assertEqual(output.status_code, 403)
@@ -307,7 +311,6 @@ class PagureFlaskRepotests(tests.Modeltests):
                 output.data)
 
             data['group'] = 'foo'
-            tests.create_projects_git(tests.HERE)
             output = self.app.post(
                 '/test/addgroup', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
@@ -331,6 +334,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             tests.create_projects(self.session)
             tests.create_projects_git(tests.HERE)
+
             output = self.app.post('/test/settings')
 
             csrf_token = output.data.split(
@@ -379,6 +383,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
+            tests.create_projects_git(tests.HERE)
 
             output = self.app.post('/test/dropuser/1')
             self.assertEqual(output.status_code, 403)
@@ -390,7 +395,6 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
-            tests.create_projects_git(tests.HERE)
             output = self.app.post('/test/settings')
 
             csrf_token = output.data.split(
@@ -518,6 +522,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
+            tests.create_projects_git(tests.HERE)
 
             output = self.app.post('/test/dropgroup/1')
             self.assertEqual(output.status_code, 403)
@@ -529,7 +534,6 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
-            tests.create_projects_git(tests.HERE)
             output = self.app.post('/test/settings')
 
             csrf_token = output.data.split(
@@ -2132,18 +2136,21 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
+            #tests.create_projects_git(tests.HERE)
 
             output = self.app.post('/test/delete')
             # No git repo associated
-            self.assertEqual(output.status_code, 403)
+            self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
+            tests.create_projects_git(tests.HERE)
+
             ast.return_value = True
             output = self.app.post('/test/delete')
             self.assertEqual(output.status_code, 302)
-
             ast.return_value = False
+
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -2166,6 +2173,7 @@ index 0000000..fb7093d
             self.session.add(item)
             self.session.commit()
             tests.create_projects_git(tests.HERE)
+
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
@@ -2372,6 +2380,7 @@ index 0000000..fb7093d
         """ Test the new_repo_hook_token endpoint. """
         ast.return_value = False
         tests.create_projects(self.session)
+        tests.create_projects_git(tests.HERE)
 
         repo = pagure.lib.get_project(self.session, 'test')
         self.assertEqual(repo.hook_token, 'aaabbbccc')
@@ -2413,7 +2422,6 @@ index 0000000..fb7093d
             repo = pagure.lib.get_project(self.session, 'test')
             self.assertEqual(repo.hook_token, 'aaabbbccc')
 
-            tests.create_projects_git(tests.HERE)
             output = self.app.post(
                 '/test/hook_token', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)

@@ -40,6 +40,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         pagure.SESSION = self.session
         pagure.internal.SESSION = self.session
         pagure.ui.repo.SESSION = self.session
+        pagure.ui.filters.SESSION = self.session
 
         pagure.APP.config['GIT_FOLDER'] = tests.HERE
         pagure.APP.config['FORK_FOLDER'] = os.path.join(
@@ -815,6 +816,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
     def test_get_branches_of_commit(self):
         ''' Test the get_branches_of_commit from the internal API. '''
         tests.create_projects(self.session)
+        tests.create_projects_git(tests.HERE)
 
         user = tests.FakeUser()
         user.username = 'pingou'
@@ -868,8 +870,17 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
 
         # Request is fine, but git repo doesn't exist
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test20',
+            description='test project #20',
+            hook_token='aaabbbhhh',
+        )
+        self.session.add(item)
+        self.session.commit()
+
         data = {
-            'repo': 'test',
+            'repo': 'test20',
             'commit_id': 'foo',
             'csrf_token': csrf_token,
         }
@@ -886,9 +897,8 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         # Create a git repo to play with
         gitrepo = os.path.join(tests.HERE, 'test.git')
-        self.assertFalse(os.path.exists(gitrepo))
-        os.makedirs(gitrepo)
-        repo = pygit2.init_repository(gitrepo)
+        self.assertTrue(os.path.exists(gitrepo))
+        repo = pygit2.Repository(gitrepo)
 
         # Create a file in that git repo
         with open(os.path.join(gitrepo, 'sources'), 'w') as stream:
