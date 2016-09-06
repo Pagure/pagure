@@ -321,14 +321,19 @@ def get_pull_request_ready_branch():
         project_id_from=repo.id,
         status='Open'
     )
+    branches_pr = {}
     for pr in prs:
         if pr.branch_from in branches:
+            branches_pr[pr.branch_from] = pr.id
             del(branches[pr.branch_from])
 
     return flask.jsonify(
         {
             'code': 'OK',
-            'message': branches,
+            'message': {
+                'new_branch': branches,
+                'branch_w_pr': branches_pr,
+            },
         }
     )
 
