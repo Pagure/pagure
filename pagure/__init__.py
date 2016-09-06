@@ -208,8 +208,11 @@ def repo_method(function):
     def wrapper(*args, **kwargs):
         ''' Actually does the job with the arguments provided. '''
 
+        # Check if there is a `repo` and an `username` variable in the URL
+        # path
         repo = flask.request.view_args.get('repo')
         username = flask.request.view_args.get('username')
+        # If there isn't a `repo` in the URL path, just don't do anything
         if repo:
             flask.g.repo = pagure.lib.get_project(
                 SESSION, repo, user=username)
