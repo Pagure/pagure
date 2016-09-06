@@ -216,7 +216,7 @@ def repo_method(function):
             if flask.g.repo is None:
                 flask.abort(404, 'Project not found')
 
-            flask.g.reponame = pagure.get_repo_path(flask.g.repo)
+            flask.g.reponame = get_repo_path(flask.g.repo)
             flask.g.repo_obj = pygit2.Repository(flask.g.reponame)
             flask.g.repo_admin = is_repo_admin(flask.g.repo)
 
@@ -523,7 +523,6 @@ def get_repo_path(repo):
     Repository object from the DB.
     """
     repopath = os.path.join(APP.config['GIT_FOLDER'], repo.path)
-
     if not os.path.exists(repopath):
         flask.abort(404, 'No git repo found')
 
