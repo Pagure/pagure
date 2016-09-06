@@ -157,7 +157,6 @@ def view_repo(repo, username=None):
         last_commits=last_commits,
         tree=tree,
         diff_commits=diff_commits,
-        repo_admin=is_repo_admin(repo),
         form=pagure.forms.ConfirmationForm(),
     )
 
@@ -253,7 +252,6 @@ def view_repo_branch(repo, branchname, username=None):
         safe=safe,
         readme=readme,
         diff_commits=diff_commits,
-        repo_admin=is_repo_admin(repo),
         form=pagure.forms.ConfirmationForm(),
     )
 
@@ -363,7 +361,6 @@ def view_commits(repo, branchname=None, username=None):
         number_of_commits=n_commits,
         page=page,
         total_page=total_page,
-        repo_admin=is_repo_admin(repo),
         form=pagure.forms.ConfirmationForm(),
     )
 
@@ -433,7 +430,6 @@ def compare_commits(repo, commit1, commit2, username=None):
         diff=diff,
         diff_commits=diff_commits,
         branches=sorted(repo_obj.listall_branches()),
-        repo_admin=is_repo_admin(repo),
     )
 
 
@@ -554,7 +550,6 @@ def view_file(repo, identifier, filename, username=None):
             filename=filename,
             content=content,
             output_type=output_type,
-            repo_admin=is_repo_admin(repo),
             readme=readme,
             readme_ext=readme_ext,
             safe=safe,
@@ -723,7 +718,6 @@ def view_commit(repo, commitid, username=None):
         repo=repo,
         branchname=branchname,
         username=username,
-        repo_admin=is_repo_admin(repo),
         commitid=commitid,
         commit=commit,
         diff=diff,
@@ -820,7 +814,6 @@ def view_tree(repo, identifier=None, username=None):
         filename='',
         content=content,
         output_type=output_type,
-        repo_admin=is_repo_admin(repo),
         readme=readme,
         readme_ext=readme_ext,
         safe=safe,
@@ -844,7 +837,6 @@ def view_forks(repo, username=None):
         select='forks',
         username=username,
         repo=repo,
-        repo_admin=is_repo_admin(repo),
     )
 
 
@@ -868,7 +860,6 @@ def view_tags(repo, username=None):
         username=username,
         repo=repo,
         tags=tags,
-        repo_admin=is_repo_admin(repo),
         repo_obj=repo_obj,
     )
 
@@ -942,8 +933,7 @@ def view_settings(repo, username=None):
     reponame = flask.g.reponame
     repo_obj = flask.g.repo_obj
 
-    repo_admin = is_repo_admin(repo)
-    if not repo_admin:
+    if not flask.g.repo_admin:
         flask.abort(
             403,
             'You are not allowed to change the settings for this project')
@@ -1001,7 +991,6 @@ def view_settings(repo, username=None):
         branches_form=branches_form,
         tags=tags,
         plugins=plugins,
-        repo_admin=repo_admin,
         branchname=branchname,
     )
 
@@ -1245,7 +1234,7 @@ def change_ref_head(repo, username=None):
     reponame = flask.g.reponame
     repo_obj = flask.g.repo_obj
 
-    if not is_repo_admin(repo):
+    if not flask.g.repo_admin:
         flask.abort(
             403,
             'You are not allowed to change the settings for this project')
@@ -1270,6 +1259,7 @@ def change_ref_head(repo, username=None):
 @APP.route('/<repo:repo>/delete', methods=['POST'])
 @APP.route('/fork/<username>/<repo:repo>/delete', methods=['POST'])
 @login_required
+@repo_method
 def delete_repo(repo, username=None):
     """ Delete the present project.
     """
@@ -1283,12 +1273,9 @@ def delete_repo(repo, username=None):
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = flask.g.repo
 
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    if not is_repo_admin(repo):
+    if not flask.g.repo_admin:
         flask.abort(
             403,
             'You are not allowed to change the settings for this project')
@@ -1329,6 +1316,7 @@ def delete_repo(repo, username=None):
 @APP.route('/<repo:repo>/hook_token', methods=['POST'])
 @APP.route('/fork/<username>/<repo:repo>/hook_token', methods=['POST'])
 @login_required
+@repo_method
 def new_repo_hook_token(repo, username=None):
     """ Re-generate a hook token for the present project.
     """
@@ -1342,12 +1330,9 @@ def new_repo_hook_token(repo, username=None):
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = flask.g.repo
 
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    if not is_repo_admin(repo):
+    if not flask.g.repo_admin:
         flask.abort(
             403,
             'You are not allowed to change the settings for this project')
@@ -1373,6 +1358,7 @@ def new_repo_hook_token(repo, username=None):
 @APP.route('/fork/<username>/<repo:repo>/dropuser/<int:userid>',
            methods=['POST'])
 @login_required
+@repo_method
 def remove_user(repo, userid, username=None):
     """ Remove the specified user from the project.
     """
@@ -1387,12 +1373,9 @@ def remove_user(repo, userid, username=None):
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = flask.g.repo
 
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    if not is_repo_admin(repo):
+    if not flask.g.repo_admin:
         flask.abort(
             403,
             'You are not allowed to change the users for this project')
@@ -1432,6 +1415,7 @@ def remove_user(repo, userid, username=None):
 @APP.route('/fork/<username>/<repo:repo>/adduser/', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo:repo>/adduser', methods=('GET', 'POST'))
 @login_required
+@repo_method
 def add_user(repo, username=None):
     """ Add the specified user from the project.
     """
@@ -1446,12 +1430,9 @@ def add_user(repo, username=None):
         return flask.redirect(
             flask.url_for('auth_login', next=flask.request.url))
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = flask.g.repo
 
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    if not is_repo_admin(repo):
+    if not flask.g.repo_admin:
         flask.abort(
             403,
             'You are not allowed to add users to this project')
@@ -1492,6 +1473,7 @@ def add_user(repo, username=None):
 @APP.route(
     '/fork/<username>/<repo:repo>/dropgroup/<int:groupid>', methods=['POST'])
 @login_required
+@repo_method
 def remove_group_project(repo, groupid, username=None):
     """ Remove the specified group from the project.
     """
@@ -1507,12 +1489,9 @@ def remove_group_project(repo, groupid, username=None):
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = flask.g.repo
 
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    if not is_repo_admin(repo):
+    if not flask.g.repo_admin:
         flask.abort(
             403,
             'You are not allowed to change the users for this project')
@@ -1552,6 +1531,7 @@ def remove_group_project(repo, groupid, username=None):
 @APP.route('/fork/<username>/<repo:repo>/addgroup/', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo:repo>/addgroup', methods=('GET', 'POST'))
 @login_required
+@repo_method
 def add_group_project(repo, username=None):
     """ Add the specified group from the project.
     """
@@ -1566,12 +1546,9 @@ def add_group_project(repo, username=None):
         return flask.redirect(
             flask.url_for('auth_login', next=flask.request.url))
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = flask.g.repo
 
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    if not is_repo_admin(repo):
+    if not flask.g.repo_admin:
         flask.abort(
             403,
             'You are not allowed to add groups to this project')
