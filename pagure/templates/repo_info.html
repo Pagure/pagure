@@ -278,7 +278,7 @@ $(function() {
     dataType: 'json',
     success: function(res) {
       if (res.code == 'OK'){
-        for (branch in res.message){
+        for (branch in res.message.new_branch){
           var url = "{{ url_for(
             'new_request_pull',
             repo=repo.name,
@@ -286,7 +286,8 @@ $(function() {
             branch_to=head or 'master',
             branch_from='') }}";
           html = '<div class="alert alert-info" role="alert"> \
-                The branch ' + branch +' contains ' + res.message[branch].length
+                The branch ' + branch +' contains '
+                + res.message.new_branch[branch].length
                 +  ' commits not in the main branch \
                 <span class="pr-toplabel"> \
                 <span class="oi" data-glyph="random"> </span> \
@@ -299,18 +300,37 @@ $(function() {
           html2 = ' \
                 <a class="small label label-sm label-primary" data-toggle="tooltip" \
                 href="' + url + branch + '"\
-                 title="' + branch +' contains ' + res.message[branch].length+' \
+                 title="' + branch +' contains '
+                 + res.message.new_branch[branch].length+' \
                  commit not in the upstream project. Click to create new PR now.'+'"> New PR</a> \
                 </div>';
           {% else %}
           html2 = ' \
                 <a class="small label label-sm label-primary" data-toggle="tooltip" \
                 href="' + url + branch + '"\
-                 title="' + branch +' contains ' + res.message[branch].length+' \
+                 title="' + branch +' contains '
+                 + res.message.new_branch[branch].length+' \
                  commit not in the main branch. Click to create new PR now.'+'"> New PR</a> \
                 </div>';
           {%endif%}
           $('#branch-'+branch+' .branch_del').prepend(html2);
+          $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
+        }
+        for (branch in res.message.branch_w_pr){
+          var url = "{{ url_for(
+              'request_pull',
+              repo=repo.name,
+              username=repo.user.user if repo.is_fork else None,
+              requestid=-100) }}";
+          url = url.replace(-100, res.message.branch_w_pr[branch]);
+          var html = ' \
+              <a class="small label label-sm label-success" data-toggle="tooltip" \
+              href="' + url + '"\
+               title="' + branch +' is already in an opened pull-request">'
+               + 'See PR </a> \
+              </div>';
+          console.log(html);
+          $('#branch-' + branch + ' .branch_del').prepend(html);
           $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
         }
       }
