@@ -219,6 +219,7 @@ def repo_method(function):
             flask.g.reponame = get_repo_path(flask.g.repo)
             flask.g.repo_obj = pygit2.Repository(flask.g.reponame)
             flask.g.repo_admin = is_repo_admin(flask.g.repo)
+            flask.g.branches = sorted(flask.g.repo_obj.listall_branches())
 
         return function(*args, **kwargs)
 
