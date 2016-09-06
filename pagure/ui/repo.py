@@ -48,7 +48,7 @@ import pagure.forms
 import pagure
 import pagure.ui.plugins
 from pagure import (APP, SESSION, LOG, __get_file_in_tree, login_required,
-                    is_repo_admin, admin_session_timedout)
+                    is_repo_admin, admin_session_timedout, repo_method)
 
 
 @APP.route('/<repo:repo>.git')
@@ -65,17 +65,13 @@ def view_repo_git(repo, username=None):
 @APP.route('/<repo:repo>')
 @APP.route('/fork/<username>/<repo:repo>/')
 @APP.route('/fork/<username>/<repo:repo>')
+@repo_method
 def view_repo(repo, username=None):
     """ Front page of a specific repo.
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if repo is None:
-        flask.abort(404, 'Project not found')
-
-    reponame = pagure.get_repo_path(repo)
-
-    repo_obj = pygit2.Repository(reponame)
+    repo = flask.g.repo
+    reponame = flask.g.reponame
+    repo_obj = flask.g.repo_obj
 
     if not repo_obj.is_empty and not repo_obj.head_is_unborn:
         head = repo_obj.head.shorthand
@@ -168,17 +164,13 @@ def view_repo(repo, username=None):
 
 @APP.route('/<repo:repo>/branch/<path:branchname>')
 @APP.route('/fork/<username>/<repo:repo>/branch/<path:branchname>')
+@repo_method
 def view_repo_branch(repo, branchname, username=None):
     ''' Returns the list of branches in the repo. '''
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    reponame = pagure.get_repo_path(repo)
-
-    repo_obj = pygit2.Repository(reponame)
+    repo = flask.g.repo
+    reponame = flask.g.reponame
+    repo_obj = flask.g.repo_obj
 
     if branchname not in repo_obj.listall_branches():
         flask.abort(404, 'Branch no found')
@@ -272,17 +264,13 @@ def view_repo_branch(repo, branchname, username=None):
 @APP.route('/fork/<username>/<repo:repo>/commits/')
 @APP.route('/fork/<username>/<repo:repo>/commits')
 @APP.route('/fork/<username>/<repo:repo>/commits/<path:branchname>')
+@repo_method
 def view_commits(repo, branchname=None, username=None):
     """ Displays the commits of the specified repo.
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    reponame = pagure.get_repo_path(repo)
-
-    repo_obj = pygit2.Repository(reponame)
+    repo = flask.g.repo
+    reponame = flask.g.reponame
+    repo_obj = flask.g.repo_obj
 
     if branchname and branchname not in repo_obj.listall_branches():
         flask.abort(404, 'Branch no found')
@@ -384,17 +372,13 @@ def view_commits(repo, branchname=None, username=None):
 @APP.route('/<repo>/c/<commit1>..<commit2>')
 @APP.route('/fork/<username>/<repo>/c/<commit1>..<commit2>/')
 @APP.route('/fork/<username>/<repo>/c/<commit1>..<commit2>')
+@repo_method
 def compare_commits(repo, commit1, commit2, username=None):
     """ Compares two commits for specified repo
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    reponame = pagure.get_repo_path(repo)
-
-    repo_obj = pygit2.Repository(reponame)
+    repo = flask.g.repo
+    reponame = flask.g.reponame
+    repo_obj = flask.g.repo_obj
 
     if not repo_obj.is_empty and not repo_obj.head_is_unborn:
         head = repo_obj.head.shorthand
@@ -456,17 +440,13 @@ def compare_commits(repo, commit1, commit2, username=None):
 @APP.route('/<repo:repo>/blob/<path:identifier>/f/<path:filename>')
 @APP.route(
     '/fork/<username>/<repo:repo>/blob/<path:identifier>/f/<path:filename>')
+@repo_method
 def view_file(repo, identifier, filename, username=None):
     """ Displays the content of a file or a tree for the specified repo.
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    reponame = pagure.get_repo_path(repo)
-
-    repo_obj = pygit2.Repository(reponame)
+    repo = flask.g.repo
+    reponame = flask.g.reponame
+    repo_obj = flask.g.repo_obj
 
     if repo_obj.is_empty:
         flask.abort(404, 'Empty repo cannot have a file')
@@ -591,17 +571,13 @@ def view_file(repo, identifier, filename, username=None):
     defaults={'filename': None})
 @APP.route(
     '/fork/<username>/<repo:repo>/raw/<path:identifier>/f/<path:filename>')
+@repo_method
 def view_raw_file(repo, identifier, filename=None, username=None):
     """ Displays the raw content of a file of a commit for the specified repo.
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    reponame = pagure.get_repo_path(repo)
-
-    repo_obj = pygit2.Repository(reponame)
+    repo = flask.g.repo
+    reponame = flask.g.reponame
+    repo_obj = flask.g.repo_obj
 
     if repo_obj.is_empty:
         flask.abort(404, 'Empty repo cannot have a file')
@@ -701,17 +677,23 @@ if APP.config.get('OLD_VIEW_COMMIT_ENABLED', False):
 @APP.route('/<repo:repo>/c/<commitid>')
 @APP.route('/fork/<username>/<repo:repo>/c/<commitid>/')
 @APP.route('/fork/<username>/<repo:repo>/c/<commitid>')
+@repo_method
 def view_commit(repo, commitid, username=None):
     """ Render a commit in a repo
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    print flask.request
+    print dir(flask.request)
+    print flask.request.args
+    print flask.request.query_string
+    print flask.request.values
+    print flask.request.endpoint
+    print flask.request.json
+    print flask.request.url_rule
+    print flask.request.view_args
 
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    reponame = pagure.get_repo_path(repo)
-
-    repo_obj = pygit2.Repository(reponame)
+    repo = flask.g.repo
+    reponame = flask.g.reponame
+    repo_obj = flask.g.repo_obj
 
     branchname = flask.request.args.get('branch', None)
 
@@ -751,17 +733,13 @@ def view_commit(repo, commitid, username=None):
 
 @APP.route('/<repo:repo>/c/<commitid>.patch')
 @APP.route('/fork/<username>/<repo:repo>/c/<commitid>.patch')
+@repo_method
 def view_commit_patch(repo, commitid, username=None):
     """ Render a commit in a repo as patch
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    reponame = pagure.get_repo_path(repo)
-
-    repo_obj = pygit2.Repository(reponame)
+    repo = flask.g.repo
+    reponame = flask.g.reponame
+    repo_obj = flask.g.repo_obj
 
     try:
         commit = repo_obj.get(commitid)
@@ -782,17 +760,13 @@ def view_commit_patch(repo, commitid, username=None):
 @APP.route('/fork/<username>/<repo:repo>/tree/')
 @APP.route('/fork/<username>/<repo:repo>/tree')
 @APP.route('/fork/<username>/<repo:repo>/tree/<path:identifier>')
+@repo_method
 def view_tree(repo, identifier=None, username=None):
     """ Render the tree of the repo
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if repo is None:
-        flask.abort(404, 'Project not found')
-
-    reponame = pagure.get_repo_path(repo)
-
-    repo_obj = pygit2.Repository(reponame)
+    repo = flask.g.repo
+    reponame = flask.g.reponame
+    repo_obj = flask.g.repo_obj
 
     branchname = None
     content = None
@@ -857,13 +831,13 @@ def view_tree(repo, identifier=None, username=None):
 @APP.route('/<repo:repo>/forks')
 @APP.route('/fork/<username>/<repo:repo>/forks/')
 @APP.route('/fork/<username>/<repo:repo>/forks')
+@repo_method
 def view_forks(repo, username=None):
     """ Presents all the forks of the project.
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if not repo:
-        flask.abort(404, 'Project not found')
+    repo = flask.g.repo
+    reponame = flask.g.reponame
+    repo_obj = flask.g.repo_obj
 
     return flask.render_template(
         'forks.html',
@@ -878,16 +852,13 @@ def view_forks(repo, username=None):
 @APP.route('/<repo:repo>/releases')
 @APP.route('/fork/<username>/<repo:repo>/releases/')
 @APP.route('/fork/<username>/<repo:repo>/releases')
+@repo_method
 def view_tags(repo, username=None):
     """ Presents all the tags of the project.
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    reponame = pagure.get_repo_path(repo)
-    repo_obj = pygit2.Repository(reponame)
+    repo = flask.g.repo
+    reponame = flask.g.reponame
+    repo_obj = flask.g.repo_obj
 
     tags = pagure.lib.git.get_git_tags_objects(repo)
 
@@ -957,6 +928,7 @@ def new_release(repo, username=None):
 @APP.route('/fork/<username>/<repo:repo>/settings/', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo:repo>/settings', methods=('GET', 'POST'))
 @login_required
+@repo_method
 def view_settings(repo, username=None):
     """ Presents the settings of the project.
     """
@@ -966,19 +938,15 @@ def view_settings(repo, username=None):
         return flask.redirect(
             flask.url_for('auth_login', next=flask.request.url))
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if not repo:
-        flask.abort(404, 'Project not found')
+    repo = flask.g.repo
+    reponame = flask.g.reponame
+    repo_obj = flask.g.repo_obj
 
     repo_admin = is_repo_admin(repo)
     if not repo_admin:
         flask.abort(
             403,
             'You are not allowed to change the settings for this project')
-
-    reponame = pagure.get_repo_path(repo)
-    repo_obj = pygit2.Repository(reponame)
 
     plugins = pagure.ui.plugins.get_plugin_names(
         APP.config.get('DISABLED_PLUGINS'))
@@ -1261,6 +1229,7 @@ def update_milestones(repo, username=None):
 @APP.route('/<repo:repo>/default/branch/', methods=['POST'])
 @APP.route('/fork/<username>/<repo:repo>/default/branch/', methods=['POST'])
 @login_required
+@repo_method
 def change_ref_head(repo, username=None):
     """ Change HEAD reference
     """
@@ -1272,16 +1241,15 @@ def change_ref_head(repo, username=None):
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-    if not repo:
-        flask.abort(404, 'Project not found')
+    repo = flask.g.repo
+    reponame = flask.g.reponame
+    repo_obj = flask.g.repo_obj
 
     if not is_repo_admin(repo):
         flask.abort(
             403,
             'You are not allowed to change the settings for this project')
-    repopath = pagure.get_repo_path(repo)
-    repo_obj = pygit2.Repository(repopath)
+
     branches = repo_obj.listall_branches()
     form = pagure.forms.DefaultBranchForm(branches=branches)
 
@@ -1695,6 +1663,7 @@ def regenerate_git(repo, username=None):
 @APP.route('/fork/<username>/<repo:repo>/token/new/', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo:repo>/token/new', methods=('GET', 'POST'))
 @login_required
+@repo_method
 def add_token(repo, username=None):
     """ Add a token to a specified project.
     """
@@ -1704,13 +1673,9 @@ def add_token(repo, username=None):
         return flask.redirect(
             flask.url_for('auth_login', next=flask.request.url))
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = flask.g.repo
 
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    repo_admin = is_repo_admin(repo)
-    if not repo_admin:
+    if not flask.g.repo_admin:
         flask.abort(
             403,
             'You are not allowed to change the settings for this project')
@@ -1742,7 +1707,6 @@ def add_token(repo, username=None):
         select='settings',
         form=form,
         acls=acls,
-        repo_admin=repo_admin,
         username=username,
         repo=repo,
     )
@@ -1752,6 +1716,7 @@ def add_token(repo, username=None):
 @APP.route('/fork/<username>/<repo:repo>/token/revoke/<token_id>',
            methods=['POST'])
 @login_required
+@repo_method
 def revoke_api_token(repo, token_id, username=None):
     """ Revokie a token to a specified project.
     """
@@ -1762,12 +1727,9 @@ def revoke_api_token(repo, token_id, username=None):
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = flask.g.repo
 
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    if not is_repo_admin(repo):
+    if not flask.g.repo_admin:
         flask.abort(
             403,
             'You are not allowed to change the settings for this project')
@@ -1806,25 +1768,21 @@ def revoke_api_token(repo, token_id, username=None):
     '/fork/<username>/<repo:repo>/edit/<path:branchname>/f/<path:filename>',
     methods=('GET', 'POST'))
 @login_required
+@repo_method
 def edit_file(repo, branchname, filename, username=None):
     """ Edit a file online.
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = flask.g.repo
+    reponame = flask.g.reponame
+    repo_obj = flask.g.repo_obj
 
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    if not is_repo_admin(repo):
+    if not flask.g.repo_admin:
         flask.abort(
             403,
             'You are not allowed to change the settings for this project')
 
     user = pagure.lib.search_user(
         SESSION, username=flask.g.fas_user.username)
-
-    reponame = pagure.get_repo_path(repo)
-
-    repo_obj = pygit2.Repository(reponame)
 
     if repo_obj.is_empty:
         flask.abort(404, 'Empty repo cannot have a file')
@@ -1894,15 +1852,15 @@ def edit_file(repo, branchname, filename, username=None):
 @APP.route('/fork/<username>/<repo:repo>/b/<path:branchname>/delete',
            methods=['POST'])
 @login_required
+@repo_method
 def delete_branch(repo, branchname, username=None):
     """ Delete the branch of a project.
     """
-    repo_obj = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = flask.g.repo
+    reponame = flask.g.reponame
+    repo_obj = flask.g.repo_obj
 
-    if not repo_obj:
-        flask.abort(404, 'Project not found')
-
-    if not is_repo_admin(repo_obj):
+    if not flask.g.repo_admin:
         flask.abort(
             403,
             'You are not allowed to delete branch for this project')
@@ -1910,14 +1868,11 @@ def delete_branch(repo, branchname, username=None):
     if branchname == 'master':
         flask.abort(403, 'You are not allowed to delete the master branch')
 
-    reponame = pagure.get_repo_path(repo_obj)
-    repo_git = pygit2.Repository(reponame)
-
-    if branchname not in repo_git.listall_branches():
+    if branchname not in repo_obj.listall_branches():
         flask.abort(404, 'Branch no found')
 
     try:
-        branch = repo_git.lookup_branch(branchname)
+        branch = repo_obj.lookup_branch(branchname)
         branch.delete()
         flask.flash('Branch `%s` deleted' % branchname)
     except pygit2.GitError as err:
@@ -1925,7 +1880,7 @@ def delete_branch(repo, branchname, username=None):
         flask.flash('Could not delete `%s`' % branchname, 'error')
 
     return flask.redirect(
-        flask.url_for('view_repo', repo=repo, username=username))
+        flask.url_for('view_repo', repo=repo.name, username=username))
 
 
 @APP.route('/docs/<repo:repo>/')
@@ -1974,9 +1929,9 @@ def view_project_activity(repo):
 
 
 @APP.route('/watch/<repo:repo>/settings/<watch>', methods=['POST'])
-@APP.route('/watch/fork/<user>/<repo:repo>/settings/<watch>', methods=['POST'])
+@APP.route('/watch/fork/<username>/<repo:repo>/settings/<watch>', methods=['POST'])
 @login_required
-def watch_repo(repo, watch, user=None):
+def watch_repo(repo, watch, username=None):
     """ Marked for watching or Unwatching
     """
     return_point = flask.url_for('index')
@@ -1990,19 +1945,17 @@ def watch_repo(repo, watch, user=None):
     if str(watch) not in ['0', '1']:
         flask.abort(400)
 
-    username = flask.g.fas_user.username
-    repo_obj = pagure.lib.get_project(SESSION, repo)
-    if user is not None:
-        repo_obj = pagure.lib.get_project(SESSION, repo, user)
+    repo_obj = pagure.lib.get_project(SESSION, repo, user=username)
 
     if not repo_obj:
         flask.abort(404, 'Project not found')
 
     try:
         msg = pagure.lib.update_watch_status(
-            SESSION, repo_obj,
-            username, watch
-            )
+            SESSION,
+            repo_obj,
+            flask.g.fas_user.username,
+            watch)
         SESSION.commit()
         flask.flash(msg)
     except pagure.exceptions.PagureException as msg:
