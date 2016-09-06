@@ -327,7 +327,7 @@ $(function() {
               <a class="small label label-sm label-success" data-toggle="tooltip" \
               href="' + url + '"\
                title="' + branch +' is already in an opened pull-request">'
-               + 'See PR </a> \
+               + 'PR#' + res.message.branch_w_pr[branch] + ' </a> \
               </div>';
           console.log(html);
           $('#branch-' + branch + ' .branch_del').prepend(html);
