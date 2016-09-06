@@ -2560,6 +2560,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
+            tests.create_projects_git(tests.HERE, bare=True)
 
             # No a repo admin
             output = self.app.get('/test/edit/foo/f/sources')
@@ -2568,12 +2569,7 @@ index 0000000..fb7093d
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
 
-            # No associated git repo
-            output = self.app.get('/test/edit/foo/f/sources')
-            self.assertEqual(output.status_code, 404)
-
-            tests.create_projects_git(tests.HERE, bare=True)
-
+            # No such file
             output = self.app.get('/test/edit/foo/f/sources')
             self.assertEqual(output.status_code, 404)
 
@@ -2704,7 +2700,7 @@ index 0000000..fb7093d
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
             output = self.app.post('/foo/default/branch/')
-            self.assertEqual(output.status_code, 302)
+            self.assertEqual(output.status_code, 404)
 
             ast.return_value = False
 
@@ -2712,13 +2708,13 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
+            repos = tests.create_projects_git(tests.HERE)
 
             output = self.app.post('/test/default/branch/')
             self.assertEqual(output.status_code, 403)
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
-            repo = tests.create_projects_git(tests.HERE)
             output = self.app.post('/test/default/branch/',
                                     follow_redirects=True) # without git branch
             self.assertEqual(output.status_code, 200)
@@ -2731,7 +2727,7 @@ index 0000000..fb7093d
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
-            repo_obj = pygit2.Repository(repo[0])
+            repo_obj = pygit2.Repository(repos[0])
             tree = repo_obj.index.write_tree()
             author = pygit2.Signature(
                 'Alice Author', 'alice@authors.tld')
@@ -2858,6 +2854,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
+            tests.create_projects_git(tests.HERE, bare=True)
 
             output = self.app.get('/test/token/new/')
             self.assertEqual(output.status_code, 403)
@@ -2889,15 +2886,6 @@ index 0000000..fb7093d
             self.assertIn('<strong>Create a new token</strong>', output.data)
 
             data = {'csrf_token': csrf_token, 'acls': ['issue_create']}
-            output = self.app.post(
-                '/test/token/new/', data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 404)
-            self.assertIn(
-                '</button>\n                      Token created',
-                output.data)
-            self.assertIn('<p>No git repo found</p>', output.data)
-
-            repo = tests.create_projects_git(tests.HERE)
 
             # Upload successful
             data = {'csrf_token': csrf_token, 'acls': ['issue_create']}
@@ -2927,6 +2915,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
+            tests.create_projects_git(tests.HERE, bare=True)
 
             output = self.app.post('/test/token/revoke/123')
             self.assertEqual(output.status_code, 403)
@@ -2957,7 +2946,6 @@ index 0000000..fb7093d
             self.assertIn('<p>Token not found</p>', output.data)
 
             # Create a token to revoke
-            repo = tests.create_projects_git(tests.HERE)
             data = {'csrf_token': csrf_token, 'acls': ['issue_create']}
             output = self.app.post(
                 '/test/token/new/', data=data, follow_redirects=True)
@@ -2999,6 +2987,7 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 302)
 
         tests.create_projects(self.session)
+        tests.create_projects_git(tests.HERE, bare=True)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
@@ -3016,8 +3005,6 @@ index 0000000..fb7093d
             self.assertIn(
                 '<p>You are not allowed to delete the master branch</p>',
                 output.data)
-
-            tests.create_projects_git(tests.HERE, bare=True)
 
             output = self.app.post('/test/b/bar/delete')
             self.assertEqual(output.status_code, 404)
