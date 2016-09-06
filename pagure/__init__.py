@@ -17,6 +17,7 @@ __api_version__ = '0.7'
 
 
 import datetime
+import functools
 import logging
 import os
 import subprocess
@@ -196,6 +197,32 @@ LOG = APP.logger
 LOG.setLevel(APP.config.get('LOG_LEVEL', 'INFO'))
 
 APP.wsgi_app = pagure.proxy.ReverseProxied(APP.wsgi_app)
+
+
+def repo_method(function):
+    ''' Check the info provided in the URL and return the arguments needed
+    for all the endpoints.
+    '''
+
+    @functools.wraps(function)
+    def wrapper(*args, **kwargs):
+        ''' Actually does the job with the arguments provided. '''
+
+        repo = flask.request.view_args.get('repo')
+        username = flask.request.view_args.get('username')
+        if repo:
+            flask.g.repo = pagure.lib.get_project(
+                SESSION, repo, user=username)
+            if flask.g.repo is None:
+                flask.abort(404, 'Project not found')
+
+            flask.g.reponame = pagure.get_repo_path(flask.g.repo)
+            flask.g.repo_obj = pygit2.Repository(flask.g.reponame)
+            flask.g.repo_admin = is_repo_admin(flask.g.repo)
+
+        return function(*args, **kwargs)
+
+    return wrapper
 
 
 def authenticated():
