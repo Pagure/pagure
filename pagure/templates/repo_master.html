@@ -156,7 +156,7 @@
                 <span class="oi hidden-md-up" data-glyph="warning"></span>
                 <span class="hidden-sm-down">Issues&nbsp;</span>
                 <span class="label label-default label-pill hidden-sm-down">
-                  {{ repo.open_tickets if repo_admin else repo.open_tickets_public }}
+                  {{ repo.open_tickets if g.repo_admin else repo.open_tickets_public }}
                 </span>
             </a>
         </li>
@@ -195,7 +195,7 @@
         {% endif %}
 
       {% if authenticated %}
-        {% if repo_admin %}
+        {% if g.repo_admin %}
           <li class="nav-item pull-xs-right">
             <a title="Settings" {%
               if select == 'settings' %}class="active nav-link" {%
