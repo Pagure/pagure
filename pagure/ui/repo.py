@@ -152,7 +152,6 @@ def view_repo(repo, username=None):
         readme=readme,
         safe=safe,
         origin='view_repo',
-        branches=sorted(repo_obj.listall_branches()),
         branchname=branchname,
         last_commits=last_commits,
         tree=tree,
@@ -244,7 +243,6 @@ def view_repo_branch(repo, branchname, username=None):
         repo=repo,
         head=head,
         username=username,
-        branches=sorted(repo_obj.listall_branches()),
         branchname=branchname,
         origin='view_repo_branch',
         last_commits=last_commits,
@@ -353,7 +351,6 @@ def view_commits(repo, branchname=None, username=None):
         repo=repo,
         username=username,
         head=head,
-        branches=sorted(repo_obj.listall_branches()),
         branchname=branchname,
         last_commits=last_commits,
         diff_commits=diff_commits,
@@ -429,7 +426,6 @@ def compare_commits(repo, commit1, commit2, username=None):
         commit2=commit2,
         diff=diff,
         diff_commits=diff_commits,
-        branches=sorted(repo_obj.listall_branches()),
     )
 
 
@@ -545,7 +541,6 @@ def view_file(repo, identifier, filename, username=None):
             repo=repo,
             origin='view_file',
             username=username,
-            branches=sorted(repo_obj.listall_branches()),
             branchname=branchname,
             filename=filename,
             content=content,
@@ -676,16 +671,6 @@ if APP.config.get('OLD_VIEW_COMMIT_ENABLED', False):
 def view_commit(repo, commitid, username=None):
     """ Render a commit in a repo
     """
-    print flask.request
-    print dir(flask.request)
-    print flask.request.args
-    print flask.request.query_string
-    print flask.request.values
-    print flask.request.endpoint
-    print flask.request.json
-    print flask.request.url_rule
-    print flask.request.view_args
-
     repo = flask.g.repo
     reponame = flask.g.reponame
     repo_obj = flask.g.repo_obj
@@ -810,7 +795,6 @@ def view_tree(repo, identifier=None, username=None):
         repo=repo,
         username=username,
         branchname=branchname,
-        branches=sorted(repo_obj.listall_branches()),
         filename='',
         content=content,
         output_type=output_type,
@@ -1821,7 +1805,6 @@ def edit_file(repo, branchname, filename, username=None):
         filename=filename,
         form=form,
         user=user,
-        branches=repo_obj.listall_branches(),
     )
 
 
