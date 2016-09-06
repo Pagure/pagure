@@ -100,7 +100,7 @@ git push -u origin master</pre>
               </div>
               {% endif %}
 
-            {% for branch in branches if branch != head%}
+            {% for branch in g.branches if branch != head%}
               <div id="branch-{{ branch }}" class="repoinfo-branchlistitem row">
                 <div class="branch_name col-md-8">
                   <span class="oi text-muted" data-glyph="random"></span>

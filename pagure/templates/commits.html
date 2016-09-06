@@ -37,7 +37,7 @@
                   <span class="oi" data-glyph="random"> </span> {{ branchname }}
           </button>
           <div class="dropdown-menu dropdown-menu-right">
-            {% for branch in branches %}
+            {% for branch in g.branches %}
                 <a class="dropdown-item" href="{{ url_for('view_commits',
                             username=username, repo=repo.name, branchname=branch) }}">
                   {{ branch }}

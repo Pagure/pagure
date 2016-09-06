@@ -149,7 +149,7 @@
       </span> &nbsp;
       <select class="pr-toplabel-select" id="branch_select" name="branch_to">
           <option value="{{ branch_to }}">{{ branch_to }}</option>
-        {% for branch in branches |reverse %}
+        {% for branch in g.branches |reverse %}
           {% if branch != branch_to %}
           <option value="{{ branch }}">{{ branch }}</option>
           {% endif %}
