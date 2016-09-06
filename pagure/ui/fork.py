@@ -30,7 +30,7 @@ import pagure.lib
 import pagure.lib.git
 import pagure.forms
 from pagure import (APP, SESSION, LOG, login_required, is_repo_admin,
-                    __get_file_in_tree)
+                    __get_file_in_tree, repo_method)
 
 
 
@@ -133,6 +133,7 @@ def _get_pr_info(repo_obj, orig_repo, branch_from, branch_to):
 @APP.route('/<repo:repo>/pull-requests')
 @APP.route('/fork/<username>/<repo:repo>/pull-requests/')
 @APP.route('/fork/<username>/<repo:repo>/pull-requests')
+@repo_method
 def request_pulls(repo, username=None):
     """ Request pulling the changes from the fork into the project.
     """
@@ -140,10 +141,7 @@ def request_pulls(repo, username=None):
     assignee = flask.request.args.get('assignee', None)
     author = flask.request.args.get('author', None)
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if not repo:
-        flask.abort(404, 'Project not found')
+    repo = flask.g.repo
 
     if not repo.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-requests found for this project')
@@ -198,7 +196,6 @@ def request_pulls(repo, username=None):
         status=status,
         assignee=assignee,
         author=author,
-        repo_admin=is_repo_admin(repo),
         form=pagure.forms.ConfirmationForm(),
         head=head,
     )
@@ -208,14 +205,12 @@ def request_pulls(repo, username=None):
 @APP.route('/<repo:repo>/pull-request/<int:requestid>')
 @APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/')
 @APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>')
+@repo_method
 def request_pull(repo, requestid, username=None):
     """ Request pulling the changes from the fork into the project.
     """
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if not repo:
-        flask.abort(404, 'Project not found')
+    repo = flask.g.repo
 
     if not repo.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-requests found for this project')
@@ -286,7 +281,6 @@ def request_pull(repo, requestid, username=None):
         username=username,
         repo_obj=repo_obj,
         pull_request=request,
-        repo_admin=is_repo_admin(request.project),
         diff_commits=diff_commits,
         diff=diff,
         mergeform=form,
@@ -295,13 +289,11 @@ def request_pull(repo, requestid, username=None):
 
 @APP.route('/<repo:repo>/pull-request/<int:requestid>.patch')
 @APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>.patch')
+@repo_method
 def request_pull_patch(repo, requestid, username=None):
     """ Returns the commits from the specified pull-request as patches.
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if not repo:
-        flask.abort(404, 'Project not found')
+    repo = flask.g.repo
 
     if not repo.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-requests found for this project')
@@ -372,14 +364,12 @@ def request_pull_patch(repo, requestid, username=None):
 @APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/edit',
            methods=('GET', 'POST'))
 @login_required
+@repo_method
 def request_pull_edit(repo, requestid, username=None):
     """ Edit the title of a pull-request.
     """
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if not repo:
-        flask.abort(404, 'Project not found')
+    repo = flask.g.repo
 
     if not repo.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-requests found for this project')
@@ -437,15 +427,13 @@ def request_pull_edit(repo, requestid, username=None):
 @APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/comment/'
            '<commit>/<path:filename>/<row>', methods=('GET', 'POST'))
 @login_required
+@repo_method
 def pull_request_add_comment(
         repo, requestid, commit=None,
         filename=None, row=None, username=None):
     """ Add a comment to a commit in a pull-request.
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if not repo:
-        flask.abort(404, 'Project not found')
+    repo = flask.g.repo
 
     if not repo.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-requests found for this project')
@@ -520,13 +508,11 @@ def pull_request_add_comment(
     '/fork/<username>/<repo:repo>/pull-request/<int:requestid>/comment/drop',
     methods=['POST'])
 @login_required
+@repo_method
 def pull_request_drop_comment(repo, requestid, username=None):
     """ Delete a comment of a pull-request.
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if not repo:
-        flask.abort(404, 'Project not found')
+    repo = flask.g.repo
 
     if not repo.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-requests found for this project')
@@ -585,15 +571,13 @@ def pull_request_drop_comment(repo, requestid, username=None):
     '/fork/<username>/<repo:repo>/pull-request/<int:requestid>/comment'
     '/<int:commentid>/edit', methods=('GET', 'POST'))
 @login_required
+@repo_method
 def pull_request_edit_comment(repo, requestid, commentid, username=None):
     """Edit comment of a pull request
     """
     is_js = flask.request.args.get('js', False)
 
-    project = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if not project:
-        flask.abort(404, 'Project not found')
+    project = flask.g.repo
 
     if not project.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-requests found for this project')
@@ -666,6 +650,7 @@ def pull_request_edit_comment(repo, requestid, commentid, username=None):
 @APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/merge',
            methods=['POST'])
 @login_required
+@repo_method
 def merge_request_pull(repo, requestid, username=None):
     """ Request pulling the changes from the fork into the project.
     """
@@ -676,10 +661,7 @@ def merge_request_pull(repo, requestid, username=None):
         return flask.redirect(flask.url_for(
             'request_pull', repo=repo, requestid=requestid, username=username))
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if not repo:
-        flask.abort(404, 'Project not found')
+    repo = flask.g.repo
 
     if not repo.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-requests found for this project')
@@ -741,28 +723,27 @@ def merge_request_pull(repo, requestid, username=None):
 @APP.route('/fork/<username>/<repo:repo>/pull-request/cancel/<int:requestid>',
            methods=['POST'])
 @login_required
+@repo_method
 def cancel_request_pull(repo, requestid, username=None):
     """ Cancel request pulling request.
     """
+    reponame=repo
 
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
 
-        repo_obj = pagure.lib.get_project(SESSION, repo, user=username)
+        repo = flask.g.repo
 
-        if not repo_obj:
-            flask.abort(404, 'Project not found')
-
-        if not repo_obj.settings.get('pull_requests', True):
+        if not repo.settings.get('pull_requests', True):
             flask.abort(404, 'No pull-requests found for this project')
 
         request = pagure.lib.search_pull_requests(
-            SESSION, project_id=repo_obj.id, requestid=requestid)
+            SESSION, project_id=repo.id, requestid=requestid)
 
         if not request:
             flask.abort(404, 'Pull-request not found')
 
-        if not is_repo_admin(repo_obj) \
+        if not is_repo_admin(repo) \
                 and not flask.g.fas_user.username == request.user.username:
             flask.abort(
                 403,
@@ -784,7 +765,7 @@ def cancel_request_pull(repo, requestid, username=None):
     else:
         flask.flash('Invalid input submitted', 'error')
 
-    return flask.redirect(flask.url_for('view_repo', repo=repo))
+    return flask.redirect(flask.url_for('view_repo', repo=reponame))
 
 
 @APP.route(
@@ -793,12 +774,10 @@ def cancel_request_pull(repo, requestid, username=None):
     '/fork/<username>/<repo:repo>/pull-request/<int:requestid>/assign',
     methods=['POST'])
 @login_required
+@repo_method
 def set_assignee_requests(repo, requestid, username=None):
     ''' Assign a pull-request. '''
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if repo is None:
-        flask.abort(404, 'Project not found')
+    repo = flask.g.repo
 
     if not repo.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-request allowed on this project')
@@ -847,17 +826,15 @@ def set_assignee_requests(repo, requestid, username=None):
 @APP.route('/do_fork/<repo:repo>', methods=['POST'])
 @APP.route('/do_fork/fork/<username>/<repo:repo>', methods=['POST'])
 @login_required
+@repo_method
 def fork_project(repo, username=None):
     """ Fork the project specified into the user's namespace
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = flask.g.repo
 
     form = pagure.forms.ConfirmationForm()
     if not form.validate_on_submit():
         flask.abort(400)
-
-    if repo is None:
-        flask.abort(404)
 
     if pagure.lib.get_project(
             SESSION, repo.name, user=flask.g.fas_user.username):
@@ -904,14 +881,13 @@ def fork_project(repo, username=None):
 @APP.route(
     '/fork/<username>/<repo:repo>/diff/<path:branch_to>..<path:branch_from>',
     methods=('GET', 'POST'))
+@repo_method
 def new_request_pull(repo, branch_to, branch_from, username=None):
     """ Request pulling the changes from the fork into the project.
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
     branch_to = flask.request.values.get('branch_to', branch_to)
 
-    if not repo:
-        flask.abort(404)
+    repo = flask.g.repo
 
     parent = repo
     if repo.parent:
@@ -1040,14 +1016,13 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
 @APP.route(
     '/fork/<username>/<repo:repo>/diff/remote', methods=('GET', 'POST'))
 @login_required
+@repo_method
 def new_remote_request_pull(repo, username=None):
     """ Request pulling the changes from a remote fork into the project.
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
     confirm = flask.request.values.get('confirm', False)
 
-    if not repo:
-        flask.abort(404)
+    repo = flask.g.repo
 
     if not repo.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-request allowed on this project')
@@ -1182,17 +1157,15 @@ def new_remote_request_pull(repo, username=None):
     '/fork_edit/fork/<username>/<repo:repo>/edit/<path:branchname>/'
     'f/<path:filename>', methods=['POST'])
 @login_required
+@repo_method
 def fork_edit_file(repo, branchname, filename, username=None):
     """ Fork the project specified and open the specific file to edit
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = flask.g.repo
 
     form = pagure.forms.ConfirmationForm()
     if not form.validate_on_submit():
         flask.abort(400)
-
-    if repo is None:
-        flask.abort(404)
 
     if pagure.lib.get_project(
             SESSION, repo.name, user=flask.g.fas_user.username):
