@@ -17,7 +17,6 @@ __api_version__ = '0.7'
 
 
 import datetime
-import functools
 import logging
 import os
 import subprocess
@@ -199,36 +198,6 @@ LOG.setLevel(APP.config.get('LOG_LEVEL', 'INFO'))
 APP.wsgi_app = pagure.proxy.ReverseProxied(APP.wsgi_app)
 
 
-def repo_method(function):
-    ''' Check the info provided in the URL and return the arguments needed
-    for all the endpoints.
-    '''
-
-    @functools.wraps(function)
-    def wrapper(*args, **kwargs):
-        ''' Actually does the job with the arguments provided. '''
-
-        # Check if there is a `repo` and an `username` variable in the URL
-        # path
-        repo = flask.request.view_args.get('repo')
-        username = flask.request.view_args.get('username')
-        # If there isn't a `repo` in the URL path, just don't do anything
-        if repo:
-            flask.g.repo = pagure.lib.get_project(
-                SESSION, repo, user=username)
-            if flask.g.repo is None:
-                flask.abort(404, 'Project not found')
-
-            flask.g.reponame = get_repo_path(flask.g.repo)
-            flask.g.repo_obj = pygit2.Repository(flask.g.reponame)
-            flask.g.repo_admin = is_repo_admin(flask.g.repo)
-            flask.g.branches = sorted(flask.g.repo_obj.listall_branches())
-
-        return function(*args, **kwargs)
-
-    return wrapper
-
-
 def authenticated():
     ''' Utility function checking if the current user is logged in or not.
     '''
@@ -406,6 +375,36 @@ def inject_variables():
 def set_session():
     """ Set the flask session as permanent. """
     flask.session.permanent = True
+
+
+@APP.before_request
+def set_variables():
+    """ This method retrieve the repo and username set in the URLs and
+    provide some of the variables that are most often used.
+    """
+
+    if flask.request.blueprint == 'api_ns':
+        return
+
+    # Retrieve the variables in the URL
+    args = flask.request.view_args or {}
+    # Check if there is a `repo` and an `username`
+    repo = args.get('repo')
+    username = args.get('username')
+
+    # If there isn't a `repo` in the URL path, or if there is but the
+    # endpoint called is part of the API, just don't do anything
+    if repo:
+        flask.g.repo = pagure.lib.get_project(
+            SESSION, repo, user=username)
+
+        if flask.g.repo is None:
+            flask.abort(404, 'Project not found')
+
+        flask.g.reponame = get_repo_path(flask.g.repo)
+        flask.g.repo_obj = pygit2.Repository(flask.g.reponame)
+        flask.g.repo_admin = is_repo_admin(flask.g.repo)
+        flask.g.branches = sorted(flask.g.repo_obj.listall_branches())
 
 
 @APP.errorhandler(404)
