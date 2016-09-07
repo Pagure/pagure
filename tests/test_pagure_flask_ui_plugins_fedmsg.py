@@ -55,6 +55,7 @@ class PagureFlaskPluginFedmsgtests(tests.Modeltests):
         """ Test the fedmsg plugin on/off endpoint. """
 
         tests.create_projects(self.session)
+        tests.create_projects_git(tests.HERE)
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
@@ -87,11 +88,6 @@ class PagureFlaskPluginFedmsgtests(tests.Modeltests):
                 tests.HERE, 'test.git', 'hooks', 'post-receive.fedmsg')))
 
             data['csrf_token'] = csrf_token
-            # No git found
-            output = self.app.post('/test/settings/Fedmsg', data=data)
-            self.assertEqual(output.status_code, 404)
-
-            tests.create_projects_git(tests.HERE)
 
             # With the git repo
             output = self.app.post(

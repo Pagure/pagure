@@ -84,8 +84,9 @@ class PagureFlaskPluginstests(tests.Modeltests):
     def test_view_plugin_page(self):
         """ Test the view_plugin_page endpoint. """
 
+        # No Git repo
         output = self.app.get('/foo/settings/Mail')
-        self.assertEqual(output.status_code, 302)
+        self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
@@ -97,6 +98,10 @@ class PagureFlaskPluginstests(tests.Modeltests):
 
             output = self.app.get('/test/settings/Mail')
             self.assertEqual(output.status_code, 403)
+
+        # User not logged in
+        output = self.app.get('/test/settings/Mail')
+        self.assertEqual(output.status_code, 302)
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):

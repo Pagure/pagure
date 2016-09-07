@@ -1854,14 +1854,18 @@ index 0000000..2a552bb
 
         send_email.return_value = True
 
-        # User not logged in
+        # Git repo not found
         output = self.app.post('fork_edit/test/edit/master/f/sources')
-        self.assertEqual(output.status_code, 302)
+        self.assertEqual(output.status_code, 404)
 
         tests.create_projects(self.session)
         for folder in ['docs', 'tickets', 'requests', 'repos']:
             tests.create_projects_git(
                 os.path.join(tests.HERE, folder), bare=True)
+
+        # User not logged in
+        output = self.app.post('fork_edit/test/edit/master/f/sources')
+        self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
         user.username = 'pingou'

@@ -55,6 +55,7 @@ class PagureFlaskPluginNoFFtests(tests.Modeltests):
         """ Test the noff plugin on/off endpoint. """
 
         tests.create_projects(self.session)
+        tests.create_projects_git(tests.HERE)
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
@@ -96,12 +97,6 @@ class PagureFlaskPluginNoFFtests(tests.Modeltests):
                 in output.data)
 
             data['csrf_token'] = csrf_token
-            # No git found
-            output = self.app.post(
-                '/test/settings/Block non fast-forward pushes', data=data)
-            self.assertEqual(output.status_code, 404)
-
-            tests.create_projects_git(tests.HERE)
 
             # With the git repo
             output = self.app.post(

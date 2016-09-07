@@ -65,13 +65,19 @@ class PagureFlaskRepotests(tests.Modeltests):
         pagure.APP.config['ENABLE_USER_MNGT'] = False
         ast.return_value = False
 
+        # No Git repo
         output = self.app.get('/foo/adduser')
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(tests.HERE)
+
+        # User not logged in
+        output = self.app.get('/test/adduser')
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
-            tests.create_projects(self.session)
-            tests.create_projects_git(tests.HERE)
 
             output = self.app.get('/test/adduser')
             self.assertEqual(output.status_code, 404)
@@ -109,18 +115,19 @@ class PagureFlaskRepotests(tests.Modeltests):
         """ Test the add_user endpoint. """
         ast.return_value = False
 
+        # No git repo
         output = self.app.get('/foo/adduser')
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(tests.HERE)
+
+        # User not logged in
+        output = self.app.get('/test/adduser')
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
-
-            output = self.app.get('/foo/adduser')
-            self.assertEqual(output.status_code, 404)
-
-            tests.create_projects(self.session)
-            tests.create_projects_git(tests.HERE)
-
             output = self.app.get('/test/adduser')
             self.assertEqual(output.status_code, 403)
 
@@ -185,7 +192,15 @@ class PagureFlaskRepotests(tests.Modeltests):
         pagure.APP.config['ENABLE_USER_MNGT'] = False
         ast.return_value = False
 
+        # No Git repo
         output = self.app.get('/foo/addgroup')
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(tests.HERE)
+
+        # User not logged in
+        output = self.app.get('/test/addgroup')
         self.assertEqual(output.status_code, 302)
 
         msg = pagure.lib.add_group(
@@ -203,13 +218,8 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
-            output = self.app.get('/test/addgroup')
-            self.assertEqual(output.status_code, 404)
-
             #just get the csrf token
             pagure.APP.config['ENABLE_USER_MNGT'] = True
-            tests.create_projects(self.session)
-            tests.create_projects_git(tests.HERE)
 
             output = self.app.get('/test/addgroup')
             csrf_token = output.data.split(
@@ -240,17 +250,19 @@ class PagureFlaskRepotests(tests.Modeltests):
         """ Test the add_group_project endpoint. """
         ast.return_value = False
 
+        # No Git repo
         output = self.app.get('/foo/addgroup')
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(tests.HERE)
+
+        # User not logged in
+        output = self.app.get('/test/addgroup')
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
-            output = self.app.get('/foo/addgroup')
-            self.assertEqual(output.status_code, 404)
-
-            tests.create_projects(self.session)
-            tests.create_projects_git(tests.HERE)
-
             output = self.app.get('/test/addgroup')
             self.assertEqual(output.status_code, 403)
 
@@ -327,8 +339,9 @@ class PagureFlaskRepotests(tests.Modeltests):
         pagure.APP.config['ENABLE_USER_MNGT'] = False
         ast.return_value = False
 
+        # Git repo not found
         output = self.app.post('/foo/dropuser/1')
-        self.assertEqual(output.status_code, 302)
+        self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
@@ -345,6 +358,10 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.post(
                 '/test/dropuser/2', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 404)
+
+        # User not logged in
+        output = self.app.post('/test/dropuser/1')
+        self.assertEqual(output.status_code, 302)
 
         # Add an user to a project
         repo = pagure.lib.get_project(self.session, 'test')
@@ -374,8 +391,9 @@ class PagureFlaskRepotests(tests.Modeltests):
         """ Test the remove_user endpoint. """
         ast.return_value = False
 
+        # Git repo not found
         output = self.app.post('/foo/dropuser/1')
-        self.assertEqual(output.status_code, 302)
+        self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
@@ -392,6 +410,10 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.post('/test/dropuser/1')
             self.assertEqual(output.status_code, 302)
             ast.return_value = False
+
+        # User not logged in
+        output = self.app.post('/test/dropuser/1')
+        self.assertEqual(output.status_code, 302)
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
@@ -450,16 +472,20 @@ class PagureFlaskRepotests(tests.Modeltests):
         pagure.APP.config['ENABLE_USER_MNGT'] = False
         ast.return_value = False
 
+        # No Git repo
         output = self.app.post('/foo/dropgroup/1')
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(tests.HERE)
+
+        # User not logged in
+        output = self.app.post('/test/dropgroup/1')
         self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser()
-        with tests.user_set(pagure.APP, user):
-            tests.create_projects(self.session)
-
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
-            tests.create_projects_git(tests.HERE)
             output = self.app.post('/test/settings')
 
             csrf_token = output.data.split(
@@ -513,8 +539,9 @@ class PagureFlaskRepotests(tests.Modeltests):
         """ Test the remove_group_project endpoint. """
         ast.return_value = False
 
+        # No Git repo
         output = self.app.post('/foo/dropgroup/1')
-        self.assertEqual(output.status_code, 302)
+        self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
@@ -531,6 +558,10 @@ class PagureFlaskRepotests(tests.Modeltests):
             output = self.app.post('/test/dropgroup/1')
             self.assertEqual(output.status_code, 302)
             ast.return_value = False
+
+        # User not logged in
+        output = self.app.post('/test/dropgroup/1')
+        self.assertEqual(output.status_code, 302)
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
@@ -604,27 +635,35 @@ class PagureFlaskRepotests(tests.Modeltests):
         """ Test the update_project endpoint. """
         ast.return_value = True
 
+        # Git repo not found
         output = self.app.post('/foo/update')
-        self.assertEqual(output.status_code, 302)
+        self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
-            output = self.app.post('/foo/update')
-            self.assertEqual(output.status_code, 302)
-
-            ast.return_value = False
-
+            # Project does not exist
             output = self.app.post('/foo/update')
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
+            tests.create_projects_git(tests.HERE)
 
+            # Session timed-out
+            output = self.app.post('/test/update')
+            self.assertEqual(output.status_code, 302)
+
+            ast.return_value = False
+
+            # Not allowed
             output = self.app.post('/test/update')
             self.assertEqual(output.status_code, 403)
 
+        # User not logged in
+        output = self.app.post('/test/update')
+        self.assertEqual(output.status_code, 302)
+
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
-            tests.create_projects_git(tests.HERE)
             output = self.app.post('/test/update', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -692,8 +731,9 @@ class PagureFlaskRepotests(tests.Modeltests):
         """ Test the view_settings endpoint. """
         ast.return_value = False
 
+        # No Git repo
         output = self.app.get('/foo/settings')
-        self.assertEqual(output.status_code, 302)
+        self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
@@ -705,6 +745,10 @@ class PagureFlaskRepotests(tests.Modeltests):
 
             output = self.app.get('/test/settings')
             self.assertEqual(output.status_code, 403)
+
+        # User not logged in
+        output = self.app.get('/test/settings')
+        self.assertEqual(output.status_code, 302)
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
@@ -1918,16 +1962,23 @@ index 0000000..fb7093d
         send_email.return_value = True
         pagure.APP.config['ENABLE_DEL_PROJECTS'] = False
 
+        # No Git repo
         output = self.app.post('/foo/delete')
-        # User not logged in
-        self.assertEqual(output.status_code, 302)
+        self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
             tests.create_projects(self.session)
+            tests.create_projects_git(tests.HERE)
+
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
+        # User not logged in
+        output = self.app.post('/test/delete')
+        self.assertEqual(output.status_code, 302)
+
+        with tests.user_set(pagure.APP, user):
             # Only git repo
             item = pagure.lib.model.Project(
                 user_id=1,  # pingou
@@ -1937,7 +1988,6 @@ index 0000000..fb7093d
             )
             self.session.add(item)
             self.session.commit()
-            tests.create_projects_git(tests.HERE)
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
@@ -2125,22 +2175,22 @@ index 0000000..fb7093d
         ast.return_value = False
         send_email.return_value = True
 
+        # No Git repo
         output = self.app.post('/foo/delete')
-        # User not logged in
-        self.assertEqual(output.status_code, 302)
+        self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
-            output = self.app.post('/foo/delete')
-            # No project registered in the DB
-            self.assertEqual(output.status_code, 404)
-
             tests.create_projects(self.session)
-            #tests.create_projects_git(tests.HERE)
+            tests.create_projects_git(tests.HERE)
 
-            output = self.app.post('/test/delete')
-            # No git repo associated
+            # No project registered in the DB (no git repo)
+            output = self.app.post('/foo/delete')
             self.assertEqual(output.status_code, 404)
+
+        # User not logged in
+        output = self.app.post('/test/delete')
+        self.assertEqual(output.status_code, 302)
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
@@ -2442,6 +2492,7 @@ index 0000000..fb7093d
         upgit.return_value = True
         sendmail.return_value = True
         tests.create_projects(self.session)
+        tests.create_projects_git(tests.HERE)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
@@ -2491,7 +2542,6 @@ index 0000000..fb7093d
             self.assertEqual(msg.title, 'Test issue')
 
             data['regenerate'] = 'tickets'
-            tests.create_projects_git(tests.HERE)
             output = self.app.post(
                 '/test/regenerate', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
@@ -2558,8 +2608,9 @@ index 0000000..fb7093d
     def test_edit_file(self):
         """ Test the edit_file endpoint. """
 
+        # No Git repo
         output = self.app.get('/foo/edit/foo/f/sources')
-        self.assertEqual(output.status_code, 302)
+        self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
@@ -2573,6 +2624,10 @@ index 0000000..fb7093d
             # No a repo admin
             output = self.app.get('/test/edit/foo/f/sources')
             self.assertEqual(output.status_code, 403)
+
+        # User not logged in
+        output = self.app.get('/test/edit/foo/f/sources')
+        self.assertEqual(output.status_code, 302)
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
@@ -2702,8 +2757,9 @@ index 0000000..fb7093d
         """ Test the change_ref_head endpoint. """
         ast.return_value = True
 
+        # No Git repo
         output = self.app.post('/foo/default/branch/')
-        self.assertEqual(output.status_code, 302)
+        self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
@@ -2720,6 +2776,10 @@ index 0000000..fb7093d
 
             output = self.app.post('/test/default/branch/')
             self.assertEqual(output.status_code, 403)
+
+        # User no logged in
+        output = self.app.post('/test/default/branch/')
+        self.assertEqual(output.status_code, 302)
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
@@ -2798,8 +2858,9 @@ index 0000000..fb7093d
     def test_new_release(self):
         """ Test the new_release endpoint. """
 
+        # No Git repo
         output = self.app.post('/foo/upload/')
-        self.assertEqual(output.status_code, 302)
+        self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
@@ -2807,9 +2868,14 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
+            repo = tests.create_projects_git(tests.HERE)
 
             output = self.app.post('/test/upload/')
             self.assertEqual(output.status_code, 403)
+
+        # User not logged in
+        output = self.app.post('/test/upload/')
+        self.assertEqual(output.status_code, 302)
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
@@ -2823,19 +2889,6 @@ index 0000000..fb7093d
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
-
-            # Upload Ok but No git repo
-            data = {'filestream': open(img), 'csrf_token': csrf_token}
-            output = self.app.post(
-                '/test/upload/', data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 404)
-            self.assertIn(
-                '</button>\n                      File', output.data)
-            self.assertIn(
-                'uploaded\n                    </div>', output.data)
-            self.assertIn('<p>No git repo found</p>', output.data)
-
-            repo = tests.create_projects_git(tests.HERE)
 
             # Upload successful
             data = {'filestream': open(img), 'csrf_token': csrf_token}
@@ -2853,8 +2906,9 @@ index 0000000..fb7093d
         """ Test the add_token endpoint. """
         ast.return_value = False
 
+        # No Git repo
         output = self.app.get('/foo/token/new/')
-        self.assertEqual(output.status_code, 302)
+        self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
@@ -2866,6 +2920,10 @@ index 0000000..fb7093d
 
             output = self.app.get('/test/token/new/')
             self.assertEqual(output.status_code, 403)
+
+        # User not logged in
+        output = self.app.get('/test/token/new/')
+        self.assertEqual(output.status_code, 302)
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
@@ -2914,8 +2972,9 @@ index 0000000..fb7093d
         """ Test the revoke_api_token endpoint. """
         ast.return_value = False
 
+        # No Git repo
         output = self.app.post('/foo/token/revoke/123')
-        self.assertEqual(output.status_code, 302)
+        self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
@@ -2927,6 +2986,10 @@ index 0000000..fb7093d
 
             output = self.app.post('/test/token/revoke/123')
             self.assertEqual(output.status_code, 403)
+
+        # User not logged in
+        output = self.app.post('/test/token/revoke/123')
+        self.assertEqual(output.status_code, 302)
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
@@ -2990,17 +3053,21 @@ index 0000000..fb7093d
 
     def test_delete_branch(self):
         """ Test the delete_branch endpoint. """
+        # No Git repo
         output = self.app.post('/foo/b/master/delete')
-        # No project registered in the DB
-        self.assertEqual(output.status_code, 302)
+        self.assertEqual(output.status_code, 404)
 
         tests.create_projects(self.session)
         tests.create_projects_git(tests.HERE, bare=True)
 
+        # User not logged in
+        output = self.app.post('/test/b/master/delete')
+        self.assertEqual(output.status_code, 302)
+
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
-            output = self.app.post('/foo/b/master/delete')
             # Unknown repo
+            output = self.app.post('/foo/b/master/delete')
             self.assertEqual(output.status_code, 404)
 
             output = self.app.post('/test/b/master/delete')
@@ -3097,6 +3164,7 @@ index 0000000..fb7093d
     def test_view_project_activity(self):
         """ Test the view_project_activity endpoint. """
         tests.create_projects(self.session)
+        tests.create_projects_git(tests.HERE, bare=True)
 
         # Project Exists, but No DATAGREPPER_URL set
         output = self.app.get('/test/activity/')
@@ -3122,6 +3190,7 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 405)
 
         tests.create_projects(self.session)
+        tests.create_projects_git(tests.HERE, bare=True)
 
         user = tests.FakeUser()
         user.username = 'pingou'
@@ -3164,13 +3233,15 @@ index 0000000..fb7093d
             item = pagure.lib.model.Project(
                 user_id=2,  # foo
                 name='test',
-                description='test project #1',
+                description='foo project #1',
                 hook_token='aaabbb',
                 is_fork=True,
                 parent_id=1,
             )
             self.session.add(item)
             self.session.commit()
+            gitrepo = os.path.join(tests.HERE, 'forks', 'foo', 'test.git')
+            pygit2.init_repository(gitrepo, bare=True)
 
             output = self.app.post(
                 '/watch/fork/foo/test/settings/0', data=data, follow_redirects=True)

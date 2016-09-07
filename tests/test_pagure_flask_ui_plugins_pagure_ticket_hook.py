@@ -55,6 +55,7 @@ class PagureFlaskPluginPagureTicketHooktests(tests.Modeltests):
         """ Test the pagure_ticket plugin on/off endpoint. """
 
         tests.create_projects(self.session)
+        tests.create_projects_git(tests.HERE)
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
@@ -84,15 +85,10 @@ class PagureFlaskPluginPagureTicketHooktests(tests.Modeltests):
                 in output.data)
 
             data['csrf_token'] = csrf_token
-            # No git found
-            output = self.app.post('/test/settings/Pagure tickets', data=data)
-            self.assertEqual(output.status_code, 404)
 
-            # Create both the tickets repo
+            # Create the tickets repo
             tests.create_projects_git(os.path.join(tests.HERE, 'tickets'))
 
-            # With the git repo
-            tests.create_projects_git(tests.HERE)
             output = self.app.post(
                 '/test/settings/Pagure tickets', data=data,
                 follow_redirects=True)

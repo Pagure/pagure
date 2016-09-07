@@ -47,6 +47,7 @@ class PagureFlaskPluginPagureCItests(tests.Modeltests):
         """ Test the pagure ci plugin on/off endpoint. """
 
         tests.create_projects(self.session)
+        tests.create_projects_git(tests.HERE)
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
@@ -103,12 +104,6 @@ class PagureFlaskPluginPagureCItests(tests.Modeltests):
                 'value="y">', output.data)
 
             data['csrf_token'] = csrf_token
-
-            # No git found
-            output = self.app.post('/test/settings/Pagure', data=data)
-            self.assertEqual(output.status_code, 404)
-
-            tests.create_projects_git(tests.HERE)
 
             if not pagure.APP.config.get('PAGURE_CI_SERVICES'):
                 return
