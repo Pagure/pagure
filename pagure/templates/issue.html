@@ -36,7 +36,7 @@
     {{ issue.date_created | humanize}} by {{ issue.user.user }}
   </h5>
 
-    {{ show_initial_comment(issue, username, repo,issueid, repo_admin, form) }}
+    {{ show_initial_comment(issue, username, repo,issueid, form) }}
 
     <section id="comments">
       {% if issue.comments %}
@@ -54,7 +54,7 @@
             </div>
           </div>
         {% else %}
-          {{ show_comment(comment, comment.id, repo, username, issueid, form, repo_admin) }}
+          {{ show_comment(comment, comment.id, repo, username, issueid, form) }}
         {% endif %}
         {% endfor %}
       {% endif %}
@@ -125,7 +125,7 @@
             </h2>
           </fieldset>
 
-          {% if authenticated and repo_admin %}
+          {% if authenticated and g.repo_admin %}
             {{ render_bootstrap_field(form.status,
               formclass="issue-metadata-form") }}
           {% endif%}
@@ -143,7 +143,7 @@
               </h4>
           </fieldset>
 
-          {% if authenticated and repo_admin %}
+          {% if authenticated and g.repo_admin %}
           <fieldset class="form-group issue-metadata-form">
             <label for="tag"><strong>Tags</strong></label>
              <input id="tag" type="text" placeholder="tag1, tag2" name="tag"
@@ -164,7 +164,7 @@
               {% else %}
                 unassigned
               {% endif %}
-              {% if authenticated and repo_admin
+              {% if authenticated and g.repo_admin
                 and (not issue.assignee or issue.assignee.username != g.fas_user.username) %}
               <button class="btn btn-sm pull-xs-right" id="take-btn"
                 title="assign this issue to you">
@@ -174,7 +174,7 @@
             </div>
           </fieldset>
 
-          {% if authenticated and repo_admin %}
+          {% if authenticated and g.repo_admin %}
           <fieldset class="form-group issue-metadata-form">
             <label for="assignee"><strong>Assignee</strong></label>
             <input class="form-control" name="assignee" id="assignee"
@@ -195,7 +195,7 @@
             </div>
           </fieldset>
 
-          {% if authenticated and repo_admin %}
+          {% if authenticated and g.repo_admin %}
                 <fieldset class="form-group issue-metadata-form">
                   <label for="blocks"><strong>Blocked</strong></label>
                   <input class="form-control" id="blocks" type="text"
@@ -217,7 +217,7 @@
             </div>
           </fieldset>
 
-          {% if authenticated and repo_admin %}
+          {% if authenticated and g.repo_admin %}
             <fieldset class="form-group issue-metadata-form">
               <label for="depends"><strong>Depends on</strong></label>
               <input class="form-control" id="depends" type="text"
@@ -235,7 +235,7 @@
               {% endif %}
             </div>
           </fieldset>
-          {% if authenticated and repo_admin %}
+          {% if authenticated and g.repo_admin %}
             {{ render_bootstrap_field(form.priority,
               formclass="issue-metadata-form") }}
           {% endif%}
@@ -246,7 +246,7 @@
             <a class="btn btn-secondary issue-metadata-form editmetadatatoggle">
               cancel
             </a>
-          {% if authenticated and repo_admin %}
+          {% if authenticated and g.repo_admin %}
             <a class="btn btn-secondary issue-metadata-display editmetadatatoggle">
               Edit Metadata
             </a>
@@ -398,7 +398,7 @@ $(document).ready(function() {
     return false;
   };
 
-  {% if repo_admin %}
+  {% if g.repo_admin %}
   $('#closeticket').click(function(event){
     event.preventDefault();
     var closeForm = $('<form>', {
@@ -672,7 +672,7 @@ $( document ).ready(function() {
     }
   );
 
-  {% if authenticated and repo_admin %}
+  {% if authenticated and g.repo_admin %}
     $("#take-btn").click(function(){
       var _url = "{{ url_for(
         'api_ns.api_assign_issue', repo=repo.name, username=username, issueid=issueid

@@ -8,7 +8,7 @@
 <h2>
   Releases
 {% if config.get('UPLOAD_FOLDER_PATH') and config.get('UPLOAD_FOLDER') %}
-  {% if repo_admin %}
+  {% if g.repo_admin %}
     <a class="pull-xs-right" href="{{ url_for('.new_release', username=username, repo=repo.name) }}"
         method="get" class="icon">
     <button class="btn btn-primary" type="submit" title="Upload a tarball">

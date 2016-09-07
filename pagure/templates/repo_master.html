@@ -111,7 +111,7 @@
         {% endif %}
 
         <li class="nav-item{%
-            if repo_obj and repo_obj.is_empty %} disabled{% endif %}">
+            if g.repo_obj and g.repo_obj.is_empty %} disabled{% endif %}">
           <a {%
             if select == 'commits' %}class="active nav-link" {%
             else %}class="nav-link" {%
@@ -123,7 +123,7 @@
         </li>
 
         <li class="nav-item{%
-            if repo_obj and repo_obj.is_empty %} disabled{% endif %}">
+            if g.repo_obj and g.repo_obj.is_empty %} disabled{% endif %}">
           <a {%
             if select == 'tree' %}class="active nav-link" {%
             else %}class="nav-link"{%

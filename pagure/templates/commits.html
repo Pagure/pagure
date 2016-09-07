@@ -5,7 +5,7 @@
 
 {% block repo %}
   <div class="row m-b-1">
-    {% if repo_obj and repo_obj.is_empty %}
+    {% if g.repo_obj and g.repo_obj.is_empty %}
     <div class="col-md-12">
       <div class="alert alert-info" role="alert">
         <p>This repo is brand new!</p>
@@ -75,7 +75,7 @@
               href="{{ url_for('new_request_pull',
                     username=username, repo=repo.name,
                     branch_to=head, branch_from=branchname or 'master') }}">
-              {% if repo_admin %}Request pull{% else %}Compare{% endif %}
+              {% if g.repo_admin %}Request pull{% else %}Compare{% endif %}
             </a>
           </div>
       {% endif %}
