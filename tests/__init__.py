@@ -110,7 +110,12 @@ def user_set(APP, user):
     # flask.ext.fas_openid.FAS which otherwise kills our effort to set a
     # flask.g.fas_user.
     from flask import appcontext_pushed, g
-    APP.before_request_funcs[None] = []
+    keep = []
+    for meth in APP.before_request_funcs[None]:
+        if 'flask_fas_openid.FAS' in str(meth):
+            continue
+        keep.append(meth)
+    APP.before_request_funcs[None] = keep
 
     def handler(sender, **kwargs):
         g.fas_user = user
