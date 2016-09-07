@@ -2188,6 +2188,10 @@ index 0000000..fb7093d
             output = self.app.post('/foo/delete')
             self.assertEqual(output.status_code, 404)
 
+            # User not allowed
+            output = self.app.post('/test/delete')
+            self.assertEqual(output.status_code, 403)
+
         # User not logged in
         output = self.app.post('/test/delete')
         self.assertEqual(output.status_code, 302)
