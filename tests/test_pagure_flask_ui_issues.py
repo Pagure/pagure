@@ -63,8 +63,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
         p_send_email.return_value = True
         p_ugt.return_value = True
 
+        # No Git repo
         output = self.app.get('/foo/new_issue')
-        self.assertEqual(output.status_code, 302)
+        self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
@@ -123,6 +124,10 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<p>No such user found in the database: username</p>',
                 output.data)
+
+        # User not logged in
+        output = self.app.get('/test/new_issue')
+        self.assertEqual(output.status_code, 302)
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
@@ -1228,8 +1233,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
         p_send_email.return_value = True
         p_ugt.return_value = True
 
+        # No Git repo
         output = self.app.get('/foo/issue/1/edit')
-        self.assertEqual(output.status_code, 302)
+        self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
@@ -1242,6 +1248,10 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
             output = self.app.get('/test/issue/1/edit')
             self.assertEqual(output.status_code, 404)
+
+        # User not logged in
+        output = self.app.get('/foo/issue/1/edit')
+        self.assertEqual(output.status_code, 404)
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
@@ -1342,8 +1352,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
         p_send_email.return_value = True
         p_ugt.return_value = True
 
+        # No Git repo
         output = self.app.get('/foo/tag/foo/edit')
-        self.assertEqual(output.status_code, 302)
+        self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
@@ -1354,6 +1365,10 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
             output = self.app.get('/test/tag/foo/edit')
             self.assertEqual(output.status_code, 403)
+
+        # User not logged in
+        output = self.app.get('/test/tag/foo/edit')
+        self.assertEqual(output.status_code, 302)
 
         # Create issues to play with
         repo = pagure.lib.get_project(self.session, 'test')
@@ -1431,8 +1446,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
         p_send_email.return_value = True
         p_ugt.return_value = True
 
+        # No Git repo
         output = self.app.post('/foo/droptag/')
-        self.assertEqual(output.status_code, 302)
+        self.assertEqual(output.status_code, 404)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
@@ -1443,6 +1459,10 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
             output = self.app.post('/test/droptag/')
             self.assertEqual(output.status_code, 403)
+
+        # User not logged in
+        output = self.app.post('/test/droptag/')
+        self.assertEqual(output.status_code, 302)
 
         # Create issues to play with
         repo = pagure.lib.get_project(self.session, 'test')
