@@ -379,10 +379,12 @@ def set_session():
 
 @APP.before_request
 def set_variables():
-    """ This method retrieve the repo and username set in the URLs and
-    provide some of the variables that are most often used.
+    """ This method retrieves the repo and username set in the URLs and
+    provides some of the variables that are most often used.
     """
 
+    # The API namespace has its own way of getting repo and username and
+    # of handling errors
     if flask.request.blueprint == 'api_ns':
         return
 
