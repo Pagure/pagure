@@ -439,8 +439,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
         p_send_email.return_value = True
         p_ugt.return_value = True
 
+        # No Git repo
         output = self.app.get('/foo/issue/1/update')
-        self.assertEqual(output.status_code, 302)
+        self.assertEqual(output.status_code, 404)
 
         tests.create_projects(self.session)
         tests.create_projects_git(
@@ -1362,6 +1363,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
+            tests.create_projects_git(tests.HERE)
 
             output = self.app.get('/test/tag/foo/edit')
             self.assertEqual(output.status_code, 403)
@@ -1425,7 +1427,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '"tag1"</p>' in output.data)
 
             data['csrf_token'] = csrf_token
-            tests.create_projects_git(tests.HERE)
             output = self.app.post(
                 '/test/tag/tag1/edit', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
@@ -1456,6 +1457,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
+            tests.create_projects_git(tests.HERE)
 
             output = self.app.post('/test/droptag/')
             self.assertEqual(output.status_code, 403)
@@ -1495,7 +1497,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
         # Edit tag
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
-            tests.create_projects_git(tests.HERE)
             output = self.app.post(
                 '/test/droptag/', data={}, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
