@@ -878,8 +878,8 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
     if not parent.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-request allowed on this project')
 
-    repopath = pagure.get_repo_path(repo)
-    repo_obj = pygit2.Repository(repopath)
+    repopath = flask.g.reponame
+    repo_obj = flask.g.repo_obj
 
     parentpath = _get_parent_repo_path(repo)
     orig_repo = pygit2.Repository(parentpath)
@@ -949,7 +949,7 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
             SESSION.rollback()
             flask.flash(str(err), 'error')
 
-    if not flask.g.repo_admin:
+    if not repo_admin:
         form = None
 
     # if the pull request we are creating only has one commit,
@@ -1007,8 +1007,8 @@ def new_remote_request_pull(repo, username=None):
     if not repo.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-request allowed on this project')
 
-    parentpath = pagure.get_repo_path(repo)
-    orig_repo = pygit2.Repository(parentpath)
+    parentpath = flask.g.reponame
+    orig_repo = flask.g.repo_obj
 
     repo_admin = flask.g.repo_admin
 
@@ -1030,20 +1030,18 @@ def new_remote_request_pull(repo, username=None):
                 'view_repo', username=username, repo=repo.name))
 
         if not confirm:
+            flask.g.branches = sorted(orig_repo.listall_branches())
             return flask.render_template(
                 'pull_request.html',
                 select='requests',
                 repo=repo,
                 username=username,
-                repo_obj=repo_obj,
                 orig_repo=orig_repo,
                 diff_commits=diff_commits,
                 diff=diff,
                 form=form,
-                branches=sorted(orig_repo.listall_branches()),
                 branch_to=branch_to,
                 branch_from=branch_from,
-                repo_admin=repo_admin,
                 remote_git=remote_git,
             )
 
@@ -1118,14 +1116,14 @@ def new_remote_request_pull(repo, username=None):
             SESSION.rollback()
             flask.flash(str(err), 'error')
 
+    flask.g.branches = sorted(orig_repo.listall_branches())
+
     return flask.render_template(
         'remote_pull_request.html',
         select='requests',
         repo=repo,
         username=username,
         form=form,
-        branches=sorted(orig_repo.listall_branches()),
-        repo_admin=repo_admin,
         branch_to=orig_repo.head.shorthand,
     )
 
