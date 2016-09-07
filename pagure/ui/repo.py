@@ -48,7 +48,7 @@ import pagure.forms
 import pagure
 import pagure.ui.plugins
 from pagure import (APP, SESSION, LOG, __get_file_in_tree, login_required,
-                    is_repo_admin, admin_session_timedout)
+                    admin_session_timedout)
 
 
 @APP.route('/<repo:repo>.git')
@@ -145,7 +145,6 @@ def view_repo(repo, username=None):
         'repo_info.html',
         select='overview',
         repo=repo,
-        repo_obj=repo_obj,
         username=username,
         head=head,
         readme=readme,
@@ -344,7 +343,6 @@ def view_commits(repo, branchname=None, username=None):
         'commits.html',
         select='commits',
         origin='view_commits',
-        repo_obj=repo_obj,
         repo=repo,
         username=username,
         head=head,
@@ -781,7 +779,6 @@ def view_tree(repo, identifier=None, username=None):
     return flask.render_template(
         'file.html',
         select='tree',
-        repo_obj=repo_obj,
         origin='view_tree',
         repo=repo,
         username=username,
@@ -833,7 +830,6 @@ def view_tags(repo, username=None):
         username=username,
         repo=repo,
         tags=tags,
-        repo_obj=repo_obj,
     )
 
 
@@ -849,12 +845,9 @@ def new_release(repo, username=None):
             and not APP.config.get('UPLOAD_FOLDER'):
         flask.abort(404)
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = flask.g.repo
 
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    if not is_repo_admin(repo):
+    if not flask.g.repo_admin:
         flask.abort(
             403,
             'You are not allowed to change the settings for this project')
@@ -957,7 +950,6 @@ def view_settings(repo, username=None):
         select='settings',
         username=username,
         repo=repo,
-        repo_obj=repo_obj,
         form=form,
         tag_form=tag_form,
         branches_form=branches_form,
@@ -980,12 +972,9 @@ def update_project(repo, username=None):
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = flask.g.repo
 
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    if not is_repo_admin(repo):
+    if not flask.g.repo_admin:
         flask.abort(
             403,
             'You are not allowed to change the settings for this project')
@@ -1027,15 +1016,12 @@ def update_priorities(repo, username=None):
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if not repo:
-        flask.abort(404, 'Project not found')
+    repo = flask.g.repo
 
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
 
-    if not is_repo_admin(repo):
+    if not flask.g.repo_admin:
         flask.abort(
             403,
             'You are not allowed to change the settings for this project')
@@ -1118,15 +1104,12 @@ def update_milestones(repo, username=None):
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if not repo:
-        flask.abort(404, 'Project not found')
+    repo = flask.g.repo
 
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
 
-    if not is_repo_admin(repo):
+    if not flask.g.repo_admin:
         flask.abort(
             403,
             'You are not allowed to change the settings for this project')
@@ -1565,12 +1548,9 @@ def regenerate_git(repo, username=None):
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = flask.g.repo
 
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    if not is_repo_admin(repo):
+    if not flask.g.repo_admin:
         flask.abort(403, 'You are not allowed to regenerate the git repos')
 
     regenerate = flask.request.form.get('regenerate')

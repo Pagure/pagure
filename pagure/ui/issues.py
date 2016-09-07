@@ -31,7 +31,7 @@ import pagure.exceptions
 import pagure.lib
 import pagure.forms
 from pagure import (APP, SESSION, LOG, __get_file_in_tree,
-                    login_required, is_repo_admin, authenticated)
+                    login_required, authenticated)
 
 
 # URLs
@@ -47,16 +47,13 @@ def update_issue(repo, issueid, username=None):
     ''' Add a comment to an issue. '''
     is_js = flask.request.args.get('js', False)
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = flask.g.repo
 
     if flask.request.method == 'GET':
         if not is_js:
             flask.flash('Invalid method: GET', 'error')
         return flask.redirect(flask.url_for(
             'view_issue', username=username, repo=repo.name, issueid=issueid))
-
-    if repo is None:
-        flask.abort(404, 'Project not found')
 
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
@@ -66,7 +63,7 @@ def update_issue(repo, issueid, username=None):
     if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
 
-    if issue.private and not is_repo_admin(repo) \
+    if issue.private and not flask.g.repo_admin \
             and (not authenticated() or
                  not issue.user.user == flask.g.fas_user.username):
         flask.abort(
@@ -84,7 +81,7 @@ def update_issue(repo, issueid, username=None):
         status=status, priorities=repo.priorities)
 
     if form.validate_on_submit():
-        repo_admin = is_repo_admin(repo)
+        repo_admin = flask.g.repo_admin
 
         if flask.request.form.get('drop_comment'):
             commentid = flask.request.form.get('drop_comment')
@@ -96,7 +93,7 @@ def update_issue(repo, issueid, username=None):
 
             if (flask.g.fas_user.username != comment.user.username
                     or comment.parent.status != 'Open') \
-                    and not is_repo_admin(repo):
+                    and not flask.g.repo_admin:
                 flask.abort(
                     403,
                     'You are not allowed to remove this comment from '
@@ -269,12 +266,9 @@ def update_issue(repo, issueid, username=None):
 def edit_tag(repo, tag, username=None):
     """ Edit the specified tag associated with the issues of a project.
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = flask.g.repo
 
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    if not is_repo_admin(repo):
+    if not flask.g.repo_admin:
         flask.abort(
             403,
             'You are not allowed to edit tags associated with the issues of \
@@ -325,12 +319,9 @@ def edit_tag(repo, tag, username=None):
 def remove_tag(repo, username=None):
     """ Remove the specified tag, associated with the issues, from the project.
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = flask.g.repo
 
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    if not is_repo_admin(repo):
+    if not flask.g.repo_admin:
         flask.abort(
             403,
             'You are not allowed to remove tags associated with the issues \
@@ -379,10 +370,7 @@ def view_issues(repo, username=None):
     assignee = flask.request.args.get('assignee', None)
     author = flask.request.args.get('author', None)
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if repo is None:
-        flask.abort(404, 'Project not found')
+    repo = flask.g.repo
 
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
@@ -398,7 +386,7 @@ def view_issues(repo, username=None):
     if authenticated():
         private = flask.g.fas_user.username
     # If user is repo admin, show all tickets included the private ones
-    if is_repo_admin(repo):
+    if flask.g.repo_admin:
         private = None
 
     oth_issues = None
@@ -463,8 +451,6 @@ def view_issues(repo, username=None):
         assignee=assignee,
         author=author,
         priority=priority,
-        repo_admin=is_repo_admin(repo),
-        repo_obj=repo_obj,
     )
 
 
@@ -480,10 +466,7 @@ def view_roadmap(repo, username=None):
         status = None
     milestone = flask.request.args.getlist('milestone', None)
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if repo is None:
-        flask.abort(404, 'Project not found')
+    repo = flask.g.repo
 
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
@@ -494,7 +477,7 @@ def view_roadmap(repo, username=None):
     if authenticated():
         private = flask.g.fas_user.username
     # If user is repo admin, show all tickets included the private ones
-    if is_repo_admin(repo):
+    if flask.g.repo_admin:
         private = None
 
     milestones = milestone or list(repo.milestones.keys())
@@ -556,8 +539,6 @@ def view_roadmap(repo, username=None):
         milestones=milestones_ordered,
         issues=milestone_issues,
         tags=milestone,
-        repo_admin=is_repo_admin(repo),
-        repo_obj=repo_obj,
     )
 
 
@@ -569,10 +550,7 @@ def view_roadmap(repo, username=None):
 def new_issue(repo, username=None):
     """ Create a new issue
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if repo is None:
-        flask.abort(404, 'Project not found')
+    repo = flask.g.repo
 
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
@@ -665,7 +643,6 @@ def new_issue(repo, username=None):
         form=form,
         repo=repo,
         username=username,
-        repo_admin=is_repo_admin(repo),
         types=types,
         default=default,
     )
@@ -679,10 +656,7 @@ def view_issue(repo, issueid, username=None):
     """ List all issues associated to a repo
     """
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if repo is None:
-        flask.abort(404, 'Project not found')
+    repo = flask.g.repo
 
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
@@ -692,7 +666,7 @@ def view_issue(repo, issueid, username=None):
     if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
 
-    if issue.private and not is_repo_admin(repo) \
+    if issue.private and not flask.g.repo_admin \
             and (not authenticated() or
                  not issue.user.user == flask.g.fas_user.username):
         flask.abort(
@@ -713,12 +687,10 @@ def view_issue(repo, issueid, username=None):
         select='issues',
         repo=repo,
         username=username,
-        repo_obj=repo_obj,
         tag_list=tag_list,
         issue=issue,
         issueid=issueid,
         form=form,
-        repo_admin=is_repo_admin(repo),
     )
 
 
@@ -729,10 +701,7 @@ def delete_issue(repo, issueid, username=None):
     """ Delete the specified issue
     """
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if repo is None:
-        flask.abort(404, 'Project not found')
+    repo = flask.g.repo
 
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
@@ -742,7 +711,7 @@ def delete_issue(repo, issueid, username=None):
     if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
 
-    if not is_repo_admin(repo):
+    if not flask.g.repo_admin:
         flask.abort(
             403,
             'You are not allowed to remove tickets of this project')
@@ -778,10 +747,7 @@ def delete_issue(repo, issueid, username=None):
 def edit_issue(repo, issueid, username=None):
     """ Edit the specified issue
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if repo is None:
-        flask.abort(404, 'Project not found')
+    repo = flask.g.repo
 
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
@@ -791,7 +757,7 @@ def edit_issue(repo, issueid, username=None):
     if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
 
-    if not (is_repo_admin(repo)
+    if not (flask.g.repo_admin
             or flask.g.fas_user.username == issue.user.username):
         flask.abort(
             403, 'You are not allowed to edit issues for this project')
@@ -875,7 +841,6 @@ def edit_issue(repo, issueid, username=None):
         username=username,
         issue=issue,
         issueid=issueid,
-        repo_admin=is_repo_admin(repo),
     )
 
 
@@ -886,10 +851,7 @@ def edit_issue(repo, issueid, username=None):
 def upload_issue(repo, issueid, username=None):
     ''' Upload a file to a ticket.
     '''
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if repo is None:
-        flask.abort(404, 'Project not found')
+    repo = flask.g.repo
 
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
@@ -939,10 +901,7 @@ def view_issue_raw_file(repo, filename=None, username=None):
     """ Displays the raw content of a file of a commit for the specified
     ticket repo.
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if not repo:
-        flask.abort(404, 'Project not found')
+    repo = flask.g.repo
 
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
@@ -1004,10 +963,7 @@ def edit_comment_issue(repo, issueid, commentid, username=None):
     """
     is_js = flask.request.args.get('js', False)
 
-    project = pagure.lib.get_project(SESSION, repo, user=username)
-
-    if not project:
-        flask.abort(404, 'Project not found')
+    project = flask.g.repo
 
     if not project.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
@@ -1025,7 +981,7 @@ def edit_comment_issue(repo, issueid, commentid, username=None):
 
     if (flask.g.fas_user.username != comment.user.username
             or comment.parent.status != 'Open') \
-            and not is_repo_admin(project):
+            and not flask.g.repo_admin:
         flask.abort(403, 'You are not allowed to edit this comment')
 
     form = pagure.forms.EditCommentForm()
@@ -1072,5 +1028,4 @@ def edit_comment_issue(repo, issueid, commentid, username=None):
         form=form,
         comment=comment,
         is_js=is_js,
-        repo_admin=is_repo_admin(project),
     )

@@ -29,8 +29,7 @@ import pagure.exceptions
 import pagure.lib
 import pagure.lib.git
 import pagure.forms
-from pagure import (APP, SESSION, LOG, login_required, is_repo_admin,
-                    __get_file_in_tree)
+from pagure import APP, SESSION, LOG, login_required, __get_file_in_tree
 
 
 
@@ -189,7 +188,6 @@ def request_pulls(repo, username=None):
         select='requests',
         repo=repo,
         username=username,
-        repo_obj=repo_obj,
         requests=requests,
         oth_requests=oth_requests,
         status=status,
@@ -379,7 +377,7 @@ def request_pull_edit(repo, requestid, username=None):
     if request.status != 'Open':
         flask.abort(400, 'Pull-request is already closed')
 
-    if not is_repo_admin(repo) \
+    if not flask.g.repo_admin \
             and flask.g.fas_user.username != request.user.username:
         flask.abort(403, 'You are not allowed to edit this pull-request')
 
@@ -537,7 +535,7 @@ def pull_request_drop_comment(repo, requestid, username=None):
 
             if (flask.g.fas_user.username != comment.user.username
                     or comment.parent.status is False) \
-                    and not is_repo_admin(repo):
+                    and not flask.g.repo_admin:
                 flask.abort(
                     403,
                     'You are not allowed to remove this comment from '
@@ -589,7 +587,7 @@ def pull_request_edit_comment(repo, requestid, commentid, username=None):
 
     if (flask.g.fas_user.username != comment.user.username
             or comment.parent.status != 'Open') \
-            and not is_repo_admin(project):
+            and not flask.g.repo_admin:
         flask.abort(403, 'You are not allowed to edit the comment')
 
     form = pagure.forms.EditCommentForm()
@@ -635,7 +633,6 @@ def pull_request_edit_comment(repo, requestid, commentid, username=None):
         form=form,
         comment=comment,
         is_js=is_js,
-        repo_admin=is_repo_admin(project),
     )
 
 
@@ -664,7 +661,7 @@ def merge_request_pull(repo, requestid, username=None):
     if not request:
         flask.abort(404, 'Pull-request not found')
 
-    if not is_repo_admin(repo):
+    if not flask.g.repo_admin:
         flask.abort(
             403,
             'You are not allowed to merge pull-request for this project')
@@ -778,7 +775,7 @@ def set_assignee_requests(repo, requestid, username=None):
     if request.status != 'Open':
         flask.abort(403, 'Pull-request closed')
 
-    if not is_repo_admin(repo):
+    if not flask.g.repo_admin:
         flask.abort(403, 'You are not allowed to assign this pull-request')
 
     form = pagure.forms.ConfirmationForm()
@@ -895,7 +892,7 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
         return flask.redirect(flask.url_for(
             'view_repo', username=username, repo=repo.name))
 
-    repo_admin = is_repo_admin(repo)
+    repo_admin = flask.g.repo_admin
 
     form = pagure.forms.RequestPullForm()
     if form.validate_on_submit() and repo_admin:
@@ -952,7 +949,7 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
             SESSION.rollback()
             flask.flash(str(err), 'error')
 
-    if not is_repo_admin(repo):
+    if not flask.g.repo_admin:
         form = None
 
     # if the pull request we are creating only has one commit,
@@ -976,20 +973,19 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
                 contributing, _ = pagure.doc_utils.convert_readme(
                     contributing.data, 'md')
 
+    flask.g.branches = sorted(orig_repo.listall_branches())
+
     return flask.render_template(
         'pull_request.html',
         select='requests',
         repo=repo,
         username=username,
-        repo_obj=repo_obj,
         orig_repo=orig_repo,
         diff_commits=diff_commits,
         diff=diff,
         form=form,
-        branches=sorted(orig_repo.listall_branches()),
         branch_to=branch_to,
         branch_from=branch_from,
-        repo_admin=repo_admin,
         contributing=contributing,
     )
 
@@ -1014,7 +1010,7 @@ def new_remote_request_pull(repo, username=None):
     parentpath = pagure.get_repo_path(repo)
     orig_repo = pygit2.Repository(parentpath)
 
-    repo_admin = is_repo_admin(repo)
+    repo_admin = flask.g.repo_admin
 
     form = pagure.forms.RemoteRequestPullForm()
     if form.validate_on_submit():

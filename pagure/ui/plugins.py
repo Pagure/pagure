@@ -20,7 +20,7 @@ from pagure.hooks import BaseHook
 import pagure.exceptions
 import pagure.lib
 import pagure.forms
-from pagure import APP, SESSION, login_required, is_repo_admin
+from pagure import APP, SESSION, login_required
 from pagure.lib.model import BASE
 from pagure.exceptions import FileNotFoundException
 
@@ -79,12 +79,9 @@ def get_plugin(plugin_name):
 def view_plugin(repo, plugin, username=None, full=True):
     """ Presents the settings of the project.
     """
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = flask.g.repo
 
-    if not repo:
-        flask.abort(404, 'Project not found')
-
-    if not is_repo_admin(repo):
+    if not flask.g.repo_admin:
         flask.abort(
             403,
             'You are not allowed to change the settings for this project')
