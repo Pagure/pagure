@@ -177,8 +177,8 @@ def request_pulls(repo, username=None):
             author=author,
             count=True)
 
-    reponame = pagure.get_repo_path(repo)
-    repo_obj = pygit2.Repository(reponame)
+    reponame = flask.g.reponame
+    repo_obj = flask.g.repo_obj
     if not repo_obj.is_empty and not repo_obj.head_is_unborn:
         head = repo_obj.head.shorthand
     else:
@@ -718,23 +718,20 @@ def merge_request_pull(repo, requestid, username=None):
 def cancel_request_pull(repo, requestid, username=None):
     """ Cancel request pulling request.
     """
-    reponame=repo
 
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
 
-        repo = flask.g.repo
-
-        if not repo.settings.get('pull_requests', True):
+        if not flask.g.repo.settings.get('pull_requests', True):
             flask.abort(404, 'No pull-requests found for this project')
 
         request = pagure.lib.search_pull_requests(
-            SESSION, project_id=repo.id, requestid=requestid)
+            SESSION, project_id=flask.g.repo.id, requestid=requestid)
 
         if not request:
             flask.abort(404, 'Pull-request not found')
 
-        if not is_repo_admin(repo) \
+        if not flask.g.repo_admin \
                 and not flask.g.fas_user.username == request.user.username:
             flask.abort(
                 403,
@@ -756,7 +753,7 @@ def cancel_request_pull(repo, requestid, username=None):
     else:
         flask.flash('Invalid input submitted', 'error')
 
-    return flask.redirect(flask.url_for('view_repo', repo=reponame))
+    return flask.redirect(flask.url_for('view_repo', repo=repo))
 
 
 @APP.route(
