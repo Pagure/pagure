@@ -1060,7 +1060,7 @@ def merge_pull_request(
                 commit = repo_commit.oid.hex
             else:
                 tree = new_repo.index.write_tree()
-                user_obj = pagure.lib.__get_user(session, username)
+                user_obj = pagure.lib.get_user(session, username)
                 author = pygit2.Signature(
                     user_obj.fullname.encode('utf-8'),
                     user_obj.default_email.encode('utf-8'))
@@ -1097,7 +1097,7 @@ def merge_pull_request(
 
         if domerge:
             head = new_repo.lookup_reference('HEAD').get_object()
-            user_obj = pagure.lib.__get_user(session, username)
+            user_obj = pagure.lib.get_user(session, username)
             author = pygit2.Signature(
                 user_obj.fullname.encode('utf-8'),
                 user_obj.default_email.encode('utf-8'))

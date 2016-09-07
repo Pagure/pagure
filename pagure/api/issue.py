@@ -78,7 +78,7 @@ def api_new_issue(repo, username=None):
     if repo != flask.g.token.project:
         raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
-    user_obj = pagure.lib.__get_user(
+    user_obj = pagure.lib.get_user(
         SESSION, flask.g.fas_user.username)
     if not user_obj:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOUSER)

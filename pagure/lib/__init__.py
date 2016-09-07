@@ -69,7 +69,7 @@ def set_pagure_ci(services):
     PAGURE_CI = services
 
 
-def __get_user(session, key):
+def get_user(session, key):
     """ Searches for a user in the database for a given username or email.
     """
     user_obj = search_user(session, username=key)
@@ -225,7 +225,7 @@ def create_user_ssh_keys_on_disk(user, gitolite_keydir):
 def add_issue_comment(session, issue, comment, user, ticketfolder,
                       notify=True, date_created=None, notification=False):
     ''' Add a comment to an issue. '''
-    user_obj = __get_user(session, user)
+    user_obj = get_user(session, user)
 
     issue_comment = model.IssueComment(
         issue_uid=issue.uid,
@@ -281,7 +281,7 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
 
 def add_tag_obj(session, obj, tags, user, ticketfolder):
     ''' Add a tag to an object (either an issue or a project). '''
-    user_obj = __get_user(session, user)
+    user_obj = get_user(session, user)
 
     if isinstance(tags, basestring):
         tags = [tags]
@@ -350,7 +350,7 @@ def add_tag_obj(session, obj, tags, user, ticketfolder):
 def add_issue_assignee(session, issue, assignee, user, ticketfolder,
                        notify=True):
     ''' Add an assignee to an issue, in other words, assigned an issue. '''
-    user_obj = __get_user(session, user)
+    user_obj = get_user(session, user)
 
     if assignee is None and issue.assignee is not None:
         issue.assignee_id = None
@@ -384,7 +384,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder,
         return
 
     # Validate the assignee
-    assignee_obj = __get_user(session, assignee)
+    assignee_obj = get_user(session, assignee)
 
     if issue.assignee_id != assignee_obj.id:
         issue.assignee_id = assignee_obj.id
@@ -419,8 +419,8 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder,
 def add_pull_request_assignee(
         session, request, assignee, user, requestfolder):
     ''' Add an assignee to a request, in other words, assigned an issue. '''
-    __get_user(session, assignee)
-    user_obj = __get_user(session, user)
+    get_user(session, assignee)
+    user_obj = get_user(session, user)
 
     if assignee is None and request.assignee is not None:
         request.assignee_id = None
@@ -446,7 +446,7 @@ def add_pull_request_assignee(
         return
 
     # Validate the assignee
-    assignee_obj = __get_user(session, assignee)
+    assignee_obj = get_user(session, assignee)
 
     if request.assignee_id != assignee_obj.id:
         request.assignee_id = assignee_obj.id
@@ -475,7 +475,7 @@ def add_pull_request_assignee(
 def add_issue_dependency(
         session, issue, issue_blocked, user, ticketfolder):
     ''' Add a dependency between two issues. '''
-    user_obj = __get_user(session, user)
+    user_obj = get_user(session, user)
 
     if issue.uid == issue_blocked.uid:
         raise pagure.exceptions.PagureException(
@@ -534,7 +534,7 @@ def add_issue_dependency(
 def remove_issue_dependency(
         session, issue, issue_blocked, user, ticketfolder):
     ''' Remove a dependency between two issues. '''
-    user_obj = __get_user(session, user)
+    user_obj = get_user(session, user)
 
     if issue.uid == issue_blocked.uid:
         raise pagure.exceptions.PagureException(
@@ -593,7 +593,7 @@ def remove_issue_dependency(
 
 def remove_tags(session, project, tags, ticketfolder, user):
     ''' Removes the specified tag of a project. '''
-    user_obj = __get_user(session, user)
+    user_obj = get_user(session, user)
 
     if not isinstance(tags, list):
         tags = [tags]
@@ -634,7 +634,7 @@ def remove_tags(session, project, tags, ticketfolder, user):
 def remove_tags_obj(
         session, obj, tags, ticketfolder, user):
     ''' Removes the specified tag(s) of a given object. '''
-    user_obj = __get_user(session, user)
+    user_obj = get_user(session, user)
 
     if isinstance(tags, basestring):
         tags = [tags]
@@ -672,7 +672,7 @@ def remove_tags_obj(
 
 def edit_issue_tags(session, project, old_tag, new_tag, ticketfolder, user):
     ''' Removes the specified tag of a project. '''
-    user_obj = __get_user(session, user)
+    user_obj = get_user(session, user)
 
     if old_tag == new_tag:
         raise pagure.exceptions.PagureException(
@@ -738,8 +738,8 @@ def edit_issue_tags(session, project, old_tag, new_tag, ticketfolder, user):
 
 def add_user_to_project(session, project, new_user, user):
     ''' Add a specified user to a specified project. '''
-    new_user_obj = __get_user(session, new_user)
-    user_obj = __get_user(session, user)
+    new_user_obj = get_user(session, new_user)
+    user_obj = get_user(session, user)
 
     users = set([user.user for user in project.users])
     users.add(project.user.user)
@@ -834,7 +834,7 @@ def add_pull_request_comment(session, request, commit, tree_id, filename,
                              row, comment, user, requestfolder,
                              notify=True, notification=False):
     ''' Add a comment to a pull-request. '''
-    user_obj = __get_user(session, user)
+    user_obj = get_user(session, user)
 
     pr_comment = model.PullRequestComment(
         pull_request_uid=request.uid,
@@ -902,7 +902,7 @@ def add_pull_request_comment(session, request, commit, tree_id, filename,
 def edit_comment(session, parent, comment, user,
                  updated_comment, folder):
     ''' Edit a comment. '''
-    user_obj = __get_user(session, user)
+    user_obj = get_user(session, user)
     comment.comment = updated_comment
     comment.edited_on = datetime.datetime.utcnow()
     comment.editor = user_obj
@@ -963,7 +963,7 @@ def edit_comment(session, parent, comment, user,
 def add_pull_request_flag(session, request, username, percent, comment, url,
                           uid, user, requestfolder):
     ''' Add a flag to a pull-request. '''
-    user_obj = __get_user(session, user)
+    user_obj = get_user(session, user)
 
     action = 'added'
     pr_flag = get_pull_request_flag_by_uid(session, uid)
@@ -1016,7 +1016,7 @@ def new_project(session, user, name, blacklist, allowed_prefix,
             'conflicts in URLs with pagure itself' % name
         )
 
-    user_obj = __get_user(session, user)
+    user_obj = get_user(session, user)
     allowed_prefix = allowed_prefix + [grp for grp in user_obj.groups]
 
     first_part, _, second_part = name.partition('/')
@@ -1136,7 +1136,7 @@ def new_issue(session, repo, title, content, user, ticketfolder,
               issue_id=None, issue_uid=None, private=False, status=None,
               notify=True, date_created=None):
     ''' Create a new issue for the specified repo. '''
-    user_obj = __get_user(session, user)
+    user_obj = get_user(session, user)
 
     issue = model.Issue(
         id=issue_id or get_next_id(session, repo.id),
@@ -1179,7 +1179,7 @@ def new_issue(session, repo, title, content, user, ticketfolder,
 
 def drop_issue(session, issue, user, ticketfolder):
     ''' Delete a specified issue. '''
-    user_obj = __get_user(session, user)
+    user_obj = get_user(session, user)
 
     private = issue.private
     session.delete(issue)
@@ -1217,7 +1217,7 @@ def new_pull_request(session, branch_from,
             'Invalid input, you must specify either a local repo or a '
             'remote one')
 
-    user_obj = __get_user(session, user)
+    user_obj = get_user(session, user)
 
     request = model.PullRequest(
         id=requestid or get_next_id(session, repo_to.id),
@@ -1267,7 +1267,7 @@ def edit_issue(session, issue, ticketfolder, user,
                priority=None, private=False):
     ''' Edit the specified issue.
     '''
-    user_obj = __get_user(session, user)
+    user_obj = get_user(session, user)
 
     if status == 'Fixed' and issue.parents:
         for parent in issue.parents:
@@ -1348,7 +1348,7 @@ def edit_issue(session, issue, ticketfolder, user,
 
 def update_project_settings(session, repo, settings, user):
     ''' Update the settings of a project. '''
-    user_obj = __get_user(session, user)
+    user_obj = get_user(session, user)
 
     update = []
     new_settings = repo.settings
@@ -1405,7 +1405,7 @@ def fork_project(session, user, repo, gitfolder,
         raise pagure.exceptions.RepoExistsException(
             'Repo "forks/%s/%s" already exists' % (user, repo.name))
 
-    user_obj = __get_user(session, user)
+    user_obj = get_user(session, user)
 
     project = model.Project(
         name=repo.name,
@@ -1955,7 +1955,7 @@ def search_pull_requests(
 def close_pull_request(session, request, user, requestfolder, merged=True):
     ''' Close the provided pull-request.
     '''
-    user_obj = __get_user(session, user)
+    user_obj = get_user(session, user)
 
     if merged is True:
         request.status = 'Merged'
@@ -2156,7 +2156,7 @@ def add_email_to_user(session, user, user_email):
 def update_user_ssh(session, user, ssh_key, keydir):
     ''' Set up a new user into the database or update its information. '''
     if isinstance(user, basestring):
-        user = __get_user(session, user)
+        user = get_user(session, user)
 
     user.public_ssh_key = ssh_key
     if keydir and user.public_ssh_key:
@@ -2881,7 +2881,7 @@ def get_pull_request_of_user(session, username):
 def update_watch_status(session, project, user, watch):
     ''' Update the user status for watching a project.
     '''
-    user_obj = __get_user(session, user)
+    user_obj = get_user(session, user)
 
     if not user_obj:
         raise pagure.exceptions.PagureException(

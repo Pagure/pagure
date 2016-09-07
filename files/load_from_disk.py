@@ -91,7 +91,7 @@ def main(folder, debug=False):
                     'conflicts in URLs with pagure itself' % name
                 )
 
-            user_obj = pagure.lib.__get_user(pagure.SESSION, pocs[orig_name])
+            user_obj = pagure.lib.get_user(pagure.SESSION, pocs[orig_name])
             allowed_prefix = pagure.APP.config[
                 'ALLOWED_PREFIX'] + [grp for grp in user_obj.groups]
 

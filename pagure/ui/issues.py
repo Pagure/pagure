@@ -562,7 +562,7 @@ def new_issue(repo, username=None):
         private = form.private.data
 
         try:
-            user_obj = pagure.lib.__get_user(
+            user_obj = pagure.lib.get_user(
                 SESSION, flask.g.fas_user.username)
         except pagure.exceptions.PagureException:
             flask.abort(
@@ -771,7 +771,7 @@ def edit_issue(repo, issueid, username=None):
         private = form.private.data
 
         try:
-            user_obj = pagure.lib.__get_user(
+            user_obj = pagure.lib.get_user(
                 SESSION, flask.g.fas_user.username)
         except pagure.exceptions.PagureException:
             flask.abort(
@@ -862,7 +862,7 @@ def upload_issue(repo, issueid, username=None):
         flask.abort(404, 'Issue not found')
 
     try:
-        user_obj = pagure.lib.__get_user(
+        user_obj = pagure.lib.get_user(
             SESSION, flask.g.fas_user.username)
     except pagure.exceptions.PagureException:
         flask.abort(
