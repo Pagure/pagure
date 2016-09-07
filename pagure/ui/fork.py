@@ -30,7 +30,7 @@ import pagure.lib
 import pagure.lib.git
 import pagure.forms
 from pagure import (APP, SESSION, LOG, login_required, is_repo_admin,
-                    __get_file_in_tree, repo_method)
+                    __get_file_in_tree)
 
 
 
@@ -133,7 +133,6 @@ def _get_pr_info(repo_obj, orig_repo, branch_from, branch_to):
 @APP.route('/<repo:repo>/pull-requests')
 @APP.route('/fork/<username>/<repo:repo>/pull-requests/')
 @APP.route('/fork/<username>/<repo:repo>/pull-requests')
-@repo_method
 def request_pulls(repo, username=None):
     """ Request pulling the changes from the fork into the project.
     """
@@ -205,7 +204,6 @@ def request_pulls(repo, username=None):
 @APP.route('/<repo:repo>/pull-request/<int:requestid>')
 @APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/')
 @APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>')
-@repo_method
 def request_pull(repo, requestid, username=None):
     """ Request pulling the changes from the fork into the project.
     """
@@ -289,7 +287,6 @@ def request_pull(repo, requestid, username=None):
 
 @APP.route('/<repo:repo>/pull-request/<int:requestid>.patch')
 @APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>.patch')
-@repo_method
 def request_pull_patch(repo, requestid, username=None):
     """ Returns the commits from the specified pull-request as patches.
     """
@@ -364,7 +361,6 @@ def request_pull_patch(repo, requestid, username=None):
 @APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/edit',
            methods=('GET', 'POST'))
 @login_required
-@repo_method
 def request_pull_edit(repo, requestid, username=None):
     """ Edit the title of a pull-request.
     """
@@ -427,7 +423,6 @@ def request_pull_edit(repo, requestid, username=None):
 @APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/comment/'
            '<commit>/<path:filename>/<row>', methods=('GET', 'POST'))
 @login_required
-@repo_method
 def pull_request_add_comment(
         repo, requestid, commit=None,
         filename=None, row=None, username=None):
@@ -508,7 +503,6 @@ def pull_request_add_comment(
     '/fork/<username>/<repo:repo>/pull-request/<int:requestid>/comment/drop',
     methods=['POST'])
 @login_required
-@repo_method
 def pull_request_drop_comment(repo, requestid, username=None):
     """ Delete a comment of a pull-request.
     """
@@ -571,7 +565,6 @@ def pull_request_drop_comment(repo, requestid, username=None):
     '/fork/<username>/<repo:repo>/pull-request/<int:requestid>/comment'
     '/<int:commentid>/edit', methods=('GET', 'POST'))
 @login_required
-@repo_method
 def pull_request_edit_comment(repo, requestid, commentid, username=None):
     """Edit comment of a pull request
     """
@@ -650,7 +643,6 @@ def pull_request_edit_comment(repo, requestid, commentid, username=None):
 @APP.route('/fork/<username>/<repo:repo>/pull-request/<int:requestid>/merge',
            methods=['POST'])
 @login_required
-@repo_method
 def merge_request_pull(repo, requestid, username=None):
     """ Request pulling the changes from the fork into the project.
     """
@@ -723,7 +715,6 @@ def merge_request_pull(repo, requestid, username=None):
 @APP.route('/fork/<username>/<repo:repo>/pull-request/cancel/<int:requestid>',
            methods=['POST'])
 @login_required
-@repo_method
 def cancel_request_pull(repo, requestid, username=None):
     """ Cancel request pulling request.
     """
@@ -774,7 +765,6 @@ def cancel_request_pull(repo, requestid, username=None):
     '/fork/<username>/<repo:repo>/pull-request/<int:requestid>/assign',
     methods=['POST'])
 @login_required
-@repo_method
 def set_assignee_requests(repo, requestid, username=None):
     ''' Assign a pull-request. '''
     repo = flask.g.repo
@@ -826,7 +816,6 @@ def set_assignee_requests(repo, requestid, username=None):
 @APP.route('/do_fork/<repo:repo>', methods=['POST'])
 @APP.route('/do_fork/fork/<username>/<repo:repo>', methods=['POST'])
 @login_required
-@repo_method
 def fork_project(repo, username=None):
     """ Fork the project specified into the user's namespace
     """
@@ -881,7 +870,6 @@ def fork_project(repo, username=None):
 @APP.route(
     '/fork/<username>/<repo:repo>/diff/<path:branch_to>..<path:branch_from>',
     methods=('GET', 'POST'))
-@repo_method
 def new_request_pull(repo, branch_to, branch_from, username=None):
     """ Request pulling the changes from the fork into the project.
     """
@@ -1016,7 +1004,6 @@ def new_request_pull(repo, branch_to, branch_from, username=None):
 @APP.route(
     '/fork/<username>/<repo:repo>/diff/remote', methods=('GET', 'POST'))
 @login_required
-@repo_method
 def new_remote_request_pull(repo, username=None):
     """ Request pulling the changes from a remote fork into the project.
     """
@@ -1157,7 +1144,6 @@ def new_remote_request_pull(repo, username=None):
     '/fork_edit/fork/<username>/<repo:repo>/edit/<path:branchname>/'
     'f/<path:filename>', methods=['POST'])
 @login_required
-@repo_method
 def fork_edit_file(repo, branchname, filename, username=None):
     """ Fork the project specified and open the specific file to edit
     """
