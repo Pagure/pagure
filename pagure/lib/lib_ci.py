@@ -24,19 +24,6 @@ BUILD_STATS = {
 }
 
 
-def get_project_by_ci_token(session, ci_token):
-    """ Return the project corresponding to the provided ci_token. """
-    query = session.query(
-        model.Project
-    ).filter(
-        model.Project.id == pagure_ci.PagureCITable.project_id
-    ).filter(
-        pagure_ci.PagureCITable.pagure_ci_token == ci_token
-    )
-
-    return query.first()
-
-
 def process_jenkins_build(session, project, build_id, requestfolder):
     """  Gets the build info from jenkins and flags that particular
     pull-request.
