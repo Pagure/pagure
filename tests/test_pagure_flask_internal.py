@@ -822,6 +822,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/test/adduser')
+            self.assertEqual(output.status_code, 200)
             csrf_token = output.data.split(
                 b'name="csrf_token" type="hidden" value="')[1].split(b'">')[0]
 
