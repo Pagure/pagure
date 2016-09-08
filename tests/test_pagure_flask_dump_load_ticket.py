@@ -207,6 +207,7 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         pagure.lib.git.update_ticket_from_git(
             self.session,
             reponame='test',
+            namespace=None,
             username=None,
             issue_uid='foobar',
             json_data=jsondata,

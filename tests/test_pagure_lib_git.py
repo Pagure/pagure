@@ -853,13 +853,14 @@ index 0000000..60f7480
             pagure.lib.git.update_ticket_from_git,
             self.session,
             reponame='foobar',
+            namespace=None,
             username=None,
             issue_uid='foobar',
             json_data=data
         )
 
         pagure.lib.git.update_ticket_from_git(
-            self.session, reponame='test', username=None,
+            self.session, reponame='test', namespace=None, username=None,
             issue_uid='foobar', json_data=data
         )
         self.session.commit()
@@ -874,7 +875,7 @@ index 0000000..60f7480
 
         data["title"] = "fake issue for tests"
         pagure.lib.git.update_ticket_from_git(
-            self.session, reponame='test', username=None,
+            self.session, reponame='test', namespace=None, username=None,
             issue_uid='foobar', json_data=data
         )
         self.session.commit()
@@ -937,7 +938,7 @@ index 0000000..60f7480
         }
 
         pagure.lib.git.update_ticket_from_git(
-            self.session, reponame='test', username=None,
+            self.session, reponame='test', namespace=None, username=None,
             issue_uid='foobar2', json_data=data
         )
 
@@ -1100,6 +1101,7 @@ index 0000000..60f7480
             pagure.lib.git.update_request_from_git,
             self.session,
             reponame='foobar',
+            namespace=None,
             username=None,
             request_uid='d4182a2ac2d541d884742d3037c26e56',
             json_data=data,
@@ -1112,6 +1114,7 @@ index 0000000..60f7480
         pagure.lib.git.update_request_from_git(
             self.session,
             reponame='test',
+            namespace=None,
             username=None,
             request_uid='d4182a2ac2d541d884742d3037c26e56',
             json_data=data,
@@ -1215,6 +1218,7 @@ index 0000000..60f7480
         pagure.lib.git.update_request_from_git(
             self.session,
             reponame='test',
+            namespace=None,
             username=None,
             request_uid='d4182a2ac2d541d884742d3037c26e57',
             json_data=data,

@@ -43,21 +43,26 @@ class PagureLibLinktests(tests.Modeltests):
         """ Test the get_relation function of pagure.lib.link with relates.
         """
 
-        self.assertEqual(
-            pagure.lib.link.get_relation(
-                self.session,
-                'test',
-                None,
-                COMMENTS[0],
-                'relates',
-            ),
-            []
+        link = pagure.lib.link.get_relation(
+            self.session,
+            reponame='test',
+            namespace=None,
+            username=None,
+            text=COMMENTS[0],
+            reftype='relates',
         )
+        self.assertEqual(link, [])
 
         tests.create_projects(self.session)
 
         link = pagure.lib.link.get_relation(
-            self.session, 'test', None, COMMENTS[4], 'relates')
+            self.session,
+            reponame='test',
+            namespace=None,
+            username=None,
+            text=COMMENTS[4],
+            reftype='relates',
+        )
         self.assertEqual(link, [])
 
         # Create the issue
@@ -75,7 +80,12 @@ class PagureLibLinktests(tests.Modeltests):
 
         for idx, comment in enumerate(COMMENTS):
             link = pagure.lib.link.get_relation(
-                self.session, 'test', None, comment, 'relates')
+                self.session,
+                reponame='test',
+                namespace=None,
+                username=None,
+                text=comment,
+                reftype='relates')
             if idx == 4:
                 self.assertEqual(
                     str(link),
@@ -84,7 +94,13 @@ class PagureLibLinktests(tests.Modeltests):
                 self.assertEqual(link, [])
 
         link = pagure.lib.link.get_relation(
-            self.session, 'test', None, COMMENTS[5], 'relates')
+            self.session,
+            reponame='test',
+            namespace=None,
+            username=None,
+            text=COMMENTS[5],
+            reftype='relates',
+        )
         self.assertEqual(link, [])
 
         # Create the issue
@@ -102,7 +118,12 @@ class PagureLibLinktests(tests.Modeltests):
 
         for idx, comment in enumerate(COMMENTS):
             link = pagure.lib.link.get_relation(
-                self.session, 'test', None, comment, 'relates')
+                self.session,
+                reponame='test',
+                namespace=None,
+                username=None,
+                text=comment,
+                reftype='relates')
             if idx == 4:
                 self.assertEqual(
                     str(link),
@@ -118,21 +139,26 @@ class PagureLibLinktests(tests.Modeltests):
         """ Test the get_relation function of pagure.lib.link with fixes.
         """
 
-        self.assertEqual(
-            pagure.lib.link.get_relation(
-                self.session,
-                'test',
-                None,
-                COMMENTS[0],
-                'fixes',
-            ),
-            []
+        link = pagure.lib.link.get_relation(
+            self.session,
+            reponame='test',
+            namespace=None,
+            username=None,
+            text=COMMENTS[0],
+            reftype='fixes',
         )
+        self.assertEqual(link, [])
 
         tests.create_projects(self.session)
 
         link = pagure.lib.link.get_relation(
-            self.session, 'test', None, COMMENTS[2], 'fixes')
+            self.session,
+            reponame='test',
+            namespace=None,
+            username=None,
+            text=COMMENTS[2],
+            reftype='fixes',
+        )
         self.assertEqual(link, [])
 
         # Create the issue
@@ -150,7 +176,12 @@ class PagureLibLinktests(tests.Modeltests):
 
         for idx, comment in enumerate(COMMENTS):
             link = pagure.lib.link.get_relation(
-                self.session, 'test', None, comment, 'fixes')
+                self.session,
+                reponame='test',
+                namespace=None,
+                username=None,
+                text=comment,
+                reftype='fixes')
             if idx == 2:
                 self.assertEqual(
                     str(link),
