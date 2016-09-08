@@ -712,7 +712,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,83 @@
+@@ -0,0 +1,85 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
@@ -730,6 +730,7 @@ index 0000000..60f7480
 +        "description": "test project for ticket",
 +        "id": 1,
 +        "name": "test_ticket_repo",
++        "namespace": null,
 +        "parent": null,
 +        "priorities": {},
 +        "settings": {
@@ -759,6 +760,7 @@ index 0000000..60f7480
 +        "description": "test project for ticket",
 +        "id": 1,
 +        "name": "test_ticket_repo",
++        "namespace": null,
 +        "parent": null,
 +        "priorities": {},
 +        "settings": {
