@@ -1397,6 +1397,37 @@ index 0000000..60f7480
             tests.HERE, 'forks', 'pingou', 'fooo/bar/foo.test.git'))
         self.assertEqual(repo_name, 'pingou')
 
+    def test_get_repo_namespace(self):
+        """ Test the get_repo_namespace method of pagure.lib.git. """
+        repo_name = pagure.lib.git.get_repo_namespace(
+            os.path.join(tests.HERE, 'repos', 'test_ticket_repo.git'))
+        self.assertEqual(repo_name, None)
+
+        repo_name = pagure.lib.git.get_repo_namespace(
+            os.path.join(tests.HERE, 'repos', 'foo/bar/baz/test.git'))
+        self.assertEqual(repo_name, 'foo/bar/baz')
+
+        repo_name = pagure.lib.git.get_repo_namespace(
+            os.path.join(tests.HERE, 'repos', 'foo.test.git'))
+        self.assertEqual(repo_name, None)
+
+        repo_name = pagure.lib.git.get_repo_namespace(os.path.join(
+            tests.HERE, 'repos', 'forks', 'user', 'foo.test.git'))
+        self.assertEqual(repo_name, None)
+
+        repo_name = pagure.lib.git.get_repo_namespace(os.path.join(
+            tests.HERE, 'repos', 'forks', 'user', 'bar/foo.test.git'))
+        self.assertEqual(repo_name, 'bar')
+
+        repo_name = pagure.lib.git.get_repo_namespace(os.path.join(
+            tests.HERE, 'repos', 'forks', 'user', 'ns/bar/foo.test.git'))
+        self.assertEqual(repo_name, 'ns/bar')
+
+        repo_name = pagure.lib.git.get_repo_namespace(os.path.join(
+            tests.HERE, 'repos', 'forks', 'user', '/bar/foo.test.git'))
+        self.assertEqual(repo_name, 'bar')
+
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibGittests)
