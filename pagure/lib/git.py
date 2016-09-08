@@ -940,7 +940,7 @@ def get_repo_namespace(abspath):
         projectname = short_path
 
     if '/' in projectname:
-        namespace = projectname.split('/', 1)[0]
+        namespace = projectname.rsplit('/', 1)[0]
 
     return namespace
 
