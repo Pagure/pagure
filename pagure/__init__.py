@@ -381,12 +381,13 @@ def set_variables():
     # Check if there is a `repo` and an `username`
     repo = args.get('repo')
     username = args.get('username')
+    namespace = args.get('namespace')
 
     # If there isn't a `repo` in the URL path, or if there is but the
     # endpoint called is part of the API, just don't do anything
     if repo:
         flask.g.repo = pagure.lib.get_project(
-            SESSION, repo, user=username)
+            SESSION, repo, user=username, namespace=namespace)
 
         if flask.g.repo is None:
             flask.abort(404, 'Project not found')
