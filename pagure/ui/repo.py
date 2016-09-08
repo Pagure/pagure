@@ -78,19 +78,6 @@ def view_repo(repo, username=None, namespace=None):
     reponame = flask.g.reponame
     repo_obj = flask.g.repo_obj
 
-    #if not repo_db and not APP.config.get('OLD_VIEW_COMMIT_ENABLED', False):
-        #repo_db = pagure.lib.get_project(
-            #SESSION, namespace, user=username, namespace=None)
-
-    if not repo_db and APP.config.get('OLD_VIEW_COMMIT_ENABLED', False) \
-            and len(repo) == 40:
-        return flask.redirect(flask.url_for(
-            'view_commit', repo=namespace, commitid=repo, username=username,
-            namespace=None))
-
-    if repo_db is None:
-        flask.abort(404, 'Project not found')
-
     if not repo_obj.is_empty and not repo_obj.head_is_unborn:
         head = repo_obj.head.shorthand
     else:
@@ -1888,7 +1875,6 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
 def delete_branch(repo, branchname, username=None, namespace=None):
     """ Delete the branch of a project.
     """
-    repo = flask.g.repo
     reponame = flask.g.reponame
     repo_obj = flask.g.repo_obj
 

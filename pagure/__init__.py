@@ -389,6 +389,13 @@ def set_variables():
         flask.g.repo = pagure.lib.get_project(
             SESSION, repo, user=username, namespace=namespace)
 
+        if not flask.g.repo \
+            and APP.config.get('OLD_VIEW_COMMIT_ENABLED', False) \
+            and len(repo) == 40:
+            return flask.redirect(flask.url_for(
+                'view_commit', repo=namespace, commitid=repo,
+                username=username, namespace=None))
+
         if flask.g.repo is None:
             flask.abort(404, 'Project not found')
 
