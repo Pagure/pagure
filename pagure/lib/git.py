@@ -414,7 +414,7 @@ def get_project_from_json(
 
 
 def update_ticket_from_git(
-        session, reponame,namespace,  username, issue_uid, json_data):
+        session, reponame, namespace,  username, issue_uid, json_data):
     """ Update the specified issue (identified by its unique identifier)
     with the data present in the json blob provided.
 
@@ -430,7 +430,7 @@ def update_ticket_from_git(
         session, reponame, user=username, namespace=namespace)
     if not repo:
         raise pagure.exceptions.PagureException(
-            'Unknown repo %s of username: %s in namespace: ' % (
+            'Unknown repo %s of username: %s in namespace: %s' % (
                 reponame, username, namespace))
 
     user = get_user_from_json(session, json_data)
