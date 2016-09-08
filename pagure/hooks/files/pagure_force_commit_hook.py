@@ -1,8 +1,7 @@
 #! /usr/bin/env python2
 
 
-"""Pagure specific hook to add comment on issues if the commits fixes or
-relates to an issue.
+"""Pagure specific hook to block non-fastforward pushes.
 """
 
 import os
@@ -27,14 +26,18 @@ abspath = os.path.abspath(os.environ['GIT_DIR'])
 
 def run_as_pre_receive_hook():
     reponame = pagure.lib.git.get_repo_name(abspath)
+    namespace = pagure.lib.git.get_repo_namespace(abspath)
     username = pagure.lib.git.get_username(abspath)
     if pagure.APP.config.get('HOOK_DEBUG', False):
-        print 'repo:', reponame
-        print 'user:', username
+        print 'repo:     ', reponame
+        print 'user:     ', username
+        print 'namspaces:', namespace
 
-    repo = pagure.lib.get_project(pagure.SESSION, reponame, user=username)
+    repo = pagure.lib.get_project(
+        pagure.SESSION, reponame, user=username, namespace=namespace)
     if not repo:
-        print 'Unknown repo %s of username: %s' % (reponame, username)
+        print 'Unknown repo %s of username: %s in namespace %s' % (
+            reponame, username, namespace)
         sys.exit(1)
 
     plugin = pagure.ui.plugins.get_plugin('Block non fast-forward pushes')

@@ -29,11 +29,14 @@ abspath = os.path.abspath(os.environ['GIT_DIR'])
 def run_as_post_receive_hook():
     reponame = pagure.lib.git.get_repo_name(abspath)
     username = pagure.lib.git.get_username(abspath)
+    namespace = pagure.lib.git.get_repo_namespace(abspath)
     if pagure.APP.config.get('HOOK_DEBUG', False):
-        print 'repo:', reponame
-        print 'user:', username
+        print 'repo:     ', reponame
+        print 'user:     ', username
+        print 'namespace:', namespace
 
-    repo = pagure.lib.get_project(pagure.SESSION, reponame, user=username)
+    repo = pagure.lib.get_project(
+        pagure.SESSION, reponame, user=username, namespace=namespace)
     if not repo:
         print 'Unknown repo %s of username: %s' % (reponame, username)
         sys.exit(1)

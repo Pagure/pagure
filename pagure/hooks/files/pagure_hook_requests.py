@@ -67,7 +67,8 @@ def run_as_post_receive_hook():
 
     reponame = pagure.lib.git.get_repo_name(abspath)
     username = pagure.lib.git.get_username(abspath)
-    print 'repo:', reponame, username
+    namespace = pagure.lib.git.get_repo_namespace(abspath)
+    print 'repo:', reponame, username, namespace
 
     for filename in file_list:
         print 'To load: %s' % filename
@@ -84,6 +85,7 @@ def run_as_post_receive_hook():
             pagure.lib.git.update_request_from_git(
                 pagure.SESSION,
                 reponame=reponame,
+                namespace=namespace,
                 username=username,
                 request_uid=filename,
                 json_data=json_data,

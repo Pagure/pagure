@@ -40,8 +40,8 @@ RELATES = [
 ]
 
 
-def get_relation(session, reponame, username, text, reftype='relates',
-                 include_prs=False):
+def get_relation(session, reponame, namespace, username, text,
+                 reftype='relates', include_prs=False):
     ''' For a given text, searches using regex if the text contains
     reference to another issue in this project or another one.
 
@@ -57,7 +57,8 @@ def get_relation(session, reponame, username, text, reftype='relates',
 
     '''
 
-    repo = pagure.lib.get_project(session, reponame, user=username)
+    repo = pagure.lib.get_project(
+        session, reponame, user=username, namespace=namespace)
     if not repo:
         return []
 
