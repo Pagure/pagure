@@ -915,7 +915,8 @@ def get_author_email(commit, abspath):
 def get_repo_name(abspath):
     ''' Return the name of the git repo based on its path.
     '''
-    repo_name = '.'.join(abspath.split(os.path.sep)[-1].split('.')[:-1])
+    repo_name = '.'.join(
+        abspath.rsplit(os.path.sep, 1)[-1].rsplit('.', 1)[:-1])
     return repo_name
 
 
