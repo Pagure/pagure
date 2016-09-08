@@ -928,17 +928,19 @@ def get_repo_namespace(abspath):
     ''' Return the name of the git repo based on its path.
     '''
     namespace = None
-    repo_name = '.'.join(
-        abspath.rsplit(os.path.sep, 1)[-1].rsplit('.', 1)[:-1])
 
-    if '/forks/' in abspath:
-        namespace = abspath.split('/forks/', 1)[-1].split('/', 1)[0]
-        if namespace == repo_name:
-            namespace = None
+    short_path = os.path.abspath(abspath).replace(
+        os.path.abspath(pagure.APP.config['GIT_FOLDER']),
+        ''
+    ).strip('/')
+
+    if short_path.startswith('forks/'):
+        username, projectname = short_path.split('forks/', 1)[1].split('/', 1)
     else:
-        namespace = os.path.abspath(abspath.rsplit('/', 1)[0])
-        if namespace == os.path.abspath(pagure.APP.config['GIT_FOLDER']):
-            namespace = None
+        projectname = short_path
+
+    if '/' in projectname:
+        namespace = projectname.split('/', 1)[0]
 
     return namespace
 
