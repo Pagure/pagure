@@ -4,7 +4,7 @@
 {% block title %}
   {%- if pull_request -%}
     PR#{{ requestid }}: {{ pull_request.title | noJS(ignore="img")}}
-  {%- elif form and (g.repo_admin or remote_git) %}
+  {%- elif form and (g.repo_admin or remote_git) -%}
     Create new Pull Request for {{ branch_to }}
   {%- elif origin == 'compare_commits' -%}
     Diff from {{ commit1 }} to {{ commit2 }}
