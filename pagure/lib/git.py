@@ -920,6 +920,25 @@ def get_repo_name(abspath):
     return repo_name
 
 
+def get_repo_namespace(abspath):
+    ''' Return the name of the git repo based on its path.
+    '''
+    namespace = None
+    repo_name = '.'.join(
+        abspath.rsplit(os.path.sep, 1)[-1].rsplit('.', 1)[:-1])
+
+    if '/forks/' in abspath:
+        namespace = abspath.split('/forks/', 1)[-1].split('/', 1)[0]
+        if namespace == repo_name:
+            namespace = None
+    else:
+        namespace = os.path.abspath(abspath.rsplit('/', 1)[0])
+        if namespace == os.path.abspath(pagure.APP.config['GIT_FOLDER']):
+            namespace = None
+
+    return namespace
+
+
 def get_username(abspath):
     ''' Return the username of the git repo based on its path.
     '''
