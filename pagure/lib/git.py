@@ -925,10 +925,8 @@ def get_username(abspath):
     '''
     username = None
     repo = os.path.abspath(os.path.join(abspath, '..'))
-    if pagure.APP.config['FORK_FOLDER'] in repo:
-        username = repo.split(pagure.APP.config['FORK_FOLDER'])[1]
-        if username.startswith('/'):
-            username = username[1:]
+    if '/forks/' in repo:
+        username = repo.split('/forks/', 1)[1].split('/', 1)[0]
     return username
 
 
