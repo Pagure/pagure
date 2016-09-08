@@ -115,9 +115,13 @@ def handle_messages():
             data = json.loads(reply.value)
             username = None
             if data['project'].startswith('forks'):
-                _, username, projectname = data['project'].split('/', 2)
+                username, projectname = data['project'].split('/', 1)
             else:
                 projectname = data['project']
+
+            namespace = None
+            if '/' in projectname:
+                namespace, projectname = projectname.split('/', 1)
 
             project = pagure.lib.get_project(
                 session=pagure.SESSION, name=projectname, user=username)

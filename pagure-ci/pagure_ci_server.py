@@ -67,13 +67,17 @@ def handle_messages():
         pr_id = data['pr']['id']
         branch = data['pr']['branch_from']
         projectname = data['pr']['project']['name']
+        namespace = data['pr']['project'].get('namespace')
 
         username = None
         if data['pr'].get('parent'):
             username = data['pr']['project']['user']['user']
 
         project = pagure.lib.get_project(
-            session=pagure.SESSION, name=projectname, user=username)
+            session=pagure.SESSION,
+            name=projectname,
+            user=username,
+            namespace=namespace)
 
         if not project:
             LOG.warning(
