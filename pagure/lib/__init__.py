@@ -1643,7 +1643,7 @@ def get_project(session, name, user=None, namespace=None):
 def search_issues(
         session, repo, issueid=None, issueuid=None, status=None,
         closed=False, tags=None, assignee=None, author=None, private=None,
-        priority=None, count=False):
+        priority=None, count=False, offset=None, limit=None):
     ''' Retrieve one or more issues associated to a project with the given
     criterias.
 
@@ -1832,6 +1832,10 @@ def search_issues(
     elif count:
         output = query.count()
     else:
+        if offset:
+            query = query.offset(offset)
+        if limit:
+            query = query.limit(limit)
         output = query.all()
 
     return output
@@ -1874,7 +1878,8 @@ def get_tag(session, tag):
 
 def search_pull_requests(
         session, requestid=None, project_id=None, project_id_from=None,
-        status=None, author=None, assignee=None, count=False):
+        status=None, author=None, assignee=None, count=False,
+        offset=None, limit=None):
     ''' Retrieve the specified issue
     '''
 
@@ -1956,6 +1961,10 @@ def search_pull_requests(
     elif count:
         output = query.count()
     else:
+        if offset:
+            query = query.offset(offset)
+        if limit:
+            query = query.limit(limit)
         output = query.all()
 
     return output
