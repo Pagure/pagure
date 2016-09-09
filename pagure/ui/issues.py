@@ -400,7 +400,7 @@ def remove_tag(repo, username=None, namespace=None):
 def view_issues(repo, username=None, namespace=None):
     """ List all issues associated to a repo
     """
-    status = flask.request.args.get('status', None)
+    status = flask.request.args.get('status', 'Open')
     priority = flask.request.args.get('priority', None)
     tags = flask.request.args.getlist('tags')
     tags = [tag.strip() for tag in tags if tag.strip()]
@@ -425,6 +425,9 @@ def view_issues(repo, username=None, namespace=None):
     # If user is repo admin, show all tickets included the private ones
     if flask.g.repo_admin:
         private = None
+
+    if str(status).lower() in ['all']:
+        status = None
 
     oth_issues = None
     if status is not None:
@@ -464,11 +467,9 @@ def view_issues(repo, username=None, namespace=None):
 
     else:
         issues = pagure.lib.search_issues(
-            SESSION, repo, status='Open', tags=tags, assignee=assignee,
+            SESSION, repo, tags=tags, assignee=assignee,
             author=author, private=private, priority=priority)
-        oth_issues = pagure.lib.search_issues(
-            SESSION, repo, closed=True, tags=tags, assignee=assignee,
-            author=author, private=private, priority=priority, count=True)
+        oth_issues = []
 
     tag_list = pagure.lib.get_tags_of_project(SESSION, repo)
 

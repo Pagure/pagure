@@ -39,31 +39,33 @@
 
 <section id="tags">
   <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
-    {% if status and status != 'Open' %}
-      <a class="btn btn-secondary btn-sm" href="{{ url_for('view_issues',
-        repo=repo.name,
-        username=username,
-        namespace=repo.namespace,
-        tags=tags, author=author, assignee=assignee) }}">Open</a>
-      <a class="btn btn-primary btn-sm" href="{{ url_for('view_issues',
-        repo=repo.name,
-        username=username,
-        namespace=repo.namespace,
-        status='Closed', tags=tags, author=author,
-        assignee=assignee) }}">Closed</a>
-    {% else %}
-      <a class="btn btn-primary btn-sm" href="{{ url_for('view_issues',
-        repo=repo.name,
-        username=username,
-        namespace=repo.namespace,
-        tags=tags, author=author, assignee=assignee) }}">Open</a>
-      <a class="btn btn-secondary btn-sm" href="{{ url_for('view_issues',
-        repo=repo.name,
-        username=username,
-        namespace=repo.namespace,
-        status='Closed', tags=tags, author=author,
-        assignee=assignee) }}">Closed</a>
-    {% endif %}
+      <a class="btn {%
+        if status|lower in ['open', 'true'] %}btn-primary{%
+        else %}btn-secondary{%
+        endif %} btn-sm" href="{{ url_for('view_issues',
+          repo=repo.name,
+          username=username,
+          namespace=repo.namespace,
+          tags=tags, author=author,
+          assignee=assignee) }}">Open</a>
+      <a class="btn {%
+        if status|lower in ['closed', 'false'] %}btn-primary{%
+        else %}btn-secondary{%
+        endif %} btn-sm" href="{{ url_for('view_issues',
+          repo=repo.name,
+          username=username,
+          namespace=repo.namespace,
+          tags=tags, author=author, status='Closed',
+          assignee=assignee) }}">Close</a>
+      <a class="btn {%
+        if status|lower in ['all', 'none'] %}btn-primary{%
+        else %}btn-secondary{%
+        endif %} btn-sm" href="{{ url_for('view_issues',
+          repo=repo.name,
+          username=username,
+          namespace=repo.namespace,
+          tags=tags, author=author, status='all',
+          assignee=assignee) }}">All</a>
   </span>
   <span class="oi m-l-2" data-glyph="tag"></span>
   <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
@@ -143,7 +145,7 @@
         <tr>
             <td>
               <span class="label label-default">#{{ issue.id }}</span>
-              {% if status and status != 'Open' %}
+              {% if status != 'Open' %}
               <span class="label {% if
                 issue.status|lower == 'invalid' %}label-danger{%
                 elif issue.status|lower == 'fixed' %}label-success{%
