@@ -9,10 +9,12 @@
 
 
   <h2>
-    {% if status and status != 'Open' %}
+    {% if status|lower in ['open', 'true'] %}
+      {{ issues|count }} Open Issues
+    {% elif status|lower not in ['open', 'true', 'all', 'none'] %}
       {{ issues|count }} Closed Issues
     {% else %}
-      {{ issues|count }} Open Issues
+      {{ issues|count }} Issues
     {% endif %}
     <span class="btn-group btn-group-sm pull-xs-right" role="group">
     {% if repo.milestones %}
@@ -38,7 +40,7 @@
     {% endif %}
 
 <section id="tags">
-  <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
+  <span class="btn-group btn-group-sm issues-tagbar" role="group">
       <a class="btn {%
         if status|lower in ['open', 'true'] %}btn-primary{%
         else %}btn-secondary{%
