@@ -18,6 +18,7 @@
 import flask
 import os
 from collections import defaultdict
+from math import ceil
 
 import pygit2
 from sqlalchemy.exc import SQLAlchemyError
@@ -431,50 +432,58 @@ def view_issues(repo, username=None, namespace=None):
 
     oth_issues = None
     if status is not None:
-        if status.lower() == 'closed':
-            issues = pagure.lib.search_issues(
-                SESSION,
-                repo,
-                closed=True,
-                tags=tags,
-                assignee=assignee,
-                author=author,
-                private=private,
-                priority=priority,
-            )
-            oth_issues = pagure.lib.search_issues(
-                SESSION,
-                repo,
-                status='Open',
-                tags=tags,
-                assignee=assignee,
-                author=author,
-                private=private,
-                priority=priority,
-                count=True,
-            )
-        else:
-            issues = pagure.lib.search_issues(
-                SESSION,
-                repo,
-                status=status,
-                tags=tags,
-                assignee=assignee,
-                author=author,
-                private=private,
-                priority=priority,
-            )
-
+        issues = pagure.lib.search_issues(
+            SESSION,
+            repo,
+            closed=True if status.lower() == 'closed' else False,
+            status='Open' if status.lower() == 'open' else None,
+            tags=tags,
+            assignee=assignee,
+            author=author,
+            private=private,
+            priority=priority,
+            offset=flask.g.offset,
+            limit=flask.g.limit,
+        )
+        issues_cnt = pagure.lib.search_issues(
+            SESSION,
+            repo,
+            closed=True if status.lower() == 'closed' else False,
+            status='Open' if status.lower() == 'open' else None,
+            tags=tags,
+            assignee=assignee,
+            author=author,
+            private=private,
+            priority=priority,
+            count=True
+        )
+        oth_issues = pagure.lib.search_issues(
+            SESSION,
+            repo,
+            closed=False if status.lower() == 'closed' else True,
+            tags=tags,
+            assignee=assignee,
+            author=author,
+            private=private,
+            priority=priority,
+            count=True,
+        )
     else:
         issues = pagure.lib.search_issues(
             SESSION, repo, tags=tags, assignee=assignee,
-            author=author, private=private, priority=priority)
-        oth_issues = []
+            author=author, private=private, priority=priority,
+            offset=flask.g.offset, limit=flask.g.limit,
+        )
+        issues_cnt = pagure.lib.search_issues(
+            SESSION, repo, tags=tags, assignee=assignee,
+            author=author, private=private, priority=priority, count=True)
 
     tag_list = pagure.lib.get_tags_of_project(SESSION, repo)
 
     reponame = pagure.get_repo_path(repo)
     repo_obj = pygit2.Repository(reponame)
+
+    total_page = int(ceil(issues_cnt / float(flask.g.limit)))
 
     return flask.render_template(
         'issues.html',
@@ -484,11 +493,13 @@ def view_issues(repo, username=None, namespace=None):
         tag_list=tag_list,
         status=status,
         issues=issues,
+        issues_cnt=issues_cnt,
         oth_issues=oth_issues,
         tags=tags,
         assignee=assignee,
         author=author,
         priority=priority,
+        total_page=total_page,
     )
 
 
