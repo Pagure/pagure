@@ -730,7 +730,7 @@ class PagureFlaskForktests(tests.Modeltests):
         output = self.app.get('/test/pull-requests')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            'Pull Requests <span class="label label-default">0</span>',
+            '<h2 class="p-b-1">\n    0 Pull Requests (on 0)\n  </h2>',
             output.data)
         # Open is primary
         self.assertIn(
@@ -745,7 +745,7 @@ class PagureFlaskForktests(tests.Modeltests):
         output = self.app.get('/test/pull-requests')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            'Pull Requests <span class="label label-default">1</span>',
+            '<h2 class="p-b-1">\n    1 Pull Requests (on 1)\n  </h2>',
             output.data)
         # Open is primary
         self.assertIn(
@@ -758,7 +758,7 @@ class PagureFlaskForktests(tests.Modeltests):
         output = self.app.get('/test/pull-requests?status=Closed')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            'Closed Pull Requests <span class="label label-default">0</span>',
+            '<h2 class="p-b-1">\n    0 Closed Pull Requests (on 0)\n  </h2>',
             output.data)
         # Close is primary
         self.assertIn(
@@ -771,7 +771,7 @@ class PagureFlaskForktests(tests.Modeltests):
         output = self.app.get('/test/pull-requests?status=0')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            'Closed/Merged Pull Requests <span class="label label-default">0</span>',
+            '<h2 class="p-b-1">\n    0 Closed/Merged Pull Requests (on 0)\n  </h2>',
             output.data)
         # Close is primary
         self.assertIn(
