@@ -484,14 +484,14 @@ class PagureLibtests(tests.Modeltests):
         # All issues
         issues = pagure.lib.search_issues(self.session, repo)
         self.assertEqual(len(issues), 2)
-        self.assertEqual(issues[0].id, 1)
-        self.assertEqual(issues[0].project_id, 1)
-        self.assertEqual(issues[0].status, 'Open')
-        self.assertEqual(issues[0].tags, [])
-        self.assertEqual(issues[1].id, 2)
+        self.assertEqual(issues[1].id, 1)
         self.assertEqual(issues[1].project_id, 1)
-        self.assertEqual(issues[1].status, 'Invalid')
+        self.assertEqual(issues[1].status, 'Open')
         self.assertEqual(issues[1].tags, [])
+        self.assertEqual(issues[0].id, 2)
+        self.assertEqual(issues[0].project_id, 1)
+        self.assertEqual(issues[0].status, 'Invalid')
+        self.assertEqual(issues[0].tags, [])
 
         # Issues by status
         issues = pagure.lib.search_issues(
@@ -637,8 +637,8 @@ class PagureLibtests(tests.Modeltests):
         issues = pagure.lib.search_issues(
             self.session, repo, assignee=False)
         self.assertEqual(len(issues), 2)
-        self.assertEqual(issues[0].id, 1)
-        self.assertEqual(issues[1].id, 2)
+        self.assertEqual(issues[0].id, 2)
+        self.assertEqual(issues[1].id, 1)
 
         issues = pagure.lib.search_issues(
             self.session, repo, assignee=True)

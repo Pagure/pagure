@@ -310,25 +310,6 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "assignee": None,
                   "blocks": [],
                   "comments": [],
-                  "content": "This issue needs attention",
-                  "date_created": "1431414800",
-                  "closed_at": None,
-                  "depends": [],
-                  "id": 1,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "comments": [],
                   "content": "We should work on this",
                   "date_created": "1431414800",
                   "closed_at": None,
@@ -339,6 +320,25 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "status": "Open",
                   "tags": [],
                   "title": "Test issue",
+                  "user": {
+                    "fullname": "PY C",
+                    "name": "pingou"
+                  }
+                },
+                {
+                  "assignee": None,
+                  "blocks": [],
+                  "comments": [],
+                  "content": "This issue needs attention",
+                  "date_created": "1431414800",
+                  "closed_at": None,
+                  "depends": [],
+                  "id": 1,
+                  "priority": None,
+                  "private": False,
+                  "status": "Open",
+                  "tags": [],
+                  "title": "test issue",
                   "user": {
                     "fullname": "PY C",
                     "name": "pingou"
@@ -405,25 +405,6 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                         "assignee": None,
                         "blocks": [],
                         "comments": [],
-                        "content": "This issue needs attention",
-                        "date_created": "1431414800",
-                        "closed_at": None,
-                        "depends": [],
-                        "id": 1,
-                        "priority": None,
-                        "private": False,
-                        "status": "Open",
-                        "tags": [],
-                        "title": "test issue",
-                        "user": {
-                            "fullname": "PY C",
-                            "name": "pingou"
-                        }
-                    },
-                    {
-                        "assignee": None,
-                        "blocks": [],
-                        "comments": [],
                         "content": "We should work on this",
                         "date_created": "1431414800",
                         "closed_at": None,
@@ -434,6 +415,25 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                         "status": "Open",
                         "tags": [],
                         "title": "Test issue",
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou"
+                        }
+                    },
+                    {
+                        "assignee": None,
+                        "blocks": [],
+                        "comments": [],
+                        "content": "This issue needs attention",
+                        "date_created": "1431414800",
+                        "closed_at": None,
+                        "depends": [],
+                        "id": 1,
+                        "priority": None,
+                        "private": False,
+                        "status": "Open",
+                        "tags": [],
+                        "title": "test issue",
                         "user": {
                             "fullname": "PY C",
                             "name": "pingou"
