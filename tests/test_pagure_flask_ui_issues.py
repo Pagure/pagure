@@ -260,6 +260,18 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
 
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test invalid issue',
+            content='This really is not related',
+            user='pingou',
+            status='Invalid',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test invalid issue')
+
         # Whole list
         output = self.app.get('/test/issues')
         self.assertEqual(output.status_code, 200)
@@ -267,12 +279,12 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertTrue(
             '<h2>\n      1 Open Issues' in output.data)
 
-        # Status = closed
+        # Status = closed (all but open)
         output = self.app.get('/test/issues?status=cloSED')
         self.assertEqual(output.status_code, 200)
         self.assertIn('<title>Issues - test - Pagure</title>', output.data)
         self.assertTrue(
-            '<h2>\n      0 Closed Issues' in output.data)
+            '<h2>\n      1 Closed Issues' in output.data)
 
         # Status = fixed
         output = self.app.get('/test/issues?status=fixed')
@@ -280,6 +292,20 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertIn('<title>Issues - test - Pagure</title>', output.data)
         self.assertTrue(
             '<h2>\n      0 Closed Issues' in output.data)
+
+        # Status = Invalid
+        output = self.app.get('/test/issues?status=Invalid')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
+        self.assertTrue(
+            '<h2>\n      1 Closed Issues' in output.data)
+
+        # All tickets
+        output = self.app.get('/test/issues?status=all')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
+        self.assertTrue(
+            '<h2>\n      2 Issues' in output.data)
 
         # New issue button is shown
         user = tests.FakeUser()
