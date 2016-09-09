@@ -11,12 +11,12 @@
 
 <div>
   <h2 class="p-b-1">
-    {{ requests|count }} {%
+    {{ requests|count }} {%-
     if status and status|lower != 'open' and status|lower != 'false'
-     %} {{ status }} {%
-    elif status and status|lower != 'open'
-    %} Closed/Merged {% endif -%}
-    Pull Requests (on {{ requests_cnt }})
+     %} {{ status }} {%-
+    elif status|lower in ['closed', 'false']
+    %} Closed/Merged {%- endif
+    %} Pull Requests (on {{ requests_cnt }})
     {% if authenticated and repo.settings.get('pull_requests', True) %}
         <span id="request_pull" class="inline_it">
 
