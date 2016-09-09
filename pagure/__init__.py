@@ -407,6 +407,32 @@ def set_variables():
         flask.g.repo_admin = is_repo_admin(flask.g.repo)
         flask.g.branches = sorted(flask.g.repo_obj.listall_branches())
 
+    flask.g.offset = 0
+    flask.g.page = 1
+    flask.g.limit = 10
+    page = flask.request.args.get('page')
+    limit = flask.request.args.get('n')
+    if limit:
+        try:
+            limit = int(limit)
+        except ValueError:
+            limit = 10
+        if limit > 500 or limit <= 0:
+            limit = 10
+
+        flask.g.limit = limit
+
+    if page:
+        try:
+            page = abs(int(page))
+        except ValueError:
+            page = 1
+        if page <= 0:
+            page = 1
+
+        flask.g.page = page
+        flask.g.offset = (page - 1) * flask.g.limit
+
 
 @APP.errorhandler(404)
 def not_found(error):
