@@ -318,6 +318,7 @@ class Project(BASE):
         nullable=True)
     _priorities = sa.Column(sa.Text, nullable=True)
     _milestones = sa.Column(sa.Text, nullable=True)
+    _reports = sa.Column(sa.Text, nullable=True)
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
@@ -438,6 +439,23 @@ class Project(BASE):
     def priorities(self, priorities):
         ''' Ensures the priorities are properly saved. '''
         self._priorities = json.dumps(priorities)
+
+    @property
+    def reports(self):
+        """ Return the dict stored as string in the database as an actual
+        dict object.
+        """
+        reports = {}
+
+        if self._reports:
+            reports = json.loads(self._reports)
+
+        return reports
+
+    @reports.setter
+    def reports(self, reports):
+        ''' Ensures the reports are properly saved. '''
+        self._reports = json.dumps(reports)
 
     @property
     def open_requests(self):
