@@ -2,7 +2,7 @@ Installing pagure's EventSource server
 ======================================
 
 Eventsource or Server Sent Events are messages sent from a server to a web
-browser. It allows to refresh a page "live", ie, without the need to reload
+browser. It allows one to refresh a page "live", ie, without the need to reload
 it entirely.
 
 

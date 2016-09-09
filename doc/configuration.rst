@@ -155,7 +155,7 @@ https.
 FROM_EMAIL
 ~~~~~~~~~~
 
-This setting allows to specify the email address used by this pagure instance
+This setting allows one to specify the email address used by this pagure instance
 when sending emails (notifications).
 
 Defaults to: ``pagure@pagure.org``
@@ -164,7 +164,7 @@ Defaults to: ``pagure@pagure.org``
 DOMAIN_EMAIL_NOTIFICATIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This setting allows to specify the domain used by this pagure instance
+This setting allows one to specify the domain used by this pagure instance
 when sending emails (notifications). More precisely, this setting is used
 when building the ``msg-id`` header of the emails sent.
 
@@ -199,7 +199,7 @@ gitolite is ran.
 GITOLITE_VERSION
 ~~~~~~~~~~~~~~~~
 
-This configuration key allows to specify which version of gitolite you are
+This configuration key allows one to specify which version of gitolite you are
 using, it can be either ``2`` or ``3``.
 
 Defaults to: ``3``.
@@ -347,7 +347,7 @@ Defaults to: ``50``.
 SMTP_SERVER
 ~~~~~~~~~~~
 
-This configuration key allows to configure the SMTP server to use when
+This configuration key allows one to configure the SMTP server to use when
 sending emails.
 
 Defaults to: ``localhost``.
@@ -355,7 +355,7 @@ Defaults to: ``localhost``.
 SMTP_PORT
 ~~~~~~~~~
 
-This configuration key allow to define the SMTP server port.
+This configuration key allows one to define the SMTP server port.
 
 SMTP by default uses TCP port 25. The protocol for mail submission is
 the same, but uses port 587.
@@ -367,7 +367,7 @@ Defaults to: ``25``
 SMTP_SSL
 ~~~~~~~~
 
-This configuration key allows to specify whether the SMTP connections
+This configuration key allows one to specify whether the SMTP connections
 should secured over SSL
 
 Defaults to: ``False``
@@ -393,7 +393,7 @@ Defaults to: ``None``
 SHORT_LENGTH
 ~~~~~~~~~~~~
 
-This configuration key allows to configure the length of the commit ids or
+This configuration key allows one to configure the length of the commit ids or
 file hex displayed in the user interface.
 
 Defaults to: ``6``.
@@ -402,7 +402,7 @@ Defaults to: ``6``.
 BLACKLISTED_PROJECTS
 ~~~~~~~~~~~~~~~~~~~~
 
-This configuration key allows to set a list of project name that are forbidden.
+This configuration key allows one to set a list of project name that are forbidden.
 This list is used for example to avoid conflicts at the URL level between the
 static files located under ``/static/`` and a project that would be named
 ``static`` and thus be located at ``/static``.
@@ -421,7 +421,7 @@ Defaults to:
 CHECK_SESSION_IP
 ~~~~~~~~~~~~~~~~
 
-This configuration key allows to configure whether to check the user's IP
+This configuration key allows one to configure whether to check the user's IP
 address when retrieving its session. This makes things more secure but
 under certain setup it might not work (for example if there are proxies
 in front of the application).
@@ -432,7 +432,7 @@ Defaults to: ``True``.
 PAGURE_AUTH
 ~~~~~~~~~~~~
 
-This configuration key allows to specify which authentication method to use.
+This configuration key allows one to specify which authentication method to use.
 Pagure supports currently two authentication methods, one relying on the
 Fedora Account System `FAS <https://admin.fedoraproject.org/accounts>`_,
 the other relying on local user accounts.
@@ -444,9 +444,9 @@ Defaults to: ``fas``.
 IP_ALLOWED_INTERNAL
 ~~~~~~~~~~~~~~~~~~~
 
-This configuration key allows to specify which IP addresses are allowed
+This configuration key allows one to specify which IP addresses are allowed
 to access the internal API endpoint. These endpoints are accessed by the
-milters for example and allow to perform action in the name of someone else.
+milters for example and allow one to perform action in the name of someone else.
 So they are sensitive, thus the check for the origin of the request using
 these endpoints.
 
@@ -456,7 +456,7 @@ Defaults to: ``['127.0.0.1', 'localhost', '::1']``.
 MAX_CONTENT_LENGTH
 ~~~~~~~~~~~~~~~~~~
 
-This configuration key allows to specify the maximum size allowed when
+This configuration key allows one to specify the maximum size allowed when
 uploading content to pagure (for example, screenshots to a ticket).
 
 Defaults to: ``4 * 1024 * 1024`` which corresponds to 4 megabytes.
@@ -465,7 +465,7 @@ Defaults to: ``4 * 1024 * 1024`` which corresponds to 4 megabytes.
 ENABLE_TICKETS
 ~~~~~~~~~~~~~~
 
-This configuration key allows to activate or de-activate the ticketing system
+This configuration key allows one to activate or de-activate the ticketing system
 for all the projects hosted on this pagure instance.
 
 Defaults to: ``True``
@@ -474,7 +474,7 @@ Defaults to: ``True``
 ENABLE_NEW_PROJECTS
 ~~~~~~~~~~~~~~~~~~~
 
-This configuration key allows to create or forbids creating new projects in
+This configuration key allows one to create or forbids creating new projects in
 the user interface of this pagure instance.
 
 Defaults to: ``True``
@@ -483,7 +483,7 @@ Defaults to: ``True``
 ENABLE_DEL_PROJECTS
 ~~~~~~~~~~~~~~~~~~~
 
-This configuration key allows to delete or forbids deleting projects in
+This configuration key allows one to delete or forbids deleting projects in
 the user interface of this pagure instance.
 
 Defaults to: ``True``

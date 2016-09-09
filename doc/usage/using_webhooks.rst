@@ -21,7 +21,7 @@ Each POST request made contains two specific headers:
 
 
 ``X-Pagure-Topic`` is a global header giving a clue about the type of action
-that just occured. For example ``issue.edit``.
+that just occurred. For example ``issue.edit``.
 
 
 ``X-Pagure-Signature`` contains the signature of the message allowing to

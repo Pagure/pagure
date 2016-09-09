@@ -3,7 +3,7 @@ Installing pagure
 
 There are two ways to install pagure:
 
-* via the RPM package (recommanded if you are using a RPM-based linux distribution)
+* via the RPM package (recommended if you are using a RPM-based linux distribution)
 * via the setup.py
 
 

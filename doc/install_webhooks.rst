@@ -3,7 +3,7 @@ Installing pagure's web-hooks notification system
 
 Web-hooks are a notification system upon which a system makes a http POST
 request with some data upon doing an action. This allows notifying a system
-that an action has occured.
+that an action has occurred.
 
 If you want more information feel free to check out the corresponding page
 on wikipedia: `https://en.wikipedia.org/wiki/Webhook

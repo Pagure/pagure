@@ -100,7 +100,7 @@ You should be able to access the server at http://localhost:5000
 
 
 Every time you save a file, the project will be automatically restarted
-so you can see your change immediatly.
+so you can see your change immediately.
 
 
 
