@@ -1,5 +1,7 @@
 {% extends "repo_master.html" %}
 
+{% from "_render_repo.html" import pagination_link %}
+
 {% block title %}Issues - {{
     repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 {% set tag = "home"%}
@@ -10,9 +12,9 @@
 
   <h2>
     {% if status|lower in ['open', 'true'] %}
-      {{ issues|count }} Open Issues
+      {{ issues|count }} Open Issues (on {{ issues_cnt }})
     {% elif status|lower not in ['open', 'true', 'all', 'none'] %}
-      {{ issues|count }} Closed Issues
+      {{ issues|count }} Closed Issues (on {{ issues_cnt }})
     {% else %}
       {{ issues|count }} Issues
     {% endif %}
@@ -251,6 +253,8 @@
     </tbody>
 </table>
 </div>
+{{ pagination_link('page', g.page, total_page) }}
+
 {% endblock %}
 {% block jscripts %}
 {{ super() }}

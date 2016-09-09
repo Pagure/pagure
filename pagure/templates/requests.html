@@ -1,5 +1,7 @@
 {% extends "repo_master.html" %}
 
+{% from "_render_repo.html" import pagination_link %}
+
 {% block title %}Pull requests - {{
     repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 {% set tag = "home" %}
@@ -9,10 +11,12 @@
 
 <div>
   <h2 class="p-b-1">
-    {% if status|lower != 'open' and status|lower != 'false' %}
-    {{ status }} {% elif status|lower != 'open' -%}
-    Closed/Merged {% endif -%}
-    Pull Requests <span class="label label-default">{{ requests|count }}</span>
+    {{ requests|count }} {%
+    if status and status|lower != 'open' and status|lower != 'false'
+     %} {{ status }} {%
+    elif status and status|lower != 'open'
+    %} Closed/Merged {% endif -%}
+    Pull Requests (on {{ requests_cnt }})
     {% if authenticated and repo.settings.get('pull_requests', True) %}
         <span id="request_pull" class="inline_it">
 
@@ -190,6 +194,7 @@
     </tbody>
 </table>
 </div>
+{{ pagination_link('page', g.page, total_page) }}
 {% endblock %}
 
 
