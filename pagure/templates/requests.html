@@ -38,7 +38,7 @@
   </h2>
 
 <div>
-  <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
+  <span class="btn-group btn-group-sm issues-tagbar" role="group">
       <a class="btn {%
             if status|lower in ['open', 'true'] %}btn-primary{%
             else %}btn-secondary{%
@@ -48,14 +48,23 @@
                 username=username,
                 namespace=repo.namespace) }}">Open</a>
       <a class="btn {%
-        if status|lower in ['open', 'true'] %}btn-secondary{%
-        else %}btn-primary{%
+        if status|lower in ['closed', 'false'] %}btn-primary{%
+        else %}btn-secondary{%
         endif %} btn-sm" href="{{ url_for(
             'request_pulls',
             repo=repo.name,
             username=username,
             namespace=repo.namespace,
             status=0) }}">Closed</a>
+      <a class="btn {%
+        if status|lower in ['all', 'none'] %}btn-primary{%
+        else %}btn-secondary{%
+        endif %} btn-sm" href="{{ url_for(
+            'request_pulls',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace,
+            status='all') }}">All</a>
   </span>
   <a class="btn btn-secondary btn-sm pull-xs-right" href="{{ url_for(
     'request_pulls',

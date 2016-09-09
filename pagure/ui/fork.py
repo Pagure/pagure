@@ -150,6 +150,8 @@ def request_pulls(repo, username=None, namespace=None):
 
     if str(status).lower() in ['false', '0']:
         status = False
+    elif str(status).lower() in ['all']:
+        status = None
 
     if str(status).lower() in ['true', '1', 'open']:
         requests = pagure.lib.search_pull_requests(
