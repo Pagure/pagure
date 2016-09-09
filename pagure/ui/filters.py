@@ -15,6 +15,7 @@
 
 import datetime
 import textwrap
+import urlparse
 
 import arrow
 import flask
@@ -437,3 +438,16 @@ def convert_unicode(text):
         return text.decode("utf8")
     else:
         return text
+
+
+@APP.template_filter('combine_url')
+def combine_url(url, page, pagetitle, **kwargs):
+    """ Add the specified arguments in the provided kwargs dictionary to
+    the given URL.
+    """
+    url_obj = urlparse.urlparse(url)
+    url = url_obj.geturl().replace(url_obj.query, '')
+    query = dict(urlparse.parse_qsl(url_obj.query))
+    query[pagetitle] = page
+    query.update(kwargs)
+    return url + '&'.join(['%s=%s' % (k, query[k]) for k in query])

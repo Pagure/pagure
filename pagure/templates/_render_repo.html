@@ -42,13 +42,11 @@
 {%- endmacro %}
 
 
-{% macro pagination_link(pagetitle, page, total, sorting=None) -%}
-{% set prev_page = "%s?%s=%s" % (request.base_url, pagetitle, page - 1) %}
-{% set next_page = "%s?%s=%s" % (request.base_url, pagetitle, page + 1) %}
-{% if sorting %}
-{% set prev_page = "%s&sorting=%s" % (prev_page, sorting) %}
-{% set next_page = "%s&sorting=%s" % (next_page, sorting) %}
-{% endif %}
+{% macro pagination_link(pagetitle, page, total) -%}
+{% set prev_page = request.url | combine_url(
+    page=page-1, pagetitle=pagetitle, **kwargs) %}
+{% set next_page = request.url | combine_url(
+    page=page+1, pagetitle=pagetitle, **kwargs) %}
 <aside>
     <nav class="text-center">
       <ul class="pagination">
@@ -90,7 +88,7 @@
         <div class="row">
           <div class="col-sm-6">
             {% if total and total > 1 %}
-            {{ pagination_link(pagetitle, page, total, sorting) }}
+            {{ pagination_link(pagetitle, page, total, sorting=sorting) }}
             {% endif %}
           </div>
           <div class="col-sm-6 text-xs-right">
@@ -128,7 +126,7 @@
             {{ render_row(list) }}
         </div>
         {% if total and total > 1 %}
-        {{ pagination_link(pagetitle, page, total, sorting) }}
+        {{ pagination_link(pagetitle, page, total, sorting=sorting) }}
         {% endif %}
     </section>
 {% endmacro %}
