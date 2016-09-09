@@ -19,6 +19,7 @@
 
 import flask
 import os
+from math import ceil
 
 import pygit2
 from sqlalchemy.exc import SQLAlchemyError
@@ -159,7 +160,16 @@ def request_pulls(repo, username=None, namespace=None):
             project_id=repo.id,
             status=True,
             assignee=assignee,
-            author=author)
+            author=author,
+            offset=flask.g.offset,
+            limit=flask.g.limit)
+        requests_cnt = pagure.lib.search_pull_requests(
+            SESSION,
+            project_id=repo.id,
+            status=True,
+            assignee=assignee,
+            author=author,
+            count=True)
         oth_requests = pagure.lib.search_pull_requests(
             SESSION,
             project_id=repo.id,
@@ -173,7 +183,16 @@ def request_pulls(repo, username=None, namespace=None):
             project_id=repo.id,
             assignee=assignee,
             author=author,
-            status=status)
+            status=status,
+            offset=flask.g.offset,
+            limit=flask.g.limit)
+        requests_cnt = pagure.lib.search_pull_requests(
+            SESSION,
+            project_id=repo.id,
+            assignee=assignee,
+            author=author,
+            status=status,
+            count=True)
         oth_requests = pagure.lib.search_pull_requests(
             SESSION,
             project_id=repo.id,
@@ -189,18 +208,22 @@ def request_pulls(repo, username=None, namespace=None):
     else:
         head = 'master'
 
+    total_page = int(ceil(requests_cnt / float(flask.g.limit)))
+
     return flask.render_template(
         'requests.html',
         select='requests',
         repo=repo,
         username=username,
         requests=requests,
+        requests_cnt=requests_cnt,
         oth_requests=oth_requests,
         status=status,
         assignee=assignee,
         author=author,
         form=pagure.forms.ConfirmationForm(),
         head=head,
+        total_page=total_page,
     )
 
 
