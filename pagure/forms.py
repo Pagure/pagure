@@ -502,3 +502,12 @@ class ForkRepoForm(wtf.Form):
         'The project namespace',
         [wtforms.validators.optional()]
     )
+
+
+class AddReportForm(wtf.Form):
+    """ Form to verify that comment is not empty
+    """
+    report_name = wtforms.TextAreaField(
+        'Report name<span class="error">*</span>',
+        [wtforms.validators.Required()]
+    )
