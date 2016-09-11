@@ -3030,3 +3030,15 @@ def user_watch_list(session, user):
             watch.remove(project)
 
     return sorted(list(watch), key=lambda proj: proj.name)
+
+
+def save_report(session, repo, name, url, username):
+    """ Save the report of issues based on the given URL of the project.
+    """
+    url_obj = urlparse.urlparse(url)
+    url = url_obj.geturl().replace(url_obj.query, '')
+    query = dict(urlparse.parse_qsl(url_obj.query))
+    reports = repo.reports
+    reports[name] = query
+    repo.reports = reports
+    session.add(repo)
