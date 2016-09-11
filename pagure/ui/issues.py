@@ -1122,3 +1122,39 @@ def edit_comment_issue(
         comment=comment,
         is_js=is_js,
     )
+
+
+@APP.route('/<repo>/issues/reports', methods=['POST'])
+@APP.route('/<namespace>/<repo>/issues/reports', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/issues/reports', methods=['POST'])
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/issues/reports', methods=['POST'])
+@login_required
+def save_reports(repo, username=None, namespace=None):
+    """ Marked for watching or Unwatching
+    """
+
+    return_point = flask.url_for(
+        'view_issues', repo=repo, username=username, namespace=namespace)
+    if pagure.is_safe_url(flask.request.referrer):
+        return_point = flask.request.referrer
+
+    form = pagure.forms.AddReportForm()
+    if not form.validate_on_submit():
+        flask.abort(400)
+
+    name = form.report_name.data
+
+    try:
+        msg = pagure.lib.save_report(
+            SESSION,
+            flask.g.repo,
+            name=name,
+            url=flask.request.referrer,
+            username=flask.g.fas_user.username)
+        SESSION.commit()
+        flask.flash(msg)
+    except pagure.exceptions.PagureException as msg:
+        flask.flash(msg, 'error')
+
+    return flask.redirect(return_point)
