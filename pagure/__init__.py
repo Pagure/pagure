@@ -343,11 +343,13 @@ def inject_variables():
     if justlogedout:
         flask.session['_justloggedout'] = None
 
-    def is_watching(reponame, username=None):
+    def is_watching(reponame, username=None, namespace=None):
         watch = False
         if authenticated():
             watch = pagure.lib.is_watching(
-                SESSION, flask.g.fas_user, reponame, repouser=username)
+                SESSION, flask.g.fas_user, reponame,
+                namespace=namespace,
+                repouser=username)
         return watch
 
     return dict(

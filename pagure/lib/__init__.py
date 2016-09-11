@@ -2928,7 +2928,7 @@ def update_watch_status(session, project, user, watch):
     return msg_success
 
 
-def is_watching(session, user, reponame, repouser=None):
+def is_watching(session, user, reponame, repouser=None, namespace=None):
     ''' Check user watching the project. '''
 
     if user is None:
@@ -2961,12 +2961,18 @@ def is_watching(session, user, reponame, repouser=None):
             model.Project.is_fork == False
         )
 
+    if namespace is not None:
+        query = query.filter(
+            model.Project.namespace == namespace
+        )
+
     watcher = query.first()
 
     if watcher:
         return watcher.watch
 
-    project = pagure.lib.get_project(session, reponame, user=repouser)
+    project = pagure.lib.get_project(
+        session, reponame, user=repouser, namespace=namespace)
     if not project:
         return False
 
