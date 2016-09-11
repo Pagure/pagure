@@ -326,6 +326,7 @@ $(function() {
           var url = "{{ url_for(
               'request_pull',
               repo=repo.name,
+              namespace=repo.namespace,
               username=repo.user.user if repo.is_fork else None,
               requestid=-100) }}";
           url = url.replace(-100, res.message.branch_w_pr[branch]);

@@ -640,7 +640,8 @@
       <div class="card-block">
         {% if authenticated and mergeform and pull_request.status == 'Open' and g.repo_admin %}
           <form method="POST" action="{{ url_for('.set_assignee_requests',
-              username=username, repo=repo.name, requestid=requestid) }}">
+              username=username, repo=repo.name, namespace=repo.namespace,
+              requestid=requestid) }}">
             <fieldset class="form-group issue-metadata-form">
               <label><strong>Assignee</strong></label>
               <div>

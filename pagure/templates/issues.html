@@ -191,14 +191,16 @@
             {% if not status or status|lower == 'open' %}
               {% if issue.assignee %}
                 <a href="{{ url_for('view_issues', username=username,
-                  repo=repo.name, assignee=issue.assignee.username,
+                  namespace=repo.namespace, repo=repo.name,
+                  assignee=issue.assignee.username,
                   tags=tags, author=author, status=status) }}"
                   title="Filter issues by assignee">
                   {{ issue.assignee.default_email | avatar(16) | safe }}
                   {{ issue.assignee.user }}
                 </a>
               {% else %}
-                <a class="text-muted" href="{{ url_for('view_issues', username=username,
+                <a class="text-muted" href="{{ url_for(
+                  'view_issues', username=username, namespace=repo.namespace,
                   repo=repo.name, tags=tags, author=author, status=status,
                   assignee=0) }}">unassigned
                 </a>
