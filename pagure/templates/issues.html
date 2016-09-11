@@ -253,6 +253,40 @@
     </tbody>
 </table>
 </div>
+<button type="button" class="btn btn-secondary btn-sm pull-xs-right"
+  data-toggle="modal" data-target="#report_modal">
+  Save report
+</button>
+<div class="modal fade" id="report_modal" tabindex="-1"
+      role="dialog" aria-labelledby="New report" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+          <span class="sr-only">Close</span>
+        </button>
+        <h4 class="modal-title" id="myModalLabel">New Report</h4>
+      </div>
+      <div class="modal-body">
+        <form action="{{ url_for(
+            '.save_reports', namespace=repo.namespace,
+            username=username, repo=repo.name) }}" method="post" class="icon">
+          <fieldset class="form-group">
+            <label for="report_name">Report name</label>
+            <input class="form-control" name="report_name" required/>
+            <small class="text-muted">name of the report</small>
+          </fieldset>
+          {{ add_report_form.csrf_token }}
+          <button class="btn btn-primary" type="submit" title="Save this report">
+            Save
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 {{ pagination_link('page', g.page, total_page) }}
 
 {% endblock %}
