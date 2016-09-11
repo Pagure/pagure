@@ -1283,6 +1283,7 @@ def fork_edit_file(
         return flask.redirect(flask.url_for(
             'edit_file',
             username=flask.g.fas_user.username,
+            namespace=repo.namespace,
             repo=repo.name,
             branchname=branchname,
             filename=filename

@@ -53,7 +53,7 @@ from pagure import (APP, SESSION, LOG, __get_file_in_tree, login_required,
 
 @APP.route('/<repo>.git')
 @APP.route('/<namespace>/<repo>.git')
-@APP.route('/fork/<username>/<namespace>/<repo>.git')
+@APP.route('/fork/<username>/<repo>.git')
 @APP.route('/fork/<username>/<namespace>/<repo>.git')
 def view_repo_git(repo, username=None, namespace=None):
     ''' Redirect to the project index page when user wants to view
@@ -240,6 +240,7 @@ def view_repo_branch(repo, branchname, username=None, namespace=None):
                     content, ext,
                     view_file_url=flask.url_for(
                         'view_raw_file', username=username,
+                        namespace=repo.namespace,
                         repo=repo.name, identifier=branchname, filename=''))
 
     return flask.render_template(
@@ -896,8 +897,9 @@ def new_release(repo, username=None, namespace=None):
             except Exception as err:  # pragma: no cover
                 APP.logger.exception(err)
                 flask.flash('Upload failed', 'error')
-        return flask.redirect(
-            flask.url_for('view_tags', repo=repo.name, username=username))
+        return flask.redirect(flask.url_for(
+            'view_tags', repo=repo.name, username=username,
+            namespace=repo.namespace))
 
     return flask.render_template(
         'new_release.html',
@@ -963,7 +965,8 @@ def view_settings(repo, username=None, namespace=None):
             SESSION.commit()
             flask.flash(message)
             return flask.redirect(flask.url_for(
-                'view_repo', username=username, repo=repo.name))
+                'view_repo', username=username, repo=repo.name,
+                namespace=repo.namespace))
         except pagure.exceptions.PagureException as msg:
             SESSION.rollback()
             flask.flash(msg, 'error')
@@ -1037,7 +1040,8 @@ def update_project(repo, username=None, namespace=None):
             flask.flash(str(err), 'error')
 
     return flask.redirect(flask.url_for(
-        'view_settings', username=username, repo=repo.name))
+        'view_settings', username=username, repo=repo.name,
+        namespace=repo.namespace))
 
 
 @APP.route('/<repo>/update/priorities', methods=['POST'])
@@ -1130,7 +1134,8 @@ def update_priorities(repo, username=None, namespace=None):
                 flask.flash(str(err), 'error')
 
     return flask.redirect(flask.url_for(
-        'view_settings', username=username, repo=repo.name))
+        'view_settings', username=username, repo=repo.name.
+        namespace=repo.namespace))
 
 
 @APP.route('/<repo>/update/milestones', methods=['POST'])
@@ -1403,9 +1408,9 @@ def remove_user(repo, userid, username=None, namespace=None):
         if str(userid) not in userids:
             flask.flash(
                 'User does not have commit or cannot loose it right', 'error')
-            return flask.redirect(
-                flask.url_for(
-                    '.view_settings', repo=repo.name, username=username)
+            return flask.redirect(flask.url_for(
+                '.view_settings', repo=repo.name, username=username,
+                namespace=repo.namespace,)
             )
 
         for user in repo.users:
@@ -1912,11 +1917,7 @@ def delete_branch(repo, branchname, username=None, namespace=None):
 def view_docs(repo, username=None, filename=None, namespace=None):
     """ Display the documentation
     """
-    repo_obj = pagure.lib.get_project(
-        SESSION, repo, user=username, namespace=namespace)
-
-    if not repo_obj:
-        flask.abort(404, 'Project not found')
+    repo = flask.g.repo
 
     if not APP.config.get('DOC_APP_URL'):
         flask.abort(404, 'This pagure instance has no doc server')
@@ -1924,7 +1925,7 @@ def view_docs(repo, username=None, filename=None, namespace=None):
     return flask.render_template(
         'docs.html',
         select='docs',
-        repo=repo_obj,
+        repo=repo,
         username=username,
         filename=filename,
         endpoint='view_docs',
@@ -1942,15 +1943,11 @@ def view_project_activity(repo, namespace=None):
     if not APP.config.get('DATAGREPPER_URL'):
         flask.abort(404)
 
-    repo_obj = pagure.lib.get_project(
-        SESSION, repo, user=None, namespace=namespace)
-
-    if not repo_obj:
-        flask.abort(404, 'Project not found')
+    repo = flask.g.repo
 
     return flask.render_template(
         'activity.html',
-        repo=repo_obj,
+        repo=repo,
     )
 
 

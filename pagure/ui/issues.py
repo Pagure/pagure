@@ -71,7 +71,8 @@ def update_issue(repo, issueid, username=None, namespace=None):
         if not is_js:
             flask.flash('Invalid method: GET', 'error')
         return flask.redirect(flask.url_for(
-            'view_issue', username=username, repo=repo.name, issueid=issueid))
+            'view_issue', username=username, repo=repo.name,
+            namespace=repo.namespace, issueid=issueid))
 
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
@@ -135,7 +136,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
             else:
                 return flask.redirect(flask.url_for(
                     'view_issue', username=username, repo=repo.name,
-                    issueid=issueid))
+                    namespace=repo.namespace, issueid=issueid))
 
         comment = form.comment.data
         depends = []
@@ -330,7 +331,8 @@ def edit_tag(repo, tag, username=None, namespace=None):
             flask.flash('Could not edit tag: %s' % tag, 'error')
 
         return flask.redirect(flask.url_for(
-            '.view_settings', repo=repo.name, username=username))
+            '.view_settings', repo=repo.name, username=username,
+            namespace=repo.namespace))
 
     return flask.render_template(
         'edit_tag.html',
@@ -381,8 +383,9 @@ def remove_tag(repo, username=None, namespace=None):
             flask.flash(
                 'Could not remove tag: %s' % ','.join(tags), 'error')
 
-    return flask.redirect(
-        flask.url_for('.view_settings', repo=repo.name, username=username)
+    return flask.redirect(flask.url_for(
+        '.view_settings', repo=repo.name, username=username,
+        namespace=repo.namespace)
     )
 
 
@@ -788,7 +791,8 @@ def delete_issue(repo, issueid, username=None, namespace=None):
             flask.flash('Could not delete the issue', 'error')
 
     return flask.redirect(flask.url_for(
-        'view_issue', username=username, repo=repo.name, issueid=issueid))
+        'view_issue', username=username, repo=repo.name,
+        namespace=repo.namespace, issueid=issueid))
 
 
 @APP.route('/<repo>/issue/<int:issueid>/edit/', methods=('GET', 'POST'))
@@ -871,6 +875,7 @@ def edit_issue(repo, issueid, username=None, namespace=None):
                 filelocation = flask.url_for(
                     'view_issue_raw_file',
                     repo=repo.name,
+                    namespace=repo.namespace,
                     username=username,
                     filename=new_filename,
                 )
@@ -955,6 +960,7 @@ def upload_issue(repo, issueid, username=None, namespace=None):
                 'view_issue_raw_file',
                 repo=repo.name,
                 username=username,
+                namespace=repo.namespace,
                 filename=new_filename,
             )
         })
