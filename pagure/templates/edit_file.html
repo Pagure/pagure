@@ -120,10 +120,8 @@ var lbranch = $('#branch').html();
 
 $("input[name=braction]:radio").change(function (e) {
   if ($(e.currentTarget).val() == 'new'){
-    console.log('new');
     $('#branch').html('<input type="text" placeholder="Branch name" name="branch">');
   } else {
-    console.log('not new');
     $('#branch').html(lbranch);
   }
 });
