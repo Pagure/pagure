@@ -21,6 +21,7 @@ from collections import defaultdict
 from math import ceil
 
 import pygit2
+import werkzeug.datastructures
 from sqlalchemy.exc import SQLAlchemyError
 
 import chardet
@@ -500,6 +501,7 @@ def view_issues(repo, username=None, namespace=None):
         author=author,
         priority=priority,
         total_page=total_page,
+        add_report_form=pagure.forms.AddReportForm(),
     )
 
 
@@ -1158,3 +1160,21 @@ def save_reports(repo, username=None, namespace=None):
         flask.flash(msg, 'error')
 
     return flask.redirect(return_point)
+
+
+@APP.route('/<repo>/report/<report>')
+@APP.route('/<namespace>/<repo>/report/<report>')
+@APP.route('/fork/<username>/<repo>/report/<report>')
+@APP.route('/fork/<username>/<namespace>/<repo>/report/<report>')
+@login_required
+def view_report(repo, report, username=None, namespace=None):
+    """ Show the specified report.
+    """
+    reports = flask.g.repo.reports
+    if report not in reports:
+        flask.abort(404, 'No such report found')
+
+    flask.request.args = werkzeug.datastructures.ImmutableMultiDict(
+        reports[report])
+
+    return view_issues(repo=repo, username=username, namespace=namespace)
