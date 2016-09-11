@@ -9,96 +9,98 @@
 <div class="repo-header p-t-1">
   <div class="container">
     <header>
-        <h2 class="repo-name m-b-0">
-            <a href="{{ url_for('view_repo',
-                namespace=repo.namespace, username=username, repo=repo.name)}}">
-              {% if repo.is_fork -%}
-                <span class="oi" data-glyph="fork"></span>
-                {{ repo.user.user }}/{{
-                    repo.namespace + '/' if repo.namespace
-                }}{{ repo.name}}
-              {%- else -%}
-                {{ repo.namespace + '/' if repo.namespace }}{{ repo.name }}
-              {%- endif -%}
-            </a>
-            {% if authenticated %}
-            <div class="pull-xs-right">
-              {% if repo.settings.get('issue_tracker', True)
-                    and config.get('ENABLE_TICKETS', True)%}
-              <a href="{{ url_for('new_issue',
+      <h2 class="repo-name m-b-0">
+        <a href="{{ url_for('view_repo',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace)}}">
+          {% if repo.is_fork -%}
+            <span class="oi" data-glyph="fork"></span>
+            {{ repo.user.user }}/{{
+                repo.namespace + '/' if repo.namespace
+            }}{{ repo.name}}
+          {%- else -%}
+            {{ repo.namespace + '/' if repo.namespace }}{{ repo.name }}
+          {%- endif -%}
+        </a>
+        {% if authenticated %}
+        <div class="pull-xs-right">
+          {% if repo.settings.get('issue_tracker', True)
+                and config.get('ENABLE_TICKETS', True)%}
+          <a href="{{ url_for('new_issue',
+              repo=repo.name,
+              username=username,
+              namespace=repo.namespace) }}"
+            class="btn btn-success btn-sm">New Issue</a>
+          {% endif %}
+          <div class="btn-group">
+          {% if not repo.is_fork %}
+            <form method="POST" name="fork_project" id="fork_project"
+              action="{{ url_for(
+                '.fork_project',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace) }}">
+              {{ forkbuttonform.csrf_token }}
+            </form>
+            <button class="btn btn-sm btn-secondary"
+              onclick="$('#fork_project').submit();">
+              <span class="oi" data-glyph="fork"></span> Fork</button>
+          {% endif %}
+            <button title="{%-
+            if is_watching(
+              repo.name,
+              repo.user.user if repo.is_fork else None,
+              repo.namespace
+            )%}You are watching this project{%
+            else %}You are not watching this project{%
+            endif -%}"
+            type="button" class="btn btn-sm dropdown-toggle
+            {%-
+            if is_watching(
+              repo.name,
+              repo.user.user if repo.is_fork else None,
+              repo.namespace
+            )%} btn-primary{%
+            else %} btn-secondary{%
+            endif -%}"
+            data-toggle="dropdown" id="watch-button">
+              <span class="oi" data-glyph="eye"></span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-right watch-menu">
+              <form method="POST" id="watch_project" name="watch_project"
+                action="{{ url_for('.watch_repo',
                   repo=repo.name,
-                  username=username,
-                  namespace=repo.namespace) }}"
-                class="btn btn-success btn-sm">New Issue</a>
-              {% endif %}
-              <div class="btn-group">
-              {% if not repo.is_fork %}
-                <form method="POST" name="fork_project" id="fork_project"
-                  action="{{ url_for(
-                    '.fork_project',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace) }}">
-                  {{ forkbuttonform.csrf_token }}
-                </form>
-                <button class="btn btn-sm btn-secondary"
-                  onclick="$('#fork_project').submit();">
-                  <span class="oi" data-glyph="fork"></span> Fork</button>
-              {% endif %}
-                <button title="{%- if is_watching(
-                    repo.name,
-                    repo.user.user if repo.is_fork else None,
-                    repo.namespace)
-                %}You are watching this project{% else
-                %}You are not watching this project{% endif -%}"
-                type="button" class="btn btn-sm dropdown-toggle
-                {%- if is_watching(
-                    repo.name,
-                    repo.user.user if repo.is_fork else None,
-                    repo.namespace)
-                %} btn-primary{% else %} btn-secondary{% endif -%}"
-                data-toggle="dropdown" id="watch-button">
-                  <span class="oi" data-glyph="eye"></span>
-                </button>
-                <div class="dropdown-menu dropdown-menu-right watch-menu">
-                  <form method="POST" id="watch_project" name="watch_project"
-                      action="{{ url_for('.watch_repo',
-                        repo=repo.name,
-                        user=repo.user.user if repo.is_fork else None,
-                        namespace=repo.namespace,
-                        watch=0) }}">
-                   {%- if is_watching(
-                        repo.name,
-                        repo.user.user if repo.is_fork else None,
-                        repo.namespace)
-                   %}
-                   <a class="dropdown-item" id="unwatch_button">Stop watching {{repo.name}}</a>
-                   {% else %}
-                   <a class="dropdown-item" id="watch_button">Watch {{repo.name}}</a>
-                   {% endif -%}
+                  user=repo.user.user if repo.is_fork else None,
+                  namespace=repo.namespace,
+                  watch=0) }}">
+               {%- if is_watching(
+                  repo.name,
+                  repo.user.user if repo.is_fork else None,
+                  repo.namespace)
+               %}
+               <a class="dropdown-item" id="unwatch_button">Stop watching {{
+                  repo.name }}</a>
+               {% else %}
+               <a class="dropdown-item" id="watch_button">Watch {{
+                  repo.name }}</a>
+               {% endif -%}
 
-                    {{ forkbuttonform.csrf_token }}
-                  </form>
-                </div>
-              </div>
-            </div>
-            {% endif %}
-
-          {% if authenticated %}
-            <div class="btn-group pull-xs-right">
+                {{ forkbuttonform.csrf_token }}
+              </form>
             </div>
           {% endif %}
         </h2>
         {% if repo.is_fork and repo.parent %}
         <div class="m-t-0">
-            Forked from
-            <a href="{{ url_for(
-                'view_repo',
-                repo=repo.parent.name,
-                username=repo.parent.user.user if repo.parent.is_fork else None,
-                namespace=repo.parent.namespace)}}">
-                {{ repo.parent.namespace + '/' if repo.parent.namespace }}{{ repo.parent.fullname }}
-            </a>
+          Forked from
+          <a href="{{ url_for(
+            'view_repo',
+            repo=repo.parent.name,
+            username=repo.parent.user.user if repo.parent.is_fork else None,
+            namespace=repo.parent.namespace)}}">
+            {{ repo.parent.namespace + '/' if repo.parent.namespace }}{{ repo.parent.fullname }}
+          </a>
         </div>
         {% elif repo.is_fork and not repo.parent %}
         <div class="m-t-0">
@@ -109,6 +111,7 @@
         {% if repo.description %}{{ repo.description | safe }}{% else %}-{% endif -%}
         {%- if repo.url %} &nbsp;| &nbsp;<a class="inline" href="{{ repo.url }}">{{ repo.url }}</a>{% endif %}
         </div>
+
     </header>
     <ul class="nav nav-tabs nav-small">
       <li class="nav-item">
