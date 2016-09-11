@@ -1134,7 +1134,7 @@ def update_priorities(repo, username=None, namespace=None):
                 flask.flash(str(err), 'error')
 
     return flask.redirect(flask.url_for(
-        'view_settings', username=username, repo=repo.name.
+        'view_settings', username=username, repo=repo.name,
         namespace=repo.namespace))
 
 
