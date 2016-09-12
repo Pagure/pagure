@@ -198,7 +198,7 @@ APPLICATION_ROOT = '/'
 # List of blacklisted project names
 BLACKLISTED_PROJECTS = [
     'static', 'pv', 'releases', 'new', 'api', 'settings',
-    'logout', 'login', 'users', 'groups', 'projects', 'ssh_info'
+    'logout', 'login', 'user', 'users', 'groups', 'projects', 'ssh_info'
     'issues', 'pull-requests', 'commits', 'tree', 'forks',
 ]
 
