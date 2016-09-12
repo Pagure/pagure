@@ -95,6 +95,7 @@ class ProjectForm(ProjectFormSimplified):
         'Project Namespace',
         [wtforms.validators.optional()],
         choices=[],
+        coerce=lambda val: unicode(val) if val else None
     )
 
     def __init__(self, *args, **kwargs):
