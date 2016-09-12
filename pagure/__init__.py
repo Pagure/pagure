@@ -407,9 +407,10 @@ def set_variables():
         flask.g.repo_admin = is_repo_admin(flask.g.repo)
         flask.g.branches = sorted(flask.g.repo_obj.listall_branches())
 
+    items_per_page = 100
     flask.g.offset = 0
     flask.g.page = 1
-    flask.g.limit = 10
+    flask.g.limit = items_per_page
     page = flask.request.args.get('page')
     limit = flask.request.args.get('n')
     if limit:
@@ -418,7 +419,7 @@ def set_variables():
         except ValueError:
             limit = 10
         if limit > 500 or limit <= 0:
-            limit = 10
+            limit = items_per_page
 
         flask.g.limit = limit
 
