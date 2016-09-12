@@ -1578,7 +1578,7 @@ def search_projects(
             )
 
     if namespace:
-        projects = project.filter(
+        projects = projects.filter(
             model.Project.namespace == namespace
         )
 
