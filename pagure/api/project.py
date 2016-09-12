@@ -232,7 +232,12 @@ def api_new_project():
         raise pagure.exceptions.APIError(
             404, error_code=APIERROR.ENEWPROJECTDISABLED)
 
-    form = pagure.forms.ProjectForm(csrf_enabled=False)
+    namespaces = APP.config['ALLOWED_PREFIX'][:]
+    if user:
+        namespaces.extend([grp for grp in user.groups])
+
+    form = pagure.forms.ProjectForm(
+        namespaces=namespaces, csrf_enabled=False)
     if form.validate_on_submit():
         name = form.name.data
         description = form.description.data
