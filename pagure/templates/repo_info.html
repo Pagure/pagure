@@ -88,8 +88,10 @@ git push -u origin master</pre>
                   <span class="oi text-muted" data-glyph="random"
                     title="Default branch"></span>
                   <a href="{{ url_for('view_repo_branch',
-                    username=username, namespace=repo.namespace,
-                    repo=repo.name, branchname=head) }}"
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace,
+                    branchname=head) }}"
                     title="{{ head }}" data-toggle="tooltip">
                     {{ head }}
                   </a>
@@ -108,8 +110,10 @@ git push -u origin master</pre>
                   <span class="oi text-muted" data-glyph="random"></span>
                   {% if branchname != branch %}
                   <a class="" href="{{ url_for('view_repo_branch',
-                    username=username, repo=repo.name, branchname=branch,
-                    namespace=repo.namespace) }}"
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace,
+                    branchname=branch) }}"
                     title="{{ branch }}" data-toggle="tooltip">{{ branch }}
                   </a>
                   {% else %}
@@ -121,8 +125,10 @@ git push -u origin master</pre>
                   {% if g.repo_admin and branch != head %}
                   <form id="delete_branch_form-{{ branch | replace('/', '_') }}" action="{{
                     url_for('.delete_branch',
-                            username=username, repo=repo.name,
-                            namespace=repo.namespace, branchname=branch)
+                            repo=repo.name,
+                            username=username,
+                            namespace=repo.namespace,
+                            branchname=branch)
                     }}" method="post" class="inline icon del_icon"
                     onsubmit="return confirm('Are you sure you want to remove the branch: {{ branch }}?\nThis cannot be un-done!');">
                     {{ form.csrf_token }}
@@ -224,9 +230,11 @@ git push -u origin master</pre>
               <div class="list-group list-group-flush">
                 {% for commit in last_commits %}
                   <a href="{{
-                      url_for('view_commit', username=username,
+                      url_for('view_commit',
+                      repo=repo.name,
+                      username=username,
                       namespace=repo.namespace,
-                      repo=repo.name, commitid=commit.hex) }}" class="list-group-item">
+                      commitid=commit.hex) }}" class="list-group-item">
                     <div class="commitdate" title="{{ commit.commit_time|format_ts }}">
                       <small>
                         <strong>
@@ -326,8 +334,8 @@ $(function() {
           var url = "{{ url_for(
               'request_pull',
               repo=repo.name,
-              namespace=repo.namespace,
               username=repo.user.user if repo.is_fork else None,
+              namespace=repo.namespace,
               requestid=-100) }}";
           url = url.replace(-100, res.message.branch_w_pr[branch]);
           var html = ' \

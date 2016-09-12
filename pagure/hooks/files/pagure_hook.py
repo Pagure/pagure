@@ -40,8 +40,8 @@ def generate_revision_change_log(new_commits_list):
         for relation in pagure.lib.link.get_relation(
                 pagure.SESSION,
                 pagure.lib.git.get_repo_name(abspath),
-                pagure.lib.git.get_repo_namespace(abspath),
                 pagure.lib.git.get_username(abspath),
+                pagure.lib.git.get_repo_namespace(abspath),
                 line,
                 'fixes',
                 include_prs=True):
@@ -51,8 +51,8 @@ def generate_revision_change_log(new_commits_list):
         for issue in pagure.lib.link.get_relation(
                 pagure.SESSION,
                 pagure.lib.git.get_repo_name(abspath),
-                pagure.lib.git.get_repo_namespace(abspath),
                 pagure.lib.git.get_username(abspath),
+                pagure.lib.git.get_repo_namespace(abspath),
                 line,
                 'relates'):
             relates_commit(commitid, issue, pagure.APP.config.get('APP_URL'))

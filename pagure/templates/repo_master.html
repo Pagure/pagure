@@ -26,15 +26,19 @@
               {% if repo.settings.get('issue_tracker', True)
                     and config.get('ENABLE_TICKETS', True)%}
               <a href="{{ url_for('new_issue',
-                  namespace=repo.namespace, username=username, repo=repo.name) }}"
+                  repo=repo.name,
+                  username=username,
+                  namespace=repo.namespace) }}"
                 class="btn btn-success btn-sm">New Issue</a>
               {% endif %}
               <div class="btn-group">
               {% if not repo.is_fork %}
                 <form method="POST" name="fork_project" id="fork_project"
                   action="{{ url_for(
-                    '.fork_project', namespace=repo.namespace,
-                    repo=repo.name, username=username) }}">
+                    '.fork_project',
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace) }}">
                   {{ forkbuttonform.csrf_token }}
                 </form>
                 <button class="btn btn-sm btn-secondary"
@@ -42,11 +46,16 @@
                   <span class="oi" data-glyph="fork"></span> Fork</button>
               {% endif %}
                 <button title="{%- if is_watching(
-                    repo.name, repo.namespace, repo.user.user if repo.is_fork else None)
+                    repo.name,
+                    repo.user.user if repo.is_fork else None,
+                    repo.namespace)
                 %}You are watching this project{% else
                 %}You are not watching this project{% endif -%}"
                 type="button" class="btn btn-sm dropdown-toggle
-                {%- if is_watching(repo.name, repo.user.user if repo.is_fork else None)
+                {%- if is_watching(
+                    repo.name,
+                    repo.user.user if repo.is_fork else None,
+                    repo.namespace)
                 %} btn-primary{% else %} btn-secondary{% endif -%}"
                 data-toggle="dropdown" id="watch-button">
                   <span class="oi" data-glyph="eye"></span>
@@ -54,10 +63,14 @@
                 <div class="dropdown-menu dropdown-menu-right watch-menu">
                   <form method="POST" id="watch_project" name="watch_project"
                       action="{{ url_for('.watch_repo',
-                        namespace=repo.namespace,
+                        repo=repo.name,
                         user=repo.user.user if repo.is_fork else None,
-                        repo=repo.name, watch=0) }}">
-                   {%- if is_watching(repo.name, repo.user.user if repo.is_fork else None)
+                        namespace=repo.namespace,
+                        watch=0) }}">
+                   {%- if is_watching(
+                        repo.name,
+                        repo.user.user if repo.is_fork else None,
+                        repo.namespace)
                    %}
                    <a class="dropdown-item" id="unwatch_button">Stop watching {{repo.name}}</a>
                    {% else %}
@@ -82,8 +95,8 @@
             <a href="{{ url_for(
                 'view_repo',
                 repo=repo.parent.name,
-                namespace=repo.parent.namespace,
-                username=repo.parent.user.user if repo.parent.is_fork else None)}}">
+                username=repo.parent.user.user if repo.parent.is_fork else None,
+                namespace=repo.parent.namespace)}}">
                 {{ repo.parent.namespace + '/' if repo.parent.namespace }}{{ repo.parent.fullname }}
             </a>
         </div>
@@ -103,8 +116,10 @@
           if select == 'overview' %}class="nav-link active" {%
           else %}class="nav-link" {%
           endif %}href="{{ url_for(
-              'view_repo', namespace=repo.namespace,
-              username=username, repo=repo.name) }}">
+              'view_repo',
+              repo=repo.name,
+              username=username,
+              namespace=repo.namespace) }}">
             <span class="oi hidden-md-up" data-glyph="home"></span>
             <span class="hidden-sm-down">Overview</span>
         </a>
@@ -115,8 +130,10 @@
             if select == 'docs' %}class="active nav-link" {%
             else %}class="nav-link" {%
             endif %}href="{{ url_for(
-                '.view_docs', namespace=repo.namespace, username=username,
-                repo=repo.name) }}">
+                '.view_docs',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace) }}">
               <span class="oi hidden-md-up" data-glyph="book"></span>
               <span class="hidden-sm-down">Docs</span>
           </a>
@@ -129,8 +146,11 @@
             if select == 'commits' %}class="active nav-link" {%
             else %}class="nav-link" {%
             endif %}href="{{ url_for(
-                '.view_commits', username=username, namespace=repo.namespace,
-                repo=repo.name, branchname=branchname) }}">
+                '.view_commits',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                branchname=branchname) }}">
               <span class="oi hidden-md-up" data-glyph="spreadsheet">
               </span><span class="hidden-sm-down">Commits</span>
             </a>
@@ -142,8 +162,11 @@
             if select == 'tree' %}class="active nav-link" {%
             else %}class="nav-link"{%
             endif %} href="{{ url_for(
-                '.view_tree', username=username, namespace=repo.namespace,
-                repo=repo.name, identifier=branchname) }}">
+                '.view_tree',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                identifier=branchname) }}">
               <span class="oi hidden-md-up" data-glyph="file"></span>
               <span class="hidden-sm-down">Files</span>
           </a>
@@ -154,8 +177,10 @@
             if select == 'tags' %}class="active nav-link" {%
             else %}class="nav-link" {%
             endif %}href="{{ url_for(
-                '.view_tags', username=username, namespace=repo.namespace,
-                repo=repo.name) }}">
+                '.view_tags',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace) }}">
               <span class="oi hidden-md-up" data-glyph="box"></span>
               <span class="hidden-sm-down">Releases</span>
           </a>
@@ -168,8 +193,10 @@
               if select == 'issues' %}class="active nav-link" {%
               else %}class="nav-link" {%
               endif %}href="{{ url_for(
-                  '.view_issues', username=username, namespace=repo.namespace,
-                  repo=repo.name) }}">
+                  '.view_issues',
+                  repo=repo.name,
+                  username=username,
+                  namespace=repo.namespace) }}">
                 <span class="oi hidden-md-up" data-glyph="warning"></span>
                 <span class="hidden-sm-down">Issues&nbsp;</span>
                 <span class="label label-default label-pill hidden-sm-down">
@@ -185,8 +212,10 @@
             if select == 'requests' %}class="active nav-link" {%
             else %}class="nav-link" {%
             endif %}href="{{ url_for(
-                '.request_pulls', username=username, namespace=repo.namespace,
-                repo=repo.name) }}">
+                '.request_pulls',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace) }}">
               <span class="oi hidden-md-up" data-glyph="task"></span>
               <span class="hidden-sm-down">Pull Requests&nbsp;</span>
               <span class="label label-default label-pill hidden-sm-down">
@@ -202,8 +231,10 @@
             if select == 'forks' %}class="active nav-link" {%
             else %}class="nav-link" {%
             endif %}href="{{ url_for(
-                '.view_forks', username=username, namespace=repo.namespace,
-                repo=repo.name) }}">
+                '.view_forks',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace) }}">
               <span class="oi hidden-md-up" data-glyph="fork"></span>
               <span class="hidden-sm-down">Forks&nbsp;</span>
               <span class="hidden-sm-down label label-default label-pill">
@@ -220,8 +251,10 @@
               if select == 'settings' %}class="active nav-link" {%
               else %}class="nav-link" {%
               endif %}href="{{ url_for(
-                  '.view_settings', namespace=repo.namespace,
-                  repo=repo.name, username=username) }}">
+                  '.view_settings',
+                  repo=repo.name,
+                  username=username,
+                  namespace=repo.namespace) }}">
                 <span class="oi" data-glyph="cog"></span>
                 <span class="hidden-sm-down">Settings</span>
             </a>
@@ -231,8 +264,11 @@
       {% if endpoint == 'view_docs' %}
       <li class="nav-item pull-xs-right">
         <a class="nav-link" href="{{ config['DOC_APP_URL'] + url_for(
-            '.view_repo', namespace=repo.namespace,
-            username=username, repo=repo.name, filename=filename)
+            '.view_repo',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace,
+            filename=filename)
           }}" target="_blank" title="Open to a new tab" rel="noopener noreferrer">
           <span class="oi" data-glyph="external-link"></span>
         </a>

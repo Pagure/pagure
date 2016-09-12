@@ -347,9 +347,10 @@ def inject_variables():
         watch = False
         if authenticated():
             watch = pagure.lib.is_watching(
-                SESSION, flask.g.fas_user, reponame,
-                namespace=namespace,
-                repouser=username)
+                SESSION, flask.g.fas_user,
+                reponame,
+                repouser=username,
+                namespace=namespace)
         return watch
 
     return dict(

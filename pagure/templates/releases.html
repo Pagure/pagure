@@ -11,7 +11,9 @@
 {% if config.get('UPLOAD_FOLDER_PATH') and config.get('UPLOAD_FOLDER') %}
   {% if g.repo_admin %}
     <a class="pull-xs-right" href="{{ url_for('.new_release',
-            namespace=repo.namespace, username=username, repo=repo.name) }}"
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace) }}"
         method="get" class="icon">
     <button class="btn btn-primary" type="submit" title="Upload a tarball">
       <span class="icon icon-plus blue"></span>
@@ -36,7 +38,9 @@
   <div class="list-group">
     {% for tag in tags %}
       <a class="list-group-item" href="{{ url_for('.view_tree',
-            namespace=repo.namespace, username=username, repo=repo.name,
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace,
             identifier=tag['object'].oid) }}">
         <div class="pull-xs-right">{{tag['date'] | humanize}}
           <span id="tagid" class="label label-default">

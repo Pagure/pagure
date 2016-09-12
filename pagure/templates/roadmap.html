@@ -12,13 +12,17 @@
     {{ issues|count }} Milestones
     <span class="btn-group btn-group-sm pull-xs-right" role="group">
       <a href="{{ url_for(
-          'view_issues', namespace=repo.namespace, username=username,
-          repo=repo.name) }}" class="btn btn-secondary btn-sm">
+          'view_issues',
+          repo=repo.name,
+          username=username,
+          namespace=repo.namespace) }}" class="btn btn-secondary btn-sm">
         List
       </a>
       <a href="{{ url_for(
-          'new_issue', namespace=repo.namespace, username=username,
-          repo=repo.name) }}" class="btn btn-success btn-sm">
+          'new_issue',
+          repo=repo.name,
+          username=username,
+          namespace=repo.namespace) }}" class="btn btn-success btn-sm">
         New Issue
       </a>
     </span>
@@ -37,18 +41,28 @@
   <span class="btn-group btn-group-sm issues-tagbar" role="group">
     {% if not status %}
       <a class="btn btn-secondary btn-sm" href="{{ url_for(
-          'view_roadmap', namespace=repo.namespace,
-          username=username, repo=repo.name) }}">Open</a>
+          'view_roadmap',
+          repo=repo.name,
+          username=username,
+          namespace=repo.namespace) }}">Open</a>
       <a class="btn btn-primary btn-sm" href="{{ url_for(
-          'view_roadmap', namespace=repo.namespace,
-          username=username, repo=repo.name, status='All') }}">All</a>
+          'view_roadmap',
+          repo=repo.name,
+          username=username,
+          namespace=repo.namespace,
+          status='All') }}">All</a>
     {% else %}
       <a class="btn btn-primary btn-sm" href="{{ url_for(
-          'view_roadmap', namespace=repo.namespace,
-          username=username, repo=repo.name) }}">Open</a>
+          'view_roadmap',
+          repo=repo.name,
+          username=username,
+          namespace=repo.namespace) }}">Open</a>
       <a class="btn btn-secondary btn-sm" href="{{ url_for(
-          'view_roadmap',namespace=repo.namespace,
-           username=username, repo=repo.name, status='All') }}">All</a>
+          'view_roadmap',
+          repo=repo.name,
+          username=username,
+          namespace=repo.namespace,
+          status='All') }}">All</a>
     {% endif %}
   </span>
   <span class="oi m-l-2" data-glyph="tag"></span>
@@ -57,15 +71,21 @@
       {% if tag.tag in tags %}
         <a class="btn btn-secondary btn-sm {% if tag.tag in tags%}active{% endif %}"
             href="{{ url_for(
-                'view_roadmap', username=username, namespace=repo.namespace,
-                repo=repo.name, milestone=tag.tag,
+                'view_roadmap',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                milestone=tag.tag,
                 status='All' if not status else None) }}"
                    title="Filter issues by milestone">
       {% else %}
         <a class="btn btn-secondary btn-sm {% if tag.tag in tags%}active{%endif%}"
             href="{{ url_for(
-                'view_roadmap', username=username, namespace=repo.namespace,
-                repo=repo.name, milestone=tag.tag,
+                'view_roadmap',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                milestone=tag.tag,
                 status='All' if not status else None) }}"
                    title="Filter issues by milestone">
       {% endif %}
@@ -109,8 +129,11 @@
               <span class="oi red-icon" data-glyph="lock-locked" title="Private issue"></span>
               {% endif %}
               <a {% if issue.status != 'Open' %}class="text-muted"{% endif %} href="{{ url_for(
-                  'view_issue', username=username, namespace=repo.namespace,
-                  repo=repo.name, issueid=issue.id) }}">
+                  'view_issue',
+                  repo=repo.name,
+                  username=username,
+                  namespace=repo.namespace,
+                  issueid=issue.id) }}">
                 {{ issue.title | noJS("img") | safe }}
               </a>
                &nbsp;&nbsp;

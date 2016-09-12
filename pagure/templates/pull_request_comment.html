@@ -3,7 +3,9 @@
 <section class="add_comment">
 
   <form action="{{ url_for(
-    'pull_request_add_comment', username=username, repo=repo.name,
+    'pull_request_add_comment',
+    repo=repo.name,
+    username=username,
     namespace=repo.namespace,
     requestid=requestid, commit=commit, tree_id=tree_id, filename=filename,
     row=row) }}"

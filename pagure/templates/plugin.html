@@ -14,7 +14,9 @@
 {% endif %}
 
   <form action="{{ url_for('.view_plugin',
-        namespace=repo.namespace, username=username, repo=repo.name,
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace,
         plugin=plugin.name) }}" method="post">
   {{ plugin.description | markdown | noJS | safe }}
 

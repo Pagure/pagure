@@ -22,7 +22,9 @@
       </div>
       <div class="card-block" class="edit_tag">
         <form action="{{ url_for('.request_pull_edit',
-            namespace=repo.namespace, username=username, repo=repo.name,
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace,
             requestid=request.id) }}" method="post">
 
           <table>
@@ -37,8 +39,10 @@
             <input type="submit" class="btn btn-primary" value="Edit">
             {{ form.csrf_token }}
             <a href="{{ url_for('request_pull',
+              repo=repo.name,
+              username=username,
               namespace=repo.namespace,
-              username=username, repo=repo.name, requestid=request.id)}}">
+              requestid=request.id)}}">
               <input type="button" class="btn btn-secondary" value="Cancel" />
             </a>
             {{ form.csrf_token }}

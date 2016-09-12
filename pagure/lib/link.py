@@ -40,7 +40,7 @@ RELATES = [
 ]
 
 
-def get_relation(session, reponame, namespace, username, text,
+def get_relation(session, reponame, username, namespace, text,
                  reftype='relates', include_prs=False):
     ''' For a given text, searches using regex if the text contains
     reference to another issue in this project or another one.

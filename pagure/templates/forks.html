@@ -16,7 +16,9 @@
       <div class="list-group-item">
         <h5>
           <strong><a href="{{ url_for('view_repo',
-                namespace=repo.namespace, username=fork.user.user,repo=fork.name) }}">
+                repo=fork.name,
+                username=fork.user.user,
+                namespace=repo.namespace) }}">
               <span class="oi text-muted" data-glyph="fork"></span>
               {{ fork.user.user }}/{{ fork.name }}
           </a></strong>

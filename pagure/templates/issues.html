@@ -17,8 +17,10 @@
     <span class="btn-group btn-group-sm pull-xs-right" role="group">
     {% if repo.milestones %}
       <a href="{{ url_for(
-          'view_roadmap', namespace=repo.namespace,
-          username=username, repo=repo.name) }}"
+          'view_roadmap',
+          repo=repo.name,
+          username=username,
+          namespace=repo.namespace) }}"
          class="btn btn-secondary btn-sm">
         Roadmap
       </a>
@@ -39,19 +41,27 @@
   <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
     {% if status and status != 'Open' %}
       <a class="btn btn-secondary btn-sm" href="{{ url_for('view_issues',
-        namespace=repo.namespace, username=username,
-        repo=repo.name, tags=tags, author=author, assignee=assignee) }}">Open</a>
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace,
+        tags=tags, author=author, assignee=assignee) }}">Open</a>
       <a class="btn btn-primary btn-sm" href="{{ url_for('view_issues',
-        namespace=repo.namespace, username=username,
-        repo=repo.name, status='Closed', tags=tags, author=author,
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace,
+        status='Closed', tags=tags, author=author,
         assignee=assignee) }}">Closed</a>
     {% else %}
       <a class="btn btn-primary btn-sm" href="{{ url_for('view_issues',
-        namespace=repo.namespace, username=username,
-        repo=repo.name, tags=tags, author=author, assignee=assignee) }}">Open</a>
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace,
+        tags=tags, author=author, assignee=assignee) }}">Open</a>
       <a class="btn btn-secondary btn-sm" href="{{ url_for('view_issues',
-        namespace=repo.namespace, username=username,
-        repo=repo.name, status='Closed', tags=tags, author=author,
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace,
+        status='Closed', tags=tags, author=author,
         assignee=assignee) }}">Closed</a>
     {% endif %}
   </span>
@@ -62,19 +72,25 @@
         {% if status and status != 'Open' %}
         <a class="btn btn-secondary btn-sm {% if tag.tag in tags%}active{% endif %}"
             href="{{ url_for('view_issues',
-                namespace=repo.namespace, username=username,
-                repo=repo.name, status='Closed') }}" title="Filter issues by tag">
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                status='Closed') }}" title="Filter issues by tag">
          {% else %}
         <a class="btn btn-secondary btn-sm {% if tag.tag in tags%}active{% endif %}"
-            href="{{ url_for('view_issues', namespace=repo.namespace,
-                username=username, repo=repo.name) }}"
+            href="{{ url_for('view_issues',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace) }}"
                 title="Filter issues by tag">
          {% endif %}
       {% else %}
         <a class="btn btn-secondary btn-sm {% if tag.tag in tags%}active{%endif%}"
             href="{{ url_for('view_issues',
-                namespace=repo.namespace, username=username,
-                repo=repo.name, tags=tag.tag,
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                tags=tag.tag,
                 author=author, assignee=assignee, status=status) }}"
                 title="Filter issues by tag">
       {% endif %}
@@ -94,21 +110,27 @@
             {% endif %}
             <th class="priority" data-sort="int">
               Priority&nbsp;(<a href="{{ url_for('view_issues',
-              namespace=repo.namespace, username=username,
-              repo=repo.name, tags=tags, author=author, assignee=assignee,
+              repo=repo.name,
+              username=username,
+              namespace=repo.namespace,
+              tags=tags, author=author, assignee=assignee,
               status=status) }}">reset</a>)
             </th>
             <th class="open_by">
               Reporter&nbsp;(<a href="{{ url_for('view_issues',
-              namespace=repo.namespace, username=username,
-              repo=repo.name, tags=tags, assignee=assignee, priority=priority,
+              repo=repo.name,
+              username=username,
+              namespace=repo.namespace,
+              tags=tags, assignee=assignee, priority=priority,
               status=status) }}">reset</a>)
             </th>
             {% if not status or status|lower == 'open' %}
             <th class="assigned">
               Assignee&nbsp;(<a href="{{ url_for('view_issues',
-              namespace=repo.namespace, username=username,
-              repo=repo.name, tags=tags, author=author, priority=priority,
+              repo=repo.name,
+              username=username,
+              namespace=repo.namespace,
+              tags=tags, author=author, priority=priority,
               status=status) }}">reset</a>)
             </th>
             {% endif %}
@@ -133,8 +155,10 @@
               <span class="oi red-icon" data-glyph="lock-locked" title="Private issue"></span>
               {% endif %}
               <a href="{{ url_for('view_issue',
-                  namespace=repo.namespace, username=username,
-                  repo=repo.name, issueid=issue.id) }}">
+                  repo=repo.name,
+                  username=username,
+                  namespace=repo.namespace,
+                  issueid=issue.id) }}">
                 {{ issue.title | noJS("img") | safe }}
               </a>
                &nbsp;&nbsp;
@@ -168,10 +192,11 @@
               {% if issue.priority %}
 
                 <a href="{{ url_for('view_issues',
-                    namespace=repo.namespace, username=username,
-                    repo=repo.name, author=author,
-                    tags=tags, assignee=assignee, status=status,
-                    priority=issue.priority) }}"
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace,
+                    author=author, tags=tags, assignee=assignee,
+                    status=status, priority=issue.priority) }}"
                     title="Filter issues by priority">{{
                   repo.priorities[issue.priority | string] }}
                 </a>
@@ -179,9 +204,11 @@
             </td>
             <td class="nowrap">
                 <a href="{{ url_for('view_issues',
-                    namespace=repo.namespace, username=username,
-                    repo=repo.name, author=issue.user.user,
-                    tags=tags, assignee=assignee, status=status) }}"
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace,
+                    author=issue.user.user, tags=tags,
+                    assignee=assignee, status=status) }}"
                     title="Filter issues by reporter">
                     {{ issue.user.default_email | avatar(16) | safe }}
                     {{ issue.user.user }}
@@ -190,8 +217,10 @@
             <td class="nowrap">
             {% if not status or status|lower == 'open' %}
               {% if issue.assignee %}
-                <a href="{{ url_for('view_issues', username=username,
-                  namespace=repo.namespace, repo=repo.name,
+                <a href="{{ url_for('view_issues',
+                  repo=repo.name,
+                  username=username,
+                  namespace=repo.namespace,
                   assignee=issue.assignee.username,
                   tags=tags, author=author, status=status) }}"
                   title="Filter issues by assignee">
@@ -199,9 +228,11 @@
                   {{ issue.assignee.user }}
                 </a>
               {% else %}
-                <a class="text-muted" href="{{ url_for(
-                  'view_issues', username=username, namespace=repo.namespace,
-                  repo=repo.name, tags=tags, author=author, status=status,
+                <a class="text-muted" href="{{ url_for('view_issues',
+                  repo=repo.name,
+                  username=username,
+                  namespace=repo.namespace,
+                  tags=tags, author=author, status=status,
                   assignee=0) }}">unassigned
                 </a>
               {% endif %}

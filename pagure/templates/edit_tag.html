@@ -11,8 +11,11 @@
 <h2>Edit tag: {{ edit_tag }}</h2>
 
 <section class="edit_tag">
-    <form action="{{ url_for('.edit_tag', namespace=repo.namespace,
-                     username=username, repo=repo.name, tag=edit_tag) }}" method="post">
+    <form action="{{ url_for('.edit_tag',
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace,
+                    tag=edit_tag) }}" method="post">
 
     <p>Enter in the field below the new name for the tag: "{{ edit_tag }}"</p>
     <table>

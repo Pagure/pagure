@@ -135,9 +135,11 @@
               <h4 id="taglist">
                 {% for tag in issue.tags %}
                   <a id="tag-{{ tag.tag }}" class="label label-default"
-                    href="{{ url_for('view_issues', username=username,
+                    href="{{ url_for('view_issues',
+                        repo=repo.name,
+                        username=username,
                         namespace=repo.namespace,
-                        repo=repo.name, tags=tag.tag) }}">
+                        tags=tag.tag) }}">
                     {{ tag.tag }}
                   </a>
                 {% endfor %}
@@ -158,7 +160,9 @@
             <div id="assignee_plain">
               {% if issue.assignee %}
                   <a href="{{ url_for(
-                    'view_issues', username=username, repo=repo.name,
+                    'view_issues',
+                    repo=repo.name,
+                    username=username,
                     namespace=repo.namespace,
                     assignee=issue.assignee.username) }}">
                     {{ issue.assignee.username }}
@@ -190,9 +194,11 @@
             <div id="blocklist">
               {% for ticket in issue.parents %}
                 <a id="block-{{ ticket.id }}" class="label label-default"
-                  href="{{ url_for('view_issue', username=username,
+                  href="{{ url_for('view_issue',
+                    repo=repo.name,
+                    username=username,
                     namespace=repo.namespace,
-                    repo=repo.name, issueid=ticket.id)
+                    issueid=ticket.id)
                   }}" >#{{ ticket.id }}</a>
               {% endfor %}
             </div>
@@ -213,9 +219,11 @@
             <div id="dependlist">
               {% for ticket in issue.children %}
                 <a id="depend-{{ ticket.id }}" class="label label-default"
-                  href="{{ url_for('view_issue', username=username,
+                  href="{{ url_for('view_issue',
+                    repo=repo.name,
+                    username=username,
                     namespace=repo.namespace,
-                    repo=repo.name, issueid=ticket.id)
+                    issueid=ticket.id)
                     }}">#{{ ticket.id }}</a>
               {% endfor %}
             </div>
@@ -267,7 +275,7 @@
 {% block jscripts %}
 {{ super() }}
 <script type="text/javascript">
-  var UPLOAD_URL = "{{ url_for('upload_issue', namespace=repo.namespace, repo=repo.name, issueid=issue.id, username=username) }}";
+  var UPLOAD_URL = "{{ url_for('upload_issue', repo=repo.name, username=username, namespace=repo.namespace, issueid=issue.id) }}";
 </script>
 <script type="text/javascript"
     src="{{ url_for('static', filename='emoji/jquery.textcomplete.min.js') }}">
@@ -306,8 +314,16 @@ $(document).ready(function() {
     }
     $("#comment").atwho(userConfig);
   });
-   $.when($.get("{{ url_for('api_ns.api_view_issues', namespace=repo.namespace, repo=repo.name, username=username, status='all') }}"),
-          $.get("{{ url_for('api_ns.api_pull_request_views', namespace=repo.namespace, repo=repo.name, username=username, status='all') }}")
+   $.when($.get("{{ url_for('api_ns.api_view_issues',
+                            repo=repo.name,
+                            username=username,
+                            namespace=repo.namespace,
+                            status='all') }}"),
+          $.get("{{ url_for('api_ns.api_pull_request_views',
+                            repo=repo.name,
+                            username=username,
+                            namespace=repo.namespace,
+                            status='all') }}")
    ).done(function(issuesResp, prResp) {
      // 0 is the api response
      var issuesAndPrs = issuesResp[0]['issues'].concat(prResp[0]['requests']);
@@ -408,8 +424,11 @@ $(document).ready(function() {
     var closeForm = $('<form>', {
         'method': 'POST',
         'action': '{{
-        url_for('.delete_issue', namespace=repo.namespace,
-                 username=username, repo=repo.name, issueid=issueid) }}',
+        url_for('.delete_issue',
+                 repo=repo.name,
+                 username=username,
+                 namespace=repo.namespace,
+                 issueid=issueid) }}',
     }).append($('<input>', {
         'name': 'csrf_token',
         'value': '{{ form.csrf_token.current_token }}',
@@ -454,13 +473,22 @@ source.addEventListener('message', function(e) {
   console.log(e.data);
   var data = $.parseJSON(e.data);
   var _issues_url ='<a href="{{
-    url_for('view_issues', namespace=repo.namespace, username=username, repo=repo.name)}}';
+    url_for('view_issues',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace)}}';
   var _api_issues_url ='{{
-    url_for('api_ns.api_view_issue', namespace=repo.namespace,
-            username=username, repo=repo.name, issueid='-123456789')}}';
+    url_for('api_ns.api_view_issue',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace,
+            issueid='-123456789')}}';
   var _issue_url ='{{
-    url_for('view_issue', namespace=repo.namespace,
-            username=username, repo=repo.name, issueid='-123456789')}}';
+    url_for('view_issue',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace,
+            issueid='-123456789')}}';
   process_event(data, "{{ issue.uid }}", _issue_url,
                 _issues_url, _api_issues_url,
                 "{{ g.fas_user.username }}");
@@ -582,7 +610,10 @@ $( document ).ready(function() {
     create: false,
     load: function(query, callback) {
       $.getJSON(
-        "{{ url_for('api_ns.api_view_issues', namespace=repo.namespace, username=username, repo=repo.name) }}",
+        "{{ url_for('api_ns.api_view_issues',
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace) }}",
         function( data ) {
           //console.log(data.issues);
           callback(data.issues);
@@ -608,7 +639,10 @@ $( document ).ready(function() {
     create: false,
     load: function(query, callback) {
       $.getJSON(
-        "{{ url_for('api_ns.api_view_issues', namespace=repo.namespace, username=username, repo=repo.name) }}",
+        "{{ url_for('api_ns.api_view_issues',
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace) }}",
         function( data ) {
           //console.log(data.issues);
           callback(data.issues);
@@ -644,9 +678,9 @@ $( document ).ready(function() {
       if ($( "#previewinmarkdown" ).hasClass("inactive")){
         var _text = $( "#comment" ).val();
         var _url = "{{ url_for('markdown_preview',
+                        repo=repo.name,
                         user=repo.user.user if repo.is_fork,
-                        namespace=repo.namespace,
-                        repo=repo.name) | safe}}";
+                        namespace=repo.namespace) | safe}}";
         $.ajax({
           url: _url ,
           type: 'POST',
@@ -680,13 +714,19 @@ $( document ).ready(function() {
   {% if authenticated and g.repo_admin %}
     $("#take-btn").click(function(){
       var _url = "{{ url_for(
-        'api_ns.api_assign_issue', namespace=repo.namespace, repo=repo.name,
-        username=username, issueid=issueid
+        'api_ns.api_assign_issue',
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace,
+        issueid=issueid
         ) }}";
       var _data = {assignee: "{{ g.fas_user.username }}"};
       $.post( _url, _data ).done(
         function(data) {
-          var _user_url = '\n<a href="{{ url_for("view_issues",namespace=repo.namespace, repo=repo.name, username=username) }}'
+          var _user_url = '\n<a href="{{ url_for("view_issues",
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace) }}'
             + '?assignee={{ g.fas_user.username }}">'
             + '{{ g.fas_user.username }}</a>';
           $('#assignee_plain').html(_user_url);

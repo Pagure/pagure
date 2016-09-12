@@ -13,18 +13,27 @@
     <span>{{ splitted_message[0] }}</span>
     <div class="pull-xs-right btn-group">
       <a class="btn btn-secondary btn-sm" href="{{ url_for(
-        'view_raw_file', username=username, namespace=repo.namespace,
-        repo=repo.name, identifier=commitid) }}" title="View as raw">raw</a>
+        'view_raw_file',
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace,
+        identifier=commitid) }}" title="View as raw">raw</a>
       <a class="btn btn-secondary btn-sm" href="{{ url_for(
-        'view_commit_patch', username=username, namespace=repo.namespace,
-        repo=repo.name, commitid=commitid) }}">patch</a>
+        'view_commit_patch',
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace,
+        commitid=commitid) }}">patch</a>
       <a class="btn btn-secondary btn-sm" href="{{ url_for(
         'view_tree', username=username, namespace=repo.namespace,
         repo=repo.name, identifier=commitid) }}">tree</a>
       {% if commit.parents|length == 1 %}
       <a class="btn btn-secondary btn-sm" title={{commit.parents[0].oid.hex}} href="{{ url_for(
-        'view_commit', username=username, namespace=repo.namespace,
-        repo=repo.name, commitid=commit.parents[0].oid.hex) }}">parent</a>
+        'view_commit',
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace,
+        commitid=commit.parents[0].oid.hex) }}">parent</a>
       {% elif commit.parents|length > 1 %}
       <div class="btn-group" role="group">
         <button id="parentsDrop" type="button" class="btn btn-secondary btn-sm dropdown-toggle"
@@ -34,8 +43,11 @@
         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="parentsDrop">
           {% for parent in commit.parents %}
             <a class="dropdown-item" href="{{ url_for(
-                'view_commit', username=username, namespace=repo.namespace,
-                repo=repo.name, commitid=parent.oid.hex)
+                'view_commit',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                commitid=parent.oid.hex)
             }}" class="commitid">{{parent.oid.hex}}</a>
           {% endfor %}
         </div>
@@ -175,9 +187,9 @@
         url: '{{ url_for("internal_ns.get_branches_of_commit") }}' ,
         type: 'POST',
         data: {
-          namespace: "{{ repo.namespace }}",
           repo: "{{ repo.name }}",
           repouser: "{{ repo.user.user if repo.is_fork else '' }}",
+          namespace: "{{ repo.namespace }}",
           commit_id: "{{ commitid }}",
           csrf_token: "{{ form.csrf_token.current_token }}",
         },

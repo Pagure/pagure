@@ -189,8 +189,11 @@
       {% if g.repo_admin or (
         g.fas_user and g.fas_user.username == comment.user.username) %}
       <a class="btn btn-primary btn-sm" href="{{
-          url_for('edit_issue', username=username,
-                  repo=repo.name, issueid=issueid)
+          url_for('edit_issue',
+                  repo=repo.name,
+                  username=username,
+                  namespace=repo.namespace,
+                  issueid=issueid)
           }}" title="Edit this issue">
       <span class="oi" data-glyph="pencil"></span></a>
       {% endif %}

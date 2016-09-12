@@ -26,8 +26,10 @@
       </button>
       <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
         <a class="dropdown-item" href="{{ url_for(
-            'new_remote_request_pull', namespace=repo.namespace,
-            username=username, repo=repo.name) }}">
+            'new_remote_request_pull',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace) }}">
           <small>Remote pull-request</small>
         </a>
       </div>
@@ -41,18 +43,25 @@
             if status|lower in ['open', 'true'] %}btn-primary{%
             else %}btn-secondary{%
             endif %} btn-sm" href="{{ url_for(
-                'request_pulls', username=username, namespace=repo.namespace,
-                repo=repo.name) }}">Open</a>
+                'request_pulls',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace) }}">Open</a>
       <a class="btn {%
         if status|lower in ['open', 'true'] %}btn-secondary{%
         else %}btn-primary{%
         endif %} btn-sm" href="{{ url_for(
-            'request_pulls', username=username, namespace=repo.namespace,
-            repo=repo.name, status=0) }}">Closed</a>
+            'request_pulls',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace,
+            status=0) }}">Closed</a>
   </span>
   <a class="btn btn-secondary btn-sm pull-xs-right" href="{{ url_for(
-    'request_pulls', namespace=repo.namespace,
-    username=username, repo=repo.name) }}">Reset Filters</a>
+    'request_pulls',
+    repo=repo.name,
+    username=username,
+    namespace=repo.namespace) }}">Reset Filters</a>
 </div>
 </div>
 <div class="card m-t-1">
@@ -66,14 +75,20 @@
             {% endif %}
             <th class="open_by">
               Reporter(<a href="{{ url_for(
-                'request_pulls', username=username, namespace=repo.namespace,
-                repo=repo.name, assignee=assignee, status=status) }}">reset</a>)
+                'request_pulls',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                assignee=assignee, status=status) }}">reset</a>)
             </th>
             {% if status|lower == 'open' %}
             <th class="assigned">
               Assignee(<a href="{{ url_for(
-                'request_pulls', username=username, namespace=repo.namespace,
-                repo=repo.name, author=author, status=status) }}">reset</a>)
+                'request_pulls',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                author=author, status=status) }}">reset</a>)
             </th>
             {% endif %}
         </tr>
@@ -85,8 +100,11 @@
         <tr>
             <td>
               <a href="{{ url_for(
-                  'request_pull', username=username, namespace=repo.namespace,
-                  repo=repo.name, requestid=request.id) }}">
+                  'request_pull',
+                  repo=repo.name,
+                  username=username,
+                  namespace=repo.namespace,
+                  requestid=request.id) }}">
                 <span class="label label-default">PR#{{ request.id }}</span>
                 {% if status|lower not in ['open', 'true'] %}<span class="label {%
                     if request.status|lower == 'merged' %}label-success{%
@@ -119,9 +137,11 @@
             {% endif %}
             <td class="nowrap">
               <a href="{{ url_for(
-                  'request_pulls', username=username,
+                  'request_pulls',
+                  repo=repo.name,
+                  username=username,
                   namespace=repo.namespace,
-                  repo=repo.name, author=request.user.user,
+                  author=request.user.user,
                   assignee=assignee, status=status) }}"
                   title="Filter requests by reporter">
                 {{ request.user.default_email | avatar(16) | safe }}
@@ -132,9 +152,11 @@
             <td class="nowrap">
               {% if request.assignee %}
               <a href="{{ url_for(
-                'request_pulls', username=username,
+                'request_pulls',
+                repo=repo.name,
+                username=username,
                 namespace=repo.namespace,
-                repo=repo.name, assignee=request.assignee.username,
+                assignee=request.assignee.username,
                 author=author, status=status) }}"
                 title="Filter issues by assignee">
                 {{ request.assignee.default_email | avatar(16) | safe }}
@@ -142,8 +164,11 @@
               </a>
               {% else %}
               <a class="text-muted" href="{{ url_for(
-                'request_pulls', username=username, namespace=repo.namespace,
-                repo=repo.name, author=author, status=status) }}">unassigned</a>
+                'request_pulls',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                author=author, status=status) }}">unassigned</a>
               {% endif %}
             </td>
             {% endif %}
@@ -185,9 +210,9 @@ $(function() {
         for (branch in res.message){
             var url = "{{ url_for(
             'new_request_pull',
-            namespace=repo.namespace,
             repo=repo.name,
             username=g.fas_user.username,
+            namespace=repo.namespace,
             branch_to=head,
             branch_from='') }}" + branch;
           html = '<small><a class="dropdown-item" \
@@ -224,9 +249,9 @@ $(function() {
         for (branch in res.message){
           var url = "{{ url_for(
             'new_request_pull',
-            namespace=repo.namespace,
             repo=repo.name,
             username=repo.user.user if repo.is_fork else None,
+            namespace=repo.namespace,
             branch_to=head,
             branch_from='') }}";
           html = '<small><a class="dropdown-item" href="' + url + branch + '">'

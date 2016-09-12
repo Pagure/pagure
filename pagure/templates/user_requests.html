@@ -51,9 +51,10 @@
                 <td class="stretch-table-column">
                   <a href="{{ url_for(
                       'request_pull',
+                      repo=request.project.name,
                       username=request.project.username if request.project.is_fork else None,
                       namespace=request.project.namespace,
-                      repo=request.project.name, requestid=request.id) }}">
+                      requestid=request.id) }}">
                     {{ request.title | noJS("img") | safe }}
                   </a>
                 </td>
@@ -64,9 +65,9 @@
                 <td class="nowrap">
                   <a href="{{ url_for(
                     'view_repo',
+                    repo=request.project.name,
                     username=request.project.username if request.project.is_fork else None,
-                    namespace=request.project.namespace,
-                    repo=request.project.name)}}">
+                    namespace=request.project.namespace) }}">
                     {{ request.project.username + '/' if request.project.is_fork }}
                     {{ request.project.namespace + '/' if request.project.namespace }}
                     {{ request.project.name }}

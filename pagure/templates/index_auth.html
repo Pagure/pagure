@@ -36,9 +36,10 @@
             {% for repo in repos %}
               <div class="list-group-item">
                 {% set url = url_for(
-                    'view_repo', namespace=repo.namespace,
+                    'view_repo',
+                    repo=repo.name,
                     username=repo.user.username if repo.is_fork else None,
-                    repo=repo.name) %}
+                    namespace=repo.namespace) %}
                 <a href="{{ url }}">
                   {% if repo.avatar_email %}
                     <img class="projecticon pull-xs-left" src="{{ repo.avatar_email | avatar_url }}" width=20 height=20 />&nbsp;
@@ -73,9 +74,10 @@
                       </span>
                     {% else %}
                       <a class="notblue" data-toggle="tooltip"
-                        href="{{ url_for('.request_pulls', repo=repo.name,
-                        namespace=repo.namespace,
-                        username=repo.user.username if repo.is_fork else None) }}"
+                        href="{{ url_for('.request_pulls',
+                        repo=repo.name,
+                        username=repo.user.username if repo.is_fork else None,
+                        namespace=repo.namespace) }}"
                         title="{{repo.open_requests}} open pull requests in {{repo.name}}">
                         <span class="oi" data-glyph="arrow-thick-bottom"></span>
                         {{- repo.open_requests}}
@@ -112,8 +114,9 @@
               <div class="list-group-item">
                 {% set url = url_for(
                     'view_repo',
+                    repo=fork.name,
                     username=fork.user.username if fork.is_fork else None,
-                    repo=fork.name, namespace=fork.namespace) %}
+                    namespace=fork.namespace) %}
 
                 <a href="{{ url }}">
                   <span class="oi text-muted" data-glyph="fork"></span>
@@ -205,7 +208,9 @@
               <div class="list-group">
                 {% if repo.is_fork %}
                   <a class="list-group-item" href="{{ url_for(
-                    'view_repo', username=repo.user.username, repo=repo.name,
+                    'view_repo',
+                    repo=repo.name,
+                    username=repo.user.username,
                     namespace=repo.namespace) }}">
                     <div class="">
                       <strong>

@@ -30,8 +30,10 @@
 
 {% if form %}
   <form action="{{ url_for(
-    '.new_remote_request_pull', namespace=repo.namespace, username=username,
-    repo=repo.name) }}" method="post">
+    '.new_remote_request_pull',
+    repo=repo.name,
+    username=username,
+    namespace=repo.namespace) }}" method="post">
     <div class="card-block">
       {{ render_bootstrap_field(
           form.title, size=80,
@@ -56,8 +58,10 @@
       {{ form.csrf_token }}
 
       <a href="{{ url_for(
-        'view_repo', namespace=repo.namespace,
-        username=username, repo=repo.name)}}">
+        'view_repo',
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace)}}">
         <input type="button" class="btn btn-secondary" value="Cancel" />
       </a>
     </p>

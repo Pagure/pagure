@@ -148,8 +148,9 @@
                 <a class="project_link logo_link" href="{{
                     url_for(
                     'view_repo',
+                    repo=repo.name,
                     username=repo.user.username if repo.is_fork else None,
-                    repo=repo.name, namespace=repo.namespace)
+                    namespace=repo.namespace)
                 }}">
                   <div>
                     <strong>
@@ -224,8 +225,9 @@
             {% for repo in list %}
               <div class="list-group-item">
                 {% set url = url_for('view_repo',
+                  repo=repo.name,
                   username=repo.user.username if repo.is_fork else None,
-                  repo=repo.name, namespace=repo.namespace) %}
+                  namespace=repo.namespace) %}
 
                 {% if repo.avatar_email %}
                   <img class="projecticon pull-xs-left"

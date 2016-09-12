@@ -27,13 +27,17 @@
       <div class="card-block">
         {% if not type or type == 'new' %}
           <form action="{{ url_for('.new_issue',
-                namespace=repo.namespace, username=username, repo=repo.name)
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace)
             }}" method="post" enctype="multipart/form-data">
 
         {% elif type and type == 'edit' %}
           <form action="{{ url_for('.edit_issue',
-                namespace=repo.namespace, username=username,
-                repo=repo.name, issueid=issueid) }}" method="post"
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                issueid=issueid) }}" method="post"
                 enctype="multipart/form-data">
         {% endif %}
         {{ render_bootstrap_field(form.title, field_description="Gist of your issue") }}
@@ -101,8 +105,11 @@
 
     {% if authenticated and g.repo_admin and type and type == 'edit' %}
     <form method="post" class="pull-xs-right" action="{{
-        url_for('.delete_issue', namespace=repo.namespace,
-                username=username, repo=repo.name, issueid=issueid) }}">
+        url_for('.delete_issue',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                issueid=issueid) }}">
       <button class="btn btn-danger" type="submit"
           onclick="return confirm('Are you sure to delete this ticket? \nThis is final and cannot be un-done.');"
           title="Delete this ticket">
@@ -137,8 +144,10 @@ $(document).ready(function() {
       _txt += '\n';
     }
     var _loc = "{{ url_for('view_issue_raw_file',
-        namespace=repo.namespace, repo=repo.name,
-        username=username, filename='') }}" + this.file;
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace,
+        filename='') }}" + this.file;
 
     $("#issue_content").val(_txt + '<!!image>');
   });
@@ -163,9 +172,9 @@ $(document).ready(function() {
     var _type = $("#type").val();
     var _url = "{{
       url_for('internal_ns.get_ticket_template',
+              repo=repo.name,
               username=repo.username if repo.is_fork else None,
-              namespace=repo.namespace,
-              repo=repo.name) }}";
+              namespace=repo.namespace) }}";
     _url += '?template=' + _type;
     $.ajax({
       url: _url ,
@@ -194,9 +203,9 @@ $(function() {
       if ($( "#previewinmarkdown" ).hasClass("inactive")){
         var _text = $( "#issue_content" ).val();
         var _url = "{{ url_for('markdown_preview',
-                        namespace=repo.namespace,
+                        repo=repo.name,
                         user=repo.user.user if repo.is_fork,
-                        repo=repo.name) | safe}}";
+                        namespace=repo.namespace) | safe}}";
         $.ajax({
           url: _url ,
           type: 'POST',

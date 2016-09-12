@@ -14,8 +14,11 @@
 <div class="card">
   <div class="card-header">
       <ol class="breadcrumb">
-      <li><a href="{{ url_for('view_tree', username=username,
-            namespace=repo.namespace, repo=repo.name, identifier=branchname)
+      <li><a href="{{ url_for('view_tree',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace,
+            identifier=branchname)
       }}"><span class="oi" data-glyph="random"></span>&nbsp; {{ branchname }}</a></li>{%
     for file in filename.split('/') %}
       {% if loop.first %}
@@ -25,8 +28,10 @@
       {% endif %}
       {% if loop.index != loop.length %}<li><a
       href="{{ url_for('view_file',
-            username=username, namespace=repo.namespace,
-            repo=repo.name, identifier=branchname,
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace,
+            identifier=branchname,
             filename=path)}}"
         ><span class="oi" data-glyph="folder"></span>&nbsp; {{ file }}</a>
         </li>{%
@@ -41,8 +46,11 @@
   </div>
   <div class="card-block p-a-0">
     <form action="{{ url_for(
-          'edit_file', username=username, namespace=repo.namespace,
-          repo=repo.name, branchname=branchname, filename=filename) }}"
+          'edit_file',
+          repo=repo.name,
+          username=username,
+          namespace=repo.namespace,
+          branchname=branchname, filename=filename) }}"
           method="post">
     {{ form.csrf_token }}
 
