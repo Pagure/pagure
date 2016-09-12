@@ -446,8 +446,8 @@ def combine_url(url, page, pagetitle, **kwargs):
     the given URL.
     """
     url_obj = urlparse.urlparse(url)
-    url = url_obj.geturl().replace(url_obj.query, '')
+    url = url_obj.geturl().replace(url_obj.query, '').rstrip('?')
     query = dict(urlparse.parse_qsl(url_obj.query))
     query[pagetitle] = page
     query.update(kwargs)
-    return url + '&'.join(['%s=%s' % (k, query[k]) for k in query])
+    return url + '?' + '&'.join(['%s=%s' % (k, query[k]) for k in query])
