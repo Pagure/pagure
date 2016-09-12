@@ -35,6 +35,7 @@ EXPLICIT_FORK_ISSUE_RE = r'(\w+)/(\w+)#([0-9]+)'
 EXPLICIT_MAIN_ISSUE_RE = r'[^|\w](?<!\/)(\w+)#([0-9]+)'
 IMPLICIT_ISSUE_RE = r'[^|\w](?<!\w)#([0-9]+)'
 IMPLICIT_PR_RE = r'[^|\w](?<!\w)PR#([0-9]+)'
+STRIKE_THROUGH_RE = r'~~(\w+)~~'
 
 
 class MentionPattern(markdown.inlinepatterns.Pattern):
@@ -181,6 +182,18 @@ class ImplicitPRPattern(markdown.inlinepatterns.Pattern):
         return text
 
 
+class StrikeThroughPattern(markdown.inlinepatterns.Pattern):
+    """ ~~striked~~ pattern class. """
+
+    def handleMatch(self, m):
+        """ When the pattern matches, update the text. """
+        text = markdown.util.AtomicString(m.group(2))
+
+        element = markdown.util.etree.Element("del")
+        element.text = text
+        return element
+
+
 class PagureExtension(markdown.extensions.Extension):
 
     def extendMarkdown(self, md, md_globals):
@@ -200,6 +213,9 @@ class PagureExtension(markdown.extensions.Extension):
                 ExplicitMainIssuePattern(EXPLICIT_MAIN_ISSUE_RE)
             md.inlinePatterns['implicit_issue'] = \
                 ImplicitIssuePattern(IMPLICIT_ISSUE_RE)
+
+        md.inlinePatterns['striked'] = StrikeThroughPattern(
+            STRIKE_THROUGH_RE)
 
         md.registerExtension(self)
 
