@@ -1,1 +1,1 @@
-jquery.caret-1.5.2.js
+jquery.caret-0.3.1.js
