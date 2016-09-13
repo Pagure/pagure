@@ -3,17 +3,17 @@ Contributors to pagure
 
 Pagure would be nothing without its contributors.
 
-On Aug 31, 2016 (release 2.4), the list looks as follow:
+On Sep 13, 2016 (release 2.5), the list looks as follow:
 
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  4249              Pierre-Yves Chibon <pingou@pingoured.fr>
-   182              Ryan Lerch <rlerch@redhat.com>
+  4369              Pierre-Yves Chibon <pingou@pingoured.fr>
+   186              Ryan Lerch <rlerch@redhat.com>
     89              farhaanbukhsh <farhaan.bukhsh@gmail.com>
     59              Johan Cwiklinski <johan@x-tnd.be>
-    48              Clement Verna <cverna@tutanota.com>
-    47              Vivek Anand <vivekanand1101@gmail.com>
+    51              Clement Verna <cverna@tutanota.com>
+    49              Vivek Anand <vivekanand1101@gmail.com>
     27              Farhaan Bukhsh <farhaan.bukhsh@gmail.com>
     18              Sayan Chowdhury <sayan.chowdhury2012@gmail.com>
     17              Lubomír Sedlář <lsedlar@redhat.com>
@@ -25,17 +25,18 @@ Number of commits  Contributor
      8              Lei Yang <yltt1234512@gmail.com>
      5              Mike McLean <mikem@redhat.com>
      5              Oliver Gutierrez <ogutierrez@redhat.com>
+     5              Paul W. Frields <stickster@gmail.com>
      5              vanzhiganov <vanzhiganov@ya.ru>
      5              yangl1996 <yltt1234512@gmail.com>
      4              Eric Barbour <ebarbour@redhat.com>
      4              Maciej Lasyk <maciek@lasyk.info>
-     4              Paul W. Frields <stickster@gmail.com>
      3              Ankush Behl <cloudbehl@gmail.com>
      3              Anthony Lackey <alackey96@gmail.com>
      3              Dhriti Shikhar <dhriti.shikhar.rokz@gmail.com>
      3              Jan Pokorný <jpokorny@redhat.com>
      3              Kushal Khandelwal <kushal124@gmail.com>
      3              Pedro Lima <pedro.lima@gmail.com>
+     3              Sergio Durigan Junior <sergiodj@sergiodj.net>
      3              skrzepto <shims506@gmail.com>
      2              Daniel Mach <dmach@redhat.com>
      2              Nuno Maltez <nuno@cognitiva.com>

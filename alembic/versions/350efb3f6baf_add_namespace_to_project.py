@@ -1,14 +1,14 @@
 """Add namespace to project
 
 Revision ID: 350efb3f6baf
-Revises: 1d18843a1994
+Revises: 1640c7d75e5f
 Create Date: 2016-08-30 22:02:07.645138
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '350efb3f6baf'
-down_revision = '1d18843a1994'
+down_revision = '1640c7d75e5f'
 
 from alembic import op
 import sqlalchemy as sa

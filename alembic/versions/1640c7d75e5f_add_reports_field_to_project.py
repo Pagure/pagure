@@ -1,14 +1,14 @@
 """Add reports field to project
 
 Revision ID: 1640c7d75e5f
-Revises: 350efb3f6baf
+Revises: 1d18843a1994
 Create Date: 2016-09-09 16:11:28.099423
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '1640c7d75e5f'
-down_revision = '350efb3f6baf'
+down_revision = '1d18843a1994'
 
 from alembic import op
 import sqlalchemy as sa
