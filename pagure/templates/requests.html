@@ -16,7 +16,7 @@
      %} {{ status }} {%-
     elif status|lower in ['closed', 'false']
     %} Closed/Merged {%- endif
-    %} Pull Requests (on {{ requests_cnt }})
+    %} Pull Requests (of {{ requests_cnt }})
     {% if authenticated and repo.settings.get('pull_requests', True) %}
         <span id="request_pull" class="inline_it">
 
