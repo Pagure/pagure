@@ -1068,12 +1068,12 @@ def new_project(session, user, name, blacklist, allowed_prefix,
     else:
         temp_gitrepo_path = tempfile.mkdtemp(prefix='pagure-')
         temp_gitrepo = pygit2.init_repository(temp_gitrepo_path, bare=False)
-        author = pygit2.Signature(
-            userobj.fullname.encode('utf-8')
-            if six.PY2 else userobj.fullname,
-            userobj.default_email.encode('utf-8')
-            if six.PY2 else userobj.fullname
-        )
+        author = userobj.fullname or userobj.user
+        author_email = userobj.default_email
+        if six.PY2:
+            author = author.encode('utf-8')
+            author_email = author_email.encode('utf-8')
+        author = pygit2.Signature(author, author_email)
         content = u"# %s\n\n%s" % (name, description)
         readme_file = os.path.join(temp_gitrepo.workdir, "README.md")
         with open(readme_file, 'wb') as stream:
