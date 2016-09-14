@@ -18,6 +18,7 @@ receiving end is offline or so.
 
 import json
 import logging
+logging.basicConfig(level=logging.DEBUG)
 import os
 import requests
 
@@ -65,41 +66,34 @@ def handle_messages():
         data = json.loads(reply.value)
 
         pr_id = data['pr']['id']
+        pr_uid = data['pr']['uid']
         branch = data['pr']['branch_from']
-        projectname = data['pr']['project']['name']
-        namespace = data['pr']['project'].get('namespace')
+        LOG.info('Looking for PR: %s', pr_uid)
+        request = pagure.lib.get_request_by_uid(pagure.SESSION, pr_uid)
 
-        username = None
-        if data['pr'].get('parent'):
-            username = data['pr']['project']['user']['user']
-
-        project = pagure.lib.get_project(
-            session=pagure.SESSION,
-            name=projectname,
-            user=username,
-            namespace=namespace)
-
-        if not project:
+        if not request:
             LOG.warning(
-                'No project could be found from the message %s', data)
+                'No request could be found from the message %s', data)
             continue
 
         LOG.info(
             "Trigger on %s PR #%s from %s: %s",
-            project.fullname, pr_id, project.fullname, branch)
+            request.project.fullname, pr_id,
+            request.project_from.fullname, branch)
 
-        url = project.ci_hook.ci_url.rstrip('/')
+        url = request.project.ci_hook.ci_url.rstrip('/')
 
         if data['ci_type'] == 'jenkins':
             url = url + '/buildWithParameters'
             repo = '%s/%s' % (
-                pagure.APP.config['GIT_URL_GIT'].rstrip('/'), project.path)
+                pagure.APP.config['GIT_URL_GIT'].rstrip('/'),
+                request.project_from.path)
             LOG.info(
                 'Triggering the build at: %s, for repo: %s', url, repo)
             requests.post(
                 url,
                 data={
-                    'token': project.ci_hook.pagure_ci_token,
+                    'token': request.project.ci_hook.pagure_ci_token,
                     'cause': pr_id,
                     'REPO': repo,
                     'BRANCH': branch
@@ -141,6 +135,8 @@ if __name__ == '__main__':
     shellhandler.setLevel(logging.DEBUG)
 
     aslog = logging.getLogger("asyncio")
+    aslog.setLevel(logging.DEBUG)
+    aslog = logging.getLogger("trollius")
     aslog.setLevel(logging.DEBUG)
 
     shellhandler.setFormatter(formatter)
