@@ -99,7 +99,10 @@ def update_issue(repo, issueid, username=None, namespace=None):
 
     status = pagure.lib.get_issue_statuses(SESSION)
     form = pagure.forms.UpdateIssueForm(
-        status=status, priorities=repo.priorities)
+        status=status,
+        priorities=repo.priorities,
+        milestones=repo.milestones,
+    )
 
     if form.validate_on_submit():
         repo_admin = flask.g.repo_admin
@@ -169,7 +172,14 @@ def update_issue(repo, issueid, username=None, namespace=None):
             for tag in form.tag.data.split(',')
             if tag.strip()]
 
+        new_milestone = None
         try:
+            new_milestone = form.milestone.data.strip() or None
+        except:
+            pass
+
+        try:
+            messages = set()
 
             # New comment
             if comment:
@@ -182,18 +192,15 @@ def update_issue(repo, issueid, username=None, namespace=None):
                 )
                 SESSION.commit()
                 if message and not is_js:
-                    flask.flash(message)
+                    messages.add(message)
 
             if repo_admin:
                 # Adjust (add/remove) tags
-                messages = pagure.lib.update_tags(
+                messages.union(set(pagure.lib.update_tags(
                     SESSION, issue, tags,
                     username=flask.g.fas_user.username,
                     ticketfolder=APP.config['TICKETS_FOLDER']
-                )
-                if not is_js:
-                    for message in messages:
-                        flask.flash(message)
+                )))
 
             # The meta-data can only be changed by admins, which means they
             # will be missing for non-admin and thus reset if we let them
@@ -207,8 +214,8 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     ticketfolder=APP.config['TICKETS_FOLDER'],
                 )
                 SESSION.commit()
-                if message and not is_js:
-                    flask.flash(message)
+                if message:
+                    messages.add(message)
 
                 # Update status
                 if new_status in status:
@@ -222,7 +229,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     )
                     SESSION.commit()
                     if message:
-                        flask.flash(message)
+                        messages.add(message)
 
                 # Update priority
                 if str(new_priority) in repo.priorities:
@@ -236,24 +243,35 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     )
                     SESSION.commit()
                     if message:
-                        flask.flash(message)
+                        messages.add(message)
+
+                # Update milestone
+                message = pagure.lib.edit_issue(
+                    SESSION,
+                    issue=issue,
+                    milestone=new_milestone,
+                    private=issue.private,
+                    user=flask.g.fas_user.username,
+                    ticketfolder=APP.config['TICKETS_FOLDER'],
+                )
+                SESSION.commit()
+                if message:
+                    messages.add(message)
 
             # Update ticket this one depends on
-            messages = pagure.lib.update_dependency_issue(
+            messages.union(set(pagure.lib.update_dependency_issue(
                 SESSION, repo, issue, depends,
                 username=flask.g.fas_user.username,
                 ticketfolder=APP.config['TICKETS_FOLDER'],
-            )
-            if not is_js:
-                for message in messages:
-                    flask.flash(message)
+            )))
 
             # Update ticket(s) depending on this one
-            messages = pagure.lib.update_blocked_issue(
+            messages.union(set(pagure.lib.update_blocked_issue(
                 SESSION, repo, issue, blocks,
                 username=flask.g.fas_user.username,
                 ticketfolder=APP.config['TICKETS_FOLDER'],
-            )
+            )))
+
             if not is_js:
                 for message in messages:
                     flask.flash(message)
@@ -745,9 +763,13 @@ def view_issue(repo, issueid, username=None, namespace=None):
     status = pagure.lib.get_issue_statuses(SESSION)
 
     form = pagure.forms.UpdateIssueForm(
-        status=status, priorities=repo.priorities)
+        status=status,
+        priorities=repo.priorities,
+        milestones=repo.milestones,
+    )
     form.status.data = issue.status
     form.priority.data = str(issue.priority)
+    form.milestone.data = str(issue.milestone)
     tag_list = pagure.lib.get_tags_of_project(SESSION, repo)
     return flask.render_template(
         'issue.html',

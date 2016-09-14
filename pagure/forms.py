@@ -257,6 +257,11 @@ class UpdateIssueForm(wtf.Form):
         [wtforms.validators.Optional()],
         choices=[]
     )
+    milestone = wtforms.SelectField(
+        'Milestone',
+        [wtforms.validators.Optional()],
+        choices=[]
+    )
 
     def __init__(self, *args, **kwargs):
         """ Calls the default constructor with the normal argument but
@@ -275,6 +280,12 @@ class UpdateIssueForm(wtf.Form):
                 self.priority.choices.append(
                     (key, kwargs['priorities'][key])
                 )
+
+        self.milestone.choices = []
+        if 'milestones' in kwargs:
+            for key in sorted(kwargs['milestones']):
+                self.milestone.choices.append((key, key))
+            self.milestone.choices.insert(0, ('', ''))
 
 
 class AddPullRequestCommentForm(wtf.Form):
