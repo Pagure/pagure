@@ -673,6 +673,7 @@ class Issue(BASE):
             'assignee': self.assignee.to_json(
                 public=public) if self.assignee else None,
             'priority': self.priority,
+            'milestone': self.milestone,
         }
 
         comments = []
