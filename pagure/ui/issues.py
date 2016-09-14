@@ -554,12 +554,11 @@ def view_roadmap(repo, username=None, namespace=None):
         private = None
 
     milestones = milestone or list(repo.milestones.keys())
-    tags = ['roadmap'] + milestones
 
     issues = pagure.lib.search_issues(
         SESSION,
         repo,
-        tags=tags,
+        milestones=milestones,
         private=private,
     )
 
@@ -568,7 +567,7 @@ def view_roadmap(repo, username=None, namespace=None):
     for cnt in range(len(issues)):
         saved = False
         for mlstone in sorted(milestones):
-            if mlstone in issues[cnt].tags_text:
+            if mlstone == issues[cnt].milestone:
                 milestone_issues[mlstone].append(issues[cnt])
                 saved = True
                 break
