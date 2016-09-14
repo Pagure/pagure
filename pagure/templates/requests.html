@@ -221,7 +221,7 @@ $(function() {
     success: function(res) {
       console.log("done");
       if (res.code == 'OK'){
-        for (branch in res.message){
+        for (branch in res.message.new_branch){
             var url = "{{ url_for(
             'new_request_pull',
             repo=repo.name,
@@ -260,7 +260,7 @@ $(function() {
     success: function(res) {
       console.log("done");
       if (res.code == 'OK'){
-        for (branch in res.message){
+        for (branch in res.message.new_branch){
           var url = "{{ url_for(
             'new_request_pull',
             repo=repo.name,
