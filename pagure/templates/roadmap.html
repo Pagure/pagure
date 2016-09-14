@@ -15,16 +15,27 @@
           'view_issues',
           repo=repo.name,
           username=username,
-          namespace=repo.namespace) }}" class="btn btn-secondary btn-sm">
-        List
+          namespace=repo.namespace) }}">
+        <button class="btn btn-secondary btn-sm">List</button>
       </a>
-      <a href="{{ url_for(
-          'new_issue',
-          repo=repo.name,
-          username=username,
-          namespace=repo.namespace) }}" class="btn btn-success btn-sm">
-        New Issue
-      </a>
+      {% if g.repo.reports %}
+      <div class="dropdown" id="PR-dropdown">
+        <button class="btn btn-primary btn-sm dropdown-toggle"
+          type="button" id="dropdownMenu1" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">
+          Report
+        </button>
+        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+          {% for report in repo.reports %}
+          <a class="dropdown-item" href="{{ url_for(
+              'view_report', namespace=repo.namespace,
+              username=username, repo=repo.name, report=report) }}">
+            <small>Report: {{ report }}</small>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
     </span>
   </h2>
     {% if oth_issues %}
