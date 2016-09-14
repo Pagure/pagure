@@ -1269,7 +1269,7 @@ def new_pull_request(session, branch_from,
 
 def edit_issue(session, issue, ticketfolder, user,
                title=None, content=None, status=None,
-               priority=None, private=False):
+               priority=None, milestone=None, private=False):
     ''' Edit the specified issue.
     '''
     user_obj = get_user(session, user)
@@ -1304,6 +1304,9 @@ def edit_issue(session, issue, ticketfolder, user,
     if private in [True, False] and private != issue.private:
         issue.private = private
         edit.append('private')
+    if milestone != issue.milestone:
+        issue.milestone = milestone
+        edit.append('milestone')
 
     pagure.lib.git.update_git(
         issue, repo=issue.project, repofolder=ticketfolder)
