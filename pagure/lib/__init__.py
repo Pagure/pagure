@@ -1646,7 +1646,8 @@ def get_project(session, name, user=None, namespace=None):
 def search_issues(
         session, repo, issueid=None, issueuid=None, status=None,
         closed=False, tags=None, assignee=None, author=None, private=None,
-        priority=None, count=False, offset=None, limit=None):
+        priority=None, milestones=None,
+        count=False, offset=None, limit=None):
     ''' Retrieve one or more issues associated to a project with the given
     criterias.
 
@@ -1687,6 +1688,9 @@ def search_issues(
     :type private: False, None or str
     :kwarg priority: the priority of the issues to search
     :type priority: int or None
+    :kwarg milestones: a milestone the issue(s) returned should be
+        associated with.
+    :type milestones: str or list(str) or None
     :kwarg count: a boolean to specify if the method should return the list
         of Issues or just do a COUNT query.
     :type count: boolean
@@ -1816,6 +1820,14 @@ def search_issues(
                     user2.user == private,
                 )
             )
+        )
+
+    if milestones is not None and milestones != []:
+        if isinstance(milestones, basestring):
+            milestones = [milestones]
+
+        query = query.filter(
+            model.Issue.milestone.in_(milestones)
         )
 
     query = session.query(
