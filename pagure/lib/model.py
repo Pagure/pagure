@@ -586,6 +586,7 @@ class Issue(BASE):
         nullable=False)
     private = sa.Column(sa.Boolean, nullable=False, default=False)
     priority = sa.Column(sa.Integer, nullable=True, default=None)
+    milestone = sa.Column(sa.String(255), nullable=True, default=None)
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
