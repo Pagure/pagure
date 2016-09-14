@@ -617,10 +617,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output.data)
             self.assertIn(
-                '</button>\n                      Tag added: tag2',
-                output.data)
-            self.assertNotIn(
-                '</button>\n                      No changes to edit',
+                '</button>\n                      '
+                'Successfully edited issue #1',
                 output.data)
             self.assertTrue(
                 '<p>Woohoo a second comment !</p>' in output.data)
@@ -941,7 +939,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output.data)
             self.assertIn(
-                '</button>\n                      Dependency added',
+                '</button>\n                      '
+                'Successfully edited issue #1',
                 output.data)
 
             # Add an invalid dependent ticket
@@ -960,7 +959,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output.data)
             self.assertNotIn(
-                '</button>\n                      Dependency added',
+                '</button>\n                      '
+                'Successfully edited issue #1',
                 output.data)
 
         repo = pagure.lib.get_project(self.session, 'test')
@@ -1036,7 +1036,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output.data)
             self.assertIn(
-                '</button>\n                      Dependency added',
+                '</button>\n                      '
+                'Successfully edited issue #1',
                 output.data)
 
             # Add an invalid dependent ticket
@@ -1055,7 +1056,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output.data)
             self.assertNotIn(
-                '</button>\n                      Dependency added',
+                '</button>\n                      '
+                'Successfully edited issue #1',
                 output.data)
 
         repo = pagure.lib.get_project(self.session, 'test')
