@@ -573,8 +573,6 @@ def view_roadmap(repo, username=None, namespace=None):
                 break
         if saved:
             continue
-        if not milestone:
-            milestone_issues['unplanned'].append(issues[cnt])
 
     if status:
         for key in milestone_issues.keys():
