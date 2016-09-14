@@ -162,7 +162,8 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output.data)
             self.assertIn(
-                u'</button>\n                      Tag added: roadmap',
+                u'</button>\n                      '
+                u'Successfully edited issue #1',
                 output.data)
 
     def test_update_milestones(self):
@@ -392,6 +393,29 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             csrf_token = output.data.split(
                 u'name="csrf_token" type="hidden" value="')[1].split(u'">')[0]
 
+            # Create an unplanned milestone
+            data = {
+                'milestones': ['v1.0', 'v2.0', 'unplanned'],
+                'milestone_dates': ['Tomorrow', '', ''],
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/update/milestones', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            # Check the redirect
+            self.assertIn(
+                u'<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn(u'<h3>Settings for test</h3>', output.data)
+            self.assertIn(u'Milestones updated', output.data)
+            # Check the result of the action -- Milestones recorded
+            repo = pagure.lib.get_project(self.session, 'test')
+            self.assertEqual(
+                repo.milestones,
+                {
+                    u'v1.0': u'Tomorrow', u'v2.0': u'', u'unplanned': u''
+                }
+            )
+
             # Create the issues
             for cnt in range(6):
                 cnt += 1
@@ -399,7 +423,6 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                     'title': 'Test issue %s' % cnt,
                     'issue_content': 'We really should improve on this '
                     'issue %s' % cnt,
-                    'status': 'Open',
                     'csrf_token': csrf_token,
                 }
 
@@ -417,8 +440,14 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                     output.data)
 
                 # Mark the ticket for the roadmap
+                mstone = 'v%s.0' % cnt
+                if cnt >= 3:
+                    if (cnt % 3) == 0:
+                        mstone = 'unplanned'
+                    else:
+                        mstone = 'v%s.0' % (cnt % 3)
                 data = {
-                    'tag': ['roadmap, v%s.0' % cnt],
+                    'milestone': mstone,
                     'csrf_token': csrf_token,
                 }
                 output = self.app.post(
@@ -436,20 +465,21 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                     output.data)
                 self.assertIn(
                     u'</button>\n                      '
-                    'Tag added: v%s.0, roadmap' % cnt,
+                    u'Successfully edited issue #%s' % cnt,
                     output.data)
 
         repo = pagure.lib.get_project(self.session, 'test')
 
         # Mark ticket #1 as Fixed
-        ticket = pagure.lib.search_issues(
-            self.session,
-            repo,
-            issueid=1
-        )
-        ticket.status = 'Fixed'
-        self.session.add(ticket)
-        self.session.commit()
+        for iid in [1, 4]:
+            ticket = pagure.lib.search_issues(
+                self.session,
+                repo,
+                issueid=iid
+            )
+            ticket.status = 'Fixed'
+            self.session.add(ticket)
+            self.session.commit()
 
         # test the roadmap view
         output = self.app.get('/test/roadmap')
@@ -458,7 +488,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
         self.assertIn(u'Milestone: v2.0', output.data)
         self.assertIn(u'Milestone: unplanned', output.data)
         self.assertEqual(
-            output.data.count(u'<span class="label label-default">#'), 5)
+            output.data.count(u'<span class="label label-default">#'), 4)
 
         # test the roadmap view for all milestones
         output = self.app.get('/test/roadmap?status=All')
@@ -476,7 +506,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
         self.assertIn(u'1 Milestones', output.data)
         self.assertIn(u'Milestone: v2.0', output.data)
         self.assertEqual(
-            output.data.count(u'<span class="label label-default">#'), 1)
+            output.data.count(u'<span class="label label-default">#'), 2)
 
         # test the roadmap view for a specific milestone - closed
         output = self.app.get('/test/roadmap?milestone=v1.0')
@@ -492,7 +522,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
         self.assertIn(u'1 Milestones', output.data)
         self.assertIn(u'Milestone: v1.0', output.data)
         self.assertEqual(
-            output.data.count(u'<span class="label label-default">#'), 1)
+            output.data.count(u'<span class="label label-default">#'), 2)
 
         # test the roadmap view for errors
         output = self.app.get('/foo/roadmap')
