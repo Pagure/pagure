@@ -6,13 +6,12 @@ their tags.
 
 The principal is as follow:
 
-* All the ticket with the tag ``roadmap`` will show up on the roadmap page.
-
 * For each milestones defined in the settings of the project, the roadmap
-  will group tickets with the corresponding tag.
+  will group tickets with the corresponding milestone.
 
-* Tickets with the tag ``roadmap`` that are not associated with any of the
-  milestones defined in the settings are group in an ``unplanned`` section.
+* If your project has an ``unplanned`` milestone, this milestone will be
+  shown at the bottom of the roadmap page. This allowing you to put something
+  on the roadmap without assigning a real milestone to it.
 
 
 Example
@@ -21,14 +20,14 @@ Example
 For a project named ``test`` on ``pagure.io``.
 
 
-
 * First, go to the settings page of the project, create the milestones you
   like, for example: ``v1.0`` and ``v2.0``.
 
 * For the tickets you want to be on these milestones, go through each of them
-  and add them the tags: ``roadmap`` in combination with the milestone you want
-  ``v1.0`` or ``v2.0``, or none of them if the ticket is on the roadmap but
-  not assigned to any milestones.
+  and set their milestone to either ``v1.0`` or ``v2.0``, or none of them
+  if the ticket is on not on the roadmap.
+  You can set the milestone on the metadata panel on the right side of the
+  issue page.
 
 
 * And this is how it will look like
