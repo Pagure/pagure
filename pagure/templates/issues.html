@@ -12,9 +12,9 @@
 
   <h2>
     {% if status|lower in ['open', 'true'] %}
-      {{ issues|count }} Open Issues (on {{ issues_cnt }})
+      {{ issues|count }} Open Issues (of {{ issues_cnt }})
     {% elif status|lower not in ['open', 'true', 'all', 'none'] %}
-      {{ issues|count }} Closed Issues (on {{ issues_cnt }})
+      {{ issues|count }} Closed Issues (of {{ issues_cnt }})
     {% else %}
       {{ issues|count }} Issues
     {% endif %}
