@@ -715,6 +715,10 @@ def new_issue(repo, username=None, namespace=None):
                 default, _ = pagure.doc_utils.convert_readme(
                     default_file.data, 'md')
 
+    if flask.request.method == 'GET':
+        form.private.data = repo.settings.get(
+            'issues_default_to_private', False)
+
     return flask.render_template(
         'new_issue.html',
         select='issues',
