@@ -26,7 +26,4 @@ def upgrade():
 def downgrade():
     ''' Add the column milestone to the table issues.
     '''
-    op.add_column(
-        'issues',
-        sa.Column('milestone', sa.String(255), nullable=True)
-    )
+    op.drop_column('issues', 'milestone')
