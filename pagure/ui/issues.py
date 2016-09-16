@@ -245,12 +245,12 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     if message:
                         messages.add(message)
 
-                # Update milestone
+                # Update milestone and privacy setting
                 message = pagure.lib.edit_issue(
                     SESSION,
                     issue=issue,
                     milestone=new_milestone,
-                    private=issue.private,
+                    private=form.private.data,
                     user=flask.g.fas_user.username,
                     ticketfolder=APP.config['TICKETS_FOLDER'],
                 )
@@ -771,6 +771,7 @@ def view_issue(repo, issueid, username=None, namespace=None):
     form.status.data = issue.status
     form.priority.data = str(issue.priority)
     form.milestone.data = str(issue.milestone)
+    form.private.data = issue.private
     tag_list = pagure.lib.get_tags_of_project(SESSION, repo)
     return flask.render_template(
         'issue.html',

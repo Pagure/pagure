@@ -270,6 +270,16 @@
 
           {% endif %}
 
+          {% if issue.private %}
+          <fieldset class="form-group issue-metadata-display">
+            <label><strong class="red-icon">Private</strong></label>
+          </fieldset>
+          {% endif %}
+          {% if authenticated and g.repo_admin %}
+            {{ render_bootstrap_field(form.private,
+              formclass="issue-metadata-form") }}
+          {% endif%}
+
           <input type="submit" class="btn btn-primary issue-metadata-form" value="Update">
             <a class="btn btn-secondary issue-metadata-form editmetadatatoggle">
               cancel

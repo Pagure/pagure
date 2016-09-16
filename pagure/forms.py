@@ -262,6 +262,10 @@ class UpdateIssueForm(wtf.Form):
         [wtforms.validators.Optional()],
         choices=[]
     )
+    private = wtforms.BooleanField(
+        'Private',
+        [wtforms.validators.optional()],
+    )
 
     def __init__(self, *args, **kwargs):
         """ Calls the default constructor with the normal argument but
