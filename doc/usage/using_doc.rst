@@ -44,7 +44,7 @@ This is how it is built/updated:
 
 * Clone pagure's sources::
 
-    git clone https://pagure.io/docs/pagure.git
+    git clone https://pagure.io/pagure.git
 
 * Move into its doc folder::
 
