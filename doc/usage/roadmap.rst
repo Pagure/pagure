@@ -2,7 +2,7 @@ Using the roadmap feature
 =========================
 
 Pagure allows building the roadmap of the project using the tickets and
-their tags.
+their milestones.
 
 The principal is as follow:
 
@@ -25,7 +25,7 @@ For a project named ``test`` on ``pagure.io``.
 
 * For the tickets you want to be on these milestones, go through each of them
   and set their milestone to either ``v1.0`` or ``v2.0``, or none of them
-  if the ticket is on not on the roadmap.
+  if the ticket is not on the roadmap.
   You can set the milestone on the metadata panel on the right side of the
   issue page.
 
