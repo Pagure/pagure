@@ -1986,3 +1986,60 @@ def watch_repo(repo, watch, username=None, namespace=None):
         flask.flash(msg, 'error')
 
     return flask.redirect(return_point)
+
+
+@APP.route('/<repo>/update/public_notif', methods=['POST'])
+@APP.route('/<namespace>/<repo>/public_notif', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/public_notif', methods=['POST'])
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/public_notif', methods=['POST'])
+@login_required
+def update_public_notifications(repo, username=None, namespace=None):
+    """ Update the public notification settings of a project.
+    """
+    if admin_session_timedout():
+        flask.flash('Action canceled, try it again', 'error')
+        url = flask.url_for(
+            'view_settings', username=username, repo=repo,
+            namespace=namespace)
+        return flask.redirect(
+            flask.url_for('auth_login', next=url))
+
+    repo = flask.g.repo
+
+    if not flask.g.repo_admin:
+        flask.abort(
+            403,
+            'You are not allowed to change the settings for this project')
+
+    form = pagure.forms.PublicNotificationForm()
+
+    error = False
+    if form.validate_on_submit():
+        issue_notifs = [
+            w.strip()
+            for w in form.issue_notifs.data.split(',')
+            if w.strip()
+        ]
+        pr_notifs = [
+            w.strip()
+            for w in form.pr_notifs.data.split(',')
+            if w.strip()
+        ]
+
+        try:
+            notifs = repo.notifications
+            notifs['issues'] = issue_notifs
+            notifs['requests'] = pr_notifs
+            repo.notifications = notifs
+
+            SESSION.add(repo)
+            SESSION.commit()
+            flask.flash('Project updated')
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            flask.flash(str(err), 'error')
+
+    return flask.redirect(flask.url_for(
+        'view_settings', username=username, repo=repo.name,
+        namespace=repo.namespace))

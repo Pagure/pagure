@@ -255,6 +255,75 @@
     <div class="col-md-8 col-md-offset-2">
       <div class="card">
         <div class="card-header">
+          Public notifications
+        </div>
+        <div class="card-block">
+          <p>
+            The email addresses entered below will receive all the notifications
+            related to (public) issue and pull-requests, this includes
+            notifications about new issue or pull-request, new comment
+            and status change.
+          </p>
+          <p>
+            To enter multiple addresses, simply delimit then with a comma.
+          </p>
+        </div>
+        <form action="{{ url_for(
+              '.update_public_notifications',
+              repo=repo.name,
+              username=username,
+              namespace=repo.namespace) }}"
+            method="post" class="icon">
+          {{ tag_form.csrf_token }}
+          <div class="card-block">
+
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>Issues notifications</strong>
+              </div>
+            </div>
+
+            <div id="issue-notifications">
+              <div class="row p-t-1">
+                <div class="col-sm-9 p-r-0">
+                  <input type="text" name="issue_notifs"
+                    value="{{ repo.notifications['issues'] | join(', ') }}" class="form-control"/>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-sm-12 p-t-1">
+                <strong>Pull-requests notifications</strong>
+              </div>
+            </div>
+
+            <div id="pr-notifications">
+              <div class="row p-t-1">
+                <div class="col-sm-9 p-r-0">
+                  <input type="text" name="pr_notifs"
+                    value="{{ repo.notifications['requests'] | join(', ') }}" class="form-control"/>
+                </div>
+              </div>
+            </div>
+
+            <div class="row p-t-1">
+              <div class="col-sm-12">
+                <button class="btn btn-primary" type="submit"
+                    title="Update the priorities">
+                  Update
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-md-8 col-md-offset-2">
+      <div class="card">
+        <div class="card-header">
           Re-generate git repos
         </div>
         <div class="card-block">

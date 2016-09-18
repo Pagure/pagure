@@ -526,3 +526,17 @@ class AddReportForm(wtf.Form):
         'Report name<span class="error">*</span>',
         [wtforms.validators.Required()]
     )
+
+
+class PublicNotificationForm(wtf.Form):
+    """ Form to verify that comment is not empty
+    """
+    issue_notifs = wtforms.TextAreaField(
+        'Public issue notification<span class="error">*</span>',
+        [wtforms.validators.optional(), wtforms.validators.Email()]
+    )
+
+    pr_notifs = wtforms.TextAreaField(
+        'Public PR notification<span class="error">*</span>',
+        [wtforms.validators.optional(), wtforms.validators.Email()]
+    )

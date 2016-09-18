@@ -129,6 +129,14 @@ def _get_emails_for_issue(issue):
         for watcher in issue.project.watchers:
             emails.add(watcher.user.default_email)
 
+    # Add public notifications to lists/users set project-wide
+    if issue.isa == 'issue' and not issue.private:
+        for notifs in issue.project.notifications.get('issues'):
+            emails.add(notifs)
+    elif issue.isa == 'pull-request':
+        for notifs in issue.project.notifications.get('requests'):
+            emails.add(notifs)
+
     # Remove the person list in unwatch
     for unwatcher in issue.project.unwatchers:
         if unwatcher.user.default_email in emails:
