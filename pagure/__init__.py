@@ -609,7 +609,7 @@ APP.register_blueprint(pagure.internal.PV)
 # Only import the login controller if the app is set up for local login
 if APP.config.get('PAGURE_AUTH', None) == 'local':
     import pagure.ui.login as login
-    APP.before_request(login._check_session_cookie)
+    APP.before_request_funcs[None].insert(0, login._check_session_cookie)
     APP.after_request(login._send_session_cookie)
 
 
