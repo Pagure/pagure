@@ -96,7 +96,7 @@ def get_plugin(plugin_name):
     '/fork/<username>/<namespace>/<repo>/settings/<plugin>/<int:full>',
     methods=('GET', 'POST'))
 @login_required
-def view_plugin(repo, plugin, username=None, full=True):
+def view_plugin(repo, plugin, username=None, namespace=None, full=True):
     """ Presents the settings of the project.
     """
     repo = flask.g.repo
@@ -149,6 +149,7 @@ def view_plugin(repo, plugin, username=None, full=True):
                 full=full,
                 repo=repo,
                 username=username,
+                namespace=namespace,
                 plugin=plugin,
                 form=form,
                 fields=fields)
@@ -174,13 +175,15 @@ def view_plugin(repo, plugin, username=None, full=True):
         SESSION.commit()
 
         return flask.redirect(flask.url_for(
-            'view_settings', repo=repo.name, username=username))
+            'view_settings', repo=repo.name, username=username,
+            namespace=namespace))
 
     return flask.render_template(
         'plugin.html',
         select='settings',
         full=full,
         repo=repo,
+        namespace=namespace,
         username=username,
         plugin=plugin,
         form=form,
