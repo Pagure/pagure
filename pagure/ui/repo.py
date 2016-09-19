@@ -2039,6 +2039,9 @@ def update_public_notifications(repo, username=None, namespace=None):
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')
+    else:
+        flask.flash(
+            'Unable to adjust one or more of the email provided', 'error')
 
     return flask.redirect(flask.url_for(
         'view_settings', username=username, repo=repo.name,
