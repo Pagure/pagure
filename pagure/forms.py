@@ -28,6 +28,19 @@ PROJECT_NAME_REGEX = \
     '^[a-zA-z0-9_][a-zA-Z0-9-_]*$'
 
 
+class MultipleEmail(wtforms.validators.Email):
+    """ Split the value by comma and run them through the email validator
+    of wtforms.
+    """
+    def __call__(self, form, field):
+        regex = re.compile(r'^.+@[^.].*\.[a-z]{2,10}$', re.IGNORECASE)
+        message = field.gettext('One or more invalid email address.')
+        for data in field.data.split(','):
+            data = data.strip()
+            if not self.regex.match(data or ''):
+                raise wtforms.validators.ValidationError(message)
+
+
 def file_virus_validator(form, field):
     if not pagure.APP.config['VIRUS_SCAN_ATTACHMENTS']:
         return
@@ -533,10 +546,10 @@ class PublicNotificationForm(wtf.Form):
     """
     issue_notifs = wtforms.TextAreaField(
         'Public issue notification<span class="error">*</span>',
-        [wtforms.validators.optional(), wtforms.validators.Email()]
+        [wtforms.validators.optional(), MultipleEmail()]
     )
 
     pr_notifs = wtforms.TextAreaField(
         'Public PR notification<span class="error">*</span>',
-        [wtforms.validators.optional(), wtforms.validators.Email()]
+        [wtforms.validators.optional(), MultipleEmail()]
     )
