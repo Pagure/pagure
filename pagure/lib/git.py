@@ -924,15 +924,15 @@ def get_repo_name(abspath):
     return repo_name
 
 
-def get_repo_namespace(abspath):
+def get_repo_namespace(abspath, gitfolder=None):
     ''' Return the name of the git repo based on its path.
     '''
     namespace = None
+    if not gitfolder:
+        gitfolder = pagure.APP.config['GIT_FOLDER']
 
     short_path = os.path.abspath(abspath).replace(
-        os.path.abspath(pagure.APP.config['GIT_FOLDER']),
-        ''
-    ).strip('/')
+        os.path.abspath(gitfolder), '').strip('/')
 
     if short_path.startswith('forks/'):
         username, projectname = short_path.split('forks/', 1)[1].split('/', 1)

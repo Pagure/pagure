@@ -72,7 +72,8 @@ def run_as_post_receive_hook():
 
     reponame = pagure.lib.git.get_repo_name(abspath)
     username = pagure.lib.git.get_username(abspath)
-    namespace = pagure.lib.git.get_repo_namespace(abspath)
+    namespace = pagure.lib.git.get_repo_namespace(
+        abspath, gitfolder = pagure.APP.config['TICKETS_FOLDER'])
     print 'repo:', reponame, username, namespace
 
     for filename in file_list:
