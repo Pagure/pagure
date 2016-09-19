@@ -933,6 +933,7 @@ class PagureLibtests(tests.Modeltests):
                 'Web-hooks': None,
                 'Enforce_signed-off_commits_in_pull-request': False,
                 'always_merge': False,
+                "issues_default_to_private": False,
             },
             user='pingou',
         )

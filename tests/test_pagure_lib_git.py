@@ -713,7 +713,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,85 @@
+@@ -0,0 +1,87 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
@@ -741,6 +741,7 @@ index 0000000..60f7480
 +            "Web-hooks": null,
 +            "always_merge": false,
 +            "issue_tracker": true,
++            "issues_default_to_private": false,
 +            "project_documentation": false,
 +            "pull_requests": true
 +        },
@@ -771,6 +772,7 @@ index 0000000..60f7480
 +            "Web-hooks": null,
 +            "always_merge": false,
 +            "issue_tracker": true,
++            "issues_default_to_private": false,
 +            "project_documentation": false,
 +            "pull_requests": true
 +        },
