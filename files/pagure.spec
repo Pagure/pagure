@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            2.5
+Version:            2.6
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -298,6 +298,28 @@ install -m 644 pagure-ci/pagure_ci.service \
 
 
 %changelog
+* Tue Sep 20 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.6-1
+- Update to 2.6
+- Fix creating new PR from the page listing all the PRs
+- Fix grammar error in the issues and PRs page (Jason Tibbitts)
+- Fall back to the user's username if no fullname is provided (Vivek Anand)
+- Fix typo in the using_docs documentation page (Aleksandra Fedorova (bookwar))
+- Fix viewing plugins when the project has a namespace (and the redirection
+  after that)
+- Rework the milestone, so that a ticket can only be assigned to one milestone
+  and things look better
+- Add a project wide setting allowing to make all new tickets private by default
+  (with the option to make them public)
+- Allow toggling the privacy setting when editing the ticket's metadata
+- Rework some of the logic of pagure-ci for when it searches the project related
+  to a receive notification
+- Fix the label of the button to view all close issues to be consistent with the
+  PR page (Jeremy Cline)
+- Add the possibility for projects to notify specific email addresses about
+  issues/PRs update
+- Fix loading tickets from the ticket git repository (fixes importing project to
+  pagure)
+
 * Tue Sep 13 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.5-1
 - Update to 2.5
 - Don't track pagure_env (venv) dir (Paul W. Frields) 

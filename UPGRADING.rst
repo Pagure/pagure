@@ -1,6 +1,16 @@
 Upgrading Pagure
 ================
 
+From 2.5 to 2.6
+---------------
+
+2.6 brings quite a few changes and some of them impacting the database scheme.
+
+Therefore when upgrading from 2.4 to 2.6, you will have to:
+
+* Update the database schame using alembic: ``alembic upgrade head``
+
+
 From 2.4 to 2.5
 ---------------
 
