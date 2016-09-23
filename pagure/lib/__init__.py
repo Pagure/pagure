@@ -33,14 +33,11 @@ import redis
 import six
 import sqlalchemy
 import sqlalchemy.schema
-from datetime import timedelta
 from sqlalchemy import func
 from sqlalchemy import asc
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
-from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.exc import SQLAlchemyError
 
 import pygit2
 
