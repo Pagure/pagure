@@ -1,0 +1,25 @@
+---
+
+- name: Install gitolite3
+  dnf: name={{ item }} state=present
+  with_items:
+    - gitolite3
+
+- name: Install gitolite.rc to ~/.gitolite.rc
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  copy:
+    src: gitolite3.rc
+    dest: /home/{{ ansible_env.SUDO_USER }}/.gitolite.rc
+
+- name: Create a key for gitolite
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  command: ssh-keygen -f gitolite_rsa -t rsa -N ''
+  args:
+    chdir: /home/{{ ansible_env.SUDO_USER }}
+    creates: /home/{{ ansible_env.SUDO_USER }}/gitolite_rsa.pub
+
+- name: Setup gitolite
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  command: gitolite setup -pk gitolite_rsa.pub
+  args:
+    chdir: /home/{{ ansible_env.SUDO_USER }}

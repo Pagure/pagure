@@ -1,0 +1,30 @@
+---
+
+- name: Install ClamAV packages
+  dnf: name={{ item }} state=present
+  with_items:
+    - clamav-data-empty
+    - clamav-server
+    - clamav-server-systemd
+    - clamav-update
+
+- name: Configure freshclam
+  replace:
+    dest: /etc/freshclam.conf
+    regexp: "Example*"
+    replace: ""
+
+- name: Install Pagure's ClamAV configuration
+  copy:
+    src: clamd.conf
+    dest: /etc/clamd.d/pagure.conf
+
+# pyclamd expects /etc/clamd.conf
+- name: Link /etc/clamd.conf to our pagure config
+  file: src=/etc/clamd.d/pagure.conf dest=/etc/clamd.conf state=link
+
+- name: Download latest ClamAV database
+  command: freshclam
+
+- name: Start ClamAV
+  service: name=clamd@pagure state=started enabled=yes

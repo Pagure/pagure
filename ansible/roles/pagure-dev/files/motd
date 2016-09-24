@@ -1,0 +1,22 @@
+
+Welcome to the Pagure development environment!
+
+Here are some tips:
+
+* Pagure is installed in a Python virtualenv. Use `workon python2-pagure` to
+  enter the virtualenv.
+
+* The code for Pagure is located at ~/devel/
+
+* You can populate the database with the `dev-data.py` script in the repository
+
+* Run `pstart` to start the development server and `pstop` to stop it.
+
+* Logs for the server are available with `journalctl`; the services are run
+  as systemd user units in ~/.config/systemd/user/
+
+Once you start the server you can navigate to http://localhost:5000/
+in your browser on the host to access your Pagure development environment.
+
+Happy hacking!
+

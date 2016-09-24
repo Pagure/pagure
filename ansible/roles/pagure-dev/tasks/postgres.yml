@@ -1,0 +1,38 @@
+---
+
+- name: Install postgresql packages
+  dnf: name={{ item }} state=present
+  with_items:
+      - postgresql
+      - postgresql-server
+      - postgresql-devel  # Allows pip installing psycopg2 is desired
+      - python-psycopg2
+
+- name: Initialize PostgreSQL
+  command: postgresql-setup initdb
+  args:
+      creates: /var/lib/pgsql/data/pg_hba.conf
+
+- replace:
+    dest: /var/lib/pgsql/data/pg_hba.conf
+    regexp: "local   all             all                                     peer"
+    replace: "local   all             all                                     trust"
+
+- replace:
+    dest: /var/lib/pgsql/data/pg_hba.conf
+    regexp: "host    all             all             127.0.0.1/32            ident"
+    replace: "host    all             all             127.0.0.1/32            trust"
+
+- replace:
+    dest: /var/lib/pgsql/data/pg_hba.conf
+    regexp: "host    all             all             ::1/128                 ident"
+    replace: "host    all             all             ::1/128                 trust"
+
+- name: Start postgresql
+  service: name=postgresql state=restarted enabled=yes
+
+- name: Add a pagure postgres user
+  postgresql_user: name=pagure role_attr_flags=SUPERUSER,LOGIN
+
+- name: Create a database for pagure
+  postgresql_db: name=pagure owner=pagure

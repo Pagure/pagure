@@ -1,0 +1,10 @@
+[Unit]
+Description=Runs the Pagure documentation server
+After=network.target
+
+[Service]
+ExecStart=/home/vagrant/.virtualenvs/python2-pagure/bin/python %h/devel/rundocserver.py -c %h/pagure.cfg --host 0.0.0.0
+Type=simple
+
+[Install]
+WantedBy=multi-user.target

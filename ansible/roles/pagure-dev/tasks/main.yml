@@ -1,0 +1,159 @@
+---
+
+- include: clamav.yml
+- include: eventsource.yml
+- include: gitolite.yml
+- include: milter.yml
+- include: postgres.yml
+
+- name: Install helpful development packages
+  dnf: name={{ item }} state=present
+  with_items:
+    - git
+    - ngrep
+    - nmap-ncat
+    - python-rpdb
+    - tmux
+    - tree
+    - vim-enhanced
+
+- name: Install Pagure development packages
+  dnf: name={{ item }} state=present
+  with_items:
+    - gcc
+    - libgit2-devel
+    - libffi-devel
+    - libjpeg-devel
+    - make
+    - python-alembic
+    - python-arrow
+    - python-binaryornot
+    - python-bleach
+    - python-blinker
+    - python-chardet
+    - python-cryptography
+    - python-docutils
+    - python-enum34
+    - python-fedora-flask
+    - python-flask
+    - python-flask-wtf
+    - python-flask-multistatic
+    - python2-jinja2
+    - python-markdown
+    - python-munch
+    - python-openid-cla
+    - python-openid-teams
+    - python-pip
+    - python-psutil
+    - python-pygit2
+    - python-pygments
+    - python-redis
+    - python-sqlalchemy
+    - python-straight-plugin
+    - python-virtualenvwrapper
+    - python-wtforms
+    - python-devel
+    - python3-devel
+    - redhat-rpm-config
+
+# Add various helpful configuration files
+- name: Install a custom bashrc
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  copy: src=bashrc dest=/home/{{ ansible_env.SUDO_USER }}/.bashrc
+
+- name: Install the message of the day
+  copy: src=motd dest=/etc/motd
+
+
+# Install Pagure inside a virtualenv and configure it
+- name: Install Pagure Python dependencies into a virtualenv
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  pip:
+    requirements: /home/{{ ansible_env.SUDO_USER }}/devel/{{ item }}
+    virtualenv: /home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python2-pagure/
+    virtualenv_python: python2
+  with_items:
+    - "requirements.txt"
+    - "tests_requirements.txt"
+
+- name: Install Pagure package into a virtualenv
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  pip:
+    name: /home/{{ ansible_env.SUDO_USER }}/devel/
+    extra_args: '-e'
+    virtualenv: /home/{{ ansible_env.SUDO_USER }}/.virtualenvs/python2-pagure/
+
+- name: Install Pagure package into /usr/lib
+  pip:
+    name: /home/{{ ansible_env.SUDO_USER }}/devel/
+    extra_args: '-e'
+
+- name: Install the pagure configuration
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  copy: src=pagure.cfg dest=/home/{{ ansible_env.SUDO_USER }}/pagure.cfg
+
+- name: Creates pagure data directories
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  file: path=/home/{{ ansible_env.SUDO_USER }}/pagure_data/{{ item }} state=directory
+  with_items:
+    - forks
+    - docs
+    - tickets
+    - requests
+    - remotes
+
+- name: Link the pagure repos directory to gitolite
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  file:
+    path: /home/{{ ansible_env.SUDO_USER }}/pagure_data/repos
+    src: /home/{{ ansible_env.SUDO_USER }}/repositories
+    state: link
+
+- name: Add a working copy of alembic.ini
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  copy:
+    src: /home/{{ ansible_env.SUDO_USER }}/devel/files/alembic.ini
+    dest: /home/{{ ansible_env.SUDO_USER }}/alembic.ini
+    remote_src: True
+
+- name: Configure alembic to use our development database
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  replace:
+    dest: /home/{{ ansible_env.SUDO_USER }}/alembic.ini
+    regexp: "sqlalchemy.url = sqlite:////var/tmp/pagure_dev.sqlite"
+    replace: "sqlalchemy.url = sqlite:////home/{{ ansible_env.SUDO_USER }}/pagure_data/pagure_dev.sqlite"
+
+- name: Configure alembic to point to the pagure migration folder
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  replace:
+    dest: /home/{{ ansible_env.SUDO_USER }}/alembic.ini
+    regexp: "script_location = /usr/share/pagure/alembic"
+    replace: "script_location = /home/vagrant/devel/alembic/"
+
+- name: Create the Pagure database
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  command: .virtualenvs/python2-pagure/bin/python devel/createdb.py
+  args:
+    creates: /home/{{ ansible_env.SUDO_USER }}/pagure_data/pagure_dev.sqlite
+    chdir: "/home/{{ ansible_env.SUDO_USER }}/"
+
+- name: Stamp the database with its current migration
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  shell: alembic stamp $(alembic heads | awk '{ print $1 }')
+  args:
+    chdir: "/home/{{ ansible_env.SUDO_USER }}/"
+
+- name: Create systemd user unit directory
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  file:
+    path: /home/{{ ansible_env.SUDO_USER }}/.config/systemd/user/
+    state: directory
+
+- name: Install the Pagure service files for systemd
+  become_user: "{{ ansible_env.SUDO_USER }}"
+  copy:
+    src: "{{ item }}"
+    dest: /home/{{ ansible_env.SUDO_USER }}/.config/systemd/user/{{ item }}
+  with_items:
+    - pagure.service
+    - pagure-docs.service

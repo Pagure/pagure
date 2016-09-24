@@ -32,3 +32,9 @@ alembic.ini
 
 # Don't track the virtualenv we tell developers to use
 pagure_env/
+
+# Ignore the Vagrantfile
+Vagrantfile
+.dnf-cache
+*.retry
+.vagrant

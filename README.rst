@@ -24,6 +24,39 @@ Playground version: https://stg.pagure.io
 Get it running
 ==============
 
+There are several options when it comes to a development environment. Vagrant
+will provide you with a virtual machine which you can develop on, or you can
+install it directly on your host machine.
+
+Vagrant
+^^^^^^^
+
+For a more thorough introduction to Vagrant, see
+https://fedoraproject.org/wiki/Vagrant.
+
+An example Vagrantfile is provided as ``Vagrantfile.example``. To use it,
+just copy it and install Vagrant::
+
+    $ cp Vagrantfile.example Vagrantfile
+    $ sudo dnf install ansible libvirt vagrant-libvirt vagrant-sshfs vagrant-hostmanager
+    $ vagrant up
+
+The default ``Vagrantfile`` forwards ports from the host to the guest,
+so you can interact with the application as if it were running on your
+host machine.
+
+.. note::
+    ``vagrant-hostmanager`` will automatically maintain /etc/hosts for you so you
+    can access the development environment from the host using its hostname, which
+    by default is ``pagure-dev.example.com``. You can choose not to use this
+    functionality by simply not installing the ``vagrant-hostmanager`` plugin, but
+    if you want Pagure to provide valid URLs in the UI for git repositories, you
+    will need to adjust Pagure's configuration found in ~/pagure.cfg on the guest.
+
+
+Manually
+^^^^^^^^
+
 * Install the needed system libraries::
 
     sudo dnf install git python-virtualenv libgit2-devel \
