@@ -151,6 +151,7 @@ class PagureCi(BaseHook):
             should be installed
 
         '''
-        for hook in project.ci_hook:
-            hook.pagure_ci_token = None
-        SESSION.commit()
+        if project.ci_hook is not None:
+            for hook in project.ci_hook:
+                hook.pagure_ci_token = None
+            SESSION.commit()
