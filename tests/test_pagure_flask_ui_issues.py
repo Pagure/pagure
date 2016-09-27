@@ -565,9 +565,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<option selected value="Fixed">Fixed</option>'
                 in output.data)
             self.assertIn(
-                '<small><p><a href="https://pagure.org/user/pingou"> '
+                '<small><p><a href="{app_url}/user/pingou"> '
                 '@pingou</a> changed the status to <code>Fixed</code>'
-                '</p></small>',
+                '</p></small>'.format(app_url=pagure.APP.config['APP_URL']),
                 output.data)
 
             # Add new comment

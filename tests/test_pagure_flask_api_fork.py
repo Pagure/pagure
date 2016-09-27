@@ -23,6 +23,7 @@ from mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
+import pagure.api
 import pagure.lib
 import tests
 
@@ -341,14 +342,9 @@ class PagureFlaskApiForktests(tests.Modeltests):
             '/api/0/test2/pull-request/1/close', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {
-              "error": "Invalid or expired token. Please visit " \
-                  "https://pagure.org/ to get or renew your API token.",
-              "error_code": "EINVALIDTOK",
-            }
-        )
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
+                         data['error_code'])
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
 
         # Invalid PR
         output = self.app.post(
@@ -455,14 +451,9 @@ class PagureFlaskApiForktests(tests.Modeltests):
             '/api/0/test2/pull-request/1/merge', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {
-              "error": "Invalid or expired token. Please visit " \
-                  "https://pagure.org/ to get or renew your API token.",
-              "error_code": "EINVALIDTOK",
-            }
-        )
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
+                         data['error_code'])
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
 
         # Invalid PR
         output = self.app.post(
@@ -550,14 +541,9 @@ class PagureFlaskApiForktests(tests.Modeltests):
             '/api/0/test2/pull-request/1/comment', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {
-              "error": "Invalid or expired token. Please visit " \
-                  "https://pagure.org/ to get or renew your API token.",
-              "error_code": "EINVALIDTOK",
-            }
-        )
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
+                         data['error_code'])
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
 
         # No input
         output = self.app.post(
@@ -664,14 +650,9 @@ class PagureFlaskApiForktests(tests.Modeltests):
             '/api/0/test2/pull-request/1/flag', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {
-              "error": "Invalid or expired token. Please visit " \
-                  "https://pagure.org/ to get or renew your API token.",
-              "error_code": "EINVALIDTOK",
-            }
-        )
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
+                         data['error_code'])
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
 
         # No input
         output = self.app.post(

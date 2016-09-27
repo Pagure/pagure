@@ -57,14 +57,9 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         output = self.app.post('/api/0/test2/new_issue', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {
-              "error": "Invalid or expired token. Please visit " \
-                  "https://pagure.org/ to get or renew your API token.",
-              "error_code": "EINVALIDTOK",
-            }
-        )
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
+                         data['error_code'])
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
 
         # No input
         output = self.app.post('/api/0/test/new_issue', headers=headers)
@@ -540,13 +535,9 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         output = self.app.get('/api/0/test/issue/2', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {
-              "error": "Invalid or expired token. Please visit https://pagure.org/ to get or renew your API token.",
-              "error_code": "EINVALIDTOK"
-            }
-        )
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
+                         data['error_code'])
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
 
         # Create a new token for another user
         item = pagure.lib.model.Token(
@@ -657,14 +648,9 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         output = self.app.post('/api/0/test2/issue/1/status', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {
-              "error": "Invalid or expired token. Please visit " \
-                  "https://pagure.org/ to get or renew your API token.",
-              "error_code": "EINVALIDTOK",
-            }
-        )
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
+                         data['error_code'])
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
 
         # No input
         output = self.app.post('/api/0/test/issue/1/status', headers=headers)
@@ -802,14 +788,9 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             '/api/0/foo/issue/1/status', data=data, headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {
-                "error": "Invalid or expired token. Please "
-                "visit https://pagure.org/ to get or renew your API token.",
-                "error_code": "EINVALIDTOK"
-            }
-        )
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
+                         data['error_code'])
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -840,14 +821,9 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         output = self.app.post('/api/0/test2/issue/1/comment', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {
-              "error": "Invalid or expired token. Please visit " \
-                  "https://pagure.org/ to get or renew your API token.",
-              "error_code": "EINVALIDTOK",
-            }
-        )
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
+                         data['error_code'])
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
 
         # No input
         output = self.app.post('/api/0/test/issue/1/comment', headers=headers)
@@ -982,14 +958,9 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             '/api/0/foo/issue/1/comment', data=data, headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {
-                "error": "Invalid or expired token. Please "
-                "visit https://pagure.org/ to get or renew your API token.",
-                "error_code": "EINVALIDTOK"
-            }
-        )
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
+                         data['error_code'])
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
 
         # No comment added
         repo = pagure.lib.get_project(self.session, 'foo')
@@ -1166,14 +1137,9 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         output = self.app.post('/api/0/test2/issue/1/assign', headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {
-              "error": "Invalid or expired token. Please visit " \
-                  "https://pagure.org/ to get or renew your API token.",
-              "error_code": "EINVALIDTOK",
-            }
-        )
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
+                         data['error_code'])
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
 
         # No input
         output = self.app.post('/api/0/test/issue/1/assign', headers=headers)
@@ -1308,14 +1274,9 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             '/api/0/foo/issue/1/assign', data=data, headers=headers)
         self.assertEqual(output.status_code, 401)
         data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {
-                "error": "Invalid or expired token. Please "
-                "visit https://pagure.org/ to get or renew your API token.",
-                "error_code": "EINVALIDTOK"
-            }
-        )
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
+                         data['error_code'])
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
 
         # No comment added
         repo = pagure.lib.get_project(self.session, 'foo')
