@@ -33,12 +33,12 @@ def get_requirements(requirements_file='requirements.txt'):
     :return type: list
     """
 
-    lines = open(requirements_file).readlines()
-    return [
-        line.rstrip().split('#')[0]
-        for line in lines
-        if not line.startswith('#')
-    ]
+    with open(requirements_file) as f:
+        return [
+            line.rstrip().split('#')[0]
+            for line in f.readlines()
+            if not line.startswith('#')
+        ]
 
 
 setup(

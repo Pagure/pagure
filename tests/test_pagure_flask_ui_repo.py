@@ -2886,8 +2886,9 @@ index 0000000..fb7093d
             img = os.path.join(tests.HERE, 'placebo.png')
 
             # Missing CSRF Token
-            data = {'filestream': open(img)}
-            output = self.app.post('/test/upload/', data=data)
+            with open(img, mode='rb') as stream:
+                data = {'filestream': stream}
+                output = self.app.post('/test/upload/', data=data)
             self.assertEqual(output.status_code, 200)
             self.assertIn('<h2>Upload a new release</h2>', output.data)
 
@@ -2895,9 +2896,10 @@ index 0000000..fb7093d
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             # Upload successful
-            data = {'filestream': open(img), 'csrf_token': csrf_token}
-            output = self.app.post(
-                '/test/upload/', data=data, follow_redirects=True)
+            with open(img, mode='rb') as stream:
+                data = {'filestream': stream, 'csrf_token': csrf_token}
+                output = self.app.post(
+                    '/test/upload/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '</button>\n                      File', output.data)

@@ -2091,8 +2091,8 @@ class ProjectdescEnvironmentMixin(Environment):
 
         git_dir = get_git_dir()
         try:
-            projectdesc = open(
-                os.path.join(git_dir, 'description')).readline().strip()
+            with open(os.path.join(git_dir, 'description')) as f:
+                projectdesc = f.readline().strip()
             if projectdesc and not projectdesc.startswith(
                     'Unnamed repository'):
                 return projectdesc
