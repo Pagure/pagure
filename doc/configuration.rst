@@ -185,7 +185,7 @@ Configure Gitolite
 
 Pagure uses `gitolite <http://gitolite.com/>`_ as an authorization layer.
 Gitolite relies on `SSH <https://en.wikipedia.org/wiki/Secure_Shell>`_ for
-the authentication. In other words, SSH let you in and gitolite check if you
+the authentication. In other words, SSH lets you in and gitolite checks if you
 are allowed to do what you are trying to do once you are inside.
 
 
@@ -193,7 +193,7 @@ GITOLITE_HOME
 ~~~~~~~~~~~~~
 
 This configuration key should point to the home of the user under which
-gitolite is ran.
+gitolite is run.
 
 
 GITOLITE_VERSION
