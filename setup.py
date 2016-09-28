@@ -43,20 +43,30 @@ def get_requirements(requirements_file='requirements.txt'):
 
 setup(
     name='pagure',
-    description='A light-weight git-centered forge based on pygit2..',
+    description='A light-weight git-centered forge based on pygit2.',
     version=__version__,
     author='Pierre-Yves Chibon',
     author_email='pingou@pingoured.fr',
     maintainer='Pierre-Yves Chibon',
     maintainer_email='pingou@pingoured.fr',
     license='GPLv2+',
-    download_url='https://fedorahosted.org/releases/p/r/pagure/',
-    url='https://fedorahosted.org/pagure/',
+    download_url='https://pagure.io/releases/pagure/',
+    url='https://pagure.io/pagure/',
     packages=['pagure'],
     include_package_data=True,
     install_requires=get_requirements(),
     entry_points="""
     [moksha.consumer]
     integrator = pagureCI.consumer:Integrator
-    """
+    """,
+    classifiers=[
+        'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
+        'Operating System :: POSIX :: Linux',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
+        'Topic :: Internet :: WWW/HTTP :: WSGI :: Application',
+        'Topic :: Software Development :: Bug Tracking',
+        'Topic :: Software Development :: Version Control',
+    ]
 )
