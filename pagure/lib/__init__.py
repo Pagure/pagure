@@ -1679,12 +1679,11 @@ def get_project(session, name, user=None, namespace=None):
 
     return query.first()
 
-
 def search_issues(
         session, repo, issueid=None, issueuid=None, status=None,
         closed=False, tags=None, assignee=None, author=None, private=None,
-        priority=None, milestones=None,
-        count=False, offset=None, limit=None):
+        priority=None, milestones=None, count=False, offset=None,
+        limit=None, search_pattern=None):
     ''' Retrieve one or more issues associated to a project with the given
     criterias.
 
@@ -1731,6 +1730,8 @@ def search_issues(
     :kwarg count: a boolean to specify if the method should return the list
         of Issues or just do a COUNT query.
     :type count: boolean
+    :kwarg search_pattern: a string to search in issues title
+    :type search_pattern: str or None
 
     :return: A single Issue object if issueid is specified, a list of Project
         objects otherwise.
@@ -1874,6 +1875,15 @@ def search_issues(
     ).filter(
         model.Issue.project_id == repo.id
     )
+
+    if search_pattern is not None:
+        query = session.query(
+            model.Issue
+        ).filter(
+            model.Issue.title.like('%' + str(search_pattern) + '%')
+        ).filter(
+            model.Issue.project_id == repo.id
+        )
 
     query = query.order_by(
         model.Issue.date_created.desc()

@@ -435,6 +435,7 @@ def view_issues(repo, username=None, namespace=None):
     tags = [tag.strip() for tag in tags if tag.strip()]
     assignee = flask.request.args.get('assignee', None)
     author = flask.request.args.get('author', None)
+    search_pattern = flask.request.args.get('search_pattern', None)
 
     repo = flask.g.repo
 
@@ -472,6 +473,7 @@ def view_issues(repo, username=None, namespace=None):
             priority=priority,
             offset=flask.g.offset,
             limit=flask.g.limit,
+            search_pattern=search_pattern,
         )
         issues_cnt = pagure.lib.search_issues(
             SESSION,
@@ -495,12 +497,14 @@ def view_issues(repo, username=None, namespace=None):
             private=private,
             priority=priority,
             count=True,
+            search_pattern=search_pattern,
         )
     else:
         issues = pagure.lib.search_issues(
             SESSION, repo, tags=tags, assignee=assignee,
             author=author, private=private, priority=priority,
             offset=flask.g.offset, limit=flask.g.limit,
+            search_pattern=search_pattern,
         )
         issues_cnt = pagure.lib.search_issues(
             SESSION, repo, tags=tags, assignee=assignee,
