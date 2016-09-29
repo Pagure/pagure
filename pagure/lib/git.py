@@ -470,6 +470,29 @@ def update_ticket_from_git(
 
     issue = pagure.lib.get_issue_by_uid(session, issue_uid=issue_uid)
 
+    # Update milestone
+    milestone = json_data.get('milestone')
+
+    # If milestone is not in the repo settings, add it
+    if milestone:
+        if milestone.strip() not in repo.milestones:
+            try:
+                repo.milestones[milestone.strip()] = None
+                session.add(repo)
+                session.commit()
+            except SQLAlchemyError:
+                session.rollback()
+    try:
+        msg = pagure.lib.edit_issue(
+            session,
+            issue=issue,
+            ticketfolder=None,
+            user=user.username,
+            milestone=milestone,
+        )
+    except SQLAlchemyError:
+        session.rollback()
+
     # Update tags
     tags = json_data.get('tags', [])
     pagure.lib.update_tags(
