@@ -174,7 +174,8 @@ def update_issue(repo, issueid, username=None, namespace=None):
 
         new_milestone = None
         try:
-            new_milestone = form.milestone.data.strip() or None
+            if form.milestone.raw_data:
+                new_milestone = form.milestone.data.strip() or None
         except:
             pass
 
