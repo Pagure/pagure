@@ -194,6 +194,11 @@ def is_valid_ssh_key(key):
     return proc.returncode == 0
 
 
+def are_valid_ssh_keys(keys):
+    return all([is_valid_ssh_key(key) is not False
+                for key in keys.split('\n')])
+
+
 def create_user_ssh_keys_on_disk(user, gitolite_keydir):
     ''' Create the ssh keys for the user on the specific folder.
 

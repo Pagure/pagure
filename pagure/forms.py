@@ -20,6 +20,7 @@ import wtforms
 import tempfile
 
 import pagure
+import pagure.lib
 
 
 STRICT_REGEX = '^[a-zA-Z0-9-_]+$'
@@ -66,6 +67,11 @@ def file_virus_validator(form, field):
             raise wtforms.ValidationError('Virus found: %s' % res_msg)
         else:
             raise wtforms.ValidationError('Error scanning uploaded file')
+
+
+def ssh_key_validator(form, field):
+    if not pagure.lib.are_valid_ssh_keys(field.data):
+        raise wtforms.ValidationError('Invalid SSH keys')
 
 
 class ProjectFormSimplified(wtf.Form):
@@ -336,7 +342,8 @@ class UserSettingsForm(wtf.Form):
     ''' Form to create or edit project. '''
     ssh_key = wtforms.TextAreaField(
         'Public SSH key <span class="error">*</span>',
-        [wtforms.validators.Required()]
+        [wtforms.validators.Required(),
+         ssh_key_validator]
     )
 
 
