@@ -327,7 +327,7 @@ $(function() {
                  commit not in the main branch. Click to create new PR now.'+'"> New PR</a> \
                 </div>';
           {%endif%}
-          $('#branch-'+branch+' .branch_del').prepend(html2);
+          $('#branch-' + branch.replace('.', '\\.') + ' .branch_del').prepend(html2);
           $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
         }
         for (branch in res.message.branch_w_pr){
@@ -345,7 +345,7 @@ $(function() {
                + 'PR#' + res.message.branch_w_pr[branch] + ' </a> \
               </div>';
           console.log(html);
-          $('#branch-' + branch + ' .branch_del').prepend(html);
+          $('#branch-' + branch.replace('.', '\\.') + ' .branch_del').prepend(html);
           $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
         }
       }
