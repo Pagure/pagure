@@ -11,12 +11,16 @@
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
+from unittest.case import SkipTest
 import json
 import unittest
 import shutil
 import sys
 import os
-import pyclamd
+try:
+    import pyclamd
+except:
+    pyclamd = None
 import tempfile
 
 import pygit2
@@ -1068,6 +1072,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
     @patch('pagure.lib.notify.send_email')
     def test_upload_issue(self, p_send_email, p_ugt):
         """ Test the upload_issue endpoint. """
+        if not pyclamd:
+            raise SkipTest()
         p_send_email.return_value = True
         p_ugt.return_value = True
 
