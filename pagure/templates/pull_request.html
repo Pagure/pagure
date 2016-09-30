@@ -1272,6 +1272,8 @@ $(document).ready(function () {
                     username=username,
                     namespace=repo.namespace,
                     status='all') }}"),
+        {%- else %}
+        {},
         {%- endif %}
         {%- if repo.settings.get('pull_requests', True) %}
         $.get("{{ url_for('api_ns.api_pull_request_views',
@@ -1279,10 +1281,18 @@ $(document).ready(function () {
                     username=username,
                     namespace=repo.namespace,
                     status='all') }}")
+        {%- else %}
+        {}
         {%- endif %}
      ).done(function(issuesResp, prResp) {
        // 0 is the api response
-       var issuesAndPrs = issuesResp[0]['issues'].concat(prResp[0]['requests']);
+       var issuesAndPrs = [];
+       if (typeof issuesResp[0] !== 'undefined') {
+         issuesAndPrs = issuesAndPrs.concat(issuesResp[0]['issues']);
+       }
+       if (typeof prResp[0] !== 'undefined') {
+         issuesAndPrs = issuesAndPrs.concat(prResp[0]['requests']);
+       }
        var data = $.map(issuesAndPrs, function(ticket, idx) {
          return {
            name: ticket.id.toString(),
