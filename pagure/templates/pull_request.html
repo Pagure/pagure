@@ -1273,7 +1273,7 @@ $(document).ready(function () {
                     namespace=repo.namespace,
                     status='all') }}"),
         {%- endif %}
-        {%- if repo.settings.get('issue_tracker', True) %}
+        {%- if repo.settings.get('pull_requests', True) %}
         $.get("{{ url_for('api_ns.api_pull_request_views',
                     repo=repo.name,
                     username=username,
