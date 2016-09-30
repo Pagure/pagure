@@ -395,7 +395,7 @@ class PagureFlaskApptests(tests.Modeltests):
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
-                'ssh_key': 'this is my ssh key',
+                'ssh_key': 'blah'
             }
 
             output = self.app.post('/settings/', data=data)
@@ -403,24 +403,40 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
                 '      </div>', output.data)
-            self.assertIn(
-                '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                'this is my ssh key</textarea>', output.data)
 
             data['csrf_token'] =  csrf_token
 
             output = self.app.post(
                 '/settings/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue(
-                '</button>\n                      Public ssh key updated'
-                in output.data)
+            self.assertIn('Invalid SSH keys', output.data)
+            self.assertIn(
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
+            self.assertIn('>blah</textarea>', output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+                'ssh_key': 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDUkub32fZnNI'
+                           '1zJYs43vhhx3c6IcYo4yzhw1gQ37BLhrrNeS6x8l5PKX4J8ZP5'
+                           '1XhViPaLbeOpl94Vm5VSCbLy0xtY9KwLhMkbKj7g6vvfxLm2sT'
+                           'Osb15j4jzIkUYYgIE7cHhZMCLWR6UA1c1HEzo6mewMDsvpQ9wk'
+                           'cDnAuXjK3Q==',
+                'csrf_token': csrf_token
+            }
+
+            output = self.app.post(
+                '/settings/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('Public ssh key updated', output.data)
             self.assertIn(
                 '<div class="card-header">\n          Basic Information\n'
                 '      </div>', output.data)
             self.assertIn(
                 '<textarea class="form-control" id="ssh_key" name="ssh_key">'
-                'this is my ssh key</textarea>', output.data)
+                'ssh-rsa AAAA', output.data)
 
             ast.return_value = True
             output = self.app.get('/settings/')
