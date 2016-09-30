@@ -1293,7 +1293,6 @@ $(document).ready(function () {
     if (typeof prResp[0] !== 'undefined') {
      issuesAndPrs = issuesAndPrs.concat(prResp[0]['requests']);
     }
-    console.log(issuesAndPrs);
     var data = $.map(issuesAndPrs, function(ticket, idx) {
      return {
        name: ticket.id.toString(),
@@ -1306,7 +1305,6 @@ $(document).ready(function () {
      insertTpl: '#${name}',
      displayTpl: "<li>#${name}<small> ${title}</small></li>",
     }
-    console.log(issueAndPrConfig);
     $("#comment").atwho(issueAndPrConfig);
     $("#initial_comment").atwho(issueAndPrConfig);
   });
