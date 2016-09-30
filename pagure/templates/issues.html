@@ -270,6 +270,8 @@
     </tbody>
 </table>
 </div>
+
+{% if g.repo_admin %}
 <button type="button" class="btn btn-secondary btn-sm pull-xs-right"
   data-toggle="modal" data-target="#report_modal">
   Save report
@@ -303,6 +305,7 @@
     </div>
   </div>
 </div>
+{% endif %}
 
 {{ pagination_link('page', g.page, total_page) }}
 

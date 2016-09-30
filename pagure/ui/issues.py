@@ -1159,6 +1159,10 @@ def edit_comment_issue(
 def save_reports(repo, username=None, namespace=None):
     """ Marked for watching or Unwatching
     """
+    if not flask.g.repo_admin:
+        flask.abort(
+            403,
+            'You are not allowed to create reports for this project')
 
     return_point = flask.url_for(
         'view_issues', repo=repo, username=username, namespace=namespace)
