@@ -71,6 +71,9 @@ def jenkins_ci_notification(
             build_id,
             requestfolder=APP.config['REQUESTS_FOLDER']
         )
+    except pagure.exceptions.NoCorrespondingPR as err:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.ENOCODE, error=str(err))
     except pagure.exceptions.PagureException as err:
         APP.logger.error('Error processing jenkins notification', exc_info=err)
         raise pagure.exceptions.APIError(

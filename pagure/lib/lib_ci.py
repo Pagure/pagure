@@ -46,7 +46,7 @@ def process_jenkins_build(session, project, build_id, requestfolder):
                 continue
 
     if not pr_id:
-        raise pagure.exceptions.PagureException(
+        raise pagure.exceptions.NoCorrespondingPR(
             'No corresponding PR found')
 
     if result not in BUILD_STATS:

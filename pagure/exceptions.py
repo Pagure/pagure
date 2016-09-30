@@ -62,3 +62,9 @@ class GitConflictsException(PagureException):
 class HookInactiveException(PagureException):
     ''' Exception raised when the hook is inactive. '''
     pass
+
+
+class NoCorrespondingPR(PagureException):
+    ''' Exception raised when no pull-request is found with the given
+    information. '''
+    pass
