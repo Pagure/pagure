@@ -571,7 +571,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<small><p><a href="{app_url}/user/pingou"> '
                 '@pingou</a> changed the status to <code>Fixed</code>'
-                '</p></small>'.format(app_url=pagure.APP.config['APP_URL']),
+                '</p></small>'.format(
+                    app_url=pagure.APP.config['APP_URL'].rstrip('/')),
                 output.data)
 
             # Add new comment
