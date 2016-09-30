@@ -133,7 +133,7 @@ git push -u origin master</pre>
                     onsubmit="return confirm('Are you sure you want to remove the branch: {{ branch }}?\nThis cannot be un-done!');">
                     {{ form.csrf_token }}
                     <a title="Remove branch {{ branch }}" href="#"
-                      onclick="$('#delete_branch_form-{{ branch | replace('/', '_') }}').submit();">
+                      onclick="$('#delete_branch_form-{{ branch | replace('/', '_') | replace('.', '\\\\.') }}').submit();">
                       <span class="oi" data-glyph="trash"></span>
                     </a>
                   </form>
