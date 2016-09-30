@@ -51,8 +51,8 @@
     {% if oth_issues %}
     <div class="addrem_bar issues_pbar m-b-1">
       {% if (issues | length + oth_issues) %}
-        <span style="width: {{ (100.0 * (1 - issues | length / (issues | length + oth_issues)))|round|int }}%">
-            {{ (100.0 * (1 - issues | length / (issues | length + oth_issues)))|round|int }}%
+        <span style="width: {{ (100.0 * (1 - issues_cnt / (issues_cnt + oth_issues)))|round|int }}%">
+            {{ (100.0 * (1 - issues_cnt / (issues_cnt + oth_issues)))|round|int }}%
         </span>
       {% endif %}
     </div>
