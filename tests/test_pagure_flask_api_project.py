@@ -421,6 +421,24 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             }
         )
 
+        data = {
+            'repo': 'test',
+            'namespace': 'pingou',
+        }
+
+        # Repo does not exists
+        output = self.app.post(
+            '/api/0/fork/', data=data, headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                "error": "Project not found",
+                "error_code": "ENOPROJECT"
+            }
+        )
+
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
         PagureFlaskApiProjecttests)
