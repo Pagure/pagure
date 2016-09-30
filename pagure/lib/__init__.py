@@ -25,6 +25,7 @@ import markdown
 import os
 import shutil
 import tempfile
+import subprocess
 import urlparse
 import uuid
 
@@ -181,6 +182,18 @@ def search_user(session, username=None, email=None, token=None, pattern=None):
     return output
 
 
+def is_valid_ssh_key(key):
+    key = key.strip()
+    if not key:
+        return None
+    proc = subprocess.Popen(['/usr/bin/ssh-keygen', '-l', '-f', '-'],
+                            stdin=subprocess.PIPE,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE)
+    proc.communicate(key)
+    return proc.returncode == 0
+
+
 def create_user_ssh_keys_on_disk(user, gitolite_keydir):
     ''' Create the ssh keys for the user on the specific folder.
 
@@ -210,6 +223,8 @@ def create_user_ssh_keys_on_disk(user, gitolite_keydir):
         keys = user.public_ssh_key.split('\n')
         for i in range(len(keys)):
             if not keys[i]:
+                continue
+            if not is_valid_ssh_key(keys[i]):
                 continue
             keyline_dir = os.path.join(gitolite_keydir, 'keys_%i' % i)
             if not os.path.exists(keyline_dir):
