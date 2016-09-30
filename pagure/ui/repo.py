@@ -1172,7 +1172,6 @@ def update_milestones(repo, username=None, namespace=None):
     if form.validate_on_submit():
         milestones = [
             w.strip() for w in flask.request.form.getlist('milestones')
-            if w.strip()
         ]
 
         milestone_dates = [
@@ -1186,7 +1185,7 @@ def update_milestones(repo, username=None, namespace=None):
             error = True
 
         for milestone in milestones:
-            if milestones.count(milestone) != 1:
+            if milestone.strip() and milestones.count(milestone) != 1:
                 flask.flash(
                     'Milestone %s is present %s times' % (
                         milestone, milestones.count(milestone)
@@ -1196,7 +1195,7 @@ def update_milestones(repo, username=None, namespace=None):
                 break
 
         for milestone_date in milestone_dates:
-            if milestone_date and milestone_dates.count(milestone_date) != 1:
+            if milestone_date.strip() and milestone_dates.count(milestone_date) != 1:
                 flask.flash(
                     'Date %s is present %s times' % (
                         milestone_date, milestone_dates.count(milestone_date)
@@ -1208,7 +1207,8 @@ def update_milestones(repo, username=None, namespace=None):
         if not error:
             miles = {}
             for cnt in range(len(milestones)):
-                miles[milestones[cnt]] = milestone_dates[cnt]
+                if milestones[cnt].strip():
+                    miles[milestones[cnt]] = milestone_dates[cnt]
             try:
                 repo.milestones = miles
                 SESSION.add(repo)
