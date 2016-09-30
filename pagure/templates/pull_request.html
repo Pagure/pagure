@@ -1262,73 +1262,54 @@ $(document).ready(function () {
        searchKey: "username"
      }
      $("#comment").atwho(userConfig);
+     $("#initial_comment").atwho(userConfig);
    });
 
-   {% if config.get('ENABLE_TICKETS', True) %}
-     $.when(
-        {%- if repo.settings.get('issue_tracker', True) %}
-        $.get("{{ url_for('api_ns.api_view_issues',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace,
-                    status='all') }}"),
-        {%- else %}
-        {},
-        {%- endif %}
-        {%- if repo.settings.get('pull_requests', True) %}
-        $.get("{{ url_for('api_ns.api_pull_request_views',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace,
-                    status='all') }}")
-        {%- else %}
-        {}
-        {%- endif %}
-     ).done(function(issuesResp, prResp) {
-       // 0 is the api response
-       var issuesAndPrs = [];
-       if (typeof issuesResp[0] !== 'undefined') {
-         issuesAndPrs = issuesAndPrs.concat(issuesResp[0]['issues']);
-       }
-       if (typeof prResp[0] !== 'undefined') {
-         issuesAndPrs = issuesAndPrs.concat(prResp[0]['requests']);
-       }
-       var data = $.map(issuesAndPrs, function(ticket, idx) {
-         return {
-           name: ticket.id.toString(),
-           title: $('<div>').text(ticket.title).html()
-         }
-       });
-       var issueAndPrConfig = {
-         at: '#',
-         data: data,
-         insertTpl: '#${name}',
-         displayTpl: "<li>#${name}<small> ${title}</small></li>",
-       }
-       $("#comment").atwho(issueAndPrConfig);
-      });
-   {% else %}
-     $.get("{{ url_for('api_ns.api_pull_request_views',
-                        repo=repo.name,
-                        username=username,
-                        namespace=repo.namespace,
-                        status='all') }}")
-         .done(function(prResp) {
-             var data = $.map(prResp['requests'], function(pr, idx) {
-                 return {
-                     name: pr.id.toString(),
-                     title: $('<div>').text(pr.title).html()
-                 }
-             });
-             var conf = {
-                 at: '#',
-                 data: data,
-                 insertTpl: '#${name}',
-                 displayTpl: "<li>#${name}<small> ${title} </small></li>",
-             }
-             $("#comment").atwho(conf);
-         });
-    {% endif %}
+  $.when(
+    {%- if config.get('ENABLE_TICKETS', True) and repo.settings.get('issue_tracker', True) %}
+    $.get("{{ url_for('api_ns.api_view_issues',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                status='all') }}"),
+    {%- else %}
+    {},
+    {%- endif %}
+    {%- if repo.settings.get('pull_requests', True) %}
+    $.get("{{ url_for('api_ns.api_pull_request_views',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                status='all') }}")
+    {%- else %}
+    {}
+    {%- endif %}
+  ).done(function(issuesResp, prResp) {
+    // 0 is the api response
+    var issuesAndPrs = [];
+    if (typeof issuesResp[0] !== 'undefined') {
+     issuesAndPrs = issuesAndPrs.concat(issuesResp[0]['issues']);
+    }
+    if (typeof prResp[0] !== 'undefined') {
+     issuesAndPrs = issuesAndPrs.concat(prResp[0]['requests']);
+    }
+    console.log(issuesAndPrs);
+    var data = $.map(issuesAndPrs, function(ticket, idx) {
+     return {
+       name: ticket.id.toString(),
+       title: $('<div>').text(ticket.title).html()
+     }
+    });
+    var issueAndPrConfig = {
+     at: '#',
+     data: data,
+     insertTpl: '#${name}',
+     displayTpl: "<li>#${name}<small> ${title}</small></li>",
+    }
+    console.log(issueAndPrConfig);
+    $("#comment").atwho(issueAndPrConfig);
+    $("#initial_comment").atwho(issueAndPrConfig);
+  });
 } );
 $(window).on('hashchange', updateHighlight);
 var selected = [];
