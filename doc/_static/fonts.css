@@ -1,0 +1,40 @@
+h1 {
+		font-family: Helvetica Neue;
+		font-size: 24px;
+		font-style: normal;
+		font-variant: normal;
+		font-weight: 700;
+		line-height: 38.4px;
+}
+h3 {
+		font-family: Helvetica Neue;
+		font-size: 14px;
+		font-style: normal;
+		font-variant: normal;
+		font-weight: 700;
+		line-height: 22.4px;
+}
+p {
+		font-family: Cantarell, Arial;
+		font-size: 15px;
+		font-style: normal;
+		font-variant: normal;
+		font-weight: 400;
+		line-height: 18px;
+}
+blockquote {
+		font-family: sans-serif;
+		font-size: 21px;
+		font-style: normal;
+		font-variant: normal;
+		font-weight: 400;
+		line-height: 25.2px;
+}
+pre {
+		font-family: Helvetica Neue;
+		font-size: 14px;
+		font-style: normal;
+		font-variant: normal;
+		font-weight: 400;
+		line-height: 16.8px;
+}

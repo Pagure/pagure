@@ -1,5 +1,5 @@
 @import url("cloud.css");
-@import url("http://fonts.googleapis.com/css?family=Comfortaa");
+@import url("fonts.css");
 
 .pagure-logo span {
     background: url("pagure.png") no-repeat scroll 50% 0 transparent;

@@ -155,6 +155,8 @@ html_theme_options = {
     "codetrimcolor": "#79db32",  # First Green
 
     "footerbgcolor": "#FEFEFE",
+
+    "fontcssurl": "{% _static 'site.css' %}",
 }
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
