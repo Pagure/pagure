@@ -620,10 +620,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output.data)
-            self.assertIn(
-                '</button>\n                      '
-                'Successfully edited issue #1',
-                output.data)
             self.assertTrue(
                 '<p>Woohoo a second comment !</p>' in output.data)
             self.assertEqual(output.data.count('comment_body">'), 2)
@@ -942,10 +938,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output.data)
-            self.assertIn(
-                '</button>\n                      '
-                'Successfully edited issue #1',
-                output.data)
 
             # Add an invalid dependent ticket
             data = {
@@ -1038,10 +1030,6 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
-                output.data)
-            self.assertIn(
-                '</button>\n                      '
-                'Successfully edited issue #1',
                 output.data)
 
             # Add an invalid dependent ticket

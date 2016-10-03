@@ -161,10 +161,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                 u'<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output.data)
-            self.assertIn(
-                u'</button>\n                      '
-                u'Successfully edited issue #1',
-                output.data)
+
 
     def test_update_milestones(self):
         """ Test updating milestones of a repo. """
