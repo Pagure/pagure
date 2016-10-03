@@ -16,6 +16,11 @@ import re
 
 import flask
 import flask_wtf as wtf
+try:
+    from flask_wtf import FlaskForm as FlaskForm
+except:
+    from flask_wtf import Form as FlaskForm
+
 import wtforms
 import tempfile
 
@@ -74,7 +79,7 @@ def ssh_key_validator(form, field):
         raise wtforms.ValidationError('Invalid SSH keys')
 
 
-class ProjectFormSimplified(wtf.Form):
+class ProjectFormSimplified(FlaskForm):
     ''' Form to edit the description of a project. '''
     description = wtforms.TextField(
         'Description <span class="error">*</span>',
@@ -130,7 +135,7 @@ class ProjectForm(ProjectFormSimplified):
             self.namespace.choices.insert(0, ('', ''))
 
 
-class IssueFormSimplied(wtf.Form):
+class IssueFormSimplied(FlaskForm):
     ''' Form to create or edit an issue. '''
     title = wtforms.TextField(
         'Title<span class="error">*</span>',
@@ -166,7 +171,7 @@ class IssueForm(IssueFormSimplied):
             ]
 
 
-class RequestPullForm(wtf.Form):
+class RequestPullForm(FlaskForm):
     ''' Form to create a request pull. '''
     title = wtforms.TextField(
         'Title<span class="error">*</span>',
@@ -192,7 +197,7 @@ class RemoteRequestPullForm(RequestPullForm):
     )
 
 
-class AddIssueTagForm(wtf.Form):
+class AddIssueTagForm(FlaskForm):
     ''' Form to add a comment to an issue. '''
     tag = wtforms.TextField(
         'tag',
@@ -204,7 +209,7 @@ class AddIssueTagForm(wtf.Form):
     )
 
 
-class StatusForm(wtf.Form):
+class StatusForm(FlaskForm):
     ''' Form to add/change the status of an issue. '''
     status = wtforms.SelectField(
         'Status',
@@ -224,7 +229,7 @@ class StatusForm(wtf.Form):
             ]
 
 
-class NewTokenForm(wtf.Form):
+class NewTokenForm(FlaskForm):
     ''' Form to add/change the status of an issue. '''
     acls = wtforms.SelectMultipleField(
         'ACLs',
@@ -244,7 +249,7 @@ class NewTokenForm(wtf.Form):
             ]
 
 
-class UpdateIssueForm(wtf.Form):
+class UpdateIssueForm(FlaskForm):
     ''' Form to add a comment to an issue. '''
     tag = wtforms.TextField(
         'tag',
@@ -311,7 +316,7 @@ class UpdateIssueForm(wtf.Form):
             self.milestone.choices.insert(0, ('', ''))
 
 
-class AddPullRequestCommentForm(wtf.Form):
+class AddPullRequestCommentForm(FlaskForm):
     ''' Form to add a comment to a pull-request. '''
     commit = wtforms.HiddenField('commit identifier')
     filename = wtforms.HiddenField('file changed')
@@ -324,7 +329,7 @@ class AddPullRequestCommentForm(wtf.Form):
     )
 
 
-class AddPullRequestFlagForm(wtf.Form):
+class AddPullRequestFlagForm(FlaskForm):
     ''' Form to add a flag to a pull-request. '''
     username = wtforms.TextField(
         'Username', [wtforms.validators.Required()])
@@ -338,7 +343,7 @@ class AddPullRequestFlagForm(wtf.Form):
         'UID', [wtforms.validators.optional()])
 
 
-class UserSettingsForm(wtf.Form):
+class UserSettingsForm(FlaskForm):
     ''' Form to create or edit project. '''
     ssh_key = wtforms.TextAreaField(
         'Public SSH key <span class="error">*</span>',
@@ -347,7 +352,7 @@ class UserSettingsForm(wtf.Form):
     )
 
 
-class AddUserForm(wtf.Form):
+class AddUserForm(FlaskForm):
     ''' Form to add a user to a project. '''
     user = wtforms.TextField(
         'Username <span class="error">*</span>',
@@ -355,7 +360,7 @@ class AddUserForm(wtf.Form):
     )
 
 
-class AssignIssueForm(wtf.Form):
+class AssignIssueForm(FlaskForm):
     ''' Form to assign an user to an issue. '''
     assignee = wtforms.TextField(
         'Assignee <span class="error">*</span>',
@@ -363,7 +368,7 @@ class AssignIssueForm(wtf.Form):
     )
 
 
-class AddGroupForm(wtf.Form):
+class AddGroupForm(FlaskForm):
     ''' Form to add a group to a project. '''
     group = wtforms.TextField(
         'Group <span class="error">*</span>',
@@ -374,19 +379,19 @@ class AddGroupForm(wtf.Form):
     )
 
 
-class ConfirmationForm(wtf.Form):
+class ConfirmationForm(FlaskForm):
     ''' Simple form used just for CSRF protection. '''
     pass
 
 
-class UploadFileForm(wtf.Form):
+class UploadFileForm(FlaskForm):
     ''' Form to upload a file. '''
     filestream = wtforms.FileField(
         'File',
         [wtforms.validators.Required(), file_virus_validator])
 
 
-class UserEmailForm(wtf.Form):
+class UserEmailForm(FlaskForm):
     ''' Form to edit the description of a project. '''
     email = wtforms.TextField(
         'email', [wtforms.validators.Required()]
@@ -403,7 +408,7 @@ class UserEmailForm(wtf.Form):
             self.email.validators = [wtforms.validators.Required()]
 
 
-class ProjectCommentForm(wtf.Form):
+class ProjectCommentForm(FlaskForm):
     ''' Form to represent project. '''
     objid = wtforms.TextField(
         'Ticket/Request id',
@@ -415,14 +420,14 @@ class ProjectCommentForm(wtf.Form):
     )
 
 
-class CommentForm(wtf.Form):
+class CommentForm(FlaskForm):
     ''' Form to upload a file. '''
     comment = wtforms.FileField(
         'Comment',
         [wtforms.validators.Required(), file_virus_validator])
 
 
-class EditGroupForm(wtf.Form):
+class EditGroupForm(FlaskForm):
     """ Form to ask for a password change. """
     display_name = wtforms.TextField(
         'Group name to display',
@@ -468,7 +473,7 @@ class NewGroupForm(EditGroupForm):
             ]
 
 
-class EditFileForm(wtf.Form):
+class EditFileForm(FlaskForm):
     """ Form used to edit a file. """
     content = wtforms.TextAreaField(
         'content', [wtforms.validators.Required()])
@@ -495,7 +500,7 @@ class EditFileForm(wtf.Form):
             ]
 
 
-class DefaultBranchForm(wtf.Form):
+class DefaultBranchForm(FlaskForm):
     """Form to change the default branh for a repository"""
     branches = wtforms.SelectField(
         'default_branch',
@@ -515,7 +520,7 @@ class DefaultBranchForm(wtf.Form):
             ]
 
 
-class EditCommentForm(wtf.Form):
+class EditCommentForm(FlaskForm):
     """ Form to verify that comment is not empty
     """
     update_comment = wtforms.TextAreaField(
@@ -524,7 +529,7 @@ class EditCommentForm(wtf.Form):
     )
 
 
-class ForkRepoForm(wtf.Form):
+class ForkRepoForm(FlaskForm):
     ''' Form to fork a project in the API. '''
     repo = wtforms.TextField(
         'The project name',
@@ -539,7 +544,7 @@ class ForkRepoForm(wtf.Form):
     )
 
 
-class AddReportForm(wtf.Form):
+class AddReportForm(FlaskForm):
     """ Form to verify that comment is not empty
     """
     report_name = wtforms.TextAreaField(
@@ -548,7 +553,7 @@ class AddReportForm(wtf.Form):
     )
 
 
-class PublicNotificationForm(wtf.Form):
+class PublicNotificationForm(FlaskForm):
     """ Form to verify that comment is not empty
     """
     issue_notifs = wtforms.TextAreaField(

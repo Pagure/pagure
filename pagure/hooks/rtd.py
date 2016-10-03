@@ -8,9 +8,14 @@
 
 """
 
-import flask_wtf as wtf
+
 import sqlalchemy as sa
 import wtforms
+
+try:
+    from flask_wtf import FlaskForm as FlaskForm
+except ImportError:
+    from flask_wtf import Form as FlaskForm
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
@@ -49,7 +54,7 @@ class RtdTable(BASE):
     )
 
 
-class RtdForm(wtf.Form):
+class RtdForm(FlaskForm):
     ''' Form to configure the pagure hook. '''
     project_name = wtforms.TextField(
         'Project name on readthedoc.org',

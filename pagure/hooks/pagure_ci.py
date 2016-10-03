@@ -8,9 +8,12 @@
 
 """
 
-import flask_wtf as wtf
 import sqlalchemy as sa
 import wtforms
+try:
+    from flask_wtf import FlaskForm as FlaskForm
+except:
+    from flask_wtf import Form as FlaskForm
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
@@ -82,7 +85,7 @@ the URL to which your CI service should send its info.
 """
 
 
-class PagureCiForm(wtf.Form):
+class PagureCiForm(FlaskForm):
     ''' Form to configure the CI hook. '''
     ci_type = wtforms.SelectField(
         'Type of CI service',

@@ -10,10 +10,13 @@
 
 import os
 
-import flask_wtf as wtf
 import sqlalchemy as sa
 import pygit2
 import wtforms
+try:
+    from flask_wtf import FlaskForm as FlaskForm
+except:
+    from flask_wtf import Form as FlaskForm
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
@@ -56,7 +59,7 @@ class IrcTable(BASE):
     )
 
 
-class IrcForm(wtf.Form):
+class IrcForm(FlaskForm):
     ''' Form to configure the irc hook. '''
     server = wtforms.TextField(
         'Server <span class="error">*</span>',

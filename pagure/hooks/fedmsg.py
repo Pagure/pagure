@@ -8,9 +8,12 @@
 
 """
 
-import flask_wtf as wtf
 import sqlalchemy as sa
 import wtforms
+try:
+    from flask_wtf import FlaskForm as FlaskForm
+except:
+    from flask_wtf import Form as FlaskForm
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
@@ -46,7 +49,7 @@ class FedmsgTable(BASE):
     )
 
 
-class FedmsgForm(wtf.Form):
+class FedmsgForm(FlaskForm):
     ''' Form to configure the fedmsg hook. '''
     active = wtforms.BooleanField(
         'Active',

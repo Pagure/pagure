@@ -8,10 +8,13 @@
 
 """
 
-import flask_wtf as wtf
 import sqlalchemy as sa
 import pygit2
 import wtforms
+try:
+    from flask_wtf import FlaskForm as FlaskForm
+except:
+    from flask_wtf import Form as FlaskForm
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
@@ -49,7 +52,7 @@ class PagureForceCommitTable(BASE):
     )
 
 
-class PagureForceCommitForm(wtf.Form):
+class PagureForceCommitForm(FlaskForm):
     ''' Form to configure the pagure hook. '''
     branches = wtforms.TextField(
         'Branches',

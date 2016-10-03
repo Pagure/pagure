@@ -20,7 +20,10 @@
 # pylint: disable=no-init
 
 
-import flask_wtf as wtf
+try:
+    from flask_wtf import FlaskForm as FlaskForm
+except:
+    from flask_wtf import Form as FlaskForm
 import wtforms
 
 from pagure.forms import ConfirmationForm
@@ -34,7 +37,7 @@ def same_password(form, field):
             'Both password fields should be equal')
 
 
-class LostPasswordForm(wtf.Form):
+class LostPasswordForm(FlaskForm):
     """ Form to ask for a password change. """
     username = wtforms.TextField(
         'username  <span class="error">*</span>',
@@ -42,7 +45,7 @@ class LostPasswordForm(wtf.Form):
     )
 
 
-class ResetPasswordForm(wtf.Form):
+class ResetPasswordForm(FlaskForm):
     """ Form to reset one's password in the local database. """
     password = wtforms.PasswordField(
         'Password  <span class="error">*</span>',
@@ -54,7 +57,7 @@ class ResetPasswordForm(wtf.Form):
     )
 
 
-class LoginForm(wtf.Form):
+class LoginForm(FlaskForm):
     """ Form to login via the local database. """
     username = wtforms.TextField(
         'username  <span class="error">*</span>',
@@ -66,7 +69,7 @@ class LoginForm(wtf.Form):
     )
 
 
-class NewUserForm(wtf.Form):
+class NewUserForm(FlaskForm):
     """ Form to add a new user to the local database. """
     user = wtforms.TextField(
         'username  <span class="error">*</span>',
@@ -90,7 +93,7 @@ class NewUserForm(wtf.Form):
     )
 
 
-class ChangePasswordForm(wtf.Form):
+class ChangePasswordForm(FlaskForm):
     """ Form to reset one's password in the local database. """
     old_password = wtforms.PasswordField(
         'Old Password  <span class="error">*</span>',

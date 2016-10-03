@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014 - Copyright Red Hat Inc
+ (c) 2014-2016 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -11,9 +11,12 @@
 import os
 
 import flask
-import flask_wtf as wtf
 import sqlalchemy as sa
 import wtforms
+try:
+    from flask_wtf import FlaskForm as FlaskForm
+except:
+    from flask_wtf import Form as FlaskForm
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
@@ -50,7 +53,7 @@ class PagureRequestsTable(BASE):
     )
 
 
-class PagureRequestsForm(wtf.Form):
+class PagureRequestsForm(FlaskForm):
     ''' Form to configure the pagure hook. '''
     active = wtforms.BooleanField(
         'Active',
