@@ -310,7 +310,7 @@ class UpdateIssueForm(FlaskForm):
                 )
 
         self.milestone.choices = []
-        if 'milestones' in kwargs:
+        if 'milestones' in kwargs and kwargs['milestones']:
             for key in sorted(kwargs['milestones']):
                 self.milestone.choices.append((key, key))
             self.milestone.choices.insert(0, ('', ''))
