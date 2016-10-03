@@ -333,10 +333,7 @@ def api_fork_project():
     if form.validate_on_submit():
         repo = form.repo.data
         username = form.username.data or None
-        if form.namespace.raw_data:
-            namespace = form.namespace.data.strip() or None
-        else:
-            namespace = None
+        namespace = form.namespace.data.strip() or None
 
         repo = pagure.lib.get_project(
             SESSION, repo, user=username, namespace=namespace)
