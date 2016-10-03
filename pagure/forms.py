@@ -17,8 +17,8 @@ import re
 import flask
 import flask_wtf as wtf
 try:
-    from flask_wtf import FlaskForm as FlaskForm
-except:
+    from flask_wtf import FlaskForm
+except ImportError:
     from flask_wtf import Form as FlaskForm
 
 import wtforms

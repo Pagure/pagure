@@ -14,7 +14,7 @@ import sqlalchemy as sa
 import pygit2
 import wtforms
 try:
-    from flask_wtf import FlaskForm as FlaskForm
+    from flask_wtf import FlaskForm
 except:
     from flask_wtf import Form as FlaskForm
 from sqlalchemy.orm import relation

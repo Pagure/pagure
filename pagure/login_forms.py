@@ -20,11 +20,11 @@
 # pylint: disable=no-init
 
 
+import wtforms
 try:
     from flask_wtf import FlaskForm as FlaskForm
-except:
+except ImportError:
     from flask_wtf import Form as FlaskForm
-import wtforms
 
 from pagure.forms import ConfirmationForm
 
