@@ -1034,16 +1034,7 @@ function setup_reply_btns() {
 
   {% if pull_request.status == 'Open' %}
   $(function(){
-    $('#spinner').show();
-    $.ajax({
-      url: '{{ url_for("internal_ns.mergeable_request_pull") }}' ,
-      type: 'POST',
-      data: {
-        requestid: "{{ pull_request.uid }}",
-        csrf_token: "{{ mergeform.csrf_token.current_token }}",
-      },
-      dataType: 'json',
-      success: function(res) {
+    function process_response(res) {
         $('#spinner').hide();
         if (res.code == 'FFORWARD'){
           $('#merge_btn').addClass("btn-success");
@@ -1069,19 +1060,21 @@ function setup_reply_btns() {
           $('#merge-alert-message').append(res.message);
           $('#merge-alert').show();
         }
+    };
+    $('#spinner').show();
+    $.ajax({
+      url: '{{ url_for("internal_ns.mergeable_request_pull") }}' ,
+      type: 'POST',
+      data: {
+        requestid: "{{ pull_request.uid }}",
+        csrf_token: "{{ mergeform.csrf_token.current_token }}",
+      },
+      dataType: 'json',
+      success: function(res) {
+        process_response(res)
       },
       error: function(res) {
-        $('#spinner').hide();
-        var _obj = $('#pr_flags').find('tbody');
-        if (res.responseJSON.message) {
-          _obj.append(
-            $('<tr><th>PR Status:</th><td><span class="'+ res.responseJSON.code +'" title="'
-            + res.responseJSON.message +'"></span>'+ res.responseJSON.message +'</td></tr>'));
-        } else {
-          _obj.append(
-            $('<tr><th>PR Status:</th><td><span class="'+ res.responseJSON.code +'"></span>'
-              + res.responseJSON.message +'</td></tr>'));
-        }
+        process_response(res.responseJSON);
         $('#merge_btn').attr("disabled", "disabled");
       }
     });
