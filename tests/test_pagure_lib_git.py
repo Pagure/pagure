@@ -38,15 +38,15 @@ class PagureLibGittests(tests.Modeltests):
 
         pagure.lib.git.SESSION = self.session
         pagure.APP.config['GIT_FOLDER'] = os.path.join(
-            tests.HERE, 'repos')
+            self.path, 'repos')
         pagure.APP.config['FORK_FOLDER'] = os.path.join(
-            tests.HERE, 'forks')
+            self.path, 'forks')
         pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            tests.HERE, 'tickets')
+            self.path, 'tickets')
         pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            tests.HERE, 'docs')
+            self.path, 'docs')
         pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
-            tests.HERE, 'requests')
+            self.path, 'requests')
 
     def test_write_gitolite_acls(self):
         """ Test the write_gitolite_acls function of pagure.lib.git. """
@@ -74,7 +74,7 @@ class PagureLibGittests(tests.Modeltests):
         self.session.add(item)
         self.session.commit()
 
-        outputconf = os.path.join(tests.HERE, 'test_gitolite.conf')
+        outputconf = os.path.join(self.path, 'test_gitolite.conf')
 
         pagure.lib.git.write_gitolite_acls(self.session, outputconf)
 
@@ -210,7 +210,7 @@ repo requests/forks/pingou/test3
         self.session.add(item)
         self.session.commit()
 
-        outputconf = os.path.join(tests.HERE, 'test_gitolite.conf')
+        outputconf = os.path.join(self.path, 'test_gitolite.conf')
 
         pagure.lib.git.write_gitolite_acls(self.session, outputconf)
 
@@ -282,7 +282,7 @@ repo requests/forks/pingou/test2
     def test_commit_to_patch(self):
         """ Test the commit_to_patch function of pagure.lib.git. """
         # Create a git repo to play with
-        self.gitrepo = os.path.join(tests.HERE, 'test_repo.git')
+        self.gitrepo = os.path.join(self.path, 'test_repo.git')
         os.makedirs(self.gitrepo)
         repo = pygit2.init_repository(self.gitrepo)
 
@@ -441,7 +441,7 @@ index 9f44358..2a552bb 100644
         self.session.commit()
 
         # Create repo
-        self.gitrepo = os.path.join(tests.HERE, 'test_ticket_repo.git')
+        self.gitrepo = os.path.join(self.path, 'test_ticket_repo.git')
         os.makedirs(self.gitrepo)
         repo_obj = pygit2.init_repository(self.gitrepo, bare=True)
 
@@ -453,11 +453,11 @@ index 9f44358..2a552bb 100644
             title='Test issue',
             content='We should work on this',
             user='pingou',
-            ticketfolder=tests.HERE
+            ticketfolder=self.path
         )
         self.assertEqual(msg.title, 'Test issue')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        pagure.lib.git.update_git(issue, repo, tests.HERE)
+        pagure.lib.git.update_git(issue, repo, self.path)
 
         repo = pygit2.Repository(self.gitrepo)
         commit = repo.revparse_single('HEAD')
@@ -541,7 +541,7 @@ index 0000000..60f7480
             issue=issue,
             comment='Hey look a comment!',
             user='foo',
-            ticketfolder=tests.HERE
+            ticketfolder=self.path
         )
         self.session.commit()
         self.assertEqual(msg, 'Comment added')
@@ -628,7 +628,7 @@ index 458821a..77674a8
 
         self.test_update_git()
 
-        gitpath = os.path.join(tests.HERE, 'test_ticket_repo.git')
+        gitpath = os.path.join(self.path, 'test_ticket_repo.git')
         gitrepo = pygit2.init_repository(gitpath, bare=True)
 
         # Get the uid of the ticket created
@@ -646,7 +646,7 @@ index 458821a..77674a8
 
         repo = pagure.lib.get_project(self.session, 'test_ticket_repo')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        pagure.lib.git.clean_git(issue, repo, tests.HERE)
+        pagure.lib.git.clean_git(issue, repo, self.path)
 
         # No more files in the git repo
         commit = gitrepo.revparse_single('HEAD')
@@ -669,7 +669,7 @@ index 458821a..77674a8
         self.session.commit()
 
         # Create repo
-        self.gitrepo = os.path.join(tests.HERE, 'test_ticket_repo.git')
+        self.gitrepo = os.path.join(self.path, 'test_ticket_repo.git')
         os.makedirs(self.gitrepo)
         repo_obj = pygit2.init_repository(self.gitrepo, bare=True)
 
@@ -683,7 +683,7 @@ index 458821a..77674a8
             branch_to='master',
             title='test PR',
             user='pingou',
-            requestfolder=tests.HERE,
+            requestfolder=self.path,
             requestuid='foobar',
             requestid=None,
             status='Open',
@@ -694,7 +694,7 @@ index 458821a..77674a8
 
         request = repo.requests[0]
         self.assertEqual(request.title, 'test PR')
-        pagure.lib.git.update_git(request, request.project, tests.HERE)
+        pagure.lib.git.update_git(request, request.project, self.path)
 
         repo = pygit2.Repository(self.gitrepo)
         commit = repo.revparse_single('HEAD')
@@ -962,7 +962,7 @@ index 0000000..60f7480
     def test_update_request_from_git(self):
         """ Test the update_request_from_git method from pagure.lib.git. """
         tests.create_projects(self.session)
-        tests.create_projects_git(os.path.join(tests.HERE, 'repos'))
+        tests.create_projects_git(os.path.join(self.path, 'repos'))
 
         repo = pagure.lib.get_project(self.session, 'test')
 
@@ -1110,10 +1110,10 @@ index 0000000..60f7480
             username=None,
             request_uid='d4182a2ac2d541d884742d3037c26e56',
             json_data=data,
-            gitfolder=tests.HERE,
-            docfolder=os.path.join(tests.HERE, 'docs'),
-            ticketfolder=os.path.join(tests.HERE, 'tickets'),
-            requestfolder=os.path.join(tests.HERE, 'requests')
+            gitfolder=self.path,
+            docfolder=os.path.join(self.path, 'docs'),
+            ticketfolder=os.path.join(self.path, 'tickets'),
+            requestfolder=os.path.join(self.path, 'requests')
         )
 
         pagure.lib.git.update_request_from_git(
@@ -1123,10 +1123,10 @@ index 0000000..60f7480
             username=None,
             request_uid='d4182a2ac2d541d884742d3037c26e56',
             json_data=data,
-            gitfolder=tests.HERE,
-            docfolder=os.path.join(tests.HERE, 'docs'),
-            ticketfolder=os.path.join(tests.HERE, 'tickets'),
-            requestfolder=os.path.join(tests.HERE, 'requests')
+            gitfolder=self.path,
+            docfolder=os.path.join(self.path, 'docs'),
+            ticketfolder=os.path.join(self.path, 'tickets'),
+            requestfolder=os.path.join(self.path, 'requests')
         )
         self.session.commit()
 
@@ -1227,10 +1227,10 @@ index 0000000..60f7480
             username=None,
             request_uid='d4182a2ac2d541d884742d3037c26e57',
             json_data=data,
-            gitfolder=tests.HERE,
-            docfolder=os.path.join(tests.HERE, 'docs'),
-            ticketfolder=os.path.join(tests.HERE, 'tickets'),
-            requestfolder=os.path.join(tests.HERE, 'requests')
+            gitfolder=self.path,
+            docfolder=os.path.join(self.path, 'docs'),
+            ticketfolder=os.path.join(self.path, 'tickets'),
+            requestfolder=os.path.join(self.path, 'requests')
         )
         self.session.commit()
 
@@ -1252,7 +1252,7 @@ index 0000000..60f7480
         """ Test the read_git_lines method of pagure.lib.git. """
         self.test_update_git()
 
-        gitrepo = os.path.join(tests.HERE, 'test_ticket_repo.git')
+        gitrepo = os.path.join(self.path, 'test_ticket_repo.git')
         output = pagure.lib.git.read_git_lines(
             ['log', '-1', "--pretty='%s'"], gitrepo)
         self.assertEqual(len(output), 1)
@@ -1276,7 +1276,7 @@ index 0000000..60f7480
 
         self.test_update_git()
 
-        gitrepo = os.path.join(tests.HERE, 'test_ticket_repo.git')
+        gitrepo = os.path.join(self.path, 'test_ticket_repo.git')
         output = pagure.lib.git.read_git_lines(
             ['log', '-3', "--pretty='%H'"], gitrepo)
         self.assertEqual(len(output), 2)
@@ -1343,7 +1343,7 @@ index 0000000..60f7480
 
         self.test_update_git()
 
-        gitrepo = os.path.join(tests.HERE, 'test_ticket_repo.git')
+        gitrepo = os.path.join(self.path, 'test_ticket_repo.git')
         output = pagure.lib.git.read_git_lines(
             ['log', '-3', "--pretty='%H'"], gitrepo)
         self.assertEqual(len(output), 2)
@@ -1357,7 +1357,7 @@ index 0000000..60f7480
 
         self.test_update_git()
 
-        gitrepo = os.path.join(tests.HERE, 'test_ticket_repo.git')
+        gitrepo = os.path.join(self.path, 'test_ticket_repo.git')
         output = pagure.lib.git.read_git_lines(
             ['log', '-3', "--pretty='%H'"], gitrepo)
         self.assertEqual(len(output), 2)
@@ -1368,7 +1368,7 @@ index 0000000..60f7480
 
     def test_get_repo_name(self):
         """ Test the get_repo_name method of pagure.lib.git. """
-        gitrepo = os.path.join(tests.HERE, 'test_ticket_repo.git')
+        gitrepo = os.path.join(self.path, 'test_ticket_repo.git')
         repo_name = pagure.lib.git.get_repo_name(gitrepo)
         self.assertEqual(repo_name, 'test_ticket_repo')
 
@@ -1380,7 +1380,7 @@ index 0000000..60f7480
 
     def test_get_username(self):
         """ Test the get_username method of pagure.lib.git. """
-        gitrepo = os.path.join(tests.HERE, 'test_ticket_repo.git')
+        gitrepo = os.path.join(self.path, 'test_ticket_repo.git')
         repo_name = pagure.lib.git.get_username(gitrepo)
         self.assertEqual(repo_name, None)
 
@@ -1391,45 +1391,45 @@ index 0000000..60f7480
         self.assertEqual(repo_name, None)
 
         repo_name = pagure.lib.git.get_username(
-            os.path.join(tests.HERE, 'forks', 'pingou', 'foo.test.git'))
+            os.path.join(self.path, 'forks', 'pingou', 'foo.test.git'))
         self.assertEqual(repo_name, 'pingou')
 
         repo_name = pagure.lib.git.get_username(
-            os.path.join(tests.HERE, 'forks', 'pingou', 'bar/foo.test.git'))
+            os.path.join(self.path, 'forks', 'pingou', 'bar/foo.test.git'))
         self.assertEqual(repo_name, 'pingou')
 
         repo_name = pagure.lib.git.get_username(os.path.join(
-            tests.HERE, 'forks', 'pingou', 'fooo/bar/foo.test.git'))
+            self.path, 'forks', 'pingou', 'fooo/bar/foo.test.git'))
         self.assertEqual(repo_name, 'pingou')
 
     def test_get_repo_namespace(self):
         """ Test the get_repo_namespace method of pagure.lib.git. """
         repo_name = pagure.lib.git.get_repo_namespace(
-            os.path.join(tests.HERE, 'repos', 'test_ticket_repo.git'))
+            os.path.join(self.path, 'repos', 'test_ticket_repo.git'))
         self.assertEqual(repo_name, None)
 
         repo_name = pagure.lib.git.get_repo_namespace(
-            os.path.join(tests.HERE, 'repos', 'foo/bar/baz/test.git'))
+            os.path.join(self.path, 'repos', 'foo/bar/baz/test.git'))
         self.assertEqual(repo_name, 'foo/bar/baz')
 
         repo_name = pagure.lib.git.get_repo_namespace(
-            os.path.join(tests.HERE, 'repos', 'foo.test.git'))
+            os.path.join(self.path, 'repos', 'foo.test.git'))
         self.assertEqual(repo_name, None)
 
         repo_name = pagure.lib.git.get_repo_namespace(os.path.join(
-            tests.HERE, 'repos', 'forks', 'user', 'foo.test.git'))
+            self.path, 'repos', 'forks', 'user', 'foo.test.git'))
         self.assertEqual(repo_name, None)
 
         repo_name = pagure.lib.git.get_repo_namespace(os.path.join(
-            tests.HERE, 'repos', 'forks', 'user', 'bar/foo.test.git'))
+            self.path, 'repos', 'forks', 'user', 'bar/foo.test.git'))
         self.assertEqual(repo_name, 'bar')
 
         repo_name = pagure.lib.git.get_repo_namespace(os.path.join(
-            tests.HERE, 'repos', 'forks', 'user', 'ns/bar/foo.test.git'))
+            self.path, 'repos', 'forks', 'user', 'ns/bar/foo.test.git'))
         self.assertEqual(repo_name, 'ns/bar')
 
         repo_name = pagure.lib.git.get_repo_namespace(os.path.join(
-            tests.HERE, 'repos', 'forks', 'user', '/bar/foo.test.git'))
+            self.path, 'repos', 'forks', 'user', '/bar/foo.test.git'))
         self.assertEqual(repo_name, 'bar')
 
 

@@ -51,13 +51,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.filters.SESSION = self.session
 
-        pagure.APP.config['GIT_FOLDER'] = tests.HERE
+        pagure.APP.config['GIT_FOLDER'] = self.path
         pagure.APP.config['FORK_FOLDER'] = os.path.join(
-            tests.HERE, 'forks')
+            self.path, 'forks')
         pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            tests.HERE, 'tickets')
+            self.path, 'tickets')
         pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            tests.HERE, 'docs')
+            self.path, 'docs')
         self.app = pagure.APP.test_client()
 
     @patch('pagure.lib.git.update_git')
@@ -78,7 +78,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
             tests.create_projects(self.session)
             tests.create_projects_git(
-                os.path.join(tests.HERE), bare=True)
+                os.path.join(self.path), bare=True)
 
             output = self.app.get('/test/new_issue')
             self.assertEqual(output.status_code, 200)
@@ -167,9 +167,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(tests.HERE), bare=True)
+            os.path.join(self.path), bare=True)
         tests.create_projects_git(
-            os.path.join(tests.HERE, 'tickets'), bare=True)
+            os.path.join(self.path, 'tickets'), bare=True)
 
         user = tests.FakeUser()
         user.username = 'pingou'
@@ -240,7 +240,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(tests.HERE), bare=True)
+            os.path.join(self.path), bare=True)
 
         output = self.app.get('/test/issues')
         self.assertEqual(output.status_code, 200)
@@ -349,7 +349,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(tests.HERE), bare=True)
+            os.path.join(self.path), bare=True)
 
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 404)
@@ -474,7 +474,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(tests.HERE), bare=True)
+            os.path.join(self.path), bare=True)
 
         output = self.app.get('/test/issue/1/update')
         self.assertEqual(output.status_code, 302)
@@ -776,7 +776,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(tests.HERE), bare=True)
+            os.path.join(self.path), bare=True)
 
         # Create issues to play with
         repo = pagure.lib.get_project(self.session, 'test')
@@ -886,7 +886,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(tests.HERE), bare=True)
+            os.path.join(self.path), bare=True)
 
         # Create issues to play with
         repo = pagure.lib.get_project(self.session, 'test')
@@ -979,7 +979,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(tests.HERE), bare=True)
+            os.path.join(self.path), bare=True)
 
         # Create issues to play with
         repo = pagure.lib.get_project(self.session, 'test')
@@ -1074,9 +1074,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(tests.HERE), bare=True)
+            os.path.join(self.path), bare=True)
         tests.create_projects_git(
-            os.path.join(tests.HERE, 'tickets'), bare=True)
+            os.path.join(self.path, 'tickets'), bare=True)
 
         # Create issues to play with
         repo = pagure.lib.get_project(self.session, 'test')
@@ -1183,7 +1183,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         # Create the project and git repos
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(tests.HERE, 'tickets'), bare=True)
+            os.path.join(self.path, 'tickets'), bare=True)
 
         # Create issues to play with
         repo = pagure.lib.get_project(self.session, 'test')
@@ -1271,7 +1271,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
             tests.create_projects(self.session)
             tests.create_projects_git(
-                os.path.join(tests.HERE), bare=True)
+                os.path.join(self.path), bare=True)
 
             output = self.app.get('/test/issue/1/edit')
             self.assertEqual(output.status_code, 404)
@@ -1389,7 +1389,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
-            tests.create_projects_git(tests.HERE)
+            tests.create_projects_git(self.path)
 
             output = self.app.get('/test/tag/foo/edit')
             self.assertEqual(output.status_code, 403)
@@ -1483,7 +1483,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
-            tests.create_projects_git(tests.HERE)
+            tests.create_projects_git(self.path)
 
             output = self.app.post('/test/droptag/')
             self.assertEqual(output.status_code, 403)
@@ -1557,8 +1557,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         p_ugt.return_value = True
 
         tests.create_projects(self.session)
-        tests.create_projects_git(tests.HERE)
-        tests.create_projects_git(os.path.join(tests.HERE, 'tickets'))
+        tests.create_projects_git(self.path)
+        tests.create_projects_git(os.path.join(self.path, 'tickets'))
 
         # Create issues to play with
         repo = pagure.lib.get_project(self.session, 'test')
@@ -1640,7 +1640,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(tests.HERE), bare=True)
+            os.path.join(self.path), bare=True)
 
         # Create issues to play with
         repo = pagure.lib.get_project(self.session, 'test')

@@ -40,15 +40,15 @@ class PagureFlaskGroupstests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.filters.SESSION = self.session
 
-        pagure.APP.config['GIT_FOLDER'] = tests.HERE
+        pagure.APP.config['GIT_FOLDER'] = self.path
         pagure.APP.config['FORK_FOLDER'] = os.path.join(
-            tests.HERE, 'forks')
+            self.path, 'forks')
         pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            tests.HERE, 'tickets')
+            self.path, 'tickets')
         pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            tests.HERE, 'docs')
+            self.path, 'docs')
         pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
-            tests.HERE, 'requests')
+            self.path, 'requests')
         self.app = pagure.APP.test_client()
 
     def test_group_lists(self):

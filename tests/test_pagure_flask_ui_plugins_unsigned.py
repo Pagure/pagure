@@ -42,20 +42,20 @@ class PagureFlaskPluginUnsignedtests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.filters.SESSION = self.session
 
-        pagure.APP.config['GIT_FOLDER'] = tests.HERE
+        pagure.APP.config['GIT_FOLDER'] = self.path
         pagure.APP.config['FORK_FOLDER'] = os.path.join(
-            tests.HERE, 'forks')
+            self.path, 'forks')
         pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            tests.HERE, 'tickets')
+            self.path, 'tickets')
         pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            tests.HERE, 'docs')
+            self.path, 'docs')
         self.app = pagure.APP.test_client()
 
     def test_plugin_unsigned(self):
         """ Test the noff plugin on/off endpoint. """
 
         tests.create_projects(self.session)
-        tests.create_projects_git(tests.HERE)
+        tests.create_projects_git(self.path)
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
@@ -118,7 +118,7 @@ class PagureFlaskPluginUnsignedtests(tests.Modeltests):
                 in output.data)
 
             self.assertFalse(os.path.exists(os.path.join(
-                tests.HERE, 'test.git', 'hooks',
+                self.path, 'test.git', 'hooks',
                 'pre-receive.pagureunsignedcommit')))
 
             # Activate the hook
@@ -139,7 +139,7 @@ class PagureFlaskPluginUnsignedtests(tests.Modeltests):
                 output.data)
 
             self.assertTrue(os.path.exists(os.path.join(
-                tests.HERE, 'test.git', 'hooks',
+                self.path, 'test.git', 'hooks',
                 'pre-receive.pagureunsignedcommit')))
 
             # De-Activate hook
@@ -168,7 +168,7 @@ class PagureFlaskPluginUnsignedtests(tests.Modeltests):
                 'value="y">', output.data)
 
             self.assertFalse(os.path.exists(os.path.join(
-                tests.HERE, 'test.git', 'hooks',
+                self.path, 'test.git', 'hooks',
                 'pre-receive.pagureunsignedcommit')))
 
 

@@ -55,13 +55,13 @@ class PagureFlaskPluginstests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.filters.SESSION = self.session
 
-        pagure.APP.config['GIT_FOLDER'] = tests.HERE
+        pagure.APP.config['GIT_FOLDER'] = self.path
         pagure.APP.config['FORK_FOLDER'] = os.path.join(
-            tests.HERE, 'forks')
+            self.path, 'forks')
         pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            tests.HERE, 'tickets')
+            self.path, 'tickets')
         pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            tests.HERE, 'docs')
+            self.path, 'docs')
         self.app = pagure.APP.test_client()
 
     def test_get_plugin_names(self):
@@ -94,7 +94,7 @@ class PagureFlaskPluginstests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
-            tests.create_projects_git(tests.HERE)
+            tests.create_projects_git(self.path)
 
             output = self.app.get('/test/settings/Mail')
             self.assertEqual(output.status_code, 403)

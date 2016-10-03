@@ -45,26 +45,26 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         pagure.ui.fork.SESSION = self.session
         pagure.ui.repo.SESSION = self.session
 
-        pagure.APP.config['GIT_FOLDER'] = os.path.join(tests.HERE, 'repos')
-        pagure.APP.config['FORK_FOLDER'] = os.path.join(tests.HERE, 'forks')
+        pagure.APP.config['GIT_FOLDER'] = os.path.join(self.path, 'repos')
+        pagure.APP.config['FORK_FOLDER'] = os.path.join(self.path, 'forks')
         pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            tests.HERE, 'tickets')
+            self.path, 'tickets')
         pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            tests.HERE, 'docs')
+            self.path, 'docs')
         pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
-            tests.HERE, 'requests')
+            self.path, 'requests')
         self.app = pagure.APP.test_client()
 
     @patch('pagure.lib.notify.send_email')
-    def test_dumping_ticket(self, send_email):
+    def test_dumping_reloading_ticket(self, send_email):
         """ Test dumping a ticket into a JSON blob. """
         send_email.return_value = True
 
         tests.create_projects(self.session)
 
         # Create repo
-        self.gitrepo = os.path.join(tests.HERE, 'tickets', 'test.git')
-        repopath = os.path.join(tests.HERE, 'tickets')
+        self.gitrepo = os.path.join(self.path, 'tickets', 'test.git')
+        repopath = os.path.join(self.path, 'tickets')
         os.makedirs(self.gitrepo)
         repo_obj = pygit2.init_repository(self.gitrepo, bare=True)
 
@@ -183,26 +183,21 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
 
         self.assertEqual(len(os.listdir(newpath)), 4)
 
-        ticket_json = os.path.join(tests.HERE, 'test_ticket.json')
+        ticket_json = os.path.join(self.path, 'test_ticket.json')
         self.assertFalse(os.path.exists(ticket_json))
         shutil.copyfile(os.path.join(newpath, fileid), ticket_json)
         self.assertTrue(os.path.exists(ticket_json))
-
-        shutil.rmtree(newpath)
-
-    @patch('pagure.lib.notify.send_email')
-    def test_reload_ticket(self, send_email):
-        """ Test reloading a ticket from a JSON blob. """
-        send_email.return_value = True
-        ticket_json = os.path.join(tests.HERE, 'test_ticket.json')
-        self.assertTrue(os.path.exists(ticket_json))
-
-        tests.create_projects(self.session)
-
         jsondata = None
         with open(ticket_json) as stream:
             jsondata = json.load(stream)
         self.assertNotEqual(jsondata, None)
+
+        shutil.rmtree(newpath)
+
+        # Test reloading the JSON
+        self.tearDown()
+        self.setUp()
+        tests.create_projects(self.session)
 
         pagure.lib.git.update_ticket_from_git(
             self.session,
@@ -225,10 +220,6 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         self.assertEqual(issue.assignee.username, 'pingou')
         self.assertEqual(issue.children, [])
         self.assertEqual(issue.parents, [])
-
-        self.assertTrue(os.path.exists(ticket_json))
-        os.unlink(ticket_json)
-        self.assertFalse(os.path.exists(ticket_json))
 
 
 if __name__ == '__main__':

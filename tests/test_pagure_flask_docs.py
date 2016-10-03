@@ -45,21 +45,21 @@ class PagureFlaskDocstests(tests.Modeltests):
         pagure.ui.app.SESSION = self.session
         pagure.ui.repo.SESSION = self.session
 
-        pagure.docs_server.APP.config['GIT_FOLDER'] = tests.HERE
+        pagure.docs_server.APP.config['GIT_FOLDER'] = self.path
         pagure.docs_server.APP.config['FORK_FOLDER'] = os.path.join(
-            tests.HERE, 'forks')
+            self.path, 'forks')
         pagure.docs_server.APP.config['TICKETS_FOLDER'] = os.path.join(
-            tests.HERE, 'tickets')
+            self.path, 'tickets')
         pagure.docs_server.APP.config['DOCS_FOLDER'] = os.path.join(
-            tests.HERE, 'docs')
+            self.path, 'docs')
 
-        pagure.APP.config['GIT_FOLDER'] = tests.HERE
+        pagure.APP.config['GIT_FOLDER'] = self.path
         pagure.APP.config['FORK_FOLDER'] = os.path.join(
-            tests.HERE, 'forks')
+            self.path, 'forks')
         pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            tests.HERE, 'tickets')
+            self.path, 'tickets')
         pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            tests.HERE, 'docs')
+            self.path, 'docs')
         self.app = pagure.docs_server.APP.test_client()
 
     def test_view_docs_no_project(self):
@@ -96,7 +96,7 @@ class PagureFlaskDocstests(tests.Modeltests):
         """
         tests.create_projects(self.session)
         repo = pagure.lib.get_project(self.session, 'test')
-        tests.create_projects_git(os.path.join(tests.HERE, 'docs'))
+        tests.create_projects_git(os.path.join(self.path, 'docs'))
 
         output = self.app.get('/test/docs')
         self.assertEqual(output.status_code, 404)
@@ -112,13 +112,13 @@ class PagureFlaskDocstests(tests.Modeltests):
         """ Test the view_docs endpoint. """
         tests.create_projects(self.session)
         repo = pygit2.init_repository(
-            os.path.join(tests.HERE, 'docs', 'test.git'), bare=True)
+            os.path.join(self.path, 'docs', 'test.git'), bare=True)
 
         output = self.app.get('/test/docs')
         self.assertEqual(output.status_code, 404)
 
         # forked doc repo
-        docrepo = os.path.join(tests.HERE, 'docs', 'test', 'test.git')
+        docrepo = os.path.join(self.path, 'docs', 'test', 'test.git')
         repo = pygit2.init_repository(docrepo)
 
         # Create files in that git repo
@@ -153,7 +153,7 @@ class PagureFlaskDocstests(tests.Modeltests):
 
         # Push the changes to the bare repo
         remote = repo.create_remote(
-            'origin', os.path.join(tests.HERE, 'docs', 'test.git'))
+            'origin', os.path.join(self.path, 'docs', 'test.git'))
 
         PagureRepo.push(remote, 'refs/heads/master:refs/heads/master')
 

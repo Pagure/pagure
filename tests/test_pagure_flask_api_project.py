@@ -44,15 +44,15 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         pagure.api.project.SESSION = self.session
         pagure.lib.SESSION = self.session
 
-        pagure.APP.config['GIT_FOLDER'] = os.path.join(tests.HERE, 'repos')
+        pagure.APP.config['GIT_FOLDER'] = os.path.join(self.path, 'repos')
         pagure.APP.config['FORK_FOLDER'] = os.path.join(
-            tests.HERE, 'forks')
+            self.path, 'forks')
         pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
-            tests.HERE, 'requests')
+            self.path, 'requests')
         pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            tests.HERE, 'tickets')
+            self.path, 'tickets')
         pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            tests.HERE, 'docs')
+            self.path, 'docs')
 
         self.app = pagure.APP.test_client()
 
@@ -61,7 +61,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.create_projects(self.session)
 
         # Create a git repo to play with
-        gitrepo = os.path.join(tests.HERE, 'repos', 'test.git')
+        gitrepo = os.path.join(self.path, 'repos', 'test.git')
         repo = pygit2.init_repository(gitrepo, bare=True)
 
         newpath = tempfile.mkdtemp(prefix='pagure-fork-test')
@@ -239,7 +239,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         p_gga.return_value = True
 
         tests.create_projects(self.session)
-        tests.create_projects_git(os.path.join(tests.HERE, 'tickets'))
+        tests.create_projects_git(os.path.join(self.path, 'tickets'))
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
 
@@ -325,7 +325,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         tests.create_projects(self.session)
         for folder in ['docs', 'tickets', 'requests', 'repos']:
             tests.create_projects_git(
-                os.path.join(tests.HERE, folder), bare=True)
+                os.path.join(self.path, folder), bare=True)
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
 

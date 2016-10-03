@@ -53,17 +53,17 @@ class PagureFlaskRepoOldUrltests(tests.Modeltests):
 
         pagure.APP.config['OLD_VIEW_COMMIT_ENABLED'] = True
         pagure.APP.config['EMAIL_SEND'] = False
-        pagure.APP.config['GIT_FOLDER'] = tests.HERE
+        pagure.APP.config['GIT_FOLDER'] = self.path
         pagure.APP.config['FORK_FOLDER'] = os.path.join(
-            tests.HERE, 'forks')
+            self.path, 'forks')
         pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
-            tests.HERE, 'requests')
+            self.path, 'requests')
         pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            tests.HERE, 'tickets')
+            self.path, 'tickets')
         pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            tests.HERE, 'docs')
+            self.path, 'docs')
         pagure.APP.config['UPLOAD_FOLDER_PATH'] = os.path.join(
-            tests.HERE, 'releases')
+            self.path, 'releases')
         self.app = pagure.APP.test_client()
 
     def tearDown(self):
@@ -79,11 +79,11 @@ class PagureFlaskRepoOldUrltests(tests.Modeltests):
         """ Test the view_commit_old endpoint. """
 
         tests.create_projects(self.session)
-        tests.create_projects_git(tests.HERE, bare=True)
+        tests.create_projects_git(self.path, bare=True)
 
         # Add a README to the git repo - First commit
-        tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
-        repo = pygit2.Repository(os.path.join(tests.HERE, 'test.git'))
+        tests.add_readme_git_repo(os.path.join(self.path, 'test.git'))
+        repo = pygit2.Repository(os.path.join(self.path, 'test.git'))
         commit = repo.revparse_single('HEAD')
 
         # View first commit
@@ -119,9 +119,9 @@ class PagureFlaskRepoOldUrltests(tests.Modeltests):
             '<span style="color: #00A000">+ ======</span>' in output.data)
 
         # Add some content to the git repo
-        tests.add_content_git_repo(os.path.join(tests.HERE, 'test.git'))
+        tests.add_content_git_repo(os.path.join(self.path, 'test.git'))
 
-        repo = pygit2.Repository(os.path.join(tests.HERE, 'test.git'))
+        repo = pygit2.Repository(os.path.join(self.path, 'test.git'))
         commit = repo.revparse_single('HEAD')
 
         # View another commit
@@ -159,7 +159,7 @@ class PagureFlaskRepoOldUrltests(tests.Modeltests):
         self.session.add(item)
         self.session.commit()
         forkedgit = os.path.join(
-            tests.HERE, 'forks', 'pingou', 'test3.git')
+            self.path, 'forks', 'pingou', 'test3.git')
 
         tests.add_content_git_repo(forkedgit)
         tests.add_readme_git_repo(forkedgit)

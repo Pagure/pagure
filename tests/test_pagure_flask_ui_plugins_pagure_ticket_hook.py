@@ -42,20 +42,20 @@ class PagureFlaskPluginPagureTicketHooktests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.filters.SESSION = self.session
 
-        pagure.APP.config['GIT_FOLDER'] = tests.HERE
+        pagure.APP.config['GIT_FOLDER'] = self.path
         pagure.APP.config['FORK_FOLDER'] = os.path.join(
-            tests.HERE, 'forks')
+            self.path, 'forks')
         pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            tests.HERE, 'tickets')
+            self.path, 'tickets')
         pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            tests.HERE, 'docs')
+            self.path, 'docs')
         self.app = pagure.APP.test_client()
 
     def test_plugin_pagure_ticket(self):
         """ Test the pagure_ticket plugin on/off endpoint. """
 
         tests.create_projects(self.session)
-        tests.create_projects_git(tests.HERE)
+        tests.create_projects_git(self.path)
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
@@ -87,7 +87,7 @@ class PagureFlaskPluginPagureTicketHooktests(tests.Modeltests):
             data['csrf_token'] = csrf_token
 
             # Create the tickets repo
-            tests.create_projects_git(os.path.join(tests.HERE, 'tickets'))
+            tests.create_projects_git(os.path.join(self.path, 'tickets'))
 
             output = self.app.post(
                 '/test/settings/Pagure tickets', data=data,
@@ -111,7 +111,7 @@ class PagureFlaskPluginPagureTicketHooktests(tests.Modeltests):
                 in output.data)
 
             self.assertFalse(os.path.exists(os.path.join(
-                tests.HERE, 'tickets', 'test.git', 'hooks',
+                self.path, 'tickets', 'test.git', 'hooks',
                 'post-receive.pagure')))
 
             # Activate hook
@@ -142,7 +142,7 @@ class PagureFlaskPluginPagureTicketHooktests(tests.Modeltests):
                 'value="y">' in output.data)
 
             self.assertTrue(os.path.exists(os.path.join(
-                tests.HERE, 'tickets', 'test.git', 'hooks',
+                self.path, 'tickets', 'test.git', 'hooks',
                 'post-receive.pagure-ticket')))
 
             # De-Activate hook
@@ -169,7 +169,7 @@ class PagureFlaskPluginPagureTicketHooktests(tests.Modeltests):
                 'value="y">' in output.data)
 
             self.assertFalse(os.path.exists(os.path.join(
-                tests.HERE, 'tickets', 'test.git', 'hooks',
+                self.path, 'tickets', 'test.git', 'hooks',
                 'post-receive.pagure-ticket')))
 
             # Try re-activate hook w/o the git repo
@@ -177,7 +177,7 @@ class PagureFlaskPluginPagureTicketHooktests(tests.Modeltests):
                 'csrf_token': csrf_token,
                 'active': 'y',
             }
-            shutil.rmtree(os.path.join(tests.HERE, 'tickets', 'test.git'))
+            shutil.rmtree(os.path.join(self.path, 'tickets', 'test.git'))
 
             output = self.app.post('/test/settings/Pagure tickets', data=data)
             self.assertEqual(output.status_code, 404)

@@ -65,13 +65,13 @@ class PagureFlaskForktests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.issues.SESSION = self.session
 
-        pagure.APP.config['GIT_FOLDER'] = os.path.join(tests.HERE, 'repos')
+        pagure.APP.config['GIT_FOLDER'] = os.path.join(self.path, 'repos')
         pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            tests.HERE, 'tickets')
+            self.path, 'tickets')
         pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            tests.HERE, 'docs')
+            self.path, 'docs')
         pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
-            tests.HERE, 'requests')
+            self.path, 'requests')
         self.app = pagure.APP.test_client()
 
     def set_up_git_repo(
@@ -81,7 +81,7 @@ class PagureFlaskForktests(tests.Modeltests):
         """
 
         # Create a git repo to play with
-        gitrepo = os.path.join(tests.HERE, 'repos', 'test.git')
+        gitrepo = os.path.join(self.path, 'repos', 'test.git')
         repo = pygit2.init_repository(gitrepo, bare=True)
 
         newpath = tempfile.mkdtemp(prefix='pagure-fork-test')
@@ -230,7 +230,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(tests.HERE, 'requests'), bare=True)
+            os.path.join(self.path, 'requests'), bare=True)
 
         # Non-existant project
         output = self.app.get('/foobar/pull-request/1')
@@ -420,7 +420,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(tests.HERE, 'requests'), bare=True)
+            os.path.join(self.path, 'requests'), bare=True)
         self.set_up_git_repo(
             new_project=None, branch_from='feature', mtype='merge')
 
@@ -460,7 +460,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(tests.HERE, 'requests'), bare=True)
+            os.path.join(self.path, 'requests'), bare=True)
         self.set_up_git_repo(
             new_project=None, branch_from='feature', mtype='conflicts')
 
@@ -496,7 +496,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(tests.HERE, 'requests'), bare=True)
+            os.path.join(self.path, 'requests'), bare=True)
         self.set_up_git_repo(
             new_project=None, branch_from='master', mtype='nochanges')
 
@@ -554,7 +554,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(tests.HERE, 'requests'), bare=True)
+            os.path.join(self.path, 'requests'), bare=True)
         self.set_up_git_repo(new_project=None, branch_from='feature')
 
         # Project w/o pull-request
@@ -586,19 +586,19 @@ class PagureFlaskForktests(tests.Modeltests):
         self.session.commit()
 
         tests.create_projects_git(
-            os.path.join(tests.HERE, 'requests'), bare=True)
+            os.path.join(self.path, 'requests'), bare=True)
         tests.create_projects_git(
-            os.path.join(tests.HERE, 'repos', 'forks', 'foo'), bare=True)
+            os.path.join(self.path, 'repos', 'forks', 'foo'), bare=True)
 
         # Create a git repo to play with
-        gitrepo = os.path.join(tests.HERE, 'repos', 'test.git')
+        gitrepo = os.path.join(self.path, 'repos', 'test.git')
         self.assertFalse(os.path.exists(gitrepo))
         os.makedirs(gitrepo)
         repo = pygit2.init_repository(gitrepo, bare=True)
 
         # Create a fork of this repo
         newpath = tempfile.mkdtemp(prefix='pagure-fork-test')
-        gitrepo = os.path.join(tests.HERE, 'repos', 'forks', 'foo', 'test.git')
+        gitrepo = os.path.join(self.path, 'repos', 'forks', 'foo', 'test.git')
         new_repo = pygit2.clone_repository(gitrepo, newpath)
 
         # Edit the sources file again
@@ -670,12 +670,12 @@ class PagureFlaskForktests(tests.Modeltests):
         self.session.commit()
 
         tests.create_projects_git(
-            os.path.join(tests.HERE, 'requests'), bare=True)
+            os.path.join(self.path, 'requests'), bare=True)
         tests.create_projects_git(
-            os.path.join(tests.HERE, 'repos', 'forks', 'foo'), bare=True)
+            os.path.join(self.path, 'repos', 'forks', 'foo'), bare=True)
 
         # Create a git repo to play with
-        gitrepo = os.path.join(tests.HERE, 'repos', 'test.git')
+        gitrepo = os.path.join(self.path, 'repos', 'test.git')
         self.assertFalse(os.path.exists(gitrepo))
         os.makedirs(gitrepo)
         repo = pygit2.init_repository(gitrepo, bare=True)
@@ -683,7 +683,7 @@ class PagureFlaskForktests(tests.Modeltests):
         # Create a fork of this repo
         newpath = tempfile.mkdtemp(prefix='pagure-fork-test')
         gitrepo = os.path.join(
-            tests.HERE, 'repos', 'forks', 'foo', 'test.git')
+            self.path, 'repos', 'forks', 'foo', 'test.git')
         new_repo = pygit2.clone_repository(gitrepo, newpath)
 
         # Create a PR for these "changes" (there are none, both repos are
@@ -725,7 +725,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(tests.HERE, 'repos'), bare=True)
+            os.path.join(self.path, 'repos'), bare=True)
 
         output = self.app.get('/test/pull-requests')
         self.assertEqual(output.status_code, 200)
@@ -802,7 +802,7 @@ class PagureFlaskForktests(tests.Modeltests):
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(tests.HERE, 'requests'), bare=True)
+            os.path.join(self.path, 'requests'), bare=True)
         self.set_up_git_repo(
             new_project=None, branch_from='feature', mtype='merge')
 
@@ -927,12 +927,12 @@ index 9f44358..2a552bb 100644
         self.session.commit()
 
         tests.create_projects_git(
-            os.path.join(tests.HERE, 'requests'), bare=True)
+            os.path.join(self.path, 'requests'), bare=True)
         tests.create_projects_git(
-            os.path.join(tests.HERE, 'repos', 'forks', 'foo'), bare=True)
+            os.path.join(self.path, 'repos', 'forks', 'foo'), bare=True)
 
         # Create a git repo to play with
-        gitrepo = os.path.join(tests.HERE, 'repos', 'test.git')
+        gitrepo = os.path.join(self.path, 'repos', 'test.git')
         self.assertFalse(os.path.exists(gitrepo))
         os.makedirs(gitrepo)
         repo = pygit2.init_repository(gitrepo, bare=True)
@@ -940,7 +940,7 @@ index 9f44358..2a552bb 100644
         # Create a fork of this repo
         newpath = tempfile.mkdtemp(prefix='pagure-fork-test')
         gitrepo = os.path.join(
-            tests.HERE, 'repos', 'forks', 'foo', 'test.git')
+            self.path, 'repos', 'forks', 'foo', 'test.git')
         new_repo = pygit2.clone_repository(gitrepo, newpath)
 
         # Edit the sources file again
@@ -1042,12 +1042,12 @@ index 0000000..2a552bb
         self.session.commit()
 
         tests.create_projects_git(
-            os.path.join(tests.HERE, 'requests'), bare=True)
+            os.path.join(self.path, 'requests'), bare=True)
         tests.create_projects_git(
-            os.path.join(tests.HERE, 'repos', 'forks', 'foo'), bare=True)
+            os.path.join(self.path, 'repos', 'forks', 'foo'), bare=True)
 
         # Create a git repo to play with
-        gitrepo = os.path.join(tests.HERE, 'repos', 'test.git')
+        gitrepo = os.path.join(self.path, 'repos', 'test.git')
         self.assertFalse(os.path.exists(gitrepo))
         os.makedirs(gitrepo)
         repo = pygit2.init_repository(gitrepo, bare=True)
@@ -1055,7 +1055,7 @@ index 0000000..2a552bb
         # Create a fork of this repo
         newpath = tempfile.mkdtemp(prefix='pagure-fork-test')
         gitrepo = os.path.join(
-            tests.HERE, 'repos', 'forks', 'foo', 'test.git')
+            self.path, 'repos', 'forks', 'foo', 'test.git')
         new_repo = pygit2.clone_repository(gitrepo, newpath)
 
         # Create a PR for these "changes" (there are none, both repos are
@@ -1093,7 +1093,7 @@ index 0000000..2a552bb
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(tests.HERE, 'requests'), bare=True)
+            os.path.join(self.path, 'requests'), bare=True)
         self.set_up_git_repo(
             new_project=None, branch_from='feature', mtype='merge')
 
@@ -1174,7 +1174,7 @@ index 0000000..2a552bb
 
         tests.create_projects(self.session)
         tests.create_projects_git(
-            os.path.join(tests.HERE, 'requests'), bare=True)
+            os.path.join(self.path, 'requests'), bare=True)
         self.set_up_git_repo(new_project=None, branch_from='feature')
 
         user = tests.FakeUser()
@@ -1309,7 +1309,7 @@ index 0000000..2a552bb
         tests.create_projects(self.session)
         for folder in ['docs', 'tickets', 'requests', 'repos']:
             tests.create_projects_git(
-                os.path.join(tests.HERE, folder), bare=True)
+                os.path.join(self.path, folder), bare=True)
 
         user = tests.FakeUser()
         user.username = 'pingou'
@@ -1356,7 +1356,7 @@ index 0000000..2a552bb
         self.test_fork_project()
 
         tests.create_projects_git(
-            os.path.join(tests.HERE, 'requests'), bare=True)
+            os.path.join(self.path, 'requests'), bare=True)
 
         repo = pagure.lib.get_project(self.session, 'test')
         fork = pagure.lib.get_project(self.session, 'test', user='foo')
@@ -1446,18 +1446,18 @@ index 0000000..2a552bb
         self.test_fork_project()
 
         tests.create_projects_git(
-            os.path.join(tests.HERE, 'requests'), bare=True)
+            os.path.join(self.path, 'requests'), bare=True)
 
         repo = pagure.lib.get_project(self.session, 'test')
         fork = pagure.lib.get_project(self.session, 'test', user='foo')
 
         # Create a git repo to play with
-        gitrepo = os.path.join(tests.HERE, 'repos', 'test.git')
+        gitrepo = os.path.join(self.path, 'repos', 'test.git')
         repo = pygit2.init_repository(gitrepo, bare=True)
 
         # Create a fork of this repo
         newpath = tempfile.mkdtemp(prefix='pagure-fork-test')
-        gitrepo = os.path.join(tests.HERE, 'repos', 'forks', 'foo', 'test.git')
+        gitrepo = os.path.join(self.path, 'repos', 'forks', 'foo', 'test.git')
         new_repo = pygit2.clone_repository(gitrepo, newpath)
 
         user = tests.FakeUser()
@@ -1501,19 +1501,19 @@ index 0000000..2a552bb
         self.test_fork_project()
 
         tests.create_projects_git(
-            os.path.join(tests.HERE, 'requests'), bare=True)
+            os.path.join(self.path, 'requests'), bare=True)
 
         repo = pagure.lib.get_project(self.session, 'test')
         fork = pagure.lib.get_project(self.session, 'test', user='foo')
 
         # Create a git repo to play with
-        gitrepo = os.path.join(tests.HERE, 'repos', 'test.git')
+        gitrepo = os.path.join(self.path, 'repos', 'test.git')
         repo = pygit2.init_repository(gitrepo, bare=True)
 
         # Create a fork of this repo
         newpath = tempfile.mkdtemp(prefix='pagure-fork-test')
         gitrepo = os.path.join(
-            tests.HERE, 'repos', 'forks', 'foo', 'test.git')
+            self.path, 'repos', 'forks', 'foo', 'test.git')
         new_repo = pygit2.clone_repository(gitrepo, newpath)
 
         user = tests.FakeUser()
@@ -1861,7 +1861,7 @@ index 0000000..2a552bb
         tests.create_projects(self.session)
         for folder in ['docs', 'tickets', 'requests', 'repos']:
             tests.create_projects_git(
-                os.path.join(tests.HERE, folder), bare=True)
+                os.path.join(self.path, folder), bare=True)
 
         # User not logged in
         output = self.app.post('fork_edit/test/edit/master/f/sources')
@@ -2008,17 +2008,17 @@ index 0000000..2a552bb
         self.session.commit()
 
         tests.create_projects_git(
-            os.path.join(tests.HERE, 'repos', 'forks', 'foo'), bare=True)
+            os.path.join(self.path, 'repos', 'forks', 'foo'), bare=True)
 
         # Create a git repo to play with
-        gitrepo = os.path.join(tests.HERE, 'repos', 'test.git')
+        gitrepo = os.path.join(self.path, 'repos', 'test.git')
         self.assertFalse(os.path.exists(gitrepo))
         os.makedirs(gitrepo)
         repo = pygit2.init_repository(gitrepo, bare=True)
 
         # Create a fork of this repo
         newpath = tempfile.mkdtemp(prefix='pagure-fork-test')
-        gitrepo = os.path.join(tests.HERE, 'repos', 'forks', 'foo', 'test.git')
+        gitrepo = os.path.join(self.path, 'repos', 'forks', 'foo', 'test.git')
         new_repo = pygit2.clone_repository(gitrepo, newpath)
         tests.add_content_git_repo(gitrepo)
 

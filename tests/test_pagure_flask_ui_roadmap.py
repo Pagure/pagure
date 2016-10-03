@@ -45,13 +45,13 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
         pagure.ui.issues.SESSION = self.session
 
-        pagure.APP.config['GIT_FOLDER'] = tests.HERE
+        pagure.APP.config['GIT_FOLDER'] = self.path
         pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
-            tests.HERE, 'requests')
+            self.path, 'requests')
         pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            tests.HERE, 'tickets')
+            self.path, 'tickets')
         pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            tests.HERE, 'docs')
+            self.path, 'docs')
         self.app = pagure.APP.test_client()
 
     @patch('pagure.lib.git.update_git')
@@ -62,7 +62,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
         p_ugt.return_value = True
 
         tests.create_projects(self.session)
-        tests.create_projects_git(os.path.join(tests.HERE), bare=True)
+        tests.create_projects_git(os.path.join(self.path), bare=True)
 
         user = tests.FakeUser()
         user.username = 'pingou'
@@ -105,7 +105,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
         p_ugt.return_value = True
 
         tests.create_projects(self.session)
-        tests.create_projects_git(os.path.join(tests.HERE), bare=True)
+        tests.create_projects_git(os.path.join(self.path), bare=True)
 
         # Set some milestone
         repo = pagure.lib.get_project(self.session, 'test')
@@ -166,7 +166,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
     def test_update_milestones(self):
         """ Test updating milestones of a repo. """
         tests.create_projects(self.session)
-        tests.create_projects_git(os.path.join(tests.HERE), bare=True)
+        tests.create_projects_git(os.path.join(self.path), bare=True)
 
         # Set some milestones
         repo = pagure.lib.get_project(self.session, 'test')
@@ -340,7 +340,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
     def test_milestones_without_dates(self, p_send_email, p_ugt):
         """ Test creating two milestones with no dates. """
         tests.create_projects(self.session)
-        tests.create_projects_git(os.path.join(tests.HERE), bare=True)
+        tests.create_projects_git(os.path.join(self.path), bare=True)
 
         user = tests.FakeUser()
         user.username = 'pingou'

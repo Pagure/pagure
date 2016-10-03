@@ -45,21 +45,21 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
         pagure.ui.fork.SESSION = self.session
         pagure.ui.repo.SESSION = self.session
 
-        pagure.APP.config['GIT_FOLDER'] = os.path.join(tests.HERE, 'repos')
-        pagure.APP.config['FORK_FOLDER'] = os.path.join(tests.HERE, 'forks')
+        pagure.APP.config['GIT_FOLDER'] = os.path.join(self.path, 'repos')
+        pagure.APP.config['FORK_FOLDER'] = os.path.join(self.path, 'forks')
         pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            tests.HERE, 'tickets')
+            self.path, 'tickets')
         pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            tests.HERE, 'docs')
+            self.path, 'docs')
         pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
-            tests.HERE, 'requests')
+            self.path, 'requests')
         self.app = pagure.APP.test_client()
 
     def set_up_git_repo(self):
         """ Set up the git repo to play with. """
 
         # Create a git repo to play with
-        gitrepo = os.path.join(tests.HERE, 'repos', 'test.git')
+        gitrepo = os.path.join(self.path, 'repos', 'test.git')
         repo = pygit2.init_repository(gitrepo, bare=True)
 
         newpath = tempfile.mkdtemp(prefix='pagure-other-test')

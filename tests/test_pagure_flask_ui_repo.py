@@ -45,17 +45,17 @@ class PagureFlaskRepotests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
 
         pagure.APP.config['VIRUS_SCAN_ATTACHMENTS'] = False
-        pagure.APP.config['GIT_FOLDER'] = tests.HERE
+        pagure.APP.config['GIT_FOLDER'] = self.path
         pagure.APP.config['FORK_FOLDER'] = os.path.join(
-            tests.HERE, 'forks')
+            self.path, 'forks')
         pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
-            tests.HERE, 'requests')
+            self.path, 'requests')
         pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            tests.HERE, 'tickets')
+            self.path, 'tickets')
         pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            tests.HERE, 'docs')
+            self.path, 'docs')
         pagure.APP.config['UPLOAD_FOLDER_PATH'] = os.path.join(
-            tests.HERE, 'releases')
+            self.path, 'releases')
         self.app = pagure.APP.test_client()
 
     @patch('pagure.ui.repo.admin_session_timedout')
@@ -70,7 +70,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         tests.create_projects(self.session)
-        tests.create_projects_git(tests.HERE)
+        tests.create_projects_git(self.path)
 
         # User not logged in
         output = self.app.get('/test/adduser')
@@ -102,7 +102,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             data['user'] = 'foo'
-            tests.create_projects_git(tests.HERE)
+            tests.create_projects_git(self.path)
             output = self.app.post(
                 '/test/adduser', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 404)
@@ -120,7 +120,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         tests.create_projects(self.session)
-        tests.create_projects_git(tests.HERE)
+        tests.create_projects_git(self.path)
 
         # User not logged in
         output = self.app.get('/test/adduser')
@@ -197,7 +197,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         tests.create_projects(self.session)
-        tests.create_projects_git(tests.HERE)
+        tests.create_projects_git(self.path)
 
         # User not logged in
         output = self.app.get('/test/addgroup')
@@ -255,7 +255,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         tests.create_projects(self.session)
-        tests.create_projects_git(tests.HERE)
+        tests.create_projects_git(self.path)
 
         # User not logged in
         output = self.app.get('/test/addgroup')
@@ -346,7 +346,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
             tests.create_projects(self.session)
-            tests.create_projects_git(tests.HERE)
+            tests.create_projects_git(self.path)
 
             output = self.app.post('/test/settings')
 
@@ -401,7 +401,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
-            tests.create_projects_git(tests.HERE)
+            tests.create_projects_git(self.path)
 
             output = self.app.post('/test/dropuser/1')
             self.assertEqual(output.status_code, 403)
@@ -477,7 +477,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         tests.create_projects(self.session)
-        tests.create_projects_git(tests.HERE)
+        tests.create_projects_git(self.path)
 
         # User not logged in
         output = self.app.post('/test/dropgroup/1')
@@ -549,7 +549,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
-            tests.create_projects_git(tests.HERE)
+            tests.create_projects_git(self.path)
 
             output = self.app.post('/test/dropgroup/1')
             self.assertEqual(output.status_code, 403)
@@ -646,7 +646,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
-            tests.create_projects_git(tests.HERE)
+            tests.create_projects_git(self.path)
 
             # Session timed-out
             output = self.app.post('/test/update')
@@ -741,7 +741,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
-            tests.create_projects_git(tests.HERE)
+            tests.create_projects_git(self.path)
 
             output = self.app.get('/test/settings')
             self.assertEqual(output.status_code, 403)
@@ -858,7 +858,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         tests.create_projects(self.session)
-        tests.create_projects_git(tests.HERE, bare=True)
+        tests.create_projects_git(self.path, bare=True)
 
         output = self.app.get('/test/forks', follow_redirects=True)
         self.assertEqual(output.status_code, 200)
@@ -877,7 +877,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         # No git repo associated
         self.assertEqual(output.status_code, 404)
 
-        tests.create_projects_git(tests.HERE, bare=True)
+        tests.create_projects_git(self.path, bare=True)
 
         output = self.app.get('/test')
         self.assertEqual(output.status_code, 200)
@@ -894,8 +894,8 @@ class PagureFlaskRepotests(tests.Modeltests):
             'test project #1        </div>', output.data)
 
         # Add some content to the git repo
-        tests.add_content_git_repo(os.path.join(tests.HERE, 'test.git'))
-        tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
+        tests.add_content_git_repo(os.path.join(self.path, 'test.git'))
+        tests.add_readme_git_repo(os.path.join(self.path, 'test.git'))
 
         output = self.app.get('/test')
         self.assertEqual(output.status_code, 200)
@@ -918,9 +918,9 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         # Add some content to the git repo
         tests.add_content_git_repo(
-            os.path.join(tests.HERE, 'forks', 'pingou', 'test.git'))
+            os.path.join(self.path, 'forks', 'pingou', 'test.git'))
         tests.add_readme_git_repo(
-            os.path.join(tests.HERE, 'forks', 'pingou', 'test.git'))
+            os.path.join(self.path, 'forks', 'pingou', 'test.git'))
 
         output = self.app.get('/fork/pingou/test')
         self.assertEqual(output.status_code, 200)
@@ -943,11 +943,11 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.session.commit()
 
         tests.add_content_git_repo(
-            os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'))
+            os.path.join(self.path, 'forks', 'pingou', 'test3.git'))
         tests.add_readme_git_repo(
-            os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'))
+            os.path.join(self.path, 'forks', 'pingou', 'test3.git'))
         tests.add_commit_git_repo(
-            os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'),
+            os.path.join(self.path, 'forks', 'pingou', 'test3.git'),
             ncommits=10)
 
         output = self.app.get('/fork/pingou/test3')
@@ -963,7 +963,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         tests.create_projects(self.session)
         # Create a git repo to play with
-        gitrepo = os.path.join(tests.HERE, 'test.git')
+        gitrepo = os.path.join(self.path, 'test.git')
         pygit2.init_repository(gitrepo, bare=True)
 
         # Create a fork of this repo
@@ -1019,14 +1019,14 @@ class PagureFlaskRepotests(tests.Modeltests):
         # No git repo associated
         self.assertEqual(output.status_code, 404)
 
-        tests.create_projects_git(tests.HERE, bare=True)
+        tests.create_projects_git(self.path, bare=True)
 
         output = self.app.get('/test/branch/master')
         self.assertEqual(output.status_code, 404)
 
         # Add some content to the git repo
-        tests.add_content_git_repo(os.path.join(tests.HERE, 'test.git'))
-        tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
+        tests.add_content_git_repo(os.path.join(self.path, 'test.git'))
+        tests.add_readme_git_repo(os.path.join(self.path, 'test.git'))
 
         output = self.app.get('/test/branch/master')
         self.assertEqual(output.status_code, 200)
@@ -1049,9 +1049,9 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         # Add some content to the git repo
         tests.add_content_git_repo(
-            os.path.join(tests.HERE, 'forks', 'pingou', 'test.git'))
+            os.path.join(self.path, 'forks', 'pingou', 'test.git'))
         tests.add_readme_git_repo(
-            os.path.join(tests.HERE, 'forks', 'pingou', 'test.git'))
+            os.path.join(self.path, 'forks', 'pingou', 'test.git'))
 
         output = self.app.get('/fork/pingou/test/branch/master')
         self.assertEqual(output.status_code, 200)
@@ -1074,11 +1074,11 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.session.commit()
 
         tests.add_content_git_repo(
-            os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'))
+            os.path.join(self.path, 'forks', 'pingou', 'test3.git'))
         tests.add_readme_git_repo(
-            os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'))
+            os.path.join(self.path, 'forks', 'pingou', 'test3.git'))
         tests.add_commit_git_repo(
-            os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'),
+            os.path.join(self.path, 'forks', 'pingou', 'test3.git'),
             ncommits=10)
 
         output = self.app.get('/fork/pingou/test3/branch/master')
@@ -1101,7 +1101,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         # No git repo associated
         self.assertEqual(output.status_code, 404)
 
-        tests.create_projects_git(tests.HERE, bare=True)
+        tests.create_projects_git(self.path, bare=True)
 
         output = self.app.get('/test/commits')
         self.assertEqual(output.status_code, 200)
@@ -1111,8 +1111,8 @@ class PagureFlaskRepotests(tests.Modeltests):
             'test project #1        </div>', output.data)
 
         # Add some content to the git repo
-        tests.add_content_git_repo(os.path.join(tests.HERE, 'test.git'))
-        tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
+        tests.add_content_git_repo(os.path.join(self.path, 'test.git'))
+        tests.add_readme_git_repo(os.path.join(self.path, 'test.git'))
 
         output = self.app.get('/test/commits')
         self.assertEqual(output.status_code, 200)
@@ -1144,9 +1144,9 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         # Add some content to the git repo
         tests.add_content_git_repo(
-            os.path.join(tests.HERE, 'forks', 'pingou', 'test.git'))
+            os.path.join(self.path, 'forks', 'pingou', 'test.git'))
         tests.add_readme_git_repo(
-            os.path.join(tests.HERE, 'forks', 'pingou', 'test.git'))
+            os.path.join(self.path, 'forks', 'pingou', 'test.git'))
 
         output = self.app.get('/fork/pingou/test/commits?page=abc')
         self.assertEqual(output.status_code, 200)
@@ -1169,11 +1169,11 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.session.commit()
 
         tests.add_content_git_repo(
-            os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'))
+            os.path.join(self.path, 'forks', 'pingou', 'test3.git'))
         tests.add_readme_git_repo(
-            os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'))
+            os.path.join(self.path, 'forks', 'pingou', 'test3.git'))
         tests.add_commit_git_repo(
-            os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'),
+            os.path.join(self.path, 'forks', 'pingou', 'test3.git'),
             ncommits=10)
 
         output = self.app.get('/fork/pingou/test3/commits/fobranch')
@@ -1313,26 +1313,26 @@ class PagureFlaskRepotests(tests.Modeltests):
         # No git repo associated
         self.assertEqual(output.status_code, 404)
 
-        tests.create_projects_git(tests.HERE, bare=True)
+        tests.create_projects_git(self.path, bare=True)
 
         output = self.app.get('/test/bar')
         self.assertEqual(output.status_code, 404)
 
-        repo = pygit2.Repository(os.path.join(tests.HERE, 'test.git'))
+        repo = pygit2.Repository(os.path.join(self.path, 'test.git'))
 
         # Add one commit to git repo
         tests.add_commit_git_repo(
-            os.path.join(tests.HERE, 'test.git'), ncommits=1)
+            os.path.join(self.path, 'test.git'), ncommits=1)
         c1 = repo.revparse_single('HEAD')
 
         # Add another commit to git repo
         tests.add_commit_git_repo(
-            os.path.join(tests.HERE, 'test.git'), ncommits=1)
+            os.path.join(self.path, 'test.git'), ncommits=1)
         c2 = repo.revparse_single('HEAD')
 
         # Add one more commit to git repo
         tests.add_commit_git_repo(
-            os.path.join(tests.HERE, 'test.git'),
+            os.path.join(self.path, 'test.git'),
             ncommits=1, filename='Šource')
         c3 = repo.revparse_single('HEAD')
 
@@ -1357,18 +1357,18 @@ class PagureFlaskRepotests(tests.Modeltests):
         # No git repo associated
         self.assertEqual(output.status_code, 404)
 
-        tests.create_projects_git(tests.HERE, bare=True)
+        tests.create_projects_git(self.path, bare=True)
 
         output = self.app.get('/test/blob/foo/f/sources')
         self.assertEqual(output.status_code, 404)
 
         # Add some content to the git repo
-        tests.add_content_git_repo(os.path.join(tests.HERE, 'test.git'))
-        tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
+        tests.add_content_git_repo(os.path.join(self.path, 'test.git'))
+        tests.add_readme_git_repo(os.path.join(self.path, 'test.git'))
         tests.add_binary_git_repo(
-            os.path.join(tests.HERE, 'test.git'), 'test.jpg')
+            os.path.join(self.path, 'test.git'), 'test.jpg')
         tests.add_binary_git_repo(
-            os.path.join(tests.HERE, 'test.git'), 'test_binary')
+            os.path.join(self.path, 'test.git'), 'test_binary')
 
         output = self.app.get('/test/blob/master/foofile')
         self.assertEqual(output.status_code, 404)
@@ -1393,7 +1393,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             output.data)
 
         # View by commit id
-        repo = pygit2.Repository(os.path.join(tests.HERE, 'test.git'))
+        repo = pygit2.Repository(os.path.join(self.path, 'test.git'))
         commit = repo.revparse_single('HEAD')
 
         output = self.app.get('/test/blob/%s/f/test.jpg' % commit.oid.hex)
@@ -1435,7 +1435,7 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         # View file with a non-ascii name
         tests.add_commit_git_repo(
-            os.path.join(tests.HERE, 'test.git'),
+            os.path.join(self.path, 'test.git'),
             ncommits=1, filename='Šource')
         output = self.app.get('/test/blob/master/f/Šource')
         self.assertEqual(output.status_code, 200)
@@ -1464,11 +1464,11 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.session.commit()
 
         tests.add_content_git_repo(
-            os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'))
+            os.path.join(self.path, 'forks', 'pingou', 'test3.git'))
         tests.add_readme_git_repo(
-            os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'))
+            os.path.join(self.path, 'forks', 'pingou', 'test3.git'))
         tests.add_commit_git_repo(
-            os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'),
+            os.path.join(self.path, 'forks', 'pingou', 'test3.git'),
             ncommits=10)
 
         output = self.app.get('/fork/pingou/test3/blob/master/f/sources')
@@ -1492,13 +1492,13 @@ class PagureFlaskRepotests(tests.Modeltests):
         # No git repo associated
         self.assertEqual(output.status_code, 404)
 
-        tests.create_projects_git(tests.HERE, bare=True)
+        tests.create_projects_git(self.path, bare=True)
 
         output = self.app.get('/test/raw/foo/sources')
         self.assertEqual(output.status_code, 404)
 
         # Add some content to the git repo
-        tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
+        tests.add_readme_git_repo(os.path.join(self.path, 'test.git'))
 
         # View first commit
         output = self.app.get('/test/raw/master')
@@ -1506,11 +1506,11 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertTrue(':Author: Pierre-Yves Chibon' in output.data)
 
         # Add some more content to the repo
-        tests.add_content_git_repo(os.path.join(tests.HERE, 'test.git'))
+        tests.add_content_git_repo(os.path.join(self.path, 'test.git'))
         tests.add_binary_git_repo(
-            os.path.join(tests.HERE, 'test.git'), 'test.jpg')
+            os.path.join(self.path, 'test.git'), 'test.jpg')
         tests.add_binary_git_repo(
-            os.path.join(tests.HERE, 'test.git'), 'test_binary')
+            os.path.join(self.path, 'test.git'), 'test_binary')
 
         output = self.app.get('/test/raw/master/f/foofile')
         self.assertEqual(output.status_code, 404)
@@ -1526,7 +1526,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertTrue(output.data.startswith('\x00\x00\x01\x00'))
 
         # View by commit id
-        repo = pygit2.Repository(os.path.join(tests.HERE, 'test.git'))
+        repo = pygit2.Repository(os.path.join(self.path, 'test.git'))
         commit = repo.revparse_single('HEAD')
 
         output = self.app.get('/test/raw/%s/f/test.jpg' % commit.oid.hex)
@@ -1579,11 +1579,11 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.session.commit()
 
         tests.add_content_git_repo(
-            os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'))
+            os.path.join(self.path, 'forks', 'pingou', 'test3.git'))
         tests.add_readme_git_repo(
-            os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'))
+            os.path.join(self.path, 'forks', 'pingou', 'test3.git'))
         tests.add_commit_git_repo(
-            os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'),
+            os.path.join(self.path, 'forks', 'pingou', 'test3.git'),
             ncommits=10)
 
         output = self.app.get('/fork/pingou/test3/raw/master/f/sources')
@@ -1602,14 +1602,14 @@ class PagureFlaskRepotests(tests.Modeltests):
         # No git repo associated
         self.assertEqual(output.status_code, 404)
 
-        tests.create_projects_git(tests.HERE, bare=True)
+        tests.create_projects_git(self.path, bare=True)
 
         output = self.app.get('/test/c/bar')
         self.assertEqual(output.status_code, 404)
 
         # Add a README to the git repo - First commit
-        tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
-        repo = pygit2.Repository(os.path.join(tests.HERE, 'test.git'))
+        tests.add_readme_git_repo(os.path.join(self.path, 'test.git'))
+        repo = pygit2.Repository(os.path.join(self.path, 'test.git'))
         commit = repo.revparse_single('HEAD')
 
         # View first commit
@@ -1632,9 +1632,9 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertIn('<p>Project not found</p>', output.data)
 
         # Add some content to the git repo
-        tests.add_content_git_repo(os.path.join(tests.HERE, 'test.git'))
+        tests.add_content_git_repo(os.path.join(self.path, 'test.git'))
 
-        repo = pygit2.Repository(os.path.join(tests.HERE, 'test.git'))
+        repo = pygit2.Repository(os.path.join(self.path, 'test.git'))
         commit = repo.revparse_single('HEAD')
 
         # View another commit
@@ -1685,7 +1685,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.session.add(item)
         self.session.commit()
         forkedgit = os.path.join(
-            tests.HERE, 'forks', 'pingou', 'test3.git')
+            self.path, 'forks', 'pingou', 'test3.git')
 
         tests.add_content_git_repo(forkedgit)
         tests.add_readme_git_repo(forkedgit)
@@ -1746,14 +1746,14 @@ class PagureFlaskRepotests(tests.Modeltests):
         # No git repo associated
         self.assertEqual(output.status_code, 404)
 
-        tests.create_projects_git(tests.HERE, bare=True)
+        tests.create_projects_git(self.path, bare=True)
 
         output = self.app.get('/test/c/bar.patch')
         self.assertEqual(output.status_code, 404)
 
         # Add a README to the git repo - First commit
-        tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
-        repo = pygit2.Repository(os.path.join(tests.HERE, 'test.git'))
+        tests.add_readme_git_repo(os.path.join(self.path, 'test.git'))
+        repo = pygit2.Repository(os.path.join(self.path, 'test.git'))
         commit = repo.revparse_single('HEAD')
 
         # View first commit
@@ -1785,9 +1785,9 @@ index 0000000..fb7093d
         self.assertTrue('Subject: Add a README file' in output.data)
 
         # Add some content to the git repo
-        tests.add_content_git_repo(os.path.join(tests.HERE, 'test.git'))
+        tests.add_content_git_repo(os.path.join(self.path, 'test.git'))
 
-        repo = pygit2.Repository(os.path.join(tests.HERE, 'test.git'))
+        repo = pygit2.Repository(os.path.join(self.path, 'test.git'))
         commit = repo.revparse_single('HEAD')
 
         # View another commit
@@ -1819,7 +1819,7 @@ index 0000000..11980b1
         )
         self.session.add(item)
         self.session.commit()
-        forkedgit = os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git')
+        forkedgit = os.path.join(self.path, 'forks', 'pingou', 'test3.git')
 
         tests.add_content_git_repo(forkedgit)
         tests.add_readme_git_repo(forkedgit)
@@ -1871,7 +1871,7 @@ index 0000000..fb7093d
         # No git repo associated
         self.assertEqual(output.status_code, 404)
 
-        tests.create_projects_git(tests.HERE, bare=True)
+        tests.create_projects_git(self.path, bare=True)
 
         output = self.app.get('/test/tree/')
         self.assertEqual(output.status_code, 200)
@@ -1889,8 +1889,8 @@ index 0000000..fb7093d
             'No content found in this repository' in output.data)
 
         # Add a README to the git repo - First commit
-        tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
-        repo = pygit2.Repository(os.path.join(tests.HERE, 'test.git'))
+        tests.add_readme_git_repo(os.path.join(self.path, 'test.git'))
+        repo = pygit2.Repository(os.path.join(self.path, 'test.git'))
         commit = repo.revparse_single('HEAD')
 
         # View first commit
@@ -1926,7 +1926,7 @@ index 0000000..fb7093d
         )
         self.session.add(item)
         self.session.commit()
-        forkedgit = os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git')
+        forkedgit = os.path.join(self.path, 'forks', 'pingou', 'test3.git')
 
         tests.add_content_git_repo(forkedgit)
 
@@ -1969,7 +1969,7 @@ index 0000000..fb7093d
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
             tests.create_projects(self.session)
-            tests.create_projects_git(tests.HERE)
+            tests.create_projects_git(self.path)
 
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 404)
@@ -2000,8 +2000,8 @@ index 0000000..fb7093d
             )
             self.session.add(item)
             self.session.commit()
-            tests.create_projects_git(tests.HERE)
-            tests.create_projects_git(os.path.join(tests.HERE, 'docs'))
+            tests.create_projects_git(self.path)
+            tests.create_projects_git(os.path.join(self.path, 'docs'))
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
@@ -2016,12 +2016,12 @@ index 0000000..fb7093d
             self.session.commit()
 
             # Create all the git repos
-            tests.create_projects_git(tests.HERE)
-            tests.create_projects_git(os.path.join(tests.HERE, 'docs'))
+            tests.create_projects_git(self.path)
+            tests.create_projects_git(os.path.join(self.path, 'docs'))
             tests.create_projects_git(
-                os.path.join(tests.HERE, 'tickets'), bare=True)
+                os.path.join(self.path, 'tickets'), bare=True)
             tests.create_projects_git(
-                os.path.join(tests.HERE, 'requests'), bare=True)
+                os.path.join(self.path, 'requests'), bare=True)
 
             # Check repo was created
             output = self.app.get('/')
@@ -2041,7 +2041,7 @@ index 0000000..fb7093d
                 title='Test issue',
                 content='We should work on this',
                 user='pingou',
-                ticketfolder=os.path.join(tests.HERE, 'tickets')
+                ticketfolder=os.path.join(self.path, 'tickets')
             )
             self.session.commit()
             self.assertEqual(msg.title, 'Test issue')
@@ -2052,7 +2052,7 @@ index 0000000..fb7093d
                 title='Test issue #2',
                 content='We should work on this, really',
                 user='pingou',
-                ticketfolder=os.path.join(tests.HERE, 'tickets')
+                ticketfolder=os.path.join(self.path, 'tickets')
             )
             self.session.commit()
             self.assertEqual(msg.title, 'Test issue #2')
@@ -2078,7 +2078,7 @@ index 0000000..fb7093d
                 branch_to='master',
                 title='test pull-request',
                 user='pingou',
-                requestfolder=os.path.join(tests.HERE, 'requests'),
+                requestfolder=os.path.join(self.path, 'requests'),
             )
             self.session.commit()
             self.assertEqual(req.id, 3)
@@ -2092,7 +2092,7 @@ index 0000000..fb7093d
                 branch_to='master',
                 title='test pull-request',
                 user='pingou',
-                requestfolder=os.path.join(tests.HERE, 'requests'),
+                requestfolder=os.path.join(self.path, 'requests'),
             )
             self.session.commit()
             self.assertEqual(req.id, 4)
@@ -2145,11 +2145,11 @@ index 0000000..fb7093d
             self.session.add(item)
             self.session.commit()
             tests.add_content_git_repo(
-                os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'))
+                os.path.join(self.path, 'forks', 'pingou', 'test3.git'))
             tests.add_content_git_repo(
-                os.path.join(tests.HERE, 'docs', 'pingou', 'test3.git'))
+                os.path.join(self.path, 'docs', 'pingou', 'test3.git'))
             tests.add_content_git_repo(
-                os.path.join(tests.HERE, 'tickets', 'pingou', 'test3.git'))
+                os.path.join(self.path, 'tickets', 'pingou', 'test3.git'))
 
             # Check before deleting the fork
             output = self.app.get('/')
@@ -2182,7 +2182,7 @@ index 0000000..fb7093d
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
             tests.create_projects(self.session)
-            tests.create_projects_git(tests.HERE)
+            tests.create_projects_git(self.path)
 
             # No project registered in the DB (no git repo)
             output = self.app.post('/foo/delete')
@@ -2198,7 +2198,7 @@ index 0000000..fb7093d
 
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
-            tests.create_projects_git(tests.HERE)
+            tests.create_projects_git(self.path)
 
             ast.return_value = True
             output = self.app.post('/test/delete')
@@ -2226,7 +2226,7 @@ index 0000000..fb7093d
             )
             self.session.add(item)
             self.session.commit()
-            tests.create_projects_git(tests.HERE)
+            tests.create_projects_git(self.path)
 
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
@@ -2249,8 +2249,8 @@ index 0000000..fb7093d
             )
             self.session.add(item)
             self.session.commit()
-            tests.create_projects_git(tests.HERE)
-            tests.create_projects_git(os.path.join(tests.HERE, 'docs'))
+            tests.create_projects_git(self.path)
+            tests.create_projects_git(os.path.join(self.path, 'docs'))
             output = self.app.post('/test/delete', follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue(
@@ -2268,12 +2268,12 @@ index 0000000..fb7093d
             self.session.commit()
 
             # Create all the git repos
-            tests.create_projects_git(tests.HERE)
-            tests.create_projects_git(os.path.join(tests.HERE, 'docs'))
+            tests.create_projects_git(self.path)
+            tests.create_projects_git(os.path.join(self.path, 'docs'))
             tests.create_projects_git(
-                os.path.join(tests.HERE, 'tickets'), bare=True)
+                os.path.join(self.path, 'tickets'), bare=True)
             tests.create_projects_git(
-                os.path.join(tests.HERE, 'requests'), bare=True)
+                os.path.join(self.path, 'requests'), bare=True)
 
             # Check repo was created
             output = self.app.get('/')
@@ -2293,7 +2293,7 @@ index 0000000..fb7093d
                 title='Test issue',
                 content='We should work on this',
                 user='pingou',
-                ticketfolder=os.path.join(tests.HERE, 'tickets')
+                ticketfolder=os.path.join(self.path, 'tickets')
             )
             self.session.commit()
             self.assertEqual(msg.title, 'Test issue')
@@ -2304,7 +2304,7 @@ index 0000000..fb7093d
                 title='Test issue #2',
                 content='We should work on this, really',
                 user='pingou',
-                ticketfolder=os.path.join(tests.HERE, 'tickets')
+                ticketfolder=os.path.join(self.path, 'tickets')
             )
             self.session.commit()
             self.assertEqual(msg.title, 'Test issue #2')
@@ -2330,7 +2330,7 @@ index 0000000..fb7093d
                 branch_to='master',
                 title='test pull-request',
                 user='pingou',
-                requestfolder=os.path.join(tests.HERE, 'requests'),
+                requestfolder=os.path.join(self.path, 'requests'),
             )
             self.session.commit()
             self.assertEqual(req.id, 3)
@@ -2344,7 +2344,7 @@ index 0000000..fb7093d
                 branch_to='master',
                 title='test pull-request',
                 user='pingou',
-                requestfolder=os.path.join(tests.HERE, 'requests'),
+                requestfolder=os.path.join(self.path, 'requests'),
             )
             self.session.commit()
             self.assertEqual(req.id, 4)
@@ -2403,11 +2403,11 @@ index 0000000..fb7093d
             self.session.add(item)
             self.session.commit()
             tests.add_content_git_repo(
-                os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'))
+                os.path.join(self.path, 'forks', 'pingou', 'test3.git'))
             tests.add_content_git_repo(
-                os.path.join(tests.HERE, 'docs', 'pingou', 'test3.git'))
+                os.path.join(self.path, 'docs', 'pingou', 'test3.git'))
             tests.add_content_git_repo(
-                os.path.join(tests.HERE, 'tickets', 'pingou', 'test3.git'))
+                os.path.join(self.path, 'tickets', 'pingou', 'test3.git'))
 
             # Check before deleting the fork
             output = self.app.get('/')
@@ -2434,7 +2434,7 @@ index 0000000..fb7093d
         """ Test the new_repo_hook_token endpoint. """
         ast.return_value = False
         tests.create_projects(self.session)
-        tests.create_projects_git(tests.HERE)
+        tests.create_projects_git(self.path)
 
         repo = pagure.lib.get_project(self.session, 'test')
         self.assertEqual(repo.hook_token, 'aaabbbccc')
@@ -2496,7 +2496,7 @@ index 0000000..fb7093d
         upgit.return_value = True
         sendmail.return_value = True
         tests.create_projects(self.session)
-        tests.create_projects_git(tests.HERE)
+        tests.create_projects_git(self.path)
 
         user = tests.FakeUser()
         with tests.user_set(pagure.APP, user):
@@ -2588,15 +2588,15 @@ index 0000000..fb7093d
         # No git repo associated
         self.assertEqual(output.status_code, 404)
 
-        tests.create_projects_git(tests.HERE, bare=True)
+        tests.create_projects_git(self.path, bare=True)
 
         output = self.app.get('/test/releases')
         self.assertEqual(output.status_code, 200)
         self.assertIn('This project has not been tagged.', output.data)
 
         # Add a README to the git repo - First commit
-        tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
-        repo = pygit2.Repository(os.path.join(tests.HERE, 'test.git'))
+        tests.add_readme_git_repo(os.path.join(self.path, 'test.git'))
+        repo = pygit2.Repository(os.path.join(self.path, 'test.git'))
         first_commit = repo.revparse_single('HEAD')
         tagger = pygit2.Signature('Alice Doe', 'adoe@example.com', 12347, 0)
         repo.create_tag(
@@ -2623,7 +2623,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
-            tests.create_projects_git(tests.HERE, bare=True)
+            tests.create_projects_git(self.path, bare=True)
 
             # No a repo admin
             output = self.app.get('/test/edit/foo/f/sources')
@@ -2641,12 +2641,12 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 404)
 
             # Add some content to the git repo
-            tests.add_content_git_repo(os.path.join(tests.HERE, 'test.git'))
-            tests.add_readme_git_repo(os.path.join(tests.HERE, 'test.git'))
+            tests.add_content_git_repo(os.path.join(self.path, 'test.git'))
+            tests.add_readme_git_repo(os.path.join(self.path, 'test.git'))
             tests.add_binary_git_repo(
-                os.path.join(tests.HERE, 'test.git'), 'test.jpg')
+                os.path.join(self.path, 'test.git'), 'test.jpg')
             tests.add_binary_git_repo(
-                os.path.join(tests.HERE, 'test.git'), 'test_binary')
+                os.path.join(self.path, 'test.git'), 'test_binary')
 
             output = self.app.get('/test/edit/master/foofile')
             self.assertEqual(output.status_code, 404)
@@ -2737,11 +2737,11 @@ index 0000000..fb7093d
             self.session.commit()
 
             tests.add_content_git_repo(
-                os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'))
+                os.path.join(self.path, 'forks', 'pingou', 'test3.git'))
             tests.add_readme_git_repo(
-                os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'))
+                os.path.join(self.path, 'forks', 'pingou', 'test3.git'))
             tests.add_commit_git_repo(
-                os.path.join(tests.HERE, 'forks', 'pingou', 'test3.git'),
+                os.path.join(self.path, 'forks', 'pingou', 'test3.git'),
                 ncommits=10)
 
             output = self.app.get('/fork/pingou/test3/edit/master/f/sources')
@@ -2776,7 +2776,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
-            repos = tests.create_projects_git(tests.HERE)
+            repos = tests.create_projects_git(self.path)
 
             output = self.app.post('/test/default/branch/')
             self.assertEqual(output.status_code, 403)
@@ -2872,7 +2872,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
-            repo = tests.create_projects_git(tests.HERE)
+            repo = tests.create_projects_git(self.path)
 
             output = self.app.post('/test/upload/')
             self.assertEqual(output.status_code, 403)
@@ -2883,7 +2883,8 @@ index 0000000..fb7093d
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
-            img = os.path.join(tests.HERE, 'placebo.png')
+            img = os.path.join(os.path.abspath(os.path.dirname(__file__)),
+                               'placebo.png')
 
             # Missing CSRF Token
             with open(img, mode='rb') as stream:
@@ -2922,7 +2923,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
-            tests.create_projects_git(tests.HERE, bare=True)
+            tests.create_projects_git(self.path, bare=True)
 
             output = self.app.get('/test/token/new/')
             self.assertEqual(output.status_code, 403)
@@ -2988,7 +2989,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 404)
 
             tests.create_projects(self.session)
-            tests.create_projects_git(tests.HERE, bare=True)
+            tests.create_projects_git(self.path, bare=True)
 
             output = self.app.post('/test/token/revoke/123')
             self.assertEqual(output.status_code, 403)
@@ -3064,7 +3065,7 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 404)
 
         tests.create_projects(self.session)
-        tests.create_projects_git(tests.HERE, bare=True)
+        tests.create_projects_git(self.path, bare=True)
 
         # User not logged in
         output = self.app.post('/test/b/master/delete')
@@ -3092,7 +3093,7 @@ index 0000000..fb7093d
             self.assertIn('<p>Branch no found</p>', output.data)
 
             # Add a branch that we can delete
-            path = os.path.join(tests.HERE, 'test.git')
+            path = os.path.join(self.path, 'test.git')
             tests.add_content_git_repo(path)
             repo = pygit2.Repository(path)
             repo.create_branch('foo', repo.head.get_object())
@@ -3121,7 +3122,7 @@ index 0000000..fb7093d
                 output.data)
 
             # Add a branch with a '/' in its name that we can delete
-            path = os.path.join(tests.HERE, 'test.git')
+            path = os.path.join(self.path, 'test.git')
             tests.add_content_git_repo(path)
             repo = pygit2.Repository(path)
             repo.create_branch('feature/foo', repo.head.get_object())
@@ -3162,7 +3163,7 @@ index 0000000..fb7093d
         # No git repo associated
         self.assertEqual(output.status_code, 404)
 
-        tests.create_projects_git(tests.HERE, bare=True)
+        tests.create_projects_git(self.path, bare=True)
 
         output = self.app.get('/docs/test/')
         self.assertEqual(output.status_code, 404)
@@ -3170,7 +3171,7 @@ index 0000000..fb7093d
     def test_view_project_activity(self):
         """ Test the view_project_activity endpoint. """
         tests.create_projects(self.session)
-        tests.create_projects_git(tests.HERE, bare=True)
+        tests.create_projects_git(self.path, bare=True)
 
         # Project Exists, but No DATAGREPPER_URL set
         output = self.app.get('/test/activity/')
@@ -3196,7 +3197,7 @@ index 0000000..fb7093d
         self.assertEqual(output.status_code, 405)
 
         tests.create_projects(self.session)
-        tests.create_projects_git(tests.HERE, bare=True)
+        tests.create_projects_git(self.path, bare=True)
 
         user = tests.FakeUser()
         user.username = 'pingou'
@@ -3246,7 +3247,7 @@ index 0000000..fb7093d
             )
             self.session.add(item)
             self.session.commit()
-            gitrepo = os.path.join(tests.HERE, 'forks', 'foo', 'test.git')
+            gitrepo = os.path.join(self.path, 'forks', 'foo', 'test.git')
             pygit2.init_repository(gitrepo, bare=True)
 
             output = self.app.post(

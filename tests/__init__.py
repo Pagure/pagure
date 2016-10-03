@@ -132,7 +132,7 @@ class Modeltests(unittest.TestCase):
         """ Constructor. """
         unittest.TestCase.__init__(self, method_name)
         self.session = None
-        self.path = tempfile.mkdtemp(prefix='pagure-tests')
+        self.path = None
         self.gitrepo = None
         self.gitrepos = None
 
@@ -140,17 +140,10 @@ class Modeltests(unittest.TestCase):
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
         # Clean up eventual git repo left in the present folder.
-        for filename in os.listdir(HERE):
-            filename = os.path.join(HERE, filename)
-            if filename.endswith('.git') and os.path.isdir(filename):
-                shutil.rmtree(filename)
-
-        for folder in ['tickets', 'repos', 'forks', 'docs',
-                       'requests' ,'releases']:
-            folder = os.path.join(HERE, folder)
-            if os.path.exists(folder):
-                shutil.rmtree(folder)
-            os.mkdir(folder)
+        self.path = tempfile.mkdtemp(prefix='pagure-tests')
+        for folder in ['tickets', 'repos', 'forks', 'docs', 'requests',
+                       'releases']:
+            os.mkdir(os.path.join(self.path, folder))
 
         self.session = pagure.lib.model.create_tables(
             DB_PATH, acls=pagure.APP.config.get('ACLS', {}))

@@ -30,12 +30,12 @@ def get_tag_name(tags):
     return output
 
 
-def add_repo_tag(repo, tags, repo_name):
+def add_repo_tag(git_dir, repo, tags, repo_name):
     """ Use a list to create multiple tags on a git repo """
     for tag in reversed(tags):
         time.sleep(1)
         tests.add_commit_git_repo(
-            os.path.join(tests.HERE, 'repos', repo_name),
+            os.path.join(git_dir, 'repos', repo_name),
             ncommits=1)
         first_commit = repo.revparse_single('HEAD')
         tagger = pygit2.Signature('Alice Doe', 'adoe@example.com', 12347, 0)
@@ -52,20 +52,20 @@ class PagureLibGitGetTagstests(tests.Modeltests):
 
         pagure.lib.git.SESSION = self.session
         pagure.APP.config['GIT_FOLDER'] = os.path.join(
-            tests.HERE, 'repos')
+            self.path, 'repos')
         pagure.APP.config['FORK_FOLDER'] = os.path.join(
-            tests.HERE, 'forks')
+            self.path, 'forks')
         pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            tests.HERE, 'tickets')
+            self.path, 'tickets')
         pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            tests.HERE, 'docs')
+            self.path, 'docs')
         pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
-            tests.HERE, 'requests')
+            self.path, 'requests')
 
     def test_get_git_tags_objects(self):
         """ Test the get_git_tags_objects method of pagure.lib.git. """
         tests.create_projects(self.session)
-        tests.create_projects_git(os.path.join(tests.HERE, 'repos'), bare=True)
+        tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
         project = pagure.lib.get_project(self.session, 'test')
 
         # Case 1 - Empty repo with no tags
@@ -74,9 +74,9 @@ class PagureLibGitGetTagstests(tests.Modeltests):
         self.assertEqual(exp, get_tag_name(tags))
 
         tests.add_readme_git_repo(os.path.join(os.path.join(
-            tests.HERE, 'repos'), 'test.git'))
+            self.path, 'repos'), 'test.git'))
         repo = pygit2.Repository(os.path.join(os.path.join(
-            tests.HERE, 'repos'), 'test.git'))
+            self.path, 'repos'), 'test.git'))
 
         # Case 2 - Repo with one commit and no tags
         exp = []
@@ -86,20 +86,20 @@ class PagureLibGitGetTagstests(tests.Modeltests):
         # Case 3 - Simple sort
         exp = ['0.1.0', 'test-0.0.21', '0.0.12-beta', '0.0.12-alpha', '0.0.12',
                '0.0.11', '0.0.3', 'foo-0.0.2', '0.0.1']
-        add_repo_tag(repo, exp, 'test.git')
+        add_repo_tag(self.path, repo, exp, 'test.git')
         tags = pagure.lib.git.get_git_tags_objects(project)
         self.assertEqual(exp, get_tag_name(tags))
 
         # Case 4 - Sorting with different splitting characters
         project = pagure.lib.get_project(self.session, 'test2')
         tests.add_readme_git_repo(os.path.join(os.path.join(
-            tests.HERE, 'repos'), 'test2.git'))
+            self.path, 'repos'), 'test2.git'))
         repo = pygit2.Repository(os.path.join(os.path.join(
-            tests.HERE, 'repos'), 'test2.git'))
+            self.path, 'repos'), 'test2.git'))
 
         exp = ['1.0-0_2', '1.0-0_1', '0.1-1_0', '0.1-0_0', '0.0-2_0',
                '0.0-1_34', '0.0-1_11', '0.0-1_3', '0.0-1_2', '0.0-1_1']
-        add_repo_tag(repo, exp, 'test2.git')
+        add_repo_tag(self.path, repo, exp, 'test2.git')
         tags = pagure.lib.git.get_git_tags_objects(project)
         self.assertEqual(exp, get_tag_name(tags))
 
