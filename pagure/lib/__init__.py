@@ -186,11 +186,15 @@ def is_valid_ssh_key(key):
     key = key.strip()
     if not key:
         return None
-    proc = subprocess.Popen(['/usr/bin/ssh-keygen', '-l', '-f', '-'],
-                            stdin=subprocess.PIPE,
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE)
-    proc.communicate(key)
+    with tempfile.TemporaryFile() as f:
+        f.write(key)
+        f.seek(0)
+        proc = subprocess.Popen(['/usr/bin/ssh-keygen', '-l', '-f',
+                                 '/dev/stdin'],
+                                stdin=f,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE)
+    proc.communicate()
     return proc.returncode == 0
 
 
