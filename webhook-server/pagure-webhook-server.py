@@ -123,8 +123,10 @@ def handle_messages():
             if '/' in projectname:
                 namespace, projectname = projectname.split('/', 1)
 
+            session = pagure.lib.create_session(pagure.APP.config['DB_URL'])
             project = pagure.lib.get_project(
-                session=pagure.SESSION, name=projectname, user=username)
+                session=session, name=projectname, user=username)
+            session.close()
             log.info('Got the project, going to the webhooks')
             call_web_hooks(project, data['topic'], data['msg'])
 
