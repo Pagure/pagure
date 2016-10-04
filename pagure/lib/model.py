@@ -387,6 +387,7 @@ class Project(BASE):
             'Enforce_signed-off_commits_in_pull-request': False,
             'always_merge': False,
             'issues_default_to_private': False,
+            'fedmsg_notifications': True,
         }
 
         if self._settings:

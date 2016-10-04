@@ -52,7 +52,8 @@ def log(project, topic, msg, redis=None):
     occuring in pagure.
     '''
     # Send fedmsg notification (if fedmsg is there and set-up)
-    fedmsg_publish(topic, msg)
+    if not project or project.settings.get('fedmsg_notifications', True):
+        fedmsg_publish(topic, msg)
 
     if redis and project:
         redis.publish(

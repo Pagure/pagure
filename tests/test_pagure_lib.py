@@ -933,7 +933,8 @@ class PagureLibtests(tests.Modeltests):
                 'Web-hooks': None,
                 'Enforce_signed-off_commits_in_pull-request': False,
                 'always_merge': False,
-                "issues_default_to_private": False,
+                'issues_default_to_private': False,
+                'fedmsg_notifications': True,
             },
             user='pingou',
         )
@@ -950,6 +951,8 @@ class PagureLibtests(tests.Modeltests):
                 'Minimum_score_to_merge_pull-request': None,
                 'Web-hooks': '',
                 'Enforce_signed-off_commits_in_pull-request': False,
+                'issues_default_to_private': False,
+                'fedmsg_notifications': True,
             },
             user='pingou',
         )
