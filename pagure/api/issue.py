@@ -510,11 +510,16 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
     Input
     ^^^^^
 
-    +-------------+---------+--------------+------------------------------+
-    | Key         | Type    | Optionality  | Description                  |
-    +=============+=========+==============+==============================+
-    | ``status``  | string  | Mandatory    | The new status of the issue  |
-    +-------------+---------+--------------+------------------------------+
+    +----------------- +---------+--------------+------------------------+
+    | Key              | Type    | Optionality  | Description            |
+    +==================+=========+==============+========================+
+    | ``close_status`` | string  | Optional     | The close status of    |
+    |                  |         |              | the issue              |
+    +----------------- +---------+--------------+------------------------+
+    | ``status``       | string  | Mandatory    | The new status of the  |
+    |                  |         |              | issue, can be 'Open' or|
+    |                  |         |              | 'Closed'               |                 |
+    +----------------- +---------+--------------+------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -555,15 +560,27 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
             403, error_code=APIERROR.EISSUENOTALLOWED)
 
     status = pagure.lib.get_issue_statuses(SESSION)
-    form = pagure.forms.StatusForm(status=status, csrf_enabled=False)
+    form = pagure.forms.StatusForm(
+        status=status,
+        close_status=repo.close_status,
+        csrf_enabled=False)
+
+    close_status = None
+    if form.close_status.raw_data:
+        close_status = form.close_status.data
+    new_status = form.status.data.strip()
+    if new_status in repo.close_status and not close_status:
+        close_status = new_status
+        form.status.data = 'Closed'
+
     if form.validate_on_submit():
-        new_status = form.status.data
         try:
             # Update status
             message = pagure.lib.edit_issue(
                 SESSION,
                 issue=issue,
                 status=new_status,
+                close_status=close_status,
                 user=flask.g.fas_user.username,
                 ticketfolder=APP.config['TICKETS_FOLDER'],
             )

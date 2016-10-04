@@ -216,6 +216,11 @@ class StatusForm(FlaskForm):
         [wtforms.validators.Required()],
         choices=[]
     )
+    close_status = wtforms.SelectField(
+        'Closed as',
+        [wtforms.validators.Optional()],
+        choices=[]
+    )
 
     def __init__(self, *args, **kwargs):
         """ Calls the default constructor with the normal argument but
@@ -227,6 +232,11 @@ class StatusForm(FlaskForm):
             self.status.choices = [
                 (status, status) for status in kwargs['status']
             ]
+        self.close_status.choices = []
+        if 'close_status' in kwargs:
+            for key in sorted(kwargs['close_status']):
+                self.close_status.choices.append((key, key))
+            self.close_status.choices.insert(0, ('', ''))
 
 
 class NewTokenForm(FlaskForm):
@@ -247,6 +257,7 @@ class NewTokenForm(FlaskForm):
             self.acls.choices = [
                 (acl.name, acl.name) for acl in kwargs['acls']
             ]
+
 
 
 class UpdateIssueForm(FlaskForm):
