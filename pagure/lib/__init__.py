@@ -1289,13 +1289,13 @@ def new_pull_request(session, branch_from,
 
 
 def edit_issue(session, issue, ticketfolder, user,
-               title=None, content=None, status=None,
+               title=None, content=None, status=None, close_status=None,
                priority=None, milestone=None, private=False):
     ''' Edit the specified issue.
     '''
     user_obj = get_user(session, user)
 
-    if status == 'Fixed' and issue.parents:
+    if status != 'Open' and issue.parents:
         for parent in issue.parents:
             if parent.status == 'Open':
                 raise pagure.exceptions.PagureException(
@@ -1314,6 +1314,9 @@ def edit_issue(session, issue, ticketfolder, user,
         if status.lower() != 'open':
             issue.closed_at = datetime.datetime.utcnow()
         edit.append('status')
+    if close_status and close_status != issue.close_status:
+        issue.close_status = close_status
+        edit.append('close_status')
     if priority:
         try:
             priority = int(priority)

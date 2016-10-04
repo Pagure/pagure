@@ -290,6 +290,11 @@ class UpdateIssueForm(FlaskForm):
         'Private',
         [wtforms.validators.optional()],
     )
+    close_status = wtforms.SelectField(
+        'Closed as',
+        [wtforms.validators.Optional()],
+        choices=[]
+    )
 
     def __init__(self, *args, **kwargs):
         """ Calls the default constructor with the normal argument but
@@ -314,6 +319,12 @@ class UpdateIssueForm(FlaskForm):
             for key in sorted(kwargs['milestones']):
                 self.milestone.choices.append((key, key))
             self.milestone.choices.insert(0, ('', ''))
+
+        self.close_status.choices = []
+        if 'close_status' in kwargs:
+            for key in sorted(kwargs['close_status']):
+                self.close_status.choices.append((key, key))
+            self.close_status.choices.insert(0, ('', ''))
 
 
 class AddPullRequestCommentForm(FlaskForm):

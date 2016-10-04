@@ -102,6 +102,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
         status=status,
         priorities=repo.priorities,
         milestones=repo.milestones,
+        close_status=repo.close_status,
     )
 
     if form.validate_on_submit():
@@ -160,8 +161,14 @@ def update_issue(repo, issueid, username=None, namespace=None):
                 except ValueError:
                     pass
 
-        assignee = form.assignee.data
-        new_status = form.status.data
+        assignee = form.assignee.data.strip() or None
+        new_status = form.status.data.strip() or None
+        close_status = form.close_status.data.strip() or None
+        if new_status != 'Closed':
+            close_status = None
+        if close_status not in repo.close_status:
+            close_status = None
+
         new_priority = None
         try:
             new_priority = int(form.priority.data)
@@ -224,6 +231,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                         SESSION,
                         issue=issue,
                         status=new_status,
+                        close_status=close_status,
                         private=issue.private,
                         user=flask.g.fas_user.username,
                         ticketfolder=APP.config['TICKETS_FOLDER'],
@@ -768,11 +776,13 @@ def view_issue(repo, issueid, username=None, namespace=None):
         status=status,
         priorities=repo.priorities,
         milestones=repo.milestones,
+        close_status=repo.close_status,
     )
     form.status.data = issue.status
     form.priority.data = str(issue.priority)
     form.milestone.data = str(issue.milestone)
     form.private.data = issue.private
+    form.close_status.data = issue.close_status
     tag_list = pagure.lib.get_tags_of_project(SESSION, repo)
     return flask.render_template(
         'issue.html',

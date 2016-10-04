@@ -116,17 +116,25 @@
             <label><strong>Status</strong></label>
             <h2 id="status">
               <span class="label {%
-                if issue.status|lower == 'invalid' %}label-danger{%
-                elif issue.status|lower == 'fixed' %}label-success{%
-                elif issue.status|lower == 'insufficient data' %}label-warning{%
-                elif issue.status|lower == 'duplicate' %}label-default{%
+                if issue.close_status|lower == 'invalid' %}label-danger{%
+                elif issue.close_status|lower == 'fixed' %}label-success{%
+                elif issue.close_status|lower == 'insufficient data' %}label-warning{%
+                elif issue.close_status|lower == 'duplicate' %}label-default{%
                 elif issue.status|lower == 'open' %}label-primary{%
+                else %}label-info{%
                 endif %}">{{ issue.status }}</span>
+                {% if issue.status == 'Closed' %}
+                <small>
+                as: {{ issue.close_status }}
+                </small>
+                {% endif %}
             </h2>
           </fieldset>
 
           {% if authenticated and g.repo_admin %}
             {{ render_bootstrap_field(form.status,
+              formclass="issue-metadata-form") }}
+            {{ render_bootstrap_field(form.close_status,
               formclass="issue-metadata-form") }}
           {% endif%}
 
