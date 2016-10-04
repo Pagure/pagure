@@ -96,6 +96,11 @@ if APP.config.get('PAGURE_AUTH', None) in ['fas', 'openid']:
     @FAS.postlogin
     def set_user(return_url):
         ''' After login method. '''
+        flask.session['_new_user'] = False
+        if not pagure.lib.search_user(
+                SESSION, username=flask.g.fas_user.username):
+            flask.session['_new_user'] = True
+
         try:
             pagure.lib.set_up_user(
                 session=SESSION,
@@ -353,12 +358,19 @@ def inject_variables():
                 namespace=namespace)
         return watch
 
+    new_user = False
+    if flask.session.get('_new_user'):
+        new_user = True
+        flask.flash('Welcome to pagure')
+        flask.session['_new_user'] = False
+
     return dict(
         version=__version__,
         admin=user_admin,
         authenticated=authenticated(),
         forkbuttonform=forkbuttonform,
         is_watching=is_watching,
+        new_user=new_user,
     )
 
 
