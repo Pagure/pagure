@@ -167,12 +167,14 @@
             <td>
               <span class="label label-default">#{{ issue.id }}</span>
               {% if status != 'Open' %}
-              <span class="label {% if
-                issue.status|lower == 'invalid' %}label-danger{%
-                elif issue.status|lower == 'fixed' %}label-success{%
-                elif issue.status|lower == 'insufficient data' %}label-warning{%
-                elif issue.status|lower == 'duplicate' %}label-default{%
-                endif %}">{{issue.status}}</span>
+              <span class="label {%
+                if issue.close_status|lower == 'invalid' %}label-danger{%
+                elif issue.close_status|lower == 'fixed' %}label-success{%
+                elif issue.close_status|lower == 'insufficient data' %}label-warning{%
+                elif issue.close_status|lower == 'duplicate' %}label-default{%
+                elif issue.status|lower == 'open' %}label-primary{%
+                else %}label-info{%
+                endif %}">{{issue.close_status if issue.status == 'Closed' else issue.status }}</span>
               {% endif %}
               {% if issue.private %}
               <span class="oi red-icon" data-glyph="lock-locked" title="Private issue"></span>
