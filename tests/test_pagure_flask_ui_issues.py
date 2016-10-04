@@ -509,7 +509,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {
-                'status': 'fixed'
+                'status': 'Closed',
+                'close_status': 'fixed'
             }
 
             # Invalid repo
@@ -535,7 +536,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 in output.data)
 
             # Right status, wrong csrf
-            data['status'] = 'Fixed'
+            data['close_status'] = 'Fixed'
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
@@ -570,7 +571,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 in output.data)
             self.assertIn(
                 '<small><p><a href="{app_url}/user/pingou"> '
-                '@pingou</a> changed the status to <code>Fixed</code>'
+                '@pingou</a> changed the status to <code>Closed</code>'
                 '</p></small>'.format(
                     app_url=pagure.APP.config['APP_URL'].rstrip('/')),
                 output.data)
@@ -578,7 +579,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             # Add new comment
             data = {
                 'csrf_token': csrf_token,
-                'status': 'Fixed',
+                'status': 'Closed',
+                'close_status': 'Fixed',
                 'comment': 'Woohoo a second comment !',
             }
             output = self.app.post(
@@ -607,7 +609,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             # Add new tag
             data = {
                 'csrf_token': csrf_token,
-                'status': 'Fixed',
+                'status': 'Closed',
+                'close_status': 'Fixed',
                 'tag': 'tag2',
             }
             output = self.app.post(
@@ -630,7 +633,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             # Assign issue to an non-existent user
             data = {
                 'csrf_token': csrf_token,
-                'status': 'Fixed',
+                'status': 'Closed',
+                'close_status': 'Fixed',
                 'assignee': 'ralph',
             }
             output = self.app.post(
@@ -656,7 +660,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             # Assign issue properly
             data = {
                 'csrf_token': csrf_token,
-                'status': 'Fixed',
+                'status': 'Closed',
+                'close_status': 'Fixed',
                 'assignee': 'pingou',
             }
             output = self.app.post(
@@ -696,8 +701,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         # Reset the status of the first issue
         parent_issue = pagure.lib.search_issues(
-            self.session, repo, issueid=2)
+            self.session, repo, issueid=1)
         parent_issue.status = 'Open'
+        self.session.add(parent_issue)
         # Add the dependency relationship
         self.session.add(parent_issue)
         issue = pagure.lib.search_issues(self.session, repo, issueid=2)

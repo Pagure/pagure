@@ -257,6 +257,7 @@ def create_projects(session):
         description='test project #1',
         hook_token='aaabbbccc',
     )
+    item.close_status = ['Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
     session.add(item)
 
     item = pagure.lib.model.Project(
@@ -265,6 +266,7 @@ def create_projects(session):
         description='test project #2',
         hook_token='aaabbbddd',
     )
+    item.close_status = ['Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
     session.add(item)
 
     session.commit()
