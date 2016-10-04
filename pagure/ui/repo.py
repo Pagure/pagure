@@ -2046,3 +2046,53 @@ def update_public_notifications(repo, username=None, namespace=None):
     return flask.redirect(flask.url_for(
         'view_settings', username=username, repo=repo.name,
         namespace=repo.namespace))
+
+
+@APP.route('/<repo>/update/close_status', methods=['POST'])
+@APP.route('/<namespace>/<repo>/update/close_status', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/update/close_status', methods=['POST'])
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/update/close_status',
+    methods=['POST'])
+@login_required
+def update_close_status(repo, username=None, namespace=None):
+    """ Update the close_status of a project.
+    """
+    if admin_session_timedout():
+        flask.flash('Action canceled, try it again', 'error')
+        url = flask.url_for(
+            'view_settings', username=username, repo=repo,
+            namespace=namespace)
+        return flask.redirect(
+            flask.url_for('auth_login', next=url))
+
+    repo = flask.g.repo
+
+    if not repo.settings.get('issue_tracker', True):
+        flask.abort(404, 'No issue tracker found for this project')
+
+    if not flask.g.repo_admin:
+        flask.abort(
+            403,
+            'You are not allowed to change the settings for this project')
+
+    form = pagure.forms.ConfirmationForm()
+
+    error = False
+    if form.validate_on_submit():
+        close_status = [
+            w.strip() for w in flask.request.form.getlist('close_status')
+            if w.strip()
+        ]
+        try:
+            repo.close_status = close_status
+            SESSION.add(repo)
+            SESSION.commit()
+            flask.flash('List of close status updated')
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            flask.flash(str(err), 'error')
+
+    return flask.redirect(flask.url_for(
+        'view_settings', username=username, repo=repo.name,
+        namespace=namespace))

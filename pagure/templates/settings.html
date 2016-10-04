@@ -619,6 +619,60 @@
     <div class="col-md-8 col-md-offset-2">
       <div class="card">
         <div class="card-header">
+          <strong>Close status</strong>
+        </div>
+        <div class="card-block">
+          <p>
+            Here is the list of all the status that can be used when closing
+            an issue.
+          </p>
+        </div>
+        <form action="{{ url_for(
+              '.update_close_status',
+              repo=repo.name,
+              username=username,
+              namespace=repo.namespace) }}"
+            method="post" class="icon">
+          {{ tag_form.csrf_token }}
+          <div class="card-block">
+            <div class="row">
+              <div class="col-sm-6">
+                <strong>Status</strong>
+              </div>
+            </div>
+            <div id="close_sstatus">
+            {% for status in repo.close_status | sort %}
+              <div class="row p-t-1">
+                <div class="col-sm-12 p-r-0">
+                  <input type="text" name="close_status"
+                    value="{{ status }}" class="form-control"/>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          <div class="row p-t-1">
+            <div class="col-sm-6">
+              <a class="btn btn-secondary btn-sm btn-block" id="new_close_status">
+                  Add new close status
+              </a>
+            </div>
+          </div>
+          <div class="row p-t-1">
+            <div class="col-sm-12">
+              <button class="btn btn-primary" type="submit"
+                  title="Update the status">
+                Update
+              </button>
+            </div>
+          </div>
+        </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-md-8 col-md-offset-2">
+      <div class="card">
+        <div class="card-header">
           <strong>Issue Tags</strong>
         </div>
         <div class="card-block">
@@ -802,6 +856,18 @@ $('#new_milestone').click(function(e) {
         <div class="col-sm-6 p-r-0">\
           <input type="text" name="milestone_dates"\
             value="" class="form-control"/>\
+        </div>\
+    </div>'
+  );
+});
+
+$('#new_close_status').click(function(e) {
+  console.log('new close status');
+  $('#close_sstatus').append(
+    '<div class="row p-t-1"> \
+        <div class="col-sm-12 p-r-0">\
+          <input type="text" name="close_status"\
+            value="" size="3" class="form-control"/>\
         </div>\
     </div>'
   );
