@@ -102,7 +102,7 @@ def create_default_status(session, acls=None):
     """ Insert the defaults status in the status tables.
     """
 
-    statuses = ['Open', 'Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
+    statuses = ['Open', 'Closed']
     for status in statuses:
         ticket_stat = StatusIssue(status=status)
         session.add(ticket_stat)
@@ -320,6 +320,7 @@ class Project(BASE):
     _milestones = sa.Column(sa.Text, nullable=True)
     _reports = sa.Column(sa.Text, nullable=True)
     _notifications = sa.Column(sa.Text, nullable=True)
+    _close_status = sa.Column(sa.Text, nullable=True)
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
@@ -478,6 +479,23 @@ class Project(BASE):
         self._reports = json.dumps(reports)
 
     @property
+    def close_status(self):
+        """ Return the dict stored as string in the database as an actual
+        dict object.
+        """
+        close_status = []
+
+        if self._close_status:
+            close_status = json.loads(self._close_status)
+
+        return close_status
+
+    @close_status.setter
+    def close_status(self, close_status):
+        ''' Ensures the different close status are properly saved. '''
+        self._close_status = json.dumps(close_status)
+
+    @property
     def open_requests(self):
         ''' Returns the number of open pull-requests for this project. '''
         return BASE.metadata.bind.query(
@@ -607,6 +625,7 @@ class Issue(BASE):
     private = sa.Column(sa.Boolean, nullable=False, default=False)
     priority = sa.Column(sa.Integer, nullable=True, default=None)
     milestone = sa.Column(sa.String(255), nullable=True, default=None)
+    close_status = sa.Column(sa.Text, nullable=True)
 
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
