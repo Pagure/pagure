@@ -544,7 +544,7 @@ th[data-sort] {
 }
 
 .readme dd{
-	margin-left:2em;
+    margin-left:2em;
 }
 
 /*Our specific responsive overrides*/
@@ -567,11 +567,19 @@ th[data-sort] {
 }
 
 .btn-align {
-    padding: 6px 0;
-    line-height: 1.42857143;
-    vertical-align: middle;
+  padding: 6px 0;
+  line-height: 1.42857143;
+  vertical-align: middle;
 }
 
 a.nav-link.btn{
   color:white!important;
+}
+
+.input-sm {
+ height: 28px;
+/*
+ font-size: 10px;
+*/
+ line-height: 14px;
 }

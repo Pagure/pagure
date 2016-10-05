@@ -120,18 +120,20 @@
 
         {{ tag.tag }}</a>
     {% endfor %}
-</span>
-<span class="col-lg-3 pull-xs-right" >
-   <form action="{{ url_for('view_issues', username=username,
-                  repo=repo.name ) }}">
-      <div class="input-group">
-         <input type="text" class="form-control" placeholder="Search">
-         <span class="input-group-btn">
-            <button class="btn btn-secondary" type="button">Go!</button>
-         </span>
-      </div>
-   </form>
-</span>
+  </span>
+  <span class="col-lg-3 pull-xs-right tiny" >
+     <form action="{{ url_for('view_issues', username=username,
+                    repo=repo.name ) }}" method="GET">
+        <div class="input-group">
+           <input type="text" class="form-control input-sm"
+                  name="search_pattern" placeholder="Search"
+                  value="{{ search_pattern or '' }}" />
+           <span class="input-group-btn">
+              <input type="submit" class="btn btn-secondary btn-sm" value="Go!" />
+           </span>
+        </div>
+     </form>
+  </span>
 </section>
 <div class="card m-t-1">
 <table id="pagure-issues-list" class="table table-hover table-striped m-b-0">
