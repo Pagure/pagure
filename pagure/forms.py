@@ -304,7 +304,8 @@ class UpdateIssueForm(FlaskForm):
     close_status = wtforms.SelectField(
         'Closed as',
         [wtforms.validators.Optional()],
-        choices=[]
+        choices=[],
+        coerce=lambda val: unicode(val) if val else None
     )
 
     def __init__(self, *args, **kwargs):
