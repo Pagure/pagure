@@ -533,6 +533,7 @@ def view_issues(repo, username=None, namespace=None):
         priority=priority,
         total_page=total_page,
         add_report_form=pagure.forms.AddReportForm(),
+        search_pattern=search_pattern,
     )
 
 
