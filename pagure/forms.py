@@ -295,7 +295,8 @@ class UpdateIssueForm(FlaskForm):
     milestone = wtforms.SelectField(
         'Milestone',
         [wtforms.validators.Optional()],
-        choices=[]
+        choices=[],
+        coerce=lambda val: unicode(val) if val else None
     )
     private = wtforms.BooleanField(
         'Private',
