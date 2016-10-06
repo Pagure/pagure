@@ -764,6 +764,7 @@ class PagureLibtests(tests.Modeltests):
         )
 
         # Create a new project
+        pagure.APP.config['GIT_FOLDER'] = gitfolder
         msg = pagure.lib.new_project(
             session=self.session,
             user='pingou',
@@ -1140,6 +1141,7 @@ class PagureLibtests(tests.Modeltests):
         docfolder = os.path.join(self.path, 'docs')
         ticketfolder = os.path.join(self.path, 'tickets')
         requestfolder = os.path.join(self.path, 'requests')
+        pagure.APP.config['GIT_FOLDER'] = gitfolder
 
         projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 0)

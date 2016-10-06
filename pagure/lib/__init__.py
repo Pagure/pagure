@@ -46,6 +46,7 @@ import pagure.exceptions
 import pagure.lib.git
 import pagure.lib.login
 import pagure.lib.notify
+import pagure.lib.plugins
 import pagure.pfmarkdown
 from pagure.lib import model
 
@@ -1084,6 +1085,7 @@ def new_project(session, user, name, blacklist, allowed_prefix,
     # Make sure we won't have SQLAlchemy error before we create the repo
     session.flush()
 
+    # Add the readme file if it was asked
     if not add_readme:
         pygit2.init_repository(gitrepo, bare=True)
     else:
@@ -1107,6 +1109,7 @@ def new_project(session, user, name, blacklist, allowed_prefix,
         pygit2.clone_repository(temp_gitrepo_path, gitrepo, bare=True)
         shutil.rmtree(temp_gitrepo_path)
 
+    # Make the repo exportable via apache
     http_clone_file = os.path.join(gitrepo, 'git-daemon-export-ok')
     if not os.path.exists(http_clone_file):
         with open(http_clone_file, 'w') as stream:
@@ -1142,6 +1145,16 @@ def new_project(session, user, name, blacklist, allowed_prefix,
     pygit2.init_repository(
         requestrepo, bare=True,
         mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
+
+    # Install the default hook
+    plugin = pagure.lib.plugins.get_plugin('default')
+    dbobj = plugin.db_object()
+    dbobj.active = True
+    dbobj.project_id = project.id
+    session.add(dbobj)
+    session.flush()
+    plugin.set_up(project)
+    plugin.install(project, dbobj)
 
     # create the project in the db
     session.commit()
