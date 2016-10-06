@@ -21,6 +21,10 @@ SECRET_KEY = '<insert here your own key>'
 # url to the database server:
 DB_URL = 'sqlite:////var/tmp/pagure_dev.sqlite'
 
+# Name the instance, used in the welcome screen upon first login (not
+# working with `local` auth)
+INSTANCE_NAME = 'Pagure'
+
 # url to datagrepper (optional):
 #DATAGREPPER_URL = 'https://apps.fedoraproject.org/datagrepper'
 #DATAGREPPER_CATEGORY = 'pagure'

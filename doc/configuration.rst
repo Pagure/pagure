@@ -530,3 +530,15 @@ the only CI service supported at the moment).
 Defaults to: ``None``.
 
 .. warning:: Requires `Redis` to be configured and running.
+
+
+INSTANCE_NAME
+~~~~~~~~~~~~~
+
+This allows giving a name to this running instance of pagure. The name is
+then used in the welcome screen showns upon first login.
+
+Defaults to: ``Pagure``
+
+.. note: the welcome screen currently does not work with the `local`
+         authentication.
