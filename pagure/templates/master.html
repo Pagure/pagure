@@ -112,6 +112,36 @@
                 </div>
                 {% endif %}
             {% endwith %}
+            {% if new_user %}
+              <div class="notification-spacer">
+                <div class="container p-t-2">
+                    <div class="alert alert-info alert-dismissible" role="alert">
+                      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                      </button>
+                      <h4 class="modal-title" id="welcome_title">
+                        Welcome to Pagure, {{ g.fas_user.username }}!
+                      </h4>
+                      <div class="modal-body">
+                        <p>
+                          We are glad to welcome you to pagure.
+                        </p>
+                        <p>
+                          In order to get started with pagure, you may want to read
+                          the <a href="https://docs.pagure.org/pagure/usage/first_steps.html">
+                          First steps in Pagure</a> documentation.
+                        </p>
+                        <p>
+                          You may also find some more information on how to use pagure
+                          in the <a href="https://docs.pagure.org/pagure/usage.html">
+                          usage section of the documentation</a>.
+                        </p>
+                      </div>
+                    </div>
+                </div>
+              </div>
+            {% endif %}
 
             {% block content %}{% endblock %}
     </div>
@@ -126,44 +156,6 @@
             <p><a href="{{ url_for('ssh_hostkey') }}">SSH Hostkey/Fingerprint</a></p>
         </div>
     </div>
-
-    {% if new_user %}
-    <div class="modal fade" id="welcome_screen" tabindex="-1"
-        role="dialog" aria-labelledby="add_group" aria-hidden="false">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal"
-                aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-            <h4 class="modal-title" id="welcome_title">
-              Welcome to Pagure, {{ g.fas_user.username }}!
-            </h4>
-          </div>
-          <div class="modal-body">
-            <p>
-              We are glad to welcome you to pagure.
-            </p>
-            <p>
-              In order to get started with pagure, you may want to read
-              the <a href="https://docs.pagure.org/pagure/usage/first_steps.html">
-              First steps in Pagure</a> documentation.
-            </p>
-            <p>
-              You may also find some more information on how to use pagure
-              in the <a href="https://docs.pagure.org/pagure/usage.html">
-              usage section of the documentation</a>.
-            </p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary"
-              data-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    {% endif %}
 
     {% block jscripts %}
     <script type="text/javascript"
@@ -180,13 +172,6 @@
     <script type="text/javascript">
 $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
     </script>
-    {% if new_user %}
-    <script type="text/javascript">
-    $(document).ready(function(){
-        $("#welcome_screen").modal('show');
-    });
-    </script>
-    {% endif %}
     {% endblock %}
 
 {% if config['FEDMENU_URL'] %}
