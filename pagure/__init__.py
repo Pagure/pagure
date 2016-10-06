@@ -155,6 +155,9 @@ if APP.config.get('PAGURE_AUTH', None) in ['fas', 'openid']:
             flask.flash(
                 'Could not set up you as a user properly, please contact '
                 'an admin', 'error')
+            # Ensure the user is logged out if we cannot set them up
+            # correctly
+            logout()
         return flask.redirect(return_url)
 
 
