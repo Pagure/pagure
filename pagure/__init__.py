@@ -361,7 +361,6 @@ def inject_variables():
     new_user = False
     if flask.session.get('_new_user'):
         new_user = True
-        flask.flash('Welcome to pagure')
         flask.session['_new_user'] = False
 
     return dict(
