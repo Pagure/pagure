@@ -44,6 +44,7 @@ from binaryornot.helpers import is_binary_string
 import pagure.exceptions
 import pagure.lib
 import pagure.lib.git
+import pagure.lib.plugins
 import pagure.forms
 import pagure
 import pagure.ui.plugins
@@ -939,7 +940,7 @@ def view_settings(repo, username=None, namespace=None):
             403,
             'You are not allowed to change the settings for this project')
 
-    plugins = pagure.ui.plugins.get_plugin_names(
+    plugins = pagure.lib.plugins.get_plugin_names(
         APP.config.get('DISABLED_PLUGINS'))
     tags = pagure.lib.get_tags_of_project(SESSION, repo)
 

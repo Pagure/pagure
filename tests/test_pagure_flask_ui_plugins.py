@@ -25,8 +25,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
 import pagure.lib
+import pagure.lib.plugins
 import pagure.hooks
-import pagure.ui.plugins
 import tests
 
 
@@ -66,7 +66,7 @@ class PagureFlaskPluginstests(tests.Modeltests):
 
     def test_get_plugin_names(self):
         """ Test the get_plugin_names function. """
-        names = pagure.ui.plugins.get_plugin_names()
+        names = pagure.lib.plugins.get_plugin_names()
         self.assertEqual(
             sorted(names),
             [
@@ -78,7 +78,7 @@ class PagureFlaskPluginstests(tests.Modeltests):
 
     def test_get_plugin(self):
         """ Test the get_plugin function. """
-        name = pagure.ui.plugins.get_plugin('Mail')
+        name = pagure.lib.plugins.get_plugin('Mail')
         self.assertEqual(str(name), "<class 'pagure.hooks.mail.Mail'>")
 
     def test_view_plugin_page(self):

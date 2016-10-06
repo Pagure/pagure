@@ -68,7 +68,7 @@ def create_tables(db_url, alembic_ini=None, acls=None, debug=False):
     else:
         engine = create_engine(db_url, echo=debug, client_encoding='utf8')
 
-    from pagure.ui.plugins import get_plugin_tables
+    from pagure.lib.plugins import get_plugin_tables
     get_plugin_tables()
     BASE.metadata.create_all(engine)
     # engine.execute(collection_package_create_view(driver=engine.driver))
