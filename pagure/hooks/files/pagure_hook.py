@@ -131,7 +131,7 @@ def fixes_relation(commitid, relation, app_url=None):
         print err
     except SQLAlchemyError as err:  # pragma: no cover
         pagure.SESSION.rollback()
-        pagure.APP.logger.exception(err)
+        pagure.LOG.exception(err)
 
     try:
         if relation.isa == 'issue':
@@ -140,7 +140,7 @@ def fixes_relation(commitid, relation, app_url=None):
                 relation,
                 ticketfolder=pagure.APP.config['TICKETS_FOLDER'],
                 user=pagure.lib.git.get_author_email(commitid, abspath),
-                status='Fixed')
+                status='Closed', close_status='Fixed')
         elif relation.isa == 'pull-request':
             pagure.lib.close_pull_request(
                 pagure.SESSION,
@@ -153,7 +153,8 @@ def fixes_relation(commitid, relation, app_url=None):
         print err
     except SQLAlchemyError as err:  # pragma: no cover
         pagure.SESSION.rollback()
-        pagure.APP.logger.exception(err)
+        print 'ERROR', err
+        pagure.LOG.exception(err)
 
 
 def run_as_post_receive_hook():
