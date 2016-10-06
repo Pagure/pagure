@@ -38,6 +38,9 @@ def get_plugin_names(blacklist=None):
         for plugin in plugins
         if plugin.name not in blacklist
     ]
+    # The default hook is not one we show
+    if 'default' in output:
+        output.remove('default')
     return sorted(output)
 
 
