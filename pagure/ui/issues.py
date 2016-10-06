@@ -163,7 +163,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
 
         assignee = form.assignee.data.strip() or None
         new_status = form.status.data.strip() or None
-        close_status = form.close_status.data.strip() or None
+        close_status = form.close_status.data or None
         if new_status != 'Closed':
             close_status = None
         if close_status not in repo.close_status:
