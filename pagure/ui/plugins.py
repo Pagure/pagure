@@ -77,6 +77,9 @@ def view_plugin(repo, plugin, username=None, namespace=None, full=True):
     if plugin in APP.config.get('DISABLED_PLUGINS', []):
         flask.abort(404, 'Plugin disabled')
 
+    if plugin == 'default':
+        flask.abort(403, 'This plugin cannot be changed')
+
     plugin = pagure.lib.plugins.get_plugin(plugin)
     fields = []
     new = True
