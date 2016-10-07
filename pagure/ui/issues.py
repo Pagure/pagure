@@ -464,7 +464,7 @@ def view_issues(repo, username=None, namespace=None):
         issues = pagure.lib.search_issues(
             SESSION,
             repo,
-            closed=True if status.lower() == 'closed' else False,
+            closed=True if status.lower() != 'open' else False,
             status=status.capitalize() if status.lower() != 'closed' else None,
             tags=tags,
             assignee=assignee,
@@ -478,7 +478,7 @@ def view_issues(repo, username=None, namespace=None):
         issues_cnt = pagure.lib.search_issues(
             SESSION,
             repo,
-            closed=True if status.lower() == 'closed' else False,
+            closed=True if status.lower() != 'open' else False,
             status=status.capitalize() if status.lower() != 'closed' else None,
             tags=tags,
             assignee=assignee,
@@ -490,7 +490,7 @@ def view_issues(repo, username=None, namespace=None):
         oth_issues = pagure.lib.search_issues(
             SESSION,
             repo,
-            closed=False if status.lower() == 'closed' else True,
+            closed=True if status.lower() != 'open' else False,
             tags=tags,
             assignee=assignee,
             author=author,
