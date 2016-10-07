@@ -124,8 +124,8 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual('pingou', items[0].username)
         self.assertEqual([], items[0].groups)
         self.assertEqual(
-            ['bar@pingou.com', 'foo@pingou.com'],
-            [email.email for email in items[0].emails])
+            sorted(['bar@pingou.com', 'foo@pingou.com']),
+            sorted([email.email for email in items[0].emails]))
         self.assertEqual(3, items[1].id)
         self.assertEqual('pingou2', items[1].user)
         self.assertEqual('pingou2', items[1].username)
@@ -1109,8 +1109,8 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(3, len(items))
         self.assertEqual('skvidal', items[2].user)
         self.assertEqual(
-            ['skvidal@fp.o', 'svidal@fp.o'],
-            [email.email for email in items[2].emails])
+            sorted(['skvidal@fp.o', 'svidal@fp.o']),
+            sorted([email.email for email in items[2].emails]))
 
     def test_update_user_ssh(self):
         """ Test the update_user_ssh of pagure.lib. """
@@ -2367,7 +2367,7 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             project=project,
             user='aavrug',
-            watch='1',
+            watch=True,
         )
 
         # All good and when user seleted watch option.
@@ -2375,7 +2375,7 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             project=project,
             user='pingou',
-            watch='1',
+            watch=True,
         )
         self.session.commit()
         self.assertEqual(msg, 'You are now watching this repo.')
@@ -2385,7 +2385,7 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             project=project,
             user='pingou',
-            watch='0',
+            watch=False,
         )
         self.session.commit()
         self.assertEqual(msg, 'You are no longer watching this repo.')
@@ -2457,7 +2457,7 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             project=project,
             user='pingou',
-            watch='1',
+            watch=True,
         )
         self.session.commit()
 
@@ -2474,7 +2474,7 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             project=project,
             user='pingou',
-            watch=0,
+            watch=False,
         )
         self.session.commit()
         self.assertEqual(msg, 'You are no longer watching this repo.')
