@@ -49,7 +49,8 @@ if os.environ.get('BUILD_ID'):
         if req.status_code == 200:
             DB_PATH = req.text
             print 'Using faitout at: %s' % DB_PATH
-    except:
+    except Exception as err:
+        print 'Error while querying faitout:', err
         pass
 
 # Remove the log handlers for the tests

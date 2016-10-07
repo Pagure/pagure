@@ -2465,13 +2465,14 @@ class PagureLibtests(tests.Modeltests):
         self.assertTrue(watch)
 
         # Entry into watchers table
-        pagure.lib.update_watch_status(
+        msg = pagure.lib.update_watch_status(
             session=self.session,
             project=project,
             user='pingou',
-            watch='0',
+            watch=0,
         )
         self.session.commit()
+        self.assertEqual(msg, 'You are no longer watching this repo.')
 
         # From watchers table
         watch = pagure.lib.is_watching(
