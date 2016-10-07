@@ -40,7 +40,7 @@ import pagure.lib.model
 from pagure.lib.repo import PagureRepo
 
 DB_PATH = 'sqlite:///:memory:'
-FAITOUT_URL = 'http://faitout.cloud.fedoraproject.org/faitout/'
+FAITOUT_URL = 'http://faitout.fedorainfracloud.org/'
 HERE = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 LOG = logging.getLogger("pagure")
 LOG.setLevel(logging.DEBUG)
