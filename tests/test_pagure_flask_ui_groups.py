@@ -36,6 +36,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
         pagure.APP.config['TESTING'] = True
         pagure.SESSION = self.session
         pagure.ui.SESSION = self.session
+        pagure.ui.app.SESSION = self.session
         pagure.ui.groups.SESSION = self.session
         pagure.ui.repo.SESSION = self.session
         pagure.ui.filters.SESSION = self.session
