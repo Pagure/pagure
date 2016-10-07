@@ -54,6 +54,8 @@ if os.environ.get('BUILD_ID'):
         if req.status_code == 200:
             DB_PATH = req.text
             LOG.info('Using faitout at: %s', DB_PATH)
+        else:
+            LOG.info('faitout returned: %s : %s', req.status_code, req.text)
     except Exception as err:
         LOG.info('Error while querying faitout: %s', err)
         pass
