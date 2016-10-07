@@ -774,7 +774,6 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         # Valid request
         output = self.app.post(
             '/api/0/test/issue/1/status', data=data, headers=headers)
-        print output.data
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         self.assertDictEqual(
