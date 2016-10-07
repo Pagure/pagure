@@ -259,7 +259,8 @@ class PagureLibtests(tests.Modeltests):
             ticketfolder=None,
             title='Foo issue #2',
             content='We should work on this period',
-            status='Invalid',
+            status='Closed',
+            close_status='Invalid',
             private=True,
         )
         self.session.commit()
@@ -490,16 +491,18 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(issues[1].tags, [])
         self.assertEqual(issues[0].id, 2)
         self.assertEqual(issues[0].project_id, 1)
-        self.assertEqual(issues[0].status, 'Invalid')
+        self.assertEqual(issues[0].status, 'Closed')
+        self.assertEqual(issues[0].close_status, 'Invalid')
         self.assertEqual(issues[0].tags, [])
 
         # Issues by status
         issues = pagure.lib.search_issues(
-            self.session, repo, status='Invalid')
+            self.session, repo, status='Closed')
         self.assertEqual(len(issues), 1)
         self.assertEqual(issues[0].id, 2)
         self.assertEqual(issues[0].project_id, 1)
-        self.assertEqual(issues[0].status, 'Invalid')
+        self.assertEqual(issues[0].status, 'Closed')
+        self.assertEqual(issues[0].close_status, 'Invalid')
         self.assertEqual(issues[0].tags, [])
 
         # Issues closed
@@ -508,7 +511,8 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(len(issues), 1)
         self.assertEqual(issues[0].id, 2)
         self.assertEqual(issues[0].project_id, 1)
-        self.assertEqual(issues[0].status, 'Invalid')
+        self.assertEqual(issues[0].status, 'Closed')
+        self.assertEqual(issues[0].close_status, 'Invalid')
         self.assertEqual(issues[0].tags, [])
 
         # Issues by tag
@@ -528,7 +532,8 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(len(issues), 1)
         self.assertEqual(issues[0].id, 2)
         self.assertEqual(issues[0].project_id, 1)
-        self.assertEqual(issues[0].status, 'Invalid')
+        self.assertEqual(issues[0].status, 'Closed')
+        self.assertEqual(issues[0].close_status, 'Invalid')
         self.assertEqual(issues[0].tags, [])
 
         # Issues by assignee

@@ -269,7 +269,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             title='Test invalid issue',
             content='This really is not related',
             user='pingou',
-            status='Invalid',
+            status='Closed',
+            close_status='Invalid',
             ticketfolder=None
         )
         self.session.commit()

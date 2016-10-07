@@ -474,7 +474,8 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                 repo,
                 issueid=iid
             )
-            ticket.status = 'Fixed'
+            ticket.status = 'Closed'
+            ticket.close_status = 'Fixed'
             self.session.add(ticket)
             self.session.commit()
 
