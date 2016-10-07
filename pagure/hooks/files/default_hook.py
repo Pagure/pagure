@@ -55,17 +55,17 @@ def run_as_post_receive_hook():
                 "pagure hook"
             return
 
-	repo = pagure.lib.git.get_repo_name(abspath)
-	username = pagure.lib.git.get_username(abspath)
-	namespace = pagure.lib.git.get_repo_namespace(abspath)
+    repo = pagure.lib.git.get_repo_name(abspath)
+    username = pagure.lib.git.get_username(abspath)
+    namespace = pagure.lib.git.get_repo_namespace(abspath)
     if pagure.APP.config.get('HOOK_DEBUG', False):
         print 'repo:', repo
         print 'user:', username
         print 'namespace:', namespace
 
     project = pagure.lib.get_project(
-		pagure.SESSION, repo, user=username, namespace=namespace)
-	try:
+        pagure.SESSION, repo, user=username, namespace=namespace)
+    try:
         # Reset the merge_status of all opened PR to refresh their cache
         pagure.lib.reset_status_pull_request(pagure.SESSION, project)
         pagure.SESSION.commit()
@@ -73,11 +73,11 @@ def run_as_post_receive_hook():
         pagure.SESSION.rollback()
         pagure.APP.logger.exception(err)
         print 'An error occured while running the default hook, please '\
-			'report it to an admin.'
+            'report it to an admin.'
 
 
 def main(args):
-        run_as_post_receive_hook()
+    run_as_post_receive_hook()
 
 
 if __name__ == '__main__':

@@ -196,7 +196,7 @@ def run_as_post_receive_hook():
 
 
 def main(args):
-        run_as_post_receive_hook()
+    run_as_post_receive_hook()
 
 
 if __name__ == '__main__':
