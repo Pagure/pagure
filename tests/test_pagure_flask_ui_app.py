@@ -670,9 +670,13 @@ class PagureFlaskApptests(tests.Modeltests):
                 '/settings/email/add', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertTrue("<strong>Add new email</strong>" in output.data)
-            self.assertIn(
+            self.assertTrue(
                 'Invalid value, can&#39;t be any of: bar@pingou.com, '
-                'foo@pingou.com.&nbsp;', output.data)
+                'foo@pingou.com.&nbsp;' in output.data
+                or
+                'Invalid value, can&#39;t be any of: foo@pingou.com, '
+                'bar@pingou.com.&nbsp;' in output.data
+            )
             self.assertEqual(output.data.count('foo@pingou.com'), 6)
             self.assertEqual(output.data.count('bar@pingou.com'), 5)
             self.assertEqual(output.data.count('foobar@pingou.com'), 0)
