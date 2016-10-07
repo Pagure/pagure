@@ -1877,12 +1877,8 @@ def search_issues(
     )
 
     if search_pattern is not None:
-        query = session.query(
-            model.Issue
-        ).filter(
+        query = query.filter(
             model.Issue.title.like('%' + str(search_pattern) + '%')
-        ).filter(
-            model.Issue.project_id == repo.id
         )
 
     query = query.order_by(
