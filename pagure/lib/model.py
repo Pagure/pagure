@@ -223,7 +223,7 @@ class User(BASE):
         }
         if not public:
             output['default_email'] = self.default_email
-            output['emails'] = [email.email for email in self.emails]
+            output['emails'] = sorted([email.email for email in self.emails])
 
         return output
 
