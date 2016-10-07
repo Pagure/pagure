@@ -571,7 +571,7 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
     new_status = form.status.data.strip()
     if new_status in repo.close_status and not close_status:
         close_status = new_status
-        form.status.data = 'Closed'
+        new_status = 'Closed'
 
     if form.validate_on_submit():
         try:
