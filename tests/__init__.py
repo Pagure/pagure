@@ -11,11 +11,13 @@
 __requires__ = ['SQLAlchemy >= 0.7']
 import pkg_resources
 
+import logging
 import unittest
 import shutil
 import sys
 import tempfile
 import os
+logging.basicConfig(stream=sys.stderr)
 
 from datetime import date
 from datetime import datetime
@@ -40,17 +42,20 @@ from pagure.lib.repo import PagureRepo
 DB_PATH = 'sqlite:///:memory:'
 FAITOUT_URL = 'http://faitout.cloud.fedoraproject.org/faitout/'
 HERE = os.path.join(os.path.dirname(os.path.abspath(__file__)))
+LOG = logging.getLogger("pagure")
+LOG.setLevel(logging.DEBUG)
 
 
+LOG.info('BUILD_ID: %s', os.environ.get('BUILD_ID'))
 if os.environ.get('BUILD_ID'):
     try:
         import requests
         req = requests.get('%s/new' % FAITOUT_URL)
         if req.status_code == 200:
             DB_PATH = req.text
-            print 'Using faitout at: %s' % DB_PATH
+            LOG.info('Using faitout at: %s', DB_PATH)
     except Exception as err:
-        print 'Error while querying faitout:', err
+        LOG.info('Error while querying faitout: %s', err)
         pass
 
 # Remove the log handlers for the tests
