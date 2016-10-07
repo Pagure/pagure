@@ -1756,7 +1756,7 @@ def search_issues(
             model.Issue.uid == issueuid
         )
 
-    if status is not None and not closed:
+    if status is not None:
         if status in ['Open', 'Closed']:
             query = query.filter(
                 model.Issue.status == status
