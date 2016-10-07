@@ -78,8 +78,8 @@ class PagureLibtests(tests.Modeltests):
         item = pagure.lib.search_user(self.session, email='foo@pingou.com')
         self.assertEqual('pingou', item.user)
         self.assertEqual(
-            ['bar@pingou.com', 'foo@pingou.com'],
-            [email.email for email in item.emails])
+            sorted(['bar@pingou.com', 'foo@pingou.com']),
+            sorted([email.email for email in item.emails]))
 
     def test_search_user_token(self):
         """ Test the search_user of pagure.lib. """
