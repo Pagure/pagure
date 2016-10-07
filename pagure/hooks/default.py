@@ -69,7 +69,7 @@ class Default(BaseHook):
 
     name = 'default'
     description = 'Default hooks that should be enabled for each and '\
-		'every project.'
+        'every project.'
 
     form = DefaultForm
     db_object = DefaultTable
