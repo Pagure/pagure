@@ -24,7 +24,7 @@ from pagure import SESSION, APP, get_repo_path
 
 
 class DefaultTable(BASE):
-    """ Stores information about the CI linked to on a project.
+    """ Stores information about the default hook of a project.
 
     Table -- hook_default
     """
@@ -65,7 +65,7 @@ class DefaultForm(FlaskForm):
 
 
 class Default(BaseHook):
-    ''' Mail hooks. '''
+    ''' Default hooks. '''
 
     name = 'default'
     description = 'Default hooks that should be enabled for each and '\
