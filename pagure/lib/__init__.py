@@ -1173,7 +1173,7 @@ def new_project(session, user, name, blacklist, allowed_prefix,
 
 def new_issue(session, repo, title, content, user, ticketfolder,
               issue_id=None, issue_uid=None, private=False, status=None,
-              notify=True, date_created=None):
+              close_status=None, notify=True, date_created=None):
     ''' Create a new issue for the specified repo. '''
     user_obj = get_user(session, user)
 
@@ -1190,6 +1190,8 @@ def new_issue(session, repo, title, content, user, ticketfolder,
 
     if status is not None:
         issue.status = status
+    if close_status is not None:
+        issue.close_status = close_status
 
     session.add(issue)
     # Make sure we won't have SQLAlchemy error before we create the issue
