@@ -1478,7 +1478,7 @@ def fork_project(session, user, repo, gitfolder,
     for branch in frepo.listall_branches(pygit2.GIT_BRANCH_REMOTE):
         branch_obj = frepo.lookup_branch(branch, pygit2.GIT_BRANCH_REMOTE)
         name = branch_obj.branch_name.replace(
-            branch_obj.remote_name, '')[1:]
+            branch_obj.remote_name, '', 1)[1:]
         if name in frepo.listall_branches(pygit2.GIT_BRANCH_LOCAL):
             continue
         frepo.create_branch(name, frepo.get(branch_obj.target.hex))
