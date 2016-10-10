@@ -3144,7 +3144,7 @@ def set_custom_key_value(session, issue, key, value):
     query = session.query(
         model.IssueValues
     ).filter(
-        model.IssueKeys.id == key.id
+        model.IssueValues.key_id == key.id
     ).filter(
         model.IssueValues.issue_uid == issue.uid
     )
