@@ -673,6 +673,69 @@
     <div class="col-md-8 col-md-offset-2">
       <div class="card">
         <div class="card-header">
+          <strong>Custom issue fields</strong>
+        </div>
+        <div class="card-block">
+          <p>
+            Set some custom fields for your issues.
+          </p>
+        </div>
+        <form action="{{ url_for(
+              '.update_custom_keys',
+              repo=repo.name,
+              username=username,
+              namespace=repo.namespace) }}"
+            method="post" class="icon">
+          {{ tag_form.csrf_token }}
+          <div class="card-block">
+            <div class="row">
+              <div class="col-sm-6">
+                <strong>Fields</strong>
+              </div>
+            </div>
+            <div id="custom_fields">
+            {% for field in repo.issue_keys | sort %}
+              <div class="row p-t-1">
+                <div class="col-sm-6 p-r-0">
+                  <input type="text" name="custom_keys"
+                    value="{{ field.name }}" class="form-control"/>
+                </div>
+                <div class="col-sm-6 p-r-0">
+                   <select name="custom_keys_type" class="form-control">
+                    <option value="text" {%
+                      if field.type_ == 'text' %} selected {%
+                      endif %}>text</option>
+                    <option value="boolean" {%
+                      if field.type_ == 'boolean' %} selected {%
+                      endif %}>boolean</option>
+                  </select>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          <div class="row p-t-1">
+            <div class="col-sm-6">
+              <a class="btn btn-secondary btn-sm btn-block" id="new_custom_field">
+                  Add new custom field
+              </a>
+            </div>
+          </div>
+          <div class="row p-t-1">
+            <div class="col-sm-12">
+              <button class="btn btn-primary" type="submit"
+                  title="Update the custom fields">
+                Update
+              </button>
+            </div>
+          </div>
+        </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-md-8 col-md-offset-2">
+      <div class="card">
+        <div class="card-header">
           <strong>Issue Tags</strong>
         </div>
         <div class="card-block">
@@ -870,6 +933,24 @@ $('#new_close_status').click(function(e) {
             value="" size="3" class="form-control"/>\
         </div>\
     </div>'
+  );
+});
+
+$('#new_custom_field').click(function(e) {
+  console.log('new custom fields');
+  $('#custom_fields').append(
+    '<div class="row p-t-1"> \
+      <div class="col-sm-6 p-r-0"> \
+        <input type="text" name="custom_keys" \
+            value="" class="form-control"/> \
+        </div> \
+        <div class="col-sm-6 p-r-0"> \
+           <select name="custom_keys_type" class="form-control"> \
+            <option value="text">text</option> \
+            <option value="boolean">boolean</option> \
+          </select> \
+        </div> \
+      </div>'
   );
 });
 
