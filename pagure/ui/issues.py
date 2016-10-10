@@ -267,6 +267,15 @@ def update_issue(repo, issueid, username=None, namespace=None):
                 if message:
                     messages.add(message)
 
+                # Update the custom keys/fields
+                for key in repo.issue_keys:
+                    value = flask.request.form.get(key.name)
+                    if value:
+                        messages.add(
+                            pagure.lib.set_custom_key_value(
+                                SESSION, issue, key, value)
+                        )
+
             # Update ticket this one depends on
             messages.union(set(pagure.lib.update_dependency_issue(
                 SESSION, repo, issue, depends,
@@ -789,6 +798,11 @@ def view_issue(repo, issueid, username=None, namespace=None):
     form.private.data = issue.private
     form.close_status.data = issue.close_status
     tag_list = pagure.lib.get_tags_of_project(SESSION, repo)
+
+    knowns_keys = {}
+    for key in issue.other_fields:
+        knowns_keys[key.key.name] = key
+
     return flask.render_template(
         'issue.html',
         select='issues',
@@ -798,6 +812,7 @@ def view_issue(repo, issueid, username=None, namespace=None):
         issue=issue,
         issueid=issueid,
         form=form,
+        knowns_keys=knowns_keys,
     )
 
 

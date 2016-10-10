@@ -289,14 +289,50 @@
           {% endif%}
 
           <input type="submit" class="btn btn-primary issue-metadata-form" value="Update">
-            <a class="btn btn-secondary issue-metadata-form editmetadatatoggle">
-              cancel
-            </a>
+          <a class="btn btn-secondary issue-metadata-form editmetadatatoggle">
+            cancel
+          </a>
           {% if authenticated and g.repo_admin %}
             <a class="btn btn-secondary issue-metadata-display editmetadatatoggle">
               Edit Metadata
             </a>
           {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-block">
+
+        {% for field in repo.issue_keys %}
+          <fieldset class="form-group issue-custom-display">
+            <label><strong>{{ field.name }}</strong></label>
+            <div id="{{ field.name }}_plain">
+              <p>
+                {{ knowns_keys[field.name].value if field.name in knowns_keys }}
+              </p>
+            </div>
+          </fieldset>
+          {% if authenticated and g.repo_admin %}
+            <fieldset class="form-group issue-custom-form">
+              <label for="field"><strong>{{ field.name }}</strong></label>
+              <input class="form-control" name="{{ field.name }}" id="{{ field.name }}"
+                value="{{ knowns_keys[field.name].value if field.name in knowns_keys }}" />
+            </fieldset>
+          {% endif %}
+        {% endfor %}
+
+        <input type="submit" class="btn btn-primary issue-custom-form" value="Update">
+        <a class="btn btn-secondary issue-custom-form edit_custom_toggle">
+          cancel
+        </a>
+        {% if authenticated and g.repo_admin %}
+          <a class="btn btn-secondary issue-custom-display edit_custom_toggle">
+            Edit Metadata
+          </a>
+        {% endif %}
+
       </div>
     </div>
   </div>
@@ -564,6 +600,8 @@ function try_async_comment(form) {
         $('#comments').find('.edit_comment').remove();
         $( ".issue-metadata-form" ).hide();
         $( ".issue-metadata-display" ).show();
+        $( ".issue-custom-form" ).hide();
+        $( ".issue-custom-display" ).show();
       } else {
         // Make the browser submit the form sync
         $(form).off('submit');
@@ -608,6 +646,13 @@ $( document ).ready(function() {
     function() {
       $( ".issue-metadata-form" ).toggle();
       $( ".issue-metadata-display" ).toggle();
+    }
+  );
+
+  $( ".edit_custom_toggle" ).click(
+    function() {
+      $( ".issue-custom-form" ).toggle();
+      $( ".issue-custom-display" ).toggle();
     }
   );
 

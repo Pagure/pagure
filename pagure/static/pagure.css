@@ -120,7 +120,12 @@ white-space: nowrap;
 
 .issue-metadata-form
 {
-display:none;
+  display:none;
+}
+
+.issue-custom-form
+{
+  display:none;
 }
 
 .bodycontent
