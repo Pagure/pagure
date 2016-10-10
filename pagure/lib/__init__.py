@@ -3107,3 +3107,57 @@ def save_report(session, repo, name, url, username):
     reports[name] = query
     repo.reports = reports
     session.add(repo)
+
+
+def set_custom_key_fields(session, project, fields, types):
+    """ Set or update the custom key fields of a project with the values
+    provided.
+    """
+
+    if len(fields) != len(types):
+        raise pagure.exceptions.PagureException(
+                'Not all the custom fields have a type specified')
+
+    current_keys = {}
+    for key in project.issue_keys:
+        current_keys[key.name] = key
+
+    for idx, key in enumerate(fields):
+        if key in current_keys:
+            issuekey = current_keys[key]
+            issuekey.type_ = types[idx]
+        else:
+            issuekey = model.IssueKeys(
+                project_id=project.id,
+                name=key,
+                type_=types[idx],
+            )
+        session.add(issuekey)
+
+    return 'List of custom fields updated'
+
+
+def set_custom_key_value(session, issue, key, value):
+    """ Set or update the value of the specified custom key.
+    """
+
+    query = session.query(
+        model.IssueValues
+    ).filter(
+        model.IssueKeys.id == key.id
+    ).filter(
+        model.IssueValues.issue_uid == issue.uid
+    )
+
+    current_field = query.first()
+    if current_field:
+        current_field.value = value
+    else:
+        current_field = model.IssueValues(
+            issue_uid=issue.uid,
+            key_id=key.id,
+            value=value,
+        )
+    session.add(current_field)
+
+    return 'Custom key adjusted'
