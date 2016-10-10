@@ -446,6 +446,14 @@ def view_issues(repo, username=None, namespace=None):
     author = flask.request.args.get('author', None)
     search_pattern = flask.request.args.get('search_pattern', None)
 
+    # Custom fields
+    custom_keys = flask.request.args.getlist('ckeys')
+    custom_values = flask.request.args.getlist('cvalue')
+    custom_search = {}
+    if len(custom_keys) == len(custom_values):
+        for idx, key in enumerate(custom_keys):
+            custom_search[key] = custom_values[idx]
+
     repo = flask.g.repo
 
     if not repo.settings.get('issue_tracker', True):
@@ -483,6 +491,7 @@ def view_issues(repo, username=None, namespace=None):
             offset=flask.g.offset,
             limit=flask.g.limit,
             search_pattern=search_pattern,
+            custom_search=custom_search,
         )
         issues_cnt = pagure.lib.search_issues(
             SESSION,
@@ -507,6 +516,7 @@ def view_issues(repo, username=None, namespace=None):
             priority=priority,
             count=True,
             search_pattern=search_pattern,
+            custom_search=custom_search,
         )
     else:
         issues = pagure.lib.search_issues(
@@ -514,6 +524,7 @@ def view_issues(repo, username=None, namespace=None):
             author=author, private=private, priority=priority,
             offset=flask.g.offset, limit=flask.g.limit,
             search_pattern=search_pattern,
+            custom_search=custom_search,
         )
         issues_cnt = pagure.lib.search_issues(
             SESSION, repo, tags=tags, assignee=assignee,

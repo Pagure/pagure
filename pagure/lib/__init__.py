@@ -1685,7 +1685,7 @@ def search_issues(
         session, repo, issueid=None, issueuid=None, status=None,
         closed=False, tags=None, assignee=None, author=None, private=None,
         priority=None, milestones=None, count=False, offset=None,
-        limit=None, search_pattern=None):
+        limit=None, search_pattern=None, custom_search=None):
     ''' Retrieve one or more issues associated to a project with the given
     criterias.
 
@@ -1734,6 +1734,9 @@ def search_issues(
     :type count: boolean
     :kwarg search_pattern: a string to search in issues title
     :type search_pattern: str or None
+    :kwarg custom_search: a dictionary of key/values to be used when
+        searching issues with a custom key constraint
+    :type custom_search: dict or None
 
     :return: A single Issue object if issueid is specified, a list of Project
         objects otherwise.
@@ -1874,6 +1877,37 @@ def search_issues(
         query = query.filter(
             model.Issue.milestone.in_(milestones)
         )
+
+    if custom_search:
+        constraints = []
+        for key in custom_search:
+            value = custom_search[key]
+            if '*' in value:
+                value = value.replace('*', '%')
+                constraints.append(
+                    sqlalchemy.and_(
+                        model.IssueKeys.name == key,
+                        model.IssueValues.value.ilike(value)
+                    )
+                )
+            else:
+                constraints.append(
+                    sqlalchemy.and_(
+                        model.IssueKeys.name == key,
+                        model.IssueValues.value == value
+                    )
+                )
+        if constraints:
+            query = query.filter(
+                model.Issue.uid == model.IssueValues.issue_uid
+            ).filter(
+                model.IssueValues.key_id == model.IssueKeys.id
+            )
+            query = query.filter(
+                sqlalchemy.or_(
+                    (const for const in constraints)
+                )
+            )
 
     query = session.query(
         model.Issue
