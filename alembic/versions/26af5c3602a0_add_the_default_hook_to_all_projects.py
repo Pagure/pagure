@@ -45,9 +45,8 @@ def upgrade():
         session.flush()
         plugin.set_up(project)
         plugin.install(project, dbobj)
-
-    # create the project in the db
-    session.commit()
+        # Save the change
+        session.commit()
 
 
 def downgrade():
@@ -67,5 +66,5 @@ def downgrade():
         session.flush()
         plugin.remove(project, dbobj)
 
-    # create the project in the db
-    session.commit()
+        # Save the change
+        session.commit()
