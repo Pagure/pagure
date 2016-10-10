@@ -2097,3 +2097,61 @@ def update_close_status(repo, username=None, namespace=None):
     return flask.redirect(flask.url_for(
         'view_settings', username=username, repo=repo.name,
         namespace=namespace))
+
+
+@APP.route('/<repo>/update/custom_keys', methods=['POST'])
+@APP.route('/<namespace>/<repo>/update/custom_keys', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/update/custom_keys', methods=['POST'])
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/update/custom_keys',
+    methods=['POST'])
+@login_required
+def update_custom_keys(repo, username=None, namespace=None):
+    """ Update the custom_keys of a project.
+    """
+    if admin_session_timedout():
+        flask.flash('Action canceled, try it again', 'error')
+        url = flask.url_for(
+            'view_settings', username=username, repo=repo,
+            namespace=namespace)
+        return flask.redirect(
+            flask.url_for('auth_login', next=url))
+
+    repo = flask.g.repo
+
+    if not repo.settings.get('issue_tracker', True):
+        flask.abort(404, 'No issue tracker found for this project')
+
+    if not flask.g.repo_admin:
+        flask.abort(
+            403,
+            'You are not allowed to change the settings for this project')
+
+    form = pagure.forms.ConfirmationForm()
+
+    error = False
+    if form.validate_on_submit():
+        custom_keys = [
+            w.strip() for w in flask.request.form.getlist('custom_keys')
+            if w.strip()
+        ]
+        custom_keys_type = [
+            w.strip() for w in flask.request.form.getlist('custom_keys_type')
+            if w.strip()
+        ]
+
+        try:
+            msg = pagure.lib.set_custom_key_fields(
+                SESSION, repo, custom_keys, custom_keys_type)
+            SESSION.commit()
+            flask.flash(msg)
+        except pagure.exceptions.PagureException as msg:
+            SESSION.rollback()
+            flask.flash(msg, 'error')
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            flask.flash(str(err), 'error')
+
+    return flask.redirect(flask.url_for(
+        'view_settings', username=username, repo=repo.name,
+        namespace=namespace))
