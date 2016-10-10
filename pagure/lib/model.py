@@ -840,6 +840,66 @@ class IssueComment(BASE):
         return output
 
 
+class IssueKeys(BASE):
+    """ Stores the custom keys a project can use on issues.
+
+    Table -- issue_keys
+    """
+
+    __tablename__ = 'issue_keys'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    project_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(
+            'projects.id', onupdate='CASCADE',
+        ),
+        nullable=True)
+    name = sa.Column(sa.Text(), nullable=False)
+    type_ = sa.Column(sa.String(255), nullable=False)
+
+    project = relation(
+        'Project', foreign_keys=[project_id], remote_side=[Project.id],
+        backref=backref(
+            'issue_keys', cascade="delete, delete-orphan", single_parent=True)
+        )
+
+
+class IssueValues(BASE):
+    """ Stores the values of the custom keys set by project on issues.
+
+    Table -- issue_values
+    """
+
+    __tablename__ = 'issue_values'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    key_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(
+            'issue_keys.id', ondelete='CASCADE', onupdate='CASCADE',
+        ),
+        index=True)
+    issue_uid = sa.Column(
+        sa.String(32),
+        sa.ForeignKey(
+            'issues.uid', ondelete='CASCADE', onupdate='CASCADE',
+        ),
+        index=True)
+    value = sa.Column(sa.Text(), nullable=False)
+
+    issue = relation(
+        'Issue', foreign_keys=[issue_uid], remote_side=[Issue.uid],
+        backref=backref(
+            'other_fields', cascade="delete, delete-orphan", single_parent=True)
+        )
+
+    key = relation(
+        'IssueKeys', foreign_keys=[key_id], remote_side=[IssueKeys.id],
+        backref=backref('values', cascade="delete, delete-orphan")
+        )
+
+
 class Tag(BASE):
     """ Stores the tags.
 
