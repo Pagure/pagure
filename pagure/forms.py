@@ -13,6 +13,7 @@
 # pylint: disable=super-on-old-class
 
 import re
+import tempfile
 
 import flask
 import flask_wtf as wtf
@@ -21,8 +22,8 @@ try:
 except ImportError:
     from flask_wtf import Form as FlaskForm
 
+import six
 import wtforms
-import tempfile
 
 import pagure
 import pagure.lib
@@ -32,6 +33,15 @@ STRICT_REGEX = '^[a-zA-Z0-9-_]+$'
 TAGS_REGEX = '^[a-zA-Z0-9-_, .]+$'
 PROJECT_NAME_REGEX = \
     '^[a-zA-z0-9_][a-zA-Z0-9-_]*$'
+
+
+def convert_value(val):
+    """ Convert the provided values to strings when possible. """
+    if val:
+        if not isinstance(val, (list, tuple, six.string_types)):
+            return val.decode('utf-8')
+        elif isinstance(val, six.string_types):
+            return val
 
 
 class MultipleEmail(wtforms.validators.Email):
@@ -119,7 +129,7 @@ class ProjectForm(ProjectFormSimplified):
         'Project Namespace',
         [wtforms.validators.optional()],
         choices=[],
-        coerce=lambda val: unicode(val) if val else None
+        coerce=convert_value
     )
 
     def __init__(self, *args, **kwargs):
@@ -296,7 +306,7 @@ class UpdateIssueForm(FlaskForm):
         'Milestone',
         [wtforms.validators.Optional()],
         choices=[],
-        coerce=lambda val: unicode(val) if val else None
+        coerce=convert_value
     )
     private = wtforms.BooleanField(
         'Private',
@@ -306,7 +316,7 @@ class UpdateIssueForm(FlaskForm):
         'Closed as',
         [wtforms.validators.Optional()],
         choices=[],
-        coerce=lambda val: unicode(val) if val else None
+        coerce=convert_value
     )
 
     def __init__(self, *args, **kwargs):
