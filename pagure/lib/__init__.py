@@ -188,7 +188,7 @@ def is_valid_ssh_key(key):
     if not key:
         return None
     with tempfile.TemporaryFile() as f:
-        f.write(key)
+        f.write(key.encode('utf-8'))
         f.seek(0)
         proc = subprocess.Popen(['/usr/bin/ssh-keygen', '-l', '-f',
                                  '/dev/stdin'],
