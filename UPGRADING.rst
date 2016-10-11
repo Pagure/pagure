@@ -1,6 +1,32 @@
 Upgrading Pagure
 ================
 
+From 2.6 to 2.7
+---------------
+
+2.7 adds new tables as well as changes some of the existing ones.
+
+Therefore when upgrading to 2.7, you will have to:
+
+* Create the new DB tables and the new status field using the ``createdb.py``
+  script.
+
+* Update the database schame using alembic, one of the upgrade will require
+  access to pagure's configuration file, which should thus be passed onto the
+  command via an environment variable:
+  ``PAGURE_CONFIG=/path/to/pagure.cf alembic upgrade head``
+
+
+This release also brings a new configuration key:
+
+* ``INSTANCE_NAME`` used in the welcome screen shown upon first login (only with
+  FAS and OpenID auth) to describe the instance
+
+
+The API has also been upgraded to a version ``0.8`` due to the changes (backward
+compatible) made to support the introduction of `close_status` to issues.
+
+
 From 2.5 to 2.6
 ---------------
 

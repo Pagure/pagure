@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            2.6
+Version:            2.7
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -298,6 +298,43 @@ install -m 644 pagure-ci/pagure_ci.service \
 
 
 %changelog
+* Tue Oct 11 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.7-1
+- Update to 2.7
+- Clean imports (Vivek Anand)
+- Fix NoneType error when pagure-ci form is inactively updated first time
+  (Farhaan Bukhsh)
+- Fix minor typos in configuration documentation (Jeremy Cline)
+- Use context managers to ensure files are closed (Jeremy Cline)
+- Adjust update_tickets_from_git to add milestones for issues as well (Vivek
+  Anand)
+- Update milestone description in Settings (Lubomír Sedlář)
+- Add checks for the validity of the ssh keys provided (Patrick Uiterwijk)
+- Remove hardcoded hostnames in unit tests (Jeremy Cline)
+- Skip clamd-dependent tests when pyclamd isn't installed (Patrick Uiterwijk)
+- Fix interacting with branch containing a dot in their name (new PR button,
+  delete branch button)
+- Ensure only project admins can create reports
+- Do not warn admins when a build in jenkins did not correspond to a
+  pull-request
+- Fix the progress bar on the page listing the issues (d3prof3t)
+- Do not call the API when viewing a diff or a PR if issues or PRs are disabled
+- Port pagure to flask 0.13+
+- Fix displaying the reason when a PR cannot be merged
+- Allow projects to turn on/off fedmsg notifications
+- Fix the web-hook service so when a project is updated the service is as well
+- Add the possibility to specify a status to close ticket (closed as upstream,
+  works for me, invalid...)
+- Let all the optional SelectFields in forms return None when they should
+- Make each tests in the test suite run in its own temporary directory (Jeremy
+  Cline)
+- Use long dash in footer instead of two short ones (Lubomír Sedlář)
+- Add a welcome screen to new comers (does not work with local auth)
+- Ensure user are not logged in if we couldn't properly set them up in pagure
+- Add the possibility to search through issues (AnjaliPardeshi)
+- Add a default hook to all new projects, this hook re-set the merge status of
+  all the open PR upon push to the main branch of the repo
+- Add support for setting custom fields for issues per projects
+
 * Tue Sep 20 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.6-1
 - Update to 2.6
 - Fix creating new PR from the page listing all the PRs
