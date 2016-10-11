@@ -854,9 +854,11 @@ class IssueKeys(BASE):
         sa.ForeignKey(
             'projects.id', onupdate='CASCADE',
         ),
-        nullable=True)
+        nullable=False)
     name = sa.Column(sa.Text(), nullable=False)
-    type_ = sa.Column(sa.String(255), nullable=False)
+    key_type = sa.Column(sa.String(255), nullable=False)
+
+    __table_args__ = (sa.UniqueConstraint('project_id', 'name'),)
 
     project = relation(
         'Project', foreign_keys=[project_id], remote_side=[Project.id],
@@ -873,19 +875,18 @@ class IssueValues(BASE):
 
     __tablename__ = 'issue_values'
 
-    id = sa.Column(sa.Integer, primary_key=True)
     key_id = sa.Column(
         sa.Integer,
         sa.ForeignKey(
             'issue_keys.id', ondelete='CASCADE', onupdate='CASCADE',
         ),
-        index=True)
+        primary_key=True)
     issue_uid = sa.Column(
         sa.String(32),
         sa.ForeignKey(
             'issues.uid', ondelete='CASCADE', onupdate='CASCADE',
         ),
-        index=True)
+        primary_key=True)
     value = sa.Column(sa.Text(), nullable=False)
 
     issue = relation(
