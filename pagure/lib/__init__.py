@@ -3159,12 +3159,12 @@ def set_custom_key_fields(session, project, fields, types):
     for idx, key in enumerate(fields):
         if key in current_keys:
             issuekey = current_keys[key]
-            issuekey.type_ = types[idx]
+            issuekey.key_type = types[idx]
         else:
             issuekey = model.IssueKeys(
                 project_id=project.id,
                 name=key,
-                type_=types[idx],
+                key_type=types[idx],
             )
         session.add(issuekey)
 
