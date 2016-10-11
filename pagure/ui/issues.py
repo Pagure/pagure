@@ -807,7 +807,9 @@ def view_issue(repo, issueid, username=None, namespace=None):
     form.priority.data = str(issue.priority)
     form.milestone.data = str(issue.milestone)
     form.private.data = issue.private
-    form.close_status.data = issue.close_status
+    form.close_status.data = ''
+    if issue.close_status:
+        form.close_status.data = issue.close_status
     tag_list = pagure.lib.get_tags_of_project(SESSION, repo)
 
     knowns_keys = {}
