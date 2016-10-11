@@ -852,7 +852,7 @@ class IssueKeys(BASE):
     project_id = sa.Column(
         sa.Integer,
         sa.ForeignKey(
-            'projects.id', onupdate='CASCADE',
+            'projects.id', onupdate='CASCADE', ondelete='CASCADE',
         ),
         nullable=False)
     name = sa.Column(sa.Text(), nullable=False)
