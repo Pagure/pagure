@@ -316,9 +316,15 @@
           </fieldset>
           {% if authenticated and g.repo_admin %}
             <fieldset class="form-group issue-custom-form">
-              <label for="field"><strong>{{ field.name }}</strong></label>
-              <input class="form-control" name="{{ field.name }}" id="{{ field.name }}"
-                value="{{ knowns_keys[field.name].value if field.name in knowns_keys }}" />
+              <label for="field"><strong>{{ field.name }} - {{ field.key_type }}</strong></label>
+              <input
+                {%- if field.key_type == 'boolean' %} type="checkbox" {% endif -%}
+                class="form-control" name="{{ field.name }}" id="{{ field.name }}"
+                {%- if field.name in knowns_keys %}{%
+                      if field.key_type == 'boolean' %} checked {%
+                      else %} value="{{ knowns_keys[field.name].value }}"{%
+                      endif %}{%-
+                    endif -%} />
             </fieldset>
           {% endif %}
         {% endfor %}
