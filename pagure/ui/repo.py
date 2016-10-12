@@ -2145,9 +2145,6 @@ def update_custom_keys(repo, username=None, namespace=None):
                 SESSION, repo, custom_keys, custom_keys_type)
             SESSION.commit()
             flask.flash(msg)
-        except pagure.exceptions.PagureException as msg:
-            SESSION.rollback()
-            flask.flash(msg, 'error')
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')

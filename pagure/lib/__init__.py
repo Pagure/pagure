@@ -3148,10 +3148,6 @@ def set_custom_key_fields(session, project, fields, types):
     provided.
     """
 
-    if len(fields) != len(types):
-        raise pagure.exceptions.PagureException(
-                'Not all the custom fields have a type specified')
-
     current_keys = {}
     for key in project.issue_keys:
         current_keys[key.name] = key
@@ -3167,6 +3163,11 @@ def set_custom_key_fields(session, project, fields, types):
                 key_type=types[idx],
             )
         session.add(issuekey)
+
+    # Delete keys
+    for key in current_keys:
+        if key not in fields:
+            session.delete(current_keys[key])
 
     return 'List of custom fields updated'
 
