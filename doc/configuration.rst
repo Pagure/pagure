@@ -498,6 +498,9 @@ pagure, or for test or pre-production instances.
 
 Defaults to: ``True``.
 
+.. note::
+    This does not disable emails to the email address set in ``EMAIL_ERROR``.
+
 
 OLD_VIEW_COMMIT_ENABLED
 ~~~~~~~~~~~~~~~~~~~~~~~
