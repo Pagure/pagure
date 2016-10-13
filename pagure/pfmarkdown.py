@@ -31,8 +31,8 @@ import pagure.lib
 
 
 MENTION_RE = r'@(\w+)'
-EXPLICIT_FORK_ISSUE_RE = r'(\w+)/(\w+)#([0-9]+)'
-EXPLICIT_MAIN_ISSUE_RE = r'[^|\w](?<!\/)(\w+)#([0-9]+)'
+EXPLICIT_FORK_ISSUE_RE = r'(\w+)/([\w-]+)#([0-9]+)'
+EXPLICIT_MAIN_ISSUE_RE = r'[^|\w](?<!\/)([\w-]+)#([0-9]+)'
 IMPLICIT_ISSUE_RE = r'[^|\w](?<!\w)#([0-9]+)'
 IMPLICIT_PR_RE = r'[^|\w](?<!\w)PR#([0-9]+)'
 STRIKE_THROUGH_RE = r'~~(\w+)~~'
