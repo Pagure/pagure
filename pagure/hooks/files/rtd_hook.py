@@ -20,7 +20,7 @@ if 'PAGURE_CONFIG' not in os.environ \
 import pagure
 import pagure.exceptions
 import pagure.lib.link
-import pagure.ui.plugins
+import pagure.lib.plugins
 
 
 abspath = os.path.abspath(os.environ['GIT_DIR'])
@@ -41,7 +41,7 @@ def run_as_post_receive_hook():
         print 'Unknown repo %s of username: %s' % (reponame, username)
         sys.exit(1)
 
-    plugin = pagure.ui.plugins.get_plugin('Read the Doc')
+    plugin = pagure.lib.plugins.get_plugin('Read the Doc')
     dbobj = plugin.db_object()
     # Get the list of branches
     branches = [

@@ -18,7 +18,7 @@ if 'PAGURE_CONFIG' not in os.environ \
 import pagure
 import pagure.exceptions
 import pagure.lib.link
-import pagure.ui.plugins
+import pagure.lib.plugins
 
 
 abspath = os.path.abspath(os.environ['GIT_DIR'])
@@ -40,7 +40,7 @@ def run_as_pre_receive_hook():
             reponame, username, namespace)
         sys.exit(1)
 
-    plugin = pagure.ui.plugins.get_plugin('Block non fast-forward pushes')
+    plugin = pagure.lib.plugins.get_plugin('Block non fast-forward pushes')
     dbobj = plugin.db_object()
     # Get the list of branches
     branches = [
