@@ -3,12 +3,12 @@ Contributors to pagure
 
 Pagure would be nothing without its contributors.
 
-On Oct 12, 2016 (release 2.7.1), the list looks as follow:
+On Oct 13, 2016 (release 2.7.2), the list looks as follow:
 
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  4492              Pierre-Yves Chibon <pingou@pingoured.fr>
+  4494              Pierre-Yves Chibon <pingou@pingoured.fr>
    186              Ryan Lerch <rlerch@redhat.com>
     89              farhaanbukhsh <farhaan.bukhsh@gmail.com>
     59              Johan Cwiklinski <johan@x-tnd.be>
@@ -23,7 +23,7 @@ Number of commits  Contributor
     13              Ghost-script <subho.prp@gmail.com>
     13              Mathieu Bridon <bochecha@fedoraproject.org>
      8              Lei Yang <yltt1234512@gmail.com>
-     6              Jeremy Cline <jeremy@jcline.org>
+     7              Jeremy Cline <jeremy@jcline.org>
      5              Mike McLean <mikem@redhat.com>
      5              Oliver Gutierrez <ogutierrez@redhat.com>
      5              Paul W. Frields <stickster@gmail.com>
