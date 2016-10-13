@@ -83,7 +83,9 @@ def _clean_emails(emails, user):
     This avoids receiving emails about action you do.
     '''
     # Remove the user doing the action from the list of person to email
-    if user and user.emails:
+    # unless they actively asked for it
+    if user and user.emails \
+            and not user.settings.get('cc_me_to_my_actions', False):
         for email in user.emails:
             if email.email in emails:
                 emails.remove(email.email)
