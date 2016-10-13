@@ -1,5 +1,7 @@
 {% extends "repo_master.html" %}
 
+{% from "_render_repo.html" import pagination_link %}
+
 {% block title %}{{ select.capitalize() }} - {{
     repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 {% set tag = "home" %}
@@ -152,37 +154,8 @@
         {% endfor %}
       </div>
 
-      {% if total_page %}
-        <nav class="text-center">
-          <ul class="pagination">
-            <li {% if page <= 1%} class="disabled" {% endif %}>
-              <a href="{{ url_for('.%s' % origin,
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace,
-                    branchname=branchname,
-                    page=page-1)
-                }}" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-                <span class="sr-only">Newer</span>
-              </a>
-            </li>
-            <li class="active">page {{ page }} of {{total_page}}</li>
-            <li {% if page >= total_page %}class="disabled"{%endif%}>
-              <a href="{{ url_for('.%s' % origin,
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace,
-                    branchname=branchname,
-                    page=page+1)
-                }}" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-                <span class="sr-only">Older</span>
-              </a>
-            </li>
-          </ul>
-        </nav>
-      {% endif %}
+      {{ pagination_link('page', g.page, total_page) }}
+
     {% endif %}
     </div>
 {% endblock %}
