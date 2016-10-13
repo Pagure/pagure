@@ -112,6 +112,42 @@
         </form>
       </div>
     </div>
+
+
+  <div class="card m-b-3">
+    <div class="card-header">
+      User settings
+    </div>
+    <div class="card-block">
+      <form action="{{ url_for('update_user_settings') }}" method="post">
+        {% for key in user.settings | sort %}
+            {% if user.settings[key] in [True, False, 'y'] %}
+            <div>
+              <label class="c-input c-checkbox">
+                <input id="{{ key }}" type="checkbox" value="y" name="{{ key }}" {%
+                        if user.settings[key] -%}checked=""{%- endif -%}/>
+                <span class="c-indicator"></span>
+                Activate {{ key | replace('_', ' ') }}
+              </label>
+            </div>
+          {% else %}
+            <div class="form-inline">
+              <label for="{{ key }}">Activate {{ key | replace('_', ' ') }} :</label>
+              <input width="4em" class="form-control" id="{{ key }}" type="text" {%
+                if user.settings[key] %}value="{{ user.settings[key] }}"{%
+                endif %} name="{{ key }}" />
+            </div>
+          {% endif %}
+      {% endfor %}
+      </table>
+      <p class="p-t-2">
+          <input type="submit" class="btn btn-primary" value="Update">
+          {{ form.csrf_token }}
+        </p>
+      </form>
+    </div>
+  </div>
+
     <div class="card m-b-3">
         {% if config.get('PAGURE_AUTH')=='local' %}
             <a href="{{ url_for('change_password', username=g.fas_user.username) }}">Change password</a>

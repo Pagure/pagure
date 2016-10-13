@@ -1441,6 +1441,32 @@ def update_project_settings(session, repo, settings, user):
         return 'Edited successfully settings of repo: %s' % repo.fullname
 
 
+def update_user_settings(session, settings, user):
+    ''' Update the settings of a project. '''
+    user_obj = get_user(session, user)
+
+    update = []
+    new_settings = user_obj.settings
+    for key in new_settings:
+        if key in settings:
+            if new_settings[key] != settings[key]:
+                update.append(key)
+                new_settings[key] = settings[key]
+        else:
+            update.append(key)
+            val = False
+            new_settings[key] = val
+
+    if not update:
+        return 'No settings to change'
+    else:
+        user_obj.settings = new_settings
+        session.add(user_obj)
+        session.flush()
+
+        return 'Successfully edited your settings'
+
+
 def fork_project(session, user, repo, gitfolder,
                  docfolder, ticketfolder, requestfolder):
     ''' Fork a given project into the user's forks. '''

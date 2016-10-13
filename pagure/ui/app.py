@@ -471,6 +471,49 @@ def user_settings():
         form=form,
     )
 
+@APP.route('/settings/usersettings', methods=['POST'])
+@login_required
+def update_user_settings():
+    """ Update the user's settings set in the settings page.
+    """
+    if admin_session_timedout():
+        if flask.request.method == 'POST':
+            flask.flash('Action canceled, try it again', 'error')
+        return flask.redirect(
+            flask.url_for('auth_login', next=flask.request.url))
+
+
+    user = pagure.lib.search_user(
+        SESSION, username=flask.g.fas_user.username)
+    if not user:
+        flask.abort(404, 'User not found')
+
+    form = pagure.forms.ConfirmationForm()
+
+    if form.validate_on_submit():
+        settings = {}
+        for key in flask.request.form:
+            if key == 'csrf_token':
+                continue
+            settings[key] = flask.request.form[key]
+
+        try:
+            message = pagure.lib.update_user_settings(
+                SESSION,
+                settings=settings,
+                user=flask.g.fas_user.username,
+            )
+            SESSION.commit()
+            flask.flash(message)
+        except pagure.exceptions.PagureException as msg:
+            SESSION.rollback()
+            flask.flash(msg, 'error')
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            flask.flash(str(err), 'error')
+
+    return flask.redirect(flask.url_for('user_settings'))
+
 
 @APP.route('/markdown/', methods=['POST'])
 def markdown_preview():
