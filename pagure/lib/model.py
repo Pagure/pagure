@@ -177,6 +177,7 @@ class User(BASE):
     fullname = sa.Column(sa.String(255), nullable=False, index=True)
     public_ssh_key = sa.Column(sa.Text, nullable=True)
     default_email = sa.Column(sa.Text, nullable=False)
+    _settings = sa.Column(sa.Text, nullable=True)
 
     password = sa.Column(sa.Text, nullable=True)
     token = sa.Column(sa.String(50), nullable=True)
@@ -209,6 +210,32 @@ class User(BASE):
     def groups(self):
         ''' Return the list of Group.group_name in which the user is. '''
         return [group.group_name for group in self.group_objs]
+
+    @property
+    def settings(self):
+        """ Return the dict stored as string in the database as an actual
+        dict object.
+        """
+        default = {
+            'cc_me_to_my_actions': False,
+        }
+
+        if self._settings:
+            current = json.loads(self._settings)
+            # Update the current dict with the new keys
+            for key in default:
+                if key not in current:
+                    current[key] = default[key]
+                elif str(current[key]).lower() in ['true', 'y']:
+                    current[key] = True
+            return current
+        else:
+            return default
+
+    @settings.setter
+    def settings(self, settings):
+        ''' Ensures the settings are properly saved. '''
+        self._settings = json.dumps(settings)
 
     def __repr__(self):
         ''' Return a string representation of this object. '''
