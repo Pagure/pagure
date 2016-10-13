@@ -301,6 +301,17 @@ def view_commits(repo, branchname=None, username=None, namespace=None):
     except ValueError:
         page = 1
 
+    author = flask.request.args.get('author', None)
+    author_obj = None
+    if author:
+        try:
+            author_obj = pagure.lib.get_user(SESSION, author)
+        except:
+            pass
+        if not author_obj:
+            flask.flash(
+                'No user found for the author: %s' % author, 'error')
+
     limit = APP.config['ITEM_PER_PAGE']
     start = limit * (page - 1)
     end = limit * page
@@ -310,6 +321,19 @@ def view_commits(repo, branchname=None, username=None, namespace=None):
     if branch:
         for commit in repo_obj.walk(
                 branch.get_object().hex, pygit2.GIT_SORT_TIME):
+
+            # Filters the commits for an user
+            filters = None
+            if author_obj:
+                filters = True
+                tmp = False
+                for email in author_obj.emails:
+                    if email.email == commit.author.email:
+                        tmp = True
+                        break
+                if not tmp:
+                    continue
+
             if n_commits >= start and n_commits <= end:
                 last_commits.append(commit)
             n_commits += 1
