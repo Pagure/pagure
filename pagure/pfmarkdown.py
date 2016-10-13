@@ -32,7 +32,7 @@ import pagure.lib
 
 MENTION_RE = r'@(\w+)'
 EXPLICIT_FORK_ISSUE_RE = r'(\w+)/([\w-]+)#([0-9]+)'
-EXPLICIT_MAIN_ISSUE_RE = r'[^|\w](?<!\/)([\w-]+)#([0-9]+)'
+EXPLICIT_MAIN_ISSUE_RE = r'([\w-]+)#([0-9]+)'
 IMPLICIT_ISSUE_RE = r'[^|\w](?<!\w)#([0-9]+)'
 IMPLICIT_PR_RE = r'[^|\w](?<!\w)PR#([0-9]+)'
 STRIKE_THROUGH_RE = r'~~(\w+)~~'
@@ -74,10 +74,15 @@ class ExplicitForkIssuePattern(markdown.inlinepatterns.Pattern):
             return text
 
         issue = _issue_exists(user, repo, idx)
-        if not issue:
-            return text
+        if issue:
+            return _obj_anchor_tag(user, repo, issue, text)
 
-        return _obj_anchor_tag(user, repo, issue, text)
+
+        request = _pr_exists(user, repo, idx)
+        if request:
+            return _obj_anchor_tag(user, repo, request, text)
+
+        return text
 
 
 class ExplicitMainIssuePattern(markdown.inlinepatterns.Pattern):
@@ -87,17 +92,22 @@ class ExplicitMainIssuePattern(markdown.inlinepatterns.Pattern):
         """ When the pattern matches, update the text. """
         repo = markdown.util.AtomicString(m.group(2))
         idx = markdown.util.AtomicString(m.group(3))
-        text = ' %s#%s' % (repo, idx)
+        text = '%s#%s' % (repo, idx)
         try:
             idx = int(idx)
         except:
             return text
 
         issue = _issue_exists(None, repo, idx)
-        if not issue:
-            return text
+        if issue:
+            return _obj_anchor_tag(None, repo, issue, text)
 
-        return _obj_anchor_tag(None, repo, issue, text)
+
+        request = _pr_exists(None, repo, idx)
+        if request:
+            return _obj_anchor_tag(None, repo, request, text)
+
+        return text
 
 
 class ImplicitIssuePattern(markdown.inlinepatterns.Pattern):
