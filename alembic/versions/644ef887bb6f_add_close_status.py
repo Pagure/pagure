@@ -51,14 +51,14 @@ def upgrade():
     session.add(ticket_stat)
     session.commit()
 
-    # Remove the old status
-    op.execute('''DELETE FROM "status_issue" WHERE "status" NOT IN ('Open', 'Closed'); ''')
-
     # Set the close_status for all the closed tickets
     op.execute('''UPDATE "issues" SET "close_status"=status where status != 'Open'; ''')
 
     # Mark all the tickets as closed
     op.execute('''UPDATE "issues" SET status='Closed' where status != 'Open';  ''')
+
+    # Remove the old status
+    op.execute('''DELETE FROM "status_issue" WHERE "status" NOT IN ('Open', 'Closed'); ''')
 
 
 def downgrade():
