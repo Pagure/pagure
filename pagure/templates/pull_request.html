@@ -822,7 +822,7 @@ function cancel_edit_btn() {
       item = $(this).closest('section');
       $(item.parent().find('.issue_comment')).show();
       $(item.parent().find('.issue_actions')).show();
-      $(item.parent().closest('.pr_comment_form')).remove();
+      $(item.parent().find('.pr_comment_form')).remove();
       return false;
     }
   );
