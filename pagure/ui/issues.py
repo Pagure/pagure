@@ -503,6 +503,8 @@ def view_issues(repo, username=None, namespace=None):
             author=author,
             private=private,
             priority=priority,
+            search_pattern=search_pattern,
+            custom_search=custom_search,
             count=True
         )
         oth_issues = pagure.lib.search_issues(
