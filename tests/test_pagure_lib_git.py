@@ -620,7 +620,7 @@ index 458821a..77674a8
                 row = '+++ b/456'
             npatch.append(row)
         patch = '\n'.join(npatch)
-        print patch
+        #print patch
         self.assertEqual(patch, exp)
 
     def test_clean_git(self):
