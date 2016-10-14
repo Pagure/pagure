@@ -1439,6 +1439,8 @@ class PagureFlaskRepotests(tests.Modeltests):
             ncommits=1, filename='Šource')
         output = self.app.get('/test/blob/master/f/Šource')
         self.assertEqual(output.status_code, 200)
+        self.assertEqual(output.headers['Content-Type'].lower(),
+                         'text/html; charset=utf-8')
         self.assertIn('</span>&nbsp; Šource', output.data)
         self.assertIn('<table class="code_table">', output.data)
         self.assertIn(
@@ -1503,6 +1505,8 @@ class PagureFlaskRepotests(tests.Modeltests):
         # View first commit
         output = self.app.get('/test/raw/master')
         self.assertEqual(output.status_code, 200)
+        self.assertEqual(output.headers['Content-Type'].lower(),
+                         'text/plain; charset=ascii')
         self.assertTrue(':Author: Pierre-Yves Chibon' in output.data)
 
         # Add some more content to the repo
@@ -1517,6 +1521,8 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         # View in a branch
         output = self.app.get('/test/raw/master/f/sources')
+        self.assertEqual(output.headers['Content-Type'].lower(),
+                         'text/plain; charset=ascii')
         self.assertEqual(output.status_code, 200)
         self.assertTrue('foo\n bar' in output.data)
 
@@ -1541,6 +1547,8 @@ class PagureFlaskRepotests(tests.Modeltests):
         # View binary file
         output = self.app.get('/test/raw/sources/f/test_binary')
         self.assertEqual(output.status_code, 200)
+        self.assertEqual(output.headers['Content-Type'].lower(),
+                         'application/octet-stream')
         self.assertTrue(output.data.startswith('\x00\x00\x01\x00'))
 
         # View folder
@@ -1558,6 +1566,8 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         output = self.app.get('/test/raw/master')
         self.assertEqual(output.status_code, 200)
+        self.assertEqual(output.headers['Content-Type'].lower(),
+                         'text/plain; charset=ascii')
         self.assertTrue(output.data.startswith(
             'diff --git a/test_binary b/test_binary\n'))
 
@@ -1588,6 +1598,8 @@ class PagureFlaskRepotests(tests.Modeltests):
 
         output = self.app.get('/fork/pingou/test3/raw/master/f/sources')
         self.assertEqual(output.status_code, 200)
+        self.assertEqual(output.headers['Content-Type'].lower(),
+                         'text/plain; charset=ascii')
         self.assertTrue('foo\n bar' in output.data)
 
     def test_view_commit(self):

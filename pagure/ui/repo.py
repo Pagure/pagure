@@ -547,8 +547,6 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
         output_type = 'tree'
 
     headers = {}
-    if encoding:
-        headers['Content-Encoding'] = encoding
 
     return (
         flask.render_template(
@@ -652,9 +650,9 @@ def view_raw_file(
     if mimetype.startswith('text/') and not encoding:
         encoding = chardet.detect(ktc.to_bytes(data))['encoding']
 
-    headers['Content-Type'] = mimetype
     if encoding:
-        headers['Content-Encoding'] = encoding
+        mimetype += '; charset={encoding}'.format(encoding=encoding)
+    headers['Content-Type'] = mimetype
 
     return (data, 200, headers)
 
