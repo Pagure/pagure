@@ -15,7 +15,7 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    ''' Add the column notifications to the table users.
+    ''' Add the column _settings to the table users.
     '''
     op.add_column(
         'users',
@@ -24,6 +24,6 @@ def upgrade():
 
 
 def downgrade():
-    ''' Add the column notifications to the table users.
+    ''' Add the column _settings to the table users.
     '''
     op.drop_column('users', '_settings')

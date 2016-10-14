@@ -1454,8 +1454,7 @@ def update_user_settings(session, settings, user):
                 new_settings[key] = settings[key]
         else:
             update.append(key)
-            val = False
-            new_settings[key] = val
+            new_settings[key] = False
 
     if not update:
         return 'No settings to change'

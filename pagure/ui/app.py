@@ -482,7 +482,6 @@ def update_user_settings():
         return flask.redirect(
             flask.url_for('auth_login', next=flask.request.url))
 
-
     user = pagure.lib.search_user(
         SESSION, username=flask.g.fas_user.username)
     if not user:
