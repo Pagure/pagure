@@ -728,6 +728,7 @@ class Issue(BASE):
             'title': self.title,
             'content': self.content,
             'status': self.status,
+            'close_status': self.close_status,
             'date_created': self.date_created.strftime('%s'),
             'closed_at': self.closed_at.strftime(
                 '%s') if self.closed_at else None,

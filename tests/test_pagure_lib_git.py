@@ -476,10 +476,11 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,25 @@
+@@ -0,0 +1,26 @@
 +{
 +    "assignee": null,
 +    "blocks": [],
++    "close_status": null,
 +    "closed_at": null,
 +    "comments": [],
 +    "content": "We should work on this",
@@ -561,9 +562,9 @@ diff --git a/123 b/456
 index 458821a..77674a8
 --- a/123
 +++ b/456
-@@ -2,7 +2,25 @@
-     "assignee": null,
+@@ -3,7 +3,25 @@
      "blocks": [],
+     "close_status": null,
      "closed_at": null,
 -    "comments": [],
 +    "comments": [
@@ -619,7 +620,7 @@ index 458821a..77674a8
                 row = '+++ b/456'
             npatch.append(row)
         patch = '\n'.join(npatch)
-        #print patch
+        print patch
         self.assertEqual(patch, exp)
 
     def test_clean_git(self):
