@@ -24,6 +24,6 @@ def upgrade():
 
 
 def downgrade():
-    ''' Add the column _settings to the table users.
+    ''' Drop the column _settings to the table users.
     '''
     op.drop_column('users', '_settings')
