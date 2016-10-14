@@ -573,7 +573,7 @@ source.addEventListener('message', function(e) {
             issueid='-123456789')}}';
   process_event(data, "{{ issue.uid }}", _issue_url,
                 _issues_url, _api_issues_url,
-                "{{ g.fas_user.username }}");
+                "{{ g.fas_user.username if authenticated or '' }}");
   setup_edit_btns();
   setup_reply_btns();
 

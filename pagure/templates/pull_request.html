@@ -1345,7 +1345,10 @@ window.onbeforeunload = function() {
 source.addEventListener('message', function(e) {
   console.log(e.data);
   var data = $.parseJSON(e.data);
-  process_event(data, "{{ request.uid }}", "{{ g.fas_user.username }}");
+  process_event(
+    data,
+    "{{ request.uid }}",
+    "{{ g.fas_user.username if authenticated or '' }}");
   setup_edit_btns();
   setup_reply_btns();
   }, false);
