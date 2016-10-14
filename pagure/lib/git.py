@@ -449,6 +449,7 @@ def update_ticket_from_git(
             issue_uid=issue_uid,
             private=json_data.get('private'),
             status=json_data.get('status'),
+            close_status=json_data.get('close_status'),
             date_created=datetime.datetime.utcfromtimestamp(
                 float(json_data.get('date_created'))),
             notify=False,
@@ -464,6 +465,7 @@ def update_ticket_from_git(
             title=json_data.get('title'),
             content=json_data.get('content'),
             status=json_data.get('status'),
+            close_status=json_data.get('close_status'),
             private=json_data.get('private'),
         )
     session.commit()
