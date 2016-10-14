@@ -1944,7 +1944,7 @@ def search_issues(
 
     if search_pattern is not None:
         query = query.filter(
-            model.Issue.title.like('%' + str(search_pattern) + '%')
+            model.Issue.title.ilike('%' + str(search_pattern) + '%')
         )
 
     query = query.order_by(
