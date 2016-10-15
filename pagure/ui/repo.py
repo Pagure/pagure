@@ -890,7 +890,7 @@ def new_release(repo, username=None, namespace=None):
                     APP.config['UPLOAD_FOLDER_PATH'],
                     repo.fullname)
                 if not os.path.exists(folder):
-                    os.mkdir(folder)
+                    os.makedirs(folder)
                 filestream.save(os.path.join(folder, filename))
                 flask.flash('File "%s" uploaded' % filename)
             except Exception as err:  # pragma: no cover
