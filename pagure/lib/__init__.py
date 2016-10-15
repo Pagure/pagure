@@ -2931,6 +2931,7 @@ def clean_input(text, ignore=None):
         ignore = [ignore]
 
     attrs = bleach.ALLOWED_ATTRIBUTES
+    attrs['table'] = ['class']
     if not ignore or not 'img' in ignore:
         attrs['img'] = filter_img_src
 
