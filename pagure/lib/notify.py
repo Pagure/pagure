@@ -170,7 +170,7 @@ def _build_url(*args):
 
 def send_email(text, subject, to_mail,
                mail_id=None, in_reply_to=None,
-               project_name=None):  # pragma: no cover
+               project_name=None, user_from=None):  # pragma: no cover
     ''' Send an email with the specified information.
 
     :arg text: the content of the email to send
@@ -186,8 +186,14 @@ def send_email(text, subject, to_mail,
     if not to_mail:
         return
 
+    from_email = pagure.APP.config.get(
+        'FROM_EMAIL', 'pagure@fedoraproject.org')
+    if user_from:
+        from_email = '%s <%s>' % (user_from, from_email)
+
     if not pagure.APP.config.get('EMAIL_SEND', True):
         print '******EMAIL******'
+        print 'From: %s' % from_email
         print 'To: %s' % to_mail
         print 'Subject: %s' % subject
         print 'in_reply_to: %s' % in_reply_to
@@ -212,8 +218,6 @@ def send_email(text, subject, to_mail,
     for mailto in to_mail.split(','):
         msg = MIMEText(text.encode('utf-8'), 'plain', 'utf-8')
         msg['Subject'] = '[%s] %s' % (subject_tag, subject)
-        from_email = pagure.APP.config.get(
-            'FROM_EMAIL', 'pagure@fedoraproject.org')
         msg['From'] = from_email
 
         if mail_id:
@@ -289,6 +293,7 @@ def notify_new_comment(comment, user=None):
         mail_id=comment.mail_id,
         in_reply_to=comment.issue.mail_id,
         project_name=comment.issue.project.name,
+        user_from=comment.user.fullname or comment.user.user,
     )
 
 
@@ -323,6 +328,7 @@ def notify_new_issue(issue, user=None):
         ','.join(mail_to),
         mail_id=issue.mail_id,
         project_name=issue.project.name,
+        user_from=issue.user.fullname or issue.user.user,
     )
 
 
@@ -359,6 +365,7 @@ The issue: `%s` of project: `%s` has been %s by %s.
         mail_id='%s/assigned/%s' % (issue.mail_id, uid),
         in_reply_to=issue.mail_id,
         project_name=issue.project.name,
+        user_from=user.fullname or user.user,
     )
 
 
@@ -395,6 +402,7 @@ The pull-request: `%s` of project: `%s` has been %s by %s.
         mail_id='%s/assigned/%s' % (request.mail_id, uid),
         in_reply_to=request.mail_id,
         project_name=request.project.name,
+        user_from=user.fullname or user.user,
     )
 
 
@@ -427,6 +435,7 @@ def notify_new_pull_request(request):
         ','.join(mail_to),
         mail_id=request.mail_id,
         project_name=request.project.name,
+        user_from=request.user.fullname or request.user.user,
     )
 
 
@@ -462,6 +471,7 @@ Merged pull-request:
         mail_id='%s/close/%s' % (request.mail_id, uid),
         in_reply_to=request.mail_id,
         project_name=request.project.name,
+        user_from=user.fullname or user.user,
     )
 
 
@@ -497,6 +507,7 @@ Cancelled pull-request:
         mail_id='%s/close/%s' % (request.mail_id, uid),
         in_reply_to=request.mail_id,
         project_name=request.project.name,
+        user_from=user.fullname or user.user,
     )
 
 
@@ -532,6 +543,7 @@ def notify_pull_request_comment(comment, user):
         mail_id=comment.mail_id,
         in_reply_to=comment.pull_request.mail_id,
         project_name=comment.pull_request.project.name,
+        user_from=comment.user.fullname or comment.user.user,
     )
 
 
@@ -564,4 +576,5 @@ Your pagure admin.
         text,
         'Confirm new email',
         email.email,
+        user_from=user.fullname or user.user,
     )
