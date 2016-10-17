@@ -340,19 +340,13 @@ def author_to_user(author, size=16, cssclass=None):
         return output
     user = pagure.lib.search_user(SESSION, email=author.email)
     if user:
-        if cssclass:
-            output = "%s <a href='%s' class='%s'>%s</a>" % (
-                avatar(user.default_email, size),
-                flask.url_for('view_user', username=user.username),
-                cssclass,
-                author.name,
-            )
-        else:
-            output = "%s <a href='%s'>%s</a>" % (
-                avatar(user.default_email, size),
-                flask.url_for('view_user', username=user.username),
-                author.name,
-            )
+        output = "%s <a href='%s' %s>%s</a>" % (
+            avatar(user.default_email, size),
+            flask.url_for('view_user', username=user.username),
+            ('class="%s"' % cssclass) if cssclass else '',
+            author.name,
+        )
+
     return output
 
 
