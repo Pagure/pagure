@@ -1113,13 +1113,24 @@ $('#assignee').selectize({
     }
   );
 
+function set_ui_for_comment(setting){
+  console.log(setting)
+  if (setting == false) {
+    $(document.body).find('input[type="submit"]').removeAttr("disabled");
+    document.body.style.cursor = 'default';
+  } else {
+    $(document.body).find('input[type="submit"]').attr("disabled", "disabled");
+    document.body.style.cursor = 'wait';
+  }
+}
+
 function try_async_comment(form, inline) {
-  $(form).off('submit');
-  $(form).find('input[type="submit"]').attr("disabled", "disabled");
+  set_ui_for_comment(true);
   var _data = $(form).serialize();
   var btn = $(document.activeElement);
   if (btn[0].name == 'drop_comment'){
     _data += '&drop_comment=' + btn[0].value;
+    set_ui_for_comment(false);
     return true;
   }
   if (!sse) {
@@ -1148,6 +1159,7 @@ function try_async_comment(form, inline) {
           $(item.parent().children()[1]).show()
         }
         item.remove();
+        set_ui_for_comment(false);
       } else {
         // Make the browser submit the form sync
         form.submit();
@@ -1157,8 +1169,6 @@ function try_async_comment(form, inline) {
       // Make the browser submit the form sync
       form.submit();
     })
-  $(form).on('submit');
-  $(form).find('input[type="submit"]').removeAttr("disabled");
   return false;
 };
 {% endif %}
