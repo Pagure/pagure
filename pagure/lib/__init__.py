@@ -2606,7 +2606,10 @@ def search_groups(session, pattern=None, group_name=None, group_type=None):
     if pattern:
         pattern = pattern.replace('*', '%')
         query = query.filter(
-            model.PagureGroup.group_name.like(pattern)
+            sqlalchemy.or_(
+                model.PagureGroup.group_name.ilike(pattern),
+                model.PagureGroup.display_name.ilike(pattern)
+            )
         )
 
     if group_name:
