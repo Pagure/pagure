@@ -24,7 +24,6 @@ import pygit2
 import werkzeug.datastructures
 from sqlalchemy.exc import SQLAlchemyError
 
-import chardet
 import kitchen.text.converters as ktc
 import mimetypes
 
@@ -1104,7 +1103,7 @@ def view_issue_raw_file(
         headers['Content-Disposition'] = 'attachment'
 
     if mimetype.startswith('text/') and not encoding:
-        encoding = chardet.detect(ktc.to_bytes(data))['encoding']
+        encoding = pagure.lib.guess_encoding(ktc.to_bytes(data))
 
     if encoding:
         mimetype += '; charset={encoding}'.format(encoding=encoding)

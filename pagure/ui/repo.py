@@ -37,7 +37,6 @@ from pygments.util import ClassNotFound
 from sqlalchemy.exc import SQLAlchemyError
 
 import mimetypes
-import chardet
 
 from binaryornot.helpers import is_binary_string
 
@@ -50,6 +49,7 @@ import pagure
 import pagure.ui.plugins
 from pagure import (APP, SESSION, LOG, __get_file_in_tree, login_required,
                     admin_session_timedout)
+from pagure.lib import encoding_utils
 
 
 @APP.route('/<repo>.git')
@@ -512,8 +512,7 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
             content, safe = pagure.doc_utils.convert_readme(content.data, ext)
             output_type = 'markup'
         elif not is_binary_string(content.data):
-            encoding = chardet.detect(ktc.to_bytes(content.data))['encoding']
-            file_content = content.data
+            file_content = encoding_utils.decode(ktc.to_bytes(content.data))
             try:
                 lexer = guess_lexer_for_filename(
                     filename,
@@ -648,7 +647,7 @@ def view_raw_file(
         headers['Content-Disposition'] = 'attachment'
 
     if mimetype.startswith('text/') and not encoding:
-        encoding = chardet.detect(ktc.to_bytes(data))['encoding']
+        encoding = encoding_utils.guess_encoding(ktc.to_bytes(data))
 
     if encoding:
         mimetype += '; charset={encoding}'.format(encoding=encoding)
