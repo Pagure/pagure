@@ -121,12 +121,7 @@
 
       <div class="list-group m-t-1">
         {% for commit in last_commits %}
-          <a href="{{ url_for('view_commit',
-                repo=repo.name,
-                username=username,
-                namespace=repo.namespace,
-                commitid=commit.hex, branch=branchname) }}"
-              class="list-group-item {%
+          <div class="list-group-item {%
                 if diff_commits and commit.oid.hex in diff_commits %}p-l-3{%
                 endif %}" style="position:relative;">
             {% if diff_commits and commit.oid.hex in diff_commits %}
@@ -138,19 +133,25 @@
               </div>
             {% endif %}
             <h5>
-              <strong>{{ commit.message.split('\n')[0] }}</strong>
-              <div class="pull-xs-right">
-                <span class="commitdate"
-                      title="{{ commit.commit_time|format_ts }}">
-                  {{ commit.commit_time|humanize }}
-                </span>
-              </div>
+              <a href="{{ url_for('view_commit',
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace,
+                    commitid=commit.hex, branch=branchname) }}">
+                <strong>{{ commit.message.split('\n')[0] }}</strong>
+                <div class="pull-xs-right">
+                  <span class="commitdate"
+                        title="{{ commit.commit_time|format_ts }}">
+                    {{ commit.commit_time|humanize }}
+                  </span>
+                </div>
+              </a>
             </h5>
-            {{ commit.author | author2avatar(20) | safe }} {{ commit.author.name }}
+              {{commit.author|author2user(cssclass="notblue")|safe}}
             <div class="pull-xs-right">
               <span class="label label-default">{{ commit.hex|short }}</span>
             </div>
-          </a>
+          </div>
         {% endfor %}
       </div>
 

@@ -406,6 +406,10 @@ a.notblue {
     text-decoration:none;
 }
 
+a.notblue:hover {
+    color: #888;
+}
+
 #headerSearch .selectize-control.single .selectize-input::after
 {
   content: "\e08f";

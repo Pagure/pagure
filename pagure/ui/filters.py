@@ -331,7 +331,7 @@ def patch_to_diff(patch):
 
 
 @APP.template_filter('author2user')
-def author_to_user(author, size=16):
+def author_to_user(author, size=16, cssclass=None):
     """ Template filter transforming a pygit2 Author object into a text
     either with just the username or linking to the user in pagure.
     """
@@ -340,11 +340,19 @@ def author_to_user(author, size=16):
         return output
     user = pagure.lib.search_user(SESSION, email=author.email)
     if user:
-        output = "%s <a href='%s'>%s</a>" % (
-            avatar(user.default_email, size),
-            flask.url_for('view_user', username=user.username),
-            author.name,
-        )
+        if cssclass:
+            output = "%s <a href='%s' class='%s'>%s</a>" % (
+                avatar(user.default_email, size),
+                flask.url_for('view_user', username=user.username),
+                cssclass,
+                author.name,
+            )
+        else:
+            output = "%s <a href='%s'>%s</a>" % (
+                avatar(user.default_email, size),
+                flask.url_for('view_user', username=user.username),
+                author.name,
+            )
     return output
 
 
