@@ -26,7 +26,7 @@ Get it running
 
 * Install the needed system libraries::
 
-    sudo dnf install git python-virtualenv libgit2-devel \
+    sudo dnf install git python2-virtualenv libgit2-devel \
                      libjpeg-devel gcc libffi-devel redhat-rpm-config
 
   .. note:: Do note the version of libgit2 that you install, for example
