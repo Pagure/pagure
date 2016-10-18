@@ -1,0 +1,13 @@
+[Unit]
+Description=Pagure EventSource server (Allowing live refresh of the pages supporting it)
+After=redis.target
+Documentation=https://pagure.io/pagure
+
+[Service]
+Environment="PAGURE_CONFIG=/home/vagrant/pagure.cfg"
+ExecStart=/home/vagrant/.virtualenvs/python2-pagure/bin/python \
+          /home/vagrant/devel/ev-server/pagure-stream-server.py
+Type=simple
+
+[Install]
+WantedBy=multi-user.target

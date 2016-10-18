@@ -157,3 +157,6 @@
   with_items:
     - pagure.service
     - pagure-docs.service
+    - pagure_ci.service
+    - pagure_ev.service
+    - pagure_webhook.service

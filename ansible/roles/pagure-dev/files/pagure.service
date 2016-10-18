@@ -3,7 +3,8 @@ Description=The Pagure web service
 After=network.target
 
 [Service]
-ExecStart=/home/vagrant/.virtualenvs/python2-pagure/bin/python %h/devel/runserver.py -c %h/pagure.cfg --host 0.0.0.0
+Environment="PAGURE_CONFIG=/home/vagrant/pagure.cfg"
+ExecStart=/home/vagrant/.virtualenvs/python2-pagure/bin/python %h/devel/runserver.py --host 0.0.0.0
 Type=simple
 
 [Install]

@@ -1,11 +1,12 @@
 [Unit]
-Description=Runs the Pagure documentation server
-After=network.target
+Description=Pagure Continuous Integration service
+After=redis.target
+Documentation=https://pagure.io/pagure
 
 [Service]
 Environment="PAGURE_CONFIG=/home/vagrant/pagure.cfg"
 ExecStart=/home/vagrant/.virtualenvs/python2-pagure/bin/python \
-          /home/vagrant/devel/rundocserver.py --host 0.0.0.0
+          /home/vagrant/devel/pagure-ci/pagure_ci_server.py
 Type=simple
 
 [Install]

@@ -15,13 +15,21 @@ fi
 export PAGURE_CONFIG=~/pagure.cfg
 
 pstart (){
-    systemctl --user start pagure.service
+    systemctl --user start pagure.service pagure-docs.service pagure_ci.service\
+        pagure_ev.service pagure_webhook.service
 }
 
 pstop (){
-    systemctl --user stop pagure.service
+    systemctl --user stop pagure.service pagure-docs.service pagure_ci.service\
+        pagure_ev.service pagure_webhook.service
 }
 
 prestart (){
-    systemctl --user restart pagure.service
+    systemctl --user restart pagure.service pagure-docs.service pagure_ci.service\
+        pagure_ev.service pagure_webhook.service
+}
+
+pstatus (){
+    systemctl --user restart pagure.service pagure-docs.service pagure_ci.service\
+        pagure_ev.service pagure_webhook.service
 }
