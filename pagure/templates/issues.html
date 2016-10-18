@@ -132,7 +132,9 @@
                     repo=repo.name ) }}" method="GET">
         <div class="input-group">
           <input type="hidden" name="status" value="{{ status }}" />
-          <input type="hidden" name="tags" value="{{ tags }}" />
+          {% for tag in tags %}
+          <input type="hidden" name="tags" value="{{ tag }}" />
+          {% endfor %}
            <input type="text" class="form-control input-sm"
                   name="search_pattern" placeholder="Search"
                   value="{{ search_pattern or '' }}" />
