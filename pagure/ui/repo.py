@@ -369,7 +369,7 @@ def view_commits(repo, branchname=None, username=None, namespace=None):
                     pygit2.GIT_SORT_TIME)
             ]
 
-        if branch:
+        if head and branch:
             repo_commit = repo_obj[branch.get_object().hex]
 
             for commit in repo_obj.walk(

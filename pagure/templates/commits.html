@@ -57,7 +57,7 @@
   </div>
   </div>
 
-    {% if diff_commits|count > 0 %}
+    {% if diff_commits|count > 0 and head %}
     <div class="alert alert-info" role="alert">
       This branch contains <a href="#" id="diff_commits_link">
       {{ diff_commits|count }} commits</a> not in
@@ -75,7 +75,7 @@
         {{head}}
       </span>
 
-      {% if diff_commits and authenticated and
+      {% if diff_commits and authenticated and head and
         (repo.is_fork or repo.settings.get('pull_requests', True)) %}
           <div id="request_pull" class="pull-xs-right">
             <a class="btn btn-primary btn-sm"
