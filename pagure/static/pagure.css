@@ -407,7 +407,8 @@ a.notblue {
 }
 
 a.notblue:hover {
-    color: #888;
+    color: #444;
+    text-decoration:underline;
 }
 
 #headerSearch .selectize-control.single .selectize-input::after
