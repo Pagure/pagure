@@ -67,6 +67,7 @@
           repo=repo.name,
           username=username,
           namespace=repo.namespace,
+          search_pattern=search_pattern,
           tags=tags, author=author,
           assignee=assignee) }}">Open</a>
       <a class="btn {%
@@ -76,6 +77,7 @@
           repo=repo.name,
           username=username,
           namespace=repo.namespace,
+          search_pattern=search_pattern,
           tags=tags, author=author, status='Closed',
           assignee=assignee) }}">Closed</a>
       <a class="btn {%
@@ -85,6 +87,7 @@
           repo=repo.name,
           username=username,
           namespace=repo.namespace,
+          search_pattern=search_pattern,
           tags=tags, author=author, status='all',
           assignee=assignee) }}">All</a>
   </span>
@@ -97,6 +100,7 @@
             href="{{ url_for('view_issues',
                 repo=repo.name,
                 username=username,
+                search_pattern=search_pattern,
                 namespace=repo.namespace,
                 status='Closed') }}" title="Filter issues by tag">
          {% else %}
@@ -104,6 +108,7 @@
             href="{{ url_for('view_issues',
                 repo=repo.name,
                 username=username,
+                search_pattern=search_pattern,
                 namespace=repo.namespace) }}"
                 title="Filter issues by tag">
          {% endif %}
@@ -114,6 +119,7 @@
                 username=username,
                 namespace=repo.namespace,
                 tags=tag.tag,
+                search_pattern=search_pattern,
                 author=author, assignee=assignee, status=status) }}"
                 title="Filter issues by tag">
       {% endif %}
@@ -125,6 +131,8 @@
      <form action="{{ url_for('view_issues', username=username,
                     repo=repo.name ) }}" method="GET">
         <div class="input-group">
+          <input type="hidden" name="status" value="{{ status }}" />
+          <input type="hidden" name="tags" value="{{ tags }}" />
            <input type="text" class="form-control input-sm"
                   name="search_pattern" placeholder="Search"
                   value="{{ search_pattern or '' }}" />
