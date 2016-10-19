@@ -59,11 +59,16 @@ Manually
 
 * Install the needed system libraries::
 
-    sudo dnf install git python-virtualenv libgit2-devel \
+    sudo dnf install git python2-virtualenv libgit2-devel \
                      libjpeg-devel gcc libffi-devel redhat-rpm-config
 
   .. note:: Do note the version of libgit2 that you install, for example
             in ``libgit2-0.23.4-1`` you need to keep in mind the ``0.23``
+
+
+  .. note:: On Fedora 23 and earlier or on RHEL and derivative (CentOS,
+            Scientific Linux) the package `python2-virtualenv` is named
+            `python-virtualenv`
 
 * Retrieve the sources::
 
