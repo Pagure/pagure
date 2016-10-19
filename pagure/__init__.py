@@ -165,7 +165,7 @@ SESSION = pagure.lib.create_session(APP.config['DB_URL'])
 REDIS = None
 if APP.config['EVENTSOURCE_SOURCE'] \
         or APP.config['WEBHOOK'] \
-        or APP.config['PAGURE_CI_SERVICES']:
+        or APP.config.get('PAGURE_CI_SERVICES'):
     pagure.lib.set_redis(
         host=APP.config['REDIS_HOST'],
         port=APP.config['REDIS_PORT'],
@@ -173,7 +173,7 @@ if APP.config['EVENTSOURCE_SOURCE'] \
     )
 
 
-if APP.config['PAGURE_CI_SERVICES']:
+if APP.config.get('PAGURE_CI_SERVICES'):
     pagure.lib.set_pagure_ci(APP.config['PAGURE_CI_SERVICES'])
 
 
