@@ -2930,7 +2930,7 @@ def clean_input(text, ignore=None):
     if ignore and not isinstance(ignore, (tuple, set, list)):
         ignore = [ignore]
 
-    attrs = bleach.ALLOWED_ATTRIBUTES
+    attrs = bleach.ALLOWED_ATTRIBUTES.copy()
     attrs['table'] = ['class']
     if not ignore or not 'img' in ignore:
         attrs['img'] = filter_img_src
