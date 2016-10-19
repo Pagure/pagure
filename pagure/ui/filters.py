@@ -359,6 +359,26 @@ def author_to_avatar(author, size=32):
     return avatar(output.encode('utf-8'), size)
 
 
+@APP.template_filter('author2user_commits')
+def author_to_user_commits(author, link, size=16, cssclass=None):
+    """ Template filter transforming a pygit2 Author object into a text
+    either with just the username or linking to the user in pagure.
+    """
+    output = author.name
+    if not author.email:
+        return output
+    user = pagure.lib.search_user(SESSION, email=author.email)
+    if user:
+        output = "<a href='%s'>%s</a> <a href='%s' %s>%s</a>" % (
+            flask.url_for('view_user', username=user.username),
+            avatar(user.default_email, size),
+            link,
+            ('class="%s"' % cssclass) if cssclass else '',
+            author.name,
+        )
+
+    return output
+
 @APP.template_filter('InsertDiv')
 def insert_div(content):
     """ Template filter inserting an opening <div> and closing </div>

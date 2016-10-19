@@ -148,7 +148,14 @@
                 </div>
               </a>
             </h5>
-              {{commit.author|author2user(cssclass="notblue")|safe}}
+              {{commit.author|author2user_commits(
+                link=url_for('view_commits',
+                    repo=repo.name,
+                    branchname=branchname,
+                    username=username,
+                    namespace=repo.namespace,
+                    author=commit.author.email),
+                cssclass="notblue")|safe}}
             <div class="pull-xs-right">
               <span class="label label-default">{{ commit.hex|short }}</span>
             </div>
