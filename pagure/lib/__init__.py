@@ -2893,7 +2893,10 @@ def text2markdown(text, extended=True):
     """
     extensions = [
         'markdown.extensions.extra',
+        'markdown.extensions.admonition',
+        'markdown.extensions.codehilite',
         'markdown.extensions.nl2br',
+        'markdown.extensions.sane_lists',
         'markdown.extensions.toc',
     ]
     if extended:
@@ -2941,6 +2944,8 @@ def clean_input(text, ignore=None):
 
     attrs = bleach.ALLOWED_ATTRIBUTES.copy()
     attrs['table'] = ['class']
+    attrs['span'] = ['class', 'id']
+    attrs['div'] = ['class']
     if not ignore or not 'img' in ignore:
         attrs['img'] = filter_img_src
 
