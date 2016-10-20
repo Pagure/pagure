@@ -197,7 +197,7 @@ class PagureFlaskNoMasterBranchtests(tests.Modeltests):
         self.assertNotIn(
             '<div class="list-group m-t-1">\n      </div>', output.data)
         self.assertEqual(
-            output.data.count('class="list-group-item p-l-3"'), 2)
+            output.data.count('class="list-group-item"'), 2)
 
     @patch('pagure.lib.notify.send_email')
     def test_view_file(self, send_email):
