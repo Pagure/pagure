@@ -2891,10 +2891,19 @@ def add_token_to_user(session, project, acls, username):
 def text2markdown(text, extended=True):
     """ Simple text to html converter using the markdown library.
     """
-    md_processor = markdown.Markdown(safe_mode="escape")
+    extensions = [
+        'markdown.extensions.extra',
+        'markdown.extensions.nl2br',
+        'markdown.extensions.toc',
+    ]
     if extended:
         # Install our markdown modifications
-        md_processor = markdown.Markdown(extensions=['pagure.pfmarkdown'])
+        extensions.append('pagure.pfmarkdown')
+
+    md_processor = markdown.Markdown(
+        safe_mode="escape",
+        extensions=extensions,
+    )
 
     if text:
         # Hack to allow blockquotes to be marked by ~~~
@@ -2937,9 +2946,9 @@ def clean_input(text, ignore=None):
 
     tags = bleach.ALLOWED_TAGS + [
         'p', 'br', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-        'table', 'td', 'tr', 'th',
-        'col', 'tbody', 'pre', 'img', 'hr', 'dl', 'dt', 'dd', 'span',
-        'kbd', 'var', 'del',
+        'table', 'td', 'tr', 'th', 'thead','tbody',
+        'col', 'pre', 'img', 'hr', 'dl', 'dt', 'dd', 'span',
+        'kbd', 'var', 'del', 'cite',
     ]
     if ignore:
         for tag in ignore:
