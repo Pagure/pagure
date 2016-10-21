@@ -71,6 +71,10 @@ def detect_encodings(data):
     :return: A dictionary mapping possible encodings to confidence levels
     :rtype:  dict
     """
+    if not data:
+        # It's an empty string so we can safely say it's ascii
+        return {'ascii': 1.0}
+
     # We can't use ``chardet.detect`` because we want to dig in the internals
     # of the detector to bias the utf-8 result.
     detector = universaldetector.UniversalDetector()

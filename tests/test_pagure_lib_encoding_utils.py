@@ -29,6 +29,13 @@ class TestGuessEncoding(unittest.TestCase):
         self.assertEqual(result, 'utf-8')
         self.assertEqual(chardet_result['encoding'], 'ISO-8859-2')
 
+    def test_guess_encoding_no_data(self):
+        result = encoding_utils.guess_encoding(u''.encode('utf-8'))
+        self.assertEqual(result, 'ascii')
+
+
+class TestDecode(unittest.TestCase):
+
     def test_decode(self):
         data = u'Šabata'
         self.assertEqual(data, encoding_utils.decode(data.encode('utf-8')))
