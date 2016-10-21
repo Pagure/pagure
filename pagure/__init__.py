@@ -405,6 +405,10 @@ def set_variables():
     if repo:
         flask.g.repo = pagure.lib.get_project(
             SESSION, repo, user=username, namespace=namespace)
+        if authenticated():
+            flask.g.repo_forked = pagure.lib.get_project(
+                SESSION, repo, user=flask.g.fas_user.username,
+                namespace=namespace)
 
         if not flask.g.repo \
             and APP.config.get('OLD_VIEW_COMMIT_ENABLED', False) \

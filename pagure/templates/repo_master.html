@@ -35,6 +35,16 @@
           {% endif %}
           <div class="btn-group">
           {% if not repo.is_fork %}
+            {% if g.repo_forked %}
+              <a href="{{ url_for(
+                '.view_repo',
+                repo=repo.name,
+                username=g.fas_user.username,
+                namespace=repo.namespace) }}" class="btn btn-sm btn-secondary">
+
+              <span class="oi" data-glyph="fork"></span> View Fork
+              </a>
+            {% else %}
             <form method="POST" name="fork_project" id="fork_project"
               action="{{ url_for(
                 '.fork_project',
@@ -43,11 +53,6 @@
                 namespace=repo.namespace) }}">
               {{ forkbuttonform.csrf_token }}
             </form>
-            {% if repo and repo.forks %}
-              <button class="btn btn-sm btn-secondary"
-              onclick="$('#fork_project').submit();">
-              <span class="oi" data-glyph="fork"></span>View Fork</button>
-            {% else %}
               <button class="btn btn-sm btn-secondary"
               onclick="$('#fork_project').submit();">
               <span class="oi" data-glyph="fork"></span>Fork</button>
