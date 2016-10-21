@@ -1,6 +1,17 @@
 Upgrading Pagure
 ================
 
+
+From 2.7 to 2.8
+---------------
+
+2.8 brings a little change to the database scheme.
+
+Therefore when upgrading to from 2.7 to 2.8, you will have to:
+
+* Update the database schame using alembic: ``alembic upgrade head``
+
+
 From 2.6 to 2.7
 ---------------
 

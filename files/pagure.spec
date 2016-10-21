@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            2.7.2
+Version:            2.8
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -298,6 +298,40 @@ install -m 644 pagure-ci/pagure_ci.service \
 
 
 %changelog
+* Fri Oct 21 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.8-1
+- Update to 2.8
+- Fix the migration adding the close_status field to remove the old status
+  only at the end
+- Fix the RTD and Force push hooks for the change in location of the plugins
+- Fix creating new PR from the page listing the pull-requests
+- Add the possibility for the user to edit their settings in their settings page
+- Include the close_status in the JSON representation of an issue
+- Load the close_status if there is one set in the JSON repsentation given
+- Fix running the tests when EVENTSOURCE_SOURCE is defined in the
+  configuration.
+- Make the search case-insensitive when searching issues
+- Fix the "cancel" button when editing a "regular" comment on a pull-request
+- Remove the ``Content-Encoding`` headers from responses (Jeremy Cline)
+- Fix creating the release folder for project with a namespace
+- When sending email, make the user who made the action be in the From field
+- When searching groups, search both their name and display name
+- Create a Vagrantfile and Ansible role for Pagure development (Jeremy Cline)
+- Made searching issue stop clearing status and tags filters (Ryan Lerch)
+- Improve documentation (Bill Auger)
+- Fix finding out the encoding of a file in git (Jeremy Cline)
+- Fix making cross-project references using <project>#<id>
+- Allow filter the list of commits for a certain user
+- Ensure we disable all the submit button when clicking on one (avoid sending
+  two comments)
+- Do not always compute the list of diff commits
+- Let's not assume PAGURE_CI_SERVICES is always there
+- Allow html table to define their CSS class
+- Add a link to the user on the commit list (Ryan Lerch)
+- Change `Fork` button to `View Fork` on all pages of the project (tenstormavi)
+- Enable some of the markdown extensions by default
+- Fix mixed content blocked in the doc by not sending our user to google (Rahul
+  Bajaj)
+
 * Thu Oct 13 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.7.2-1
 - Update to 2.7.2
 - Do not show the custom field if the project has none

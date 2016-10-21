@@ -3,13 +3,13 @@ Contributors to pagure
 
 Pagure would be nothing without its contributors.
 
-On Oct 13, 2016 (release 2.7.2), the list looks as follow:
+On Oct 21, 2016 (release 2.8), the list looks as follow:
 
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  4494              Pierre-Yves Chibon <pingou@pingoured.fr>
-   186              Ryan Lerch <rlerch@redhat.com>
+  4533              Pierre-Yves Chibon <pingou@pingoured.fr>
+   189              Ryan Lerch <rlerch@redhat.com>
     89              farhaanbukhsh <farhaan.bukhsh@gmail.com>
     59              Johan Cwiklinski <johan@x-tnd.be>
     52              Vivek Anand <vivekanand1101@gmail.com>
@@ -22,8 +22,8 @@ Number of commits  Contributor
     15              Ralph Bean <rbean@redhat.com>
     13              Ghost-script <subho.prp@gmail.com>
     13              Mathieu Bridon <bochecha@fedoraproject.org>
+    11              Jeremy Cline <jeremy@jcline.org>
      8              Lei Yang <yltt1234512@gmail.com>
-     7              Jeremy Cline <jeremy@jcline.org>
      5              Mike McLean <mikem@redhat.com>
      5              Oliver Gutierrez <ogutierrez@redhat.com>
      5              Paul W. Frields <stickster@gmail.com>
@@ -39,9 +39,12 @@ Number of commits  Contributor
      3              Kushal Khandelwal <kushal124@gmail.com>
      3              Pedro Lima <pedro.lima@gmail.com>
      3              Sergio Durigan Junior <sergiodj@sergiodj.net>
+     3              bill auger <mr.j.spam.me@gmail.com>
      3              skrzepto <shims506@gmail.com>
+     3              tenstormavi <avi.avinash3008@gmail.com>
      2              Daniel Mach <dmach@redhat.com>
      2              Nuno Maltez <nuno@cognitiva.com>
+     2              Rahul Bajaj <rahulrb0509@gmail.com>
      2              Richard Marko <rmarko@fedoraproject.org>
      2              Ricky Elrod <ricky@elrod.me>
      2              Simo Sorce <simo@redhat.com>
@@ -49,7 +52,6 @@ Number of commits  Contributor
      2              William Moreno Reyes <williamjmorenor@gmail.com>
      2              bruno <bruno@wolff.to>
      2              dhrish20 <dhrish20@gmail.com>
-     2              tenstormavi <avi.avinash3008@gmail.com>
      2              “AnjaliPardeshi” <“anjalipardeshi92@gmail.com”>
      1              Aleksandra Fedorova (bookwar) <afedorova@mirantis.com>
      1              Anthony Lackey <alackey@localhost.localdomain>
@@ -59,7 +61,6 @@ Number of commits  Contributor
      1              Kunaal Jain <kunaalus@gmail.com>
      1              Mathew Robinson <mathew.robinson3114@gmail.com>
      1              Pierre-YvesChibon <pingou@fedoraproject.org>
-     1              Rahul Bajaj <rahulrb0509@gmail.com>
      1              Stanislav Ochotnicky <sochotnicky@redhat.com>
      1              Tiago M. Vieira <tiago@tvieira.com>
      1              Vyacheslav Anzhiganov <vanzhiganov@ya.ru>
