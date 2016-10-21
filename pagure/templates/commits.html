@@ -121,12 +121,7 @@
 
       <div class="list-group m-t-1">
         {% for commit in last_commits %}
-          <a href="{{ url_for('view_commit',
-                repo=repo.name,
-                username=username,
-                namespace=repo.namespace,
-                commitid=commit.hex, branch=branchname) }}"
-              class="list-group-item{%
+          <div class="list-group-item{%
                 if diff_commits and commit.oid.hex in diff_commits %} p-l-3{%
                 endif %}" style="position:relative;">
             {% if diff_commits and commit.oid.hex in diff_commits %}
