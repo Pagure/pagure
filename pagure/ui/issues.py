@@ -30,6 +30,7 @@ import mimetypes
 import pagure.doc_utils
 import pagure.exceptions
 import pagure.lib
+import pagure.lib.encoding_utils
 import pagure.forms
 from pagure import (APP, SESSION, LOG, __get_file_in_tree,
                     login_required, authenticated)
@@ -1103,7 +1104,8 @@ def view_issue_raw_file(
         headers['Content-Disposition'] = 'attachment'
 
     if mimetype.startswith('text/') and not encoding:
-        encoding = pagure.lib.guess_encoding(ktc.to_bytes(data))
+        encoding = pagure.lib.encoding_utils.guess_encoding(
+            ktc.to_bytes(data))
 
     if encoding:
         mimetype += '; charset={encoding}'.format(encoding=encoding)
