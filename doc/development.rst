@@ -191,7 +191,13 @@ We are also inspecting the code using `pylint
 <http://pypi.python.org/pypi/pylint>`_ and aim of course for a 10/10 code
 (but it is an assymptotic goal).
 
-.. note:: both pep8 and pylint are available in Fedora via yum:
+.. note:: both pep8 and pylint are available in Fedora:
+
+          ::
+
+            dnf install python-pep8 pylint
+
+          or
 
           ::
 
@@ -270,6 +276,12 @@ by alone, allowing easier debugging of the tests. For example:
 
 .. note:: In order to have coverage information you might have to install
           ``python-coverage``
+
+          ::
+
+            dnf install python-coverage
+
+          or
 
           ::
 
