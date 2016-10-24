@@ -495,6 +495,18 @@ def update_ticket_from_git(
     except SQLAlchemyError:
         session.rollback()
 
+    # Update close_status
+    close_status = json_data.get('close_status')
+
+    if close_status:
+        if close_status.strip() not in repo.close_status:
+            try:
+                repo.close_status.append(close_status.strip())
+                session.add(repo)
+                session.commit()
+            except SQLAlchemyError:
+                session.rollback()
+
     # Update tags
     tags = json_data.get('tags', [])
     pagure.lib.update_tags(
