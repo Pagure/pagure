@@ -310,7 +310,12 @@ def update_issue(repo, issueid, username=None, namespace=None):
         return 'ok'
     else:
         return flask.redirect(flask.url_for(
-            'view_issue', username=username, repo=repo.name, issueid=issueid))
+            'view_issue',
+            repo=repo.name,
+            username=username,
+            namespace=namespace,
+            issueid=issueid)
+        )
 
 
 @APP.route('/<repo>/tag/<tag>/edit/', methods=('GET', 'POST'))
