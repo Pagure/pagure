@@ -82,7 +82,7 @@ def detect_encodings(data):
     detector.feed(data)
     result = detector.close()
     if not result:
-        return {'ascii': 1.0}
+        return {'utf-8': 1.0}
     encodings = {result['encoding']: result['confidence']}
     for prober in detector._mCharSetProbers:
         if prober:
