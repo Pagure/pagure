@@ -419,6 +419,59 @@ def get_project_from_json(
     return project
 
 
+def update_custom_field_from_json(session, repo, issue, json_data):
+    ''' Update the custom fields according to the custom fields of
+    the issue. If the custom field is not present for the repo in
+    it's settings, this will create them.
+
+    :arg session: the session to connect to the database with.
+    :arg repo: the sqlalchemy object of the project
+    :arg issue: the sqlalchemy object of the issue
+    :arg json_data: the json representation of the issue taken from the git
+        and used to update the data in the database.
+    '''
+
+    # Update custom key value, if present
+    custom_fields = json_data.get('custom_fields')
+    if not custom_fields:
+        return
+
+    current_keys = []
+    for key in repo.issue_keys:
+        current_keys.append(key.name)
+
+    for new_key in custom_fields:
+        if new_key['name'] not in current_keys:
+            issuekey = model.IssueKeys(
+                project_id=repo.id,
+                name=new_key['name'],
+                key_type=new_key['key_type'],
+            )
+            try:
+                session.add(issuekey)
+                session.commit()
+            except SQLAlchemyError:
+                session.rollback()
+                continue
+
+        # The key should be present in the database now
+        key_obj = pagure.lib.get_custom_key(session, repo, new_key['name'])
+
+        value = new_key.get('value')
+        if value:
+            value = value.strip()
+        pagure.lib.set_custom_key_value(
+            session,
+            issue=issue,
+            key=key_obj,
+            value=value,
+        )
+        try:
+            session.commit()
+        except SQLAlchemyError:
+            session.rollback()
+
+
 def update_ticket_from_git(
         session, reponame, namespace,  username, issue_uid, json_data):
     """ Update the specified issue (identified by its unique identifier)
@@ -477,6 +530,13 @@ def update_ticket_from_git(
     session.commit()
 
     issue = pagure.lib.get_issue_by_uid(session, issue_uid=issue_uid)
+
+    update_custom_field_from_json(
+        session,
+        repo=repo,
+        issue=issue,
+        json_data=json_data,
+    )
 
     # Update milestone
     milestone = json_data.get('milestone')

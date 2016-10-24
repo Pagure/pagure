@@ -3470,3 +3470,17 @@ def update_log_email_user(session, email, user):
         {model.PagureLog.user_id: user.id},
         synchronize_session=False
     )
+
+
+def get_custom_key(session, project, keyname):
+    ''' Returns custom key object given it's name and the project '''
+
+    query = session.query(
+        model.IssueKeys
+    ).filter(
+        model.IssueKeys.project_id == project.id
+    ).filter(
+        model.IssueKeys.name == keyname
+    )
+
+    return query.first()
