@@ -3246,3 +3246,22 @@ def set_custom_key_value(session, issue, key, value):
     session.add(current_field)
 
     return 'Custom key adjusted'
+
+
+def get_yearly_stats_user(session, user, date):
+    """ Return the activity of the specified user in the year preceding the
+    specified date.
+    """
+    start_date = datetime.datetime(date.year -1, date.month, date.day)
+
+    query = session.query(
+        model.PagureLog.date, func.count(model.PagureLog.id)
+    ).filter(
+        model.PagureLog.date_created.between(start_date, date)
+    ).filter(
+        model.PagureLog.user_id == user.id
+    ).group_by(
+        model.PagureLog.date
+    )
+
+    return query.all()
