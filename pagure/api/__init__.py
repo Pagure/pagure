@@ -461,6 +461,9 @@ def api():
     api_version_doc = load_doc(api_version)
     api_users_doc = load_doc(api_users)
     api_view_user_doc = load_doc(user.api_view_user)
+    api_view_user_activity_stats_doc = load_doc(
+        user.api_view_user_activity_stats)
+
     if pagure.APP.config.get('ENABLE_TICKETS', True):
         api_project_tags_doc = load_doc(api_project_tags)
     api_groups_doc = load_doc(api_groups)
@@ -496,6 +499,7 @@ def api():
             api_users_doc,
             api_view_user_doc,
             api_groups_doc,
+            api_view_user_activity_stats_doc,
         ],
         ci=ci_doc,
         extras=extras,
