@@ -178,7 +178,7 @@
               {% else %}
                 unassigned
               {% endif %}
-              {% if authenticated and g.repo_admin
+              {% if authenticated and g.repo_admin and issue.status|lower == 'open'
                 and (not issue.assignee or issue.assignee.username != g.fas_user.username) %}
               <button class="btn btn-sm pull-xs-right" id="take-btn"
                 title="assign this issue to you">
