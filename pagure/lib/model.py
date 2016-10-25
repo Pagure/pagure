@@ -1545,6 +1545,75 @@ class Watcher(BASE):
         ),
     )
 
+
+
+class PagureLog(BASE):
+    """
+    Log user's actions.
+    """
+    __tablename__ = 'pagure_logs'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    user_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(
+            'users.id', onupdate='CASCADE', ondelete='CASCADE',
+        ),
+        nullable=False,
+        index=True)
+    project_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(
+            'projects.id', onupdate='CASCADE', ondelete='CASCADE',
+        ),
+        nullable=True,
+        index=True
+    )
+    issue_uid = sa.Column(
+        sa.String(32),
+        sa.ForeignKey(
+            'issues.uid', ondelete='CASCADE', onupdate='CASCADE',
+        ),
+        nullable=True,
+        index=True
+    )
+    pull_request_uid = sa.Column(
+        sa.String(32),
+        sa.ForeignKey(
+            'pull_requests.uid', ondelete='CASCADE', onupdate='CASCADE',
+        ),
+        nullable=True,
+        index=True
+    )
+    description = sa.Column(sa.Text, nullable=False)
+    date = sa.Column(
+        sa.Date,
+        nullable=False,
+        default=datetime.datetime.utcnow,
+        index=True)
+    date_created = sa.Column(
+        sa.DateTime,
+        nullable=False,
+        default=datetime.datetime.utcnow,
+        index=True)
+
+    user = relation(
+        'User', foreign_keys=[user_id], remote_side=[User.id],
+        backref=backref('logs', cascade="delete, delete-orphan"),
+    )
+    project = relation(
+        'Project', foreign_keys=[project_id], remote_side=[Project.id],
+        backref=backref('logs', cascade="delete, delete-orphan")
+    )
+    issue = relation(
+        'Issue', foreign_keys=[issue_uid], remote_side=[Issue.uid],
+    )
+    pull_request = relation(
+        'PullRequest',
+        foreign_keys=[pull_request_uid],
+        remote_side=[PullRequest.uid]
+    )
+
 #
 # Class and tables specific for the API/token access
 #
