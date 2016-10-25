@@ -32,7 +32,7 @@
   </h2>
 
   <h5 class="text-muted">
-    <a href="#" data-toggle="tooltip">Created</a>
+    <a href="#" data-toggle="tooltip" title="{{ issue.date_created.strftime('%Y-%m-%d %H:%M:%S') }}">Created</a>
     {{ issue.date_created | humanize}} by {{ issue.user.user }}
   </h5>
 
