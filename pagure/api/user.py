@@ -204,7 +204,7 @@ def api_view_user_activity_stats(username):
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOUSER)
 
     stats = pagure.lib.get_yearly_stats_user(
-        SESSION, user, datetime.datetime.utcnow().date()
+        SESSION, user, datetime.datetime.utcnow().date() + datetime.timedelta(days=1)
     )
     def format_date(d):
         if date_format == 'timestamp':
