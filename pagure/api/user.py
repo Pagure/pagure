@@ -113,10 +113,10 @@ def api_view_user(username):
 @api_method
 def api_view_user_activity_stats(username):
     """
-    User activity
-    -------------
-    Use this endpoint to retrieve activity information about a specific user
-    over the last year.
+    User activity stats
+    -------------------
+    Use this endpoint to retrieve activity stats about a specific user over
+    the last year.
 
     ::
 
