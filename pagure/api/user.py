@@ -10,6 +10,7 @@
 
 import datetime
 
+import arrow
 import flask
 
 import pagure
@@ -217,5 +218,98 @@ def api_view_user_activity_stats(username):
     ]
 
     jsonout = flask.jsonify(stats)
+    jsonout.status_code = httpcode
+    return jsonout
+
+
+@API.route('/user/<username>/activity/<date>')
+@api_method
+def api_view_user_activity_date(username, date):
+    """
+    User activity on a specific date
+    --------------------------------
+    Use this endpoint to retrieve activity information about a specific user
+    on the specified date.
+
+    ::
+
+        GET /api/0/user/<username>/activity/<date>
+
+    ::
+
+        GET /api/0/user/ralph/activity/2016-01-02
+
+    Parameters
+    ^^^^^^^^^^
+
+    +---------------+----------+--------------+----------------------------+
+    | Key           | Type     | Optionality  | Description                |
+    +===============+==========+==============+============================+
+    | ``username``  | string   | Mandatory    | | The username of the user |
+    |               |          |              |   whose activity you are   |
+    |               |          |              |   interested in.           |
+    +---------------+----------+--------------+----------------------------+
+    | ``date``      | string   | Mandatory    | | The date of interest     |
+    +---------------+----------+--------------+----------------------------+
+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "activities": [
+            {
+              "date": "2016-02-24",
+              "date_created": "1456305852",
+              "description": "pingou created PR test#44",
+              "description_mk": "<p>pingou created PR <a href=\"/test/pull-request/44\" title=\"Update test_foo\">test#44</a></p>",
+              "id": 4067,
+              "user": {
+                "fullname": "Pierre-YvesC",
+                "name": "pingou"
+              }
+            },
+            {
+              "date": "2016-02-24",
+              "date_created": "1456305887",
+              "description": "pingou commented on PR test#44",
+              "description_mk": "<p>pingou commented on PR <a href=\"/test/pull-request/44\" title=\"Update test_foo\">test#44</a></p>",
+              "id": 4112,
+              "user": {
+                "fullname": "Pierre-YvesC",
+                "name": "pingou"
+              }
+            }
+          ]
+        }
+
+    """
+    httpcode = 200
+
+    try:
+        date = arrow.get(date)
+        date = date.strftime('%Y-%m-%d')
+    except arrow.ParserError as err:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.ENOCODE, error=str(err))
+
+    user = pagure.lib.search_user(SESSION, username=username)
+    if not user:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOUSER)
+
+    activities = pagure.lib.get_user_activity_day(SESSION, user, date)
+    js_act = []
+    for activity in activities:
+        activity = activity.to_json(public=True)
+        activity['description_mk'] = pagure.lib.text2markdown(
+            activity['description']
+        )
+        js_act.append(activity)
+
+    jsonout = flask.jsonify(
+        dict(activities=js_act)
+    )
     jsonout.status_code = httpcode
     return jsonout
