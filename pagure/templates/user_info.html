@@ -11,7 +11,7 @@
 {% endblock %}
 
 
-{% from "_render_repo.html" import render_repos_as_card, render_contributions_graph %}
+{% from "_render_repo.html" import render_repos_as_card, render_activity_graph %}
 
 
 {% block content %}
@@ -31,9 +31,9 @@
     </p>
     <div class="row">
       <div class="col-md-8">
+        {{ render_activity_graph(username) }}
         {{ render_repos_as_card(repos, repos_length, 'Projects', 'repopage', repopage, total_page_repos) }}
         {{ render_repos_as_card(forks, forks_length,'Forks', 'forkpage', forkpage, total_page_forks) }}
-        {{ render_contributions_graph(username) }}
       </div>
       <div class="col-md-4">
         <div class="card" id="group_list">

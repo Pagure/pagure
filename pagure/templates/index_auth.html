@@ -11,13 +11,16 @@
 {% endblock %}
 
 
-{% from "_render_repo.html" import render_repos_as_card, render_contributions_graph %}
+{% from "_render_repo.html" import render_repos_as_card, render_activity_graph %}
 
 {% block content %}
 <div class="p-t-2">
   <div class="container">
     <div class="row">
       <div class="col-md-8">
+
+          {{ render_activity_graph(username) }}
+
         <div class="card">
           <div class="card-header">
             My Projects <span class="label label-default">{{repos | count}}</span>
@@ -176,8 +179,6 @@
           </div>
         {% endif %}
         </div>
-
-        {{render_contributions_graph(username)}}
 
       </div>
       <div class="col-md-4">
