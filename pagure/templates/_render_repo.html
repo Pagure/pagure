@@ -264,19 +264,82 @@
         {% endif %}
 {% endmacro %}
 
-{% macro render_contributions_graph(username) %}
-  {% if config.get('DATAGREPPER_URL') %}
-  <div class="card" id="user_graph">
-    <div class="card-header">
-      Contributions <a href="{{config.get('DATAGREPPER_URL')}}/raw?category={{config.get('DATAGREPPER_CATEGORY', 'pagure')}}&user={{username}}" class="btn btn-secondary btn-sm pull-xs-right">View List</a>
+{% macro render_activity_graph(username) %}
+<script type="text/javascript"src="{{
+  url_for('static', filename='jquery.min.js') }}"></script>
+<script type="text/javascript" src="{{
+  url_for('static', filename='d3/d3.v3.min.js') }}"></script>
+<script type="text/javascript" src="{{
+  url_for('static', filename='cal-heatmap/cal-heatmap.3.3.10.min.js') }}"></script>
+<link rel="stylesheet" href="{{
+  url_for('static', filename='cal-heatmap/cal-heatmap.3.3.10.css') }}" />
+
+
+<div class="card" id="user_graph">
+  <div class="card-header">Activity</div>
+  <div class="card-block p-a-0">
+    <div id="cal-heatmap">
     </div>
-    <div class="card-block p-a-0">
-      <a href="{{config.get('DATAGREPPER_URL')}}/charts/line?category={{config.get('DATAGREPPER_CATEGORY', 'pagure')}}&user={{username}}&split_on=users&delta=31536000&N=12&title=&show_y_labels=False&width=700&height=200&style=light_solarized"
-        target="_blank" rel="noopener noreferrer">
-        <img src="{{config.get('DATAGREPPER_URL')}}/charts/line?category={{config.get('DATAGREPPER_CATEGORY', 'pagure')}}&user={{username}}&split_on=users&delta=31536000&N=12&title=&show_y_labels=False&width=400&height=200&style=light_solarized"
-          alt="User activity graph"/>
-      </a>
+    <div id="user-activity" class="hidden">
+      <div class="card-header">
+        <span id="user-activity-title">
+        Recent Activity
+        </span>
+        <span class="pull-xs-right">
+          <button class="btn btn-secondary btn-sm" id="hide_activity">
+            <span class="oi" data-glyph="x" data-toggle="tooltip"
+              title="Hide activity info" aria-hidden="true">
+            </span>
+          </button>
+        </span>
+      </div>
+      <div class="list-group" id="user-activity-body"></div>
     </div>
+    <script type="text/javascript">
+      function padStr(i) {
+          return (i < 10) ? "0" + i : "" + i;
+      }
+      $('#hide_activity').click(function(){
+        $('#user-activity').hide();
+      });
+      var cal = new CalHeatMap();
+      cal.init({
+        cellSize: 9,
+        domain: "month",
+        subDomain: "day",
+        start: new Date(new Date().setMonth(new Date().getMonth() - 11)),
+        data: "{{ url_for(
+          'api_ns.api_view_user_activity_stats',
+          username=username, format='timestamp') }}",
+        onClick: function(date, nb) {
+          date = date.getFullYear() + '-' + padStr(date.getMonth() + 1)
+            + '-' + padStr(date.getDate());
+          $.ajax({
+            type: 'GET',
+            url: "{{ url_for(
+              'api_ns.api_view_user_activity_date',
+              username=username, date='') }}" + date,
+            contentType: "application/json",
+            dataType: 'json',
+            success: function(data) {
+              if (data.activities.length > 0){
+                $('#user-activity-body').html('');
+                $('#user-activity-title').text('Activity on ' + date);
+                $('#user-activity').show();
+              }
+              for (var i=0; i<data.activities.length; i++){
+                var d = data.activities[i];
+                $('#user-activity-body').append(
+                  '<div class="list-group-item">'
+                  + d.description_mk
+                  + '</div>'
+                );
+              }
+            }
+          });
+        }
+      });
+    </script>
   </div>
-  {% endif %}
+</div>
 {% endmacro%}

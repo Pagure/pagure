@@ -424,7 +424,6 @@ a.notblue:hover {
 .footer a, .footer a:hover { color: #d9d9d9; }
 
 #user_graph {
-    background-image: url("images/spinner.gif");
     background-position: center center;
     background-repeat: no-repeat;
     min-height: 150px;
@@ -555,6 +554,10 @@ th[data-sort] {
 
 .readme dd{
     margin-left:2em;
+}
+
+.hidden{
+    display: none;
 }
 
 /*Our specific responsive overrides*/
