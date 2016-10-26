@@ -3265,3 +3265,19 @@ def get_yearly_stats_user(session, user, date):
     )
 
     return query.all()
+
+
+def get_user_activity_day(session, user, date):
+    """ Return the activity of the specified user on the specified date.
+    """
+    query = session.query(
+        model.PagureLog
+    ).filter(
+        model.PagureLog.date == date
+    ).filter(
+        model.PagureLog.user_id == user.id
+    ).order_by(
+        model.PagureLog.date_created
+    )
+
+    return query.all()
