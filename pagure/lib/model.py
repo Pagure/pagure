@@ -1614,6 +1614,22 @@ class PagureLog(BASE):
         remote_side=[PullRequest.uid]
     )
 
+    def to_json(self, public=False):
+        ''' Returns a dictionary representation of the issue.
+
+        '''
+        output = {
+            'id': self.id,
+            'description': self.description,
+            'date': self.date.strftime('%Y-%m-%d'),
+            'date_created': self.date_created.strftime('%s'),
+            'user': self.user.to_json(public=public),
+            #'issue': self.issue.to_json(public=public) if self.issue else None,
+            #'pull-request': self.pull_request.to_json(public=public) if self.pull_request else None,
+            #'project': self.project.to_json(public=public) if self.project else None,
+        }
+        return output
+
 #
 # Class and tables specific for the API/token access
 #
