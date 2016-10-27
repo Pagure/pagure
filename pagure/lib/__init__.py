@@ -2124,6 +2124,8 @@ def close_pull_request(session, request, user, requestfolder, merged=True):
     session.add(request)
     session.flush()
 
+    log_action(session, request.status.lower(), request)
+
     if merged is True:
         pagure.lib.notify.notify_merge_pull_request(request, user_obj)
     else:
@@ -3322,6 +3324,10 @@ def log_action(session, action, obj):
         verb = 'created PR'
     elif obj.isa == 'pull-request' and action == 'commented':
         verb = 'comment on PR'
+    elif obj.isa == 'pull-request' and action == 'closed':
+        verb = 'closed PR'
+    elif obj.isa == 'pull-request' and action == 'merged':
+        verb = 'merged PR'
     elif obj.isa == 'project' and action == 'created':
         verb = 'created Project'
         desc = '%(user)s %(verb)s %(project)s'
