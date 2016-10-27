@@ -271,6 +271,8 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
     pagure.lib.git.update_git(
         issue, repo=issue.project, repofolder=ticketfolder)
 
+    log_action(session, 'commented', issue)
+
     if notify:
         pagure.lib.notify.notify_new_comment(issue_comment, user=user_obj)
 
@@ -883,6 +885,8 @@ def add_pull_request_comment(session, request, commit, tree_id, filename,
     pagure.lib.git.update_git(
         request, repo=request.project, repofolder=requestfolder)
 
+    log_action(session, 'commented', request)
+
     if notify:
         pagure.lib.notify.notify_pull_request_comment(pr_comment, user_obj)
 
@@ -1165,6 +1169,8 @@ def new_project(session, user, name, blacklist, allowed_prefix,
     # create the project in the db
     session.commit()
 
+    log_action(session, 'created', project)
+
     pagure.lib.notify.log(
         project,
         topic='project.new',
@@ -1205,6 +1211,8 @@ def new_issue(session, repo, title, content, user, ticketfolder,
 
     pagure.lib.git.update_git(
         issue, repo=repo, repofolder=ticketfolder)
+
+    log_action(session, 'created', issue)
 
     if notify:
         pagure.lib.notify.notify_new_issue(issue, user=user_obj)
@@ -1285,6 +1293,8 @@ def new_pull_request(session, branch_from,
 
     pagure.lib.git.update_git(
         request, repo=request.project, repofolder=requestfolder)
+
+    log_action(session, 'created', request)
 
     if notify:
         pagure.lib.notify.notify_new_pull_request(request)
@@ -3281,3 +3291,54 @@ def get_user_activity_day(session, user, date):
     )
 
     return query.all()
+
+
+def log_action(session, action, obj):
+    ''' Log an user action on a project/issue/PR. '''
+    arg = {
+        'user': obj.user.user,
+        'obj_id': obj.id
+    }
+    verb = ''
+    desc = '%(user)s %(verb)s %(project)s#%(obj_id)s'
+    project_id = None
+    project = None
+    if obj.isa in ['issue', 'pull-request']:
+        project_id = obj.project_id
+        project = obj.project.fullname
+    elif obj.isa == 'project':
+        project_id = obj.id
+        project = obj.fullname
+    else:
+        raise pagure.exceptions.PagureException(
+            'Unsupported object found: "%s"' % obj
+        )
+
+    if obj.isa == 'issue' and action == 'created':
+        verb = 'created issue'
+    elif obj.isa == 'issue' and action == 'commented':
+        verb = 'comment on issue'
+    elif obj.isa == 'pull-request' and action == 'created':
+        verb = 'created PR'
+    elif obj.isa == 'pull-request' and action == 'commented':
+        verb = 'comment on PR'
+    elif obj.isa == 'project' and action == 'created':
+        verb = 'created Project'
+        desc = '%(user)s %(verb)s %(project)s'
+
+    arg['verb'] = verb
+    arg['project'] = project
+    log = model.PagureLog(
+        user_id=obj.user_id,
+        project_id=project_id,
+        description=desc % arg,
+        date=obj.date_created.date(),
+        date_created=obj.date_created
+    )
+    if obj.isa == 'issue':
+        setattr(log, 'issue_uid', obj.uid)
+    elif obj.isa == 'request':
+        setattr(log, 'pull_request_uid', obj.uid)
+
+    session.add(log)
+    session.commit()
