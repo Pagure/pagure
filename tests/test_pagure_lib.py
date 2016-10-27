@@ -2521,6 +2521,138 @@ class PagureLibtests(tests.Modeltests):
         watch_list = [obj.name for obj in watch_list_objs]
         self.assertEqual(watch_list, [])
 
+    def test_text2markdown(self):
+        ''' Test the test2markdown method in pagure.lib. '''
+        pagure.APP.config['TESTING'] = True
+        pagure.APP.config['SERVER_NAME'] = 'https://pagure.org'
+        pagure.SESSION = self.session
+        pagure.lib.SESSION = self.session
+        self.app = pagure.APP.test_client()
+
+        # This creates:
+        # project: test
+        # fork: pingou/test
+        # PR#1 to project test
+        self.test_new_pull_request()
+
+        # create PR#2 to project pingou/test
+        repo = pagure.lib.get_project(self.session, 'test')
+        forked_repo = pagure.lib.get_project(
+            self.session, 'test', user='pingou')
+        req = pagure.lib.new_pull_request(
+            requestid=2,
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=forked_repo,
+            branch_to='master',
+            title='test pull-request in fork',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 2)
+        self.assertEqual(req.title, 'test pull-request in fork')
+
+        # Create the project ns/test
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test3',
+            namespace='ns',
+            description='test project #1',
+            hook_token='aaabbbcccdd',
+        )
+        item.close_status = ['Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
+        self.session.add(item)
+        self.session.commit()
+
+        iss = pagure.lib.new_issue(
+            issue_id=4,
+            session=self.session,
+            repo=item,
+            title='test issue',
+            content='content test issue',
+            user='pingou',
+            ticketfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(iss.id, 4)
+        self.assertEqual(iss.title, 'test issue')
+
+        # Fork ns/test to pingou
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test',
+            namespace='ns',
+            description='Forked namespaced test project #1',
+            is_fork=True,
+            parent_id=item.id,
+            hook_token='aaabbbrrrbb',
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        iss = pagure.lib.new_issue(
+            issue_id=7,
+            session=self.session,
+            repo=item,
+            title='test issue #7',
+            content='content test issue #7 in forked repo',
+            user='pingou',
+            ticketfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(iss.id, 7)
+        self.assertEqual(iss.title, 'test issue #7')
+
+        texts = [
+            'foo bar test#1 see?',
+            'foo bar pingou/test#2 I mean, really',
+            'foo bar fork/pingou/test#2 bouza!',
+            'foo bar forks/pingou/test#2 bouza!',
+            'foo bar ns/test3#4 bouza!',
+            'foo bar fork/user/ns/test#5 bouza!',
+            'foo bar fork/pingou/ns/test#7 bouza!',
+            'test#1 bazinga!',
+            'pingou opened the PR forks/pingou/test#2'
+        ]
+        expected = [
+            # 'foo bar test#1 see?',
+            '<p>foo bar <a href="http://https://pagure.org/test/pull-request/1"'
+            ' title="test pull-request">test#1</a> see?</p>',
+            # 'foo bar pingou/test#2 I mean, really', -- unknown namespace
+            '<p>foo bar pingou/test#2 I mean, really</p>',
+            # 'foo bar fork/pingou/test#2 bouza!',
+            '<p>foo bar <a href="http://https://pagure.org/fork/'
+            'pingou/test/pull-request/2" title="test pull-request in fork">'
+            'pingou/test#2</a> bouza!</p>',
+            # 'foo bar forks/pingou/test#2 bouza!',  -- the 's' doesn't matter
+            '<p>foo bar <a href="http://https://pagure.org/fork/'
+            'pingou/test/pull-request/2" title="test pull-request in fork">'
+            'pingou/test#2</a> bouza!</p>',
+            # 'foo bar ns/test3#4 bouza!',
+            '<p>foo bar <a href="http://https://pagure.org/ns/test3/issue/4"'
+            ' title="test issue">ns/test3#4</a> bouza!</p>',
+            # 'foo bar fork/user/ns/test#5 bouza!', -- unknown fork
+            '<p>foo bar user/ns/test#5 bouza!</p>',
+            # 'foo bar fork/pingou/ns/test#7 bouza!',
+            '<p>foo bar <a href="http://https://pagure.org/'
+            'fork/pingou/ns/test/issue/7" title="test issue #7">'
+            'pingou/ns/test#7</a> bouza!</p>',
+            # 'test#1 bazinga!',
+            '<p><a href="http://https://pagure.org/test/pull-request/1" '
+            'title="test pull-request">test#1</a> bazinga!</p>',
+            # 'pingou opened the PR forks/pingou/test#2'
+            '<p>pingou opened the PR <a href="http://https://pagure.org/'
+            'fork/pingou/test/pull-request/2" '
+            'title="test pull-request in fork">pingou/test#2</a></p>'
+        ]
+
+        with pagure.APP.app_context():
+            for idx, text in enumerate(texts):
+                html = pagure.lib.text2markdown(text)
+                self.assertEqual(html, expected[idx])
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibtests)
