@@ -31,8 +31,12 @@ import pagure.lib
 
 
 MENTION_RE = r'@(\w+)'
-EXPLICIT_FORK_ISSUE_RE = r'(\w+)/([\w-]+)#([0-9]+)'
-EXPLICIT_MAIN_ISSUE_RE = r'([\w-]+)#([0-9]+)'
+EXPLICIT_LINK_RE = r'(?<!\w)'\
+'(fork[s]?/)?'\
+'([a-zA-Z0-9_-]*?/)?'\
+'([a-zA-Z0-9_-]*?/)?'\
+'([a-zA-Z0-9_-]+)'\
+'#(?P<id>[0-9]+)'
 IMPLICIT_ISSUE_RE = r'[^|\w](?<!\w)#([0-9]+)'
 IMPLICIT_PR_RE = r'[^|\w](?<!\w)PR#([0-9]+)'
 STRIKE_THROUGH_RE = r'~~(\w+)~~'
@@ -59,53 +63,42 @@ class MentionPattern(markdown.inlinepatterns.Pattern):
         return element
 
 
-class ExplicitForkIssuePattern(markdown.inlinepatterns.Pattern):
-    """ Explicit fork issue pattern. """
+class ExplicitLinkPattern(markdown.inlinepatterns.Pattern):
+    """ Explicit link pattern. """
 
     def handleMatch(self, m):
         """ When the pattern matches, update the text. """
-        user = markdown.util.AtomicString(m.group(2))
-        repo = markdown.util.AtomicString(m.group(3))
-        idx = markdown.util.AtomicString(m.group(4))
-        text = '%s/%s#%s' % (user, repo, idx)
-        try:
-            idx = int(idx)
-        except:
-            return text
-
-        issue = _issue_exists(user, repo, idx)
-        if issue:
-            return _obj_anchor_tag(user, repo, issue, text)
-
-
-        request = _pr_exists(user, repo, idx)
-        if request:
-            return _obj_anchor_tag(user, repo, request, text)
-
-        return text
-
-
-class ExplicitMainIssuePattern(markdown.inlinepatterns.Pattern):
-    """ Explicit issue pattern (for non-fork project). """
-
-    def handleMatch(self, m):
-        """ When the pattern matches, update the text. """
-        repo = markdown.util.AtomicString(m.group(2))
-        idx = markdown.util.AtomicString(m.group(3))
+        is_fork = m.group(2)
+        user = m.group(3)
+        namespace = m.group(4)
+        repo = m.group(5)
+        idx = m.group(6)
         text = '%s#%s' % (repo, idx)
+
+        if not is_fork and user:
+            namespace = user
+            user = None
+
+        if namespace:
+            namespace = namespace.rstrip('/')
+            text = '%s/%s' % (namespace, text)
+        if user:
+            user = user.rstrip('/')
+            text = '%s/%s' % (user.rstrip('/'), text)
+
         try:
             idx = int(idx)
         except:
             return text
 
-        issue = _issue_exists(None, repo, idx)
+        issue = _issue_exists(user, namespace, repo, idx)
         if issue:
-            return _obj_anchor_tag(None, repo, issue, text)
+            return _obj_anchor_tag(user, namespace, repo, issue, text)
 
 
-        request = _pr_exists(None, repo, idx)
+        request = _pr_exists(user, namespace, repo, idx)
         if request:
-            return _obj_anchor_tag(None, repo, request, text)
+            return _obj_anchor_tag(user, namespace, repo, request, text)
 
         return text
 
@@ -127,10 +120,12 @@ class ImplicitIssuePattern(markdown.inlinepatterns.Pattern):
             url = flask.request.url
         except RuntimeError:
             return text
-        repo = user = None
+        repo = namespace = user = None
 
         if flask.request.args.get('user'):
             user = flask.request.args.get('user')
+        if flask.request.args.get('namespace'):
+            namespace = flask.request.args.get('namespace')
         if flask.request.args.get('repo'):
             repo = flask.request.args.get('repo')
 
@@ -140,13 +135,13 @@ class ImplicitIssuePattern(markdown.inlinepatterns.Pattern):
             else:
                 repo = url.split(root)[1].split('/', 1)[0]
 
-        issue = _issue_exists(user, repo, idx)
+        issue = _issue_exists(user, namespace, repo, idx)
         if issue:
-            return _obj_anchor_tag(user, repo, issue, text)
+            return _obj_anchor_tag(user, namespace, repo, issue, text)
 
-        request = _pr_exists(user, repo, idx)
+        request = _pr_exists(user, namespace, repo, idx)
         if request:
-            return _obj_anchor_tag(user, repo, request, text)
+            return _obj_anchor_tag(user, namespace, repo, request, text)
 
         return text
 
@@ -168,10 +163,12 @@ class ImplicitPRPattern(markdown.inlinepatterns.Pattern):
             url = flask.request.url
         except RuntimeError:
             return text
-        repo = user = None
+        repo = namespace = user = None
 
         if flask.request.args.get('user'):
             user = flask.request.args.get('user')
+        if flask.request.args.get('namespace'):
+            namespace = flask.request.args.get('namespace')
         if flask.request.args.get('repo'):
             repo = flask.request.args.get('repo')
 
@@ -181,13 +178,13 @@ class ImplicitPRPattern(markdown.inlinepatterns.Pattern):
             else:
                 repo = url.split(root)[1].split('/', 1)[0]
 
-        issue = _issue_exists(user, repo, idx)
+        issue = _issue_exists(user, namespace, repo, idx)
         if issue:
-            return _obj_anchor_tag(user, repo, issue, text)
+            return _obj_anchor_tag(user, namespace, repo, issue, text)
 
-        request = _pr_exists(user, repo, idx)
+        request = _pr_exists(user, namespace, repo, idx)
         if request:
-            return _obj_anchor_tag(user, repo, request, text)
+            return _obj_anchor_tag(user, namespace, repo, request, text)
 
         return text
 
@@ -218,9 +215,7 @@ class PagureExtension(markdown.extensions.Extension):
             md.inlinePatterns['implicit_pr'] = \
                 ImplicitPRPattern(IMPLICIT_PR_RE)
             md.inlinePatterns['explicit_fork_issue'] = \
-                ExplicitForkIssuePattern(EXPLICIT_FORK_ISSUE_RE)
-            md.inlinePatterns['explicit_main_issue'] = \
-                ExplicitMainIssuePattern(EXPLICIT_MAIN_ISSUE_RE)
+                ExplicitLinkPattern(EXPLICIT_LINK_RE)
             md.inlinePatterns['implicit_issue'] = \
                 ImplicitIssuePattern(IMPLICIT_ISSUE_RE)
 
@@ -234,10 +229,10 @@ def makeExtension(*arg, **kwargs):
     return PagureExtension(**kwargs)
 
 
-def _issue_exists(user, repo, idx):
+def _issue_exists(user, namespace, repo, idx):
     """ Utility method checking if a given issue exists. """
     repo_obj = pagure.lib.get_project(
-        pagure.SESSION, name=repo, user=user)
+        pagure.SESSION, name=repo, user=user, namespace=namespace)
     if not repo_obj:
         return False
 
@@ -249,10 +244,10 @@ def _issue_exists(user, repo, idx):
     return issue_obj
 
 
-def _pr_exists(user, repo, idx):
+def _pr_exists(user, namespace, repo, idx):
     """ Utility method checking if a given PR exists. """
     repo_obj = pagure.lib.get_project(
-        pagure.SESSION, name=repo, user=user)
+        pagure.SESSION, name=repo, user=user, namespace=namespace)
     if not repo_obj:
         return False
 
@@ -264,14 +259,16 @@ def _pr_exists(user, repo, idx):
     return pr_obj
 
 
-def _obj_anchor_tag(user, repo, obj, text):
+def _obj_anchor_tag(user, namespace, repo, obj, text):
     """ Utility method generating the link to an issue or a PR. """
     if obj.isa == 'issue':
         url = flask.url_for(
-            'view_issue', username=user, repo=repo, issueid=obj.id)
+            'view_issue', username=user, namespace=namespace, repo=repo,
+             issueid=obj.id)
     else:
         url = flask.url_for(
-            'request_pull', username=user, repo=repo, requestid=obj.id)
+            'request_pull', username=user, namespace=namespace, repo=repo,
+            requestid=obj.id)
 
     element = markdown.util.etree.Element("a")
     element.set('href', url)
