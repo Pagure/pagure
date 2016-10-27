@@ -817,12 +817,13 @@
 <script type="text/javascript">
 function cancel_edit_btn() {
   $(".cancel").unbind();
-  $( ".cancel" ).click(
+  $(".cancel").click(
     function() {
-      item = $(this).closest('section');
+      var item = $(this).closest('section');
+      var parent = item.parent().parent().parent().parent();
       $(item.parent().find('.issue_comment')).show();
       $(item.parent().find('.issue_actions')).show();
-      $(item.parent().find('.pr_comment_form')).remove();
+      $(parent.find('.pr_comment_form')).remove();
       return false;
     }
   );
