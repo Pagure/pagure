@@ -2159,12 +2159,15 @@ def close_pull_request(session, request, user, requestfolder, merged=True):
 def reset_status_pull_request(session, project):
     ''' Reset the status of all opened Pull-Requests of a project.
     '''
-    requests = search_pull_requests(
-        session, project_id=project.id, status='Open')
-
-    for request in requests:
-        request.merge_status = None
-        session.add(request)
+    query = session.query(
+        model.PullRequest
+    ).filter(
+        model.PullRequest.project_id == project.id
+    ).filter(
+        model.PullRequest.status == 'Open'
+    ).update(
+        {model.PullRequest.merge_status: None}
+    )
 
     session.commit()
 
