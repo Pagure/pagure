@@ -91,7 +91,7 @@ class PagureFlaskApptests(tests.Modeltests):
             self.assertEqual(
                 output.data.count('<p>No group found</p>'), 1)
             self.assertEqual(
-                output.data.count('<div class="card-header">'), 4)
+                output.data.count('<div class="card-header">'), 6)
 
     def test_watch_list(self):
         ''' Test for watch list of a user '''
