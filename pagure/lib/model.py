@@ -1564,7 +1564,11 @@ class PagureLog(BASE):
         sa.ForeignKey(
             'users.id', onupdate='CASCADE', ondelete='CASCADE',
         ),
-        nullable=False,
+        nullable=True,
+        index=True)
+    user_email = sa.Column(
+        sa.String(255),
+        nullable=True,
         index=True)
     project_id = sa.Column(
         sa.Integer,
