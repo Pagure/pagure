@@ -379,6 +379,11 @@ class Project(BASE):
     )
 
     @property
+    def isa(self):
+        ''' A string to allow finding out that this is an project. '''
+        return 'project'
+
+    @property
     def path(self):
         ''' Return the name of the git repo on the filesystem. '''
         return '%s.git' % self.fullname
