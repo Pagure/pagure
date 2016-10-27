@@ -2311,6 +2311,9 @@ def add_email_to_user(session, user, user_email):
             email=user_email)
         session.add(useremail)
         session.flush()
+        if email_logs_count(session, user_email):
+            update_log_email_user(session, user_email, user)
+
 
 
 def update_user_ssh(session, user, ssh_key, keydir):
@@ -3348,3 +3351,28 @@ def log_action(session, action, obj):
 
     session.add(log)
     session.commit()
+
+
+def email_logs_count(session, email):
+    """ Returns the number of logs associated with a given email."""
+    query = session.query(
+        model.PagureLog
+    ).filter(
+        model.PagureLog.user_email == email
+    )
+
+    return query.count()
+
+
+def update_log_email_user(session, email, user):
+    """ Update the logs with the provided email to point to the specified
+    user.
+    """
+    session.query(
+        model.PagureLog
+    ).filter(
+        model.PagureLog.user_email == email
+    ).update(
+        {model.PagureLog.user_id: user.id},
+        synchronize_session=False
+    )
