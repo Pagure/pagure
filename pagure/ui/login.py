@@ -56,13 +56,8 @@ def new_user():
         SESSION.add(user)
         SESSION.flush()
 
-        emails = [email.email for email in user.emails]
-        if form.email_address.data not in emails:
-            useremail = model.UserEmail(
-                user_id=user.id,
-                email=form.email_address.data)
-            SESSION.add(useremail)
-            SESSION.flush()
+        pagure.lib.add_email_to_user(
+            SESSION, user, form.email_address.data)
 
         try:
             SESSION.commit()
