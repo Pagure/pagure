@@ -33,6 +33,7 @@ Contents:
    :maxdepth: 2
 
    usage/first_steps
+   usage/markdown
    usage/project_settings
    usage/roadmap
    usage/using_doc
