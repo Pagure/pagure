@@ -1,5 +1,6 @@
 Using Markdown in Pagure
 ========================
+<<<<<<< 554748685c760f70e542cdc05dc5373b56de5348
 <<<<<<< 5babdd5746cc3345502180b67c7f9ae56bdbb00f
 <<<<<<< bf156df08f90f220fdfa78462558ae94ee175a67
 <<<<<<< ad0b1fdbfeed4d3673342cdad9a43d4b22372fe1
@@ -23,6 +24,9 @@ To create headings, you will use the `#` symbol before the text. The number of h
 >>>>>>> Include cross-project tagging in markdown doc
 =======
 >>>>>>> Add documentation for using Markdown in Pagure
+=======
+
+>>>>>>> Include cross-project tagging in markdown doc
 Pagure uses [Markdown syntax highlighting](https://daringfireball.net/projects/markdown/syntax)
 as the base for formatting comments in issues, pull requests, and in
 Markdown files in repositories. For basic formatting, Pagure follows
@@ -476,6 +480,10 @@ number. To link it, use the `#` character followed by its number. Like
 with tagging users, Pagure will provide suggestions for issues or pull
 requests as you type the number. You can select the issue in the drop-down
 to automatically tag the issue or pull request.
+
+If you need to tag an issue or pull request that is outside of the current
+project, you are also able to do this. For cross-projects links, you can
+tag them by typing `<project name>#id` or `<username>/<project name>#id`.
 
 &nbsp;
 
