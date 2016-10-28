@@ -24,6 +24,7 @@ import shutil
 import subprocess
 import tempfile
 
+import arrow
 import pygit2
 import werkzeug
 
@@ -1361,3 +1362,36 @@ def get_git_tags_objects(project):
         sorted_tags.append(tags[tag])
 
     return sorted_tags
+
+
+def log_commits_to_db(session, project, commits, gitdir):
+    """ Log the given commits to the DB. """
+    repo_obj = PagureRepo(gitdir)
+
+    for commit in commits:
+        try:
+            commit = repo_obj[commit]
+        except ValueError:
+            continue
+
+        try:
+            author_obj = pagure.lib.get_user(session, commit.author.email)
+        except pagure.exceptions.PagureException:
+            author_obj = None
+
+        date_created = arrow.get(commit.commit_time)
+
+        arg = {
+            'user': author_obj.user if author_obj else commit.author.email,
+            'project': project.fullname,
+        }
+        desc = '%(user)s committed on %(project)s' % arg
+        log = model.PagureLog(
+            user_id=author_obj.id if author_obj else None,
+            user_email=commit.author.email if not author_obj else None,
+            project_id=project.id,
+            description=desc,
+            date=date_created.date(),
+            date_created=date_created.datetime
+        )
+        session.add(log)
