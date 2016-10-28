@@ -26,6 +26,17 @@ abspath = os.path.abspath(os.environ['GIT_DIR'])
 
 def run_as_post_receive_hook():
 
+    repo = pagure.lib.git.get_repo_name(abspath)
+    username = pagure.lib.git.get_username(abspath)
+    namespace = pagure.lib.git.get_repo_namespace(abspath)
+    if pagure.APP.config.get('HOOK_DEBUG', False):
+        print 'repo:', repo
+        print 'user:', username
+        print 'namespace:', namespace
+
+    project = pagure.lib.get_project(
+        pagure.SESSION, repo, user=username, namespace=namespace)
+
     for line in sys.stdin:
         if pagure.APP.config.get('HOOK_DEBUG', False):
             print line
@@ -55,23 +66,18 @@ def run_as_post_receive_hook():
                 "pagure hook"
             return
 
-    repo = pagure.lib.git.get_repo_name(abspath)
-    username = pagure.lib.git.get_username(abspath)
-    namespace = pagure.lib.git.get_repo_namespace(abspath)
-    if pagure.APP.config.get('HOOK_DEBUG', False):
-        print 'repo:', repo
-        print 'user:', username
-        print 'namespace:', namespace
+        commits = pagure.lib.git.get_revs_between(
+            oldrev, newrev, abspath, refname)
+        pagure.lib.git.log_commits_to_db(
+            pagure.SESSION, project, commits, abspath)
 
-    project = pagure.lib.get_project(
-        pagure.SESSION, repo, user=username, namespace=namespace)
     try:
         # Reset the merge_status of all opened PR to refresh their cache
         pagure.lib.reset_status_pull_request(pagure.SESSION, project)
         pagure.SESSION.commit()
     except SQLAlchemyError as err:  # pragma: no cover
         pagure.SESSION.rollback()
-        pagure.APP.logger.exception(err)
+        print err
         print 'An error occured while running the default hook, please '\
             'report it to an admin.'
 
