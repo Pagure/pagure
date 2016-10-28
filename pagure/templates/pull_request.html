@@ -820,10 +820,17 @@ function cancel_edit_btn() {
   $(".cancel").click(
     function() {
       var item = $(this).closest('section');
-      var parent = item.parent().parent().parent().parent();
       $(item.parent().find('.issue_comment')).show();
       $(item.parent().find('.issue_actions')).show();
-      $(parent.find('.pr_comment_form')).remove();
+      var form = item.find('.pr_comment_form');
+      {# regular comments have the .pr_comment_form within the closest section #}
+      if (form.length){
+        $(form).remove();
+      } else {
+        {# inline comments have the section within the .pr_comment_form #}
+        var form = $(this).closest('.pr_comment_form').parent();
+        $(form).remove();
+      }
       return false;
     }
   );
