@@ -1,5 +1,6 @@
 Using Markdown in Pagure
 ========================
+
 Pagure uses [Markdown syntax highlighting](https://daringfireball.net/projects/markdown/syntax)
 as the base for formatting comments in issues, pull requests, and in
 Markdown files in repositories. For basic formatting, Pagure follows
@@ -177,6 +178,10 @@ number. To link it, use the `#` character followed by its number. Like
 with tagging users, Pagure will provide suggestions for issues or pull
 requests as you type the number. You can select the issue in the drop-down
 to automatically tag the issue or pull request.
+
+If you need to tag an issue or pull request that is outside of the current
+project, you are also able to do this. For cross-projects links, you can
+tag them by typing `<project name>#id` or `<username>/<project name>#id`.
 
 &nbsp;
 
