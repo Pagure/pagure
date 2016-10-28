@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014 - Copyright Red Hat Inc
+ (c) 2014-2016 - Copyright Red Hat Inc
 
  Authors:
    Ralph Bean <rbean@redhat.com>
@@ -15,6 +15,8 @@ import docutils.examples
 import markupsafe
 import markdown
 import textwrap
+
+import pagure.lib
 
 
 def modify_rst(rst, view_file_url=None):
@@ -99,7 +101,7 @@ def convert_readme(content, ext, view_file_url=None):
         safe = True
         output = convert_doc(content.decode('utf-8'), view_file_url)
     elif ext and ext in ['.mk', '.md', '.markdown']:
-        output = markdown.markdown(content.decode('utf-8'))
+        output = pagure.lib.text2markdown(content.decode('utf-8'))
         safe = True
     elif not ext or (ext and ext in ['.text', '.txt']):
         safe = True
