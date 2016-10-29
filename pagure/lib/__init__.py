@@ -21,6 +21,7 @@ except ImportError:
     import json
 
 import datetime
+import logging
 import markdown
 import os
 import shutil
@@ -53,6 +54,7 @@ from pagure.lib import model
 
 REDIS = None
 PAGURE_CI = None
+LOG = None
 
 
 def set_redis(host, port, dbname):
@@ -66,6 +68,12 @@ def set_pagure_ci(services):
     """ Set the list of CI services supported by this pagure instance. """
     global PAGURE_CI
     PAGURE_CI = services
+
+
+def set_log(logger):
+    """ Set a logger that can be used in this module. """
+    global LOG
+    LOG = logger
 
 
 def get_user(session, key):
