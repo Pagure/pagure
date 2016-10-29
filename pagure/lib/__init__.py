@@ -2923,7 +2923,12 @@ def text2markdown(text, extended=True):
     )
 
     if text:
-        return clean_input(md_processor.convert(text))
+        try:
+            text = md_processor.convert(text)
+        except Exception as err:
+            LOG.exception(
+                'A markdown error occured while processing: ``%s``' % text)
+        return clean_input(text)
 
     return ''
 
