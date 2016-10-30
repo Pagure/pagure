@@ -271,7 +271,7 @@ by alone, allowing easier debugging of the tests. For example:
 
 ::
 
-  python tests/test_pragure_lib.py
+  python tests/test_pagure_lib.py
 
 
 .. note:: In order to have coverage information you might have to install
