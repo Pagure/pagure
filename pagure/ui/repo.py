@@ -622,7 +622,7 @@ def view_raw_file(
             commit = repo_obj[repo_obj.head.target]
 
     if not commit:
-        flask.abort(400, 'Commit %s not found' % (identifier))
+        flask.abort(404, 'Commit %s not found' % (identifier))
 
     if isinstance(commit, pygit2.Tag):
         commit = commit.get_object()
