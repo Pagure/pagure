@@ -1368,9 +1368,9 @@ def log_commits_to_db(session, project, commits, gitdir):
     """ Log the given commits to the DB. """
     repo_obj = PagureRepo(gitdir)
 
-    for commit in commits:
+    for commitid in commits:
         try:
-            commit = repo_obj[commit]
+            commit = repo_obj[commitid]
         except ValueError:
             continue
 
@@ -1384,8 +1384,9 @@ def log_commits_to_db(session, project, commits, gitdir):
         arg = {
             'user': author_obj.user if author_obj else commit.author.email,
             'project': project.fullname,
+            'commitid': commit.oid.hex,
         }
-        desc = '%(user)s committed on %(project)s' % arg
+        desc = '%(user)s committed on %(project)s#%(commitid)s' % arg
         log = model.PagureLog(
             user_id=author_obj.id if author_obj else None,
             user_email=commit.author.email if not author_obj else None,
