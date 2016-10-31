@@ -17,11 +17,11 @@ add_comment = function(data, username) {
       var _data = '<div class="card"> \
             <div class="card-header"> \
               <div> \
-                ' + emojione.toImage(data.comment_added) + '\
                 <div class="pull-xs-right text-muted"> \
                   <span title="' + data.comment_date + '">\
                     Just now</span></div>\
-              </div> \
+                </div> \
+                <small>' + emojione.toImage(data.comment_added) + '</small>\
             </div> \
           </div>';
 
