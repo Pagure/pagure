@@ -2630,6 +2630,7 @@ class PagureLibtests(tests.Modeltests):
             'test#1 bazinga!',
             'pingou opened the PR forks/pingou/test#2',
             'fork/pingou/ns/test#8 is private',
+            'pingou committed on test#9364354a4555ba17aa60f0dc844d70b74eb1aecd',
         ]
         expected = [
             # 'foo bar test#1 see?',
@@ -2664,6 +2665,11 @@ class PagureLibtests(tests.Modeltests):
             # 'fork/pingou/ns/test#8 is private',
             '<p><a href="http://pagure.org/fork/pingou/ns/test/issue/8" '
             'title="Private issue">pingou/ns/test#8</a> is private</p>',
+            # 'pingou committed on test#9364354a4555ba17aa60f0dc844d70b74eb1aecd',
+            '<p>pingou committed on <a href="http://pagure.org/'
+            'test/c/9364354a4555ba17aa60f0dc844d70b74eb1aecd" '
+            'title="Commit 9364354a4555ba17aa60f0dc844d70b74eb1aecd"'
+            '>test#9364354a4555ba17aa60f0dc844d70b74eb1aecd</a></p>'
         ]
 
         with pagure.APP.app_context():
