@@ -44,6 +44,12 @@ EXPLICIT_LINK_RE = r'(?<!\w)'\
 '([a-zA-Z0-9_-]*?/)?'\
 '([a-zA-Z0-9_-]+)'\
 '#(?P<id>[0-9]+)'
+COMMIT_LINK_RE = r'(?<!\w)'\
+'(fork[s]?/)?'\
+'([a-zA-Z0-9_-]*?/)?'\
+'([a-zA-Z0-9_-]*?/)?'\
+'([a-zA-Z0-9_-]+)'\
+'#(?P<id>[\w]{40})'
 IMPLICIT_ISSUE_RE = r'[^|\w](?<!\w)#([0-9]+)'
 IMPLICIT_PR_RE = r'[^|\w](?<!\w)PR#([0-9]+)'
 STRIKE_THROUGH_RE = r'~~(\w+)~~'
@@ -106,6 +112,40 @@ class ExplicitLinkPattern(markdown.inlinepatterns.Pattern):
         request = _pr_exists(user, namespace, repo, idx)
         if request:
             return _obj_anchor_tag(user, namespace, repo, request, text)
+
+        return text
+
+
+class CommitLinkPattern(markdown.inlinepatterns.Pattern):
+    """ Commit link pattern. """
+
+    def handleMatch(self, m):
+        """ When the pattern matches, update the text. """
+        is_fork = m.group(2)
+        user = m.group(3)
+        namespace = m.group(4)
+        repo = m.group(5)
+        commitid = m.group(6)
+        text = '%s#%s' % (repo, commitid)
+
+        if not is_fork and user:
+            namespace = user
+            user = None
+
+        if namespace:
+            namespace = namespace.rstrip('/')
+            text = '%s/%s' % (namespace, text)
+        if user:
+            user = user.rstrip('/')
+            text = '%s/%s' % (user.rstrip('/'), text)
+
+        if pagure.lib.search_projects(
+                pagure.SESSION,
+                username=user,
+                fork=is_fork,
+                namespace=namespace,
+                pattern=repo):
+            return _obj_anchor_tag(user, namespace, repo, commitid, text)
 
         return text
 
@@ -221,6 +261,8 @@ class PagureExtension(markdown.extensions.Extension):
         if pagure.APP.config.get('ENABLE_TICKETS', True):
             md.inlinePatterns['implicit_pr'] = \
                 ImplicitPRPattern(IMPLICIT_PR_RE)
+            md.inlinePatterns['commit_links'] = \
+                CommitLinkPattern(COMMIT_LINK_RE)
             md.inlinePatterns['explicit_fork_issue'] = \
                 ExplicitLinkPattern(EXPLICIT_LINK_RE)
             md.inlinePatterns['implicit_issue'] = \
@@ -273,7 +315,12 @@ def _obj_anchor_tag(user, namespace, repo, obj, text):
     :return: An element tree containing the href to the issue or PR
     :rtype:  xml.etree.ElementTree.Element
     """
-    if obj.isa == 'issue':
+    if isinstance(obj, basestring):
+        url = flask.url_for(
+            'view_commit', username=user, namespace=namespace, repo=repo,
+             commitid=obj)
+        title = 'Commit %s' % obj
+    elif obj.isa == 'issue':
         url = flask.url_for(
             'view_issue', username=user, namespace=namespace, repo=repo,
              issueid=obj.id)
