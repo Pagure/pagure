@@ -8,6 +8,7 @@
 
 """
 
+import collections
 import datetime
 
 import arrow
@@ -251,6 +252,9 @@ def api_view_user_activity_date(username, date):
     +---------------+----------+--------------+----------------------------+
     | ``date``      | string   | Mandatory    | | The date of interest     |
     +---------------+----------+--------------+----------------------------+
+    | ``grouped``   | string   | Optional     | | Whether to group the     |
+    |               |          |              |   commits or not           |
+    +---------------+----------+--------------+----------------------------+
 
 
     Sample response
@@ -288,6 +292,8 @@ def api_view_user_activity_date(username, date):
     """
     httpcode = 200
 
+    grouped = str(flask.request.args.get('grouped')).lower() in ['1', 'true']
+
     try:
         date = arrow.get(date)
         date = date.strftime('%Y-%m-%d')
@@ -301,6 +307,27 @@ def api_view_user_activity_date(username, date):
 
     activities = pagure.lib.get_user_activity_day(SESSION, user, date)
     js_act = []
+    if grouped:
+        commits = collections.defaultdict(list)
+        acts = []
+        for activity in activities:
+            if activity.type_ == 'commit':
+                commits[activity.project.fullname].append(activity)
+            else:
+                acts.append(activity)
+        for project in commits:
+            if len(commits[project]) == 1:
+                tmp = commits[project]
+            else:
+                tmp = dict(
+                    description_mk=pagure.lib.text2markdown(
+                        '@%s pushed %s commits to %s' % (
+                            username, len(commits[project]), project
+                        )
+                    )
+                )
+            js_act.append(tmp)
+        activities = acts
     for activity in activities:
         activity = activity.to_json(public=True)
         activity['description_mk'] = pagure.lib.text2markdown(
