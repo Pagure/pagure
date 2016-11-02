@@ -112,3 +112,14 @@ Manually
 
 
 This will launch the application at http://127.0.0.1:5000
+
+
+* To run unit-tests on pagure
+
+  * Install the dependencies::
+
+      pip install -r tests_requirements.txt
+
+  * Run it::
+
+      ./runtests.sh

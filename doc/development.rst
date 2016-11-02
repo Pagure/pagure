@@ -250,6 +250,19 @@ expect it and the way we expect it.
 Tests checking that function are failing when/how we want are as important
 as tests checking they work the way they are intended to.
 
+
+So here are a few steps that one could perform to run unit-tests in a
+local pagure instance.
+
+* Install the dependencies::
+
+     pip install -r tests_requirements.txt
+
+* Run it::
+
+     ./runtests.sh
+
+
 ``runtests.sh``, located at the top of the sources, helps to run the
 unit-tests of the project with coverage information using `python-nose
 <https://nose.readthedocs.org/>`_.
