@@ -1594,6 +1594,7 @@ class PagureLog(BASE):
         nullable=True,
         index=True
     )
+    type_ = sa.Column(sa.Text, nullable=False)
     description = sa.Column(sa.Text, nullable=False)
     date = sa.Column(
         sa.Date,
@@ -1629,6 +1630,7 @@ class PagureLog(BASE):
         '''
         output = {
             'id': self.id,
+            'type': self.type_,
             'description': self.description,
             'date': self.date.strftime('%Y-%m-%d'),
             'date_created': self.date_created.strftime('%s'),

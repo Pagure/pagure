@@ -3343,6 +3343,7 @@ def log_action(session, action, obj):
     log = model.PagureLog(
         user_id=obj.user_id,
         project_id=project_id,
+        type_=obj.isa,
         description=desc % arg,
         date=obj.date_created.date(),
         date_created=obj.date_created
