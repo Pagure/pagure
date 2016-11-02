@@ -318,7 +318,7 @@
             type: 'GET',
             url: "{{ url_for(
               'api_ns.api_view_user_activity_date',
-              username=username, date='') }}" + date,
+              username=username, date='') }}" + date + '?grouped=1',
             contentType: "application/json",
             dataType: 'json',
             success: function(data) {
