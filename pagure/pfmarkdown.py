@@ -31,12 +31,19 @@ import pagure.lib
 
 
 MENTION_RE = r'@(\w+)'
-EXPLICIT_LINK_RE = r'(?<!\w)'\  # Ensure we catch the motif from the start
-'(fork[s]?/)?'\  # See if there is a `forks/` at the start
-'([a-zA-Z0-9_-]*?/)?'\ # See if we have a `user/`
-'([a-zA-Z0-9_-]*?/)?'\  # See if we have a `namespace/`
-'([a-zA-Z0-9_-]+)'\  # Get the last part `project`
-'#(?P<id>[0-9]+)'  # Get the identifier `#<id>`
+# Each line below correspond to a line of the regex:
+#  1) Ensure we catch the motif from the start
+#  2) See if there is a `forks/` at the start
+#  3) See if we have a `user/`
+#  4) See if we have a `namespace/`
+#  5) Get the last part `project`
+#  6) Get the identifier `#<id>`
+EXPLICIT_LINK_RE = r'(?<!\w)'\
+'(fork[s]?/)?'\
+'([a-zA-Z0-9_-]*?/)?'\
+'([a-zA-Z0-9_-]*?/)?'\
+'([a-zA-Z0-9_-]+)'\
+'#(?P<id>[0-9]+)'
 IMPLICIT_ISSUE_RE = r'[^|\w](?<!\w)#([0-9]+)'
 IMPLICIT_PR_RE = r'[^|\w](?<!\w)PR#([0-9]+)'
 STRIKE_THROUGH_RE = r'~~(\w+)~~'
