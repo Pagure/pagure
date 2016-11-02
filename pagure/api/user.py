@@ -128,6 +128,8 @@ def api_view_user_activity_stats(username):
 
         GET /api/0/user/ralph/activity/stats
 
+        GET /api/0/user/ralph/activity/stats?format=timestamp
+
     Parameters
     ^^^^^^^^^^
 
@@ -140,7 +142,10 @@ def api_view_user_activity_stats(username):
     +---------------+----------+--------------+----------------------------+
     | ``format``    | string   | Optional     | | Allows changing the      |
     |               |          |              |   of the date/time returned|
-    |               |          |              |   can be: `timestamp`      |
+    |               |          |              |   from iso formato to unix |
+    |               |          |              |   timestamp                |
+    |               |          |              |   Can be: `timestamp`      |
+    |               |          |              |   or `isoformat`           |
     +---------------+----------+--------------+----------------------------+
 
 
@@ -150,55 +155,39 @@ def api_view_user_activity_stats(username):
     ::
 
         {
-          "2016-05-04 00:00:00": 5,
-          "2016-05-09 00:00:00": 4,
-          "2016-05-28 00:00:00": 1,
-          "2016-06-27 00:00:00": 4,
-          "2016-08-06 00:00:00": 2,
-          "2016-08-08 00:00:00": 5,
-          "2016-08-09 00:00:00": 41,
-          "2016-08-12 00:00:00": 36,
-          "2016-08-30 00:00:00": 1,
-          "2016-09-12 00:00:00": 1,
-          "2016-09-13 00:00:00": 1,
-          "2016-09-18 00:00:00": 3,
-          "2016-09-30 00:00:00": 2,
-          "2016-10-03 00:00:00": 6,
-          "2016-10-04 00:00:00": 7,
-          "2016-10-06 00:00:00": 1,
-          "2016-10-13 00:00:00": 11,
-          "2016-10-17 00:00:00": 1,
-          "2016-10-20 00:00:00": 5
+          "2015-11-04": 9,
+          "2015-11-06": 3,
+          "2015-11-09": 6,
+          "2015-11-13": 4,
+          "2015-11-15": 3,
+          "2015-11-18": 15,
+          "2015-11-19": 3,
+          "2015-11-20": 15,
+          "2015-11-26": 18,
+          "2015-11-30": 116,
+          "2015-12-02": 12,
+          "2015-12-03": 2
         }
 
     or::
 
         {
-          "1462312800": 5,
-          "1462744800": 4,
-          "1464386400": 1,
-          "1466978400": 4,
-          "1470434400": 2,
-          "1470607200": 5,
-          "1470693600": 41,
-          "1470952800": 36,
-          "1472508000": 1,
-          "1473631200": 1,
-          "1473717600": 1,
-          "1474149600": 3,
-          "1475186400": 2,
-          "1475445600": 6,
-          "1475532000": 7,
-          "1475704800": 1,
-          "1476309600": 11,
-          "1476655200": 1,
-          "1476914400": 5
+          "1446591600": 9,
+          "1446764400": 3,
+          "1447023600": 6,
+          "1447369200": 4,
+          "1447542000": 3,
+          "1447801200": 15,
+          "1447887600": 3,
+          "1447974000": 15,
+          "1448492400": 18,
+          "1448838000": 116,
+          "1449010800": 12,
+          "1449097200": 2
         }
 
     """
-    httpcode = 200
-
-    date_format = flask.request.args.get('format')
+    date_format = flask.request.args.get('format', 'isoformat')
 
     user = pagure.lib.search_user(SESSION, username=username)
     if not user:
@@ -207,19 +196,20 @@ def api_view_user_activity_stats(username):
     stats = pagure.lib.get_yearly_stats_user(
         SESSION, user, datetime.datetime.utcnow().date() + datetime.timedelta(days=1)
     )
+
     def format_date(d):
         if date_format == 'timestamp':
             d = d.strftime('%s')
         else:
-            d = d.strftime('%Y-%m-%d %H:%M:%S')
+            d = d.isoformat()
         return d
+
     stats = [
         (format_date(d[0]), d[1])
         for d in stats
     ]
 
     jsonout = flask.jsonify(stats)
-    jsonout.status_code = httpcode
     return jsonout
 
 
@@ -250,9 +240,11 @@ def api_view_user_activity_date(username, date):
     |               |          |              |   whose activity you are   |
     |               |          |              |   interested in.           |
     +---------------+----------+--------------+----------------------------+
-    | ``date``      | string   | Mandatory    | | The date of interest     |
+    | ``date``      | string   | Mandatory    | | The date of interest,    |
+    |               |          |              |   best provided in ISO     |
+    |               |          |              |   format: YYYY-MM-DD       |
     +---------------+----------+--------------+----------------------------+
-    | ``grouped``   | string   | Optional     | | Whether to group the     |
+    | ``grouped``   | boolean  | Optional     | | Whether to group the     |
     |               |          |              |   commits or not           |
     +---------------+----------+--------------+----------------------------+
 
@@ -290,8 +282,6 @@ def api_view_user_activity_date(username, date):
         }
 
     """
-    httpcode = 200
-
     grouped = str(flask.request.args.get('grouped')).lower() in ['1', 'true']
 
     try:
@@ -338,5 +328,4 @@ def api_view_user_activity_date(username, date):
     jsonout = flask.jsonify(
         dict(activities=js_act)
     )
-    jsonout.status_code = httpcode
     return jsonout
