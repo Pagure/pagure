@@ -2524,7 +2524,7 @@ class PagureLibtests(tests.Modeltests):
     def test_text2markdown(self):
         ''' Test the test2markdown method in pagure.lib. '''
         pagure.APP.config['TESTING'] = True
-        pagure.APP.config['SERVER_NAME'] = 'https://pagure.org'
+        pagure.APP.config['SERVER_NAME'] = 'pagure.org'
         pagure.SESSION = self.session
         pagure.lib.SESSION = self.session
         self.app = pagure.APP.test_client()
@@ -2618,32 +2618,32 @@ class PagureLibtests(tests.Modeltests):
         ]
         expected = [
             # 'foo bar test#1 see?',
-            '<p>foo bar <a href="http://https://pagure.org/test/pull-request/1"'
+            '<p>foo bar <a href="http://pagure.org/test/pull-request/1"'
             ' title="test pull-request">test#1</a> see?</p>',
             # 'foo bar pingou/test#2 I mean, really', -- unknown namespace
             '<p>foo bar pingou/test#2 I mean, really</p>',
             # 'foo bar fork/pingou/test#2 bouza!',
-            '<p>foo bar <a href="http://https://pagure.org/fork/'
+            '<p>foo bar <a href="http://pagure.org/fork/'
             'pingou/test/pull-request/2" title="test pull-request in fork">'
             'pingou/test#2</a> bouza!</p>',
             # 'foo bar forks/pingou/test#2 bouza!',  -- the 's' doesn't matter
-            '<p>foo bar <a href="http://https://pagure.org/fork/'
+            '<p>foo bar <a href="http://pagure.org/fork/'
             'pingou/test/pull-request/2" title="test pull-request in fork">'
             'pingou/test#2</a> bouza!</p>',
             # 'foo bar ns/test3#4 bouza!',
-            '<p>foo bar <a href="http://https://pagure.org/ns/test3/issue/4"'
+            '<p>foo bar <a href="http://pagure.org/ns/test3/issue/4"'
             ' title="test issue">ns/test3#4</a> bouza!</p>',
             # 'foo bar fork/user/ns/test#5 bouza!', -- unknown fork
             '<p>foo bar user/ns/test#5 bouza!</p>',
             # 'foo bar fork/pingou/ns/test#7 bouza!',
-            '<p>foo bar <a href="http://https://pagure.org/'
+            '<p>foo bar <a href="http://pagure.org/'
             'fork/pingou/ns/test/issue/7" title="test issue #7">'
             'pingou/ns/test#7</a> bouza!</p>',
             # 'test#1 bazinga!',
-            '<p><a href="http://https://pagure.org/test/pull-request/1" '
+            '<p><a href="http://pagure.org/test/pull-request/1" '
             'title="test pull-request">test#1</a> bazinga!</p>',
             # 'pingou opened the PR forks/pingou/test#2'
-            '<p>pingou opened the PR <a href="http://https://pagure.org/'
+            '<p>pingou opened the PR <a href="http://pagure.org/'
             'fork/pingou/test/pull-request/2" '
             'title="test pull-request in fork">pingou/test#2</a></p>'
         ]
