@@ -68,3 +68,8 @@ class NoCorrespondingPR(PagureException):
     ''' Exception raised when no pull-request is found with the given
     information. '''
     pass
+
+
+class InvalidObjetException(PagureException):
+    ''' Exception raised when a given object is not what was expected. '''
+    pass

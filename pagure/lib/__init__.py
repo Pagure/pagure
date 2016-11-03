@@ -3219,6 +3219,10 @@ def set_watch_obj(session, user, obj, watch_status):
             pull_request_uid=obj.uid,
             watch=watch_status,
         )
+    else:
+        raise pagure.exceptions.InvalidObjetException(
+            'Unknow watch target: "%s"' % obj
+        )
 
     session.add(dbobj)
 
