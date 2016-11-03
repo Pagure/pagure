@@ -267,7 +267,12 @@ def _pr_exists(user, namespace, repo, idx):
 
 
 def _obj_anchor_tag(user, namespace, repo, obj, text):
-    """ Utility method generating the link to an issue or a PR. """
+    """
+    Utility method generating the link to an issue or a PR.
+
+    :return: An element tree containing the href to the issue or PR
+    :rtype:  xml.etree.ElementTree.Element
+    """
     if obj.isa == 'issue':
         url = flask.url_for(
             'view_issue', username=user, namespace=namespace, repo=repo,
