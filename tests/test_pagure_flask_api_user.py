@@ -146,6 +146,28 @@ class PagureFlaskApiUSertests(tests.Modeltests):
 
         self.test_api_view_user_activity_stats()
 
+        # Invalid date
+        output = self.app.get('/api/0/user/pingou/activity/AABB')
+        self.assertEqual(output.status_code, 400)
+
+        # Invalid date
+        output = self.app.get('/api/0/user/pingou/activity/2016asd')
+        self.assertEqual(output.status_code, 200)
+        exp = {
+          "activities": [],
+          "date": "2016-01-01"
+        }
+        self.assertEqual(json.loads(output.data), exp)
+
+        # Date parsed, just not really as expected
+        output = self.app.get('/api/0/user/pingou/activity/20161245')
+        self.assertEqual(output.status_code, 200)
+        exp = {
+          "activities": [],
+          "date": "1970-08-22"
+        }
+        self.assertEqual(json.loads(output.data), exp)
+
         date = datetime.datetime.utcnow().date().strftime('%Y-%m-%d')
         # Retrieve the user's logs for today
         output = self.app.get('/api/0/user/pingou/activity/%s' % date)
@@ -205,7 +227,8 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                 "name": "pingou"
               }
             }
-          ]
+          ],
+          "date": date,
         }
         for idx, act in enumerate(data['activities']):
             act['date_created'] = '1477558752'
