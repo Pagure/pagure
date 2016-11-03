@@ -3199,6 +3199,76 @@ def user_watch_list(session, user):
     return sorted(list(watch), key=lambda proj: proj.name)
 
 
+def watching_obj(session, user, obj, watch_status):
+    ''' Set the watch status of the user on the specified object.
+
+    Objects can be either an issue or a pull-request
+    '''
+
+    user_obj = get_user(session, user.username)
+
+    if obj.isa == "issue":
+        dbobj = model.IssueWatcher(
+            user_id=user.id,
+            issue_uid=obj.uid,
+            watch=watch_status,
+        )
+    elif obj.isa == "pull-request":
+        dbobj = model.PullRequestWatcher(
+            user_id=user.id,
+            pull_request_uid=obj.uid,
+            watch=watch_status,
+        )
+
+    session.add(dbobj)
+
+    output = 'You are no longer watching this %s' % obj.isa
+    if watch_status:
+        output = 'You are now watching this %s' % obj.isa
+    return output
+
+
+def is_watching_obj(session, user, obj):
+    ''' Check if the user is watching the specified object.
+
+    Objects can be either an issue or a pull-request
+    '''
+
+    if not user:
+        return False
+
+    if obj.user.user == user.user:
+        return True
+
+    for comment in obj.comments:
+        if comment.user.user == user.user:
+            return True
+
+    if obj.isa == "issue":
+        query = session.query(
+            model.IssueWatcher
+        ).filter(
+            model.IssueWatcher.user_id == user.id
+        ).filter(
+            model.IssueWatcher.issue_uid == obj.uid
+        )
+    elif obj.isa == "pull-request":
+        query = session.query(
+            model.PullRequestWatcher
+        ).filter(
+            model.PullRequestWatcher.user_id == user.id
+        ).filter(
+            model.PullRequestWatcher.pull_request_uid == obj.uid
+        )
+
+    watcher = query.first()
+
+    if watcher:
+        return watcher.watch
+
+    return False
+
+
 def save_report(session, repo, name, url, username):
     """ Save the report of issues based on the given URL of the project.
     """
