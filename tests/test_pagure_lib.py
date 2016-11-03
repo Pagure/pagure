@@ -2605,6 +2605,20 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(iss.id, 7)
         self.assertEqual(iss.title, 'test issue #7')
 
+        iss = pagure.lib.new_issue(
+            issue_id=8,
+            session=self.session,
+            repo=item,
+            title='private issue #8',
+            content='Private content test issue #8 in forked repo',
+            user='pingou',
+            private=True,
+            ticketfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(iss.id, 8)
+        self.assertEqual(iss.title, 'private issue #8')
+
         texts = [
             'foo bar test#1 see?',
             'foo bar pingou/test#2 I mean, really',
@@ -2614,7 +2628,8 @@ class PagureLibtests(tests.Modeltests):
             'foo bar fork/user/ns/test#5 bouza!',
             'foo bar fork/pingou/ns/test#7 bouza!',
             'test#1 bazinga!',
-            'pingou opened the PR forks/pingou/test#2'
+            'pingou opened the PR forks/pingou/test#2',
+            'fork/pingou/ns/test#8 is private',
         ]
         expected = [
             # 'foo bar test#1 see?',
@@ -2645,7 +2660,10 @@ class PagureLibtests(tests.Modeltests):
             # 'pingou opened the PR forks/pingou/test#2'
             '<p>pingou opened the PR <a href="http://pagure.org/'
             'fork/pingou/test/pull-request/2" '
-            'title="test pull-request in fork">pingou/test#2</a></p>'
+            'title="test pull-request in fork">pingou/test#2</a></p>',
+            # 'fork/pingou/ns/test#8 is private',
+            '<p><a href="http://pagure.org/fork/pingou/ns/test/issue/8" '
+            'title="Private issue">pingou/ns/test#8</a> is private</p>',
         ]
 
         with pagure.APP.app_context():
