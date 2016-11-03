@@ -1670,6 +1670,88 @@ class PagureLog(BASE):
 
         return desc % arg
 
+
+class IssueWatcher(BASE):
+    """ Stores the users watching issues.
+
+    Table -- issue_watchers
+    """
+
+    __tablename__ = 'issue_watchers'
+    __table_args__ = (
+        sa.UniqueConstraint('issue_uid', 'user_id'),
+    )
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    issue_uid = sa.Column(
+        sa.Integer,
+        sa.ForeignKey('issues.uid', onupdate='CASCADE', ondelete='CASCADE'),
+        nullable=False)
+    user_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey('users.id', onupdate='CASCADE', ondelete='CASCADE'),
+        nullable=False,
+        index=True)
+    watch = sa.Column(
+        sa.Boolean,
+        nullable=False)
+
+    user = relation(
+        'User', foreign_keys=[user_id], remote_side=[User.id],
+        backref=backref(
+            'issue_watched', cascade="delete, delete-orphan"
+        ),
+    )
+
+    issue = relation(
+        'Issue', foreign_keys=[issue_uid], remote_side=[Issue.uid],
+        backref=backref(
+            'watchers', cascade="delete, delete-orphan",
+        ),
+    )
+
+
+class PullRequestWatcher(BASE):
+    """ Stores the users watching issues.
+
+    Table -- pull_request_watchers
+    """
+
+    __tablename__ = 'pull_request_watchers'
+    __table_args__ = (
+        sa.UniqueConstraint('pull_request_uid', 'user_id'),
+    )
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    pull_request_uid = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(
+            'pull_requests.uid', onupdate='CASCADE', ondelete='CASCADE'),
+        nullable=False)
+    user_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey('users.id', onupdate='CASCADE', ondelete='CASCADE'),
+        nullable=False,
+        index=True)
+    watch = sa.Column(
+        sa.Boolean,
+        nullable=False)
+
+    user = relation(
+        'User', foreign_keys=[user_id], remote_side=[User.id],
+        backref=backref(
+            'pr_watched', cascade="delete, delete-orphan"
+        ),
+    )
+
+    pull_request = relation(
+        'PullRequest', foreign_keys=[pull_request_uid], remote_side=[PullRequest.uid],
+        backref=backref(
+            'watchers', cascade="delete, delete-orphan",
+        ),
+    )
+
+
 #
 # Class and tables specific for the API/token access
 #
