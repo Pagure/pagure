@@ -3303,55 +3303,30 @@ def get_user_activity_day(session, user, date):
 
 def log_action(session, action, obj):
     ''' Log an user action on a project/issue/PR. '''
-    arg = {
-        'user': obj.user.user,
-        'obj_id': obj.id
-    }
-    verb = ''
-    desc = '%(user)s %(verb)s %(project)s#%(obj_id)s'
+
     project_id = None
-    project = None
     if obj.isa in ['issue', 'pull-request']:
         project_id = obj.project_id
-        project = obj.project.fullname
     elif obj.isa == 'project':
         project_id = obj.id
-        project = obj.fullname
     else:
         raise pagure.exceptions.PagureException(
             'Unsupported object found: "%s"' % obj
         )
 
-    if obj.isa == 'issue' and action == 'created':
-        verb = 'created issue'
-    elif obj.isa == 'issue' and action == 'commented':
-        verb = 'comment on issue'
-    elif obj.isa == 'pull-request' and action == 'created':
-        verb = 'created PR'
-    elif obj.isa == 'pull-request' and action == 'commented':
-        verb = 'comment on PR'
-    elif obj.isa == 'pull-request' and action == 'closed':
-        verb = 'closed PR'
-    elif obj.isa == 'pull-request' and action == 'merged':
-        verb = 'merged PR'
-    elif obj.isa == 'project' and action == 'created':
-        verb = 'created Project'
-        desc = '%(user)s %(verb)s %(project)s'
-
-    arg['verb'] = verb
-    arg['project'] = project
     log = model.PagureLog(
         user_id=obj.user_id,
         project_id=project_id,
-        log_type=obj.isa,
-        description=desc % arg,
+        log_type=action,
+        ref_id=obj.id,
         date=obj.date_created.date(),
         date_created=obj.date_created
     )
     if obj.isa == 'issue':
         setattr(log, 'issue_uid', obj.uid)
-    elif obj.isa == 'request':
+    elif obj.isa == 'pull-request':
         setattr(log, 'pull_request_uid', obj.uid)
+
 
     session.add(log)
     session.commit()
