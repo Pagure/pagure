@@ -326,6 +326,9 @@ def api_view_user_activity_date(username, date):
         js_act.append(activity)
 
     jsonout = flask.jsonify(
-        dict(activities=js_act)
+        dict(
+            activities=js_act,
+            date=date,
+        )
     )
     return jsonout
