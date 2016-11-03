@@ -3199,7 +3199,7 @@ def user_watch_list(session, user):
     return sorted(list(watch), key=lambda proj: proj.name)
 
 
-def watching_obj(session, user, obj, watch_status):
+def set_watch_obj(session, user, obj, watch_status):
     ''' Set the watch status of the user on the specified object.
 
     Objects can be either an issue or a pull-request

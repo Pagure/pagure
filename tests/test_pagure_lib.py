@@ -2747,7 +2747,7 @@ class PagureLibtests(tests.Modeltests):
 
         # Watch the ticket
         user = tests.FakeUser(username='bar')
-        out = pagure.lib.watching_obj(self.session, user, iss, True)
+        out = pagure.lib.set_watch_obj(self.session, user, iss, True)
         self.assertEqual(out, 'You are now watching this issue')
 
         # Is watching the ticket
@@ -2758,8 +2758,8 @@ class PagureLibtests(tests.Modeltests):
         user = tests.FakeUser(username='bar')
         self.assertTrue(pagure.lib.is_watching_obj(self.session, user, iss))
 
-    def test_watching_obj(self):
-        """ Test the watching_obj method in pagure.lib """
+    def test_set_watch_obj(self):
+        """ Test the set_watch_obj method in pagure.lib """
         # Create the project ns/test
         item = pagure.lib.model.Project(
             user_id=1,  # pingou
@@ -2790,18 +2790,18 @@ class PagureLibtests(tests.Modeltests):
         user = tests.FakeUser(username='bar')
         self.assertRaises(
             pagure.exceptions.PagureException,
-            pagure.lib.watching_obj,
+            pagure.lib.set_watch_obj,
             self.session, user, iss, True
         )
 
         # Watch the ticket
         user = tests.FakeUser(username='foo')
-        out = pagure.lib.watching_obj(self.session, user, iss, True)
+        out = pagure.lib.set_watch_obj(self.session, user, iss, True)
         self.assertEqual(out, 'You are now watching this issue')
 
         # Un-watch the ticket
         user = tests.FakeUser(username='foo')
-        out = pagure.lib.watching_obj(self.session, user, iss, False)
+        out = pagure.lib.set_watch_obj(self.session, user, iss, False)
         self.assertEqual(out, 'You are no longer watching this issue')
 
 
