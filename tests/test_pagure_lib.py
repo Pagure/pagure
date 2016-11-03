@@ -2677,6 +2677,88 @@ class PagureLibtests(tests.Modeltests):
                 html = pagure.lib.text2markdown(text)
                 self.assertEqual(html, expected[idx])
 
+    def test_is_watching_obj(self):
+        """ Test the is_watching_obj method in pagure.lib """
+        # Create the project ns/test
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test3',
+            namespace='ns',
+            description='test project #1',
+            hook_token='aaabbbcccdd',
+        )
+        item.close_status = ['Invalid', 'Insufficient data', 'Fixed']
+        self.session.add(item)
+        self.session.commit()
+
+        # Create the ticket
+        iss = pagure.lib.new_issue(
+            issue_id=4,
+            session=self.session,
+            repo=item,
+            title='test issue',
+            content='content test issue',
+            user='pingou',
+            ticketfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(iss.id, 4)
+        self.assertEqual(iss.title, 'test issue')
+
+        # Created the ticket
+        user = tests.FakeUser(username='pingou')
+        self.assertTrue(pagure.lib.is_watching_obj(self.session, user, iss))
+        user = tests.FakeUser(username='foo')
+        self.assertFalse(pagure.lib.is_watching_obj(self.session, user, iss))
+        user = tests.FakeUser(username='bar')
+        self.assertFalse(pagure.lib.is_watching_obj(self.session, user, iss))
+
+        # Comment on the ticket
+        out = pagure.lib.add_issue_comment(
+            self.session,
+            issue=iss,
+            comment='This is a comment',
+            user='foo',
+            ticketfolder=None,
+            notify=False)
+        self.assertEqual(out, 'Comment added')
+
+        # Commented on the ticket
+        user = tests.FakeUser(username='pingou')
+        self.assertTrue(pagure.lib.is_watching_obj(self.session, user, iss))
+        user = tests.FakeUser(username='foo')
+        self.assertTrue(pagure.lib.is_watching_obj(self.session, user, iss))
+        user = tests.FakeUser(username='bar')
+        self.assertFalse(pagure.lib.is_watching_obj(self.session, user, iss))
+
+        # Add user `bar`
+        item = pagure.lib.model.User(
+            user='bar',
+            fullname='bar name',
+            password='bar',
+            default_email='bar@bar.com',
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(
+            user_id=3,
+            email='bar@bar.com')
+        self.session.add(item)
+        self.session.commit()
+
+        # Watch the ticket
+        user = tests.FakeUser(username='bar')
+        out = pagure.lib.watching_obj(self.session, user, iss, True)
+        self.assertEqual(out, 'You are now watching this issue')
+
+        # Is watching the ticket
+        user = tests.FakeUser(username='pingou')
+        self.assertTrue(pagure.lib.is_watching_obj(self.session, user, iss))
+        user = tests.FakeUser(username='foo')
+        self.assertTrue(pagure.lib.is_watching_obj(self.session, user, iss))
+        user = tests.FakeUser(username='bar')
+        self.assertTrue(pagure.lib.is_watching_obj(self.session, user, iss))
+
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibtests)

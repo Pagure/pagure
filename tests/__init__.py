@@ -226,14 +226,16 @@ class FakeGroup(object):
 class FakeUser(object):
     """ Fake user used to test the fedocallib library. """
 
-    def __init__(self, groups=[], username='username', cla_done=True):
+    def __init__(self, groups=[], username='username', cla_done=True, id=1):
         """ Constructor.
         :arg groups: list of the groups in which this fake user is
             supposed to be.
         """
         if isinstance(groups, basestring):
             groups = [groups]
+        self.id = id
         self.groups = groups
+        self.user = username
         self.username = username
         self.name = username
         self.email = 'foo@bar.com'
