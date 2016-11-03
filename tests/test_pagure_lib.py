@@ -2758,6 +2758,51 @@ class PagureLibtests(tests.Modeltests):
         user = tests.FakeUser(username='bar')
         self.assertTrue(pagure.lib.is_watching_obj(self.session, user, iss))
 
+    def test_watching_obj(self):
+        """ Test the watching_obj method in pagure.lib """
+        # Create the project ns/test
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test3',
+            namespace='ns',
+            description='test project #1',
+            hook_token='aaabbbcccdd',
+        )
+        item.close_status = ['Invalid', 'Insufficient data', 'Fixed']
+        self.session.add(item)
+        self.session.commit()
+
+        # Create the ticket
+        iss = pagure.lib.new_issue(
+            issue_id=4,
+            session=self.session,
+            repo=item,
+            title='test issue',
+            content='content test issue',
+            user='pingou',
+            ticketfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(iss.id, 4)
+        self.assertEqual(iss.title, 'test issue')
+
+        # Unknown user
+        user = tests.FakeUser(username='bar')
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.watching_obj,
+            self.session, user, iss, True
+        )
+
+        # Watch the ticket
+        user = tests.FakeUser(username='foo')
+        out = pagure.lib.watching_obj(self.session, user, iss, True)
+        self.assertEqual(out, 'You are now watching this issue')
+
+        # Un-watch the ticket
+        user = tests.FakeUser(username='foo')
+        out = pagure.lib.watching_obj(self.session, user, iss, False)
+        self.assertEqual(out, 'You are no longer watching this issue')
 
 
 if __name__ == '__main__':
