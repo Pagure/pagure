@@ -142,7 +142,7 @@ def api_view_user_activity_stats(username):
     +---------------+----------+--------------+----------------------------+
     | ``format``    | string   | Optional     | | Allows changing the      |
     |               |          |              |   of the date/time returned|
-    |               |          |              |   from iso formato to unix |
+    |               |          |              |   from iso format to unix  |
     |               |          |              |   timestamp                |
     |               |          |              |   Can be: `timestamp`      |
     |               |          |              |   or `isoformat`           |
@@ -194,7 +194,9 @@ def api_view_user_activity_stats(username):
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOUSER)
 
     stats = pagure.lib.get_yearly_stats_user(
-        SESSION, user, datetime.datetime.utcnow().date() + datetime.timedelta(days=1)
+        SESSION,
+        user,
+        datetime.datetime.utcnow().date() + datetime.timedelta(days=1)
     )
 
     def format_date(d):
@@ -244,8 +246,8 @@ def api_view_user_activity_date(username, date):
     |               |          |              |   best provided in ISO     |
     |               |          |              |   format: YYYY-MM-DD       |
     +---------------+----------+--------------+----------------------------+
-    | ``grouped``   | boolean  | Optional     | | Whether to group the     |
-    |               |          |              |   commits or not           |
+    | ``grouped``   | boolean  | Optional     | | Whether or not to group  |
+    |               |          |              |   the commits              |
     +---------------+----------+--------------+----------------------------+
 
 

@@ -1551,7 +1551,6 @@ class Watcher(BASE):
     )
 
 
-
 class PagureLog(BASE):
     """
     Log user's actions.
