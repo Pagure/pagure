@@ -277,7 +277,6 @@ def view_commits(repo, branchname=None, username=None, namespace=None):
     """ Displays the commits of the specified repo.
     """
     repo = flask.g.repo
-    reponame = flask.g.reponame
     repo_obj = flask.g.repo_obj
 
     if branchname and branchname not in repo_obj.listall_branches():
@@ -409,7 +408,6 @@ def compare_commits(repo, commit1, commit2, username=None, namespace=None):
     """ Compares two commits for specified repo
     """
     repo = flask.g.repo
-    reponame = flask.g.reponame
     repo_obj = flask.g.repo_obj
 
     if not repo_obj.is_empty and not repo_obj.head_is_unborn:
@@ -606,7 +604,6 @@ def view_raw_file(
     """ Displays the raw content of a file of a commit for the specified repo.
     """
     repo = flask.g.repo
-    reponame = flask.g.reponame
     repo_obj = flask.g.repo_obj
 
     if repo_obj.is_empty:
@@ -692,7 +689,6 @@ def view_commit(repo, commitid, username=None, namespace=None):
     """ Render a commit in a repo
     """
     repo = flask.g.repo
-    reponame = flask.g.reponame
     repo_obj = flask.g.repo_obj
 
     branchname = flask.request.args.get('branch', None)
@@ -738,7 +734,6 @@ def view_commit_patch(repo, commitid, username=None, namespace=None):
     """ Render a commit in a repo as patch
     """
     repo = flask.g.repo
-    reponame = flask.g.reponame
     repo_obj = flask.g.repo_obj
 
     try:
@@ -770,7 +765,6 @@ def view_tree(repo, identifier=None, username=None, namespace=None):
     """ Render the tree of the repo
     """
     repo = flask.g.repo
-    reponame = flask.g.reponame
     repo_obj = flask.g.repo_obj
 
     branchname = None
@@ -841,8 +835,6 @@ def view_forks(repo, username=None, namespace=None):
     """ Presents all the forks of the project.
     """
     repo = flask.g.repo
-    reponame = flask.g.reponame
-    repo_obj = flask.g.repo_obj
 
     return flask.render_template(
         'forks.html',
@@ -864,9 +856,6 @@ def view_tags(repo, username=None, namespace=None):
     """ Presents all the tags of the project.
     """
     repo = flask.g.repo
-    reponame = flask.g.reponame
-    repo_obj = flask.g.repo_obj
-
     tags = pagure.lib.git.get_git_tags_objects(repo)
 
     return flask.render_template(
@@ -953,7 +942,6 @@ def view_settings(repo, username=None, namespace=None):
             flask.url_for('auth_login', next=flask.request.url))
 
     repo = flask.g.repo
-    reponame = flask.g.reponame
     repo_obj = flask.g.repo_obj
 
     if not flask.g.repo_admin:
