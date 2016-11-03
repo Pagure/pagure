@@ -1595,7 +1595,7 @@ class PagureLog(BASE):
         index=True
     )
     log_type = sa.Column(sa.Text, nullable=False)
-    description = sa.Column(sa.Text, nullable=False)
+    ref_id = sa.Column(sa.Text, nullable=False)
     date = sa.Column(
         sa.Date,
         nullable=False,
@@ -1631,12 +1631,45 @@ class PagureLog(BASE):
         output = {
             'id': self.id,
             'type': self.log_type,
-            'description': self.description,
+            'ref_id': self.ref_id,
             'date': self.date.strftime('%Y-%m-%d'),
             'date_created': self.date_created.strftime('%s'),
             'user': self.user.to_json(public=public),
         }
         return output
+
+    def __str__(self):
+        ''' A string representation of this log entry. '''
+        verb = ''
+        desc = '%(user)s %(verb)s %(project)s#%(obj_id)s'
+        arg = {
+            'user': self.user.user,
+            'obj_id': self.ref_id,
+            'project': self.project.fullname,
+        }
+
+        if self.issue and self.log_type == 'created':
+            verb = 'created issue'
+        elif self.issue and self.log_type == 'commented':
+            verb = 'comment on issue'
+        elif self.pull_request and self.log_type == 'created':
+            verb = 'created PR'
+        elif self.pull_request and self.log_type == 'commented':
+            verb = 'comment on PR'
+        elif self.pull_request and self.log_type == 'closed':
+            verb = 'closed PR'
+        elif self.pull_request and self.log_type == 'merged':
+            verb = 'merged PR'
+        elif not self.pull_request and not self.issue \
+                and self.log_type == 'created':
+            verb = 'created Project'
+            desc = '%(user)s %(verb)s %(project)s'
+        elif self.log_type == 'commit':
+            verb = 'committed on'
+
+        arg['verb'] = verb
+
+        return desc % arg
 
 #
 # Class and tables specific for the API/token access
