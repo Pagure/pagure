@@ -2794,6 +2794,22 @@ class PagureLibtests(tests.Modeltests):
             self.session, user, iss, True
         )
 
+        # Invalid object to watch - project
+        user = tests.FakeUser(username='foo')
+        self.assertRaises(
+            pagure.exceptions.InvalidObjetException,
+            pagure.lib.set_watch_obj,
+            self.session, user, iss.project, True
+        )
+
+        # Invalid object to watch - string
+        user = tests.FakeUser(username='foo')
+        self.assertRaises(
+            AttributeError,
+            pagure.lib.set_watch_obj,
+            self.session, user, 'foo', True
+        )
+
         # Watch the ticket
         user = tests.FakeUser(username='foo')
         out = pagure.lib.set_watch_obj(self.session, user, iss, True)
