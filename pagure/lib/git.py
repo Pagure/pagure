@@ -1381,17 +1381,12 @@ def log_commits_to_db(session, project, commits, gitdir):
 
         date_created = arrow.get(commit.commit_time)
 
-        arg = {
-            'user': author_obj.user if author_obj else commit.author.email,
-            'project': project.fullname,
-            'commitid': commit.oid.hex,
-        }
-        desc = '%(user)s committed on %(project)s#%(commitid)s' % arg
         log = model.PagureLog(
             user_id=author_obj.id if author_obj else None,
             user_email=commit.author.email if not author_obj else None,
             project_id=project.id,
-            description=desc,
+            log_type='committed',
+            ref_id=commit.oid.hex,
             date=date_created.date(),
             date_created=date_created.datetime
         )
