@@ -137,12 +137,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         date = datetime.datetime.utcnow().date().strftime('%Y-%m-%d')
-        self.assertEqual(
-            data,
-            {
-                '%s 00:00:00' % date: 4
-            }
-        )
+        self.assertEqual(data, {date: 4})
 
     @patch('pagure.lib.notify.send_email')
     def test_api_view_user_activity_date(self, mockemail):
@@ -162,9 +157,10 @@ class PagureFlaskApiUSertests(tests.Modeltests):
               "date": date,
               "date_created": "1477558752",
               "type": "pull-request",
-              "description": "pingou created PR test#1",
               "description_mk": "<p>pingou created PR <a href=\"/test/pull-request/1\" title=\"test pull-request\">test#1</a></p>",
               "id": 1,
+              "ref_id": "1",
+              "type": "created",
               "user": {
                 "fullname": "PY C",
                 "name": "pingou"
@@ -174,9 +170,10 @@ class PagureFlaskApiUSertests(tests.Modeltests):
               "date": date,
               "date_created": "1477558752",
               "type": "pull-request",
-              "description": "pingou comment on PR test#1",
               "description_mk": "<p>pingou comment on PR <a href=\"/test/pull-request/1\" title=\"test pull-request\">test#1</a></p>",
               "id": 2,
+              "ref_id": "1",
+              "type": "commented",
               "user": {
                 "fullname": "PY C",
                 "name": "pingou"
@@ -186,9 +183,10 @@ class PagureFlaskApiUSertests(tests.Modeltests):
               "date": date,
               "date_created": "1477558752",
               "type": "pull-request",
-              "description": "pingou closed PR test#1",
               "description_mk": "<p>pingou closed PR <a href=\"/test/pull-request/1\" title=\"test pull-request\">test#1</a></p>",
               "id": 3,
+              "ref_id": "1",
+              "type": "closed",
               "user": {
                 "fullname": "PY C",
                 "name": "pingou"
@@ -198,9 +196,10 @@ class PagureFlaskApiUSertests(tests.Modeltests):
               "date": date,
               "date_created": "1477558752",
               "type": "pull-request",
-              "description": "pingou comment on PR test#1",
               "description_mk": "<p>pingou comment on PR <a href=\"/test/pull-request/1\" title=\"test pull-request\">test#1</a></p>",
               "id": 4,
+              "ref_id": "1",
+              "type": "commented",
               "user": {
                 "fullname": "PY C",
                 "name": "pingou"
