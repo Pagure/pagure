@@ -272,13 +272,18 @@ def _obj_anchor_tag(user, namespace, repo, obj, text):
         url = flask.url_for(
             'view_issue', username=user, namespace=namespace, repo=repo,
              issueid=obj.id)
+        if obj.private:
+            title = 'Private issue'
+        else:
+            title = obj.title
     else:
         url = flask.url_for(
             'request_pull', username=user, namespace=namespace, repo=repo,
             requestid=obj.id)
+        title = obj.title
 
     element = markdown.util.etree.Element("a")
     element.set('href', url)
-    element.set('title', obj.title)
+    element.set('title', title)
     element.text = text
     return element
