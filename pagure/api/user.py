@@ -301,7 +301,7 @@ def api_view_user_activity_date(username, date):
         commits = collections.defaultdict(list)
         acts = []
         for activity in activities:
-            if activity.type_ == 'commit':
+            if activity.log_type == 'commit':
                 commits[activity.project.fullname].append(activity)
             else:
                 acts.append(activity)
