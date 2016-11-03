@@ -1643,7 +1643,7 @@ class PagureLog(BASE):
         verb = ''
         desc = '%(user)s %(verb)s %(project)s#%(obj_id)s'
         arg = {
-            'user': self.user.user,
+            'user': self.user.user if self.user else self.user_email,
             'obj_id': self.ref_id,
             'project': self.project.fullname,
         }
@@ -1664,7 +1664,7 @@ class PagureLog(BASE):
                 and self.log_type == 'created':
             verb = 'created Project'
             desc = '%(user)s %(verb)s %(project)s'
-        elif self.log_type == 'commit':
+        elif self.log_type == 'committed':
             verb = 'committed on'
 
         arg['verb'] = verb
