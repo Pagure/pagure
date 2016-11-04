@@ -798,3 +798,107 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
 
     jsonout = flask.jsonify(output)
     return jsonout
+
+
+@API.route('/<repo>/issue/<int:issueid>/subscribe', methods=['POST'])
+@API.route('/<namespace>/<repo>/issue/<int:issueid>/subscribe', methods=['POST'])
+@API.route(
+    '/fork/<username>/<repo>/issue/<int:issueid>/subscribe', methods=['POST'])
+@API.route(
+    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/subscribe',
+    methods=['POST'])
+@api_login_required(acls=['issue_subscribe'])
+@api_method
+def api_subscribe_issue(repo, issueid, username=None, namespace=None):
+    """
+    Subscribe to an issue
+    ---------------------
+    Allows someone to subscribe or unscribe to the notifications related to
+    an issue.
+
+    ::
+
+        POST /api/0/<repo>/issue/<issue id>/subscribe
+        POST /api/0/<namespace>/<repo>/issue/<issue id>/subscribe
+
+    ::
+
+        POST /api/0/fork/<username>/<repo>/issue/<issue id>/subscribe
+        POST /api/0/fork/<username>/<namespace>/<repo>/issue/<issue id>/subscribe
+
+    Input
+    ^^^^^
+
+    +--------------+----------+---------------+---------------------------+
+    | Key          | Type     | Optionality   | Description               |
+    +==============+==========+===============+===========================+
+    | ``username`` | string   | Mandatory     | | The username of the user|
+    |              |          |               |   to (un)subscribe to the |
+    |              |          |               |   issue.                  |
+    +--------------+----------+---------------+---------------------------+
+    | ``status``   | boolean   | Mandatory    | | The subscription status |
+    |              |          |               |   to subscribe or         |
+    |              |          |               |   unsubscribe to the.     |
+    |              |          |               |   issue.                  |
+    +--------------+----------+---------------+---------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "message": "User subscribed"
+        }
+
+    """
+    repo = pagure.lib.get_project(
+        SESSION, repo, user=username, namespace=namespace)
+    output = {}
+
+    if repo is None:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    if not repo.settings.get('issue_tracker', True):
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.ETRACKERDISABLED)
+
+    if api_authenticated():
+        if repo != flask.g.token.project:
+            raise pagure.exceptions.APIError(
+                401, error_code=APIERROR.EINVALIDTOK)
+
+    issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
+
+    if issue is None or issue.project != repo:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOISSUE)
+
+    if issue.private and not is_repo_admin(repo) \
+            and (not api_authenticated() or
+                 not issue.user.user == flask.g.fas_user.username):
+        raise pagure.exceptions.APIError(
+            403, error_code=APIERROR.EISSUENOTALLOWED)
+
+    form = pagure.forms.SubscribtionForm(csrf_enabled=False)
+    if form.validate_on_submit():
+        status = str(form.status.data).strip().lower() in ['1', 'true']
+        try:
+            # Toggle subscribtion
+            message = pagure.lib.set_watch_obj(
+                SESSION,
+                user=flask.g.fas_user.username,
+                obj=issue,
+                watch_status=status
+            )
+            SESSION.commit()
+            output['message'] = message
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
+
+    else:
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
+
+    jsonout = flask.jsonify(output)
+    return jsonout

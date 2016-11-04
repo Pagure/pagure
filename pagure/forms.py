@@ -599,3 +599,11 @@ class PublicNotificationForm(FlaskForm):
         'Public PR notification<span class="error">*</span>',
         [wtforms.validators.optional(), MultipleEmail()]
     )
+
+
+class SubscribtionForm(FlaskForm):
+    ''' Form to subscribe or unsubscribe to an issue or a PR. '''
+    status = wtforms.BooleanField(
+        'Subscription status',
+        [wtforms.validators.optional()],
+    )
