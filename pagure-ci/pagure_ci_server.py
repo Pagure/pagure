@@ -70,12 +70,13 @@ def handle_messages():
         LOG.info('Looking for PR: %s', pr_uid)
         session = pagure.lib.create_session(pagure.APP.config['DB_URL'])
         request = pagure.lib.get_request_by_uid(session, pr_uid)
-        session.close()
+
         LOG.info('PR retrieved: %s', request)
 
         if not request:
             LOG.warning(
                 'No request could be found from the message %s', data)
+            session.close()
             continue
 
         LOG.info(
@@ -104,6 +105,7 @@ def handle_messages():
         else:
             LOG.warning('Un-supported CI type')
 
+        session.close()
         LOG.info('Ready for another')
 
 
