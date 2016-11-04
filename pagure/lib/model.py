@@ -565,6 +565,9 @@ class Project(BASE):
     def to_json(self, public=False, api=False):
         ''' Return a representation of the project as JSON.
         '''
+        custom_keys = [
+            [key.name, key.key_type] for key in self.issue_keys
+        ]
 
         output = {
             'id': self.id,
@@ -577,6 +580,7 @@ class Project(BASE):
             'user': self.user.to_json(public=public),
             'tags': self.tags_text,
             'priorities': self.priorities,
+            'custom_keys': custom_keys,
         }
         if not api:
             output['settings'] = self.settings
