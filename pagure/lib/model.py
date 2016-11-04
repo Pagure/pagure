@@ -1684,7 +1684,7 @@ class IssueWatcher(BASE):
 
     id = sa.Column(sa.Integer, primary_key=True)
     issue_uid = sa.Column(
-        sa.Integer,
+        sa.String(32),
         sa.ForeignKey('issues.uid', onupdate='CASCADE', ondelete='CASCADE'),
         nullable=False)
     user_id = sa.Column(
@@ -1724,7 +1724,7 @@ class PullRequestWatcher(BASE):
 
     id = sa.Column(sa.Integer, primary_key=True)
     pull_request_uid = sa.Column(
-        sa.Integer,
+        sa.String(32),
         sa.ForeignKey(
             'pull_requests.uid', onupdate='CASCADE', ondelete='CASCADE'),
         nullable=False)
