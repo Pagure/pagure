@@ -581,6 +581,8 @@ class Project(BASE):
             'tags': self.tags_text,
             'priorities': self.priorities,
             'custom_keys': custom_keys,
+            'close_status': self.close_status,
+            'milestones': self.milestones,
         }
         if not api:
             output['settings'] = self.settings
