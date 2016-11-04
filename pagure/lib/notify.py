@@ -145,6 +145,13 @@ def _get_emails_for_obj(obj):
         if unwatcher.user.default_email in emails:
             emails.remove(unwatcher.user.default_email)
 
+    # Add/Remove people who explicitly asked to be added/removed
+    for watcher in obj.watchers:
+        if not watcher.watch and watcher.user.default_email in emails:
+            emails.remove(watcher.user.default_email)
+        elif watcher.watch:
+            emails.add(watcher.user.default_email)
+
     # Drop the email used by pagure when sending
     emails = _clean_emails(
         emails, pagure.APP.config.get(pagure.APP.config.get(
