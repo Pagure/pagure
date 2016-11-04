@@ -18,7 +18,6 @@ receiving end is offline or so.
 
 import json
 import logging
-logging.basicConfig(level=logging.DEBUG)
 import os
 import requests
 
@@ -130,6 +129,8 @@ def main():
 if __name__ == '__main__':
     formatter = logging.Formatter(
         "%(asctime)s %(levelname)s [%(module)s:%(lineno)d] %(message)s")
+
+    logging.basicConfig(level=logging.DEBUG)
 
     # setup console logging
     LOG.setLevel(logging.DEBUG)
