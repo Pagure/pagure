@@ -476,7 +476,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,26 @@
+@@ -0,0 +1,27 @@
 +{
 +    "assignee": null,
 +    "blocks": [],
@@ -588,8 +588,8 @@ index 458821a..77674a8
 +        }
 +    ],
      "content": "We should work on this",
+     "custom_fields": [],
      "date_created": null,
-     "depends": [],
 
 """
         npatch = []
