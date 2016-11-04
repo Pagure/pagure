@@ -732,6 +732,15 @@ class Issue(BASE):
         ''' Returns a dictionary representation of the issue.
 
         '''
+        custom_fields = [
+            dict(
+                name=field.key.name,
+                key_type=field.key.key_type,
+                value=field.value,
+            )
+            for field in self.other_fields
+        ]
+
         output = {
             'id': self.id,
             'title': self.title,
@@ -750,6 +759,7 @@ class Issue(BASE):
                 public=public) if self.assignee else None,
             'priority': self.priority,
             'milestone': self.milestone,
+            'custom_fields': custom_fields,
         }
 
         comments = []
