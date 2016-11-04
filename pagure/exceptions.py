@@ -70,6 +70,6 @@ class NoCorrespondingPR(PagureException):
     pass
 
 
-class InvalidObjetException(PagureException):
+class InvalidObjectException(PagureException):
     ''' Exception raised when a given object is not what was expected. '''
     pass

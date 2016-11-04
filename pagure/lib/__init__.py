@@ -3224,7 +3224,7 @@ def set_watch_obj(session, user, obj, watch_status):
             model.PullRequestWatcher.pull_request_uid == obj.uid
         )
     else:
-        raise pagure.exceptions.InvalidObjetException(
+        raise pagure.exceptions.InvalidObjectException(
             'Unsupported object found: "%s"' % obj
         )
 
@@ -3287,7 +3287,7 @@ def is_watching_obj(session, user, obj):
             model.PullRequestWatcher.pull_request_uid == obj.uid
         )
     else:
-        raise pagure.exceptions.InvalidObjetException(
+        raise pagure.exceptions.InvalidObjectException(
             'Unsupported object found: "%s"' % obj
         )
 
@@ -3418,7 +3418,7 @@ def log_action(session, action, obj):
     elif obj.isa == 'project':
         project_id = obj.id
     else:
-        raise pagure.exceptions.PagureException(
+        raise pagure.exceptions.InvalidObjectException(
             'Unsupported object found: "%s"' % obj
         )
 
