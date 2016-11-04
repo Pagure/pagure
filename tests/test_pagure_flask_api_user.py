@@ -139,6 +139,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         date = datetime.datetime.utcnow().date().strftime('%Y-%m-%d')
         # There seems to be a difference in the JSON generated between
         # flask-0.10.1 (F23) and 0.11.1 (jenkins)
+        self.assertTrue(
             data == {date: 4}
             or
             data == [[date, 4]]
