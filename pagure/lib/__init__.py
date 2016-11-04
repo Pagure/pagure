@@ -3403,7 +3403,7 @@ def get_user_activity_day(session, user, date):
     ).filter(
         model.PagureLog.user_id == user.id
     ).order_by(
-        model.PagureLog.date_created
+        model.PagureLog.id.asc()
     )
 
     return query.all()
