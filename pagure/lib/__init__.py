@@ -3207,7 +3207,6 @@ def set_watch_obj(session, user, obj, watch_status):
 
     user_obj = get_user(session, user)
 
-
     if obj.isa == "issue":
         query = session.query(
             model.IssueWatcher
@@ -3224,6 +3223,11 @@ def set_watch_obj(session, user, obj, watch_status):
         ).filter(
             model.PullRequestWatcher.pull_request_uid == obj.uid
         )
+    else:
+        raise pagure.exceptions.InvalidObjetException(
+            'Unsupported object found: "%s"' % obj
+        )
+
     dbobj = query.first()
 
     if not dbobj:
@@ -3257,7 +3261,10 @@ def is_watching_obj(session, user, obj):
     '''
 
     if not isinstance(user, model.User):
-        user = get_user(session, user)
+        try:
+            user = get_user(session, user)
+        except pagure.exceptions.PagureException:
+            return False
 
     if not user:
         return False
@@ -3278,6 +3285,10 @@ def is_watching_obj(session, user, obj):
             model.PullRequestWatcher.user_id == user.id
         ).filter(
             model.PullRequestWatcher.pull_request_uid == obj.uid
+        )
+    else:
+        raise pagure.exceptions.InvalidObjetException(
+            'Unsupported object found: "%s"' % obj
         )
 
     watcher = query.first()
