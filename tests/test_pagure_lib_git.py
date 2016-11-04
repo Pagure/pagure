@@ -715,7 +715,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,91 @@
+@@ -0,0 +1,95 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
@@ -729,10 +729,12 @@ index 0000000..60f7480
 +    "id": 1,
 +    "initial_comment": null,
 +    "project": {
++        "close_status": [],
 +        "custom_keys": [],
 +        "date_created": null,
 +        "description": "test project for ticket",
 +        "id": 1,
++        "milestones": {},
 +        "name": "test_ticket_repo",
 +        "namespace": null,
 +        "parent": null,
@@ -762,10 +764,12 @@ index 0000000..60f7480
 +    },
 +    "remote_git": null,
 +    "repo_from": {
++        "close_status": [],
 +        "custom_keys": [],
 +        "date_created": null,
 +        "description": "test project for ticket",
 +        "id": 1,
++        "milestones": {},
 +        "name": "test_ticket_repo",
 +        "namespace": null,
 +        "parent": null,

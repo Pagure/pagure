@@ -149,10 +149,17 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
               "total_projects": 1,
               "projects": [
                 {
+                  "close_status": [
+                    "Invalid",
+                    "Insufficient data",
+                    "Fixed",
+                    "Duplicate"
+                  ],
                   "custom_keys": [],
                   "date_created": "1436527638",
                   "description": "test project #1",
                   "id": 1,
+                  "milestones": {},
                   "name": "test",
                   "namespace": None,
                   "parent": None,
@@ -177,10 +184,17 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
               "total_projects": 2,
               "projects": [
                 {
+                  "close_status": [
+                      "Invalid",
+                      "Insufficient data",
+                      "Fixed",
+                      "Duplicate"
+                    ],
                   "custom_keys": [],
                   "date_created": "1436527638",
                   "description": "test project #1",
                   "id": 1,
+                  "milestones": {},
                   "name": "test",
                   "namespace": None,
                   "parent": None,
@@ -192,10 +206,17 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                   }
                 },
                 {
+                  "close_status": [
+                      "Invalid",
+                      "Insufficient data",
+                      "Fixed",
+                      "Duplicate"
+                    ],
                   "custom_keys": [],
                   "date_created": "1436527638",
                   "description": "test project #2",
                   "id": 2,
+                  "milestones": {},
                   "name": "test2",
                   "namespace": None,
                   "parent": None,
@@ -219,10 +240,17 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
               "total_projects": 1,
               "projects": [
                 {
+                  "close_status": [
+                      "Invalid",
+                      "Insufficient data",
+                      "Fixed",
+                      "Duplicate"
+                    ],
                   "custom_keys": [],
                   "date_created": "1436527638",
                   "description": "test project #1",
                   "id": 1,
+                  "milestones": {},
                   "name": "test",
                   "namespace": None,
                   "parent": None,
