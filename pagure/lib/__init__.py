@@ -3205,24 +3205,42 @@ def set_watch_obj(session, user, obj, watch_status):
     Objects can be either an issue or a pull-request
     '''
 
-    user_obj = get_user(session, user.username)
+    user_obj = get_user(session, user)
+
 
     if obj.isa == "issue":
-        dbobj = model.IssueWatcher(
-            user_id=user.id,
-            issue_uid=obj.uid,
-            watch=watch_status,
+        query = session.query(
+            model.IssueWatcher
+        ).filter(
+            model.IssueWatcher.user_id == user_obj.id
+        ).filter(
+            model.IssueWatcher.issue_uid == obj.uid
         )
     elif obj.isa == "pull-request":
-        dbobj = model.PullRequestWatcher(
-            user_id=user.id,
-            pull_request_uid=obj.uid,
-            watch=watch_status,
+        query = session.query(
+            model.PullRequestWatcher
+        ).filter(
+            model.PullRequestWatcher.user_id == user_obj.id
+        ).filter(
+            model.PullRequestWatcher.pull_request_uid == obj.uid
         )
+    dbobj = query.first()
+
+    if not dbobj:
+        if obj.isa == "issue":
+            dbobj = model.IssueWatcher(
+                user_id=user_obj.id,
+                issue_uid=obj.uid,
+                watch=watch_status,
+            )
+        elif obj.isa == "pull-request":
+            dbobj = model.PullRequestWatcher(
+                user_id=user_obj.id,
+                pull_request_uid=obj.uid,
+                watch=watch_status,
+            )
     else:
-        raise pagure.exceptions.InvalidObjetException(
-            'Unknow watch target: "%s"' % obj
-        )
+        dbobj.watch = watch_status
 
     session.add(dbobj)
 
