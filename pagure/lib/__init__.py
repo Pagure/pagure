@@ -3256,6 +3256,9 @@ def is_watching_obj(session, user, obj):
     Objects can be either an issue or a pull-request
     '''
 
+    if not isinstance(user, model.User):
+        user = get_user(session, user)
+
     if not user:
         return False
 
