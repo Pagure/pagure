@@ -1319,6 +1319,146 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             {'message': 'Issue assigned'}
         )
 
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_api_subscribe_issue(self, p_send_email, p_ugt):
+        """ Test the api_subscribe_issue method of the flask api. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Invalid project
+        output = self.app.post(
+            '/api/0/foo/issue/1/subscribe', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Project not found",
+              "error_code": "ENOPROJECT",
+            }
+        )
+
+        # Valid token, wrong project
+        output = self.app.post(
+            '/api/0/test2/issue/1/subscribe', headers=headers)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.data)
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
+                         data['error_code'])
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+
+        # No input
+        output = self.app.post(
+            '/api/0/test/issue/1/subscribe', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Issue not found",
+              "error_code": "ENOISSUE",
+            }
+        )
+
+        # Create normal issue
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #1',
+            content='We should work on this',
+            user='foo',
+            ticketfolder=None,
+            private=False,
+            issue_uid='aaabbbccc#1',
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #1')
+
+        # Check subscribtion before
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertFalse(
+            pagure.lib.is_watching_obj(self.session, 'pingou', issue))
+
+
+        # Unsubscribe - no changes
+        data = {}
+        output = self.app.post(
+            '/api/0/test/issue/1/subscribe', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'You are no longer watching this issue'}
+        )
+
+        data = {}
+        output = self.app.post(
+            '/api/0/test/issue/1/subscribe', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'You are no longer watching this issue'}
+        )
+
+        # No change
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertFalse(
+            pagure.lib.is_watching_obj(self.session, 'pingou', issue))
+
+        # Subscribe
+        data = {'status': True}
+        output = self.app.post(
+            '/api/0/test/issue/1/subscribe', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'You are now watching this issue'}
+        )
+
+        # Subscribe - no changes
+        data = {'status': True}
+        output = self.app.post(
+            '/api/0/test/issue/1/subscribe', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'You are now watching this issue'}
+        )
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertTrue(
+            pagure.lib.is_watching_obj(self.session, 'pingou', issue))
+
+        # Unsubscribe
+        data = {}
+        output = self.app.post(
+            '/api/0/test/issue/1/subscribe', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'You are no longer watching this issue'}
+        )
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertFalse(
+            pagure.lib.is_watching_obj(self.session, 'pingou', issue))
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
