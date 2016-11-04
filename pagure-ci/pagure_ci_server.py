@@ -69,7 +69,9 @@ def handle_messages():
         pr_uid = data['pr']['uid']
         branch = data['pr']['branch_from']
         LOG.info('Looking for PR: %s', pr_uid)
-        request = pagure.lib.get_request_by_uid(pagure.SESSION, pr_uid)
+        session = pagure.lib.create_session(pagure.APP.config['DB_URL'])
+        request = pagure.lib.get_request_by_uid(session, pr_uid)
+        session.close()
 
         if not request:
             LOG.warning(
