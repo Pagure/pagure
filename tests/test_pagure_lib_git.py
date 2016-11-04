@@ -484,6 +484,7 @@ index 0000000..60f7480
 +    "closed_at": null,
 +    "comments": [],
 +    "content": "We should work on this",
++    "custom_fields": [],
 +    "date_created": null,
 +    "depends": [],
 +    "id": 1,
@@ -714,7 +715,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,89 @@
+@@ -0,0 +1,91 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
@@ -728,6 +729,7 @@ index 0000000..60f7480
 +    "id": 1,
 +    "initial_comment": null,
 +    "project": {
++        "custom_keys": [],
 +        "date_created": null,
 +        "description": "test project for ticket",
 +        "id": 1,
@@ -760,6 +762,7 @@ index 0000000..60f7480
 +    },
 +    "remote_git": null,
 +    "repo_from": {
++        "custom_keys": [],
 +        "date_created": null,
 +        "description": "test project for ticket",
 +        "id": 1,
@@ -975,6 +978,7 @@ index 0000000..60f7480
             "status": True,
             "uid": "d4182a2ac2d541d884742d3037c26e56",
             "project": {
+                "custom_keys": [],
                 "parent": None,
                 "settings": {
                     "issue_tracker": True,
@@ -1059,6 +1063,7 @@ index 0000000..60f7480
             "commit_start": "788efeaaf86bde8618f594a8181abb402e1dd904",
             "repo_from": {
                 "parent": {
+                    "custom_keys": [],
                     "parent": None,
                     "name": "test",
                     "date_created": "1426500194",
@@ -1086,6 +1091,7 @@ index 0000000..60f7480
                 },
                 "name": "test",
                 "date_created": "1426843440",
+                "custom_keys": [],
                 "tags": [],
                 "user": {
                     "fullname": "fake user",
@@ -1145,6 +1151,7 @@ index 0000000..60f7480
             "project": {
                 "parent": None,
                 "name": "test",
+                "custom_keys": [],
                 "date_created": "1426500194",
                 "tags": [],
                 "user": {
@@ -1179,6 +1186,7 @@ index 0000000..60f7480
                 "parent": {
                     "parent": None,
                     "name": "test",
+                    "custom_keys": [],
                     "date_created": "1426500194",
                     "tags": [],
                     "user": {
@@ -1204,6 +1212,7 @@ index 0000000..60f7480
                 },
                 "name": "test",
                 "date_created": "1426843440",
+                "custom_keys": [],
                 "tags": [],
                 "user": {
                     "fullname": "fake user",

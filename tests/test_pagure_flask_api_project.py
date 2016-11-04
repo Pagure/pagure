@@ -149,6 +149,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
               "total_projects": 1,
               "projects": [
                 {
+                  "custom_keys": [],
                   "date_created": "1436527638",
                   "description": "test project #1",
                   "id": 1,
@@ -176,6 +177,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
               "total_projects": 2,
               "projects": [
                 {
+                  "custom_keys": [],
                   "date_created": "1436527638",
                   "description": "test project #1",
                   "id": 1,
@@ -190,6 +192,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                   }
                 },
                 {
+                  "custom_keys": [],
                   "date_created": "1436527638",
                   "description": "test project #2",
                   "id": 2,
@@ -216,6 +219,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
               "total_projects": 1,
               "projects": [
                 {
+                  "custom_keys": [],
                   "date_created": "1436527638",
                   "description": "test project #1",
                   "id": 1,

@@ -115,6 +115,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                   "id": 1,
                   "initial_comment": None,
                   "project": {
+                    "custom_keys": [],
                     "date_created": "1431414800",
                     "description": "test project #1",
                     "id": 1,
@@ -130,6 +131,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                   },
                   "remote_git": None,
                   "repo_from": {
+                    "custom_keys": [],
                     "date_created": "1431414800",
                     "description": "test project #1",
                     "id": 1,
@@ -243,6 +245,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
               "id": 1,
               "initial_comment": None,
               "project": {
+                "custom_keys": [],
                 "date_created": "1431414800",
                 "description": "test project #1",
                 "id": 1,
@@ -258,6 +261,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
               },
               "remote_git": None,
               "repo_from": {
+                "custom_keys": [],
                 "date_created": "1431414800",
                 "description": "test project #1",
                 "id": 1,
