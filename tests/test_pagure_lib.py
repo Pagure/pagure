@@ -2794,7 +2794,7 @@ class PagureLibtests(tests.Modeltests):
 
         # Invalid object to watch - project
         self.assertRaises(
-            pagure.exceptions.InvalidObjetException,
+            pagure.exceptions.InvalidObjectException,
             pagure.lib.set_watch_obj,
             self.session, 'foo', iss.project, True
         )
