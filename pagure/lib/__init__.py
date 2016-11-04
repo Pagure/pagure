@@ -3259,13 +3259,7 @@ def is_watching_obj(session, user, obj):
     if not user:
         return False
 
-    if obj.user.user == user.user:
-        return True
-
-    for comment in obj.comments:
-        if comment.user.user == user.user:
-            return True
-
+    # First check if the user explicitely turned on/off notifications
     if obj.isa == "issue":
         query = session.query(
             model.IssueWatcher
@@ -3287,6 +3281,14 @@ def is_watching_obj(session, user, obj):
 
     if watcher:
         return watcher.watch
+
+    # Otherwise, just check if they are in the default group
+    if obj.user.user == user.user:
+        return True
+
+    for comment in obj.comments:
+        if comment.user.user == user.user:
+            return True
 
     return False
 
