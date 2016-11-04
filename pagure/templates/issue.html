@@ -302,6 +302,18 @@
     </div>
   </div>
 
+  {% if authenticated %}
+    <div class="col-md-4">
+      <button class="btn btn-md" id="subcribe-btn"
+      {% if subscribed -%}
+        title="Subscribe to this issue">Subscribe
+      {%- else -%}
+        title="Unsubscribe to this issue">Unsubscribe
+      {%- endif -%}
+      </button>
+    </div>
+  {% endif %}
+
   {% if repo.issue_keys %}
   <div class="col-md-4">
     <div class="card">
@@ -592,7 +604,7 @@ function set_ui_for_comment(setting){
   }
 }
 function try_async_comment(form) {
-  console.log(form)
+  console.log(form);
   set_ui_for_comment(true);
   var _data = $(form).serialize();
   var btn = $(document.activeElement);
@@ -838,6 +850,41 @@ $( document ).ready(function() {
       )
       return false;
     });
+  {% endif %}
+
+  {% if authenticated %}
+  function set_up_subcribed() {
+    $("#subcribe-btn").click(function(){
+      console.log('click');
+      var _url = "{{ url_for(
+        'api_ns.api_subscribe_issue',
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace,
+        issueid=issueid
+        ) }}";
+      var _btn = $("#subcribe-btn");
+      var _data = {};
+      if (_btn.text() == 'Subscribe'){
+        _data.status = false;
+      } else {
+        _data.status = true;
+      }
+      $.post( _url, _data ).done(
+        function(data) {
+          var _btn = $("#subcribe-btn");
+          if (_btn.text() == 'Subscribe'){
+            _btn.text('Unsubscribe');
+          } else {
+            _btn.text('Subscribe');
+          }
+          return false;
+        }
+      )
+      return false;
+    });
+  };
+  set_up_subcribed();
   {% endif %}
 
 });
