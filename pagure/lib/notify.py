@@ -92,56 +92,56 @@ def _clean_emails(emails, user):
     return emails
 
 
-def _get_emails_for_issue(issue):
+def _get_emails_for_obj(obj):
     ''' Return the list of emails to send notification to when notifying
-    about the specified issue.
+    about the specified issue or pull-request.
     '''
     emails = set()
     # Add project creator/owner
-    if issue.project.user.default_email:
-        emails.add(issue.project.user.default_email)
+    if obj.project.user.default_email:
+        emails.add(obj.project.user.default_email)
 
     # Add project maintainers
-    for user in issue.project.users:
+    for user in obj.project.users:
         if user.default_email:
             emails.add(user.default_email)
 
     # Add people in groups with commits access to the project:
-    for group in issue.project.groups:
+    for group in obj.project.groups:
         if group.creator.default_email:
             emails.add(group.creator.default_email)
         for user in group.users:
             if user.default_email:
                 emails.add(user.default_email)
 
-    # Add people that commented on the ticket
-    for comment in issue.comments:
+    # Add people that commented on the issue/PR
+    for comment in obj.comments:
         if comment.user.default_email:
             emails.add(comment.user.default_email)
 
-    # Add the person that opened the issue
-    if issue.user.default_email:
-        emails.add(issue.user.default_email)
+    # Add the person that opened the issue/PR
+    if obj.user.default_email:
+        emails.add(obj.user.default_email)
 
-    # Add the person assigned to the ticket
-    if issue.assignee and issue.assignee.default_email:
-        emails.add(issue.assignee.default_email)
+    # Add the person assigned to the issue/PR
+    if obj.assignee and obj.assignee.default_email:
+        emails.add(obj.assignee.default_email)
 
     # Add the person watching this project, if the issue is public
-    if issue.isa == 'issue' and not issue.private:
-        for watcher in issue.project.watchers:
+    if obj.isa == 'issue' and not obj.private:
+        for watcher in obj.project.watchers:
             emails.add(watcher.user.default_email)
 
     # Add public notifications to lists/users set project-wide
-    if issue.isa == 'issue' and not issue.private:
-        for notifs in issue.project.notifications.get('issues', []):
+    if obj.isa == 'issue' and not obj.private:
+        for notifs in obj.project.notifications.get('issues', []):
             emails.add(notifs)
-    elif issue.isa == 'pull-request':
-        for notifs in issue.project.notifications.get('requests', []):
+    elif obj.isa == 'pull-request':
+        for notifs in obj.project.notifications.get('requests', []):
             emails.add(notifs)
 
     # Remove the person list in unwatch
-    for unwatcher in issue.project.unwatchers:
+    for unwatcher in obj.project.unwatchers:
         if unwatcher.user.default_email in emails:
             emails.remove(unwatcher.user.default_email)
 
@@ -279,7 +279,7 @@ def notify_new_comment(comment, user=None):
            comment.issue.project.name,
            'issue',
            comment.issue.id))
-    mail_to = _get_emails_for_issue(comment.issue)
+    mail_to = _get_emails_for_obj(comment.issue)
     if comment.user and comment.user.default_email:
         mail_to.add(comment.user.default_email)
 
@@ -318,7 +318,7 @@ def notify_new_issue(issue, user=None):
            issue.project.name,
            'issue',
            issue.id))
-    mail_to = _get_emails_for_issue(issue)
+    mail_to = _get_emails_for_obj(issue)
     mail_to = _add_mentioned_users(mail_to, issue.content)
     mail_to = _clean_emails(mail_to, user)
 
@@ -351,7 +351,7 @@ The issue: `%s` of project: `%s` has been %s by %s.
            issue.project.name,
            'issue',
            issue.id))
-    mail_to = _get_emails_for_issue(issue)
+    mail_to = _get_emails_for_obj(issue)
     if new_assignee and new_assignee.default_email:
         mail_to.add(new_assignee.default_email)
 
@@ -388,7 +388,7 @@ The pull-request: `%s` of project: `%s` has been %s by %s.
            request.project.name,
            'pull-request',
            request.id))
-    mail_to = _get_emails_for_issue(request)
+    mail_to = _get_emails_for_obj(request)
     if new_assignee and new_assignee.default_email:
         mail_to.add(new_assignee.default_email)
 
@@ -427,7 +427,7 @@ def notify_new_pull_request(request):
            request.project.name,
            'pull-request',
            request.id))
-    mail_to = _get_emails_for_issue(request)
+    mail_to = _get_emails_for_obj(request)
 
     send_email(
         text,
@@ -461,7 +461,7 @@ Merged pull-request:
            request.project.name,
            'pull-request',
            request.id))
-    mail_to = _get_emails_for_issue(request)
+    mail_to = _get_emails_for_obj(request)
 
     uid = time.mktime(datetime.datetime.now().timetuple())
     send_email(
@@ -497,7 +497,7 @@ Cancelled pull-request:
            request.project.name,
            'pull-request',
            request.id))
-    mail_to = _get_emails_for_issue(request)
+    mail_to = _get_emails_for_obj(request)
 
     uid = time.mktime(datetime.datetime.now().timetuple())
     send_email(
@@ -532,7 +532,7 @@ def notify_pull_request_comment(comment, user):
            comment.pull_request.project.name,
            'pull-request',
            comment.pull_request.id))
-    mail_to = _get_emails_for_issue(comment.pull_request)
+    mail_to = _get_emails_for_obj(comment.pull_request)
     mail_to = _add_mentioned_users(mail_to, comment.comment)
     mail_to = _clean_emails(mail_to, user)
 
