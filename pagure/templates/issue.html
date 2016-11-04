@@ -306,9 +306,9 @@
     <div class="col-md-4">
       <button class="btn btn-md" id="subcribe-btn"
       {% if subscribed -%}
-        title="Subscribe to this issue">Subscribe
-      {%- else -%}
         title="Unsubscribe to this issue">Unsubscribe
+      {%- else -%}
+        title="Subscribe to this issue">Subscribe
       {%- endif -%}
       </button>
     </div>
@@ -865,11 +865,12 @@ $( document ).ready(function() {
         ) }}";
       var _btn = $("#subcribe-btn");
       var _data = {};
-      if (_btn.text() == 'Subscribe'){
+      if (_btn.text() == 'Unsubscribe'){
         _data.status = false;
       } else {
         _data.status = true;
       }
+      console.log(_data);
       $.post( _url, _data ).done(
         function(data) {
           var _btn = $("#subcribe-btn");
