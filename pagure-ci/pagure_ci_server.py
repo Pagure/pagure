@@ -71,6 +71,7 @@ def handle_messages():
         session = pagure.lib.create_session(pagure.APP.config['DB_URL'])
         request = pagure.lib.get_request_by_uid(session, pr_uid)
         session.close()
+        LOG.info('PR retrieved: %s', request)
 
         if not request:
             LOG.warning(
