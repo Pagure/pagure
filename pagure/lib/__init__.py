@@ -2318,7 +2318,6 @@ def add_email_to_user(session, user, user_email):
             update_log_email_user(session, user_email, user)
 
 
-
 def update_user_ssh(session, user, ssh_key, keydir):
     ''' Set up a new user into the database or update its information. '''
     if isinstance(user, basestring):
