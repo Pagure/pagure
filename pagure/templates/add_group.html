@@ -1,32 +1,36 @@
 {% extends "master.html" %}
-{% from "_formhelper.html" import render_field_in_row %}
+{% from "_formhelper.html" import render_bootstrap_field %}
 
+{% block title %}Create Group{% endblock %}
 {% set tag = "groups" %}
-{% block title %}Create group{% endblock %}
 
 
 {% block content %}
 
-<h2>Create group</h2>
-
-<section class="new_group">
-    <form action="{{ url_for('.add_group') }}" method="post">
-
-    <table>
-      {{ render_field_in_row(form.group_name) }}
-      {{ render_field_in_row(form.display_name) }}
-      {{ render_field_in_row(form.description) }}
-      {%- if admin %}
-      {{ render_field_in_row(form.group_type) }}
-      {%- endif %}
-    </table>
-    <p class="buttons indent">
-      <input type="submit" class="submit positive button" value="Add">
-      <input type="button" value="Cancel" class="button"
-       onclick="history.back();">
-      {{ form.csrf_token }}
-    </p>
-  </form>
-</section>
-
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2">
+      <div class="card m-t-3">
+        <div class="card-header">
+          <strong>Create new group</strong>
+        </div>
+        <div class="card-block">
+          <form action="{{ url_for('add_group') }}" method="post">
+            {{ render_bootstrap_field(form.group_name, field_description="the name of your group") }}
+            {{ render_bootstrap_field(form.display_name, field_description="display name of your group") }}
+            {{ render_bootstrap_field(form.description, field_description="short description about the group") }}
+            {%- if admin %}
+            {{ render_bootstrap_field(form.group_type, field_description="mention the type of group") }}
+            {%- endif %}
+            <p class="buttons indent">
+              <input class="submit positive btn btn-primary" type="submit" value="Create" >
+              <input type="button" value="Cancel" class="btn btn-default" onclick="history.back();">
+              {{ form.csrf_token }}
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

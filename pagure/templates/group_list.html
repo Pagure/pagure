@@ -21,44 +21,15 @@
     Groups <span class="label label-default">{{ groups | length }}</span>
     {% if authenticated and config.get('ENABLE_GROUP_MNGT', False) %}
 
-      <button type="button" id="new_user_btn" data-target="#add_group"
-        class="btn btn-success pull-xs-right" data-toggle="modal">
-        New Group
-      </button>
+      <a href="{{ url_for('add_group') }}">
+        <button type="button" id="new_user_btn" 
+          class="btn btn-success pull-xs-right" data-toggle="tooltip" title="Create New Group" >
+          New Group
+        </button>
+      </a>
 
     {% endif %}
   </h2>
-
-  {% if authenticated %}
-  <div class="modal fade" id="add_group" tabindex="-1" role="dialog" aria-labelledby="add_group" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-          <h4 class="modal-title" id="myModalLabel">Create New Group</h4>
-        </div>
-        <form action="{{ url_for('.add_group') }}" method="post">
-          <div class="modal-body">
-            <fieldset>
-              <strong>Group Name:</strong>
-              <input class="form-control" id="group_name" name="group_name" title="Group name" />
-              {%- if admin %}
-              {{ form.group_type()|safe }}
-              {%- endif %}
-              {{ form.csrf_token }}
-            </fieldset>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <input type="submit" class="btn btn-primary" value="Add">
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-  {% endif %}
 
   {% if total_page and total_page > 1 %}
   <nav class="text-center">
@@ -118,13 +89,6 @@ $(document).ready(function() {
         return false;
     }
   });
-  {% if config.get('ENABLE_GROUP_MNGT', False) %}
-  $('#add_group').on(
-    'shown.bs.modal', function () {
-      $('#group_name').focus()
-    }
-  );
-  {% endif %}
 
   $('#term').selectize({
     valueField: 'group',

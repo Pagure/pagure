@@ -74,7 +74,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/group/add')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<h2>Create group</h2>', output.data)
+            self.assertIn('<strong>Create new group</strong>', output.data)
             self.assertNotIn(
                 '<option value="admin">admin</option>', output.data)
 
@@ -87,7 +87,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
             # Insufficient input
             output = self.app.post('/group/add', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<h2>Create group</h2>', output.data)
+            self.assertIn('<strong>Create new group</strong>', output.data)
             self.assertEqual(output.data.count(
                 'This field is required.'), 3)
 
@@ -100,7 +100,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
             # Missing CSRF
             output = self.app.post('/group/add', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<h2>Create group</h2>', output.data)
+            self.assertIn('<strong>Create new group</strong>', output.data)
             self.assertEqual(output.data.count(
                 'This field is required.'), 0)
 
@@ -127,7 +127,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
         with tests.user_set(pagure.APP, user):
             output = self.app.get('/group/add')
             self.assertEqual(output.status_code, 200)
-            self.assertIn('<h2>Create group</h2>', output.data)
+            self.assertIn('<strong>Create new group</strong>', output.data)
             self.assertIn('<option value="admin">admin</option>', output.data)
 
             data = {
@@ -272,6 +272,7 @@ class PagureFlaskGroupstests(tests.Modeltests):
                 '    Groups <span class="label label-default">1</span>',
                 output.data)
 
+            output = self.app.get('/new/')
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
