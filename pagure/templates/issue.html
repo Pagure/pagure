@@ -855,7 +855,6 @@ $( document ).ready(function() {
   {% if authenticated %}
   function set_up_subcribed() {
     $("#subcribe-btn").click(function(){
-      console.log('click');
       var _url = "{{ url_for(
         'api_ns.api_subscribe_issue',
         repo=repo.name,
