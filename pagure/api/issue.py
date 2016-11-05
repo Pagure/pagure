@@ -832,10 +832,6 @@ def api_subscribe_issue(repo, issueid, username=None, namespace=None):
     +--------------+----------+---------------+---------------------------+
     | Key          | Type     | Optionality   | Description               |
     +==============+==========+===============+===========================+
-    | ``username`` | string   | Mandatory     | | The username of the user|
-    |              |          |               |   to (un)subscribe to the |
-    |              |          |               |   issue.                  |
-    +--------------+----------+---------------+---------------------------+
     | ``status``   | boolean   | Mandatory    | | The subscription status |
     |              |          |               |   to subscribe or         |
     |              |          |               |   unsubscribe to the.     |
