@@ -232,6 +232,9 @@ def api_view_user_activity_date(username, date):
 
         GET /api/0/user/ralph/activity/2016-01-02
 
+        GET /api/0/user/ralph/activity/2016-01-02?grouped=true
+
+
     Parameters
     ^^^^^^^^^^
 
