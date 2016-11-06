@@ -299,7 +299,7 @@ def notify_new_comment(comment, user=None):
         ','.join(mail_to),
         mail_id=comment.mail_id,
         in_reply_to=comment.issue.mail_id,
-        project_name=comment.issue.project.name,
+        project_name=comment.issue.project.fullname,
         user_from=comment.user.fullname or comment.user.user,
     )
 
@@ -334,7 +334,7 @@ def notify_new_issue(issue, user=None):
         'Issue #%s `%s`' % (issue.id, issue.title),
         ','.join(mail_to),
         mail_id=issue.mail_id,
-        project_name=issue.project.name,
+        project_name=issue.project.fullname,
         user_from=issue.user.fullname or issue.user.user,
     )
 
@@ -371,7 +371,7 @@ The issue: `%s` of project: `%s` has been %s by %s.
         ','.join(mail_to),
         mail_id='%s/assigned/%s' % (issue.mail_id, uid),
         in_reply_to=issue.mail_id,
-        project_name=issue.project.name,
+        project_name=issue.project.fullname,
         user_from=user.fullname or user.user,
     )
 
@@ -408,7 +408,7 @@ The pull-request: `%s` of project: `%s` has been %s by %s.
         ','.join(mail_to),
         mail_id='%s/assigned/%s' % (request.mail_id, uid),
         in_reply_to=request.mail_id,
-        project_name=request.project.name,
+        project_name=request.project.fullname,
         user_from=user.fullname or user.user,
     )
 
@@ -441,7 +441,7 @@ def notify_new_pull_request(request):
         'PR #%s `%s`' % (request.id, request.title),
         ','.join(mail_to),
         mail_id=request.mail_id,
-        project_name=request.project.name,
+        project_name=request.project.fullname,
         user_from=request.user.fullname or request.user.user,
     )
 
@@ -477,7 +477,7 @@ Merged pull-request:
         ','.join(mail_to),
         mail_id='%s/close/%s' % (request.mail_id, uid),
         in_reply_to=request.mail_id,
-        project_name=request.project.name,
+        project_name=request.project.fullname,
         user_from=user.fullname or user.user,
     )
 
@@ -513,7 +513,7 @@ Cancelled pull-request:
         ','.join(mail_to),
         mail_id='%s/close/%s' % (request.mail_id, uid),
         in_reply_to=request.mail_id,
-        project_name=request.project.name,
+        project_name=request.project.fullname,
         user_from=user.fullname or user.user,
     )
 
@@ -549,7 +549,7 @@ def notify_pull_request_comment(comment, user):
         ','.join(mail_to),
         mail_id=comment.mail_id,
         in_reply_to=comment.pull_request.mail_id,
-        project_name=comment.pull_request.project.name,
+        project_name=comment.pull_request.project.fullname,
         user_from=comment.user.fullname or comment.user.user,
     )
 
