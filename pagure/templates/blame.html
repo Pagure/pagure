@@ -100,67 +100,60 @@
       </div>
 
 {% if content %}
-  {% if output_type in ('file','binary','image','markup', 'blame') %}
   <div class="card-block p-a-0">
-        {% if content %}
-          {% if output_type in ('file','binary','image','markup', 'blame') %}
-            <div class="file-button-bar">
-                {% if output_type in ('file','markup') and g.repo_admin %}
-                <a class="btn btn-sm btn-secondary" href="{{ url_for(
-                    'edit_file',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace,
-                    branchname=branchname,
-                    filename=filename | unicode) }}" title="Edit file">Edit</a>
-                {% endif %}
-                {% if output_type in ('file','markup') %}
-                <form class="btn btn-sm" method="POST" name="fork_project"
-                    action="{{ url_for('.fork_edit_file',
-                        repo=repo.name,
-                        username=username,
-                        namespace=repo.namespace,
-                        branchname=branchname, filename=filename) }}">
-                    <button class="btn btn-sm btn-secondary"
-                        onclick="fork_project.submit();">
-                            Fork and Edit
-                    </button>
-                    {{ forkbuttonform.csrf_token }}
-                </form>
-                {% endif %}
-                {% if output_type == 'markup'  %}
-                <a class="btn btn-sm btn-secondary" href="{{ url_for(
-                    'view_file', username=username, namespace=repo.namespace,
-                    repo=repo.name, identifier=branchname,
-                    filename=filename | unicode, text=True) }}"
-                    title="View as text">Text</a>
-                {% else %}
-                <a class="btn btn-secondary btn-sm" href="{{ url_for(
-                    'view_file',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace,
-                    identifier=branchname,
-                    filename=filename | unicode) }}" title="View as blob">Blob</a>
-                {% endif %}
+    <div class="file-button-bar">
+      {% if output_type in ('file','markup') and g.repo_admin %}
+      <a class="btn btn-sm btn-secondary" href="{{ url_for(
+        'edit_file',
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace,
+        branchname=branchname,
+        filename=filename | unicode) }}" title="Edit file">Edit</a>
+      {% endif %}
+      {% if output_type in ('file','markup') %}
+      <form class="btn btn-sm" method="POST" name="fork_project"
+        action="{{ url_for('.fork_edit_file',
+          repo=repo.name,
+          username=username,
+          namespace=repo.namespace,
+          branchname=branchname, filename=filename) }}">
+        <button class="btn btn-sm btn-secondary"
+          onclick="fork_project.submit();">
+            Fork and Edit
+        </button>
+        {{ forkbuttonform.csrf_token }}
+      </form>
+      {% endif %}
+      {% if output_type == 'markup'  %}
+      <a class="btn btn-sm btn-secondary" href="{{ url_for(
+        'view_file', username=username, namespace=repo.namespace,
+        repo=repo.name, identifier=branchname,
+        filename=filename | unicode, text=True) }}"
+        title="View as text">Text</a>
+      {% else %}
+      <a class="btn btn-secondary btn-sm" href="{{ url_for(
+        'view_file',
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace,
+        identifier=branchname,
+        filename=filename | unicode) }}" title="View as blob">Blob</a>
+      {% endif %}
 
-                <a class="btn btn-secondary btn-sm" href="{{ url_for(
-                    'view_raw_file',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace,
-                    identifier=branchname,
-                    filename=filename) | unicode }}" title="View as raw">Raw</a>
-            </div>
-          {% endif %}
-        {% endif %}
-
+      <a class="btn btn-secondary btn-sm" href="{{ url_for(
+        'view_raw_file',
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace,
+        identifier=branchname,
+        filename=filename) | unicode }}" title="View as raw">Raw</a>
+    </div>
 
     {% autoescape false %}
     {{ content | blame_loc(repo, username, blame) }}
     {% endautoescape %}
   </div>
-  {% endif %}
 {% else %}
 No content found in this repository
 {% endif %}
