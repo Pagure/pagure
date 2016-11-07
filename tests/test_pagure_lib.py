@@ -970,7 +970,7 @@ class PagureLibtests(tests.Modeltests):
         tests.create_projects(self.session)
 
         projects = pagure.lib.search_projects(self.session)
-        self.assertEqual(len(projects), 2)
+        self.assertEqual(len(projects), 3)
         self.assertEqual(projects[0].id, 1)
         self.assertEqual(projects[1].id, 2)
 
@@ -978,12 +978,12 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(len(projects), 0)
 
         projects = pagure.lib.search_projects(self.session, username='pingou')
-        self.assertEqual(len(projects), 2)
+        self.assertEqual(len(projects), 3)
         self.assertEqual(projects[0].id, 1)
         self.assertEqual(projects[1].id, 2)
 
         projects = pagure.lib.search_projects(self.session, start=1)
-        self.assertEqual(len(projects), 1)
+        self.assertEqual(len(projects), 2)
         self.assertEqual(projects[0].id, 2)
 
         projects = pagure.lib.search_projects(self.session, limit=1)
@@ -991,7 +991,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(projects[0].id, 1)
 
         projects = pagure.lib.search_projects(self.session, count=True)
-        self.assertEqual(projects, 2)
+        self.assertEqual(projects, 3)
 
     def test_search_project_forked(self):
         """ Test the search_project for forked projects in pagure.lib. """
@@ -1022,7 +1022,7 @@ class PagureLibtests(tests.Modeltests):
         projects = pagure.lib.search_projects(self.session, fork=True)
         self.assertEqual(len(projects), 2)
         projects = pagure.lib.search_projects(self.session, fork=False)
-        self.assertEqual(len(projects), 2)
+        self.assertEqual(len(projects), 3)
 
     def test_get_tags_of_project(self):
         """ Test the get_tags_of_project of pagure.lib. """
@@ -1581,7 +1581,7 @@ class PagureLibtests(tests.Modeltests):
 
         prs = pagure.lib.search_pull_requests(
             session=self.session,
-            project_id_from=3
+            project_id_from=4
         )
         self.assertEqual(len(prs), 1)
 
@@ -1988,13 +1988,13 @@ class PagureLibtests(tests.Modeltests):
 
         projects = pagure.lib.search_projects(self.session)
         for proj in projects:
-            self.assertIn(proj.hook_token, ['aaabbbccc', 'aaabbbddd'])
+            self.assertIn(proj.hook_token, ['aaabbbccc', 'aaabbbddd', 'aaabbbeee'])
 
         pagure.lib.generate_hook_token(self.session)
 
         projects = pagure.lib.search_projects(self.session)
         for proj in projects:
-            self.assertNotIn(proj.hook_token, ['aaabbbccc', 'aaabbbddd'])
+            self.assertNotIn(proj.hook_token, ['aaabbbccc', 'aaabbbddd', 'aaabbbeee'])
 
     @patch('pagure.lib.notify.send_email')
     def test_pull_request_score(self, mockemail):
@@ -2664,7 +2664,7 @@ class PagureLibtests(tests.Modeltests):
             user='pingou',
         )
         watch_list = [obj.name for obj in watch_list_objs]
-        self.assertEqual(watch_list, ['test', 'test2'])
+        self.assertEqual(watch_list, ['test', 'test2', 'test3'])
 
         # He isn't in the db, thus not watching anything
         user.username = 'vivek'

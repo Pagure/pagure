@@ -712,7 +712,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         item = pagure.lib.model.Token(
             id='pingou_foo',
             user_id=1,
-            project_id=3,
+            project_id=4,
             expiration=datetime.datetime.utcnow() + datetime.timedelta(
                 days=30)
         )
@@ -932,7 +932,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         item = pagure.lib.model.Token(
             id='pingou_foo',
             user_id=1,
-            project_id=3,
+            project_id=4,
             expiration=datetime.datetime.utcnow() + datetime.timedelta(
                 days=30)
         )
@@ -991,7 +991,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         item = pagure.lib.model.Token(
             id='foo_token2',
             user_id=2,
-            project_id=3,
+            project_id=4,
             expiration=datetime.datetime.utcnow() + datetime.timedelta(days=30)
         )
         self.session.add(item)
@@ -1248,7 +1248,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         item = pagure.lib.model.Token(
             id='pingou_foo',
             user_id=1,
-            project_id=3,
+            project_id=4,
             expiration=datetime.datetime.utcnow() + datetime.timedelta(
                 days=30)
         )
@@ -1307,7 +1307,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         item = pagure.lib.model.Token(
             id='foo_token2',
             user_id=2,
-            project_id=3,
+            project_id=4,
             expiration=datetime.datetime.utcnow() + datetime.timedelta(days=30)
         )
         self.session.add(item)

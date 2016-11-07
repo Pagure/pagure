@@ -67,14 +67,14 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             '<h2 class="m-b-1">All Projects '
-            '<span class="label label-default">2</span></h2>', output.data)
+            '<span class="label label-default">3</span></h2>', output.data)
 
         # Add a 3rd project with a long description
         item = pagure.lib.model.Project(
             user_id=2,  # foo
             name='test3',
             description='test project #3 with a very long description',
-            hook_token='aaabbbeee',
+            hook_token='aaabbbeeefff',
         )
         self.session.add(item)
         self.session.commit()
@@ -113,13 +113,13 @@ class PagureFlaskApptests(tests.Modeltests):
 
             output = self.app.get('/')
             self.assertIn(
-                'My Projects <span class="label label-default">2</span>',
+                'My Projects <span class="label label-default">3</span>',
                 output.data)
             self.assertIn(
                 'My Forks <span class="label label-default">0</span>',
                 output.data)
             self.assertIn(
-                'My Watch List <span class="label label-default">2</span>',
+                'My Watch List <span class="label label-default">3</span>',
                 output.data)
 
     def test_view_users(self):
@@ -156,7 +156,7 @@ class PagureFlaskApptests(tests.Modeltests):
         output = self.app.get('/user/pingou?repopage=abc&forkpage=def')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            'Projects <span class="label label-default">2</span>',
+            'Projects <span class="label label-default">3</span>',
             output.data)
         self.assertIn(
             'Forks <span class="label label-default">0</span>', output.data)

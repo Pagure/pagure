@@ -178,10 +178,11 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         data = json.loads(output.data)
         data['projects'][0]['date_created'] = "1436527638"
         data['projects'][1]['date_created'] = "1436527638"
+        data['projects'][2]['date_created'] = "1436527638"
         self.assertDictEqual(
             data,
             {
-              "total_projects": 2,
+              "total_projects": 3,
               "projects": [
                 {
                   "close_status": [
@@ -219,6 +220,28 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
                   "milestones": {},
                   "name": "test2",
                   "namespace": None,
+                  "parent": None,
+                  "priorities": {},
+                  "tags": [],
+                  "user": {
+                    "fullname": "PY C",
+                    "name": "pingou"
+                  }
+                },
+                {
+                  "close_status": [
+                      "Invalid",
+                      "Insufficient data",
+                      "Fixed",
+                      "Duplicate"
+                    ],
+                  "custom_keys": [],
+                  "date_created": "1436527638",
+                  "description": "namespaced test project",
+                  "id": 3,
+                  "milestones": {},
+                  "name": "test3",
+                  "namespace": "somenamespace",
                   "parent": None,
                   "priorities": {},
                   "tags": [],

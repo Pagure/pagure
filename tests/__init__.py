@@ -272,13 +272,24 @@ def create_projects(session):
     item.close_status = ['Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
     session.add(item)
 
+    item = pagure.lib.model.Project(
+        user_id=1,  # pingou
+        name='test3',
+        description='namespaced test project',
+        hook_token='aaabbbeee',
+        namespace='somenamespace',
+    )
+    item.close_status = ['Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
+    session.add(item)
+
     session.commit()
 
 
 def create_projects_git(folder, bare=False):
     """ Create some projects in the database. """
     repos = []
-    for project in ['test.git', 'test2.git']:
+    for project in ['test.git', 'test2.git',
+                    os.path.join('somenamespace', 'test3.git')]:
         repo_path = os.path.join(folder, project)
         repos.append(repo_path)
         if not os.path.exists(repo_path):

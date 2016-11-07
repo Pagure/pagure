@@ -2040,7 +2040,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="label label-default">5</span>', output.data)
+                'class="label label-default">6</span>', output.data)
             self.assertIn(
                 'Forks <span class="label label-default">0</span>',
                 output.data)
@@ -2132,7 +2132,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="label label-default">5</span>', output.data)
+                'class="label label-default">6</span>', output.data)
             self.assertIn(
                 'Forks <span class="label label-default">0</span>',
                 output.data)
@@ -2168,7 +2168,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="label label-default">5</span>', output.data)
+                'class="label label-default">6</span>', output.data)
             self.assertIn(
                 'Forks <span class="label label-default">1</span>',
                 output.data)
@@ -2224,7 +2224,7 @@ index 0000000..fb7093d
                 'repos from the system', output.data)
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
-                'class="label label-default">1</span>', output.data)
+                'class="label label-default">2</span>', output.data)
             self.assertIn(
                 'Forks <span class="label label-default">0</span>',
                 output.data)
@@ -2247,7 +2247,7 @@ index 0000000..fb7093d
                 'repos from the system' in output.data)
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
-                'class="label label-default">1</span>', output.data)
+                'class="label label-default">2</span>', output.data)
             self.assertIn(
                 'Forks <span class="label label-default">0</span>',
                 output.data)
@@ -2292,7 +2292,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="label label-default">2</span>', output.data)
+                'class="label label-default">3</span>', output.data)
             self.assertIn(
                 'Forks <span class="label label-default">0</span>',
                 output.data)
@@ -2384,7 +2384,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="label label-default">2</span>', output.data)
+                'class="label label-default">3</span>', output.data)
             self.assertIn(
                 'Forks <span class="label label-default">0</span>',
                 output.data)
@@ -2393,7 +2393,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
-                'class="label label-default">1</span>', output.data)
+                'class="label label-default">2</span>', output.data)
             self.assertIn(
                 'Forks <span class="label label-default">0</span>',
                 output.data)
@@ -2426,7 +2426,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            My Projects <span '
-                'class="label label-default">1</span>', output.data)
+                'class="label label-default">2</span>', output.data)
             self.assertIn(
                 'Forks <span class="label label-default">1</span>',
                 output.data)
@@ -2436,7 +2436,7 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<div class="card-header">\n            Projects <span '
-                'class="label label-default">1</span>', output.data)
+                'class="label label-default">2</span>', output.data)
             self.assertIn(
                 'Forks <span class="label label-default">0</span>',
                 output.data)

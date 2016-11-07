@@ -363,10 +363,12 @@ def get_project_from_json(
 
     user = get_user_from_json(session, jsondata)
     name = jsondata.get('name')
+    namespace = jsondata.get('namespace')
     project_user = None
     if jsondata.get('parent'):
         project_user = user.username
-    project = pagure.lib.get_project(session, name, user=project_user)
+    project = pagure.lib.get_project(
+        session, name, user=project_user, namespace=namespace)
 
     if not project:
         parent = None
@@ -391,6 +393,7 @@ def get_project_from_json(
                 session,
                 user=user.username,
                 name=name,
+                namespace=namespace,
                 description=jsondata.get('description'),
                 parent_id=parent.id if parent else None,
                 blacklist=pagure.APP.config.get('BLACKLISTED_PROJECTS', []),
@@ -404,7 +407,9 @@ def get_project_from_json(
             )
 
         session.commit()
-        project = pagure.lib.get_project(session, name, user=user.username)
+        project = pagure.lib.get_project(
+            session, name, user=user.username, namespace=namespace)
+
         tags = jsondata.get('tags', None)
         if tags:
             pagure.lib.add_tag_obj(
