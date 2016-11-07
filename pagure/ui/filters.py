@@ -240,6 +240,64 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
     return '\n'.join(output)
 
 
+@APP.template_filter('blame_loc')
+def blame_loc(loc, repo, username, blame):
+    """ Template filter putting the provided lines of code into a table
+    """
+    if loc is None:
+        return
+
+    output = [
+        '<div class="highlight">',
+        '<table class="code_table">'
+    ]
+
+    cnt = 1
+    for idx, line in enumerate(loc.split('\n')):
+        if line == '</pre></div>':
+            break
+        output.append(
+            '<tr><td class="cell1">'
+            '<a id="%(cnt)s" href="#%(cnt)s" data-line-number='
+            '"%(cnt_lbl)s"></a></td>'
+            % (
+                {
+                    'cnt': cnt,
+                    'cnt_lbl': cnt,
+                }
+            )
+        )
+
+        cnt += 1
+        if not line:
+            output.append(line)
+            continue
+        if line.startswith('<div'):
+            line = line.split('<pre style="line-height: 125%">')[1]
+        diff = blame.for_line(idx + 1)
+        output.append(
+            '<td class="cell_user">%s</td>' % author_to_user(
+                diff.orig_committer, with_name=False)
+        )
+        output.append(
+            '<td class="cell_commit"><a href="%s">%s</a></td>' % (
+                flask.url_for('view_commit',
+                        repo=repo.name,
+                        username=username,
+                        namespace=repo.namespace,
+                        commitid=diff.final_commit_id
+                ),
+                shorted_commit(diff.final_commit_id)
+            )
+        )
+        output.append('<td class="cell2"><pre>%s</pre></td>' % line)
+        output.append('</tr>')
+
+    output.append('</table></div>')
+
+    return '\n'.join(output)
+
+
 @APP.template_filter('wraps')
 def text_wraps(text, size=10):
     """ Template filter to wrap text at a specified size
@@ -331,7 +389,7 @@ def patch_to_diff(patch):
 
 
 @APP.template_filter('author2user')
-def author_to_user(author, size=16, cssclass=None):
+def author_to_user(author, size=16, cssclass=None, with_name=True):
     """ Template filter transforming a pygit2 Author object into a text
     either with just the username or linking to the user in pagure.
     """
@@ -340,11 +398,20 @@ def author_to_user(author, size=16, cssclass=None):
         return output
     user = pagure.lib.search_user(SESSION, email=author.email)
     if user:
-        output = "%s <a href='%s' %s>%s</a>" % (
-            avatar(user.default_email, size),
-            flask.url_for('view_user', username=user.username),
-            ('class="%s"' % cssclass) if cssclass else '',
-            author.name,
+        output = "%(avatar)s <a title='%(name)s' href='%(url)s' "\
+            "%(cssclass)s>%(username)s</a>"
+        if not with_name:
+            output = "<a title='%(name)s' href='%(url)s' "\
+                "%(cssclass)s>%(avatar)s</a>"
+
+        output = output % (
+            {
+                'avatar': avatar(user.default_email, size),
+                'url': flask.url_for('view_user', username=user.username),
+                'cssclass': ('class="%s"' % cssclass) if cssclass else '',
+                'username': user.username,
+                'name': author.name,
+            }
         )
 
     return output
@@ -378,6 +445,7 @@ def author_to_user_commits(author, link, size=16, cssclass=None):
         )
 
     return output
+
 
 @APP.template_filter('InsertDiv')
 def insert_div(content):

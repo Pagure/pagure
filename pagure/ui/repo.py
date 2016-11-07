@@ -679,6 +679,52 @@ def view_raw_file(
     return (data, 200, headers)
 
 
+@APP.route('/<repo>/blame/<path:filename>')
+@APP.route('/<namespace>/<repo>/blame/<path:filename>')
+@APP.route(
+    '/fork/<username>/<repo>/blame/<path:filename>')
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/blame/<path:filename>')
+def view_blame_file(repo, filename, username=None, namespace=None):
+    """ Displays the blame of a file or a tree for the specified repo.
+    """
+    repo = flask.g.repo
+    reponame = flask.g.reponame
+    repo_obj = flask.g.repo_obj
+
+    branchname = flask.request.args.get('identifier', 'master')
+
+    if repo_obj.is_empty:
+        flask.abort(404, 'Empty repo cannot have a file')
+
+    commit = repo_obj[repo_obj.head.target]
+    content = __get_file_in_tree(
+        repo_obj, commit.tree, filename.split('/'), bail_on_tree=True)
+    if not content:
+        flask.abort(404, 'File not found')
+
+    if not isinstance(content, pygit2.Blob):
+        flask.abort(404, 'File not found')
+    if is_binary_string(content.data):
+        flask.abort(400, 'Binary files cannot be blamed')
+
+    content = ktc.to_bytes(content.data)
+    blame = repo_obj.blame(filename)
+
+    return flask.render_template(
+        'blame.html',
+        select='tree',
+        repo=repo,
+        origin='view_file',
+        username=username,
+        filename=filename,
+        branchname=branchname,
+        content=content,
+        output_type='blame',
+        blame=blame,
+    )
+
+
 @APP.route('/<repo>/c/<commitid>/')
 @APP.route('/<repo>/c/<commitid>')
 @APP.route('/<namespace>/<repo>/c/<commitid>/')
