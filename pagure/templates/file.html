@@ -127,6 +127,7 @@
                     {{ forkbuttonform.csrf_token }}
                 </form>
                 {% endif %}
+
                 {% if output_type == 'markup'  %}
                 <a class="btn btn-sm btn-secondary" href="{{ url_for(
                     'view_file', username=username, namespace=repo.namespace,
@@ -142,6 +143,14 @@
                     identifier=branchname,
                     filename=filename | unicode) }}" title="View as blob">Blob</a>
                 {% endif %}
+
+                <a class="btn btn-secondary btn-sm" href="{{ url_for(
+                    'view_blame_file',
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace,
+                    filename=filename) | unicode }}" title="View as raw">Blame</a>
+
                 <a class="btn btn-secondary btn-sm" href="{{ url_for(
                     'view_raw_file',
                     repo=repo.name,
