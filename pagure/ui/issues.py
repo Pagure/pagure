@@ -257,8 +257,9 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     ticketfolder=APP.config['TICKETS_FOLDER']
                 )))
 
-            # The meta-data can only be changed by admins, which means they
-            # will be missing for non-admin and thus reset if we let them
+            # The meta-data can be changed by admins and issue creator, 
+            # where issue creators can only change status of their issue while
+            # other fields will be missing for non-admin and thus reset if we let them 
             if repo_admin:
                 # Assign or update assignee of the ticket
                 message = pagure.lib.add_issue_assignee(
@@ -273,6 +274,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     messages.add(message)
 
                 # Update status
+            if repo_admin or flask.g.fas_user.username == issue.user.user: 
                 if new_status in status:
                     message = pagure.lib.edit_issue(
                         SESSION,
@@ -288,6 +290,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                         messages.add(message)
 
                 # Update priority
+            if repo_admin:
                 if str(new_priority) in repo.priorities:
                     message = pagure.lib.edit_issue(
                         SESSION,
@@ -302,6 +305,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                         messages.add(message)
 
                 # Update milestone and privacy setting
+            if repo_admin:
                 message = pagure.lib.edit_issue(
                     SESSION,
                     issue=issue,
@@ -315,6 +319,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     messages.add(message)
 
                 # Update the custom keys/fields
+            if repo_admin:
                 for key in repo.issue_keys:
                     value = flask.request.form.get(key.name)
                     if value:
@@ -334,6 +339,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                         )
 
                 # Update ticket this one depends on
+            if repo_admin:
                 messages.union(set(pagure.lib.update_dependency_issue(
                     SESSION, repo, issue, depends,
                     username=flask.g.fas_user.username,
@@ -341,6 +347,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                 )))
 
                 # Update ticket(s) depending on this one
+            if repo_admin:
                 messages.union(set(pagure.lib.update_blocked_issue(
                     SESSION, repo, issue, blocks,
                     username=flask.g.fas_user.username,

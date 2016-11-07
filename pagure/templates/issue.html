@@ -148,7 +148,7 @@
             </h2>
           </fieldset>
 
-          {% if authenticated and g.repo_admin %}
+          {% if authenticated and (g.repo_admin or g.fas_user.username == issue.user.user) %}
             {{ render_bootstrap_field(form.status,
               formclass="issue-metadata-form") }}
             {{ render_bootstrap_field(form.close_status,
@@ -309,7 +309,7 @@
           <a class="btn btn-secondary issue-metadata-form editmetadatatoggle">
             Cancel
           </a>
-          {% if authenticated and g.repo_admin %}
+          {% if authenticated and (g.repo_admin or g.fas_user.username == issue.user.user) %}
             <a class="btn btn-secondary issue-metadata-display editmetadatatoggle">
               Edit Metadata
             </a>
