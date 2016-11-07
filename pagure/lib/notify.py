@@ -197,6 +197,7 @@ def send_email(text, subject, to_mail,
         'FROM_EMAIL', 'pagure@fedoraproject.org')
     if user_from:
         from_email = '%s <%s>' % (user_from, from_email)
+    from_email = from_email.encode('utf-8')
 
     if not pagure.APP.config.get('EMAIL_SEND', True):
         print '******EMAIL******'
