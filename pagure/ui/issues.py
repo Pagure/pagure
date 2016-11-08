@@ -305,6 +305,9 @@ def update_issue(repo, issueid, username=None, namespace=None):
             APP.logger.exception(err)
             if not is_js:
                 flask.flash(str(err), 'error')
+    else:
+        if is_js:
+            return 'notok: %s' % form.errors
 
     if is_js:
         return 'ok'
