@@ -12,6 +12,7 @@
 # pylint: disable=no-init
 # pylint: disable=super-on-old-class
 
+import datetime
 import re
 import tempfile
 
@@ -33,6 +34,20 @@ STRICT_REGEX = '^[a-zA-Z0-9-_]+$'
 TAGS_REGEX = '^[a-zA-Z0-9-_, .]+$'
 PROJECT_NAME_REGEX = \
     '^[a-zA-z0-9_][a-zA-Z0-9-_]*$'
+
+
+class PagureForm(FlaskForm):
+    """ Local form allowing us to form set the time limit. """
+
+    def __init__(self, *args, **kwargs):
+        delta = pagure.APP.config.get('WTF_CSRF_TIME_LIMIT', 3600)
+        if delta \
+                and (not hasattr(wtf, '__version__') \
+                or tuple(wtf.__version__.split('.')) <= (0,10,0)):
+            self.TIME_LIMIT = datetime.timedelta(seconds=delta)
+        else:
+            self.TIME_LIMIT = delta
+        super(PagureForm, self).__init__(*args, **kwargs)
 
 
 def convert_value(val):
@@ -89,7 +104,7 @@ def ssh_key_validator(form, field):
         raise wtforms.ValidationError('Invalid SSH keys')
 
 
-class ProjectFormSimplified(FlaskForm):
+class ProjectFormSimplified(PagureForm):
     ''' Form to edit the description of a project. '''
     description = wtforms.TextField(
         'Description <span class="error">*</span>',
@@ -145,7 +160,7 @@ class ProjectForm(ProjectFormSimplified):
             self.namespace.choices.insert(0, ('', ''))
 
 
-class IssueFormSimplied(FlaskForm):
+class IssueFormSimplied(PagureForm):
     ''' Form to create or edit an issue. '''
     title = wtforms.TextField(
         'Title<span class="error">*</span>',
@@ -181,7 +196,7 @@ class IssueForm(IssueFormSimplied):
             ]
 
 
-class RequestPullForm(FlaskForm):
+class RequestPullForm(PagureForm):
     ''' Form to create a request pull. '''
     title = wtforms.TextField(
         'Title<span class="error">*</span>',
@@ -207,7 +222,7 @@ class RemoteRequestPullForm(RequestPullForm):
     )
 
 
-class AddIssueTagForm(FlaskForm):
+class AddIssueTagForm(PagureForm):
     ''' Form to add a comment to an issue. '''
     tag = wtforms.TextField(
         'tag',
@@ -219,7 +234,7 @@ class AddIssueTagForm(FlaskForm):
     )
 
 
-class StatusForm(FlaskForm):
+class StatusForm(PagureForm):
     ''' Form to add/change the status of an issue. '''
     status = wtforms.SelectField(
         'Status',
@@ -249,7 +264,7 @@ class StatusForm(FlaskForm):
             self.close_status.choices.insert(0, ('', ''))
 
 
-class NewTokenForm(FlaskForm):
+class NewTokenForm(PagureForm):
     ''' Form to add/change the status of an issue. '''
     acls = wtforms.SelectMultipleField(
         'ACLs',
@@ -270,7 +285,7 @@ class NewTokenForm(FlaskForm):
 
 
 
-class UpdateIssueForm(FlaskForm):
+class UpdateIssueForm(PagureForm):
     ''' Form to add a comment to an issue. '''
     tag = wtforms.TextField(
         'tag',
@@ -350,7 +365,7 @@ class UpdateIssueForm(FlaskForm):
             self.close_status.choices.insert(0, ('', ''))
 
 
-class AddPullRequestCommentForm(FlaskForm):
+class AddPullRequestCommentForm(PagureForm):
     ''' Form to add a comment to a pull-request. '''
     commit = wtforms.HiddenField('commit identifier')
     filename = wtforms.HiddenField('file changed')
@@ -363,7 +378,7 @@ class AddPullRequestCommentForm(FlaskForm):
     )
 
 
-class AddPullRequestFlagForm(FlaskForm):
+class AddPullRequestFlagForm(PagureForm):
     ''' Form to add a flag to a pull-request. '''
     username = wtforms.TextField(
         'Username', [wtforms.validators.Required()])
@@ -377,7 +392,7 @@ class AddPullRequestFlagForm(FlaskForm):
         'UID', [wtforms.validators.optional()])
 
 
-class UserSettingsForm(FlaskForm):
+class UserSettingsForm(PagureForm):
     ''' Form to create or edit project. '''
     ssh_key = wtforms.TextAreaField(
         'Public SSH key <span class="error">*</span>',
@@ -386,7 +401,7 @@ class UserSettingsForm(FlaskForm):
     )
 
 
-class AddUserForm(FlaskForm):
+class AddUserForm(PagureForm):
     ''' Form to add a user to a project. '''
     user = wtforms.TextField(
         'Username <span class="error">*</span>',
@@ -394,7 +409,7 @@ class AddUserForm(FlaskForm):
     )
 
 
-class AssignIssueForm(FlaskForm):
+class AssignIssueForm(PagureForm):
     ''' Form to assign an user to an issue. '''
     assignee = wtforms.TextField(
         'Assignee <span class="error">*</span>',
@@ -402,7 +417,7 @@ class AssignIssueForm(FlaskForm):
     )
 
 
-class AddGroupForm(FlaskForm):
+class AddGroupForm(PagureForm):
     ''' Form to add a group to a project. '''
     group = wtforms.TextField(
         'Group <span class="error">*</span>',
@@ -413,19 +428,19 @@ class AddGroupForm(FlaskForm):
     )
 
 
-class ConfirmationForm(FlaskForm):
+class ConfirmationForm(PagureForm):
     ''' Simple form used just for CSRF protection. '''
     pass
 
 
-class UploadFileForm(FlaskForm):
+class UploadFileForm(PagureForm):
     ''' Form to upload a file. '''
     filestream = wtforms.FileField(
         'File',
         [wtforms.validators.Required(), file_virus_validator])
 
 
-class UserEmailForm(FlaskForm):
+class UserEmailForm(PagureForm):
     ''' Form to edit the description of a project. '''
     email = wtforms.TextField(
         'email', [wtforms.validators.Required()]
@@ -442,7 +457,7 @@ class UserEmailForm(FlaskForm):
             self.email.validators = [wtforms.validators.Required()]
 
 
-class ProjectCommentForm(FlaskForm):
+class ProjectCommentForm(PagureForm):
     ''' Form to represent project. '''
     objid = wtforms.TextField(
         'Ticket/Request id',
@@ -454,14 +469,14 @@ class ProjectCommentForm(FlaskForm):
     )
 
 
-class CommentForm(FlaskForm):
+class CommentForm(PagureForm):
     ''' Form to upload a file. '''
     comment = wtforms.FileField(
         'Comment',
         [wtforms.validators.Required(), file_virus_validator])
 
 
-class EditGroupForm(FlaskForm):
+class EditGroupForm(PagureForm):
     """ Form to ask for a password change. """
     display_name = wtforms.TextField(
         'Group name to display',
@@ -507,7 +522,7 @@ class NewGroupForm(EditGroupForm):
             ]
 
 
-class EditFileForm(FlaskForm):
+class EditFileForm(PagureForm):
     """ Form used to edit a file. """
     content = wtforms.TextAreaField(
         'content', [wtforms.validators.Required()])
@@ -534,7 +549,7 @@ class EditFileForm(FlaskForm):
             ]
 
 
-class DefaultBranchForm(FlaskForm):
+class DefaultBranchForm(PagureForm):
     """Form to change the default branh for a repository"""
     branches = wtforms.SelectField(
         'default_branch',
@@ -554,7 +569,7 @@ class DefaultBranchForm(FlaskForm):
             ]
 
 
-class EditCommentForm(FlaskForm):
+class EditCommentForm(PagureForm):
     """ Form to verify that comment is not empty
     """
     update_comment = wtforms.TextAreaField(
@@ -563,7 +578,7 @@ class EditCommentForm(FlaskForm):
     )
 
 
-class ForkRepoForm(FlaskForm):
+class ForkRepoForm(PagureForm):
     ''' Form to fork a project in the API. '''
     repo = wtforms.TextField(
         'The project name',
@@ -578,7 +593,7 @@ class ForkRepoForm(FlaskForm):
     )
 
 
-class AddReportForm(FlaskForm):
+class AddReportForm(PagureForm):
     """ Form to verify that comment is not empty
     """
     report_name = wtforms.TextAreaField(
@@ -587,7 +602,7 @@ class AddReportForm(FlaskForm):
     )
 
 
-class PublicNotificationForm(FlaskForm):
+class PublicNotificationForm(PagureForm):
     """ Form to verify that comment is not empty
     """
     issue_notifs = wtforms.TextAreaField(
@@ -601,9 +616,10 @@ class PublicNotificationForm(FlaskForm):
     )
 
 
-class SubscribtionForm(FlaskForm):
+class SubscribtionForm(PagureForm):
     ''' Form to subscribe or unsubscribe to an issue or a PR. '''
     status = wtforms.BooleanField(
         'Subscription status',
         [wtforms.validators.optional()],
     )
+
