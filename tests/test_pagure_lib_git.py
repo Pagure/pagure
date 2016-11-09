@@ -1588,6 +1588,94 @@ index 0000000..60f7480
             self.path, 'repos', 'forks', 'user', '/bar/foo.test.git'))
         self.assertEqual(repo_name, 'bar')
 
+    def test_update_custom_fields_from_json(self):
+        """ Test the update_custom_fields_from_json method of lib.git """
+
+        tests.create_projects(self.session)
+        repo = pagure.lib.get_project(self.session, 'test')
+
+        # Create issues to play with
+        pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None,
+            issue_uid='someuid'
+        )
+        self.session.commit()
+
+        issue = pagure.lib.get_issue_by_uid(self.session, 'someuid')
+
+        # Fake json data, currently without custom_fields
+        # This should bring no new custom_fields to the issue
+        json_data = {
+            "status": "Open",
+            "title": "Test issue",
+            "private": False,
+            "content": "We should work on this",
+            "user": {
+                "fullname": "PY C",
+                "name": "pingou",
+                "default_email": "bar@pingou.com",
+                "emails": ["bar@pingou.com"]
+            },
+            "id": 1,
+            "blocks": [],
+            "depends": [],
+            "date_created": "1234567",
+            "comments": [],
+        }
+
+        pagure.lib.git.update_custom_field_from_json(
+            self.session, repo, issue, json_data)
+
+        updated_issue = pagure.lib.get_issue_by_uid(self.session, 'someuid')
+
+        self.assertEqual(updated_issue.to_json().get('custom_fields'), [])
+        custom_fields = [
+                {
+                    "name": "custom1",
+                    "key_type": "text",
+                    "value": "value1",
+                },
+                {
+                    "name": "custom2",
+                    "key_type": "text",
+                    "value": "value2",
+                }
+        ]
+
+        # Again, Fake the json data but, with custom_fields in it
+        # The updated issue should have the custom_fields as
+        # was in the json_data
+        json_data = {
+            "status": "Open",
+            "title": "Test issue",
+            "private": False,
+            "content": "We should work on this",
+            "user": {
+                "fullname": "PY C",
+                "name": "pingou",
+                "default_email": "bar@pingou.com",
+                "emails": ["bar@pingou.com"]
+            },
+            "id": 1,
+            "blocks": [],
+            "depends": [],
+            "date_created": "1234567",
+            "comments": [],
+            "custom_fields": custom_fields,
+        }
+
+        pagure.lib.git.update_custom_field_from_json(
+            self.session, repo, issue, json_data)
+
+        updated_issue = pagure.lib.get_issue_by_uid(self.session, 'someuid')
+
+        custom_fields_of_issue = updated_issue.to_json().get('custom_fields')
+        self.assertEqual(custom_fields_of_issue, custom_fields)
 
 
 if __name__ == '__main__':
