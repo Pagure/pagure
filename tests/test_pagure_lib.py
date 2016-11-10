@@ -1296,6 +1296,169 @@ class PagureLibtests(tests.Modeltests):
         projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 3)
 
+    def test_fork_project_namespaced(self):
+        """ Test the fork_project of pagure.lib on a namespaced project. """
+        gitfolder = os.path.join(self.path, 'repos')
+        docfolder = os.path.join(self.path, 'docs')
+        ticketfolder = os.path.join(self.path, 'tickets')
+        requestfolder = os.path.join(self.path, 'requests')
+        pagure.APP.config['GIT_FOLDER'] = gitfolder
+
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 0)
+
+        # Create a new project
+        msg = pagure.lib.new_project(
+            session=self.session,
+            user='pingou',
+            name='testproject',
+            namespace='foonamespace',
+            blacklist=[],
+            allowed_prefix=['foonamespace'],
+            gitfolder=gitfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
+            description='description for testproject',
+            parent_id=None,
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Project "foonamespace/testproject" created')
+
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 1)
+
+        repo = pagure.lib.get_project(
+            self.session, 'testproject', namespace='foonamespace')
+        gitrepo = os.path.join(gitfolder, repo.path)
+        docrepo = os.path.join(docfolder, repo.path)
+        ticketrepo = os.path.join(ticketfolder, repo.path)
+        requestrepo = os.path.join(requestfolder, repo.path)
+
+        self.assertTrue(os.path.exists(gitrepo))
+        self.assertTrue(os.path.exists(docrepo))
+        self.assertTrue(os.path.exists(ticketrepo))
+        self.assertTrue(os.path.exists(requestrepo))
+
+        # Git repo exists
+        grepo = '%s.git' % os.path.join(
+            gitfolder, 'forks', 'foo', 'foonamespace', 'testproject')
+        os.makedirs(grepo)
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.fork_project,
+            session=self.session,
+            user='foo',
+            repo=repo,
+            gitfolder=gitfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
+        )
+        self.session.rollback()
+        shutil.rmtree(grepo)
+
+        # Doc repo exists
+        grepo = '%s.git' % os.path.join(
+            docfolder, 'forks', 'foo', 'foonamespace', 'testproject')
+        os.makedirs(grepo)
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.fork_project,
+            session=self.session,
+            user='foo',
+            repo=repo,
+            gitfolder=gitfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
+        )
+        self.session.rollback()
+        shutil.rmtree(grepo)
+
+        # Ticket repo exists
+        grepo = '%s.git' % os.path.join(
+            ticketfolder, 'forks', 'foo', 'foonamespace', 'testproject')
+        os.makedirs(grepo)
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.fork_project,
+            session=self.session,
+            user='foo',
+            repo=repo,
+            gitfolder=gitfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
+        )
+        self.session.rollback()
+        shutil.rmtree(grepo)
+
+        # Request repo exists
+        grepo = '%s.git' % os.path.join(
+            requestfolder, 'forks', 'foo', 'foonamespace', 'testproject')
+        os.makedirs(grepo)
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.fork_project,
+            session=self.session,
+            user='foo',
+            repo=repo,
+            gitfolder=gitfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
+        )
+        self.session.rollback()
+        shutil.rmtree(grepo)
+
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 1)
+
+        # Fork worked
+
+        msg = pagure.lib.fork_project(
+            session=self.session,
+            user='foo',
+            repo=repo,
+            gitfolder=gitfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
+        )
+        self.session.commit()
+        self.assertEqual(
+            msg,
+            'Repo "foonamespace/testproject" cloned to '
+            '"foo/foonamespace/testproject"')
+
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 2)
+
+        # Fork a fork
+
+        repo = pagure.lib.get_project(
+            self.session, 'testproject',
+            namespace='foonamespace', user='foo')
+
+        msg = pagure.lib.fork_project(
+            session=self.session,
+            user='pingou',
+            repo=repo,
+            gitfolder=gitfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
+        )
+        self.session.commit()
+        self.assertEqual(
+            msg,
+            'Repo "foonamespace/testproject" cloned to '
+            '"pingou/foonamespace/testproject"')
+
+        projects = pagure.lib.search_projects(self.session)
+        self.assertEqual(len(projects), 3)
+
     @patch('pagure.lib.notify.send_email')
     def test_new_pull_request(self, mockemail):
         """ test new_pull_request of pagure.lib. """
