@@ -1487,7 +1487,8 @@ def fork_project(session, user, repo, gitfolder,
     ''' Fork a given project into the user's forks. '''
     reponame = os.path.join(gitfolder, repo.path)
     forkreponame = '%s.git' % os.path.join(
-        gitfolder, 'forks', user, repo.name)
+        gitfolder, 'forks', user,
+        repo.namespace if repo.namespace else '', repo.name)
 
     if os.path.exists(forkreponame):
         raise pagure.exceptions.RepoExistsException(
@@ -1497,6 +1498,7 @@ def fork_project(session, user, repo, gitfolder,
 
     project = model.Project(
         name=repo.name,
+        namespace=repo.namespace,
         description=repo.description,
         user_id=user_obj.id,
         parent_id=repo.id,
@@ -1570,7 +1572,9 @@ def fork_project(session, user, repo, gitfolder,
         ),
     )
 
-    return 'Repo "%s" cloned to "%s/%s"' % (repo.name, user, repo.name)
+    return 'Repo "{0}" cloned to "{1}/{0}"'.format(
+        '%s/%s' % (repo.namespace, repo.name) if repo.namespace else repo.name,
+        user)
 
 
 def search_projects(
