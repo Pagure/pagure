@@ -27,7 +27,7 @@
 
 {% block repo %}
 <div class="row">
-  <div class="{% if pull_request %}col-md-8{% elif form and (g.repo_admin or remote_git) %}col-md-12{%endif%}">
+  <div class="col-md-12">
 {% if pull_request %}
 <h3><span class="label label-default">PR#{{requestid}}</span>
   {% if pull_request.status != 'Open'%}
@@ -506,6 +506,7 @@
   </div>
   {% if pull_request %}
   <div class="tab-pane active" role="tabpanel" id="comments">
+    <div class="col-md-8">
     <section class="request_comment" id="request_comment">
     {% if pull_request.comments %}
       <form action="{{ url_for('.pull_request_drop_comment',
@@ -606,13 +607,9 @@
       </div>
     </div>
     {% endif %}
+
+
   </div>
-  {% endif %}
-</div> <!-- tab content-->
-
-</div>
-
-
   <div class="col-md-4">
   {% if pull_request %}
     <section class="pr_info">
@@ -795,6 +792,14 @@
     </div>
   {% endif %}
   </div>
+</div>
+  {% endif %}
+</div> <!-- tab content-->
+
+</div>
+
+
+
 
 </div>
 {% endblock %}
