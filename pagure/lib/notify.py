@@ -177,6 +177,15 @@ def _build_url(*args):
     return '/'.join(items)
 
 
+def _fullname_to_url(fullname):
+    ''' For forked projects, fullname is 'forks/user/...' but URL is
+    'fork/user/...'. This is why we can't have nice things.
+    '''
+    if fullname.startswith('forks/'):
+        fullname = fullname.replace('forks', 'fork', 1)
+    return fullname
+
+
 def send_email(text, subject, to_mail,
                mail_id=None, in_reply_to=None,
                project_name=None, user_from=None):  # pragma: no cover
@@ -292,7 +301,7 @@ def notify_new_comment(comment, user=None):
        REPLY_MSG,
        _build_url(
            pagure.APP.config['APP_URL'],
-           comment.issue.project.name,
+           _fullname_to_url(comment.issue.project.fullname),
            'issue',
            comment.issue.id))
     mail_to = _get_emails_for_obj(comment.issue)
@@ -331,7 +340,7 @@ def notify_new_issue(issue, user=None):
        REPLY_MSG,
        _build_url(
            pagure.APP.config['APP_URL'],
-           issue.project.name,
+           _fullname_to_url(issue.project.fullname),
            'issue',
            issue.id))
     mail_to = _get_emails_for_obj(issue)
@@ -364,7 +373,7 @@ The issue: `%s` of project: `%s` has been %s by %s.
        user.username,
        _build_url(
            pagure.APP.config['APP_URL'],
-           issue.project.name,
+           _fullname_to_url(issue.project.fullname),
            'issue',
            issue.id))
     mail_to = _get_emails_for_obj(issue)
@@ -401,7 +410,7 @@ The pull-request: `%s` of project: `%s` has been %s by %s.
        user.username,
        _build_url(
            pagure.APP.config['APP_URL'],
-           request.project.name,
+           _fullname_to_url(request.project.fullname),
            'pull-request',
            request.id))
     mail_to = _get_emails_for_obj(request)
@@ -440,7 +449,7 @@ def notify_new_pull_request(request):
        REPLY_MSG,
        _build_url(
            pagure.APP.config['APP_URL'],
-           request.project.name,
+           _fullname_to_url(request.project.fullname),
            'pull-request',
            request.id))
     mail_to = _get_emails_for_obj(request)
@@ -474,7 +483,7 @@ Merged pull-request:
        request.title,
        _build_url(
            pagure.APP.config['APP_URL'],
-           request.project.name,
+           _fullname_to_url(request.project.fullname),
            'pull-request',
            request.id))
     mail_to = _get_emails_for_obj(request)
@@ -510,7 +519,7 @@ Cancelled pull-request:
        request.title,
        _build_url(
            pagure.APP.config['APP_URL'],
-           request.project.name,
+           _fullname_to_url(request.project.fullname),
            'pull-request',
            request.id))
     mail_to = _get_emails_for_obj(request)
@@ -545,7 +554,7 @@ def notify_pull_request_comment(comment, user):
        REPLY_MSG,
        _build_url(
            pagure.APP.config['APP_URL'],
-           comment.pull_request.project.name,
+           _fullname_to_url(comment.pull_request.project.fullname),
            'pull-request',
            comment.pull_request.id))
     mail_to = _get_emails_for_obj(comment.pull_request)
