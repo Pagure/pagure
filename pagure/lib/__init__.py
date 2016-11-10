@@ -1180,7 +1180,9 @@ def new_project(session, user, name, blacklist, allowed_prefix,
         ),
     )
 
-    return 'Project "%s" created' % name
+    return 'Project "%s" created' % (
+        '%s/%s' % (project.namespace, project.name) if project.namespace
+        else project.name)
 
 
 def new_issue(session, repo, title, content, user, ticketfolder,
