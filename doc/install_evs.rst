@@ -28,7 +28,7 @@ The eventsource server is easy to set-up.
 +----------------------------------------+-----------------------------------------------------+
 |              Source                    |                   Destination                       |
 +========================================+=====================================================+
-| ``ev-server/pagure-stream-server.py``  | ``/usr/libexec/pagure-ev/pagure-stream-server.py``  |
+| ``ev-server/pagure_stream_server.py``  | ``/usr/libexec/pagure-ev/pagure_stream_server.py``  |
 +----------------------------------------+-----------------------------------------------------+
 | ``ev-server/pagure_ev.service``        | ``/etc/systemd/system/pagure_ev.service``           |
 +----------------------------------------+-----------------------------------------------------+

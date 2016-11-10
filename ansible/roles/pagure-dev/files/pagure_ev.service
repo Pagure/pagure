@@ -6,7 +6,7 @@ Documentation=https://pagure.io/pagure
 [Service]
 Environment="PAGURE_CONFIG=/home/vagrant/pagure.cfg"
 ExecStart=/home/vagrant/.virtualenvs/python2-pagure/bin/python \
-          /home/vagrant/devel/ev-server/pagure-stream-server.py
+          /home/vagrant/devel/ev-server/pagure_stream_server.py
 Type=simple
 
 [Install]

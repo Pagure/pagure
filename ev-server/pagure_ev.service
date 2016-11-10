@@ -4,7 +4,7 @@ After=redis.target
 Documentation=https://pagure.io/pagure
 
 [Service]
-ExecStart=/usr/libexec/pagure-ev/pagure-stream-server.py
+ExecStart=/usr/libexec/pagure-ev/pagure_stream_server.py
 Type=simple
 User=git
 Group=git

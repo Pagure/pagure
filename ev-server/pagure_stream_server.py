@@ -42,53 +42,116 @@ from pagure.exceptions import PagureEvException
 
 SERVER = None
 
+
+def _get_issue(repo, objid):
+    """Get a Ticket (issue) instance for a given repo (Project) and
+    objid (issue number).
+    """
+    issue = None
+    if not repo.settings.get('issue_tracker', True):
+        raise PagureEvException("No issue tracker found for this project")
+
+    issue = pagure.lib.search_issues(
+        pagure.SESSION, repo, issueid=objid)
+
+    if issue is None or issue.project != repo:
+        raise PagureEvException("Issue '%s' not found" % objid)
+
+    if issue.private:
+        # TODO: find a way to do auth
+        raise PagureEvException(
+            "This issue is private and you are not allowed to view it")
+
+    return issue
+
+
+def _get_pull_request(repo, objid):
+    """Get a PullRequest instance for a given repo (Project) and objid
+    (request number).
+    """
+    if not repo.settings.get('pull_requests', True):
+        raise PagureEvException(
+            "No pull-request tracker found for this project")
+
+    request = pagure.lib.search_pull_requests(
+        pagure.SESSION, project_id=repo.id, requestid=objid)
+
+    if request is None or request.project != repo:
+        raise PagureEvException("Pull-Request '%s' not found" % objid)
+
+    return request
+
+
+# Dict representing known object types that we handle requests for,
+# and the bound functions for getting an object instance from the
+# parsed path data. Has to come after the functions it binds
+OBJECTS = {
+    'issue': _get_issue,
+    'pull-request': _get_pull_request
+}
+
+
+def _parse_path(path):
+    """Get the repo name, object type, object ID, and (if present)
+    username and/or namespace from a URL path component. Will only
+    handle the known object types from the OBJECTS dict. Assumes:
+    * Project name comes immediately before object type
+    * Object ID comes immediately after object type
+    * If a fork, path starts with /fork/(username)
+    * Namespace, if present, comes after fork username (if present) or at start
+    * No other components come before the project name
+    * None of the parsed items can contain a /
+    """
+    username = None
+    namespace = None
+    # path always starts with / so split and throw away first item
+    items = path.split('/')[1:]
+    # find the *last* match for any object type
+    try:
+        objtype = [item for item in items if item in OBJECTS][-1]
+    except IndexError:
+        raise PagureEvException("No known object type found in path: %s" % path)
+    try:
+        # objid is the item after objtype, we need all items up to it
+        items = items[:items.index(objtype) + 2]
+        # now strip the repo, objtype and objid off the end
+        (repo, objtype, objid) = items[-3:]
+        items = items[:-3]
+    except (IndexError, ValueError):
+        raise PagureEvException("No project or object ID found in path: %s" % path)
+    # now check for a fork
+    if items and items[0] == 'fork':
+        try:
+            # get the username and strip it and 'fork'
+            username = items[1]
+            items = items[2:]
+        except IndexError:
+            raise PagureEvException("Path starts with /fork but no user found! Path: %s" % path)
+    # if we still have an item left, it must be the namespace
+    if items:
+        namespace = items.pop(0)
+    # if we have any items left at this point, we've no idea
+    if items:
+        raise PagureEvException("More path components than expected! Path: %s" % path)
+
+    return (username, namespace, repo, objtype, objid)
+
+
 def get_obj_from_path(path):
     """ Return the Ticket or Request object based on the path provided.
     """
-    username = None
-    try:
-        if path.startswith('/fork'):
-            username, repo, obj, objid = path.split('/')[2:6]
-        else:
-            repo, obj, objid = path.split('/')[1:4]
-    except:
-        raise PagureEvException("Invalid URL: %s" % path)
-
-    repo = pagure.lib.get_project(pagure.SESSION, repo, user=username)
-
+    (username, namespace, reponame, objtype, objid) = _parse_path(path)
+    repo = pagure.lib.get_project(pagure.SESSION, reponame, user=username, namespace=namespace)
     if repo is None:
-        raise PagureEvException("Project '%s' not found" % repo)
+        raise PagureEvException("Project '%s' not found" % reponame)
 
-    output = None
-    if obj == 'issue':
-        if not repo.settings.get('issue_tracker', True):
-            raise PagureEvException("No issue tracker found for this project")
+    # find the appropriate object getter function from OBJECTS
+    try:
+        getfunc = OBJECTS[objtype]
+    except KeyError:
+        raise PagureEvException("Invalid object provided: '%s'" % objtype)
 
-        output = pagure.lib.search_issues(
-            pagure.SESSION, repo, issueid=objid)
-
-        if output is None or output.project != repo:
-            raise PagureEvException("Issue '%s' not found" % objid)
-
-        if output.private:
-            # TODO: find a way to do auth
-            raise PagureEvException(
-                "This issue is private and you are not allowed to view it")
-    elif obj == 'pull-request':
-        if not repo.settings.get('pull_requests', True):
-            raise PagureEvException(
-                "No pull-request tracker found for this project")
-
-        output = pagure.lib.search_pull_requests(
-            pagure.SESSION, project_id=repo.id, requestid=objid)
-
-        if output is None or output.project != repo:
-            raise PagureEvException("Pull-Request '%s' not found" % objid)
-
-    else:
-        raise PagureEvException("Invalid object provided: '%s'" % obj)
-
-    return output
+    return getfunc(repo, objid)
 
 
 @trollius.coroutine
