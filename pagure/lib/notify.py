@@ -25,6 +25,7 @@ import warnings
 import flask
 import pagure
 
+from email.header import Header
 from email.mime.text import MIMEText
 
 
@@ -196,8 +197,8 @@ def send_email(text, subject, to_mail,
     from_email = pagure.APP.config.get(
         'FROM_EMAIL', 'pagure@fedoraproject.org')
     if user_from:
-        from_email = '%s <%s>' % (user_from, from_email)
-    from_email = from_email.encode('utf-8')
+        header = Header(user_from, 'utf-8')
+        from_email = '%s <%s>' % (header.encode(), from_email)
 
     if not pagure.APP.config.get('EMAIL_SEND', True):
         print '******EMAIL******'
