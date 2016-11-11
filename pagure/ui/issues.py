@@ -269,11 +269,10 @@ def update_issue(repo, issueid, username=None, namespace=None):
                 # Update the custom keys/fields
                 for key in repo.issue_keys:
                     value = flask.request.form.get(key.name)
-                    if value:
-                        messages.add(
-                            pagure.lib.set_custom_key_value(
-                                SESSION, issue, key, value)
-                        )
+                    messages.add(
+                        pagure.lib.set_custom_key_value(
+                            SESSION, issue, key, value)
+                    )
 
             # Update ticket this one depends on
             messages.union(set(pagure.lib.update_dependency_issue(
