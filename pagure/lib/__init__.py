@@ -3368,15 +3368,33 @@ def set_custom_key_value(session, issue, key, value):
     )
 
     current_field = query.first()
+    updated = False
     if current_field:
-        current_field.value = value
+        if current_field.key.key_type == 'boolean':
+            value = value or False
+        if current_field.value != value:
+            current_field.value = value
+            updated = True
     else:
         current_field = model.IssueValues(
             issue_uid=issue.uid,
             key_id=key.id,
             value=value,
         )
+        updated = True
     session.add(current_field)
+
+    if REDIS and updated:
+        if issue.private:
+            REDIS.publish('pagure.%s' % issue.uid, json.dumps({
+                'issue': 'private',
+                'custom_fields': [key.name],
+            }))
+        else:
+            REDIS.publish('pagure.%s' % issue.uid, json.dumps({
+                'custom_fields': [key.name],
+                'issue': issue.to_json(public=True, with_comments=False),
+            }))
 
     return 'Custom key adjusted'
 
