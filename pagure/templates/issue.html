@@ -594,7 +594,6 @@ source.addEventListener('message', function(e) {
 
 {% if authenticated and form %}
 function set_ui_for_comment(setting){
-  console.log(setting)
   if (setting == false) {
     $(document.body).find('input[type="submit"]').removeAttr("disabled");
     document.body.style.cursor = 'default';
@@ -604,6 +603,7 @@ function set_ui_for_comment(setting){
   }
 }
 function try_async_comment(form) {
+  console.log('Submitting form:');
   console.log(form);
   set_ui_for_comment(true);
   var _data = $(form).serialize();
