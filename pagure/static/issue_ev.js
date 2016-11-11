@@ -200,6 +200,37 @@ update_issue = function(data) {
   }
 }
 
+update_custom_fields = function(data) {
+  console.log('Adjusting custom fields ' + data.custom_fields);
+  for (i=0; i<data.custom_fields.length; i++){
+    var _f = data.custom_fields[i];
+    var field = $('#' +  _f);
+    var _val = null;
+    for (j=0; j<data.issue.custom_fields.length; j++) {
+      if (data.issue.custom_fields[j].name == _f){
+        if (data.issue.custom_fields[j].key_type == 'boolean'){
+          _val = data.issue.custom_fields[j].value == 'on';
+        } else {
+          _val = data.issue.custom_fields[j].value;
+        }
+        break;
+      }
+    }
+    if (_val == null) {
+      console.log('No corresponding custom field/value found');
+      return
+    }
+    if (_val == true || _val == false) {
+      field[0].checked = _val;
+    } else {
+      field.val(_val);
+    }
+
+    var field = $('#' +  _f + '_plain');
+    field.html(_val);
+  }
+}
+
 private_issue = function(data, _api_issue_url, issue_uid) {
   if (data.comment_id){
     var _url = _api_issue_url.replace('-123456789', issue_uid)
@@ -289,6 +320,10 @@ process_event = function(
   else if (data.comment_updated){
     update_comment(data);
     category = 'Comment updated';
+  }
+  else if (data.custom_fields){
+    update_custom_fields(data);
+    category = 'Custom fields edited';
   }
   else if (data.fields){
     update_issue(data);
