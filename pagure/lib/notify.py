@@ -199,7 +199,7 @@ def send_email(text, subject, to_mail,
         'FROM_EMAIL', 'pagure@fedoraproject.org')
     if user_from:
         header = Header(user_from, 'utf-8')
-        from_email = '%s <%s>' % (header.encode(), from_email)
+        from_email = '%s <%s>' % (header, from_email)
 
     if project_name is not None:
         subject_tag = project_name
