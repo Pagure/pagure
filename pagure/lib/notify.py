@@ -8,6 +8,7 @@
 
 pagure notifications.
 """
+from __future__ import print_function
 
 # pylint: disable=too-many-branches
 # pylint: disable=too-many-arguments
@@ -200,18 +201,6 @@ def send_email(text, subject, to_mail,
         header = Header(user_from, 'utf-8')
         from_email = '%s <%s>' % (header.encode(), from_email)
 
-    if not pagure.APP.config.get('EMAIL_SEND', True):
-        print '******EMAIL******'
-        print 'From: %s' % from_email
-        print 'To: %s' % to_mail
-        print 'Subject: %s' % subject
-        print 'in_reply_to: %s' % in_reply_to
-        print 'mail_id: %s' % mail_id
-        print 'Contents:'
-        print text.encode('utf-8')
-        print '*****/EMAIL******'
-        return
-
     if project_name is not None:
         subject_tag = project_name
     else:
@@ -253,6 +242,19 @@ def send_email(text, subject, to_mail,
             mhash.hexdigest(),
             pagure.APP.config['DOMAIN_EMAIL_NOTIFICATIONS'])
         msg['Mail-Followup-To'] = msg['Reply-To']
+        if not pagure.APP.config.get('EMAIL_SEND', True):
+            print('******EMAIL******')
+            print('From: %s' % from_email)
+            print('To: %s' % to_mail)
+            print('Subject: %s' % subject)
+            print('in_reply_to: %s' % in_reply_to)
+            print('mail_id: %s' % mail_id)
+            print('Contents:')
+            print(text.encode('utf-8'))
+            print('*****************')
+            print(msg.as_string())
+            print('*****/EMAIL******')
+            continue
         try:
             if pagure.APP.config['SMTP_USERNAME'] \
                     and pagure.APP.config['SMTP_PASSWORD']:
