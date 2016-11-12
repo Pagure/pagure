@@ -244,6 +244,10 @@ def send_email(text, subject, to_mail,
         # envelope header.
         msg['To'] = mailto
         salt = pagure.APP.config.get('SALT_EMAIL')
+        if isinstance(mailto, unicode):
+            mailto = mailto.encode('utf-8')
+        if isinstance(mail_id, unicode):
+            mail_id = mail_id.encode('utf-8')
         mhash = hashlib.sha512('<%s>%s%s' % (mail_id, salt, mailto))
         msg['Reply-To'] = 'reply+%s@%s' % (
             mhash.hexdigest(),
