@@ -542,7 +542,7 @@ def view_issues(repo, username=None, namespace=None):
 
     tag_list = pagure.lib.get_tags_of_project(SESSION, repo)
 
-    total_page = int(ceil(issues_cnt / float(flask.g.limit)))
+    total_page = int(ceil(issues_cnt / float(flask.g.limit)) if issues_cnt > 0 else 1)
 
     return flask.render_template(
         'issues.html',

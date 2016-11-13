@@ -337,7 +337,7 @@ def view_commits(repo, branchname=None, username=None, namespace=None):
                 last_commits.append(commit)
             n_commits += 1
 
-    total_page = int(ceil(n_commits / float(limit)))
+    total_page = int(ceil(n_commits / float(limit)) if n_commits > 0 else 1)
 
     diff_commits = []
     diff_commits_full = []

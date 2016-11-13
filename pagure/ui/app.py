@@ -56,7 +56,7 @@ def index():
         SESSION,
         fork=False,
         count=True)
-    total_page = int(ceil(num_repos / float(limit)))
+    total_page = int(ceil(num_repos / float(limit)) if num_repos > 0 else 1)
 
     if authenticated() and flask.request.path == '/':
         return index_auth()
