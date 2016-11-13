@@ -2341,6 +2341,8 @@ def avatar_url_from_openid(openid, size=64, default='retro', dns=False):
     """
     Our own implementation since fas doesn't support this nicely yet.
     """
+    if isinstance(openid, unicode):
+        openid = openid.encode('utf-8')
 
     if dns:  # pragma: no cover
         # This makes an extra DNS SRV query, which can slow down our webapps.

@@ -275,8 +275,6 @@ def avatar_url(email, size=64):
     """ Template filter sorting the given branches, Fedora first then EPEL,
     then whatever is left.
     """
-    if isinstance(email, unicode):
-        email = email.encode('utf-8')
     return pagure.lib.avatar_url_from_openid(email, size)
 
 
