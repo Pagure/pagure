@@ -215,7 +215,8 @@ def send_email(text, subject, to_mail,
 
     for mailto in to_mail.split(','):
         msg = MIMEText(text.encode('utf-8'), 'plain', 'utf-8')
-        msg['Subject'] = '[%s] %s' % (subject_tag, subject)
+        msg['Subject'] = header = Header(
+            '[%s] %s' % (subject_tag, subject), 'utf-8')
         msg['From'] = from_email
 
         if mail_id:
