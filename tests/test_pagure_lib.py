@@ -1140,6 +1140,13 @@ class PagureLibtests(tests.Modeltests):
             'b3ee7bb4de70b6522c2478df3b4cd6322b5ec5d62ac7ceb1128e3d4ff42f6928'
             '?s=64&d=retro')
 
+        output = pagure.lib.avatar_url_from_openid(u'zoé@çëfò.org')
+        self.assertEqual(
+            output,
+            'https://seccdn.libravatar.org/avatar/'
+            '8fa6110d1f6a7a013969f012e1149ff89bf1252d4f15d25edee31d4662878656'
+            '?s=64&d=retro')
+
     def test_fork_project(self):
         """ Test the fork_project of pagure.lib. """
         gitfolder = os.path.join(self.path, 'repos')
