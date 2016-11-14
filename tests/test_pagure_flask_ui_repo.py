@@ -1602,6 +1602,114 @@ class PagureFlaskRepotests(tests.Modeltests):
                          'text/plain; charset=ascii')
         self.assertTrue('foo\n bar' in output.data)
 
+    def test_view_blame_file(self):
+        """ Test the view_blame_file endpoint. """
+        output = self.app.get('/foo/blame/sources')
+        # No project registered in the DB
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+
+        output = self.app.get('/test/blame/sources')
+        # No git repo associated
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects_git(self.path, bare=True)
+
+        output = self.app.get('/test/blame/sources')
+        self.assertEqual(output.status_code, 404)
+
+        # Add some content to the git repo
+        tests.add_content_git_repo(os.path.join(self.path, 'test.git'))
+        tests.add_readme_git_repo(os.path.join(self.path, 'test.git'))
+        tests.add_binary_git_repo(
+            os.path.join(self.path, 'test.git'), 'test.jpg')
+        tests.add_binary_git_repo(
+            os.path.join(self.path, 'test.git'), 'test_binary')
+
+        output = self.app.get('/test/blame/foofile')
+        self.assertEqual(output.status_code, 404)
+
+        # View in a branch
+        output = self.app.get('/test/blame/sources')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(b'<table class="code_table">', output.data)
+        self.assertIn(
+            b'<tr><td class="cell1"><a id="1" href="#1" '
+            'data-line-number="1"></a></td>', output.data)
+        self.assertIn(
+            b'<td class="cell2"><pre> bar</pre></td>', output.data)
+
+        # View what's supposed to be an image
+        output = self.app.get('/test/blame/test.jpg')
+        self.assertEqual(output.status_code, 400)
+        self.assertIn(
+            b'<title>400 Bad Request</title>', output.data)
+        self.assertIn(
+            b'<p>Binary files cannot be blamed</p>', output.data)
+
+        # View folder
+        output = self.app.get('/test/blame/folder1')
+        self.assertEqual(output.status_code, 404)
+        self.assertIn("<title>Page not found :'( - Pagure</title>", output.data)
+        self.assertIn(
+            '<h2>Page not found (404)</h2>', output.data)
+
+        # View by image name -- with a non-existant file
+        output = self.app.get('/test/blame/testfoo.jpg')
+        self.assertEqual(output.status_code, 404)
+        output = self.app.get('/test/blame/folder1/testfoo.jpg')
+        self.assertEqual(output.status_code, 404)
+
+        # View file with a non-ascii name
+        tests.add_commit_git_repo(
+            os.path.join(self.path, 'test.git'),
+            ncommits=1, filename='Šource')
+        output = self.app.get('/test/blame/Šource')
+        self.assertEqual(output.status_code, 200)
+        self.assertEqual(output.headers['Content-Type'].lower(),
+                         'text/html; charset=utf-8')
+        self.assertIn('</span>&nbsp; Šource', output.data)
+        self.assertIn('<table class="code_table">', output.data)
+        self.assertIn(
+            '<tr><td class="cell1"><a id="1" href="#1" '
+            'data-line-number="1"></a></td>', output.data)
+        self.assertTrue(
+            '<td class="cell2"><pre><span></span>Row 0</pre></td>'
+            in output.data
+            or
+            '<td class="cell2"><pre>Row 0</pre></td>' in output.data
+        )
+
+        # Add a fork of a fork
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test3',
+            description='test project #3',
+            is_fork=True,
+            parent_id=1,
+            hook_token='aaabbbppp',
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        tests.add_content_git_repo(
+            os.path.join(self.path, 'forks', 'pingou', 'test3.git'))
+        tests.add_readme_git_repo(
+            os.path.join(self.path, 'forks', 'pingou', 'test3.git'))
+        tests.add_commit_git_repo(
+            os.path.join(self.path, 'forks', 'pingou', 'test3.git'),
+            ncommits=10)
+
+        output = self.app.get('/fork/pingou/test3/blame/sources')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<table class="code_table">', output.data)
+        self.assertIn(
+            '<tr><td class="cell1"><a id="1" href="#1" '
+            'data-line-number="1"></a></td>', output.data)
+        self.assertIn(
+            '<td class="cell2"><pre> barRow 0</pre></td>', output.data)
+
     def test_view_commit(self):
         """ Test the view_commit endpoint. """
         output = self.app.get('/foo/c/bar')
