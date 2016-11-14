@@ -180,7 +180,7 @@ class PagureLibNotifytests(tests.Modeltests):
         """ Test the notify_new_comment method from pagure.lib.notify. """
         email = pagure.lib.notify.send_email(
             'Email content',
-            'Email Subject',
+            'Email “Subject“',
             'foo@bar.com,zöé@foo.net',
             mail_id='test-pull-request-2edbf96ebe644f4bb31b94605e-1@pagure',
             in_reply_to='test-pull-request-2edbf96ebe644f4bb31b94605e@pagure',
@@ -190,7 +190,7 @@ class PagureLibNotifytests(tests.Modeltests):
         exp = '''Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: base64
-Subject: [namespace/project] Email Subject
+Subject: =?utf-8?b?W25hbWVzcGFjZS9wcm9qZWN0XSBFbWFpbCDigJxTdWJqZWN04oCc?=
 From: =?utf-8?b?WsO2w6k=?= <pagure@pagure.org>
 mail-id: test-pull-request-2edbf96ebe644f4bb31b94605e-1@pagure
 Message-Id: <test-pull-request-2edbf96ebe644f4bb31b94605e-1@pagure>
