@@ -176,6 +176,35 @@ class PagureLibNotifytests(tests.Modeltests):
         out = pagure.lib.notify._get_emails_for_obj(req)
         self.assertEqual(out, exp)
 
+    def test_send_email(self):
+        """ Test the notify_new_comment method from pagure.lib.notify. """
+        email = pagure.lib.notify.send_email(
+            'Email content',
+            'Email Subject',
+            'foo@bar.com,zöé@foo.net',
+            mail_id='test-pull-request-2edbf96ebe644f4bb31b94605e-1@pagure',
+            in_reply_to='test-pull-request-2edbf96ebe644f4bb31b94605e@pagure',
+            project_name='namespace/project',
+            user_from='Zöé',
+        )
+        exp = '''Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
+Subject: [namespace/project] Email Subject
+From: =?utf-8?b?WsO2w6k=?= <pagure@pagure.org>
+mail-id: test-pull-request-2edbf96ebe644f4bb31b94605e-1@pagure
+Message-Id: <test-pull-request-2edbf96ebe644f4bb31b94605e-1@pagure>
+In-Reply-To: <test-pull-request-2edbf96ebe644f4bb31b94605e@pagure>
+X-pagure: https://pagure.org/
+X-pagure-project: namespace/project
+To: zöé@foo.net
+Reply-To: reply+42f5809bca16d73f59180bdcc76c981e939b5eab5c02930d7d7dd38f45118b89e9ceb877e94e7f22376fbf35aab1d0e8e83dfb074ee82640cc82da12ea8019ca@pagure.org
+Mail-Followup-To: reply+42f5809bca16d73f59180bdcc76c981e939b5eab5c02930d7d7dd38f45118b89e9ceb877e94e7f22376fbf35aab1d0e8e83dfb074ee82640cc82da12ea8019ca@pagure.org
+
+RW1haWwgY29udGVudA==
+'''
+        self.assertEqual(email.as_string(), exp)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibNotifytests)
