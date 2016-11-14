@@ -208,7 +208,10 @@ def request_pulls(repo, username=None, namespace=None):
     else:
         head = 'master'
 
-    total_page = int(ceil(requests_cnt / float(flask.g.limit)) if requests_cnt > 0 else 1)
+    if(requests_cnt > 0):
+	   total_page = int(ceil(requests_cnt / float(flask.g.limit)))
+	else:
+		total_page = 1
 
     return flask.render_template(
         'requests.html',
