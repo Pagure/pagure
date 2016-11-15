@@ -474,7 +474,7 @@ def api_view_issue_comment(
             404, error_code=APIERROR.ENOCOMMENT)
 
     output = comment.to_json(public=True)
-    output['avatar_url'] = pagure.lib.avatar_url_from_openid(
+    output['avatar_url'] = pagure.lib.avatar_url_from_email(
         comment.user.default_email, size=16)
     output['comment_date'] = comment.date_created.strftime(
         '%Y-%m-%d %H:%M:%S')

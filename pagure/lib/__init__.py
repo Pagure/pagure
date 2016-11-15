@@ -301,7 +301,7 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
                 'project': issue.project.fullname,
                 'comment_added': text2markdown(issue_comment.comment),
                 'comment_user': issue_comment.user.user,
-                'avatar_url': avatar_url_from_openid(
+                'avatar_url': avatar_url_from_email(
                     issue_comment.user.default_email, size=16),
                 'comment_date': issue_comment.date_created.strftime(
                     '%Y-%m-%d %H:%M:%S'),
@@ -899,7 +899,7 @@ def add_pull_request_comment(session, request, commit, tree_id, filename,
             'comment_added': comment_text,
             'comment_user': pr_comment.user.user,
             'comment_id': pr_comment.id,
-            'avatar_url': avatar_url_from_openid(
+            'avatar_url': avatar_url_from_email(
                 pr_comment.user.default_email, size=16),
             'comment_date': pr_comment.date_created.strftime(
                 '%Y-%m-%d %H:%M:%S'),
@@ -983,7 +983,7 @@ def edit_comment(session, parent, comment, user,
                 'comment_id': comment.id,
                 'parent_id': comment.parent.id,
                 'comment_editor': user_obj.user,
-                'avatar_url': avatar_url_from_openid(
+                'avatar_url': avatar_url_from_email(
                     comment.user.default_email, size=16),
                 'comment_date': comment.edited_on.strftime(
                     '%Y-%m-%d %H:%M:%S'),

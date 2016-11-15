@@ -275,7 +275,7 @@ def avatar_url(email, size=64):
     """ Template filter sorting the given branches, Fedora first then EPEL,
     then whatever is left.
     """
-    return pagure.lib.avatar_url_from_openid(email, size)
+    return pagure.lib.avatar_url_from_email(email, size)
 
 
 @APP.template_filter('short')

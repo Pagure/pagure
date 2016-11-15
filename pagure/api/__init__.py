@@ -284,8 +284,8 @@ def api_users():
             'mention': [{
                 'username': usr.username,
                 'name': usr.fullname,
-                'image': pagure.lib.avatar_url_from_openid(usr.default_email,
-                                                           size=16)
+                'image': pagure.lib.avatar_url_from_email(
+                    usr.default_email, size=16)
             } for usr in users]
         }
     )
