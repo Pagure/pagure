@@ -77,7 +77,7 @@
           <span id="branch"><select name="branch" class="c-select">
             {% for branch in g.branches %}
             <option value="{{ branch }}" {%
-                if form.branch.data or branchname == branch %}selected{%
+                if form.branch.data == branch or branchname == branch %}selected{%
                 endif %}>{{ branch }}</option>
             {% endfor %}
           </select></span>
