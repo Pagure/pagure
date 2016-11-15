@@ -2337,19 +2337,19 @@ def update_user_ssh(session, user, ssh_key, keydir):
     session.flush()
 
 
-def avatar_url_from_openid(openid, size=64, default='retro', dns=False):
+def avatar_url_from_email(email, size=64, default='retro', dns=False):
     """
     Our own implementation since fas doesn't support this nicely yet.
     """
-    if isinstance(openid, unicode):
-        openid = openid.encode('utf-8')
+    if isinstance(email, unicode):
+        email = email.encode('utf-8')
 
     if dns:  # pragma: no cover
         # This makes an extra DNS SRV query, which can slow down our webapps.
         # It is necessary for libravatar federation, though.
         import libravatar
         return libravatar.libravatar_url(
-            openid=openid,
+            openid=email,
             size=size,
             default=default,
         )
@@ -2357,7 +2357,7 @@ def avatar_url_from_openid(openid, size=64, default='retro', dns=False):
         import urllib
         import hashlib
         query = urllib.urlencode({'s': size, 'd': default})
-        hashhex = hashlib.sha256(openid).hexdigest()
+        hashhex = hashlib.sha256(email).hexdigest()
         return "https://seccdn.libravatar.org/avatar/%s?%s" % (
             hashhex, query)
 
