@@ -34,7 +34,7 @@ def _get_repo(repo_name, username=None, namespace=None):
     :raises pagure.exceptions.APIError: when repository doesn't exists or is disabled
     :return: repository name
     """
-    repo = pagure.lib.get_project(
+    repo = pagure.get_authorized_project(
         SESSION, repo_name, user=username, namespace=namespace)
 
     if repo is None:
