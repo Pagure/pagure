@@ -189,7 +189,7 @@ class PagureLibNotifytests(tests.Modeltests):
         self.session.commit()
 
         # Create the PR
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=repo,

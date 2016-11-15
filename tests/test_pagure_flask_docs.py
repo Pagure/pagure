@@ -141,7 +141,7 @@ class PagureFlaskDocstests(tests.Modeltests):
         docs.
         """
         tests.create_projects(self.session)
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         tests.create_projects_git(os.path.join(self.path, 'docs'))
 
         output = self.app.get('/test/docs')

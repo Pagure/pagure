@@ -405,7 +405,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             self.assertIn(u'<h3>Settings for test</h3>', output.data)
             self.assertIn(u'Milestones updated', output.data)
             # Check the result of the action -- Milestones recorded
-            repo = pagure.lib.get_project(self.session, 'test')
+            repo = pagure.lib._get_project(self.session, 'test')
             self.assertEqual(
                 repo.milestones,
                 {

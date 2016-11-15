@@ -1837,8 +1837,7 @@ class PagureLibtests(tests.Modeltests):
         projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 1)
 
-        repo = pagure.lib.get_project(
-            self.session, 'testproject', namespace='foonamespace')
+        repo = pagure.lib._get_project(self.session, 'testproject', namespace='foonamespace')
         gitrepo = os.path.join(gitfolder, repo.path)
         docrepo = os.path.join(docfolder, repo.path)
         ticketrepo = os.path.join(ticketfolder, repo.path)
@@ -1946,9 +1945,7 @@ class PagureLibtests(tests.Modeltests):
 
         # Fork a fork
 
-        repo = pagure.lib.get_project(
-            self.session, 'testproject',
-            namespace='foonamespace', user='foo')
+        repo = pagure.lib._get_project(self.session, 'testproject', user='foo', namespace='foonamespace')
 
         msg = pagure.lib.fork_project(
             session=self.session,
@@ -3364,9 +3361,8 @@ class PagureLibtests(tests.Modeltests):
         self.test_new_pull_request()
 
         # create PR#2 to project pingou/test
-        repo = pagure.lib.get_project(self.session, 'test')
-        forked_repo = pagure.lib.get_project(
-            self.session, 'test', user='pingou')
+        repo = pagure.lib._get_project(self.session, 'test')
+        forked_repo = pagure.lib._get_project(self.session, 'test', user='pingou')
         req = pagure.lib.new_pull_request(
             requestid=2,
             session=self.session,

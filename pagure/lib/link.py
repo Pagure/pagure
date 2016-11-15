@@ -57,7 +57,7 @@ def get_relation(session, reponame, username, namespace, text,
 
     '''
 
-    repo = pagure.lib.get_project(
+    repo = pagure.lib._get_project(
         session, reponame, user=username, namespace=namespace)
     if not repo:
         return []

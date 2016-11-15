@@ -2088,7 +2088,7 @@ def search_projects(
         return query.all()
 
 
-def get_project(session, name, user=None, namespace=None):
+def _get_project(session, name, user=None, namespace=None):
     '''Get a project from the database
     '''
     query = session.query(
@@ -3663,7 +3663,7 @@ def is_watching(session, user, reponame, repouser=None, namespace=None):
     if watcher:
         return watcher.watch
 
-    project = pagure.lib.get_project(
+    project = pagure.lib._get_project(
         session, reponame, user=repouser, namespace=namespace)
 
     if not project:

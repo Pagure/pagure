@@ -3048,7 +3048,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         )
 
         # Create normal issue
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -3063,7 +3063,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(msg.title, 'Test issue #1')
 
         # Check subscribtion before
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(
             pagure.lib.get_watch_list(self.session, issue),
@@ -3092,7 +3092,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         )
 
         # No change
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(
             pagure.lib.get_watch_list(self.session, issue),
@@ -3120,7 +3120,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             {'message': 'You are now watching this issue'}
         )
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(
             pagure.lib.get_watch_list(self.session, issue),
@@ -3137,7 +3137,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             {'message': 'You are no longer watching this issue'}
         )
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(
             pagure.lib.get_watch_list(self.session, issue),

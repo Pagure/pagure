@@ -255,8 +255,8 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         headers = {'Authorization': 'token aaabbbcccddd'}
 
         # Create a pull-request
-        repo = pagure.lib.get_project(self.session, 'test')
-        forked_repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
+        forked_repo = pagure.lib._get_project(self.session, 'test')
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,

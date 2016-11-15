@@ -134,7 +134,7 @@ def handle_messages():
             log.info(
                 'Searching %s/%s/%s' % (username, namespace, projectname))
             session = pagure.lib.create_session(pagure.APP.config['DB_URL'])
-            project = pagure.lib.get_project(
+            project = pagure.lib._get_project(
                 session=session, name=projectname, user=username,
                 namespace=namespace)
             if not project:

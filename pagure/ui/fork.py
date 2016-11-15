@@ -889,7 +889,7 @@ def fork_project(repo, username=None, namespace=None):
     if not form.validate_on_submit():
         flask.abort(400)
 
-    if pagure.lib.get_project(
+    if pagure.lib._get_project(
             SESSION, repo.name, user=flask.g.fas_user.username,
             namespace=namespace):
         return flask.redirect(flask.url_for(
@@ -1254,7 +1254,7 @@ def fork_edit_file(
     if not form.validate_on_submit():
         flask.abort(400)
 
-    if pagure.lib.get_project(
+    if pagure.lib._get_project(
             SESSION, repo.name, user=flask.g.fas_user.username):
         flask.flash('You had already forked this project')
         return flask.redirect(flask.url_for(

@@ -2192,7 +2192,7 @@ index 0000000..2a552bb
         self.session.commit()
 
         # Get fork project
-        project = pagure.lib.get_project(self.session, 'test', 'foo')
+        project = pagure.lib._get_project(self.session, 'test', 'foo')
 
         # Pull-requests and issue-trackers are off for forks
         # lib function is not used here so mannually turning them off

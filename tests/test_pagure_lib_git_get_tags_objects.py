@@ -65,7 +65,7 @@ class PagureLibGitGetTagstests(tests.Modeltests):
         """ Test the get_git_tags_objects method of pagure.lib.git. """
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'), bare=True)
-        project = pagure.lib.get_project(self.session, 'test')
+        project = pagure.lib._get_project(self.session, 'test')
 
         # Case 1 - Empty repo with no tags
         exp = []

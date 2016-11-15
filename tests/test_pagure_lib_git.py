@@ -1988,9 +1988,8 @@ index 0000000..60f7480
         tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'repos'))
 
-        repo = pagure.lib.get_project(self.session, 'test')
-        namespaced_repo = pagure.lib.get_project(
-            self.session, 'test3', namespace='somenamespace')
+        repo = pagure.lib._get_project(self.session, 'test')
+        namespaced_repo = pagure.lib._get_project(self.session, 'test3', namespace='somenamespace')
 
         # Before
         self.assertEqual(len(repo.requests), 0)

@@ -44,7 +44,7 @@ def jenkins_ci_notification(
 
     """
 
-    project = pagure.lib.get_project(
+    project = pagure.lib._get_project(
         SESSION, repo, user=username, namespace=namespace)
     if not project:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
