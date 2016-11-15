@@ -374,12 +374,12 @@ def is_repo_user(repo_obj):
     ) or (user in usergrps)
 
 
-def get_authorized_project(session, repo, user=None):
+def get_authorized_project(session, repo, user=None, namespace=None):
     """ Return repo object if repo is public,
         if repo is private and user is authorized to
         view repo object is returned else None
     """
-    repo = pagure.lib._get_project(session, repo, user)
+    repo = pagure.lib._get_project(session, repo, user, namespace)
 
     if repo and repo.private and not is_repo_admin(repo):
         return None
@@ -489,12 +489,11 @@ def set_variables():
     # If there isn't a `repo` in the URL path, or if there is but the
     # endpoint called is part of the API, just don't do anything
     if repo:
-        flask.g.repo = pagure.lib.get_project(
+        flask.g.repo = pagure.get_authorized_project(
             SESSION, repo, user=username, namespace=namespace)
         if authenticated():
-            flask.g.repo_forked = pagure.lib.get_project(
-                SESSION, repo, user=flask.g.fas_user.username,
-                namespace=namespace)
+            flask.g.repo_forked = pagure.lib._get_project(SESSION, repo, user=flask.g.fas_user.username,
+                                                          namespace=namespace)
 
         if not flask.g.repo \
             and APP.config.get('OLD_VIEW_COMMIT_ENABLED', False) \
