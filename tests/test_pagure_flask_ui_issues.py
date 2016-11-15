@@ -205,6 +205,12 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output.data)
+            # Check the image was uploaded
+            self.assertIn(
+                'href="/test/issue/raw/files/'
+                '8a06845923010b27bfd8e7e75acff7badc40d1021b4'
+                '994e01f5e11ca40bc3abe',
+                output.data)
 
         # Project w/o issue tracker
         repo = pagure.lib.get_project(self.session, 'test')
@@ -227,6 +233,49 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output = self.app.post(
                     '/test/new_issue', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 404)
+
+        # Project with a namespace
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/somenamespace/test3/new_issue')
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue(
+                '<div class="card-header">\n        New issue'
+                in output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            with open(os.path.join(tests.HERE, 'placebo.png'), 'r') as stream:
+                data = {
+                    'title': 'Test issue3',
+                    'issue_content': 'We really should improve on this issue\n'
+                                     '<!!image>',
+                    'status': 'Open',
+                    'filestream': stream,
+                    'enctype': 'multipart/form-data',
+                    'csrf_token': csrf_token,
+                }
+
+                output = self.app.post(
+                    '/somenamespace/test3/new_issue', data=data, follow_redirects=True)
+
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Issue #1: Test issue3 - test3 - Pagure</title>',
+                output.data)
+            self.assertIn(
+                '<a class="btn btn-primary btn-sm" '
+                'href="/somenamespace/test3/issue/1/edit" '
+                'title="Edit this issue">',
+                output.data)
+            # Check the image was uploaded
+            self.assertIn(
+                'href="/somenamespace/test3/issue/raw/files/'
+                '8a06845923010b27bfd8e7e75acff7badc40d1021b4'
+                '994e01f5e11ca40bc3abe',
+                output.data)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
