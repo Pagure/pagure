@@ -205,6 +205,17 @@ RW1haWwgY29udGVudA==
 '''
         self.assertEqual(email.as_string(), exp)
 
+        email = pagure.lib.notify.send_email(
+            'Email content',
+            'Email “Subject“',
+            u'foo@bar.com,zöé@foo.net',
+            mail_id='test-pull-request-2edbf96ebe644f4bb31b94605e-1@pagure',
+            in_reply_to='test-pull-request-2edbf96ebe644f4bb31b94605e@pagure',
+            project_name='namespace/project',
+            user_from='Zöé',
+        )
+        self.assertEqual(email.as_string(), exp)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibNotifytests)

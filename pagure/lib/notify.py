@@ -232,6 +232,8 @@ def send_email(text, subject, to_mail,
 
         # Send the message via our own SMTP server, but don't include the
         # envelope header.
+        if isinstance(mailto, unicode):
+            mailto = mailto.encode('utf-8')
         msg['To'] = mailto
         salt = pagure.APP.config.get('SALT_EMAIL')
         if isinstance(mailto, unicode):
