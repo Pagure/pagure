@@ -45,15 +45,18 @@ class PagurePrivateRepotest(tests.Modeltests):
         pagure.api.fork.SESSION = self.session
         pagure.api.issue.SESSION = self.session
 
-        pagure.APP.config['GIT_FOLDER'] = os.path.join(tests.HERE, 'repos')
+        pagure.APP.config['VIRUS_SCAN_ATTACHMENTS'] = False
+        pagure.APP.config['GIT_FOLDER'] = self.path
         pagure.APP.config['FORK_FOLDER'] = os.path.join(
-            tests.HERE, 'forks')
-        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
-            tests.HERE, 'tickets')
-        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
-            tests.HERE, 'docs')
+            self.path, 'forks')
         pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
-            tests.HERE, 'requests')
+            self.path, 'requests')
+        pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
+            self.path, 'tickets')
+        pagure.APP.config['DOCS_FOLDER'] = os.path.join(
+            self.path, 'docs')
+        pagure.APP.config['UPLOAD_FOLDER_PATH'] = os.path.join(
+            self.path, 'releases')
         self.app = pagure.APP.test_client()
 
     def set_up_git_repo(
@@ -63,7 +66,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         """
 
         # Create a git repo to play with
-        gitrepo = os.path.join(tests.HERE, 'repos', 'pmc.git')
+        gitrepo = os.path.join(self.path, 'repos', 'pmc.git')
         repo = pygit2.init_repository(gitrepo, bare=True)
 
         newpath = tempfile.mkdtemp(prefix='pagure-private-test')
@@ -611,7 +614,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.session.commit()
 
         # Create a git repo to play with
-        gitrepo = os.path.join(tests.HERE, 'repos', 'test4.git')
+        gitrepo = os.path.join(self.path, 'repos', 'test4.git')
         repo = pygit2.init_repository(gitrepo, bare=True)
 
         newpath = tempfile.mkdtemp(prefix='pagure-fork-test')
