@@ -525,7 +525,7 @@ class NewGroupForm(EditGroupForm):
 class EditFileForm(PagureForm):
     """ Form used to edit a file. """
     content = wtforms.TextAreaField(
-        'content', [wtforms.validators.Required()])
+        'content', [wtforms.validators.Optional()])
     commit_title = wtforms.TextField(
         'Title', [wtforms.validators.Required()])
     commit_message = wtforms.TextAreaField(
