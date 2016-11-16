@@ -1654,12 +1654,15 @@ class PagurePrivateRepotest(tests.Modeltests):
                         {
                             "assignee": None,
                             "blocks": [],
+                            "close_status": None,
                             "closed_at": None,
                             "comments": [],
                             "content": "This issue needs attention",
+                            "custom_fields": [],
                             "date_created": "1431414800",
                             "depends": [],
                             "id": 1,
+                            "milestone": None,
                             "priority": None,
                             "private": False,
                             "status": "Open",
@@ -1668,6 +1671,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                             "user": {
                                 "fullname": "PY C",
                                 "name": "pingou"
+
                             }
                         }
                     ]
@@ -1698,37 +1702,62 @@ class PagurePrivateRepotest(tests.Modeltests):
             data['issues'][1]['date_created'] = '1431414800'
             self.assertDictEqual(
                 data,
-                {'args':
-                 {'assignee': None, 'author': None, 'status': None, 'tags': []},
-                 'issues': [{u'assignee': None,
-                             'blocks': [],
-                             'closed_at': None,
-                             'comments': [],
-                             'content': 'This issue needs attention',
-                             'date_created': '1431414800',
-                             'depends': [],
-                             'id': 1,
-                             'priority': None,
-                             'private': False,
-                             'status': 'Open',
-                             'tags': [],
-                             'title': u'test issue',
-                             'user': {'fullname': 'PY C', 'name': 'pingou'}},
-                            {'assignee': None,
-                             'blocks': [],
-                             'closed_at': None,
-                             'comments': [],
-                             'content': 'We should work on this',
-                             'date_created': '1431414800',
-                             'depends': [],
-                             'id': 2,
-                             'priority': None,
-                             'private': True,
-                             'status': 'Open',
-                             'tags': [],
-                             'title': 'Test issue',
-                             'user': {'fullname': 'PY C', 'name': 'pingou'}}],
-                    'total_issues': 2}
+                {
+                    "args": {
+                        "assignee": None,
+                        "author": None,
+                        "status": None,
+                        "tags": []
+                    },
+                    "issues": [
+                        {
+                            "assignee": None,
+                            "blocks": [],
+                            "close_status": None,
+                            "closed_at": None,
+                            "comments": [],
+                            "content": "We should work on this",
+                            "custom_fields": [],
+                            "date_created": "1431414800",
+                            "depends": [],
+                            "id": 2,
+                            "milestone": None,
+                            "priority": None,
+                            "private": True,
+                            "status": "Open",
+                            "tags": [],
+                            "title": "Test issue",
+                            "user": {
+                                "fullname": "PY C",
+                                "name": "pingou"
+                            }
+                        },
+                        {
+                            "assignee": None,
+                            "blocks": [],
+                            "close_status": None,
+                            "closed_at": None,
+                            "comments": [],
+                            "content": "This issue needs attention",
+                            "custom_fields": [],
+                            "date_created": "1431414800",
+                            "depends": [],
+                            "id": 1,
+                            "milestone": None,
+                            "priority": None,
+                            "private": False,
+                            "status": "Open",
+                            "tags": [],
+                            "title": "test issue",
+                            "user": {
+                                "fullname": "PY C",
+                                "name": "pingou"
+                            }
+                        }
+                    ],
+                    "total_issues": 2
+                }
+
             )
 
         # Access issues authenticated but non-existing token
@@ -1753,36 +1782,19 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "status": None,
                     "tags": []
                 },
-                "total_issues": 2,
                 "issues": [
                     {
                         "assignee": None,
                         "blocks": [],
-                        "closed_at": None,
-                        "comments": [],
-                        "content": "This issue needs attention",
-                        "date_created": "1431414800",
-                        "depends": [],
-                        "id": 1,
-                        "priority": None,
-                        "private": False,
-                        "status": "Open",
-                        "tags": [],
-                        "title": "test issue",
-                        "user": {
-                            "fullname": "PY C",
-                            "name": "pingou"
-                        }
-                    },
-                    {
-                        "assignee": None,
-                        "blocks": [],
+                        "close_status": None,
                         "closed_at": None,
                         "comments": [],
                         "content": "We should work on this",
+                        "custom_fields": [],
                         "date_created": "1431414800",
                         "depends": [],
                         "id": 2,
+                        "milestone": None,
                         "priority": None,
                         "private": True,
                         "status": "Open",
@@ -1792,9 +1804,33 @@ class PagurePrivateRepotest(tests.Modeltests):
                             "fullname": "PY C",
                             "name": "pingou"
                         }
+                    },
+                    {
+                        "assignee": None,
+                        "blocks": [],
+                        "close_status": None,
+                        "closed_at": None,
+                        "comments": [],
+                        "content": "This issue needs attention",
+                        "custom_fields": [],
+                        "date_created": "1431414800",
+                        "depends": [],
+                        "id": 1,
+                        "milestone": None,
+                        "priority": None,
+                        "private": False,
+                        "status": "Open",
+                        "tags": [],
+                        "title": "test issue",
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou"
+                        }
                     }
-                ]
+                ],
+                "total_issues": 2
             }
+
         )
 
         # List closed issue
@@ -1851,36 +1887,19 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "status": "All",
                     "tags": []
                 },
-                "total_issues": 2,
                 "issues": [
                     {
                         "assignee": None,
                         "blocks": [],
-                        "closed_at": None,
-                        "comments": [],
-                        "content": "This issue needs attention",
-                        "date_created": "1431414800",
-                        "depends": [],
-                        "id": 1,
-                        "priority": None,
-                        "private": False,
-                        "status": "Open",
-                        "tags": [],
-                        "title": "test issue",
-                        "user": {
-                            "fullname": "PY C",
-                            "name": "pingou"
-                        }
-                    },
-                    {
-                        "assignee": None,
-                        "blocks": [],
+                        "close_status": None,
                         "closed_at": None,
                         "comments": [],
                         "content": "We should work on this",
+                        "custom_fields": [],
                         "date_created": "1431414800",
                         "depends": [],
                         "id": 2,
+                        "milestone": None,
                         "priority": None,
                         "private": True,
                         "status": "Open",
@@ -1890,9 +1909,33 @@ class PagurePrivateRepotest(tests.Modeltests):
                             "fullname": "PY C",
                             "name": "pingou"
                         }
+                    },
+                    {
+                        "assignee": None,
+                        "blocks": [],
+                        "close_status": None,
+                        "closed_at": None,
+                        "comments": [],
+                        "content": "This issue needs attention",
+                        "custom_fields": [],
+                        "date_created": "1431414800",
+                        "depends": [],
+                        "id": 1,
+                        "milestone": None,
+                        "priority": None,
+                        "private": False,
+                        "status": "Open",
+                        "tags": [],
+                        "title": "test issue",
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou"
+                        }
                     }
                 ],
+                "total_issues": 2
             }
+
         )
 
     def test_api_pivate_repo_view_issue(self):
@@ -1949,12 +1992,15 @@ class PagurePrivateRepotest(tests.Modeltests):
                 {
                     "assignee": None,
                     "blocks": [],
-                    "closed_at":None,
+                    "close_status": None,
+                    "closed_at": None,
                     "comments": [],
                     "content": "This issue needs attention",
+                    "custom_fields": [],
                     "date_created": "1431414800",
                     "depends": [],
                     "id": 1,
+                    "milestone": None,
                     "priority": None,
                     "private": False,
                     "status": "Open",
@@ -1963,6 +2009,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "user": {
                         "fullname": "PY C",
                         "name": "pingou"
+
                     }
                 }
             )
@@ -1993,12 +2040,15 @@ class PagurePrivateRepotest(tests.Modeltests):
             {
                 "assignee": None,
                 "blocks": [],
-                "closed_at":None,
+                "close_status": None,
+                "closed_at": None,
                 "comments": [],
                 "content": "This issue needs attention",
+                "custom_fields": [],
                 "date_created": "1431414800",
                 "depends": [],
                 "id": 1,
+                "milestone": None,
                 "priority": None,
                 "private": False,
                 "status": "Open",
@@ -2007,6 +2057,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                 "user": {
                     "fullname": "PY C",
                     "name": "pingou"
+
                 }
             }
         )
