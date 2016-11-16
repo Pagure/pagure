@@ -9,7 +9,6 @@
 """
 
 # pylint: disable=too-many-branches
-# pylint: disable=no-member
 
 import flask
 

@@ -10,9 +10,6 @@ Internal endpoints.
 
 """
 
-# pylint: disable=no-member
-
-
 import shutil
 import tempfile
 import os

@@ -8,8 +8,6 @@
 
 """
 
-# pylint: disable=no-member
-
 import flask
 
 from sqlalchemy.exc import SQLAlchemyError

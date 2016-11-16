@@ -8,9 +8,6 @@
 
 """
 
-# pylint: disable=no-member
-
-
 from functools import wraps
 
 import flask

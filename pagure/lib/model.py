@@ -44,7 +44,6 @@ ERROR_LOG = logging.getLogger('pagure.model')
 # pylint: disable=invalid-name
 # pylint: disable=too-few-public-methods
 # pylint: disable=no-init
-# pylint: disable=no-member
 # pylint: disable=too-many-lines
 
 

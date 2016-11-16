@@ -12,7 +12,6 @@ API namespace version 0.
 
 # pylint: disable=invalid-name
 # pylint: disable=too-few-public-methods
-# pylint: disable=no-member
 # pylint: disable=too-many-locals
 
 import codecs
@@ -424,7 +423,7 @@ def api_error_codes():
         }
 
     '''
-    errors = {val.name: val.value for val in APIERROR.__members__.values()}
+    errors = {val.name: val.value for val in APIERROR.__members__.values()}     # pylint: disable=no-member
 
     return flask.jsonify(errors)
 

@@ -8,7 +8,6 @@
 
 """
 
-# pylint: disable=no-member
 # pylint: disable=too-many-lines
 # pylint: disable=too-many-branches
 # pylint: disable=too-many-locals

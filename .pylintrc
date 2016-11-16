@@ -1,0 +1,22 @@
+[TYPECHECK]
+
+# add,bind,close,commit,delete,flush,rollback are for SQLAlchemy's
+# scoped_session implementation, which uses __call__ to pass the call
+# to a backing instance
+
+# secure_filename is from werkzeug, which lazy loads functions from
+# submodules
+
+# get_object,set_target,shorthand,target are for some kind of
+# shenanigans going on with flask and werkzeug proxying and pygit2
+
+# GIT_REPOSITORY_INIT_SHARED_GROUP is for a constant we get from
+# pygit2; we could use:
+# pygit2.GIT_REPOSITORY_INIT_SHARED_GROUP
+# instead of:
+# pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP
+# and avoid the pylint error, but per
+# https://github.com/libgit2/pygit2/issues/483
+# that only works since a commit in early 2015 which may be too new
+# to be safe
+generated-members=GIT_REPOSITORY_INIT_SHARED_GROUP,add,bind,close,commit,delete,flush,get_object,rollback,secure_filename,set_target,shorthand,target

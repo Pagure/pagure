@@ -14,7 +14,6 @@
 # pylint: disable=too-many-locals
 # pylint: disable=too-many-statements
 # pylint: disable=too-many-lines
-# pylint: disable=no-member
 
 
 import flask

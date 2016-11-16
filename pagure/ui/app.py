@@ -23,10 +23,6 @@ from pagure import (APP, SESSION, login_required,
                     admin_session_timedout)
 
 
-# Application
-# pylint: disable=no-member
-
-
 @APP.route('/browse/projects', endpoint='browse_projects')
 @APP.route('/browse/projects/', endpoint='browse_projects')
 @APP.route('/')
