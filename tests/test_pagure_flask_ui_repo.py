@@ -2876,6 +2876,30 @@ index 0000000..fb7093d
                 '<textarea id="textareaCode" name="content">foo\n barRow 0\n',
                 output.data)
 
+            # Empty the file - no `content` provided
+            data = {
+                'commit_title': 'test commit',
+                'commit_message': 'Online commits from the tests',
+                'csrf_token': csrf_token,
+                'email': 'bar@pingou.com',
+                'branch': 'master',
+            }
+            output = self.app.post(
+                '/test/edit/master/f/sources', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Commits - test - Pagure</title>', output.data)
+            self.assertIn(
+                '</button>\n                      Changes committed',
+                output.data)
+
+            # Check file after the commit:
+            output = self.app.get('/test/raw/master/f/sources')
+            self.assertEqual(output.status_code, 404)
+            self.assertIn(
+                '<p>No content found</p>', output.data)
+
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_change_ref_head(self,ast):
         """ Test the change_ref_head endpoint. """
