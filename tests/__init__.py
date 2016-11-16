@@ -144,8 +144,7 @@ class Modeltests(unittest.TestCase):
         self.gitrepo = None
         self.gitrepos = None
 
-    # pylint: disable=invalid-name
-    def setUp(self):
+    def setUp(self):    # pylint: disable=invalid-name
         """ Set up the environnment, ran before every tests. """
         # Clean up eventual git repo left in the present folder.
         self.path = tempfile.mkdtemp(prefix='pagure-tests')
@@ -190,8 +189,7 @@ class Modeltests(unittest.TestCase):
         # Prevent unit-tests to send email, globally
         pagure.APP.config['EMAIL_SEND'] = False
 
-    # pylint: disable=invalid-name
-    def tearDown(self):
+    def tearDown(self):     # pylint: disable=invalid-name
         """ Remove the test.db database if there is one. """
         self.session.close()
 
@@ -209,7 +207,7 @@ class Modeltests(unittest.TestCase):
                 requests.get('%s/clean/%s' % (FAITOUT_URL, db_name))
 
 
-class FakeGroup(object):
+class FakeGroup(object):    # pylint: disable=too-few-public-methods
     """ Fake object used to make the FakeUser object closer to the
     expectations.
     """
@@ -222,8 +220,7 @@ class FakeGroup(object):
         self.group_type = 'cla'
 
 
-# pylint: disable=too-few-public-methods
-class FakeUser(object):
+class FakeUser(object):     # pylint: disable=too-few-public-methods
     """ Fake user used to test the fedocallib library. """
 
     def __init__(self, groups=[], username='username', cla_done=True, id=1):
