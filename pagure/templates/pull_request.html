@@ -588,6 +588,9 @@
                     aria-pressed="false" id="previewinmarkdown">Preview
                   </span>
                 </small>
+                {% if repo.quick_replies %}
+                {% include "quick_reply.html" %}
+                {% endif %}
                 <textarea class="form-control" rows=8 id="comment" name="comment"
                 placeholder="Enter your comment here" tabindex=1></textarea>
                 <div id="preview">
@@ -1383,6 +1386,10 @@ source.addEventListener('message', function(e) {
   setup_reply_btns();
   }, false);
 </script>
+{% endif %}
+
+{% if repo.quick_replies %}
+<script type="text/javascript" src="{{ url_for('static', filename='quick_reply.js') }}"></script>
 {% endif %}
 
 {% endblock %}

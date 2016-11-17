@@ -1,0 +1,12 @@
+<div class="btn-group qr pull-xs-right">
+  <button type="button" class="btn btn-secondary btn-sm dropdown-toggle qr-btn" data-toggle="dropdown">
+    <span class="oi" data-glyph="copywriting"></span> <span class="caret"></span>
+  </button>
+  <div class="dropdown-menu dropdown-menu-right">
+    {% for reply in repo.quick_replies %}
+    <a href="#" class="qr-reply dropdown-item" data-qr="{{reply}}">
+      {{reply|wraps(50)}}
+    </a></li>
+    {% endfor %}
+  </div>
+</div>
