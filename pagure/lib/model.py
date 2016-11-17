@@ -344,6 +344,7 @@ class Project(BASE):
         nullable=True)
     _priorities = sa.Column(sa.Text, nullable=True)
     _milestones = sa.Column(sa.Text, nullable=True)
+    _quick_replies = sa.Column(sa.Text, nullable=True)
     _reports = sa.Column(sa.Text, nullable=True)
     _notifications = sa.Column(sa.Text, nullable=True)
     _close_status = sa.Column(sa.Text, nullable=True)
@@ -474,6 +475,23 @@ class Project(BASE):
     def priorities(self, priorities):
         ''' Ensures the priorities are properly saved. '''
         self._priorities = json.dumps(priorities)
+
+    @property
+    def quick_replies(self):
+        """ Return a list of quick replies available for pull requests and
+        issues.
+        """
+        quick_replies = []
+
+        if self._quick_replies:
+            quick_replies = json.loads(self._quick_replies)
+
+        return quick_replies
+
+    @quick_replies.setter
+    def quick_replies(self, quick_replies):
+        """ Ensures the quick replies are properly saved. """
+        self._quick_replies = json.dumps(quick_replies)
 
     @property
     def notifications(self):
