@@ -3202,6 +3202,17 @@ index 0000000..fb7093d
         output = self.app.get('/foo/activity/')
         self.assertEqual(output.status_code, 404)
 
+    def test_goimport(self):
+        """ Test the go-import tag. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(self.path, bare=True)
+        output = self.app.get('/test/')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<meta name="go-import" '
+                      'content="pagure.org/test git git://pagure.org/test.git"'
+                      '>',
+                      output.data)
+
     def test_watch_repo(self):
         """ Test the  watch_repo endpoint. """
 

@@ -4,6 +4,10 @@
     repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 {% set tag = "home" %}
 
+{% block header %}
+    <meta name="go-import" content="{{ config.get('APP_URL').split('://', 1)[1] }}{{ repo.fullname }} git {{ config.get('GIT_URL_GIT') }}{{ repo.fullname }}.git">
+{% endblock %}
+
 {% block repo %}
   <div class="row">
     {% if g.repo_obj and g.repo_obj.is_empty %}
