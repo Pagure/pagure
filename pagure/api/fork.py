@@ -214,6 +214,8 @@ def api_pull_request_view(repo, requestid, username=None, namespace=None):
           "date_created": "1431414800",
           "id": 1,
           "project": {
+            "close_status": [],
+            "custom_keys": [],
             "date_created": "1431414800",
             "description": "test project #1",
             "id": 1,
