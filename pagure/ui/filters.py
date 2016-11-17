@@ -274,13 +274,8 @@ def blame_loc(loc, repo, username, blame):
         output.append(
             '<tr><td class="cell1">'
             '<a id="%(cnt)s" href="#%(cnt)s" data-line-number='
-            '"%(cnt_lbl)s"></a></td>'
-            % (
-                {
-                    'cnt': cnt,
-                    'cnt_lbl': cnt,
-                }
-            )
+            '"%(cnt)s"></a></td>'
+            % ({'cnt': cnt})
         )
 
         cnt += 1
