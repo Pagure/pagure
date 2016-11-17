@@ -102,10 +102,11 @@ def _get_pr_info(repo_obj, orig_repo, branch_from, branch_to):
 
         if diff_commits:
             first_commit = repo_obj[diff_commits[-1].oid.hex]
-            diff = repo_obj.diff(
-                repo_obj.revparse_single(first_commit.parents[0].oid.hex),
-                repo_obj.revparse_single(diff_commits[0].oid.hex)
-            )
+            if len(first_commit.parents) > 0:
+                diff = repo_obj.diff(
+                    repo_obj.revparse_single(first_commit.parents[0].oid.hex),
+                    repo_obj.revparse_single(diff_commits[0].oid.hex)
+                )
 
     elif orig_repo.is_empty and not repo_obj.is_empty:
         orig_commit = None
