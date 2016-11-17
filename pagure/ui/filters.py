@@ -243,6 +243,21 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
 @APP.template_filter('blame_loc')
 def blame_loc(loc, repo, username, blame):
     """ Template filter putting the provided lines of code into a table
+
+
+    This method blame lines of code (loc) takes as input a text (lines of
+    code) concerning a given repo, with its repo and a pygit2.Blame object
+    and convert it into a html table displayed to the user with the git
+    blame information (user, commit, commit date).
+
+    :arg loc: a text object of the lines of code to display (in this case,
+        most likely the content of a file).
+    :arg repo: the name of the repo in which this file is.
+    :arg username: the user name of the user whose repo this is, if the repo
+        is not a *fork*, this value is ``None``.
+    :arg blame: a pygit2.Blame object allowing us to link a given line of
+        code to a commit.
+
     """
     if loc is None:
         return
