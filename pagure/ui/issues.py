@@ -274,19 +274,19 @@ def update_issue(repo, issueid, username=None, namespace=None):
                             SESSION, issue, key, value)
                     )
 
-            # Update ticket this one depends on
-            messages.union(set(pagure.lib.update_dependency_issue(
-                SESSION, repo, issue, depends,
-                username=flask.g.fas_user.username,
-                ticketfolder=APP.config['TICKETS_FOLDER'],
-            )))
+                # Update ticket this one depends on
+                messages.union(set(pagure.lib.update_dependency_issue(
+                    SESSION, repo, issue, depends,
+                    username=flask.g.fas_user.username,
+                    ticketfolder=APP.config['TICKETS_FOLDER'],
+                )))
 
-            # Update ticket(s) depending on this one
-            messages.union(set(pagure.lib.update_blocked_issue(
-                SESSION, repo, issue, blocks,
-                username=flask.g.fas_user.username,
-                ticketfolder=APP.config['TICKETS_FOLDER'],
-            )))
+                # Update ticket(s) depending on this one
+                messages.union(set(pagure.lib.update_blocked_issue(
+                    SESSION, repo, issue, blocks,
+                    username=flask.g.fas_user.username,
+                    ticketfolder=APP.config['TICKETS_FOLDER'],
+                )))
 
             if not is_js:
                 for message in messages:
