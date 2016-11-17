@@ -24,16 +24,16 @@ Each POST request made contains two specific headers:
 ``X-Pagure-Topic`` is a global header giving a clue about the type of action
 that just occurred. For example ``issue.edit``.
 
+.. warning:: This header is present for convenience only, it is not
+        signed and therefore should not be trusted. Rely on the payload
+        after checking the signature to make any decision.
+
 
 ``X-Pagure-Signature`` contains the signature of the message allowing to
 check that the message comes from pagure.
 
 ``X-Pagure-Signature-256`` contains the SHA-256 signature of the message
 allowing to check that the message comes from pagure.
-
-.. warning:: These headers are present for convenience only, they are not
-        signed and therefore should not be trusted. Rely on the payload
-        after checking the signature to make any decision.
 
 Pagure relies on ``hmac`` to sign the content of its messages. If you want
 to validate the message, in python, you can do something like the following:
