@@ -791,6 +791,63 @@
     </div>
     {% endif %}
 
+    {% if (config.get('ENABLE_TICKETS', True)
+        and repo.settings.get('issue_tracker', True))
+        or repo.settings.get('pull_requests', True) %}
+    <div class="col-md-8 col-md-offset-2">
+      <div class="card">
+        <div class="card-header">
+          <strong>Quick replies</strong>
+        </div>
+        <div class="card-block">
+          <p>Quick replies will be offered in a new comment form on Issue or
+          Pull Request page. This allows you to reply to common probles with a
+          click of a button.</p>
+          <p>The reply can use the same Markdown formatting as regular
+          comments. The list you will choose the reply from will only show the
+          first 50 characters. Please make sure the important message is at the
+          beginning.</p>
+          <p>The replies will be presented in the same order they are written
+          here.</p>
+        </div>
+        <form action="{{ url_for(
+              '.update_quick_replies',
+              repo=repo.name,
+              username=username,
+              namespace=repo.namespace) }}"
+            method="post">
+          {{ tag_form.csrf_token }}
+          <div class="card-block">
+            <div id="quick_reply_list">
+            {% for quick_reply in repo.quick_replies %}
+              <div class="row p-t-1">
+                <div class="col-sm-12 p-r-0">
+                    <textarea class="form-control" name="quick_reply">{{quick_reply}}</textarea>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          <div class="row p-t-1">
+            <div class="col-sm-6">
+              <a class="btn btn-secondary btn-sm btn-block" id="new_quick_reply">
+                  Add new quick reply
+              </a>
+            </div>
+          </div>
+          <div class="row p-t-1">
+            <div class="col-sm-12">
+              <button class="btn btn-primary" type="submit"
+                  title="Update quick replies">
+                Update
+              </button>
+            </div>
+          </div>
+        </div>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+
     {% if config.get('ENABLE_DEL_PROJECTS', True) %}
     <div class="col-md-8 col-md-offset-2">
       <div class="card">
@@ -934,6 +991,17 @@ $('#new_close_status').click(function(e) {
         <div class="col-sm-12 p-r-0">\
           <input type="text" name="close_status"\
             value="" size="3" class="form-control"/>\
+        </div>\
+    </div>'
+  );
+});
+
+$('#new_quick_reply').click(function(e) {
+  console.log('new quick reply');
+  $('#quick_reply_list').append(
+    '<div class="row p-t-1"> \
+        <div class="col-sm-12 p-r-0">\
+          <textarea class="form-control" name="quick_reply"></textarea>\
         </div>\
     </div>'
   );
