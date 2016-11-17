@@ -2071,6 +2071,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             hook_token='aaabbbeeeceee',
             private=True,
         )
+        item.close_status = ['Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
         self.session.add(item)
         self.session.commit()
 
