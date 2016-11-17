@@ -71,9 +71,12 @@ def call_web_hooks(project, topic, msg):
     content = json.dumps(msg)
     hashhex = hmac.new(
         str(project.hook_token), content, hashlib.sha1).hexdigest()
+    hashhex256 = hmac.new(
+        str(project.hook_token), content, hashlib.sha256).hexdigest()
     headers = {
         'X-Pagure-Topic': topic,
-        'X-Pagure-Signature': hashhex
+        'X-Pagure-Signature': hashhex,
+        'X-Pagure-Signature-256': hashhex256
     }
     msg = json.dumps(msg)
     for url in project.settings.get('Web-hooks').split('\n'):
