@@ -1336,7 +1336,7 @@ def diff_pull_request(
                 request, repo=request.project,
                 repofolder=requestfolder)
 
-        if diff_commits and with_diff:
+        if diff_commits and with_diff and len(diff_commits[-1].parents) > 0:
             diff = repo_obj.diff(
                 repo_obj.revparse_single(diff_commits[-1].parents[0].oid.hex),
                 repo_obj.revparse_single(diff_commits[0].oid.hex)
