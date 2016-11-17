@@ -1056,6 +1056,35 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #2')
 
+        # User is not an admin of the project
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/issue/1')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            # Add a dependent ticket
+            data = {
+                'csrf_token': csrf_token,
+                'blocks': '2',
+            }
+            output = self.app.post(
+                '/test/issue/1/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
+
+            repo = pagure.lib.get_project(self.session, 'test')
+            issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+            self.assertEqual(issue.depends_text, [])
+            self.assertEqual(issue.blocks_text, [])
+
         user = tests.FakeUser()
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
