@@ -279,9 +279,6 @@ def blame_loc(loc, repo, username, blame):
         )
 
         cnt += 1
-        if not line:
-            output.append(line)
-            continue
         if line.startswith('<div'):
             line = line.split('<pre style="line-height: 125%">')[1]
         diff = blame.for_line(idx + 1)
