@@ -267,25 +267,31 @@ def blame_loc(loc, repo, username, blame):
         '<table class="code_table">'
     ]
 
-    cnt = 1
     for idx, line in enumerate(loc.split('\n')):
         if line == '</pre></div>':
             break
+
+        try:
+            diff = blame.for_line(idx + 1)
+        except IndexError:
+            # Happens at the end of the file, since we are using idx + 1
+            continue
+
+        if line.startswith('<div'):
+            line = line.split('<pre style="line-height: 125%">')[1]
+
         output.append(
             '<tr><td class="cell1">'
             '<a id="%(cnt)s" href="#%(cnt)s" data-line-number='
             '"%(cnt)s"></a></td>'
-            % ({'cnt': cnt})
+            % ({'cnt': idx})
         )
 
-        cnt += 1
-        if line.startswith('<div'):
-            line = line.split('<pre style="line-height: 125%">')[1]
-        diff = blame.for_line(idx + 1)
         output.append(
             '<td class="cell_user">%s</td>' % author_to_user(
                 diff.orig_committer, with_name=False)
         )
+
         output.append(
             '<td class="cell_commit"><a href="%s">%s</a></td>' % (
                 flask.url_for('view_commit',
