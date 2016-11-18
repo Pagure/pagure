@@ -60,6 +60,8 @@ def call_web_hooks(project, topic, msg):
     year = datetime.datetime.now().year
     if isinstance(topic, six.text_type):
         topic = to_bytes(topic, encoding='utf8', nonstring="passthru")
+    msg['pagure_instance'] = pagure.APP.config['APP_URL']
+    msg['project_fullname'] = project.fullname
     msg = dict(
         topic=topic.decode('utf-8'),
         msg=msg,
@@ -74,9 +76,11 @@ def call_web_hooks(project, topic, msg):
     hashhex256 = hmac.new(
         str(project.hook_token), content, hashlib.sha256).hexdigest()
     headers = {
-        'X-Pagure-Topic': topic,
+        'X-Pagure': pagure.APP.config['APP_URL'],
+        'X-Pagure-project': project.fullname,
         'X-Pagure-Signature': hashhex,
-        'X-Pagure-Signature-256': hashhex256
+        'X-Pagure-Signature-256': hashhex256,
+        'X-Pagure-Topic': topic,
     }
     msg = json.dumps(msg)
     for url in project.settings.get('Web-hooks').split('\n'):

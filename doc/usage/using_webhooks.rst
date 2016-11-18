@@ -12,22 +12,19 @@ There is, in the settings page, a web-hook key which is used by the
 server (here pagure) to sign the message sent and which you can use to
 ensure the notifications received are coming from the right source.
 
-Each POST request made contains two specific headers:
+Each POST request made contains some specific headers:
 
 ::
 
-    X-Pagure-Topic
+    X-Pagure
+    X-Pagure-Project
     X-Pagure-Signature
     X-Pagure-Signature-256
+    X-Pagure-Topic
 
+``X-Pagure`` contains URL of the pagure instance sending this notification.
 
-``X-Pagure-Topic`` is a global header giving a clue about the type of action
-that just occurred. For example ``issue.edit``.
-
-.. warning:: This header is present for convenience only, it is not
-        signed and therefore should not be trusted. Rely on the payload
-        after checking the signature to make any decision.
-
+``X-Pagure-Project`` contains the name of the project on that pagure instance.
 
 ``X-Pagure-Signature`` contains the signature of the message allowing to
 check that the message comes from pagure.
@@ -38,6 +35,14 @@ allowing to check that the message comes from pagure.
 .. note:: These headers are present to allow you to verify that the webhook
         was actually sent by the correct Pagure instance. These are not
         included in the signed data.
+
+``X-Pagure-Topic`` is a global header giving a clue about the type of action
+that just occurred. For example ``issue.edit``.
+
+.. warning:: The headers ``X-Pagure``, ``X-Pagure-Project`` and ``X-Pagure-Topic``
+        are present for convenience only, they are not signed and therefore
+        should not be trusted. Rely on the payload after checking the
+        signature to make any decision.
 
 Pagure relies on ``hmac`` to sign the content of its messages. If you want
 to validate the message, in python, you can do something like the following:
