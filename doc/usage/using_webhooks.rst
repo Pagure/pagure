@@ -35,6 +35,10 @@ check that the message comes from pagure.
 ``X-Pagure-Signature-256`` contains the SHA-256 signature of the message
 allowing to check that the message comes from pagure.
 
+.. note:: These headers are present to allow you to verify that the webhook
+        was actually sent by the correct Pagure instance. These are not
+        included in the signed data.
+
 Pagure relies on ``hmac`` to sign the content of its messages. If you want
 to validate the message, in python, you can do something like the following:
 
