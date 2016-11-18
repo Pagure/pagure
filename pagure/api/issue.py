@@ -133,6 +133,7 @@ def api_new_issue(repo, username=None, namespace=None):
 
             SESSION.commit()
             output['message'] = 'Issue created'
+            output['issue'] = issue.to_json(public=True)
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             APP.logger.exception(err)

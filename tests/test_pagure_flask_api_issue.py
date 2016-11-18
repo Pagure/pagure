@@ -113,9 +113,34 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
+        data['issue']['date_created'] = '1479458613'
         self.assertDictEqual(
             data,
-            {'message': 'Issue created'}
+            {
+              "issue": {
+                "assignee": None,
+                "blocks": [],
+                "close_status": None,
+                "closed_at": None,
+                "comments": [],
+                "content": "This issue needs attention",
+                "custom_fields": [],
+                "date_created": "1479458613",
+                "depends": [],
+                "id": 1,
+                "milestone": None,
+                "priority": None,
+                "private": False,
+                "status": "Open",
+                "tags": [],
+                "title": "test issue",
+                "user": {
+                  "fullname": "PY C",
+                  "name": "pingou"
+                }
+              },
+              "message": "Issue created"
+            }
         )
 
     def test_api_view_issues(self):
