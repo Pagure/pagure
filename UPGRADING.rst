@@ -2,6 +2,28 @@ Upgrading Pagure
 ================
 
 
+From 2.8 to 2.9
+---------------
+
+The 2.9 releases brings some adjustments to the database scheme.
+
+* Create the new DB tables and the new status field using the ``createdb.py``
+    script.
+
+* Update the database schame using alembic: ``alembic upgrade head``
+
+If you are interested in loading your local data into the ``pagure_logs`` table
+that this new release adds (data which is then displayed in the calendar heatmap
+on the user's page), you can find two utility scripts in
+https://pagure.io/pagure-utility that will help you to do that. They are:
+
+* fill_logs_from_db - Based on the data present in the database, this script
+  fills the ``pagure_logs`` table (this will add: new ticket, new comment, new
+  PR, closing a PR or a ticket and so on).
+* fill_logs_from_gits - By going through all the git repo hosted in your pagure
+  instance, it will log who did what when.
+
+
 From 2.7 to 2.8
 ---------------
 

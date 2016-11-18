@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            2.8.1
+Version:            2.9
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -298,6 +298,64 @@ install -m 644 pagure-ci/pagure_ci.service \
 
 
 %changelog
+* Fri Nov 18 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.9-1
+- Update to 2.9
+- Fix redirecting after updating an issue on a project with namespace (Vivek
+  Anand)
+- Remove take button from Closed Issues (Rahul Bajaj)
+- Show the open date/time on issues as we do for PR (Rahul Bajaj)
+- When rendering markdown file use the same code path as when rendering comments
+- Add documentation for using Markdown in Pagure (Justing W. Flory)
+- Fix the behavior of the Cancel button on PR page (Rahul Bajaj)
+- Be tolerant to markdown processing error
+- Let the notifications render correctly when added by the SSE server
+- Fix the URL for pull request on the list of branches of a fork (Rahul Bajaj)
+- Adjust the markdown processor to have 1 regex for all cross-project links
+- Remove unsued variables (Farhaan Bukhsh)
+- Hide the title of private tickets when linking to them in markdown
+- Show user activity in pagure on the user's page
+- Add the possibility to subscribe to issues
+- Do not cache the session in pagure-ci (as we did for pagure-webhook)
+- Fix rendering raw file when the sha1 provided is one of a blob
+- Include project's custom fields in the JSON representation of a project
+- Include the issue's custom fields values in the JSON representation of an
+  issue
+- Include the list of close_status and the milestones in the JSON of a project
+- Improve documentation related to unit-tests (Rahul Bajaj)
+- Use `project.fullname` in X-Pagure-Project header (Adam Williamson)
+- Figure a way to properly support WTF_CSRF_TIME_LIMIT on older version of
+  flask-wtf
+- When updating an issue, if the form does not validate, say so to the user
+- Fix the total number of pages when there are no PR/issues/repo (vibhcool)
+- Fix forking a repo with a namespace
+- Include the namespace in the message returned in pagure.lib.new_project
+- Move the metadata-ery area in PR to under the comments tab (Ryan Lerch)
+- Update setup instructions in the README.rst (alunux)
+- Support namespaced projects when reading json data (clime)
+- When uploading a file in a new issue, propagate the namespace info
+- Ensure our avatar works with non-ascii email addresses
+- Downgrade to emoji 1.3.1, we loose some of the newer emojis we get back
+  preview and reasonable size (Clément Verna)
+- Fix sending notifications email containing non-ascii characters
+- Fix using the proper URL in email notifications (Adam Williamson)
+- Move the Clear and Cancel buttons to the right hand side of the comment box
+- Fix spelling in the PR page (Vibhor Verma)
+- Support loading custom fields from JSON when loading issues from git (Vivek
+  Anand)
+- Fix handling namespaced project in the SSE server (Adam Williamson)
+- Add a pylintrc configuration file to help with code standards (Adam
+  Williamson)
+- Add go-import meta tag allowing go projects to be hosted on pagure (Patrick
+  Uiterwijk)
+- Fix index overflow when opening remote pull-request (Mark Reynolds)
+- Add SSE support for custom fields
+- Add a git blame view
+- Allow emptying a file when doing online editing
+- Only let admins edit the dependency tree of issues
+- Fix some spelling errors (Adam Williamson)
+- Add SHA256 signature to webhooks notifications (Patrick Uiterwijk)
+- Multiple fixes in the API documentation and output
+
 * Mon Oct 24 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.8.1-1
 - Update to 2.8.1
 - Handle empty files in detect_encodings (Jeremy Cline)

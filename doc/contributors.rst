@@ -3,27 +3,30 @@ Contributors to pagure
 
 Pagure would be nothing without its contributors.
 
-On Oct 24, 2016 (release 2.8.1), the list looks as follow:
+On Nov 18, 2016 (release 2.9), the list looks as follow:
 
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  4538              Pierre-Yves Chibon <pingou@pingoured.fr>
-   189              Ryan Lerch <rlerch@redhat.com>
+  4692              Pierre-Yves Chibon <pingou@pingoured.fr>
+   190              Ryan Lerch <rlerch@redhat.com>
     89              farhaanbukhsh <farhaan.bukhsh@gmail.com>
     59              Johan Cwiklinski <johan@x-tnd.be>
-    53              Vivek Anand <vivekanand1101@gmail.com>
-    51              Clement Verna <cverna@tutanota.com>
-    28              Farhaan Bukhsh <farhaan.bukhsh@gmail.com>
-    22              Patrick Uiterwijk <puiterwijk@redhat.com>
+    56              Vivek Anand <vivekanand1101@gmail.com>
+    55              Clement Verna <cverna@tutanota.com>
+    31              Farhaan Bukhsh <farhaan.bukhsh@gmail.com>
+    26              Patrick Uiterwijk <puiterwijk@redhat.com>
     19              Lubomír Sedlář <lsedlar@redhat.com>
     18              Sayan Chowdhury <sayan.chowdhury2012@gmail.com>
     15              Gaurav Kumar <aavrug@gmail.com>
     15              Ralph Bean <rbean@redhat.com>
+    14              Justin W. Flory <git@jwf.io>
     13              Ghost-script <subho.prp@gmail.com>
+    13              Jeremy Cline <jeremy@jcline.org>
     13              Mathieu Bridon <bochecha@fedoraproject.org>
-    12              Jeremy Cline <jeremy@jcline.org>
+    10              rahul Bajaj <you@example.com>
      8              Lei Yang <yltt1234512@gmail.com>
+     7              Adam Williamson <awilliam@redhat.com>
      5              Mike McLean <mikem@redhat.com>
      5              Oliver Gutierrez <ogutierrez@redhat.com>
      5              Paul W. Frields <stickster@gmail.com>
@@ -31,6 +34,7 @@ Number of commits  Contributor
      5              yangl1996 <yltt1234512@gmail.com>
      4              Eric Barbour <ebarbour@redhat.com>
      4              Maciej Lasyk <maciek@lasyk.info>
+     4              Vibhor Verma <vibhcool@gmail.com>
      3              Ankush Behl <cloudbehl@gmail.com>
      3              Anthony Lackey <alackey96@gmail.com>
      3              Dhriti Shikhar <dhriti.shikhar.rokz@gmail.com>
@@ -43,6 +47,7 @@ Number of commits  Contributor
      3              skrzepto <shims506@gmail.com>
      3              tenstormavi <avi.avinash3008@gmail.com>
      2              Daniel Mach <dmach@redhat.com>
+     2              Mark Reynolds <mreynolds@redhat.com>
      2              Nuno Maltez <nuno@cognitiva.com>
      2              Rahul Bajaj <rahulrb0509@gmail.com>
      2              Richard Marko <rmarko@fedoraproject.org>
@@ -67,12 +72,14 @@ Number of commits  Contributor
      1              Yves Martin <ymartin1040@gmail.com>
      1              abhishek <abhishekarora12@gmail.com>
      1              abhishek goswami <abhishekg785@gmail.com>
+     1              alunux <fadlun.net@gmail.com>
+     1              clime <clime@redhat.com>
      1              d3prof3t <saurabhpysharma@gmail.com>
      1              jcvicelli <jcvicelli@gmail.com>
      1              pingou <pingou@fedoraproject.org>
-     1              rahul Bajaj <you@example.com>
      1              ryanlerch <rlerch@redhat.com>
      1              skrzepto <skrzepto@gmail.com>
+     1              vibhcool <vibhcool@gmail.com>
 =================  ===========
 
 This list is generated using
