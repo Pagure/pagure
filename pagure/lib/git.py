@@ -472,7 +472,7 @@ def update_custom_field_from_json(session, repo, issue, json_data):
 
 
 def update_ticket_from_git(
-        session, reponame, namespace,  username, issue_uid, json_data):
+        session, reponame, namespace, username, issue_uid, json_data):
     """ Update the specified issue (identified by its unique identifier)
     with the data present in the json blob provided.
 

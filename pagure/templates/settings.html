@@ -708,6 +708,9 @@
                     <option value="boolean" {%
                       if field.type_ == 'boolean' %} selected {%
                       endif %}>boolean</option>
+                    <option value="link" {%
+                      if field.type_ == 'link' %} selected {%
+                      endif %}>link</option>
                   </select>
                 </div>
               </div>
@@ -948,6 +951,7 @@ $('#new_custom_field').click(function(e) {
            <select name="custom_keys_type" class="form-control"> \
             <option value="text">text</option> \
             <option value="boolean">boolean</option> \
+            <option value="link">link</option> \
           </select> \
         </div> \
       </div>'
