@@ -358,6 +358,26 @@ def view_user_requests(username):
     )
 
 
+@APP.route('/user/<username>/issues/')
+@APP.route('/user/<username>/issues')
+def view_user_issues(username):
+    """
+    Shows the issues created by the specified user.
+
+    :param username: The username to retrieve the issues for
+    :type  username: str
+    """
+    user = pagure.lib.search_user(SESSION, username=username)
+    if not user:
+        flask.abort(404, 'No user `%s` found' % username)
+
+    return flask.render_template(
+        'user_issues.html',
+        username=username,
+        user=user,
+    )
+
+
 @APP.route('/new/', methods=('GET', 'POST'))
 @APP.route('/new', methods=('GET', 'POST'))
 @login_required
@@ -466,6 +486,7 @@ def user_settings():
         user=user,
         form=form,
     )
+
 
 @APP.route('/settings/usersettings', methods=['POST'])
 @login_required

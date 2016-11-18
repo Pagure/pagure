@@ -923,6 +923,55 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
 
+class ViewMyRequestsTests(tests.Modeltests):
+
+    def test_view_my_requests_no_user(self):
+        """Test the  endpoint."""
+        output = self.app.get('/user/somenonexistentuser/requests')
+        self.assertEqual(output.status_code, 404)
+
+    def test_view_my_requests(self):
+        """Test the index endpoint. """
+        user = tests.FakeUser(username='jcline')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/user/jcline/requests')
+            self.assertEqual(output.status_code, 200)
+
+
+class ViewMyIssuesTests(tests.Modeltests):
+
+    @classmethod
+    def setUpClass(cls):
+        """ Set up the environnment, ran before every tests. """
+        super(ViewMyIssuesTests, cls).setUpClass()
+        tests.create_projects(cls.session)
+        tests.create_projects_git(
+            os.path.join(cls.path, 'tickets'), bare=True)
+        tests.create_tokens(cls.session)
+        tests.create_tokens_acl(cls.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        data = {
+            'title': 'test issue',
+            'issue_content': 'This issue needs attention',
+        }
+
+        # Valid request
+        cls.app.post('/api/0/test/new_issue', data=data, headers=headers)
+
+    def test_view_my_issues_no_user(self):
+        """Test the  endpoint."""
+        output = self.app.get('/user/somenonexistentuser/issues')
+        self.assertEqual(output.status_code, 404)
+
+    def test_view_my_issues(self):
+        """Test the index endpoint. """
+        user = tests.FakeUser(username='jcline')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/user/jcline/issues')
+            self.assertEqual(output.status_code, 200)
+
+
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskApptests)
     unittest.TextTestRunner(verbosity=2).run(SUITE)

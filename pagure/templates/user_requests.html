@@ -1,17 +1,9 @@
 {% extends "master.html" %}
-{% from "_formhelper.html" import render_field_in_row %}
-{% from "_browseheader.html" import browse_header %}
 
 {% block title %}Pull-requests of {{ username }}{% endblock %}
-{% set tag = "users"%}
 
 
 {% block content %}
-<div class="repo-header p-t-1">
-  <div class="container">
-    {{browse_header(select=tag)}}
-  </div>
-</div>
 <div class="p-t-2">
   <div class="container">
     <h3 class="p-b-2">

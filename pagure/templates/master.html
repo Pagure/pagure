@@ -37,6 +37,16 @@
           {% if not nologin %}
             {% if g.fas_user %}
             <li class="nav-item">
+              <a class="nav-link"
+                  href="{{ url_for('view_user_requests', username=g.fas_user.username) }}">
+                  My Pull Requests</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link"
+                  href="{{ url_for('view_user_issues', username=g.fas_user.username) }}">
+                  My Issues</a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link" href="{{ url_for('browse_projects') }}">Browse</a>
             </li>
             {% if admin %}
