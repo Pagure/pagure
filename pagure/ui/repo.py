@@ -1465,7 +1465,7 @@ def remove_user(repo, userid, username=None, namespace=None):
 
         if str(userid) not in userids:
             flask.flash(
-                'User does not have commit or cannot loose it right', 'error')
+                'User does not have commit rights, or cannot have them removed', 'error')
             return flask.redirect(flask.url_for(
                 '.view_settings', repo=repo.name, username=username,
                 namespace=repo.namespace,)

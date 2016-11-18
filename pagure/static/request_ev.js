@@ -45,7 +45,7 @@ add_comment = function(data, username) {
         <div class="issue_actions m-t-2"> \
         <aside class="btn-group issue_action icon pull-xs-right p-b-1"> \
             <div class="btn-group" role="group" aria-label="Basic example"> \
-              <a class="reply btn btn-secondary btn-sm" data-toggle="tooltip" title="Reply to this comment - loose formating"> \
+              <a class="reply btn btn-secondary btn-sm" data-toggle="tooltip" title="Reply to this comment - lose formatting"> \
                 <span class="oi" data-glyph="share-boxed"></span> \
               </a>';
         if ( data.comment_user == username) {
@@ -82,7 +82,7 @@ add_comment = function(data, username) {
       <div class="issue_actions m-t-2"> \
         <div class="issue_action icon pull-xs-right p-b-1"> \
           <div class="btn-group" role="group" aria-label="Basic example"> \
-            <a class="reply btn btn-secondary btn-sm" data-toggle="tooltip" title="Reply to this comment - loose formating"> \
+            <a class="reply btn btn-secondary btn-sm" data-toggle="tooltip" title="Reply to this comment - lose formatting"> \
               <span class="oi" data-glyph="share-boxed"></span> \
             </a>';
     if ( data.comment_user == username) {

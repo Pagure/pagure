@@ -143,7 +143,7 @@ add_comment = function(data, username) {
       <div class="issue_actions m-t-2"> \
         <aside class="issue_action icon pull-xs-right p-b-1"> \
         <div class="btn-group" aria-label="Basic example" role="group"> \
-        <a class="reply btn btn-secondary btn-sm" title="" data-toggle="tooltip" data-original-title="Reply to this comment - loose formating"> \
+        <a class="reply btn btn-secondary btn-sm" title="" data-toggle="tooltip" data-original-title="Reply to this comment - lose formatting"> \
             <span class="oi" data-glyph="share-boxed"></span> \
         </a>';
     if ( data.comment_user == username) {

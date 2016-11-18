@@ -431,8 +431,8 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<title>Settings - test - Pagure</title>', output.data)
             self.assertIn('<h3>Settings for test</h3>', output.data)
             self.assertIn(
-                '</button>\n                      User does not have commit or cannot '
-                'loose it right', output.data)
+                '</button>\n                      User does not have commit rights, '
+                'or cannot have them removed', output.data)
 
         # Add an user to a project
         repo = pagure.lib.get_project(self.session, 'test')
