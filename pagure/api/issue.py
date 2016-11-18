@@ -65,6 +65,28 @@ def api_new_issue(repo, username=None, namespace=None):
     ::
 
         {
+          "issue": {
+            "assignee": null,
+            "blocks": [],
+            "close_status": null,
+            "closed_at": null,
+            "comments": [],
+            "content": "This issue needs attention",
+            "custom_fields": [],
+            "date_created": "1479458613",
+            "depends": [],
+            "id": 1,
+            "milestone": null,
+            "priority": null,
+            "private": false,
+            "status": "Open",
+            "tags": [],
+            "title": "test issue",
+            "user": {
+              "fullname": "PY C",
+              "name": "pingou"
+            }
+          },
           "message": "Issue created"
         }
 
