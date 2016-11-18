@@ -179,19 +179,19 @@ def api_method(function):
                 APP.logger.exception(err)
 
             if err.error_code in [APIERROR.ENOCODE]:
-                response = flask.jsonify(
-                    {
+                output = {
                         'error': err.error,
                         'error_code': err.error_code.name
                     }
-                )
             else:
-                response = flask.jsonify(
-                    {
+                output = {
                         'error': err.error_code.value,
                         'error_code': err.error_code.name,
                     }
-                )
+
+            if err.errors:
+                output['errors'] = err.errors
+            response = flask.jsonify(output)
             response.status_code = err.status_code
         else:
             response = result

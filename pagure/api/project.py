@@ -285,7 +285,8 @@ def api_new_project():
             SESSION.rollback()
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
     else:
-        raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
 
     jsonout = flask.jsonify(output)
     return jsonout
@@ -370,7 +371,7 @@ def api_fork_project():
                 400, error_code=APIERROR.EDBERROR)
     else:
         raise pagure.exceptions.APIError(
-            400, error_code=APIERROR.EINVALIDREQ)
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
 
     jsonout = flask.jsonify(output)
     return jsonout

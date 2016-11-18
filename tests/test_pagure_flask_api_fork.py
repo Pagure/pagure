@@ -636,6 +636,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             {
               "error": "Invalid or incomplete input submited",
               "error_code": "EINVALIDREQ",
+              "errors": {"comment": ["This field is required."]}
             }
         )
 
@@ -748,6 +749,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
             {
               "error": "Invalid or incomplete input submited",
               "error_code": "EINVALIDREQ",
+              "errors": {"comment": ["This field is required."]}
             }
         )
 

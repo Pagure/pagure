@@ -70,6 +70,10 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             {
               "error": "Invalid or incomplete input submited",
               "error_code": "EINVALIDREQ",
+              "errors": {
+                "issue_content": ["This field is required."],
+                "title": ["This field is required."]
+              }
             }
         )
 
@@ -100,6 +104,10 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             {
               "error": "Invalid or incomplete input submited",
               "error_code": "EINVALIDREQ",
+              "errors": {
+                "issue_content": ["This field is required."],
+                "title": ["This field is required."]
+              }
             }
         )
 
@@ -1561,6 +1569,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             {
               "error": "Invalid or incomplete input submited",
               "error_code": "EINVALIDREQ",
+              "errors": {"status": ["Not a valid choice"]}
             }
         )
 
@@ -1692,6 +1701,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             {
               "error": "Invalid or incomplete input submited",
               "error_code": "EINVALIDREQ",
+              "errors": {"comment": ["This field is required."]}
             }
         )
 
@@ -2008,6 +2018,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             {
               "error": "Invalid or incomplete input submited",
               "error_code": "EINVALIDREQ",
+              "errors": {"assignee": ["This field is required."]}
             }
         )
 

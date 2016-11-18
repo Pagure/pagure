@@ -549,7 +549,8 @@ def api_pull_request_add_comment(
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
-        raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
 
     jsonout = flask.jsonify(output)
     return jsonout
@@ -691,7 +692,8 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
-        raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
 
     jsonout = flask.jsonify(output)
     return jsonout

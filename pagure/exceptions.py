@@ -33,10 +33,11 @@ class FileNotFoundException(PagureException):
 class APIError(PagureException):
     ''' Exception raised by the API when something goes wrong. '''
 
-    def __init__(self, status_code, error_code, error=None):
+    def __init__(self, status_code, error_code, error=None, errors=None):
         self.status_code = status_code
         self.error_code = error_code
         self.error = error
+        self.errors = errors
 
 
 class BranchNotFoundException(PagureException):

@@ -162,7 +162,8 @@ def api_new_issue(repo, username=None, namespace=None):
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
-        raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
 
     jsonout = flask.jsonify(output)
     return jsonout
@@ -621,7 +622,8 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
-        raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
 
     jsonout = flask.jsonify(output)
     return jsonout
@@ -719,7 +721,8 @@ def api_comment_issue(repo, issueid, username=None, namespace=None):
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
-        raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
 
     jsonout = flask.jsonify(output)
     return jsonout
@@ -817,7 +820,8 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
-        raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
 
     jsonout = flask.jsonify(output)
     return jsonout
@@ -917,7 +921,8 @@ def api_subscribe_issue(repo, issueid, username=None, namespace=None):
             raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     else:
-        raise pagure.exceptions.APIError(400, error_code=APIERROR.EINVALIDREQ)
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
 
     jsonout = flask.jsonify(output)
     return jsonout
