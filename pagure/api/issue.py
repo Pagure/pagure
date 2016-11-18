@@ -236,7 +236,7 @@ def api_view_issues(repo, username=None, namespace=None):
           "issues": [
             {
               "assignee": null,
-              "blocks": [],
+              "blocks": ["1"],
               "comments": [],
               "content": "asd",
               "date_created": "1427442217",
@@ -355,7 +355,7 @@ def api_view_issue(repo, issueid, username=None, namespace=None):
           "comments": [],
           "content": "This issue needs attention",
           "date_created": "1431414800",
-          "depends": [],
+          "depends": ["4"],
           "id": 1,
           "private": false,
           "status": "Open",
