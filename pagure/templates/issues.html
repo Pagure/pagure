@@ -153,6 +153,8 @@
             <th class="open_date">Opened</th>
             {% if status and status|lower != 'open' %}
             <th class="close_date">Closed</th>
+            {% else %}
+            <th class="mod_date">Modified</th>
             {% endif %}
             <th class="priority" data-sort="int">
               Priority&nbsp;(<a href="{{ url_for('view_issues',
@@ -231,6 +233,11 @@
                 <span title="{{issue.closed_at.strftime('%Y-%m-%d %H:%M:%S')}}">{{
                         issue.closed_at | humanize}}</span>
                 {% endif %}
+            </td>
+            {% else %}
+            <td class="td-mod_date nowrap">
+                <span title="{{issue.last_updated.strftime('%Y-%m-%d %H:%M:%S')}}">{{
+                        issue.last_updated | humanize}}</span>
             </td>
             {% endif %}
             <td class="td-priority nowrap" data-sort-value="{{

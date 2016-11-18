@@ -122,6 +122,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['issue']['date_created'] = '1479458613'
+        data['issue']['last_updated'] = '1479458613'
         self.assertDictEqual(
             data,
             {
@@ -136,6 +137,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "date_created": "1479458613",
                 "depends": [],
                 "id": 1,
+                "last_updated": "1479458613",
                 "milestone": None,
                 "priority": None,
                 "private": False,
@@ -163,6 +165,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['issue']['date_created'] = '1479458613'
+        data['issue']['last_updated'] = '1479458613'
         self.assertDictEqual(
             data,
             {
@@ -177,6 +180,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "date_created": "1479458613",
                 "depends": [],
                 "id": 2,
+                "last_updated": "1479458613",
                 "milestone": None,
                 "priority": None,
                 "private": False,
@@ -204,6 +208,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['issue']['date_created'] = '1479458613'
+        data['issue']['last_updated'] = '1479458613'
         self.assertDictEqual(
             data,
             {
@@ -216,6 +221,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "content": "This issue needs attention",
                 "custom_fields": [],
                 "date_created": "1479458613",
+                "last_updated": "1479458613",
                 "depends": [],
                 "id": 3,
                 "milestone": None,
@@ -245,6 +251,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['issue']['date_created'] = '1479458613'
+        data['issue']['last_updated'] = '1479458613'
         self.assertDictEqual(
             data,
             {
@@ -259,6 +266,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "date_created": "1479458613",
                 "depends": [],
                 "id": 4,
+                "last_updated": "1479458613",
                 "milestone": None,
                 "priority": None,
                 "private": False,
@@ -286,6 +294,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['issue']['date_created'] = '1479458613'
+        data['issue']['last_updated'] = '1479458613'
         self.assertDictEqual(
             data,
             {
@@ -300,6 +309,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "date_created": "1479458613",
                 "depends": [],
                 "id": 5,
+                "last_updated": "1479458613",
                 "milestone": None,
                 "priority": None,
                 "private": False,
@@ -326,6 +336,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['issue']['date_created'] = '1479458613'
+        data['issue']['last_updated'] = '1479458613'
         self.assertDictEqual(
             data,
             {
@@ -340,6 +351,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "date_created": "1479458613",
                 "depends": [],
                 "id": 6,
+                "last_updated": "1479458613",
                 "milestone": None,
                 "priority": None,
                 "private": True,
@@ -366,6 +378,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['issue']['date_created'] = '1479458613'
+        data['issue']['last_updated'] = '1479458613'
         self.assertDictEqual(
             data,
             {
@@ -380,6 +393,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "date_created": "1479458613",
                 "depends": [],
                 "id": 7,
+                "last_updated": "1479458613",
                 "milestone": None,
                 "priority": None,
                 "private": True,
@@ -417,12 +431,14 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = json.loads(output.data)
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
+            data['issues'][idx]['last_updated'] = '1431414800'
         self.assertDictEqual(
             data,
             {
               "args": {
                 "assignee": None,
                 "author": None,
+                "since": None,
                 "status": None,
                 "tags": []
               },
@@ -438,6 +454,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 5,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": False,
@@ -460,6 +477,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 4,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": False,
@@ -482,6 +500,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 3,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": False,
@@ -504,6 +523,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 2,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": False,
@@ -526,6 +546,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 1,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": False,
@@ -562,12 +583,14 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = json.loads(output.data)
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
+            data['issues'][idx]['last_updated'] = '1431414800'
         self.assertDictEqual(
             data,
             {
               "args": {
                 "assignee": None,
                 "author": None,
+                "since": None,
                 "status": None,
                 "tags": []
               },
@@ -583,6 +606,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 5,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": False,
@@ -605,6 +629,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 4,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": False,
@@ -627,6 +652,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 3,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": False,
@@ -649,6 +675,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 2,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": False,
@@ -671,6 +698,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 1,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": False,
@@ -710,12 +738,14 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = json.loads(output.data)
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
+            data['issues'][idx]['last_updated'] = '1431414800'
         self.assertDictEqual(
             data,
             {
               "args": {
                 "assignee": None,
                 "author": None,
+                "since": None,
                 "status": None,
                 "tags": []
               },
@@ -731,6 +761,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 5,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": False,
@@ -753,6 +784,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 4,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": False,
@@ -775,6 +807,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 3,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": False,
@@ -797,6 +830,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 2,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": False,
@@ -819,6 +853,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 1,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": False,
@@ -843,12 +878,14 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = json.loads(output.data)
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
+            data['issues'][idx]['last_updated'] = '1431414800'
         self.assertDictEqual(
             data,
             {
               "args": {
                 "assignee": None,
                 "author": None,
+                "since": None,
                 "status": None,
                 "tags": []
               },
@@ -864,6 +901,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 8,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": True,
@@ -886,6 +924,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 7,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": True,
@@ -908,6 +947,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 6,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": True,
@@ -930,6 +970,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 5,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": False,
@@ -952,6 +993,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 4,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": False,
@@ -974,6 +1016,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 3,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": False,
@@ -996,6 +1039,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 2,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": False,
@@ -1018,6 +1062,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 1,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": False,
@@ -1035,7 +1080,8 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         )
 
         # List closed issue
-        output = self.app.get('/api/0/test/issues?status=Closed', headers=headers)
+        output = self.app.get('/api/0/test/issues?status=Closed',
+                              headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         self.assertDictEqual(
@@ -1044,6 +1090,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "args": {
                 "assignee": None,
                 "author": None,
+                "since": None,
                 "status": "Closed",
                 "tags": []
               },
@@ -1053,7 +1100,8 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         )
 
         # List closed issue
-        output = self.app.get('/api/0/test/issues?status=Invalid', headers=headers)
+        output = self.app.get('/api/0/test/issues?status=Invalid',
+                              headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         self.assertDictEqual(
@@ -1062,6 +1110,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "args": {
                 "assignee": None,
                 "author": None,
+                "since": None,
                 "status": "Invalid",
                 "tags": []
               },
@@ -1076,12 +1125,15 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = json.loads(output.data)
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
+            last_updated = data['issues'][idx]['last_updated']  # Save for later
+            data['issues'][idx]['last_updated'] = '1431414800'
         self.assertDictEqual(
             data,
             {
                 "args": {
                     "assignee": None,
                     "author": None,
+                    "since": None,
                     "status": "All",
                     "tags": []
                 },
@@ -1097,6 +1149,8 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 8,
+                  "last_updated": "1431414800",
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": True,
@@ -1119,6 +1173,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 7,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": True,
@@ -1141,6 +1196,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 6,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": True,
@@ -1163,6 +1219,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 5,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": False,
@@ -1185,6 +1242,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 4,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": False,
@@ -1207,6 +1265,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 3,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": False,
@@ -1229,6 +1288,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 2,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": False,
@@ -1251,6 +1311,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                   "date_created": "1431414800",
                   "depends": [],
                   "id": 1,
+                  "last_updated": "1431414800",
                   "milestone": None,
                   "priority": None,
                   "private": False,
@@ -1267,6 +1328,33 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
 
             }
         )
+
+        #
+        # Test the Issue search arg "since" for present, past, and future dates
+        #
+
+        # Query the "present", which should return all the issues.
+        output = self.app.get('/api/0/test/issues?since=%s' %
+                              (last_updated), headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertEqual(data['total_issues'], 8)
+
+        # Query the "past", which should return all the issues
+        last_updated_past = str(int(last_updated) - 30)
+        output = self.app.get('/api/0/test/issues?since=%s' %
+                              (last_updated_past), headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertEqual(data['total_issues'], 8)
+
+        # Query the "future", which should not return any issues
+        last_updated_future = str(int(last_updated) + 30)
+        output = self.app.get('/api/0/test/issues?since=%s' %
+                              (last_updated_future), headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertEqual(data['total_issues'], 0)
 
     def test_api_view_issue(self):
         """ Test the api_view_issue method of the flask api. """
@@ -1301,6 +1389,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['date_created'] = '1431414800'
+        data['last_updated'] = '1431414800'
         self.assertDictEqual(
             data,
             {
@@ -1314,6 +1403,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "closed_at": None,
               "depends": [],
               "id": 1,
+              "last_updated": "1431414800",
               "milestone": None,
               "priority": None,
               "private": False,
@@ -1395,6 +1485,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['date_created'] = '1431414800'
+        data['last_updated'] = '1431414800'
         self.assertDictEqual(
             data,
             {
@@ -1408,6 +1499,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "closed_at": None,
               "depends": [],
               "id": 6,
+              "last_updated": "1431414800",
               "milestone": None,
               "priority": None,
               "private": True,
@@ -1426,6 +1518,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['date_created'] = '1431414800'
+        data['last_updated'] = '1431414800'
         self.assertDictEqual(
             data,
             {
@@ -1439,6 +1532,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "closed_at": None,
               "depends": [],
               "id": 8,
+              "last_updated": "1431414800",
               "milestone": None,
               "priority": None,
               "private": True,

@@ -386,6 +386,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder,
 
     if assignee is None and issue.assignee is not None:
         issue.assignee_id = None
+        issue.last_updated = datetime.datetime.utcnow()
         session.add(issue)
         session.commit()
         pagure.lib.git.update_git(
@@ -439,6 +440,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder,
                 ),
                 redis=REDIS,
             )
+        issue.last_updated = datetime.datetime.utcnow()
 
         # Send notification for the event-source server
         if REDIS:
@@ -456,6 +458,7 @@ def add_pull_request_assignee(
 
     if assignee is None and request.assignee is not None:
         request.assignee_id = None
+        request.last_updated = datetime.datetime.utcnow()
         session.add(request)
         session.commit()
         pagure.lib.git.update_git(
@@ -482,6 +485,7 @@ def add_pull_request_assignee(
 
     if request.assignee_id != assignee_obj.id:
         request.assignee_id = assignee_obj.id
+        request.last_updated = datetime.datetime.utcnow()
         session.add(request)
         session.flush()
         pagure.lib.git.update_git(
@@ -882,6 +886,8 @@ def add_pull_request_comment(session, request, commit, tree_id, filename,
     # Make sure we won't have SQLAlchemy error before we continue
     session.flush()
 
+    request.last_updated = datetime.datetime.utcnow()
+
     pagure.lib.git.update_git(
         request, repo=request.project, repofolder=requestfolder)
 
@@ -938,6 +944,7 @@ def edit_comment(session, parent, comment, user,
     comment.comment = updated_comment
     comment.edited_on = datetime.datetime.utcnow()
     comment.editor = user_obj
+    parent.last_updated = comment.edited_on
 
     session.add(comment)
     # Make sure we won't have SQLAlchemy error before we continue
@@ -1206,6 +1213,7 @@ def new_issue(session, repo, title, content, user, ticketfolder,
         issue.status = status
     if close_status is not None:
         issue.close_status = close_status
+    issue.last_updated = datetime.datetime.utcnow()
 
     session.add(issue)
     # Make sure we won't have SQLAlchemy error before we create the issue
@@ -1289,6 +1297,8 @@ def new_pull_request(session, branch_from,
         user_id=user_obj.id,
         status=status,
     )
+    request.last_updated = datetime.datetime.utcnow()
+
     session.add(request)
     # Make sure we won't have SQLAlchemy error before we create the request
     session.flush()
@@ -1364,6 +1374,7 @@ def edit_issue(session, issue, ticketfolder, user,
     if milestone != issue.milestone:
         issue.milestone = milestone
         edit.append('milestone')
+    issue.last_updated = datetime.datetime.utcnow()
 
     pagure.lib.git.update_git(
         issue, repo=issue.project, repofolder=ticketfolder)
@@ -1728,11 +1739,12 @@ def get_project(session, name, user=None, namespace=None):
 
     return query.first()
 
+
 def search_issues(
         session, repo, issueid=None, issueuid=None, status=None,
         closed=False, tags=None, assignee=None, author=None, private=None,
         priority=None, milestones=None, count=False, offset=None,
-        limit=None, search_pattern=None, custom_search=None):
+        limit=None, search_pattern=None, custom_search=None, last_updated=None):
     ''' Retrieve one or more issues associated to a project with the given
     criterias.
 
@@ -1784,6 +1796,8 @@ def search_issues(
     :kwarg custom_search: a dictionary of key/values to be used when
         searching issues with a custom key constraint
     :type custom_search: dict or None
+    :kwarg last_updated: datetime's date format (e.g. 2016-11-15)
+    :type last_updated: str or None
 
     :return: A single Issue object if issueid is specified, a list of Project
         objects otherwise.
@@ -1795,6 +1809,11 @@ def search_issues(
     ).filter(
         model.Issue.project_id == repo.id
     )
+
+    if last_updated:
+        query = query.filter(
+            model.Issue.last_updated >= last_updated
+        )
 
     if issueid is not None:
         query = query.filter(
@@ -2025,7 +2044,7 @@ def get_tag(session, tag):
 def search_pull_requests(
         session, requestid=None, project_id=None, project_id_from=None,
         status=None, author=None, assignee=None, count=False,
-        offset=None, limit=None):
+        offset=None, limit=None, last_updated=None):
     ''' Retrieve the specified issue
     '''
 
@@ -2038,6 +2057,11 @@ def search_pull_requests(
     if requestid:
         query = query.filter(
             model.PullRequest.id == requestid
+        )
+
+    if last_updated:
+        query = query.filter(
+            model.PullRequest.last_updated >= last_updated
         )
 
     if project_id:

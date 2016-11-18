@@ -85,6 +85,8 @@
             <th class="open_date nowrap">Opened</th>
             {% if status|lower != 'open' %}
             <th class="close_date nowrap">Closed</th>
+            {% else %}
+            <th class="last_updated nowrap">Modified</th>
             {% endif %}
             <th class="open_by">
               Reporter(<a href="{{ url_for(
@@ -137,6 +139,10 @@
             <td class="nowrap">
               <span title="{{request.date_created.strftime('%Y-%m-%d %H:%M:%S')}}">{{
                 request.date_created | humanize}}</span>
+            </td>
+            <td class="nowrap">
+              <span title="{{request.last_updated.strftime('%Y-%m-%d %H:%M:%S')}}">{{
+                request.last_updated | humanize}}</span>
             </td>
             {% if status|lower not in ['open', 'true'] %}
             <td class="nowrap">

@@ -78,6 +78,8 @@ class APIERROR(enum.Enum):
     ENOCOMMENT = 'Comment not found'
     ENEWPROJECTDISABLED = 'Creating project have been disabled for this '\
         'instance'
+    ETIMESTAMP = 'Invalid timestamp format'
+    EDATETIME = 'Invalid datetime format'
 
 
 def check_api_acls(acls, optional=False):

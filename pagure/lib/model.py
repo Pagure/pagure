@@ -663,10 +663,11 @@ class Issue(BASE):
     priority = sa.Column(sa.Integer, nullable=True, default=None)
     milestone = sa.Column(sa.String(255), nullable=True, default=None)
     close_status = sa.Column(sa.Text, nullable=True)
-
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
-
+    last_updated = sa.Column(sa.DateTime, nullable=True,
+                             default=datetime.datetime.utcnow,
+                             onupdate=datetime.datetime.utcnow)
     closed_at = sa.Column(sa.DateTime, nullable=True)
 
     project = relation(
@@ -749,6 +750,7 @@ class Issue(BASE):
             'status': self.status,
             'close_status': self.close_status,
             'date_created': self.date_created.strftime('%s'),
+            'last_updated': self.last_updated.strftime('%s'),
             'closed_at': self.closed_at.strftime(
                 '%s') if self.closed_at else None,
             'user': self.user.to_json(public=public),
@@ -1118,6 +1120,10 @@ class PullRequest(BASE):
         default=sa.func.now(),
         onupdate=sa.func.now())
 
+    last_updated = sa.Column(sa.DateTime, nullable=True,
+                             default=datetime.datetime.utcnow,
+                             onupdate=datetime.datetime.utcnow)
+
     __table_args__ = (
         sa.CheckConstraint(
             'NOT(project_id_from IS NULL AND remote_git IS NULL)',
@@ -1223,6 +1229,7 @@ class PullRequest(BASE):
             'remote_git': self.remote_git,
             'date_created': self.date_created.strftime('%s'),
             'updated_on': self.updated_on.strftime('%s'),
+            'last_updated': self.last_updated.strftime('%s'),
             'closed_at': self.closed_at.strftime(
                 '%s') if self.closed_at else None,
             'user': self.user.to_json(public=public),

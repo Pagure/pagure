@@ -9,6 +9,7 @@
 """
 
 import flask
+import datetime
 
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -273,6 +274,7 @@ def api_view_issues(repo, username=None, namespace=None):
     tags = [tag.strip() for tag in tags if tag.strip()]
     assignee = flask.request.args.get('assignee', None)
     author = flask.request.args.get('author', None)
+    last_updated = flask.request.args.get('since', None)
 
     # Hide private tickets
     private = False
@@ -301,9 +303,29 @@ def api_view_issues(repo, username=None, namespace=None):
             params.update({'status': status})
         issues = pagure.lib.search_issues(**params)
     else:
+        lastupdated = None
+        if last_updated:
+            # Validate and convert the time
+            if last_updated.isdigit():
+                # We assume its a timestamp, so convert it to datetime
+                try:
+                    lastupdated = \
+                        datetime.datetime.fromtimestamp(int(last_updated))
+                except:
+                    raise pagure.exceptions.APIError(
+                        404, error_code=APIERROR.ETIMESTAMP)
+            else:
+                # We assume datetime format, so validate it
+                try:
+                    datetime.datetime.strptime(last_updated, '%Y-%m-%d')
+                except:
+                    raise pagure.exceptions.APIError(
+                        404, error_code=APIERROR.EDATETIME)
+                lastupdated = last_updated
+
         issues = pagure.lib.search_issues(
             SESSION, repo, status='Open', tags=tags, assignee=assignee,
-            author=author, private=private)
+            author=author, private=private, last_updated=lastupdated)
 
     jsonout = flask.jsonify({
         'total_issues': len(issues),
@@ -313,6 +335,7 @@ def api_view_issues(repo, username=None, namespace=None):
             'tags': tags,
             'assignee': assignee,
             'author': author,
+            'since': last_updated
         }
     })
     return jsonout

@@ -504,7 +504,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,27 @@
+@@ -0,0 +1,28 @@
 +{
 +    "assignee": null,
 +    "blocks": [],
@@ -516,6 +516,7 @@ index 0000000..60f7480
 +    "date_created": null,
 +    "depends": [],
 +    "id": 1,
++    "last_updated": null,
 +    "milestone": null,
 +    "priority": null,
 +    "private": false,
@@ -551,6 +552,9 @@ index 0000000..60f7480
                 row[3] = '<hash>:'
                 row = ' '.join(row)
             elif 'date_created' in row:
+                t = row.split(': ')[0]
+                row = '%s: null,' % t
+            elif 'last_updated' in row:
                 t = row.split(': ')[0]
                 row = '%s: null,' % t
             elif 'closed_at' in row:
@@ -743,7 +747,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,95 @@
+@@ -0,0 +1,96 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
@@ -756,6 +760,7 @@ index 0000000..60f7480
 +    "date_created": null,
 +    "id": 1,
 +    "initial_comment": null,
++    "last_updated": null,
 +    "project": {
 +        "close_status": [],
 +        "custom_keys": [],
@@ -858,6 +863,9 @@ index 0000000..60f7480
                 row[3] = '<hash>:'
                 row = ' '.join(row)
             elif 'date_created' in row:
+                t = row.split(': ')[0]
+                row = '%s: null,' % t
+            elif 'last_updated' in row:
                 t = row.split(': ')[0]
                 row = '%s: null,' % t
             elif 'updated_on' in row:

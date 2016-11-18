@@ -36,6 +36,14 @@
         issue.date_created.strftime('%b %d %Y %H:%M:%S')
       }}">{{ issue.date_created | humanize}}</a> by {{ issue.user.user }}
   </h5>
+  {% if issue.last_updated %}
+    <h5 class="text-muted">
+      Modified <a href="#" data-toggle="tooltip" title="{{
+        issue.last_updated.strftime('%b %d %Y %H:%M:%S')
+      }}">{{ issue.last_updated | humanize}}</a> by {{ issue.user.user }}
+    </h5>
+  {% endif %}
+  <br>
 
     {{ show_initial_comment(issue, username, repo,issueid, form) }}
 

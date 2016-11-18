@@ -77,6 +77,13 @@
     by {{ pull_request.user.default_email | avatar(16) | safe
       }} {{ pull_request.user.user }}
   </h5>
+  <h5 class="text-muted">
+    Modified <a href="#" data-toggle="tooltip" title="{{
+        pull_request.last_updated.strftime('%b %d %Y %H:%M:%S')
+      }}">{{ pull_request.last_updated |humanize }}</a>
+    by {{ pull_request.user.default_email | avatar(16) | safe
+      }} {{ pull_request.user.user }}
+  </h5>
 
   From
     <span class="pr-toplabel">{{

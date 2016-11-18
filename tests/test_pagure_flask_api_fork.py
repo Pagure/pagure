@@ -92,6 +92,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         data['requests'][0]['project']['date_created'] = '1431414800'
         data['requests'][0]['repo_from']['date_created'] = '1431414800'
         data['requests'][0]['uid'] = '1431414800'
+        data['requests'][0]['last_updated'] = '1431414800'
         self.assertDictEqual(
             data,
             {
@@ -114,6 +115,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
                   "date_created": "1431414800",
                   "id": 1,
                   "initial_comment": None,
+                  "last_updated": "1431414800",
                   "project": {
                     "close_status": [
                       "Invalid",
@@ -183,13 +185,13 @@ class PagureFlaskApiForktests(tests.Modeltests):
         data2['requests'][0]['project']['date_created'] = '1431414800'
         data2['requests'][0]['repo_from']['date_created'] = '1431414800'
         data2['requests'][0]['uid'] = '1431414800'
+        data2['requests'][0]['last_updated'] = '1431414800'
         self.assertDictEqual(data, data2)
 
     @patch('pagure.lib.notify.send_email')
     def test_api_pull_request_view(self, send_email):
         """ Test the api_pull_request_view method of the flask api. """
         send_email.return_value = True
-
         tests.create_projects(self.session)
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
@@ -244,6 +246,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         data['project']['date_created'] = '1431414800'
         data['repo_from']['date_created'] = '1431414800'
         data['uid'] = '1431414800'
+        data['last_updated'] = '1431414800'
         self.assertDictEqual(
             data,
             {
@@ -258,6 +261,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
               "date_created": "1431414800",
               "id": 1,
               "initial_comment": None,
+              "last_updated": "1431414800",
               "project": {
                 "close_status": [
                   "Invalid",
@@ -326,6 +330,7 @@ class PagureFlaskApiForktests(tests.Modeltests):
         data2['uid'] = '1431414800'
         data2['date_created'] = '1431414800'
         data2['updated_on'] = '1431414800'
+        data2['last_updated'] = '1431414800'
         self.assertDictEqual(data, data2)
 
     @patch('pagure.lib.notify.send_email')
