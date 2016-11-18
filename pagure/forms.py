@@ -139,6 +139,7 @@ class ProjectForm(ProjectFormSimplified):
     create_readme = wtforms.BooleanField(
         'Create README',
         [wtforms.validators.optional()],
+        false_values=('false', '', False, 'False', 0, '0'),
     )
     namespace = wtforms.SelectField(
         'Project Namespace',
@@ -173,6 +174,7 @@ class IssueFormSimplied(PagureForm):
     private = wtforms.BooleanField(
         'Private',
         [wtforms.validators.optional()],
+        false_values=('false', '', False, 'False', 0, '0'),
     )
 
 
@@ -326,6 +328,7 @@ class UpdateIssueForm(PagureForm):
     private = wtforms.BooleanField(
         'Private',
         [wtforms.validators.optional()],
+        false_values=('false', '', False, 'False', 0, '0'),
     )
     close_status = wtforms.SelectField(
         'Closed as',
@@ -621,5 +624,6 @@ class SubscribtionForm(PagureForm):
     status = wtforms.BooleanField(
         'Subscription status',
         [wtforms.validators.optional()],
+        false_values=('false', '', False, 'False', 0, '0'),
     )
 
