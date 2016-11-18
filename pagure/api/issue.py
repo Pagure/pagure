@@ -46,18 +46,18 @@ def api_new_issue(repo, username=None, namespace=None):
     Input
     ^^^^^
 
-    +--------------+----------+--------------+-----------------------------+
-    | Key          | Type     | Optionality  | Description                 |
-    +==============+==========+==============+=============================+
-    | ``title``    | string   | Mandatory    | The title of the issue      |
-    +--------------+----------+--------------+-----------------------------+
-    | ``content``  | string   | Mandatory    | | The description of the    |
-    |              |          |              |   issue                     |
-    +--------------+----------+--------------+-----------------------------+
-    | ``private``  | boolean  | Optional     | | Include this key if       |
-    |              |          |              |   you want a private issue  |
-    |              |          |              |   to be created             |
-    +--------------+----------+--------------+-----------------------------+
+    +-------------------+--------+-------------+---------------------------+
+    | Key               | Type   | Optionality | Description               |
+    +===================+========+=============+===========================+
+    | ``title``         | string | Mandatory   | The title of the issue    |
+    +-------------------+--------+-------------+---------------------------+
+    | ``issue_content`` | string | Mandatory   | | The description of the  |
+    |                   |        |             |   issue                   |
+    +-------------------+--------+-------------+---------------------------+
+    | ``private``       | boolean| Optional    | | Include this key if     |
+    |                   |        |             |   you want a private issue|
+    |                   |        |             |   to be created           |
+    +-------------------+--------+-------------+---------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
