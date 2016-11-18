@@ -146,6 +146,14 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
+              "args": {
+                "fork": None,
+                "pattern": None,
+                "tags": [
+                  "infra"
+                ],
+                "username": None
+              },
               "total_projects": 1,
               "projects": [
                 {
@@ -182,6 +190,12 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
+              "args": {
+                "fork": None,
+                "pattern": None,
+                "tags": [],
+                "username": "pingou",
+              },
               "total_projects": 3,
               "projects": [
                 {
@@ -260,6 +274,14 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
+              "args": {
+                "fork": None,
+                "pattern": None,
+                "tags": [
+                  "infra"
+                ],
+                "username": "pingou"
+              },
               "total_projects": 1,
               "projects": [
                 {

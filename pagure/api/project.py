@@ -167,7 +167,13 @@ def api_projects():
 
     jsonout = flask.jsonify({
         'total_projects': len(projects),
-        'projects': [p.to_json(api=True, public=True) for p in projects]
+        'projects': [p.to_json(api=True, public=True) for p in projects],
+        'args': {
+            'tags': tags,
+            'username': username,
+            'fork': fork,
+            'pattern': pattern,
+        }
     })
     return jsonout
 
