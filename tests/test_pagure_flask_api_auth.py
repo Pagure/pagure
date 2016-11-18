@@ -129,6 +129,10 @@ class PagureFlaskApiAuthtests(tests.Modeltests):
             {
               "error": "Invalid or incomplete input submited",
               "error_code": "EINVALIDREQ",
+              "errors": {
+                "issue_content": ["This field is required."],
+                "title": ["This field is required."]
+              }
             }
         )
 
