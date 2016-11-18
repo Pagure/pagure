@@ -109,7 +109,7 @@ def api_pull_request_views(repo, username=None, namespace=None):
                   "name": "pingou"
                 }
               },
-              "status": true,
+              "status": "Open",
               "title": "test pull-request",
               "uid": "1431414800",
               "updated_on": "1431414800",
@@ -237,7 +237,7 @@ def api_pull_request_view(repo, requestid, username=None, namespace=None):
               "name": "pingou"
             }
           },
-          "status": true,
+          "status": "Open",
           "title": "test pull-request",
           "uid": "1431414800",
           "updated_on": "1431414800",
