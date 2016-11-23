@@ -847,61 +847,71 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertDictEqual(
                 data,
                 {
-                    'args': {
-                        'assignee': None,
-                        'author': None,
-                        'status': True
-                    },
-                    'requests': [{
-                        'assignee': None,
-                        'branch':  'master',
-                        'branch_from':  'master',
-                        'closed_at': None,
-                        'closed_by': None,
-                        'comments': [],
-                        'commit_start': None,
-                        'commit_stop': None,
-                        'date_created': '1431414800',
-                        'id': 1,
-                        'initial_comment': None,
-                        'project': {
-                                 'date_created': '1431414800',
-                                 'description':  'test project description',
-                                 'id': 1,
-                                 'name':  'test4',
-                                 'parent': None,
-                                 'priorities': {},
-                                 'tags': [],
-                                 'user': {
-                                     'fullname':  'PY C',
-                                     'name':  'pingou'
-                                 }
-                                 },
-                        'remote_git': None,
-                        'repo_from': {
-                            'date_created': '1431414800',
-                            'description':  'test project description',
-                            'id': 1,
-                            'name':  'test4',
-                            'parent': None,
-                            'priorities': {},
-                            'tags': [],
-                            'user': {
-                                'fullname':  'PY C',
-                                'name':  'pingou'
-                            }
-                        },
-                        'status':  'Open',
-                        'title':  'test pull-request',
-                        'uid': '1431414800',
-                        'updated_on': '1431414800',
-                        'user': {
-                            'fullname':  'PY C',
-                            'name':  'pingou'
-                        }
-                    }],
-                    'total_requests': 1
+"args": {
+        "assignee": None,
+        "author": None,
+        "status": True
+    },
+    "requests": [
+        {
+            "assignee": None,
+            "branch": "master",
+            "branch_from": "master",
+            "closed_at": None,
+            "closed_by": None,
+            "comments": [],
+            "commit_start": None,
+            "commit_stop": None,
+            "date_created": "1431414800",
+            "id": 1,
+            "initial_comment": None,
+            "project": {
+                "close_status": [],
+                "custom_keys": [],
+                "date_created": "1431414800",
+                "description": "test project description",
+                "id": 1,
+                "milestones": {},
+                "name": "test4",
+                "namespace": None,
+                "parent": None,
+                "priorities": {},
+                "tags": [],
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou"
                 }
+            },
+            "remote_git": None,
+            "repo_from": {
+                "close_status": [],
+                "custom_keys": [],
+                "date_created": "1431414800",
+                "description": "test project description",
+                "id": 1,
+                "milestones": {},
+                "name": "test4",
+                "namespace": None,
+                "parent": None,
+                "priorities": {},
+                "tags": [],
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou"
+                }
+            },
+            "status": "Open",
+            "title": "test pull-request",
+            "uid": "1431414800",
+            "updated_on": "1431414800",
+            "user": {
+                "fullname": "PY C",
+                "name": "pingou"
+            }
+        }
+    ],
+    "total_requests": 1
+    }
             )
             headers = {'Authorization': 'token foobar_token'}
 
@@ -928,54 +938,63 @@ class PagurePrivateRepotest(tests.Modeltests):
             data['uid'] = '1431414800'
             self.assertDictEqual(
                 data,
-                {
-                    "assignee": None,
-                    "branch": "master",
-                    "branch_from": "master",
-                    "closed_at": None,
-                    "closed_by": None,
-                    "comments": [],
-                    "commit_start": None,
-                    "commit_stop": None,
-                    "date_created": "1431414800",
-                    "id": 1,
-                    "initial_comment": None,
-                    "project": {
-                        "date_created": "1431414800",
-                        "description": "test project description",
-                        "id": 1,
-                        "name": "test4",
-                        "parent": None,
-                        "priorities": {},
-                        "tags": [],
-                        "user": {
-                            "fullname": "PY C",
-                            "name": "pingou"
-                        }
-                    },
-                    "remote_git": None,
-                    "repo_from": {
-                        "date_created": "1431414800",
-                        "description": "test project description",
-                        "id": 1,
-                        "name": "test4",
-                        "parent": None,
-                        "priorities": {},
-                        "tags": [],
-                        "user": {
-                            "fullname": "PY C",
-                            "name": "pingou"
-                        }
-                    },
-                    "status": 'Open',
-                    "title": "test pull-request",
-                    "uid": "1431414800",
-                    "updated_on": "1431414800",
-                    "user": {
-                        "fullname": "PY C",
-                        "name": "pingou"
-                    }
+            {
+            "assignee": None,
+            "branch": "master",
+            "branch_from": "master",
+            "closed_at": None,
+            "closed_by": None,
+            "comments": [],
+            "commit_start": None,
+            "commit_stop": None,
+            "date_created": "1431414800",
+            "id": 1,
+            "initial_comment": None,
+            "project": {
+                "close_status": [],
+                "custom_keys": [],
+                "date_created": "1431414800",
+                "description": "test project description",
+                "id": 1,
+                "milestones": {},
+                "name": "test4",
+                "namespace": None,
+                "parent": None,
+                "priorities": {},
+                "tags": [],
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou"
                 }
+            },
+            "remote_git": None,
+            "repo_from": {
+                "close_status": [],
+                "custom_keys": [],
+                "date_created": "1431414800",
+                "description": "test project description",
+                "id": 1,
+                "milestones": {},
+                "name": "test4",
+                "namespace": None,
+                "parent": None,
+                "priorities": {},
+                "tags": [],
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou"
+                }
+            },
+            "status": "Open",
+            "title": "test pull-request",
+            "uid": "1431414800",
+            "updated_on": "1431414800",
+            "user": {
+                "fullname": "PY C",
+                "name": "pingou"
+            }
+        }
+
             )
 
             # Access Pull-Request authenticated
