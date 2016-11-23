@@ -1361,9 +1361,15 @@ class PagurePrivateRepotest(tests.Modeltests):
         )
         self.session.add(item)
         self.session.commit()
+        # Allow the token to close PR
+        acls = pagure.lib.get_acls(self.session)
+        acl = None
+        for acl in acls:
+            if acl.name == 'pull_request_close':
+                break
         item = pagure.lib.model.TokenAcl(
             token_id='foobar_token',
-            acl_id=7,
+            acl_id=acl.id,
         )
         self.session.add(item)
         self.session.commit()
@@ -1371,6 +1377,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         headers = {'Authorization': 'token foobar_token'}
 
         # User not admin
+        print headers
         output = self.app.post(
             '/api/0/test4/pull-request/1/close', headers=headers)
         self.assertEqual(output.status_code, 404)
@@ -1495,9 +1502,16 @@ class PagurePrivateRepotest(tests.Modeltests):
         )
         self.session.add(item)
         self.session.commit()
+
+        # Allow the token to merge PR
+        acls = pagure.lib.get_acls(self.session)
+        acl = None
+        for acl in acls:
+            if acl.name == 'pull_request_merge':
+                break
         item = pagure.lib.model.TokenAcl(
             token_id='foobar_token',
-            acl_id=10,
+            acl_id=acl.id,
         )
         self.session.add(item)
         self.session.commit()
