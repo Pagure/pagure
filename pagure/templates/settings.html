@@ -929,101 +929,49 @@ $('#accordions').on('hide.bs.collapse', function (e) {
 })
 
 $('#new_priority').click(function(e) {
-  console.log('new priority');
-  console.log($('#priorities'));
-  $('#priorities').append(
-    '<div class="row p-t-1"> \
-        <div class="col-sm-2 p-r-0">\
-          <input type="text" name="priority_weigth"\
-            value="" size="3" class="form-control"/>\
-        </div>\
-        <div class="col-sm-9 p-r-0">\
-          <input type="text" name="priority_title"\
-            value="" class="form-control"/>\
-        </div>\
-    </div>'
-  );
+  let form = $('#priorities>div:last-child').clone();
+  form.find('input[type=text], textarea').val('');
+  $('#priorities').append(form);
 });
 
 {% if not repo.priorities %}
 $('#default_priorities').click(function(e) {
+  let form = $('#priorities>div:last-child');
+  form.find('input[type=text], textarea').val('');
   $('#priorities').html('');
   var def_priorities = ['', 'High', 'Normal', 'Low'];
   for (var cnt = 1; cnt < def_priorities.length; cnt++) {
-    $('#priorities').append(
-      '<div class="row p-t-1"> \
-          <div class="col-sm-2 p-r-0">\
-            <input type="text" name="priority_weigth"\
-              value="' + cnt + '" size="3" class="form-control"/>\
-          </div>\
-          <div class="col-sm-9 p-r-0">\
-            <input type="text" name="priority_title"\
-              value="' + def_priorities[cnt] + '" class="form-control"/>\
-          </div>\
-      </div>'
-    );
+    let f = form.clone();
+    f.find("[name=priority_weigth]").val(cnt);
+    f.find("[name=priority_title]").val(def_priorities[cnt]);
+    $('#priorities').append(f);
   }
   console.log($('#priorities'));
 });
 {% endif %}
 
 $('#new_milestone').click(function(e) {
-  console.log('new milestone');
-  console.log($('#milestones'));
-  $('#milestones').append(
-    '<div class="row p-t-1"> \
-        <div class="col-sm-6 p-r-0">\
-          <input type="text" name="milestones"\
-            value="" size="3" class="form-control"/>\
-        </div>\
-        <div class="col-sm-6 p-r-0">\
-          <input type="text" name="milestone_dates"\
-            value="" class="form-control"/>\
-        </div>\
-    </div>'
-  );
+  let form = $('#milestones>div:last-child').clone();
+  form.find('input[type=text], textarea').val('');
+  $('#milestones').append(form);
 });
 
 $('#new_close_status').click(function(e) {
-  console.log('new close status');
-  $('#close_sstatus').append(
-    '<div class="row p-t-1"> \
-        <div class="col-sm-12 p-r-0">\
-          <input type="text" name="close_status"\
-            value="" size="3" class="form-control"/>\
-        </div>\
-    </div>'
-  );
+  let form = $('#close_sstatus>div:last-child').clone();
+  form.find('input[type=text], textarea').val('');
+  $('#close_sstatus').append(form);
 });
 
 $('#new_quick_reply').click(function(e) {
-  console.log('new quick reply');
-  $('#quick_reply_list').append(
-    '<div class="row p-t-1"> \
-        <div class="col-sm-12 p-r-0">\
-          <textarea class="form-control" name="quick_reply"></textarea>\
-        </div>\
-    </div>'
-  );
+  let form = $('#quick_reply_list>div:last-child').clone();
+  form.find('input[type=text], textarea').val('');
+  $('#quick_reply_list').append(form);
 });
 
 $('#new_custom_field').click(function(e) {
-  console.log('new custom fields');
-  $('#custom_fields').append(
-    '<div class="row p-t-1"> \
-      <div class="col-sm-6 p-r-0"> \
-        <input type="text" name="custom_keys" \
-            value="" class="form-control"/> \
-        </div> \
-        <div class="col-sm-6 p-r-0"> \
-           <select name="custom_keys_type" class="form-control"> \
-            <option value="text">text</option> \
-            <option value="boolean">boolean</option> \
-            <option value="link">link</option> \
-          </select> \
-        </div> \
-      </div>'
-  );
+  let form = $('#custom_fields>div:last-child').clone();
+  form.find('input[type=text], textarea').val('');
+  $('#custom_fields').append(form);
 });
 
 </script>
