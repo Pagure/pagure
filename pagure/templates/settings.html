@@ -703,13 +703,13 @@
                 <div class="col-sm-6 p-r-0">
                    <select name="custom_keys_type" class="form-control">
                     <option value="text" {%
-                      if field.type_ == 'text' %} selected {%
+                      if field.key_type == 'text' %} selected {%
                       endif %}>text</option>
                     <option value="boolean" {%
-                      if field.type_ == 'boolean' %} selected {%
+                      if field.key_type == 'boolean' %} selected {%
                       endif %}>boolean</option>
                     <option value="link" {%
-                      if field.type_ == 'link' %} selected {%
+                      if field.key_type == 'link' %} selected {%
                       endif %}>link</option>
                   </select>
                 </div>
