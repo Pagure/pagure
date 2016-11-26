@@ -514,7 +514,7 @@
               </div>
             </div>
             <div id="priorities">
-          {% for priority in repo.priorities | sort %}
+          {% for priority in repo.priorities or [""] | sort %}
               <div class="row p-t-1">
                 <div class="col-sm-2 p-r-0">
                   <input type="text" name="priority_weigth"
@@ -583,7 +583,7 @@
               </div>
             </div>
             <div id="milestones">
-          {% for milestone in repo.milestones | sort %}
+          {% for milestone in repo.milestones or [""] | sort %}
               <div class="row p-t-1">
                 <div class="col-sm-6 p-r-0">
                   <input type="text" name="milestones"
@@ -641,7 +641,7 @@
               </div>
             </div>
             <div id="close_sstatus">
-            {% for status in repo.close_status | sort %}
+            {% for status in repo.close_status or [""] | sort %}
               <div class="row p-t-1">
                 <div class="col-sm-12 p-r-0">
                   <input type="text" name="close_status"
@@ -694,7 +694,7 @@
               </div>
             </div>
             <div id="custom_fields">
-            {% for field in repo.issue_keys | sort %}
+            {% for field in repo.issue_keys or [dict(key_type="", name="")] | sort %}
               <div class="row p-t-1">
                 <div class="col-sm-6 p-r-0">
                   <input type="text" name="custom_keys"
@@ -819,7 +819,7 @@
           {{ tag_form.csrf_token }}
           <div class="card-block">
             <div id="quick_reply_list">
-            {% for quick_reply in repo.quick_replies %}
+            {% for quick_reply in repo.quick_replies or [""] %}
               <div class="row p-t-1">
                 <div class="col-sm-12 p-r-0">
                     <textarea class="form-control" name="quick_reply">{{quick_reply}}</textarea>
