@@ -529,7 +529,7 @@
           </div>
           <div class="row p-t-1">
             <div class="col-sm-6">
-              <a class="btn btn-secondary btn-sm btn-block" id="new_priority">
+              <a class="btn btn-secondary btn-sm btn-block extend-form" data-target="#priorities">
                   Add new priority
               </a>
             </div>
@@ -598,7 +598,7 @@
           </div>
           <div class="row p-t-1">
             <div class="col-sm-6">
-              <a class="btn btn-secondary btn-sm btn-block" id="new_milestone">
+              <a class="btn btn-secondary btn-sm btn-block extend-form" data-target="#milestones">
                   Add new milestone
               </a>
             </div>
@@ -652,7 +652,7 @@
           </div>
           <div class="row p-t-1">
             <div class="col-sm-6">
-              <a class="btn btn-secondary btn-sm btn-block" id="new_close_status">
+              <a class="btn btn-secondary btn-sm btn-block extend-form" data-target="#close_sstatus">
                   Add new close status
               </a>
             </div>
@@ -718,7 +718,7 @@
           </div>
           <div class="row p-t-1">
             <div class="col-sm-6">
-              <a class="btn btn-secondary btn-sm btn-block" id="new_custom_field">
+              <a class="btn btn-secondary btn-sm btn-block extend-form" data-target="#custom_fields">
                   Add new custom field
               </a>
             </div>
@@ -829,7 +829,7 @@
           </div>
           <div class="row p-t-1">
             <div class="col-sm-6">
-              <a class="btn btn-secondary btn-sm btn-block" id="new_quick_reply">
+              <a class="btn btn-secondary btn-sm btn-block extend-form" data-target="#quick_reply_list">
                   Add new quick reply
               </a>
             </div>
@@ -928,12 +928,6 @@ $('#accordions').on('hide.bs.collapse', function (e) {
   $(e.target).siblings().find("#dropdowncaret").attr('data-glyph', "caret-right");
 })
 
-$('#new_priority').click(function(e) {
-  let form = $('#priorities>div:last-child').clone();
-  form.find('input[type=text], textarea').val('');
-  $('#priorities').append(form);
-});
-
 {% if not repo.priorities %}
 $('#default_priorities').click(function(e) {
   let form = $('#priorities>div:last-child');
@@ -950,28 +944,11 @@ $('#default_priorities').click(function(e) {
 });
 {% endif %}
 
-$('#new_milestone').click(function(e) {
-  let form = $('#milestones>div:last-child').clone();
+$('.extend-form').click(function(e) {
+  const tgt = $(this).attr('data-target');
+  let form = $(tgt + ' > div:last-child').clone();
   form.find('input[type=text], textarea').val('');
-  $('#milestones').append(form);
-});
-
-$('#new_close_status').click(function(e) {
-  let form = $('#close_sstatus>div:last-child').clone();
-  form.find('input[type=text], textarea').val('');
-  $('#close_sstatus').append(form);
-});
-
-$('#new_quick_reply').click(function(e) {
-  let form = $('#quick_reply_list>div:last-child').clone();
-  form.find('input[type=text], textarea').val('');
-  $('#quick_reply_list').append(form);
-});
-
-$('#new_custom_field').click(function(e) {
-  let form = $('#custom_fields>div:last-child').clone();
-  form.find('input[type=text], textarea').val('');
-  $('#custom_fields').append(form);
+  $(tgt).append(form);
 });
 
 </script>
