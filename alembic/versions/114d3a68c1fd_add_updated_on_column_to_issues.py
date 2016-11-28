@@ -21,15 +21,35 @@ def upgrade():
     op.add_column(
         'issues',
         sa.Column('last_updated', sa.DateTime, nullable=True,
-            default=sa.datetime.datetime.utcnow,
+            default=datetime.datetime.utcnow,
             onupdate=datetime.datetime.utcnow)
     )
+    op.execute('''
+UPDATE "issues" SET last_updated=o_date
+FROM (
+    SELECT issue_uid, GREATEST(date_created, edited_on) AS o_date
+    FROM issue_comments
+    ORDER BY o_date DESC
+) AS subq
+WHERE "issues".uid = issue_uid;''')
+    op.execute('''UPDATE "issues" SET last_updated=date_created '''
+               '''WHERE last_updated IS NULL;''')
     op.add_column(
         'pull_requests',
         sa.Column('last_updated', sa.DateTime, nullable=True,
-            default=sa.datetime.datetime.utcnow,
+            default=datetime.datetime.utcnow,
             onupdate=datetime.datetime.utcnow)
     )
+    op.execute('''
+UPDATE "pull_requests" SET last_updated=o_date
+FROM (
+    SELECT pull_request_uid, GREATEST(date_created, edited_on) AS o_date
+    FROM pull_request_comments
+    ORDER BY o_date DESC
+) AS subq
+WHERE "pull_requests".uid = pull_request_uid;''')
+    op.execute('''UPDATE "pull_requests" SET last_updated=date_created '''
+               '''WHERE last_updated IS NULL;''')
 
 
 def downgrade():
