@@ -26,6 +26,192 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 import pagure.lib
 import tests
 
+FULL_ISSUE_LIST = [
+  {
+    "assignee": None,
+    "blocks": [],
+    "close_status": None,
+    "closed_at": None,
+    "comments": [],
+    "content": "We should work on this",
+    "custom_fields": [],
+    "date_created": "1431414800",
+    "depends": [],
+    "id": 8,
+    "last_updated": "1431414800",
+    "milestone": None,
+    "priority": None,
+    "private": True,
+    "status": "Open",
+    "tags": [],
+    "title": "Test issue",
+    "user": {
+      "fullname": "PY C",
+      "name": "pingou"
+    }
+  },
+  {
+    "assignee": None,
+    "blocks": [],
+    "close_status": None,
+    "closed_at": None,
+    "comments": [],
+    "content": "This issue needs attention",
+    "custom_fields": [],
+    "date_created": "1431414800",
+    "depends": [],
+    "id": 7,
+    "last_updated": "1431414800",
+    "milestone": None,
+    "priority": None,
+    "private": True,
+    "status": "Open",
+    "tags": [],
+    "title": "test issue",
+    "user": {
+      "fullname": "PY C",
+      "name": "pingou"
+    }
+  },
+  {
+    "assignee": None,
+    "blocks": [],
+    "close_status": None,
+    "closed_at": None,
+    "comments": [],
+    "content": "This issue needs attention",
+    "custom_fields": [],
+    "date_created": "1431414800",
+    "depends": [],
+    "id": 6,
+    "last_updated": "1431414800",
+    "milestone": None,
+    "priority": None,
+    "private": True,
+    "status": "Open",
+    "tags": [],
+    "title": "test issue",
+    "user": {
+      "fullname": "PY C",
+      "name": "pingou"
+    }
+  },
+  {
+    "assignee": None,
+    "blocks": [],
+    "close_status": None,
+    "closed_at": None,
+    "comments": [],
+    "content": "This issue needs attention",
+    "custom_fields": [],
+    "date_created": "1431414800",
+    "depends": [],
+    "id": 5,
+    "last_updated": "1431414800",
+    "milestone": None,
+    "priority": None,
+    "private": False,
+    "status": "Open",
+    "tags": [],
+    "title": "test issue",
+    "user": {
+      "fullname": "PY C",
+      "name": "pingou"
+    }
+  },
+  {
+    "assignee": None,
+    "blocks": [],
+    "close_status": None,
+    "closed_at": None,
+    "comments": [],
+    "content": "This issue needs attention",
+    "custom_fields": [],
+    "date_created": "1431414800",
+    "depends": [],
+    "id": 4,
+    "last_updated": "1431414800",
+    "milestone": None,
+    "priority": None,
+    "private": False,
+    "status": "Open",
+    "tags": [],
+    "title": "test issue",
+    "user": {
+      "fullname": "PY C",
+      "name": "pingou"
+    }
+  },
+  {
+    "assignee": None,
+    "blocks": [],
+    "close_status": None,
+    "closed_at": None,
+    "comments": [],
+    "content": "This issue needs attention",
+    "custom_fields": [],
+    "date_created": "1431414800",
+    "depends": [],
+    "id": 3,
+    "last_updated": "1431414800",
+    "milestone": None,
+    "priority": None,
+    "private": False,
+    "status": "Open",
+    "tags": [],
+    "title": "test issue",
+    "user": {
+      "fullname": "PY C",
+      "name": "pingou"
+    }
+  },
+  {
+    "assignee": None,
+    "blocks": [],
+    "close_status": None,
+    "closed_at": None,
+    "comments": [],
+    "content": "This issue needs attention",
+    "custom_fields": [],
+    "date_created": "1431414800",
+    "depends": [],
+    "id": 2,
+    "last_updated": "1431414800",
+    "milestone": None,
+    "priority": None,
+    "private": False,
+    "status": "Open",
+    "tags": [],
+    "title": "test issue",
+    "user": {
+      "fullname": "PY C",
+      "name": "pingou"
+    }
+  },
+  {
+    "assignee": None,
+    "blocks": [],
+    "close_status": None,
+    "closed_at": None,
+    "comments": [],
+    "content": "This issue needs attention",
+    "custom_fields": [],
+    "date_created": "1431414800",
+    "depends": [],
+    "id": 1,
+    "last_updated": "1431414800",
+    "milestone": None,
+    "priority": None,
+    "private": False,
+    "status": "Open",
+    "tags": [],
+    "title": "test issue",
+    "user": {
+      "fullname": "PY C",
+      "name": "pingou"
+    }
+  }
+]
 
 class PagureFlaskApiIssuetests(tests.Modeltests):
     """ Tests for the flask API of pagure for issue """
@@ -121,34 +307,12 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
-        data['issue']['date_created'] = '1479458613'
-        data['issue']['last_updated'] = '1479458613'
+        data['issue']['date_created'] = '1431414800'
+        data['issue']['last_updated'] = '1431414800'
         self.assertDictEqual(
             data,
             {
-              "issue": {
-                "assignee": None,
-                "blocks": [],
-                "close_status": None,
-                "closed_at": None,
-                "comments": [],
-                "content": "This issue needs attention",
-                "custom_fields": [],
-                "date_created": "1479458613",
-                "depends": [],
-                "id": 1,
-                "last_updated": "1479458613",
-                "milestone": None,
-                "priority": None,
-                "private": False,
-                "status": "Open",
-                "tags": [],
-                "title": "test issue",
-                "user": {
-                  "fullname": "PY C",
-                  "name": "pingou"
-                }
-              },
+              "issue": FULL_ISSUE_LIST[7],
               "message": "Issue created"
             }
         )
@@ -164,34 +328,12 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
-        data['issue']['date_created'] = '1479458613'
-        data['issue']['last_updated'] = '1479458613'
+        data['issue']['date_created'] = '1431414800'
+        data['issue']['last_updated'] = '1431414800'
         self.assertDictEqual(
             data,
             {
-              "issue": {
-                "assignee": None,
-                "blocks": [],
-                "close_status": None,
-                "closed_at": None,
-                "comments": [],
-                "content": "This issue needs attention",
-                "custom_fields": [],
-                "date_created": "1479458613",
-                "depends": [],
-                "id": 2,
-                "last_updated": "1479458613",
-                "milestone": None,
-                "priority": None,
-                "private": False,
-                "status": "Open",
-                "tags": [],
-                "title": "test issue",
-                "user": {
-                  "fullname": "PY C",
-                  "name": "pingou"
-                }
-              },
+              "issue": FULL_ISSUE_LIST[6],
               "message": "Issue created"
             }
         )
@@ -207,34 +349,12 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
-        data['issue']['date_created'] = '1479458613'
-        data['issue']['last_updated'] = '1479458613'
+        data['issue']['date_created'] = '1431414800'
+        data['issue']['last_updated'] = '1431414800'
         self.assertDictEqual(
             data,
             {
-              "issue": {
-                "assignee": None,
-                "blocks": [],
-                "close_status": None,
-                "closed_at": None,
-                "comments": [],
-                "content": "This issue needs attention",
-                "custom_fields": [],
-                "date_created": "1479458613",
-                "last_updated": "1479458613",
-                "depends": [],
-                "id": 3,
-                "milestone": None,
-                "priority": None,
-                "private": False,
-                "status": "Open",
-                "tags": [],
-                "title": "test issue",
-                "user": {
-                  "fullname": "PY C",
-                  "name": "pingou"
-                }
-              },
+              "issue": FULL_ISSUE_LIST[5],
               "message": "Issue created"
             }
         )
@@ -250,34 +370,12 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
-        data['issue']['date_created'] = '1479458613'
-        data['issue']['last_updated'] = '1479458613'
+        data['issue']['date_created'] = '1431414800'
+        data['issue']['last_updated'] = '1431414800'
         self.assertDictEqual(
             data,
             {
-              "issue": {
-                "assignee": None,
-                "blocks": [],
-                "close_status": None,
-                "closed_at": None,
-                "comments": [],
-                "content": "This issue needs attention",
-                "custom_fields": [],
-                "date_created": "1479458613",
-                "depends": [],
-                "id": 4,
-                "last_updated": "1479458613",
-                "milestone": None,
-                "priority": None,
-                "private": False,
-                "status": "Open",
-                "tags": [],
-                "title": "test issue",
-                "user": {
-                  "fullname": "PY C",
-                  "name": "pingou"
-                }
-              },
+              "issue": FULL_ISSUE_LIST[4],
               "message": "Issue created"
             }
         )
@@ -293,34 +391,12 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
-        data['issue']['date_created'] = '1479458613'
-        data['issue']['last_updated'] = '1479458613'
+        data['issue']['date_created'] = '1431414800'
+        data['issue']['last_updated'] = '1431414800'
         self.assertDictEqual(
             data,
             {
-              "issue": {
-                "assignee": None,
-                "blocks": [],
-                "close_status": None,
-                "closed_at": None,
-                "comments": [],
-                "content": "This issue needs attention",
-                "custom_fields": [],
-                "date_created": "1479458613",
-                "depends": [],
-                "id": 5,
-                "last_updated": "1479458613",
-                "milestone": None,
-                "priority": None,
-                "private": False,
-                "status": "Open",
-                "tags": [],
-                "title": "test issue",
-                "user": {
-                  "fullname": "PY C",
-                  "name": "pingou"
-                }
-              },
+              "issue": FULL_ISSUE_LIST[3],
               "message": "Issue created"
             }
         )
@@ -335,34 +411,12 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
-        data['issue']['date_created'] = '1479458613'
-        data['issue']['last_updated'] = '1479458613'
+        data['issue']['date_created'] = '1431414800'
+        data['issue']['last_updated'] = '1431414800'
         self.assertDictEqual(
             data,
             {
-              "issue": {
-                "assignee": None,
-                "blocks": [],
-                "close_status": None,
-                "closed_at": None,
-                "comments": [],
-                "content": "This issue needs attention",
-                "custom_fields": [],
-                "date_created": "1479458613",
-                "depends": [],
-                "id": 6,
-                "last_updated": "1479458613",
-                "milestone": None,
-                "priority": None,
-                "private": True,
-                "status": "Open",
-                "tags": [],
-                "title": "test issue",
-                "user": {
-                  "fullname": "PY C",
-                  "name": "pingou"
-                }
-              },
+              "issue": FULL_ISSUE_LIST[2],
               "message": "Issue created"
             }
         )
@@ -377,34 +431,12 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
-        data['issue']['date_created'] = '1479458613'
-        data['issue']['last_updated'] = '1479458613'
+        data['issue']['date_created'] = '1431414800'
+        data['issue']['last_updated'] = '1431414800'
         self.assertDictEqual(
             data,
             {
-              "issue": {
-                "assignee": None,
-                "blocks": [],
-                "close_status": None,
-                "closed_at": None,
-                "comments": [],
-                "content": "This issue needs attention",
-                "custom_fields": [],
-                "date_created": "1479458613",
-                "depends": [],
-                "id": 7,
-                "last_updated": "1479458613",
-                "milestone": None,
-                "priority": None,
-                "private": True,
-                "status": "Open",
-                "tags": [],
-                "title": "test issue",
-                "user": {
-                  "fullname": "PY C",
-                  "name": "pingou"
-                }
-              },
+              "issue": FULL_ISSUE_LIST[1],
               "message": "Issue created"
             }
         )
@@ -442,123 +474,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "status": None,
                 "tags": []
               },
-              "issues": [
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 5,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 4,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 3,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 2,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 1,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                }
-              ],
+              "issues": FULL_ISSUE_LIST[3:],
               "total_issues": 5
             }
         )
@@ -594,123 +510,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "status": None,
                 "tags": []
               },
-              "issues": [
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 5,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 4,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 3,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 2,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 1,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                }
-              ],
+              "issues": FULL_ISSUE_LIST[3:],
               "total_issues": 5
             }
         )
@@ -749,123 +549,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "status": None,
                 "tags": []
               },
-              "issues": [
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 5,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 4,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 3,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 2,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 1,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                }
-              ],
+              "issues": FULL_ISSUE_LIST[3:],
               "total_issues": 5
             }
         )
@@ -889,199 +573,76 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "status": None,
                 "tags": []
               },
-              "issues": [
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "We should work on this",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 8,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": True,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "Test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 7,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": True,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 6,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": True,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 5,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 4,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 3,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 2,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 1,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                }
-              ],
+              "issues": FULL_ISSUE_LIST,
+              "total_issues": 8
+            }
+        )
+        headers = {'Authorization': 'token aaabbbccc'}
+
+        # Access issues authenticated but non-existing token
+        output = self.app.get('/api/0/test/issues', headers=headers)
+        self.assertEqual(output.status_code, 401)
+
+        # Create a new token for another user
+        item = pagure.lib.model.Token(
+            id='bar_token',
+            user_id=2,
+            project_id=1,
+            expiration=datetime.datetime.utcnow() + datetime.timedelta(
+                days=30)
+        )
+        self.session.add(item)
+
+        headers = {'Authorization': 'token bar_token'}
+
+        # Access issues authenticated but wrong token
+        output = self.app.get('/api/0/test/issues', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        for idx in range(len(data['issues'])):
+            data['issues'][idx]['date_created'] = '1431414800'
+            data['issues'][idx]['last_updated'] = '1431414800'
+        self.assertDictEqual(
+            data,
+            {
+              "args": {
+                "assignee": None,
+                "author": None,
+                "since": None,
+                "status": None,
+                "tags": []
+              },
+              "issues": FULL_ISSUE_LIST[3:],
+              "total_issues": 5
+            }
+        )
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Access issues authenticated correctly
+        output = self.app.get('/api/0/test/issues', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        for idx in range(len(data['issues'])):
+            data['issues'][idx]['date_created'] = '1431414800'
+            data['issues'][idx]['last_updated'] = '1431414800'
+        self.assertDictEqual(
+            data,
+            {
+              "args": {
+                "assignee": None,
+                "author": None,
+                "since": None,
+                "status": None,
+                "tags": []
+              },
+              "issues": FULL_ISSUE_LIST,
               "total_issues": 8
             }
         )
 
         # List closed issue
-        output = self.app.get('/api/0/test/issues?status=Closed',
-                              headers=headers)
+        output = self.app.get('/api/0/test/issues?status=Closed', headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         self.assertDictEqual(
@@ -1100,8 +661,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         )
 
         # List closed issue
-        output = self.app.get('/api/0/test/issues?status=Invalid',
-                              headers=headers)
+        output = self.app.get('/api/0/test/issues?status=Invalid', headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         self.assertDictEqual(
@@ -1124,237 +684,22 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         for idx in range(len(data['issues'])):
-            data['issues'][idx]['date_created'] = '1431414800'
-            last_updated = data['issues'][idx]['last_updated']  # Save for later
             data['issues'][idx]['last_updated'] = '1431414800'
+            data['issues'][idx]['date_created'] = '1431414800'
         self.assertDictEqual(
             data,
             {
-                "args": {
-                    "assignee": None,
-                    "author": None,
-                    "since": None,
-                    "status": "All",
-                    "tags": []
-                },
-                "issues": [
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "We should work on this",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 8,
-                  "last_updated": "1431414800",
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": True,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "Test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 7,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": True,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 6,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": True,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 5,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 4,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 3,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 2,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                },
-                {
-                  "assignee": None,
-                  "blocks": [],
-                  "close_status": None,
-                  "closed_at": None,
-                  "comments": [],
-                  "content": "This issue needs attention",
-                  "custom_fields": [],
-                  "date_created": "1431414800",
-                  "depends": [],
-                  "id": 1,
-                  "last_updated": "1431414800",
-                  "milestone": None,
-                  "priority": None,
-                  "private": False,
-                  "status": "Open",
-                  "tags": [],
-                  "title": "test issue",
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
-                }
-              ],
+              "args": {
+                "assignee": None,
+                "author": None,
+                "since": None,
+                "status": "All",
+                "tags": []
+              },
+              "issues": FULL_ISSUE_LIST,
               "total_issues": 8
-
             }
         )
-
-        #
-        # Test the Issue search arg "since" for present, past, and future dates
-        #
-
-        # Query the "present", which should return all the issues.
-        output = self.app.get('/api/0/test/issues?since=%s' %
-                              (last_updated), headers=headers)
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        self.assertEqual(data['total_issues'], 8)
-
-        # Query the "past", which should return all the issues
-        last_updated_past = str(int(last_updated) - 30)
-        output = self.app.get('/api/0/test/issues?since=%s' %
-                              (last_updated_past), headers=headers)
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        self.assertEqual(data['total_issues'], 8)
-
-        # Query the "future", which should not return any issues
-        last_updated_future = str(int(last_updated) + 30)
-        output = self.app.get('/api/0/test/issues?since=%s' %
-                              (last_updated_future), headers=headers)
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        self.assertEqual(data['total_issues'], 0)
 
     def test_api_view_issue(self):
         """ Test the api_view_issue method of the flask api. """
