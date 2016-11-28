@@ -665,7 +665,7 @@ class Issue(BASE):
     close_status = sa.Column(sa.Text, nullable=True)
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
-    last_updated = sa.Column(sa.DateTime, nullable=True,
+    last_updated = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow,
                              onupdate=datetime.datetime.utcnow)
     closed_at = sa.Column(sa.DateTime, nullable=True)
@@ -1120,7 +1120,7 @@ class PullRequest(BASE):
         default=sa.func.now(),
         onupdate=sa.func.now())
 
-    last_updated = sa.Column(sa.DateTime, nullable=True,
+    last_updated = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow,
                              onupdate=datetime.datetime.utcnow)
 

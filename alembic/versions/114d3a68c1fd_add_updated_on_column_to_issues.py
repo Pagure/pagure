@@ -24,6 +24,7 @@ def upgrade():
             default=datetime.datetime.utcnow,
             onupdate=datetime.datetime.utcnow)
     )
+    # Update all the tickets having comments
     op.execute('''
 UPDATE "issues" SET last_updated=o_date
 FROM (
@@ -32,14 +33,21 @@ FROM (
     ORDER BY o_date DESC
 ) AS subq
 WHERE "issues".uid = issue_uid;''')
+    # Update all the tickets without comments
     op.execute('''UPDATE "issues" SET last_updated=date_created '''
                '''WHERE last_updated IS NULL;''')
+    # Require `last_updated` no NULL at the DB level
+    op.alter_column(
+        'issues', 'last_updated',
+        nullable=False, existing_nullable=True)
+
     op.add_column(
         'pull_requests',
         sa.Column('last_updated', sa.DateTime, nullable=True,
             default=datetime.datetime.utcnow,
             onupdate=datetime.datetime.utcnow)
     )
+    # Update all the PRs having comments
     op.execute('''
 UPDATE "pull_requests" SET last_updated=o_date
 FROM (
@@ -48,8 +56,13 @@ FROM (
     ORDER BY o_date DESC
 ) AS subq
 WHERE "pull_requests".uid = pull_request_uid;''')
+    # Update all the PRs without comments
     op.execute('''UPDATE "pull_requests" SET last_updated=date_created '''
                '''WHERE last_updated IS NULL;''')
+    # Require `last_updated` no NULL at the DB level
+    op.alter_column(
+        'pull_requests', 'last_updated',
+        nullable=False, existing_nullable=True)
 
 
 def downgrade():
