@@ -307,6 +307,7 @@
         cellSize: 9,
         domain: "month",
         subDomain: "day",
+        domainLabelFormat: "%b",
         start: new Date(new Date().setMonth(new Date().getMonth() - 11)),
         data: "{{ url_for(
           'api_ns.api_view_user_activity_stats',
