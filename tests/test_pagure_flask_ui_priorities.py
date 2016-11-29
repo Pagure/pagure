@@ -347,6 +347,105 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
                 '/test/update/priorities', data=data)
             self.assertEqual(output.status_code, 403)
 
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_reset_priorities(self, p_send_email, p_ugt):
+        """ Test resetting the priorities of a repo. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path), bare=True)
+
+        # Start from scrach on priorities
+        repo = pagure.lib.get_project(self.session, 'test')
+        self.assertEqual(repo.priorities, {})
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+
+            # Get the CSRF token
+            output = self.app.get('/test/settings')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            # Set some priorities
+            data = {
+                'priority_weigth': [1, 2, 3],
+                'priority_title': ['High', 'Normal', 'Low'],
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/update/priorities', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+
+            # Check the result of the action -- Priority recorded
+            repo = pagure.lib.get_project(self.session, 'test')
+            self.assertEqual(
+                repo.priorities,
+                {u'': u'', u'1': u'High', u'2': u'Normal', u'3': u'Low'}
+            )
+
+            # Create an issue
+            data = {
+                'title': 'Test issue',
+                'issue_content': 'We really should improve on this issue',
+                'status': 'Open',
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/new_issue', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Issue #1: Test issue - test - Pagure</title>',
+                output.data)
+            self.assertIn(
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
+            self.assertIn('<div id="priority_plain">', output.data)
+            self.assertIn('<option value="1">High</option>', output.data)
+
+            # Check that the ticket *does* have priorities
+            output = self.app.get('/test/issue/1')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<div id="priority_plain">', output.data)
+            self.assertIn('<option value="1">High</option>', output.data)
+
+            # Reset the priorities
+            data = {
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/update/priorities', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+
+            # Check that the issue list renders fine
+            output = self.app.get('/test/issues')
+            self.assertEqual(output.status_code, 200)
+
+            # Check that the ticket *does not* have priorities
+            output = self.app.get('/test/issue/1')
+            self.assertEqual(output.status_code, 200)
+            self.assertNotIn('<div id="priority_plain">', output.data)
+            self.assertNotIn('<option value="1">High</option>', output.data)
+
+            # Check the result of the action -- Priority recorded
+            repo = pagure.lib.get_project(self.session, 'test')
+            self.assertEqual(repo.priorities, {})
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(

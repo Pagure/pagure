@@ -527,9 +527,10 @@ def largest_priority(dictionary):
     """ Template filter to return the largest priority +1
     """
     if dictionary:
-        return max([int(k) for k in dictionary if k]) + 1
-    else:
-        return 1
+        keys = [int(k) for k in dictionary if k]
+        if keys:
+            return max(keys) + 1
+    return 1
 
 
 @APP.template_filter('unicode')

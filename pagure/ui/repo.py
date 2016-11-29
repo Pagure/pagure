@@ -1179,9 +1179,10 @@ def update_priorities(repo, username=None, namespace=None):
 
         if not error:
             priorities = {}
-            for cnt in range(len(weights)):
-                priorities[weights[cnt]] = titles[cnt]
-            priorities[''] = ''
+            if weights:
+                for cnt in range(len(weights)):
+                    priorities[weights[cnt]] = titles[cnt]
+                priorities[''] = ''
             try:
                 repo.priorities = priorities
                 SESSION.add(repo)
