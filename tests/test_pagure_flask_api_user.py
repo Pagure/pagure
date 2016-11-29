@@ -25,6 +25,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 
 import pagure.api
 import pagure.lib
+import pagure.lib.model as model
 import tests
 
 
@@ -240,6 +241,44 @@ class PagureFlaskApiUSertests(tests.Modeltests):
             act['date_created'] = '1477558752'
             data['activities'][idx] = act
 
+        self.assertEqual(data, exp)
+
+    @patch('pagure.lib.notify.send_email')
+    def test_api_view_user_activity_date_1_activity(self, mockemail):
+        """ Test the api_view_user_activity_date method of the flask user
+        api when the user only did one action. """
+
+        tests.create_projects(self.session)
+        repo = pagure.lib.get_project(self.session, 'test')
+
+        now = datetime.datetime.utcnow()
+        date = now.date().strftime('%Y-%m-%d')
+        # Create a single commit log
+        log = model.PagureLog(
+            user_id=1,
+            user_email='foo@bar.com',
+            project_id=1,
+            log_type='committed',
+            ref_id='githash',
+            date=now.date(),
+            date_created=now
+        )
+        self.session.add(log)
+        self.session.commit()
+
+        # Retrieve the user's logs for today
+        output = self.app.get(
+            '/api/0/user/pingou/activity/%s?grouped=1' % date)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        exp = {
+          "activities": [
+            {
+              "description_mk": "<p>pingou committed on test#githash</p>"
+            }
+          ],
+          "date": date,
+        }
         self.assertEqual(data, exp)
 
 

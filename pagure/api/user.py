@@ -312,7 +312,10 @@ def api_view_user_activity_date(username, date):
                 acts.append(activity)
         for project in commits:
             if len(commits[project]) == 1:
-                tmp = commits[project]
+                tmp = dict(
+                    description_mk=pagure.lib.text2markdown(
+                        str(commits[project][0]))
+                )
             else:
                 tmp = dict(
                     description_mk=pagure.lib.text2markdown(
@@ -323,6 +326,7 @@ def api_view_user_activity_date(username, date):
                 )
             js_act.append(tmp)
         activities = acts
+
     for act in activities:
         activity = act.to_json(public=True)
         activity['description_mk'] = pagure.lib.text2markdown(str(act))
