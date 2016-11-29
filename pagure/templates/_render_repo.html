@@ -322,17 +322,22 @@
             contentType: "application/json",
             dataType: 'json',
             success: function(data) {
+              $('#user-activity-body').html('');
+              $('#user-activity-title').text('Activity on ' + date);
+              $('#user-activity').show();
               if (data.activities.length > 0){
-                $('#user-activity-body').html('');
-                $('#user-activity-title').text('Activity on ' + date);
-                $('#user-activity').show();
+                for (var i=0; i<data.activities.length; i++){
+                  var d = data.activities[i];
+                  $('#user-activity-body').append(
+                    '<div class="list-group-item">'
+                    + d.description_mk
+                    + '</div>'
+                  );
+                }
               }
-              for (var i=0; i<data.activities.length; i++){
-                var d = data.activities[i];
-                $('#user-activity-body').append(
-                  '<div class="list-group-item">'
-                  + d.description_mk
-                  + '</div>'
+               else {
+                  $('#user-activity-body').append(
+                  '<div class="list-group-item">No activity recorded on that day</div>'
                 );
               }
             }
