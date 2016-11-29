@@ -564,6 +564,11 @@ th[data-sort] {
     padding-left:0.5em;
 }
 
+
+#cal-heatmap {
+    padding:0.5em;
+}
+
 /*Our specific responsive overrides*/
 
 @media (min-width:544px) {
