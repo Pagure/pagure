@@ -54,6 +54,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.path, 'tickets')
         pagure.APP.config['DOCS_FOLDER'] = os.path.join(
             self.path, 'docs')
+        pagure.APP.config['UPLOAD_FOLDER_URL'] = '/releases/'
         pagure.APP.config['UPLOAD_FOLDER_PATH'] = os.path.join(
             self.path, 'releases')
         self.app = pagure.APP.test_client()

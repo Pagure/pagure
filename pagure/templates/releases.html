@@ -8,7 +8,7 @@
 
 <h2>
   Releases
-{% if config.get('UPLOAD_FOLDER_PATH') and config.get('UPLOAD_FOLDER') %}
+{% if config.get('UPLOAD_FOLDER_PATH') and config.get('UPLOAD_FOLDER_URL') %}
   {% if g.repo_admin %}
     <a class="pull-xs-right" href="{{ url_for('.new_release',
             repo=repo.name,
