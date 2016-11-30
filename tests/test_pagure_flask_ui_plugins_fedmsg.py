@@ -97,7 +97,7 @@ class PagureFlaskPluginFedmsgtests(tests.Modeltests):
                 '<section class="settings">\n  <h3>Settings for test</h3>',
                 output.data)
             self.assertIn(
-                '</button>\n                      Hook Fedmsg inactived',
+                '</button>\n                      Hook Fedmsg deactivated',
                 output.data)
             output = self.app.get('/test/settings/Fedmsg', data=data)
             self.assertIn(
@@ -148,7 +148,7 @@ class PagureFlaskPluginFedmsgtests(tests.Modeltests):
                 '<section class="settings">\n  <h3>Settings for test</h3>',
                 output.data)
             self.assertIn(
-                '</button>\n                      Hook Fedmsg inactived',
+                '</button>\n                      Hook Fedmsg deactivated',
                 output.data)
             output = self.app.get('/test/settings/Fedmsg', data=data)
             self.assertEqual(output.status_code, 200)

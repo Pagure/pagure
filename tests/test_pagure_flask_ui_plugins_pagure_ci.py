@@ -143,7 +143,7 @@ class PagureFlaskPluginPagureCItests(tests.Modeltests):
                 '/test/settings/Pagure CI', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '</button>\n                      Hook Pagure CI inactived',
+                '</button>\n                      Hook Pagure CI deactivated',
                 output.data)
             self.assertIn(
                 '<section class="settings">\n  <h3>Settings for test</h3>',

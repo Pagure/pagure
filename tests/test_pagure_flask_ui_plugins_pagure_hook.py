@@ -99,7 +99,7 @@ class PagureFlaskPluginPagureHooktests(tests.Modeltests):
                 '<section class="settings">\n  <h3>Settings for test</h3>',
                 output.data)
             self.assertTrue(
-                '</button>\n                      Hook Pagure inactived'
+                '</button>\n                      Hook Pagure deactivated'
                 in output.data)
 
             output = self.app.get('/test/settings/Pagure')
@@ -153,7 +153,7 @@ class PagureFlaskPluginPagureHooktests(tests.Modeltests):
                 '<section class="settings">\n  <h3>Settings for test</h3>',
                 output.data)
             self.assertTrue(
-                '</button>\n                      Hook Pagure inactived'
+                '</button>\n                      Hook Pagure deactivated'
                 in output.data)
 
             output = self.app.get('/test/settings/Pagure')

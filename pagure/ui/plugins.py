@@ -137,7 +137,7 @@ def view_plugin(repo, plugin, username=None, namespace=None, full=True):
         else:
             try:
                 plugin.remove(repo)
-                flask.flash('Hook %s inactived' % plugin.name)
+                flask.flash('Hook %s deactivated' % plugin.name)
             except FileNotFoundException as err:
                 pagure.APP.logger.exception(err)
                 flask.abort(404, 'No git repo found')

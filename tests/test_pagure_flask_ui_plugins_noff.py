@@ -108,7 +108,7 @@ class PagureFlaskPluginNoFFtests(tests.Modeltests):
                 output.data)
             self.assertTrue(
                 '</button>\n                      Hook Block non '
-                'fast-forward pushes inactived' in output.data)
+                'fast-forward pushes deactivated' in output.data)
 
             output = self.app.get(
                 '/test/settings/Block non fast-forward pushes')
@@ -204,7 +204,7 @@ class PagureFlaskPluginNoFFtests(tests.Modeltests):
                 output.data)
             self.assertIn(
                 '</button>\n                      Hook Block non '
-                'fast-forward pushes inactived', output.data)
+                'fast-forward pushes deactivated', output.data)
 
             output = self.app.get(
                 '/test/settings/Block non fast-forward pushes')

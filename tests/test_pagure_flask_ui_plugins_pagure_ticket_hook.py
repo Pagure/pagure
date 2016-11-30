@@ -97,7 +97,7 @@ class PagureFlaskPluginPagureTicketHooktests(tests.Modeltests):
                 '<section class="settings">\n  <h3>Settings for test</h3>',
                 output.data)
             self.assertTrue(
-                '</button>\n                      Hook Pagure tickets inactived'
+                '</button>\n                      Hook Pagure tickets deactivated'
                 in output.data)
 
             output = self.app.get('/test/settings/Pagure tickets')
@@ -155,7 +155,7 @@ class PagureFlaskPluginPagureTicketHooktests(tests.Modeltests):
                 '<section class="settings">\n  <h3>Settings for test</h3>',
                 output.data)
             self.assertTrue(
-                '</button>\n                      Hook Pagure tickets inactived'
+                '</button>\n                      Hook Pagure tickets deactivated'
                 in output.data)
 
             output = self.app.get('/test/settings/Pagure tickets')

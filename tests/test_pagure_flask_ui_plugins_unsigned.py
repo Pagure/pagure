@@ -102,7 +102,7 @@ class PagureFlaskPluginUnsignedtests(tests.Modeltests):
                 output.data)
             self.assertTrue(
                 '</button>\n                      Hook Block Un-Signed '
-                'commits inactived' in output.data)
+                'commits deactivated' in output.data)
 
             output = self.app.get(
                 '/test/settings/Block Un-Signed commits')
@@ -153,7 +153,7 @@ class PagureFlaskPluginUnsignedtests(tests.Modeltests):
                 output.data)
             self.assertTrue(
                 '</button>\n                      Hook Block Un-Signed '
-                'commits inactived' in output.data)
+                'commits deactivated' in output.data)
 
             output = self.app.get(
                 '/test/settings/Block Un-Signed commits')

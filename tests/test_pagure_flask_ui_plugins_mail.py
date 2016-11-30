@@ -100,7 +100,7 @@ class PagureFlaskPluginMailtests(tests.Modeltests):
                 '<section class="settings">\n  <h3>Settings for test</h3>',
                 output.data)
             self.assertTrue(
-                '</button>\n                      Hook Mail inactived' in output.data)
+                '</button>\n                      Hook Mail deactivated' in output.data)
 
             output = self.app.get('/test/settings/Mail')
             self.assertEqual(output.status_code, 200)
@@ -181,7 +181,7 @@ class PagureFlaskPluginMailtests(tests.Modeltests):
                 '<section class="settings">\n  <h3>Settings for test</h3>',
                 output.data)
             self.assertTrue(
-                '</button>\n                      Hook Mail inactived' in output.data)
+                '</button>\n                      Hook Mail deactivated' in output.data)
 
             output = self.app.get('/test/settings/Mail')
             self.assertIn(

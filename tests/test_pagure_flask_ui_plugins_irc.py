@@ -97,7 +97,7 @@ class PagureFlaskPluginIRCtests(tests.Modeltests):
                 '<section class="settings">\n  <h3>Settings for test</h3>',
                 output.data)
             self.assertTrue(
-                '</button>\n                      Hook IRC inactived' in output.data)
+                '</button>\n                      Hook IRC deactivated' in output.data)
 
             output = self.app.get('/test/settings/IRC')
             self.assertEqual(output.status_code, 200)
@@ -152,7 +152,7 @@ class PagureFlaskPluginIRCtests(tests.Modeltests):
                 '<section class="settings">\n  <h3>Settings for test</h3>',
                 output.data)
             self.assertTrue(
-                '</button>\n                      Hook IRC inactived' in output.data)
+                '</button>\n                      Hook IRC deactivated' in output.data)
 
             output = self.app.get('/test/settings/IRC')
             self.assertEqual(output.status_code, 200)

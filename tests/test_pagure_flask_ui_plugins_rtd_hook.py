@@ -97,7 +97,7 @@ class PagureFlaskPluginRtdHooktests(tests.Modeltests):
                 '<section class="settings">\n  <h3>Settings for test</h3>',
                 output.data)
             self.assertIn(
-                '</button>\n                      Hook Read the Doc inactived',
+                '</button>\n                      Hook Read the Doc deactivated',
                 output.data)
 
             output = self.app.get('/test/settings/Read the Doc')
@@ -156,7 +156,7 @@ class PagureFlaskPluginRtdHooktests(tests.Modeltests):
                 '<section class="settings">\n  <h3>Settings for test</h3>',
                 output.data)
             self.assertIn(
-                '</button>\n                      Hook Read the Doc inactived',
+                '</button>\n                      Hook Read the Doc deactivated',
                 output.data)
 
             output = self.app.get('/test/settings/Read the Doc')
