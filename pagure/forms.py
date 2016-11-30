@@ -503,7 +503,7 @@ class NewGroupForm(EditGroupForm):
         'Group name  <span class="error">*</span>',
         [
             wtforms.validators.Required(),
-            wtforms.validators.Length(max=16),
+            wtforms.validators.Length(max=255),
             wtforms.validators.Regexp(STRICT_REGEX, flags=re.IGNORECASE)
         ]
     )
