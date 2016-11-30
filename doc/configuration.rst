@@ -525,7 +525,7 @@ This configuration key enables or disables all email notifications for
 this pagure instance. This can be useful to turn off when developing on
 pagure, or for test or pre-production instances.
 
-Defaults to: ``True``.
+Defaults to: ``False``.
 
 .. note::
     This does not disable emails to the email address set in ``EMAIL_ERROR``.
