@@ -1744,7 +1744,8 @@ def search_issues(
         session, repo, issueid=None, issueuid=None, status=None,
         closed=False, tags=None, assignee=None, author=None, private=None,
         priority=None, milestones=None, count=False, offset=None,
-        limit=None, search_pattern=None, custom_search=None, last_updated=None):
+        limit=None, search_pattern=None, custom_search=None,
+        updated_after=None):
     ''' Retrieve one or more issues associated to a project with the given
     criterias.
 
@@ -1796,8 +1797,9 @@ def search_issues(
     :kwarg custom_search: a dictionary of key/values to be used when
         searching issues with a custom key constraint
     :type custom_search: dict or None
-    :kwarg last_updated: datetime's date format (e.g. 2016-11-15)
-    :type last_updated: str or None
+    :kwarg updated_after: datetime's date format (e.g. 2016-11-15) used to
+        filter issues updated after that date
+    :type updated_after: str or None
 
     :return: A single Issue object if issueid is specified, a list of Project
         objects otherwise.
@@ -1810,9 +1812,9 @@ def search_issues(
         model.Issue.project_id == repo.id
     )
 
-    if last_updated:
+    if updated_after:
         query = query.filter(
-            model.Issue.last_updated >= last_updated
+            model.Issue.last_updated >= updated_after
         )
 
     if issueid is not None:
@@ -2044,7 +2046,7 @@ def get_tag(session, tag):
 def search_pull_requests(
         session, requestid=None, project_id=None, project_id_from=None,
         status=None, author=None, assignee=None, count=False,
-        offset=None, limit=None, last_updated=None):
+        offset=None, limit=None, updated_after=None):
     ''' Retrieve the specified issue
     '''
 
@@ -2059,9 +2061,9 @@ def search_pull_requests(
             model.PullRequest.id == requestid
         )
 
-    if last_updated:
+    if updated_after:
         query = query.filter(
-            model.PullRequest.last_updated >= last_updated
+            model.PullRequest.last_updated >= updated_after
         )
 
     if project_id:
