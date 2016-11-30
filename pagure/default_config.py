@@ -139,8 +139,7 @@ GITOLITE_CONFIG = os.path.join(
 
 # Configuration keys to specify where the upload folder is and what is its
 # name
-UPLOAD_FOLDER = 'releases/'
-UPLOAD_FOLDER_PATH = './' + UPLOAD_FOLDER
+UPLOAD_FOLDER_PATH = './releases'
 
 # Home folder of the gitolite user -- Folder where to run gl-compile-conf from
 GITOLITE_HOME = None

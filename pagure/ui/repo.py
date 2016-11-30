@@ -930,7 +930,7 @@ def new_release(repo, username=None, namespace=None):
     """ Upload a new release.
     """
     if not APP.config.get('UPLOAD_FOLDER_PATH') \
-            and not APP.config.get('UPLOAD_FOLDER'):
+            and not APP.config.get('UPLOAD_FOLDER_URL'):
         flask.abort(404)
 
     repo = flask.g.repo

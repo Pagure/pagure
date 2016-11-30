@@ -24,10 +24,10 @@
 {% endif %}
 </h2>
 
-{% if config.get('UPLOAD_FOLDER_PATH') and config.get('UPLOAD_FOLDER') %}
+{% if config.get('UPLOAD_FOLDER_PATH') and config.get('UPLOAD_FOLDER_URL') %}
 <p>
   If the developers have upload one or more tarball(s), you will be able to
-  find them in the <a href="{{ config['APP_URL'] + config['UPLOAD_FOLDER'] + repo.fullname }}">
+  find them in the <a href="{{ config['UPLOAD_FOLDER_URL'] + repo.fullname }}">
     release folder.
   </a>
 </p>

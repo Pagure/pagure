@@ -143,6 +143,20 @@ This configuration key points to the folder where user-uploaded tarballs
 are stored and served from.
 
 
+UPLOAD_FOLDER_URL
+~~~~~~~~~~~~~~~~~~
+
+Full URL to where the uploads are available. It is highly recommanded for
+security reasons that this URL lives on a different domain than the main
+application (an entirely different domain, not just a sub-domain).
+
+Defaults to: ``/releases/``, unsafe for production!
+
+
+.. warning:: both `UPLOAD_FOLDER_PATH` and `UPLOAD_FOLDER_URL` must be
+            specified for the upload release feature to work
+
+
 SESSION_COOKIE_SECURE
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -438,7 +452,7 @@ CHECK_SESSION_IP
 
 This configuration key specifies whether to check the user's IP
 address when retrieving its session. This makes things more secure but
-under certain setups it might not work (for example if there 
+under certain setups it might not work (for example if there
 are proxies in front of the application).
 
 Defaults to: ``True``.
