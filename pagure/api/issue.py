@@ -274,7 +274,7 @@ def api_view_issues(repo, username=None, namespace=None):
     tags = [tag.strip() for tag in tags if tag.strip()]
     assignee = flask.request.args.get('assignee', None)
     author = flask.request.args.get('author', None)
-    last_updated = flask.request.args.get('since', None)
+    since = flask.request.args.get('since', None)
 
     # Hide private tickets
     private = False
@@ -303,29 +303,29 @@ def api_view_issues(repo, username=None, namespace=None):
             params.update({'status': status})
         issues = pagure.lib.search_issues(**params)
     else:
-        lastupdated = None
-        if last_updated:
+        updated_after = None
+        if since:
             # Validate and convert the time
-            if last_updated.isdigit():
+            if since.isdigit():
                 # We assume its a timestamp, so convert it to datetime
                 try:
-                    lastupdated = \
-                        datetime.datetime.fromtimestamp(int(last_updated))
-                except:
+                    updated_after = \
+                        datetime.datetime.fromtimestamp(int(since))
+                except ValueError:
                     raise pagure.exceptions.APIError(
-                        404, error_code=APIERROR.ETIMESTAMP)
+                        400, error_code=APIERROR.ETIMESTAMP)
             else:
                 # We assume datetime format, so validate it
                 try:
-                    datetime.datetime.strptime(last_updated, '%Y-%m-%d')
-                except:
+                    updated_after= datetime.datetime.strptime(
+                        since, '%Y-%m-%d')
+                except ValueError:
                     raise pagure.exceptions.APIError(
-                        404, error_code=APIERROR.EDATETIME)
-                lastupdated = last_updated
+                        400, error_code=APIERROR.EDATETIME)
 
         issues = pagure.lib.search_issues(
             SESSION, repo, status='Open', tags=tags, assignee=assignee,
-            author=author, private=private, last_updated=lastupdated)
+            author=author, private=private, updated_after=updated_after)
 
     jsonout = flask.jsonify({
         'total_issues': len(issues),
@@ -335,7 +335,7 @@ def api_view_issues(repo, username=None, namespace=None):
             'tags': tags,
             'assignee': assignee,
             'author': author,
-            'since': last_updated
+            'since': since
         }
     })
     return jsonout
