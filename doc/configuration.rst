@@ -574,3 +574,14 @@ Defaults to: ``Pagure``
 
 .. note: the welcome screen currently does not work with the `local`
          authentication.
+
+
+Deprecated configuration keys
+-----------------------------
+
+UPLOAD_FOLDER
+~~~~~~~~~~~~~
+
+This configuration key used to be use to specify where the uploaded releases
+are available. It has been replaced by `UPLOAD_FOLDER_PATH` in the release
+2.10 of pagure.
