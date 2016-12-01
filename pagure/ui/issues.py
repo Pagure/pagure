@@ -894,6 +894,7 @@ def view_issue(repo, issueid, username=None, namespace=None):
         form=form,
         knowns_keys=knowns_keys,
         subscribed=subscribed,
+        subscribers=pagure.lib.get_watch_list(SESSION, issue),
     )
 
 

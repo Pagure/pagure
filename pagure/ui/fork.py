@@ -317,6 +317,7 @@ def request_pull(repo, requestid, username=None, namespace=None):
         diff_commits=diff_commits,
         diff=diff,
         mergeform=form,
+        subscribers=pagure.lib.get_watch_list(SESSION, request),
     )
 
 

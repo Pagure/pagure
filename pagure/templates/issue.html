@@ -312,6 +312,19 @@
   </div>
 
   {% if authenticated %}
+    {% if subscribers %}
+      <div class="col-md-4">
+        <div class="card">
+          <div class="card-block">
+            <label><strong>Subscribers</strong></label>
+            <div id="subscribers_list">
+              {{ subscribers | join(', ') }}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
     <div class="col-md-4">
       <button class="btn btn-md" id="subcribe-btn"
       {% if subscribed -%}

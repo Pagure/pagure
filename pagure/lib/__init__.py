@@ -3344,6 +3344,38 @@ def is_watching_obj(session, user, obj):
     return False
 
 
+def get_watch_list(session, obj):
+    """ Return a list of all the users that are watching the "object"
+    """
+    if obj.isa == "issue":
+        query = session.query(
+            model.IssueWatcher
+        ).filter(
+            model.IssueWatcher.issue_uid == obj.uid
+        )
+    elif obj.isa == "pull-request":
+        query = session.query(
+            model.PullRequestWatcher
+        ).filter(
+            model.PullRequestWatcher.pull_request_uid == obj.uid
+        )
+    else:
+        raise pagure.exceptions.InvalidObjectException(
+            'Unsupported object found: "%s"' % obj
+        )
+
+    user_objs = query.all()
+    users = []
+    if user_objs:
+        # We found watchers
+        for user in user_objs:
+            users.append(str(user.user.username))
+    if str(obj.user.user) not in users:
+        # Add Issue/PR creator if not already in the list
+        users.append(str(obj.user.user))
+        return users
+
+
 def save_report(session, repo, name, url, username):
     """ Save the report of issues based on the given URL of the project.
     """

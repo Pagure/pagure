@@ -707,6 +707,20 @@
         {% endif %}
       </div>
     </div>
+
+    {% if subscribers and authenticated %}
+      <div class="card">
+        <div class="card-block">
+          <fieldset class="form-group">
+            <label><strong>Subscribers</strong></label>
+            <div id="subscribers_list">
+              {{ subscribers | join(', ') }}
+            </div>
+          </fieldset>
+        </div>
+      </div>
+    {% endif %}
+
     </section>
   {% endif %}
   {% if diff and pull_request%}
