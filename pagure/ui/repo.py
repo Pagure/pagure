@@ -708,7 +708,7 @@ def view_blame_file(repo, filename, username=None, namespace=None):
     if is_binary_string(content.data):
         flask.abort(400, 'Binary files cannot be blamed')
 
-    content = ktc.to_bytes(content.data)
+    content = encoding_utils.decode(content.data)
     blame = repo_obj.blame(filename)
 
     return flask.render_template(

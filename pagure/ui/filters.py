@@ -20,6 +20,7 @@ import urlparse
 import arrow
 import flask
 import md5
+import six
 
 from pygments import highlight
 from pygments.lexers.text import DiffLexer
@@ -250,7 +251,7 @@ def blame_loc(loc, repo, username, blame):
     and convert it into a html table displayed to the user with the git
     blame information (user, commit, commit date).
 
-    :arg loc: a text object of the lines of code to display (in this case,
+    :arg loc: a unicode object of the lines of code to display (in this case,
         most likely the content of a file).
     :arg repo: the name of the repo in which this file is.
     :arg username: the user name of the user whose repo this is, if the repo
@@ -262,14 +263,15 @@ def blame_loc(loc, repo, username, blame):
     if loc is None:
         return
 
+    if not isinstance(loc, six.text_type):
+        raise ValueError('"loc" must be a unicode string, not ' + str(type(loc)))
+
     output = [
         '<div class="highlight">',
         '<table class="code_table">'
     ]
 
     for idx, line in enumerate(loc.split('\n')):
-        line = line.decode('utf-8')
-
         if line == '</pre></div>':
             break
 

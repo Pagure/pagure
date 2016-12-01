@@ -1637,7 +1637,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertIn(b'<table class="code_table">', output.data)
         self.assertIn(
             b'<tr><td class="cell1"><a id="1" href="#1" '
-            'data-line-number="1"></a></td>', output.data)
+            b'data-line-number="1"></a></td>', output.data)
         self.assertIn(
             b'<td class="cell2"><pre> bar</pre></td>', output.data)
 
@@ -1703,7 +1703,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             ncommits=10)
         tests.add_content_to_git(
             os.path.join(self.path, 'forks', 'pingou', 'test3.git'),
-            content='foö\bbáßðáz')
+            content=u'✨☃🍰☃✨'.encode('utf-8'))
 
         output = self.app.get('/fork/pingou/test3/blame/sources')
         self.assertEqual(output.status_code, 200)
