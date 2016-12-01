@@ -694,7 +694,7 @@ def view_blame_file(repo, filename, username=None, namespace=None):
 
     branchname = flask.request.args.get('identifier', 'master')
 
-    if repo_obj.is_empty:
+    if repo_obj.is_empty or repo_obj.head_is_unborn:
         flask.abort(404, 'Empty repo cannot have a file')
 
     commit = repo_obj[repo_obj.head.target]
