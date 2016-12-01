@@ -558,6 +558,57 @@ def add_commit_git_repo(folder, ncommits=10, filename='sources'):
     shutil.rmtree(newfolder)
 
 
+def add_content_to_git(folder, filename='sources', content='foo'):
+    """ Create some more commits for the specified git repo. """
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+    brepo = pygit2.init_repository(folder, bare=True)
+
+    newfolder = tempfile.mkdtemp(prefix='pagure-tests')
+    repo = pygit2.clone_repository(folder, newfolder)
+
+    # Create a file in that git repo
+    with open(os.path.join(newfolder, filename), 'a') as stream:
+        stream.write('%s\n' % content)
+    repo.index.add(filename)
+    repo.index.write()
+
+    parents = []
+    commit = None
+    try:
+        commit = repo.revparse_single('HEAD')
+    except KeyError:
+        pass
+    if commit:
+        parents = [commit.oid.hex]
+
+    # Commits the files added
+    tree = repo.index.write_tree()
+    author = pygit2.Signature(
+        'Alice Author', 'alice@authors.tld')
+    committer = pygit2.Signature(
+        'Cecil Committer', 'cecil@committers.tld')
+    repo.create_commit(
+        'refs/heads/master',  # the name of the reference to update
+        author,
+        committer,
+        'Add content to file %s' % (filename),
+        # binary string representing the tree object ID
+        tree,
+        # list of binary strings representing parents of the new commit
+        parents,
+    )
+
+    # Push to origin
+    ori_remote = repo.remotes[0]
+    master_ref = repo.lookup_reference('HEAD').resolve()
+    refname = '%s:%s' % (master_ref.name, master_ref.name)
+
+    PagureRepo.push(ori_remote, refname)
+
+    shutil.rmtree(newfolder)
+
+
 def add_binary_git_repo(folder, filename):
     """ Create a fake image file for the specified git repo. """
     if not os.path.exists(folder):
