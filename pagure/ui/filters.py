@@ -268,6 +268,8 @@ def blame_loc(loc, repo, username, blame):
     ]
 
     for idx, line in enumerate(loc.split('\n')):
+        line = line.decode('utf-8')
+
         if line == '</pre></div>':
             break
 
