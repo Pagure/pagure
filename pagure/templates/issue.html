@@ -318,7 +318,12 @@
           <div class="card-block">
             <label><strong>Subscribers</strong></label>
             <div id="subscribers_list">
-              {{ subscribers | join(', ') }}
+            {% for subscriber in subscribers %}
+                <a href="{{ url_for('view_user', username=subscriber)
+                }}" title="{{ subscriber }}">{{
+                  subscriber |avatar(size=24) | safe
+                }}</a>
+            {% endfor %}
             </div>
           </div>
         </div>
