@@ -43,7 +43,7 @@
                   <a href="{{ url_for(
                       'view_issue',
                       repo=issue.project.name,
-                      username=issue.project.username if issue.project.is_fork else None,
+                      username=issue.project.user.username if issue.project.is_fork else None,
                       namespace=issue.project.namespace,
                       issueid=issue.id) }}">
                     {% if issue.private %}
@@ -61,9 +61,9 @@
                   <a href="{{ url_for(
                     'view_repo',
                     repo=issue.project.name,
-                    username=issue.project.username if issue.project.is_fork else None,
+                    username=issue.project.user.username if issue.project.is_fork else None,
                     namespace=issue.project.namespace) }}">
-                    {{ issue.project.username + '/' if issue.project.is_fork }}
+                    {{ issue.project.user.username + '/' if issue.project.is_fork }}
                     {{ issue.project.namespace + '/' if issue.project.namespace }}
                     {{ issue.project.name }}
                   </a>

@@ -44,7 +44,7 @@
                   <a href="{{ url_for(
                       'request_pull',
                       repo=request.project.name,
-                      username=request.project.username if request.project.is_fork else None,
+                      username=request.project.user.username if request.project.is_fork else None,
                       namespace=request.project.namespace,
                       requestid=request.id) }}">
                     {{ request.title | noJS("img") | safe }}
@@ -58,9 +58,9 @@
                   <a href="{{ url_for(
                     'view_repo',
                     repo=request.project.name,
-                    username=request.project.username if request.project.is_fork else None,
+                    username=request.project.user.username if request.project.is_fork else None,
                     namespace=request.project.namespace) }}">
-                    {{ request.project.username + '/' if request.project.is_fork }}
+                    {{ request.project.user.username + '/' if request.project.is_fork }}
                     {{ request.project.namespace + '/' if request.project.namespace }}
                     {{ request.project.name }}
                   </a>
