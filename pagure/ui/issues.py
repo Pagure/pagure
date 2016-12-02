@@ -878,11 +878,6 @@ def view_issue(repo, issueid, username=None, namespace=None):
     for key in issue.other_fields:
         knowns_keys[key.key.name] = key
 
-    subscribed = False
-    if authenticated():
-        subscribed = pagure.lib.is_watching_obj(
-            SESSION, flask.g.fas_user.username, issue)
-
     return flask.render_template(
         'issue.html',
         select='issues',
@@ -893,7 +888,6 @@ def view_issue(repo, issueid, username=None, namespace=None):
         issueid=issueid,
         form=form,
         knowns_keys=knowns_keys,
-        subscribed=subscribed,
         subscribers=pagure.lib.get_watch_list(SESSION, issue),
     )
 
