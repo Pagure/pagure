@@ -1587,8 +1587,22 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         p_send_email.return_value = True
         p_ugt.return_value = True
 
+        item = pagure.lib.model.User(
+            user='bar',
+            fullname='bar foo',
+            password='foo',
+            default_email='bar@bar.com',
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(
+            user_id=3,
+            email='bar@bar.com')
+        self.session.add(item)
+
+        self.session.commit()
+
         tests.create_projects(self.session)
-        tests.create_tokens(self.session)
+        tests.create_tokens(self.session, user_id=3)
         tests.create_tokens_acl(self.session)
 
         headers = {'Authorization': 'token aaabbbcccddd'}
@@ -1646,8 +1660,9 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         # Check subscribtion before
         repo = pagure.lib.get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        self.assertFalse(
-            pagure.lib.is_watching_obj(self.session, 'pingou', issue))
+        self.assertEqual(
+            pagure.lib.get_watch_list(self.session, issue),
+            set(['pingou', 'foo']))
 
 
         # Unsubscribe - no changes
@@ -1674,8 +1689,9 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         # No change
         repo = pagure.lib.get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        self.assertFalse(
-            pagure.lib.is_watching_obj(self.session, 'pingou', issue))
+        self.assertEqual(
+            pagure.lib.get_watch_list(self.session, issue),
+            set(['pingou', 'foo']))
 
         # Subscribe
         data = {'status': True}
@@ -1701,8 +1717,9 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
 
         repo = pagure.lib.get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        self.assertTrue(
-            pagure.lib.is_watching_obj(self.session, 'pingou', issue))
+        self.assertEqual(
+            pagure.lib.get_watch_list(self.session, issue),
+            set(['pingou', 'foo', 'bar']))
 
         # Unsubscribe
         data = {}
@@ -1717,8 +1734,9 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
 
         repo = pagure.lib.get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        self.assertFalse(
-            pagure.lib.is_watching_obj(self.session, 'pingou', issue))
+        self.assertEqual(
+            pagure.lib.get_watch_list(self.session, issue),
+            set(['pingou', 'foo']))
 
 
 if __name__ == '__main__':

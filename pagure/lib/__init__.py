@@ -3291,59 +3291,6 @@ def set_watch_obj(session, user, obj, watch_status):
     return output
 
 
-def is_watching_obj(session, user, obj):
-    ''' Check if the user is watching the specified object.
-
-    Objects can be either an issue or a pull-request
-    '''
-
-    if not isinstance(user, model.User):
-        try:
-            user = get_user(session, user)
-        except pagure.exceptions.PagureException:
-            return False
-
-    if not user:
-        return False
-
-    # First check if the user explicitely turned on/off notifications
-    if obj.isa == "issue":
-        query = session.query(
-            model.IssueWatcher
-        ).filter(
-            model.IssueWatcher.user_id == user.id
-        ).filter(
-            model.IssueWatcher.issue_uid == obj.uid
-        )
-    elif obj.isa == "pull-request":
-        query = session.query(
-            model.PullRequestWatcher
-        ).filter(
-            model.PullRequestWatcher.user_id == user.id
-        ).filter(
-            model.PullRequestWatcher.pull_request_uid == obj.uid
-        )
-    else:
-        raise pagure.exceptions.InvalidObjectException(
-            'Unsupported object found: "%s"' % obj
-        )
-
-    watcher = query.first()
-
-    if watcher:
-        return watcher.watch
-
-    # Otherwise, just check if they are in the default group
-    if obj.user.user == user.user:
-        return True
-
-    for comment in obj.comments:
-        if comment.user.user == user.user:
-            return True
-
-    return False
-
-
 def get_watch_list(session, obj):
     """ Return a list of all the users that are watching the "object"
     """
