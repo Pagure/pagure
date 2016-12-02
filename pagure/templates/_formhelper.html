@@ -207,3 +207,30 @@
   </div>
 </div>
 {% endmacro %}
+
+{% macro show_attachments(attachments) %}
+<div class="card clearfix">
+  <div id="attachments" class="card-header">
+  <b>Attachments</b>
+  </div>
+
+  <div class="card-block">
+    <section class="issue_comment">
+      <div>
+        <span class="comment_text comment_body">
+        {% for attachment in attachments %}
+          {% if attachment[2] == "" %}
+            {% set attachment_md = "**" + attachment[0] + "**`` ``*(" +
+              attachment[1] + "`` - ``From Issue description)*" %}
+          {% else %}
+            {% set attachment_md = "**" + attachment[0] + "**`` ``*(" +
+              attachment[1] + "`` - ``[Comment](#comment-" + attachment[2] + "))*" %}
+          {% endif %}
+          <small> {{ attachment_md | markdown | noJS | safe }}</small>
+        {% endfor %}
+        </span>
+      </div>
+    </section>
+  </div>
+</div>
+{% endmacro %}

@@ -15,6 +15,7 @@ import datetime
 import logging
 import json
 import operator
+import re
 
 import sqlalchemy as sa
 
@@ -711,6 +712,49 @@ class Issue(BASE):
         return 'Issue(%s, project:%s, user:%s, title:%s)' % (
             self.id, self.project.name, self.user.user, self.title
         )
+
+    @property
+    def attachments(self):
+        ''' Return a list of attachment tuples: (LINK, DATE, COMMENT_ID) '''
+
+        def extract_md_link(text):
+            pattern = re.compile('^\[\!(.*)\]')
+            try:
+                result = pattern.search(text).group(1)
+                if result is None:
+                    # No match, return the original string
+                    result = text
+            except:
+                # Search failed, return the original string
+                result = text
+            return result
+
+        attachments = []
+        if self.content:
+            # Check the initial issue description for attachments
+            lines = self.content.split('\n')
+            for line in lines:
+                if line and line != "" and line.startswith("[!["):
+                    link = extract_md_link(line)
+                    attachments.append(
+                        (link, self.date_created.strftime('%Y-%m-%d %H:%M:%S'),
+                         ""))
+        if self.comments:
+            # Check the comments for attachments
+            for comment in self.comments:
+                if comment.id == 0:
+                    comment_text = comment.content
+                else:
+                    comment_text = comment.comment
+                lines = comment_text.split('\n')
+                for line in lines:
+                    if line and line != "" and line.startswith("[!["):
+                        link = extract_md_link(line)
+                        attachments.append(
+                            (link,
+                             comment.date_created.strftime('%Y-%m-%d %H:%M:%S'),
+                             str(comment.id)))
+        return attachments
 
     @property
     def isa(self):

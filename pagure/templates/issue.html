@@ -1,7 +1,7 @@
 {% extends "repo_master.html" %}
 {% from "_formhelper.html"
     import render_field, render_bootstrap_field,
-           show_comment, show_initial_comment %}
+           show_comment, show_initial_comment, show_attachments %}
 
 {% block title %}Issue #{{ issueid }}: {{issue.title | noJS(ignore="img") | safe }} - {{ repo.name }}{% endblock %}
 {% set tag = "home"%}
@@ -46,6 +46,13 @@
   <br>
 
     {{ show_initial_comment(issue, username, repo,issueid, form) }}
+
+    {% if attachments %}
+      <section id="attachments">
+        {{ show_attachments(attachments) }}
+        <br>
+      </section>
+    {% endif %}
 
     <section id="comments">
       {% if issue.comments %}
