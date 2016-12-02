@@ -3348,13 +3348,13 @@ def get_watch_list(session, obj):
     """ Return a list of all the users that are watching the "object"
     """
     if obj.isa == "issue":
-        query = session.query(
+        obj_watchers_query = session.query(
             model.IssueWatcher
         ).filter(
             model.IssueWatcher.issue_uid == obj.uid
         )
     elif obj.isa == "pull-request":
-        query = session.query(
+        obj_watchers_query = session.query(
             model.PullRequestWatcher
         ).filter(
             model.PullRequestWatcher.pull_request_uid == obj.uid
@@ -3364,16 +3364,50 @@ def get_watch_list(session, obj):
             'Unsupported object found: "%s"' % obj
         )
 
-    user_objs = query.all()
-    users = []
-    if user_objs:
-        # We found watchers
-        for user in user_objs:
-            users.append(str(user.user.username))
-    if str(obj.user.user) not in users:
-        # Add Issue/PR creator if not already in the list
-        users.append(str(obj.user.user))
-        return users
+    project_watchers_query = session.query(
+        model.Watcher
+    ).filter(
+        model.Watcher.project_id == obj.project.id
+    )
+
+    users = set()
+
+    # Add the person who opened the object
+    users.add(obj.user.username)
+
+    # Add all the people who commented on that object
+    for comment in obj.comments:
+        users.add(comment.user.username)
+
+    # Add the user of the project
+    users.add(obj.project.user.username)
+
+    # Add the regular contributors
+    for contributor in obj.project.users:
+        users.add(contributor.username)
+
+    # Add people in groups with commit access
+    for group in obj.project.groups:
+        for member in group.users:
+            users.add(member.username)
+
+    # Add all the people watching the repo, remove those who opted-out
+    for watcher in project_watchers_query.all():
+        if watcher.watch:
+            users.add(watcher.user.username)
+        else:
+            if watcher.user.username in users:
+                users.remove(watcher.user.username)
+
+    # Add all the people watching this object, remove those who opted-out
+    for watcher in obj_watchers_query.all():
+        if watcher.watch:
+            users.add(watcher.user.username)
+        else:
+            if watcher.user.username in users:
+                users.remove(watcher.user.username)
+
+    return users
 
 
 def save_report(session, repo, name, url, username):
