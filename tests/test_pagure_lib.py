@@ -16,7 +16,7 @@ import shutil
 import sys
 import os
 
-from mock import patch
+from mock import patch, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -2657,6 +2657,35 @@ class PagureLibtests(tests.Modeltests):
         )
         self.assertFalse(watch)
 
+        # Add a contributor to the project
+        item = pagure.lib.model.User(
+            user='bar',
+            fullname='bar foo',
+            password='foo',
+            default_email='bar@bar.com',
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(
+            user_id=3,
+            email='bar@bar.com')
+        self.session.add(item)
+        msg = pagure.lib.add_user_to_project(
+            session=self.session,
+            project=project,
+            new_user='bar',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User added')
+
+        # Check if the new contributor is watching
+        user.username = 'bar'
+        watch = pagure.lib.is_watching(
+            session=self.session,
+            user=user,
+            reponame='test',
+        )
+        self.assertTrue(watch)
 
     def test_user_watch_list(self):
         ''' test user watch list method of pagure.lib '''
@@ -2691,6 +2720,7 @@ class PagureLibtests(tests.Modeltests):
         watch_list = [obj.name for obj in watch_list_objs]
         self.assertEqual(watch_list, [])
 
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_text2markdown(self):
         ''' Test the test2markdown method in pagure.lib. '''
         pagure.APP.config['TESTING'] = True

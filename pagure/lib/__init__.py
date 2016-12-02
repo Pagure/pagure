@@ -3183,6 +3183,10 @@ def is_watching(session, user, reponame, repouser=None, namespace=None):
     if user.username == project.user.username:
         return True
 
+    for contributor in project.users:
+        if user.username == contributor.username:
+            return True
+
     for group in project.groups:
         for guser in group.users:
             if user.username == guser.username:
