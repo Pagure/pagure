@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            2.9
+Version:            2.10
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -298,6 +298,26 @@ install -m 644 pagure-ci/pagure_ci.service \
 
 
 %changelog
+* Fri Dec 02 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.10-1
+- Update to 2.10
+- Updating language on not found page (Brian (bex) Exelbierd)
+- Add a view for open pull requests and issues (Jeremy Cline)
+- Issue 1540 - New meta-data custom field type of "link" (Mark Reynolds)
+- Fix overflow issue with comment preview and pre (Ryan Lerch)
+- Issue 1549 - Add "updated_on" to Issues and make it queryable (Mark Reynolds)
+- Drop UPLOAD_FOLDER in favor of UPLOAD_FOLDER_URL
+- Make the group_name be of max 255 characters
+- Bug - Update documentation to match the default EMAIL_SEND value (Michael
+  Watters)
+- Change - Fix grammar in UI messages around enabling/deactivating git hooks
+  (Michael Watters)
+- Allow resetting the priorities of a project
+- Several fixes and enhancements around the activity calendarheatmap
+- Add quick_replies field to project (Lubomír Sedlář)
+- Fix blaming files containing non-ascii characters (Jeremy Cline and I)
+- Include regular contributors when checking if user is watching a project
+- List subscribers on the issue pages (Mark Renyolds and I)
+
 * Fri Nov 18 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.9-1
 - Update to 2.9
 - Fix redirecting after updating an issue on a project with namespace (Vivek

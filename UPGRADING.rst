@@ -1,6 +1,15 @@
 Upgrading Pagure
 ================
 
+From 2.9 to 2.10
+----------------
+
+The 2.10 releases brings some little changes to the database scheme.
+
+Therefore when upgrading to 2.10, you will have to:
+
+* Update the database schame using alembic: ``alembic upgrade head``
+
 
 From 2.8 to 2.9
 ---------------
