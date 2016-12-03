@@ -32,7 +32,7 @@
         <tbody>
         {% for issue in user.issues %}
             <tr class="issue-status issue-status-{{issue.status|lower}}"
-              {%if issue.status|lower != "open" %}style="display:none;"{% endif %}>
+              {%- if issue.status|lower != "open" %} style="display:none;"{% endif %}>
                 <td class="nowrap"><span class="label label-default">#{{ issue.id }}</span></td>
                 <td><span class="label {%
                     if issue.status|lower == 'closed' %}label-danger{%
