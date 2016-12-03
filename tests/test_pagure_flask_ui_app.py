@@ -18,7 +18,7 @@ import os
 
 import six
 import json
-from mock import patch
+from mock import patch, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -923,30 +923,142 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
 
-class ViewMyRequestsTests(tests.Modeltests):
-
     def test_view_my_requests_no_user(self):
-        """Test the  endpoint."""
+        """Test the view_user_requests endpoint."""
         output = self.app.get('/user/somenonexistentuser/requests')
         self.assertEqual(output.status_code, 404)
 
+    @patch(
+        'pagure.lib.git.update_git', MagicMock(return_value=True))
+    @patch(
+        'pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_view_my_requests(self):
-        """Test the index endpoint. """
+        """Test the view_user_requests endpoint. """
+        # Create the PR
+        tests.create_projects(self.session)
+        repo = pagure.lib.get_project(self.session, 'test')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=repo,
+            branch_from='dev',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request #1',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request #1')
+
         output = self.app.get('/user/pingou/requests')
         self.assertEqual(output.status_code, 200)
+        self.assertIn('test pull-request #1', output.data)
+        self.assertEqual(
+            output.data.count('<tr class="pr-status pr-status-open"'),
+            1)
 
+        # Add a PR in a fork
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test_fork',
+            description='test project #1',
+            is_fork=True,
+            parent_id=1,
+            hook_token='aaabbbttt',
+        )
+        self.session.add(item)
+        repo = pagure.lib.get_project(
+            self.session, 'test_fork', user='pingou')
 
-class ViewMyIssuesTests(tests.Modeltests):
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=repo,
+            branch_from='dev',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request #2',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request #2')
+
+        output = self.app.get('/user/pingou/requests')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('test pull-request #1', output.data)
+        self.assertIn('test pull-request #2', output.data)
+        self.assertEqual(
+            output.data.count('<tr class="pr-status pr-status-open"'),
+            2)
 
     def test_view_my_issues_no_user(self):
-        """Test the endpoint returns 404 with a missing user."""
+        """Test the view_user_issues endpoint with a missing user."""
         output = self.app.get('/user/somenonexistentuser/issues')
         self.assertEqual(output.status_code, 404)
 
+    @patch(
+        'pagure.lib.git.update_git', MagicMock(return_value=True))
+    @patch(
+        'pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_view_my_issues(self):
-        """Test the endpoint returns 200 when the user exists."""
+        """Test the view_user_issues endpoint when the user exists."""
+        # Create the issue
+        tests.create_projects(self.session)
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #1',
+            content='We should work on this for the second time',
+            user='pingou',
+            status='Open',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #1')
+
         output = self.app.get('/user/pingou/issues')
         self.assertEqual(output.status_code, 200)
+        self.assertIn('Test issue #1', output.data)
+        self.assertEqual(
+            output.data.count('<tr class="issue-status issue-status-open"'),
+            1)
+
+        # Add an issue in a fork
+        item = pagure.lib.model.Project(
+            user_id=2,  # foo
+            name='test_fork',
+            description='test project #1',
+            is_fork=True,
+            parent_id=1,
+            hook_token='aaabbbttt',
+        )
+        self.session.add(item)
+        repo = pagure.lib.get_project(self.session, 'test_fork', user='foo')
+
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #2',
+            content='We should work on this for the second time',
+            user='pingou',
+            status='Open',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #2')
+
+
+        output = self.app.get('/user/pingou/issues')
+        print output.data
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('Test issue #1', output.data)
+        self.assertIn('Test issue #2', output.data)
+        self.assertEqual(
+            output.data.count('<tr class="issue-status issue-status-open"'),
+            2)
 
 
 if __name__ == '__main__':
