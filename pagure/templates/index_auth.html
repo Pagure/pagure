@@ -123,7 +123,7 @@
 
                 <a href="{{ url }}">
                   <span class="oi text-muted" data-glyph="fork"></span>
-                  <strong>{{username}}/{{ fork.namespace + '/' if fork.namespace }}{{ fork.name }}</strong>
+                  <strong>{{fork.user.username}}/{{ fork.namespace + '/' if fork.namespace }}{{ fork.name }}</strong>
                 </a>
                   <div class="pull-xs-right">
                   <span class="text-muted">forked from</span>
