@@ -316,7 +316,8 @@
       <div class="col-md-4">
         <div class="card">
           <div class="card-block">
-            <label><strong>Subscribers</strong></label>
+            <label><strong>Subscribers</strong> ({{
+              subscribers | length }})</label>
             <div id="subscribers_list">
             {% for subscriber in subscribers %}
                 <a href="{{ url_for('view_user', username=subscriber)
