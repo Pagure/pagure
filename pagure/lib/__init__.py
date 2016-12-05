@@ -2982,8 +2982,9 @@ def text2markdown(text, extended=True, readme=False):
         try:
             text = md_processor.convert(text)
         except Exception as err:
-            LOG.exception(
-                'A markdown error occured while processing: ``%s``' % text)
+            LOG.debug(
+                'A markdown error occured while processing: ``%s``',
+                str(text))
         return clean_input(text)
 
     return ''
