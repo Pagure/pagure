@@ -54,8 +54,6 @@ class PagureFlaskRepoOldUrltests(tests.Modeltests):
         pagure.APP.config['OLD_VIEW_COMMIT_ENABLED'] = True
         pagure.APP.config['EMAIL_SEND'] = False
         pagure.APP.config['GIT_FOLDER'] = self.path
-        pagure.APP.config['FORK_FOLDER'] = os.path.join(
-            self.path, 'forks')
         pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
             self.path, 'requests')
         pagure.APP.config['TICKETS_FOLDER'] = os.path.join(

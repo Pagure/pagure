@@ -47,7 +47,6 @@ class PagureFlaskSlashInNametests(tests.Modeltests):
         pagure.ui.issues.SESSION = self.session
 
         pagure.APP.config['GIT_FOLDER'] = os.path.join(self.path, 'repos')
-        pagure.APP.config['FORK_FOLDER'] = os.path.join(self.path, 'forks')
         pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
             self.path, 'tickets')
         pagure.APP.config['DOCS_FOLDER'] = os.path.join(

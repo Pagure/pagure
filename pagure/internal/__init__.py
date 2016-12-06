@@ -271,15 +271,8 @@ def get_pull_request_ready_branch():
 
         diff_commits = []
 
-        if repo.is_fork and repo.parent:
-            parentpath = os.path.join(
-                pagure.APP.config['GIT_FOLDER'], repo.parent.path)
-            if repo.parent.is_fork:
-                parentpath = os.path.join(
-                    pagure.APP.config['FORK_FOLDER'], repo.parent.path)
-        else:
-            parentpath = os.path.join(
-                pagure.APP.config['GIT_FOLDER'], repo.path)
+        parentpath = os.path.join(
+            pagure.APP.config['GIT_FOLDER'], repo.path)
 
         orig_repo = pygit2.Repository(parentpath)
 

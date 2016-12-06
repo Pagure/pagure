@@ -45,8 +45,6 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         pagure.lib.SESSION = self.session
 
         pagure.APP.config['GIT_FOLDER'] = os.path.join(self.path, 'repos')
-        pagure.APP.config['FORK_FOLDER'] = os.path.join(
-            self.path, 'forks')
         pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
             self.path, 'requests')
         pagure.APP.config['TICKETS_FOLDER'] = os.path.join(

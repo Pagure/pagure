@@ -92,13 +92,6 @@ GIT_FOLDER = os.path.join(
     'repos'
 )
 
-# Folder containing the forks repos
-FORK_FOLDER = os.path.join(
-    os.path.abspath(os.path.dirname(__file__)),
-    '..',
-    'forks'
-)
-
 # Folder containing the docs repos
 DOCS_FOLDER = os.path.join(
     os.path.abspath(os.path.dirname(__file__)),

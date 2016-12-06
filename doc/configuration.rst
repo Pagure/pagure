@@ -579,6 +579,18 @@ Defaults to: ``Pagure``
 Deprecated configuration keys
 -----------------------------
 
+FORK_FOLDER
+~~~~~~~~~~~
+
+This configuration key used to be use to specify the folder where the forks
+are placed. Since the release 2.0 of pagure, it has been deprecated, forks
+are now automatically placed in a sub-folder of the folder containing the
+mains git repositories (ie ``GIT_FOLDER``).
+
+See the ``UPGRADING.rst`` file for more information about this change and
+how to handle it.
+
+
 UPLOAD_FOLDER
 ~~~~~~~~~~~~~
 

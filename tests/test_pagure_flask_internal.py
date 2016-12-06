@@ -43,8 +43,6 @@ class PagureFlaskInternaltests(tests.Modeltests):
         pagure.ui.filters.SESSION = self.session
 
         pagure.APP.config['GIT_FOLDER'] = self.path
-        pagure.APP.config['FORK_FOLDER'] = os.path.join(
-            self.path, 'forks')
         pagure.APP.config['REQUESTS_FOLDER'] = None
         pagure.APP.config['TICKETS_FOLDER'] = None
         pagure.APP.config['DOCS_FOLDER'] = None

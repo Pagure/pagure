@@ -46,16 +46,12 @@ class PagureFlaskDocstests(tests.Modeltests):
         pagure.ui.repo.SESSION = self.session
 
         pagure.docs_server.APP.config['GIT_FOLDER'] = self.path
-        pagure.docs_server.APP.config['FORK_FOLDER'] = os.path.join(
-            self.path, 'forks')
         pagure.docs_server.APP.config['TICKETS_FOLDER'] = os.path.join(
             self.path, 'tickets')
         pagure.docs_server.APP.config['DOCS_FOLDER'] = os.path.join(
             self.path, 'docs')
 
         pagure.APP.config['GIT_FOLDER'] = self.path
-        pagure.APP.config['FORK_FOLDER'] = os.path.join(
-            self.path, 'forks')
         pagure.APP.config['TICKETS_FOLDER'] = os.path.join(
             self.path, 'tickets')
         pagure.APP.config['DOCS_FOLDER'] = os.path.join(
