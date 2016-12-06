@@ -281,7 +281,7 @@ def blame_loc(loc, repo, username, blame):
             # Happens at the end of the file, since we are using idx + 1
             continue
 
-        if line.startswith('<div'):
+        if '<pre style="line-height: 125%">' in line:
             line = line.split('<pre style="line-height: 125%">')[1]
 
         output.append(
