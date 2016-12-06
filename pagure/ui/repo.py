@@ -725,6 +725,12 @@ def view_blame_file(repo, filename, username=None, namespace=None):
         LOG.exception('File could not be decoded')
         flask.abort(500, 'File could not be decoded')
 
+    lexer = TextLexer()
+    content = highlight(
+        content,
+        lexer,
+        HtmlFormatter(noclasses=True, style="tango")
+    )
     blame = repo_obj.blame(filename)
 
     return flask.render_template(
