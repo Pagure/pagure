@@ -36,58 +36,57 @@
         <ul class="nav navbar-nav nav-underline pull-xs-right">
           {% if not nologin %}
             {% if g.fas_user %}
-            <li class="nav-item">
-              <a class="nav-link"
-                  href="{{ url_for('view_user_requests', username=g.fas_user.username) }}">
-                  My Pull Requests</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link"
-                  href="{{ url_for('view_user_issues', username=g.fas_user.username) }}">
-                  My Issues</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('browse_projects') }}">Browse</a>
-            </li>
-            {% if admin %}
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('admin_index') }}">Admin</a>
-            </li>
-            {% endif %}
-            {% if config.get('ENABLE_NEW_PROJECTS', True) %}
-            <li class="nav-item p-l-1">
-              <a class="nav-link" href="{{ url_for('new_project') }}">
-                  <span class="oi" data-glyph="plus" title="Create New"
-                      aria-hidden="true">
-                  </span>
-              </a>
-            </li>
-            {% endif %}
-            <li class="nav-item dropdown p-l-1">
-                  <a class="nav-link dropdown-toggle" data-toggle="dropdown"
-                     href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                    {{ g.fas_user.username | avatar(24) | safe }}
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('browse_projects') }}">Browse</a>
+              </li>
+              {% if admin %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{{ url_for('admin_index') }}">Admin</a>
+                </li>
+              {% endif %}
+              {% if config.get('ENABLE_NEW_PROJECTS', True) %}
+                <li class="nav-item p-l-1">
+                  <a class="nav-link" href="{{ url_for('new_project') }}">
+                      <span class="oi" data-glyph="plus" title="Create New"
+                          aria-hidden="true">
+                      </span>
                   </a>
-                  <div class="dropdown-menu dropdown-menu-right">
-                    <div class="dropdown-header"><strong>{{ g.fas_user.username }}</strong></div>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="{{ url_for('view_user', username=g.fas_user.username)
-                      }}">My Public Profile</a>
-                <a class="dropdown-item" href="{{ url_for('user_settings')
-                  }}">My Settings</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="{{ url_for('auth_logout')
-                  }}?next={{request.url}}">Log Out</a>
-              </div>
-            </li>
-                 <!--<a href="{{ url_for('user_settings') }}">{{ g.fas_user.username }}</a>
-                     <a href="{{ url_for('auth_logout') }}?next={{request.url}}">log out</a> -->
-            {% else %}
-            <li class="nav-item p-l-1">
-                <a class="nav-link btn btn-primary" href="{{ url_for('auth_login') }}?next={{request.url}}">
-                Log In
+                </li>
+              {% endif %}
+              <li class="nav-item dropdown p-l-1">
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown"
+                   href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                  {{ g.fas_user.username | avatar(24) | safe }}
                 </a>
-            </li>
+                <div class="dropdown-menu dropdown-menu-right">
+                  <div class="dropdown-header">
+                    <strong>{{ g.fas_user.username }}</strong>
+                  </div>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="{{
+                    url_for('view_user', username=g.fas_user.username)
+                    }}">My Public Profile</a>
+                  <a class="dropdown-item" href="{{
+                    url_for('user_settings')
+                    }}">My Settings</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="{{
+                    url_for('view_user_issues', username=g.fas_user.username)
+                    }}">My Issues</a>
+                  <a class="dropdown-item" href="{{
+                    url_for('view_user_requests', username=g.fas_user.username)
+                    }}">My Pull Requests</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="{{ url_for('auth_logout')
+                    }}?next={{request.url}}">Log Out</a>
+                </div>
+              </li>
+            {% else %}
+              <li class="nav-item p-l-1">
+                <a class="nav-link btn btn-primary" href="{{
+                url_for('auth_login') }}?next={{request.url
+                }}">Log In</a>
+              </li>
             {% endif %}
          {% endif %}
         </ul>
