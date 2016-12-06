@@ -654,24 +654,24 @@
     {% if pull_request.flags %}
     <div class="card" id="pr_flags">
       <ul class="list-group list-group-flush">
-            {% for flag in pull_request.flags %}
-              <li class="list-group-item">
-                <div>
-                  <span><a href="{{ flag.url }}">{{ flag.username }}</a></span>
-                  <div class="pull-xs-right"><span class="label {%
-                    if flag.percent <= 10 %}label-danger{%
-                    elif flag.percent <= 90 %}label-warning{%
-                    else %}label-success{%
-                    endif %}">{{ flag.percent }}%</label></div>
-                </div>
-                <small><div class="clearfix">
-                    <span>{{ flag.comment }}</span>
-                    <div title="{{ flag.date_created }}" class="pull-xs-right">
-                    {{ flag.date_created | humanize }}</div>
-                </div>
-                </small>
-              </li>
-            {% endfor %}
+        {% for flag in pull_request.flags %}
+          <li class="list-group-item">
+            <div>
+              <span><a href="{{ flag.url }}">{{ flag.username }}</a></span>
+              <div class="pull-xs-right"><span class="label {%
+                if flag.percent <= 10 %}label-danger{%
+                elif flag.percent <= 90 %}label-warning{%
+                else %}label-success{%
+                endif %}">{{ flag.percent }}%</label></div>
+            </div>
+            <small><div class="clearfix">
+                <span>{{ flag.comment }}</span>
+                <div title="{{ flag.date_created }}" class="pull-xs-right">
+                {{ flag.date_created | humanize }}</div>
+            </div>
+            </small>
+          </li>
+        {% endfor %}
       </ul>
     </div>
     {% endif %}
@@ -708,13 +708,19 @@
       </div>
     </div>
 
-    {% if subscribers and authenticated %}
+    {% if subscribers %}
       <div class="card">
         <div class="card-block">
           <fieldset class="form-group">
-            <label><strong>Subscribers</strong></label>
+            <label><strong>Subscribers</strong> ({{
+              subscribers | length }})</label>
             <div id="subscribers_list">
-              {{ subscribers | join(', ') }}
+            {% for subscriber in subscribers %}
+                <a href="{{ url_for('view_user', username=subscriber)
+                }}" title="{{ subscriber }}">{{
+                  subscriber |avatar(size=24) | safe
+                }}</a>
+            {% endfor %}
             </div>
           </fieldset>
         </div>
@@ -775,7 +781,6 @@
     {% for patch in diff %}
         {% set count = count+1 %}
         <div class="list-group-item">
-
           {% if patch | hasattr('additions') %}
           {# Version of pygit2 -0.21.4 -- F21/EL7 #}
               {% set linesadded = patch.additions %}
