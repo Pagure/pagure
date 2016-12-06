@@ -569,6 +569,10 @@ th[data-sort] {
     padding:0.5em;
 }
 
+.attachment_list p {
+    margin-bottom: 0;
+}
+
 /*Our specific responsive overrides*/
 
 @media (min-width:544px) {
