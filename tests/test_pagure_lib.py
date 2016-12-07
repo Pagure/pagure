@@ -2201,6 +2201,20 @@ class PagureLibtests(tests.Modeltests):
             blacklist=[],
         )
 
+        # Group with this display name already exists
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.add_group,
+            self.session,
+            group_name='foo1',
+            display_name='foo group',
+            description=None,
+            group_type='bar',
+            user='pingou',
+            is_admin=False,
+            blacklist=[],
+        )
+
         # Group with a blacklisted prefix
         self.assertRaises(
             pagure.exceptions.PagureException,

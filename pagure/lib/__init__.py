@@ -2657,7 +2657,7 @@ def get_group_types(session, group_type=None):
     return query.all()
 
 
-def search_groups(session, pattern=None, group_name=None, group_type=None):
+def search_groups(session, pattern=None, group_name=None, group_type=None, display_name=None):
     ''' Return the groups based on the criteria specified.
 
     '''
@@ -2679,6 +2679,11 @@ def search_groups(session, pattern=None, group_name=None, group_type=None):
     if group_name:
         query = query.filter(
             model.PagureGroup.group_name == group_name
+        )
+
+    if display_name:
+        query = query.filter(
+            model.PagureGroup.display_name == display_name
         )
 
     if group_type:
@@ -2848,6 +2853,11 @@ def add_group(
     if group:
         raise pagure.exceptions.PagureException(
             'There is already a group named %s' % group_name)
+
+    display = search_groups(session, display_name=display_name)
+    if display:
+        raise pagure.exceptions.PagureException(
+            'There is already a group with display name `%s` created.' % display_name)
 
     grp = pagure.lib.model.PagureGroup(
         group_name=group_name,
