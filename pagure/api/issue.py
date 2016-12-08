@@ -825,7 +825,7 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
 
     form = pagure.forms.AssignIssueForm(csrf_enabled=False)
     if form.validate_on_submit():
-        assignee = form.assignee.data
+        assignee = form.assignee.data or None
         try:
             # New comment
             message = pagure.lib.add_issue_assignee(

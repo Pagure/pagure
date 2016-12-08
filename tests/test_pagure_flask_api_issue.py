@@ -1443,24 +1443,6 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.comments), 0)
 
-        data = {
-            'title': 'test issue',
-        }
-
-        # Incomplete request
-        output = self.app.post(
-            '/api/0/test/issue/1/assign', data=data, headers=headers)
-        self.assertEqual(output.status_code, 400)
-        data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {
-              "error": "Invalid or incomplete input submited",
-              "error_code": "EINVALIDREQ",
-              "errors": {"assignee": ["This field is required."]}
-            }
-        )
-
         # No change
         repo = pagure.lib.get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
@@ -1471,6 +1453,66 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         }
 
         # Valid request
+        output = self.app.post(
+            '/api/0/test/issue/1/assign', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'Issue assigned'}
+        )
+
+        # Un-assign
+        output = self.app.post(
+            '/api/0/test/issue/1/assign', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'Assignee reset'}
+        )
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(issue.assignee, None)
+
+        # Un-assign
+        data = {'assignee': None}
+        output = self.app.post(
+            '/api/0/test/issue/1/assign', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'Nothing to change'}
+        )
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(issue.assignee, None)
+
+        # Re-assign for the rest of the tests
+        data = {'assignee': 'pingou'}
+        output = self.app.post(
+            '/api/0/test/issue/1/assign', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'Issue assigned'}
+        )
+
+        # Un-assign
+        data = {'assignee': ''}
+        output = self.app.post(
+            '/api/0/test/issue/1/assign', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'Assignee reset'}
+        )
+
+        # Re-assign for the rest of the tests
+        data = {'assignee': 'pingou'}
         output = self.app.post(
             '/api/0/test/issue/1/assign', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
