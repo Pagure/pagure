@@ -291,9 +291,14 @@ def blame_loc(loc, repo, username, blame):
             % ({'cnt': idx + 1})
         )
 
+        committer = None
+        try:
+            committer = diff.orig_committer
+        except ValueError:
+            pass
         output.append(
-            '<td class="cell_user">%s</td>' % author_to_user(
-                diff.orig_committer, with_name=False)
+            '<td class="cell_user">%s</td>' % (author_to_user(
+                committer, with_name=False) if committer else ' ')
         )
 
         output.append(
