@@ -51,8 +51,8 @@ def api_git_tags(repo, username=None, namespace=None):
         }
 
     """
-    repo = pagure.lib._get_project(SESSION, repo, user=username, namespace=namespace)
-
+    repo = pagure.get_authorized_project(
+        SESSION, repo, user=username, namespace=namespace)
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
@@ -392,7 +392,8 @@ def api_fork_project():
         username = form.username.data or None
         namespace = form.namespace.data.strip() or None
 
-        repo = pagure.lib._get_project(SESSION, repo, user=username, namespace=namespace)
+        repo = pagure.lib._get_project(
+            SESSION, repo, user=username, namespace=namespace)
         if repo is None:
             raise pagure.exceptions.APIError(
                 404, error_code=APIERROR.ENOPROJECT)

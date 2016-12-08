@@ -170,7 +170,6 @@ def request_pulls(repo, username=None, namespace=None):
 def request_pull(repo, requestid, username=None, namespace=None):
     """ Create a pull request with the changes from the fork into the project.
     """
-
     repo = flask.g.repo
 
     if not repo.settings.get('pull_requests', True):

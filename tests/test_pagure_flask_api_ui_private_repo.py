@@ -257,7 +257,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertEqual(
                 output.get_data(as_text=True).count('<p>No group found</p>'), 1)
             self.assertEqual(
-                output.get_data(as_text=True).count('<div class="card-header">'), 3)
+                output.get_data(as_text=True).count('<div class="card-header">'), 6)
 
     def test_view_user(self):
         """ Test the view_user endpoint. """
@@ -316,7 +316,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertEqual(
                 output.get_data(as_text=True).count('<p>No group found</p>'), 1)
             self.assertEqual(
-                output.get_data(as_text=True).count('<div class="card-header">'), 3)
+                output.get_data(as_text=True).count('<div class="card-header">'), 5)
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
@@ -330,7 +330,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertEqual(
                 output.get_data(as_text=True).count('<p>No group found</p>'), 1)
             self.assertEqual(
-                output.get_data(as_text=True).count('<div class="card-header">'), 3)
+                output.get_data(as_text=True).count('<div class="card-header">'), 5)
 
         # Check pingou has 0 projects
         user.username = 'pingou'
@@ -345,7 +345,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertEqual(
                 output.get_data(as_text=True).count('<p>No group found</p>'), 1)
             self.assertEqual(
-                output.get_data(as_text=True).count('<div class="card-header">'), 3)
+                output.get_data(as_text=True).count('<div class="card-header">'), 6)
 
         repo = pagure.lib._get_project(self.session, 'test3')
 
@@ -370,7 +370,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertEqual(
                 output.get_data(as_text=True).count('<p>No group found</p>'), 1)
             self.assertEqual(
-                output.get_data(as_text=True).count('<div class="card-header">'), 3)
+                output.get_data(as_text=True).count('<div class="card-header">'), 6)
 
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_private_settings_ui(self, ast):
@@ -451,7 +451,7 @@ class PagurePrivateRepotest(tests.Modeltests):
 
         # Create all the git repos
         tests.create_projects_git(
-            os.path.join(tests.HERE, 'requests'), bare=True)
+            os.path.join(self.path, 'requests'), bare=True)
 
         # Add a git repo
         repo_path = os.path.join(
@@ -459,7 +459,6 @@ class PagurePrivateRepotest(tests.Modeltests):
         if not os.path.exists(repo_path):
             os.makedirs(repo_path)
         pygit2.init_repository(repo_path, bare=True)
-
         # Check repo was created
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
@@ -614,13 +613,12 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.session.commit()
 
         # Create a git repo to play with
-        gitrepo = os.path.join(self.path, 'repos', 'test4.git')
+        gitrepo = os.path.join(self.path, 'test4.git')
         repo = pygit2.init_repository(gitrepo, bare=True)
 
         newpath = tempfile.mkdtemp(prefix='pagure-fork-test')
         repopath = os.path.join(newpath, 'test4')
         clone_repo = pygit2.clone_repository(gitrepo, repopath)
-
         # Create a file in that git repo
         with open(os.path.join(repopath, 'sources'), 'w') as stream:
             stream.write('foo\n bar')
@@ -847,71 +845,71 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertDictEqual(
                 data,
                 {
-"args": {
-        "assignee": None,
-        "author": None,
-        "status": True
-    },
-    "requests": [
-        {
-            "assignee": None,
-            "branch": "master",
-            "branch_from": "master",
-            "closed_at": None,
-            "closed_by": None,
-            "comments": [],
-            "commit_start": None,
-            "commit_stop": None,
-            "date_created": "1431414800",
-            "id": 1,
-            "initial_comment": None,
-            "project": {
-                "close_status": [],
-                "custom_keys": [],
-                "date_created": "1431414800",
-                "description": "test project description",
-                "id": 1,
-                "milestones": {},
-                "name": "test4",
-                "namespace": None,
-                "parent": None,
-                "priorities": {},
-                "tags": [],
-                "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
+                    "args": {
+                        "assignee": None,
+                        "author": None,
+                        "status": True
+                    },
+                    "requests": [
+                        {
+                            "assignee": None,
+                            "branch": "master",
+                            "branch_from": "master",
+                            "closed_at": None,
+                            "closed_by": None,
+                            "comments": [],
+                            "commit_start": None,
+                            "commit_stop": None,
+                            "date_created": "1431414800",
+                            "id": 1,
+                            "initial_comment": None,
+                            "project": {
+                                "close_status": [],
+                                "custom_keys": [],
+                                "date_created": "1431414800",
+                                "description": "test project description",
+                                "id": 1,
+                                "milestones": {},
+                                "name": "test4",
+                                "namespace": None,
+                                "parent": None,
+                                "priorities": {},
+                                "tags": [],
+                                "user": {
+                                    "fullname": "PY C",
+                                    "name": "pingou"
+                                }
+                            },
+                            "remote_git": None,
+                            "repo_from": {
+                                "close_status": [],
+                                "custom_keys": [],
+                                "date_created": "1431414800",
+                                "description": "test project description",
+                                "id": 1,
+                                "milestones": {},
+                                "name": "test4",
+                                "namespace": None,
+                                "parent": None,
+                                "priorities": {},
+                                "tags": [],
+                                "user": {
+                                    "fullname": "PY C",
+                                    "name": "pingou"
+                                }
+                            },
+                            "status": "Open",
+                            "title": "test pull-request",
+                            "uid": "1431414800",
+                            "updated_on": "1431414800",
+                            "user": {
+                                "fullname": "PY C",
+                                "name": "pingou"
+                            }
+                        }
+                    ],
+                    "total_requests": 1
                 }
-            },
-            "remote_git": None,
-            "repo_from": {
-                "close_status": [],
-                "custom_keys": [],
-                "date_created": "1431414800",
-                "description": "test project description",
-                "id": 1,
-                "milestones": {},
-                "name": "test4",
-                "namespace": None,
-                "parent": None,
-                "priorities": {},
-                "tags": [],
-                "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                }
-            },
-            "status": "Open",
-            "title": "test pull-request",
-            "uid": "1431414800",
-            "updated_on": "1431414800",
-            "user": {
-                "fullname": "PY C",
-                "name": "pingou"
-            }
-        }
-    ],
-    "total_requests": 1
-    }
             )
             headers = {'Authorization': 'token foobar_token'}
 
@@ -938,62 +936,62 @@ class PagurePrivateRepotest(tests.Modeltests):
             data['uid'] = '1431414800'
             self.assertDictEqual(
                 data,
-            {
-            "assignee": None,
-            "branch": "master",
-            "branch_from": "master",
-            "closed_at": None,
-            "closed_by": None,
-            "comments": [],
-            "commit_start": None,
-            "commit_stop": None,
-            "date_created": "1431414800",
-            "id": 1,
-            "initial_comment": None,
-            "project": {
-                "close_status": [],
-                "custom_keys": [],
-                "date_created": "1431414800",
-                "description": "test project description",
-                "id": 1,
-                "milestones": {},
-                "name": "test4",
-                "namespace": None,
-                "parent": None,
-                "priorities": {},
-                "tags": [],
-                "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
+                {
+                    "assignee": None,
+                    "branch": "master",
+                    "branch_from": "master",
+                    "closed_at": None,
+                    "closed_by": None,
+                    "comments": [],
+                    "commit_start": None,
+                    "commit_stop": None,
+                    "date_created": "1431414800",
+                    "id": 1,
+                    "initial_comment": None,
+                    "project": {
+                        "close_status": [],
+                        "custom_keys": [],
+                        "date_created": "1431414800",
+                        "description": "test project description",
+                        "id": 1,
+                        "milestones": {},
+                        "name": "test4",
+                        "namespace": None,
+                        "parent": None,
+                        "priorities": {},
+                        "tags": [],
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou"
+                        }
+                    },
+                    "remote_git": None,
+                    "repo_from": {
+                        "close_status": [],
+                        "custom_keys": [],
+                        "date_created": "1431414800",
+                        "description": "test project description",
+                        "id": 1,
+                        "milestones": {},
+                        "name": "test4",
+                        "namespace": None,
+                        "parent": None,
+                        "priorities": {},
+                        "tags": [],
+                        "user": {
+                            "fullname": "PY C",
+                            "name": "pingou"
+                        }
+                    },
+                    "status": "Open",
+                    "title": "test pull-request",
+                    "uid": "1431414800",
+                    "updated_on": "1431414800",
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou"
+                    }
                 }
-            },
-            "remote_git": None,
-            "repo_from": {
-                "close_status": [],
-                "custom_keys": [],
-                "date_created": "1431414800",
-                "description": "test project description",
-                "id": 1,
-                "milestones": {},
-                "name": "test4",
-                "namespace": None,
-                "parent": None,
-                "priorities": {},
-                "tags": [],
-                "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                }
-            },
-            "status": "Open",
-            "title": "test pull-request",
-            "uid": "1431414800",
-            "updated_on": "1431414800",
-            "user": {
-                "fullname": "PY C",
-                "name": "pingou"
-            }
-        }
 
             )
 
@@ -1377,7 +1375,6 @@ class PagurePrivateRepotest(tests.Modeltests):
         headers = {'Authorization': 'token foobar_token'}
 
         # User not admin
-        print headers
         output = self.app.post(
             '/api/0/test4/pull-request/1/close', headers=headers)
         self.assertEqual(output.status_code, 404)
