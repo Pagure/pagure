@@ -66,7 +66,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         """
 
         # Create a git repo to play with
-        gitrepo = os.path.join(self.path, 'repos', 'pmc.git')
+        gitrepo = os.path.join(self.path, 'pmc.git')
         repo = pygit2.init_repository(gitrepo, bare=True)
 
         newpath = tempfile.mkdtemp(prefix='pagure-private-test')
@@ -742,10 +742,14 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "total_projects": 1,
                     "projects": [
                         {
+                            "close_status": [],
+                            "custom_keys": [],
                             "date_created": "1436527638",
                             "description": "test project description",
                             "id": 1,
+                            "milestones": {},
                             "name": "test4",
+                            "namespace": None,
                             "parent": None,
                             "priorities": {},
                             "tags": ["infra"],
@@ -768,10 +772,14 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "total_projects": 1,
                     "projects": [
                         {
+                            "close_status": [],
+                            "custom_keys": [],
                             "date_created": "1436527638",
                             "description": "test project description",
                             "id": 1,
+                            "milestones": {},
                             "name": "test4",
+                            "namespace": None,
                             "parent": None,
                             "priorities": {},
                             "tags": ["infra"],
@@ -782,6 +790,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                         }
                     ]
                 }
+
             )
 
     # Api pull-request views
