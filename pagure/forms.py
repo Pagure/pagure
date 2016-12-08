@@ -416,7 +416,7 @@ class AssignIssueForm(PagureForm):
     ''' Form to assign an user to an issue. '''
     assignee = wtforms.TextField(
         'Assignee <span class="error">*</span>',
-        [wtforms.validators.Required()]
+        [wtforms.validators.Optional()]
     )
 
 

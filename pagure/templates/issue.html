@@ -192,6 +192,12 @@
                     assignee=issue.assignee.username) }}">
                     {{ issue.assignee.username }}
                   </a>
+		{% if authenticated and (issue.assignee.username == g.fas_user.username) %}
+		  <button class="btn btn-sm pull-xs-right" id="drop-btn"
+			  title="drop the assignment of this issue">
+		    Drop
+		  </button>
+		{% endif %}
               {% else %}
                 unassigned
               {% endif %}
@@ -698,6 +704,60 @@ function try_async_comment(form) {
 </script>
 {% endif %}
 <script type="text/javascript">
+
+{% if authenticated and g.repo_admin %}
+function take_issue(){
+  var _url = "{{ url_for('api_ns.api_assign_issue', repo=repo.name, username=username, issueid=issueid) }}";
+  var _data = {assignee: "{{ g.fas_user.username }}"};
+  $.post (_url, _data ).done(
+    function(data) {
+      var _user_url = '\n<a href="{{ url_for("view_issues", repo=repo.name, username=username) }}'
+        + '?assignee={{ g.fas_user.username }}">'
+        + '{{ g.fas_user.username }}</a>'
+        + '<button class="btn btn-sm pull-xs-right" id="drop-btn" title="drop the assignment of this issue">Drop</button>';
+      $('#assignee_plain').html(_user_url);
+      $('#assignee').val("{{ g.fas_user.username }}");
+      setup_btn_take_drop();
+    }
+  )
+  return false;
+}
+{% endif %}
+
+{% if authenticated and (
+    g.repo_admin
+    or issue.user.user == g.fas_user.username
+    or issue.assignee.user == g.fas_user.username) %}
+function drop_issue(){
+  var _url = "{{ url_for(
+      'api_ns.api_assign_issue', repo=repo.name, username=username, issueid=issueid
+      ) }}";
+  var _data = {assignee: ""};
+  $.post( _url, _data ).done(
+    function(data) {
+      var _user_url = '\nunassigned'
+        + '<button class="btn btn-sm pull-xs-right" id="take-btn" title="assign this issue to you">Take</button>';
+      $('#assignee_plain').html(_user_url);
+      $('#assignee').val("");
+      setup_btn_take_drop();
+    }
+  )
+  return false;
+}
+{% endif %}
+
+function setup_btn_take_drop(){
+  {% if authenticated and g.repo_admin %}
+  $("#take-btn").click(take_issue)
+  {% endif %}
+  {% if authenticated and (
+    g.repo_admin
+    or issue.user.user == g.fas_user.username
+    or issue.assignee.user == g.fas_user.username) %}
+  $("#drop-btn").click(drop_issue);
+  {% endif %}
+}
+
 $( document ).ready(function() {
 
 
@@ -870,30 +930,11 @@ $( document ).ready(function() {
     }
   );
 
-  {% if authenticated and g.repo_admin %}
-    $("#take-btn").click(function(){
-      var _url = "{{ url_for(
-        'api_ns.api_assign_issue',
-        repo=repo.name,
-        username=username,
-        namespace=repo.namespace,
-        issueid=issueid
-        ) }}";
-      var _data = {assignee: "{{ g.fas_user.username }}"};
-      $.post( _url, _data ).done(
-        function(data) {
-          var _user_url = '\n<a href="{{ url_for("view_issues",
-            repo=repo.name,
-            username=username,
-            namespace=repo.namespace) }}'
-            + '?assignee={{ g.fas_user.username }}">'
-            + '{{ g.fas_user.username }}</a>';
-          $('#assignee_plain').html(_user_url);
-          $('#assignee').val("{{ g.fas_user.username }}");
-        }
-      )
-      return false;
-    });
+  {% if authenticated and (
+    g.repo_admin
+    or issue.user.user == g.fas_user.username
+    or issue.assignee.user == g.fas_user.username) %}
+  setup_btn_take_drop();
   {% endif %}
 
   {% if authenticated %}

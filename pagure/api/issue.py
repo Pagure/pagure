@@ -837,6 +837,9 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
             )
             SESSION.commit()
             output['message'] = message
+        except pagure.exceptions.PagureException as err:  # pragma: no cover
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.ENOCODE, error=str(err))
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             APP.logger.exception(err)

@@ -386,7 +386,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder,
     ''' Add an assignee to an issue, in other words, assigned an issue. '''
     user_obj = get_user(session, user)
 
-    if assignee is None and issue.assignee is not None:
+    if not assignee and issue.assignee is not None:
         issue.assignee_id = None
         issue.last_updated = datetime.datetime.utcnow()
         session.add(issue)
@@ -415,8 +415,8 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder,
                 {'unassigned': '-'}))
 
         return 'Assignee reset'
-    elif assignee is None and issue.assignee is None:
-        return
+    elif not assignee and issue.assignee is None:
+        return 'Nothing to change'
 
     # Validate the assignee
     assignee_obj = get_user(session, assignee)
