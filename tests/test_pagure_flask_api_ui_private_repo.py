@@ -21,6 +21,193 @@ import pagure.lib
 import tests
 from pagure.lib.repo import PagureRepo
 
+FULL_ISSUE_LIST = [
+    {
+        "assignee": None,
+        "blocks": [],
+        "close_status": None,
+        "closed_at": None,
+        "comments": [],
+        "content": "We should work on this",
+        "custom_fields": [],
+        "date_created": "1431414800",
+        "depends": [],
+        "id": 8,
+        "last_updated": "1431414800",
+        "milestone": None,
+        "priority": None,
+        "private": True,
+        "status": "Open",
+        "tags": [],
+        "title": "Test issue",
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou"
+        }
+    },
+    {
+        "assignee": None,
+        "blocks": [],
+        "close_status": None,
+        "closed_at": None,
+        "comments": [],
+        "content": "This issue needs attention",
+        "custom_fields": [],
+        "date_created": "1431414800",
+        "depends": [],
+        "id": 7,
+        "last_updated": "1431414800",
+        "milestone": None,
+        "priority": None,
+        "private": True,
+        "status": "Open",
+        "tags": [],
+        "title": "test issue",
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou"
+        }
+    },
+    {
+        "assignee": None,
+        "blocks": [],
+        "close_status": None,
+        "closed_at": None,
+        "comments": [],
+        "content": "This issue needs attention",
+        "custom_fields": [],
+        "date_created": "1431414800",
+        "depends": [],
+        "id": 6,
+        "last_updated": "1431414800",
+        "milestone": None,
+        "priority": None,
+        "private": True,
+        "status": "Open",
+        "tags": [],
+        "title": "test issue",
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou"
+        }
+    },
+    {
+        "assignee": None,
+        "blocks": [],
+        "close_status": None,
+        "closed_at": None,
+        "comments": [],
+        "content": "This issue needs attention",
+        "custom_fields": [],
+        "date_created": "1431414800",
+        "depends": [],
+        "id": 5,
+        "last_updated": "1431414800",
+        "milestone": None,
+        "priority": None,
+        "private": False,
+        "status": "Open",
+        "tags": [],
+        "title": "test issue",
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou"
+        }
+    },
+    {
+        "assignee": None,
+        "blocks": [],
+        "close_status": None,
+        "closed_at": None,
+        "comments": [],
+        "content": "This issue needs attention",
+        "custom_fields": [],
+        "date_created": "1431414800",
+        "depends": [],
+        "id": 4,
+        "last_updated": "1431414800",
+        "milestone": None,
+        "priority": None,
+        "private": False,
+        "status": "Open",
+        "tags": [],
+        "title": "test issue",
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou"
+        }
+    },
+    {
+        "assignee": None,
+        "blocks": [],
+        "close_status": None,
+        "closed_at": None,
+        "comments": [],
+        "content": "This issue needs attention",
+        "custom_fields": [],
+        "date_created": "1431414800",
+        "depends": [],
+        "id": 3,
+        "last_updated": "1431414800",
+        "milestone": None,
+        "priority": None,
+        "private": False,
+        "status": "Open",
+        "tags": [],
+        "title": "test issue",
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou"
+        }
+    },
+    {
+        "assignee": None,
+        "blocks": [],
+        "close_status": None,
+        "closed_at": None,
+        "comments": [],
+        "content": "This issue needs attention",
+        "custom_fields": [],
+        "date_created": "1431414800",
+        "depends": [],
+        "id": 2,
+        "last_updated": "1431414800",
+        "milestone": None,
+        "priority": None,
+        "private": False,
+        "status": "Open",
+        "tags": [],
+        "title": "test issue",
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou"
+        }
+    },
+    {
+        "assignee": None,
+        "blocks": [],
+        "close_status": None,
+        "closed_at": None,
+        "comments": [],
+        "content": "This issue needs attention",
+        "custom_fields": [],
+        "date_created": "1431414800",
+        "depends": [],
+        "id": 1,
+        "last_updated": "1431414800",
+        "milestone": None,
+        "priority": None,
+        "private": False,
+        "status": "Open",
+        "tags": [],
+        "title": "test issue",
+        "user": {
+            "fullname": "PY C",
+            "name": "pingou"
+        }
+    }
+]
+
 
 class PagurePrivateRepotest(tests.Modeltests):
     """ Tests for private repo in pagure """
@@ -462,7 +649,6 @@ class PagurePrivateRepotest(tests.Modeltests):
         # Check repo was created
         user = tests.FakeUser(username='pingou')
         with tests.user_set(pagure.APP, user):
-
             output = self.app.get('/user/pingou/')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
@@ -739,6 +925,13 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertDictEqual(
                 data,
                 {
+                    "args": {
+                        "fork": None,
+                        "pattern": None,
+                        "tags": [],
+                        "username": "pingou"
+                    },
+
                     "total_projects": 1,
                     "projects": [
                         {
@@ -769,6 +962,12 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertDictEqual(
                 data,
                 {
+                    "args": {
+                        "fork": None,
+                        "pattern": None,
+                        "tags": ["infra"],
+                        "username": "pingou"
+                    },
                     "total_projects": 1,
                     "projects": [
                         {
@@ -851,6 +1050,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             data['requests'][0]['project']['date_created'] = '1431414800'
             data['requests'][0]['repo_from']['date_created'] = '1431414800'
             data['requests'][0]['uid'] = '1431414800'
+            data['requests'][0]['last_updated'] = '1431414800'
             self.assertDictEqual(
                 data,
                 {
@@ -870,6 +1070,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                             "commit_start": None,
                             "commit_stop": None,
                             "date_created": "1431414800",
+                            "last_updated": "1431414800",
                             "id": 1,
                             "initial_comment": None,
                             "project": {
@@ -932,6 +1133,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             data2['requests'][0]['project']['date_created'] = '1431414800'
             data2['requests'][0]['repo_from']['date_created'] = '1431414800'
             data2['requests'][0]['uid'] = '1431414800'
+            data2['requests'][0]['last_updated'] = '1431414800'
             self.assertDictEqual(data, data2)
 
             # For single PR
@@ -943,6 +1145,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             data['project']['date_created'] = '1431414800'
             data['repo_from']['date_created'] = '1431414800'
             data['uid'] = '1431414800'
+            data['last_updated'] = '1431414800'
             self.assertDictEqual(
                 data,
                 {
@@ -955,6 +1158,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "commit_start": None,
                     "commit_stop": None,
                     "date_created": "1431414800",
+                    "last_updated": "1431414800",
                     "id": 1,
                     "initial_comment": None,
                     "project": {
@@ -1015,6 +1219,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             data2['uid'] = '1431414800'
             data2['date_created'] = '1431414800'
             data2['updated_on'] = '1431414800'
+            data2['last_updated'] = '1431414800'
             self.assertDictEqual(data, data2)
 
     @patch('pagure.lib.notify.send_email')
@@ -1073,6 +1278,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             {
                 "error": "Invalid or incomplete input submited",
                 "error_code": "EINVALIDREQ",
+                "errors": {"comment": ["This field is required."]}
             }
         )
 
@@ -1155,7 +1361,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             data,
             {
                 "error": "Invalid or expired token. Please visit "
-                "https://pagure.org/ to get or renew your API token.",
+                         "https://pagure.org/ to get or renew your API token.",
                 "error_code": "EINVALIDTOK",
             }
         )
@@ -1212,6 +1418,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             {
                 "error": "Invalid or incomplete input submited",
                 "error_code": "EINVALIDREQ",
+                "errors": {"comment": ["This field is required."]}
             }
         )
 
@@ -1343,7 +1550,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             data,
             {
                 "error": "Invalid or expired token. Please visit "
-                "https://pagure.org/ to get or renew your API token.",
+                         "https://pagure.org/ to get or renew your API token.",
                 "error_code": "EINVALIDTOK",
             }
         )
@@ -1483,7 +1690,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             data,
             {
                 "error": "Invalid or expired token. Please visit "
-                "https://pagure.org/ to get or renew your API token.",
+                         "https://pagure.org/ to get or renew your API token.",
                 "error_code": "EINVALIDTOK",
             }
         )
@@ -1594,7 +1801,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             data,
             {
                 "error": "Invalid or expired token. Please visit "
-                "https://pagure.org/ to get or renew your API token.",
+                         "https://pagure.org/ to get or renew your API token.",
                 "error_code": "EINVALIDTOK",
             }
         )
@@ -1608,8 +1815,11 @@ class PagurePrivateRepotest(tests.Modeltests):
             {
                 "error": "Invalid or incomplete input submited",
                 "error_code": "EINVALIDREQ",
-            }
-        )
+                "errors": {
+                    "issue_content": ["This field is required."],
+                    "title": ["This field is required."]
+                }
+            })
 
         data = {
             'title': 'test issue',
@@ -1638,6 +1848,11 @@ class PagurePrivateRepotest(tests.Modeltests):
             {
                 "error": "Invalid or incomplete input submited",
                 "error_code": "EINVALIDREQ",
+                "errors": {
+                    "issue_content": ["This field is required."],
+                    "title": ["This field is required."]
+                }
+
             }
         )
 
@@ -1651,9 +1866,14 @@ class PagurePrivateRepotest(tests.Modeltests):
             '/api/0/test4/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
+        data['issue']['date_created'] = '1431414800'
+        data['issue']['last_updated'] = '1431414800'
         self.assertDictEqual(
             data,
-            {'message': 'Issue created'}
+            {
+                'issue': FULL_ISSUE_LIST[7],
+                'message': 'Issue created'
+            }
         )
 
     def test_api_priavte_repo_view_issues(self):
@@ -1679,12 +1899,14 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             data = json.loads(output.get_data(as_text=True))
             data['issues'][0]['date_created'] = '1431414800'
+            data['issues'][0]['last_updated'] = '1431414800'
             self.assertDictEqual(
                 data,
                 {
                     "args": {
                         "assignee": None,
                         "author": None,
+                        "since": None,
                         "status": None,
                         "tags": []
                     },
@@ -1699,6 +1921,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                             "content": "This issue needs attention",
                             "custom_fields": [],
                             "date_created": "1431414800",
+                            "last_updated": "1431414800",
                             "depends": [],
                             "id": 1,
                             "milestone": None,
@@ -1738,7 +1961,9 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             data = json.loads(output.get_data(as_text=True))
             data['issues'][0]['date_created'] = '1431414800'
+            data['issues'][0]['last_updated'] = '1431414800'
             data['issues'][1]['date_created'] = '1431414800'
+            data['issues'][1]['last_updated'] = '1431414800'
             self.assertDictEqual(
                 data,
                 {
@@ -1746,6 +1971,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                         "assignee": None,
                         "author": None,
                         "status": None,
+                        "since": None,
                         "tags": []
                     },
                     "issues": [
@@ -1758,6 +1984,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                             "content": "We should work on this",
                             "custom_fields": [],
                             "date_created": "1431414800",
+                            "last_updated": "1431414800",
                             "depends": [],
                             "id": 2,
                             "milestone": None,
@@ -1780,6 +2007,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                             "content": "This issue needs attention",
                             "custom_fields": [],
                             "date_created": "1431414800",
+                            "last_updated": "1431414800",
                             "depends": [],
                             "id": 1,
                             "milestone": None,
@@ -1811,7 +2039,9 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         data['issues'][0]['date_created'] = '1431414800'
+        data['issues'][0]['last_updated'] = '1431414800'
         data['issues'][1]['date_created'] = '1431414800'
+        data['issues'][1]['last_updated'] = '1431414800'
         self.assertDictEqual(
             data,
             {
@@ -1819,6 +2049,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "assignee": None,
                     "author": None,
                     "status": None,
+                    "since": None,
                     "tags": []
                 },
                 "issues": [
@@ -1831,6 +2062,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                         "content": "We should work on this",
                         "custom_fields": [],
                         "date_created": "1431414800",
+                        "last_updated": "1431414800",
                         "depends": [],
                         "id": 2,
                         "milestone": None,
@@ -1853,6 +2085,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                         "content": "This issue needs attention",
                         "custom_fields": [],
                         "date_created": "1431414800",
+                        "last_updated": "1431414800",
                         "depends": [],
                         "id": 1,
                         "milestone": None,
@@ -1884,6 +2117,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "assignee": None,
                     "author": None,
                     "status": "Closed",
+                    "since": None,
                     "tags": []
                 },
                 "total_issues": 0,
@@ -1903,6 +2137,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "assignee": None,
                     "author": None,
                     "status": "Invalid",
+                    "since": None,
                     "tags": []
                 },
                 "total_issues": 0,
@@ -1916,13 +2151,16 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         data['issues'][0]['date_created'] = '1431414800'
+        data['issues'][0]['last_updated'] = '1431414800'
         data['issues'][1]['date_created'] = '1431414800'
+        data['issues'][1]['last_updated'] = '1431414800'
         self.assertDictEqual(
             data,
             {
                 "args": {
                     "assignee": None,
                     "author": None,
+                    "since": None,
                     "status": "All",
                     "tags": []
                 },
@@ -1936,6 +2174,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                         "content": "We should work on this",
                         "custom_fields": [],
                         "date_created": "1431414800",
+                        "last_updated": "1431414800",
                         "depends": [],
                         "id": 2,
                         "milestone": None,
@@ -1958,6 +2197,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                         "content": "This issue needs attention",
                         "custom_fields": [],
                         "date_created": "1431414800",
+                        "last_updated": "1431414800",
                         "depends": [],
                         "id": 1,
                         "milestone": None,
@@ -2026,6 +2266,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             data = json.loads(output.get_data(as_text=True))
             data['date_created'] = '1431414800'
+            data['last_updated'] = '1431414800'
             self.assertDictEqual(
                 data,
                 {
@@ -2039,6 +2280,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "date_created": "1431414800",
                     "depends": [],
                     "id": 1,
+                    "last_updated": "1431414800",
                     "milestone": None,
                     "priority": None,
                     "private": False,
@@ -2048,9 +2290,9 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "user": {
                         "fullname": "PY C",
                         "name": "pingou"
-
                     }
                 }
+
             )
 
         headers = {'Authorization': 'token aaabbbccc'}
@@ -2074,6 +2316,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.get_data(as_text=True))
         data['date_created'] = '1431414800'
+        data['last_updated'] = '1431414800'
         self.assertDictEqual(
             data,
             {
@@ -2087,6 +2330,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                 "date_created": "1431414800",
                 "depends": [],
                 "id": 1,
+                "last_updated": "1431414800",
                 "milestone": None,
                 "priority": None,
                 "private": False,
@@ -2096,8 +2340,8 @@ class PagurePrivateRepotest(tests.Modeltests):
                 "user": {
                     "fullname": "PY C",
                     "name": "pingou"
-
                 }
+
             }
         )
 
@@ -2201,6 +2445,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                 {
                     "error": "Invalid or incomplete input submited",
                     "error_code": "EINVALIDREQ",
+                    "errors": {"status": ["Not a valid choice"]}
                 }
             )
 
@@ -2284,7 +2529,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             data,
             {
                 "error": "Invalid or expired token. Please visit "
-                "https://pagure.org/ to get or renew your API token.",
+                         "https://pagure.org/ to get or renew your API token.",
                 "error_code": "EINVALIDTOK",
             }
         )
@@ -2336,6 +2581,7 @@ class PagurePrivateRepotest(tests.Modeltests):
             {
                 "error": "Invalid or incomplete input submited",
                 "error_code": "EINVALIDREQ",
+                "errors": {"comment": ["This field is required."]}
             }
         )
 
@@ -2398,7 +2644,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "avatar_url": "https://seccdn.libravatar.org/avatar/...",
                     "comment": "This is a very interesting question",
                     "comment_date": "2015-07-02 09:22",
-                    "notification":False,
+                    "notification": False,
                     "date_created": "1435821770",
                     "edited_on": None,
                     "editor": None,
@@ -2424,7 +2670,7 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "avatar_url": "https://seccdn.libravatar.org/avatar/...",
                     "comment": "This is a very interesting question",
                     "comment_date": "2015-07-02 09:22",
-                    "notification":False,
+                    "notification": False,
                     "date_created": "1435821770",
                     "edited_on": None,
                     "editor": None,
