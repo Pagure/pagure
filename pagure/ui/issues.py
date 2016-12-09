@@ -1316,7 +1316,6 @@ def save_reports(repo, username=None, namespace=None):
 @APP.route('/<namespace>/<repo>/report/<report>')
 @APP.route('/fork/<username>/<repo>/report/<report>')
 @APP.route('/fork/<username>/<namespace>/<repo>/report/<report>')
-@login_required
 def view_report(repo, report, username=None, namespace=None):
     """ Show the specified report.
     """
