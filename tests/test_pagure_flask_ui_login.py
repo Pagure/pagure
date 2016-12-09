@@ -544,7 +544,7 @@ class PagureFlaskLogintests(tests.Modeltests):
             # Due to the way the tests are running we do not actually
             # log out
             self.assertIn(
-                '<a href="/logout/?next=http://localhost/">log out</a>',
+                '<a class="dropdown-item" href="/logout/?next=http://localhost/">Log Out</a>',
                 output.data)
 
     def test_settings_admin_session_timedout(self):
