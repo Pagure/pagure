@@ -426,7 +426,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         api when the user only did one action. """
 
         tests.create_projects(self.session)
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
 
         now = datetime.datetime.utcnow()
         date = now.date().strftime('%Y-%m-%d')

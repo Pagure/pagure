@@ -1511,7 +1511,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
 
-            repo = pagure.lib.get_project(self.session, 'test')
+            repo = pagure.lib._get_project(self.session, 'test')
             issue = pagure.lib.search_issues(self.session, repo, issueid=1)
             self.assertEqual(issue.depending_text, [])
             self.assertEqual(issue.blocking_text, [])

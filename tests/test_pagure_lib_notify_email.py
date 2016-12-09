@@ -40,9 +40,9 @@ class PagureLibNotifyEmailtests(tests.Modeltests):
 
         self.user1 = pagure.lib.get_user(self.session, 'pingou')
         self.user2 = pagure.lib.get_user(self.session, 'foo')
-        self.project1 = pagure.lib.get_project(self.session, 'test')
-        self.project2 = pagure.lib.get_project(self.session, 'test2')
-        self.project3 = pagure.lib.get_project(self.session, 'test3', namespace='somenamespace')
+        self.project1 = pagure.lib._get_project(self.session, 'test')
+        self.project2 = pagure.lib._get_project(self.session, 'test2')
+        self.project3 = pagure.lib._get_project(self.session, 'test3', namespace='somenamespace')
 
         # Create a forked repo, should be project #4
         # Not using fork_project as it tries to do a git clone
@@ -56,7 +56,7 @@ class PagureLibNotifyEmailtests(tests.Modeltests):
         )
         self.session.add(item)
         self.session.commit()
-        self.forkedproject = pagure.lib.get_project(self.session, 'test', user='foo')
+        self.forkedproject = pagure.lib._get_project(self.session, 'test', user='foo')
 
         # Report an issue on project #1
         self.issue1 = pagure.lib.new_issue(

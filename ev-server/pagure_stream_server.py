@@ -144,9 +144,8 @@ def get_obj_from_path(path):
     """ Return the Ticket or Request object based on the path provided.
     """
     (username, namespace, reponame, objtype, objid) = _parse_path(path)
-    repo = pagure.lib.get_project(
-        pagure.SESSION, reponame, user=username, namespace=namespace)
-
+    repo = pagure.get_authorized_project(pagure.SESSION, reponame,
+                                         user=username, namespace=namespace)
     if repo is None:
         raise PagureEvException("Project '%s' not found" % reponame)
 

@@ -49,8 +49,8 @@ class StreamingServerTests(tests.Modeltests):
 
         # Setup projects
         tests.create_projects(self.session)
-        self.repo = pagure.lib.get_project(self.session, 'test')
-        self.repo2 = pagure.lib.get_project(self.session, 'test2')
+        self.repo = pagure.lib._get_project(self.session, 'test')
+        self.repo2 = pagure.lib._get_project(self.session, 'test2')
 
         # Disable repo 2's issue tracker and PR tracker
         pagure.lib.update_project_settings(

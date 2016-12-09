@@ -2579,7 +2579,7 @@ index 0000000..60f7480
         """ Test the update_custom_fields_from_json method of lib.git """
 
         tests.create_projects(self.session)
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
 
         # Create issues to play with
         pagure.lib.new_issue(

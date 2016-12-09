@@ -364,7 +364,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
         tests.create_projects_git(os.path.join(self.path), bare=True)
 
         # Start from scrach on priorities
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         self.assertEqual(repo.priorities, {})
 
         user = tests.FakeUser()
@@ -395,7 +395,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             self.assertIn('<h3>Settings for test</h3>', output.data)
 
             # Check the result of the action -- Priority recorded
-            repo = pagure.lib.get_project(self.session, 'test')
+            repo = pagure.lib._get_project(self.session, 'test')
             self.assertEqual(
                 repo.priorities,
                 {u'': u'', u'1': u'High', u'2': u'Normal', u'3': u'Low'}
@@ -449,7 +449,7 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             self.assertNotIn('<option value="1">High</option>', output.data)
 
             # Check the result of the action -- Priority recorded
-            repo = pagure.lib.get_project(self.session, 'test')
+            repo = pagure.lib._get_project(self.session, 'test')
             self.assertEqual(repo.priorities, {})
 
 

@@ -149,7 +149,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
             email='bar@bar.com')
         self.session.add(item)
 
-        project = pagure.lib.get_project(
+        project = pagure.lib._get_project(
             self.session, 'test3', namespace='ns')
         msg = pagure.lib.add_user_to_project(
             session=self.session,
@@ -233,7 +233,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'User `bar` added to the group `foo`.')
 
-        project = pagure.lib.get_project(
+        project = pagure.lib._get_project(
             self.session, 'test3', namespace='ns')
 
         # Add group to project
@@ -293,7 +293,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
             email='bar@bar.com')
         self.session.add(item)
 
-        project = pagure.lib.get_project(
+        project = pagure.lib._get_project(
             self.session, 'test3', namespace='ns')
         msg = pagure.lib.add_user_to_project(
             session=self.session,
@@ -361,7 +361,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
             email='bar@bar.com')
         self.session.add(item)
 
-        project = pagure.lib.get_project(
+        project = pagure.lib._get_project(
             self.session, 'test3', namespace='ns')
         msg = pagure.lib.add_user_to_project(
             session=self.session,
@@ -426,7 +426,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         self.session.add(item)
 
         # Set the user `bar` to watch the project
-        project = pagure.lib.get_project(
+        project = pagure.lib._get_project(
             self.session, 'test3', namespace='ns')
         msg = pagure.lib.update_watch_status(
             session=self.session,

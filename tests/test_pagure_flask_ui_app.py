@@ -1053,7 +1053,7 @@ class PagureFlaskApptests(tests.Modeltests):
         """Test the view_user_requests endpoint. """
         # Create the PR
         tests.create_projects(self.session)
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=repo,
@@ -1085,7 +1085,7 @@ class PagureFlaskApptests(tests.Modeltests):
             hook_token='aaabbbttt',
         )
         self.session.add(item)
-        repo = pagure.lib.get_project(
+        repo = pagure.lib._get_project(
             self.session, 'test_fork', user='pingou')
 
         req = pagure.lib.new_pull_request(
@@ -1123,7 +1123,7 @@ class PagureFlaskApptests(tests.Modeltests):
         """Test the view_user_issues endpoint when the user exists."""
         # Create the issue
         tests.create_projects(self.session)
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -1153,7 +1153,7 @@ class PagureFlaskApptests(tests.Modeltests):
             hook_token='aaabbbttt',
         )
         self.session.add(item)
-        repo = pagure.lib.get_project(self.session, 'test_fork', user='foo')
+        repo = pagure.lib._get_project(self.session, 'test_fork', user='foo')
 
         msg = pagure.lib.new_issue(
             session=self.session,

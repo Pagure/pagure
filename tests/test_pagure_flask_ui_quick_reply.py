@@ -51,7 +51,7 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
 
         self.admin = tests.FakeUser(username='pingou')
         self.user = tests.FakeUser(username='ralph')
-        self.repo = pagure.lib.get_project(self.session, 'test')
+        self.repo = pagure.lib._get_project(self.session, 'test')
 
     def disable_issues_and_pull_requests(self):
         """Disable both issues and pull requests."""
@@ -101,7 +101,7 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
             self.assertIn(notice, output.data)
 
     def assertQuickReplies(self, quick_replies, project='test'):
-        repo = pagure.lib.get_project(self.session, project)
+        repo = pagure.lib._get_project(self.session, project)
         self.assertEqual(repo.quick_replies, quick_replies)
 
     def assertQuickReplyLinks(self, output):
@@ -158,7 +158,7 @@ class PagureFlaskQuickReplytest(tests.Modeltests):
 
     def test_update_quick_replies_empty_to_reset(self):
         # Set some quick replies
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         repo.quick_replies = ['Ship it!', 'Nah.']
         self.session.add(repo)
         self.session.commit()
