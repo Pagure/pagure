@@ -35,7 +35,7 @@ def run_as_post_receive_hook():
         print 'user:     ', username
         print 'namespace:', namespace
 
-    repo = pagure.lib._get_project(pagure.SESSION, reponame, user=username, namespace=namespace)
+    repo = pagure.get_authorized_project(pagure.SESSION, reponame, user=username, namespace=namespace)
     if not repo:
         print 'Unknown repo %s of username: %s' % (reponame, username)
         sys.exit(1)

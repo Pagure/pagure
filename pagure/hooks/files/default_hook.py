@@ -38,7 +38,7 @@ def run_as_post_receive_hook():
         print('user:', username)
         print('namespace:', namespace)
 
-    project = pagure.lib._get_project(pagure.SESSION, repo, user=username, namespace=namespace)
+    project = pagure.get_authorized_project(pagure.SESSION, repo, user=username, namespace=namespace)
 
     for line in sys.stdin:
         if pagure.APP.config.get('HOOK_DEBUG', False):

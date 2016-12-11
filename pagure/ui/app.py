@@ -21,8 +21,7 @@ import pagure.lib.git
 import pagure.forms
 import pagure.ui.filters
 from pagure import (APP, SESSION, login_required,
-                    authenticated, is_repo_admin,
-                    admin_session_timedout)
+                    authenticated, admin_session_timedout)
 
 
 @APP.route('/browse/projects', endpoint='browse_projects')

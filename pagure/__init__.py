@@ -492,7 +492,7 @@ def set_variables():
         flask.g.repo = pagure.get_authorized_project(
             SESSION, repo, user=username, namespace=namespace)
         if authenticated():
-            flask.g.repo_forked = pagure.lib._get_project(SESSION, repo, user=flask.g.fas_user.username,
+            flask.g.repo_forked = pagure.get_authorized_project(SESSION, repo, user=flask.g.fas_user.username,
                                                           namespace=namespace)
 
         if not flask.g.repo \

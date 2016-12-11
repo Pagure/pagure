@@ -50,8 +50,7 @@ import pagure.forms
 import pagure
 import pagure.ui.plugins
 from pagure import (APP, SESSION, LOG, __get_file_in_tree, login_required,
-                    is_repo_admin, admin_session_timedout, authenticated,
-                    get_authorized_project)
+                    is_repo_admin, admin_session_timedout)
 from pagure.lib import encoding_utils
 
 
@@ -916,6 +915,7 @@ def view_tags(repo, username=None, namespace=None):
 
 
 @APP.route('/<repo>/upload/', methods=('GET', 'POST'))
+@APP.route('/<repo>/upload', methods=('GET', 'POST'))
 @APP.route('/<namespace>/<repo>/upload/', methods=('GET', 'POST'))
 @APP.route('/<namespace>/<repo>/upload', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/upload/', methods=('GET', 'POST'))

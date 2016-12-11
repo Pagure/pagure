@@ -3663,7 +3663,7 @@ def is_watching(session, user, reponame, repouser=None, namespace=None):
     if watcher:
         return watcher.watch
 
-    project = pagure.lib._get_project(
+    project = pagure.get_authorized_project(
         session, reponame, user=repouser, namespace=namespace)
 
     if not project:

@@ -55,7 +55,7 @@ for line in sys.stdin.readlines():
     project_name = pagure.lib.git.get_repo_name(abspath)
     username = pagure.lib.git.get_username(abspath)
     namespace = pagure.lib.git.get_repo_namespace(abspath)
-    project = pagure.lib._get_project(
+    project = pagure.get_authorized_project(
         pagure.SESSION, project_name, username, namespace=namespace)
     if not project:
         project = project_name

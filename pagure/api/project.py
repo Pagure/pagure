@@ -15,7 +15,7 @@ from sqlalchemy.exc import SQLAlchemyError
 import pagure
 import pagure.exceptions
 import pagure.lib
-from pagure import SESSION, APP, is_repo_admin, authenticated
+from pagure import SESSION, APP, authenticated
 from pagure.api import API, api_method, APIERROR, api_login_required
 
 
@@ -392,7 +392,7 @@ def api_fork_project():
         username = form.username.data or None
         namespace = form.namespace.data.strip() or None
 
-        repo = pagure.lib._get_project(
+        repo = pagure.get_authorized_project(
             SESSION, repo, user=username, namespace=namespace)
         if repo is None:
             raise pagure.exceptions.APIError(

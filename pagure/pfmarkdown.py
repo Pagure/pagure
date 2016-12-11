@@ -316,7 +316,7 @@ def makeExtension(*arg, **kwargs):
 def _issue_exists(user, namespace, repo, idx):
     """ Utility method checking if a given issue exists. """
 
-    repo_obj = pagure.lib._get_project(pagure.SESSION, name=repo, user=user, namespace=namespace)
+    repo_obj = pagure.get_authorized_project(pagure.SESSION, repo=repo, user=user, namespace=namespace)
 
     if not repo_obj:
         return False
@@ -331,7 +331,7 @@ def _issue_exists(user, namespace, repo, idx):
 
 def _pr_exists(user, namespace, repo, idx):
     """ Utility method checking if a given PR exists. """
-    repo_obj = pagure.lib._get_project(pagure.SESSION, name=repo, user=user, namespace=namespace)
+    repo_obj = pagure.get_authorized_project(pagure.SESSION, repo=repo, user=user, namespace=namespace)
 
     if not repo_obj:
         return False
