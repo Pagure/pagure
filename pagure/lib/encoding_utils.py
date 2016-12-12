@@ -25,6 +25,38 @@ _log = logging.getLogger(__name__)
 Guess = namedtuple('Guess', ['encoding', 'confidence'])
 
 
+def detect_encodings(data):
+    """
+    Analyze the provided data for possible character encodings.
+
+    This simply wraps chardet and extracts all the potential encodings it
+    considered before deciding on a particular result.
+
+    :param data: An array of bytes to treat as text data
+    :type  data: bytes
+
+    :return: A dictionary mapping possible encodings to confidence levels
+    :rtype:  dict
+    """
+    if not data:
+        # It's an empty string so we can safely say it's ascii
+        return {'ascii': 1.0}
+
+    # We can't use ``chardet.detect`` because we want to dig in the internals
+    # of the detector to bias the utf-8 result.
+    detector = universaldetector.UniversalDetector()
+    detector.reset()
+    detector.feed(data)
+    result = detector.close()
+    if not result:
+        return {'utf-8': 1.0}
+    encodings = {result['encoding']: result['confidence']}
+    for prober in detector._mCharSetProbers:
+        if prober:
+            encodings[prober.get_charset_name()] = prober.get_confidence()
+
+    return encodings
+
 
 def guess_encodings(data):
     """
@@ -90,39 +122,6 @@ def guess_encoding(data):
         except UnicodeDecodeError:
             pass
     raise PagureException('No encoding could be guessed for this file')
-
-
-def detect_encodings(data):
-    """
-    Analyze the provided data for possible character encodings.
-
-    This simply wraps chardet and extracts all the potential encodings it
-    considered before deciding on a particular result.
-
-    :param data: An array of bytes to treat as text data
-    :type  data: bytes
-
-    :return: A dictionary mapping possible encodings to confidence levels
-    :rtype:  dict
-    """
-    if not data:
-        # It's an empty string so we can safely say it's ascii
-        return {'ascii': 1.0}
-
-    # We can't use ``chardet.detect`` because we want to dig in the internals
-    # of the detector to bias the utf-8 result.
-    detector = universaldetector.UniversalDetector()
-    detector.reset()
-    detector.feed(data)
-    result = detector.close()
-    if not result:
-        return {'utf-8': 1.0}
-    encodings = {result['encoding']: result['confidence']}
-    for prober in detector._mCharSetProbers:
-        if prober:
-            encodings[prober.get_charset_name()] = prober.get_confidence()
-
-    return encodings
 
 
 def decode(data):
