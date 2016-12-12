@@ -2948,7 +2948,7 @@ def add_token_to_user(session, project, acls, username):
     return 'Token created'
 
 
-def text2markdown(text, extended=True):
+def text2markdown(text, extended=True, readme=False):
     """ Simple text to html converter using the markdown library.
     """
     extensions = [
@@ -2961,10 +2961,14 @@ def text2markdown(text, extended=True):
         # All of the above are the .extra extensions - the attribute lists one
         'markdown.extensions.admonition',
         'markdown.extensions.codehilite',
-        'markdown.extensions.nl2br',
         'markdown.extensions.sane_lists',
         'markdown.extensions.toc',
     ]
+    # Some extensions are disabled for READMEs and enabled otherwise
+    if not readme:
+        extensions.append(
+            'markdown.extensions.nl2br',
+        )
     if extended:
         # Install our markdown modifications
         extensions.append('pagure.pfmarkdown')
