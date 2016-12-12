@@ -533,7 +533,13 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
             content, safe = pagure.doc_utils.convert_readme(content.data, ext)
             output_type = 'markup'
         elif not is_binary_string(content.data):
-            file_content = encoding_utils.decode(ktc.to_bytes(content.data))
+            try:
+                file_content = encoding_utils.decode(ktc.to_bytes(content.data))
+            except pagure.exceptions.PagureException:
+                # We cannot decode the file, so let's pretend it's a binary
+                # file and let the user download it instead of displaying
+                # it.
+                output_type = 'binary'
             try:
                 lexer = guess_lexer_for_filename(
                     filename,
@@ -670,7 +676,11 @@ def view_raw_file(
         headers['Content-Disposition'] = 'attachment'
 
     if mimetype.startswith('text/') and not encoding:
-        encoding = encoding_utils.guess_encoding(ktc.to_bytes(data))
+        try:
+            encoding = encoding_utils.guess_encoding(ktc.to_bytes(data))
+        except pagure.exceptions.PagureException:
+            # We cannot decode the file, so bail but warn the admins
+            LOG.exception('File could not be decoded')
 
     if encoding:
         mimetype += '; charset={encoding}'.format(encoding=encoding)
@@ -708,7 +718,13 @@ def view_blame_file(repo, filename, username=None, namespace=None):
     if is_binary_string(content.data):
         flask.abort(400, 'Binary files cannot be blamed')
 
-    content = encoding_utils.decode(content.data)
+    try:
+        content = encoding_utils.decode(content.data)
+    except pagure.exceptions.PagureException:
+        # We cannot decode the file, so bail but warn the admins
+        LOG.exception('File could not be decoded')
+        flask.abort(400, 'File could not be decoded')
+
     blame = repo_obj.blame(filename)
 
     return flask.render_template(

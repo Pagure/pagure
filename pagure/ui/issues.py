@@ -1175,8 +1175,12 @@ def view_issue_raw_file(
         headers['Content-Disposition'] = 'attachment'
 
     if mimetype.startswith('text/') and not encoding:
-        encoding = pagure.lib.encoding_utils.guess_encoding(
-            ktc.to_bytes(data))
+        try:
+            encoding = pagure.lib.encoding_utils.guess_encoding(
+                ktc.to_bytes(data))
+        except pagure.exceptions.PagureException:
+            # We cannot decode the file, so bail but warn the admins
+            LOG.exception('File could not be decoded')
 
     if encoding:
         mimetype += '; charset={encoding}'.format(encoding=encoding)

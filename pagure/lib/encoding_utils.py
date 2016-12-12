@@ -17,6 +17,8 @@ import logging
 
 from chardet import universaldetector
 
+from pagure.exceptions import PagureException
+
 
 _log = logging.getLogger(__name__)
 
@@ -55,7 +57,14 @@ def guess_encoding(data):
         encodings, key=lambda guess: guess.confidence, reverse=True)
 
     _log.debug('Possible encodings: ' + str(sorted_encodings))
-    return sorted_encodings[0].encoding
+    for encoding in sorted_encodings:
+        _log.debug('Trying encoding: %s', str(encoding))
+        try:
+            data.decode(encoding.encoding)
+            return encoding.encoding
+        except UnicodeDecodeError:
+            pass
+    raise PagureException('No encoding could be guessed for this file')
 
 
 def detect_encodings(data):
