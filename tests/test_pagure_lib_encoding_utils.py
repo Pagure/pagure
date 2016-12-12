@@ -40,6 +40,25 @@ class TestGuessEncoding(unittest.TestCase):
         self.assertEqual(result, 'ascii')
 
 
+class TestGuessEncodings(unittest.TestCase):
+
+    def test_guess_encodings(self):
+        """ Test the encoding_utils.guess_encodings() method. """
+        data = u'Šabata'.encode('utf-8')
+        result = encoding_utils.guess_encodings(data)
+        chardet_result = chardet.detect(data)
+        self.assertEqual(
+            [encoding.encoding for encoding in result],
+            ['utf-8', 'ISO-8859-2', 'windows-1252'])
+        self.assertEqual(chardet_result['encoding'], 'ISO-8859-2')
+
+    def test_guess_encodings_no_data(self):
+        """ Test encoding_utils.guess_encodings() with an emtpy string """
+        result = encoding_utils.guess_encodings(u''.encode('utf-8'))
+        self.assertEqual(
+            [encoding.encoding for encoding in result],
+            ['ascii'])
+
 class TestDecode(unittest.TestCase):
 
     def test_decode(self):
