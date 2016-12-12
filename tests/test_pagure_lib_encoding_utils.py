@@ -4,7 +4,12 @@ Tests for :module:`pagure.lib.encoding_utils`.
 """
 
 import chardet
+import os
 import unittest
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(
+    os.path.abspath(__file__)), '..'))
 
 from pagure.lib import encoding_utils
 
@@ -30,6 +35,7 @@ class TestGuessEncoding(unittest.TestCase):
         self.assertEqual(chardet_result['encoding'], 'ISO-8859-2')
 
     def test_guess_encoding_no_data(self):
+        """ Test encoding_utils.guess_encoding() with an emtpy string """
         result = encoding_utils.guess_encoding(u''.encode('utf-8'))
         self.assertEqual(result, 'ascii')
 
@@ -37,9 +43,10 @@ class TestGuessEncoding(unittest.TestCase):
 class TestDecode(unittest.TestCase):
 
     def test_decode(self):
+        """ Test encoding_utils.decode() """
         data = u'Šabata'
         self.assertEqual(data, encoding_utils.decode(data.encode('utf-8')))
 
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(verbosity=2)
