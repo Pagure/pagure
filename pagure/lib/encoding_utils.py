@@ -34,9 +34,9 @@ def detect_encodings(data):
 
     :param data: An array of bytes to treat as text data
     :type  data: bytes
-
     :return: A dictionary mapping possible encodings to confidence levels
     :rtype:  dict
+
     """
     if not data:
         # It's an empty string so we can safely say it's ascii
@@ -74,6 +74,9 @@ def guess_encodings(data):
 
     :param data: An array of bytes to treat as text data
     :type  data: bytes
+    :return: A dictionary mapping possible encodings to confidence levels
+    :rtype:  dict
+
     """
     encodings = detect_encodings(data)
 
@@ -109,8 +112,11 @@ def guess_encoding(data):
 
     :param data: An array of bytes to treat as text data
     :type  data: bytes
+    :return: A string of the best encoding found
+    :rtype: str
     :raises PagureException: if no encoding was found that the data could
         be decoded into
+
     """
     encodings = guess_encodings(data)
 
