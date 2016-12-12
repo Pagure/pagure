@@ -58,13 +58,21 @@
   <h5 class="text-muted">
     {% if commit.author| author2user == commit.committer| author2user %}
       <a href="#" id="diff_list_link">{{ diff|count}} file{{'s' if diff|count > 1 }}</a>
-      Authored and Committed by {{ commit.author | author2user |safe }}
+      {% if commit.parents | length == 1 %}
+        Authored and Committed by {{ commit.author | author2user |safe }}
+      {% else %}
+        Merged and Committed by {{ commit.author | author2user |safe }}
+      {% endif %}
       <span data-toggle="tooltip" title="{{ commit.commit_time | format_ts }}">
         {{ commit.commit_time | humanize }}
       </span>
     {% else %}
       <a href="#" id="diff_list_link">{{ diff|count}} file{{'s' if diff|count > 1 }}</a>
-      Authored by {{ commit.author | author2user |safe }}
+      {% if commit.parents | length == 1 %}
+        Authored by {{ commit.author | author2user |safe }}
+      {% else %}
+        Merged by {{ commit.author | author2user |safe }}
+      {% endif %}
       <span data-toggle="tooltip" title="{{ commit.commit_time | format_ts }}">
         {{ commit.commit_time | humanize }}
       </span>,
