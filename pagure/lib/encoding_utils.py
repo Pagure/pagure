@@ -25,9 +25,10 @@ _log = logging.getLogger(__name__)
 Guess = namedtuple('Guess', ['encoding', 'confidence'])
 
 
-def guess_encoding(data):
+
+def guess_encodings(data):
     """
-    Attempt to guess the text encoding used for the given data.
+    List all the possible encoding found for the given data.
 
     This uses chardet to guess the encoding, but biases the results towards
     UTF-8. There are cases where chardet cannot know the encoding and
@@ -57,7 +58,31 @@ def guess_encoding(data):
         encodings, key=lambda guess: guess.confidence, reverse=True)
 
     _log.debug('Possible encodings: ' + str(sorted_encodings))
-    for encoding in sorted_encodings:
+    return sorted_encodings
+
+
+def guess_encoding(data):
+    """
+    Attempt to guess the text encoding used for the given data.
+
+    This uses chardet to guess the encoding, but biases the results towards
+    UTF-8. There are cases where chardet cannot know the encoding and
+    therefore is occasionally wrong. In those cases it was decided that it
+    would be better to err on the side of UTF-8 rather than ISO-8859-*.
+    However, it is important to be aware that this also guesses and _will_
+    misclassify ISO-8859-* encoded text as UTF-8 in some cases.
+
+    The discussion that lead to this decision can be found at
+    https://pagure.io/pagure/issue/891.
+
+    :param data: An array of bytes to treat as text data
+    :type  data: bytes
+    :raises PagureException: if no encoding was found that the data could
+        be decoded into
+    """
+    encodings = guess_encodings(data)
+
+    for encoding in encodings:
         _log.debug('Trying encoding: %s', str(encoding))
         try:
             data.decode(encoding.encoding)
