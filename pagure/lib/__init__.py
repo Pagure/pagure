@@ -264,6 +264,8 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
         date_created=date_created,
         notification=notification,
     )
+    issue.last_updated = datetime.datetime.utcnow()
+    session.add(issue)
     session.add(issue_comment)
     # Make sure we won't have SQLAlchemy error before we continue
     session.commit()
