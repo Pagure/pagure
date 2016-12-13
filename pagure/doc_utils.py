@@ -12,11 +12,13 @@
 import docutils
 import docutils.core
 import docutils.examples
+import kitchen.text.converters as ktc
 import markupsafe
 import markdown
 import textwrap
 
 import pagure.lib
+import pagure.lib.encoding_utils
 
 
 def modify_rst(rst, view_file_url=None):
@@ -95,17 +97,17 @@ def convert_readme(content, ext, view_file_url=None):
     ''' Convert the provided content according to the extension of the file
     provided.
     '''
-    output = content
+    output = pagure.lib.encoding_utils.decode(ktc.to_bytes(content))
     safe = False
     if ext and ext in ['.rst']:
         safe = True
-        output = convert_doc(content.decode('utf-8'), view_file_url)
+        output = convert_doc(output, view_file_url)
     elif ext and ext in ['.mk', '.md', '.markdown']:
-        output = pagure.lib.text2markdown(content.decode('utf-8'))
+        output = pagure.lib.text2markdown(output)
         safe = True
     elif not ext or (ext and ext in ['.text', '.txt']):
         safe = True
-        output = '<pre>%s</pre>' % content
+        output = '<pre>%s</pre>' % output
     return output, safe
 
 
