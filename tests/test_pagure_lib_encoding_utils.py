@@ -35,7 +35,7 @@ class TestGuessEncoding(unittest.TestCase):
         self.assertEqual(chardet_result['encoding'], 'ISO-8859-2')
 
     def test_guess_encoding_no_data(self):
-        """ Test encoding_utils.guess_encoding() with an emtpy string """
+        """ Test encoding_utils.guess_encoding() with an empty string """
         result = encoding_utils.guess_encoding(u''.encode('utf-8'))
         self.assertEqual(result, 'ascii')
 
