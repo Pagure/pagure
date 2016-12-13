@@ -121,7 +121,7 @@ def guess_encoding(data):
     encodings = guess_encodings(data)
 
     for encoding in encodings:
-        _log.debug('Trying encoding: %s', str(encoding))
+        _log.debug('Trying encoding: %s', encoding)
         try:
             data.decode(encoding.encoding)
             return encoding.encoding
