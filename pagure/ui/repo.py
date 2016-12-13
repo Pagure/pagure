@@ -723,7 +723,7 @@ def view_blame_file(repo, filename, username=None, namespace=None):
     except pagure.exceptions.PagureException:
         # We cannot decode the file, so bail but warn the admins
         LOG.exception('File could not be decoded')
-        flask.abort(400, 'File could not be decoded')
+        flask.abort(500, 'File could not be decoded')
 
     blame = repo_obj.blame(filename)
 
