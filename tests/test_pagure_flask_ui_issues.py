@@ -1856,6 +1856,88 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(len(issue.comments), 1)
         self.assertEqual(issue.comments[0].comment, 'Second update')
 
+        # Create another issue from someone else
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='foo',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(len(issue.comments), 1)
+        self.assertEqual(issue.status, 'Open')
+
+        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
+        self.assertEqual(len(issue.comments), 0)
+        self.assertEqual(issue.status, 'Open')
+
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(pagure.APP, user):
+            data = {
+                'csrf_token' : csrf_token,
+                'comment' : 'Nevermind figured it out',
+                'status': 'Closed',
+                'close_status': 'Invalid'
+            }
+
+            # Add a comment and close the ticket #1
+            output = self.app.post(
+                '/test/issue/1/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertNotIn(
+                '</button>\n                      '
+                'Successfully edited issue #1\n',
+                output.data
+            )
+            self.assertIn(
+                '</button>\n                      Comment added\n',
+                output.data
+            )
+            self.assertNotIn(
+                'editmetadatatoggle">\n              Edit Metadata',
+                output.data
+            )
+
+            data = {
+                'csrf_token' : csrf_token,
+                'comment' : 'Nevermind figured it out',
+                'status': 'Closed',
+                'close_status': 'Invalid'
+            }
+
+            # Add a comment and close the ticket #2
+            output = self.app.post(
+                '/test/issue/2/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '</button>\n                      '
+                'Successfully edited issue #2\n',
+                output.data
+            )
+            self.assertIn(
+                '</button>\n                      Comment added\n',
+                output.data
+            )
+            self.assertIn(
+                'editmetadatatoggle">\n              Edit Metadata',
+                output.data
+            )
+
+        # Ticket #1 has one more comment and is still open
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(len(issue.comments), 2)
+        self.assertEqual(issue.status, 'Open')
+
+        # Ticket #2 has one more comment and is closed
+        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
+        self.assertEqual(len(issue.comments), 2)
+        self.assertEqual(issue.status, 'Closed')
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
