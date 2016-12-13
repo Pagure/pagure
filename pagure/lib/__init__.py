@@ -948,6 +948,7 @@ def edit_comment(session, parent, comment, user,
     comment.editor = user_obj
     parent.last_updated = comment.edited_on
 
+    session.add(parent)
     session.add(comment)
     # Make sure we won't have SQLAlchemy error before we continue
     session.flush()

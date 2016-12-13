@@ -171,6 +171,8 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     'You are not allowed to remove this comment from '
                     'this issue')
 
+            issue.last_updated = datetime.datetime.utcnow()
+            SESSION.add(issue)
             SESSION.delete(comment)
             try:
                 SESSION.commit()
