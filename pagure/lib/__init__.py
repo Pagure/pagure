@@ -3420,20 +3420,30 @@ def set_custom_key_value(session, issue, key, value):
 
     current_field = query.first()
     updated = False
+    delete = False
     if current_field:
         if current_field.key.key_type == 'boolean':
             value = value or False
-        if current_field.value != value:
+        if value is None:
+            session.delete(current_field)
+            updated = True
+            delete = True
+        elif current_field.value != value:
             current_field.value = value
             updated = True
     else:
+        if not value:
+            raise pagure.exceptions.PagureException(
+                'No value given to this new custom field: %s' % key.name
+            )
         current_field = model.IssueValues(
             issue_uid=issue.uid,
             key_id=key.id,
             value=value,
         )
         updated = True
-    session.add(current_field)
+    if not delete:
+        session.add(current_field)
 
     if REDIS and updated:
         if issue.private:
