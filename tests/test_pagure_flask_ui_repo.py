@@ -1727,7 +1727,7 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertTrue(
             '<div class="list-group" id="diff_list" style="display:none;">'
             in output.data)
-        self.assertTrue('  Authored by Alice Author\n' in output.data)
+        self.assertTrue('  Merged by Alice Author\n' in output.data)
         self.assertTrue('  Committed by Cecil Committer\n' in output.data)
 
         # View first commit - with the old URL scheme disabled - default
