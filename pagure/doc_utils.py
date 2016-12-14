@@ -103,7 +103,7 @@ def convert_readme(content, ext, view_file_url=None):
         safe = True
         output = convert_doc(output, view_file_url)
     elif ext and ext in ['.mk', '.md', '.markdown']:
-        output = pagure.lib.text2markdown(content, readme=True)
+        output = pagure.lib.text2markdown(output, readme=True)
         safe = True
     elif not ext or (ext and ext in ['.text', '.txt']):
         safe = True
