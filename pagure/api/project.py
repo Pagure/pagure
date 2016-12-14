@@ -178,6 +178,49 @@ def api_projects():
     return jsonout
 
 
+@API.route('/<repo>')
+@API.route('/<namespace>/<repo>')
+@API.route('/fork/<username>/<repo>')
+@API.route('/fork/<username>/<namespace>/<repo>')
+@api_method
+def api_project(repo, username=None, namespace=None):
+    """
+    Project information
+    -------------------
+    Return information about a specific project
+
+    ::
+
+        GET /api/0/<repo>
+        GET /api/0/<namespace>/<repo>
+
+    ::
+
+        GET /api/0/fork/<username>/<repo>
+        GET /api/0/fork/<username>/<namespace>/<repo>
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "total_tags": 2,
+          "tags": ["0.0.1", "0.0.2"]
+        }
+
+    """
+    repo = pagure.lib.get_project(
+        SESSION, repo, user=username, namespace=namespace)
+
+    if repo is None:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    jsonout = flask.jsonify(repo.to_json(api=True, public=True))
+    return jsonout
+
+
+
 @API.route('/new/', methods=['POST'])
 @API.route('/new', methods=['POST'])
 @api_login_required(acls=['create_project'])

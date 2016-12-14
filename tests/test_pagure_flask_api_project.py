@@ -308,6 +308,67 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             }
         )
 
+    def test_api_project(self):
+        """ Test the api_project method of the flask api. """
+        tests.create_projects(self.session)
+
+        # Check before adding
+        repo = pagure.lib.get_project(self.session, 'test')
+        self.assertEqual(repo.tags, [])
+
+        # Adding a tag
+        output = pagure.lib.update_tags(
+            self.session, repo, 'infra', 'pingou',
+            ticketfolder=None)
+        self.assertEqual(output, ['Tag added: infra'])
+
+        # Check after adding
+        repo = pagure.lib.get_project(self.session, 'test')
+        self.assertEqual(len(repo.tags), 1)
+        self.assertEqual(repo.tags_text, ['infra'])
+
+        # Check the API
+
+        # Non-existing project
+        output = self.app.get('/api/0/random')
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'error_code': 'ENOPROJECT', 'error': 'Project not found'}
+        )
+
+        # Existing project
+        output = self.app.get('/api/0/test')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        data['date_created'] = "1436527638"
+        self.assertDictEqual(
+            data,
+            {
+              "close_status": [
+                "Invalid",
+                "Insufficient data",
+                "Fixed",
+                "Duplicate"
+              ],
+              "custom_keys": [],
+              "date_created": "1436527638",
+              "description": "test project #1",
+              "id": 1,
+              "milestones": {},
+              "name": "test",
+              "namespace": None,
+              "parent": None,
+              "priorities": {},
+              "tags": ["infra"],
+              "user": {
+                "fullname": "PY C",
+                "name": "pingou"
+              }
+            }
+        )
+
     @patch('pagure.lib.git.generate_gitolite_acls')
     def test_api_new_project(self, p_gga):
         """ Test the api_new_project method of the flask api. """

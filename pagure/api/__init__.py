@@ -433,8 +433,9 @@ def api_error_codes():
 @API.route('/')
 def api():
     ''' Display the api information page. '''
-    api_git_tags_doc = load_doc(project.api_git_tags)
+    api_project_doc = load_doc(project.api_project)
     api_projects_doc = load_doc(project.api_projects)
+    api_git_tags_doc = load_doc(project.api_git_tags)
 
     issues = []
     if pagure.APP.config.get('ENABLE_TICKETS', True):
@@ -486,8 +487,9 @@ def api():
         api_doc=APIDOC,
         projects=[
             api_new_project_doc,
-            api_git_tags_doc,
+            api_project_doc,
             api_projects_doc,
+            api_git_tags_doc,
         ],
         issues=issues,
         requests=[
