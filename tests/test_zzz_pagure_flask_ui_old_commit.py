@@ -96,10 +96,15 @@ class PagureFlaskRepoOldUrltests(tests.Modeltests):
             in output.data)
         self.assertTrue('  Authored by Alice Author\n' in output.data)
         self.assertTrue('  Committed by Cecil Committer\n' in output.data)
+
         self.assertTrue(
-            '<span style="color: #00A000">+ Pagure</span>' in output.data)
+            '<span style="background-color: #f0f0f0; padding: 0 5px 0 5px">' +
+            ' 2 </span><span style="color: #00A000; background-color: ' +
+            '#ddffdd">+ Pagure</span>' in output.data)
         self.assertTrue(
-            '<span style="color: #00A000">+ ======</span>' in output.data)
+            '<span style="background-color: #f0f0f0; padding: 0 5px 0 5px">' +
+            ' 3 </span><span style="color: #00A000; background-color: ' +
+            '#ddffdd">+ ======</span>' in output.data)
 
         self.app = pagure.APP.test_client()
         # View first commit - with the old URL scheme
@@ -111,10 +116,15 @@ class PagureFlaskRepoOldUrltests(tests.Modeltests):
             in output.data)
         self.assertTrue('  Authored by Alice Author\n' in output.data)
         self.assertTrue('  Committed by Cecil Committer\n' in output.data)
+
         self.assertTrue(
-            '<span style="color: #00A000">+ Pagure</span>' in output.data)
+            '<span style="background-color: #f0f0f0; padding: 0 5px 0 5px"> 2' +
+            ' </span><span style="color: #00A000; background-color: #ddffdd">' +
+            '+ Pagure</span>' in output.data)
         self.assertTrue(
-            '<span style="color: #00A000">+ ======</span>' in output.data)
+            '<span style="background-color: #f0f0f0; padding: 0 5px 0 5px">' +
+            ' 3 </span><span style="color: #00A000; background-color: ' +
+            '#ddffdd">+ ======</span>' in output.data)
 
         # Add some content to the git repo
         tests.add_content_git_repo(os.path.join(self.path, 'test.git'))
@@ -133,16 +143,16 @@ class PagureFlaskRepoOldUrltests(tests.Modeltests):
         self.assertTrue('  Committed by Cecil Committer\n' in output.data)
         self.assertTrue(
             # new version of pygments
-            '<div class="highlight" style="background: #f8f8f8">'
-            '<pre style="line-height: 125%">'
-            '<span></span>'
-            '<span style="color: #800080; font-weight: bold">'
-            '@@ -0,0 +1,3 @@</span>' in output.data
+            '<div class="highlight" style="background: #f8f8f8"><pre style' +
+            '="line-height: 125%"><span></span><span style="background-color' +
+            ': #f0f0f0; padding: 0 5px 0 5px">1 </span><span style="color: ' +
+            '#800080; font-weight: bold">@@ -0,0 +1,3 @@</span>' in
+            output.data
             or
             # old version of pygments
-            '<div class="highlight" style="background: #f8f8f8">'
-            '<pre style="line-height: 125%">'
-            '<span style="color: #800080; font-weight: bold">'
+            '<div class="highlight" style="background: #f8f8f8">' +
+            '<pre style="line-height: 125%">' +
+            '<span style="color: #800080; font-weight: bold">' +
             '@@ -0,0 +1,3 @@</span>' in output.data)
 
         # Add a fork of a fork
@@ -180,9 +190,13 @@ class PagureFlaskRepoOldUrltests(tests.Modeltests):
         self.assertTrue('  Authored by Alice Author\n' in output.data)
         self.assertTrue('  Committed by Cecil Committer\n' in output.data)
         self.assertTrue(
-            '<span style="color: #00A000">+ Pagure</span>' in output.data)
+            '<span style="background-color: #f0f0f0; padding: 0 5px 0 5px"> 2' +
+            ' </span><span style="color: #00A000; background-color: #ddffdd">' +
+            '+ Pagure</span>' in output.data)
         self.assertTrue(
-            '<span style="color: #00A000">+ ======</span>' in output.data)
+            '<span style="background-color: #f0f0f0; padding: 0 5px 0 5px"> 3' +
+            ' </span><span style="color: #00A000; background-color: #ddffdd">' +
+            '+ ======</span>' in output.data)
 
         # View commit of fork - With the old URL scheme
         output = self.app.get(
@@ -194,9 +208,13 @@ class PagureFlaskRepoOldUrltests(tests.Modeltests):
         self.assertTrue('  Authored by Alice Author\n' in output.data)
         self.assertTrue('  Committed by Cecil Committer\n' in output.data)
         self.assertTrue(
-            '<span style="color: #00A000">+ Pagure</span>' in output.data)
+            '<span style="background-color: #f0f0f0; padding: 0 5px 0 5px"> 2' +
+            ' </span><span style="color: #00A000; background-color: #ddffdd">' +
+            '+ Pagure</span>' in output.data)
         self.assertTrue(
-            '<span style="color: #00A000">+ ======</span>' in output.data)
+            '<span style="background-color: #f0f0f0; padding: 0 5px 0 5px"> 3' +
+            ' </span><span style="color: #00A000; background-color: #ddffdd">' +
+            '+ ======</span>' in output.data)
 
         # Try the old URL scheme with a short hash
         output = self.app.get(

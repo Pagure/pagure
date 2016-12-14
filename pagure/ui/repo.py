@@ -33,6 +33,7 @@ from pygments.formatters import HtmlFormatter
 from pygments.lexers import guess_lexer_for_filename
 from pygments.lexers.special import TextLexer
 from pygments.util import ClassNotFound
+from pygments.filters import VisibleWhitespaceFilter
 from sqlalchemy.exc import SQLAlchemyError
 
 import mimetypes
@@ -548,12 +549,18 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
             except (ClassNotFound, TypeError):
                 lexer = TextLexer()
 
+            style = "tango"
+
+            if ext in ('.diff', '.patch'):
+                lexer.add_filter(VisibleWhitespaceFilter(
+                    wstokentype=False, tabs=True))
+                style = "diffstyle"
             content = highlight(
                 file_content,
                 lexer,
                 HtmlFormatter(
                     noclasses=True,
-                    style="tango",)
+                    style=style,)
             )
             output_type = 'file'
         else:

@@ -1,0 +1,18 @@
+{% extends "repo_master.html" %}
+
+{% block title %}Patch File - {{
+    repo.namespace + '/' if repo.namespace }}{{ repo.name }} {% endblock %}
+
+{% block repo %}
+<div class="card" id="patch-file">
+        <h1>{{ patchfile }}</h1>
+        <hr />
+        {% autoescape false %}
+        {{ diff|html_diff}}
+        {% endautoescape %}
+</div>
+{% endblock %}
+
+{% block jscripts %}
+    {{ super() }}
+{% endblock %}

@@ -58,6 +58,8 @@ setup(
     entry_points="""
     [moksha.consumer]
     integrator = pagureCI.consumer:Integrator
+    [pygments.styles]
+    diffstyle = pagure.ui.diff_style:DiffStyle
     """,
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',

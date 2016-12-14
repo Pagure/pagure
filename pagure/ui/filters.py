@@ -25,6 +25,7 @@ import six
 from pygments import highlight
 from pygments.lexers.text import DiffLexer
 from pygments.formatters import HtmlFormatter
+from pygments.filters import VisibleWhitespaceFilter
 
 import pagure.exceptions
 import pagure.lib
@@ -153,8 +154,8 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
         tpl_delete = '<button class="btn btn-secondary btn-sm" '\
             'title="Remove comment" '\
             'name="drop_comment" value="%(commentid)s" type="submit" ' \
-            'onclick="return confirm(\'Do you really want to remove this comment?\');" '\
-            '><span class="oi" data-glyph="trash"></span>' \
+            'onclick="return confirm(\'Do you really want to remove this' \
+            ' comment?\');" ><span class="oi" data-glyph="trash"></span>' \
             '</button>'
 
         if cnt - 1 in comments:
@@ -166,10 +167,10 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
                 status = str(comment.parent.status).lower()
                 if authenticated() and (
                         (
-                            status in ['true', 'open']
-                            and comment.user.user == flask.g.fas_user.username
-                        )
-                        or is_repo_admin(comment.parent.project)):
+                            status in ['true', 'open'] and
+                            comment.user.user == flask.g.fas_user.username
+                        ) or
+                        is_repo_admin(comment.parent.project)):
                     templ_delete = tpl_delete % ({'commentid': comment.id})
                     templ_edit = tpl_edit % ({
                         'edit_url': flask.url_for(
@@ -377,12 +378,19 @@ def html_diff(diff):
     """Display diff as HTML"""
     if diff is None:
         return
+    difflexer = DiffLexer()
+    # Do not give whitespaces the special Whitespace token type as this
+    # prevents the html formatter from picking up on trailing whitespaces in
+    # the diff.
+    difflexer.add_filter(VisibleWhitespaceFilter(wstokentype=False, tabs=True))
+
     return highlight(
         diff,
-        DiffLexer(),
+        difflexer,
         HtmlFormatter(
+            linenos='inline',
             noclasses=True,
-            style="tango",)
+            style="diffstyle")
     )
 
 

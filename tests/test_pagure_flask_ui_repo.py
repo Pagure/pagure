@@ -1209,11 +1209,8 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '\n        2\n      </span>',
                 output.data)
             self.assertIn(
-                '<span style="color: #800080; font-weight: bold">' +
-                '@@ -1,2 +1,1 @@</span>',
-                output.data)
-            self.assertIn(
-                '<span style="color: #a40000">- Row 0</span>', output.data)
+                '<span style="color: #a40000; background-color: #ffdddd">- ' +
+                'Row 0', output.data)
             # View inverse commits comparison
             output = self.app.get('/test/c/%s..%s' % (c1.oid.hex, c2.oid.hex))
             self.assertEqual(output.status_code, 200)
@@ -1232,12 +1229,8 @@ class PagureFlaskRepotests(tests.Modeltests):
                 (c1.oid.hex, c2.oid.hex),
                 output.data)
             self.assertIn(
-                '<span style="color: #800080; font-weight: bold">' +
-                '@@ -1,1 +1,2 @@</span>',
-                output.data)
-            self.assertIn(
-                '<span style="color: #00A000">+ Row 0</span>',
-                output.data)
+                '<span style="color: #00A000; background-color: #ddffdd">' +
+                '+ Row 0', output.data)
 
         def compare_all(c1, c3):
             # View commits comparison
@@ -1251,14 +1244,12 @@ class PagureFlaskRepotests(tests.Modeltests):
                 (c1.oid.hex, c3.oid.hex),
                 output.data)
             self.assertIn(
-                '<span style="color: #800080; font-weight: bold">' +
-                '@@ -1,1 +1,2 @@</span>',
-                output.data)
-            self.assertIn(
-                '<span style="color: #00A000">+ Row 0</span>', output.data)
+                '<span style="color: #00A000; background-color: ' +
+                '#ddffdd">+ Row 0</span>', output.data)
             self.assertEqual(
                 output.data.count(
-                    '<span style="color: #00A000">+ Row 0</span>'), 2)
+                '<span style="color: #00A000; background-color: ' +
+                '#ddffdd">+ Row 0'), 2)
             self.assertIn(
                 '<span class="hidden-sm-down">Commits&nbsp;</span>\n      ' +
                 '<span ' +
@@ -1282,15 +1273,11 @@ class PagureFlaskRepotests(tests.Modeltests):
                 (c3.oid.hex, c1.oid.hex),
                 output.data)
             self.assertIn(
-                '<span style="color: #800080; font-weight: bold">' +
-                '@@ -1,2 +1,1 @@</span>',
-                output.data)
+                '<span style="color: #800080; font-weight: bold">@@ -1,2 +1,1' +
+                ' @@', output.data)
             self.assertIn(
-                '<span style="color: #a40000">- Row 0</span>',
-                output.data)
-            self.assertEqual(
-                output.data.count(
-                    '<span style="color: #a40000">- Row 0</span>'), 1)
+                '<span style="color: #a40000; background-color: #ffdddd">- ' +
+                'Row 0</span>', output.data)
             self.assertIn(
                 '<span class="hidden-sm-down">Commits&nbsp;</span>\n      ' +
                 '<span ' +
@@ -1742,10 +1729,6 @@ class PagureFlaskRepotests(tests.Modeltests):
             in output.data)
         self.assertTrue('  Authored by Alice Author\n' in output.data)
         self.assertTrue('  Committed by Cecil Committer\n' in output.data)
-        self.assertTrue(
-            '<span style="color: #00A000">+ Pagure</span>' in output.data)
-        self.assertTrue(
-            '<span style="color: #00A000">+ ======</span>' in output.data)
 
         # View first commit - with the old URL scheme disabled - default
         output = self.app.get(
@@ -1768,18 +1751,8 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertTrue('  Authored by Alice Author\n' in output.data)
         self.assertTrue('  Committed by Cecil Committer\n' in output.data)
         self.assertTrue(
-            # new version of pygments
-            '<div class="highlight" style="background: #f8f8f8">'
-            '<pre style="line-height: 125%">'
-            '<span></span>'
-            '<span style="color: #800080; font-weight: bold">'
-            '@@ -0,0 +1,3 @@</span>' in output.data
-            or
-            # old version of pygments
-            '<div class="highlight" style="background: #f8f8f8">'
-            '<pre style="line-height: 125%">'
-            '<span style="color: #800080; font-weight: bold">'
-            '@@ -0,0 +1,3 @@</span>' in output.data)
+            '<span style="background-color: #f0f0f0' in
+            output.data)
 
         #View the commit when branch name is provided
         output = self.app.get('/test/c/%s?branch=master' % commit.oid.hex)
@@ -1829,9 +1802,13 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertTrue('  Authored by Alice Author\n' in output.data)
         self.assertTrue('  Committed by Cecil Committer\n' in output.data)
         self.assertTrue(
-            '<span style="color: #00A000">+ Pagure</span>' in output.data)
+            '<span style="background-color: #f0f0f0; padding: 0 5px 0 5px"> 2' +
+            ' </span><span style="color: #00A000; background-color: #ddffdd">' +
+            '+ Pagure</span>' in output.data)
         self.assertTrue(
-            '<span style="color: #00A000">+ ======</span>' in output.data)
+            '<span style="background-color: #f0f0f0; padding: 0 5px 0 5px"> 3' +
+            ' </span><span style="color: #00A000; background-color: #ddffdd">' +
+            '+ ======</span>' in output.data)
 
         # Try the old URL scheme with a short hash
         output = self.app.get(

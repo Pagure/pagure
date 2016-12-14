@@ -13,7 +13,6 @@
 # pylint: disable=too-many-locals
 # pylint: disable=too-many-statements
 
-
 import flask
 import os
 from collections import defaultdict
@@ -22,6 +21,7 @@ from math import ceil
 import pygit2
 import werkzeug.datastructures
 from sqlalchemy.exc import SQLAlchemyError
+from binaryornot.helpers import is_binary_string
 
 import kitchen.text.converters as ktc
 import mimetypes
@@ -82,9 +82,8 @@ urlregex = re.compile(
 )
 urlpattern = re.compile(urlregex)
 
+
 # URLs
-
-
 @APP.route(
     '/<repo>/issue/<int:issueid>/update/',
     methods=['GET', 'POST'])
@@ -163,9 +162,9 @@ def update_issue(repo, issueid, username=None, namespace=None):
             if comment is None or comment.issue.project != repo:
                 flask.abort(404, 'Comment not found')
 
-            if (flask.g.fas_user.username != comment.user.username
-                    or comment.parent.status != 'Open') \
-                    and not flask.g.repo_admin:
+            if (flask.g.fas_user.username != comment.user.username or
+                    comment.parent.status != 'Open') and not \
+                    flask.g.repo_admin:
                 flask.abort(
                     403,
                     'You are not allowed to remove this comment from '
@@ -975,8 +974,8 @@ def edit_issue(repo, issueid, username=None, namespace=None):
     if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
 
-    if not (flask.g.repo_admin
-            or flask.g.fas_user.username == issue.user.username):
+    if not (flask.g.repo_admin or
+            flask.g.fas_user.username == issue.user.username):
         flask.abort(
             403, 'You are not allowed to edit issues for this project')
 
@@ -1156,6 +1155,20 @@ def view_issue_raw_file(
     if not data:
         flask.abort(404, 'No content found')
 
+    if (filename.endswith('.patch') or filename.endswith('.diff')) \
+            and not is_binary_string(content.data):
+        # We have a patch file attached to this issue, render the diff in html
+        orig_filename = filename.split('-', 1)[1]
+        return flask.render_template(
+            'patchfile.html',
+            select='issues',
+            repo=repo,
+            username=username,
+            diff=data,
+            patchfile=orig_filename,
+            form=pagure.forms.ConfirmationForm(),
+        )
+
     if not mimetype and data[:2] == '#!':
         mimetype = 'text/plain'
 
@@ -1186,8 +1199,8 @@ def view_issue_raw_file(
 
 @APP.route('/<repo>/issue/<int:issueid>/comment/<int:commentid>/edit',
            methods=('GET', 'POST'))
-@APP.route('/<namespace>/<repo>/issue/<int:issueid>/comment/<int:commentid>/edit',
-           methods=('GET', 'POST'))
+@APP.route('/<namespace>/<repo>/issue/<int:issueid>/comment/<int:commentid>/' +
+           'edit', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<repo>/issue/<int:issueid>/comment'
            '/<int:commentid>/edit', methods=('GET', 'POST'))
 @APP.route('/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/comment'
@@ -1215,8 +1228,8 @@ def edit_comment_issue(
     if comment is None or comment.parent.project != project:
         flask.abort(404, 'Comment not found')
 
-    if (flask.g.fas_user.username != comment.user.username
-            or comment.parent.status != 'Open') \
+    if (flask.g.fas_user.username != comment.user.username or
+            comment.parent.status != 'Open') \
             and not flask.g.repo_admin:
         flask.abort(403, 'You are not allowed to edit this comment')
 
