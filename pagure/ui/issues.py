@@ -13,9 +13,10 @@
 # pylint: disable=too-many-locals
 # pylint: disable=too-many-statements
 
+
+import datetime
 import flask
 import os
-import datetime
 from collections import defaultdict
 from math import ceil
 
@@ -233,6 +234,11 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     username=flask.g.fas_user.username,
                     ticketfolder=APP.config['TICKETS_FOLDER']
                 )))
+
+            # The meta-data can be changed by admins and issue creator,
+            # where issue creators can only change status of their issue while
+            # other fields will be missing for non-admin and thus reset if we let them
+            if repo_admin:
                 # Assign or update assignee of the ticket
                 message = pagure.lib.add_issue_assignee(
                     SESSION,
