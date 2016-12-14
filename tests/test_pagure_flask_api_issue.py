@@ -920,7 +920,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                          data['error_code'])
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
 
-        # No input
+        # No issue
         output = self.app.post('/api/0/test/issue/1/status', headers=headers)
         self.assertEqual(output.status_code, 404)
         data = json.loads(output.data)
@@ -1779,6 +1779,198 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(
             pagure.lib.get_watch_list(self.session, issue),
             set(['pingou', 'foo']))
+
+    def test_api_update_custom_field(self):
+        """ Test the api_update_custom_field method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'tickets'))
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Invalid project
+        output = self.app.post(
+            '/api/0/foo/issue/1/custom/bugzilla', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Project not found",
+              "error_code": "ENOPROJECT",
+            }
+        )
+
+        # Valid token, wrong project
+        output = self.app.post(
+            '/api/0/test2/issue/1/custom/bugzilla', headers=headers)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.data)
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
+                         data['error_code'])
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+
+        # No issue
+        output = self.app.post(
+            '/api/0/test/issue/1/custom/bugzilla', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Issue not found",
+              "error_code": "ENOISSUE",
+            }
+        )
+
+        # Create normal issue
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #1',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None,
+            private=False,
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #1')
+
+        # Project does not have this custom field
+        output = self.app.post(
+            '/api/0/test/issue/1/custom/bugzilla', headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid custom field submitted",
+              "error_code": "EINVALIDISSUEFIELD",
+            }
+        )
+
+        # Check the behavior if the project disabled the issue tracker
+        repo = pagure.lib.get_project(self.session, 'test')
+        settings = repo.settings
+        settings['issue_tracker'] = False
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        output = self.app.post(
+            '/api/0/test/issue/1/custom/bugzilla', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Issue tracker disabled for this project",
+              "error_code": "ETRACKERDISABLED",
+            }
+        )
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        settings = repo.settings
+        settings['issue_tracker'] = True
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        # Invalid API token
+        headers = {'Authorization': 'token foobar'}
+
+        output = self.app.post(
+            '/api/0/test/issue/1/custom/bugzilla', headers=headers)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid or expired token. Please visit "
+                  "https://pagure.org/ to get or renew your API token.",
+              "error_code": "EINVALIDTOK",
+            }
+        )
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Set some custom fields
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.set_custom_key_fields(
+            self.session, repo,
+            ['bugzilla', 'upstream'], ['link', 'boolean'])
+        self.session.commit()
+        self.assertEqual(msg, 'List of custom fields updated')
+
+        # No value specified while we try to create the field
+        output = self.app.post(
+            '/api/0/test/issue/1/custom/bugzilla', headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "No value given to this new custom field: bugzilla",
+              "error_code": "ENOCODE",
+            }
+        )
+
+        # Invalid value
+        output = self.app.post(
+            '/api/0/test/issue/1/custom/bugzilla', headers=headers,
+            data={'value': 'foobar'})
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid custom field submitted, the value is not "
+                  "a link",
+              "error_code": "EINVALIDISSUEFIELD_LINK",
+            }
+        )
+
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(issue.other_fields, [])
+        self.assertEqual(len(issue.other_fields), 0)
+
+        # All good
+        output = self.app.post(
+            '/api/0/test/issue/1/custom/bugzilla', headers=headers,
+            data={'value': 'https://bugzilla.redhat.com/1234'})
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "message": "Custom key adjusted"
+            }
+        )
+
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(len(issue.other_fields), 1)
+        self.assertEqual(issue.other_fields[0].key.name, 'bugzilla')
+        self.assertEqual(
+            issue.other_fields[0].value,
+            'https://bugzilla.redhat.com/1234')
+
+        # Reset the value
+        output = self.app.post(
+            '/api/0/test/issue/1/custom/bugzilla', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "message": "Custom key adjusted"
+            }
+        )
+
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(issue.other_fields, [])
+        self.assertEqual(len(issue.other_fields), 0)
 
 
 if __name__ == '__main__':
