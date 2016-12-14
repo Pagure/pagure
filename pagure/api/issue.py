@@ -16,7 +16,9 @@ from sqlalchemy.exc import SQLAlchemyError
 import pagure
 import pagure.exceptions
 import pagure.lib
-from pagure import APP, SESSION, is_repo_admin, api_authenticated
+from pagure import (
+    APP, SESSION, is_repo_admin, api_authenticated, urlpattern
+)
 from pagure.api import (
     API, api_method, api_login_required, api_login_optional, APIERROR
 )
@@ -949,6 +951,119 @@ def api_subscribe_issue(repo, issueid, username=None, namespace=None):
     else:
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
+
+    jsonout = flask.jsonify(output)
+    return jsonout
+
+
+@API.route('/<repo>/issue/<int:issueid>/custom/<field>', methods=['POST'])
+@API.route(
+    '/<namespace>/<repo>/issue/<int:issueid>/custom/<field>',
+    methods=['POST'])
+@API.route(
+    '/fork/<username>/<repo>/issue/<int:issueid>/custom/<field>',
+    methods=['POST'])
+@API.route(
+    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/custom/<field>',
+    methods=['POST'])
+@api_login_required(acls=['issue_update_custom_fields', 'issue_update'])
+@api_method
+def api_update_custom_field(
+        repo, issueid, field, username=None, namespace=None):
+    """
+    Update custom field
+    -------------------
+    Update or reset the content of a custom field associated to an issue.
+
+    ::
+
+        POST /api/0/<repo>/issue/<issue id>/custom/<field>
+        POST /api/0/<namespace>/<repo>/issue/<issue id>/custom/<field>
+
+    ::
+
+        POST /api/0/fork/<username>/<repo>/issue/<issue id>/custom/<field>
+        POST /api/0/fork/<username>/<namespace>/<repo>/issue/<issue id>/custom/<field>
+
+    Input
+    ^^^^^
+
+    +----------------- +---------+--------------+-------------------------+
+    | Key              | Type    | Optionality  | Description             |
+    +==================+=========+==============+=========================+
+    | ``value``        | string  | Optional     | The new value of the    |
+    |                  |         |              | custom field of interest|
+    +----------------- +---------+--------------+-------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "message": "Custom key adjusted"
+        }
+
+    """
+    repo = pagure.lib.get_project(
+        SESSION, repo, user=username, namespace=namespace)
+
+    output = {}
+
+    if repo is None:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    if not repo.settings.get('issue_tracker', True):
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.ETRACKERDISABLED)
+
+    if api_authenticated():
+        if repo != flask.g.token.project:
+            raise pagure.exceptions.APIError(
+                401, error_code=APIERROR.EINVALIDTOK)
+
+    issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
+
+    if issue is None or issue.project != repo:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOISSUE)
+
+    if issue.private and not is_repo_admin(repo) \
+            and (not api_authenticated() or
+                 not issue.user.user == flask.g.fas_user.username):
+        raise pagure.exceptions.APIError(
+            403, error_code=APIERROR.EISSUENOTALLOWED)
+
+    fields = {k.name: k for k in repo.issue_keys}
+    if field not in fields:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDISSUEFIELD)
+
+    key = fields[field]
+    value = flask.request.form.get('value')
+    if value:
+        if key.key_type == 'link':
+            links = value.split(',')
+            for link in links:
+                link = link.replace(' ', '')
+                if not urlpattern.match(link):
+                    raise pagure.exceptions.APIError(
+                        400, error_code=APIERROR.EINVALIDISSUEFIELD_LINK)
+    try:
+        message = pagure.lib.set_custom_key_value(
+            SESSION, issue, key, value)
+
+        SESSION.commit()
+        if message:
+            output['message'] = message
+        else:
+            output['message'] = 'No changes'
+    except pagure.exceptions.PagureException as err:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.ENOCODE, error=str(err))
+    except SQLAlchemyError as err:  # pragma: no cover
+        print err
+        SESSION.rollback()
+        raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
 
     jsonout = flask.jsonify(output)
     return jsonout

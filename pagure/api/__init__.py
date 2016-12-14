@@ -80,6 +80,9 @@ class APIERROR(enum.Enum):
         'instance'
     ETIMESTAMP = 'Invalid timestamp format'
     EDATETIME = 'Invalid datetime format'
+    EINVALIDISSUEFIELD = 'Invalid custom field submitted'
+    EINVALIDISSUEFIELD_LINK = 'Invalid custom field submitted, the value '\
+        'is not a link'
 
 
 def check_api_acls(acls, optional=False):
