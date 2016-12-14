@@ -217,6 +217,7 @@ ACLS = {
     'pull_request_flag': 'Flag a pull-request of this project',
     'pull_request_merge': 'Merge a pull-request of this project',
     'issue_subscribe': 'Subscribe the user with this token to an issue',
+    'issue_update': 'Update an issue, status, comments, custom fields...',
 }
 
 # Bootstrap URLS

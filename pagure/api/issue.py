@@ -536,7 +536,7 @@ def api_view_issue_comment(
 @API.route(
     '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/status',
     methods=['POST'])
-@api_login_required(acls=['issue_change_status'])
+@api_login_required(acls=['issue_change_status', 'issue_update'])
 @api_method
 def api_change_status_issue(repo, issueid, username=None, namespace=None):
     """
@@ -659,7 +659,7 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
 @API.route(
     '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/comment',
     methods=['POST'])
-@api_login_required(acls=['issue_comment'])
+@api_login_required(acls=['issue_comment', 'issue_update'])
 @api_method
 def api_comment_issue(repo, issueid, username=None, namespace=None):
     """
@@ -758,7 +758,7 @@ def api_comment_issue(repo, issueid, username=None, namespace=None):
 @API.route(
     '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/assign',
     methods=['POST'])
-@api_login_required(acls=['issue_assign'])
+@api_login_required(acls=['issue_assign', 'issue_update'])
 @api_method
 def api_assign_issue(repo, issueid, username=None, namespace=None):
     """
