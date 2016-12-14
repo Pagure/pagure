@@ -1050,7 +1050,6 @@ class PagureFlaskApptests(tests.Modeltests):
 
 
         output = self.app.get('/user/pingou/issues')
-        print output.data
         self.assertEqual(output.status_code, 200)
         self.assertIn('Test issue #1', output.data)
         self.assertIn('Test issue #2', output.data)
