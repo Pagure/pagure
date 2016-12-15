@@ -251,8 +251,8 @@ def update_issue(repo, issueid, username=None, namespace=None):
                 if message and not is_js:
                     messages.add(message)
 
-            # The status field can be updated by bot the admin and the person
-            # who opened the ticket.
+            # The status field can be updated by bot hthe admin and the
+            # person who opened the ticket.
             # Update status
             if repo_admin or flask.g.fas_user.username == issue.user.user:
                 if new_status in status:
