@@ -226,7 +226,7 @@ class RemoteRequestPullForm(RequestPullForm):
 
 
 class AddIssueTagForm(PagureForm):
-    ''' Form to add a comment to an issue. '''
+    ''' Form to add a tag to an issue. '''
     tag = wtforms.TextField(
         'tag',
         [
@@ -235,6 +235,18 @@ class AddIssueTagForm(PagureForm):
             wtforms.validators.Length(max=255),
         ]
     )
+    tag_color = wtforms.SelectField(
+        'tag_color',
+        [wtforms.validators.Optional()],
+        choices=[]
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(AddIssueTagForm, self).__init__(*args, **kwargs)
+        self.tag_color.choices = [
+            (tag_color, tag_color) for tag_color in
+                pagure.APP.config['TAG_COLOR_LIST']
+        ]
 
 
 class StatusForm(PagureForm):
@@ -285,7 +297,6 @@ class NewTokenForm(PagureForm):
             self.acls.choices = [
                 (acl.name, acl.name) for acl in kwargs['acls']
             ]
-
 
 
 class UpdateIssueForm(PagureForm):

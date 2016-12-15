@@ -132,17 +132,19 @@ class PagureLibModeltests(tests.Modeltests):
         issues = pagure.lib.search_issues(self.session, repo)
         self.assertEqual(len(issues), 1)
 
-        item = pagure.lib.model.Tag(tag='foo')
+        item = pagure.lib.model.Tag(tag='foo', tag_color='DeepSkyBlue',
+                                    project_id=repo.id)
         self.session.add(item)
         self.session.commit()
 
         item = pagure.lib.model.TagIssue(
+            issue=issues[0],
             issue_uid=issues[0].uid,
             tag='foo',
+            tag_id=item.tag_id
         )
         self.session.add(item)
         self.session.commit()
-
         self.assertEqual(str(item), 'TagIssue(issue:1, tag:foo)')
 
 

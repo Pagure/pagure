@@ -1034,9 +1034,18 @@ class Tag(BASE):
 
     __tablename__ = 'tags'
 
-    tag = sa.Column(sa.String(255), primary_key=True)
+    tag_id = sa.Column(sa.Integer, primary_key=True)
+    tag = sa.Column(sa.String(255), nullable=False)
+    tag_color = sa.Column(sa.String(25), default="DeepSkyBlue")
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
+    project_id = sa.Column(sa.Integer, nullable=False)
+
+    def __init__(self, tag=None, project_id=None, tag_color="DeepSkyBlue"):
+        # Create our unique tag identifier
+        self.tag = tag
+        self.project_id = project_id
+        self.tag_color = tag_color
 
 
 class TagIssue(BASE):
@@ -1047,10 +1056,10 @@ class TagIssue(BASE):
 
     __tablename__ = 'tags_issues'
 
-    tag = sa.Column(
-        sa.String(255),
+    tag_id = sa.Column(
+        sa.Integer,
         sa.ForeignKey(
-            'tags.tag', ondelete='CASCADE', onupdate='CASCADE',
+            'tags.tag_id', ondelete='CASCADE', onupdate='CASCADE',
         ),
         primary_key=True)
     issue_uid = sa.Column(
@@ -1059,6 +1068,16 @@ class TagIssue(BASE):
             'issues.uid', ondelete='CASCADE', onupdate='CASCADE',
         ),
         primary_key=True)
+    tag_color = sa.Column(
+        sa.String(25),
+        sa.ForeignKey(
+            'tags.tag_color', ondelete='CASCADE', onupdate='CASCADE',
+        ))
+    tag = sa.Column(
+        sa.String(255),
+        sa.ForeignKey(
+            'tags.tag', ondelete='CASCADE', onupdate='CASCADE',
+        ))
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
 

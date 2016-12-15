@@ -143,7 +143,7 @@
                     repo=repo.name ) }}" method="GET">
         <div class="input-group">
           <input type="hidden" name="status" value="{{ status }}" />
-          {% for tag in tags %}
+          {% for tag in tag_list %}
           <input type="hidden" name="tags" value="{{ tag }}" />
           {% endfor %}
            <input type="text" class="form-control input-sm"
@@ -230,8 +230,8 @@
                   {{issue.user_comments|count}}
             </span>
               {% endif %}
-              {% for tag in issue.tags%}
-                <span class="label label-info">{{tag.tag}}</span>
+              {% for tag in issue.tags %}
+                <span class="label label-info" style="background-color:{{tag.tag_color}}">{{tag.tag}}</span>
               {% endfor%}
             </td>
             <td class="td-open_date nowrap">

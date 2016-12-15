@@ -1080,6 +1080,7 @@ def view_settings(repo, username=None, namespace=None):
         tags=tags,
         plugins=plugins,
         branchname=branchname,
+        color_list=pagure.APP.config['TAG_COLOR_LIST']
     )
 
 

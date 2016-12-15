@@ -365,7 +365,6 @@ class PagureLibtests(tests.Modeltests):
         self.test_add_tag_obj()
         repo = pagure.lib.get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-
         self.assertRaises(
             pagure.exceptions.PagureException,
             pagure.lib.remove_tags,
@@ -421,7 +420,9 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             project=repo,
             old_tag='foo',
+            old_tag_color='DeepSkyBlue',
             new_tag='bar',
+            new_tag_color='black',
             user='pingou',
             ticketfolder=None,
         )
@@ -430,12 +431,14 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             project=repo,
             old_tag='tag1',
+            old_tag_color='DeepSkyBlue',
             new_tag='tag2',
+            new_tag_color='black',
             user='pingou',
             ticketfolder=None,
         )
         self.session.commit()
-        self.assertEqual(msgs, ['Edited tag: tag1 to tag2'])
+        self.assertEqual(msgs, ['Edited tag: tag1(DeepSkyBlue) to tag2(black)'])
 
         # Add a new tag
         msg = pagure.lib.add_tag_obj(
@@ -448,29 +451,33 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(msg, 'Tag added: tag3')
         self.assertEqual([tag.tag for tag in issue.tags], ['tag2', 'tag3'])
 
-        # Rename an existing tag into another existing one
-        msgs = pagure.lib.edit_issue_tags(
-            session=self.session,
-            project=repo,
-            old_tag='tag2',
-            new_tag='tag3',
-            user='pingou',
-            ticketfolder=None,
-        )
-        self.session.commit()
-        self.assertEqual(msgs, ['Edited tag: tag2 to tag3'])
-        self.assertEqual([tag.tag for tag in issue.tags], ['tag3'])
-
+        # Attempt to rename an existing tag into another existing one
         self.assertRaises(
             pagure.exceptions.PagureException,
             pagure.lib.edit_issue_tags,
             session=self.session,
             project=repo,
             old_tag='tag2',
-            new_tag='tag2',
+            old_tag_color='black',
+            new_tag='tag3',
+            new_tag_color='red',
             user='pingou',
             ticketfolder=None,
         )
+
+        # Rename an existing tag
+        msgs = pagure.lib.edit_issue_tags(
+            session=self.session,
+            project=repo,
+            old_tag='tag2',
+            old_tag_color='black',
+            new_tag='tag4',
+            new_tag_color='purple',
+            user='pingou',
+            ticketfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(msgs, ['Edited tag: tag2(black) to tag4(purple)'])
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')

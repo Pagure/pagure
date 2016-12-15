@@ -374,16 +374,25 @@ def edit_tag(repo, tag, username=None, namespace=None):
         flask.abort(404, 'No issue tracker found for this project')
 
     tags = pagure.lib.get_tags_of_project(SESSION, repo)
+    if not tags:
+        flask.abort(404, 'Project has no tags to edit')
 
-    if not tags or tag not in [t.tag for t in tags]:
+    # Check the tag exists, and get its old/original color
+    found = False
+    for t in tags:
+        if t.tag == tag:
+            old_tag_color = t.tag_color
+            found = True
+            break
+    if not found:
         flask.abort(404, 'Tag %s not found in this project' % tag)
 
     form = pagure.forms.AddIssueTagForm()
     if form.validate_on_submit():
         new_tag = form.tag.data
-
+        new_tag_color = form.tag_color.data
         msgs = pagure.lib.edit_issue_tags(
-            SESSION, repo, tag, new_tag,
+            SESSION, repo, tag, new_tag, old_tag_color, new_tag_color,
             user=flask.g.fas_user.username,
             ticketfolder=APP.config['TICKETS_FOLDER']
         )
@@ -407,7 +416,74 @@ def edit_tag(repo, tag, username=None, namespace=None):
         username=username,
         repo=repo,
         edit_tag=tag,
+        tag_color=old_tag_color,
+        color_list=pagure.APP.config['TAG_COLOR_LIST']
     )
+
+
+@APP.route('/<repo>/update/tags', methods=['POST'])
+@APP.route('/<namespace>/<repo>/update/tags', methods=['POST'])
+@login_required
+def update_tags(repo, username=None, namespace=None):
+    """ Update the tags of a project.
+    """
+
+    repo = flask.g.repo
+
+    if not repo.settings.get('issue_tracker', True):
+        flask.abort(404, 'No issue tracker found for this project')
+
+    if not flask.g.repo_admin:
+        flask.abort(
+            403,
+            'You are not allowed to change the settings for this project')
+
+    form = pagure.forms.ConfirmationForm()
+
+    error = False
+    if form.validate_on_submit():
+        tag_names = flask.request.form.getlist('tag')
+        tag_colors = flask.request.form.getlist('tag_color_select')
+
+        tags = []
+        colors = []
+        for t in range(len(tag_names)):
+            if tag_names[t] == "":
+                # Blank field, ignore
+                continue
+            tags.append(tag_names[t].strip())
+            colors.append(tag_colors[t].strip())
+
+        if len(tags) != len(colors):
+            flask.flash(
+                'tags and tag colors are not of the same length', 'error')
+            error = True
+
+        for tag in tags:
+            if tag.strip() and tags.count(tag) != 1:
+                flask.flash(
+                    'Tag %s is present %s times' % (
+                        tag, tags.count(tag)
+                    ),
+                    'error')
+                error = True
+                break
+
+        if not error:
+            for cnt in range(len(tags)):
+                new_tag = pagure.lib.new_tag(tags[cnt].strip(),
+                                             colors[cnt], repo.id)
+                try:
+                    SESSION.add(new_tag)
+                    SESSION.commit()
+                    flask.flash('Tags updated')
+                except SQLAlchemyError as err:  # pragma: no cover
+                    SESSION.rollback()
+                    flask.flash(str(err), 'error')
+
+    return flask.redirect(flask.url_for(
+        'view_settings', username=username, repo=repo.name,
+        namespace=namespace))
 
 
 @APP.route('/<repo>/droptag/', methods=['POST'])

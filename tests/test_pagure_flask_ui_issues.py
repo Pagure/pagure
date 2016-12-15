@@ -1512,31 +1512,26 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
             output = self.app.get('/test/tag/tag1/edit')
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>Edit tag: tag1</h2>' in output.data)
-            self.assertTrue(
-                '<p>Enter in the field below the new name for the tag: '
-                '"tag1"</p>' in output.data)
+            self.assertTrue('<strong>Edit tag: tag1</strong>' in output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
-            data = {'tag': 'tag2'}
+            data = {'tag': 'tag2',
+                    'tag_color': 'DeepSkyBlue'}
 
             output = self.app.post('/test/tag/tag1/edit', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<h2>Edit tag: tag1</h2>' in output.data)
-            self.assertTrue(
-                '<p>Enter in the field below the new name for the tag: '
-                '"tag1"</p>' in output.data)
+            self.assertTrue('<strong>Edit tag: tag1</strong>' in output.data)
 
             data['csrf_token'] = csrf_token
             output = self.app.post(
                 '/test/tag/tag1/edit', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
+                'Settings - test - Pagure', output.data)
             self.assertIn(
-                '</button>\n                      Edited tag: tag1 to tag2',
+                '</button>\n                      Edited tag: tag1(DeepSkyBlue) to tag2(DeepSkyBlue)',
                 output.data)
 
         # After edit, list tags

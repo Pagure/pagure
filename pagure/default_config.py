@@ -232,3 +232,7 @@ PAGURE_CI_SERVICES = []
 
 # Boolean to turn on project being by default in the user's namespace
 USER_NAMESPACE = False
+
+# list of allowed tag colors
+TAG_COLOR_LIST = ['DeepSkyBlue', 'red', 'maroon', 'SlateBlue', 'teal', 'green',
+                  'brown', 'orange', 'gray', 'purple', 'black']
