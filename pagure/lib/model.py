@@ -715,19 +715,32 @@ class Issue(BASE):
 
     @property
     def attachments(self):
-        ''' Return a list of attachment tuples: (LINK, DATE, COMMENT_ID) '''
+        ''' Return a list of attachment tuples: (LINK, FILENAME, DISPLAY_NAME,
+        DATE) '''
 
-        def extract_md_link(text):
-            pattern = re.compile('^\[\!(.*)\]')
+        def extract_info(text):
+            ''' Return a tuple containing the link, file name, and the
+            "display" file name from the markdown attachment link '''
+            pattern_md = re.compile('^\[\!(.*)\]')
+            pattern_link = re.compile('\(([^)]+)\)')
+            pattern_file = re.compile('\[([^]]+)\]')
+
             try:
-                result = pattern.search(text).group(1)
-                if result is None:
+                md_link = pattern_md.search(text).group(1)
+                link = pattern_link.search(md_link).group(1)
+                filename = pattern_file.search(md_link).group(1)
+                if md_link is None or link is None or filename is None:
                     # No match, return the original string
-                    result = text
+                    return (text, text, text)
+                if len(filename) > 50:
+                    # File name is too long to display, truncate it.
+                    display_name = filename[:50] + "..."
+                else:
+                    display_name = filename
             except:
                 # Search failed, return the original string
-                result = text
-            return result
+                return (text, text, text)
+            return (link, filename, display_name)
 
         attachments = []
         if self.content:
@@ -735,10 +748,10 @@ class Issue(BASE):
             lines = self.content.split('\n')
             for line in lines:
                 if line and line != "" and line.startswith("[!["):
-                    link = extract_md_link(line)
+                    link, filename, display_name = extract_info(line)
                     attachments.append(
-                        (link, self.date_created.strftime('%Y-%m-%d %H:%M:%S'),
-                         ""))
+                        (link, filename, display_name,
+                         self.date_created.strftime('%Y-%m-%d %H:%M:%S'), None))
         if self.comments:
             # Check the comments for attachments
             for comment in self.comments:
@@ -749,9 +762,9 @@ class Issue(BASE):
                 lines = comment_text.split('\n')
                 for line in lines:
                     if line and line != "" and line.startswith("[!["):
-                        link = extract_md_link(line)
+                        link, filename, display_name = extract_info(line)
                         attachments.append(
-                            (link,
+                            (link, filename, display_name,
                              comment.date_created.strftime('%Y-%m-%d %H:%M:%S'),
                              str(comment.id)))
         return attachments

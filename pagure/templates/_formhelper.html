@@ -219,14 +219,25 @@
       <div>
         <span class="comment_text comment_body attachment_list">
         {% for attachment in attachments %}
-          {% if attachment[2] == "" %}
-            {% set attachment_md = "**" + attachment[0] + "**`` ``*(" +
-              attachment[1] + "`` - ``From Issue description)*" %}
-          {% else %}
-            {% set attachment_md = "**" + attachment[0] + "**`` ``*(" +
-              attachment[1] + "`` - ``[Comment](#comment-" + attachment[2] + "))*" %}
-          {% endif %}
-          <small> {{ attachment_md | markdown | noJS | safe }}</small>
+          {#
+             attachment[0] = link
+             attachment[1] = file name
+             attachment[2] = display name
+             attachment[3] = date
+             attachment[4] = comment id
+           #}
+          <span>
+            <a href="{{ attachment[0] }}">{{ attachment[2] }}</a> - <small><i>{{ attachment[3] }}
+            {% if attachment[4] is not none %}
+              <a href="#comment-{{ attachment[4] }}">Comment</a></i>
+            {% else %}
+              From Issue description</i>
+            {% endif %}
+            <a href="{{ attachment[0] }}" download="{{ attachment[1] }}"
+               style="float: right;background-color:slategray" class="label label-default">Download</a>
+            <br>
+            </small>
+          </span>
         {% endfor %}
         </span>
       </div>
