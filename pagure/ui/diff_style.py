@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2016 - Copyright Red Hat Inc
+ (c) 2016 - Copyright Red Hat Inc
 
  Authors:
    Mark Reynolds <mreynolds@redhat.com>
@@ -96,10 +96,8 @@ class DiffStyle(Style):
         String.Symbol:             "#4e9a06",        # class: 'ss'
 
         Generic:                   "#000000",        # class: 'g'
-        Generic.Deleted:           'bg:#ffdddd #a40000',  # trac #000000
-        Generic.Inserted:          'bg:#ddffdd #00A000',  # trac
-        #Generic.Deleted:           "#a40000",        # class: 'gd'
-        #Generic.Inserted:          "#00A000",        # class: 'gi'
+        Generic.Deleted:           'bg:#ffdddd #a40000',  # trac bg color
+        Generic.Inserted:          'bg:#ddffdd #00A000',  # trac bg color
         Generic.Emph:              "italic #000000", # class: 'ge'
         Generic.Error:             "#ef2929",        # class: 'gr'
         Generic.Heading:           "bold #000080",   # class: 'gh'
