@@ -1001,7 +1001,7 @@ def api_update_custom_field(
     ::
 
         {
-          "message": "Custom key adjusted"
+          "message": "Custom field adjusted"
         }
 
     """
