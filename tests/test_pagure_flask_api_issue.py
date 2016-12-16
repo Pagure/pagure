@@ -1945,7 +1945,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "message": "Custom key adjusted"
+              "message": "Custom field adjusted"
             }
         )
 
@@ -1964,7 +1964,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "message": "Custom key adjusted"
+              "message": "Custom field adjusted"
             }
         )
 

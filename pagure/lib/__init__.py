@@ -3457,7 +3457,7 @@ def set_custom_key_value(session, issue, key, value):
                 'issue': issue.to_json(public=True, with_comments=False),
             }))
 
-    return 'Custom key adjusted'
+    return 'Custom field adjusted'
 
 
 def get_yearly_stats_user(session, user, date):
