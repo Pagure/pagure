@@ -56,8 +56,6 @@ setup(
     include_package_data=True,
     install_requires=get_requirements(),
     entry_points="""
-    [moksha.consumer]
-    integrator = pagureCI.consumer:Integrator
     [pygments.styles]
     diffstyle = pagure.ui.diff_style:DiffStyle
     """,
