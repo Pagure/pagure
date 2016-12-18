@@ -1,0 +1,14 @@
+[Unit]
+Description=Pagure Logging Commit service
+After=redis.target
+Documentation=https://pagure.io/pagure
+
+[Service]
+ExecStart=/usr/libexec/pagure-logcom/pagure_logcom_server.py
+Type=simple
+User=git
+Group=git
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
