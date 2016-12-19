@@ -912,6 +912,79 @@ class PagureLibtests(tests.Modeltests):
             'Project "pingou/ssssssssssssssssssssssssssssssssssssssss" '
             'created')
 
+
+    def test_new_project_user_ns(self):
+        """ Test the new_project of pagure.lib with user_ns on. """
+        gitfolder = os.path.join(self.path, 'repos')
+        docfolder = os.path.join(self.path, 'docs')
+        ticketfolder = os.path.join(self.path, 'tickets')
+        requestfolder = os.path.join(self.path, 'requests')
+
+        # Create a new project with user_ns as True
+        pagure.APP.config['GIT_FOLDER'] = gitfolder
+        msg = pagure.lib.new_project(
+            session=self.session,
+            user='pingou',
+            name='testproject',
+            blacklist=[],
+            allowed_prefix=[],
+            gitfolder=gitfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
+            description='description for testproject',
+            parent_id=None,
+            user_ns=True,
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Project "pingou/testproject" created')
+
+        repo = pagure.lib.get_project(
+            self.session, 'testproject', namespace='pingou')
+        self.assertEqual(repo.path, 'pingou/testproject.git')
+
+        gitrepo = os.path.join(gitfolder, repo.path)
+        docrepo = os.path.join(docfolder, repo.path)
+        ticketrepo = os.path.join(ticketfolder, repo.path)
+        requestrepo = os.path.join(requestfolder, repo.path)
+
+        for path in [gitrepo, docrepo, ticketrepo, requestrepo]:
+            self.assertTrue(os.path.exists(path))
+            shutil.rmtree(path)
+
+        # Create a new project with a namespace and user_ns as True
+        pagure.APP.config['GIT_FOLDER'] = gitfolder
+        msg = pagure.lib.new_project(
+            session=self.session,
+            user='pingou',
+            name='testproject2',
+            namespace='testns',
+            blacklist=[],
+            allowed_prefix=['testns'],
+            gitfolder=gitfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
+            description='description for testproject2',
+            parent_id=None,
+            user_ns=True,
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Project "testns/testproject2" created')
+
+        repo = pagure.lib.get_project(
+            self.session, 'testproject2', namespace='testns')
+        self.assertEqual(repo.path, 'testns/testproject2.git')
+
+        gitrepo = os.path.join(gitfolder, repo.path)
+        docrepo = os.path.join(docfolder, repo.path)
+        ticketrepo = os.path.join(ticketfolder, repo.path)
+        requestrepo = os.path.join(requestfolder, repo.path)
+
+        for path in [gitrepo, docrepo, ticketrepo, requestrepo]:
+            self.assertTrue(os.path.exists(path))
+            shutil.rmtree(path)
+
     def test_update_project_settings(self):
         """ Test the update_project_settings of pagure.lib. """
 

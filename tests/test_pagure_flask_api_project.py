@@ -459,6 +459,55 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         )
 
     @patch('pagure.lib.git.generate_gitolite_acls')
+    def test_api_new_project_user_ns(self, p_gga):
+        """ Test the api_new_project method of the flask api. """
+        pagure.APP.config['USER_NAMESPACE'] = True
+        p_gga.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'tickets'))
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Create a project with the user namespace feature on
+        data = {
+            'name': 'testproject',
+            'description': 'Just another small test project',
+        }
+
+        # Valid request
+        output = self.app.post(
+            '/api/0/new/', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'Project "pingou/testproject" created'}
+        )
+
+        # Create a project with a namespace and the user namespace feature on
+        pagure.APP.config['ALLOWED_PREFIX'] = ['testns']
+        data = {
+            'name': 'testproject2',
+            'namespace': 'testns',
+            'description': 'Just another small test project',
+        }
+
+        # Valid request
+        output = self.app.post(
+            '/api/0/new/', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'Project "testns/testproject2" created'}
+        )
+
+        pagure.APP.config['USER_NAMESPACE'] = False
+
+    @patch('pagure.lib.git.generate_gitolite_acls')
     def test_api_fork_project(self, p_gga):
         """ Test the api_fork_project method of the flask api. """
         p_gga.return_value = True
