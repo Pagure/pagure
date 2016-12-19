@@ -5,6 +5,7 @@
 """
 from __future__ import print_function
 
+import json
 import os
 import sys
 
@@ -20,6 +21,8 @@ if 'PAGURE_CONFIG' not in os.environ \
 import pagure
 import pagure.exceptions
 import pagure.lib.link
+
+from pagure.lib import REDIS
 
 
 abspath = os.path.abspath(os.environ['GIT_DIR'])
@@ -69,8 +72,16 @@ def run_as_post_receive_hook():
 
         commits = pagure.lib.git.get_revs_between(
             oldrev, newrev, abspath, refname)
-        pagure.lib.git.log_commits_to_db(
-            pagure.SESSION, project, commits, abspath)
+
+        if REDIS:
+            print('Sending to redis to log activity')
+            REDIS.publish('pagure.logcom',
+                json.dumps({
+                    'project': project.to_json(public=True),
+                    'abspath': abspath,
+                    'commits': commits,
+                }
+            ))
 
     try:
         # Reset the merge_status of all opened PR to refresh their cache
