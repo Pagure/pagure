@@ -576,6 +576,17 @@ Defaults to: ``Pagure``
          authentication.
 
 
+USER_NAMESPACE
+~~~~~~~~~~~~~~
+
+This configuration key allows to enforce that project are namespaced under
+the user's username, behaving in this way in a similar fashion as github.com
+or gitlab.com.
+
+Defaults to: ``False``
+
+
+
 Deprecated configuration keys
 -----------------------------
 
