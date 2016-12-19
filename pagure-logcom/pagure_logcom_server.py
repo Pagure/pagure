@@ -73,7 +73,6 @@ def handle_messages():
         namespace = data['project']['namespace']
 
         session = pagure.lib.create_session(pagure.APP.config['DB_URL'])
-        print(session.bind.engine.url)
 
         LOG.info('Looking for project: %s%s of %s',
                  '%s/' % namespacerepo if namespace else '',
@@ -90,9 +89,14 @@ def handle_messages():
         LOG.info('Processing %s commits in %s', len(commits), abspath)
 
         pagure.lib.git.log_commits_to_db(
-            pagure.SESSION, project, commits, abspath)
+            session, project, commits, abspath)
 
-        session.close()
+        try:
+            session.commit()
+        except SQLAlchemyError as err:  # pragma: no cover
+            session.rollback()
+        finally:
+            session.close()
         LOG.info('Ready for another')
 
 
