@@ -291,11 +291,12 @@ def api_new_project():
         name = form.name.data
         description = form.description.data
         namespace = form.namespace.data
-        if namespace:
-            namespace = namespace.strip()
         url = form.url.data
         avatar_email = form.avatar_email.data
         create_readme = form.create_readme.data
+
+        if namespace:
+            namespace = namespace.strip()
 
         try:
             message = pagure.lib.new_project(
@@ -316,6 +317,7 @@ def api_new_project():
                 userobj=user,
                 prevent_40_chars=APP.config.get(
                     'OLD_VIEW_COMMIT_ENABLED', False),
+                user_ns=APP.config.get('USER_NAMESPACE', False),
             )
             SESSION.commit()
             pagure.lib.git.generate_gitolite_acls()

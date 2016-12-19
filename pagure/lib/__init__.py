@@ -1049,7 +1049,7 @@ def new_project(session, user, name, blacklist, allowed_prefix,
                 gitfolder, docfolder, ticketfolder, requestfolder,
                 description=None, url=None, avatar_email=None,
                 parent_id=None, add_readme=False, userobj=None,
-                prevent_40_chars=False, namespace=None):
+                prevent_40_chars=False, namespace=None, user_ns=False):
     ''' Create a new project based on the information provided.
     '''
     if name in blacklist or (
@@ -1061,6 +1061,10 @@ def new_project(session, user, name, blacklist, allowed_prefix,
 
     user_obj = get_user(session, user)
     allowed_prefix = allowed_prefix + [grp for grp in user_obj.groups]
+    if user_ns:
+        allowed_prefix.append(user)
+        if not namespace:
+            namespace = user
 
     if namespace and namespace not in allowed_prefix:
         raise pagure.exceptions.PagureException(

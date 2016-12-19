@@ -158,7 +158,8 @@ class ProjectForm(ProjectFormSimplified):
             self.namespace.choices = [
                 (namespace, namespace) for namespace in kwargs['namespaces']
             ]
-            self.namespace.choices.insert(0, ('', ''))
+            if not pagure.APP.config.get('USER_NAMESPACE', False):
+                self.namespace.choices.insert(0, ('', ''))
 
 
 class IssueFormSimplied(PagureForm):

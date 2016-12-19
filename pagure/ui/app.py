@@ -393,6 +393,8 @@ def new_project():
     namespaces = APP.config['ALLOWED_PREFIX'][:]
     if user:
         namespaces.extend([grp for grp in user.groups])
+    if APP.config.get('USER_NAMESPACE', False):
+        namespaces.insert(0, flask.g.fas_user.username)
 
     form = pagure.forms.ProjectForm(namespaces=namespaces)
 
@@ -425,6 +427,7 @@ def new_project():
                 userobj=user,
                 prevent_40_chars=APP.config.get(
                     'OLD_VIEW_COMMIT_ENABLED', False),
+                user_ns=APP.config.get('USER_NAMESPACE', False),
             )
             SESSION.commit()
             pagure.lib.git.generate_gitolite_acls()

@@ -229,3 +229,6 @@ BOOTSTRAP_URLS_JS = 'https://apps.fedoraproject.org/global/' \
 
 # List of the type of CI service supported by this pagure instance
 PAGURE_CI_SERVICES = []
+
+# Boolean to turn on project being by default in the user's namespace
+USER_NAMESPACE = False
