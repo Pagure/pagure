@@ -1,0 +1,137 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+ (c) 2016 - Copyright Red Hat Inc
+
+ Authors:
+   Pierre-Yves Chibon <pingou@pingoured.fr>
+
+
+This server listens to message sent via redis post commits and log the
+user's activity in the database.
+
+Using this mechanism, we no longer need to block the git push until all the
+activity has been logged (which is you push the kernel tree for the first
+time can be really time-consuming).
+
+"""
+
+import json
+import logging
+import os
+import requests
+
+import trollius
+import trollius_redis
+
+
+LOG = logging.getLogger(__name__)
+
+if 'PAGURE_CONFIG' not in os.environ \
+        and os.path.exists('/etc/pagure/pagure.cfg'):
+    print 'Using configuration file `/etc/pagure/pagure.cfg`'
+    os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
+
+
+import pagure
+import pagure.lib
+
+
+@trollius.coroutine
+def handle_messages():
+    ''' Handles connecting to redis and acting upon messages received.
+    In this case, it means triggering a build on jenkins based on the
+    information provided.
+    '''
+
+    host = pagure.APP.config.get('REDIS_HOST', '0.0.0.0')
+    port = pagure.APP.config.get('REDIS_PORT', 6379)
+    dbname = pagure.APP.config.get('REDIS_DB', 0)
+    connection = yield trollius.From(trollius_redis.Connection.create(
+        host=host, port=port, db=dbname))
+
+    # Create subscriber.
+    subscriber = yield trollius.From(connection.start_subscribe())
+
+    # Subscribe to channel.
+    yield trollius.From(subscriber.subscribe(['pagure.logcom']))
+
+    # Inside a while loop, wait for incoming events.
+    while True:
+        reply = yield trollius.From(subscriber.next_published())
+        LOG.info(
+            'Received: %s on channel: %s',
+            repr(reply.value), reply.channel)
+        data = json.loads(reply.value)
+
+        commits = data['commits']
+        abspath = data['abspath']
+        repo = data['project']['name']
+        username = data['project']['username']['name'] \
+            if data['project']['parent'] else None
+        namespace = data['project']['namespace']
+
+        session = pagure.lib.create_session(pagure.APP.config['DB_URL'])
+        print(session.bind.engine.url)
+
+        LOG.info('Looking for project: %s%s of %s',
+                 '%s/' % namespacerepo if namespace else '',
+                 repo, username)
+        project = pagure.lib.get_project(
+            pagure.SESSION, repo, user=username, namespace=namespace)
+
+        if not project:
+            LOG.info('No project found')
+            continue
+
+        LOG.info('Found project: %s', project.fullname)
+
+        LOG.info('Processing %s commits in %s', len(commits), abspath)
+
+        pagure.lib.git.log_commits_to_db(
+            pagure.SESSION, project, commits, abspath)
+
+        session.close()
+        LOG.info('Ready for another')
+
+
+def main():
+    ''' Start the main async loop. '''
+
+    try:
+        loop = trollius.get_event_loop()
+        tasks = [
+            trollius.async(handle_messages()),
+        ]
+        loop.run_until_complete(trollius.wait(tasks))
+        loop.run_forever()
+    except KeyboardInterrupt:
+        pass
+    except trollius.ConnectionResetError:
+        pass
+
+    LOG.info("End Connection")
+    loop.close()
+    LOG.info("End")
+
+
+if __name__ == '__main__':
+    formatter = logging.Formatter(
+        "%(asctime)s %(levelname)s [%(module)s:%(lineno)d] %(message)s")
+
+    logging.basicConfig(level=logging.DEBUG)
+
+    # setup console logging
+    LOG.setLevel(logging.DEBUG)
+    shellhandler = logging.StreamHandler()
+    shellhandler.setLevel(logging.DEBUG)
+
+    aslog = logging.getLogger("asyncio")
+    aslog.setLevel(logging.DEBUG)
+    aslog = logging.getLogger("trollius")
+    aslog.setLevel(logging.DEBUG)
+
+    shellhandler.setFormatter(formatter)
+    LOG.addHandler(shellhandler)
+    main()
