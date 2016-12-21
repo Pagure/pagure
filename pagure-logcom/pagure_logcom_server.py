@@ -26,7 +26,7 @@ import trollius
 import trollius_redis
 
 
-LOG = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
@@ -82,7 +82,7 @@ def handle_messages():
     # Inside a while loop, wait for incoming events.
     while True:
         reply = yield trollius.From(subscriber.next_published())
-        LOG.info(
+        _log.info(
             'Received: %s on channel: %s',
             repr(reply.value), reply.channel)
         data = json.loads(reply.value)
@@ -96,19 +96,19 @@ def handle_messages():
 
         session = pagure.lib.create_session(pagure.APP.config['DB_URL'])
 
-        LOG.info('Looking for project: %s%s of %s',
+        _log.info('Looking for project: %s%s of %s',
                  '%s/' % namespacerepo if namespace else '',
                  repo, username)
         project = pagure.lib.get_project(
             pagure.SESSION, repo, user=username, namespace=namespace)
 
         if not project:
-            LOG.info('No project found')
+            _log.info('No project found')
             continue
 
-        LOG.info('Found project: %s', project.fullname)
+        _log.info('Found project: %s', project.fullname)
 
-        LOG.info('Processing %s commits in %s', len(commits), abspath)
+        _log.info('Processing %s commits in %s', len(commits), abspath)
 
         pagure.lib.git.log_commits_to_db(
             session, project, commits, abspath)
@@ -119,7 +119,7 @@ def handle_messages():
             session.rollback()
         finally:
             session.close()
-        LOG.info('Ready for another')
+        _log.info('Ready for another')
 
 
 def main():
@@ -137,9 +137,9 @@ def main():
     except trollius.ConnectionResetError:
         pass
 
-    LOG.info("End Connection")
+    _log.info("End Connection")
     loop.close()
-    LOG.info("End")
+    _log.info("End")
 
 
 if __name__ == '__main__':
@@ -149,7 +149,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
 
     # setup console logging
-    LOG.setLevel(logging.DEBUG)
+    _log.setLevel(logging.DEBUG)
     shellhandler = logging.StreamHandler()
     shellhandler.setLevel(logging.DEBUG)
 
@@ -159,5 +159,5 @@ if __name__ == '__main__':
     aslog.setLevel(logging.DEBUG)
 
     shellhandler.setFormatter(formatter)
-    LOG.addHandler(shellhandler)
+    _log.addHandler(shellhandler)
     main()
