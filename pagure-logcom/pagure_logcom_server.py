@@ -20,8 +20,8 @@ time can be really time-consuming).
 import json
 import logging
 import os
-import requests
 
+import requests
 import trollius
 import trollius_redis
 
@@ -41,8 +41,30 @@ import pagure.lib
 @trollius.coroutine
 def handle_messages():
     ''' Handles connecting to redis and acting upon messages received.
-    In this case, it means triggering a build on jenkins based on the
-    information provided.
+    In this case, it means logging into the DB the commits specified in the
+    message for the specified repo.
+
+    The currently accepted message format looks like:
+
+    ::
+
+        {
+          "project": {
+            "name": "foo",
+            "namespace": null,
+            "parent": null,
+            "username": {
+              "name": "user"
+            }
+          },
+          "abspath": "/srv/git/repositories/pagure.git",
+          "commits": [
+            "b7b4059c44d692d7df3227ce58ce01191e5407bd",
+            "f8d0899bb6654590ffdef66b539fd3b8cf873b35",
+            "9b6fdc48d3edab82d3de28953271ea52b0a96117"
+          ]
+        }
+
     '''
 
     host = pagure.APP.config.get('REDIS_HOST', '0.0.0.0')
