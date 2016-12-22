@@ -133,6 +133,9 @@ def _get_emails_for_obj(obj):
     if obj.isa == 'issue' and not obj.private:
         for watcher in obj.project.watchers:
             emails.add(watcher.user.default_email)
+    elif obj.isa == 'pull-request':
+        for watcher in obj.project.watchers:
+            emails.add(watcher.user.default_email)
 
     # Add public notifications to lists/users set project-wide
     if obj.isa == 'issue' and not obj.private:
