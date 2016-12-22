@@ -99,6 +99,76 @@ class PagureLibNotifytests(tests.Modeltests):
         out = pagure.lib.notify._get_emails_for_obj(iss)
         self.assertEqual(out, exp)
 
+    def test_get_emails_for_obj_issue_watching_project(self):
+        """ Test the _get_emails_for_obj method from pagure.lib.notify. """
+
+        # Create the project ns/test
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test3',
+            namespace='ns',
+            description='test project #1',
+            hook_token='aaabbbcccdd',
+        )
+        item.close_status = ['Invalid', 'Insufficient data', 'Fixed']
+        self.session.add(item)
+        self.session.commit()
+
+        # Create the ticket
+        iss = pagure.lib.new_issue(
+            issue_id=4,
+            session=self.session,
+            repo=item,
+            title='test issue',
+            content='content test issue',
+            user='pingou',
+            ticketfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(iss.id, 4)
+        self.assertEqual(iss.title, 'test issue')
+
+        exp = set(['bar@pingou.com'])
+        out = pagure.lib.notify._get_emails_for_obj(iss)
+        self.assertEqual(out, exp)
+
+        # Comment on the ticket
+        out = pagure.lib.add_issue_comment(
+            self.session,
+            issue=iss,
+            comment='This is a comment',
+            user='foo',
+            ticketfolder=None,
+            notify=False)
+        self.assertEqual(out, 'Comment added')
+
+        exp = set(['bar@pingou.com', 'foo@bar.com'])
+        out = pagure.lib.notify._get_emails_for_obj(iss)
+        self.assertEqual(out, exp)
+
+        # Create user `bar`
+        item = pagure.lib.model.User(
+            user='bar',
+            fullname='bar name',
+            password='bar',
+            default_email='bar@bar.com',
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(
+            user_id=3,
+            email='bar@bar.com')
+        self.session.add(item)
+        self.session.commit()
+
+        # Watch the project
+        repo = pagure.lib.get_project(self.session, 'test3', namespace='ns')
+        out = pagure.lib.update_watch_status(self.session, repo, 'bar', True)
+        self.assertEqual(out, 'You are now watching this repo.')
+
+        exp = set(['bar@pingou.com', 'foo@bar.com', 'bar@bar.com'])
+        out = pagure.lib.notify._get_emails_for_obj(iss)
+        self.assertEqual(out, exp)
+
     def test_get_emails_for_obj_pr(self):
         """ Test the _get_emails_for_obj method from pagure.lib.notify. """
         tests.create_projects(self.session)
@@ -168,9 +238,87 @@ class PagureLibNotifytests(tests.Modeltests):
         self.session.add(item)
         self.session.commit()
 
-        # Watch the ticket
+        # Watch the pull-request
         out = pagure.lib.set_watch_obj(self.session, 'bar', req, True)
         self.assertEqual(out, 'You are now watching this pull-request')
+
+        exp = set(['bar@pingou.com', 'foo@bar.com', 'bar@bar.com'])
+        out = pagure.lib.notify._get_emails_for_obj(req)
+        self.assertEqual(out, exp)
+
+    def test_get_emails_for_obj_pr_watching_project(self):
+        """ Test the _get_emails_for_obj method from pagure.lib.notify. """
+        tests.create_projects(self.session)
+
+        # Create the project ns/test
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test3',
+            namespace='ns',
+            description='test project #1',
+            hook_token='aaabbbcccdd',
+        )
+        item.close_status = ['Invalid', 'Insufficient data', 'Fixed']
+        self.session.add(item)
+        self.session.commit()
+
+        # Create the PR
+        repo = pagure.lib.get_project(self.session, 'test')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+        self.assertEqual(repo.open_requests, 1)
+
+        exp = set(['bar@pingou.com'])
+        out = pagure.lib.notify._get_emails_for_obj(req)
+        self.assertEqual(out, exp)
+
+        # Comment on the ticket
+        out = pagure.lib.add_pull_request_comment(
+            self.session,
+            request=req,
+            commit=None,
+            tree_id=None,
+            filename=None,
+            row=None,
+            comment='This is a comment',
+            user='foo',
+            requestfolder=None,
+            notify=False)
+        self.assertEqual(out, 'Comment added')
+
+        exp = set(['bar@pingou.com', 'foo@bar.com'])
+        out = pagure.lib.notify._get_emails_for_obj(req)
+        self.assertEqual(out, exp)
+
+        # Create user `bar`
+        item = pagure.lib.model.User(
+            user='bar',
+            fullname='bar name',
+            password='bar',
+            default_email='bar@bar.com',
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(
+            user_id=3,
+            email='bar@bar.com')
+        self.session.add(item)
+        self.session.commit()
+
+        # Watch the project
+        repo = pagure.lib.get_project(self.session, 'test')
+        out = pagure.lib.update_watch_status(self.session, repo, 'bar', True)
+        self.assertEqual(out, 'You are now watching this repo.')
 
         exp = set(['bar@pingou.com', 'foo@bar.com', 'bar@bar.com'])
         out = pagure.lib.notify._get_emails_for_obj(req)
