@@ -193,9 +193,9 @@ APPLICATION_ROOT = '/'
 
 # List of blacklisted project names
 BLACKLISTED_PROJECTS = [
-    'static', 'pv', 'releases', 'new', 'api', 'settings',
-    'logout', 'login', 'user', 'users', 'groups', 'projects', 'ssh_info'
-    'issues', 'pull-requests', 'commits', 'tree', 'forks',
+    'static', 'pv', 'releases', 'new', 'api', 'settings', 'search', 'fork',
+    'logout', 'login', 'user', 'users', 'groups', 'projects', 'ssh_info',
+    'issues', 'pull-requests', 'commits', 'tree', 'forks', 'admin', 
 ]
 
 # List of prefix allowed in project names
