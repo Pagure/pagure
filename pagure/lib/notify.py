@@ -397,6 +397,39 @@ The issue: `%s` of project: `%s` has been %s by %s.
     )
 
 
+def notify_status_change_issue(issue, user):
+    ''' Notify the people following a project that an issue changed status.
+    '''
+    status = issue.status
+    if status.lower() != 'open' and issue.close_status:
+        status = '%s as %s' % (status, issue.close_status)
+    text = u"""
+The status of the issue: `%s` of project: `%s` has been updated to: %s by %s.
+
+%s
+""" % (issue.title,
+       issue.project.fullname,
+       status,
+       user.username,
+       _build_url(
+           pagure.APP.config['APP_URL'],
+           _fullname_to_url(issue.project.fullname),
+           'issue',
+           issue.id))
+    mail_to = _get_emails_for_obj(issue)
+
+    uid = time.mktime(datetime.datetime.now().timetuple())
+    send_email(
+        text,
+        'Issue #%s `%s`' % (issue.id, issue.title),
+        ','.join(mail_to),
+        mail_id='%s/close/%s' % (issue.mail_id, uid),
+        in_reply_to=issue.mail_id,
+        project_name=issue.project.fullname,
+        user_from=user.fullname or user.user,
+    )
+
+
 def notify_assigned_request(request, new_assignee, user):
     ''' Notify the people following a pull-request that the assignee changed.
     '''
