@@ -1381,7 +1381,7 @@ def new_tag(session, tag_name, tag_color, project_id):
 
 
 def edit_issue(session, issue, ticketfolder, user,
-               title=None, content=None, status=None, close_status=None,
+               title=None, content=None, status=None, close_status=-1,
                priority=None, milestone=None, private=False):
     ''' Edit the specified issue.
     '''
@@ -1405,8 +1405,11 @@ def edit_issue(session, issue, ticketfolder, user,
         issue.status = status
         if status.lower() != 'open':
             issue.closed_at = datetime.datetime.utcnow()
+        elif issue.close_status:
+            issue.close_status = None
+            edit.append('close_status')
         edit.append('status')
-    if close_status and close_status != issue.close_status:
+    if close_status != -1 and close_status != issue.close_status:
         issue.close_status = close_status
         edit.append('close_status')
     if priority:
@@ -1424,6 +1427,8 @@ def edit_issue(session, issue, ticketfolder, user,
         issue.milestone = milestone
         edit.append('milestone')
     issue.last_updated = datetime.datetime.utcnow()
+    # uniquify the list of edited fields
+    edit = list(set(edit))
 
     pagure.lib.git.update_git(
         issue, repo=issue.project, repofolder=ticketfolder)
@@ -1448,7 +1453,7 @@ def edit_issue(session, issue, ticketfolder, user,
             msg=dict(
                 issue=issue.to_json(public=True),
                 project=issue.project.to_json(public=True),
-                fields=edit,
+                fields=list(set(edit)),
                 agent=user_obj.username,
             ),
             redis=REDIS,

@@ -266,8 +266,50 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Successfully edited issue #2')
 
+        repo = pagure.lib.get_project(self.session, 'test')
         self.assertEqual(repo.open_tickets, 1)
         self.assertEqual(repo.open_tickets_public, 1)
+        self.assertEqual(repo.issues[1].status, 'Closed')
+        self.assertEqual(repo.issues[1].close_status, 'Invalid')
+
+        # Edit the status: re-open the ticket
+        msg = pagure.lib.edit_issue(
+            session=self.session,
+            issue=issue,
+            user='pingou',
+            status='Open',
+            ticketfolder=None,
+            private=True,
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Successfully edited issue #2')
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        for issue in repo.issues:
+            self.assertEqual(issue.status, 'Open')
+            self.assertEqual(issue.close_status, None)
+        # 2 open but one of them is private
+        self.assertEqual(repo.open_tickets, 2)
+        self.assertEqual(repo.open_tickets_public, 1)
+
+        # Edit the status: re-close the ticket
+        msg = pagure.lib.edit_issue(
+            session=self.session,
+            issue=issue,
+            user='pingou',
+            status='Closed',
+            close_status='Invalid',
+            ticketfolder=None,
+            private=True,
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Successfully edited issue #2')
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        self.assertEqual(repo.open_tickets, 1)
+        self.assertEqual(repo.open_tickets_public, 1)
+        self.assertEqual(repo.issues[1].status, 'Closed')
+        self.assertEqual(repo.issues[1].close_status, 'Invalid')
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
