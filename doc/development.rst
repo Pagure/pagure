@@ -139,10 +139,11 @@ local pagure instance.
 
     mkdir clones
 
-* Clone the repo of the ``test`` project into this ``clones`` folder::
+* Clone the repo of the ``test`` project into this ``clones`` folder and move into it::
 
     cd clones
     git clone ~/path/to/pagure/repos/test.git
+    cd test
 
 * Add and commit some files::
 
