@@ -506,6 +506,9 @@ def view_issues(repo, username=None, namespace=None):
         status = None
 
     oth_issues = None
+    total_issues_cnt = pagure.lib.search_issues(
+            SESSION, repo, tags=tags, assignee=assignee,
+            author=author, private=private, priority=priority, count=True)
     if status is not None:
         issues = pagure.lib.search_issues(
             SESSION,
@@ -557,9 +560,7 @@ def view_issues(repo, username=None, namespace=None):
             search_pattern=search_pattern,
             custom_search=custom_search,
         )
-        issues_cnt = pagure.lib.search_issues(
-            SESSION, repo, tags=tags, assignee=assignee,
-            author=author, private=private, priority=priority, count=True)
+        issues_cnt = total_issues_cnt
 
     tag_list = pagure.lib.get_tags_of_project(SESSION, repo)
 
@@ -574,6 +575,7 @@ def view_issues(repo, username=None, namespace=None):
         status=status,
         issues=issues,
         issues_cnt=issues_cnt,
+        total_issues_cnt=total_issues_cnt,
         oth_issues=oth_issues,
         tags=tags,
         assignee=assignee,

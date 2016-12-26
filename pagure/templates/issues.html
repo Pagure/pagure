@@ -12,9 +12,9 @@
 
   <h2>
     {% if status|lower in ['open', 'true'] %}
-      {{ issues|count }} Open Issues (of {{ issues_cnt }})
+      {{ issues|count }} Open Issues (of {{ total_issues_cnt }})
     {% elif status|lower not in ['open', 'true', 'all', 'none'] %}
-      {{ issues|count }} Closed Issues (of {{ issues_cnt }})
+      {{ issues|count }} Closed Issues (of {{ total_issues_cnt }})
     {% else %}
       {{ issues|count }} Issues
     {% endif %}
@@ -51,8 +51,8 @@
     {% if oth_issues %}
     <div class="addrem_bar issues_pbar m-b-1">
       {% if (issues | length + oth_issues) %}
-        <span style="width: {{ (100.0 * (1 - issues_cnt / (issues_cnt + oth_issues)))|round|int }}%">
-            {{ (100.0 * (1 - issues_cnt / (issues_cnt + oth_issues)))|round|int }}%
+        <span style="width: {{ (100.0 * (issues_cnt / total_issues_cnt))|round|int }}%">
+            {{ (100.0 * (issues_cnt / total_issues_cnt))|round|int }}%
         </span>
       {% endif %}
     </div>
