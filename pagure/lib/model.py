@@ -708,6 +708,13 @@ class Issue(BASE):
         backref="children",
     )
 
+    tags = relation(
+        "TagColored",
+        secondary="tags_issues_colored",
+        primaryjoin="issues.c.uid==tags_issues_colored.c.issue_uid",
+        secondaryjoin="tags_issues_colored.c.tag_id==tags_colored.c.id",
+    )
+
     def __repr__(self):
         return 'Issue(%s, project:%s, user:%s, title:%s)' % (
             self.id, self.project.name, self.user.user, self.title
@@ -1034,18 +1041,9 @@ class Tag(BASE):
 
     __tablename__ = 'tags'
 
-    tag_id = sa.Column(sa.Integer, primary_key=True)
-    tag = sa.Column(sa.String(255), nullable=False)
-    tag_color = sa.Column(sa.String(25), default="DeepSkyBlue")
+    tag = sa.Column(sa.String(255), primary_key=True)
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
-    project_id = sa.Column(sa.Integer, nullable=False)
-
-    def __init__(self, tag=None, project_id=None, tag_color="DeepSkyBlue"):
-        # Create our unique tag identifier
-        self.tag = tag
-        self.project_id = project_id
-        self.tag_color = tag_color
 
 
 class TagIssue(BASE):
@@ -1056,10 +1054,10 @@ class TagIssue(BASE):
 
     __tablename__ = 'tags_issues'
 
-    tag_id = sa.Column(
-        sa.Integer,
+    tag = sa.Column(
+        sa.String(255),
         sa.ForeignKey(
-            'tags.tag_id', ondelete='CASCADE', onupdate='CASCADE',
+            'tags.tag', ondelete='CASCADE', onupdate='CASCADE',
         ),
         primary_key=True)
     issue_uid = sa.Column(
@@ -1068,27 +1066,84 @@ class TagIssue(BASE):
             'issues.uid', ondelete='CASCADE', onupdate='CASCADE',
         ),
         primary_key=True)
-    tag_color = sa.Column(
-        sa.String(25),
-        sa.ForeignKey(
-            'tags.tag_color', ondelete='CASCADE', onupdate='CASCADE',
-        ))
-    tag = sa.Column(
-        sa.String(255),
-        sa.ForeignKey(
-            'tags.tag', ondelete='CASCADE', onupdate='CASCADE',
-        ))
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
 
     issue = relation(
         'Issue', foreign_keys=[issue_uid], remote_side=[Issue.uid],
         backref=backref(
-            'tags', cascade="delete, delete-orphan", single_parent=True)
+            'old_tags', cascade="delete, delete-orphan", single_parent=True)
         )
 
     def __repr__(self):
         return 'TagIssue(issue:%s, tag:%s)' % (self.issue.id, self.tag)
+
+
+
+class TagColored(BASE):
+    """ Stores the colored tags.
+
+    Table -- tags_colored
+    """
+
+    __tablename__ = 'tags_colored'
+
+    id = sa.Column(sa.Integer, primary_key=True)
+    tag = sa.Column(sa.String(255), nullable=False)
+    project_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(
+            'projects.id', ondelete='CASCADE', onupdate='CASCADE',
+        ),
+        nullable=False,
+    )
+    tag_color = sa.Column(sa.String(25), default="DeepSkyBlue")
+    date_created = sa.Column(sa.DateTime, nullable=False,
+                             default=datetime.datetime.utcnow)
+
+    __table_args__ = (sa.UniqueConstraint('project_id', 'tag'),)
+
+    project = relation(
+        'Project', foreign_keys=[project_id], remote_side=[Project.id],
+    )
+
+    def __repr__(self):
+        return 'TagColored(tag:%s, color:%s)' % (self.tag, self.tag_color)
+
+
+class TagIssueColored(BASE):
+    """ Stores the colored tag associated with an issue.
+
+    Table -- tags_issues_colored
+    """
+
+    __tablename__ = 'tags_issues_colored'
+
+    tag_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(
+            'tags_colored.id', ondelete='CASCADE', onupdate='CASCADE',
+        ),
+        primary_key=True)
+    issue_uid = sa.Column(
+        sa.String(32),
+        sa.ForeignKey(
+            'issues.uid', ondelete='CASCADE', onupdate='CASCADE',
+        ),
+        primary_key=True)
+    date_created = sa.Column(sa.DateTime, nullable=False,
+                             default=datetime.datetime.utcnow)
+
+    issue = relation(
+        'Issue', foreign_keys=[issue_uid], remote_side=[Issue.uid],
+    )
+    tag = relation(
+        'TagColored', foreign_keys=[tag_id], remote_side=[TagColored.id],
+    )
+
+    def __repr__(self):
+        return 'TagIssueColored(issue:%s, tag:%s, project:%s)' % (
+            self.issue.id, self.tag.tag, self.tag.project.fullname)
 
 
 class TagProject(BASE):
