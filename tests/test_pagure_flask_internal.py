@@ -123,9 +123,13 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.assertEqual(len(request.discussion), 1)
 
         # Check the @localonly
-        pagure.APP.config['IP_ALLOWED_INTERNAL'].remove(None)
+        before = pagure.APP.config['IP_ALLOWED_INTERNAL'][:]
+        pagure.APP.config['IP_ALLOWED_INTERNAL'] = []
+
         output = self.app.put('/pv/pull-request/comment/', data=data)
         self.assertEqual(output.status_code, 403)
+
+        pagure.APP.config['IP_ALLOWED_INTERNAL'] = before[:]
 
     @patch('pagure.lib.notify.send_email')
     def test_ticket_add_comment(self, send_email):
@@ -198,8 +202,13 @@ class PagureFlaskInternaltests(tests.Modeltests):
 
         # Check the @localonly
         pagure.APP.config['IP_ALLOWED_INTERNAL'].remove(None)
+        before = pagure.APP.config['IP_ALLOWED_INTERNAL'][:]
+        pagure.APP.config['IP_ALLOWED_INTERNAL'] = []
+
         output = self.app.put('/pv/ticket/comment/', data=data)
         self.assertEqual(output.status_code, 403)
+
+        pagure.APP.config['IP_ALLOWED_INTERNAL'] = before[:]
 
     @patch('pagure.lib.notify.send_email')
     def test_private_ticket_add_comment(self, send_email):
@@ -281,9 +290,13 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.assertEqual(len(issue.comments), 1)
 
         # Check the @localonly
-        pagure.APP.config['IP_ALLOWED_INTERNAL'].remove(None)
+        before = pagure.APP.config['IP_ALLOWED_INTERNAL'][:]
+        pagure.APP.config['IP_ALLOWED_INTERNAL'] = []
+
         output = self.app.put('/pv/ticket/comment/', data=data)
         self.assertEqual(output.status_code, 403)
+
+        pagure.APP.config['IP_ALLOWED_INTERNAL'] = before[:]
 
     @patch('pagure.lib.notify.send_email')
     def test_mergeable_request_pull_FF(self, send_email):

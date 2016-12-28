@@ -21,6 +21,7 @@ import sys
 import tempfile
 import os
 
+import flask
 import pygit2
 from mock import patch
 
@@ -232,9 +233,16 @@ class PagureFlaskLogintests(tests.Modeltests):
         self.assertIn(
             '<a class="nav-link btn btn-primary" '
             'href="/login/?next=http://localhost/">', output.data)
-        self.assertIn(
-            'Could not set the session in the db, please report this error '
-            'to an admin', output.data)
+
+        # I'm not sure if the change was in flask or werkzeug, but in older
+        # version flask.request.remote_addr was returning None, while it
+        # now returns 127.0.0.1 making our logic pass where it used to
+        # partly fail
+        if hasattr(flask, '__version__') and \
+                tuple(flask.__version__.split('.')) <= (0,12,0):
+            self.assertIn(
+                'Could not set the session in the db, please report '
+                'this error to an admin', output.data)
 
         # Make the password invalid
         item = pagure.lib.search_user(self.session, username='foouser')
@@ -284,9 +292,16 @@ class PagureFlaskLogintests(tests.Modeltests):
         self.assertIn(
             '<a class="nav-link btn btn-primary" '
             'href="/login/?next=http://localhost/">', output.data)
-        self.assertIn(
-            'Could not set the session in the db, please report this error '
-            'to an admin', output.data)
+
+        # I'm not sure if the change was in flask or werkzeug, but in older
+        # version flask.request.remote_addr was returning None, while it
+        # now returns 127.0.0.1 making our logic pass where it used to
+        # partly fail
+        if hasattr(flask, '__version__') and \
+                tuple(flask.__version__.split('.')) <= (0,12,0):
+            self.assertIn(
+                'Could not set the session in the db, please report '
+                'this error to an admin', output.data)
 
     def test_confirm_user(self):
         """ Test the confirm_user endpoint. """
