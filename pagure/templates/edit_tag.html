@@ -1,7 +1,7 @@
 {% extends "repo_master.html" %}
-{% from "_formhelper.html" import render_field_in_row %}
+{% from "_formhelper.html" import render_bootstrap_field %}
 
-{% block title %}Edit tag: {{ tag }} - {{
+{% block title %}Edit tag: {{ tagname }} - {{
     repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 {% set tag = "home" %}
 
@@ -9,40 +9,46 @@
 {% block repo %}
 
 <section class="edit_tag">
-    <div class="col-md-8 col-md-offset-2">
-      <div class="card">
-        <div class="card-header">
-          <strong>Edit tag: {{ edit_tag }}</strong>
-        </div>
-        <form action="{{ url_for(
+  <div class="col-md-8 col-md-offset-2">
+    <div class="card">
+      <div class="card-header">
+        <strong>Edit tag: {{ tagname }}</strong>
+      </div>
+      <div class="card-block">
+        <form method="post" action="{{ url_for(
               '.edit_tag',
-              tag=edit_tag,
               repo=repo.name,
               username=username,
-              namespace=repo.namespace) }}"
-            method="post" class="icon">
+              tag=tagname,
+              namespace=repo.namespace) }}" >
             {{ form.csrf_token }}
-          <div class="row p-t-1">
-          <div class="col-sm-6 p-r-0">
-            <input type="text" name=tag
-              value={{ edit_tag }} size="3" class="form-control"/>
-          </div>
-          <div class="col-sm-2 p-r-0">
-            <select id="tag_color" name="tag_color" style="background-color:{{tag_color}}; width: 80px;" class="c-select"
-              onChange="this.style.backgroundColor=this.options[this.selectedIndex].style.backgroundColor">
-              {% for color_opt in color_list %}
-                <option value={{ color_opt }} style="background-color:{{color_opt}}" {% if tag_color == color_opt %}selected{% endif %}></option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
-          <p class="buttons indent">
-            <input type="submit" class="submit positive button" value="Update Tag">
-            <input type="button" value="Cancel" class="button" onclick="history.back();">
-            {{ form.csrf_token }}
-          </p>
+          {{ render_bootstrap_field(form.tag) }}
+          <fieldset class="form-group {% if form.tag.errors %}has-error{% endif %}">
+            {% set formclasses = "form-control c-select"%}
+            {% if form.tag_color.errors %} {% set formclasses = formclasses + " form-control-error" %} {% endif %}
+
+            <strong>{{ form.tag_color.label }}</strong>
+            <input type="color" name="tag_color" class="form-control c-select"
+              onchange="clickColor(0, -1, -1, 5)" value="{{ form.tag_color.data }}">
+
+            <div>
+              {% if form.tag_color.errors %}
+              <span class="pull-xs-right text-danger">
+                <small>
+                {% for error in form.tag_color.errors %}
+                  {{ error }}&nbsp;
+                {% endfor %}
+                </small>
+              </span>
+              {% endif %}
+            </div>
+          </fieldset>
+          <input type="submit" class="btn btn-primary" value="Update Tag" />
+          <input type="button" class="btn btn-secondary pull-md-right"
+            value="Cancel" onclick="history.back();" />
         </form>
       </div>
     </div>
+  </div>
 </section>
 {% endblock %}

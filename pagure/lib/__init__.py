@@ -336,30 +336,31 @@ def add_tag_obj(session, obj, tags, user, ticketfolder):
         else:
             proj_id = obj.project.id
         tagobj = get_tag(session, objtag, proj_id)
-        if not tagobj:
-            if isinstance(obj, model.Project):
-                project_id = obj.id
-            else:
-                project_id = obj.project.id
 
-            tagobj = model.Tag(tag=objtag,
-                               tag_color="DeepSkyBlue",
-                               project_id=project_id)
+        if obj.isa == 'project':
+            if not tagobj:
+                tagobj = model.Tag(tag=objtag)
 
-            session.add(tagobj)
-            session.flush()
+                session.add(tagobj)
+                session.flush()
 
-        if isinstance(obj, model.Issue):
-            dbobjtag = model.TagIssue(
-                issue_uid=obj.uid,
-                tag=tagobj.tag,
-                tag_color=tagobj.tag_color,
-                tag_id=tagobj.tag_id
-            )
-        if isinstance(obj, model.Project):
             dbobjtag = model.TagProject(
                 project_id=obj.id,
                 tag=tagobj.tag,
+            )
+
+        else:
+            if not tagobj:
+                tagobj = model.TagColored(
+                    tag=objtag,
+                    project_id=proj_id
+                )
+                session.add(tagobj)
+                session.flush()
+
+            dbobjtag = model.TagIssueColored(
+                issue_uid=obj.uid,
+                tag_id=tagobj.id
             )
 
         session.add(dbobjtag)
@@ -657,14 +658,12 @@ def remove_tags(session, project, tags, ticketfolder, user):
     removed_tags = []
     tag_found = False
     for tag in tags:
-        deltags = session.query(model.Tag).filter(
-            model.Tag.tag == tag).filter(
-            model.Tag.project_id == project.id).all()
-        for deltag in deltags:
+        tagobj = get_tag(session, tag, project.id)
+        if tagobj:
             tag_found = True
             removed_tags.append(tag)
             msgs.append('Removed tag: %s' % tag)
-            session.delete(deltag)
+            session.delete(tagobj)
 
     if not tag_found:
         raise pagure.exceptions.PagureException(
@@ -731,82 +730,68 @@ def remove_tags_obj(session, obj, tags, ticketfolder, user):
     return 'Removed tag: %s' % ', '.join(removed_tags)
 
 
-def edit_issue_tags(session, project, old_tag, new_tag, old_tag_color,
-                    new_tag_color, ticketfolder, user):
+def edit_issue_tags(
+        session, project, old_tag, new_tag,
+        new_tag_color, ticketfolder, user):
     ''' Removes the specified tag of a project. '''
     user_obj = get_user(session, user)
+    old_tag_name = old_tag
 
-    if old_tag == new_tag and old_tag_color == new_tag_color:
+    if not isinstance(old_tag, model.TagColored):
+        old_tag = get_tag(session, old_tag_name, project.id)
+
+    if not old_tag:
+        raise pagure.exceptions.PagureException(
+            'No tag "%s" found related to this project' % (old_tag_name))
+
+    old_tag_name = old_tag.tag
+    old_tag_color = old_tag.tag_color
+    if old_tag.tag == new_tag and old_tag_color == new_tag_color:
         # check for change
         raise pagure.exceptions.PagureException(
             'No change.  Old tag "%s(%s)" is the same as new tag "%s(%s)"'
             % (old_tag, old_tag_color, new_tag, new_tag_color))
-    elif old_tag != new_tag:
+    elif old_tag.tag != new_tag:
         # Check if new tag already exists
-        existing_tag = session.query(model.Tag).filter(
-            model.Tag.tag == new_tag).filter(
-            model.Tag.project_id == project.id).all()
-        if existing_tag is not None and len(existing_tag) > 0:
+        existing_tag = get_tag(session, new_tag, project.id)
+        if existing_tag:
             raise pagure.exceptions.PagureException(
-                'Can not rename a tag to an existing tag name: ' + new_tag)
+                'Can not rename a tag to an existing tag name: %s' % new_tag)
 
-    issues = search_issues(session, project, closed=False, tags=old_tag)
-    issues.extend(search_issues(session, project, closed=True, tags=old_tag))
+    session.query(
+        model.TagColored
+    ).filter(
+        model.TagColored.tag == old_tag.tag
+    ).filter(
+        model.TagColored.project_id == project.id
+    ).update(
+        {
+            model.TagColored.tag: new_tag,
+            model.TagColored.tag_color: new_tag_color
+        }
+    )
 
-    # Grab the old tag (there can only be one), and remove it.
-    orig_tags = session.query(model.Tag).filter(
-        model.Tag.tag == old_tag).filter(
-            model.Tag.project_id == project.id).all()
-
-    if orig_tags is not None and len(orig_tags) > 0:
-        session.delete(orig_tags[0])
-        session.commit()
-
-        # Now, add the new tag since the old was removed
-        tagobj = model.Tag(tag=new_tag, tag_color=new_tag_color,
-                           project_id=project.id)
-        session.add(tagobj)
-        session.flush()
-
-        # Update the Issues tag list
-        for issue in set(issues):
-            # Drop the old tag from the issue
-            cnt = 0
-            while cnt < len(issue.tags):
-                issue_tag = issue.tags[cnt]
-                if issue_tag.tag == old_tag:
-                    issue.tags.remove(issue_tag)
-                    cnt -= 1
-                cnt += 1
-            session.flush()
-
-            # Add the new one to the issue
-            issue_tag = model.TagIssue(
-                issue_uid=issue.uid,
-                tag=tagobj.tag,
-                tag_color=tagobj.tag_color,
-                tag_id=tagobj.tag_id
-            )
-            issue.tags.append(issue_tag)
-            session.add(issue_tag)
-            session.flush()
-
-            # Update the git version
-            pagure.lib.git.update_git(
-                issue, repo=issue.project, repofolder=ticketfolder)
-    else:
-        raise pagure.exceptions.PagureException(
-            'Tag not found: %s' % old_tag)
+    issues = session.query(
+        model.Issue
+    ).filter(
+        model.TagIssueColored.tag_id == old_tag.id
+    ).filter(
+        model.TagIssueColored.issue_uid == model.Issue.uid
+    ).all()
+    for issue in issues:
+        # Update the git version
+        pagure.lib.git.update_git(
+            issue, repo=issue.project, repofolder=ticketfolder)
 
     msgs = []
     msgs.append('Edited tag: %s(%s) to %s(%s)' %
-                (old_tag, old_tag_color, new_tag, new_tag_color))
+                (old_tag_name, old_tag_color, new_tag, new_tag_color))
     pagure.lib.notify.log(
         project,
         topic='project.tag.edited',
         msg=dict(
             project=project.to_json(public=True),
-            old_tag=old_tag,
+            old_tag=old_tag.tag,
             old_tag_color=old_tag_color,
             new_tag=new_tag,
             new_tag_color=new_tag_color,
@@ -1382,9 +1367,17 @@ def new_pull_request(session, branch_from,
     return request
 
 
-def new_tag(tag_name, tag_color, project_id):
+def new_tag(session, tag_name, tag_color, project_id):
     ''' Return a new tag object '''
-    return model.Tag(tag=tag_name, tag_color=tag_color, project_id=project_id)
+    tagobj = model.TagColored(
+        tag=tag_name,
+        tag_color=tag_color,
+        project_id=project_id
+    )
+    session.add(tagobj)
+    session.flush()
+
+    return tagobj
 
 
 def edit_issue(session, issue, ticketfolder, user,
@@ -1917,9 +1910,11 @@ def search_issues(
             ).filter(
                 model.Issue.project_id == repo.id
             ).filter(
-                model.Issue.uid == model.TagIssue.issue_uid
+                model.Issue.uid == model.TagIssueColored.issue_uid
             ).filter(
-                model.TagIssue.tag.in_(ytags)
+                model.TagIssueColored.tag_id == model.TagColored.id
+            ).filter(
+                model.TagColored.tag.in_(ytags)
             )
         if notags:
             sub_q3 = session.query(
@@ -1927,9 +1922,11 @@ def search_issues(
             ).filter(
                 model.Issue.project_id == repo.id
             ).filter(
-                model.Issue.uid == model.TagIssue.issue_uid
+                model.Issue.uid == model.TagIssueColored.issue_uid
             ).filter(
-                model.TagIssue.tag.in_(notags)
+                model.TagIssueColored.tag_id == model.TagColored.id
+            ).filter(
+                model.TagColored.tag.in_(notags)
             )
         # Adjust the main query based on the parameters specified
         if ytags and not notags:
@@ -2068,18 +2065,18 @@ def get_tags_of_project(session, project, pattern=None):
     ''' Returns the list of tags associated with the issues of a project.
     '''
     query = session.query(
-        model.Tag
+        model.TagColored
     ).filter(
-        model.Tag.tag != ""
+        model.TagColored.tag != ""
     ).filter(
-        model.Tag.project_id == project.id
+        model.TagColored.project_id == project.id
     ).order_by(
-        model.Tag.tag
+        model.TagColored.tag
     )
 
     if pattern:
         query = query.filter(
-            model.Tag.tag.ilike(pattern.replace('*', '%'))
+            model.TagColored.tag.ilike(pattern.replace('*', '%'))
         )
 
     return query.all()
@@ -2089,11 +2086,11 @@ def get_tag(session, tag, project_id):
     ''' Returns a Tag object for the given tag text.
     '''
     query = session.query(
-        model.Tag
+        model.TagColored
     ).filter(
-        model.Tag.tag == tag
+        model.TagColored.tag == tag
     ).filter(
-        model.Tag.project_id == project_id
+        model.TagColored.project_id == project_id
     )
 
     return query.first()

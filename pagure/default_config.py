@@ -195,7 +195,7 @@ APPLICATION_ROOT = '/'
 BLACKLISTED_PROJECTS = [
     'static', 'pv', 'releases', 'new', 'api', 'settings', 'search', 'fork',
     'logout', 'login', 'user', 'users', 'groups', 'projects', 'ssh_info',
-    'issues', 'pull-requests', 'commits', 'tree', 'forks', 'admin', 
+    'issues', 'pull-requests', 'commits', 'tree', 'forks', 'admin',
 ]
 
 # List of prefix allowed in project names
@@ -232,7 +232,3 @@ PAGURE_CI_SERVICES = []
 
 # Boolean to turn on project being by default in the user's namespace
 USER_NAMESPACE = False
-
-# list of allowed tag colors
-TAG_COLOR_LIST = ['DeepSkyBlue', 'red', 'maroon', 'SlateBlue', 'teal', 'green',
-                  'brown', 'orange', 'gray', 'purple', 'black']

@@ -378,21 +378,21 @@ def edit_tag(repo, tag, username=None, namespace=None):
         flask.abort(404, 'Project has no tags to edit')
 
     # Check the tag exists, and get its old/original color
-    found = False
-    for t in tags:
-        if t.tag == tag:
-            old_tag_color = t.tag_color
-            found = True
-            break
-    if not found:
+    tagobj = pagure.lib.get_tag(SESSION, tag, repo.id)
+    if not tagobj:
         flask.abort(404, 'Tag %s not found in this project' % tag)
 
     form = pagure.forms.AddIssueTagForm()
     if form.validate_on_submit():
         new_tag = form.tag.data
         new_tag_color = form.tag_color.data
+
         msgs = pagure.lib.edit_issue_tags(
-            SESSION, repo, tag, new_tag, old_tag_color, new_tag_color,
+            SESSION,
+            repo,
+            tagobj,
+            new_tag,
+            new_tag_color,
             user=flask.g.fas_user.username,
             ticketfolder=APP.config['TICKETS_FOLDER']
         )
@@ -409,15 +409,16 @@ def edit_tag(repo, tag, username=None, namespace=None):
         return flask.redirect(flask.url_for(
             '.view_settings', repo=repo.name, username=username,
             namespace=repo.namespace))
+    elif flask.request.method == 'GET':
+        form.tag_color.data = tagobj.tag_color
+        form.tag.data = tag
 
     return flask.render_template(
         'edit_tag.html',
-        form=form,
         username=username,
         repo=repo,
-        edit_tag=tag,
-        tag_color=old_tag_color,
-        color_list=pagure.APP.config['TAG_COLOR_LIST']
+        form=form,
+        tagname=tag,
     )
 
 
@@ -443,7 +444,7 @@ def update_tags(repo, username=None, namespace=None):
     error = False
     if form.validate_on_submit():
         tag_names = flask.request.form.getlist('tag')
-        tag_colors = flask.request.form.getlist('tag_color_select')
+        tag_colors = flask.request.form.getlist('tag_color')
 
         tags = []
         colors = []
@@ -471,10 +472,12 @@ def update_tags(repo, username=None, namespace=None):
 
         if not error:
             for cnt in range(len(tags)):
-                new_tag = pagure.lib.new_tag(tags[cnt].strip(),
-                                             colors[cnt], repo.id)
                 try:
-                    SESSION.add(new_tag)
+                    pagure.lib.new_tag(
+                        SESSION,
+                        tags[cnt].strip(),
+                        colors[cnt],
+                        repo.id)
                     SESSION.commit()
                     flask.flash('Tags updated')
                 except SQLAlchemyError as err:  # pragma: no cover
@@ -505,7 +508,7 @@ def remove_tag(repo, username=None, namespace=None):
     if not repo.settings.get('issue_tracker', True):
         flask.abort(404, 'No issue tracker found for this project')
 
-    form = pagure.forms.AddIssueTagForm()
+    form = pagure.forms.DeleteIssueTagForm()
     if form.validate_on_submit():
         tags = form.tag.data
         tags = [tag.strip() for tag in tags.split(',')]
