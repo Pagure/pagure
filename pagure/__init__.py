@@ -97,6 +97,14 @@ if APP.config.get('PAGURE_AUTH', None) in ['fas', 'openid']:
     @FAS.postlogin
     def set_user(return_url):
         ''' After login method. '''
+        if flask.g.fas_user.username is None:
+            flask.flash(
+                'It looks like your OpenID provider did not provide an '
+                'username we could retrieve, username being needed we cannot '
+                'go further.', 'error')
+            logout()
+            return flask.redirect(return_url)
+
         flask.session['_new_user'] = False
         if not pagure.lib.search_user(
                 SESSION, username=flask.g.fas_user.username):
