@@ -132,20 +132,42 @@ class PagureLibModeltests(tests.Modeltests):
         issues = pagure.lib.search_issues(self.session, repo)
         self.assertEqual(len(issues), 1)
 
-        item = pagure.lib.model.Tag(tag='foo', tag_color='DeepSkyBlue',
-                                    project_id=repo.id)
+        item = pagure.lib.model.Tag(tag='foo')
         self.session.add(item)
         self.session.commit()
 
         item = pagure.lib.model.TagIssue(
-            issue=issues[0],
             issue_uid=issues[0].uid,
-            tag='foo',
-            tag_id=item.tag_id
+            tag='foo'
         )
         self.session.add(item)
         self.session.commit()
         self.assertEqual(str(item), 'TagIssue(issue:1, tag:foo)')
+
+    def test_tagissuecolor__repr__(self):
+        """ Test the TagIssue.__repr__ function of pagure.lib.model. """
+        self.test_issue__repr__()
+        repo = pagure.lib.get_project(self.session, 'test')
+        issues = pagure.lib.search_issues(self.session, repo)
+        self.assertEqual(len(issues), 1)
+
+        item = pagure.lib.model.TagColored(
+            tag='foo',
+            tag_color='DeepSkyBlue',
+            project_id=repo.id)
+        self.session.add(item)
+        self.session.commit()
+
+        item = pagure.lib.model.TagIssueColored(
+            issue_uid=issues[0].uid,
+            tag_id=item.id
+        )
+        self.session.add(item)
+        self.session.commit()
+        self.assertEqual(
+            str(item),
+            'TagIssueColored(issue:1, tag:foo, project:test)'
+        )
 
 
 if __name__ == '__main__':

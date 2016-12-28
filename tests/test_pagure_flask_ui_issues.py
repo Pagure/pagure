@@ -1531,7 +1531,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 'Settings - test - Pagure', output.data)
             self.assertIn(
-                '</button>\n                      Edited tag: tag1(DeepSkyBlue) to tag2(DeepSkyBlue)',
+                '</button>\n                      '
+                'Edited tag: tag1(DeepSkyBlue) to tag2(DeepSkyBlue)',
                 output.data)
 
         # After edit, list tags

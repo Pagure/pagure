@@ -420,7 +420,18 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             project=repo,
             old_tag='foo',
-            old_tag_color='DeepSkyBlue',
+            new_tag='bar',
+            new_tag_color='black',
+            user='pingou',
+            ticketfolder=None,
+        )
+
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.edit_issue_tags,
+            session=self.session,
+            project=repo,
+            old_tag=None,
             new_tag='bar',
             new_tag_color='black',
             user='pingou',
@@ -431,14 +442,16 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             project=repo,
             old_tag='tag1',
-            old_tag_color='DeepSkyBlue',
             new_tag='tag2',
             new_tag_color='black',
             user='pingou',
             ticketfolder=None,
         )
         self.session.commit()
-        self.assertEqual(msgs, ['Edited tag: tag1(DeepSkyBlue) to tag2(black)'])
+        self.assertEqual(
+            msgs,
+            ['Edited tag: tag1(DeepSkyBlue) to tag2(black)']
+        )
 
         # Add a new tag
         msg = pagure.lib.add_tag_obj(
@@ -458,7 +471,6 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             project=repo,
             old_tag='tag2',
-            old_tag_color='black',
             new_tag='tag3',
             new_tag_color='red',
             user='pingou',
@@ -470,7 +482,6 @@ class PagureLibtests(tests.Modeltests):
             session=self.session,
             project=repo,
             old_tag='tag2',
-            old_tag_color='black',
             new_tag='tag4',
             new_tag_color='purple',
             user='pingou',

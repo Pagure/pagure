@@ -76,15 +76,14 @@ class PagureFlaskApitests(tests.Modeltests):
         )
         self.session.add(item)
         self.session.commit()
-        item = pagure.lib.model.Tag(
+        item = pagure.lib.model.TagColored(
             tag='tag1', tag_color='DeepBlueSky', project_id=1,
         )
         self.session.add(item)
         self.session.commit()
-        item = pagure.lib.model.TagIssue(
-            tag='tag1',
+        item = pagure.lib.model.TagIssueColored(
             issue_uid='foobar',
-            tag_id=tag.tag_id
+            tag_id=item.id
         )
         self.session.add(item)
         self.session.commit()
