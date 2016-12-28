@@ -656,6 +656,13 @@
                   Add new close status
               </a>
             </div>
+            {% if not repo.close_status %}
+            <div class="col-sm-6">
+              <a class="btn btn-secondary btn-sm btn-block" id="default_close_status">
+                  Default close status set
+              </a>
+            </div>
+            {% endif %}
           </div>
           <div class="row p-t-1">
             <div class="col-sm-12">
@@ -941,6 +948,21 @@ $('#default_priorities').click(function(e) {
     $('#priorities').append(f);
   }
   console.log($('#priorities'));
+});
+{% endif %}
+
+{% if not repo.close_status %}
+$('#default_close_status').click(function(e) {
+  let form = $('#close_sstatus>div:last-child');
+  form.find('input[type=text], textarea').val('');
+  $('#close_sstatus').html('');
+  var def_closestatus = ['Fixed', 'Invalid', 'Duplicate', 'Insufficient Data'];
+  for (var cnt = 0; cnt < def_closestatus.length; cnt++) {
+    let f = form.clone();
+    f.find("[name=close_status]").val(def_closestatus[cnt]);
+    $('#close_sstatus').append(f);
+  }
+  console.log($('#close_sstatus'));
 });
 {% endif %}
 
