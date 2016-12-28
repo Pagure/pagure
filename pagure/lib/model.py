@@ -1108,7 +1108,8 @@ class TagColored(BASE):
     )
 
     def __repr__(self):
-        return 'TagColored(tag:%s, color:%s)' % (self.tag, self.tag_color)
+        return 'TagColored(id: %s, tag:%s, color:%s)' % (
+            self.id, self.tag, self.tag_color)
 
 
 class TagIssueColored(BASE):
