@@ -443,40 +443,33 @@ def update_tags(repo, username=None, namespace=None):
 
     error = False
     if form.validate_on_submit():
-        tag_names = flask.request.form.getlist('tag')
-        tag_colors = flask.request.form.getlist('tag_color')
-
-        tags = []
-        colors = []
-        for t in range(len(tag_names)):
-            if tag_names[t] == "":
-                # Blank field, ignore
-                continue
-            tags.append(tag_names[t].strip())
-            colors.append(tag_colors[t].strip())
+        # Uniquify and order preserving
+        seen = set()
+        tags = [
+            tag.strip()
+            for tag in flask.request.form.getlist('tag')
+            if tag.strip() and tag.strip() not in seen and not seen.add(tag.strip())
+        ]
+        # Uniquify and order preserving
+        seen = set()
+        colors = [
+            col.strip()
+            for col in flask.request.form.getlist('tag_color')
+            if col.strip() and col.strip() not in seen and not seen.add(col.strip())
+        ]
 
         if len(tags) != len(colors):
             flask.flash(
                 'tags and tag colors are not of the same length', 'error')
             error = True
 
-        for tag in tags:
-            if tag.strip() and tags.count(tag) != 1:
-                flask.flash(
-                    'Tag %s is present %s times' % (
-                        tag, tags.count(tag)
-                    ),
-                    'error')
-                error = True
-                break
-
         if not error:
-            for cnt in range(len(tags)):
+            for idx, tag in enumerate(tags):
                 try:
                     pagure.lib.new_tag(
                         SESSION,
-                        tags[cnt].strip(),
-                        colors[cnt],
+                        tag,
+                        colors[idx],
                         repo.id)
                     SESSION.commit()
                     flask.flash('Tags updated')
