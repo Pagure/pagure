@@ -488,9 +488,17 @@ a.notblue:hover {
     background-color: #FDD;
 }
 
+.addrem_bar.closed {
+    background-color: #DBFFDB;
+}
+
 .addrem_bar > span {
     display: block;
     background-color: #DBFFDB;
+}
+
+.addrem_bar.closed > span {
+    background-color: #FDD;
 }
 
 .comment_body img {

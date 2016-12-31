@@ -506,6 +506,7 @@ def view_issues(repo, username=None, namespace=None):
         status = None
 
     oth_issues = None
+    oth_issues_cnt = None
     total_issues_cnt = pagure.lib.search_issues(
             SESSION, repo, tags=tags, assignee=assignee,
             author=author, private=private, priority=priority, count=True)
@@ -552,6 +553,7 @@ def view_issues(repo, username=None, namespace=None):
             search_pattern=search_pattern,
             custom_search=custom_search,
         )
+        oth_issues_cnt = total_issues_cnt ^ issues_cnt
     else:
         issues = pagure.lib.search_issues(
             SESSION, repo, tags=tags, assignee=assignee,
@@ -577,6 +579,7 @@ def view_issues(repo, username=None, namespace=None):
         issues_cnt=issues_cnt,
         total_issues_cnt=total_issues_cnt,
         oth_issues=oth_issues,
+        oth_issues_cnt=oth_issues_cnt,
         tags=tags,
         assignee=assignee,
         author=author,
