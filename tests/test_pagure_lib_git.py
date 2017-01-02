@@ -893,6 +893,7 @@ index 0000000..60f7480
             "content": "bar", "date_created": "1426500263",
             "user": {
                 "name": "pingou", "emails": ["pingou@fedoraproject.org"]},
+            "milestone": "Next Release",
         }
 
         self.assertRaises(
@@ -919,6 +920,8 @@ index 0000000..60f7480
         self.assertEqual(repo.issues[0].title, 'foo')
         self.assertEqual(repo.issues[0].depends_text, [])
         self.assertEqual(repo.issues[0].blocks_text, [])
+        self.assertEqual(repo.issues[0].milestone, 'Next Release')
+        self.assertEqual(repo.milestones, {'Next Release': None})
 
         data["title"] = "fake issue for tests"
         pagure.lib.git.update_ticket_from_git(
@@ -948,6 +951,7 @@ index 0000000..60f7480
             "blocks": [1],
             "depends": [3, 4],
             "date_created": "1426595224",
+            "milestone": "Future",
             "comments": [
                 {
                     "comment": "Nirik:\r\n\r\n- sourceforge++ \r\n- "
@@ -1000,6 +1004,8 @@ index 0000000..60f7480
         self.assertEqual(repo.issues[1].title, 'Rename pagure')
         self.assertEqual(repo.issues[1].depends_text, [])
         self.assertEqual(repo.issues[1].blocks_text, [1])
+        self.assertEqual(repo.issues[1].milestone, 'Future')
+        self.assertEqual(repo.milestones, {'Future': None, 'Next Release': None})
 
     def test_update_request_from_git(self):
         """ Test the update_request_from_git method from pagure.lib.git. """

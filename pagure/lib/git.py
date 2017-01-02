@@ -544,7 +544,9 @@ def update_ticket_from_git(
     if milestone:
         if milestone.strip() not in repo.milestones:
             try:
-                repo.milestones[milestone.strip()] = None
+                tmp_milestone = repo.milestones.copy()
+                tmp_milestone[milestone.strip()] = None
+                repo.milestones = tmp_milestone
                 session.add(repo)
                 session.commit()
             except SQLAlchemyError:
