@@ -553,7 +553,7 @@ def view_issues(repo, username=None, namespace=None):
             search_pattern=search_pattern,
             custom_search=custom_search,
         )
-        oth_issues_cnt = total_issues_cnt ^ issues_cnt
+        oth_issues_cnt = total_issues_cnt - issues_cnt
     else:
         issues = pagure.lib.search_issues(
             SESSION, repo, tags=tags, assignee=assignee,
