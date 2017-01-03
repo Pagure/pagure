@@ -241,17 +241,16 @@ def update_issue(repo, issueid, username=None, namespace=None):
             # other fields will be missing for non-admin and thus reset if we let them
             if repo_admin:
                 # Assign or update assignee of the ticket
-                if assignee:
-                    message = pagure.lib.add_issue_assignee(
-                        SESSION,
-                        issue=issue,
-                        assignee=assignee or None,
-                        user=flask.g.fas_user.username,
-                        ticketfolder=APP.config['TICKETS_FOLDER'],
-                    )
-                    SESSION.commit()
-                    if message:
-                        messages.add(message)
+                message = pagure.lib.add_issue_assignee(
+                    SESSION,
+                    issue=issue,
+                    assignee=assignee or None,
+                    user=flask.g.fas_user.username,
+                    ticketfolder=APP.config['TICKETS_FOLDER'],
+                )
+                SESSION.commit()
+                if message and message != 'Nothing to change':
+                    messages.add(message)
 
                 # Update priority
                 if str(new_priority) in repo.priorities:
