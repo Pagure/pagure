@@ -17,6 +17,7 @@
 import datetime
 import flask
 import os
+import re
 from collections import defaultdict
 from math import ceil
 
@@ -457,6 +458,14 @@ def update_tags(repo, username=None, namespace=None):
             for col in flask.request.form.getlist('tag_color')
             if col.strip() and col.strip() not in seen and not seen.add(col.strip())
         ]
+
+        color_pattern = re.compile('^#\w{3,6}$')
+        for color in colors:
+            if not color_pattern.match(color):
+                flask.flash(
+                    'Color: %s does not match the expected pattern' % color,
+                    'error')
+                error = True
 
         if len(tags) != len(colors):
             flask.flash(
