@@ -16,7 +16,7 @@ import shutil
 import sys
 import os
 
-from mock import patch
+from mock import patch, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -169,8 +169,11 @@ class PagureLibNotifytests(tests.Modeltests):
         out = pagure.lib.notify._get_emails_for_obj(iss)
         self.assertEqual(out, exp)
 
-    def test_get_emails_for_obj_pr(self):
+    @patch('pagure.lib.notify.smtplib.SMTP')
+    def test_get_emails_for_obj_pr(self, mock_smtp):
         """ Test the _get_emails_for_obj method from pagure.lib.notify. """
+        mock_smtp.return_value = MagicMock()
+
         tests.create_projects(self.session)
 
         # Create the project ns/test
@@ -246,8 +249,11 @@ class PagureLibNotifytests(tests.Modeltests):
         out = pagure.lib.notify._get_emails_for_obj(req)
         self.assertEqual(out, exp)
 
-    def test_get_emails_for_obj_pr_watching_project(self):
+    @patch('pagure.lib.notify.smtplib.SMTP')
+    def test_get_emails_for_obj_pr_watching_project(self, mock_smtp):
         """ Test the _get_emails_for_obj method from pagure.lib.notify. """
+        mock_smtp.return_value = MagicMock()
+
         tests.create_projects(self.session)
 
         # Create the project ns/test
@@ -324,8 +330,11 @@ class PagureLibNotifytests(tests.Modeltests):
         out = pagure.lib.notify._get_emails_for_obj(req)
         self.assertEqual(out, exp)
 
-    def test_send_email(self):
+    @patch('pagure.lib.notify.smtplib.SMTP')
+    def test_send_email(self, mock_smtp):
         """ Test the notify_new_comment method from pagure.lib.notify. """
+        mock_smtp.return_value = MagicMock()
+
         email = pagure.lib.notify.send_email(
             'Email content',
             'Email “Subject“',

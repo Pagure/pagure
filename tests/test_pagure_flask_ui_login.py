@@ -23,7 +23,7 @@ import os
 
 import flask
 import pygit2
-from mock import patch
+from mock import patch, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -53,6 +53,7 @@ class PagureFlaskLogintests(tests.Modeltests):
 
         self.app = pagure.APP.test_client()
 
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_new_user(self):
         """ Test the new_user endpoint. """
 
@@ -329,6 +330,7 @@ class PagureFlaskLogintests(tests.Modeltests):
         self.assertIn(
             'Email confirmed, account activated', output.data)
 
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_lost_password(self):
         """ Test the lost_password endpoint. """
 
@@ -381,6 +383,7 @@ class PagureFlaskLogintests(tests.Modeltests):
             'check your spam folder? Otherwise, try again after some time.',
             output.data)
 
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def test_reset_password(self):
         """ Test the reset_password endpoint. """
 
