@@ -509,6 +509,44 @@ class PagureFlaskIssuestests(tests.Modeltests):
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 404)
 
+        # Issue with a non-ascii milestone but project has no milestone
+        repo = pagure.lib.get_project(self.session, 'test')
+        repo.settings = {'issue_tracker': True}
+        self.session.add(repo)
+        self.session.commit()
+
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        message = pagure.lib.edit_issue(
+            self.session,
+            issue=issue,
+            milestone=b'käpy'.decode('utf-8'),
+            private=False,
+            user='pingou',
+            ticketfolder=None,
+        )
+        self.assertEqual(message, 'Successfully edited issue #1')
+        self.session.commit()
+
+        output = self.app.get('/test/issue/1')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(
+            '<title>Issue #1: Test issue - test - Pagure</title>',
+            output.data)
+        self.assertNotIn(b'käpy'.decode('utf-8'), output.data)
+
+        # Issue with non-ascii milestone and project as well
+        repo = pagure.lib.get_project(self.session, 'test')
+        repo.milestones = {b'käpy'.decode('utf-8'): None}
+        self.session.add(repo)
+        self.session.commit()
+
+        output = self.app.get('/test/issue/1')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(
+            '<title>Issue #1: Test issue - test - Pagure</title>',
+            output.data)
+        self.assertIn(b'käpy'.decode('utf-8'), output.data.decode('utf-8'))
+
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
     def test_update_issue(self, p_send_email, p_ugt):
