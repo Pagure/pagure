@@ -189,7 +189,8 @@ if APP.config.get('PAGURE_CI_SERVICES'):
 if not APP.debug:
     APP.logger.addHandler(pagure.mail_logging.get_mail_handler(
         smtp_server=APP.config.get('SMTP_SERVER', '127.0.0.1'),
-        mail_admin=APP.config.get('MAIL_ADMIN', APP.config['EMAIL_ERROR'])
+        mail_admin=APP.config.get('MAIL_ADMIN', APP.config['EMAIL_ERROR']),
+        from_email=APP.config.get('FROM_EMAIL', 'pagure@fedoraproject.org')
     ))
 
 # Send classic logs into syslog

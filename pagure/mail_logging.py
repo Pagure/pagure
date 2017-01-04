@@ -181,12 +181,13 @@ Callstack that lead to the logging statement
 """
 
 
-def get_mail_handler(smtp_server, mail_admin):
+def get_mail_handler(smtp_server, mail_admin, from_email):
     """ Set up the handler sending emails for big exception
     """
+
     mail_handler = logging.handlers.SMTPHandler(
         smtp_server,
-        'nobody@fedoraproject.org',
+        from_email,
         mail_admin,
         'Pagure error')
     mail_handler.setFormatter(logging.Formatter(MSG_FORMAT))
