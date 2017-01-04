@@ -947,8 +947,8 @@ def view_issue(repo, issueid, username=None, namespace=None):
         close_status=repo.close_status,
     )
     form.status.data = issue.status
-    form.priority.data = str(issue.priority)
-    form.milestone.data = str(issue.milestone)
+    form.priority.data = issue.priority
+    form.milestone.data = issue.milestone
     form.private.data = issue.private
     form.close_status.data = ''
     if issue.close_status:
