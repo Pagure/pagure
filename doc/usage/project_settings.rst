@@ -145,3 +145,13 @@ The URL of the web-hooks can be entered in this field.
 
 .. note:: See the ``notifications`` documentation to learn more about
           web-hooks in pagure and how to use them.
+
+`Tags`
+------
+
+Pagure allows you to define "tags" that can be added to Issues.  Tags are
+unique to each project, and they can only be defined in the project
+settings page.  The Tag color can also be customized for a more robust
+visual representation of the tag.
+
+
