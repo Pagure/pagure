@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015-2016 - Copyright Red Hat Inc
+ (c) 2015-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -1964,6 +1964,137 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.get('/test')
             self.assertIn(
                 '<h5><strong>Issues GIT URLs</strong></h5>', output.data)
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_update_tags(self, p_send_email, p_ugt):
+        """ Test the update_tags endpoint. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        # No Git repo
+        output = self.app.post('/foo/update/tags')
+        self.assertEqual(output.status_code, 404)
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/foo/update/tags')
+            self.assertEqual(output.status_code, 404)
+
+            tests.create_projects(self.session)
+            tests.create_projects_git(self.path)
+
+            output = self.app.post('/test/update/tags')
+            self.assertEqual(output.status_code, 403)
+
+        # User not logged in
+        output = self.app.post('/test/update/tags')
+        self.assertEqual(output.status_code, 302)
+
+        # Create issues to play with
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+         # Before update, list tags
+        tags = pagure.lib.get_tags_of_project(self.session, repo)
+        self.assertEqual([tag.tag for tag in tags], [])
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            # No CSRF
+            data = {
+                'tag': 'red',
+                'tag_color': '#ff0000'
+            }
+            output = self.app.post(
+                '/test/update/tags', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn(
+                '        <ul class="list-group list-group-flush">'
+                '\n        </ul>', output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            # Invalid color
+            data = {
+                'tag': 'red',
+                'tag_color': 'red',
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/update/tags', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn(
+                '</button>\n                      '
+                'Color: red does not match the expected pattern',
+                output.data)
+            self.assertIn(
+                '        <ul class="list-group list-group-flush">'
+                '\n        </ul>', output.data)
+
+            # Inconsistent length color
+            data = {
+                'tag': ['red', 'blue'],
+                'tag_color': 'red',
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/update/tags', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn(
+                '</button>\n                      '
+                'Color: red does not match the expected pattern',
+                output.data)
+            self.assertIn(
+                '</button>\n                      tags and tag colors'
+                ' are not of the same length', output.data)
+            self.assertIn(
+                '        <ul class="list-group list-group-flush">'
+                '\n        </ul>', output.data)
+
+            # Valid query
+            data = {
+                'tag': ['red', 'blue'],
+                'tag_color': ['#ff0000', '#003cff'],
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/update/tags', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<span class="label label-info" style="background-color:'
+                '#003cff">blue</span>', output.data)
+            self.assertIn(
+                '<input type="hidden" value="blue" name="tag" />',
+                output.data)
+            self.assertIn(
+                '<span class="label label-info" style="background-color:'
+                '#ff0000">red</span>', output.data)
+            self.assertIn(
+                '<input type="hidden" value="red" name="tag" />',
+                output.data)
+
+        # After update, list tags
+        tags = pagure.lib.get_tags_of_project(self.session, repo)
+        self.assertEqual([tag.tag for tag in tags], ['blue', 'red'])
 
 
 if __name__ == '__main__':
