@@ -49,9 +49,20 @@
     </span>
   </h2>
     {% if oth_issues %}
-    <div class="addrem_bar issues_pbar m-b-1 {% if status|lower not in ['open', 'true'] %}closed{% endif %}" title="{{ (100.0 * (oth_issues_cnt / total_issues_cnt))|round|int }}% of {% if status|lower in ['open', 'true'] %}closed{% else %}open{% endif %} issues on {{ total_issues_cnt }} issues in total">
+    <div class="addrem_bar issues_pbar m-b-1 {%
+      if status|lower not in ['open', 'true'] %}closed{%
+      endif %}" title="{{
+      (100.0 * (oth_issues_cnt / total_issues_cnt))|round|int }}% of {%
+      if status|lower in ['open', 'true'] %}closed{%
+      else %}open{%
+      endif %} issues on {{ total_issues_cnt }} issues in total">
       {% if (issues | length + oth_issues) %}
-        <span style="width: {{ (100.0 * (issues_cnt / total_issues_cnt))|round|int }}%" title="{{ (100.0 * (issues_cnt / total_issues_cnt))|round|int }}% of {% if status|lower in ['open', 'true'] %}open{% else %}closed{% endif %} issues on {{ total_issues_cnt }} issues in total">
+        <span style="width: {{
+          (100.0 * (issues_cnt / total_issues_cnt))|round|int }}%" title="{{
+          (100.0 * (issues_cnt / total_issues_cnt))|round|int }}% of {%
+          if status|lower in ['open', 'true'] %}open{%
+          else %}closed{%
+          endif %} issues on {{ total_issues_cnt }} issues in total">
             {{ (100.0 * (issues_cnt / total_issues_cnt))|round|int }}%
         </span>
       {% endif %}
