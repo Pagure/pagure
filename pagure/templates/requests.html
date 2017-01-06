@@ -124,6 +124,7 @@
                 {% if status|lower not in ['open', 'true'] %}<span class="label {%
                     if request.status|lower == 'merged' %}label-success{%
                     elif request.status|lower == 'closed'%}label-danger{%
+                    elif request.status|lower == 'open' %}label-primary{%
                     endif %}">{{request.status}}</span>{%
                   endif %} {{ request.title | noJS("img") | safe }}
               </a>
