@@ -83,10 +83,9 @@
         <tr>
             <th class="stretch-table-column">Pull Request</th>
             <th class="open_date nowrap">Opened</th>
-            {% if status|lower != 'open' %}
-            <th class="close_date nowrap">Closed</th>
-            {% else %}
             <th class="last_updated nowrap">Modified</th>
+            {% if status|lower not in ['open', 'true'] %}
+            <th class="closed_date nowrap">Closed</th>
             {% endif %}
             <th class="open_by">
               Reporter(<a href="{{ url_for(
