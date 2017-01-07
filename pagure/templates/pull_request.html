@@ -1383,6 +1383,12 @@ $("[data-line-number]").click(function (ev) {
   window.location.hash = hash;
   return false;
 });
+
+// Update hash links in the addressbar according to which tab is clicked
+// on the PR page.
+$(document).on('click', '#pr-tabs a', function() {
+  window.location.hash = $(this).attr('href');
+});
 </script>
 
 
