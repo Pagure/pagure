@@ -209,9 +209,7 @@ class Modeltests(unittest.TestCase):
         if os.path.exists(DB_PATH):
             os.unlink(DB_PATH)
         if DB_PATH.startswith('postgres'):
-            if 'localhost' in DB_PATH:
-                pagure.lib.model.drop_tables(DB_PATH, self.session.bind)
-            else:
+            if 'localhost' not in DB_PATH:
                 db_name = DB_PATH.rsplit('/', 1)[1]
                 requests.get('%s/clean/%s' % (FAITOUT_URL, db_name))
 
