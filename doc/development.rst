@@ -14,7 +14,7 @@ Contributors:
 
 ::
 
-  git clone ssh://git@pagure.io:pagure.git
+  git clone ssh://git@pagure.io/pagure.git
 
 
 Dependencies
