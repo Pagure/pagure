@@ -5,6 +5,7 @@ Pagure offers a wide varieties of options that must or can be used to
 adjust its behavior.
 
 
+
 Must options
 ------------
 
@@ -83,6 +84,7 @@ the ``git://`` or ``http(s)://`` protocols.
 The URL should end with a slash ``/``.
 
 Defaults to: ``'git://pagure.org/'``
+
 
 
 Repo Directories
@@ -198,6 +200,7 @@ upload. For more information, see the install.rst guide.
 Defaults to: ``False``
 
 
+
 Configure Gitolite
 ------------------
 
@@ -256,6 +259,7 @@ using a package manager or something like ``/opt/bin/`` for a more custom
 install.
 
 
+
 EventSource options
 -------------------
 
@@ -277,6 +281,7 @@ running.
          below)
 
 
+
 Web-hooks notifications
 -----------------------
 
@@ -290,6 +295,7 @@ Defaults to: ``False``.
 
 .. note:: The Web-hooks server requires a redis server (see ``Redis options``
          below)
+
 
 
 Redis options
@@ -320,6 +326,7 @@ communicating with the EventSource server.
 Defaults to: ``0``.
 
 
+
 Authentication options
 ----------------------
 
@@ -338,6 +345,7 @@ PAGURE_ADMIN_USERS
 List of local users that are the site admins. These admins have the same rights as
 the users in the admin groups listed above as well as admin rights to
 all projects hosted on this pagure instance.
+
 
 
 Optional options
@@ -444,7 +452,6 @@ Defaults to:
         'static', 'pv', 'releases', 'new', 'api', 'settings',
         'logout', 'login', 'users', 'groups'
     ]
-
 
 
 CHECK_SESSION_IP
@@ -584,6 +591,17 @@ the user's username, behaving in this way in a similar fashion as github.com
 or gitlab.com.
 
 Defaults to: ``False``
+
+
+DOC_APP_URL
+~~~~~~~~~~~
+
+This configuration key allows you to specify where the documentation server
+is running (preferably in a different domain name entirely).
+If not set, the documentation page will show an error message saying that
+this pagure instance does not have a documentation server.
+
+Defaults to: ``None``
 
 
 
