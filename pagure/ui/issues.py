@@ -686,6 +686,7 @@ def view_roadmap(repo, username=None, namespace=None):
     if status.lower() == 'all':
         status = None
     milestone = flask.request.args.getlist('milestone', None)
+    tags = flask.request.args.getlist('tag', None)
 
     repo = flask.g.repo
 
@@ -701,12 +702,17 @@ def view_roadmap(repo, username=None, namespace=None):
     if flask.g.repo_admin:
         private = None
 
+    requested_stones = None
+    if milestone is not None:
+        requested_stones = milestone
     milestones = milestone or list(repo.milestones.keys())
+    all_milestones = list(repo.milestones.keys())
 
     issues = pagure.lib.search_issues(
         SESSION,
         repo,
         milestones=milestones,
+        tags=tags,
         private=private,
     )
 
@@ -732,12 +738,10 @@ def view_roadmap(repo, username=None, namespace=None):
             if not active:
                 del milestone_issues[key]
 
-    if milestone:
-        for mlstone in milestone:
-            if mlstone not in milestone_issues:
-                milestone_issues[mlstone] = []
-
-    tag_list = pagure.lib.get_tags_of_project(SESSION, repo)
+    all_tags = pagure.lib.get_tags_of_project(SESSION, repo)
+    tag_list = []
+    for tag in all_tags:
+        tag_list.append(tag.tag)
 
     reponame = pagure.get_repo_path(repo)
     repo_obj = pygit2.Repository(reponame)
@@ -755,8 +759,10 @@ def view_roadmap(repo, username=None, namespace=None):
         tag_list=tag_list,
         status=status,
         milestones=milestones_ordered,
+        requested_stones=requested_stones,
+        allmilestones=all_milestones,
         issues=milestone_issues,
-        tags=milestone,
+        tags=tags,
     )
 
 

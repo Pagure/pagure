@@ -9,7 +9,7 @@
 
 
   <h2>
-    {{ issues|count }} Milestones
+    Milestone Roadmap
     <span class="btn-group btn-group-sm pull-xs-right" role="group">
       <a href="{{ url_for(
           'view_issues',
@@ -47,94 +47,161 @@
       {% endif %}
     </div>
     {% endif %}
+  <hr>
 
-<section id="tags">
+<section id="stones">Milestones:&nbsp
+  <span class="btn-group btn-group-sm issues-tagbar" role="group">
+    {% for stone in allmilestones|sort %}
+      {% if stone in requested_stones %}
+        <a class="btn btn-secondary btn-sm {% if stone in requested_stones%}active{% endif %}"
+          href="{{ url_for(
+            'view_roadmap',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace,
+            tag=tags,
+            status='All' if not status else None) }}"
+            title="Filter issues by milestone">
+          {{ stone }}</a>
+      {% else %}
+        <a class="btn btn-secondary btn-sm {% if stone in requested_stones%}active{% endif %}"
+          href="{{ url_for(
+            'view_roadmap',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace,
+            milestone=stone,
+            tag=tags,
+            status='All' if not status else None) }}"
+            title="Filter issues by milestone">
+          {{ stone }}</a>
+      {% endif %}
+    {% endfor %}
+</span>
+</section>
+<section id="status">Status:&nbsp
   <span class="btn-group btn-group-sm issues-tagbar" role="group">
     {% if not status %}
       <a class="btn btn-secondary btn-sm" href="{{ url_for(
           'view_roadmap',
           repo=repo.name,
           username=username,
+          milestone=requested_stones,
+          tag=tags,
           namespace=repo.namespace) }}">Open</a>
-      <a class="btn btn-primary btn-sm" href="{{ url_for(
+      <a class="btn btn-secondary btn-sm active" href="{{ url_for(
           'view_roadmap',
           repo=repo.name,
           username=username,
+          milestone=requested_stones,
+          tag=tags,
           namespace=repo.namespace,
           status='All') }}">All</a>
     {% else %}
-      <a class="btn btn-primary btn-sm" href="{{ url_for(
+      <a class="btn btn-secondary btn-sm active" href="{{ url_for(
           'view_roadmap',
           repo=repo.name,
           username=username,
+          milestone=requested_stones,
+          tag=tags,
           namespace=repo.namespace) }}">Open</a>
       <a class="btn btn-secondary btn-sm" href="{{ url_for(
           'view_roadmap',
           repo=repo.name,
           username=username,
+          milestone=requested_stones,
+          tag=tags,
           namespace=repo.namespace,
           status='All') }}">All</a>
     {% endif %}
   </span>
-  <span class="oi m-l-2" data-glyph="tag"></span>
+</section>
+
+<section>Tags:&nbsp
   <span class="btn-group btn-group-sm issues-tagbar" role="group">
     {% for tag in tag_list %}
-      {% if tag.tag in tags %}
-        <a class="btn btn-secondary btn-sm {% if tag.tag in tags%}active{% endif %}"
-            href="{{ url_for(
-                'view_roadmap',
-                repo=repo.name,
-                username=username,
-                namespace=repo.namespace,
-                milestone=tag.tag,
-                status='All' if not status else None) }}"
-                   title="Filter issues by milestone">
+      {% if tag in tags %}
+        <a class="btn btn-secondary btn-sm {% if tag in tags %}active{% endif %}"
+          href="{{ url_for(
+            'view_roadmap',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace,
+            milestone=requested_stones,
+            status='All' if not status else None) }}"
+            title="Filter issues by tags">
       {% else %}
-        <a class="btn btn-secondary btn-sm {% if tag.tag in tags%}active{%endif%}"
-            href="{{ url_for(
-                'view_roadmap',
-                repo=repo.name,
-                username=username,
-                namespace=repo.namespace,
-                milestone=tag.tag,
-                status='All' if not status else None) }}"
-                   title="Filter issues by milestone">
+        <a class="btn btn-secondary btn-sm {% if tag in tags %}active{% endif %}"
+          href="{{ url_for(
+            'view_roadmap',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace,
+            milestone=requested_stones,
+            tag=tag,
+            status='All' if not status else None) }}"
+            title="Filter issues by tags">
       {% endif %}
-
-        {{ tag.tag }}</a>
+      {{ tag }}</a>
     {% endfor %}
-</span>
+  </span>
 </section>
+<br>
 
 {% for milestone in milestones %}
 <div class="card m-t-1">
-  <div class="card-header">
-    <h5>
-      Milestone: {{ milestone }}
-      {% if repo.milestones[milestone] %}
-      <span class="pull-xs-right">
-        Due: {{ repo.milestones[milestone] }}
-      </span>
-      {% endif %}
-    </h5>
-  </div>
-
   <div class="card-block">
-      <table id="pagure-issues-list" class="table table-hover table-striped m-b-0">
-      <thead></thead>
+    <table id="pagure-issues-list" class="table table-hover table-striped m-b-0">
+      <thead class="thead-default">
+        <tr>
+          <th id="issue-title">Milestone: {{ milestone }}</th>
+          <th class="open_date">Opened</th>
+          {% if status and status|lower != 'open' %}
+            <th class="close_date">Closed</th>
+          {% else %}
+            <th class="mod_date">Modified</th>
+          {% endif %}
+          <th class="priority" data-sort="int">
+            Priority&nbsp;(<a href="{{ url_for('view_issues',
+            repo=repo.name,
+            username=username,
+            namespace=repo.namespace,
+            tags=tags, author=author, assignee=assignee,
+            status=status) }}">reset</a>)
+          </th>
+          {% if not status or status|lower == 'open' %}
+            <th class="assigned">
+              Assignee&nbsp;(<a href="{{ url_for('view_issues',
+              repo=repo.name,
+              username=username,
+              namespace=repo.namespace,
+              tags=tags, author=author, priority=priority,
+              status=status) }}">reset</a>)
+            </th>
+          {% endif %}
+          {% if repo.milestones[milestone] %}
+            <span class="pull-xs-right">
+            Due: {{ repo.milestones[milestone] }}
+            </span>
+          {% endif %}
+          <th class="issue_status">Status</th>
+        </tr>
+      </thead>
       <tfoot></tfoot>
       <tbody>
-        {% for issue in issues[milestone] |sort(attribute='priority') %}
+      {% for issue in issues[milestone] |sort(attribute='priority') %}
+        {% if status is none or (status and issue.status == 'Open') %}
           <tr {% if issue.status != 'Open' %}class="text-muted"{% endif %}>
             <td>
               <span class="label label-default">#{{ issue.id }}</span>
-              {% if status and status != 'Open' %}
+              {% if status is none or status != 'Open' %}
               <span class="label {% if
-                issue.status|lower == 'invalid' %}label-danger{%
-                elif issue.status|lower == 'fixed' %}label-success{%
-                elif issue.status|lower == 'insufficient data' %}label-warning{%
-                elif issue.status|lower == 'duplicate' %}label-default{%
-                endif %}">{{issue.status}}</span>
+                issue.close_status|lower == 'invalid' %}label-danger{%
+                elif issue.close_status|lower == 'fixed' %}label-success{%
+                elif issue.close_status|lower == 'insufficient data' %}label-warning{%
+                elif issue.close_status|lower == 'duplicate' %}label-default{%
+                elif issue.close_status %}label-default{%
+                endif %}">{{issue.close_status}}</span>
               {% endif %}
               {% if issue.private %}
               <span class="oi red-icon" data-glyph="lock-locked" title="Private issue"></span>
@@ -163,6 +230,10 @@
                 <span title="{{issue.date_created.strftime('%Y-%m-%d %H:%M:%S')}}">{{
                         issue.date_created | humanize}}</span>
             </td>
+            <td class="td-mod_date nowrap">
+                <span title="{{issue.last_updated.strftime('%Y-%m-%d %H:%M:%S')}}">{{
+                        issue.last_updated | humanize}}</span>
+            </td>
             <td class="td-priority nowrap" data-sort-value="{{
               issue.priority
               if issue.priority
@@ -172,20 +243,20 @@
               {% endif %}
             </td>
             <td class="nowrap">
-              {% if issue.status != 'Open' %}
-              <span class="label {%
-                if issue.status == 'Fixed' -%}label-primary{%
-                else %}label-danger{% endif %}">{{ issue.status }}</span>
+              {% if issue.assignee %}
+                {{ issue.assignee.default_email | avatar(16) | safe }}
+                {{ issue.assignee.user }}
               {% else %}
-                {% if issue.assignee %}
-                  {{ issue.assignee.default_email | avatar(16) | safe }}
-                  {{ issue.assignee.user }}
-                {% else %}
-                  <span class="text-muted">unassigned</span>
-                {% endif %}
+                 <span class="text-muted">unassigned</span>
               {% endif %}
             </td>
+            <td class="nowrap">
+                <span class="label {%
+                  if issue.status != 'Open' -%}label-danger{%
+                  else %}label-success{% endif %}">{{ issue.status }}</span>
+            </td>
           </tr>
+        {% endif %}
         {% else %}
           <tr>
             <td colspan="5" class="noresult">No issues found</td>
@@ -195,6 +266,12 @@
     </table>
   </div>
 </div>
+{% else %}
+  <div class="card-block">
+  <tr>
+    <td colspan="5" class="noresult"><b><i>No issues found</i></b></td>
+  </tr>
+  </div>
 {% endfor %}
 {% endblock %}
 {% block jscripts %}
