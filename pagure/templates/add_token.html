@@ -13,6 +13,14 @@
           <strong>Create a new token</strong>
         </div>
         <div class="card-block">
+          <p>
+            From the list below, select one or more actions you want to
+            authorize this token for.
+          </p>
+          <p>
+            After that, click 'Create' to generate a token with the selected
+            permissions.
+          </p>
           <form action="{{
               url_for('.add_token', username=username,
                       repo=repo.name, namespace=repo.namespace)
