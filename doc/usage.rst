@@ -44,3 +44,4 @@ Contents:
    usage/upgrade_db
    usage/pagure_ci
    usage/quick_replies
+   usage/troubleshooting

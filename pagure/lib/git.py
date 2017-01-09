@@ -1284,8 +1284,8 @@ def diff_pull_request(
 
     if request.branch not in orig_repo.listall_branches():
         raise pagure.exceptions.PagureException(
-            'The branch into which this pull-request was to be merged : %s '
-            'seems to no longer present in this repo' % request.branch)
+            'The branch into which this pull-request was to be merged: %s '
+            'seems to no longer be present in this repo' % request.branch)
 
     if not repo_obj.is_empty and not orig_repo.is_empty:
         # Pull-request open
