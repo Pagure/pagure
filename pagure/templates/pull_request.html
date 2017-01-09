@@ -26,7 +26,7 @@
 {% endblock %}
 
 {% block repo %}
-<div class="row">
+<div class="row" id="pr-wrapper">
   <div class="col-md-12">
 {% if pull_request %}
 <h3><span class="label label-default">PR#{{requestid}}</span>
@@ -1244,10 +1244,14 @@ function updateHighlight(onload) {
     highlight_comment();
   } else {
     if (onload) {
-      $('#comments').removeClass('active');
-      $('[href="#comments"]').removeClass('active');
-      // When the hash points to 'Files Changed' tab.
-      if (location.hash.indexOf("request_diff") > -1) {
+      // Hide all tabs, and then show the one pointed to by the hash.
+      // This is neccessary to handle 'Back' button presses in the browser,
+      // which otherwise break the tabs view .
+      $('#pr-tabs .nav-item a.nav-link').removeClass('active');
+      $('#pr-wrapper .tab-pane').removeClass('active');
+      // When the hash points to 'Files Changed' tab, or a highlight.
+      if (location.hash.indexOf("request_diff") > -1 ||
+          location.hash.indexOf("_") === 1) {
         $('[href="#request_diff"]').addClass('active');
         $('#request_diff').addClass('active');
       }
