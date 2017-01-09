@@ -27,7 +27,8 @@ parser.add_argument(
     help='Port for the Pagure to run on.')
 parser.add_argument(
     '--host', default="127.0.0.1",
-    help='Hostname to listen on. When set to 0.0.0.0 the server is available externally. Defaults to 127.0.0.1 making the it only visable on localhost')
+    help='Hostname to listen on. When set to 0.0.0.0 the server is available '
+    'externally. Defaults to 127.0.0.1 making the it only visible on localhost')
 
 args = parser.parse_args()
 

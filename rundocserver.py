@@ -29,7 +29,7 @@ parser.add_argument(
     '--host', default="127.0.0.1",
     help='Hostname to listen on. When set to 0.0.0.0 the server is '
     'available externally. Defaults to 127.0.0.1 making the it only '
-    'visable on localhost')
+    'visible on localhost')
 
 args = parser.parse_args()
 
@@ -40,7 +40,6 @@ if args.config:
         config = os.path.join(here, config)
     os.environ['PAGURE_CONFIG'] = config
 
-from pagure import APP
 from pagure.docs_server import APP
 
 if args.profile:
