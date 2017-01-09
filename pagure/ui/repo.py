@@ -1805,6 +1805,10 @@ def add_token(repo, username=None, namespace=None):
             APP.logger.exception(err)
             flask.flash('User could not be added', 'error')
 
+    # When form is displayed after an empty submission, show an error.
+    if form.errors.get('acls'):
+        flask.flash('You must select atleast one permission.', 'error')
+
     return flask.render_template(
         'add_token.html',
         select='settings',

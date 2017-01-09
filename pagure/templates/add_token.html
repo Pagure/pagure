@@ -37,8 +37,8 @@
           </table>
           <div class="p-t-2">
             <input type="submit" class="btn btn-primary" value="Create">
-            <input type="button" value="Cancel" class="btn btn-secondary"
-             onclick="history.back();">
+            <a class="btn btn-secondary" href="{{ url_for('.view_settings',
+                username=username, repo=repo.name, namespace=repo.namespace) }}">Cancel</a>
             {{ form.csrf_token }}
           </div>
         </form>
