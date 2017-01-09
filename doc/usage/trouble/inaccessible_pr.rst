@@ -21,7 +21,8 @@ When trying to open a pull-request, if you run into this error:
 
 This means that the pull-request was opened against a branch on your repo and
 that this branch no longer exists.
-Pagure is therefore unable to compute the diff between of the pull-request.
+Pagure is therefore unable to compute the diff between the sources and
+the target of the pull-request.
 
 The pull-request is thus inaccessible but remains in the list of open
 pull-requests.
@@ -38,7 +39,7 @@ This can be done using git simply by doing:
 ::
 
     git checkout -b <branch_name>
-    git push
+    git push origin <branch_name>
 
 It will create the branch named ``<branch_name>`` in pagure, allowing the
 diff to be computed for that pull-request and thus allowing it to be
