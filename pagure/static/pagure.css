@@ -128,6 +128,14 @@ white-space: nowrap;
   display:none;
 }
 
+.milestone-table {
+  width: 100%;
+}
+
+.milestone-table tr td:first-child {
+  width: 100%;
+}
+
 .bodycontent
 {
 min-height: 85vh;
