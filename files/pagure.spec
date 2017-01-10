@@ -25,6 +25,7 @@ BuildRequires:      python-blinker
 BuildRequires:      python-chardet
 BuildRequires:      python-cryptography
 BuildRequires:      python-docutils
+BuildRequires:      python-filelock
 BuildRequires:      python-flask
 BuildRequires:      python-flask-wtf
 BuildRequires:      python-flask-multistatic
@@ -62,6 +63,7 @@ Requires:           python-chardet
 Requires:           python-cryptography
 Requires:           python-docutils
 Requires:           python-enum34
+Requires:           python-filelock
 Requires:           python-flask
 Requires:           python-flask-wtf
 Requires:           python-flask-multistatic
