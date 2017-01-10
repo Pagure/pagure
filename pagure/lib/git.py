@@ -247,8 +247,9 @@ def update_git(obj, repo, repofolder):
 
         PagureRepo.push(ori_remote, refname)
 
-    # Remove the clone
-    shutil.rmtree(newpath)
+        # Remove the clone
+        shutil.rmtree(newpath)
+
     # Remove the lock file
     os.unlink(lockfile)
 
@@ -926,8 +927,9 @@ def update_file_in_git(
             raise pagure.exceptions.PagureException(
                 'Commit could not be done: %s' % err)
 
-    # Remove the clone
-    shutil.rmtree(newpath)
+        # Remove the clone
+        shutil.rmtree(newpath)
+
     # Remove the lock file
     os.unlink(lockfile)
 
