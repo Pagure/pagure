@@ -1807,7 +1807,7 @@ def add_token(repo, username=None, namespace=None):
 
     # When form is displayed after an empty submission, show an error.
     if form.errors.get('acls'):
-        flask.flash('You must select atleast one permission.', 'error')
+        flask.flash('You must select at least one permission.', 'error')
 
     return flask.render_template(
         'add_token.html',
