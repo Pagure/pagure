@@ -320,20 +320,17 @@ def update_issue(repo, issueid, username=None, namespace=None):
         except pagure.exceptions.PagureException as err:
             is_js = False
             SESSION.rollback()
-            if not is_js:
-                flask.flash(err.message, 'error')
+            flask.flash(err.message, 'error')
         except SQLAlchemyError as err:  # pragma: no cover
             is_js = False
             SESSION.rollback()
             APP.logger.exception(err)
-            if not is_js:
-                flask.flash(str(err), 'error')
+            flask.flash(str(err), 'error')
         except filelock.Timeout as err:  # pragma: no cover
             is_js = False
             SESSION.rollback()
             APP.logger.exception(err)
-            if not is_js:
-                flask.flash(
+            flask.flash(
                     'We could not save all the info, please try again',
                     'error')
     else:
@@ -848,6 +845,12 @@ def new_issue(repo, username=None, namespace=None):
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')
+        except filelock.Timeout as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash(
+                    'We could not save all the info, please try again',
+                    'error')
 
     types = None
     default = None
@@ -1093,10 +1096,18 @@ def edit_issue(repo, issueid, username=None, namespace=None):
                 repo=repo.name, issueid=issueid)
             return flask.redirect(url)
         except pagure.exceptions.PagureException as err:
+            SESSION.rollback()
             flask.flash(str(err), 'error')
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')
+        except filelock.Timeout as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash(
+                    'We could not save all the info, please try again',
+                    'error')
+
     elif flask.request.method == 'GET':
         form.title.data = issue.title
         form.issue_content.data = issue.content
@@ -1147,14 +1158,22 @@ def upload_issue(repo, issueid, username=None, namespace=None):
 
     if form.validate_on_submit():
         filestream = flask.request.files['filestream']
-        new_filename = pagure.lib.git.add_file_to_git(
-            repo=repo,
-            issue=issue,
-            ticketfolder=APP.config['TICKETS_FOLDER'],
-            user=user_obj,
-            filename=filestream.filename,
-            filestream=filestream.stream,
-        )
+        try:
+            new_filename = pagure.lib.git.add_file_to_git(
+                repo=repo,
+                issue=issue,
+                ticketfolder=APP.config['TICKETS_FOLDER'],
+                user=user_obj,
+                filename=filestream.filename,
+                filestream=filestream.stream,
+            )
+        except filelock.Timeout as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash(
+                    'We could not save all the info, please try again',
+                    'error')
+
         return flask.jsonify({
             'output': 'ok',
             'filename': new_filename.split('-', 1)[1],
@@ -1310,6 +1329,12 @@ def edit_comment_issue(
                 return 'error'
             flask.flash(
                 'Could not edit the comment: %s' % commentid, 'error')
+        except filelock.Timeout as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash(
+                    'We could not save all the info, please try again',
+                    'error')
 
         if is_js:
             return 'ok'

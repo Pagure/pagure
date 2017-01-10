@@ -541,7 +541,6 @@ def pull_request_add_comment(
             else:
                 flask.flash(str(err), 'error')
         except filelock.Timeout as err:  # pragma: no cover
-            is_js = False
             SESSION.rollback()
             APP.logger.exception(err)
             if is_js:
@@ -705,8 +704,18 @@ def pull_request_edit_comment(
             LOG.error(err)
             if is_js:
                 return 'error'
-            flask.flash(
-                'Could not edit the comment: %s' % commentid, 'error')
+            else:
+                flask.flash(
+                    'Could not edit the comment: %s' % commentid, 'error')
+        except filelock.Timeout as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            if is_js:
+                return 'error'
+            else:
+                flask.flash(
+                    'We could not save all the info, please try again',
+                    'error')
 
         if is_js:
             return 'ok'
@@ -854,6 +863,13 @@ def cancel_request_pull(repo, requestid, username=None, namespace=None):
             flask.flash(
                 'Could not update this pull-request in the database',
                 'error')
+        except filelock.Timeout as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash(
+                    'We could not save all the info, please try again',
+                    'error')
+
     else:
         flask.flash('Invalid input submitted', 'error')
 
@@ -911,6 +927,12 @@ def set_assignee_requests(repo, requestid, username=None, namespace=None):
             SESSION.rollback()
             APP.logger.exception(err)
             flask.flash(str(err), 'error')
+        except filelock.Timeout as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash(
+                'We could not save all the info, please try again',
+                'error')
 
     return flask.redirect(flask.url_for(
         'request_pull', username=username, namespace=namespace,
@@ -1079,6 +1101,12 @@ def new_request_pull(
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             flask.flash(str(err), 'error')
+        except filelock.Timeout as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash(
+                    'We could not save all the info, please try again',
+                    'error')
 
     if not repo_admin:
         form = None
