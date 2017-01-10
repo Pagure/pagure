@@ -156,7 +156,7 @@
       {% set index = index + 1 %}
       <thead class="thead-default">
         <tr>
-          <th id="issue-title">Milestone: {{ milestone }}
+          <th id="issue-title">{{ milestone }}
             {% if repo.milestones[milestone] %}
               <span style="font-weight:normal">&nbsp (Due: {{ repo.milestones[milestone] }})</span>
             {% endif %}
@@ -168,21 +168,11 @@
             <th class="mod_date">Modified</th>
           {% endif %}
           <th class="priority" data-sort="int">
-            Priority&nbsp;(<a href="{{ url_for('view_issues',
-            repo=repo.name,
-            username=username,
-            namespace=repo.namespace,
-            tags=tags, author=author, assignee=assignee,
-            status=status) }}">reset</a>)
+            Priority
           </th>
           {% if not status or status|lower == 'open' %}
             <th class="assigned">
-              Assignee&nbsp;(<a href="{{ url_for('view_issues',
-              repo=repo.name,
-              username=username,
-              namespace=repo.namespace,
-              tags=tags, author=author, priority=priority,
-              status=status) }}">reset</a>)
+              Assignee
             </th>
           {% endif %}
           <th class="issue_status">Status</th>
