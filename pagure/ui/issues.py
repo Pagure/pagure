@@ -21,6 +21,7 @@ import re
 from collections import defaultdict
 from math import ceil
 
+import filelock
 import pygit2
 import werkzeug.datastructures
 from sqlalchemy.exc import SQLAlchemyError
@@ -327,6 +328,14 @@ def update_issue(repo, issueid, username=None, namespace=None):
             APP.logger.exception(err)
             if not is_js:
                 flask.flash(str(err), 'error')
+        except filelock.Timeout as err:  # pragma: no cover
+            is_js = False
+            SESSION.rollback()
+            APP.logger.exception(err)
+            if not is_js:
+                flask.flash(
+                    'We could not save all the info, please try again',
+                    'error')
     else:
         if is_js:
             return 'notok: %s' % form.errors

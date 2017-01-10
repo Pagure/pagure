@@ -20,6 +20,7 @@ import flask
 import os
 from math import ceil
 
+import filelock
 import pygit2
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -535,9 +536,20 @@ def pull_request_add_comment(
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             APP.logger.exception(err)
-            flask.flash(str(err), 'error')
             if is_js:
                 return 'error'
+            else:
+                flask.flash(str(err), 'error')
+        except filelock.Timeout as err:  # pragma: no cover
+            is_js = False
+            SESSION.rollback()
+            APP.logger.exception(err)
+            if is_js:
+                return 'error'
+            else:
+                flask.flash(
+                    'We could not save all the info, please try again',
+                    'error')
 
         if is_js:
             return 'ok'
