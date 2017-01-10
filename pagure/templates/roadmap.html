@@ -151,10 +151,14 @@
 {% for milestone in milestones %}
 <div class="card m-t-1">
   <div class="card-block">
-    <table id="pagure-issues-list" class="table table-hover table-striped m-b-0">
+    <table id="pagure-issues-list-{{milestone}}" class="table table-hover table-striped m-b-0">
       <thead class="thead-default">
         <tr>
-          <th id="issue-title">Milestone: {{ milestone }}</th>
+          <th id="issue-title">Milestone: {{ milestone }}
+            {% if repo.milestones[milestone] %}
+              <span style="font-weight:normal">&nbsp (Due: {{ repo.milestones[milestone] }})</span>
+            {% endif %}
+          </th>
           <th class="open_date">Opened</th>
           {% if status and status|lower != 'open' %}
             <th class="close_date">Closed</th>
@@ -179,11 +183,6 @@
               status=status) }}">reset</a>)
             </th>
           {% endif %}
-          {% if repo.milestones[milestone] %}
-            <span class="pull-xs-right">
-            Due: {{ repo.milestones[milestone] }}
-            </span>
-          {% endif %}
           <th class="issue_status">Status</th>
         </tr>
       </thead>
@@ -194,15 +193,6 @@
           <tr {% if issue.status != 'Open' %}class="text-muted"{% endif %}>
             <td>
               <span class="label label-default">#{{ issue.id }}</span>
-              {% if status is none or status != 'Open' %}
-              <span class="label {% if
-                issue.close_status|lower == 'invalid' %}label-danger{%
-                elif issue.close_status|lower == 'fixed' %}label-success{%
-                elif issue.close_status|lower == 'insufficient data' %}label-warning{%
-                elif issue.close_status|lower == 'duplicate' %}label-default{%
-                elif issue.close_status %}label-default{%
-                endif %}">{{issue.close_status}}</span>
-              {% endif %}
               {% if issue.private %}
               <span class="oi red-icon" data-glyph="lock-locked" title="Private issue"></span>
               {% endif %}

@@ -162,7 +162,6 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output.data)
 
-
     def test_update_milestones(self):
         """ Test updating milestones of a repo. """
         tests.create_projects(self.session)
@@ -482,7 +481,6 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
         # test the roadmap view
         output = self.app.get('/test/roadmap')
         self.assertEqual(output.status_code, 200)
-        self.assertIn(u'2 Milestones', output.data)
         self.assertIn(u'Milestone: v2.0', output.data)
         self.assertIn(u'Milestone: unplanned', output.data)
         self.assertEqual(
@@ -491,7 +489,6 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
         # test the roadmap view for all milestones
         output = self.app.get('/test/roadmap?status=All')
         self.assertEqual(output.status_code, 200)
-        self.assertIn(u'3 Milestones', output.data)
         self.assertIn(u'Milestone: v1.0', output.data)
         self.assertIn(u'Milestone: v2.0', output.data)
         self.assertIn(u'Milestone: unplanned', output.data)
@@ -501,26 +498,30 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
         # test the roadmap view for a specific milestone
         output = self.app.get('/test/roadmap?milestone=v2.0')
         self.assertEqual(output.status_code, 200)
-        self.assertIn(u'1 Milestones', output.data)
         self.assertIn(u'Milestone: v2.0', output.data)
         self.assertEqual(
             output.data.count(u'<span class="label label-default">#'), 2)
 
-        # test the roadmap view for a specific milestone - closed
+        # test the roadmap view for a specific milestone - open
         output = self.app.get('/test/roadmap?milestone=v1.0')
         self.assertEqual(output.status_code, 200)
-        self.assertIn(u'1 Milestones', output.data)
-        self.assertIn(u'Milestone: v1.0', output.data)
+        self.assertIn(u'No issues found', output.data)
         self.assertEqual(
             output.data.count(u'<span class="label label-default">#'), 0)
 
         # test the roadmap view for a specific milestone - closed
         output = self.app.get('/test/roadmap?milestone=v1.0&status=All')
         self.assertEqual(output.status_code, 200)
-        self.assertIn(u'1 Milestones', output.data)
         self.assertIn(u'Milestone: v1.0', output.data)
         self.assertEqual(
             output.data.count(u'<span class="label label-default">#'), 2)
+
+        # test the roadmap view for a specific tag
+        output = self.app.get('/test/roadmap?milestone=v2.0&tag=unknown')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(u'No issues found', output.data)
+        self.assertEqual(
+            output.data.count(u'<span class="label label-default">#'), 0)
 
         # test the roadmap view for errors
         output = self.app.get('/foo/roadmap')

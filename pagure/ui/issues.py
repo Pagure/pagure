@@ -249,7 +249,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     ticketfolder=APP.config['TICKETS_FOLDER'],
                 )
                 SESSION.commit()
-                if message and message != 'Nothing to change':
+                if message:
                     messages.add(message)
 
                 # Update priority
@@ -705,13 +705,12 @@ def view_roadmap(repo, username=None, namespace=None):
     requested_stones = None
     if milestone is not None:
         requested_stones = milestone
-    milestones = milestone or list(repo.milestones.keys())
     all_milestones = list(repo.milestones.keys())
 
     issues = pagure.lib.search_issues(
         SESSION,
         repo,
-        milestones=milestones,
+        milestones=milestone or list(repo.milestones.keys()),
         tags=tags,
         private=private,
     )
@@ -720,7 +719,7 @@ def view_roadmap(repo, username=None, namespace=None):
     milestone_issues = defaultdict(list)
     for cnt in range(len(issues)):
         saved = False
-        for mlstone in sorted(milestones):
+        for mlstone in sorted(milestone or list(repo.milestones.keys())):
             if mlstone == issues[cnt].milestone:
                 milestone_issues[mlstone].append(issues[cnt])
                 saved = True
