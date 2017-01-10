@@ -24,6 +24,7 @@ import subprocess
 import tempfile
 
 import arrow
+import filelock
 import pygit2
 import werkzeug
 
@@ -169,80 +170,87 @@ def update_git(obj, repo, repofolder):
 
     # Get the fork
     repopath = os.path.join(repofolder, repo.path)
+    lockfile = '%s.lock' % repopath
 
-    # Clone the repo into a temp folder
-    newpath = tempfile.mkdtemp(prefix='pagure-')
-    new_repo = pygit2.clone_repository(repopath, newpath)
+    lock = filelock.FileLock(lockfile)
+    with lock:
 
-    file_path = os.path.join(newpath, obj.uid)
+        # Clone the repo into a temp folder
+        newpath = tempfile.mkdtemp(prefix='pagure-')
+        new_repo = pygit2.clone_repository(repopath, newpath)
 
-    # Get the current index
-    index = new_repo.index
+        file_path = os.path.join(newpath, obj.uid)
 
-    # Are we adding files
-    added = False
-    if not os.path.exists(file_path):
-        added = True
+        # Get the current index
+        index = new_repo.index
 
-    # Write down what changed
-    with open(file_path, 'w') as stream:
-        stream.write(json.dumps(
-            obj.to_json(), sort_keys=True, indent=4,
-            separators=(',', ': ')))
+        # Are we adding files
+        added = False
+        if not os.path.exists(file_path):
+            added = True
 
-    # Retrieve the list of files that changed
-    diff = new_repo.diff()
-    files = []
-    for patch in diff:
-        if hasattr(patch, 'new_file_path'):
-            files.append(patch.new_file_path)
-        elif hasattr(patch, 'delta'):
-            files.append(patch.delta.new_file.path)
+        # Write down what changed
+        with open(file_path, 'w') as stream:
+            stream.write(json.dumps(
+                obj.to_json(), sort_keys=True, indent=4,
+                separators=(',', ': ')))
 
-    # Add the changes to the index
-    if added:
-        index.add(obj.uid)
-    for filename in files:
-        index.add(filename)
+        # Retrieve the list of files that changed
+        diff = new_repo.diff()
+        files = []
+        for patch in diff:
+            if hasattr(patch, 'new_file_path'):
+                files.append(patch.new_file_path)
+            elif hasattr(patch, 'delta'):
+                files.append(patch.delta.new_file.path)
 
-    # If not change, return
-    if not files and not added:
-        shutil.rmtree(newpath)
-        return
+        # Add the changes to the index
+        if added:
+            index.add(obj.uid)
+        for filename in files:
+            index.add(filename)
 
-    # See if there is a parent to this commit
-    parent = None
-    try:
-        parent = new_repo.head.get_object().oid
-    except pygit2.GitError:
-        pass
+        # If not change, return
+        if not files and not added:
+            shutil.rmtree(newpath)
+            os.unlink(lockfile)
+            return
 
-    parents = []
-    if parent:
-        parents.append(parent)
+        # See if there is a parent to this commit
+        parent = None
+        try:
+            parent = new_repo.head.get_object().oid
+        except pygit2.GitError:
+            pass
 
-    # Author/commiter will always be this one
-    author = pygit2.Signature(name='pagure', email='pagure')
+        parents = []
+        if parent:
+            parents.append(parent)
 
-    # Actually commit
-    new_repo.create_commit(
-        'refs/heads/master',
-        author,
-        author,
-        'Updated %s %s: %s' % (obj.isa, obj.uid, obj.title),
-        new_repo.index.write_tree(),
-        parents)
-    index.write()
+        # Author/commiter will always be this one
+        author = pygit2.Signature(name='pagure', email='pagure')
 
-    # Push to origin
-    ori_remote = new_repo.remotes[0]
-    master_ref = new_repo.lookup_reference('HEAD').resolve()
-    refname = '%s:%s' % (master_ref.name, master_ref.name)
+        # Actually commit
+        new_repo.create_commit(
+            'refs/heads/master',
+            author,
+            author,
+            'Updated %s %s: %s' % (obj.isa, obj.uid, obj.title),
+            new_repo.index.write_tree(),
+            parents)
+        index.write()
 
-    PagureRepo.push(ori_remote, refname)
+        # Push to origin
+        ori_remote = new_repo.remotes[0]
+        master_ref = new_repo.lookup_reference('HEAD').resolve()
+        refname = '%s:%s' % (master_ref.name, master_ref.name)
+
+        PagureRepo.push(ori_remote, refname)
 
     # Remove the clone
     shutil.rmtree(newpath)
+    # Remove the lock file
+    os.unlink(lockfile)
 
 
 def clean_git(obj, repo, repofolder):
@@ -835,84 +843,93 @@ def update_file_in_git(
     # Get the fork
     repopath = pagure.get_repo_path(repo)
 
-    # Clone the repo into a temp folder
-    newpath = tempfile.mkdtemp(prefix='pagure-')
-    new_repo = pygit2.clone_repository(
-        repopath, newpath, checkout_branch=branch)
+    lockfile = '%s.lock' % repopath
 
-    file_path = os.path.join(newpath, filename)
+    lock = filelock.FileLock(lockfile)
+    with lock:
 
-    # Get the current index
-    index = new_repo.index
+        # Clone the repo into a temp folder
+        newpath = tempfile.mkdtemp(prefix='pagure-')
+        new_repo = pygit2.clone_repository(
+            repopath, newpath, checkout_branch=branch)
 
-    # Write down what changed
-    with open(file_path, 'w') as stream:
-        stream.write(content.replace('\r', '').encode('utf-8'))
+        file_path = os.path.join(newpath, filename)
 
-    # Retrieve the list of files that changed
-    diff = new_repo.diff()
-    files = []
-    for patch in diff:
-        if hasattr(patch, 'new_file_path'):
-            files.append(patch.new_file_path)
-        elif hasattr(patch, 'delta'):
-            files.append(patch.delta.new_file.path)
+        # Get the current index
+        index = new_repo.index
 
-    # Add the changes to the index
-    added = False
-    for filename in files:
-        added = True
-        index.add(filename)
+        # Write down what changed
+        with open(file_path, 'w') as stream:
+            stream.write(content.replace('\r', '').encode('utf-8'))
 
-    # If not change, return
-    if not files and not added:
-        shutil.rmtree(newpath)
-        return
+        # Retrieve the list of files that changed
+        diff = new_repo.diff()
+        files = []
+        for patch in diff:
+            if hasattr(patch, 'new_file_path'):
+                files.append(patch.new_file_path)
+            elif hasattr(patch, 'delta'):
+                files.append(patch.delta.new_file.path)
 
-    # See if there is a parent to this commit
-    branch_ref = get_branch_ref(new_repo, branch)
-    parent = branch_ref.get_object()
+        # Add the changes to the index
+        added = False
+        for filename in files:
+            added = True
+            index.add(filename)
 
-    # See if we need to create the branch
-    nbranch_ref = None
-    if branchto not in new_repo.listall_branches():
-        nbranch_ref = new_repo.create_branch(branchto, parent)
+        # If not change, return
+        if not files and not added:
+            shutil.rmtree(newpath)
+            os.unlink(lockfile)
+            return
 
-    parents = []
-    if parent:
-        parents.append(parent.hex)
+        # See if there is a parent to this commit
+        branch_ref = get_branch_ref(new_repo, branch)
+        parent = branch_ref.get_object()
 
-    # Author/commiter will always be this one
-    author = pygit2.Signature(
-        name=user.username.encode('utf-8'),
-        email=email.encode('utf-8')
-    )
+        # See if we need to create the branch
+        nbranch_ref = None
+        if branchto not in new_repo.listall_branches():
+            nbranch_ref = new_repo.create_branch(branchto, parent)
 
-    # Actually commit
-    new_repo.create_commit(
-        nbranch_ref.name if nbranch_ref else branch_ref.name,
-        author,
-        author,
-        message.strip(),
-        new_repo.index.write_tree(),
-        parents)
-    index.write()
+        parents = []
+        if parent:
+            parents.append(parent.hex)
 
-    # Push to origin
-    ori_remote = new_repo.remotes[0]
-    refname = '%s:refs/heads/%s' % (
-        nbranch_ref.name if nbranch_ref else branch_ref.name,
-        branchto)
+        # Author/commiter will always be this one
+        author = pygit2.Signature(
+            name=user.username.encode('utf-8'),
+            email=email.encode('utf-8')
+        )
 
-    try:
-        PagureRepo.push(ori_remote, refname)
-    except pygit2.GitError as err:  # pragma: no cover
-        shutil.rmtree(newpath)
-        raise pagure.exceptions.PagureException(
-            'Commit could not be done: %s' % err)
+        # Actually commit
+        new_repo.create_commit(
+            nbranch_ref.name if nbranch_ref else branch_ref.name,
+            author,
+            author,
+            message.strip(),
+            new_repo.index.write_tree(),
+            parents)
+        index.write()
+
+        # Push to origin
+        ori_remote = new_repo.remotes[0]
+        refname = '%s:refs/heads/%s' % (
+            nbranch_ref.name if nbranch_ref else branch_ref.name,
+            branchto)
+
+        try:
+            PagureRepo.push(ori_remote, refname)
+        except pygit2.GitError as err:  # pragma: no cover
+            os.unlink(lockfile)
+            shutil.rmtree(newpath)
+            raise pagure.exceptions.PagureException(
+                'Commit could not be done: %s' % err)
 
     # Remove the clone
     shutil.rmtree(newpath)
+    # Remove the lock file
+    os.unlink(lockfile)
 
     return os.path.join('files', filename)
 
