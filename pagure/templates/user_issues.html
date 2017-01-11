@@ -1,13 +1,13 @@
 {% extends "master.html" %}
 
-{% block title %}Issues opened by {{ username }}{% endblock %}
+{% block title %}Issues for {{ username }}{% endblock %}
 
 
 {% block content %}
 <div class="p-t-2">
   <div class="container">
     <h3 class="p-b-2">
-        Issues opened by {{ username | avatar(20) | safe }} {{ username }}
+        Issues for {{ username | avatar(20) | safe }} {{ username }}
     </h3>
     <div>
       <span class="btn-group btn-group-sm issues-tagbar" role="group">
@@ -16,7 +16,17 @@
           <a data-togglebutton="issue-status-all" class="btn btn-secondary btn-sm" href="#">All</a>
       </span>
     </div>
-    <table class="table table-hover table-striped m-b-0 m-t-1">
+    <hr>
+
+    {% set opened = true %}
+    {% for issues in (user.issues, user.assigned_issues) %}
+      {% if opened == true %}
+        <b>Opened Issues</b>
+        {% set opened = false %}
+      {% else %}
+        <b>Assigned Issues</b>
+      {% endif %}
+      <table class="table table-hover table-striped m-b-0 m-t-1">
         <thead class="thead-default">
             <tr>
                 <th class="nowrap">#</th>
@@ -24,13 +34,14 @@
                 <th>Title</th>
                 <th class="open_date nowrap">Opened</th>
                 <th class="nowrap">Project</th>
+                <th class="assigned nowrap">Created by</th>
                 <th class="assigned nowrap">Assigned to</th>
             </tr>
         </thead>
         <tfoot>
         </tfoot>
         <tbody>
-        {% for issue in user.issues %}
+        {% for issue in issues %}
             <tr class="issue-status issue-status-{{issue.status|lower}}"
               {%- if issue.status|lower != "open" %} style="display:none;"{% endif %}>
                 <td class="nowrap"><span class="label label-default">#{{ issue.id }}</span></td>
@@ -69,6 +80,10 @@
                   </a>
                 </td>
                 <td class="nowrap">
+                  {{ issue.user.default_email | avatar(16) | safe }}
+                  {{ issue.user.user }}
+                </td>
+                <td class="nowrap">
                   {% if issue.assignee %}
                   {{ issue.assignee.default_email | avatar(16) | safe }}
                   {{ issue.assignee.user }}
@@ -83,7 +98,9 @@
             </tr>
         {% endfor %}
         </tbody>
-    </table>
+      </table>
+      <br>
+    {% endfor %}
   </div>
 </div>
 

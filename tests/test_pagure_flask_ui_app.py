@@ -1048,14 +1048,35 @@ class PagureFlaskApptests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #2')
 
+        # Test the assigned issue table.  Create issue then set the assignee
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #3',
+            content='This issue created by foo, but assigned to pingou',
+            user='foo',
+            status='Open',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #3')
+
+        msg = pagure.lib.add_issue_assignee(
+            session=self.session,
+            issue=msg,
+            assignee='pingou',
+            user='foo',
+            ticketfolder=None)
+        self.session.commit()
+        self.assertEqual(msg, 'Issue assigned')
 
         output = self.app.get('/user/pingou/issues')
         self.assertEqual(output.status_code, 200)
         self.assertIn('Test issue #1', output.data)
         self.assertIn('Test issue #2', output.data)
+        self.assertIn('Test issue #3', output.data)
         self.assertEqual(
-            output.data.count('<tr class="issue-status issue-status-open"'),
-            2)
+            output.data.count('<tr class="issue-status issue-status-open"'), 3)
 
 
 if __name__ == '__main__':
