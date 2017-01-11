@@ -33,6 +33,7 @@
                 <th>Status</th>
                 <th>Title</th>
                 <th class="open_date nowrap">Opened</th>
+                <th class="open_date nowrap">Modified</th>
                 <th class="nowrap">Project</th>
                 <th class="assigned nowrap">Created by</th>
                 <th class="assigned nowrap">Assigned to</th>
@@ -67,6 +68,10 @@
                 <td class="nowrap">
                     <span title="{{issue.date_created.strftime('%Y-%m-%d %H:%M:%S')}}">{{
                         issue.date_created | humanize}}</span>
+                </td>
+                <td class="nowrap">
+                    <span title="{{issue.last_updated.strftime('%Y-%m-%d %H:%M:%S')}}">{{
+                        issue.last_updated | humanize}}</span>
                 </td>
                 <td class="nowrap">
                   <a href="{{ url_for(
