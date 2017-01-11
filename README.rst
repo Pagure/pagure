@@ -102,10 +102,17 @@ Manually
 
     mkdir -p lcl/{repos,docs,forks,tickets,requests,remotes,attachments,releases}
 
+* Copy and edit the alembic.ini file (especially the ``script_location`` key)::
+
+    cp files/alembic.ini .
+    vim alembic.ini
+
+* Set the ``script_location`` to ``alembic``, ie: the folder where are stored
+  the revisions relative to where the ``alembic.ini`` file is.
 
 * Create the inital database scheme::
 
-    python createdb.py
+    python createdb.py --initial alembic.ini
 
 * Start a worker, in one terminal::
 
