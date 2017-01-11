@@ -220,22 +220,21 @@ tables, the database scheme.
 
 To create the database tables, you need to run the script
 ``/usr/share/pagure/pagure_createdb.py`` and specify the configuration
-file to use via an environment variable.
+to use for pagure and for alembic.
 
 For example:
 ::
 
-    PAGURE_CONFIG=/etc/pagure/pagure.cfg python /usr/share/pagure/pagure_createdb.py
+    python /usr/share/pagure/pagure_createdb.py -c /etc/pagure/pagure.cfg -i /etc/pagure/alembic.ini
 
 This will tell ``/usr/share/pagure/pagure_createdb.py`` to use the database
-information specified in the file ``/etc/pagure/pagure.cfg``.
+information specified in the file ``/etc/pagure/pagure.cfg`` and to stamp
+the database at the last alembic revision.
 
 .. warning:: Pagure's default configuration is using sqlite. This is fine
         for development purpose but not for production use as sqlite does
         not support all the operations needed when updating the database
         schema. Do use PostgreSQL, MySQL or MariaDB in production.
-
-* Stamp the alembic revision
 
 For changes to existing tables, we rely on `Alembic <http://alembic.readthedocs.org/>`_.
 It uses `revisions` to perform the upgrades, but to know which upgrades are
@@ -243,26 +242,16 @@ needed and which are already done, the current revision needs to be saved
 in the database. This will allow alembic to know apply the new revision when
 running it.
 
-You can save the current revision in the database using the following command:
-::
+In the ``alembic.ini`` file, one of the configuration key is most important:
+``script_location`` which is the path to the ``versions`` folder containing
+all the alembic migration files. The ``sqlalchemy.url`` configuration key if
+missing will be replaced by the url filled in the configuration file of
+pagure.
 
-    cd /etc/pagure
-    alembic stamp $(alembic heads | awk '{ print $1 }')
-
-The ``cd /etc/pagure`` is needed as the command must be run in the folder
-where the file ``alembic.ini`` is. This file contains two important pieces
-of information:
-
-* ``sqlalchemy.url`` which is the URL used to connect to the database, likely
-  the same URL as the one in ``pagure.cfg``.
-
-* ``script_location`` which is the path to the ``versions`` folder containing
-  all the alembic migration files.
-
-The ``alembic stamp`` command is the one actually saving the current revision
-into the database. This current revision is found using ``alembic heads``
-which returns the most recent revision found by alembic, and since the
-database was just created, it is at the latest revision.
+.. warning:: Calling ``pagure_createdb.py`` is asked regularly, especially
+        to handle database schema changes upon upgrades, but the ``--initial``
+        argument should only be used the first time as it will otherwise
+        break upgrading the database schema via alembic.
 
 
 Set up virus scanning
