@@ -3031,6 +3031,17 @@ index 0000000..fb7093d
                 'uploaded\n                    </div>', output.data)
             self.assertIn('This project has not been tagged.', output.data)
 
+            # Try uploading the same file -- fails
+            with open(img, mode='rb') as stream:
+                data = {'filestream': stream, 'csrf_token': csrf_token}
+                output = self.app.post(
+                    '/test/upload/', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '</button>\n                      This tarball has already '
+                'been uploaded', output.data)
+            self.assertIn('This project has not been tagged.', output.data)
+
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_add_token(self, ast):
         """ Test the add_token endpoint. """
@@ -3083,7 +3094,7 @@ index 0000000..fb7093d
 
             data = {'csrf_token': csrf_token, 'acls': ['issue_create']}
 
-            # Upload successful
+            # New token created
             data = {'csrf_token': csrf_token, 'acls': ['issue_create']}
             output = self.app.post(
                 '/test/token/new/', data=data, follow_redirects=True)

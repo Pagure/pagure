@@ -980,8 +980,15 @@ def new_release(repo, username=None, namespace=None):
                     repo.fullname)
                 if not os.path.exists(folder):
                     os.makedirs(folder)
-                filestream.save(os.path.join(folder, filename))
-                flask.flash('File "%s" uploaded' % filename)
+                dest = os.path.join(folder, filename)
+                if os.path.exists(dest):
+                    raise pagure.exceptions.PagureException(
+                        'This tarball has already been uploaded')
+                else:
+                    filestream.save(dest)
+                    flask.flash('File "%s" uploaded' % filename)
+            except pagure.exceptions.PagureException as err:
+                flask.flash(str(err), 'error')
             except Exception as err:  # pragma: no cover
                 APP.logger.exception(err)
                 flask.flash('Upload failed', 'error')
