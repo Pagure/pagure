@@ -236,13 +236,15 @@
                       <span class="oi" data-glyph="document"></span>
                     </div>
                 {% endif %}
+
                 <a class="project_link logo_link" href="{{ url }}">
                     <div class="repo_name">
                       <strong>
-                        {{ repo.namespace + '/' if repo.namespace }}{{ repo.name }}
+                        {{ repo.fullname }}
                       </strong>
                     </div>
                 </a>
+                
                 <div class="repo_desc" title="{{ repo.description }}"
                     data-toggle="tooltip">
                   <small>{% if
