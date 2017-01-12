@@ -40,7 +40,7 @@
 </h2>
 <hr />
 
-<section id="tags">
+<section id="flags">
   <span class="btn-group btn-group-sm issues-tagbar" role="group">
     <a class="btn {%
       if status|lower in ['open', 'true'] %}btn-primary{%
@@ -72,8 +72,8 @@
         milestone=requested_stones,
         status='all') }}" title="Filter issues by status">All</a>
   </span>
-  <span class="oi m-l-2" data-glyph="tag" title="Tags"></span>
   <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
+  <span class="oi m-l-2 btn btn-nopad" data-glyph="tag" title="Tags"></span>
     {% for tag in tag_list %}
       {% if tag in tags %}
         <a class="btn btn-secondary btn-sm {% if tag in tags%}active{% endif %}"
@@ -98,8 +98,8 @@
         {{ tag }}</a>
     {% endfor %}
   </span>
-  <span class="oi m-l-2" data-glyph="target" title="Milestones"></span>
   <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
+  <span class="oi m-l-2 btn btn-nopad" data-glyph="target" title="Milestones"></span>
     {% for stone in milestones %}
       {% if stone in requested_stones %}
         <a class="btn btn-secondary btn-sm {% if stone in requested_stones %}active{% endif %}"

@@ -547,11 +547,11 @@ blockquote {
 }
 
 .messageicon{
-float: left;
-font-size: 1.5em;
-padding-right: 0.5em;
-margin-top: -4px;
-color: #999;
+  float: left;
+  font-size: 1.5em;
+  padding-right: 0.5em;
+  margin-top: -4px;
+  color: #999;
 }
 .msg-git-hash{
   font-family:monospace;
@@ -560,7 +560,7 @@ color: #999;
 }
 
 th[data-sort] {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .pr-changes-description
@@ -569,24 +569,30 @@ th[data-sort] {
 }
 
 .readme dd{
-    margin-left:2em;
+  margin-left:2em;
 }
 
 .hidden{
-    display: none;
+  display: none;
 }
 
 .code_table .cell_commit{
-    padding-left:0.5em;
+  padding-left:0.5em;
 }
 
 
 #cal-heatmap {
-    padding:0.5em;
+  padding:0.5em;
 }
 
 .attachment_list p {
-    margin-bottom: 0;
+  margin-bottom: 0;
+}
+
+.btn-group-sm .btn-nopad,
+.btn-nopad {
+  padding: 0rem .375rem!important;
+  margin-left: .5rem !important
 }
 
 /*Our specific responsive overrides*/
