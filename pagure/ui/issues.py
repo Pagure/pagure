@@ -683,9 +683,7 @@ def view_roadmap(repo, username=None, namespace=None):
     """ List all issues associated to a repo as roadmap
     """
     status = flask.request.args.get('status', 'Open')
-    if status.lower() == 'all':
-        status = None
-    milestone = flask.request.args.getlist('milestone', None)
+    milestones = flask.request.args.getlist('milestone', None)
     tags = flask.request.args.getlist('tag', None)
 
     repo = flask.g.repo
@@ -702,53 +700,48 @@ def view_roadmap(repo, username=None, namespace=None):
     if flask.g.repo_admin:
         private = None
 
-    requested_stones = None
-    if milestone is not None:
-        requested_stones = milestone
-    all_milestones = list(repo.milestones.keys())
+    all_milestones = sorted(list(repo.milestones.keys()))
 
     issues = pagure.lib.search_issues(
         SESSION,
         repo,
-        milestones=milestone or list(repo.milestones.keys()),
+        milestones=milestones or all_milestones,
         tags=tags,
         private=private,
+        status=status if status.lower()!= 'all' else None,
     )
 
     # Change from a list of issues to a dict of milestone/issues
     milestone_issues = defaultdict(list)
-    for cnt in range(len(issues)):
+    for issue in issues:
         saved = False
-        for mlstone in sorted(milestone or list(repo.milestones.keys())):
-            if mlstone == issues[cnt].milestone:
-                milestone_issues[mlstone].append(issues[cnt])
+        for mlstone in sorted(milestones or all_milestones):
+            if mlstone == issue.milestone:
+                milestone_issues[mlstone].append(issue)
                 saved = True
                 break
         if saved:
             continue
 
-    if status:
+    if status and status.lower() != 'all':
         for key in milestone_issues.keys():
             active = False
             for issue in milestone_issues[key]:
-                if issue.status == 'Open':
+                if issue.status == status:
                     active = True
                     break
             if not active:
                 del milestone_issues[key]
 
-    all_tags = pagure.lib.get_tags_of_project(SESSION, repo)
-    tag_list = []
-    for tag in all_tags:
-        tag_list.append(tag.tag)
+    tag_list = [
+        tag.tag
+        for tag in pagure.lib.get_tags_of_project(SESSION, repo)
+    ]
 
-    reponame = pagure.get_repo_path(repo)
-    repo_obj = pygit2.Repository(reponame)
-    milestones_ordered = sorted(list(milestone_issues.keys()))
-    if 'unplanned' in milestones_ordered:
-        index = milestones_ordered.index('unplanned')
-        cnt = len(milestones_ordered)
-        milestones_ordered.insert(cnt, milestones_ordered.pop(index))
+    if 'unplanned' in all_milestones:
+        index = all_milestones.index('unplanned')
+        cnt = len(all_milestones)
+        all_milestones.insert(cnt, all_milestones.pop(index))
 
     return flask.render_template(
         'roadmap.html',
@@ -757,9 +750,8 @@ def view_roadmap(repo, username=None, namespace=None):
         username=username,
         tag_list=tag_list,
         status=status,
-        milestones=milestones_ordered,
-        requested_stones=requested_stones,
-        allmilestones=all_milestones,
+        milestones=all_milestones,
+        requested_stones=milestones,
         issues=milestone_issues,
         tags=tags,
     )
