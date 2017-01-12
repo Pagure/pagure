@@ -18,11 +18,9 @@
     </div>
     <hr>
 
-    {% set opened = true %}
     {% for issues in (user.issues, user.assigned_issues) %}
-      {% if opened == true %}
+      {% if loop.index == 1 %}
         <b>Opened Issues</b>
-        {% set opened = false %}
       {% else %}
         <b>Assigned Issues</b>
       {% endif %}
