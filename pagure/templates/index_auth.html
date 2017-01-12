@@ -61,7 +61,7 @@
                         </span>
                       {% else %}
                         <a class="notblue" data-toggle="tooltip"
-                          href="{{ url_for('.view_issues', repo=repo.name) }}"
+                          href="{{ url_for('.view_issues', repo=repo.name, namespace=repo.namespace) }}"
                           title="{{ repo.open_tickets_public }} open issues against {{repo.name}}">
                           <span class="oi" data-glyph="warning"></span>
                           {{- repo.open_tickets_public }}
