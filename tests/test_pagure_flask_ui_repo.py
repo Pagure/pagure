@@ -3091,6 +3091,9 @@ index 0000000..fb7093d
             output = self.app.post('/test/token/new/', data=data)
             self.assertEqual(output.status_code, 200)
             self.assertIn('<strong>Create a new token</strong>', output.data)
+            self.assertIn(
+                    '</button>\n                      You must select at least '
+                    'one permission.', output.data)
 
             data = {'csrf_token': csrf_token, 'acls': ['issue_create']}
 
