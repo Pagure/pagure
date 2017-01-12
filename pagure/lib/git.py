@@ -1282,7 +1282,11 @@ def diff_pull_request(
     if branch:
         commitid = branch.get_object().hex
 
-    if request.branch not in orig_repo.listall_branches():
+    if repo_obj.is_empty and orig_repo.is_empty:
+        raise pagure.exceptions.PagureException(
+            'Fork is empty, there are no commits to request pulling')
+
+    if not orig_repo.is_empty and request.branch not in orig_repo.listall_branches():
         raise pagure.exceptions.PagureException(
             'The branch into which this pull-request was to be merged: %s '
             'seems to no longer be present in this repo' % request.branch)
@@ -1369,9 +1373,6 @@ def diff_pull_request(
         repo_commit = repo_obj[request.commit_stop]
         if with_diff:
             diff = repo_commit.tree.diff_to_tree(swap=True)
-    else:
-        raise pagure.exceptions.PagureException(
-            'Fork is empty, there are no commits to request pulling')
 
     return (diff_commits, diff)
 
