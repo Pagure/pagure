@@ -140,7 +140,7 @@
   {% if issues[milestone] %}
     <div class="card m-t-1">
       <div class="card-block">
-        <table id="pagure-issues-list-{{ index }}" class="table table-hover table-striped m-b-0 milestone-table">
+        <table id="pagure-issues-list-{{ loop.index }}" class="table table-hover table-striped m-b-0 milestone-table">
           <thead class="thead-default">
             <tr>
               <th id="issue-title">{{ milestone }}
