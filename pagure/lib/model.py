@@ -381,7 +381,7 @@ class Project(BASE):
 
     @property
     def isa(self):
-        ''' A string to allow finding out that this is an project. '''
+        ''' A string to allow finding out that this is a project. '''
         return 'project'
 
     @property
@@ -1824,11 +1824,11 @@ class PagureLog(BASE):
         if self.issue and self.log_type == 'created':
             verb = 'created issue'
         elif self.issue and self.log_type == 'commented':
-            verb = 'comment on issue'
+            verb = 'commented on issue'
         elif self.pull_request and self.log_type == 'created':
             verb = 'created PR'
         elif self.pull_request and self.log_type == 'commented':
-            verb = 'comment on PR'
+            verb = 'commented on PR'
         elif self.pull_request and self.log_type == 'closed':
             verb = 'closed PR'
         elif self.pull_request and self.log_type == 'merged':
