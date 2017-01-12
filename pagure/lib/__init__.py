@@ -273,7 +273,7 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
     pagure.lib.git.update_git(
         issue, repo=issue.project, repofolder=ticketfolder)
 
-    log_action(session, 'commented', issue)
+    log_action(session, 'commented', issue, user_obj)
 
     if notify:
         pagure.lib.notify.notify_new_comment(issue_comment, user=user_obj)
@@ -922,7 +922,7 @@ def add_pull_request_comment(session, request, commit, tree_id, filename,
     pagure.lib.git.update_git(
         request, repo=request.project, repofolder=requestfolder)
 
-    log_action(session, 'commented', request)
+    log_action(session, 'commented', request, user_obj)
 
     if notify:
         pagure.lib.notify.notify_pull_request_comment(pr_comment, user_obj)
@@ -1212,7 +1212,7 @@ def new_project(session, user, name, blacklist, allowed_prefix,
     # create the project in the db
     session.commit()
 
-    log_action(session, 'created', project)
+    log_action(session, 'created', project, user_obj)
 
     pagure.lib.notify.log(
         project,
@@ -1258,7 +1258,7 @@ def new_issue(session, repo, title, content, user, ticketfolder,
     pagure.lib.git.update_git(
         issue, repo=repo, repofolder=ticketfolder)
 
-    log_action(session, 'created', issue)
+    log_action(session, 'created', issue, user_obj)
 
     if notify:
         pagure.lib.notify.notify_new_issue(issue, user=user_obj)
@@ -1342,7 +1342,7 @@ def new_pull_request(session, branch_from,
     pagure.lib.git.update_git(
         request, repo=request.project, repofolder=requestfolder)
 
-    log_action(session, 'created', request)
+    log_action(session, 'created', request, user_obj)
 
     if notify:
         pagure.lib.notify.notify_new_pull_request(request)
@@ -2215,7 +2215,7 @@ def close_pull_request(session, request, user, requestfolder, merged=True):
     session.add(request)
     session.flush()
 
-    log_action(session, request.status.lower(), request)
+    log_action(session, request.status.lower(), request, user_obj)
 
     if merged is True:
         pagure.lib.notify.notify_merge_pull_request(request, user_obj)
@@ -3561,7 +3561,7 @@ def get_user_activity_day(session, user, date):
     return query.all()
 
 
-def log_action(session, action, obj):
+def log_action(session, action, obj, user_obj):
     ''' Log an user action on a project/issue/PR. '''
 
     project_id = None
@@ -3575,7 +3575,7 @@ def log_action(session, action, obj):
         )
 
     log = model.PagureLog(
-        user_id=obj.user_id,
+        user_id=user_obj.id,
         project_id=project_id,
         log_type=action,
         ref_id=obj.id,
