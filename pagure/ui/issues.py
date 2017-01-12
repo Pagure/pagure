@@ -249,7 +249,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     ticketfolder=APP.config['TICKETS_FOLDER'],
                 )
                 SESSION.commit()
-                if message:
+                if message and message != 'Nothing to change':
                     messages.add(message)
 
                 # Update priority
