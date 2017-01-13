@@ -1,21 +1,21 @@
 """Create private column in project table
 
 Revision ID: 4255158a6913
-Revises: 317a285e04a8
+Revises: 208b0cd232ab
 Create Date: 2016-06-06 14:33:47.039207
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '4255158a6913'
-down_revision = '317a285e04a8'
+down_revision = '208b0cd232ab'
 
 from alembic import op
 import sqlalchemy as sa
 
 
 def upgrade():
-    ''' Add a pivate column in the project table
+    ''' Add a private column in the project table
     '''
     op.add_column(
         'projects',
