@@ -142,7 +142,7 @@ class PagureLibtests(tests.Modeltests):
         p_ugt.return_value = True
 
         tests.create_projects(self.session)
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
 
         # Before
         issues = pagure.lib.search_issues(self.session, repo)
@@ -163,7 +163,7 @@ class PagureLibtests(tests.Modeltests):
         )
 
         # Add an extra user to project `foo`
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         msg = pagure.lib.add_user_to_project(
             session=self.session,
             project=repo,
@@ -226,7 +226,7 @@ class PagureLibtests(tests.Modeltests):
 
         self.test_new_issue()
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=2)
 
         self.assertEqual(repo.open_tickets, 2)
@@ -274,7 +274,7 @@ class PagureLibtests(tests.Modeltests):
             ]
         )
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         self.assertEqual(repo.open_tickets, 1)
         self.assertEqual(repo.open_tickets_public, 1)
         self.assertEqual(repo.issues[1].status, 'Closed')
@@ -293,7 +293,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(
             msg, ['Issue status updated to: Open (was: Closed)'])
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         for issue in repo.issues:
             self.assertEqual(issue.status, 'Open')
             self.assertEqual(issue.close_status, None)
@@ -320,7 +320,7 @@ class PagureLibtests(tests.Modeltests):
             ]
         )
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         self.assertEqual(repo.open_tickets, 1)
         self.assertEqual(repo.open_tickets_public, 1)
         self.assertEqual(repo.issues[1].status, 'Closed')
@@ -509,7 +509,7 @@ class PagureLibtests(tests.Modeltests):
         p_ugt.return_value = True
 
         self.test_new_issue()
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         issue_blocked = pagure.lib.search_issues(
             self.session, repo, issueid=2)
@@ -561,7 +561,7 @@ class PagureLibtests(tests.Modeltests):
         p_ugt.return_value = True
 
         self.test_edit_issue()
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 
         # Add a tag to the issue
@@ -599,7 +599,7 @@ class PagureLibtests(tests.Modeltests):
         p_ugt.return_value = True
 
         self.test_add_tag_obj()
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertRaises(
             pagure.exceptions.PagureException,
@@ -627,7 +627,7 @@ class PagureLibtests(tests.Modeltests):
         p_ugt.return_value = True
 
         self.test_add_tag_obj()
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 
         msgs = pagure.lib.remove_tags_obj(
@@ -683,7 +683,7 @@ class PagureLibtests(tests.Modeltests):
         p_ugt.return_value = True
 
         self.test_add_tag_obj()
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 
         self.assertRaises(
@@ -723,6 +723,7 @@ class PagureLibtests(tests.Modeltests):
             ticketfolder=None,
         )
         self.session.commit()
+        print msgs
         self.assertEqual(
             msgs,
             ['Edited tag: tag1()[DeepSkyBlue] to tag2(lorem ipsum)[black]']
@@ -775,7 +776,7 @@ class PagureLibtests(tests.Modeltests):
         p_ugt.return_value = True
 
         self.test_edit_issue()
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
 
         # All issues
         issues = pagure.lib.search_issues(self.session, repo)
@@ -848,7 +849,7 @@ class PagureLibtests(tests.Modeltests):
         p_ugt.return_value = True
 
         self.test_new_issue()
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=2)
 
         # Before
@@ -952,7 +953,7 @@ class PagureLibtests(tests.Modeltests):
         p_ugt.return_value = True
 
         self.test_new_issue()
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
 
         # Before
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
@@ -993,7 +994,7 @@ class PagureLibtests(tests.Modeltests):
         tests.create_projects(self.session)
 
         # Before
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         self.assertEqual(len(repo.users), 0)
 
         # Add an user to a project
@@ -1016,7 +1017,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(msg, 'User added')
 
         # After
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         self.assertEqual(len(repo.users), 1)
         self.assertEqual(repo.users[0].user, 'foo')
         self.assertEqual(repo.admins[0].user, 'foo')
@@ -1321,7 +1322,7 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Project "pingou/testproject" created')
 
-        repo = pagure.lib.get_project(
+        repo = pagure.lib._get_project(
             self.session, 'testproject', namespace='pingou')
         self.assertEqual(repo.path, 'pingou/testproject.git')
 
@@ -1354,7 +1355,7 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Project "testns/testproject2" created')
 
-        repo = pagure.lib.get_project(
+        repo = pagure.lib._get_project(
             self.session, 'testproject2', namespace='testns')
         self.assertEqual(repo.path, 'testns/testproject2.git')
 
@@ -1374,7 +1375,7 @@ class PagureLibtests(tests.Modeltests):
         tests.create_projects(self.session)
 
         # Before
-        repo = pagure.get_authorized_project(self.session, 'test2')
+        repo = pagure.lib._get_project(self.session, 'test2')
         self.assertTrue(repo.settings['issue_tracker'])
         self.assertFalse(repo.settings['project_documentation'])
 
@@ -1431,7 +1432,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(args[1]['topic'], 'project.edit')
 
         # After
-        repo = pagure.get_authorized_project(self.session, 'test2')
+        repo = pagure.lib._get_project(self.session, 'test2')
         self.assertFalse(repo.settings['issue_tracker'])
         self.assertTrue(repo.settings['project_documentation'])
         self.assertFalse(repo.settings['pull_requests'])
@@ -1530,7 +1531,7 @@ class PagureLibtests(tests.Modeltests):
         """ Test the get_tags_of_project of pagure.lib. """
 
         self.test_add_tag_obj()
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
 
         tags = pagure.lib.get_tags_of_project(self.session, repo)
         self.assertEqual([tag.tag for tag in tags], ['tag1'])
@@ -1539,7 +1540,7 @@ class PagureLibtests(tests.Modeltests):
             self.session, repo, pattern='T*')
         self.assertEqual([tag.tag for tag in tags], ['tag1'])
 
-        repo = pagure.get_authorized_project(self.session, 'test2')
+        repo = pagure.lib._get_project(self.session, 'test2')
 
         tags = pagure.lib.get_tags_of_project(self.session, repo)
         self.assertEqual([tag.tag for tag in tags], [])
@@ -1680,7 +1681,7 @@ class PagureLibtests(tests.Modeltests):
         projects = pagure.lib.search_projects(self.session)
         self.assertEqual(len(projects), 1)
 
-        repo = pagure.get_authorized_project(self.session, 'testproject')
+        repo = pagure.lib._get_project(self.session, 'testproject')
         gitrepo = os.path.join(gitfolder, repo.path)
         docrepo = os.path.join(docfolder, repo.path)
         ticketrepo = os.path.join(ticketfolder, repo.path)
@@ -1786,7 +1787,7 @@ class PagureLibtests(tests.Modeltests):
 
         # Fork a fork
 
-        repo = pagure.get_authorized_project(
+        repo = pagure.lib._get_project(
             self.session, 'testproject', user='foo')
 
         msg = pagure.lib.fork_project(
@@ -1985,7 +1986,7 @@ class PagureLibtests(tests.Modeltests):
         self.session.add(item)
 
         # Add an extra user to project `foo`
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         self.assertEqual(repo.open_requests, 0)
 
         msg = pagure.lib.add_user_to_project(
@@ -1997,8 +1998,8 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'User added')
 
-        repo = pagure.get_authorized_project(self.session, 'test')
-        forked_repo = pagure.get_authorized_project(
+        repo = pagure.lib._get_project(self.session, 'test')
+        forked_repo = pagure.lib._get_project(
             self.session, 'test', user='pingou')
 
         req = pagure.lib.new_pull_request(
@@ -2183,7 +2184,7 @@ class PagureLibtests(tests.Modeltests):
 
         self.test_new_pull_request()
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         self.assertEqual(repo.open_requests, 1)
         request = pagure.lib.search_pull_requests(self.session, requestid=1)
 
@@ -2195,7 +2196,7 @@ class PagureLibtests(tests.Modeltests):
             merged=True,
         )
         self.session.commit()
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         self.assertEqual(repo.open_requests, 0)
 
         prs = pagure.lib.search_pull_requests(
@@ -2229,7 +2230,7 @@ class PagureLibtests(tests.Modeltests):
         p_ugt.return_value = True
 
         self.test_add_issue_dependency()
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         issue_blocked = pagure.lib.search_issues(
             self.session, repo, issueid=2)
@@ -2289,7 +2290,7 @@ class PagureLibtests(tests.Modeltests):
 
         self.test_add_issue_comment()
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 
         self.assertEqual(
@@ -2309,7 +2310,7 @@ class PagureLibtests(tests.Modeltests):
 
         self.test_new_issue()
 
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 
         self.assertEqual(
@@ -2328,7 +2329,7 @@ class PagureLibtests(tests.Modeltests):
         p_ugt.return_value = True
 
         self.test_new_issue()
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 
         # before
@@ -2376,7 +2377,7 @@ class PagureLibtests(tests.Modeltests):
         p_ugt.return_value = True
 
         self.test_new_issue()
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 
         self.assertEqual(repo.open_tickets, 2)
@@ -2432,7 +2433,7 @@ class PagureLibtests(tests.Modeltests):
         p_ugt.return_value = True
 
         self.test_new_issue()
-        repo = pagure.get_authorized_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 
         # Create issues to play with
@@ -3050,7 +3051,7 @@ class PagureLibtests(tests.Modeltests):
         tests.create_projects(self.session)
         self.test_add_group()
 
-        project = pagure.get_authorized_project(self.session, 'test2')
+        project = pagure.lib._get_project(self.session, 'test2')
 
         # Group does not exist
         self.assertRaises(
@@ -3133,7 +3134,7 @@ class PagureLibtests(tests.Modeltests):
         """ Test the update_watch_status method of pagure.lib. """
         tests.create_projects(self.session)
 
-        project = pagure.get_authorized_project(self.session, 'test')
+        project = pagure.lib._get_project(self.session, 'test')
 
         # User does not exist
         self.assertRaises(
@@ -3190,7 +3191,7 @@ class PagureLibtests(tests.Modeltests):
         tests.create_projects(self.session)
         self.test_add_group()
 
-        project = pagure.get_authorized_project(self.session, 'test')
+        project = pagure.lib._get_project(self.session, 'test')
 
         # If user not logged in
         watch = pagure.lib.is_watching(

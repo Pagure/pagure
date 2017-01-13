@@ -1511,7 +1511,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Issue #1: Test issue - test - Pagure</title>',
                 output.data)
 
-            repo = pagure.lib._get_project(self.session, 'test')
+            repo = pagure.get_authorized_project(self.session, 'test')
             issue = pagure.lib.search_issues(self.session, repo, issueid=1)
             self.assertEqual(issue.depending_text, [])
             self.assertEqual(issue.blocking_text, [])
@@ -2296,7 +2296,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(issue.comments[0].comment, 'Second update')
 
         # Create another issue from someone else
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -2448,7 +2448,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 302)
 
         # Create issues to play with
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,

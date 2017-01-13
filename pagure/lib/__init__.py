@@ -862,6 +862,7 @@ def edit_issue_tags(
             new_tag, new_tag_description, new_tag_color
         )
     )
+
     pagure.lib.notify.log(
         project,
         topic='project.tag.edited',
@@ -877,7 +878,6 @@ def edit_issue_tags(
         ),
         redis=REDIS,
     )
-        msgs.append('Edited tag: %s to %s' % (old_tag, new_tag))
 
     return msgs
 

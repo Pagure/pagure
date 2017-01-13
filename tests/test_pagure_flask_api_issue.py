@@ -2806,7 +2806,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(len(issue.comments), 0)
 
         # No change
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.status, 'Open')
 
@@ -2848,7 +2848,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             data,
             {'message': 'Nothing to change'}
         )
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.assignee, None)
 
@@ -3048,7 +3048,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         )
 
         # Create normal issue
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -3063,7 +3063,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(msg.title, 'Test issue #1')
 
         # Check subscribtion before
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(
             pagure.lib.get_watch_list(self.session, issue),
@@ -3092,7 +3092,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         )
 
         # No change
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(
             pagure.lib.get_watch_list(self.session, issue),
@@ -3120,7 +3120,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             {'message': 'You are now watching this issue'}
         )
 
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(
             pagure.lib.get_watch_list(self.session, issue),
@@ -3137,7 +3137,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             {'message': 'You are no longer watching this issue'}
         )
 
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(
             pagure.lib.get_watch_list(self.session, issue),
@@ -3188,7 +3188,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         )
 
         # Create normal issue
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -3215,7 +3215,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         )
 
         # Check the behavior if the project disabled the issue tracker
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         settings = repo.settings
         settings['issue_tracker'] = False
         repo.settings = settings
@@ -3234,7 +3234,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             }
         )
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         settings = repo.settings
         settings['issue_tracker'] = True
         repo.settings = settings
@@ -3260,7 +3260,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         headers = {'Authorization': 'token aaabbbcccddd'}
 
         # Set some custom fields
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         msg = pagure.lib.set_custom_key_fields(
             self.session, repo,
             ['bugzilla', 'upstream', 'reviewstatus'],

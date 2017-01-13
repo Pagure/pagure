@@ -216,7 +216,7 @@ def api_project(repo, username=None, namespace=None):
         }
 
     """
-    repo = pagure.lib.get_project(
+    repo = pagure.get_authorized_project(
         SESSION, repo, user=username, namespace=namespace)
 
     if repo is None:
