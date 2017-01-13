@@ -1282,7 +1282,7 @@ def diff_pull_request(
     if branch:
         commitid = branch.get_object().hex
 
-    if repo_obj.is_empty and orig_repo.is_empty:
+    if repo_obj.is_empty:
         raise pagure.exceptions.PagureException(
             'Fork is empty, there are no commits to request pulling')
 
