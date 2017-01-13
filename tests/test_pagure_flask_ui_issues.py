@@ -509,12 +509,37 @@ class PagureFlaskIssuestests(tests.Modeltests):
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 404)
 
-        # Issue with a non-ascii milestone but project has no milestone
-        repo = pagure.lib.get_project(self.session, 'test')
-        repo.settings = {'issue_tracker': True}
-        self.session.add(repo)
-        self.session.commit()
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_view_issue_non_ascii_milestone(self, p_send_email, p_ugt):
+        """ Test the view_issue endpoint with non-ascii milestone. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
 
+        output = self.app.get('/foo/issue/1')
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path), bare=True)
+
+        output = self.app.get('/test/issue/1')
+        self.assertEqual(output.status_code, 404)
+
+        # Create issues to play with
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        # Add a non-ascii milestone to the issue but project has no milestone
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         message = pagure.lib.edit_issue(
             self.session,
@@ -534,12 +559,13 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output.data)
         self.assertNotIn(b'käpy'.decode('utf-8'), output.data)
 
-        # Issue with non-ascii milestone and project as well
+        # Add a non-ascii milestone to the project
         repo = pagure.lib.get_project(self.session, 'test')
         repo.milestones = {b'käpy'.decode('utf-8'): None}
         self.session.add(repo)
         self.session.commit()
 
+        # View the issue
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
