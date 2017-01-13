@@ -144,7 +144,7 @@
         <table id="pagure-issues-list-{{ loop.index }}" class="table table-hover table-striped m-b-0 milestone-table">
           <thead class="thead-default">
             <tr>
-              <th id="issue-title">{{ milestone }}
+              <th>{{ milestone }}
                 {% if repo.milestones[milestone] %}
                   <span style="font-weight:normal">&nbsp (Due: {{ repo.milestones[milestone] }})</span>
                 {% endif %}

@@ -481,24 +481,24 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
         # test the roadmap view
         output = self.app.get('/test/roadmap')
         self.assertEqual(output.status_code, 200)
-        self.assertIn(u'<th id="issue-title">v2.0', output.data)
-        self.assertIn(u'<th id="issue-title">unplanned', output.data)
+        self.assertIn(u'<th>v2.0', output.data)
+        self.assertIn(u'<th>unplanned', output.data)
         self.assertEqual(
             output.data.count(u'<span class="label label-default">#'), 4)
 
         # test the roadmap view for all milestones
         output = self.app.get('/test/roadmap?status=All')
         self.assertEqual(output.status_code, 200)
-        self.assertIn(u'<th id="issue-title">v1.0', output.data)
-        self.assertIn(u'<th id="issue-title">v2.0', output.data)
-        self.assertIn(u'<th id="issue-title">unplanned', output.data)
+        self.assertIn(u'<th>v1.0', output.data)
+        self.assertIn(u'<th>v2.0', output.data)
+        self.assertIn(u'<th>unplanned', output.data)
         self.assertEqual(
             output.data.count(u'<span class="label label-default">#'), 6)
 
         # test the roadmap view for a specific milestone
         output = self.app.get('/test/roadmap?milestone=v2.0')
         self.assertEqual(output.status_code, 200)
-        self.assertIn(u'<th id="issue-title">v2.0', output.data)
+        self.assertIn(u'<th>v2.0', output.data)
         self.assertEqual(
             output.data.count(u'<span class="label label-default">#'), 2)
 
@@ -512,7 +512,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
         # test the roadmap view for a specific milestone - closed
         output = self.app.get('/test/roadmap?milestone=v1.0&status=All')
         self.assertEqual(output.status_code, 200)
-        self.assertIn(u'<th id="issue-title">v1.0', output.data)
+        self.assertIn(u'<th>v1.0', output.data)
         self.assertEqual(
             output.data.count(u'<span class="label label-default">#'), 2)
 
