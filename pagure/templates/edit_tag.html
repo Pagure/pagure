@@ -22,13 +22,13 @@
               tag=tagname,
               namespace=repo.namespace) }}" >
             {{ form.csrf_token }}
-          {{ render_bootstrap_field(form.tag) }}
-          {{ render_bootstrap_field(form.tag_description) }}
+          {{ render_bootstrap_field(form.tag, field_label="Tag") }}
+          {{ render_bootstrap_field(form.tag_description, field_label="Tag Description") }}
           <fieldset class="form-group {% if form.tag.errors %}has-error{% endif %}">
             {% set formclasses = "form-control c-select"%}
             {% if form.tag_color.errors %} {% set formclasses = formclasses + " form-control-error" %} {% endif %}
 
-            <strong>{{ form.tag_color.label }}</strong>
+            <strong>Tag Color</strong>
             <input type="color" name="tag_color" class="form-control c-select"
               onchange="clickColor(0, -1, -1, 5)" value="{{ form.tag_color.data }}">
 
