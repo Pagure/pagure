@@ -181,6 +181,8 @@ def view_users(username=None):
     users = pagure.lib.search_user(SESSION, pattern=username)
 
     private = False
+    # Condition to check non-authorized user should't be able to access private
+    # project of other users
     if authenticated() and username == flask.g.fas_user.username:
         private = flask.g.fas_user.username
 

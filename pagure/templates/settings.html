@@ -41,12 +41,14 @@
               <input class="form-control" name="tags" value="{{ repo.tags_text |join(', ') if repo.tags else '' }}" />
               <small class="text-muted">tags for project (separated by commas)</small>
             </fieldset>
-            <fieldset class="form-group">
-                <label class="c-input c-checkbox">Private</lable>
-                  <input type="checkbox" value="private" name="private" {%
-                      if repo.private -%}checked=""{%- endif -%}/>
-                  <span class="c-indicator"></span>
-            </fieldset>
+            {% if config.get('PRIVATE_PROJECTS', False) %}
+                <fieldset class="form-group">
+                    <label class="c-input c-checkbox">Private</lable>
+                    <input type="checkbox" value="private" name="private" {%
+                        if repo.private -%}checked=""{%- endif -%}/>
+                    <span class="c-indicator"></span>
+                </fieldset>
+            {% endif %}
             <button class="btn btn-primary" type="submit" title="Update description">
               Update
             </button>

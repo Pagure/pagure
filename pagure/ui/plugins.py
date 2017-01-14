@@ -74,6 +74,9 @@ def view_plugin(repo, plugin, username=None, namespace=None, full=True):
             403,
             'You are not allowed to change the settings for this project')
 
+    # Private repos are not allowed to leak information outside so disabling CI
+    # enables us to keep the repos totally discreate and prevents from leaking
+    # information outside
     if repo.private and plugin == 'Pagure CI':
         flask.abort(404, 'Plugin disabled')
 

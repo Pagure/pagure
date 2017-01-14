@@ -1997,14 +1997,9 @@ def search_projects(
         projects = projects.filter(
             model.Project.private == False
         )
-    elif private == username:
-        projects = projects.filter(
-            sqlalchemy.or_(
-                model.Project.private == False,
-                model.Project.private == True,
-            )
-        )
-    elif isinstance(private, basestring):
+    # No filtering is done if private == username i.e  if the owner of the
+    # project is viewing the project
+    elif isinstance(private, basestring) and private != username:
         projects = projects.filter(
                 sqlalchemy.or_(
                     model.Project.private == False,
