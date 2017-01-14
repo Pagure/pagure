@@ -392,6 +392,7 @@ def edit_tag(repo, tag, username=None, namespace=None):
     form = pagure.forms.AddIssueTagForm()
     if form.validate_on_submit():
         new_tag = form.tag.data
+        new_tag_description = form.tag_description.data
         new_tag_color = form.tag_color.data
 
         msgs = pagure.lib.edit_issue_tags(
@@ -399,6 +400,7 @@ def edit_tag(repo, tag, username=None, namespace=None):
             repo,
             tagobj,
             new_tag,
+            new_tag_description,
             new_tag_color,
             user=flask.g.fas_user.username,
             ticketfolder=APP.config['TICKETS_FOLDER']
@@ -418,6 +420,7 @@ def edit_tag(repo, tag, username=None, namespace=None):
             namespace=repo.namespace))
     elif flask.request.method == 'GET':
         form.tag_color.data = tagobj.tag_color
+        form.tag_description.data = tagobj.tag_description
         form.tag.data = tag
 
     return flask.render_template(
@@ -457,6 +460,14 @@ def update_tags(repo, username=None, namespace=None):
             for tag in flask.request.form.getlist('tag')
             if tag.strip() and tag.strip() not in seen and not seen.add(tag.strip())
         ]
+
+        seen = set()
+        tag_descriptions = [
+            desc.strip()
+            for desc in flask.request.form.getlist('tag_description')
+            if desc.strip() and desc.strip() not in seen and not seen.add(desc.strip())
+        ]
+
         # Uniquify and order preserving
         seen = set()
         colors = [

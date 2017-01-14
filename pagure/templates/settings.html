@@ -765,6 +765,7 @@
               <span class="oi" data-glyph="tag"></span>&nbsp; {{ tag.tag }}
             </a>
             &nbsp<span class="label label-info" style="background-color:{{tag.tag_color}}">{{tag.tag}}</span>
+            &nbsp;<span class="text-muted">{{ tag.tag_description }}</span>
             <div class="pull-xs-right">
             <form class="icon del_icon pull-xs-right" method="POST"
               action="{{ url_for(
@@ -1003,10 +1004,13 @@ $('#new_tag').click(function(e) {
     // Only display the Tag row the first time Add New Tag is clicked
     $('#tagcolor').append(
      '<div class="row">\
-        <div class="col-sm-6">\
+        <div class="col-sm-4">\
           <strong>New Tag</strong>\
         </div>\
         <div class="col-sm-6">\
+          <strong>Description</strong>\
+        </div>\
+        <div class="col-sm-2">\
           <strong>Tag Color</strong>\
         </div>\
       </div>');
@@ -1014,11 +1018,15 @@ $('#new_tag').click(function(e) {
   }
   $('#tagcolor').append(
    '<div class="row p-t-1"> \
-        <div class="col-sm-6 p-r-0">\
+        <div class="col-sm-4 p-r-0">\
           <input type="text" name="tag"\
             value="" size="3" class="form-control"/>\
         </div>\
         <div class="col-sm-6 p-r-0">\
+          <input type="text" name="tag_description" placeholder="(optional)"\
+            value="" size="15" class="form-control"/>\
+        </div>\
+        <div class="col-sm-2 p-r-0">\
           <input type="color" name="tag_color" class="form-control c-select" \
               onchange="clickColor(0, -1, -1, 5)" /> \
         </div>\

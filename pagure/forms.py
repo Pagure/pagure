@@ -239,6 +239,10 @@ class DeleteIssueTagForm(PagureForm):
 
 class AddIssueTagForm(DeleteIssueTagForm):
     ''' Form to add a tag to a project. '''
+    tag_description = wtforms.TextField(
+        'tag_description',
+        [wtforms.validators.Optional()],
+    )
     tag_color = wtforms.TextField(
         'tag_color',
         [wtforms.validators.Required()],
@@ -634,4 +638,3 @@ class SubscribtionForm(PagureForm):
         [wtforms.validators.optional()],
         false_values=('false', '', False, 'False', 0, '0'),
     )
-

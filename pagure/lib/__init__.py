@@ -736,7 +736,7 @@ def remove_tags_obj(session, obj, tags, ticketfolder, user):
 
 
 def edit_issue_tags(
-        session, project, old_tag, new_tag,
+        session, project, old_tag, new_tag, new_tag_description,
         new_tag_color, ticketfolder, user):
     ''' Removes the specified tag of a project. '''
     user_obj = get_user(session, user)
@@ -750,12 +750,18 @@ def edit_issue_tags(
             'No tag "%s" found related to this project' % (old_tag_name))
 
     old_tag_name = old_tag.tag
+    old_tag_description = old_tag.tag_description
     old_tag_color = old_tag.tag_color
-    if old_tag.tag == new_tag and old_tag_color == new_tag_color:
-        # check for change
+
+    # check for change
+    no_change_in_tag = old_tag.tag == new_tag and \
+                       old_tag_description == new_tag_description  and \
+                       old_tag_color == new_tag_color
+    if no_change_in_tag:
         raise pagure.exceptions.PagureException(
-            'No change.  Old tag "%s(%s)" is the same as new tag "%s(%s)"'
-            % (old_tag, old_tag_color, new_tag, new_tag_color))
+            'No change.  Old tag "%s(%s)[%s]" is the same as new tag "%s(%s)[%s]"'
+            % (old_tag, old_tag_description, old_tag_color, new_tag,
+            new_tag_description, new_tag_color))
     elif old_tag.tag != new_tag:
         # Check if new tag already exists
         existing_tag = get_tag(session, new_tag, project.id)
@@ -772,6 +778,7 @@ def edit_issue_tags(
     ).update(
         {
             model.TagColored.tag: new_tag,
+            model.TagColored.tag_description: new_tag_description,
             model.TagColored.tag_color: new_tag_color
         }
     )
@@ -789,16 +796,19 @@ def edit_issue_tags(
             issue, repo=issue.project, repofolder=ticketfolder)
 
     msgs = []
-    msgs.append('Edited tag: %s(%s) to %s(%s)' %
-                (old_tag_name, old_tag_color, new_tag, new_tag_color))
+    msgs.append('Edited tag: %s(%s)[%s] to %s(%s)[%s]' %
+                (old_tag_name, old_tag_description, old_tag_color,
+                new_tag, new_tag_description, new_tag_color))
     pagure.lib.notify.log(
         project,
         topic='project.tag.edited',
         msg=dict(
             project=project.to_json(public=True),
             old_tag=old_tag.tag,
+            old_tag_description=old_tag_description,
             old_tag_color=old_tag_color,
             new_tag=new_tag,
+            new_tag_description=new_tag_description,
             new_tag_color=new_tag_color,
             agent=user_obj.username,
         ),
@@ -1372,10 +1382,11 @@ def new_pull_request(session, branch_from,
     return request
 
 
-def new_tag(session, tag_name, tag_color, project_id):
+def new_tag(session, tag_name, tag_description, tag_color, project_id):
     ''' Return a new tag object '''
     tagobj = model.TagColored(
         tag=tag_name,
+        tag_description=tag_description,
         tag_color=tag_color,
         project_id=project_id
     )

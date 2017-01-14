@@ -159,7 +159,7 @@
             <label><strong>Tags</strong></label>
               <h4 id="taglist">
                 {% for tag in issue.tags %}
-                  <a id="tag-{{ tag.tag }}" style="background-color:{{ tag.tag_color}}" class="label label-default"
+                  <a id="tag-{{ tag.tag }}" title="{{ tag.tag_description }}" style="background-color:{{ tag.tag_color}}" class="label label-default"
                     href="{{ url_for('view_issues',
                         repo=repo.name,
                         username=username,

@@ -1089,6 +1089,7 @@ class TagColored(BASE):
 
     id = sa.Column(sa.Integer, primary_key=True)
     tag = sa.Column(sa.String(255), nullable=False)
+    tag_description = sa.Column(sa.String(255))
     project_id = sa.Column(
         sa.Integer,
         sa.ForeignKey(

@@ -23,6 +23,7 @@
               namespace=repo.namespace) }}" >
             {{ form.csrf_token }}
           {{ render_bootstrap_field(form.tag) }}
+          {{ render_bootstrap_field(form.tag_description) }}
           <fieldset class="form-group {% if form.tag.errors %}has-error{% endif %}">
             {% set formclasses = "form-control c-select"%}
             {% if form.tag_color.errors %} {% set formclasses = formclasses + " form-control-error" %} {% endif %}
