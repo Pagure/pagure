@@ -147,7 +147,7 @@ class PagureLibModeltests(tests.Modeltests):
     def test_tagissuecolor__repr__(self):
         """ Test the TagIssue.__repr__ function of pagure.lib.model. """
         self.test_issue__repr__()
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         issues = pagure.lib.search_issues(self.session, repo)
         self.assertEqual(len(issues), 1)
 

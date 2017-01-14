@@ -1112,9 +1112,7 @@ def add_pull_request_comment(session, request, commit, tree_id, filename,
 
     # Send notification for the event-source server
     if REDIS and not request.project.private:
-        comment_text = pr_comment.comment
-        if not notification:
-            comment_text = text2markdown(pr_comment.comment)
+        comment_text = text2markdown(pr_comment.comment)
 
         REDIS.publish('pagure.%s' % request.uid, json.dumps({
             'request_id': request.id,

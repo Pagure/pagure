@@ -723,7 +723,6 @@ class PagureLibtests(tests.Modeltests):
             ticketfolder=None,
         )
         self.session.commit()
-        print msgs
         self.assertEqual(
             msgs,
             ['Edited tag: tag1()[DeepSkyBlue] to tag2(lorem ipsum)[black]']
