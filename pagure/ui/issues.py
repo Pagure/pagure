@@ -461,12 +461,7 @@ def update_tags(repo, username=None, namespace=None):
             if tag.strip() and tag.strip() not in seen and not seen.add(tag.strip())
         ]
 
-        seen = set()
-        tag_descriptions = [
-            desc.strip()
-            for desc in flask.request.form.getlist('tag_description')
-            if desc.strip() and desc.strip() not in seen and not seen.add(desc.strip())
-        ]
+        tag_descriptions = flask.request.form.getlist('tag_description')
 
         # Uniquify and order preserving
         seen = set()
@@ -484,9 +479,9 @@ def update_tags(repo, username=None, namespace=None):
                     'error')
                 error = True
 
-        if len(tags) != len(colors):
+        if not (len(tags) == len(colors) == len(tag_descriptions)):
             flask.flash(
-                'tags and tag colors are not of the same length', 'error')
+                'tags, tag descriptions and tag colors are not of the same length', 'error')
             error = True
 
         if not error:
@@ -495,6 +490,7 @@ def update_tags(repo, username=None, namespace=None):
                     pagure.lib.new_tag(
                         SESSION,
                         tag,
+                        tag_descriptions[idx],
                         colors[idx],
                         repo.id)
                     SESSION.commit()
