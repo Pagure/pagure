@@ -484,7 +484,7 @@ def update_tags(repo, username=None, namespace=None):
 
         if not (len(tags) == len(colors) == len(tag_descriptions)):
             error = True
-            # store the lengths because we are going to use them a lot
+            # Store the lengths because we are going to use them a lot
             len_tags = len(tags)
             len_tag_descriptions = len(tag_descriptions)
             len_colors = len(colors)

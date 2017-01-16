@@ -228,7 +228,7 @@ class RemoteRequestPullForm(RequestPullForm):
 class DeleteIssueTagForm(PagureForm):
     ''' Form to remove a tag to from a project. '''
     tag = wtforms.TextField(
-        'tag',
+        'Tag',
         [
             wtforms.validators.Optional(),
             wtforms.validators.Regexp(TAGS_REGEX, flags=re.IGNORECASE),
@@ -240,11 +240,11 @@ class DeleteIssueTagForm(PagureForm):
 class AddIssueTagForm(DeleteIssueTagForm):
     ''' Form to add a tag to a project. '''
     tag_description = wtforms.TextField(
-        'tag_description',
+        'Tag Description',
         [wtforms.validators.Optional()],
     )
     tag_color = wtforms.TextField(
-        'tag_color',
+        'Tag Color',
         [wtforms.validators.Required()],
     )
 

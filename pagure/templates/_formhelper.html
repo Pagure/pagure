@@ -12,9 +12,7 @@
 </div>
 {% endmacro %}
 
-{% macro render_bootstrap_field(field, field_label, field_description="", formclass="") %}
-  {% if field_label is not defined %} {% set field_label = field.label %} {% endif %}
-
+{% macro render_bootstrap_field(field, field_description="", formclass="") %}
   <fieldset class="form-group {% if field.errors %}has-error{% endif %} {% if formclass %}issue-metadata-form{% endif %}">
     {% set formclasses = "form-control"%}
     {% if field.errors %} {% set formclasses = formclasses + " form-control-error" %} {% endif %}
@@ -25,14 +23,14 @@
         <label class="c-input c-checkbox">
           {{ field(type='checkbox', **kwargs) }}
           <span class="c-indicator"></span>
-          <strong>{{ field_label }}</strong>
+          <strong>{{ field.label }}</strong>
         </label>
         <br />
         {% if field_description %}
           <small class="text-muted">{{ field_description }}</small>
         {% endif %}
     {% else %}
-      <strong>{{ field_label }}</strong>
+      <strong>{{ field.label }}</strong>
       {{ field(class_=formclasses)|safe }}
       <div>
         {% if field_description %}

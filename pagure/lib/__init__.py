@@ -754,14 +754,15 @@ def edit_issue_tags(
     old_tag_color = old_tag.tag_color
 
     # check for change
-    no_change_in_tag = old_tag.tag == new_tag and \
-                       old_tag_description == new_tag_description  and \
-                       old_tag_color == new_tag_color
+    no_change_in_tag = old_tag.tag == new_tag \
+                       and old_tag_description == new_tag_description \
+                       and old_tag_color == new_tag_color
     if no_change_in_tag:
         raise pagure.exceptions.PagureException(
-            'No change.  Old tag "%s(%s)[%s]" is the same as new tag "%s(%s)[%s]"'
-            % (old_tag, old_tag_description, old_tag_color, new_tag,
-            new_tag_description, new_tag_color))
+            'No change.  Old tag "%s(%s)[%s]" is the same as '
+            'new tag "%s(%s)[%s]"' % (
+                old_tag, old_tag_description, old_tag_color, new_tag,
+                new_tag_description, new_tag_color))
     elif old_tag.tag != new_tag:
         # Check if new tag already exists
         existing_tag = get_tag(session, new_tag, project.id)

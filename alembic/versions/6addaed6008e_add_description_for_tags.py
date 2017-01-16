@@ -15,7 +15,7 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    ''' Add the column notification to the table pull_request_comments.
+    ''' Add the column tag_description to the table tags_colored.
     '''
     op.add_column(
         'tags_colored',
@@ -23,4 +23,6 @@ def upgrade():
     )
 
 def downgrade():
+    ''' Remove column tag_description from the table tags_colored.
+    '''
     op.drop_column('tags_colored', 'tag_description')
