@@ -46,23 +46,33 @@ def api_view_user(username):
           "forks": [],
           "repos": [
             {
-              "date_created": "1426595173",
+              "custom_keys": [],
               "description": "",
-              "id": 5,
-              "name": "pagure",
               "parent": null,
               "settings": {
+                "issues_default_to_private": false,
                 "Minimum_score_to_merge_pull-request": -1,
-                "Only_assignee_can_merge_pull-request": false,
-                "Web-hooks": null,
-                "issue_tracker": true,
+                "Web-hooks": None,
+                "fedmsg_notifications": true,
+                "always_merge": false,
                 "project_documentation": true,
-                "pull_requests": true
+                "Enforce_signed-off_commits_in_pull-request": false,
+                "pull_requests": true,
+                "Only_assignee_can_merge_pull-request": false,
+                "issue_tracker": true
               },
+              "tags": [],
+              "namespace": None,
+              "priorities": {},
+              "close_status": ["Invalid", "Insufficient data", "Fixed", "Duplicated"],
+              "milestones": {},
               "user": {
                 "fullname": "ralph",
                 "name": "ralph"
-              }
+              },
+              "date_created": "1426595173",
+              "id": 5,
+              "name": "pagure"
             }
           ],
           "user": {
