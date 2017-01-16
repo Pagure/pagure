@@ -107,8 +107,8 @@ Manually
     cp files/alembic.ini .
     vim alembic.ini
 
-* Set the ``script_location`` to ``alembic``, ie: the folder where are stored
-  the revisions relative to where the ``alembic.ini`` file is.
+* Set the ``script_location`` to ``alembic``, ie: the folder where the revisions
+  are stored, relative to the location of the ``alembic.ini`` file.
 
 * Create the inital database scheme::
 
