@@ -685,8 +685,7 @@ class Issue(BASE):
     date_created = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow)
     last_updated = sa.Column(sa.DateTime, nullable=False,
-                             default=datetime.datetime.utcnow,
-                             onupdate=datetime.datetime.utcnow)
+                             default=datetime.datetime.utcnow)
     closed_at = sa.Column(sa.DateTime, nullable=True)
 
     project = relation(
@@ -1269,8 +1268,7 @@ class PullRequest(BASE):
     updated_on = sa.Column(
         sa.DateTime,
         nullable=False,
-        default=sa.func.now(),
-        onupdate=sa.func.now())
+        default=datetime.datetime.utcnow)
 
     last_updated = sa.Column(sa.DateTime, nullable=False,
                              default=datetime.datetime.utcnow,
