@@ -3472,7 +3472,7 @@ def set_custom_key_fields(session, project, fields, types, data):
     for idx, key in enumerate(fields):
         if types[idx] != "list":
             # Only Lists use data, strip it otherwise
-            data[idx] = ""
+            data[idx] = None
         if key in current_keys:
             issuekey = current_keys[key]
             issuekey.key_type = types[idx]

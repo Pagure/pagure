@@ -733,7 +733,7 @@
                 </div>
                 <div class="col-sm-4 p-r-0">
                     <input title="Comma separated list items" type="text" name="custom_keys_data"
-                      value="{{ field.key_data }}" class="form-control"/>
+                      value={% if field.key_data is none %}""{% else %}"{{ field.key_data }}"{% endif %} class="form-control"/>
                 </div>
               </div>
             {% endfor %}
