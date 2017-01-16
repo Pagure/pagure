@@ -218,12 +218,16 @@ def send_email(text, subject, to_mail,
     else:
         subject_tag = 'Pagure'
 
-    if pagure.APP.config['SMTP_SSL']:
-        smtp = smtplib.SMTP_SSL(
-            pagure.APP.config['SMTP_SERVER'], pagure.APP.config['SMTP_PORT'])
-    else:
-        smtp = smtplib.SMTP(
-            pagure.APP.config['SMTP_SERVER'], pagure.APP.config['SMTP_PORT'])
+    smtp = None
+    if pagure.APP.config.get('EMAIL_SEND', True):
+        if pagure.APP.config['SMTP_SSL']:
+            smtp = smtplib.SMTP_SSL(
+                pagure.APP.config['SMTP_SERVER'],
+                pagure.APP.config['SMTP_PORT'])
+        else:
+            smtp = smtplib.SMTP(
+                pagure.APP.config['SMTP_SERVER'],
+                pagure.APP.config['SMTP_PORT'])
 
     for mailto in to_mail.split(','):
         msg = MIMEText(text.encode('utf-8'), 'plain', 'utf-8')
