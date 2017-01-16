@@ -149,7 +149,7 @@ class Modeltests(unittest.TestCase):
         # Clean up eventual git repo left in the present folder.
         self.path = tempfile.mkdtemp(prefix='pagure-tests')
         for folder in ['tickets', 'repos', 'forks', 'docs', 'requests',
-                       'releases']:
+                       'releases', 'remotes']:
             os.mkdir(os.path.join(self.path, folder))
 
         self.session = pagure.lib.model.create_tables(
