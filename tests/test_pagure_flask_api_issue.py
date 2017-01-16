@@ -1902,18 +1902,18 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             self.session, repo,
             ['bugzilla', 'upstream', 'reviewstatus'],
             ['link', 'boolean', 'list'],
-            ['unused data for non-list type', '', 'ack, nack, needs review'])
+            ['unused data for non-list type', '', 'ack, nack ,  needs review'])
         self.session.commit()
         self.assertEqual(msg, 'List of custom fields updated')
 
         # Check the project custom fields were correctly set
         for key in repo.issue_keys:
             # Check that the bugzilla field correctly had its data removed
-            if key.name == "bugzilla" and key.key_data != "":
+            if key.name == "bugzilla" and key.data is not None:
                 assert False
             # Check that the reviewstatus list field still has its list
             if (key.name == "reviewstatus" and
-                key.key_data != 'ack, nack, needs review'):
+                key.data_string != 'ack, nack, needs review'):
                 assert False
 
         # No value specified while we try to create the field

@@ -701,10 +701,10 @@
               <div class="col-sm-4">
                 <strong>Fields</strong>
               </div>
-              <div class="col-sm-4">
+              <div class="col-sm-2">
                 <strong>Field Type</strong>
               </div>
-              <div class="col-sm-4">
+              <div class="col-sm-6">
                 <strong>Field Values</strong> <i>(Lists only)</i>
               </div>
             </div>
@@ -715,7 +715,7 @@
                   <input type="text" name="custom_keys"
                     value="{{ field.name }}" class="form-control"/>
                 </div>
-                <div class="col-sm-4 p-r-0">
+                <div class="col-sm-2 p-r-0">
                   <select name="custom_keys_type" class="form-control">
                     <option value="text" {%
                       if field.key_type == 'text' %} selected {%
@@ -731,9 +731,9 @@
                       endif %}>List</option>
                   </select>
                 </div>
-                <div class="col-sm-4 p-r-0">
+                <div class="col-sm-6 p-r-0">
                     <input title="Comma separated list items" type="text" name="custom_keys_data"
-                      value={% if field.key_data is none %}""{% else %}"{{ field.key_data }}"{% endif %} class="form-control"/>
+                      value={% if field.data is none %}""{% else %}"{{ field.data_string }}"{% endif %} class="form-control"/>
                 </div>
               </div>
             {% endfor %}

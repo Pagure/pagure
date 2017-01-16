@@ -999,6 +999,48 @@ class IssueKeys(BASE):
             'issue_keys', cascade="delete, delete-orphan", single_parent=True)
         )
 
+    @property
+    def data(self):
+        ''' Return the list of items '''
+        items = {}
+        if self.key_data:
+            items = json.loads(self.key_data)
+        else:
+            return None
+        return items['list']
+
+    @property
+    def data_string(self):
+        ''' Take the list from key_data and convert it to a string.
+        This is used by the project settings custom field section. '''
+
+        if self.key_data:
+            mylist = json.loads(self.key_data)
+        else:
+            return ""
+
+        return_str = ""
+        first_item = True
+        if mylist:
+            for item in mylist['list']:
+                if first_item:
+                    return_str = item
+                    first_item = False
+                else:
+                    return_str = return_str + ", " + item
+        return return_str
+
+    @data.setter
+    def data(self, list_str):
+        ''' Ensures the list items are properly saved. '''
+        if list_str is None:
+            self.key_data = None
+        else:
+            list_list = [item.strip() for item in list_str.split(',')]
+            list_data = {}
+            list_data['list'] = list_list
+            self.key_data = json.dumps(list_data)
+
 
 class IssueValues(BASE):
     """ Stores the values of the custom keys set by project on issues.
