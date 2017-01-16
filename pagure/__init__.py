@@ -603,15 +603,17 @@ def get_remote_repo_path(remote_git, branch_from, loop=False):
             pygit2.clone_repository(
                 remote_git, repopath, checkout_branch=branch_from)
         except Exception as err:
-            LOG.debug(err)
             LOG.exception(err)
-            flask.abort(500, 'Could not clone the remote git repository')
+            flask.abort(
+                500,
+                'The following error was raised when trying to clone the '
+                'remote repo: %s' % str(err)
+            )
     else:
         repo = pagure.lib.repo.PagureRepo(repopath)
         try:
             repo.pull(branch=branch_from, force=True)
-        except pygit2.GitError as err:  # pragma: no-cover
-            LOG.debug(err)
+        except pygit2.GitError as err:
             LOG.exception(err)
             flask.abort(
                 500,
@@ -619,7 +621,6 @@ def get_remote_repo_path(remote_git, branch_from, loop=False):
                 'changes from the remote: %s' % str(err)
             )
         except pagure.exceptions.PagureException as err:
-            LOG.debug(err)
             LOG.exception(err)
             flask.abort(500, str(err))
 
