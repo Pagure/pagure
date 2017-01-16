@@ -698,7 +698,11 @@ def remove_tags_obj(session, obj, tags, ticketfolder, user):
         tags = [tags]
 
     removed_tags = []
-    for objtag in obj.tags_issues_colored:
+    if obj.isa == 'project':
+        objtags = obj.tags
+    else:
+        objtags = obj.tags_issues_colored
+    for objtag in objtags:
         if objtag.tag.tag in tags:
             tag = objtag.tag.tag
             removed_tags.append(tag)
