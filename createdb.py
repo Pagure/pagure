@@ -1,5 +1,7 @@
 #!/usr/bin/env python2
 
+from __future__ import print_function
+
 # These two lines are needed to run on EL6
 __requires__ = ['SQLAlchemy >= 0.8', 'jinja2 >= 2.4']
 import pkg_resources
@@ -58,6 +60,6 @@ if args.alembic_cfg:
 
     alembic_cfg = Config(args.alembic_cfg)
     alembic_cfg.set_main_option("url", APP.config['DB_URL'])
-    command.current(alembic_cfg)
     command.stamp(alembic_cfg, "head")
+    print('Current alembic revision id is at:')
     command.current(alembic_cfg)
