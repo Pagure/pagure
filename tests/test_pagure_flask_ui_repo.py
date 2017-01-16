@@ -1369,6 +1369,21 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertTrue(
             '<td class="cell2"><pre> bar</pre></td>' in output.data)
 
+        # Empty files should also be displayed
+        tests.add_content_to_git(
+            os.path.join(self.path, 'test.git'),
+            filename="emptyfile.md",
+            content="")
+        output = self.app.get('/test/blob/master/f/emptyfile.md')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(
+            '<a class="btn btn-secondary btn-sm" '
+            'href="/test/raw/master/f/emptyfile.md" '
+            'title="View as raw">Raw</a>', output.data)
+        self.assertIn(
+            '<div class="m-a-2">\n'
+            '        \n      </div>', output.data)
+
         # View what's supposed to be an image
         output = self.app.get('/test/blob/master/f/test.jpg')
         self.assertEqual(output.status_code, 200)
