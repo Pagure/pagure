@@ -2061,6 +2061,25 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '        <ul class="list-group list-group-flush">'
                 '\n        </ul>', output.data)
 
+            # Inconsistent length tags (missing tag field)
+            data = {
+                'tag': 'red',
+                'tag_description': ['lorem ipsum', 'foo bar'],
+                'tag_color': ['#ff0000', '#003cff'],
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/update/tags', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn(
+                '</button>\n                      Error: Incomplete request. '
+                'One or more tag fields missing.', output.data)
+            self.assertIn(
+                '        <ul class="list-group list-group-flush">'
+                '\n        </ul>', output.data)
+
             # Inconsistent length color
             data = {
                 'tag': ['red', 'blue'],
@@ -2078,8 +2097,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'Color: red does not match the expected pattern',
                 output.data)
             self.assertIn(
-                '</button>\n                      tags, tag descriptions and'
-                ' tag colors are not of the same length', output.data)
+                '</button>\n                      Error: Incomplete request. '
+                'One or more tag color fields missing.', output.data)
             self.assertIn(
                 '        <ul class="list-group list-group-flush">'
                 '\n        </ul>', output.data)
@@ -2097,8 +2116,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output.data)
             self.assertIn(
-                '</button>\n                      tags, tag descriptions and'
-                ' tag colors are not of the same length', output.data)
+                '</button>\n                      Error: Incomplete request. '
+                'One or more tag description fields missing.', output.data)
             self.assertIn(
                 '        <ul class="list-group list-group-flush">'
                 '\n        </ul>', output.data)

@@ -483,9 +483,21 @@ def update_tags(repo, username=None, namespace=None):
                 error = True
 
         if not (len(tags) == len(colors) == len(tag_descriptions)):
-            flask.flash(
-                'tags, tag descriptions and tag colors are not of the same length', 'error')
             error = True
+            # store the lengths because we are going to use them a lot
+            len_tags = len(tags)
+            len_tag_descriptions = len(tag_descriptions)
+            len_colors = len(colors)
+            error_message = 'Error: Incomplete request. '
+
+            if len_colors > len_tags or len_tag_descriptions > len_tags:
+                error_message += 'One or more tag fields missing.'
+            elif len_colors < len_tags:
+                error_message += 'One or more tag color fields missing.'
+            elif len_tag_descriptions < len_tags:
+                error_message += 'One or more tag description fields missing.'
+
+            flask.flash(error_message, 'error')
 
         if not error:
             for idx, tag in enumerate(tags):
