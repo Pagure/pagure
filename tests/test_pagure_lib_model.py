@@ -153,6 +153,7 @@ class PagureLibModeltests(tests.Modeltests):
 
         item = pagure.lib.model.TagColored(
             tag='foo',
+            tag_description='bar',
             tag_color='DeepSkyBlue',
             project_id=repo.id)
         self.session.add(item)

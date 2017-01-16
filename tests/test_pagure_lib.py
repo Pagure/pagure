@@ -500,6 +500,7 @@ class PagureLibtests(tests.Modeltests):
             project=repo,
             old_tag='foo',
             new_tag='bar',
+            new_tag_description='lorem ipsum',
             new_tag_color='black',
             user='pingou',
             ticketfolder=None,
@@ -512,6 +513,7 @@ class PagureLibtests(tests.Modeltests):
             project=repo,
             old_tag=None,
             new_tag='bar',
+            new_tag_description='lorem ipsum',
             new_tag_color='black',
             user='pingou',
             ticketfolder=None,
@@ -522,6 +524,7 @@ class PagureLibtests(tests.Modeltests):
             project=repo,
             old_tag='tag1',
             new_tag='tag2',
+            new_tag_description='lorem ipsum',
             new_tag_color='black',
             user='pingou',
             ticketfolder=None,
@@ -529,7 +532,7 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(
             msgs,
-            ['Edited tag: tag1(DeepSkyBlue) to tag2(black)']
+            ['Edited tag: tag1()[DeepSkyBlue] to tag2(lorem ipsum)[black]']
         )
 
         # Add a new tag
@@ -551,6 +554,7 @@ class PagureLibtests(tests.Modeltests):
             project=repo,
             old_tag='tag2',
             new_tag='tag3',
+            new_tag_description='lorem ipsum',
             new_tag_color='red',
             user='pingou',
             ticketfolder=None,
@@ -562,12 +566,13 @@ class PagureLibtests(tests.Modeltests):
             project=repo,
             old_tag='tag2',
             new_tag='tag4',
+            new_tag_description='ipsum lorem',
             new_tag_color='purple',
             user='pingou',
             ticketfolder=None,
         )
         self.session.commit()
-        self.assertEqual(msgs, ['Edited tag: tag2(black) to tag4(purple)'])
+        self.assertEqual(msgs, ['Edited tag: tag2(lorem ipsum)[black] to tag4(ipsum lorem)[purple]'])
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')

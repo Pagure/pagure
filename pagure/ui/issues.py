@@ -461,7 +461,10 @@ def update_tags(repo, username=None, namespace=None):
             if tag.strip() and tag.strip() not in seen and not seen.add(tag.strip())
         ]
 
-        tag_descriptions = flask.request.form.getlist('tag_description')
+        tag_descriptions = [
+            desc.strip()
+            for desc in flask.request.form.getlist('tag_description')
+        ]
 
         # Uniquify and order preserving
         seen = set()

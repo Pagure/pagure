@@ -19,7 +19,7 @@ def upgrade():
     '''
     op.add_column(
         'tags_colored',
-        sa.Column('tag_description', sa.String(255))
+        sa.Column('tag_description', sa.String(255), default="")
     )
 
 def downgrade():

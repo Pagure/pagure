@@ -1518,6 +1518,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
             data = {'tag': 'tag2',
+                    'tag_description': 'lorem ipsum',
                     'tag_color': 'DeepSkyBlue'}
 
             output = self.app.post('/test/tag/tag1/edit', data=data)
@@ -1532,7 +1533,19 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'Settings - test - Pagure', output.data)
             self.assertIn(
                 '</button>\n                      '
-                'Edited tag: tag1(DeepSkyBlue) to tag2(DeepSkyBlue)',
+                'Edited tag: tag1()[DeepSkyBlue] to tag2(lorem ipsum)[DeepSkyBlue]',
+                output.data)
+
+            # update tag with empty description
+            data['tag_description'] = ''
+            output = self.app.post(
+                '/test/tag/tag2/edit', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                'Settings - test - Pagure', output.data)
+            self.assertIn(
+                '</button>\n                      '
+                'Edited tag: tag2(lorem ipsum)[DeepSkyBlue] to tag2()[DeepSkyBlue]',
                 output.data)
 
         # After edit, list tags
@@ -2013,6 +2026,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             # No CSRF
             data = {
                 'tag': 'red',
+                'tag_description': 'lorem ipsum',
                 'tag_color': '#ff0000'
             }
             output = self.app.post(
@@ -2030,6 +2044,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             # Invalid color
             data = {
                 'tag': 'red',
+                'tag_description': 'lorem ipsum',
                 'tag_color': 'red',
                 'csrf_token': csrf_token,
             }
@@ -2049,6 +2064,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             # Inconsistent length color
             data = {
                 'tag': ['red', 'blue'],
+                'tag_description': ['lorem ipsum', 'foo bar'],
                 'tag_color': 'red',
                 'csrf_token': csrf_token,
             }
@@ -2062,15 +2078,35 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'Color: red does not match the expected pattern',
                 output.data)
             self.assertIn(
-                '</button>\n                      tags and tag colors'
-                ' are not of the same length', output.data)
+                '</button>\n                      tags, tag descriptions and'
+                ' tag colors are not of the same length', output.data)
             self.assertIn(
                 '        <ul class="list-group list-group-flush">'
                 '\n        </ul>', output.data)
 
-            # Valid query
+            # Inconsistent length description
             data = {
                 'tag': ['red', 'blue'],
+                'tag_description': 'lorem ipsum',
+                'tag_color': ['#ff0000', '#003cff'],
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/update/tags', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn(
+                '</button>\n                      tags, tag descriptions and'
+                ' tag colors are not of the same length', output.data)
+            self.assertIn(
+                '        <ul class="list-group list-group-flush">'
+                '\n        </ul>', output.data)
+
+            # consistent length, but empty description
+            data = {
+                'tag': ['red', 'blue'],
+                'tag_description': ['lorem ipsum', ''],
                 'tag_color': ['#ff0000', '#003cff'],
                 'csrf_token': csrf_token,
             }
@@ -2081,20 +2117,53 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<title>Settings - test - Pagure</title>', output.data)
             self.assertIn(
                 '<span class="label label-info" style="background-color:'
-                '#003cff">blue</span>', output.data)
+                '#003cff">blue</span>\n'
+                '            &nbsp;<span class="text-muted">'
+                '</span>', output.data)
             self.assertIn(
                 '<input type="hidden" value="blue" name="tag" />',
                 output.data)
             self.assertIn(
                 '<span class="label label-info" style="background-color:'
-                '#ff0000">red</span>', output.data)
+                '#ff0000">red</span>\n'
+                '            &nbsp;<span class="text-muted">lorem ipsum'
+                '</span>', output.data)
+            self.assertIn(
+                '<input type="hidden" value="red" name="tag" />',
+                output.data)
+
+            # Valid query
+            data = {
+                'tag': ['red', 'green'],
+                'tag_description': ['lorem ipsum', 'sample description'],
+                'tag_color': ['#ff0000', '#00ff00'],
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post(
+                '/test/update/tags', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn(
+                '<span class="label label-info" style="background-color:'
+                '#00ff00">green</span>\n'
+                '            &nbsp;<span class="text-muted">sample description'
+                '</span>', output.data)
+            self.assertIn(
+                '<input type="hidden" value="green" name="tag" />',
+                output.data)
+            self.assertIn(
+                '<span class="label label-info" style="background-color:'
+                '#ff0000">red</span>\n'
+                '            &nbsp;<span class="text-muted">lorem ipsum'
+                '</span>', output.data)
             self.assertIn(
                 '<input type="hidden" value="red" name="tag" />',
                 output.data)
 
         # After update, list tags
         tags = pagure.lib.get_tags_of_project(self.session, repo)
-        self.assertEqual([tag.tag for tag in tags], ['blue', 'red'])
+        self.assertEqual([tag.tag for tag in tags], ['blue', 'green', 'red'])
 
 
 if __name__ == '__main__':

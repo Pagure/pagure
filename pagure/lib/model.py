@@ -1089,7 +1089,7 @@ class TagColored(BASE):
 
     id = sa.Column(sa.Integer, primary_key=True)
     tag = sa.Column(sa.String(255), nullable=False)
-    tag_description = sa.Column(sa.String(255))
+    tag_description = sa.Column(sa.String(255), default="")
     project_id = sa.Column(
         sa.Integer,
         sa.ForeignKey(
@@ -1109,8 +1109,8 @@ class TagColored(BASE):
     )
 
     def __repr__(self):
-        return 'TagColored(id: %s, tag:%s, color:%s)' % (
-            self.id, self.tag, self.tag_color)
+        return 'TagColored(id: %s, tag:%s, tag_description:%s, color:%s)' % (
+            self.id, self.tag, self.tag_description, self.tag_color)
 
 
 class TagIssueColored(BASE):
