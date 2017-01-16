@@ -219,16 +219,6 @@ def send_email(text, subject, to_mail,
         subject_tag = 'Pagure'
 
     smtp = None
-    if pagure.APP.config.get('EMAIL_SEND', True):
-        if pagure.APP.config['SMTP_SSL']:
-            smtp = smtplib.SMTP_SSL(
-                pagure.APP.config['SMTP_SERVER'],
-                pagure.APP.config['SMTP_PORT'])
-        else:
-            smtp = smtplib.SMTP(
-                pagure.APP.config['SMTP_SERVER'],
-                pagure.APP.config['SMTP_PORT'])
-
     for mailto in to_mail.split(','):
         msg = MIMEText(text.encode('utf-8'), 'plain', 'utf-8')
         msg['Subject'] = header = Header(
@@ -273,6 +263,15 @@ def send_email(text, subject, to_mail,
             print('*****/EMAIL******')
             continue
         try:
+            if smtp is None:
+                if pagure.APP.config['SMTP_SSL']:
+                    smtp = smtplib.SMTP_SSL(
+                        pagure.APP.config['SMTP_SERVER'],
+                        pagure.APP.config['SMTP_PORT'])
+                else:
+                    smtp = smtplib.SMTP(
+                        pagure.APP.config['SMTP_SERVER'],
+                        pagure.APP.config['SMTP_PORT'])
             if pagure.APP.config['SMTP_USERNAME'] \
                     and pagure.APP.config['SMTP_PASSWORD']:
                 smtp.login(
@@ -286,7 +285,8 @@ def send_email(text, subject, to_mail,
                 msg.as_string())
         except smtplib.SMTPException as err:
             pagure.LOG.exception(err)
-    smtp.quit()
+    if smtp:
+        smtp.quit()
     return msg
 
 
