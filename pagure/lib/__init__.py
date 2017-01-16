@@ -272,7 +272,8 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
     pagure.lib.git.update_git(
         issue, repo=issue.project, repofolder=ticketfolder)
 
-    log_action(session, 'commented', issue, user_obj)
+    if not notification:
+        log_action(session, 'commented', issue, user_obj)
 
     if notify:
         pagure.lib.notify.notify_new_comment(issue_comment, user=user_obj)
@@ -1461,6 +1462,7 @@ def edit_issue(session, issue, ticketfolder, user,
             notify=False,
             notification=True,
         )
+        log_action(session, status, issue, user_obj)
         pagure.lib.notify.notify_status_change_issue(issue, user_obj)
 
     if not issue.private and edit:
