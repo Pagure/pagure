@@ -610,10 +610,18 @@ def get_remote_repo_path(remote_git, branch_from, loop=False):
         repo = pagure.lib.repo.PagureRepo(repopath)
         try:
             repo.pull(branch=branch_from, force=True)
+        except pygit2.GitError as err:  # pragma: no-cover
+            LOG.debug(err)
+            LOG.exception(err)
+            flask.abort(
+                500,
+                'The following error was raised when trying to pull the '
+                'changes from the remote: %s' % str(err)
+            )
         except pagure.exceptions.PagureException as err:
             LOG.debug(err)
             LOG.exception(err)
-            flask.abort(500, err.message)
+            flask.abort(500, str(err))
 
     return repopath
 
