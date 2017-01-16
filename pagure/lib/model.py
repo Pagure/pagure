@@ -1105,6 +1105,7 @@ class TagColored(BASE):
 
     project = relation(
         'Project', foreign_keys=[project_id], remote_side=[Project.id],
+        backref="tags_colored",
     )
 
     def __repr__(self):
@@ -1137,6 +1138,7 @@ class TagIssueColored(BASE):
 
     issue = relation(
         'Issue', foreign_keys=[issue_uid], remote_side=[Issue.uid],
+        backref="tags_issues_colored"
     )
     tag = relation(
         'TagColored', foreign_keys=[tag_id], remote_side=[TagColored.id],

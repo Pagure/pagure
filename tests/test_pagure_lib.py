@@ -1934,11 +1934,22 @@ class PagureLibtests(tests.Modeltests):
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 
         # before
+        self.assertEqual(repo.tags_colored, [])
         self.assertEqual(issue.tags_text, [])
 
         messages = pagure.lib.update_tags(
             self.session, issue, 'tag', 'pingou', ticketfolder=None)
         self.assertEqual(messages, ['Tag added: tag'])
+
+        # after
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+
+        self.assertEqual(
+            [t.tag for t in repo.tags_colored], ['tag'])
+        self.assertEqual(issue.tags_text, ['tag'])
+
+        # Replace the tag by two others
         messages = pagure.lib.update_tags(
             self.session, issue, ['tag2', 'tag3'], 'pingou',
             ticketfolder=None)
@@ -1946,7 +1957,14 @@ class PagureLibtests(tests.Modeltests):
             messages, ['Tag added: tag2, tag3', 'Removed tag: tag'])
 
         # after
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+
+        self.assertEqual(
+            sorted([t.tag for t in repo.tags_colored]),
+            ['tag', 'tag2', 'tag3'])
         self.assertEqual(issue.tags_text, ['tag2', 'tag3'])
+
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
