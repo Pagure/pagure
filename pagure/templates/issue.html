@@ -367,7 +367,7 @@
             <label><strong>{{ field.name }}</strong></label>
             <div id="{{ field.name }}_plain">
               <p>
-                {%  if field.name in knowns_keys %}
+                {% if field.name in knowns_keys %}
                   {% if field.key_type == 'link' %}
                     {% for link in knowns_keys[field.name].value.split(',') %}
                       <a target="_blank" rel="noopener noreferrer" href="{{ link }}">{{ link }}</a>
@@ -383,15 +383,25 @@
           {% if authenticated and g.repo_admin %}
             <fieldset class="form-group issue-custom-form">
               <label for="field"><strong>{{ field.name }}</strong></label>
-              <input
-                {%-
-                if field.key_type == 'boolean' %} type="checkbox" {%
-                endif %} class="form-control" name="{{ field.name }}" id="{{ field.name }}"
-                {%- if field.name in knowns_keys %}{%
-                      if field.key_type == 'boolean' %} checked {%
-                      else %} value="{{ knowns_keys[field.name].value }}"{%
-                      endif %}{%-
-                    endif -%} />
+              {% if field.key_type == 'list' %}
+                <select class="form-control" name="{{ field.name }}" id="{{ field.name }}>
+                  <option value="None">None</option>
+                  {% for item in field.key_data.split(',') %}
+                    <option value="{{item}}" {% if field.name in knowns_keys and item == knowns_keys[field.name].value %} selected {% endif %}>
+                      {{ item }}
+                    </option>
+                  {% endfor %}
+                </select>
+              {% else %}
+                <input
+                  {%- if field.key_type == 'boolean' %} type="checkbox" {% endif %}
+                  class="form-control" name="{{ field.name }}" id="{{ field.name }}"
+                  {%- if field.name in knowns_keys %}
+                    {% if field.key_type == 'boolean' %} checked
+                    {% else %} value="{{ knowns_keys[field.name].value }}"
+                    {% endif %}
+                  {%- endif -%} />
+              {% endif %}
             </fieldset>
           {% endif %}
         {% endfor %}

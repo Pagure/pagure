@@ -684,7 +684,9 @@
         </div>
         <div class="card-block">
           <p>
-            Set some custom fields for your issues.
+            Set some custom fields for your issues.  <i>Field Values</i> are currently
+            only used for Lists, and it accepts a comma separated list of items
+            for the drop down list.
           </p>
         </div>
         <form action="{{ url_for(
@@ -696,29 +698,42 @@
           {{ tag_form.csrf_token }}
           <div class="card-block">
             <div class="row">
-              <div class="col-sm-6">
+              <div class="col-sm-4">
                 <strong>Fields</strong>
+              </div>
+              <div class="col-sm-4">
+                <strong>Field Type</strong>
+              </div>
+              <div class="col-sm-4">
+                <strong>Field Values</strong> <i>(Lists only)</i>
               </div>
             </div>
             <div id="custom_fields">
             {% for field in repo.issue_keys or [dict(key_type="", name="")] | sort %}
               <div class="row p-t-1">
-                <div class="col-sm-6 p-r-0">
+                <div class="col-sm-4 p-r-0">
                   <input type="text" name="custom_keys"
                     value="{{ field.name }}" class="form-control"/>
                 </div>
-                <div class="col-sm-6 p-r-0">
-                   <select name="custom_keys_type" class="form-control">
+                <div class="col-sm-4 p-r-0">
+                  <select name="custom_keys_type" class="form-control">
                     <option value="text" {%
                       if field.key_type == 'text' %} selected {%
-                      endif %}>text</option>
+                      endif %}>Text</option>
                     <option value="boolean" {%
                       if field.key_type == 'boolean' %} selected {%
-                      endif %}>boolean</option>
+                      endif %}>Boolean</option>
                     <option value="link" {%
                       if field.key_type == 'link' %} selected {%
-                      endif %}>link</option>
+                      endif %}>Link</option>
+                    <option value="list" {%
+                      if field.key_type == 'list' %} selected {%
+                      endif %}>List</option>
                   </select>
+                </div>
+                <div class="col-sm-4 p-r-0">
+                    <input title="Comma separated list items" type="text" name="custom_keys_data"
+                      value="{{ field.key_data }}" class="form-control"/>
                 </div>
               </div>
             {% endfor %}
@@ -837,7 +852,7 @@
         </div>
         <div class="card-block">
           <p>Quick replies will be offered in a new comment form on Issue or
-          Pull Request page. This allows you to reply to common probles with a
+          Pull Request page. This allows you to reply to common problems with a
           click of a button.</p>
           <p>The reply can use the same Markdown formatting as regular
           comments. The list you will choose the reply from will only show the

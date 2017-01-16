@@ -2289,10 +2289,13 @@ def update_custom_keys(repo, username=None, namespace=None):
             w.strip() for w in flask.request.form.getlist('custom_keys_type')
             if w.strip()
         ]
+        custom_keys_data = [
+            w.strip() for w in flask.request.form.getlist('custom_keys_data')
+        ]
 
         try:
             msg = pagure.lib.set_custom_key_fields(
-                SESSION, repo, custom_keys, custom_keys_type)
+                SESSION, repo, custom_keys, custom_keys_type, custom_keys_data)
             SESSION.commit()
             flask.flash(msg)
         except SQLAlchemyError as err:  # pragma: no cover

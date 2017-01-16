@@ -3460,9 +3460,9 @@ def save_report(session, repo, name, url, username):
     session.add(repo)
 
 
-def set_custom_key_fields(session, project, fields, types):
+def set_custom_key_fields(session, project, fields, types, data):
     """ Set or update the custom key fields of a project with the values
-    provided.
+    provided.  "data" is currently only used for lists
     """
 
     current_keys = {}
@@ -3470,14 +3470,19 @@ def set_custom_key_fields(session, project, fields, types):
         current_keys[key.name] = key
 
     for idx, key in enumerate(fields):
+        if types[idx] != "list":
+            # Only Lists use data, strip it otherwise
+            data[idx] = ""
         if key in current_keys:
             issuekey = current_keys[key]
             issuekey.key_type = types[idx]
+            issuekey.key_data = data[idx]
         else:
             issuekey = model.IssueKeys(
                 project_id=project.id,
                 name=key,
                 key_type=types[idx],
+                key_data=data[idx]
             )
         session.add(issuekey)
 

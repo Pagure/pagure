@@ -820,6 +820,7 @@ class Issue(BASE):
                 name=field.key.name,
                 key_type=field.key.key_type,
                 value=field.value,
+                key_data=field.key.key_data
             )
             for field in self.other_fields
         ]
@@ -988,6 +989,7 @@ class IssueKeys(BASE):
         nullable=False)
     name = sa.Column(sa.Text(), nullable=False)
     key_type = sa.Column(sa.String(255), nullable=False)
+    key_data = sa.Column(sa.Text())
 
     __table_args__ = (sa.UniqueConstraint('project_id', 'name'),)
 
