@@ -98,10 +98,10 @@
         </ol>
       </div>
 
-{% if content %}
+{% if content is not none %}
   {% if output_type in ('file','binary','image','markup') %}
   <div class="card-block p-a-0">
-        {% if content %}
+        {% if content is not none %}
           {% if output_type in ('file','binary','image','markup') %}
             <div class="file-button-bar">
                 {% if output_type in ('file','markup') and g.repo_admin %}
