@@ -64,6 +64,123 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         self.assertEqual(sorted(data.keys()), ['mention', 'total_users', 'users'])
         self.assertEqual(data['total_users'], 1)
 
+    def test_api_view_user(self):
+        """
+            Test the api_view_user method of the flask api
+            The tested user has no project or forks.
+        """
+        output = self.app.get('/api/0/user/pingou')
+        self.assertEqual(output.status_code, 200)
+        exp = {
+            "forks": [],
+            "repos": [],
+            "user": { "fullname": "PY C", "name": "pingou"}}
+        data = json.loads(output.data)
+        self.assertEqual(data, exp)
+
+    def test_api_view_user_with_project(self):
+        """
+            Test the api_view_user method of the flask api,
+            this time the user has some project defined.
+        """
+        tests.create_projects(self.session)
+
+        output = self.app.get('/api/0/user/pingou')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        exp = {
+            "forks": [],
+            "repos": [{
+                "custom_keys": [],
+                "description": "test project #1",
+                "parent": None,
+                "settings": {
+                    "issues_default_to_private": False,
+                    "Minimum_score_to_merge_pull-request": -1,
+                    "Web-hooks": None,
+                    "fedmsg_notifications": True,
+                    "always_merge": False,
+                    "project_documentation": False,
+                    "Enforce_signed-off_commits_in_pull-request": False,
+                    "pull_requests": True,
+                    "Only_assignee_can_merge_pull-request": False,
+                    "issue_tracker": True
+                },
+                "tags": [],
+                "namespace": None,
+                "priorities": {},
+                "close_status": ["Invalid", "Insufficient data", "Fixed",  "Duplicate"],
+                "milestones": {},
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou"
+                },
+                "date_created": data['repos'][0]['date_created'],
+                "id": 1,
+                "name": "test"},
+                {
+                "custom_keys": [],
+                "description": "test project #2",
+                "parent": None,
+                "settings": {
+                    "issues_default_to_private": False,
+                    "Minimum_score_to_merge_pull-request": -1,
+                    "Web-hooks": None,
+                    "fedmsg_notifications": True,
+                    "always_merge": False,
+                    "project_documentation": False,
+                    "Enforce_signed-off_commits_in_pull-request": False,
+                    "pull_requests": True,
+                    "Only_assignee_can_merge_pull-request": False,
+                    "issue_tracker": True
+                },
+                "tags": [],
+                "namespace": None,
+                "priorities": {},
+                "close_status": ["Invalid", "Insufficient data", "Fixed",  "Duplicate"],
+                "milestones": {},
+                "user": {
+                     "fullname": "PY C",
+                     "name": "pingou"
+                },
+                "date_created": data['repos'][1]['date_created'],
+                "id": 2,
+                "name": "test2"},
+                {
+                "custom_keys": [],
+                "description": "namespaced test project",
+                "parent": None,
+                "settings": {
+                    "issues_default_to_private": False,
+                    "Minimum_score_to_merge_pull-request": -1,
+                    "Web-hooks": None,
+                    "fedmsg_notifications": True,
+                    "always_merge": False,
+                    "project_documentation": False,
+                    "Enforce_signed-off_commits_in_pull-request": False,
+                    "pull_requests": True,
+                    "Only_assignee_can_merge_pull-request": False,
+                    "issue_tracker": True
+                    },
+                "tags": [],
+                "namespace": "somenamespace",
+                "priorities": {},
+                "close_status": ["Invalid", "Insufficient data", "Fixed",  "Duplicate"],
+                "milestones": {},
+                "user": {
+                    "fullname": "PY C",
+                    "name": "pingou"
+                    },
+                "date_created": data['repos'][2]['date_created'],
+                "id": 3,
+                "name": "test3"},
+            ],
+            "user": {
+                "fullname": "PY C",
+                "name": "pingou"
+            }
+        }
+        self.assertEqual(data, exp)
 
     @patch('pagure.lib.notify.send_email')
     def test_api_view_user_activity_stats(self, mockemail):
