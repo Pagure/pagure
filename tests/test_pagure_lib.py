@@ -447,6 +447,43 @@ class PagureLibtests(tests.Modeltests):
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
+    def test_remove_tags_obj_from_project(self, p_send_email, p_ugt):
+        """ Test the remove_tags_obj of pagure.lib from a project. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+
+        # Add a tag to the project
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.add_tag_obj(
+            self.session, repo,
+            tags=['pagure', 'test'],
+            user='pingou',
+            ticketfolder=None)
+        self.assertEqual(msg, 'Tag added: pagure, test')
+        self.session.commit()
+
+        # Check the tags
+        repo = pagure.lib.get_project(self.session, 'test')
+        self.assertEqual(repo.tags_text, ['pagure', 'test'])
+
+        # Remote one of the the tag
+        msgs = pagure.lib.remove_tags_obj(
+            session=self.session,
+            obj=repo,
+            tags='test',
+            user='pingou',
+            ticketfolder=None)
+        self.assertEqual(msgs, 'Removed tag: test')
+        self.session.commit()
+
+        # Check the tags
+        repo = pagure.lib.get_project(self.session, 'test')
+        self.assertEqual(repo.tags_text, ['pagure'])
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_edit_issue_tags(self, p_send_email, p_ugt):
         """ Test the edit_issue_tags of pagure.lib. """
         p_send_email.return_value = True
