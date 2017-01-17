@@ -1846,8 +1846,7 @@ class PagureLog(BASE):
 
         pr_verb={'created': 'created PR',
             'commented': 'commented on PR',
-            'close': 'closed PR',
-            'open': 'opened PR',
+            'closed': 'closed PR',
             'merged': 'merged PR'
         }
 
