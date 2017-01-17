@@ -1913,9 +1913,9 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 self.assertTrue(key.data is None)
 
             # Check that the reviewstatus list field still has its list
-            if (key.name == "reviewstatus"):
+            if key.name == "reviewstatus":
                 for item in ['ack', 'nack', 'needs review']:
-                    self.assertFalse(item not in key.data)
+                    self.assertTrue(item in key.data)
 
         # No value specified while we try to create the field
         output = self.app.post(
