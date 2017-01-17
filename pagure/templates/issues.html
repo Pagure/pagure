@@ -120,7 +120,8 @@
                 repo=repo.name,
                 username=username,
                 search_pattern=search_pattern,
-                namespace=repo.namespace) }}"
+                namespace=repo.namespace,
+                status=status or 'all') }}"
                 title="Filter issues by tag">
          {% endif %}
       {% else %}
@@ -131,7 +132,9 @@
                 namespace=repo.namespace,
                 tags=tag.tag,
                 search_pattern=search_pattern,
-                author=author, assignee=assignee, status=status) }}"
+                author=author,
+                assignee=assignee,
+                status=status or 'all') }}"
                 title="Filter issues by tag">
       {% endif %}
 
@@ -142,8 +145,8 @@
      <form action="{{ url_for('view_issues', username=username,
                     repo=repo.name ) }}" method="GET">
         <div class="input-group">
-          <input type="hidden" name="status" value="{{ status }}" />
-          {% for tag in tag_list %}
+          <input type="hidden" name="status" value="{{ status or 'all' }}" />
+          {% for tag in tags %}
           <input type="hidden" name="tags" value="{{ tag }}" />
           {% endfor %}
            <input type="text" class="form-control input-sm"
