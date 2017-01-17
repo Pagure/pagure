@@ -231,7 +231,9 @@
             </span>
               {% endif %}
               {% for tag in issue.tags %}
-                <span class="label label-info" style="background-color:{{tag.tag_color}}">{{tag.tag}}</span>
+                <span class="label label-info"
+                  style="background-color:{{tag.tag_color}}"
+                  title="{{ tag.tag_description or '' }}">{{tag.tag}}</span>
               {% endfor%}
             </td>
             <td class="td-open_date nowrap">
