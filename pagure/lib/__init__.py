@@ -668,14 +668,13 @@ def remove_tags(session, project, tags, ticketfolder, user):
         raise pagure.exceptions.PagureException(
             'Tags not found: %s' % ', '.join(tags))
 
-    if issues is not None:
-        for issue in issues:
-            for issue_tag in issue.tags:
-                if issue_tag.tag in tags:
-                    tag = issue_tag.tag
-                    session.delete(issue_tag)
-            pagure.lib.git.update_git(
-                issue, repo=issue.project, repofolder=ticketfolder)
+    for issue in issues:
+        for issue_tag in issue.tags:
+            if issue_tag.tag in tags:
+                tag = issue_tag.tag
+                session.delete(issue_tag)
+        pagure.lib.git.update_git(
+            issue, repo=issue.project, repofolder=ticketfolder)
 
     pagure.lib.notify.log(
         project,
