@@ -21,7 +21,6 @@ except ImportError:
     import json
 
 import datetime
-import logging
 import markdown
 import os
 import shutil
