@@ -1462,7 +1462,7 @@ def edit_issue(session, issue, ticketfolder, user,
             notify=False,
             notification=True,
         )
-        log_action(session, status, issue, user_obj)
+        log_action(session, status.lower(), issue, user_obj)
         pagure.lib.notify.notify_status_change_issue(issue, user_obj)
 
     if not issue.private and edit:

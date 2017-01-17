@@ -1838,24 +1838,23 @@ class PagureLog(BASE):
             'project': self.project.fullname,
         }
 
-        if self.issue:
-            if self.log_type == 'created':
-                verb = 'created issue'
-            elif self.log_type == 'commented':
-                verb = 'comment on issue'
-            elif self.log_type == 'close':
-                verb = 'closed issue'
-            elif self.log_type == 'open':
-                verb = 'opened issue'
-        elif self.pull_request:
-            if self.log_type == 'created':
-                verb = 'created PR'
-            elif self.log_type == 'commented':
-                verb = 'comment on PR'
-            elif self.log_type == 'closed':
-                verb = 'closed PR'
-            elif self.log_type == 'merged':
-                verb = 'merged PR'
+        issue_verb={'created': 'created issue',
+             'commented': 'commented on issue',
+             'close': 'closed issue',
+             'open': 'opened issue',
+        }
+
+        pr_verb={'created': 'created PR',
+            'commented': 'commented on PR',
+            'close': 'closed PR',
+            'open': 'opened PR',
+            'merged': 'merged PR'
+        }
+
+        if self.issue and self.log_type in issue_verb.keys():
+            verb = issue_verb[self.log_type]
+        elif self.pull_request and self.log_type in pr_verb.keys():
+            verb = pr_verb[self.log_type]
         elif not self.pull_request and not self.issue \
                 and self.log_type == 'created':
             verb = 'created Project'
