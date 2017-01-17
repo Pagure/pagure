@@ -1008,12 +1008,12 @@ class IssueKeys(BASE):
             return None
 
     @data.setter
-    def data(self, list_str):
-        ''' Store the list in JSON. '''
-        if list_str is None:
+    def data(self, data_obj):
+        ''' Store the list data in JSON. '''
+        if data_obj is None:
             self.key_data = None
         else:
-            self.key_data = json.dumps(list_str)
+            self.key_data = json.dumps(data_obj)
 
 
 class IssueValues(BASE):

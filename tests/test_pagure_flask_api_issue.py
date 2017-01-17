@@ -1909,14 +1909,13 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         # Check the project custom fields were correctly set
         for key in repo.issue_keys:
             # Check that the bugzilla field correctly had its data removed
-            if key.name == "bugzilla" and key.data is not None:
-                assert False
+            if key.name == "bugzilla":
+                self.assertTrue(key.data is None)
 
             # Check that the reviewstatus list field still has its list
             if (key.name == "reviewstatus"):
                 for item in ['ack', 'nack', 'needs review']:
-                    if item not in key.data:
-                        assert False
+                    self.assertFalse(item not in key.data)
 
         # No value specified while we try to create the field
         output = self.app.post(
