@@ -468,7 +468,7 @@ class PagureLibtests(tests.Modeltests):
         repo = pagure.lib.get_project(self.session, 'test')
         self.assertEqual(repo.tags_text, ['pagure', 'test'])
 
-        # Remote one of the the tag
+        # Remove one of the the tag
         msgs = pagure.lib.remove_tags_obj(
             session=self.session,
             obj=repo,
