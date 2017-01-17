@@ -1911,10 +1911,12 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             # Check that the bugzilla field correctly had its data removed
             if key.name == "bugzilla" and key.data is not None:
                 assert False
+
             # Check that the reviewstatus list field still has its list
-            if (key.name == "reviewstatus" and
-                key.data_string != 'ack, nack, needs review'):
-                assert False
+            if (key.name == "reviewstatus"):
+                for item in ['ack', 'nack', 'needs review']:
+                    if item not in key.data:
+                        assert False
 
         # No value specified while we try to create the field
         output = self.app.post(

@@ -3473,6 +3473,8 @@ def set_custom_key_fields(session, project, fields, types, data):
         if types[idx] != "list":
             # Only Lists use data, strip it otherwise
             data[idx] = None
+        else:
+            data[idx] = [item.strip() for item in data[idx].split(',')]
 
         if key in current_keys:
             issuekey = current_keys[key]
