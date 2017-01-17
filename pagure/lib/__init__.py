@@ -699,14 +699,17 @@ def remove_tags_obj(session, obj, tags, ticketfolder, user):
 
     removed_tags = []
     if obj.isa == 'project':
-        objtags = obj.tags
+        for objtag in obj.tags:
+            if objtag.tag in tags:
+                tag = objtag.tag
+                removed_tags.append(tag)
+                session.delete(objtag)
     else:
-        objtags = obj.tags_issues_colored
-    for objtag in objtags:
-        if objtag.tag.tag in tags:
-            tag = objtag.tag.tag
-            removed_tags.append(tag)
-            session.delete(objtag)
+        for objtag in obj.tags_issues_colored:
+            if objtag.tag.tag in tags:
+                tag = objtag.tag.tag
+                removed_tags.append(tag)
+                session.delete(objtag)
 
     if isinstance(obj, model.Issue):
         pagure.lib.git.update_git(
