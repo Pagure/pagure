@@ -1838,13 +1838,15 @@ class PagureLog(BASE):
             'project': self.project.fullname,
         }
 
-        issue_verb={'created': 'created issue',
-             'commented': 'commented on issue',
-             'close': 'closed issue',
-             'open': 'opened issue',
+        issue_verb = {
+            'created': 'created issue',
+            'commented': 'commented on issue',
+            'close': 'closed issue',
+            'open': 'opened issue',
         }
 
-        pr_verb={'created': 'created PR',
+        pr_verb = {
+            'created': 'created PR',
             'commented': 'commented on PR',
             'closed': 'closed PR',
             'merged': 'merged PR'
