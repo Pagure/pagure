@@ -15,8 +15,8 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    ''' Add a new drop-down list type to the custom fields.  This requires us
-    to store the list items in the issue_keys table. '''
+    ''' Add a new drop-down list type to the custom fields.  The list options
+    need to be stored in the issue_keys table. '''
     op.add_column('issue_keys', sa.Column('key_data', sa.Text()))
 
 
