@@ -648,7 +648,7 @@ class PagureLibtests(tests.Modeltests):
         tests.create_projects(self.session)
 
         # Add a tag to the project
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         msg = pagure.lib.add_tag_obj(
             self.session, repo,
             tags=['pagure', 'test'],
@@ -658,7 +658,7 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
 
         # Check the tags
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         self.assertEqual(repo.tags_text, ['pagure', 'test'])
 
         # Remove one of the the tag
@@ -672,7 +672,7 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
 
         # Check the tags
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         self.assertEqual(repo.tags_text, ['pagure'])
 
     @patch('pagure.lib.git.update_git')
@@ -2340,7 +2340,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(messages, ['Issue tagged with: tag'])
 
         # after
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 
         self.assertEqual(
@@ -2359,7 +2359,7 @@ class PagureLibtests(tests.Modeltests):
         )
 
         # after
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 
         self.assertEqual(
