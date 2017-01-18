@@ -1,14 +1,14 @@
 """Add custom field data
 
 Revision ID: 38581a8fbae2
-Revises: 208b0cd232ab
+Revises: 6addaed6008e
 Create Date: 2017-01-16 13:03:36.683188
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '38581a8fbae2'
-down_revision = '208b0cd232ab'
+down_revision = '6addaed6008e'
 
 from alembic import op
 import sqlalchemy as sa
