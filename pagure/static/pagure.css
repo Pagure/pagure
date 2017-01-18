@@ -3,6 +3,10 @@ html
     font-size:14px;
 }
 
+.right {
+  float: right;
+}
+
 .disabled a {
     pointer-events: none;
     color: #808080;

@@ -194,12 +194,12 @@
                     assignee=issue.assignee.username) }}">
                     {{ issue.assignee.username }}
                   </a>
-		{% if authenticated and (issue.assignee.username == g.fas_user.username) %}
-		  <button class="btn btn-sm pull-xs-right" id="drop-btn"
-			  title="drop the assignment of this issue">
-		    Drop
-		  </button>
-		{% endif %}
+                {% if authenticated and (issue.assignee.username == g.fas_user.username) %}
+                  <button class="btn btn-sm pull-xs-right" id="drop-btn"
+                      title="drop the assignment of this issue">
+                    Drop
+                  </button>
+                {% endif %}
               {% else %}
                 unassigned
               {% endif %}
@@ -245,7 +245,6 @@
                     value="{{ issue.blocks_text | join(',') }}" />
                 </fieldset>
           {% endif%}
-
 
           <fieldset class="form-group issue-metadata-display">
             <label><strong>Depends on</strong></label>
@@ -358,7 +357,7 @@
   {% endif %}
 
   {% if repo.issue_keys %}
-  <div class="col-md-4">
+  <div class="col-md-4 right">
     <div class="card">
       <div class="card-block">
 
