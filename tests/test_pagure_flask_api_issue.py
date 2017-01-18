@@ -1914,8 +1914,8 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
 
             # Check that the reviewstatus list field still has its list
             if key.name == "reviewstatus":
-                for item in ['ack', 'nack', 'needs review']:
-                    self.assertTrue(item in key.data)
+                self.assertEqual(
+                    sorted(key.data), ['ack', 'nack', 'needs review'])
 
         # No value specified while we try to create the field
         output = self.app.post(
