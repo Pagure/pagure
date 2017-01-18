@@ -1852,9 +1852,9 @@ class PagureLog(BASE):
             'merged': 'merged PR'
         }
 
-        if self.issue and self.log_type in issue_verb.keys():
+        if self.issue and self.log_type in issue_verb:
             verb = issue_verb[self.log_type]
-        elif self.pull_request and self.log_type in pr_verb.keys():
+        elif self.pull_request and self.log_type in pr_verb:
             verb = pr_verb[self.log_type]
         elif not self.pull_request and not self.issue \
                 and self.log_type == 'created':
