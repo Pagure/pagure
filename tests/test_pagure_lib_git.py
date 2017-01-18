@@ -1651,11 +1651,13 @@ index 0000000..60f7480
                     "name": "custom1",
                     "key_type": "text",
                     "value": "value1",
+                    "key_data": None,
                 },
                 {
                     "name": "custom2",
                     "key_type": "text",
                     "value": "value2",
+                    "key_data": None,
                 }
         ]
 
