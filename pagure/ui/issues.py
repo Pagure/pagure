@@ -713,6 +713,7 @@ def view_roadmap(repo, username=None, namespace=None):
     status = flask.request.args.get('status', 'Open')
     milestones = flask.request.args.getlist('milestone', None)
     tags = flask.request.args.getlist('tag', None)
+    all_ms_tags = flask.request.args.get('all_ms_tags', None)
 
     repo = flask.g.repo
 
@@ -736,7 +737,7 @@ def view_roadmap(repo, username=None, namespace=None):
         milestones=milestones or all_milestones,
         tags=tags,
         private=private,
-        status=status if status.lower()!= 'all' else None,
+        status=status if status.lower() != 'all' else None,
     )
 
     # Change from a list of issues to a dict of milestone/issues
@@ -778,6 +779,7 @@ def view_roadmap(repo, username=None, namespace=None):
         username=username,
         tag_list=tag_list,
         status=status,
+        all_ms_tags=all_ms_tags,
         milestones=all_milestones,
         requested_stones=milestones,
         issues=milestone_issues,

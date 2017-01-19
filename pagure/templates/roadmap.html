@@ -42,7 +42,7 @@
 
 <section id="flags">
   <span class="btn-group btn-group-sm issues-tagbar" role="group">
-  <span class="oi m-l-2 btn btn-nopad" data-glyph="briefcase" title="Status"></span>
+  <span class="oi m-l-2 btn btn-nopad" title="Status"></span>
     <a class="btn {%
       if status|lower in ['open', 'true'] %}btn-primary{%
       else %}btn-secondary{%
@@ -51,6 +51,7 @@
         username=username,
         namespace=repo.namespace,
         milestone=requested_stones,
+        all_ms_tags=all_ms_tags,
         tag=tags) }}" title="Filter issues by status">Open</a>
     <a class="btn {%
       if status|lower in ['closed', 'false'] %}btn-primary{%
@@ -61,6 +62,7 @@
         namespace=repo.namespace,
         tag=tags,
         milestone=requested_stones,
+        all_ms_tags=all_ms_tags,
         status='Closed') }}" title="Filter issues by status">Closed</a>
     <a class="btn {%
       if status|lower in ['all', 'none'] %}btn-primary{%
@@ -71,34 +73,61 @@
         namespace=repo.namespace,
         tag=tags,
         milestone=requested_stones,
+        all_ms_tags=all_ms_tags,
         status='all') }}" title="Filter issues by status">All</a>
+  </span>
+  <span class="btn-group btn-group-sm issues-tagbar" role="group">
+  <span class="oi m-l-2 btn btn-nopad" title="Status"></span>
+    <a class="btn {%
+      if all_ms_tags is none %}btn-primary{%
+      else %}btn-secondary{%
+      endif %} btn-sm" href="{{ url_for('view_roadmap',
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace,
+        tag=tags,
+        status=status) }}" title="Only display active milestone tags">Active Milestones</a>
+    <a class="btn {%
+      if all_ms_tags is not none %}btn-primary{%
+      else %}btn-secondary{%
+      endif %} btn-sm" href="{{ url_for('view_roadmap',
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace,
+        tag=tags,
+        all_ms_tags=true,
+        status=status) }}" title="Display all milestone tags">All Milestones</a>
   </span>
   <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
   <span class="oi m-l-2 btn btn-nopad" data-glyph="target" title="Milestones"></span>
     {% for stone in milestones %}
-      {% if stone in requested_stones %}
-        <a class="btn btn-secondary btn-sm {% if stone in requested_stones %}active{% endif %}"
-          href="{{ url_for(
-            'view_roadmap',
-            repo=repo.name,
-            username=username,
-            namespace=repo.namespace,
-            tag=tags,
-            status=status) }}"
-            title="Filter issues by milestone">
-          {{ stone }}</a>
-      {% else %}
-        <a class="btn btn-secondary btn-sm {% if stone in requested_stones%}active{% endif %}"
-          href="{{ url_for(
-            'view_roadmap',
-            repo=repo.name,
-            username=username,
-            namespace=repo.namespace,
-            milestone=stone,
-            tag=tags,
-            status=status) }}"
-            title="Filter issues by milestone">
-          {{ stone }}</a>
+      {% if (all_ms_tags is none and (stone in issues or stone in requested_stones)) or all_ms_tags is not none %}
+        {% if stone in requested_stones %}
+          <a class="btn btn-secondary btn-sm {% if stone in requested_stones and all_ms_tags %}active{% endif %}"
+           href="{{ url_for(
+              'view_roadmap',
+              repo=repo.name,
+              username=username,
+              namespace=repo.namespace,
+              tag=tags,
+              all_ms_tags=all_ms_tags,
+              status=status) }}"
+              title="Filter issues by milestone">
+            {{ stone }}</a>
+        {% else %}
+          <a class="btn btn-secondary btn-sm"
+            href="{{ url_for(
+              'view_roadmap',
+              repo=repo.name,
+              username=username,
+              namespace=repo.namespace,
+              milestone=stone,
+              tag=tags,
+              all_ms_tags=all_ms_tags,
+              status=status) }}"
+              title="Filter issues by milestone">
+            {{ stone }}</a>
+        {% endif %}
       {% endif %}
     {% endfor %}
   </span>
@@ -106,22 +135,24 @@
   <span class="oi m-l-2 btn btn-nopad" data-glyph="tag" title="Tags"></span>
     {% for tag in tag_list %}
       {% if tag in tags %}
-        <a class="btn btn-secondary btn-sm {% if tag in tags%}active{% endif %}"
+        <a class="btn btn-secondary btn-sm {% if tag in tags %}active{% endif %}"
           href="{{ url_for('view_roadmap',
               repo=repo.name,
               username=username,
               namespace=repo.namespace,
               milestone=requested_stones,
+              all_ms_tags=all_ms_tags,
               status=status) }}"
               title="Filter issues by tag">
       {% else %}
-        <a class="btn btn-secondary btn-sm {% if tag in tags%}active{%endif%}"
+        <a class="btn btn-secondary btn-sm {% if tag in tags %}active{% endif %}"
           href="{{ url_for('view_roadmap',
               repo=repo.name,
               username=username,
               namespace=repo.namespace,
               status=status,
               tag=tag,
+              all_ms_tags=all_ms_tags,
               milestone=requested_stones) }}"
               title="Filter issues by tag">
       {% endif %}
