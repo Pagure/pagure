@@ -101,9 +101,9 @@
   <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
   <span class="oi m-l-2 btn btn-nopad" data-glyph="target" title="Milestones"></span>
     {% for stone in milestones %}
-      {% if (all_ms_tags is none and (stone in issues or stone in requested_stones)) or all_ms_tags is not none %}
+      {% if (all_ms_tags is none and (stone in active_milestones or stone in requested_stones)) or all_ms_tags is not none %}
         {% if stone in requested_stones %}
-          <a class="btn btn-secondary btn-sm {% if stone in requested_stones and all_ms_tags %}active{% endif %}"
+          <a class="btn btn-secondary btn-sm active"
            href="{{ url_for(
               'view_roadmap',
               repo=repo.name,
@@ -111,6 +111,7 @@
               namespace=repo.namespace,
               tag=tags,
               all_ms_tags=all_ms_tags,
+              active_milestones=active_milestones,
               status=status) }}"
               title="Filter issues by milestone">
             {{ stone }}</a>
@@ -124,6 +125,7 @@
               milestone=stone,
               tag=tags,
               all_ms_tags=all_ms_tags,
+              active_milestones=active_milestones,
               status=status) }}"
               title="Filter issues by milestone">
             {{ stone }}</a>
@@ -142,6 +144,7 @@
               namespace=repo.namespace,
               milestone=requested_stones,
               all_ms_tags=all_ms_tags,
+              active_milestones=active_milestones,
               status=status) }}"
               title="Filter issues by tag">
       {% else %}
@@ -153,6 +156,7 @@
               status=status,
               tag=tag,
               all_ms_tags=all_ms_tags,
+              active_milestones=active_milestones,
               milestone=requested_stones) }}"
               title="Filter issues by tag">
       {% endif %}
