@@ -713,7 +713,7 @@ def view_roadmap(repo, username=None, namespace=None):
     status = flask.request.args.get('status', 'Open')
     milestones = flask.request.args.getlist('milestone', None)
     tags = flask.request.args.getlist('tag', None)
-    all_ms_tags = flask.request.args.get('all_ms_tags', None)
+    all_stones = flask.request.args.get('all_stones')
     active_milestones = flask.request.args.getlist('active_milestones', None)
 
     repo = flask.g.repo
@@ -775,7 +775,7 @@ def view_roadmap(repo, username=None, namespace=None):
         all_milestones.insert(cnt, all_milestones.pop(index))
 
     milestones_list = active_milestones
-    if all_ms_tags:
+    if all_stones:
         milestones_list = all_milestones
 
     return flask.render_template(
@@ -785,7 +785,7 @@ def view_roadmap(repo, username=None, namespace=None):
         username=username,
         tag_list=tag_list,
         status=status,
-        all_ms_tags=all_ms_tags,
+        all_stones=all_stones,
         milestones=milestones_list,
         requested_stones=milestones,
         issues=milestone_issues,

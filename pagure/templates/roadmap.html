@@ -51,7 +51,7 @@
         username=username,
         namespace=repo.namespace,
         milestone=requested_stones,
-        all_ms_tags=all_ms_tags,
+        all_stones=all_stones,
         tag=tags) }}" title="Filter issues by status">Open</a>
     <a class="btn {%
       if status|lower in ['closed', 'false'] %}btn-primary{%
@@ -62,7 +62,7 @@
         namespace=repo.namespace,
         tag=tags,
         milestone=requested_stones,
-        all_ms_tags=all_ms_tags,
+        all_stones=all_stones,
         status='Closed') }}" title="Filter issues by status">Closed</a>
     <a class="btn {%
       if status|lower in ['all', 'none'] %}btn-primary{%
@@ -73,13 +73,13 @@
         namespace=repo.namespace,
         tag=tags,
         milestone=requested_stones,
-        all_ms_tags=all_ms_tags,
+        all_stones=all_stones,
         status='all') }}" title="Filter issues by status">All</a>
   </span>
   <span class="btn-group btn-group-sm issues-tagbar" role="group">
   <span class="oi m-l-2 btn btn-nopad" title="Status"></span>
     <a class="btn {%
-      if all_ms_tags is none %}btn-primary{%
+      if all_stones is none %}btn-primary{%
       else %}btn-secondary{%
       endif %} btn-sm" href="{{ url_for('view_roadmap',
         repo=repo.name,
@@ -88,14 +88,14 @@
         tag=tags,
         status=status) }}" title="Only display active milestone tags">Active Milestones</a>
     <a class="btn {%
-      if all_ms_tags is not none %}btn-primary{%
+      if all_stones is not none %}btn-primary{%
       else %}btn-secondary{%
       endif %} btn-sm" href="{{ url_for('view_roadmap',
         repo=repo.name,
         username=username,
         namespace=repo.namespace,
         tag=tags,
-        all_ms_tags=true,
+        all_stones=true,
         status=status) }}" title="Display all milestone tags">All Milestones</a>
   </span>
   <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
@@ -109,7 +109,7 @@
             username=username,
             namespace=repo.namespace,
             tag=tags,
-            all_ms_tags=all_ms_tags,
+            all_stones=all_stones,
             status=status) }}"
             title="Filter issues by milestone">
           {{ stone }}</a>
@@ -122,7 +122,7 @@
             namespace=repo.namespace,
             milestone=stone,
             tag=tags,
-            all_ms_tags=all_ms_tags,
+            all_stones=all_stones,
             status=status) }}"
             title="Filter issues by milestone">
           {{ stone }}</a>
@@ -139,7 +139,7 @@
               username=username,
               namespace=repo.namespace,
               milestone=requested_stones,
-              all_ms_tags=all_ms_tags,
+              all_stones=all_stones,
               status=status) }}"
               title="Filter issues by tag">
       {% else %}
@@ -150,7 +150,7 @@
               namespace=repo.namespace,
               status=status,
               tag=tag,
-              all_ms_tags=all_ms_tags,
+              all_stones=all_stones,
               milestone=requested_stones) }}"
               title="Filter issues by tag">
       {% endif %}
