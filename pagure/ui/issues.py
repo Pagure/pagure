@@ -731,6 +731,7 @@ def view_roadmap(repo, username=None, namespace=None):
         private = None
 
     all_milestones = sorted(list(repo.milestones.keys()))
+    active_milestones = pagure.lib.get_active_milestones(SESSION, repo)
 
     issues = pagure.lib.search_issues(
         SESSION,
@@ -773,19 +774,9 @@ def view_roadmap(repo, username=None, namespace=None):
         cnt = len(all_milestones)
         all_milestones.insert(cnt, all_milestones.pop(index))
 
-    if len(active_milestones) == 0 and all_ms_tags is None:
-        # We don't have any requested active milestones, so grab a fresh list.
-        # Get all the active tickets regardless what tags/milestones were
-        # requested.
-        active_issues = pagure.lib.search_issues(
-            SESSION,
-            repo,
-            milestones=all_milestones,
-            private=private,
-            status=status if status.lower() != 'all' else None,
-        )
-        for issue in active_issues:
-            active_milestones.append(issue.milestone)
+    milestones_list = active_milestones
+    if all_ms_tags:
+        milestones_list = all_milestones
 
     return flask.render_template(
         'roadmap.html',
@@ -795,8 +786,7 @@ def view_roadmap(repo, username=None, namespace=None):
         tag_list=tag_list,
         status=status,
         all_ms_tags=all_ms_tags,
-        milestones=all_milestones,
-        active_milestones=active_milestones,
+        milestones=milestones_list,
         requested_stones=milestones,
         issues=milestone_issues,
         tags=tags,

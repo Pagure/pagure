@@ -3656,3 +3656,20 @@ def get_custom_key(session, project, keyname):
     )
 
     return query.first()
+
+
+def get_active_milestones(session, project):
+    ''' Returns the list of all the active milestones for a given project.
+    '''
+
+    query = session.query(
+        model.Issue.milestone
+    ).filter(
+        model.Issue.project_id == project.id
+    ).filter(
+        model.Issue.status == 'Open'
+    ).filter(
+        model.Issue.milestone.isnot(None)
+    )
+
+    return sorted([item[0] for item in query.distinct()])
