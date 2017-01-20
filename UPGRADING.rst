@@ -1,6 +1,16 @@
 Upgrading Pagure
 ================
 
+From 2.10 to 2.11
+----------------
+The 2.10 releases brings some adjustments to the database scheme.
+
+* Create the new DB tables and the new status field using the ``createdb.py``
+    script.
+
+* Update the database schame using alembic: ``alembic upgrade head``
+
+
 From 2.9 to 2.10
 ----------------
 

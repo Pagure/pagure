@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            2.10.1
+Version:            2.11
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -300,6 +300,83 @@ install -m 644 pagure-ci/pagure_ci.service \
 
 
 %changelog
+* Fri Jan 20 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.11-1
+- Update to 2.11
+- Fix the forked repo text on the user's PR page (Rahul Bajaj)
+- Display the number of subscribers subscribed to the ticket
+- Add an attachments section to tickets (Mark Reynolds)
+- Small fixes around the git blame feature
+- Add an `Add group` button on page listing the groups (Rahul Bajaj)
+- Move the `My Issues` and `My Pull-requests` links under the user's menu
+- Document the FORK_FOLDER configuration key as deprecated
+- Display the subscribers to PR in the same way to display them on ticket
+- Adjust the wording when showing a merge commit
+- Ensure the last_updated field is always properly updated (Mark Reynolds)
+- Fix decoding files when we present or blame them
+- Disable the markdown extensions nl2br on README files
+- Make issue reports public
+- Only display modified time as the modifying user can not be determined (Mark
+  Reynolds)
+- Add a new API endpoint returning information about a specific project
+- Add a button allowing dropping of assignments for an issue easily (Paul W.
+  Frields)
+- Make attachments of ticket downloadable (Mark Reynolds)
+- Make patch/diff render nicely when viewed attached to a ticket (Mark Reynolds)
+- Filter out the currrent ticket in the drop-down list for the blocker/depending
+  fields (Eric Barbour)
+- Move the logging of the commit as activity to its own service: pagure_logcom
+- Add a new API endpoint to set/reset custom fields on tickets
+- Introduce the USER_NAMESPACE configuration key allowing to put the project on
+  the user's namespace by default
+- Fix sending notifications about pull-requests to people watching a project
+- Fix the list of blacklisted projects
+- Inform the user when they try to create a new group using a display name
+  already used (Rahul Bajaj)
+- Fix importing the milestones into the project when loading from the git repo
+  (Clement Verna)
+- Add a button to create a default set of close status (as we have a default set
+  of priorities)
+- Have pagure bail with an error message if the OpenID server did not return an
+  username
+- Let the error email use the FROM_EMAIL address set in the configuration file
+- Fix theprogress bar shown when listing issues (Gaurav Kumar)
+- Replace our current tags by colored one (Mark Reynolds)
+- Make the roadmap page use the colored tag (Mark Reynolds)
+- Fix the tag of Open pull-request when listing all the pull-requests (Rahul
+  Bajaj)
+- Remove the 'pagure.lib.model.drop_tables' from test/__init__.py file (Amol
+  Kahat)
+- Fix the headers of the table listing all the pull-request
+- Raise an exception when a PR was made against a branch that no longer exists
+- Document what to do when pull-requests are not available in a troubleshooting
+  section of the documentation
+- Send notification upon closing tickets
+- Fix re-setting the close_status to None it when re-opening a ticket
+- Fix linking to the tabs in the pull-request page (cep)
+- Adjust the rundocserver utility script to have the same arguments as runserver
+- Ensure the filtering by author remains when changing the status filter on PR
+  list (Rahul Bajaj)
+- Improve the page/process to create a new API token (Pradeep CE)
+- Prevent re-uploading a file with the same name
+- Improve the roadmap page (Mark Reynolds)
+- Improve the `My Issues` page (Mark Reynolds)
+- Fix home page 'open issues' links for namespaced projects (Adam Williamson)
+- Fix logging who did the action
+- Return a nicer error message to the user when an error occurs with a remote
+  pull-request
+- Make interacting with the different git repos a locked process to avoid
+  lost/orphan commits
+- Update API doc for api_view_user (Clement Verna)
+- Dont return 404 when viewing empty files (Pradeep CE (cep))
+- Do not automatically update the last_updated or updated_on fields
+- Make alembic use the DB url specified in the configuration file of pagure
+- Only connect to the smtp server if we're going to send an email
+- Add a type list to the custom fields (allows restricting the options) (Mark
+  Reynolds)
+- Fix displaying non-ascii milestones
+- Add the possibility to view all the milestones vs only the active ones (Mark
+  Reynolds)
+
 * Sun Dec 04 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.10.1-1
 - Update to 2.10.1
 - Clean up the JS code in the settings page (Lubomír Sedlář)
