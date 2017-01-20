@@ -11,6 +11,8 @@ python-fedora-flask
 python-flask
 python-flask-wtf
 python-flask-multistatic
+python-filelock
+python-bcrypt
 python-jinja2
 python-markdown
 python-munch
