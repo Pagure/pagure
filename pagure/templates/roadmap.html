@@ -79,7 +79,7 @@
   <span class="btn-group btn-group-sm issues-tagbar" role="group">
   <span class="oi m-l-2 btn btn-nopad" title="Status"></span>
     <a class="btn {%
-      if all_stones is none %}btn-primary{%
+      if not all_stones %}btn-primary{%
       else %}btn-secondary{%
       endif %} btn-sm" href="{{ url_for('view_roadmap',
         repo=repo.name,
@@ -88,7 +88,7 @@
         tag=tags,
         status=status) }}" title="Only display active milestone tags">Active Milestones</a>
     <a class="btn {%
-      if all_stones is not none %}btn-primary{%
+      if all_stones %}btn-primary{%
       else %}btn-secondary{%
       endif %} btn-sm" href="{{ url_for('view_roadmap',
         repo=repo.name,
