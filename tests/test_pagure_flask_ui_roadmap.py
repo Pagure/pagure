@@ -487,7 +487,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             output.data.count(u'<span class="label label-default">#'), 4)
 
         # test the roadmap view for all milestones
-        output = self.app.get('/test/roadmap?status=All')
+        output = self.app.get('/test/roadmap?all_stones=True&status=All')
         self.assertEqual(output.status_code, 200)
         self.assertIn(u'<th>v1.0', output.data)
         self.assertIn(u'<th>v2.0', output.data)
@@ -510,7 +510,8 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
             output.data.count(u'<span class="label label-default">#'), 0)
 
         # test the roadmap view for a specific milestone - closed
-        output = self.app.get('/test/roadmap?milestone=v1.0&status=All')
+        output = self.app.get(
+            '/test/roadmap?milestone=v1.0&status=All&all_stones=True')
         self.assertEqual(output.status_code, 200)
         self.assertIn(u'<th>v1.0', output.data)
         self.assertEqual(
