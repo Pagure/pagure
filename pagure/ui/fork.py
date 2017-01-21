@@ -434,7 +434,7 @@ def request_pull_edit(repo, requestid, username=None, namespace=None):
     if request.status != 'Open':
         flask.abort(400, 'Pull-request is already closed')
 
-    if not flask.g.repo_admin \
+    if not flask.g.repo_committer \
             and flask.g.fas_user.username != request.user.username:
         flask.abort(403, 'You are not allowed to edit this pull-request')
 
@@ -619,7 +619,7 @@ def pull_request_drop_comment(
 
             if (flask.g.fas_user.username != comment.user.username
                     or comment.parent.status is False) \
-                    and not flask.g.repo_admin:
+                    and not flask.g.repo_committer:
                 flask.abort(
                     403,
                     'You are not allowed to remove this comment from '
@@ -679,7 +679,7 @@ def pull_request_edit_comment(
 
     if (flask.g.fas_user.username != comment.user.username
             or comment.parent.status != 'Open') \
-            and not flask.g.repo_admin:
+            and not flask.g.repo_committer:
         flask.abort(403, 'You are not allowed to edit the comment')
 
     form = pagure.forms.EditCommentForm()
@@ -771,7 +771,7 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
     if not request:
         flask.abort(404, 'Pull-request not found')
 
-    if not flask.g.repo_admin:
+    if not flask.g.repo_committer:
         flask.abort(
             403,
             'You are not allowed to merge pull-request for this project')
@@ -844,7 +844,7 @@ def cancel_request_pull(repo, requestid, username=None, namespace=None):
         if not request:
             flask.abort(404, 'Pull-request not found')
 
-        if not flask.g.repo_admin \
+        if not flask.g.repo_committer \
                 and not flask.g.fas_user.username == request.user.username:
             flask.abort(
                 403,
@@ -904,7 +904,7 @@ def set_assignee_requests(repo, requestid, username=None, namespace=None):
     if request.status != 'Open':
         flask.abort(403, 'Pull-request closed')
 
-    if not flask.g.repo_admin:
+    if not flask.g.repo_committer:
         flask.abort(403, 'You are not allowed to assign this pull-request')
 
     form = pagure.forms.ConfirmationForm()
@@ -1044,10 +1044,10 @@ def new_request_pull(
             'view_repo', username=username, repo=repo.name,
             namespace=namespace))
 
-    repo_admin = flask.g.repo_admin
+    repo_committer = flask.g.repo_committer
 
     form = pagure.forms.RequestPullForm()
-    if form.validate_on_submit() and repo_admin:
+    if form.validate_on_submit() and repo_committer:
         try:
             if repo.settings.get(
                     'Enforce_signed-off_commits_in_pull-request', False):
@@ -1108,7 +1108,7 @@ def new_request_pull(
                     'We could not save all the info, please try again',
                     'error')
 
-    if not repo_admin:
+    if not flask.g.repo_committer:
         form = None
 
     # if the pull request we are creating only has one commit,
@@ -1176,8 +1176,6 @@ def new_remote_request_pull(repo, username=None, namespace=None):
 
     parentpath = flask.g.reponame
     orig_repo = flask.g.repo_obj
-
-    repo_admin = flask.g.repo_admin
 
     form = pagure.forms.RemoteRequestPullForm()
     if form.validate_on_submit():

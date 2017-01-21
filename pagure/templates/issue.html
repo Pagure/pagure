@@ -148,7 +148,7 @@
             </h2>
           </fieldset>
 
-          {% if authenticated and (g.repo_admin or g.fas_user.username == issue.user.user) %}
+          {% if authenticated and (g.repo_user or g.fas_user.username == issue.user.user) %}
             {{ render_bootstrap_field(form.status,
               formclass="issue-metadata-form") }}
             {{ render_bootstrap_field(form.close_status,
@@ -173,7 +173,7 @@
               </h4>
           </fieldset>
 
-          {% if authenticated and g.repo_admin %}
+          {% if authenticated and g.repo_user %}
           <fieldset class="form-group issue-metadata-form">
             <label for="tag"><strong>Tags</strong></label>
              <input id="tag" type="text" placeholder="tag1, tag2" name="tag"
@@ -203,7 +203,7 @@
               {% else %}
                 unassigned
               {% endif %}
-              {% if authenticated and g.repo_admin and issue.status|lower == 'open'
+              {% if authenticated and g.repo_user and issue.status|lower == 'open'
                 and (not issue.assignee or issue.assignee.username != g.fas_user.username) %}
               <button class="btn btn-sm pull-xs-right" id="take-btn"
                 title="assign this issue to you">
@@ -213,7 +213,7 @@
             </div>
           </fieldset>
 
-          {% if authenticated and g.repo_admin %}
+          {% if authenticated and g.repo_user %}
           <fieldset class="form-group issue-metadata-form">
             <label for="assignee"><strong>Assignee</strong></label>
             <input class="form-control" name="assignee" id="assignee"
@@ -237,7 +237,7 @@
             </div>
           </fieldset>
 
-          {% if authenticated and g.repo_admin %}
+          {% if authenticated and g.repo_user %}
                 <fieldset class="form-group issue-metadata-form">
                   <label for="blocks"><strong>Blocked</strong></label>
                   <input class="form-control" id="blocks" type="text"
@@ -261,7 +261,7 @@
             </div>
           </fieldset>
 
-          {% if authenticated and g.repo_admin %}
+          {% if authenticated and g.repo_user %}
             <fieldset class="form-group issue-metadata-form">
               <label for="depends"><strong>Depends on</strong></label>
               <input class="form-control" id="depends" type="text"
@@ -279,7 +279,7 @@
               {% endif %}
             </div>
           </fieldset>
-          {% if authenticated and g.repo_admin %}
+          {% if authenticated and g.repo_user %}
             {{ render_bootstrap_field(form.priority,
               formclass="issue-metadata-form") }}
           {% endif%}
@@ -316,7 +316,7 @@
           <a class="btn btn-secondary issue-metadata-form editmetadatatoggle">
             Cancel
           </a>
-          {% if authenticated and (g.repo_admin or g.fas_user.username == issue.user.user) %}
+          {% if authenticated and (g.repo_user or g.fas_user.username == issue.user.user) %}
             <a class="btn btn-secondary issue-metadata-display editmetadatatoggle">
               Edit Metadata
             </a>
@@ -575,7 +575,7 @@ $(document).ready(function() {
     return false;
   };
 
-  {% if g.repo_admin %}
+  {% if g.repo_user %}
   $('#closeticket').click(function(event){
     event.preventDefault();
     var closeForm = $('<form>', {
@@ -949,7 +949,7 @@ $( document ).ready(function() {
   );
 
   {% if authenticated and (
-    g.repo_admin
+    g.repo_user
     or issue.user.user == g.fas_user.username
     or issue.assignee.user == g.fas_user.username) %}
   setup_btn_take_drop();

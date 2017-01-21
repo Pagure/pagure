@@ -15,7 +15,7 @@ from sqlalchemy.exc import SQLAlchemyError
 import pagure
 import pagure.exceptions
 import pagure.lib
-from pagure import APP, SESSION, is_repo_admin
+from pagure import APP, SESSION, is_repo_committer
 from pagure.api import API, api_method, api_login_required, APIERROR
 
 
@@ -327,7 +327,7 @@ def api_pull_request_merge(repo, requestid, username=None, namespace=None):
     if not request:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
 
-    if not is_repo_admin(repo):
+    if not is_repo_committer(repo):
         raise pagure.exceptions.APIError(403, error_code=APIERROR.ENOPRCLOSE)
 
     if repo.settings.get('Only_assignee_can_merge_pull-request', False):
@@ -414,7 +414,7 @@ def api_pull_request_close(repo, requestid, username=None, namespace=None):
     if not request:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOREQ)
 
-    if not is_repo_admin(repo):
+    if not is_repo_committer(repo):
         raise pagure.exceptions.APIError(403, error_code=APIERROR.ENOPRCLOSE)
 
     try:

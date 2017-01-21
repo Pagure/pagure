@@ -30,6 +30,15 @@
         <input class="form-control" name="group" id="group"
           placeholder="Start typing to search groups"
           value="" />
+        <select class="form-control" id="access" name="access">
+          {% for access in access_levels %}
+            {% if access == 'admin' %}
+              <option selected value="{{ access }}"> {{ access }} </option>
+            {% else %}
+              <option value="{{ access }}"> {{ access }} </option>
+            {% endif %}
+          {% endfor %}
+        </select>
       </fieldset>
 
       <p class="buttons indent">
@@ -68,6 +77,11 @@ $( document ).ready(function() {
         );
       }
   });
+
+  $('#access').selectize({
+      sortField: 'text',
+  });
+
 });
 </script>
 {% endblock %}

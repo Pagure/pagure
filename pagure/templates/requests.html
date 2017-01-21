@@ -251,7 +251,7 @@ $(function() {
   });
 });
 
-{% if authenticated and g.repo_admin %}
+{% if authenticated and g.repo_committer %}
 $(function() {
   $.ajax({
     url: '{{ url_for("internal_ns.get_pull_request_ready_branch") }}' ,

@@ -16,9 +16,9 @@ from sqlalchemy.exc import SQLAlchemyError
 import pagure
 import pagure.exceptions
 import pagure.lib
-from pagure import (
-    APP, SESSION, is_repo_admin, api_authenticated, urlpattern
-)
+
+from pagure import APP, SESSION, is_repo_committer, api_authenticated
+
 from pagure.api import (
     API, api_method, api_login_required, api_login_optional, APIERROR
 )
@@ -288,8 +288,8 @@ def api_view_issues(repo, username=None, namespace=None):
             raise pagure.exceptions.APIError(
                 401, error_code=APIERROR.EINVALIDTOK)
         private = flask.g.fas_user.username
-    # If user is repo admin, show all tickets included the private ones
-    if is_repo_admin(repo):
+    # If user is repo committer, show all tickets included the private ones
+    if is_repo_committer(repo):
         private = None
 
     if status is not None:
@@ -426,7 +426,7 @@ def api_view_issue(repo, issueid, username=None, namespace=None):
             raise pagure.exceptions.APIError(
                 401, error_code=APIERROR.EINVALIDTOK)
 
-    if issue.private and not is_repo_admin(repo) \
+    if issue.private and not is_repo_committer(repo) \
             and (not api_authenticated() or
                  not issue.user.user == flask.g.fas_user.username):
         raise pagure.exceptions.APIError(
@@ -513,7 +513,7 @@ def api_view_issue_comment(
             raise pagure.exceptions.APIError(
                 401, error_code=APIERROR.EINVALIDTOK)
 
-    if issue.private and not is_repo_admin(issue.project) \
+    if issue.private and not is_repo_committer(issue.project) \
             and (not api_authenticated() or
                  not issue.user.user == flask.g.fas_user.username):
         raise pagure.exceptions.APIError(
@@ -604,7 +604,7 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
     if issue is None or issue.project != repo:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOISSUE)
 
-    if issue.private and not is_repo_admin(repo) \
+    if issue.private and not is_repo_committer(repo) \
             and (not api_authenticated() or
                  not issue.user.user == flask.g.fas_user.username):
         raise pagure.exceptions.APIError(
@@ -731,7 +731,7 @@ def api_comment_issue(repo, issueid, username=None, namespace=None):
     if issue is None or issue.project != repo:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOISSUE)
 
-    if issue.private and not is_repo_admin(repo) \
+    if issue.private and not is_repo_committer(repo) \
             and (not api_authenticated() or
                  not issue.user.user == flask.g.fas_user.username):
         raise pagure.exceptions.APIError(
@@ -830,7 +830,7 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
     if issue is None or issue.project != repo:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOISSUE)
 
-    if issue.private and not is_repo_admin(repo) \
+    if issue.private and not is_repo_committer(repo) \
             and (not api_authenticated() or
                  not issue.user.user == flask.g.fas_user.username):
         raise pagure.exceptions.APIError(

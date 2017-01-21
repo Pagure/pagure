@@ -88,7 +88,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
     if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
 
-    if issue.private and not flask.g.repo_admin \
+    if issue.private and not flask.g.repo_committer \
             and (not authenticated() or
                  not issue.user.user == flask.g.fas_user.username):
         flask.abort(
@@ -110,8 +110,6 @@ def update_issue(repo, issueid, username=None, namespace=None):
     )
 
     if form.validate_on_submit():
-        repo_admin = flask.g.repo_admin
-
         if flask.request.form.get('drop_comment'):
             commentid = flask.request.form.get('drop_comment')
 
@@ -122,7 +120,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
 
             if (flask.g.fas_user.username != comment.user.username
                     or comment.parent.status != 'Open') \
-                    and not flask.g.repo_admin:
+                    and not flask.g.repo_committer:
                 flask.abort(
                     403,
                     'You are not allowed to remove this comment from '
@@ -212,7 +210,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
             # The status field can be updated by both the admin and the
             # person who opened the ticket.
             # Update status
-            if repo_admin or flask.g.fas_user.username == issue.user.user:
+            if flask.g.repo_user or flask.g.fas_user.username == issue.user.user:
                 if new_status in status:
                     msgs = pagure.lib.edit_issue(
                         SESSION,
@@ -231,7 +229,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
             # All the other meta-data can be changed only by admins
             # while other field will be missing for non-admin and thus
             # reset if we let them
-            if repo_admin:
+            if flask.g.repo_user:
                 # Adjust (add/remove) tags
                 msgs = pagure.lib.update_tags(
                     SESSION, issue, tags,
@@ -240,11 +238,9 @@ def update_issue(repo, issueid, username=None, namespace=None):
                 )
                 messages = messages.union(set(msgs))
 
-            # The meta-data can be changed by admins and issue creator,
-            # where issue creators can only change status of their issue while
-            # other fields will be missing for non-admin and thus reset if we
-            # let them
-            if repo_admin:
+            # The meta-data can only be changed by admins, which means they
+            # will be missing for non-admin and thus reset if we let them
+            if flask.g.repo_user:
                 # Assign or update assignee of the ticket
                 message = pagure.lib.add_issue_assignee(
                     SESSION,
@@ -624,7 +620,7 @@ def view_issues(repo, username=None, namespace=None):
     if authenticated():
         private = flask.g.fas_user.username
     # If user is repo admin, show all tickets included the private ones
-    if flask.g.repo_admin:
+    if flask.g.repo_committer:
         private = None
 
     if str(status).lower() in ['all']:
@@ -745,8 +741,9 @@ def view_roadmap(repo, username=None, namespace=None):
     # If user is authenticated, show him/her his/her private tickets
     if authenticated():
         private = flask.g.fas_user.username
-    # If user is repo admin, show all tickets included the private ones
-    if flask.g.repo_admin:
+
+    # If user is repo committer, show all tickets included the private ones
+    if flask.g.repo_committer:
         private = None
 
     all_milestones = sorted(list(repo.milestones.keys()))
@@ -961,7 +958,7 @@ def view_issue(repo, issueid, username=None, namespace=None):
     if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
 
-    if issue.private and not flask.g.repo_admin \
+    if issue.private and not flask.g.repo_committer \
             and (not authenticated() or
                  not issue.user.user == flask.g.fas_user.username):
         flask.abort(
@@ -1002,6 +999,7 @@ def view_issue(repo, issueid, username=None, namespace=None):
         knowns_keys=knowns_keys,
         subscribers=pagure.lib.get_watch_list(SESSION, issue),
         attachments=issue.attachments,
+        subscribed=subscribed,
     )
 
 
@@ -1025,7 +1023,7 @@ def delete_issue(repo, issueid, username=None, namespace=None):
     if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
 
-    if not flask.g.repo_admin:
+    if not flask.g.repo_committer:
         flask.abort(
             403,
             'You are not allowed to remove tickets of this project')
@@ -1083,7 +1081,7 @@ def edit_issue(repo, issueid, username=None, namespace=None):
     if issue is None or issue.project != repo:
         flask.abort(404, 'Issue not found')
 
-    if not (flask.g.repo_admin
+    if not (flask.g.repo_committer
             or flask.g.fas_user.username == issue.user.username):
         flask.abort(
             403, 'You are not allowed to edit issues for this project')
@@ -1368,7 +1366,7 @@ def edit_comment_issue(
 
     if (flask.g.fas_user.username != comment.user.username
             or comment.parent.status != 'Open') \
-            and not flask.g.repo_admin:
+            and not flask.g.repo_user:
         flask.abort(403, 'You are not allowed to edit this comment')
 
     form = pagure.forms.EditCommentForm()

@@ -84,7 +84,7 @@
                     username=username,
                     namespace=repo.namespace,
                     branch_to=head, branch_from=branchname or 'master') }}">
-              {% if g.repo_admin %}Request pull{% else %}Compare{% endif %}
+              {% if g.repo_committer %}Request pull{% else %}Compare{% endif %}
             </a>
           </div>
       {% endif %}

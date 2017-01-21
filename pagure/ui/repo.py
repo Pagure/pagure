@@ -1077,11 +1077,53 @@ def view_settings(repo, username=None, namespace=None):
     if flask.request.method == 'GET' and branchname:
         branches_form.branches.data = branchname
 
+    access_users = {
+        'admin': pagure.lib.get_project_users(
+            SESSION,
+            project_obj=repo,
+            access='admin',
+            combine=False
+        ),
+        'commit': pagure.lib.get_project_users(
+            SESSION,
+            project_obj=repo,
+            access='commit',
+            combine=False
+        ),
+        'ticket': pagure.lib.get_project_users(
+            SESSION,
+            project_obj=repo,
+            access='ticket',
+            combine=False
+        ),
+    }
+    access_groups = {
+        'admin': pagure.lib.get_project_groups(
+            SESSION,
+            project_obj=repo,
+            access='admin',
+            combine=False
+        ),
+        'commit': pagure.lib.get_project_groups(
+            SESSION,
+            project_obj=repo,
+            access='commit',
+            combine=False
+        ),
+        'ticket': pagure.lib.get_project_groups(
+            SESSION,
+            project_obj=repo,
+            access='ticket',
+            combine=False
+        ),
+    }
     return flask.render_template(
         'settings.html',
         select='settings',
         username=username,
         repo=repo,
+        access_users=access_users,
+        access_groups=access_groups,
         form=form,
         tag_form=tag_form,
         branches_form=branches_form,
@@ -1612,8 +1654,7 @@ def remove_user(repo, userid, username=None, namespace=None):
         userids = [str(user.id) for user in repo.users]
 
         if str(userid) not in userids:
-            flask.flash(
-                'User does not have commit rights, or cannot have them removed', 'error')
+            flask.flash('User does not have any access on the repo', 'error')
             return flask.redirect(flask.url_for(
                 '.view_settings', repo=repo.name, username=username,
                 namespace=repo.namespace,)
@@ -1743,6 +1784,7 @@ def add_user(repo, username=None, namespace=None):
                 SESSION, repo,
                 new_user=form.user.data,
                 user=flask.g.fas_user.username,
+                access=form.access.data,
             )
             SESSION.commit()
             pagure.lib.git.generate_gitolite_acls()
@@ -1758,11 +1800,13 @@ def add_user(repo, username=None, namespace=None):
             APP.logger.exception(err)
             flask.flash('User could not be added', 'error')
 
+    access_levels = pagure.lib.get_access_levels(SESSION)
     return flask.render_template(
         'add_user.html',
         form=form,
         username=username,
         repo=repo,
+        access_levels=access_levels,
     )
 
 
@@ -1866,6 +1910,7 @@ def add_group_project(repo, username=None, namespace=None):
                 SESSION, repo,
                 new_group=form.group.data,
                 user=flask.g.fas_user.username,
+                access=form.access.data,
                 create=not pagure.APP.config.get('ENABLE_GROUP_MNGT', False),
                 is_admin=pagure.is_admin(),
             )
@@ -1883,11 +1928,13 @@ def add_group_project(repo, username=None, namespace=None):
             APP.logger.exception(err)
             flask.flash('Group could not be added', 'error')
 
+    access_levels = pagure.lib.get_access_levels(SESSION)
     return flask.render_template(
         'add_group_project.html',
         form=form,
         username=username,
         repo=repo,
+        access_levels=access_levels,
     )
 
 
@@ -1981,7 +2028,7 @@ def add_token(repo, username=None, namespace=None):
 
     repo = flask.g.repo
 
-    if not flask.g.repo_admin:
+    if not flask.g.repo_committer:
         flask.abort(
             403,
             'You are not allowed to change the settings for this project')
@@ -2177,7 +2224,7 @@ def delete_branch(repo, branchname, username=None, namespace=None):
     reponame = flask.g.reponame
     repo_obj = flask.g.repo_obj
 
-    if not flask.g.repo_admin:
+    if not flask.g.repo_committer:
         flask.abort(
             403,
             'You are not allowed to delete branch for this project')

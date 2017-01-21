@@ -4,7 +4,7 @@
 {% block title %}
   {%- if pull_request -%}
     PR#{{ requestid }}: {{ pull_request.title | noJS(ignore="img")}}
-  {%- elif form and (g.repo_admin or remote_git) -%}
+  {%- elif form and (g.repo_committer or remote_git) -%}
     Create new Pull Request for {{ branch_to }}
   {%- elif origin == 'compare_commits' -%}
     Diff from {{ commit1 }} to {{ commit2 }}
@@ -35,10 +35,10 @@
   {% endif %}
   {{ pull_request.title | noJS(ignore="img") | safe}}
   {% if authenticated and (g.fas_user.username == pull_request.user.username
-    or g.repo_admin) and pull_request.status == 'Open'%}
+    or g.repo_committer) and pull_request.status == 'Open'%}
      <span class="pull-xs-right">
      {% if pull_request.status == 'Open' and authenticated and
-        (g.repo_admin or g.fas_user.username == pull_request.user.username) %}
+        (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
         <form style="display:inline;" action="{{ url_for(
             'cancel_request_pull', username=username,
             namespace=repo.namespace,
@@ -54,7 +54,7 @@
                 requestid=requestid) }}"
                title="Update title"><span class="oi" data-glyph="pencil"></span></a>
      {% if pull_request.status == 'Open' and authenticated and
-        (g.repo_admin or g.fas_user.username == pull_request.user.username) %}
+        (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
         {{ mergeform.csrf_token }}
             <button type="submit" value="Close" id="cancel_pr"
                     class="btn btn-danger btn-sm" title="Close PR without merging it">
@@ -63,7 +63,7 @@
     {% endif %}
           </div>
     {% if pull_request.status == 'Open' and authenticated and
-        (g.repo_admin or g.fas_user.username == pull_request.user.username) %}
+        (g.repo_committer or g.fas_user.username == pull_request.user.username) %}
       </form>
     {% endif %}
     </span>
@@ -118,7 +118,7 @@
   </div>
 </section>
 {%endif%}
-{% elif form and (g.repo_admin or remote_git) %}
+{% elif form and (g.repo_committer or remote_git) %}
 <h2>Create pull request</h2>
 {% else %}
 <h2>Diff
@@ -135,7 +135,7 @@
 
 {% endif %}
 
-{% if form and (g.repo_admin or remote_git) %}
+{% if form and (g.repo_committer or remote_git) %}
 <section class="new_project">
   {% if remote_git %}
   <form action="{{ url_for('.new_remote_request_pull',
@@ -623,7 +623,7 @@
     <section class="pr_info">
       <div id="spinner" class="content-loading" style="display:none"></div>
       <div id="merge-alert" class="alert text-xs-center" style="display:none;" role="alert">
-      {% if pull_request.status == 'Open' and g.repo_admin %}
+      {% if pull_request.status == 'Open' and g.repo_committer %}
        <div>
         <form action="{{ url_for('merge_request_pull',
                 repo=repo.name,
@@ -676,7 +676,7 @@
 
     <div class="card">
       <div class="card-block">
-        {% if authenticated and mergeform and pull_request.status == 'Open' and g.repo_admin %}
+        {% if authenticated and mergeform and pull_request.status == 'Open' and g.repo_committer %}
           <form method="POST" action="{{ url_for('.set_assignee_requests',
               repo=repo.name,
               username=username,
@@ -697,7 +697,7 @@
                   {{ pull_request.assignee.username or 'Unassigned' }}
                 </div>
               </fieldset>
-        {% if authenticated and mergeform and pull_request.status == 'Open' and g.repo_admin %}
+        {% if authenticated and mergeform and pull_request.status == 'Open' and g.repo_committer %}
               <input type="submit" class="btn btn-primary issue-metadata-form" value="Update">
               <a class="btn btn-secondary issue-metadata-form editmetadatatoggle" >Cancel</a>
             </form>

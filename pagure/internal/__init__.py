@@ -121,7 +121,7 @@ def pull_request_add_comment():
 @PV.route('/ticket/comment/', methods=['PUT'])
 @localonly
 def ticket_add_comment():
-    """ Add a comment to a pull-request.
+    """ Add a comment to an issue.
     """
     pform = pagure.forms.ProjectCommentForm(csrf_enabled=False)
     if not pform.validate_on_submit():
@@ -142,7 +142,7 @@ def ticket_add_comment():
     admin = False
     if user_obj:
         admin = user_obj == issue.project.user.user or (
-            user_obj in [user.user for user in issue.project.users])
+            user_obj in [user.user for user in issue.project.committers])
 
     if issue.private and user_obj and not admin \
             and not issue.user.user == user_obj.username:

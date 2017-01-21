@@ -412,49 +412,55 @@
               </a>
               (owner)
             </li>
-          {% for user in repo.users %}
-            <li class="list-group-item">
-              <a href="{{ url_for('.view_user', username=user.user) }}">
-                <span class="oi" data-glyph="person"></span>
-                &nbsp; {{ user.user }}
-              </a>
-              <form class="pull-xs-right" method="POST"
-                action="{{ url_for(
-                    '.remove_user',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace,
-                    userid=user.id) }}">
-                <button
-                  onclick="return confirm('You sure you want to remove this user from this project?');"
-                  title="Remove user" class="btn btn-danger btn-sm">
-                  <span class="oi" data-glyph="trash"></span>
-                </button>
-                {{ form.csrf_token }}
-              </form>
-            </li>
+          {% for access in access_users %}
+            {% for user in access_users[access] %}
+              <li class="list-group-item">
+                <a href="{{ url_for('.view_user', username=user.user) }}">
+                  <span class="oi" data-glyph="person"></span>
+                  &nbsp; {{ user.user }}
+                </a>
+                ({{access}})
+                <form class="pull-xs-right" method="POST"
+                  action="{{ url_for(
+                      '.remove_user',
+                      repo=repo.name,
+                      username=username,
+                      namespace=repo.namespace,
+                      userid=user.id) }}">
+                  <button
+                    onclick="return confirm('You sure you want to remove this user from this project?');"
+                    title="Remove user" class="btn btn-danger btn-sm">
+                    <span class="oi" data-glyph="trash"></span>
+                  </button>
+                  {{ form.csrf_token }}
+                </form>
+              </li>
+            {% endfor %}
           {% endfor %}
-          {% for group in repo.groups %}
-            <li class="list-group-item">
-              <a href="{{ url_for('.view_group', group=group.group_name) }}">
-                <span class="oi" data-glyph="people"></span>
-                &nbsp; {{ group.group_name }}
-              </a>
-              <form class="pull-xs-right" method="POST"
-                action="{{ url_for(
-                    '.remove_group_project',
-                    repo=repo.name,
-                    username=username,
-                    namespace=repo.namespace,
-                    groupid=group.id) }}">
-                <button
-                  onclick="return confirm('You sure you want to remove this group from this project?');"
-                  title="Remove group" class="btn btn-danger btn-sm pull-xs-right">
-                  <span class="oi" data-glyph="trash"></span>
-                </button>
-                {{ form.csrf_token }}
-              </form>
-            </li>
+          {% for access in access_groups %}
+            {% for group in access_groups[access] %}
+              <li class="list-group-item">
+                <a href="{{ url_for('.view_group', group=group.group_name) }}">
+                  <span class="oi" data-glyph="people"></span>
+                  &nbsp; {{ group.group_name }}
+                </a>
+                ({{access}})
+                <form class="pull-xs-right" method="POST"
+                  action="{{ url_for(
+                      '.remove_group_project',
+                      repo=repo.name,
+                      username=username,
+                      namespace=repo.namespace,
+                      groupid=group.id) }}">
+                  <button
+                    onclick="return confirm('You sure you want to remove this group from this project?');"
+                    title="Remove group" class="btn btn-danger btn-sm pull-xs-right">
+                    <span class="oi" data-glyph="trash"></span>
+                  </button>
+                  {{ form.csrf_token }}
+                </form>
+              </li>
+            {% endfor %}
           {% endfor %}
           </ul>
       </div>

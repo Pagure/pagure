@@ -439,6 +439,18 @@ class AddUserForm(PagureForm):
         'Username <span class="error">*</span>',
         [wtforms.validators.Required()]
     )
+    access = wtforms.TextField(
+        'Access Level <span class="error">*</span>',
+        [wtforms.validators.Required()]
+    )
+
+
+class AddUserToGroupForm(PagureForm):
+    ''' Form to add a user to a pagure group. '''
+    user = wtforms.TextField(
+        'Username <span class="error">*</span>',
+        [wtforms.validators.Required()]
+    )
 
 
 class AssignIssueForm(PagureForm):
@@ -457,6 +469,10 @@ class AddGroupForm(PagureForm):
             wtforms.validators.Required(),
             wtforms.validators.Regexp(STRICT_REGEX, flags=re.IGNORECASE)
         ]
+    )
+    access = wtforms.TextField(
+        'Access Level <span class="error">*</span>',
+        [wtforms.validators.Required()]
     )
 
 

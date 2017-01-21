@@ -918,21 +918,46 @@ def add_deploykey_to_project(session, project, ssh_key, pushaccess, user):
     return 'Deploy key added'
 
 
-def add_user_to_project(session, project, new_user, user):
-    ''' Add a specified user to a specified project. '''
+def add_user_to_project(session, project, new_user, user, access='admin'):
+    ''' Add a specified user to a specified project with a specified access'''
+
     new_user_obj = get_user(session, new_user)
     user_obj = get_user(session, user)
 
-    users = set([user.user for user in project.users])
+    users = set([user_.user for user_ in
+        get_project_users(session, project, access, combine=False)])
     users.add(project.user.user)
+
     if new_user in users:
         raise pagure.exceptions.PagureException(
-            'This user is already listed on this project.'
+            'This user is already listed on this project with the same access'
         )
+
+    # user has some access on project, so update to new access
+    if new_user_obj in project.users:
+        access_obj = get_obj_access(session, project, new_user_obj)
+        access_obj.access = access
+        session.add(access_obj)
+        session.flush()
+
+        pagure.lib.notify.log(
+            project,
+            topic='project.user.access.updated',
+            msg=dict(
+                project=project.to_json(public=True),
+                new_user=new_user_obj.username,
+                new_access=access,
+                agent=user_obj.username,
+            ),
+            redis=REDIS,
+        )
+
+        return 'User access updated'
 
     project_user = model.ProjectUser(
         project_id=project.id,
         user_id=new_user_obj.id,
+        access=access,
     )
     session.add(project_user)
     # Make sure we won't have SQLAlchemy error before we continue
@@ -944,6 +969,7 @@ def add_user_to_project(session, project, new_user, user):
         msg=dict(
             project=project.to_json(public=True),
             new_user=new_user_obj.username,
+            access=access,
             agent=user_obj.username,
         ),
         redis=REDIS,
@@ -953,8 +979,10 @@ def add_user_to_project(session, project, new_user, user):
 
 
 def add_group_to_project(
-        session, project, new_group, user, create=False, is_admin=False):
-    ''' Add a specified group to a specified project. '''
+        session, project, new_group, user, access='admin',
+        create=False, is_admin=False):
+    ''' Add a specified group to a specified project with some access '''
+
     user_obj = search_user(session, username=user)
     if not user_obj:
         raise pagure.exceptions.PagureException(
@@ -984,15 +1012,39 @@ def add_group_to_project(
             'You are not allowed to add a group of users to this project'
         )
 
-    groups = set([group.group_name for group in project.groups])
+    groups = set([group.group_name for group in
+        get_project_groups(session, project, access, combine=False)])
+
     if new_group in groups:
         raise pagure.exceptions.PagureException(
-            'This group is already associated to this project.'
+            'This group already has this access on this project'
         )
+
+    # the group already has some access, update to new access
+    if group_obj in project.groups:
+        access_obj = get_obj_access(session, project, group_obj)
+        access_obj.access = access
+        session.add(access_obj)
+        session.flush()
+
+        pagure.lib.notify.log(
+            project,
+            topic='project.group.access.updated',
+            msg=dict(
+                project=project.to_json(public=True),
+                new_group=group_obj.group_name,
+                new_access=access,
+                agent=user,
+            ),
+            redis=REDIS,
+        )
+
+        return 'Group access updated'
 
     project_group = model.ProjectGroup(
         project_id=project.id,
         group_id=group_obj.id,
+        access=access,
     )
     session.add(project_group)
     # Make sure we won't have SQLAlchemy error before we continue
@@ -1004,6 +1056,7 @@ def add_group_to_project(
         msg=dict(
             project=project.to_json(public=True),
             new_group=group_obj.group_name,
+            access=access,
             agent=user,
         ),
         redis=REDIS,
@@ -1816,29 +1869,31 @@ def search_projects(
         sub_q2 = session.query(
             model.Project.id
         ).filter(
-            # User got commit right
+            # User got admin rights
             sqlalchemy.and_(
                 model.User.user == username,
                 model.User.id == model.ProjectUser.user_id,
-                model.ProjectUser.project_id == model.Project.id
+                model.ProjectUser.project_id == model.Project.id,
+                model.ProjectUser.access == 'admin'
             )
         )
         sub_q3 = session.query(
             model.Project.id
         ).filter(
-            # User created a group that has commit right
+            # User created a group that has admin rights
             sqlalchemy.and_(
                 model.User.user == username,
                 model.PagureGroup.user_id == model.User.id,
                 model.PagureGroup.group_type == 'user',
                 model.PagureGroup.id == model.ProjectGroup.group_id,
                 model.Project.id == model.ProjectGroup.project_id,
+                model.ProjectGroup.access == 'admin',
             )
         )
         sub_q4 = session.query(
             model.Project.id
         ).filter(
-            # User is part of a group that has commit right
+            # User is part of a group that has admin right
             sqlalchemy.and_(
                 model.User.user == username,
                 model.PagureUserGroup.user_id == model.User.id,
@@ -1846,6 +1901,7 @@ def search_projects(
                 model.PagureGroup.group_type == 'user',
                 model.PagureGroup.id == model.ProjectGroup.group_id,
                 model.Project.id == model.ProjectGroup.project_id,
+                model.ProjectGroup.access == 'admin',
             )
         )
 
@@ -3300,7 +3356,11 @@ def get_pull_request_of_user(session, username):
         sqlalchemy.and_(
             model.User.user == username,
             model.User.id == model.ProjectUser.user_id,
-            model.ProjectUser.project_id == model.Project.id
+            model.ProjectUser.project_id == model.Project.id,
+            sqlalchemy.or_(
+                model.ProjectUser.access == 'admin',
+                model.ProjectUser.access == 'commit',
+            )
         )
     )
     sub_q3 = session.query(
@@ -3313,6 +3373,10 @@ def get_pull_request_of_user(session, username):
             model.PagureGroup.group_type == 'user',
             model.PagureGroup.id == model.ProjectGroup.group_id,
             model.Project.id == model.ProjectGroup.project_id,
+            sqlalchemy.or_(
+                model.ProjectGroup.access == 'admin',
+                model.ProjectGroup.access == 'commit',
+            )
         )
     )
     sub_q4 = session.query(
@@ -3326,6 +3390,10 @@ def get_pull_request_of_user(session, username):
             model.PagureGroup.group_type == 'user',
             model.PagureGroup.id == model.ProjectGroup.group_id,
             model.Project.id == model.ProjectGroup.project_id,
+            sqlalchemy.or_(
+                model.ProjectGroup.access == 'admin',
+                model.ProjectGroup.access == 'commit',
+            )
         )
     )
 
@@ -3901,3 +3969,132 @@ def tokenize_search_string(pattern):
     remaining += finalize_token(token, custom_search)
 
     return custom_search, remaining.strip()
+
+
+def get_access_levels(session):
+    ''' Returns all the access levels a user/group can have for a project '''
+
+    access_level_objs = session.query(model.AccessLevels).all()
+    return [access_level.access for access_level in access_level_objs]
+
+
+def get_project_users(session, project_obj, access, combine=True):
+    ''' Returns the list of users/groups of the project according
+    to the given access.
+
+    :arg session: the session to use to connect to the database.
+    :arg project_obj: SQLAlchemy object of Project class.
+    :arg access: the access level to query for, can be: 'admin',
+        'commit' or 'ticket'.
+    :type access: string
+    :arg combine: The access levels have some hierarchy -
+        like: all the users having commit access also has
+        ticket access and the admins have all the access
+        that commit and ticket access users have. If combine
+        is set to False, this function will only return those
+        users which have the given access and no other access.
+        ex: if access is 'ticket' and combine is True, it will
+        return all the users with ticket access which includes
+        all the committers and admins. If combine were False,
+        it would have returned only the users with ticket access
+        and would not have included committers and admins.
+    :type combine: boolean
+    '''
+
+    if access not in ['admin', 'commit', 'ticket']:
+        return None
+
+    if combine:
+        if access == 'admin':
+            return project_obj.admins
+        elif access == 'commit':
+            return project_obj.committers
+        elif access == 'ticket':
+            return project_obj.users
+    else:
+        if access == 'admin':
+            return project_obj.admins
+        elif access == 'commit':
+            committers = set(project_obj.committers)
+            admins = set(project_obj.admins)
+            return list(committers - admins)
+        elif access == 'ticket':
+            committers = set(project_obj.committers)
+            admins = set(project_obj.admins)
+            users = set(project_obj.users)
+            return list(users - committers - admins)
+
+
+def get_project_groups(session, project_obj, access, combine=True):
+    ''' Returns the list of groups of the project according
+    to the given access.
+
+    :arg session: the session to use to connect to the database.
+    :arg project_obj: SQLAlchemy object of Project class.
+    :arg access: the access level to query for, can be: 'admin',
+        'commit' or 'ticket'.
+    :type access: string
+    :arg combine: The access levels have some hierarchy -
+        like: all the groups having commit access also has
+        ticket access and the admin_groups have all the access
+        that committer_groups and ticket access groups have.
+        If combine is set to False, this function will only return
+        those groups which have the given access and no other access.
+        ex: if access is 'ticket' and combine is True, it will
+        return all the groups with ticket access which includes
+        all the committer_groups and admin_groups. If combine were False,
+        it would have returned only the groups with ticket access
+        and would not have included committer_groups and admin_groups.
+    :type combine: boolean
+    '''
+
+    if access not in ['admin', 'commit', 'ticket']:
+        return None
+
+    if combine:
+        if access == 'admin':
+            return project_obj.admin_groups
+        elif access == 'commit':
+            return project_obj.committer_groups
+        elif access == 'ticket':
+            return project_obj.groups
+    else:
+        if access == 'admin':
+            return project_obj.admin_groups
+        elif access == 'commit':
+            committers = set(project_obj.committer_groups)
+            admins = set(project_obj.admin_groups)
+            return list(committers - admins)
+        elif access == 'ticket':
+            committers = set(project_obj.committer_groups)
+            admins = set(project_obj.admin_groups)
+            groups = set(project_obj.groups)
+            return list(groups - committers - admins)
+
+
+def get_obj_access(session, project_obj, obj):
+    ''' Returns the level of access the user/group has on the project.
+
+    :arg session: the session to use to connect to the database.
+    :arg project_obj: SQLAlchemy object of Project class
+    :arg obj: SQLAlchemy object of either User or PagureGroup class
+    '''
+
+    if isinstance(obj, model.User):
+        query = session.query(
+            model.ProjectUser
+        ).filter(
+            model.ProjectUser.project_id == project_obj.id
+        ).filter(
+            model.ProjectUser.user_id == obj.id
+        )
+    else:
+        query = session.query(
+            model.ProjectGroup
+        ).filter(
+            model.ProjectGroup.project_id == project_obj.id
+        ).filter(
+            model.ProjectGroup.group_id == obj.id
+        )
+
+    return query.first()

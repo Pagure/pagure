@@ -214,7 +214,7 @@
                 <span class="oi hidden-md-up" data-glyph="warning"></span>
                 <span class="hidden-sm-down">Issues&nbsp;</span>
                 <span class="label label-default label-pill hidden-sm-down">
-                  {{ repo.open_tickets if g.repo_admin else repo.open_tickets_public }}
+                  {{ repo.open_tickets if g.repo_committer else repo.open_tickets_public }}
                 </span>
             </a>
         </li>

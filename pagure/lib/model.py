@@ -142,6 +142,22 @@ def create_default_status(session, acls=None):
             session.rollback()
             ERROR_LOG.debug('ACL %s could not be added', acl)
 
+    for access in ['ticket', 'commit', 'admin']:
+        access_obj = AccessLevels(access=access)
+        session.add(access_obj)
+        try:
+            session.commit()
+        except SQLAlchemyError:
+            session.rollback()
+            ERROR_LOG.debug('Access level %s could not be added', access)
+
+
+class AccessLevels(BASE):
+    ''' Different access levels a user/group can have for a project '''
+    __tablename__ = 'access_levels'
+
+    access = sa.Column(sa.String(255), primary_key=True)
+
 
 class StatusIssue(BASE):
     """ Stores the status a ticket can have.
@@ -365,6 +381,25 @@ class Project(BASE):
         backref='co_projects'
     )
 
+    admins = relation(
+        'User',
+        secondary="user_projects",
+        primaryjoin="projects.c.id==user_projects.c.project_id",
+        secondaryjoin="and_(users.c.id==user_projects.c.user_id,\
+                user_projects.c.access=='admin')",
+        backref='co_projects_admins'
+    )
+
+    committers = relation(
+        'User',
+        secondary="user_projects",
+        primaryjoin="projects.c.id==user_projects.c.project_id",
+        secondaryjoin="and_(users.c.id==user_projects.c.user_id,\
+                or_(user_projects.c.access=='commit',\
+                    user_projects.c.access=='admin'))",
+        backref='co_projects_committers'
+    )
+
     groups = relation(
         "PagureGroup",
         secondary="projects_groups",
@@ -374,6 +409,25 @@ class Project(BASE):
             "projects",
             order_by="func.lower(projects.c.namespace), func.lower(projects.c.name)"
         )
+    )
+
+    admin_groups = relation(
+        "PagureGroup",
+        secondary="projects_groups",
+        primaryjoin="projects.c.id==projects_groups.c.project_id",
+        secondaryjoin="and_(pagure_group.c.id==projects_groups.c.group_id,\
+                projects_groups.c.access=='admin')",
+        backref="projects_admin_groups",
+    )
+
+    committer_groups = relation(
+        "PagureGroup",
+        secondary="projects_groups",
+        primaryjoin="projects.c.id==projects_groups.c.project_id",
+        secondaryjoin="and_(pagure_group.c.id==projects_groups.c.group_id,\
+                or_(projects_groups.c.access=='admin',\
+                    projects_groups.c.access=='commit'))",
+        backref="projects_committer_groups",
     )
 
     unwatchers = relation(
@@ -619,7 +673,7 @@ class ProjectUser(BASE):
 
     __tablename__ = 'user_projects'
     __table_args__ = (
-        sa.UniqueConstraint('project_id', 'user_id'),
+        sa.UniqueConstraint('project_id', 'user_id', 'access'),
     )
 
     id = sa.Column(sa.Integer, primary_key=True)
@@ -636,6 +690,12 @@ class ProjectUser(BASE):
         ),
         nullable=False,
         index=True)
+    access = sa.Column(
+        sa.String(255),
+        sa.ForeignKey(
+            'access_levels.access', onupdate='CASCADE', ondelete='CASCADE',
+        ),
+        nullable=False)
 
 
 class DeployKey(BASE):
@@ -1740,6 +1800,12 @@ class ProjectGroup(BASE):
             'pagure_group.id',
         ),
         primary_key=True)
+    access = sa.Column(
+        sa.String(255),
+        sa.ForeignKey(
+            'access_levels.access', onupdate='CASCADE', ondelete='CASCADE',
+        ),
+        nullable=False)
 
     # Constraints
     __table_args__ = (sa.UniqueConstraint('project_id', 'group_id'),)

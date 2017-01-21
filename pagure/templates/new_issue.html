@@ -104,7 +104,7 @@
       </div>
     </div>
 
-    {% if authenticated and g.repo_admin and type and type == 'edit' %}
+    {% if authenticated and g.repo_committer and type and type == 'edit' %}
     <form method="post" class="pull-xs-right" action="{{
         url_for('.delete_issue',
                 repo=repo.name,

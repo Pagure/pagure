@@ -305,6 +305,52 @@ def is_repo_admin(repo_obj):
 
     usergrps = [
         usr.user
+        for grp in repo_obj.admin_groups
+        for usr in grp.users]
+
+    return user == repo_obj.user.user or (
+        user in [usr.user for usr in repo_obj.admins]
+    ) or (user in usergrps)
+
+
+def is_repo_committer(repo_obj):
+    """ Return whether the user is a committer of the provided repo. """
+    if not authenticated():
+        return False
+
+    user = flask.g.fas_user.username
+
+    admin_users = APP.config.get('PAGURE_ADMIN_USERS', [])
+    if not isinstance(admin_users, list):
+        admin_users = [admin_users]
+    if user in admin_users:
+        return True
+
+    usergrps = [
+        usr.user
+        for grp in repo_obj.committer_groups
+        for usr in grp.users]
+
+    return user == repo_obj.user.user or (
+        user in [usr.user for usr in repo_obj.committers]
+    ) or (user in usergrps)
+
+
+def is_repo_user(repo_obj):
+    """ Return whether the user has some access in the provided repo. """
+    if not authenticated():
+        return False
+
+    user = flask.g.fas_user.username
+
+    admin_users = APP.config.get('PAGURE_ADMIN_USERS', [])
+    if not isinstance(admin_users, list):
+        admin_users = [admin_users]
+    if user in admin_users:
+        return True
+
+    usergrps = [
+        usr.user
         for grp in repo_obj.groups
         for usr in grp.users]
 
@@ -434,6 +480,8 @@ def set_variables():
         flask.g.reponame = get_repo_path(flask.g.repo)
         flask.g.repo_obj = pygit2.Repository(flask.g.reponame)
         flask.g.repo_admin = is_repo_admin(flask.g.repo)
+        flask.g.repo_committer = is_repo_committer(flask.g.repo)
+        flask.g.repo_user = is_repo_user(flask.g.repo)
         flask.g.branches = sorted(flask.g.repo_obj.listall_branches())
 
     items_per_page = APP.config['ITEM_PER_PAGE']

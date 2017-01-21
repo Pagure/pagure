@@ -91,7 +91,7 @@ def write_gitolite_acls(session, configfile):
     config = []
     groups = {}
     for project in session.query(model.Project).all():
-        for group in project.groups:
+        for group in project.committer_groups:
             if group.group_name not in groups:
                 groups[group.group_name] = [
                     user.username for user in group.users]
@@ -103,11 +103,11 @@ def write_gitolite_acls(session, configfile):
             config.append('repo %s%s' % (repos, project.fullname))
             if repos not in ['tickets/', 'requests/']:
                 config.append('  R   = @all')
-            if project.groups:
+            if project.committer_groups:
                 config.append('  RW+ = @%s' % ' @'.join([
-                    group.group_name for group in project.groups]))
+                    group.group_name for group in project.committer_groups]))
             config.append('  RW+ = %s' % project.user.user)
-            for user in project.users:
+            for user in project.committers:
                 if user != project.user:
                     config.append('  RW+ = %s' % user.user)
             for deploykey in project.deploykeys:

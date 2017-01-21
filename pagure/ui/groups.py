@@ -65,7 +65,7 @@ def view_group(group):
         flask.abort(404, 'Group not found')
 
     # Add new user to the group if asked
-    form = pagure.forms.AddUserForm()
+    form = pagure.forms.AddUserToGroupForm()
     if pagure.authenticated() and form.validate_on_submit() \
             and pagure.APP.config.get('ENABLE_GROUP_MNGT', False):
 

@@ -144,7 +144,7 @@
               <span class="oi" data-glyph="share-boxed" title="Reply to this comment"></span>
             </a>
           {% endif %}
-          {% if id != 0 and g.fas_user and g.repo_admin or (
+          {% if id != 0 and g.fas_user and g.repo_committer or (
               comment.parent.status in [True, 'Open']
               and g.fas_user.username == comment.user.username) %}
           <a class="btn btn-secondary btn-sm edit_btn" href="{{
@@ -153,7 +153,7 @@
             <span class="oi" data-glyph="pencil" title="Edit comment"></span>
           </a>
           {% endif %}
-          {% if id != 0 and g.fas_user and g.repo_admin or (
+          {% if id != 0 and g.fas_user and g.repo_committer or (
               comment.parent.status in [True, 'Open']
               and g.fas_user.username == comment.user.username) %}
           <button class="btn btn-secondary btn-sm" type="submit"

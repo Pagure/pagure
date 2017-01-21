@@ -108,7 +108,7 @@ def _get_emails_for_obj(obj):
         if user.default_email:
             emails.add(user.default_email)
 
-    # Add people in groups with commits access to the project:
+    # Add people in groups with any access to the project:
     for group in obj.project.groups:
         if group.creator.default_email:
             emails.add(group.creator.default_email)

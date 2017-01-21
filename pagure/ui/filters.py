@@ -30,7 +30,7 @@ from pygments.filters import VisibleWhitespaceFilter
 import pagure.exceptions
 import pagure.lib
 import pagure.forms
-from pagure import (APP, SESSION, authenticated, is_repo_admin)
+from pagure import (APP, SESSION, authenticated, is_repo_committer)
 
 
 # Jinja filters
@@ -170,7 +170,7 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
                             status in ['true', 'open']
                             and comment.user.user == flask.g.fas_user.username
                         )
-                        or is_repo_admin(comment.parent.project)):
+                        or is_repo_committer(comment.parent.project)):
                     templ_delete = tpl_delete % ({'commentid': comment.id})
                     templ_edit = tpl_edit % ({
                         'edit_url': flask.url_for(
