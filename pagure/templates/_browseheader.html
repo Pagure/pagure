@@ -29,12 +29,10 @@
         else %}class="nav-link"{%
         endif %} href="{{ url_for('view_users') }}">Users</a>
   </li>
-  {% if config.get('ENABLE_USER_MNGT', True) %}
   <li class="nav-item">
     <a {% if select == 'groups' %}class="nav-link active" {%
         else %}class="nav-link"{%
         endif %} href="{{ url_for('group_lists') }}">Groups</a>
   </li>
-  {% endif %}
 </ul>
 {%- endmacro %}
