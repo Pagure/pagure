@@ -839,6 +839,32 @@ class PagureLibtests(tests.Modeltests):
         repo = pagure.lib.get_project(self.session, 'test')
         self.assertEqual(len(repo.users), 1)
         self.assertEqual(repo.users[0].user, 'foo')
+        self.assertEqual(repo.admins[0].user, 'foo')
+
+        # Try adding the same user with the same access
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.add_user_to_project,
+            session=self.session,
+            project=repo,
+            new_user='foo',
+            user='pingou',
+            access='admin'
+        )
+
+        # Update the access of the user
+        msg = pagure.lib.add_user_to_project(
+            session=self.session,
+            project=repo,
+            new_user='foo',
+            user='pingou',
+            access='commit'
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User access updated')
+        self.assertEqual(len(repo.users), 1)
+        self.assertEqual(repo.users[0].user, 'foo')
+        self.assertEqual(repo.committers[0].user, 'foo')
 
     def test_new_project(self):
         """ Test the new_project of pagure.lib. """
