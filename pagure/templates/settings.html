@@ -269,6 +269,7 @@
           Public notifications
         </div>
         <div class="card-block">
+        {% if config.get('ENABLE_TICKETS', True) %}
           <p>
             The email addresses entered below will receive all the notifications
             related to (public) issue and pull-requests, this includes
@@ -278,7 +279,18 @@
           <p>
             To enter multiple addresses, simply delimit then with a comma.
           </p>
+        {% else %}
         </div>
+          <p>
+            The email addresses entered below will receive all the notifications
+            related to and pull-requests, this includes
+            notifications about new pull-request, new comment
+            and status change.
+          </p>
+          <p>
+            To enter multiple addresses, simply delimit then with a comma.
+          </p>
+        {% endif %}
         <form action="{{ url_for(
               '.update_public_notifications',
               repo=repo.name,
@@ -288,6 +300,7 @@
           {{ tag_form.csrf_token }}
           <div class="card-block">
 
+            {% if config.get('ENABLE_TICKETS', True) %}
             <div class="row">
               <div class="col-sm-12">
                 <strong>Issues notifications</strong>
@@ -303,6 +316,7 @@
               </div>
             </div>
 
+            {% endif %}
             <div class="row">
               <div class="col-sm-12 p-t-1">
                 <strong>Pull-requests notifications</strong>
@@ -338,19 +352,21 @@
           Re-generate git repos
         </div>
         <div class="card-block">
-          <form action="{{ url_for(
-              '.regenerate_git',
-              repo=repo.name,
-              username=username,
-              namespace=repo.namespace) }}" method="post"
-                class="icon">
-            <input name="regenerate" value="tickets" type="hidden"/>
-            <button class="btn btn-primary" type="submit"
-              title="Regenerate tickets git repo">
-              <span class="oi" data-glyph="reload"></span> &nbsp;Regenerate the git repo for issues
-            </button>
-            {{ form.csrf_token }}
-          </form>
+          {% if config.get('ENABLE_TICKETS', True) %}
+            <form action="{{ url_for(
+                '.regenerate_git',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace) }}" method="post"
+                  class="icon">
+              <input name="regenerate" value="tickets" type="hidden"/>
+              <button class="btn btn-primary" type="submit"
+                title="Regenerate tickets git repo">
+                <span class="oi" data-glyph="reload"></span> &nbsp;Regenerate the git repo for issues
+              </button>
+              {{ form.csrf_token }}
+            </form>
+          {% endif %}
           <form class="m-t-2" action="{{ url_for(
               '.regenerate_git',
               repo=repo.name,
@@ -466,6 +482,8 @@
           <div id="accordions" role="tablist" aria-multiselectable="true">
             {% set idcount = 1 %}
             {% for plugin in plugins %}
+            {% if not config.get('ENABLE_TICKETS', True) and plugin in ['Pagure tickets'] %}
+            {% else %}
             <div class="panel panel-default" >
               <div class="panel-heading" role="tab" id="pluginheading{{idcount}}">
                 <h4 class="panel-title">
@@ -483,6 +501,7 @@
               </div>
             </div>
             {% set idcount = idcount+1 %}
+            {% endif %}
             {% endfor %}
           </div>
         </div>
