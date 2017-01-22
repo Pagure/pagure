@@ -2818,6 +2818,8 @@ class PagureLibtests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(msg, 'Group added')
+        self.assertEqual(project.groups[0].group_name, 'foo')
+        self.assertEqual(project.admin_groups[0].group_name, 'foo')
 
         # Group already associated with the project
         self.assertRaises(
@@ -2828,6 +2830,19 @@ class PagureLibtests(tests.Modeltests):
             new_group='foo',
             user='pingou',
         )
+
+        # Update the access of group in the project
+        msg = pagure.lib.add_group_to_project(
+            session=self.session,
+            project=project,
+            new_group='foo',
+            user='pingou',
+            access='commit'
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Group access updated')
+        self.assertEqual(project.groups[0].group_name, 'foo')
+        self.assertEqual(project.committer_groups[0].group_name, 'foo')
 
     def test_update_watch_status(self):
         """ Test the update_watch_status method of pagure.lib. """
