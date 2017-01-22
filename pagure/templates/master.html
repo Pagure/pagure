@@ -70,9 +70,11 @@
                     url_for('user_settings')
                     }}">My Settings</a>
                   <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="{{
-                    url_for('view_user_issues', username=g.fas_user.username)
-                    }}">My Issues</a>
+                  {% if config.get('ENABLE_TICKETS', True) %}
+                    <a class="dropdown-item" href="{{
+                      url_for('view_user_issues', username=g.fas_user.username)
+                      }}">My Issues</a>
+                  {% endif %}
                   <a class="dropdown-item" href="{{
                     url_for('view_user_requests', username=g.fas_user.username)
                     }}">My Pull Requests</a>

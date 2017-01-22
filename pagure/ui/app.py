@@ -373,6 +373,10 @@ def view_user_issues(username):
     :param username: The username to retrieve the issues for
     :type  username: str
     """
+
+    if not APP.config.get('ENABLE_TICKETS', True):
+        flask.abort(404, 'Tickets have been disabled on this pagure instance')
+
     user = pagure.lib.search_user(SESSION, username=username)
     if not user:
         flask.abort(404, 'No user `%s` found' % username)
