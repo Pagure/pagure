@@ -1251,6 +1251,20 @@ class PagureLibtests(tests.Modeltests):
         projects = pagure.lib.search_projects(self.session, count=True)
         self.assertEqual(projects, 3)
 
+        # Also check if the project shows up if a user doesn't
+        # have admin access in the project
+        project = pagure.lib.get_project(self.session, name='test')
+        pagure.lib.add_user_to_project(
+            self.session,
+            project=project,
+            new_user='foo',
+            user='pingou',
+            access='commit'
+        )
+
+        projects = pagure.lib.search_projects(self.session, username='foo')
+        self.assertEqual(len(projects), 0)
+
     def test_search_project_forked(self):
         """ Test the search_project for forked projects in pagure.lib. """
         tests.create_projects(self.session)
