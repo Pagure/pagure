@@ -502,8 +502,9 @@ def set_variables():
         flask.g.repo = pagure.get_authorized_project(
             SESSION, repo, user=username, namespace=namespace)
         if authenticated():
-            flask.g.repo_forked = pagure.get_authorized_project(SESSION, repo, user=flask.g.fas_user.username,
-                                                          namespace=namespace)
+            flask.g.repo_forked = pagure.get_authorized_project(
+                    SESSION, repo, user=flask.g.fas_user.username,
+                    namespace=namespace)
 
         if not flask.g.repo \
             and APP.config.get('OLD_VIEW_COMMIT_ENABLED', False) \
