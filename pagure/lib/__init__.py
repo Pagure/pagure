@@ -3517,7 +3517,7 @@ def set_custom_key_value(session, issue, key, value):
     if current_field:
         if current_field.key.key_type == 'boolean':
             value = value or False
-        if value is None:
+        if value is None or value == '':
             session.delete(current_field)
             updated = True
             delete = True
@@ -3525,16 +3525,15 @@ def set_custom_key_value(session, issue, key, value):
             current_field.value = value
             updated = True
     else:
-        if not value:
-            raise pagure.exceptions.PagureException(
-                'No value given to this new custom field: %s' % key.name
+        if value is None or value == '':
+            delete = True
+        else:
+            current_field = model.IssueValues(
+                issue_uid=issue.uid,
+                key_id=key.id,
+                value=value,
             )
-        current_field = model.IssueValues(
-            issue_uid=issue.uid,
-            key_id=key.id,
-            value=value,
-        )
-        updated = True
+            updated = True
     if not delete:
         session.add(current_field)
 
