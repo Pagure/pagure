@@ -3211,6 +3211,15 @@ class PagureLibtests(tests.Modeltests):
                 html = pagure.lib.text2markdown(text)
                 self.assertEqual(html, expected[idx])
 
+    def test_get_access_levels(self):
+        ''' Test the get_access_levels method in pagure.lib '''
+
+        acls = pagure.lib.get_access_levels(self.session)
+        self.assertEqual(
+            sorted(['admin', 'commit', 'ticket']),
+            sorted(acls)
+        )
+
     def test_set_watch_obj(self):
         """ Test the set_watch_obj method in pagure.lib """
         # Create the project ns/test
