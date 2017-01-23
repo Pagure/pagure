@@ -14,6 +14,8 @@ import os
 import flask
 import pygit2
 
+from binaryornot.helpers import is_binary_string
+
 import pagure.doc_utils
 import pagure.exceptions
 import pagure.lib
@@ -108,7 +110,11 @@ def __get_tree_and_content(repo_obj, commit, path):
     if isinstance(blob_or_tree, pygit2.TreeEntry):  # Returned a file
         ext = os.path.splitext(blob_or_tree.name)[1]
         blob_obj = repo_obj[blob_or_tree.oid]
-        content, safe = pagure.doc_utils.convert_readme(blob_obj.data, ext)
+        if not is_binary_string(blob_obj.data):
+            content, safe = pagure.doc_utils.convert_readme(blob_obj.data, ext)
+        else:
+            safe = True
+            content = blob_obj.data
 
     tree = sorted(tree_obj, key=lambda x: x.filemode)
     return (tree, content, safe, extended)
