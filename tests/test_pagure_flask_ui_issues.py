@@ -627,7 +627,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # Create issues to play with
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -864,7 +864,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertNotIn(b'käpy'.decode('utf-8'), output.data)
 
         # Add a non-ascii milestone to the project
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         repo.milestones = {b'käpy'.decode('utf-8'): None}
         self.session.add(repo)
         self.session.commit()

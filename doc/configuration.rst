@@ -603,6 +603,17 @@ this pagure instance does not have a documentation server.
 
 Defaults to: ``None``
 
+PRIVATE_PROJECTS
+~~~~~~~~~~~~~~~~
+
+This configuration key allows you to host private repositories. These
+repositories are visible only to the creator of the repository and to the
+user who are given access to the repository. No information is leaked about the
+private repository which means redis doesn't have the access to the repository
+and even fedmsg doesn't get any notifications.
+
+Defaults to: ``False``
+
 
 EXCLUDE_GROUP_INDEX
 ~~~~~~~~~~~~~~~~~~~
