@@ -1145,7 +1145,7 @@ class PagureFlaskApptests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #3')
 
-        msg = pagure.lib.add_issue_assignee(
+        msg, comment = pagure.lib.add_issue_assignee(
             session=self.session,
             issue=msg,
             assignee='pingou',

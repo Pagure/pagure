@@ -194,6 +194,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
 
         try:
             messages = set()
+            field_comments = ""
 
             # New comment
             if comment:
@@ -213,36 +214,43 @@ def update_issue(repo, issueid, username=None, namespace=None):
             # Update status
             if repo_admin or flask.g.fas_user.username == issue.user.user:
                 if new_status in status:
-                    message = pagure.lib.edit_issue(
+                    message, new_comment = pagure.lib.edit_issue(
                         SESSION,
                         issue=issue,
                         status=new_status,
                         close_status=close_status,
                         private=issue.private,
                         user=flask.g.fas_user.username,
-                        ticketfolder=APP.config['TICKETS_FOLDER'],
+                        ticketfolder=APP.config['TICKETS_FOLDER']
                     )
                     SESSION.commit()
                     if message:
                         messages.add(message)
+                    if new_comment != "":
+                        field_comments = ("%s\n%s" %
+                                          (field_comments, new_comment))
 
             # All the other meta-data can be changed only by admins
             # while other field will be missing for non-admin and thus
             # reset if we let them
             if repo_admin:
                 # Adjust (add/remove) tags
-                messages.union(set(pagure.lib.update_tags(
+                msgs, new_comment = pagure.lib.update_tags(
                     SESSION, issue, tags,
                     username=flask.g.fas_user.username,
                     ticketfolder=APP.config['TICKETS_FOLDER']
-                )))
+                )
+                messages.union(set(msgs))
+                if new_comment != "":
+                    field_comments = ("%s\n%s" %
+                                      (field_comments, new_comment))
 
             # The meta-data can be changed by admins and issue creator,
             # where issue creators can only change status of their issue while
             # other fields will be missing for non-admin and thus reset if we let them
             if repo_admin:
                 # Assign or update assignee of the ticket
-                message = pagure.lib.add_issue_assignee(
+                message, new_comment = pagure.lib.add_issue_assignee(
                     SESSION,
                     issue=issue,
                     assignee=assignee or None,
@@ -252,26 +260,19 @@ def update_issue(repo, issueid, username=None, namespace=None):
                 SESSION.commit()
                 if message and message != 'Nothing to change':
                     messages.add(message)
+                if new_comment != "":
+                    field_comments = ("%s\n%s" %
+                                      (field_comments, new_comment))
+                # Adjust priority if needed
+                if str(new_priority) not in repo.priorities:
+                    new_priority = None
 
-                # Update priority
-                if str(new_priority) in repo.priorities:
-                    message = pagure.lib.edit_issue(
-                        SESSION,
-                        issue=issue,
-                        priority=new_priority,
-                        private=issue.private,
-                        user=flask.g.fas_user.username,
-                        ticketfolder=APP.config['TICKETS_FOLDER'],
-                    )
-                    SESSION.commit()
-                    if message:
-                        messages.add(message)
-
-                # Update milestone and privacy setting
-                message = pagure.lib.edit_issue(
+                # Update core metadata
+                message, new_comment = pagure.lib.edit_issue(
                     SESSION,
                     issue=issue,
                     milestone=new_milestone,
+                    priority=new_priority,
                     private=form.private.data,
                     user=flask.g.fas_user.username,
                     ticketfolder=APP.config['TICKETS_FOLDER'],
@@ -279,38 +280,67 @@ def update_issue(repo, issueid, username=None, namespace=None):
                 SESSION.commit()
                 if message:
                     messages.add(message)
+                if new_comment != "":
+                    field_comments = ("%s\n%s" %
+                                      (field_comments, new_comment))
 
                 # Update the custom keys/fields
+                edit_comment = ""
                 for key in repo.issue_keys:
                     value = flask.request.form.get(key.name)
-                    if key.key_type == 'link':
-                        links = value.split(',')
-                        for link in links:
-                            link = link.replace(' ', '')
-                            if not urlpattern.match(link):
-                                flask.abort(
-                                    400,
-                                    'Meta-data "link" field '
-                                    '(%s) has invalid url (%s) ' %
-                                    (key.name, link))
-                    messages.add(
-                        pagure.lib.set_custom_key_value(
-                            SESSION, issue, key, value)
-                    )
+                    if value:
+                        if key.key_type == 'link':
+                            links = value.split(',')
+                            for link in links:
+                                link = link.replace(' ', '')
+                                if not urlpattern.match(link):
+                                    flask.abort(
+                                        400,
+                                        'Meta-data "link" field '
+                                        '(%s) has invalid url (%s) ' %
+                                        (key.name, link))
+
+                    new_comment = pagure.lib.set_custom_key_value(
+                        SESSION, issue, key, value)
+                    if new_comment is not "":
+                        edit_comment = "%s%s" % (new_comment, edit_comment)
+
+                if edit_comment is not "":
+                    field_comments = ("%s%s" %
+                                      (field_comments, edit_comment))
 
                 # Update ticket this one depends on
-                messages.union(set(pagure.lib.update_dependency_issue(
+                msgs, new_comment = pagure.lib.update_dependency_issue(
                     SESSION, repo, issue, depends,
                     username=flask.g.fas_user.username,
-                    ticketfolder=APP.config['TICKETS_FOLDER'],
-                )))
+                    ticketfolder=APP.config['TICKETS_FOLDER'])
+                messages.union(set(msgs))
+                if new_comment != "":
+                    field_comments = ("%s%s" %
+                                      (field_comments, new_comment))
 
                 # Update ticket(s) depending on this one
-                messages.union(set(pagure.lib.update_blocked_issue(
+                msgs, new_comment = pagure.lib.update_blocked_issue(
                     SESSION, repo, issue, blocks,
                     username=flask.g.fas_user.username,
-                    ticketfolder=APP.config['TICKETS_FOLDER'],
-                )))
+                    ticketfolder=APP.config['TICKETS_FOLDER'],)
+                messages.union(set(msgs))
+                if new_comment != "":
+                    field_comments = ("%s%s" %
+                                      (field_comments, new_comment))
+
+                # Add the comment for field updates:
+                if field_comments != "":
+                    pagure.lib.add_issue_comment(
+                        SESSION,
+                        issue,
+                        comment='@%s updated metadata\n%s' % (
+                            flask.g.fas_user.username, field_comments),
+                        user=flask.g.fas_user.username,
+                        ticketfolder=APP.config['TICKETS_FOLDER'],
+                        notify=False,
+                        notification=True)
+                    messages.add('Metadata fields updated')
 
             if not is_js:
                 for message in messages:
@@ -1080,7 +1110,7 @@ def edit_issue(repo, issueid, username=None, namespace=None):
                     flask.g.fas_user.username))
 
         try:
-            message = pagure.lib.edit_issue(
+            message, comment = pagure.lib.edit_issue(
                 SESSION,
                 issue=issue,
                 title=title,
@@ -1091,6 +1121,15 @@ def edit_issue(repo, issueid, username=None, namespace=None):
                 private=private,
             )
             SESSION.commit()
+            if comment != "":
+                pagure.lib.add_issue_comment(
+                    SESSION,
+                    issue,
+                    comment=comment,
+                    user=flask.g.fas_user.username,
+                    ticketfolder=APP.config['TICKETS_FOLDER'],
+                    notify=False,
+                    notification=True)
 
             # If there is a file attached, attach it.
             filestream = flask.request.files.get('filestream')

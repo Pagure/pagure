@@ -123,7 +123,7 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Comment added')
         # Assign the ticket to someone
-        msg = pagure.lib.add_issue_assignee(
+        msg, comment = pagure.lib.add_issue_assignee(
             session=self.session,
             issue=issue,
             assignee='pingou',

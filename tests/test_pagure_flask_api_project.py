@@ -119,7 +119,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(repo.tags, [])
 
         # Adding a tag
-        output = pagure.lib.update_tags(
+        output, comment = pagure.lib.update_tags(
             self.session, repo, 'infra', 'pingou',
             ticketfolder=None)
         self.assertEqual(output, ['Tag added: infra'])
@@ -317,7 +317,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(repo.tags, [])
 
         # Adding a tag
-        output = pagure.lib.update_tags(
+        output, comment = pagure.lib.update_tags(
             self.session, repo, 'infra', 'pingou',
             ticketfolder=None)
         self.assertEqual(output, ['Tag added: infra'])

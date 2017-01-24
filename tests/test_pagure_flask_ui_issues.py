@@ -541,7 +541,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         # Add a non-ascii milestone to the issue but project has no milestone
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        message = pagure.lib.edit_issue(
+        message, comment = pagure.lib.edit_issue(
             self.session,
             issue=issue,
             milestone=b'käpy'.decode('utf-8'),
@@ -682,9 +682,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<option selected value="Fixed">Fixed</option>'
                 in output.data)
             self.assertIn(
-                '<small><p><a href="{app_url}/user/pingou"> '
-                '@pingou</a> changed the status to <code>Closed</code>'
-                '</p></small>'.format(
+                '@pingou</a> updated metadata</p>\n<p><strong>Closed '
+                'as</strong> changed from <code>""</code> to <code>Fixed'
+                .format(
                     app_url=pagure.APP.config['APP_URL'].rstrip('/')),
                 output.data)
 
@@ -1953,8 +1953,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         user = tests.FakeUser(username='foo')
         with tests.user_set(pagure.APP, user):
             data = {
-                'csrf_token' : csrf_token,
-                'comment' : 'Nevermind figured it out',
+                'csrf_token': csrf_token,
+                'comment': 'Nevermind figured it out',
                 'status': 'Closed',
                 'close_status': 'Invalid'
             }
@@ -1978,8 +1978,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             )
 
             data = {
-                'csrf_token' : csrf_token,
-                'comment' : 'Nevermind figured it out',
+                'csrf_token': csrf_token,
+                'comment': 'Nevermind figured it out',
                 'status': 'Closed',
                 'close_status': 'Invalid'
             }
@@ -2007,14 +2007,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(len(issue.comments), 2)
         self.assertEqual(issue.status, 'Open')
 
-        # Ticket #2 has one more comment and is closed
+        # Ticket #2 has one less comment and is closed
         issue = pagure.lib.search_issues(self.session, repo, issueid=2)
-        self.assertEqual(len(issue.comments), 2)
+        self.assertEqual(len(issue.comments), 1)
         self.assertEqual(issue.status, 'Closed')
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
-    def test_git_urls(self,  p_send_email, p_ugt):
+    def test_git_urls(self, p_send_email, p_ugt):
         """ Check that the url to the git repo for issues is present/absent when
         it should.
         """
