@@ -2528,9 +2528,9 @@ def update_tags(session, obj, tags, username, ticketfolder):
             )
         )
         if len(toadd) == 1:
-            comment += "**Tags** added tag: ``%s``\n" % list(toadd)[0]
+            comment += "**Tags** added tag: ``%s``" % list(toadd)[0]
         else:
-            comment += "**Tags** added tags: ``" + ', '.join(toadd) + "``\n"
+            comment += "**Tags** added tags: ``" + ', '.join(toadd) + "``"
 
     if torm:
         messages.append(
@@ -2542,10 +2542,12 @@ def update_tags(session, obj, tags, username, ticketfolder):
                 ticketfolder=ticketfolder,
             )
         )
+        if toadd:
+            comment += '\n'
         if len(torm) == 1:
-            comment += "**Tags** removed tag: ``%s\n``" % list(torm)[0]
+            comment += "**Tags** removed tag: ``%s``" % list(torm)[0]
         else:
-            comment += "**Tags** removed tags: ``" + ', '.join(torm) + "``\n"
+            comment += "**Tags** removed tags: ``" + ', '.join(torm) + "``"
 
     session.commit()
 
