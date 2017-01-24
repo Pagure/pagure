@@ -219,6 +219,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                         issue=issue,
                         status=new_status,
                         close_status=close_status,
+                        milestone=issue.milestone,
                         private=issue.private,
                         user=flask.g.fas_user.username,
                         ticketfolder=APP.config['TICKETS_FOLDER']
@@ -964,7 +965,9 @@ def view_issue(repo, issueid, username=None, namespace=None):
         close_status=repo.close_status,
     )
     form.status.data = issue.status
-    form.priority.data = issue.priority
+    form.priority.data = '%s' % issue.priority
+    # issue.priority is an int that we need to convert to string as the form
+    # relies on string
     form.milestone.data = issue.milestone
     form.private.data = issue.private
     form.close_status.data = ''
