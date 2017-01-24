@@ -396,7 +396,8 @@
                   {%- if field.key_type == 'boolean' %} type="checkbox" {% endif %}
                   class="form-control" name="{{ field.name }}" id="{{ field.name }}"
                   {%- if field.name in knowns_keys %}
-                    {% if field.key_type == 'boolean' %} checked
+                    {% if field.key_type == 'boolean'%}
+                      {% if knowns_keys[field.name].value in ['true', 'on', '1'] %}checked{% endif %}
                     {% else %} value="{{ knowns_keys[field.name].value }}"
                     {% endif %}
                   {%- endif -%} />

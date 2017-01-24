@@ -283,21 +283,20 @@ def update_issue(repo, issueid, username=None, namespace=None):
                 # Update the custom keys/fields
                 for key in repo.issue_keys:
                     value = flask.request.form.get(key.name)
-                    if value:
-                        if key.key_type == 'link':
-                            links = value.split(',')
-                            for link in links:
-                                link = link.replace(' ', '')
-                                if not urlpattern.match(link):
-                                    flask.abort(
-                                        400,
-                                        'Meta-data "link" field '
-                                        '(%s) has invalid url (%s) ' %
-                                        (key.name, link))
-                        messages.add(
-                            pagure.lib.set_custom_key_value(
-                                SESSION, issue, key, value)
-                        )
+                    if key.key_type == 'link':
+                        links = value.split(',')
+                        for link in links:
+                            link = link.replace(' ', '')
+                            if not urlpattern.match(link):
+                                flask.abort(
+                                    400,
+                                    'Meta-data "link" field '
+                                    '(%s) has invalid url (%s) ' %
+                                    (key.name, link))
+                    messages.add(
+                        pagure.lib.set_custom_key_value(
+                            SESSION, issue, key, value)
+                    )
 
                 # Update ticket this one depends on
                 messages.union(set(pagure.lib.update_dependency_issue(
