@@ -1405,7 +1405,7 @@ def new_tag(session, tag_name, tag_description, tag_color, project_id):
 
 def edit_issue(session, issue, ticketfolder, user, repo=None,
                title=None, content=None, status=None, close_status=-1,
-               priority=None, milestone=-1, private=False):
+               priority=-1, milestone=-1, private=False):
     ''' Edit the specified issue.
     '''
     user_obj = get_user(session, user)
@@ -1443,7 +1443,7 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
         if old_status:
             msg += ' (was: %s)' % old_status
         messages.append(msg)
-    if priority:
+    if priority != -1:
         try:
             priority = int(priority)
         except:
