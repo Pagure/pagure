@@ -48,7 +48,7 @@ from pagure.exceptions import PagureEvException
 _i = 0
 
 
-def call_web_hooks(project, topic, msg):
+def call_web_hooks(project, topic, msg, urls):
     ''' Sends the web-hook notification. '''
     log.info(
         "Processing project: %s - topic: %s", project.fullname, topic)
@@ -83,14 +83,15 @@ def call_web_hooks(project, topic, msg):
         'X-Pagure-Topic': topic,
     }
     msg = json.dumps(msg)
-    for url in project.settings.get('Web-hooks').split('\n'):
+    for url in urls:
         url = url.strip()
         log.info('Calling url %s' % url)
         try:
             req = requests.post(
                 url,
                 headers=headers,
-                data={'payload': msg}
+                data={'payload': msg},
+                timeout=60,
             )
             if not req:
                 log.info(
@@ -122,7 +123,7 @@ def handle_messages():
             data = json.loads(reply.value)
             username = None
             if data['project'].startswith('forks'):
-                username, projectname = data['project'].split('/', 1)
+                username, projectname = data['project'].split('/', 2)[1:]
             else:
                 projectname = data['project']
 
@@ -130,12 +131,24 @@ def handle_messages():
             if '/' in projectname:
                 namespace, projectname = projectname.split('/', 1)
 
+            log.info(
+                'Searching %s/%s/%s' % (username, namespace, projectname))
             session = pagure.lib.create_session(pagure.APP.config['DB_URL'])
             project = pagure.lib.get_project(
-                session=session, name=projectname, user=username)
+                session=session, name=projectname, user=username,
+                namespace=namespace)
+            if not project:
+                log.info('No project found with these criteria')
+                session.close()
+                continue
+            urls = project.settings.get('Web-hooks')
             session.close()
+            if not urls:
+                log.info('No URLs set: %s' % urls)
+                continue
+            urls = urls.split('\n')
             log.info('Got the project, going to the webhooks')
-            call_web_hooks(project, data['topic'], data['msg'])
+            call_web_hooks(project, data['topic'], data['msg'], urls)
 
 
 def main():
