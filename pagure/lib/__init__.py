@@ -1420,13 +1420,12 @@ def build_meta_comment(comment, field, old_value, new_value):
             (field, old_value, new_value, comment))
 
 
-def edit_issue(session, issue, ticketfolder, user,
+def edit_issue(session, issue, ticketfolder, user, repo=None,
                title=None, content=None, status=None, close_status=-1,
                priority=None, milestone=-1, private=False):
     ''' Edit the specified issue.
     '''
     user_obj = get_user(session, user)
-
     if status != 'Open' and issue.parents:
         for parent in issue.parents:
             if parent.status == 'Open':
@@ -1466,7 +1465,8 @@ def edit_issue(session, issue, ticketfolder, user,
             priority = None
         if priority != issue.priority:
             edit_comment = build_meta_comment(
-                edit_comment, "Priority", issue.priority, priority)
+                edit_comment, "Priority", repo.priorities[str(issue.priority)],
+                repo.priorities[str(priority)])
             issue.priority = priority
             edit.append('priority')
     if private in [True, False] and private != issue.private:

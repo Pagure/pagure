@@ -270,6 +270,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                 # Update core metadata
                 message, new_comment = pagure.lib.edit_issue(
                     SESSION,
+                    repo=repo,
                     issue=issue,
                     milestone=new_milestone,
                     priority=new_priority,
