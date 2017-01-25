@@ -248,6 +248,17 @@
               {{ form.csrf_token }}
             </p>
           </form>
+
+          {% if config.get('WEBHOOK') and repo.settings['Web-hooks'] %}
+          <form action="{{ url_for('.test_web_hook',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace) }}" method="post">
+              {{ form.csrf_token }}
+            <input type="submit" class="btn btn-primary" value="Test web-hook"
+             title="Sends a test notification to the web-hook server for testing">
+          </form>
+          {% endif %}
         </div>
       </div>
     </div>

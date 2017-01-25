@@ -17,6 +17,7 @@
 
 
 import datetime
+import json
 import shutil
 import os
 from math import ceil
@@ -1088,6 +1089,54 @@ def view_settings(repo, username=None, namespace=None):
         plugins=plugins,
         branchname=branchname,
     )
+
+
+@APP.route('/<repo>/settings/test_hook', methods=('GET', 'POST'))
+@APP.route('/<namespace>/<repo>/settings/test_hook', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/settings/test_hook', methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/settings/test_hook',
+    methods=('GET', 'POST'))
+@login_required
+def test_web_hook(repo, username=None, namespace=None):
+    """ Presents the settings of the project.
+    """
+    if admin_session_timedout():
+        if flask.request.method == 'POST':
+            flask.flash('Action canceled, try it again', 'error')
+        return flask.redirect(
+            flask.url_for('auth_login', next=flask.request.url))
+
+    repo = flask.g.repo
+    repo_obj = flask.g.repo_obj
+
+    if not flask.g.repo_admin:
+        flask.abort(
+            403,
+            'You are not allowed to trigger a test notification for this '
+            'project')
+
+    form = pagure.forms.ConfirmationForm()
+    if form.validate_on_submit():
+        if pagure.lib.REDIS:
+            pagure.lib.REDIS.publish(
+                'pagure.hook',
+                json.dumps({
+                    'project': repo.fullname,
+                    'topic': 'Test.notification',
+                    'msg': {'content': 'Test message'},
+                })
+            )
+            flask.flash('Notification triggered')
+        else:
+            flask.flash(
+                'Notification could not be sent as the web-hook server could '
+                'not be contacted'
+            )
+
+    return flask.redirect(flask.url_for(
+        'view_settings', username=username, repo=repo.name,
+        namespace=repo.namespace))
 
 
 @APP.route('/<repo>/update', methods=['POST'])
