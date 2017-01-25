@@ -15,6 +15,7 @@ if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
+
 import pagure
 import pagure.lib.git
 
@@ -91,4 +92,5 @@ for line in sys.stdin.readlines():
                 repo=project.to_json(public=True)
                 if not isinstance(project, basestring) else project,
             ),
+            redis=pagure.lib.REDIS,
         )
