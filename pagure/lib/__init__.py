@@ -396,10 +396,8 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder,
                        notify=True):
     ''' Add an assignee to an issue, in other words, assigned an issue. '''
     user_obj = get_user(session, user)
-    if issue.assignee is None or issue.assignee == "":
-        old_assignee = '\"\"'
-    else:
-        old_assignee = issue.assignee
+
+    old_assignee = issue.assignee if issue.assignee else '\"\"'
 
     if not assignee and issue.assignee is not None:
         issue.assignee_id = None
