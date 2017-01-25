@@ -1,0 +1,1 @@
+pyclamd  # This is only needed if VIRUS_SCAN_ATTACHMENTS is enabled

@@ -1,0 +1,3 @@
+cryptography
+python-jenkins
+trollius-redis

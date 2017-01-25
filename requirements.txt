@@ -17,7 +17,6 @@ markdown
 munch
 Pillow
 psutil
-pyclamd  # This is only needed if VIRUS_SCAN_ATTACHMENTS is enabled
 pygit2 >= 0.20.1
 pygments
 python-openid
@@ -27,7 +26,6 @@ redis
 six
 sqlalchemy >= 0.8
 straight.plugin==1.4.0-post-1
-trollius-redis
 wtforms
 
 # Needed only for local authentication and/or Pagure CI
@@ -39,5 +37,3 @@ python-fedora
 # Required only for the `local` authentication backend
 py-bcrypt
 
-# Required for Pagure CI
-python-jenkins
