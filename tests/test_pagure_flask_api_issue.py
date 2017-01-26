@@ -1917,18 +1917,22 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 self.assertEqual(
                     sorted(key.data), ['ack', 'nack', 'needs review'])
 
-        # No value specified while we try to create the field
+        # Reset the value of the field to None
         output = self.app.post(
             '/api/0/test/issue/1/custom/bugzilla', headers=headers)
-        self.assertEqual(output.status_code, 400)
+        self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         self.assertDictEqual(
             data,
             {
-              "error": "No value given to this new custom field: bugzilla",
-              "error_code": "ENOCODE",
+              'message': 'Custom field adjusted'
             }
         )
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(issue.other_fields, [])
+        self.assertEqual(len(issue.other_fields), 0)
 
         # Invalid value
         output = self.app.post(
@@ -1945,6 +1949,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             }
         )
 
+        repo = pagure.lib.get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.other_fields, [])
         self.assertEqual(len(issue.other_fields), 0)
@@ -1962,6 +1967,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             }
         )
 
+        repo = pagure.lib.get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.other_fields), 1)
         self.assertEqual(issue.other_fields[0].key.name, 'bugzilla')
@@ -1981,6 +1987,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             }
         )
 
+        repo = pagure.lib.get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.other_fields, [])
         self.assertEqual(len(issue.other_fields), 0)
