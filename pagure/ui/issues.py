@@ -669,10 +669,10 @@ def view_issues(repo, username=None, namespace=None):
             author=author,
             private=private,
             priority=priority,
-            count=True,
             search_pattern=search_pattern,
             custom_search=custom_search,
-        )
+            count=True,
+            )
         oth_issues_cnt = total_issues_cnt - issues_cnt
     else:
         issues = pagure.lib.search_issues(
@@ -682,12 +682,17 @@ def view_issues(repo, username=None, namespace=None):
             search_pattern=search_pattern,
             custom_search=custom_search,
         )
-        issues_cnt = total_issues_cnt
-
+        issues_cnt = pagure.lib.search_issues(
+            SESSION, repo, tags=tags, assignee=assignee,
+            author=author, private=private, priority=priority,
+            offset=flask.g.offset, limit=flask.g.limit,
+            search_pattern=search_pattern,
+            custom_search=custom_search,
+            count=True
+        )
     tag_list = pagure.lib.get_tags_of_project(SESSION, repo)
 
     total_page = int(ceil(issues_cnt / float(flask.g.limit)) if issues_cnt > 0 else 1)
-
     return flask.render_template(
         'issues.html',
         select='issues',
