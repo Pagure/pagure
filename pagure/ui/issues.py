@@ -688,7 +688,7 @@ def view_issues(repo, username=None, namespace=None):
             offset=flask.g.offset, limit=flask.g.limit,
             search_pattern=search_pattern,
             custom_search=custom_search,
-            count=True
+            count=True,
         )
     tag_list = pagure.lib.get_tags_of_project(SESSION, repo)
 
