@@ -105,6 +105,30 @@ class PagureFlaskFormTests(tests.Modeltests):
                 form.csrf_token.data = '##%s' % hmac_csrf
             self.assertTrue(form.validate_on_submit())
 
+    def test_add_user_form(self):
+        """ Test the AddUserForm of pagure.forms """
+        with pagure.APP.test_request_context(method='POST'):
+            form = pagure.forms.AddUserForm()
+            form.csrf_token.data = form.csrf_token.current_token
+            # No user or access given
+            self.assertFalse(form.validate_on_submit())
+            # No access given
+            form.user.data = 'foo'
+            self.assertFalse(form.validate_on_submit())
+            form.access.data = 'admin'
+            self.assertTrue(form.validate_on_submit())
+
+    def test_add_user_to_group_form(self):
+        """ Test the AddUserToGroup form of pagure.forms """
+        with pagure.APP.test_request_context(method='POST'):
+            form = pagure.forms.AddUserToGroupForm()
+            form.csrf_token.data = form.csrf_token.current_token
+            # No user given
+            self.assertFalse(form.validate_on_submit())
+            form.user.data = 'foo'
+            # Everything given
+            self.assertTrue(form.validate_on_submit())
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
