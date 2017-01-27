@@ -70,7 +70,8 @@
     {% endif %}
 
 <section id="tags">
-  <span class="btn-group btn-group-sm issues-tagbar" role="group">
+  <div class="m-b-1">
+    <span class="btn-group btn-group issues-tagbar" role="group">
       <a class="btn {%
         if status|lower in ['open', 'true'] %}btn-primary{%
         else %}btn-secondary{%
@@ -101,8 +102,26 @@
           search_pattern=search_pattern,
           tags=tags, author=author, status='all',
           assignee=assignee) }}">All</a>
-  </span>
-  <span class="oi m-l-2" data-glyph="tag"></span>
+    </span>
+    <span class="col-lg-3 col-sm-5 pull-xs-right tiny p-r-0">
+       <form action="{{ url_for('view_issues', username=username,
+                      repo=repo.name ) }}" method="GET">
+          <div class="input-group">
+            <input type="hidden" name="status" value="{{ status or 'all' }}" />
+            {% for tag in tags %}
+            <input type="hidden" name="tags" value="{{ tag }}" />
+            {% endfor %}
+             <input type="text" class="form-control input-sm"
+                    name="search_pattern" placeholder="Search"
+                    value="{{ search_pattern or '' }}" />
+             <span class="input-group-btn">
+                <input type="submit" class="btn btn-secondary btn-sm" value="Go!" />
+             </span>
+          </div>
+       </form>
+    </span>
+  </div>
+
   <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
     {% for tag in tag_list %}
       {% if tag.tag in tags %}
@@ -137,28 +156,12 @@
                 status=status or 'all') }}"
                 title="Filter issues by tag">
       {% endif %}
-
+        <span class="oi" data-glyph="tag"></span>
         {{ tag.tag }}</a>
     {% endfor %}
   </span>
-  <span class="col-lg-3 pull-xs-right tiny" >
-     <form action="{{ url_for('view_issues', username=username,
-                    repo=repo.name ) }}" method="GET">
-        <div class="input-group">
-          <input type="hidden" name="status" value="{{ status or 'all' }}" />
-          {% for tag in tags %}
-          <input type="hidden" name="tags" value="{{ tag }}" />
-          {% endfor %}
-           <input type="text" class="form-control input-sm"
-                  name="search_pattern" placeholder="Search"
-                  value="{{ search_pattern or '' }}" />
-           <span class="input-group-btn">
-              <input type="submit" class="btn btn-secondary btn-sm" value="Go!" />
-           </span>
-        </div>
-     </form>
-  </span>
 </section>
+
 <div class="card m-t-1">
 <table id="pagure-issues-list" class="table table-hover table-striped m-b-0">
     <thead class="thead-default">
