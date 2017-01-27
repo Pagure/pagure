@@ -3914,6 +3914,90 @@ class PagureLibtests(tests.Modeltests):
         )
         self.assertEqual(access_obj.access, 'ticket')
 
+    def test_get_obj_access_group(self):
+        """ Test the get_obj_access method of pagure.lib
+        for model.PagureGroup object """
+
+        # Create the projects
+        tests.create_projects(self.session)
+
+        # Create a group in database
+        msg = pagure.lib.add_group(
+            self.session,
+            group_name='JL',
+            display_name='Justice League',
+            description='Nope, it\'s not JLA anymore',
+            group_type='user',
+            user='foo',
+            is_admin=False,
+            blacklist=pagure.APP.config.get('BLACKLISTED_PROJECTS')
+        )
+
+        self.assertEqual(
+            msg,
+            'User `foo` added to the group `JL`.'
+        )
+
+        # Add a group object - make him an admin first
+        project = pagure.lib.get_project(self.session, name='test')
+        msg = pagure.lib.add_group_to_project(
+            self.session,
+            project=project,
+            new_group='JL',
+            user='pingou'
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Group added')
+
+        group = pagure.lib.search_groups(self.session, group_name='JL')
+        # He should be an admin
+        access_obj = pagure.lib.get_obj_access(
+            self.session,
+            project_obj=project,
+            obj=group
+        )
+        self.assertEqual(access_obj.access, 'admin')
+
+        # Update and check for commit access
+        msg = pagure.lib.add_group_to_project(
+            self.session,
+            project=project,
+            new_group='JL',
+            user='pingou',
+            access='commit'
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Group access updated')
+
+        project = pagure.lib.get_project(self.session, name='test')
+        # He should be a committer
+        access_obj = pagure.lib.get_obj_access(
+            self.session,
+            project_obj=project,
+            obj=group,
+        )
+        self.assertEqual(access_obj.access, 'commit')
+
+        # Update and check for ticket access
+        msg = pagure.lib.add_group_to_project(
+            self.session,
+            project=project,
+            new_group='JL',
+            user='pingou',
+            access='ticket'
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Group access updated')
+        project = pagure.lib.get_project(self.session, name='test')
+
+        # He should be a ticketer
+        access_obj = pagure.lib.get_obj_access(
+            self.session,
+            project_obj=project,
+            obj=group,
+        )
+        self.assertEqual(access_obj.access, 'ticket')
+
     def test_set_watch_obj(self):
         """ Test the set_watch_obj method in pagure.lib """
         # Create the project ns/test
