@@ -3513,6 +3513,340 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(len(users), 1)
         self.assertEqual(users[0].username, 'foo')
 
+    def test_get_project_groups(self):
+        ''' Test the get_project_groups method in pagure.lib
+        when combine is True '''
+
+        # Create some projects
+        tests.create_projects(self.session)
+        # Create a group in database
+        msg = pagure.lib.add_group(
+            self.session,
+            group_name='JL',
+            display_name='Justice League',
+            description='Nope, it\'s not JLA anymore',
+            group_type='user',
+            user='foo',
+            is_admin=False,
+            blacklist=pagure.APP.config.get('BLACKLISTED_PROJECTS')
+        )
+
+        self.assertEqual(
+            msg,
+            'User `foo` added to the group `JL`.'
+        )
+
+        # Add the group to project we just created, test
+        # First add it as an admin
+        project = pagure.lib.get_project(self.session, name='test')
+        msg = pagure.lib.add_group_to_project(
+            self.session,
+            project=project,
+            new_group='JL',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Group added')
+
+        # Now, the group is an admin in the project
+        # so, it must have access to everything
+        project = pagure.lib.get_project(self.session, name='test')
+        groups = pagure.lib.get_project_groups(
+            self.session,
+            project_obj=project,
+            access='admin',
+        )
+        self.assertEqual(len(groups), 1)
+        self.assertEqual(groups[0].display_name, 'Justice League')
+        self.assertEqual(len(project.admin_groups), 1)
+        self.assertEqual(
+            project.admin_groups[0].display_name,
+            'Justice League'
+        )
+
+        # The group should be committer as well
+        groups = pagure.lib.get_project_groups(
+            self.session,
+            project_obj=project,
+            access='commit',
+        )
+        self.assertEqual(len(groups), 1)
+        self.assertEqual(groups[0].display_name, 'Justice League')
+        self.assertEqual(len(project.committer_groups), 1)
+        self.assertEqual(
+            project.committer_groups[0].display_name,
+            'Justice League'
+        )
+
+        # The group should be ticketer as well
+        groups = pagure.lib.get_project_groups(
+            self.session,
+            project_obj=project,
+            access='ticket',
+        )
+        self.assertEqual(len(groups), 1)
+        self.assertEqual(groups[0].display_name, 'Justice League')
+        self.assertEqual(len(project.groups), 1)
+        self.assertEqual(
+            project.groups[0].display_name,
+            'Justice League'
+        )
+
+        # Update the access level of the group, JL to commit
+        project = pagure.lib.get_project(self.session, name='test')
+        msg = pagure.lib.add_group_to_project(
+            self.session,
+            project=project,
+            new_group='JL',
+            user='pingou',
+            access='commit'
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Group access updated')
+
+        # It shouldn't be an admin
+        project = pagure.lib.get_project(self.session, name='test')
+        groups = pagure.lib.get_project_groups(
+            self.session,
+            project_obj=project,
+            access='admin',
+        )
+        self.assertEqual(len(groups), 0)
+        self.assertEqual(len(project.admin_groups), 0)
+
+        # It is a committer
+        groups = pagure.lib.get_project_groups(
+            self.session,
+            project_obj=project,
+            access='commit',
+        )
+        self.assertEqual(len(groups), 1)
+        self.assertEqual(groups[0].display_name, 'Justice League')
+        self.assertEqual(len(project.committer_groups), 1)
+        self.assertEqual(
+            project.committer_groups[0].display_name,
+            'Justice League'
+        )
+
+        # The group should be ticketer as well
+        groups = pagure.lib.get_project_groups(
+            self.session,
+            project_obj=project,
+            access='ticket',
+        )
+        self.assertEqual(len(groups), 1)
+        self.assertEqual(groups[0].display_name, 'Justice League')
+        self.assertEqual(len(project.groups), 1)
+        self.assertEqual(
+            project.groups[0].display_name,
+            'Justice League'
+        )
+
+        # Update the access of group JL to ticket
+        msg = pagure.lib.add_group_to_project(
+            self.session,
+            project=project,
+            new_group='JL',
+            user='pingou',
+            access='ticket'
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Group access updated')
+
+        # It is not an admin
+        project = pagure.lib.get_project(self.session, name='test')
+        groups = pagure.lib.get_project_groups(
+            self.session,
+            project_obj=project,
+            access='admin',
+        )
+        self.assertEqual(len(groups), 0)
+        self.assertEqual(len(project.admin_groups), 0)
+
+        # The group shouldn't be a committer
+        groups = pagure.lib.get_project_groups(
+            self.session,
+            project_obj=project,
+            access='commit',
+        )
+        self.assertEqual(len(groups), 0)
+        self.assertEqual(len(project.committer_groups), 0)
+
+        # The group should be ticketer
+        groups = pagure.lib.get_project_groups(
+            self.session,
+            project_obj=project,
+            access='ticket',
+        )
+        self.assertEqual(len(groups), 1)
+        self.assertEqual(groups[0].display_name, 'Justice League')
+        self.assertEqual(len(project.groups), 1)
+        self.assertEqual(
+            project.groups[0].display_name,
+            'Justice League'
+        )
+
+    def test_get_project_groups_combine_false(self):
+        ''' Test the get_project_groups method in pagure.lib
+        when combine is False '''
+
+        # Create some projects
+        tests.create_projects(self.session)
+        # Create a group in database
+        msg = pagure.lib.add_group(
+            self.session,
+            group_name='JL',
+            display_name='Justice League',
+            description='Nope, it\'s not JLA anymore',
+            group_type='user',
+            user='foo',
+            is_admin=False,
+            blacklist=pagure.APP.config.get('BLACKLISTED_PROJECTS')
+        )
+
+        self.assertEqual(
+            msg,
+            'User `foo` added to the group `JL`.'
+        )
+
+        # Add the group to project we just created, test
+        # First add it as an admin
+        project = pagure.lib.get_project(self.session, name='test')
+        msg = pagure.lib.add_group_to_project(
+            self.session,
+            project=project,
+            new_group='JL',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Group added')
+
+        # Now, the group is an admin in the project
+        # so, it must have access to everything
+        project = pagure.lib.get_project(self.session, name='test')
+        groups = pagure.lib.get_project_groups(
+            self.session,
+            project_obj=project,
+            access='admin',
+            combine=False,
+        )
+        self.assertEqual(len(groups), 1)
+        self.assertEqual(groups[0].display_name, 'Justice League')
+        self.assertEqual(len(project.admin_groups), 1)
+        self.assertEqual(
+            project.admin_groups[0].display_name,
+            'Justice League'
+        )
+
+        # The group shoudn't be a committer
+        groups = pagure.lib.get_project_groups(
+            self.session,
+            project_obj=project,
+            access='commit',
+            combine=False,
+        )
+        self.assertEqual(len(groups), 0)
+
+        # The group shoudn't be a ticketer
+        groups = pagure.lib.get_project_groups(
+            self.session,
+            project_obj=project,
+            access='ticket',
+            combine=False,
+        )
+        self.assertEqual(len(groups), 0)
+
+        # Update the access level of the group, JL to commit
+        project = pagure.lib.get_project(self.session, name='test')
+        msg = pagure.lib.add_group_to_project(
+            self.session,
+            project=project,
+            new_group='JL',
+            user='pingou',
+            access='commit'
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Group access updated')
+
+        # It shouldn't be an admin
+        project = pagure.lib.get_project(self.session, name='test')
+        groups = pagure.lib.get_project_groups(
+            self.session,
+            project_obj=project,
+            access='admin',
+            combine=False,
+        )
+        self.assertEqual(len(groups), 0)
+
+        # It is a committer
+        groups = pagure.lib.get_project_groups(
+            self.session,
+            project_obj=project,
+            access='commit',
+            combine=False,
+        )
+        self.assertEqual(len(groups), 1)
+        self.assertEqual(groups[0].display_name, 'Justice League')
+        self.assertEqual(len(project.committer_groups), 1)
+        self.assertEqual(
+            project.committer_groups[0].display_name,
+            'Justice League'
+        )
+
+        # The group shouldn't be ticketer
+        groups = pagure.lib.get_project_groups(
+            self.session,
+            project_obj=project,
+            access='ticket',
+            combine=False,
+        )
+        self.assertEqual(len(groups), 0)
+
+        # Update the access of group JL to ticket
+        msg = pagure.lib.add_group_to_project(
+            self.session,
+            project=project,
+            new_group='JL',
+            user='pingou',
+            access='ticket'
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Group access updated')
+
+        # It is not an admin
+        project = pagure.lib.get_project(self.session, name='test')
+        groups = pagure.lib.get_project_groups(
+            self.session,
+            project_obj=project,
+            access='admin',
+            combine=False,
+        )
+        self.assertEqual(len(groups), 0)
+
+        # The group shouldn't be a committer
+        groups = pagure.lib.get_project_groups(
+            self.session,
+            project_obj=project,
+            access='commit',
+            combine=False,
+        )
+        self.assertEqual(len(groups), 0)
+
+        # The group should be ticketer
+        groups = pagure.lib.get_project_groups(
+            self.session,
+            project_obj=project,
+            access='ticket',
+            combine=False,
+        )
+        self.assertEqual(len(groups), 1)
+        self.assertEqual(groups[0].display_name, 'Justice League')
+        self.assertEqual(len(project.groups), 1)
+        self.assertEqual(
+            project.groups[0].display_name,
+            'Justice League'
+        )
+
     def test_set_watch_obj(self):
         """ Test the set_watch_obj method in pagure.lib """
         # Create the project ns/test
