@@ -129,6 +129,20 @@ class PagureFlaskFormTests(tests.Modeltests):
             # Everything given
             self.assertTrue(form.validate_on_submit())
 
+    def test_add_group_form(self):
+        """ Test the AddGroupForm form of pagure.forms """
+        with pagure.APP.test_request_context(method='POST'):
+            form = pagure.forms.AddGroupForm()
+            form.csrf_token.data = form.csrf_token.current_token
+            # No group given
+            self.assertFalse(form.validate_on_submit())
+            # No access given
+            form.group.data = 'gname'
+            self.assertFalse(form.validate_on_submit())
+            form.access.data = 'admin'
+            self.assertTrue(form.validate_on_submit())
+
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(
