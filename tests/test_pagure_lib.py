@@ -3220,6 +3220,287 @@ class PagureLibtests(tests.Modeltests):
             sorted(acls)
         )
 
+    def test_get_project_users(self):
+        ''' Test the get_project_users method in pagure.lib.__init__
+        when combine is True '''
+
+        tests.create_projects(self.session)
+        project = pagure.lib.get_project(self.session, name='test')
+
+        # Default value of combine is True
+        # which means the an admin is a user, committer as well
+        # and a committer is also a user
+        # and a user is just a user
+        users = pagure.lib.get_project_users(
+            self.session,
+            project_obj=project,
+            access='admin',
+        )
+
+        # Only pingou is the admin as of now
+        # But, he is the creator and
+        # the creator of the project is not listed in user_projects
+        # table. Thus, get_projec_users won't return him as an admin
+        # He has all the access of an admin though
+        self.assertEqual(len(users), 0)
+        self.assertEqual(project.user.username, 'pingou')
+
+        users = pagure.lib.get_project_users(
+            self.session,
+            project_obj=project,
+            access='owner',
+        )
+
+        # Wrong access level, should return None
+        self.assertEqual(users, None)
+
+        # Let's add a new user to the project, 'foo'
+        # By default, if no access is specified, he becomes an admin
+        msg = pagure.lib.add_user_to_project(
+            self.session,
+            project=project,
+            new_user='foo',
+            user='pingou'
+        )
+        self.session.commit()
+        # since, he is an admin, the msg should be 'User added'
+        self.assertEqual(msg, 'User added')
+
+        project = pagure.lib.get_project(self.session, name='test')
+        users = pagure.lib.get_project_users(
+            self.session,
+            project_obj=project,
+            access='admin',
+        )
+
+        self.assertEqual(len(users), 1)
+        self.assertEqual(users[0].username, 'foo')
+
+        # foo should be a committer as well, since he is an admin
+        users = pagure.lib.get_project_users(
+            self.session,
+            project_obj=project,
+            access='commit',
+        )
+
+        self.assertEqual(len(users), 1)
+        self.assertEqual(users[0].username, 'foo')
+
+        # the admin also has ticket access
+        users = pagure.lib.get_project_users(
+            self.session,
+            project_obj=project,
+            access='ticket',
+        )
+
+        self.assertEqual(len(users), 1)
+        self.assertEqual(users[0].username, 'foo')
+
+        # let's update the access of foo to 'committer'
+        msg = pagure.lib.add_user_to_project(
+            self.session,
+            project=project,
+            new_user='foo',
+            user='pingou',
+            access='commit'
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User access updated')
+
+        project = pagure.lib.get_project(self.session, name='test')
+        # No admin now, even though pingou the creator is there
+        users = pagure.lib.get_project_users(
+            self.session,
+            project_obj=project,
+            access='admin',
+        )
+        self.assertEqual(len(users), 0)
+
+        users = pagure.lib.get_project_users(
+            self.session,
+            project_obj=project,
+            access='commit',
+        )
+        # foo is the committer currently
+        self.assertEqual(len(users), 1)
+        self.assertEqual(users[0].username, 'foo')
+
+        users = pagure.lib.get_project_users(
+            self.session,
+            project_obj=project,
+            access='ticket',
+        )
+
+        # foo also has ticket rights
+        self.assertEqual(len(users), 1)
+        self.assertEqual(users[0].username, 'foo')
+
+        # let's update the access of foo to 'ticket'
+        msg = pagure.lib.add_user_to_project(
+            self.session,
+            project=project,
+            new_user='foo',
+            user='pingou',
+            access='ticket'
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User access updated')
+
+        project = pagure.lib.get_project(self.session, name='test')
+        # No admin now, even though pingou the creator is there
+        users = pagure.lib.get_project_users(
+            self.session,
+            project_obj=project,
+            access='admin',
+        )
+        self.assertEqual(len(users), 0)
+
+        users = pagure.lib.get_project_users(
+            self.session,
+            project_obj=project,
+            access='commit',
+        )
+        # foo deosn't have commit rights now
+        self.assertEqual(len(users), 0)
+
+        users = pagure.lib.get_project_users(
+            self.session,
+            project_obj=project,
+            access='ticket',
+        )
+
+        # foo does have tickets right though
+        self.assertEqual(len(users), 1)
+        self.assertEqual(users[0].username, 'foo')
+
+    def test_get_project_users_combine_false(self):
+        ''' Test the get_project_users method in pagure.lib.__init__
+        when combine is False '''
+
+        tests.create_projects(self.session)
+        project = pagure.lib.get_project(self.session, name='test')
+
+        # Let's add a new user to the project, 'foo'
+        # By default, if no access is specified, he becomes an admin
+        msg = pagure.lib.add_user_to_project(
+            self.session,
+            project=project,
+            new_user='foo',
+            user='pingou'
+        )
+        self.session.commit()
+        # since, he is an admin, the msg should be 'User added'
+        self.assertEqual(msg, 'User added')
+
+        # only one admin
+        users = pagure.lib.get_project_users(
+            self.session,
+            project_obj=project,
+            access='admin',
+            combine=False,
+        )
+
+        self.assertEqual(len(users), 1)
+        self.assertEqual(users[0].username, 'foo')
+
+        # No user with only commit access
+        users = pagure.lib.get_project_users(
+            self.session,
+            project_obj=project,
+            access='commit',
+            combine=False,
+        )
+        self.assertEqual(len(users), 0)
+
+        # No user with only ticket access
+        users = pagure.lib.get_project_users(
+            self.session,
+            project_obj=project,
+            access='ticket',
+            combine=False,
+        )
+        self.assertEqual(len(users), 0)
+
+        # Update the access level of foo user to commit
+        msg = pagure.lib.add_user_to_project(
+            self.session,
+            project=project,
+            new_user='foo',
+            user='pingou',
+            access='commit'
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User access updated')
+
+        # He is just a committer
+        project = pagure.lib.get_project(self.session, name='test')
+        users = pagure.lib.get_project_users(
+            self.session,
+            project_obj=project,
+            access='admin',
+            combine=False,
+        )
+        self.assertEqual(len(users), 0)
+
+        # He is just a committer
+        users = pagure.lib.get_project_users(
+            self.session,
+            project_obj=project,
+            access='commit',
+            combine=False,
+        )
+        self.assertEqual(len(users), 1)
+        self.assertEqual(users[0].username, 'foo')
+
+        # He is just a committer
+        users = pagure.lib.get_project_users(
+            self.session,
+            project_obj=project,
+            access='ticket',
+            combine=False,
+        )
+        self.assertEqual(len(users), 0)
+
+        # Update the access level of foo user to ticket
+        msg = pagure.lib.add_user_to_project(
+            self.session,
+            project=project,
+            new_user='foo',
+            user='pingou',
+            access='ticket'
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User access updated')
+
+        # He is just a ticketer
+        project = pagure.lib.get_project(self.session, name='test')
+        users = pagure.lib.get_project_users(
+            self.session,
+            project_obj=project,
+            access='admin',
+            combine=False,
+        )
+        self.assertEqual(len(users), 0)
+
+        # He is just a ticketer
+        users = pagure.lib.get_project_users(
+            self.session,
+            project_obj=project,
+            access='commit',
+            combine=False,
+        )
+        self.assertEqual(len(users), 0)
+
+        # He is just a ticketer
+        users = pagure.lib.get_project_users(
+            self.session,
+            project_obj=project,
+            access='ticket',
+            combine=False,
+        )
+        self.assertEqual(len(users), 1)
+        self.assertEqual(users[0].username, 'foo')
+
     def test_set_watch_obj(self):
         """ Test the set_watch_obj method in pagure.lib """
         # Create the project ns/test
