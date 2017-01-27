@@ -3847,6 +3847,73 @@ class PagureLibtests(tests.Modeltests):
             'Justice League'
         )
 
+    def test_get_obj_access_user(self):
+        """ Test the get_obj_access method of pagure.lib
+        for model.User object """
+
+        # Create the projects
+        tests.create_projects(self.session)
+
+        # Add a user object - make him an admin first
+        project = pagure.lib.get_project(self.session, name='test')
+        msg = pagure.lib.add_user_to_project(
+            self.session,
+            project=project,
+            new_user='foo',
+            user='pingou'
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User added')
+
+        user = pagure.lib.get_user(self.session, key='foo')
+        # He should be an admin
+        access_obj = pagure.lib.get_obj_access(
+            self.session,
+            project_obj=project,
+            obj=user
+        )
+        self.assertEqual(access_obj.access, 'admin')
+
+        # Update and check for commit access
+        msg = pagure.lib.add_user_to_project(
+            self.session,
+            project=project,
+            new_user='foo',
+            user='pingou',
+            access='commit'
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User access updated')
+        project = pagure.lib.get_project(self.session, name='test')
+
+        # He should be a committer
+        access_obj = pagure.lib.get_obj_access(
+            self.session,
+            project_obj=project,
+            obj=user
+        )
+        self.assertEqual(access_obj.access, 'commit')
+
+        # Update and check for ticket access
+        msg = pagure.lib.add_user_to_project(
+            self.session,
+            project=project,
+            new_user='foo',
+            user='pingou',
+            access='ticket'
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User access updated')
+        project = pagure.lib.get_project(self.session, name='test')
+
+        # He should be a ticketer
+        access_obj = pagure.lib.get_obj_access(
+            self.session,
+            project_obj=project,
+            obj=user
+        )
+        self.assertEqual(access_obj.access, 'ticket')
+
     def test_set_watch_obj(self):
         """ Test the set_watch_obj method in pagure.lib """
         # Create the project ns/test
