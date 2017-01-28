@@ -299,6 +299,112 @@ class PagureFlaskInternaltests(tests.Modeltests):
         pagure.APP.config['IP_ALLOWED_INTERNAL'] = before[:]
 
     @patch('pagure.lib.notify.send_email')
+    def test_private_ticket_add_comment_acl(self, send_email):
+        """ Test the ticket_add_comment function on a private ticket.  """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+
+        # Create issues to play with
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this, really',
+            user='pingou',
+            private=True,
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = repo.issues[0]
+        self.assertEqual(len(issue.comments), 0)
+
+        # Currently, he is just an average user,
+        # He doesn't have any access in this repo
+        data = {
+            'objid': issue.uid,
+            'useremail': 'foo@bar.com',
+            'comment': 'Looks good to me!',
+        }
+
+        # Valid objid, un-allowed user for this (private) ticket
+        output = self.app.put('/pv/ticket/comment/', data=data)
+        self.assertEqual(output.status_code, 403)
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        # Let's promote him to be a ticketer
+        # He shoudn't be able to comment even then though
+        msg = pagure.lib.add_user_to_project(
+            self.session,
+            project=repo,
+            new_user='foo',
+            user='pingou',
+            access='ticket'
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User added')
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        output = self.app.put('/pv/ticket/comment/', data=data)
+        self.assertEqual(output.status_code, 403)
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        # Let's promote him to be a committer
+        # He should be able to comment
+        msg = pagure.lib.add_user_to_project(
+            self.session,
+            project=repo,
+            new_user='foo',
+            user='pingou',
+            access='commit'
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User access updated')
+        # Add comment
+        output = self.app.put('/pv/ticket/comment/', data=data)
+        self.assertEqual(output.status_code, 200)
+        js_data = json.loads(output.data)
+        self.assertDictEqual(js_data, {'message': 'Comment added'})
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = repo.issues[0]
+        self.assertEqual(len(issue.comments), 1)
+
+        # Let's promote him to be a admin
+        # He should be able to comment
+        msg = pagure.lib.add_user_to_project(
+            self.session,
+            project=repo,
+            new_user='foo',
+            user='pingou',
+            access='admin'
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User access updated')
+        # Add comment
+        output = self.app.put('/pv/ticket/comment/', data=data)
+        self.assertEqual(output.status_code, 200)
+        js_data = json.loads(output.data)
+        self.assertDictEqual(js_data, {'message': 'Comment added'})
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = repo.issues[0]
+        self.assertEqual(len(issue.comments), 2)
+
+        # Check the @localonly
+        before = pagure.APP.config['IP_ALLOWED_INTERNAL'][:]
+        pagure.APP.config['IP_ALLOWED_INTERNAL'] = []
+
+        output = self.app.put('/pv/ticket/comment/', data=data)
+        self.assertEqual(output.status_code, 403)
+
+        pagure.APP.config['IP_ALLOWED_INTERNAL'] = before[:]
+
+    @patch('pagure.lib.notify.send_email')
     def test_mergeable_request_pull_FF(self, send_email):
         """ Test the mergeable_request_pull endpoint with a fast-forward
         merge.
