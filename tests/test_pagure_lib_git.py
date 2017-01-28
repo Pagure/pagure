@@ -9,9 +9,9 @@
 """
 
 __requires__ = ['SQLAlchemy >= 0.8']
+
 import pkg_resources
 
-import json
 import unittest
 import shutil
 import sys
