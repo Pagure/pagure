@@ -477,13 +477,14 @@ repo requests/forks/pingou/test3
 
     def test_write_gitolite_acls_groups(self):
         """ Test the write_gitolite_acls function of pagure.lib.git with
-        groups.
+        groups as admin
         """
         tests.create_projects(self.session)
 
         repo = pagure.lib.get_project(self.session, 'test')
 
         # Add a couple of groups
+        # They would be admins
         msg = pagure.lib.add_group(
             self.session,
             group_name='sysadmin',
