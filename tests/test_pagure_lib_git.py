@@ -632,6 +632,159 @@ repo requests/forks/pingou/test2
         os.unlink(outputconf)
         self.assertFalse(os.path.exists(outputconf))
 
+    def test_write_gitolite_acls_groups_ticket(self):
+        """ Test the write_gitolite_acls function of pagure.lib.git with
+        groups as ticketers
+        """
+        tests.create_projects(self.session)
+
+        repo = pagure.lib.get_project(self.session, 'test')
+
+        # Add a couple of groups
+        # They would be ticketers
+        msg = pagure.lib.add_group(
+            self.session,
+            group_name='sysadmin',
+            display_name='sysadmin group',
+            description=None,
+            group_type='user',
+            user='pingou',
+            is_admin=False,
+            blacklist=[],
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User `pingou` added to the group `sysadmin`.')
+        msg = pagure.lib.add_group(
+            self.session,
+            group_name='devs',
+            display_name='devs group',
+            description=None,
+            group_type='user',
+            user='pingou',
+            is_admin=False,
+            blacklist=[],
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User `pingou` added to the group `devs`.')
+
+        # Associate these groups to a project
+        msg = pagure.lib.add_group_to_project(
+            session=self.session,
+            project=repo,
+            new_group='sysadmin',
+            user='pingou',
+            access='ticket',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Group added')
+        msg = pagure.lib.add_group_to_project(
+            session=self.session,
+            project=repo,
+            new_group='devs',
+            user='pingou',
+            access='ticket'
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Group added')
+
+        # Add an user to a project
+        msg = pagure.lib.add_user_to_project(
+            session=self.session,
+            project=repo,
+            new_user='foo',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User added')
+        # Add a forked project
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test2',
+            description='test project #2',
+            is_fork=True,
+            parent_id=1,
+            hook_token='aaabbbvvv',
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        outputconf = os.path.join(self.path, 'test_gitolite.conf')
+
+        pagure.lib.git.write_gitolite_acls(self.session, outputconf)
+
+        self.assertTrue(os.path.exists(outputconf))
+
+        with open(outputconf) as stream:
+            data = stream.read()
+
+        exp = """
+repo test
+  R   = @all
+  RW+ = pingou
+  RW+ = foo
+
+repo docs/test
+  R   = @all
+  RW+ = pingou
+  RW+ = foo
+
+repo tickets/test
+  RW+ = pingou
+  RW+ = foo
+
+repo requests/test
+  RW+ = pingou
+  RW+ = foo
+
+repo test2
+  R   = @all
+  RW+ = pingou
+
+repo docs/test2
+  R   = @all
+  RW+ = pingou
+
+repo tickets/test2
+  RW+ = pingou
+
+repo requests/test2
+  RW+ = pingou
+
+repo somenamespace/test3
+  R   = @all
+  RW+ = pingou
+
+repo docs/somenamespace/test3
+  R   = @all
+  RW+ = pingou
+
+repo tickets/somenamespace/test3
+  RW+ = pingou
+
+repo requests/somenamespace/test3
+  RW+ = pingou
+
+repo forks/pingou/test2
+  R   = @all
+  RW+ = pingou
+
+repo docs/forks/pingou/test2
+  R   = @all
+  RW+ = pingou
+
+repo tickets/forks/pingou/test2
+  RW+ = pingou
+
+repo requests/forks/pingou/test2
+  RW+ = pingou
+
+"""
+        #print data
+        self.assertEqual(data.split('\n'), exp.split('\n'))
+
+        os.unlink(outputconf)
+        self.assertFalse(os.path.exists(outputconf))
+
     def test_commit_to_patch(self):
         """ Test the commit_to_patch function of pagure.lib.git. """
         # Create a git repo to play with
