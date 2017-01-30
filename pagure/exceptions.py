@@ -30,6 +30,12 @@ class ProjectBlackListedException(PagureException):
     pass
 
 
+class AccessLevelNotFound(PagureException):
+    ''' Exception raised when the access level asked is not allowed on pagure
+    '''
+    pass
+
+
 class FileNotFoundException(PagureException):
     ''' Exception thrown when trying to create a repository that already
     exists.
