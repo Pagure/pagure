@@ -47,11 +47,13 @@ class PagureLibGittests(tests.Modeltests):
             self.path, 'requests')
 
     def test_write_gitolite_acls(self):
-        """ Test the write_gitolite_acls function of pagure.lib.git. """
+        """ Test the write_gitolite_acls function of pagure.lib.git.
+        when the new uesr is an made an admin """
         tests.create_projects(self.session)
 
         repo = pagure.lib.get_project(self.session, 'test')
         # Add an user to a project
+        # The user will be an admin of the project
         msg = pagure.lib.add_user_to_project(
             session=self.session,
             project=repo,
