@@ -17,8 +17,9 @@ import pagure
 import pagure.exceptions
 import pagure.lib
 
-from pagure import APP, SESSION, is_repo_committer, api_authenticated
-
+from pagure import (
+    APP, SESSION, is_repo_committer, api_authenticated, urlpattern
+)
 from pagure.api import (
     API, api_method, api_login_required, api_login_optional, APIERROR
 )
