@@ -3257,14 +3257,14 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(len(users), 0)
         self.assertEqual(project.user.username, 'pingou')
 
-        users = pagure.lib.get_project_users(
-            self.session,
-            project_obj=project,
-            access='owner',
+        # Wrong access level, should raise Accesslevelnotfound exception
+        self.assertRaises(
+            pagure.exceptions.AccessLevelNotFound,
+            pagure.lib.get_project_users,
+                self.session,
+                project_obj=project,
+                access='owner',
         )
-
-        # Wrong access level, should return None
-        self.assertEqual(users, None)
 
         # Let's add a new user to the project, 'foo'
         # By default, if no access is specified, he becomes an admin
