@@ -4002,7 +4002,8 @@ def get_project_users(session, project_obj, access, combine=True):
     '''
 
     if access not in ['admin', 'commit', 'ticket']:
-        return None
+        raise pagure.exceptions.AccessLevelNotFound(
+            'The access level does not exist')
 
     if combine:
         if access == 'admin':
@@ -4049,7 +4050,8 @@ def get_project_groups(session, project_obj, access, combine=True):
     '''
 
     if access not in ['admin', 'commit', 'ticket']:
-        return None
+        raise pagure.exceptions.AccessLevelNotFound(
+            'The access level does not exist')
 
     if combine:
         if access == 'admin':
