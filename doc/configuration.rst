@@ -604,6 +604,24 @@ this pagure instance does not have a documentation server.
 Defaults to: ``None``
 
 
+EXCLUDE_GROUP_INDEX
+~~~~~~~~~~~~~~~~~~~
+
+This configuration key can be used to hide project an user has access to via
+one of the groups listed in this key.
+
+The use-case is the following: the Fedora project is deploying pagure has a
+front-end for the git repos of the packages in the distribution, that means
+about 17,000 git repositories in pagure. The project has a group of people
+that have access to all of these repositories, so when viewing the user's
+page of one member ot that group, instead of seeing all the project that
+this user works on, you can see all the projects hosted in that pagure
+instance. Using this configuration key, pagure will hide all the projects
+that this user has access to via the specified groups and thus return only
+the groups of forks of that users.
+
+Defaults to: ``[]``
+
 
 Deprecated configuration keys
 -----------------------------

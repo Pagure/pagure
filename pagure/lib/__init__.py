@@ -1685,7 +1685,8 @@ def fork_project(session, user, repo, gitfolder,
 def search_projects(
         session, username=None,
         fork=None, tags=None, namespace=None, pattern=None,
-        start=None, limit=None, count=False, sort=None):
+        start=None, limit=None, count=False, sort=None,
+        exclude_groups=None):
     '''List existing projects
     '''
     projects = session.query(
@@ -1735,6 +1736,16 @@ def search_projects(
                 model.Project.id == model.ProjectGroup.project_id,
             )
         )
+
+        # Exclude projects that the user has accessed via a group that we
+        # do not want to include
+        if exclude_groups:
+            sub_q3 = sub_q3.filter(
+                model.PagureGroup.group_name.notin_(exclude_groups)
+            )
+            sub_q4 = sub_q4.filter(
+                model.PagureGroup.group_name.notin_(exclude_groups)
+            )
 
         projects = projects.union(sub_q2).union(sub_q3).union(sub_q4)
 

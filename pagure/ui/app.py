@@ -95,6 +95,7 @@ def index_auth():
     repos = pagure.lib.search_projects(
         SESSION,
         username=flask.g.fas_user.username,
+        exclude_groups=APP.config.get('EXCLUDE_GROUP_INDEX'),
         fork=False)
     repos_length = pagure.lib.search_projects(
         SESSION,
@@ -298,6 +299,7 @@ def view_user(username):
         SESSION,
         username=username,
         fork=False,
+        exclude_groups=APP.config.get('EXCLUDE_GROUP_INDEX'),
         start=repo_start,
         limit=limit)
     repos_length = pagure.lib.search_projects(

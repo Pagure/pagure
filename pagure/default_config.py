@@ -232,3 +232,7 @@ PAGURE_CI_SERVICES = []
 
 # Boolean to turn on project being by default in the user's namespace
 USER_NAMESPACE = False
+
+# List of groups whose projects should not be shown on the user's info page
+# unless the user has direct access to it.
+EXCLUDE_GROUP_INDEX = []
