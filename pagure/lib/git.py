@@ -14,7 +14,6 @@
 # pylint: disable=too-many-statements
 # pylint: disable=too-many-lines
 
-
 import datetime
 import hashlib
 import json
@@ -29,7 +28,7 @@ import pygit2
 import werkzeug
 
 from sqlalchemy.exc import SQLAlchemyError
-
+from .__init__ import MetaComment
 import pagure
 import pagure.exceptions
 import pagure.lib
@@ -427,7 +426,7 @@ def get_project_from_json(
     return project
 
 
-def update_custom_field_from_json(session, repo, issue, json_data):
+def update_custom_field_from_json(session, repo, issue, json_data, mcomment):
     ''' Update the custom fields according to the custom fields of
     the issue. If the custom field is not present for the repo in
     it's settings, this will create them.
@@ -473,6 +472,7 @@ def update_custom_field_from_json(session, repo, issue, json_data):
             issue=issue,
             key=key_obj,
             value=value,
+            mcomment=mcomment
         )
         try:
             session.commit()
@@ -501,6 +501,7 @@ def update_ticket_from_git(
                 reponame, username, namespace))
 
     user = get_user_from_json(session, json_data)
+    mcomment = MetaComment()
 
     issue = pagure.lib.get_issue_by_uid(session, issue_uid=issue_uid)
     if not issue:
@@ -534,6 +535,7 @@ def update_ticket_from_git(
             status=json_data.get('status'),
             close_status=json_data.get('close_status'),
             private=json_data.get('private'),
+            mcomment=mcomment
         )
     session.commit()
 
@@ -544,6 +546,7 @@ def update_ticket_from_git(
         repo=repo,
         issue=issue,
         json_data=json_data,
+        mcomment=mcomment
     )
 
     # Update milestone
@@ -567,6 +570,7 @@ def update_ticket_from_git(
             ticketfolder=None,
             user=user.username,
             milestone=milestone,
+            mcomment=mcomment
         )
     except SQLAlchemyError:
         session.rollback()
@@ -586,26 +590,27 @@ def update_ticket_from_git(
     # Update tags
     tags = json_data.get('tags', [])
     pagure.lib.update_tags(
-        session, issue, tags, username=user.user, ticketfolder=None)
+        session, issue, tags, username=user.user, ticketfolder=None,
+        mcomment=mcomment)
 
     # Update assignee
     assignee = get_user_from_json(session, json_data, key='assignee')
     if assignee:
         pagure.lib.add_issue_assignee(
-            session, issue, assignee.username,
+            session, issue, assignee.username, mcomment=mcomment,
             user=user.user, ticketfolder=None, notify=False)
 
     # Update depends
     depends = json_data.get('depends', [])
     pagure.lib.update_dependency_issue(
         session, issue.project, issue, depends,
-        username=user.user, ticketfolder=None)
+        username=user.user, ticketfolder=None, mcomment=mcomment)
 
     # Update blocks
     blocks = json_data.get('blocks', [])
     pagure.lib.update_blocked_issue(
         session, issue.project, issue, blocks,
-        username=user.user, ticketfolder=None)
+        username=user.user, ticketfolder=None, mcomment=mcomment)
 
     for comment in json_data['comments']:
         user = get_user_from_json(session, comment)
@@ -622,6 +627,17 @@ def update_ticket_from_git(
                 date_created=datetime.datetime.utcfromtimestamp(
                     float(comment['date_created'])),
             )
+    if mcomment.is_set():
+        pagure.lib.add_issue_comment(
+            session,
+            issue,
+            comment='@%s updated metadata\n%s' % (
+                            user.username, mcomment.get()),
+            user=user.username,
+            ticketfolder=None,
+            notify=False,
+            notification=True)
+
     session.commit()
 
 

@@ -1075,7 +1075,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = json.loads(output.data)
         self.assertDictEqual(
             data,
-            {'message': ['', '']}
+            {'message': 'No changes'}
         )
 
         # No change
@@ -1092,12 +1092,9 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             '/api/0/test/issue/1/status', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
-        print "MARK2\n\n" + str(data)
         self.assertDictEqual(
             data,
-            {'message': ['Successfully edited issue #1',
-                         '**Closed as** changed from ``""`` to ``Fixed``\n'
-                         '**Status** changed from ``Open`` to ``Closed``\n']}
+            {'message': 'Successfully edited issue #1'}
         )
 
         headers = {'Authorization': 'token pingou_foo'}
@@ -1509,7 +1506,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = json.loads(output.data)
         self.assertDictEqual(
             data,
-            {'message': ['Issue assigned', '**Assignee** set to ``pingou``']}
+            {'message': 'Issue assigned'}
         )
 
         # Un-assign
@@ -1519,7 +1516,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = json.loads(output.data)
         self.assertDictEqual(
             data,
-            {'message': ['Assignee reset', '**Assignee** removed ``pingou``']}
+            {'message': 'Assignee reset'}
         )
         repo = pagure.lib.get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
@@ -1533,7 +1530,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = json.loads(output.data)
         self.assertDictEqual(
             data,
-            {'message': ['Nothing to change', '']}
+            {'message': 'Nothing to change'}
         )
         repo = pagure.lib.get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
@@ -1547,7 +1544,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = json.loads(output.data)
         self.assertDictEqual(
             data,
-            {'message': ['Issue assigned', '**Assignee** set to ``pingou``']}
+            {'message': 'Issue assigned'}
         )
 
         # Un-assign
@@ -1558,7 +1555,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = json.loads(output.data)
         self.assertDictEqual(
             data,
-            {'message': ['Assignee reset', '**Assignee** removed ``pingou``']}
+            {'message': 'Assignee reset'}
         )
 
         # Re-assign for the rest of the tests
@@ -1569,7 +1566,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = json.loads(output.data)
         self.assertDictEqual(
             data,
-            {'message': ['Issue assigned', '**Assignee** set to ``pingou``']}
+            {'message': 'Issue assigned'}
         )
 
         # One comment added
@@ -1669,7 +1666,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = json.loads(output.data)
         self.assertDictEqual(
             data,
-            {'message': ['Issue assigned', '**Assignee** set to ``pingou``']}
+            {'message': 'Issue assigned'}
         )
 
     @patch('pagure.lib.git.update_git')
@@ -1967,25 +1964,6 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 self.assertEqual(
                     sorted(key.data), ['ack', 'nack', 'needs review'])
 
-        # Delete a value from a custom filed that does not exist in the entry
-        output = self.app.post(
-            '/api/0/test/issue/1/custom/bugzilla', headers=headers)
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        self.assertDictEqual(
-            data,
-            {
-              "error": "An error occured at the database level and prevent "
-                       "the action from reaching completion",
-              "error_code": "EDBERROR",
-            }
-        )
-
-        repo = pagure.lib.get_project(self.session, 'test')
-        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        self.assertEqual(issue.other_fields, [])
-        self.assertEqual(len(issue.other_fields), 0)
-
         # Invalid value
         output = self.app.post(
             '/api/0/test/issue/1/custom/bugzilla', headers=headers,
@@ -2015,8 +1993,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "message": '**bugzilla** changed from ``""`` to'
-                         ' ``https://bugzilla.redhat.com/1234``\n'
+              "message": "Custom field adjusted"
             }
         )
 
@@ -2043,8 +2020,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
 
         repo = pagure.lib.get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        self.assertEqual(issue.other_fields, [])
-        self.assertEqual(len(issue.other_fields), 0)
+        self.assertEqual(len(issue.other_fields), 1)
 
 
 if __name__ == '__main__':

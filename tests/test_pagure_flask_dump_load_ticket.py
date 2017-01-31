@@ -26,6 +26,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 
 import pagure.lib
 import tests
+from pagure.lib import MetaComment
+
+mcomment = MetaComment()
 
 
 class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
@@ -123,12 +126,13 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Comment added')
         # Assign the ticket to someone
-        msg, comment = pagure.lib.add_issue_assignee(
+        msg = pagure.lib.add_issue_assignee(
             session=self.session,
             issue=issue,
             assignee='pingou',
             user='pingou',
             ticketfolder=repopath,
+            mcomment=mcomment
         )
         self.session.commit()
         self.assertEqual(msg, 'Issue assigned')
@@ -213,7 +217,7 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
 
         # Check after re-loading
-        self.assertEqual(len(issue.comments), 2)
+        self.assertEqual(len(issue.comments), 3)
         self.assertEqual(len(issue.tags), 2)
         self.assertEqual(issue.tags_text, ['future', 'feature'])
         self.assertEqual(issue.assignee.username, 'pingou')

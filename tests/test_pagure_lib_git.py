@@ -27,7 +27,9 @@ import pagure.lib.git
 import tests
 
 from pagure.lib.repo import PagureRepo
+from pagure.lib import MetaComment
 
+mcomment = MetaComment()
 
 class PagureLibGittests(tests.Modeltests):
     """ Tests for pagure.lib.git """
@@ -1641,7 +1643,7 @@ index 0000000..60f7480
         }
 
         pagure.lib.git.update_custom_field_from_json(
-            self.session, repo, issue, json_data)
+            self.session, repo, issue, json_data, mcomment=mcomment)
 
         updated_issue = pagure.lib.get_issue_by_uid(self.session, 'someuid')
 
@@ -1684,7 +1686,7 @@ index 0000000..60f7480
         }
 
         pagure.lib.git.update_custom_field_from_json(
-            self.session, repo, issue, json_data)
+            self.session, repo, issue, json_data, mcomment=mcomment)
 
         updated_issue = pagure.lib.get_issue_by_uid(self.session, 'someuid')
 

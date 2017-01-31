@@ -24,6 +24,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 import pagure.lib
 import pagure.lib.model
 import tests
+from pagure.lib import MetaComment
+
+mcomment = MetaComment()
 
 
 class PagureLibtests(tests.Modeltests):
@@ -232,19 +235,21 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(repo.open_tickets_public, 2)
 
         # Edit the issue
-        msg, comment = pagure.lib.edit_issue(
-            session=self.session,
-            issue=issue,
-            user='pingou',
-            ticketfolder=None)
-        self.session.commit()
-        self.assertEqual(msg, None or '')
-
-        msg, comment = pagure.lib.edit_issue(
+        msg = pagure.lib.edit_issue(
             session=self.session,
             issue=issue,
             user='pingou',
             ticketfolder=None,
+            mcomment=mcomment)
+        self.session.commit()
+        self.assertEqual(msg, None or '')
+
+        msg = pagure.lib.edit_issue(
+            session=self.session,
+            issue=issue,
+            user='pingou',
+            ticketfolder=None,
+            mcomment=mcomment,
             title='Test issue #2',
             content='We should work on this for the second time',
             status='Open',
@@ -252,11 +257,12 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, None or '')
 
-        msg, comment = pagure.lib.edit_issue(
+        msg = pagure.lib.edit_issue(
             session=self.session,
             issue=issue,
             user='pingou',
             ticketfolder=None,
+            mcomment=mcomment,
             title='Foo issue #2',
             content='We should work on this period',
             status='Closed',
@@ -273,11 +279,12 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(repo.issues[1].close_status, 'Invalid')
 
         # Edit the status: re-open the ticket
-        msg, comment = pagure.lib.edit_issue(
+        msg = pagure.lib.edit_issue(
             session=self.session,
             issue=issue,
             user='pingou',
             status='Open',
+            mcomment=mcomment,
             ticketfolder=None,
             private=True,
         )
@@ -293,7 +300,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(repo.open_tickets_public, 1)
 
         # Edit the status: re-close the ticket
-        msg, comment = pagure.lib.edit_issue(
+        msg = pagure.lib.edit_issue(
             session=self.session,
             issue=issue,
             user='pingou',
@@ -301,6 +308,7 @@ class PagureLibtests(tests.Modeltests):
             close_status='Invalid',
             ticketfolder=None,
             private=True,
+            mcomment=mcomment
         )
         self.session.commit()
         self.assertEqual(msg, 'Successfully edited issue #2')
@@ -442,7 +450,6 @@ class PagureLibtests(tests.Modeltests):
             tags='tag1',
             user='pingou',
             ticketfolder=None)
-
         self.assertEqual(msgs, 'Removed tag: tag1')
 
     @patch('pagure.lib.git.update_git')
@@ -671,7 +678,8 @@ class PagureLibtests(tests.Modeltests):
             issue=issue,
             assignee='foo@foobar.com',
             user='foo@pingou.com',
-            ticketfolder=None
+            ticketfolder=None,
+            mcomment=mcomment
         )
 
         self.assertRaises(
@@ -681,26 +689,29 @@ class PagureLibtests(tests.Modeltests):
             issue=issue,
             assignee='foo@bar.com',
             user='foo@foopingou.com',
-            ticketfolder=None
+            ticketfolder=None,
+            mcomment=mcomment
         )
 
         # Set the assignee by its email
-        msg, comment = pagure.lib.add_issue_assignee(
+        msg = pagure.lib.add_issue_assignee(
             session=self.session,
             issue=issue,
             assignee='foo@bar.com',
             user='foo@pingou.com',
-            ticketfolder=None)
+            ticketfolder=None,
+            mcomment=mcomment)
         self.session.commit()
         self.assertEqual(msg, 'Issue assigned')
 
         # Change the assignee to someone else by its username
-        msg, comment = pagure.lib.add_issue_assignee(
+        msg = pagure.lib.add_issue_assignee(
             session=self.session,
             issue=issue,
             assignee='pingou',
             user='pingou',
-            ticketfolder=None)
+            ticketfolder=None,
+            mcomment=mcomment)
         self.session.commit()
         self.assertEqual(msg, 'Issue assigned')
 
@@ -732,12 +743,13 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(issues[0].tags, [])
 
         # Reset the assignee to no-one
-        msg, comment = pagure.lib.add_issue_assignee(
+        msg = pagure.lib.add_issue_assignee(
             session=self.session,
             issue=issue,
             assignee=None,
             user='pingou',
-            ticketfolder=None)
+            ticketfolder=None,
+            mcomment=mcomment)
         self.session.commit()
         self.assertEqual(msg, 'Assignee reset')
 
@@ -766,12 +778,13 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(len(issue.comments), 0)
 
         # Set the assignee by its email
-        msg, comment = pagure.lib.add_issue_assignee(
+        msg = pagure.lib.add_issue_assignee(
             session=self.session,
             issue=issue,
             assignee='foo@bar.com',
             user='foo@pingou.com',
-            ticketfolder=None)
+            ticketfolder=None,
+            mcomment=mcomment)
         self.session.commit()
         self.assertEqual(msg, 'Issue assigned')
 
@@ -1979,8 +1992,9 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(repo.tags_colored, [])
         self.assertEqual(issue.tags_text, [])
 
-        messages, comment = pagure.lib.update_tags(
-            self.session, issue, 'tag', 'pingou', ticketfolder=None)
+        messages = pagure.lib.update_tags(
+            self.session, issue, 'tag', 'pingou', ticketfolder=None,
+            mcomment=mcomment)
         self.assertEqual(messages, ['Tag added: tag'])
 
         # after
@@ -1992,9 +2006,9 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(issue.tags_text, ['tag'])
 
         # Replace the tag by two others
-        messages, comment = pagure.lib.update_tags(
+        messages = pagure.lib.update_tags(
             self.session, issue, ['tag2', 'tag3'], 'pingou',
-            ticketfolder=None)
+            ticketfolder=None, mcomment=mcomment)
         self.assertEqual(
             messages, ['Tag added: tag2, tag3', 'Removed tag: tag'])
 
@@ -2043,12 +2057,13 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(issue.depends_text, [])
         self.assertEqual(issue.blocks_text, [])
 
-        messages, comment = pagure.lib.update_dependency_issue(
-            self.session, repo, issue, '2', 'pingou', ticketfolder=None)
+        messages = pagure.lib.update_dependency_issue(
+            self.session, repo, issue, '2', 'pingou', ticketfolder=None,
+            mcomment=mcomment)
         self.assertEqual(messages, ['Dependency added'])
-        messages, comment = pagure.lib.update_dependency_issue(
+        messages = pagure.lib.update_dependency_issue(
             self.session, repo, issue, ['3', '4', 5], 'pingou',
-            ticketfolder=None)
+            ticketfolder=None, mcomment=mcomment)
         self.assertEqual(
             messages, ['Dependency added', 'Dependency removed'])
 
@@ -2086,12 +2101,13 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(issue.depends_text, [])
         self.assertEqual(issue.blocks_text, [])
 
-        messages, comment = pagure.lib.update_blocked_issue(
-            self.session, repo, issue, '2', 'pingou', ticketfolder=None)
+        messages = pagure.lib.update_blocked_issue(
+            self.session, repo, issue, '2', 'pingou', ticketfolder=None,
+            mcomment=mcomment)
         self.assertEqual(messages, ['Dependency added'])
-        messages, comment = pagure.lib.update_blocked_issue(
+        messages = pagure.lib.update_blocked_issue(
             self.session, repo, issue, ['3', '4', 5], 'pingou',
-            ticketfolder=None)
+            ticketfolder=None, mcomment=mcomment)
         self.assertEqual(
             messages, ['Dependency added', 'Dependency removed'])
 

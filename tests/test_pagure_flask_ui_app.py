@@ -25,6 +25,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 
 import pagure.lib
 import tests
+from pagure.lib import MetaComment
+
+mcomment = MetaComment()
 
 
 class PagureFlaskApptests(tests.Modeltests):
@@ -1145,12 +1148,13 @@ class PagureFlaskApptests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue #3')
 
-        msg, comment = pagure.lib.add_issue_assignee(
+        msg = pagure.lib.add_issue_assignee(
             session=self.session,
             issue=msg,
             assignee='pingou',
             user='foo',
-            ticketfolder=None)
+            ticketfolder=None,
+            mcomment=mcomment)
         self.session.commit()
         self.assertEqual(msg, 'Issue assigned')
 

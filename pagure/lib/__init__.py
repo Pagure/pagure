@@ -56,6 +56,41 @@ PAGURE_CI = None
 LOG = None
 
 
+class MetaComment():
+    ''' This class store/builds comments about metadata updates that can be
+    displayed in a single notification comment in the UI. '''
+    def __init__(self):
+        ''' Initialize the comment '''
+        self.comment = ""
+
+    def add(self, field, old_value=None, new_value=None):
+        ''' Add a new comment about the changes to this field.  If the value is
+        not set/empty we still need to pass a string to markdown or else the
+        formatting is wrong.  So in this case we use ""
+        '''
+        if not old_value:
+            old_value = '""'
+        if not new_value:
+            new_value = '""'
+
+        self.comment += ("**%s** changed from ``%s`` to ``%s``\n" %
+            (field, old_value, new_value))
+
+    def add_as_is(self, comment):
+        ''' Add a comment as is '''
+        self.comment += "%s\n" % (comment)
+
+    def is_set(self):
+        if self.comment != "":
+            return True
+        else:
+            return False
+
+    def get(self):
+        ''' Return the full comment list '''
+        return self.comment
+
+
 def set_redis(host, port, dbname):
     """ Set the redis connection with the specified information. """
     global REDIS
@@ -392,12 +427,12 @@ def add_tag_obj(session, obj, tags, user, ticketfolder):
         return 'Nothing to add'
 
 
-def add_issue_assignee(session, issue, assignee, user, ticketfolder,
+def add_issue_assignee(session, issue, assignee, user, ticketfolder, mcomment,
                        notify=True):
     ''' Add an assignee to an issue, in other words, assigned an issue. '''
     user_obj = get_user(session, user)
 
-    old_assignee = issue.assignee if issue.assignee else '\"\"'
+    old_assignee = issue.assignee
 
     if not assignee and issue.assignee is not None:
         issue.assignee_id = None
@@ -406,7 +441,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder,
         session.commit()
         pagure.lib.git.update_git(
             issue, repo=issue.project, repofolder=ticketfolder)
-        comment = '**Assignee** removed ``%s``' % (old_assignee.user)
+        mcomment.add("Assignee", old_assignee.user, None)
         if notify:
             pagure.lib.notify.notify_assigned_issue(issue, None, user_obj)
 
@@ -427,20 +462,15 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder,
             REDIS.publish('pagure.%s' % issue.uid, json.dumps(
                 {'unassigned': '-'}))
 
-        return 'Assignee reset', comment
+        return 'Assignee reset'
     elif not assignee and issue.assignee is None:
-        return 'Nothing to change', ""
+        return 'Nothing to change'
 
     # Validate the assignee
     assignee_obj = get_user(session, assignee)
 
     if issue.assignee_id != assignee_obj.id:
-        if issue.assignee_id is None:
-            comment = '**Assignee** set to ``%s``' % (assignee_obj.user)
-        else:
-            comment = '**Assignee** changed from ``%s`` to ``%s``' % (
-                old_assignee, assignee_obj.user)
-
+        mcomment.add("Assignee", old_assignee, assignee_obj.user)
         issue.assignee_id = assignee_obj.id
         session.add(issue)
         session.flush()
@@ -469,9 +499,9 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder,
             REDIS.publish('pagure.%s' % issue.uid, json.dumps(
                 {'assigned': assignee_obj.to_json(public=True)}))
 
-        return 'Issue assigned', comment
+        return 'Issue assigned'
     else:
-        return "", ""
+        return ""
 
 
 def add_pull_request_assignee(
@@ -1406,19 +1436,7 @@ def new_tag(session, tag_name, tag_description, tag_color, project_id):
     return tagobj
 
 
-def build_meta_comment(comment, field, old_value, new_value):
-    ''' Format a new comment for metadata changes and add it to the existing
-    comment.  Convert 'None' and empty values to something more friendly.
-    '''
-    if old_value is None or old_value == "":
-        old_value = '\"\"'
-    if new_value is None or new_value == "":
-        new_value = '\"\"'
-    return ("**%s** changed from ``%s`` to ``%s``\n%s" %
-            (field, old_value, new_value, comment))
-
-
-def edit_issue(session, issue, ticketfolder, user, repo=None,
+def edit_issue(session, issue, ticketfolder, user, mcomment, repo=None,
                title=None, content=None, status=None, close_status=-1,
                priority=None, milestone=-1, private=False):
     ''' Edit the specified issue.
@@ -1432,18 +1450,15 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
                     'depending that are still open.')
 
     edit = []
-    edit_comment = ""
     if title and title != issue.title:
-        edit_comment = build_meta_comment(
-            edit_comment, "Title", issue.title, title)
+        mcomment.add("Title", issue.title, title)
         issue.title = title
         edit.append('title')
     if content and content != issue.content:
         issue.content = content
         edit.append('content')
     if status and status != issue.status:
-        edit_comment = build_meta_comment(
-            edit_comment, "Status", issue.status, status)
+        mcomment.add("Status", issue.status, status)
         issue.status = status
         if status.lower() != 'open':
             issue.closed_at = datetime.datetime.utcnow()
@@ -1452,8 +1467,7 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
             edit.append('close_status')
         edit.append('status')
     if close_status != -1 and close_status != issue.close_status:
-        edit_comment = build_meta_comment(
-            edit_comment, "Closed as", issue.close_status, close_status)
+        mcomment.add("Closed as", issue.close_status, close_status)
         issue.close_status = close_status
         edit.append('close_status')
     if priority:
@@ -1462,19 +1476,16 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
         except:
             priority = None
         if priority != issue.priority:
-            edit_comment = build_meta_comment(
-                edit_comment, "Priority", repo.priorities[str(issue.priority)],
+            mcomment.add("Priority", repo.priorities[str(issue.priority)],
                 repo.priorities[str(priority)])
             issue.priority = priority
             edit.append('priority')
     if private in [True, False] and private != issue.private:
-        edit_comment = build_meta_comment(
-            edit_comment, "Private", str(issue.private), str(private))
+        mcomment.add("Private", str(issue.private), str(private))
         issue.private = private
         edit.append('private')
     if milestone != -1 and milestone != issue.milestone:
-        edit_comment = build_meta_comment(
-            edit_comment, "Milestone", issue.milestone, milestone)
+        mcomment.add("Milestone", issue.milestone, milestone)
         issue.milestone = milestone
         edit.append('milestone')
     issue.last_updated = datetime.datetime.utcnow()
@@ -1516,9 +1527,9 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
     if edit:
         session.add(issue)
         session.flush()
-        return 'Successfully edited issue #%s' % issue.id, edit_comment
+        return 'Successfully edited issue #%s' % issue.id
     else:
-        return "", ""
+        return ""
 
 
 def update_project_settings(session, repo, settings, user):
@@ -2503,7 +2514,7 @@ def avatar_url_from_email(email, size=64, default='retro', dns=False):
             hashhex, query)
 
 
-def update_tags(session, obj, tags, username, ticketfolder):
+def update_tags(session, obj, tags, username, ticketfolder, mcomment):
     """ Update the tags of a specified object (adding or removing them).
     This object can be either an issue or a project.
 
@@ -2514,7 +2525,6 @@ def update_tags(session, obj, tags, username, ticketfolder):
     toadd = set(tags) - set(obj.tags_text)
     torm = set(obj.tags_text) - set(tags)
     messages = []
-    comment = ""
     if toadd:
         messages.append(
             add_tag_obj(
@@ -2526,9 +2536,10 @@ def update_tags(session, obj, tags, username, ticketfolder):
             )
         )
         if len(toadd) == 1:
-            comment += "**Tags** added tag: ``%s``" % list(toadd)[0]
+            mcomment.add_as_is("**Tags** added tag: ``%s``" % list(toadd)[0])
         else:
-            comment += "**Tags** added tags: ``" + ', '.join(toadd) + "``"
+            mcomment.add_as_is("**Tags** added tags: ``" + ', '.join(toadd) +
+                               "``")
 
     if torm:
         messages.append(
@@ -2540,20 +2551,19 @@ def update_tags(session, obj, tags, username, ticketfolder):
                 ticketfolder=ticketfolder,
             )
         )
-        if toadd:
-            comment += '\n'
         if len(torm) == 1:
-            comment += "**Tags** removed tag: ``%s``" % list(torm)[0]
+            mcomment.add_as_is("**Tags** removed tag: ``%s``" % list(torm)[0])
         else:
-            comment += "**Tags** removed tags: ``" + ', '.join(torm) + "``"
+            mcomment.add_as_is("**Tags** removed tags: ``" +
+                               ", ".join(torm) + "``")
 
     session.commit()
 
-    return messages, comment
+    return messages
 
 
 def update_dependency_issue(
-        session, repo, issue, depends, username, ticketfolder):
+        session, repo, issue, depends, username, ticketfolder, mcomment):
     """ Update the dependency of a specified issue (adding or removing them)
 
     """
@@ -2587,8 +2597,10 @@ def update_dependency_issue(
         )
         comment += "%s " % (depend)
 
-    if toadd:
-        comment += "``\n"
+    if comment:
+        comment += "``"
+        mcomment.add_as_is(comment)
+        comment = ""
 
     # Remove issue depending
     if torm:
@@ -2614,15 +2626,16 @@ def update_dependency_issue(
         )
         comment += "%s " % (depend)
 
-    if torm:
-        comment += "``\n"
+    if comment:
+        comment += "``"
+        mcomment.add_as_is(comment)
 
     session.commit()
-    return messages, comment
+    return messages
 
 
 def update_blocked_issue(
-        session, repo, issue, blocks, username, ticketfolder):
+        session, repo, issue, blocks, username, ticketfolder, mcomment):
     """ Update the upstream dependency of a specified issue (adding or
     removing them)
 
@@ -2658,8 +2671,10 @@ def update_blocked_issue(
         session.commit()
         comment += "%s " % (block)
 
-    if toadd:
-        comment += "``\n"
+    if comment:
+        comment += "``"
+        mcomment.add_as_is(comment)
+        comment = ""
 
     # Remove issue blocked
     if torm:
@@ -2686,10 +2701,12 @@ def update_blocked_issue(
         )
         comment += "%s " % (block)
 
-        if torm:
-            comment += "``\n"
+    if comment:
+        comment += "``"
+        mcomment.add_as_is(comment)
+
     session.commit()
-    return messages, comment
+    return messages
 
 
 def add_user_pending_email(session, userobj, email):
@@ -2802,7 +2819,8 @@ def get_group_types(session, group_type=None):
     return query.all()
 
 
-def search_groups(session, pattern=None, group_name=None, group_type=None, display_name=None):
+def search_groups(session, pattern=None, group_name=None, group_type=None,
+                  display_name=None):
     ''' Return the groups based on the criteria specified.
 
     '''
@@ -3002,7 +3020,8 @@ def add_group(
     display = search_groups(session, display_name=display_name)
     if display:
         raise pagure.exceptions.PagureException(
-            'There is already a group with display name `%s` created.' % display_name)
+            'There is already a group with display name `%s` created.' %
+            display_name)
 
     grp = pagure.lib.model.PagureGroup(
         group_name=group_name,
@@ -3573,7 +3592,7 @@ def set_custom_key_fields(session, project, fields, types, data):
     return 'List of custom fields updated'
 
 
-def set_custom_key_value(session, issue, key, value):
+def set_custom_key_value(session, issue, key, value, mcomment):
     """ Set or update the value of the specified custom key.
     """
 
@@ -3589,7 +3608,6 @@ def set_custom_key_value(session, issue, key, value):
     updated = False
     delete = False
     old_value = None
-    comment = ""
     if current_field:
         old_value = current_field.value
         if current_field.key.key_type == 'boolean':
@@ -3614,7 +3632,7 @@ def set_custom_key_value(session, issue, key, value):
         session.add(current_field)
 
     if updated:
-        comment = build_meta_comment("", key.name, old_value, value)
+        mcomment.add(key.name, old_value, value)
 
     if REDIS and updated:
         if issue.private:
@@ -3628,7 +3646,7 @@ def set_custom_key_value(session, issue, key, value):
                 'issue': issue.to_json(public=True, with_comments=False),
             }))
 
-    return comment
+    return 'Custom field adjusted'
 
 
 def get_yearly_stats_user(session, user, date):

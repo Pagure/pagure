@@ -16,6 +16,7 @@ from sqlalchemy.exc import SQLAlchemyError
 import pagure
 import pagure.exceptions
 import pagure.lib
+from pagure.lib import MetaComment
 from pagure import (
     APP, SESSION, is_repo_admin, api_authenticated, urlpattern
 )
@@ -569,7 +570,7 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
     +----------------- +---------+--------------+------------------------+
     | ``status``       | string  | Mandatory    | The new status of the  |
     |                  |         |              | issue, can be 'Open' or|
-    |                  |         |              | 'Closed'               |                 |
+    |                  |         |              | 'Closed'               |
     +----------------- +---------+--------------+------------------------+
 
     Sample response
@@ -626,6 +627,7 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
         form.status.data = new_status
 
     if form.validate_on_submit():
+        mcomment = MetaComment()
         try:
             # Update status
             message = pagure.lib.edit_issue(
@@ -635,12 +637,24 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
                 close_status=close_status,
                 user=flask.g.fas_user.username,
                 ticketfolder=APP.config['TICKETS_FOLDER'],
+                mcomment=mcomment,
             )
             SESSION.commit()
             if message:
                 output['message'] = message
             else:
                 output['message'] = 'No changes'
+
+            if mcomment.is_set():
+                pagure.lib.add_issue_comment(
+                    SESSION,
+                    issue,
+                    comment='@%s updated metadata\n%s' % (
+                        flask.g.fas_user.username, mcomment.get()),
+                    user=flask.g.fas_user.username,
+                    ticketfolder=APP.config['TICKETS_FOLDER'],
+                    notify=False,
+                    notification=True)
         except pagure.exceptions.PagureException as err:
             raise pagure.exceptions.APIError(
                 400, error_code=APIERROR.ENOCODE, error=str(err))
@@ -830,6 +844,8 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
     form = pagure.forms.AssignIssueForm(csrf_enabled=False)
     if form.validate_on_submit():
         assignee = form.assignee.data or None
+        # Create our metadata comment object
+        mcomment = MetaComment()
         try:
             # New comment
             message = pagure.lib.add_issue_assignee(
@@ -838,8 +854,19 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
                 assignee=assignee,
                 user=flask.g.fas_user.username,
                 ticketfolder=APP.config['TICKETS_FOLDER'],
+                mcomment=mcomment
             )
             SESSION.commit()
+            if mcomment.is_set():
+                pagure.lib.add_issue_comment(
+                    SESSION,
+                    issue,
+                    comment='@%s updated metadata\n%s' % (
+                        flask.g.fas_user.username, mcomment.get()),
+                    user=flask.g.fas_user.username,
+                    ticketfolder=APP.config['TICKETS_FOLDER'],
+                    notify=False,
+                    notification=True)
             output['message'] = message
         except pagure.exceptions.PagureException as err:  # pragma: no cover
             raise pagure.exceptions.APIError(
@@ -1051,8 +1078,9 @@ def api_update_custom_field(
                     raise pagure.exceptions.APIError(
                         400, error_code=APIERROR.EINVALIDISSUEFIELD_LINK)
     try:
+        mcomment = MetaComment()
         message = pagure.lib.set_custom_key_value(
-            SESSION, issue, key, value)
+            SESSION, issue, key, value, mcomment=mcomment)
 
         SESSION.commit()
         if message:
@@ -1066,6 +1094,17 @@ def api_update_custom_field(
         print err
         SESSION.rollback()
         raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
+
+    if mcomment.is_set():
+        pagure.lib.add_issue_comment(
+            SESSION,
+            issue,
+            comment='@%s updated metadata\n%s' % (
+                            flask.g.fas_user.username, mcomment.get()),
+            user=flask.g.fas_user.username,
+            ticketfolder=None,
+            notify=False,
+            notification=True)
 
     jsonout = flask.jsonify(output)
     return jsonout

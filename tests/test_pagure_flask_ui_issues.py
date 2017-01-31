@@ -31,6 +31,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 
 import pagure.lib
 import tests
+from pagure.lib import MetaComment
+
+mcomment = MetaComment()
 
 
 class PagureFlaskIssuestests(tests.Modeltests):
@@ -541,14 +544,16 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         # Add a non-ascii milestone to the issue but project has no milestone
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        message, comment = pagure.lib.edit_issue(
+        message = pagure.lib.edit_issue(
             self.session,
             issue=issue,
             milestone=b'käpy'.decode('utf-8'),
             private=False,
             user='pingou',
             ticketfolder=None,
+            mcomment=mcomment
         )
+        print "MARK2 " + message
         self.assertEqual(message, 'Successfully edited issue #1')
         self.session.commit()
 
@@ -682,8 +687,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<option selected value="Fixed">Fixed</option>'
                 in output.data)
             self.assertIn(
-                '@pingou</a> updated metadata</p>\n<p><strong>Closed '
-                'as</strong> changed from <code>""</code> to <code>Fixed'
+                '<small><p><a href="https://pagure.org/user/pingou"> '
+                '@pingou</a> updated metadata'
                 .format(
                     app_url=pagure.APP.config['APP_URL'].rstrip('/')),
                 output.data)
