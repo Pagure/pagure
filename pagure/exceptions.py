@@ -23,6 +23,13 @@ class RepoExistsException(PagureException):
     pass
 
 
+class ProjectBlackListedException(PagureException):
+    ''' Exception thrown when trying to create a repository but, that repository
+    name has been blacklisted
+    '''
+    pass
+
+
 class FileNotFoundException(PagureException):
     ''' Exception thrown when trying to create a repository that already
     exists.

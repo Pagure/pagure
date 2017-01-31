@@ -1104,7 +1104,7 @@ def new_project(session, user, name, blacklist, allowed_prefix,
     '''
     if name in blacklist or (
             namespace and '%s/%s' % (namespace, name) in blacklist):
-        raise pagure.exceptions.RepoExistsException(
+        raise pagure.exceptions.ProjectBlackListedException(
             'No project "%s" are allowed to be created due to potential '
             'conflicts in URLs with pagure itself' % name
         )
