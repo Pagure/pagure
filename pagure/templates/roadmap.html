@@ -132,28 +132,16 @@
   <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
   <span class="oi m-l-2 btn btn-nopad" data-glyph="tag" title="Tags"></span>
     {% for tag in tag_list %}
-      {% if tag in tags %}
-        <a class="btn btn-secondary btn-sm {% if tag in tags %}active{% endif %}"
-          href="{{ url_for('view_roadmap',
-              repo=repo.name,
-              username=username,
-              namespace=repo.namespace,
-              milestone=requested_stones,
-              all_stones=all_stones,
-              status=status) }}"
-              title="Filter issues by tag">
-      {% else %}
         <a class="btn btn-secondary btn-sm {% if tag in tags %}active{% endif %}"
           href="{{ url_for('view_roadmap',
               repo=repo.name,
               username=username,
               namespace=repo.namespace,
               status=status,
-              tag=tag,
+              tag=tag | add_or_remove(tags[:]),
               all_stones=all_stones,
               milestone=requested_stones) }}"
               title="Filter issues by tag">
-      {% endif %}
         {{ tag }}</a>
     {% endfor %}
   </span>

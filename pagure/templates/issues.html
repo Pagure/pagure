@@ -124,38 +124,17 @@
 
   <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
     {% for tag in tag_list %}
-      {% if tag.tag in tags %}
-        {% if status and status != 'Open' %}
-        <a class="btn btn-secondary btn-sm {% if tag.tag in tags%}active{% endif %}"
-            href="{{ url_for('view_issues',
-                repo=repo.name,
-                username=username,
-                search_pattern=search_pattern,
-                namespace=repo.namespace,
-                status='Closed') }}" title="Filter issues by tag">
-         {% else %}
-        <a class="btn btn-secondary btn-sm {% if tag.tag in tags%}active{% endif %}"
-            href="{{ url_for('view_issues',
-                repo=repo.name,
-                username=username,
-                search_pattern=search_pattern,
-                namespace=repo.namespace,
-                status=status or 'all') }}"
-                title="Filter issues by tag">
-         {% endif %}
-      {% else %}
         <a class="btn btn-secondary btn-sm {% if tag.tag in tags%}active{%endif%}"
             href="{{ url_for('view_issues',
                 repo=repo.name,
                 username=username,
                 namespace=repo.namespace,
-                tags=tag.tag,
+                tags=tag.tag | add_or_remove(tags[:]),
                 search_pattern=search_pattern,
                 author=author,
                 assignee=assignee,
                 status=status or 'all') }}"
                 title="Filter issues by tag">
-      {% endif %}
         <span class="oi" data-glyph="tag"></span>
         {{ tag.tag }}</a>
     {% endfor %}

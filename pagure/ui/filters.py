@@ -572,3 +572,15 @@ def combine_url(url, page, pagetitle, **kwargs):
     query[pagetitle] = page
     query.update(kwargs)
     return url + '?' + '&'.join(['%s=%s' % (k, query[k]) for k in query])
+
+
+@APP.template_filter('add_or_remove')
+def add_or_remove(item, items):
+    """ Adds the item to the list if it is not in there and remove it
+    otherwise.
+    """
+    if item in items:
+        items.remove(item)
+    else:
+        items.append(item)
+    return items
