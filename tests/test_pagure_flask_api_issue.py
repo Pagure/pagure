@@ -37,9 +37,9 @@ FULL_ISSUE_LIST = [
     "custom_fields": [],
     "date_created": "1431414800",
     "depends": [],
-    "id": 8,
+    "id": 9,
     "last_updated": "1431414800",
-    "milestone": None,
+    "milestone": "",
     "priority": None,
     "private": True,
     "status": "Open",
@@ -60,9 +60,32 @@ FULL_ISSUE_LIST = [
     "custom_fields": [],
     "date_created": "1431414800",
     "depends": [],
+    "id": 8,
+    "last_updated": "1431414800",
+    "milestone": "",
+    "priority": None,
+    "private": True,
+    "status": "Open",
+    "tags": [],
+    "title": "test issue1",
+    "user": {
+      "fullname": "PY C",
+      "name": "pingou"
+    }
+  },
+  {
+    "assignee": None,
+    "blocks": [],
+    "close_status": None,
+    "closed_at": None,
+    "comments": [],
+    "content": "This issue needs attention",
+    "custom_fields": [],
+    "date_created": "1431414800",
+    "depends": [],
     "id": 7,
     "last_updated": "1431414800",
-    "milestone": None,
+    "milestone": "",
     "priority": None,
     "private": True,
     "status": "Open",
@@ -85,9 +108,9 @@ FULL_ISSUE_LIST = [
     "depends": [],
     "id": 6,
     "last_updated": "1431414800",
-    "milestone": None,
+    "milestone": "",
     "priority": None,
-    "private": True,
+    "private": False,
     "status": "Open",
     "tags": [],
     "title": "test issue",
@@ -108,7 +131,7 @@ FULL_ISSUE_LIST = [
     "depends": [],
     "id": 5,
     "last_updated": "1431414800",
-    "milestone": None,
+    "milestone": "",
     "priority": None,
     "private": False,
     "status": "Open",
@@ -131,7 +154,7 @@ FULL_ISSUE_LIST = [
     "depends": [],
     "id": 4,
     "last_updated": "1431414800",
-    "milestone": None,
+    "milestone": "",
     "priority": None,
     "private": False,
     "status": "Open",
@@ -154,7 +177,7 @@ FULL_ISSUE_LIST = [
     "depends": [],
     "id": 3,
     "last_updated": "1431414800",
-    "milestone": None,
+    "milestone": "",
     "priority": None,
     "private": False,
     "status": "Open",
@@ -177,7 +200,7 @@ FULL_ISSUE_LIST = [
     "depends": [],
     "id": 2,
     "last_updated": "1431414800",
-    "milestone": None,
+    "milestone": "milestone-1.0",
     "priority": None,
     "private": False,
     "status": "Open",
@@ -200,7 +223,7 @@ FULL_ISSUE_LIST = [
     "depends": [],
     "id": 1,
     "last_updated": "1431414800",
-    "milestone": None,
+    "milestone": "",
     "priority": None,
     "private": False,
     "status": "Open",
@@ -212,6 +235,7 @@ FULL_ISSUE_LIST = [
     }
   }
 ]
+
 
 class PagureFlaskApiIssuetests(tests.Modeltests):
     """ Tests for the flask API of pagure for issue """
@@ -258,13 +282,13 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "error_code": "EINVALIDREQ",
               "errors": {
                 "issue_content": ["This field is required."],
-                "title": ["This field is required."]
+                "title": ["This field is required."],
               }
             }
         )
 
         data = {
-            'title': 'test issue',
+            'title': 'test issue'
         }
 
         # Invalid repo
@@ -309,6 +333,27 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = json.loads(output.data)
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
+        self.assertDictEqual(
+            data,
+            {
+              "issue": FULL_ISSUE_LIST[8],
+              "message": "Issue created"
+            }
+        )
+
+        # Valid request with milestone
+        data = {
+            'title': 'test issue',
+            'issue_content': 'This issue needs attention',
+            'milestone': ['milestone-1.0'],
+        }
+        output = self.app.post(
+            '/api/0/test/new_issue', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        data['issue']['date_created'] = '1431414800'
+        data['issue']['last_updated'] = '1431414800'
+
         self.assertDictEqual(
             data,
             {
@@ -423,7 +468,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
 
         # Private issue: 1
         data = {
-            'title': 'test issue',
+            'title': 'test issue1',
             'issue_content': 'This issue needs attention',
             'private': 1,
         }
@@ -475,7 +520,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "tags": []
               },
               "issues": FULL_ISSUE_LIST[3:],
-              "total_issues": 5
+              "total_issues": 6
             }
         )
 
@@ -489,6 +534,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             user='pingou',
             ticketfolder=None,
             private=True,
+            milestone=""
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
@@ -511,7 +557,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "tags": []
               },
               "issues": FULL_ISSUE_LIST[3:],
-              "total_issues": 5
+              "total_issues": 6
             }
         )
         headers = {'Authorization': 'token aaabbbccc'}
@@ -550,7 +596,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "tags": []
               },
               "issues": FULL_ISSUE_LIST[3:],
-              "total_issues": 5
+              "total_issues": 6
             }
         )
 
@@ -563,6 +609,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         for idx in range(len(data['issues'])):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
+
         self.assertDictEqual(
             data,
             {
@@ -574,7 +621,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "tags": []
               },
               "issues": FULL_ISSUE_LIST,
-              "total_issues": 8
+              "total_issues": 9
             }
         )
         headers = {'Authorization': 'token aaabbbccc'}
@@ -613,7 +660,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "tags": []
               },
               "issues": FULL_ISSUE_LIST[3:],
-              "total_issues": 5
+              "total_issues": 6
             }
         )
 
@@ -637,7 +684,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "tags": []
               },
               "issues": FULL_ISSUE_LIST,
-              "total_issues": 8
+              "total_issues": 9
             }
         )
 
@@ -697,7 +744,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "tags": []
               },
               "issues": FULL_ISSUE_LIST,
-              "total_issues": 8
+              "total_issues": 9
             }
         )
 
@@ -749,7 +796,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "depends": [],
               "id": 1,
               "last_updated": "1431414800",
-              "milestone": None,
+              "milestone": "",
               "priority": None,
               "private": False,
               "status": "Open",
@@ -778,7 +825,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(msg.title, 'Test issue')
 
         # Access private issue un-authenticated
-        output = self.app.get('/api/0/test/issue/6')
+        output = self.app.get('/api/0/test/issue/7')
         self.assertEqual(output.status_code, 403)
         data = json.loads(output.data)
         self.assertDictEqual(
@@ -812,7 +859,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         headers = {'Authorization': 'token bar_token'}
 
         # Access private issue authenticated but wrong token
-        output = self.app.get('/api/0/test/issue/6', headers=headers)
+        output = self.app.get('/api/0/test/issue/7', headers=headers)
         self.assertEqual(output.status_code, 403)
         data = json.loads(output.data)
         self.assertDictEqual(
@@ -845,9 +892,9 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "depends": [],
               "id": 6,
               "last_updated": "1431414800",
-              "milestone": None,
+              "milestone": "",
               "priority": None,
-              "private": True,
+              "private": False,
               "status": "Open",
               "tags": [],
               "title": "test issue",
@@ -876,7 +923,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "close_status": None,
               "closed_at": None,
               "depends": [],
-              "id": 8,
+              "id": 9,
               "last_updated": "1431414800",
               "milestone": None,
               "priority": None,

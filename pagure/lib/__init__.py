@@ -1245,9 +1245,9 @@ def new_project(session, user, name, blacklist, allowed_prefix,
         else project.name)
 
 
-def new_issue(session, repo, title, content, user, ticketfolder,
-              issue_id=None, issue_uid=None, private=False, status=None,
-              close_status=None, notify=True, date_created=None):
+def new_issue(session, repo, title, content, user, ticketfolder, issue_id=None,
+              issue_uid=None, private=False, status=None, close_status=None,
+              notify=True, date_created=None, milestone=None):
     ''' Create a new issue for the specified repo. '''
     user_obj = get_user(session, user)
 
@@ -1256,6 +1256,7 @@ def new_issue(session, repo, title, content, user, ticketfolder,
         project_id=repo.id,
         title=title,
         content=content,
+        milestone=milestone,
         user_id=user_obj.id,
         uid=issue_uid or uuid.uuid4().hex,
         private=private,

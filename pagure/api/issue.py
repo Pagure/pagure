@@ -117,6 +117,7 @@ def api_new_issue(repo, username=None, namespace=None):
     if form.validate_on_submit():
         title = form.title.data
         content = form.issue_content.data
+        milestone = form.milestone.data
         private = str(form.private.data).lower() in ['true', '1']
 
         try:
@@ -126,6 +127,7 @@ def api_new_issue(repo, username=None, namespace=None):
                 title=title,
                 content=content,
                 private=private,
+                milestone=milestone,
                 user=flask.g.fas_user.username,
                 ticketfolder=APP.config['TICKETS_FOLDER'],
             )

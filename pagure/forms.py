@@ -176,6 +176,10 @@ class IssueFormSimplied(PagureForm):
         [wtforms.validators.optional()],
         false_values=('false', '', False, 'False', 0, '0'),
     )
+    milestone = wtforms.TextField(
+        'Milestone',
+        [wtforms.validators.Optional()],
+    )
 
 
 class IssueForm(IssueFormSimplied):
