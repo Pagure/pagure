@@ -218,6 +218,18 @@ Once you have specified in the configuration file the to url used to connect
 to the database, and create the database itself, you can now create the
 tables, the database scheme.
 
+For changes to existing tables, we rely on `Alembic <http://alembic.readthedocs.org/>`_.
+It uses `revisions` to perform the upgrades, but to know which upgrades are
+needed and which are already done, the current revision needs to be saved
+in the database. This will allow alembic to know apply the new revision when
+running it.
+
+In the ``alembic.ini`` file, one of the configuration key is most important:
+``script_location`` which is the path to the ``versions`` folder containing
+all the alembic migration files. The ``sqlalchemy.url`` configuration key if
+missing will be replaced by the url filled in the configuration file of
+pagure.
+
 To create the database tables, you need to run the script
 ``/usr/share/pagure/pagure_createdb.py`` and specify the configuration
 to use for pagure and for alembic.
@@ -248,10 +260,11 @@ all the alembic migration files. The ``sqlalchemy.url`` configuration key if
 missing will be replaced by the url filled in the configuration file of
 pagure.
 
-.. warning:: Calling ``pagure_createdb.py`` is asked regularly, especially
-        to handle database schema changes upon upgrades, but the ``--initial``
-        argument should only be used the first time as it will otherwise
-        break upgrading the database schema via alembic.
+.. warning:: Calling ``pagure_createdb.py`` is asked regularly in the
+        UPGRADING.rst documentation, especially to handle database schema
+        changes upon upgrades, but the ``--initial`` argument should only
+        be used the first time as it will otherwise break upgrading the
+        database schema via alembic.
 
 
 Set up virus scanning
