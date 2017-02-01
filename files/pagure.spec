@@ -159,6 +159,22 @@ With this service, your CI server will be able to report the results of the
 build on the pull-requests opened to your project.
 
 
+%package            logcom
+Summary:            The logcom service for pagure
+BuildArch:          noarch
+
+BuildRequires:      systemd-devel
+Requires:           python-redis
+Requires:           python-trollius
+Requires:           python-trollius-redis
+Requires(post):     systemd
+Requires(preun):    systemd
+Requires(postun):   systemd
+%description        logcom
+pagure-logcom contains the service that logs commits into the database so that
+the activity calendar heatmap is filled.
+
+
 %prep
 %setup -q
 
@@ -228,6 +244,13 @@ install -m 755 pagure-ci/pagure_ci_server.py \
 install -m 644 pagure-ci/pagure_ci.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_ci.service
 
+# Install the logcom service
+mkdir -p $RPM_BUILD_ROOT/%{_libexecdir}/pagure-logcom
+install -m 755 pagure-logcom/pagure_logcom_server.py \
+    $RPM_BUILD_ROOT/%{_libexecdir}/pagure-logcom/pagure_logcom_server.py
+install -m 644 pagure-logcom/pagure_logcom.service \
+    $RPM_BUILD_ROOT/%{_unitdir}/pagure_logcom.service
+
 
 %post milters
 %systemd_post pagure_milter.service
@@ -237,6 +260,8 @@ install -m 644 pagure-ci/pagure_ci.service \
 %systemd_post pagure_webhook.service
 %post ci
 %systemd_post pagure_ci.service
+%post logcom
+%systemd_post pagure_logcom.service
 
 %preun milters
 %systemd_preun pagure_milter.service
@@ -246,6 +271,8 @@ install -m 644 pagure-ci/pagure_ci.service \
 %systemd_preun pagure_webhook.service
 %preun ci
 %systemd_preun pagure_ci.service
+%preun logcom
+%systemd_preun pagure_logcom.service
 
 %postun milters
 %systemd_postun_with_restart pagure_milter.service
@@ -255,6 +282,8 @@ install -m 644 pagure-ci/pagure_ci.service \
 %systemd_postun_with_restart pagure_webhook.service
 %postun ci
 %systemd_postun_with_restart pagure_ci.service
+%postun logcom
+%systemd_postun_with_restart pagure_logcom.service
 
 
 %files
@@ -297,6 +326,12 @@ install -m 644 pagure-ci/pagure_ci.service \
 %license LICENSE
 %{_libexecdir}/pagure-ci/
 %{_unitdir}/pagure_ci.service
+
+
+%files logcom
+%license LICENSE
+%{_libexecdir}/pagure-logcom/
+%{_unitdir}/pagure_logcom.service
 
 
 %changelog
@@ -574,7 +609,7 @@ install -m 644 pagure-ci/pagure_ci.service \
 
 * Tue Sep 13 2016 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.5-1
 - Update to 2.5
-- Don't track pagure_env (venv) dir (Paul W. Frields) 
+- Don't track pagure_env (venv) dir (Paul W. Frields)
 - Setting Mail-Followup-To when sending message to users (Sergio Durigan Junior)
   (Fixed by Ryan Lerch and I)
 - Fixed the tickets hook so that we dont ignore the files committed in the first
