@@ -121,14 +121,18 @@ def __get_tree_and_content(repo_obj, commit, path):
 
 
 @APP.route('/<repo>/')
+@APP.route('/<namespace>/<repo>/')
 @APP.route('/<repo>/<path:filename>')
+@APP.route('/<namespace>/<repo>/<path:filename>')
 @APP.route('/fork/<username>/<repo>/')
+@APP.route('/fork/<namespace>/<username>/<repo>/')
 @APP.route('/fork/<username>/<repo>/<path:filename>')
-def view_docs(repo, username=None, filename=None):
+@APP.route('/fork/<namespace>/<username>/<repo>/<path:filename>')
+def view_docs(repo, username=None, namespace=None, filename=None):
     """ Display the documentation
     """
 
-    repo = pagure.lib.get_project(SESSION, repo, user=username)
+    repo = pagure.lib.get_project(SESSION, repo, user=username, namespace=namespace)
 
     if not repo:
         flask.abort(404, 'Project not found')
