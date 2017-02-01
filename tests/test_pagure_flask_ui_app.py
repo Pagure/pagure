@@ -477,6 +477,45 @@ class PagureFlaskApptests(tests.Modeltests):
 </ul>"""
         self.assertEqual(output.data, exp)
 
+        tests.create_projects(self.session)
+        texts = [
+            'pingou committed on test#9364354a4555ba17aa60f0dc844d70b74eb1aecd',
+            'Cf commit 936435',  # 6 chars - not long enough
+            'Cf commit 9364354',  # 7 chars - long enough
+            'Cf commit 9364354a',  # 8 chars - still long enough
+            'Cf commit 9364354a4555ba17aa60f0dc844d70b74eb1aecd',  # 40 chars
+        ]
+        expected = [
+            # 'pingou committed on test#9364354a4555ba17aa60f0dc844d70b74eb1aecd',
+            '<p>pingou committed on <a href="/test/c/9364354a4555ba17aa60f0dc844d70b74eb1aecd" '
+            'title="Commit 9364354a4555ba17aa60f0dc844d70b74eb1aecd"'
+            '>test#9364354a4555ba17aa60f0dc844d70b74eb1aecd</a></p>',
+            # 'Cf commit 936435',
+            '<p>Cf commit 936435</p>',
+            # 'Cf commit 9364354',
+            #'<p>Cf commit 9364354</p>',
+            '<p>Cf commit<a href="/test/c/9364354" '
+            'title="Commit 9364354"> 9364354</a></p>',
+            # 'Cf commit 9364354a',
+            '<p>Cf commit<a href="/test/c/9364354a" '
+            'title="Commit 9364354a"> 9364354</a></p>',
+            # 'Cf commit 9364354a4555ba17aa60f0dc844d70b74eb1aecd',
+            '<p>Cf commit<a href="/test/c/9364354a4555ba17aa60f0dc844d70b74eb1aecd" '
+            'title="Commit 9364354a4555ba17aa60f0dc844d70b74eb1aecd"'
+            '> 9364354</a></p>',
+        ]
+
+        with pagure.APP.app_context():
+            for idx, text in enumerate(texts):
+                #print idx, text
+                data = {
+                    'content': text,
+                    'csrf_token': csrf_token,
+                }
+                output = self.app.post('/markdown/?repo=test', data=data)
+                self.assertEqual(output.status_code, 200)
+                self.assertEqual(expected[idx], output.data)
+
     @patch('pagure.ui.app.admin_session_timedout')
     def test_remove_user_email(self, ast):
         """ Test the remove_user_email endpoint. """

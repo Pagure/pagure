@@ -52,6 +52,7 @@ COMMIT_LINK_RE = r'(?<!\w)'\
 '#(?P<id>[\w]{40})'
 IMPLICIT_ISSUE_RE = r'[^|\w](?<!\w)#([0-9]+)'
 IMPLICIT_PR_RE = r'[^|\w](?<!\w)PR#([0-9]+)'
+IMPLICIT_COMMIT_RE = r'[^|\w](?<![>\w#])([a-f0-9]{7,40})'
 STRIKE_THROUGH_RE = r'~~(\w+)~~'
 
 
@@ -236,6 +237,44 @@ class ImplicitPRPattern(markdown.inlinepatterns.Pattern):
         return text
 
 
+class ImplicitCommitPattern(markdown.inlinepatterns.Pattern):
+    """ Implicit commit pattern. """
+
+    def handleMatch(self, m):
+        """ When the pattern matches, update the text. """
+
+        githash = markdown.util.AtomicString(m.group(2))
+        text = ' %s' % githash[:7]
+        try:
+            root = flask.request.url_root
+            url = flask.request.url
+        except RuntimeError:
+            return text
+        repo = namespace = user = None
+
+        if flask.request.args.get('user'):
+            user = flask.request.args.get('user')
+        if flask.request.args.get('namespace'):
+            namespace = flask.request.args.get('namespace')
+        if flask.request.args.get('repo'):
+            repo = flask.request.args.get('repo')
+
+        if not user and not repo:
+            if 'fork/' in url:
+                user, repo = url.split('fork/')[1].split('/', 2)[:2]
+            else:
+                repo = url.split(root)[1].split('/', 1)[0]
+
+        if pagure.lib.search_projects(
+                pagure.SESSION,
+                username=user,
+                namespace=namespace,
+                pattern=repo):
+            return _obj_anchor_tag(user, namespace, repo, githash, text)
+
+        return text
+
+
 class StrikeThroughPattern(markdown.inlinepatterns.Pattern):
     """ ~~striked~~ pattern class. """
 
@@ -258,11 +297,15 @@ class PagureExtension(markdown.extensions.Extension):
         ])
 
         md.inlinePatterns['mention'] = MentionPattern(MENTION_RE)
+
+        md.inlinePatterns['implicit_commit'] = ImplicitCommitPattern(
+            IMPLICIT_COMMIT_RE)
+        md.inlinePatterns['commit_links'] = CommitLinkPattern(
+            COMMIT_LINK_RE)
+
         if pagure.APP.config.get('ENABLE_TICKETS', True):
             md.inlinePatterns['implicit_pr'] = \
                 ImplicitPRPattern(IMPLICIT_PR_RE)
-            md.inlinePatterns['commit_links'] = \
-                CommitLinkPattern(COMMIT_LINK_RE)
             md.inlinePatterns['explicit_fork_issue'] = \
                 ExplicitLinkPattern(EXPLICIT_LINK_RE)
             md.inlinePatterns['implicit_issue'] = \
