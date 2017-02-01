@@ -1226,6 +1226,9 @@ def view_issue_raw_file(
     """ Displays the raw content of a file of a commit for the specified
     ticket repo.
     """
+    raw = flask.request.args.get('raw')
+    raw = str(raw).lower() in ['1', 'true', 't']
+
     repo = flask.g.repo
 
     if not repo.settings.get('issue_tracker', True):
@@ -1255,7 +1258,8 @@ def view_issue_raw_file(
     if not data:
         flask.abort(404, 'No content found')
 
-    if (filename.endswith('.patch') or filename.endswith('.diff')) \
+    if not raw \
+            and (filename.endswith('.patch') or filename.endswith('.diff')) \
             and not is_binary_string(content.data):
         # We have a patch file attached to this issue, render the diff in html
         orig_filename = filename.partition('-')[2]

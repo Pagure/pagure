@@ -4,15 +4,26 @@
     repo.namespace + '/' if repo.namespace }}{{ repo.name }} {% endblock %}
 
 {% block repo %}
-<div class="card" id="patch-file">
-        <h1>{{ patchfile }}</h1>
-        <hr />
-        {% autoescape false %}
-        {{ diff|html_diff}}
-        {% endautoescape %}
+<ul class="nav nav-tabs nav-small" role="tablist" id="pr-tabs">
+  <li class="nav-item pull-xs-right">
+    <a class="nav-link" href="{{ request.base_url + '?raw=1' }}">
+      <span class="hidden-sm-down">View Raw</span>
+    </a>
+  </li>
+</ul>
+<div class="card-header">
+  <strong>{{ patchfile }}</strong>
 </div>
+<div class="card card-block">
+  {% autoescape false %}
+    {{ diff|html_diff }}
+  {% endautoescape %}
+</div>
+<p>
+  <a href="{{ request.base_url + '?raw=1' }}">View Raw</a>
+</p>
 {% endblock %}
 
 {% block jscripts %}
-    {{ super() }}
+  {{ super() }}
 {% endblock %}
