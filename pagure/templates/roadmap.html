@@ -101,32 +101,19 @@
   <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
   <span class="oi m-l-2 btn btn-nopad" data-glyph="target" title="Milestones"></span>
     {% for stone in milestones %}
-      {% if stone in requested_stones %}
-        <a class="btn btn-secondary btn-sm active"
-         href="{{ url_for(
-            'view_roadmap',
-            repo=repo.name,
-            username=username,
-            namespace=repo.namespace,
-            tag=tags,
-            all_stones=all_stones,
-            status=status) }}"
-            title="Filter issues by milestone">
-          {{ stone }}</a>
-      {% else %}
-        <a class="btn btn-secondary btn-sm"
-          href="{{ url_for(
-            'view_roadmap',
-            repo=repo.name,
-            username=username,
-            namespace=repo.namespace,
-            milestone=stone,
-            tag=tags,
-            all_stones=all_stones,
-            status=status) }}"
-            title="Filter issues by milestone">
-          {{ stone }}</a>
-      {% endif %}
+      <a class="btn btn-secondary btn-sm{%
+          if stone in requested_stones %} active {% endif %}"
+        href="{{ url_for(
+          'view_roadmap',
+          repo=repo.name,
+          username=username,
+          namespace=repo.namespace,
+          milestone=stone | add_or_remove(requested_stones[:]),
+          tag=tags,
+          all_stones=all_stones,
+          status=status) }}"
+          title="Filter issues by milestone">
+        {{ stone }}</a>
     {% endfor %}
   </span>
   <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">

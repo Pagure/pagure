@@ -713,7 +713,6 @@ def view_roadmap(repo, username=None, namespace=None):
     milestones = flask.request.args.getlist('milestone', None)
     tags = flask.request.args.getlist('tag', None)
     all_stones = flask.request.args.get('all_stones')
-    active_milestones = flask.request.args.getlist('active_milestones', None)
 
     repo = flask.g.repo
 
