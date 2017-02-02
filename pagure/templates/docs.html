@@ -8,16 +8,16 @@
 {% block repo %}
 
 <iframe id="docframe" src="{{ config['DOC_APP_URL'] + url_for('.view_repo',
-        repo=repo.name,
+        repo=repo.namespace + '.' + repo.name if repo.namespace else repo.name,
         username=username,
-        namespace=repo.namespace,
         filename=filename) }}"
     frameborder="0" style="min-height:700px;width:100%"
     onload="resize_iframe()">
   <p>Your browser does not support iframe, please visit
   <a href="{{ config['DOC_APP_URL'] + url_for('.view_repo',
-        namespace=repo.namespace, username=username,
-        repo=repo.name, filename=filename)
+        repo=repo.namespace + '.' + repo.name if repo.namespace else repo.name,
+        username=username,
+        filename=filename)
     }}">the documentation directly</a>
   </p>
 </iframe>

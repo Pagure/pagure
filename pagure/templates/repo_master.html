@@ -279,9 +279,8 @@
       <li class="nav-item pull-xs-right">
         <a class="nav-link" href="{{ config['DOC_APP_URL'] + url_for(
             '.view_repo',
-            repo=repo.name,
+            repo=repo.namespace + '.' + repo.name if repo.namespace else repo.name,
             username=username,
-            namespace=repo.namespace,
             filename=filename)
           }}" target="_blank" title="Open to a new tab" rel="noopener noreferrer">
           <span class="oi" data-glyph="external-link"></span>
