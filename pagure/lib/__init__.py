@@ -3328,7 +3328,7 @@ def is_watching(session, user, reponame, repouser=None, namespace=None):
     return False
 
 
-def user_watch_list(session, user):
+def user_watch_list(session, user, exclude_groups):
     ''' Returns list of all the projects which the user is watching '''
 
     user_obj = search_user(session, username=user)
@@ -3359,7 +3359,8 @@ def user_watch_list(session, user):
     if watched:
         watched_list = [watch.project for watch in watched.all()]
 
-    user_projects = search_projects(session, username=user_obj.user)
+    user_projects = search_projects(
+        session, username=user_obj.user, exclude_groups=exclude_groups)
     watch = set(watched_list + user_projects)
 
     for project in user_projects:

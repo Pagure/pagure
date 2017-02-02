@@ -115,7 +115,9 @@ def index_auth():
 
     watch_list = pagure.lib.user_watch_list(
         SESSION,
-        user=flask.g.fas_user.username)
+        user=flask.g.fas_user.username,
+        exclude_groups=APP.config.get('EXCLUDE_GROUP_INDEX'),
+    )
 
     return flask.render_template(
         'index_auth.html',
