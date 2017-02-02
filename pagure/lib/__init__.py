@@ -3579,12 +3579,12 @@ def set_custom_key_value(session, issue, key, value):
                 'issue': issue.to_json(public=True, with_comments=False),
             }))
 
-    if value:
+    if updated and value:
         output = 'Custom field %s adjusted to %s' % (key.name, value)
         if old_value:
             output += ' (was: %s)' % old_value
         return output
-    else:
+    elif updated and old_value:
         return 'Custom field %s reset' % key.name
 
 
