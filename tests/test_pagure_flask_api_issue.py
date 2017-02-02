@@ -1094,7 +1094,10 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = json.loads(output.data)
         self.assertDictEqual(
             data,
-            {'message': 'Successfully edited issue #1'}
+            {'message':[
+                'Issue status updated to: Closed',
+                'Issue close_status updated to: Fixed'
+            ]}
         )
 
         headers = {'Authorization': 'token pingou_foo'}
@@ -1506,7 +1509,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = json.loads(output.data)
         self.assertDictEqual(
             data,
-            {'message': 'Issue assigned'}
+            {'message': 'Issue assigned to pingou'}
         )
 
         # Un-assign
@@ -1544,7 +1547,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = json.loads(output.data)
         self.assertDictEqual(
             data,
-            {'message': 'Issue assigned'}
+            {'message': 'Issue assigned to pingou'}
         )
 
         # Un-assign
@@ -1566,7 +1569,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = json.loads(output.data)
         self.assertDictEqual(
             data,
-            {'message': 'Issue assigned'}
+            {'message': 'Issue assigned to pingou'}
         )
 
         # One comment added
@@ -1666,7 +1669,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = json.loads(output.data)
         self.assertDictEqual(
             data,
-            {'message': 'Issue assigned'}
+            {'message': 'Issue assigned to pingou'}
         )
 
     @patch('pagure.lib.git.update_git')
@@ -1993,7 +1996,8 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "message": "Custom field adjusted"
+              "message": "Custom field bugzilla adjusted to "
+                "https://bugzilla.redhat.com/1234"
             }
         )
 
@@ -2014,7 +2018,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "message": "Custom field adjusted"
+              "message": "Custom field bugzilla reset"
             }
         )
 

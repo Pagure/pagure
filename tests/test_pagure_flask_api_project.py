@@ -29,9 +29,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 import pagure.lib
 import tests
 from pagure.lib.repo import PagureRepo
-from pagure.lib import MetaComment
-
-mcomment = MetaComment()
 
 
 class PagureFlaskApiProjecttests(tests.Modeltests):
@@ -124,8 +121,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         # Adding a tag
         output = pagure.lib.update_tags(
             self.session, repo, 'infra', 'pingou',
-            None, mcomment)
-        self.assertEqual(output, ['Tag added: infra'])
+            None)
+        self.assertEqual(output, ['Issue tagged with: infra'])
 
         # Check after adding
         repo = pagure.lib.get_project(self.session, 'test')
@@ -322,8 +319,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         # Adding a tag
         output = pagure.lib.update_tags(
             self.session, repo, 'infra', 'pingou',
-            ticketfolder=None, mcomment=mcomment)
-        self.assertEqual(output, ['Tag added: infra'])
+            ticketfolder=None)
+        self.assertEqual(output, ['Issue tagged with: infra'])
 
         # Check after adding
         repo = pagure.lib.get_project(self.session, 'test')

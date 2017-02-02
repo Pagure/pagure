@@ -26,9 +26,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 
 import pagure.lib
 import tests
-from pagure.lib import MetaComment
-
-mcomment = MetaComment()
 
 
 class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
@@ -132,10 +129,9 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
             assignee='pingou',
             user='pingou',
             ticketfolder=repopath,
-            mcomment=mcomment
         )
         self.session.commit()
-        self.assertEqual(msg, 'Issue assigned')
+        self.assertEqual(msg, 'Issue assigned to pingou')
         # Add a couple of tags on the ticket
         msg = pagure.lib.add_tag_obj(
             session=self.session,
@@ -145,7 +141,7 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
             ticketfolder=repopath,
         )
         self.session.commit()
-        self.assertEqual(msg, 'Tag added: feature, future')
+        self.assertEqual(msg, 'Issue tagged with: feature, future')
         # Add dependencies
         msg = pagure.lib.add_issue_dependency(
             session=self.session,
@@ -155,7 +151,7 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
             ticketfolder=repopath,
         )
         self.session.commit()
-        self.assertEqual(msg, 'Dependency added')
+        self.assertEqual(msg, 'Issue marked as depending on: #2')
         msg = pagure.lib.add_issue_dependency(
             session=self.session,
             issue=issue3,
@@ -164,7 +160,7 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
             ticketfolder=repopath,
         )
         self.session.commit()
-        self.assertEqual(msg, 'Dependency added')
+        self.assertEqual(msg, 'Issue marked as depending on: #1')
 
         # Dump the JSON
         pagure.lib.git.update_git(issue, repo, repopath)

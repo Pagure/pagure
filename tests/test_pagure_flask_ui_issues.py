@@ -31,9 +31,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(
 
 import pagure.lib
 import tests
-from pagure.lib import MetaComment
-
-mcomment = MetaComment()
 
 
 class PagureFlaskIssuestests(tests.Modeltests):
@@ -550,11 +547,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
             milestone=b'käpy'.decode('utf-8'),
             private=False,
             user='pingou',
-            ticketfolder=None,
-            mcomment=mcomment
+            ticketfolder=None
         )
-        print "MARK2 " + message
-        self.assertEqual(message, 'Successfully edited issue #1')
+        self.assertEqual(
+            message,
+            [
+                u'Issue set to the milestone: k\xe4py'
+            ]
+        )
         self.session.commit()
 
         output = self.app.get('/test/issue/1')
@@ -681,16 +681,20 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output.data)
             self.assertIn(
-                '</button>\n                      Successfully edited issue #1',
+                '</button>\n                      '
+                'Issue close_status updated to: Fixed\n',
+                output.data)
+            self.assertIn(
+                '</button>\n                      '
+                'Issue status updated to: Closed\n',
                 output.data)
             self.assertTrue(
                 '<option selected value="Fixed">Fixed</option>'
                 in output.data)
             self.assertIn(
-                '<small><p><a href="https://pagure.org/user/pingou"> '
-                '@pingou</a> updated metadata'
-                .format(
-                    app_url=pagure.APP.config['APP_URL'].rstrip('/')),
+                '''<small><p>Metadata Update:<br>
+- Issue status updated to: Closed<br>
+- Issue close_status updated to: Fixed</p></small>''',
                 output.data)
 
             # Add new comment
@@ -792,7 +796,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output.data)
             self.assertIn(
-                '</button>\n                      Issue assigned',
+                '</button>\n                      Issue assigned to pingou\n',
                 output.data)
             self.assertTrue(
                 '<a href="/test/issues?assignee=pingou">' in output.data)
@@ -1495,7 +1499,12 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '/test/issue/1/edit', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '</button>\n                      Successfully edited issue #1',
+                '</button>\n                      '
+                'Issue title edited\n',
+                output.data)
+            self.assertIn(
+                '</button>\n                      '
+                'Issue description edited\n',
                 output.data)
             self.assertIn(
                 '<span class="issueid label label-default">#1</span>\n'
@@ -1566,7 +1575,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             user='pingou',
             ticketfolder=None)
         self.session.commit()
-        self.assertEqual(msg, 'Tag added: tag1')
+        self.assertEqual(msg, 'Issue tagged with: tag1')
 
         # Before edit, list tags
         tags = pagure.lib.get_tags_of_project(self.session, repo)
@@ -1669,7 +1678,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             user='pingou',
             ticketfolder=None)
         self.session.commit()
-        self.assertEqual(msg, 'Tag added: tag1')
+        self.assertEqual(msg, 'Issue tagged with: tag1')
 
         # Before edit, list tags
         tags = pagure.lib.get_tags_of_project(self.session, repo)
@@ -1701,8 +1710,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertTrue("<h3>Settings for test</h3>" in output.data)
             self.assertIn(
-                '</button>\n                      Removed tag: tag1',
-                output.data)
+                '</button>\n                      '
+                'Issue **un**tagged with: tag1', output.data)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -1995,11 +2004,16 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '</button>\n                      '
-                'Successfully edited issue #2\n',
+                'Issue close_status updated to: Invalid\n',
                 output.data
             )
             self.assertIn(
                 '</button>\n                      Comment added\n',
+                output.data
+            )
+            self.assertIn(
+                '</button>\n                      '
+                'Issue status updated to: Closed\n',
                 output.data
             )
             self.assertIn(
@@ -2014,7 +2028,15 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         # Ticket #2 has one less comment and is closed
         issue = pagure.lib.search_issues(self.session, repo, issueid=2)
-        self.assertEqual(len(issue.comments), 1)
+        self.assertEqual(len(issue.comments), 2)
+        self.assertEqual(
+            issue.comments[0].comment,
+            'Nevermind figured it out')
+        self.assertEqual(
+            issue.comments[1].comment,
+            'Metadata Update:\n'
+            '- Issue close_status updated to: Invalid\n'
+            '- Issue status updated to: Closed')
         self.assertEqual(issue.status, 'Closed')
 
     @patch('pagure.lib.git.update_git')

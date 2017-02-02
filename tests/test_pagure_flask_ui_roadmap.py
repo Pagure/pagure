@@ -461,7 +461,7 @@ class PagureFlaskRoadmaptests(tests.Modeltests):
                     output.data)
                 self.assertIn(
                     u'</button>\n                      '
-                    u'Successfully edited issue #%s' % cnt,
+                    u'Issue set to the milestone: %s\n' % mstone,
                     output.data)
 
         repo = pagure.lib.get_project(self.session, 'test')
