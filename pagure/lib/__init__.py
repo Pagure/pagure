@@ -1469,7 +1469,7 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
         issue.milestone = milestone
         edit.append('milestone')
         msg = 'Issue set to the milestone: %s' % milestone
-        if old_private:
+        if old_milestone:
             msg += ' (was: %s)' % old_milestone
         messages.append(msg)
     issue.last_updated = datetime.datetime.utcnow()
