@@ -33,7 +33,7 @@ git push -u origin master</pre>
       </div>
     {% else %}
         <div class="col-md-8">
-            {% if readme %}
+          {% if readme %}
             <section class="readme">
               {% if safe %}
                 {{ readme | noJS |safe }}
@@ -49,27 +49,31 @@ git push -u origin master</pre>
                 </div>
               </div>
             </section>
-            {% endif %}
+          {% endif %}
         </div>
     {% endif %}
       <div class="col-md-4">
         <div class="card">
           <div class="card-block">
-            <h5><strong>Owners</strong></h5>
+            <h5><strong>Contributors</strong></h5>
             <div class="m-b-2">
               <div>
                 <a href="{{ url_for('view_user', username=repo.user.user)}}">
                   {{ repo.user.default_email | avatar(20) | safe }}
-                  {{ repo.user.fullname }} ({{ repo.user.user }})  -  creator
+                  {{ repo.user.fullname }} ({{ repo.user.user }})
                 </a>
+                -  creator
               </div>
-              {% for user in repo.admins %}
-              <div>
-                <a href="{{ url_for('view_user', username=user.user)}}">
-                  {{ user.default_email | avatar(20) | safe }}
-                  {{ user.fullname }} ({{ user.user }})
-                </a>
-              </div>
+              {% for access in repo.contributors %}
+                {% for user in repo.contributors[access] %}
+                  <div>
+                    <a href="{{ url_for('view_user', username=user.user)}}">
+                      {{ user.default_email | avatar(20) | safe }}
+                      {{ user.fullname }} ({{ user.user }})
+                    </a>
+                    - {{ access }}
+                  </div>
+                {% endfor %}
               {% endfor %}
               {% for group in repo.admin_groups %}
               <div>

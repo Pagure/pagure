@@ -12,6 +12,7 @@ __requires__ = ['SQLAlchemy >= 0.8', 'jinja2 >= 2.4']
 import pkg_resources
 
 import datetime
+import collections
 import logging
 import json
 import operator
@@ -637,6 +638,18 @@ class Project(BASE):
             Issue.private == False
         ).count()
 
+    @property
+    def contributors(self):
+        """ Return the dict presenting the different contributors of the
+        project based on their access level.
+        """
+        contributors = collections.defaultdict(list)
+
+        for user in self.user_projects:
+            contributors[user.access].append(user.user)
+
+        return contributors
+
     def to_json(self, public=False, api=False):
         ''' Return a representation of the project as JSON.
         '''
@@ -696,6 +709,12 @@ class ProjectUser(BASE):
             'access_levels.access', onupdate='CASCADE', ondelete='CASCADE',
         ),
         nullable=False)
+
+    project = relation(
+        'Project', remote_side=[Project.id],
+        backref='user_projects')
+
+    user = relation('User', backref='user_projects')
 
 
 class DeployKey(BASE):
