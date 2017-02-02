@@ -56,41 +56,6 @@ PAGURE_CI = None
 LOG = None
 
 
-class MetaComment():
-    ''' This class store/builds comments about metadata updates that can be
-    displayed in a single notification comment in the UI. '''
-    def __init__(self):
-        ''' Initialize the comment '''
-        self.comment = ""
-
-    def add(self, field, old_value=None, new_value=None):
-        ''' Add a new comment about the changes to this field.  If the value is
-        not set/empty we still need to pass a string to markdown or else the
-        formatting is wrong.  So in this case we use ""
-        '''
-        if not old_value:
-            old_value = '""'
-        if not new_value:
-            new_value = '""'
-
-        self.comment += ("**%s** changed from ``%s`` to ``%s``\n" %
-            (field, old_value, new_value))
-
-    def add_as_is(self, comment):
-        ''' Add a comment as is '''
-        self.comment += "%s\n" % (comment)
-
-    def is_set(self):
-        if self.comment != "":
-            return True
-        else:
-            return False
-
-    def get(self):
-        ''' Return the full comment list '''
-        return self.comment
-
-
 def set_redis(host, port, dbname):
     """ Set the redis connection with the specified information. """
     global REDIS
@@ -422,12 +387,12 @@ def add_tag_obj(session, obj, tags, user, ticketfolder):
                 {'added_tags': added_tags}))
 
     if added_tags:
-        return 'Tag added: %s' % ', '.join(added_tags)
+        return 'Issue tagged with: %s' % ', '.join(added_tags)
     else:
         return 'Nothing to add'
 
 
-def add_issue_assignee(session, issue, assignee, user, ticketfolder, mcomment,
+def add_issue_assignee(session, issue, assignee, user, ticketfolder,
                        notify=True):
     ''' Add an assignee to an issue, in other words, assigned an issue. '''
     user_obj = get_user(session, user)
@@ -441,7 +406,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder, mcomment,
         session.commit()
         pagure.lib.git.update_git(
             issue, repo=issue.project, repofolder=ticketfolder)
-        mcomment.add("Assignee", old_assignee.user, None)
+
         if notify:
             pagure.lib.notify.notify_assigned_issue(issue, None, user_obj)
 
@@ -464,13 +429,12 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder, mcomment,
 
         return 'Assignee reset'
     elif not assignee and issue.assignee is None:
-        return 'Nothing to change'
+        return
 
     # Validate the assignee
     assignee_obj = get_user(session, assignee)
 
     if issue.assignee_id != assignee_obj.id:
-        mcomment.add("Assignee", old_assignee, assignee_obj.user)
         issue.assignee_id = assignee_obj.id
         session.add(issue)
         session.flush()
@@ -499,9 +463,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder, mcomment,
             REDIS.publish('pagure.%s' % issue.uid, json.dumps(
                 {'assigned': assignee_obj.to_json(public=True)}))
 
-        return 'Issue assigned'
-    else:
-        return ""
+        return 'Issue assigned to %s' % assignee
 
 
 def add_pull_request_assignee(
@@ -618,7 +580,7 @@ def add_issue_dependency(
                 'type': 'parent',
             }))
 
-        return 'Dependency added'
+        return 'Issue marked as depending on: #%s' % issue_blocked.id
 
 
 def remove_issue_dependency(
@@ -678,7 +640,8 @@ def remove_issue_dependency(
                 'type': 'parent',
             }))
 
-        return 'Dependency removed'
+        return 'Issue **un**marked as depending on: #%s' % ' #'.join(
+            [str(id) for id in child_del])
 
 
 def remove_tags(session, project, tags, ticketfolder, user):
@@ -699,7 +662,7 @@ def remove_tags(session, project, tags, ticketfolder, user):
         if tagobj:
             tag_found = True
             removed_tags.append(tag)
-            msgs.append('Removed tag: %s' % tag)
+            msgs.append('Issue **un**tagged with: %s' % tag)
             session.delete(tagobj)
 
     if not tag_found:
@@ -770,7 +733,7 @@ def remove_tags_obj(session, obj, tags, ticketfolder, user):
             REDIS.publish('pagure.%s' % obj.uid, json.dumps(
                 {'removed_tags': removed_tags}))
 
-    return 'Removed tag: %s' % ', '.join(removed_tags)
+    return 'Issue **un**tagged with: %s' % ', '.join(removed_tags)
 
 
 def edit_issue_tags(
@@ -1436,7 +1399,7 @@ def new_tag(session, tag_name, tag_description, tag_color, project_id):
     return tagobj
 
 
-def edit_issue(session, issue, ticketfolder, user, mcomment, repo=None,
+def edit_issue(session, issue, ticketfolder, user, repo=None,
                title=None, content=None, status=None, close_status=-1,
                priority=None, milestone=-1, private=False):
     ''' Edit the specified issue.
@@ -1450,15 +1413,16 @@ def edit_issue(session, issue, ticketfolder, user, mcomment, repo=None,
                     'depending that are still open.')
 
     edit = []
+    messages = []
     if title and title != issue.title:
-        mcomment.add("Title", issue.title, title)
         issue.title = title
         edit.append('title')
+        messages.append('Issue title edited')
     if content and content != issue.content:
         issue.content = content
         edit.append('content')
+        messages.append('Issue description edited')
     if status and status != issue.status:
-        mcomment.add("Status", issue.status, status)
         issue.status = status
         if status.lower() != 'open':
             issue.closed_at = datetime.datetime.utcnow()
@@ -1466,28 +1430,28 @@ def edit_issue(session, issue, ticketfolder, user, mcomment, repo=None,
             issue.close_status = None
             edit.append('close_status')
         edit.append('status')
+        messages.append('Issue status updated to: %s' % status)
     if close_status != -1 and close_status != issue.close_status:
-        mcomment.add("Closed as", issue.close_status, close_status)
         issue.close_status = close_status
         edit.append('close_status')
+        messages.append('Issue close_status updated to: %s' % close_status)
     if priority:
         try:
             priority = int(priority)
         except:
             priority = None
         if priority != issue.priority:
-            mcomment.add("Priority", repo.priorities[str(issue.priority)],
-                repo.priorities[str(priority)])
             issue.priority = priority
             edit.append('priority')
+            messages.append('Issue priority set to: %s' % priority)
     if private in [True, False] and private != issue.private:
-        mcomment.add("Private", str(issue.private), str(private))
         issue.private = private
         edit.append('private')
+        messages.append('Issue private status set to: %s' % private)
     if milestone != -1 and milestone != issue.milestone:
-        mcomment.add("Milestone", issue.milestone, milestone)
         issue.milestone = milestone
         edit.append('milestone')
+        messages.append('Issue set to the milestone: %s' % milestone)
     issue.last_updated = datetime.datetime.utcnow()
     # uniquify the list of edited fields
     edit = list(set(edit))
@@ -1527,9 +1491,7 @@ def edit_issue(session, issue, ticketfolder, user, mcomment, repo=None,
     if edit:
         session.add(issue)
         session.flush()
-        return 'Successfully edited issue #%s' % issue.id
-    else:
-        return ""
+        return messages
 
 
 def update_project_settings(session, repo, settings, user):
@@ -2514,7 +2476,7 @@ def avatar_url_from_email(email, size=64, default='retro', dns=False):
             hashhex, query)
 
 
-def update_tags(session, obj, tags, username, ticketfolder, mcomment):
+def update_tags(session, obj, tags, username, ticketfolder):
     """ Update the tags of a specified object (adding or removing them).
     This object can be either an issue or a project.
 
@@ -2526,36 +2488,24 @@ def update_tags(session, obj, tags, username, ticketfolder, mcomment):
     torm = set(obj.tags_text) - set(tags)
     messages = []
     if toadd:
-        messages.append(
-            add_tag_obj(
-                session,
-                obj=obj,
-                tags=toadd,
-                user=username,
-                ticketfolder=ticketfolder,
-            )
+        add_tag_obj(
+            session,
+            obj=obj,
+            tags=toadd,
+            user=username,
+            ticketfolder=ticketfolder,
         )
-        if len(toadd) == 1:
-            mcomment.add_as_is("**Tags** added tag: ``%s``" % list(toadd)[0])
-        else:
-            mcomment.add_as_is("**Tags** added tags: ``" + ', '.join(toadd) +
-                               "``")
+        messages.append('Issue tagged with: %s' % ', '.join(toadd))
 
     if torm:
-        messages.append(
-            remove_tags_obj(
-                session,
-                obj=obj,
-                tags=torm,
-                user=username,
-                ticketfolder=ticketfolder,
-            )
+        remove_tags_obj(
+            session,
+            obj=obj,
+            tags=torm,
+            user=username,
+            ticketfolder=ticketfolder,
         )
-        if len(torm) == 1:
-            mcomment.add_as_is("**Tags** removed tag: ``%s``" % list(torm)[0])
-        else:
-            mcomment.add_as_is("**Tags** removed tags: ``" +
-                               ", ".join(torm) + "``")
+        messages.append('Issue **un**tagged with: %s' % ', '.join(torm))
 
     session.commit()
 
@@ -2563,7 +2513,7 @@ def update_tags(session, obj, tags, username, ticketfolder, mcomment):
 
 
 def update_dependency_issue(
-        session, repo, issue, depends, username, ticketfolder, mcomment):
+        session, repo, issue, depends, username, ticketfolder):
     """ Update the dependency of a specified issue (adding or removing them)
 
     """
@@ -2576,9 +2526,8 @@ def update_dependency_issue(
     comment = ""
 
     # Add issue depending
-    if toadd:
-        comment += "**Depends on** added dependencies: ``"
     for depend in toadd:
+        messages.append("Issue marked as depending on: #%s" % depend)
         issue_depend = search_issues(session, repo, issueid=depend)
         if issue_depend is None:
             continue
@@ -2586,26 +2535,17 @@ def update_dependency_issue(
             # we should never be in this case but better safe than sorry...
             continue
 
-        messages.append(
-            add_issue_dependency(
-                session,
-                issue=issue_depend,
-                issue_blocked=issue,
-                user=username,
-                ticketfolder=ticketfolder,
-            )
+        add_issue_dependency(
+            session,
+            issue=issue_depend,
+            issue_blocked=issue,
+            user=username,
+            ticketfolder=ticketfolder,
         )
-        comment += "%s " % (depend)
-
-    if comment:
-        comment += "``"
-        mcomment.add_as_is(comment)
-        comment = ""
 
     # Remove issue depending
-    if torm:
-        comment += "**Depends on** removed issue dependencies: ``"
     for depend in torm:
+        messages.append("Issue **un**marked as depending on: #%s" % depend)
         issue_depend = search_issues(session, repo, issueid=depend)
         if issue_depend is None:  # pragma: no cover
             # We cannot test this as it would mean we managed to put in an
@@ -2615,27 +2555,20 @@ def update_dependency_issue(
             # we should never be in this case but better safe than sorry...
             continue
 
-        messages.append(
-            remove_issue_dependency(
-                session,
-                issue=issue,
-                issue_blocked=issue_depend,
-                user=username,
-                ticketfolder=ticketfolder,
-            )
+        remove_issue_dependency(
+            session,
+            issue=issue,
+            issue_blocked=issue_depend,
+            user=username,
+            ticketfolder=ticketfolder,
         )
-        comment += "%s " % (depend)
-
-    if comment:
-        comment += "``"
-        mcomment.add_as_is(comment)
 
     session.commit()
     return messages
 
 
 def update_blocked_issue(
-        session, repo, issue, blocks, username, ticketfolder, mcomment):
+        session, repo, issue, blocks, username, ticketfolder):
     """ Update the upstream dependency of a specified issue (adding or
     removing them)
 
@@ -2646,12 +2579,10 @@ def update_blocked_issue(
     toadd = set(blocks) - set(issue.blocks_text)
     torm = set(issue.blocks_text) - set(blocks)
     messages = []
-    comment = ""
 
     # Add issue blocked
-    if toadd:
-        comment += "**Blocked** added blocking issue dependencies: ``"
     for block in toadd:
+        messages.append("Issue marked as blocked by: #%s" % block)
         issue_block = search_issues(session, repo, issueid=block)
         if issue_block is None:
             continue
@@ -2659,27 +2590,19 @@ def update_blocked_issue(
             # we should never be in this case but better safe than sorry...
             continue
 
-        messages.append(
-            add_issue_dependency(
-                session,
-                issue=issue,
-                issue_blocked=issue_block,
-                user=username,
-                ticketfolder=ticketfolder,
-            )
+
+        add_issue_dependency(
+            session,
+            issue=issue,
+            issue_blocked=issue_block,
+            user=username,
+            ticketfolder=ticketfolder,
         )
         session.commit()
-        comment += "%s " % (block)
-
-    if comment:
-        comment += "``"
-        mcomment.add_as_is(comment)
-        comment = ""
 
     # Remove issue blocked
-    if torm:
-        comment += "**Blocked** remove blocking issue dependencies: ``"
     for block in torm:
+        messages.append("Issue **un**marked as blocked by: #%s" % block)
         issue_block = search_issues(session, repo, issueid=block)
         if issue_block is None:  # pragma: no cover
             # We cannot test this as it would mean we managed to put in an
@@ -2690,20 +2613,13 @@ def update_blocked_issue(
             # we should never be in this case but better safe than sorry...
             continue
 
-        messages.append(
-            remove_issue_dependency(
-                session,
-                issue=issue_block,
-                issue_blocked=issue,
-                user=username,
-                ticketfolder=ticketfolder,
-            )
+        remove_issue_dependency(
+            session,
+            issue=issue_block,
+            issue_blocked=issue,
+            user=username,
+            ticketfolder=ticketfolder,
         )
-        comment += "%s " % (block)
-
-    if comment:
-        comment += "``"
-        mcomment.add_as_is(comment)
 
     session.commit()
     return messages
@@ -3592,7 +3508,7 @@ def set_custom_key_fields(session, project, fields, types, data):
     return 'List of custom fields updated'
 
 
-def set_custom_key_value(session, issue, key, value, mcomment):
+def set_custom_key_value(session, issue, key, value):
     """ Set or update the value of the specified custom key.
     """
 
@@ -3631,9 +3547,6 @@ def set_custom_key_value(session, issue, key, value, mcomment):
     if not delete:
         session.add(current_field)
 
-    if updated:
-        mcomment.add(key.name, old_value, value)
-
     if REDIS and updated:
         if issue.private:
             REDIS.publish('pagure.%s' % issue.uid, json.dumps({
@@ -3646,7 +3559,10 @@ def set_custom_key_value(session, issue, key, value, mcomment):
                 'issue': issue.to_json(public=True, with_comments=False),
             }))
 
-    return 'Custom field adjusted'
+    if value:
+        return 'Custom field %s adjusted to %s' % (key.name, value)
+    else:
+        return 'Custom field %s reset' % key.name
 
 
 def get_yearly_stats_user(session, user, date):
@@ -3768,3 +3684,31 @@ def get_active_milestones(session, project):
     )
 
     return sorted([item[0] for item in query.distinct()])
+
+
+def add_metadata_update_notif(session, issue, messages, user, ticketfolder):
+    ''' Add a notification to the specified issue with the given messages
+    which should reflect changes made to the meta-data of the issue.
+    '''
+    if not messages:
+        return
+
+    if not isinstance(messages, (list, set)):
+        messages = [messages]
+
+    user_id = None
+    if user:
+        user_obj = get_user(session, user)
+        user_id = user_obj.id
+
+    issue_comment = model.IssueComment(
+        issue_uid=issue.uid,
+        comment='Metadata Update:\n- %s' % ('\n- '.join(messages)),
+        user_id=user_id,
+        notification=True,
+    )
+    issue.last_updated = datetime.datetime.utcnow()
+    session.add(issue)
+    session.add(issue_comment)
+    # Make sure we won't have SQLAlchemy error before we continue
+    session.commit()

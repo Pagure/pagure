@@ -719,7 +719,9 @@ function try_async_comment(form) {
 
 {% if authenticated and g.repo_admin %}
 function take_issue(){
-  var _url = "{{ url_for('api_ns.api_assign_issue', repo=repo.name, username=username, issueid=issueid) }}";
+  var _url = "{{ url_for('api_ns.api_assign_issue',
+            repo=repo.name, namespace=repo.namespace, username=username,
+            issueid=issueid) }}";
   var _data = {assignee: "{{ g.fas_user.username }}"};
   $.post (_url, _data ).done(
     function(data) {
@@ -741,9 +743,9 @@ function take_issue(){
     or issue.user.user == g.fas_user.username
     or issue.assignee.user == g.fas_user.username) %}
 function drop_issue(){
-  var _url = "{{ url_for(
-      'api_ns.api_assign_issue', repo=repo.name, username=username, issueid=issueid
-      ) }}";
+  var _url = "{{ url_for('api_ns.api_assign_issue',
+            repo=repo.name, namespace=repo.namespace, username=username,
+            issueid=issueid) }}";
   var _data = {assignee: ""};
   $.post( _url, _data ).done(
     function(data) {

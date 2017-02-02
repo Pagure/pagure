@@ -28,7 +28,6 @@ import pygit2
 import werkzeug
 
 from sqlalchemy.exc import SQLAlchemyError
-from .__init__ import MetaComment
 import pagure
 import pagure.exceptions
 import pagure.lib
@@ -426,7 +425,7 @@ def get_project_from_json(
     return project
 
 
-def update_custom_field_from_json(session, repo, issue, json_data, mcomment):
+def update_custom_field_from_json(session, repo, issue, json_data):
     ''' Update the custom fields according to the custom fields of
     the issue. If the custom field is not present for the repo in
     it's settings, this will create them.
@@ -467,13 +466,20 @@ def update_custom_field_from_json(session, repo, issue, json_data, mcomment):
         value = new_key.get('value')
         if value:
             value = value.strip()
-        pagure.lib.set_custom_key_value(
+        messages = pagure.lib.set_custom_key_value(
             session,
             issue=issue,
             key=key_obj,
             value=value,
-            mcomment=mcomment
         )
+        if messages:
+            pagure.lib.add_metadata_update_notif(
+                session=session,
+                issue=issue,
+                messages=messages,
+                user=None,
+                ticketfolder=None
+            )
         try:
             session.commit()
         except SQLAlchemyError:
@@ -501,9 +507,9 @@ def update_ticket_from_git(
                 reponame, username, namespace))
 
     user = get_user_from_json(session, json_data)
-    mcomment = MetaComment()
 
     issue = pagure.lib.get_issue_by_uid(session, issue_uid=issue_uid)
+    messages = []
     if not issue:
         # Create new issue
         pagure.lib.new_issue(
@@ -525,7 +531,7 @@ def update_ticket_from_git(
 
     else:
         # Edit existing issue
-        pagure.lib.edit_issue(
+        messages.extend(pagure.lib.edit_issue(
             session,
             issue=issue,
             ticketfolder=None,
@@ -535,8 +541,8 @@ def update_ticket_from_git(
             status=json_data.get('status'),
             close_status=json_data.get('close_status'),
             private=json_data.get('private'),
-            mcomment=mcomment
-        )
+        ))
+
     session.commit()
 
     issue = pagure.lib.get_issue_by_uid(session, issue_uid=issue_uid)
@@ -546,7 +552,6 @@ def update_ticket_from_git(
         repo=repo,
         issue=issue,
         json_data=json_data,
-        mcomment=mcomment
     )
 
     # Update milestone
@@ -564,14 +569,15 @@ def update_ticket_from_git(
             except SQLAlchemyError:
                 session.rollback()
     try:
-        msg = pagure.lib.edit_issue(
+        msgs = pagure.lib.edit_issue(
             session,
             issue=issue,
             ticketfolder=None,
             user=user.username,
             milestone=milestone,
-            mcomment=mcomment
         )
+        if msgs:
+            messages.extend(msgs)
     except SQLAlchemyError:
         session.rollback()
 
@@ -589,28 +595,27 @@ def update_ticket_from_git(
 
     # Update tags
     tags = json_data.get('tags', [])
-    pagure.lib.update_tags(
-        session, issue, tags, username=user.user, ticketfolder=None,
-        mcomment=mcomment)
+    messages.extend(pagure.lib.update_tags(
+        session, issue, tags, username=user.user, ticketfolder=None))
 
     # Update assignee
     assignee = get_user_from_json(session, json_data, key='assignee')
     if assignee:
-        pagure.lib.add_issue_assignee(
-            session, issue, assignee.username, mcomment=mcomment,
-            user=user.user, ticketfolder=None, notify=False)
+        messages.append(pagure.lib.add_issue_assignee(
+            session, issue, assignee.username,
+            user=user.user, ticketfolder=None, notify=False))
 
     # Update depends
     depends = json_data.get('depends', [])
-    pagure.lib.update_dependency_issue(
+    messages.extend(pagure.lib.update_dependency_issue(
         session, issue.project, issue, depends,
-        username=user.user, ticketfolder=None, mcomment=mcomment)
+        username=user.user, ticketfolder=None))
 
     # Update blocks
     blocks = json_data.get('blocks', [])
-    pagure.lib.update_blocked_issue(
+    messages.extend(pagure.lib.update_blocked_issue(
         session, issue.project, issue, blocks,
-        username=user.user, ticketfolder=None, mcomment=mcomment)
+        username=user.user, ticketfolder=None))
 
     for comment in json_data['comments']:
         user = get_user_from_json(session, comment)
@@ -627,17 +632,14 @@ def update_ticket_from_git(
                 date_created=datetime.datetime.utcfromtimestamp(
                     float(comment['date_created'])),
             )
-    if mcomment.is_set():
-        pagure.lib.add_issue_comment(
-            session,
-            issue,
-            comment='@%s updated metadata\n%s' % (
-                            user.username, mcomment.get()),
+    if messages:
+        pagure.lib.add_metadata_update_notif(
+            session=session,
+            issue=issue,
+            messages=messages,
             user=user.username,
-            ticketfolder=None,
-            notify=False,
-            notification=True)
-
+            ticketfolder=None
+        )
     session.commit()
 
 

@@ -34,7 +34,6 @@ import pagure.doc_utils
 import pagure.exceptions
 import pagure.lib
 import pagure.lib.encoding_utils
-from pagure.lib import MetaComment
 import pagure.forms
 from pagure import (APP, SESSION, LOG, __get_file_in_tree,
                     login_required, authenticated, urlpattern)
@@ -206,32 +205,27 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     ticketfolder=APP.config['TICKETS_FOLDER'],
                 )
                 SESSION.commit()
-                if message and not is_js:
-                    messages.add(message)
-
-            # Create our metadata comment object which is used to track and
-            # report of what metadata fields were updated.  This is then turned
-            # into a notificaion comment in the Issue.
-            mcomment = MetaComment()
+                if not is_js:
+                    if message:
+                        messages.add(message)
 
             # The status field can be updated by both the admin and the
             # person who opened the ticket.
             # Update status
             if repo_admin or flask.g.fas_user.username == issue.user.user:
                 if new_status in status:
-                    message = pagure.lib.edit_issue(
+                    msgs = pagure.lib.edit_issue(
                         SESSION,
                         issue=issue,
                         status=new_status,
                         close_status=close_status,
                         private=issue.private,
                         user=flask.g.fas_user.username,
-                        mcomment=mcomment,
                         ticketfolder=APP.config['TICKETS_FOLDER']
                     )
                     SESSION.commit()
-                    if message:
-                        messages.add(message)
+                    if msgs:
+                        messages = messages.union(set(msgs))
 
             # All the other meta-data can be changed only by admins
             # while other field will be missing for non-admin and thus
@@ -242,9 +236,8 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     SESSION, issue, tags,
                     username=flask.g.fas_user.username,
                     ticketfolder=APP.config['TICKETS_FOLDER'],
-                    mcomment=mcomment
                 )
-                messages.union(set(msgs))
+                messages = messages.union(set(msgs))
 
             # The meta-data can be changed by admins and issue creator,
             # where issue creators can only change status of their issue while
@@ -258,7 +251,6 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     assignee=assignee or None,
                     user=flask.g.fas_user.username,
                     ticketfolder=APP.config['TICKETS_FOLDER'],
-                    mcomment=mcomment
                 )
                 SESSION.commit()
                 if message and message != 'Nothing to change':
@@ -269,7 +261,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     new_priority = None
 
                 # Update core metadata
-                message = pagure.lib.edit_issue(
+                msgs = pagure.lib.edit_issue(
                     SESSION,
                     repo=repo,
                     issue=issue,
@@ -278,11 +270,10 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     private=form.private.data,
                     user=flask.g.fas_user.username,
                     ticketfolder=APP.config['TICKETS_FOLDER'],
-                    mcomment=mcomment
                 )
                 SESSION.commit()
-                if message:
-                    messages.add(message)
+                if msgs:
+                    messages = messages.union(set(msgs))
 
                 # Update the custom keys/fields
                 for key in repo.issue_keys:
@@ -299,15 +290,17 @@ def update_issue(repo, issueid, username=None, namespace=None):
                                         '(%s) has invalid url (%s) ' %
                                         (key.name, link))
 
-                    pagure.lib.set_custom_key_value(
-                        SESSION, issue, key, value, mcomment=mcomment)
+                    msg = pagure.lib.set_custom_key_value(
+                        SESSION, issue, key, value)
+                    if msg:
+                        messages.add(msg)
 
                 # Update ticket this one depends on
                 msgs = pagure.lib.update_dependency_issue(
                     SESSION, repo, issue, depends,
                     username=flask.g.fas_user.username,
                     ticketfolder=APP.config['TICKETS_FOLDER'],
-                    mcomment=mcomment)
+                )
                 messages.union(set(msgs))
 
                 # Update ticket(s) depending on this one
@@ -315,25 +308,24 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     SESSION, repo, issue, blocks,
                     username=flask.g.fas_user.username,
                     ticketfolder=APP.config['TICKETS_FOLDER'],
-                    mcomment=mcomment)
+                )
                 messages.union(set(msgs))
-
-                # Add the comment for field updates:
-                if mcomment.is_set():
-                    pagure.lib.add_issue_comment(
-                        SESSION,
-                        issue,
-                        comment='@%s updated metadata\n%s' % (
-                            flask.g.fas_user.username, mcomment.get()),
-                        user=flask.g.fas_user.username,
-                        ticketfolder=APP.config['TICKETS_FOLDER'],
-                        notify=False,
-                        notification=True)
-                    messages.add('Metadata fields updated')
 
             if not is_js:
                 for message in messages:
                     flask.flash(message)
+
+            # Add the comment for field updates:
+            if messages:
+                not_needed = set(['Comment added', 'Updated comment'])
+                pagure.lib.add_metadata_update_notif(
+                    session=SESSION,
+                    issue=issue,
+                    messages=messages - not_needed,
+                    user=flask.g.fas_user.username,
+                    ticketfolder=APP.config['TICKETS_FOLDER']
+                )
+                messages.add('Metadata fields updated')
 
         except pagure.exceptions.PagureException as err:
             is_js = False
@@ -1098,13 +1090,8 @@ def edit_issue(repo, issueid, username=None, namespace=None):
                 404, 'No such user found in the database: %s' % (
                     flask.g.fas_user.username))
 
-        # Create our metadata comment object which is used to track and
-        # report of what metadata fields were updated.  This is then turned
-        # into a notificaion comment in the Issue.
-        mcomment = MetaComment()
-
         try:
-            message = pagure.lib.edit_issue(
+            messages = pagure.lib.edit_issue(
                 SESSION,
                 issue=issue,
                 title=title,
@@ -1113,19 +1100,16 @@ def edit_issue(repo, issueid, username=None, namespace=None):
                 user=flask.g.fas_user.username,
                 ticketfolder=APP.config['TICKETS_FOLDER'],
                 private=private,
-                mcomment=mcomment
             )
             SESSION.commit()
-            if mcomment.is_set():
-                pagure.lib.add_issue_comment(
-                    SESSION,
-                    issue,
-                    comment='@%s updated metadata\n%s' % (
-                            flask.g.fas_user.username, mcomment.get()),
+            if messages:
+                pagure.lib.add_metadata_update_notif(
+                    session=SESSION,
+                    issue=issue,
+                    messages=messages,
                     user=flask.g.fas_user.username,
-                    ticketfolder=APP.config['TICKETS_FOLDER'],
-                    notify=False,
-                    notification=True)
+                    ticketfolder=APP.config['TICKETS_FOLDER']
+                )
 
             # If there is a file attached, attach it.
             filestream = flask.request.files.get('filestream')
@@ -1153,7 +1137,8 @@ def edit_issue(repo, issueid, username=None, namespace=None):
                 issue.content = issue.content.replace('<!!image>', url)
                 SESSION.add(issue)
                 SESSION.commit()
-            flask.flash(message)
+            for message in messages:
+                flask.flash(message)
             url = flask.url_for(
                 'view_issue', username=username, namespace=namespace,
                 repo=repo.name, issueid=issueid)

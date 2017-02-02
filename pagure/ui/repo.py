@@ -50,7 +50,6 @@ import pagure.ui.plugins
 from pagure import (APP, SESSION, LOG, __get_file_in_tree, login_required,
                     admin_session_timedout)
 from pagure.lib import encoding_utils
-from pagure.lib import MetaComment
 
 
 @APP.route('/<repo>.git')
@@ -1117,16 +1116,16 @@ def update_project(repo, username=None, namespace=None):
     form = pagure.forms.ProjectFormSimplified()
 
     if form.validate_on_submit():
-        mcomment = MetaComment()
+
         try:
             repo.description = form.description.data
             repo.avatar_email = form.avatar_email.data.strip()
             repo.url = form.url.data.strip()
-            pagure.lib.update_tags(
+            messages = pagure.lib.update_tags(
                 SESSION, repo,
                 tags=[t.strip() for t in form.tags.data.split(',')],
                 username=flask.g.fas_user.username,
-                ticketfolder=None, mcomment=mcomment
+                ticketfolder=None,
             )
             SESSION.add(repo)
             SESSION.commit()
