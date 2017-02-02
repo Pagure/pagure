@@ -25,6 +25,7 @@ import flask
 
 import markdown.inlinepatterns
 import markdown.util
+import pygit2
 
 import pagure
 import pagure.lib
@@ -238,7 +239,7 @@ class ImplicitCommitPattern(markdown.inlinepatterns.Pattern):
         """ When the pattern matches, update the text. """
 
         githash = markdown.util.AtomicString(m.group(2))
-        text = ' %s' % githash[:7]
+        text = ' %s' % githash
         try:
             root = flask.request.url_root
             url = flask.request.url
@@ -263,8 +264,9 @@ class ImplicitCommitPattern(markdown.inlinepatterns.Pattern):
                 pagure.SESSION,
                 username=user,
                 namespace=namespace,
-                pattern=repo):
-            return _obj_anchor_tag(user, namespace, repo, githash, text)
+                pattern=repo) \
+                and _commit_exists(user, namespace, repo, githash):
+            return _obj_anchor_tag(user, namespace, repo, githash, text[:8])
 
         return text
 
@@ -343,6 +345,18 @@ def _pr_exists(user, namespace, repo, idx):
         return False
 
     return pr_obj
+
+
+def _commit_exists(user, namespace, repo, githash):
+    """ Utility method checking if a given commit exists. """
+    repo_obj = pagure.lib.get_project(
+        pagure.SESSION, name=repo, user=user, namespace=namespace)
+    if not repo_obj:
+        return False
+
+    reponame = pagure.get_repo_path(repo_obj)
+    git_repo = pygit2.Repository(reponame)
+    return githash in git_repo
 
 
 def _obj_anchor_tag(user, namespace, repo, obj, text):
