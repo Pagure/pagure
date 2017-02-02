@@ -1869,31 +1869,37 @@ def search_projects(
         sub_q2 = session.query(
             model.Project.id
         ).filter(
-            # User got admin rights
+            # User got admin or commit right
             sqlalchemy.and_(
                 model.User.user == username,
                 model.User.id == model.ProjectUser.user_id,
                 model.ProjectUser.project_id == model.Project.id,
-                model.ProjectUser.access == 'admin'
+                sqlalchemy.or_(
+                    model.ProjectUser.access == 'admin',
+                    model.ProjectUser.access == 'commit',
+                )
             )
         )
         sub_q3 = session.query(
             model.Project.id
         ).filter(
-            # User created a group that has admin rights
+            # User created a group that has admin or commit right
             sqlalchemy.and_(
                 model.User.user == username,
                 model.PagureGroup.user_id == model.User.id,
                 model.PagureGroup.group_type == 'user',
                 model.PagureGroup.id == model.ProjectGroup.group_id,
                 model.Project.id == model.ProjectGroup.project_id,
-                model.ProjectGroup.access == 'admin',
+                sqlalchemy.or_(
+                    model.ProjectGroup.access == 'admin',
+                    model.ProjectGroup.access == 'commit',
+                )
             )
         )
         sub_q4 = session.query(
             model.Project.id
         ).filter(
-            # User is part of a group that has admin right
+            # User is part of a group that has admin or commit right
             sqlalchemy.and_(
                 model.User.user == username,
                 model.PagureUserGroup.user_id == model.User.id,
@@ -1901,7 +1907,11 @@ def search_projects(
                 model.PagureGroup.group_type == 'user',
                 model.PagureGroup.id == model.ProjectGroup.group_id,
                 model.Project.id == model.ProjectGroup.project_id,
-                model.ProjectGroup.access == 'admin',
+                sqlalchemy.or_(
+                    model.ProjectUser.access == 'admin',
+                    model.ProjectUser.access == 'commit',
+                )
+
             )
         )
 
