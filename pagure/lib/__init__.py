@@ -431,6 +431,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder,
     elif not assignee and issue.assignee is None:
         return
 
+    old_assignee = issue.assignee
     # Validate the assignee
     assignee_obj = get_user(session, assignee)
 
@@ -463,7 +464,10 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder,
             REDIS.publish('pagure.%s' % issue.uid, json.dumps(
                 {'assigned': assignee_obj.to_json(public=True)}))
 
-        return 'Issue assigned to %s' % assignee
+        output = 'Issue assigned to %s' % assignee
+        if old_assignee:
+            output += ' (was: %s)' % old_assignee.username
+        return output
 
 
 def add_pull_request_assignee(
@@ -1423,6 +1427,7 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
         edit.append('content')
         messages.append('Issue description edited')
     if status and status != issue.status:
+        old_status = issue.status
         issue.status = status
         if status.lower() != 'open':
             issue.closed_at = datetime.datetime.utcnow()
@@ -1430,28 +1435,45 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
             issue.close_status = None
             edit.append('close_status')
         edit.append('status')
-        messages.append('Issue status updated to: %s' % status)
+        messages.append(
+            'Issue status updated to: %s (was: %s)' % (status, old_status))
     if close_status != -1 and close_status != issue.close_status:
+        old_status = issue.close_status
         issue.close_status = close_status
         edit.append('close_status')
-        messages.append('Issue close_status updated to: %s' % close_status)
+        msg = 'Issue close_status updated to: %s' % close_status
+        if old_status:
+            msg += ' (was: %s)' % old_status
+        messages.append(msg)
     if priority:
         try:
             priority = int(priority)
         except:
             priority = None
         if priority != issue.priority:
+            old_priority = issue.priority
             issue.priority = priority
             edit.append('priority')
-            messages.append('Issue priority set to: %s' % priority)
+            msg = 'Issue priority set to: %s' % priority
+            if old_priority:
+                msg += ' (was: %s)' % old_priority
+            messages.append(msg)
     if private in [True, False] and private != issue.private:
+        old_private = issue.private
         issue.private = private
         edit.append('private')
-        messages.append('Issue private status set to: %s' % private)
+        msg = 'Issue private status set to: %s' % priority
+        if old_private:
+            msg += ' (was: %s)' % old_private
+        messages.append(msg)
     if milestone != -1 and milestone != issue.milestone:
+        old_milestone = issue.milestone
         issue.milestone = milestone
         edit.append('milestone')
-        messages.append('Issue set to the milestone: %s' % milestone)
+        msg = 'Issue set to the milestone: %s' % milestone
+        if old_private:
+            msg += ' (was: %s)' % old_milestone
+        messages.append(msg)
     issue.last_updated = datetime.datetime.utcnow()
     # uniquify the list of edited fields
     edit = list(set(edit))
