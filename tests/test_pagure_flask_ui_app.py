@@ -440,6 +440,19 @@ class PagureFlaskApptests(tests.Modeltests):
             output = self.app.get('/settings/')
             self.assertEqual(output.status_code, 302)
 
+    def patched_commit_exists(user, namespace, repo, githash):
+        ''' Patched version of pagure.pfmarkdown._commit_exists to enforce
+        returning true on some given hash without having us actually check
+        the git repos.
+        '''
+        if githash in ['9364354', '9364354a', '9364354a4555ba17aa60f0dc844d70b74eb1aecd']:
+            return True
+        else:
+            return False
+
+    @patch(
+        'pagure.pfmarkdown._commit_exists',
+        MagicMock(side_effect=patched_commit_exists))
     def test_markdown_preview(self):
         """ Test the markdown_preview endpoint. """
 
@@ -507,7 +520,7 @@ class PagureFlaskApptests(tests.Modeltests):
 
         with pagure.APP.app_context():
             for idx, text in enumerate(texts):
-                #print idx, text
+                print idx, text
                 data = {
                     'content': text,
                     'csrf_token': csrf_token,
@@ -515,6 +528,38 @@ class PagureFlaskApptests(tests.Modeltests):
                 output = self.app.post('/markdown/?repo=test', data=data)
                 self.assertEqual(output.status_code, 200)
                 self.assertEqual(expected[idx], output.data)
+
+    @patch(
+        'pagure.pfmarkdown._commit_exists',
+        MagicMock(side_effect=patched_commit_exists))
+    def test_markdown_preview(self):
+        """ Test the markdown_preview endpoint. """
+
+        user = tests.FakeUser()
+        user.username = 'foo'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/settings/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path), bare=True)
+        text = 'Cf commit 9364354a4555ba17aa60f0d'
+        exp = '<p>Cf commit 9364354a4555ba17aa60f0d</p>'
+
+        with pagure.APP.app_context():
+            data = {
+                'content': text,
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post('/markdown/?repo=test', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertEqual(exp, output.data)
 
     @patch('pagure.ui.app.admin_session_timedout')
     def test_remove_user_email(self, ast):
