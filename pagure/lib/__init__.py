@@ -3703,7 +3703,8 @@ def add_metadata_update_notif(session, issue, messages, user, ticketfolder):
 
     issue_comment = model.IssueComment(
         issue_uid=issue.uid,
-        comment='Metadata Update:\n- %s' % ('\n- '.join(messages)),
+        comment='**Metadata Update from @%s**:\n- %s' % (
+            user, '\n- '.join(messages)),
         user_id=user_id,
         notification=True,
     )
