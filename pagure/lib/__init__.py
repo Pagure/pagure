@@ -331,13 +331,8 @@ def add_tag_obj(session, obj, tags, user, ticketfolder):
         if known:
             continue
 
-        if isinstance(obj, model.Project):
-            proj_id = obj.id
-        else:
-            proj_id = obj.project.id
-        tagobj = get_tag(session, objtag, proj_id)
-
         if obj.isa == 'project':
+            tagobj = get_tag(session, objtag)
             if not tagobj:
                 tagobj = model.Tag(tag=objtag)
 
@@ -350,10 +345,11 @@ def add_tag_obj(session, obj, tags, user, ticketfolder):
             )
 
         else:
+            tagobj = get_colored_tag(session, objtag, obj.project.id)
             if not tagobj:
                 tagobj = model.TagColored(
                     tag=objtag,
-                    project_id=proj_id
+                    project_id=obj.project.id
                 )
                 session.add(tagobj)
                 session.flush()
@@ -658,7 +654,7 @@ def remove_tags(session, project, tags, ticketfolder, user):
     removed_tags = []
     tag_found = False
     for tag in tags:
-        tagobj = get_tag(session, tag, project.id)
+        tagobj = get_colored_tag(session, tag, project.id)
         if tagobj:
             tag_found = True
             removed_tags.append(tag)
@@ -744,7 +740,7 @@ def edit_issue_tags(
     old_tag_name = old_tag
 
     if not isinstance(old_tag, model.TagColored):
-        old_tag = get_tag(session, old_tag_name, project.id)
+        old_tag = get_colored_tag(session, old_tag_name, project.id)
 
     if not old_tag:
         raise pagure.exceptions.PagureException(
@@ -766,7 +762,7 @@ def edit_issue_tags(
                 new_tag_description, new_tag_color))
     elif old_tag.tag != new_tag:
         # Check if new tag already exists
-        existing_tag = get_tag(session, new_tag, project.id)
+        existing_tag = get_colored_tag(session, new_tag, project.id)
         if existing_tag:
             raise pagure.exceptions.PagureException(
                 'Can not rename a tag to an existing tag name: %s' % new_tag)
@@ -2108,8 +2104,20 @@ def get_tags_of_project(session, project, pattern=None):
     return query.all()
 
 
-def get_tag(session, tag, project_id):
+def get_tag(session, tag):
     ''' Returns a Tag object for the given tag text.
+    '''
+    query = session.query(
+        model.Tag
+    ).filter(
+        model.Tag.tag == tag
+    )
+
+    return query.first()
+
+
+def get_colored_tag(session, tag, project_id):
+    ''' Returns a TagColored object for the given tag text.
     '''
     query = session.query(
         model.TagColored

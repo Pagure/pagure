@@ -384,7 +384,7 @@ def edit_tag(repo, tag, username=None, namespace=None):
         flask.abort(404, 'Project has no tags to edit')
 
     # Check the tag exists, and get its old/original color
-    tagobj = pagure.lib.get_tag(SESSION, tag, repo.id)
+    tagobj = pagure.lib.get_colored_tag(SESSION, tag, repo.id)
     if not tagobj:
         flask.abort(404, 'Tag %s not found in this project' % tag)
 
