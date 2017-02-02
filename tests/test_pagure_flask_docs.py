@@ -181,7 +181,7 @@ class PagureFlaskDocstests(tests.Modeltests):
         output = self.app.get('/test/folder1')
         self.assertEqual(output.status_code, 200)
         self.assertTrue(
-            '<li><ul><a href="folder2">folder2/</a></ul></li>'
+            '<li><ul><a href="folder2/">folder2/</a></ul></li>'
             in output.data)
 
         output = self.app.get('/test/folder1/foo')

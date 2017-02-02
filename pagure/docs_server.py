@@ -189,7 +189,7 @@ def view_docs(repo, username=None, namespace=None, filename=None):
             # Append a trailing '/' to the folders
             if el.filemode == 16384:
                 name += '/'
-            html += '<ul><a href="{0}">{1}</a></ul>'.format(el.name, name)
+            html += '<ul><a href="{0}">{1}</a></ul>'.format(name, name)
         html += '</li>'
         content = TMPL_HTML.format(content=html)
 
