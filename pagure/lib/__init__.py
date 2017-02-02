@@ -3582,7 +3582,10 @@ def set_custom_key_value(session, issue, key, value):
             }))
 
     if value:
-        return 'Custom field %s adjusted to %s' % (key.name, value)
+        output = 'Custom field %s adjusted to %s' % (key.name, value)
+        if old_value:
+            output += ' (was: %s)' % old_value
+        return output
     else:
         return 'Custom field %s reset' % key.name
 
