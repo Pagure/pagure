@@ -169,7 +169,6 @@ class ImplicitIssuePattern(markdown.inlinepatterns.Pattern):
             url = flask.request.url
         except RuntimeError:
             return text
-        repo = namespace = user = None
 
         user = flask.request.args.get('user')
         namespace = flask.request.args.get('namespace')
@@ -209,7 +208,6 @@ class ImplicitPRPattern(markdown.inlinepatterns.Pattern):
             url = flask.request.url
         except RuntimeError:
             return text
-        repo = namespace = user = None
 
         user = flask.request.args.get('user')
         namespace = flask.request.args.get('namespace')
@@ -245,14 +243,10 @@ class ImplicitCommitPattern(markdown.inlinepatterns.Pattern):
             url = flask.request.url
         except RuntimeError:
             return text
-        repo = namespace = user = None
 
-        if flask.request.args.get('user'):
-            user = flask.request.args.get('user')
-        if flask.request.args.get('namespace'):
-            namespace = flask.request.args.get('namespace')
-        if flask.request.args.get('repo'):
-            repo = flask.request.args.get('repo')
+        user = flask.request.args.get('user')
+        namespace = flask.request.args.get('namespace')
+        repo = flask.request.args.get('repo')
 
         if not user and not repo:
             if 'fork/' in url:
