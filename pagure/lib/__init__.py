@@ -1421,11 +1421,9 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
     if title and title != issue.title:
         issue.title = title
         edit.append('title')
-        messages.append('Issue title edited')
     if content and content != issue.content:
         issue.content = content
         edit.append('content')
-        messages.append('Issue description edited')
     if status and status != issue.status:
         old_status = issue.status
         issue.status = status
