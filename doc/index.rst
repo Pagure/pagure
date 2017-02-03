@@ -30,6 +30,7 @@ Contents:
    :maxdepth: 2
 
    overview
+   usage/index
    install
    install_milter
    install_evs
@@ -37,7 +38,6 @@ Contents:
    install_pagure_ci
    configuration
    development
-   usage
    contributing
    contributors
 
