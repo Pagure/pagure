@@ -1460,7 +1460,7 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
         old_private = issue.private
         issue.private = private
         edit.append('private')
-        msg = 'Issue private status set to: %s' % priority
+        msg = 'Issue private status set to: %s' % private
         if old_private:
             msg += ' (was: %s)' % old_private
         messages.append(msg)
