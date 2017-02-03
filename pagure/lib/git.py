@@ -466,20 +466,12 @@ def update_custom_field_from_json(session, repo, issue, json_data):
         value = new_key.get('value')
         if value:
             value = value.strip()
-        messages = pagure.lib.set_custom_key_value(
+        pagure.lib.set_custom_key_value(
             session,
             issue=issue,
             key=key_obj,
             value=value,
         )
-        if messages:
-            pagure.lib.add_metadata_update_notif(
-                session=session,
-                issue=issue,
-                messages=messages,
-                user=None,
-                ticketfolder=None
-            )
         try:
             session.commit()
         except SQLAlchemyError:
