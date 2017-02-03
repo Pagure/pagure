@@ -729,8 +729,9 @@ class PagureFlaskRepotests(tests.Modeltests):
         """ Test the view_settings endpoint when updating the project's tags.
 
         We had an issue where when you add an existing tag to a project we
-        were querying the wrong table in the database it would complain
-        (rightfully) about duplicated content.
+        were querying the wrong table in the database. It would thus not find
+        the tag, would try to add it, and (rightfully) complain about duplicated
+        content.
         This test ensure we are behaving properly.
         """
         ast.return_value = False
