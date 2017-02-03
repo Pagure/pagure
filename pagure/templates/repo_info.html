@@ -109,7 +109,7 @@ git push -u origin master</pre>
               {% endif %}
 
             {% for branch in g.branches if branch != head%}
-              <div id="branch-{{ branch }}" class="repoinfo-branchlistitem row">
+              <div id="branch-{{ branch | replace('/', '__') }}" class="repoinfo-branchlistitem row">
                 <div class="branch_name col-md-8">
                   <span class="oi text-muted" data-glyph="random"></span>
                   {% if branchname != branch %}
@@ -127,7 +127,7 @@ git push -u origin master</pre>
                 </div>
                 <div class="branch_del col-md-4">
                   {% if g.repo_admin and branch != head %}
-                  <form id="delete_branch_form-{{ branch | replace('/', '_') }}" action="{{
+                  <form id="delete_branch_form-{{ branch | replace('/', '__') }}" action="{{
                     url_for('.delete_branch',
                             repo=repo.name,
                             username=username,
@@ -137,7 +137,7 @@ git push -u origin master</pre>
                     onsubmit="return confirm('Are you sure you want to remove the branch: {{ branch }}?\nThis cannot be un-done!');">
                     {{ form.csrf_token }}
                     <a title="Remove branch {{ branch }}" href="#"
-                      onclick="$('#delete_branch_form-{{ branch | replace('/', '_') | replace('.', '\\\\.') }}').submit();">
+                      onclick="$('#delete_branch_form-{{ branch | replace('/', '__') | replace('.', '\\\\.') }}').submit();">
                       <span class="oi" data-glyph="trash"></span>
                     </a>
                   </form>
@@ -288,6 +288,7 @@ $(function() {
     url: '{{ url_for("internal_ns.get_pull_request_ready_branch") }}' ,
     type: 'POST',
     data: {
+      namespace: "{{ repo.namespace }}",
       repo: "{{ repo.name }}",
       repouser: "{{ repo.user.user if repo.is_fork else '' }}",
       csrf_token: "{{ form.csrf_token.current_token }}",
@@ -331,7 +332,8 @@ $(function() {
                  commit not in the main branch. Click to create new PR now.'+'"> New PR</a> \
                 </div>';
           {%endif%}
-          $('#branch-' + branch.replace('.', '\\.') + ' .branch_del').prepend(html2);
+          $('#branch-' + branch.replace('.', '\\.').replace('/', '__')
+            + ' .branch_del').prepend(html2);
           $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
         }
         for (branch in res.message.branch_w_pr){
@@ -349,7 +351,8 @@ $(function() {
                + 'PR#' + res.message.branch_w_pr[branch] + ' </a> \
               </div>';
           console.log(html);
-          $('#branch-' + branch.replace('.', '\\.') + ' .branch_del').prepend(html);
+          $('#branch-' + branch.replace('.', '\\.').replace('/', '__')
+            + ' .branch_del').prepend(html);
           $('[data-toggle="tooltip"]').tooltip({placement : 'bottom'});
         }
       }

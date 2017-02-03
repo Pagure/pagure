@@ -251,6 +251,7 @@ def get_pull_request_ready_branch():
     repo = pagure.lib.get_project(
         pagure.SESSION,
         flask.request.form.get('repo', '').strip() or None,
+        namespace=flask.request.form.get('namespace', '').strip() or None,
         user=flask.request.form.get('repouser', '').strip() or None)
 
     if not repo:

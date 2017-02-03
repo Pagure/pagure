@@ -258,6 +258,7 @@ $(function() {
     type: 'POST',
     data: {
       repo: "{{ repo.name }}",
+      namespace: "{{ repo.namespace }}",
       repouser: "",
       csrf_token: "{{ form.csrf_token.current_token }}",
     },
