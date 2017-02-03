@@ -1095,7 +1095,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {'message':[
-                'Issue status updated to: Closed',
+                'Issue status updated to: Closed (was: Open)',
                 'Issue close_status updated to: Fixed'
             ]}
         )
@@ -2024,7 +2024,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
 
         repo = pagure.lib.get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        self.assertEqual(len(issue.other_fields), 1)
+        self.assertEqual(len(issue.other_fields), 0)
 
 
 if __name__ == '__main__':

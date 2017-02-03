@@ -267,9 +267,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(
             msg,
             [
-                'Issue title edited',
-                'Issue description edited',
-                'Issue status updated to: Closed',
+                'Issue status updated to: Closed (was: Open)',
                 'Issue close_status updated to: Invalid',
                 'Issue private status set to: True'
             ]
@@ -291,7 +289,8 @@ class PagureLibtests(tests.Modeltests):
             private=True,
         )
         self.session.commit()
-        self.assertEqual(msg, ['Issue status updated to: Open'])
+        self.assertEqual(
+            msg, ['Issue status updated to: Open (was: Closed)'])
 
         repo = pagure.lib.get_project(self.session, 'test')
         for issue in repo.issues:
@@ -315,7 +314,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(
             msg,
             [
-                'Issue status updated to: Closed',
+                'Issue status updated to: Closed (was: Open)',
                 'Issue close_status updated to: Invalid'
             ]
         )
@@ -716,7 +715,7 @@ class PagureLibtests(tests.Modeltests):
             user='pingou',
             ticketfolder=None)
         self.session.commit()
-        self.assertEqual(msg, 'Issue assigned to pingou')
+        self.assertEqual(msg, 'Issue assigned to pingou (was: foo)')
 
         # After  -- Searches by assignee
         issues = pagure.lib.search_issues(
