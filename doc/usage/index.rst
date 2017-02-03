@@ -33,6 +33,8 @@ Contents:
    :maxdepth: 2
 
    first_steps
+   forks
+   pull_requests
    markdown
    project_settings
    roadmap
