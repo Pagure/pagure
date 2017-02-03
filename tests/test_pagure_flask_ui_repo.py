@@ -628,7 +628,6 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '</button>\n                      Group removed',
                 output.data)
 
-
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_update_project(self, ast):
         """ Test the update_project endpoint. """
@@ -721,6 +720,82 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn('<h3>Settings for test</h3>', output.data)
             self.assertIn(
                 '<input class="form-control" name="avatar_email" value="" />', output.data)
+            self.assertIn(
+                '</button>\n                      Project updated',
+                output.data)
+
+    @patch('pagure.ui.repo.admin_session_timedout')
+    def test_update_project_update_tag(self, ast):
+        """ Test the view_settings endpoint when updating the project's tags.
+
+        We had an issue where when you add an existing tag to a project we
+        were querying the wrong table in the database it would complain
+        (rightfully) about duplicated content.
+        This test ensure we are behaving properly.
+        """
+        ast.return_value = False
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(self.path)
+
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+
+            output = self.app.get('/test/settings')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            # Add tag to a project so that they are added to the database
+            data = {
+                'csrf_token': csrf_token,
+                'description': 'Test project',
+                'tags': 'test,pagure,tag',
+            }
+            output = self.app.post(
+                '/test/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+            self.assertIn(
+                '</button>\n                      Project updated',
+                output.data)
+
+            # Remove two of the tags of the project, they will still be in
+            # the DB but not associated to this project
+            data = {
+                'csrf_token': csrf_token,
+                'description': 'Test project',
+                'tags': 'tag',
+            }
+            output = self.app.post(
+                '/test/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+            self.assertIn(
+                '</button>\n                      Project updated',
+                output.data)
+
+            # Try re-adding the two tags, this used to fail before we fixed
+            # it
+            data = {
+                'csrf_token': csrf_token,
+                'description': 'Test project',
+                'tags': 'test,pagure,tag',
+            }
+            output = self.app.post(
+                '/test/update', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
             self.assertIn(
                 '</button>\n                      Project updated',
                 output.data)
