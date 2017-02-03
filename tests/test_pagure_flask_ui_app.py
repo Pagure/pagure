@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015-2016 - Copyright Red Hat Inc
+ (c) 2015-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -18,6 +18,7 @@ import os
 
 import six
 import json
+import pygit2
 from mock import patch, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
@@ -453,7 +454,7 @@ class PagureFlaskApptests(tests.Modeltests):
     @patch(
         'pagure.pfmarkdown._commit_exists',
         MagicMock(side_effect=patched_commit_exists))
-    def test_markdown_preview(self):
+    def test_patched_markdown_preview(self):
         """ Test the markdown_preview endpoint. """
 
         data = {
@@ -520,7 +521,6 @@ class PagureFlaskApptests(tests.Modeltests):
 
         with pagure.APP.app_context():
             for idx, text in enumerate(texts):
-                print idx, text
                 data = {
                     'content': text,
                     'csrf_token': csrf_token,
@@ -529,11 +529,9 @@ class PagureFlaskApptests(tests.Modeltests):
                 self.assertEqual(output.status_code, 200)
                 self.assertEqual(expected[idx], output.data)
 
-    @patch(
-        'pagure.pfmarkdown._commit_exists',
-        MagicMock(side_effect=patched_commit_exists))
     def test_markdown_preview(self):
-        """ Test the markdown_preview endpoint. """
+        """ Test the markdown_preview endpoint with a non-existing commit.
+        """
 
         user = tests.FakeUser()
         user.username = 'foo'
@@ -551,6 +549,42 @@ class PagureFlaskApptests(tests.Modeltests):
         tests.create_projects_git(os.path.join(self.path), bare=True)
         text = 'Cf commit 9364354a4555ba17aa60f0d'
         exp = '<p>Cf commit 9364354a4555ba17aa60f0d</p>'
+
+        with pagure.APP.app_context():
+            data = {
+                'content': text,
+                'csrf_token': csrf_token,
+            }
+            output = self.app.post('/markdown/?repo=test', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertEqual(exp, output.data)
+
+    def test_markdown_preview_valid_commit(self):
+        """ Test the markdown_preview endpoint with an existing commit. """
+
+        user = tests.FakeUser()
+        user.username = 'foo'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/settings/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n          Basic Information\n'
+                '      </div>', output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path), bare=True)
+        repopath = os.path.join(self.path, 'test.git')
+        tests.add_content_git_repo(repopath)
+
+        repo = pygit2.Repository(repopath)
+        first_commit = repo.revparse_single('HEAD')
+
+        text = 'Cf commit %s' % first_commit.oid.hex
+        exp = '<p>Cf commit<a href="/test/c/{0}" title="Commit {0}"> {1}'\
+        '</a></p>'.format(first_commit.oid.hex, first_commit.oid.hex[:7])
 
         with pagure.APP.app_context():
             data = {
