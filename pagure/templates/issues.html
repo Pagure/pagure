@@ -267,8 +267,8 @@
                     {{ issue.user.user }}
                 </a>
             </td>
-            <td class="nowrap">
             {% if not status or status|lower == 'open' %}
+            <td class="nowrap">
               {% if issue.assignee %}
                 <a href="{{ url_for('view_issues',
                   repo=repo.name,
@@ -289,8 +289,8 @@
                   assignee=0) }}">unassigned
                 </a>
               {% endif %}
-            {% endif %}
             </td>
+            {% endif %}
         </tr>
     {% else %}
         <tr>
