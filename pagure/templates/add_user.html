@@ -80,24 +80,29 @@
         src="{{ url_for('static', filename='selectize.min.js') }}"></script>
 <script type="text/javascript">
 $( document ).ready(function() {
-  $('#user').selectize({
-      valueField: 'user',
-      labelField: 'user',
-      searchField: 'user',
-      maxItems: 1,
-      create: false,
-      load: function(query, callback) {
-        if (!query.length) return callback();
-        $.getJSON(
-          "{{ url_for('api_ns.api_users') }}", {
-            pattern: query.term
-          },
-          function( data ) {
-            callback( data.users.map(function(x) { return { user: x }; }) );
-          }
-        );
-      }
-  });
+  var user_to_update = "{{ user_to_update }}";
+  if (!user_to_update || user_to_update === "None") {
+    $('#user').selectize({
+        valueField: 'user',
+        labelField: 'user',
+        searchField: 'user',
+        maxItems: 1,
+        create: false,
+        load: function(query, callback) {
+          if (!query.length) return callback();
+          $.getJSON(
+            "{{ url_for('api_ns.api_users') }}", {
+              pattern: query.term
+            },
+            function( data ) {
+              callback( data.users.map(function(x) { return { user: x }; }) );
+            }
+          );
+        }
+    });
+  } else {
+    $("#user").attr("value", user_to_update);
+  }
 
   $('#access').selectize({
       sortField: 'text',

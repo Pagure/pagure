@@ -82,24 +82,29 @@
         src="{{ url_for('static', filename='selectize.min.js') }}"></script>
 <script type="text/javascript">
 $( document ).ready(function() {
-  $('#group').selectize({
-      valueField: 'group',
-      labelField: 'group',
-      searchField: 'group',
-      maxItems: 1,
-      create: {{ (not config.get('ENABLE_GROUP_MNGT', False)) | lower }},
-      load: function(query, callback) {
-        if (!query.length) return callback();
-        $.getJSON(
-          "{{ url_for('api_ns.api_groups') }}", {
-            pattern: query.term
-          },
-          function( data ) {
-            callback( data.groups.map(function(x) { return { group: x }; }) );
-          }
-        );
-      }
-  });
+  var group_to_update = "{{ group_to_update }}";
+  if (!group_to_update || group_to_update === "None") {
+    $('#group').selectize({
+        valueField: 'group',
+        labelField: 'group',
+        searchField: 'group',
+        maxItems: 1,
+        create: {{ (not config.get('ENABLE_GROUP_MNGT', False)) | lower }},
+        load: function(query, callback) {
+          if (!query.length) return callback();
+          $.getJSON(
+            "{{ url_for('api_ns.api_groups') }}", {
+              pattern: query.term
+            },
+            function( data ) {
+              callback( data.groups.map(function(x) { return { group: x }; }) );
+            }
+          );
+        }
+    });
+  } else {
+    $("#group").attr("value", group_to_update);
+  }
 
   $('#access').selectize({
       sortField: 'text',
