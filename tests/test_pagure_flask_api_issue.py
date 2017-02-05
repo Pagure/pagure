@@ -3294,7 +3294,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             }
         )
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.other_fields, [])
         self.assertEqual(len(issue.other_fields), 0)
@@ -3314,7 +3314,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             }
         )
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.other_fields, [])
         self.assertEqual(len(issue.other_fields), 0)
@@ -3333,7 +3333,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             }
         )
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.other_fields), 1)
         self.assertEqual(issue.other_fields[0].key.name, 'bugzilla')
@@ -3355,7 +3355,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             }
         )
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(len(issue.other_fields), 0)
 
