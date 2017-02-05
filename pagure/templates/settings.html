@@ -434,19 +434,15 @@
                   </button>
                   {{ form.csrf_token }}
                 </form>
-                <form class="pull-xs-right" method="GET"
-                  action="{{ url_for(
+                  <a href="{{ url_for(
                       '.add_user',
                       repo=repo.name,
                       username=username,
                       namespace=repo.namespace)
-                      }}">
-                  <button
-                    title="Update User Access" class="btn btn-primary btn-sm">
+                      }}"
+                    title="Update User Access" class="btn btn-primary btn-sm pull-xs-right">
                     <span class="oi" data-glyph="pencil"></span>
-                  </button>
-                  {{ form.csrf_token }}
-                </form>
+                  </a>
               </li>
             {% endfor %}
           {% endfor %}
@@ -472,19 +468,15 @@
                   </button>
                   {{ form.csrf_token }}
                 </form>
-                <form class="pull-xs-right" method="GET"
-                  action="{{ url_for(
+                  <a href="{{ url_for(
                       '.add_group_project',
                       repo=repo.name,
                       username=username,
                       namespace=repo.namespace)
-                      }}">
-                  <button
-                    title="Update Group Access" class="btn btn-primary btn-sm">
+                      }}"
+                    title="Update Group Access" class="btn btn-primary btn-sm pull-xs-right">
                     <span class="oi" data-glyph="pencil"></span>
-                  </button>
-                  {{ form.csrf_token }}
-                </form>
+                  </a>
 
               </li>
             {% endfor %}
