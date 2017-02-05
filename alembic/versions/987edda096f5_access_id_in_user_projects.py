@@ -12,13 +12,33 @@ down_revision = '38581a8fbae2'
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.sql import table, column
 
+acl = table (
+    'access_levels',
+    column('access', sa.String(255))
+)
 
 def upgrade():
     ''' Add a foreign key in user_projects and projects_groups
     table for access_levels
     '''
 
+    # To allow N + 2 migrations easier
+    # without going through N + 1
+    # Make sure, we have all the tables
+    op.create_table(
+        'access_levels',
+        sa.Column('access', sa.String(255), primary_key=True)
+    )
+    op.bulk_insert(
+        acl,
+        [
+            {'access': 'ticket'},
+            {'access': 'commit'},
+            {'access': 'admin'},
+        ],
+    )
     op.add_column(
         'user_projects',
         sa.Column(
@@ -78,7 +98,6 @@ def upgrade():
     )
 
 
-
 def downgrade():
     ''' Remove column access_id from user_projects and projects_groups '''
 
@@ -97,3 +116,4 @@ def downgrade():
             'projects_groups',
             ['project_id', 'group_id'],
     )
+    op.drop_table('access_levels')
