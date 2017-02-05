@@ -650,6 +650,18 @@ class Project(BASE):
 
         return contributors
 
+    @property
+    def contributor_groups(self):
+        """ Return the dict presenting the different contributors of the
+        project based on their access level.
+        """
+        contributors = collections.defaultdict(list)
+
+        for group in self.projects_groups:
+            contributors[group.access].append(group.group)
+
+        return contributors
+
     def to_json(self, public=False, api=False):
         ''' Return a representation of the project as JSON.
         '''
@@ -1825,6 +1837,12 @@ class ProjectGroup(BASE):
             'access_levels.access', onupdate='CASCADE', ondelete='CASCADE',
         ),
         nullable=False)
+
+    project = relation(
+        'Project', remote_side=[Project.id],
+        backref='projects_groups')
+
+    group = relation('PagureGroup', backref='projects_groups')
 
     # Constraints
     __table_args__ = (sa.UniqueConstraint('project_id', 'group_id'),)
