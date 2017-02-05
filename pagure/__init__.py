@@ -569,7 +569,12 @@ def __get_file_in_tree(repo_obj, tree, filepath, bail_on_tree=False):
 
                 return blob
             else:
-                nextitem = repo_obj[entry.oid]
+                try:
+                    nextitem = repo_obj[entry.oid]
+                except KeyError:
+                    # We could not find the blob/entry in the git repo
+                    # so we bail
+                    return
                 # If we can't get the content (for example: an empty folder)
                 if nextitem is None:
                     return
