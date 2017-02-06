@@ -1778,14 +1778,17 @@ def add_user(repo, username=None, namespace=None):
 
     user_to_update = flask.request.args.get('user', '').strip()
     user_to_update_obj = None
+    user_access = None
     if user_to_update:
         user_to_update_obj = pagure.lib.search_user(
-                        SESSION,
-                        username=user_to_update)
+            SESSION, username=user_to_update)
+        user_access = pagure.lib.get_obj_access(
+            SESSION, repo, user_to_update_obj)
 
     # The requested user is not found
     if user_to_update_obj is None:
         user_to_update = None
+        user_access = None
 
     form = pagure.forms.AddUserForm()
 
@@ -1819,6 +1822,7 @@ def add_user(repo, username=None, namespace=None):
         repo=repo,
         access_levels=access_levels,
         user_to_update=user_to_update,
+        user_access=user_access,
     )
 
 
@@ -1916,14 +1920,17 @@ def add_group_project(repo, username=None, namespace=None):
 
     group_to_update = flask.request.args.get('group', '').strip()
     group_to_update_obj = None
+    group_access = None
     if group_to_update:
         group_to_update_obj = pagure.lib.search_groups(
-                        SESSION,
-                        group_name=group_to_update)
+            SESSION, group_name=group_to_update)
+        group_access = pagure.lib.get_obj_access(
+            SESSION, repo, group_to_update_obj)
 
     # The requested group is not found
     if group_to_update_obj is None:
         group_to_update = None
+        group_access = None
 
     form = pagure.forms.AddGroupForm()
 
@@ -1959,6 +1966,7 @@ def add_group_project(repo, username=None, namespace=None):
         repo=repo,
         access_levels=access_levels,
         group_to_update=group_to_update,
+        group_access=group_access,
     )
 
 

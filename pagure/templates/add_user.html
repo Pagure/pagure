@@ -12,7 +12,7 @@
     repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
 
 {% block repo %}
-<div class="row col-sm-6 col-sm-offset-3">
+<div class="row col-sm-8 col-sm-offset-2">
   <div class="card">
     <div class="card-header">
       <strong>Add user to the {{repo.name}} project</strong>
@@ -26,15 +26,11 @@
         <label for="user"><strong>Username</strong></label>
         <input class="form-control" name="user" id="user"
           placeholder="Start typing to search users"
-          value="" />
+          value="" style="margin-bottom:1%"/>
 
         <select class="form-control" id="access" name="access">
           {% for access in access_levels %}
-            {% if access == 'admin' %}
-              <option selected value="{{ access }}"> {{ access }} </option>
-            {% else %}
-              <option value="{{ access }}"> {{ access }} </option>
-            {% endif %}
+            <option value="{{ access }}" id="{{ access }}"> {{ access }} </option>
           {% endfor %}
         </select>
       </fieldset>
@@ -102,11 +98,12 @@ $( document ).ready(function() {
     });
   } else {
     $("#user").attr("value", user_to_update);
+    $("#user").attr("readonly", true);
+    var user_access = "{{ user_access }}";
+    if (user_access !== "None") {
+      $("#" + "{{ user_access.access }}").attr("selected", "selected");
+    }
   }
-
-  $('#access').selectize({
-      sortField: 'text',
-  });
 
 });
 </script>
