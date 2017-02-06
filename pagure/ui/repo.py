@@ -1776,7 +1776,7 @@ def add_user(repo, username=None, namespace=None):
             403,
             'You are not allowed to add users to this project')
 
-    user_to_update = flask.request.args.get('user_to_update', '').strip()
+    user_to_update = flask.request.args.get('user', '').strip()
     user_to_update_obj = None
     if user_to_update:
         user_to_update_obj = pagure.lib.search_user(
@@ -1914,7 +1914,7 @@ def add_group_project(repo, username=None, namespace=None):
             403,
             'You are not allowed to add groups to this project')
 
-    group_to_update = flask.request.args.get('group_to_update', '').strip()
+    group_to_update = flask.request.args.get('group', '').strip()
     group_to_update_obj = None
     if group_to_update:
         group_to_update_obj = pagure.lib.search_groups(
