@@ -439,9 +439,10 @@
                       repo=repo.name,
                       username=username,
                       namespace=repo.namespace)
-                      }}?user_to_update={{ user.user }}"
-                    title="Update User Access" class="btn btn-primary btn-sm pull-xs-right">
+                      }}?user_to_update={{ user.user }}">
+                    <button title="Update User Access" class="btn btn-default btn-sm pull-xs-right">
                     <span class="oi" data-glyph="pencil"></span>
+                    </button>
                   </a>
               </li>
             {% endfor %}
@@ -473,9 +474,10 @@
                       repo=repo.name,
                       username=username,
                       namespace=repo.namespace)
-                      }}?group_to_update={{ group.group_name }}"
-                    title="Update Group Access" class="btn btn-primary btn-sm pull-xs-right">
+                      }}?group_to_update={{ group.group_name }}">
+                    <button class="btn btn-default btn-sm pull-xs-right" title="Update Group Access" >
                     <span class="oi" data-glyph="pencil"></span>
+                    </button>
                   </a>
 
               </li>
