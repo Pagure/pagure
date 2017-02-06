@@ -1960,12 +1960,30 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         for key in repo.issue_keys:
             # Check that the bugzilla field correctly had its data removed
             if key.name == "bugzilla":
-                self.assertTrue(key.data is None)
+                self.assertIsNone(key.data)
 
             # Check that the reviewstatus list field still has its list
             if key.name == "reviewstatus":
                 self.assertEqual(
                     sorted(key.data), ['ack', 'nack', 'needs review'])
+
+        # Check that not setting the value on a non-existing custom field
+        # changes nothing
+        output = self.app.post(
+            '/api/0/test/issue/1/custom/bugzilla', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              'message': 'No changes'
+            }
+        )
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(issue.other_fields, [])
+        self.assertEqual(len(issue.other_fields), 0)
 
         # Invalid value
         output = self.app.post(
