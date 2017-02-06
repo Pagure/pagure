@@ -1099,7 +1099,8 @@ def view_settings(repo, username=None, namespace=None):
     methods=('GET', 'POST'))
 @login_required
 def test_web_hook(repo, username=None, namespace=None):
-    """ Presents the settings of the project.
+    """ Endpoint that can be called to send a test message to the web-hook
+    service allowing to test the web-hooks set.
     """
     if admin_session_timedout():
         if flask.request.method == 'POST':
