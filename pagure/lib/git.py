@@ -567,6 +567,11 @@ def update_ticket_from_git(
             ticketfolder=None,
             user=user.username,
             milestone=milestone,
+            title=json_data.get('title'),
+            content=json_data.get('content'),
+            status=json_data.get('status'),
+            close_status=json_data.get('close_status'),
+            private=json_data.get('private'),
         )
         if msgs:
             messages.extend(msgs)
