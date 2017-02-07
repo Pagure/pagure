@@ -3568,12 +3568,14 @@ def set_custom_key_value(session, issue, key, value):
             current_field.value = value
             updated = True
     else:
-        current_field = model.IssueValues(
-            issue_uid=issue.uid,
-            key_id=key.id,
-            value=value,
-        )
-        if value:
+        if value is None or value == '':
+            delete = True
+        else:
+            current_field = model.IssueValues(
+                issue_uid=issue.uid,
+                key_id=key.id,
+                value=value,
+            )
             updated = True
 
     if not delete:
