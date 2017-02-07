@@ -614,12 +614,14 @@ def get_remote_repo_path(remote_git, branch_from, loop=False):
         try:
             repo.pull(branch=branch_from, force=True)
         except pygit2.GitError as err:
-            LOG.exception(err)
-            flask.abort(
-                500,
-                'The following error was raised when trying to pull the '
-                'changes from the remote: %s' % str(err)
-            )
+            LOG.debug('Error pull the repo: %s -- error: %s' % (repopath, err))
+            if str(err) != 'No Content-Type header in response':
+                LOG.exception(err)
+                flask.abort(
+                    500,
+                    'The following error was raised when trying to pull the '
+                    'changes from the remote: %s' % str(err)
+                )
         except pagure.exceptions.PagureException as err:
             LOG.exception(err)
             flask.abort(500, str(err))
