@@ -62,7 +62,6 @@ class PagureFlaskFormTests(tests.Modeltests):
         with pagure.APP.test_request_context(method='POST'):
             form = pagure.forms.ConfirmationForm()
             data = form.csrf_token.current_token
-            _, hmac_csrf = data.split('##', 1)
 
             # CSRF token expired
             if hasattr(flask_wtf, '__version__') and \
@@ -72,7 +71,21 @@ class PagureFlaskFormTests(tests.Modeltests):
                 expires = (
                     datetime.datetime.now() - datetime.timedelta(minutes=1)
                 ).strftime('%Y%m%d%H%M%S')
-            form.csrf_token.data = '%s##%s' % (expires, hmac_csrf)
+
+            # Change the CSRF format
+            if hasattr(flask_wtf, '__version__') and \
+                    tuple([int(e) for e in flask_wtf.__version__.split('.')]
+                    ) >= (0,14,0):
+                import itsdangerous
+                timestamp = itsdangerous.base64_encode(
+                    itsdangerous.int_to_bytes(int(expires)))
+                print '*', data
+                part1, _, part2 = data.split('.', 2)
+                form.csrf_token.data = '.'.join([part1, timestamp, part2])
+            else:
+                _, hmac_csrf = data.split('##', 1)
+                form.csrf_token.data = '%s##%s' % (expires, hmac_csrf)
+
             self.assertFalse(form.validate_on_submit())
 
     def test_csrf_form_w_unexpiring_input(self):
@@ -81,9 +94,15 @@ class PagureFlaskFormTests(tests.Modeltests):
         with pagure.APP.test_request_context(method='POST'):
             form = pagure.forms.ConfirmationForm()
             data = form.csrf_token.current_token
-            _, hmac_csrf = data.split('##', 1)
-            # CSRF can no longer expire, they have no expiration info
-            form.csrf_token.data = '##%s' % hmac_csrf
+
+            if hasattr(flask_wtf, '__version__') and \
+                    tuple([int(e) for e in flask_wtf.__version__.split('.')]
+                    ) >= (0,14,0):
+                form.csrf_token.data = data
+            else:
+                _, hmac_csrf = data.split('##', 1)
+                # CSRF can no longer expire, they have no expiration info
+                form.csrf_token.data = '##%s' % hmac_csrf
             self.assertTrue(form.validate_on_submit())
 
 
