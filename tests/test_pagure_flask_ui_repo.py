@@ -3362,7 +3362,7 @@ index 0000000..fb7093d
                 'data-toggle="tooltip">feature/foo',
                 output.data)
             self.assertIn(
-                '<form id="delete_branch_form-feature_foo"', output.data)
+                '<form id="delete_branch_form-feature__foo"', output.data)
             self.assertIn(
                 '<strong title="Currently viewing branch master"',
                 output.data)
@@ -3374,7 +3374,7 @@ index 0000000..fb7093d
                 'data-toggle="tooltip">feature/foo',
                 output.data)
             self.assertNotIn(
-                '<form id="delete_branch_form-feature_foo"', output.data)
+                '<form id="delete_branch_form-feature__foo"', output.data)
             self.assertIn(
                 '<strong title="Currently viewing branch master"',
                 output.data)
