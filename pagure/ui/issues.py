@@ -916,6 +916,8 @@ def new_issue(repo, username=None, namespace=None):
     if flask.request.method == 'GET':
         form.private.data = repo.settings.get(
             'issues_default_to_private', False)
+        form.title.data = flask.request.args.get('title')
+        form.issue_content.data = flask.request.args.get('content')
 
     return flask.render_template(
         'new_issue.html',
