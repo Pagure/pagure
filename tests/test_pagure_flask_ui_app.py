@@ -1205,6 +1205,7 @@ class PagureFlaskApptests(tests.Modeltests):
 
         output = self.app.get('/user/pingou/issues')
         self.assertEqual(output.status_code, 404)
+        pagure.APP.config['ENABLE_TICKETS'] = True
 
 
 if __name__ == '__main__':
