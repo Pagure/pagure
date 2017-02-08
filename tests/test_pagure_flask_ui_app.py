@@ -1196,6 +1196,16 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertEqual(
             output.data.count('<tr class="issue-status issue-status-open"'), 3)
 
+    def test_view_my_issues_tickets_turned_off(self):
+        """Test the view_user_issues endpoint when the user exists and
+        and ENABLE_TICKETS is False """
+
+        # Turn off the tickets instance wide
+        pagure.APP.config['ENABLE_TICKETS'] = False
+
+        output = self.app.get('/user/pingou/issues')
+        self.assertEqual(output.status_code, 404)
+
 
 if __name__ == '__main__':
     unittest.main()
