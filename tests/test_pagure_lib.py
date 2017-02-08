@@ -849,7 +849,7 @@ class PagureLibtests(tests.Modeltests):
 
         # Try creating a blacklisted project
         self.assertRaises(
-            pagure.exceptions.PagureException,
+            pagure.exceptions.ProjectBlackListedException,
             pagure.lib.new_project,
             session=self.session,
             user='pingou',
