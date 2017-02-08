@@ -894,6 +894,7 @@ index 0000000..60f7480
             "user": {
                 "name": "pingou", "emails": ["pingou@fedoraproject.org"]},
             "milestone": "Next Release",
+            "priority": 1,
         }
 
         self.assertRaises(
@@ -921,6 +922,7 @@ index 0000000..60f7480
         self.assertEqual(repo.issues[0].depends_text, [])
         self.assertEqual(repo.issues[0].blocks_text, [])
         self.assertEqual(repo.issues[0].milestone, 'Next Release')
+        self.assertEqual(repo.issues[0].priority, 1)
         self.assertEqual(repo.milestones, {'Next Release': None})
 
         data["title"] = "fake issue for tests"
@@ -937,6 +939,7 @@ index 0000000..60f7480
         self.assertEqual(repo.issues[0].title, 'fake issue for tests')
         self.assertEqual(repo.issues[0].depends_text, [])
         self.assertEqual(repo.issues[0].blocks_text, [])
+        self.assertEqual(repo.issues[0].priority, 1)
 
         data = {
             "status": "Open", "title": "Rename pagure", "private": False,
@@ -952,6 +955,7 @@ index 0000000..60f7480
             "depends": [3, 4],
             "date_created": "1426595224",
             "milestone": "Future",
+            "priority": 1,
             "comments": [
                 {
                     "comment": "Nirik:\r\n\r\n- sourceforge++ \r\n- "
