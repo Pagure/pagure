@@ -202,8 +202,10 @@ def is_valid_ssh_key(key):
                                 stdin=f,
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE)
-    proc.communicate()
-    return proc.returncode == 0
+    stdout, stderr = proc.communicate()
+    if proc.returncode != 0:
+        return False
+    return stdout
 
 
 def are_valid_ssh_keys(keys):
