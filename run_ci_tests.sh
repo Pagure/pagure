@@ -24,6 +24,7 @@ then
     pip install nose --upgrade
     pip install --upgrade --force-reinstall python-fedora 'setuptools>=17.1' pygments
     pip install -r tests_requirements.txt
+    pip install -r requirements-ev.txt  # We have one test on the SSE server
     sed -i -e 's|pygit2 >= 0.20.1||' requirements.txt
     pip install -r requirements.txt
     pip install psycopg2
