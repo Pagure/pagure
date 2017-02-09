@@ -39,10 +39,11 @@ fi
 # Reload where the nosetests app is (within the venv)
 hash -r
 
+set -e
+
 python setup.py build
 
 PYTHONPATH=pagure ./nosetests -v --with-xcoverage --cover-erase --cover-package=pagure
-
 
 PYTHONPATH=pagure pylint -f parseable pagure | tee pylint.out
 pep8 pagure/*.py pagure/*/*.py | tee pep8.out
