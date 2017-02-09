@@ -51,3 +51,26 @@ You may encounter a situation where you want to include changes from the master
 branch that were made after you created your pull request. You can do this by
 `rebasing <https://git-scm.com/docs/git-rebase>`_ your pull request branch and
 pushing it to your remote fork.
+
+
+.. _working-with-prs:
+
+Working with Pull Requests
+--------------------------
+It's quite common to work with a pull request locally, either to build on top of
+it or to test it. Currently, the best way to do this is by adding a remote to your
+git repository and checking out the branch the pull request is based on. For example,
+suppose user ``jcline`` has opened a pull request on the ``pagure`` project. The
+pull request was created using the branch name ``doc-prs-locally``. You can work with
+the commit or commits in this pull request by doing::
+
+    $ git remote add -f jcline https://pagure.io/forks/jcline/pagure.git  # Add and fetch the remote
+    $ git checkout jcline/doc-prs-locally
+
+You will now be in a "detatched HEAD" state. If you want to build off this pull
+request, just create a local branch, add some commits, push it to your fork,
+and open your own pull request::
+
+    $ git checkout -b better-docs
+    $ git commit -m "Improve this documentation"
+    $ git push -u origin better-docs
