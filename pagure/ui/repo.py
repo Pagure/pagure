@@ -1933,9 +1933,9 @@ def regenerate_git(repo, username=None, namespace=None):
                     repofolder=APP.config['REQUESTS_FOLDER'])
             flask.flash('Requests git repo updated')
         elif (
-            regenerate.lower() == 'tickets' and
-            repo.settings.get('issue_tracker') and
-            pagure.APP.config.get('ENABLE_TICKETS')):
+                regenerate.lower() == 'tickets' and
+                repo.settings.get('issue_tracker') and
+                pagure.APP.config.get('ENABLE_TICKETS')):
 
             # delete the ticket repo and reinit
             # in case there are no tickets
