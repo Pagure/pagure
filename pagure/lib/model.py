@@ -1194,7 +1194,9 @@ class TagIssueColored(BASE):
 
     issue = relation(
         'Issue', foreign_keys=[issue_uid], remote_side=[Issue.uid],
-        backref="tags_issues_colored"
+        backref=backref(
+            'tags_issues_colored', cascade="delete, delete-orphan"
+        )
     )
     tag = relation(
         'TagColored', foreign_keys=[tag_id], remote_side=[TagColored.id],
