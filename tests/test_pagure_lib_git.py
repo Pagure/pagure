@@ -149,6 +149,122 @@ repo requests/forks/pingou/test3
         os.unlink(outputconf)
         self.assertFalse(os.path.exists(outputconf))
 
+    def test_write_gitolite_acls_deploykeys(self):
+        """ Test write_gitolite_acls function to add deploy keys. """
+        tests.create_projects(self.session)
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        # Add two deploy keys (one readonly one push)
+        msg1 = pagure.lib.add_deploykey_to_project(
+            session=self.session,
+            project=repo,
+            ssh_key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q==',
+            pushaccess=False,
+            user='pingou'
+        )
+        msg2 = pagure.lib.add_deploykey_to_project(
+            session=self.session,
+            project=repo,
+            ssh_key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQC9Xwc2RDzPBhlEDARfHldGjudIVoa04tqT1JVKGQmyllTFz7Rb8CngQL3e7zyNzotnhwYKHdoiLlPkVEiDee4dWMUe48ilqId+FJZQGhyv8fu4BoFdE1AJUVylzmltbLg14VqG5gjTpXgtlrEva9arKwBMHJjRYc8ScaSn3OgyQw==',
+            pushaccess=True,
+            user='pingou'
+        )
+        self.session.commit()
+        self.assertEqual(msg1, 'Deploy key added')
+        self.assertEqual(msg2, 'Deploy key added')
+        # Add a forked project
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test3',
+            description='test project #2',
+            is_fork=True,
+            parent_id=1,
+            hook_token='aaabbbvvv',
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        outputconf = os.path.join(self.path, 'test_gitolite.conf')
+
+        pagure.lib.git.write_gitolite_acls(self.session, outputconf)
+
+        self.assertTrue(os.path.exists(outputconf))
+
+        with open(outputconf) as stream:
+            data = stream.read()
+
+        exp = """
+repo test
+  R   = @all
+  RW+ = pingou
+  R = deploykey_test_1
+  RW+ = deploykey_test_2
+
+repo docs/test
+  R   = @all
+  RW+ = pingou
+  R = deploykey_test_1
+  RW+ = deploykey_test_2
+
+repo tickets/test
+  RW+ = pingou
+  R = deploykey_test_1
+  RW+ = deploykey_test_2
+
+repo requests/test
+  RW+ = pingou
+  R = deploykey_test_1
+  RW+ = deploykey_test_2
+
+repo test2
+  R   = @all
+  RW+ = pingou
+
+repo docs/test2
+  R   = @all
+  RW+ = pingou
+
+repo tickets/test2
+  RW+ = pingou
+
+repo requests/test2
+  RW+ = pingou
+
+repo somenamespace/test3
+  R   = @all
+  RW+ = pingou
+
+repo docs/somenamespace/test3
+  R   = @all
+  RW+ = pingou
+
+repo tickets/somenamespace/test3
+  RW+ = pingou
+
+repo requests/somenamespace/test3
+  RW+ = pingou
+
+repo forks/pingou/test3
+  R   = @all
+  RW+ = pingou
+
+repo docs/forks/pingou/test3
+  R   = @all
+  RW+ = pingou
+
+repo tickets/forks/pingou/test3
+  RW+ = pingou
+
+repo requests/forks/pingou/test3
+  RW+ = pingou
+
+"""
+        #print data
+        self.assertEqual(data, exp)
+
+        os.unlink(outputconf)
+        self.assertFalse(os.path.exists(outputconf))
+
     def test_write_gitolite_acls_groups(self):
         """ Test the write_gitolite_acls function of pagure.lib.git with
         groups.

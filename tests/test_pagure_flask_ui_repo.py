@@ -110,6 +110,109 @@ class PagureFlaskRepotests(tests.Modeltests):
 
 
     @patch('pagure.ui.repo.admin_session_timedout')
+    def test_add_deploykey(self, ast):
+        """ Test the add_deploykey endpoint. """
+        ast.return_value = False
+
+        # No git repo
+        output = self.app.get('/foo/adddeploykey')
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(self.path)
+
+        # User not logged in
+        output = self.app.get('/test/adddeploykey')
+        self.assertEqual(output.status_code, 302)
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/adddeploykey')
+            self.assertEqual(output.status_code, 403)
+
+            ast.return_value = True
+            output = self.app.get('/test/adddeploykey')
+            self.assertEqual(output.status_code, 302)
+
+            # Redirect also happens for POST request
+            output = self.app.post('/test/adddeploykey')
+            self.assertEqual(output.status_code, 302)
+
+        # Need to do this un-authentified since our fake user isn't in the DB
+        # Check the message flashed during the redirect
+        output = self.app.get('/')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(
+            '</button>\n                      Action canceled, try it '
+            'again',output.data)
+
+        ast.return_value = False
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/adddeploykey')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<strong>Add deploy key to the', output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+                'ssh_key': 'asdf',
+                'pushaccess': 'false'
+            }
+
+            # No CSRF token
+            output = self.app.post('/test/adddeploykey', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertTrue('<strong>Add deploy key to the' in output.data)
+
+            data['csrf_token'] = csrf_token
+
+            # First, invalid SSH key
+            output = self.app.post('/test/adddeploykey', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<strong>Add deploy key to the', output.data)
+            self.assertIn('Deploy key invalid', output.data)
+
+            # Next up, multiple SSH keys
+            data['ssh_key'] = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q==\nssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q=='
+            output = self.app.post(
+                '/test/adddeploykey', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('Deploy key can only be single keys.', output.data)
+
+            # Now, a valid SSH key
+            data['ssh_key'] = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q=='
+            output = self.app.post(
+                '/test/adddeploykey', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+            self.assertIn('Deploy key added', output.data)
+            self.assertNotIn('PUSH ACCESS', output.data)
+
+            # And now, adding the same key
+            output = self.app.post(
+                '/test/adddeploykey', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('Deploy key already exists', output.data)
+
+            # And next, a key with push access
+            data['ssh_key'] = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQC9Xwc2RDzPBhlEDARfHldGjudIVoa04tqT1JVKGQmyllTFz7Rb8CngQL3e7zyNzotnhwYKHdoiLlPkVEiDee4dWMUe48ilqId+FJZQGhyv8fu4BoFdE1AJUVylzmltbLg14VqG5gjTpXgtlrEva9arKwBMHJjRYc8ScaSn3OgyQw=='
+            data['pushaccess'] = 'true'
+            output = self.app.post(
+                '/test/adddeploykey', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+            self.assertIn('Deploy key added', output.data)
+            self.assertIn('PUSH ACCESS', output.data)
+
+
+    @patch('pagure.ui.repo.admin_session_timedout')
     def test_add_user(self, ast):
         """ Test the add_user endpoint. """
         ast.return_value = False
@@ -383,6 +486,82 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertEqual(output.status_code, 404)
 
         pagure.APP.config['ENABLE_USER_MNGT'] = True
+
+
+    @patch('pagure.ui.repo.admin_session_timedout')
+    def test_remove_deploykey(self, ast):
+        """ Test the remove_deploykey endpoint. """
+        ast.return_value = False
+
+        # Git repo not found
+        output = self.app.post('/foo/dropdeploykey/1')
+        self.assertEqual(output.status_code, 404)
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/foo/dropdeploykey/1')
+            self.assertEqual(output.status_code, 404)
+
+            tests.create_projects(self.session)
+            tests.create_projects_git(self.path)
+
+            output = self.app.post('/test/dropdeploykey/1')
+            self.assertEqual(output.status_code, 403)
+
+            ast.return_value = True
+            output = self.app.post('/test/dropdeploykey/1')
+            self.assertEqual(output.status_code, 302)
+            ast.return_value = False
+
+        # User not logged in
+        output = self.app.post('/test/dropdeploykey/1')
+        self.assertEqual(output.status_code, 302)
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/test/settings')
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {'csrf_token': csrf_token}
+
+            output = self.app.post(
+                '/test/dropdeploykey/1', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+            self.assertIn('Deploy key does not exist in project', output.data)
+
+        # Add a deploy key to a project
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.add_deploykey_to_project(
+            session=self.session,
+            project=repo,
+            ssh_key='ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDAzBMSIlvPRaEiLOTVInErkRIw9CzQQcnslDekAn1jFnGf+SNa1acvbTiATbCX71AA03giKrPxPH79dxcC7aDXerc6zRcKjJs6MAL9PrCjnbyxCKXRNNZU5U9X/DLaaL1b3caB+WD6OoorhS3LTEtKPX8xyjOzhf3OQSzNjhJp5Q==',
+            pushaccess=True,
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Deploy key added')
+
+        with tests.user_set(pagure.APP, user):
+            output = self.app.post('/test/dropdeploykey/1', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+            self.assertNotIn('Deploy key removed', output.data)
+
+            data = {'csrf_token': csrf_token}
+            output = self.app.post(
+                '/test/dropdeploykey/1', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+            self.assertIn('Deploy key removed', output.data)
 
 
     @patch('pagure.ui.repo.admin_session_timedout')
