@@ -269,28 +269,18 @@
           Public notifications
         </div>
         <div class="card-block">
-        {% if config.get('ENABLE_TICKETS', True) %}
           <p>
             The email addresses entered below will receive all the notifications
-            related to (public) issue and pull-requests, this includes
-            notifications about new issue or pull-request, new comment
+            related to {% if config.get('ENABLE_TICKETS', True) %}
+            (public) issue and {% endif %}pull-requests, this includes 
+            notifications about {% if config.get('ENABLE_TICKETS', True) %}
+            new issue or {% endif %} new pull-request, new comment
             and status change.
           </p>
           <p>
             To enter multiple addresses, simply delimit then with a comma.
           </p>
-        {% else %}
         </div>
-          <p>
-            The email addresses entered below will receive all the notifications
-            related to and pull-requests, this includes
-            notifications about new pull-request, new comment
-            and status change.
-          </p>
-          <p>
-            To enter multiple addresses, simply delimit then with a comma.
-          </p>
-        {% endif %}
         <form action="{{ url_for(
               '.update_public_notifications',
               repo=repo.name,
