@@ -685,7 +685,6 @@ def view_issues(repo, username=None, namespace=None):
         issues_cnt = pagure.lib.search_issues(
             SESSION, repo, tags=tags, assignee=assignee,
             author=author, private=private, priority=priority,
-            offset=flask.g.offset, limit=flask.g.limit,
             search_pattern=search_pattern,
             custom_search=custom_search,
             count=True,

@@ -16,7 +16,7 @@
     {% elif status|lower not in ['open', 'true', 'all', 'none'] %}
       {{ issues|count }} Closed Issues (of {{ issues_cnt }})
     {% else %}
-      {{ issues|count }} Issues
+      {{ issues|count }} Issues (of {{ issues_cnt }})
     {% endif %}
     <span class="btn-group btn-group-sm pull-xs-right" role="group">
     {% if repo.milestones %}

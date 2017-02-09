@@ -37,7 +37,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
     """ Tests for flask issues controller of pagure """
 
     def setUp(self):
-        """ Set up the environnment, ran before every tests. """
+        """ Set up the environnment, run before every tests. """
         super(PagureFlaskIssuestests, self).setUp()
 
         pagure.APP.config['TESTING'] = True
@@ -353,10 +353,31 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         # All tickets
         output = self.app.get('/test/issues?status=all')
+
         self.assertEqual(output.status_code, 200)
         self.assertIn('<title>Issues - test - Pagure</title>', output.data)
         self.assertTrue(
             '<h2>\n      2 Issues' in output.data)
+
+        # All tickets - different pagination
+        before = pagure.APP.config['ITEM_PER_PAGE']
+        pagure.APP.config['ITEM_PER_PAGE'] = 1
+        output = self.app.get('/test/issues?status=all')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
+        self.assertIn('<h2>\n      1 Issues (of 2)', output.data)
+        self.assertIn(
+            '<li class="active">page 1 of 2</li>', output.data)
+
+        # All tickets - filtered for 1 - checking the pagination
+        output = self.app.get(
+            '/test/issues?status=all&search_pattern=invalid')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
+        self.assertIn('<h2>\n      1 Issues (of 1)', output.data)
+        self.assertIn(
+            '<li class="active">page 1 of 1</li>', output.data)
+        pagure.APP.config['ITEM_PER_PAGE'] = before
 
         # New issue button is shown
         user = tests.FakeUser()
@@ -2270,8 +2291,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         # After update, list tags
         tags = pagure.lib.get_tags_of_project(self.session, repo)
         self.assertEqual([tag.tag for tag in tags], ['blue', 'green', 'red'])
-
-
+        
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskIssuestests)
     unittest.TextTestRunner(verbosity=2).run(SUITE)

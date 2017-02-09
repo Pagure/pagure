@@ -436,7 +436,7 @@ def set_variables():
         flask.g.repo_admin = is_repo_admin(flask.g.repo)
         flask.g.branches = sorted(flask.g.repo_obj.listall_branches())
 
-    items_per_page = 100
+    items_per_page = APP.config['ITEM_PER_PAGE']
     flask.g.offset = 0
     flask.g.page = 1
     flask.g.limit = items_per_page
