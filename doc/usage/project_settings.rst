@@ -154,4 +154,10 @@ unique to each project, and they can only be defined in the project
 settings page.  The Tag color can also be customized for a more robust
 visual representation of the tag.
 
+`Deploy keys`
+-------------
 
+Deploy keys are SSH keys that have access to pull/push only to a single
+project.
+Upon creation, admins can determine whether this particular key has read/write
+access or read-only.
