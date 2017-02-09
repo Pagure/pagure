@@ -14,7 +14,7 @@
 {% block repo %}
 <div class="row col-sm-8 col-sm-offset-2">
   <div class="card">
-    <div class="card-header">
+    <div class="card-header" id="card-topic">
       <strong>Add user to the {{repo.name}} project</strong>
     </div>
     <div class="card-block">
@@ -37,7 +37,7 @@
 
       <p class="buttons indent">
         <input type="button" value="Cancel" class="btn btn-secondary" onclick="history.back();">
-        <input type="submit" class="btn btn-primary" value="Add">
+        <input type="submit" class="btn btn-primary" id="add_update_button" value="Add">
         {{ form.csrf_token }}
       </p>
     </form>
@@ -103,6 +103,8 @@ $( document ).ready(function() {
     if (user_access !== "None") {
       $("#" + "{{ user_access.access }}").attr("selected", "selected");
     }
+    $("#card-topic").html("<strong>Update user access in {{repo.name}}</strong>");
+    $("#add_update_button").attr("value", "Update");
   }
 
 });
