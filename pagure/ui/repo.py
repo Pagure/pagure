@@ -1919,6 +1919,14 @@ def regenerate_git(repo, username=None, namespace=None):
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
         if regenerate.lower() == 'requests':
+
+            # delete the requests repo and reinit
+            # in case there are no requests
+            if len(repo.requests) == 0:
+                pagure.lib.git.reinit_git(
+                    project=repo,
+                    repofolder=APP.config['REQUESTS_FOLDER']
+                )
             for request in repo.requests:
                 pagure.lib.git.update_git(
                     request, repo=repo,
@@ -1928,6 +1936,14 @@ def regenerate_git(repo, username=None, namespace=None):
             regenerate.lower() == 'tickets' and
             repo.settings.get('issue_tracker') and
             pagure.APP.config.get('ENABLE_TICKETS')):
+
+            # delete the ticket repo and reinit
+            # in case there are no tickets
+            if len(repo.issues) == 0:
+                pagure.lib.git.reinit_git(
+                    project=repo,
+                    repofolder=APP.config['TICKETS_FOLDER']
+                )
             for ticket in repo.issues:
                 pagure.lib.git.update_git(
                     ticket, repo=repo,

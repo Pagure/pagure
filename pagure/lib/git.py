@@ -1515,3 +1515,25 @@ def log_commits_to_db(session, project, commits, gitdir):
             date_created=date_created.datetime
         )
         session.add(log)
+
+
+def reinit_git(project, repofolder):
+    ''' Delete and recreate a git folder
+    :args project: SQLAlchemy object of the project
+    :args folder: The folder which contains the git repos
+    like TICKETS_FOLDER for tickets and REQUESTS_FOLDER for
+    pull requests
+    '''
+
+    repo_path = os.path.join(repofolder, project.path)
+    if not os.path.exists(repo_path):
+        return
+
+    # delete that repo
+    shutil.rmtree(repo_path)
+
+    # create it again
+    pygit2.init_repository(
+            repo_path, bare=True,
+            mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP
+    )
