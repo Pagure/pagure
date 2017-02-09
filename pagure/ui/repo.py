@@ -1918,7 +1918,9 @@ def regenerate_git(repo, username=None, namespace=None):
 
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
-        if regenerate.lower() == 'requests':
+        if regenerate.lower() == 'requests'\
+            and repo.settings.get('pull_requests'):
+
 
             # delete the requests repo and reinit
             # in case there are no requests
@@ -1932,10 +1934,10 @@ def regenerate_git(repo, username=None, namespace=None):
                     request, repo=repo,
                     repofolder=APP.config['REQUESTS_FOLDER'])
             flask.flash('Requests git repo updated')
-        elif (
-                regenerate.lower() == 'tickets' and
-                repo.settings.get('issue_tracker') and
-                pagure.APP.config.get('ENABLE_TICKETS')):
+
+        elif regenerate.lower() == 'tickets' \
+                and repo.settings.get('issue_tracker') \
+                and pagure.APP.config.get('ENABLE_TICKETS'):
 
             # delete the ticket repo and reinit
             # in case there are no tickets
