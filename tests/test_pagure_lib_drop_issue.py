@@ -128,6 +128,128 @@ class PagureLibDropIssuetests(tests.Modeltests):
         repo = pagure.lib.get_project(self.session, 'test')
         self.assertEqual(len(repo.issues), 1)
 
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_drop_issue_two_issues_one_tag(self, p_send_email, p_ugt):
+        """ Test the drop_issue of pagure.lib.
+
+        We had an issue where we could not delete issue that had been tagged
+        with this test, we create two issues, tag them both and delete one
+        then we check that the other issue is still tagged.
+        """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+        repo = pagure.lib.get_project(self.session, 'test')
+
+        # Before
+        issues = pagure.lib.search_issues(self.session, repo)
+        self.assertEqual(len(issues), 0)
+        self.assertEqual(repo.open_tickets, 0)
+        self.assertEqual(repo.open_tickets_public, 0)
+
+        # Create two issues to play with
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+        self.assertEqual(repo.open_tickets, 1)
+        self.assertEqual(repo.open_tickets_public, 1)
+
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #2',
+            content='We should work on this for the second time',
+            user='foo',
+            status='Open',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #2')
+        self.assertEqual(repo.open_tickets, 2)
+        self.assertEqual(repo.open_tickets_public, 2)
+
+        # After
+        issues = pagure.lib.search_issues(self.session, repo)
+        self.assertEqual(len(issues), 2)
+
+        # Add tag to the project
+        pagure.lib.new_tag(
+            self.session,
+            'red',
+            'red tag',
+            '#ff0000',
+            repo.id
+        )
+        self.session.commit()
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        self.assertEqual(
+            str(repo.tags_colored),
+            '[TagColored(id: 1, tag:red, tag_description:red tag, color:#ff0000)]'
+        )
+
+        # Add the tag to both issues
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        msgs = pagure.lib.update_tags(
+            self.session,
+            issue,
+            tags=['red'],
+            username='pingou',
+            ticketfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(msgs, ['Issue tagged with: red'])
+
+        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
+        msgs = pagure.lib.update_tags(
+            self.session,
+            issue,
+            tags=['red'],
+            username='pingou',
+            ticketfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(msgs, ['Issue tagged with: red'])
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        self.assertEqual(len(repo.issues), 2)
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(
+            str(issue.tags),
+            '[TagColored(id: 1, tag:red, tag_description:red tag, color:#ff0000)]'
+        )
+        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
+        self.assertEqual(
+            str(issue.tags),
+            '[TagColored(id: 1, tag:red, tag_description:red tag, color:#ff0000)]'
+        )
+
+        # Drop the issue #2
+        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
+        pagure.lib.drop_issue(
+            self.session, issue, user='pingou', ticketfolder=None)
+        self.session.commit()
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        self.assertEqual(len(repo.issues), 1)
+
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(
+            str(issue.tags),
+            '[TagColored(id: 1, tag:red, tag_description:red tag, color:#ff0000)]'
+        )
+        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
+        self.assertIsNone(issue)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
