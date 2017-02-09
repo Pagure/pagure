@@ -419,6 +419,20 @@ class UserSettingsForm(PagureForm):
     )
 
 
+class AddDeployKeyForm(PagureForm):
+    ''' Form to add a deploy key to a project. '''
+    ssh_key = wtforms.TextField(
+        'SSH Key <span class="error">*</span>',
+        [wtforms.validators.Required()]
+        # TODO: Add an ssh key validator?
+    )
+    pushaccess = wtforms.BooleanField(
+        'Push access',
+        [wtforms.validators.optional()],
+        false_values=('false', '', False, 'False', 0, '0'),
+    )
+
+
 class AddUserForm(PagureForm):
     ''' Form to add a user to a project. '''
     user = wtforms.TextField(

@@ -110,6 +110,22 @@ def write_gitolite_acls(session, configfile):
             for user in project.users:
                 if user != project.user:
                     config.append('  RW+ = %s' % user.user)
+            for deploykey in project.deploykeys:
+                access = 'R'
+                if deploykey.pushaccess:
+                    access = 'RW+'
+                # Note: the replace of / with _ is because gitolite users can't
+                # contain a /. At first, this might look like deploy keys in a
+                # project called $namespace_$project would give access to the
+                # repos of a project $namespace/$project or vica versa, however
+                # this is NOT the case because we add the deploykey.id to the
+                # end of the deploykey name, which means it is unique. The
+                # project name is solely there to make it easier to determine
+                # what project created the deploykey for admins.
+                config.append('  %s = deploykey_%s_%s' %
+                              (access,
+                               werkzeug.secure_filename(project.fullname),
+                               deploykey.id))
             config.append('')
 
     with open(configfile, 'w') as stream:

@@ -1518,6 +1518,66 @@ def new_repo_hook_token(repo, username=None, namespace=None):
         namespace=namespace))
 
 
+@APP.route('/<repo>/dropdeploykey/<int:keyid>', methods=['POST'])
+@APP.route('/<namespace>/<repo>/dropdeploykey/<int:keyid>', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/dropdeploykey/<int:keyid>',
+           methods=['POST'])
+@APP.route('/fork/<username>/<namespace>/<repo>/dropdeploykey/<int:keyid>',
+           methods=['POST'])
+@login_required
+def remove_deploykey(repo, keyid, username=None, namespace=None):
+    """ Remove the specified deploy key from the project.
+    """
+
+    if admin_session_timedout():
+        flask.flash('Action canceled, try it again', 'error')
+        url = flask.url_for(
+            'view_settings', username=username, repo=repo,
+            namespace=namespace)
+        return flask.redirect(
+            flask.url_for('auth_login', next=url))
+
+    repo = flask.g.repo
+
+    if not flask.g.repo_admin:
+        flask.abort(
+            403,
+            'You are not allowed to change the deploy keys for this project')
+
+    form = pagure.forms.ConfirmationForm()
+    if form.validate_on_submit():
+        keyids = [str(key.id) for key in repo.deploykeys]
+
+        if str(keyid) not in keyids:
+            flask.flash(
+                'Deploy key does not exist in project.', 'error')
+            return flask.redirect(flask.url_for(
+                '.view_settings', repo=repo.name, username=username,
+                namespace=repo.namespace,)
+            )
+
+        for key in repo.deploykeys:
+            if str(key.id) == str(keyid):
+                SESSION.delete(key)
+                break
+        try:
+            SESSION.commit()
+            pagure.lib.git.generate_gitolite_acls()
+            pagure.lib.create_deploykeys_ssh_keys_on_disk(
+                repo,
+                APP.config.get('GITOLITE_KEYDIR', None)
+            )
+            flask.flash('Deploy key removed')
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash('Deploy key could not be removed', 'error')
+
+    return flask.redirect(flask.url_for(
+        '.view_settings', repo=repo.name, username=username,
+        namespace=namespace))
+
+
 @APP.route('/<repo>/dropuser/<int:userid>', methods=['POST'])
 @APP.route('/<namespace>/<repo>/dropuser/<int:userid>', methods=['POST'])
 @APP.route('/fork/<username>/<repo>/dropuser/<int:userid>',
@@ -1575,6 +1635,72 @@ def remove_user(repo, userid, username=None, namespace=None):
     return flask.redirect(flask.url_for(
         '.view_settings', repo=repo.name, username=username,
         namespace=namespace))
+
+
+@APP.route('/<repo>/adddeploykey/', methods=('GET', 'POST'))
+@APP.route('/<repo>/adddeploykey', methods=('GET', 'POST'))
+@APP.route('/<namespace>/<repo>/adddeploykey/', methods=('GET', 'POST'))
+@APP.route('/<namespace>/<repo>/adddeploykey', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/adddeploykey/', methods=('GET', 'POST'))
+@APP.route('/fork/<username>/<repo>/adddeploykey', methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/adddeploykey/',
+    methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/adddeploykey',
+    methods=('GET', 'POST'))
+@login_required
+def add_deploykey(repo, username=None, namespace=None):
+    """ Add the specified deploy key to the project.
+    """
+
+    if admin_session_timedout():
+        if flask.request.method == 'POST':
+            flask.flash('Action canceled, try it again', 'error')
+        return flask.redirect(
+            flask.url_for('auth_login', next=flask.request.url))
+
+    repo = flask.g.repo
+
+    if not flask.g.repo_admin:
+        flask.abort(
+            403,
+            'You are not allowed to add deploy keys to this project')
+
+    form = pagure.forms.AddDeployKeyForm()
+
+    if form.validate_on_submit():
+        try:
+            msg = pagure.lib.add_deploykey_to_project(
+                SESSION, repo,
+                ssh_key=form.ssh_key.data,
+                pushaccess=form.pushaccess.data,
+                user=flask.g.fas_user.username,
+            )
+            SESSION.commit()
+            pagure.lib.git.generate_gitolite_acls()
+            pagure.lib.create_deploykeys_ssh_keys_on_disk(
+                repo,
+                APP.config.get('GITOLITE_KEYDIR', None)
+            )
+            flask.flash(msg)
+            return flask.redirect(flask.url_for(
+                '.view_settings', repo=repo.name, username=username,
+                namespace=namespace))
+        except pagure.exceptions.PagureException as msg:
+            SESSION.rollback()
+            flask.flash(msg, 'error')
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash('Deploy key could not be added', 'error')
+
+    return flask.render_template(
+        'add_deploykey.html',
+        form=form,
+        username=username,
+        repo=repo,
+    )
 
 
 @APP.route('/<repo>/adduser/', methods=('GET', 'POST'))

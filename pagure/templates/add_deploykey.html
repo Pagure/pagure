@@ -1,0 +1,42 @@
+{% extends "repo_master.html" %}
+{% from "_formhelper.html" import render_field_in_row %}
+{% from "_formhelper.html" import render_bootstrap_field %}
+
+{% set tag = "home" %}
+
+{% block header %}
+<link href="{{ url_for('static', filename='selectize.bootstrap3.css') }}"
+  rel="stylesheet" />
+{% endblock %}
+
+{% block title %}Add deploy key - {{
+    repo.namespace + '/' if repo.namespace }}{{ repo.name }}{% endblock %}
+
+{% block repo %}
+<div class="row col-sm-6 col-sm-offset-3">
+  <div class="card">
+    <div class="card-header">
+      <strong>Add deploy key to the {{repo.name}} project</strong>
+    </div>
+    <div class="card-block">
+      <form action="{{ url_for('.add_deploykey',
+                       username=username, repo=repo.name,
+                       namespace=repo.namespace) }}" method="post">
+
+      <fieldset class="form-group">
+        <label for="ssh_key"><strong>SSH key</strong></label>
+        <textarea class="form-control" name="ssh_key" id="ssh_key">{{ form.ssh_key.data or '' }}</textarea>
+      </fieldset>
+      {{ render_bootstrap_field(form.pushaccess, field_description="Do you want to give this key push access?") }}
+
+      <p class="buttons indent">
+        <input type="button" value="Cancel" class="btn btn-secondary" onclick="history.back();">
+        <input type="submit" class="btn btn-primary" value="Add">
+        {{ form.csrf_token }}
+      </p>
+    </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

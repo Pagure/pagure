@@ -462,6 +462,54 @@
     {% endif %}
 
 
+    <div class="col-md-8 col-md-offset-2">
+      <div class="card">
+        <div class="card-header">
+          Deploy Keys
+        </div>
+        <div class="card-block">
+
+          <p>Below are this projects' deploy keys.</p>
+
+          <p>
+            <a href="{{ url_for(
+                  '.add_deploykey',
+                  repo=repo.name,
+                  username=username,
+                  namespace=repo.namespace) }}"
+                class="btn btn-primary">
+                add deploy key
+            </a>
+          </p>
+        </div>
+          <ul class="list-group list-group-flush">
+          {% for deploykey in repo.deploykeys %}
+            <li class="list-group-item">
+              {{ deploykey.ssh_short_key }}
+              {% if deploykey.pushaccess %}
+              (PUSH ACCESS)
+              {% endif %}
+              <form class="pull-xs-right" method="POST"
+                action="{{ url_for(
+                    '.remove_deploykey',
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace,
+                    keyid=deploykey.id) }}">
+                <button
+                  onclick="return confirm('You sure you want to remove this deploy key from this project?');"
+                  title="Remove deploy key" class="btn btn-danger btn-sm">
+                  <span class="oi" data-glyph="trash"></span>
+                </button>
+                {{ form.csrf_token }}
+              </form>
+            </li>
+          {% endfor %}
+          </ul>
+      </div>
+    </div>
+
+
     {% if plugins %}
     <div class="col-md-8 col-md-offset-2">
       <div class="card">

@@ -28,6 +28,7 @@ import tempfile
 import subprocess
 import urlparse
 import uuid
+import werkzeug
 
 import bleach
 import redis
@@ -211,6 +212,51 @@ def is_valid_ssh_key(key):
 def are_valid_ssh_keys(keys):
     return all([is_valid_ssh_key(key) is not False
                 for key in keys.split('\n')])
+
+
+def create_deploykeys_ssh_keys_on_disk(project, gitolite_keydir):
+    ''' Create the ssh keys for the projects' deploy keys on the key dir.
+
+    This method does NOT support multiple ssh keys per deploy key.
+    '''
+    if not gitolite_keydir:
+        # Nothing to do here, move right along
+        return
+
+        #keyline_file = os.path.join(gitolite_keydir,
+        #                            'keys_%i' % i,
+        #                            '%s.pub' % user.user)
+    # First remove deploykeys that no longer exist
+    keyfiles = ['deploykey_%s_%s.pub' %
+                (werkzeug.secure_filename(project.fullname),
+                 key.id)
+                for key in project.deploykeys]
+
+    project_key_dir = os.path.join(gitolite_keydir, 'deploykeys',
+                                   project.fullname)
+    if not os.path.exists(project_key_dir):
+        os.mkdir(project_key_dir)
+
+    for keyfile in os.listdir(project_key_dir):
+        if keyfile not in keyfiles:
+            # This key is no longer in the project. Remove it.
+            os.remove(os.path.join(project_key_dir, keyfile))
+
+    for deploykey in project.deploykeys:
+        # See the comment in lib/git.py:write_gitolite_acls about why this
+        # name for a file is sane and does not inject a new security risk.
+        keyfile = 'deploykey_%s_%s' % (
+            werkzeug.secure_filename(project.fullname),
+            deploykey.id)
+        if not os.path.exists(os.path.join(project_key_dir, keyfile)):
+            # We only take the very first key - deploykeys must be single keys
+            key = deploykey.public_ssh_key.split('\n')[0]
+            if not key:
+                continue
+            if not is_valid_ssh_key(key):
+                continue
+            with open(os.path.join(project_key_dir, keyfile), 'w') as f:
+                f.write(deploykey.public_ssh_key)
 
 
 def create_user_ssh_keys_on_disk(user, gitolite_keydir):
@@ -824,6 +870,52 @@ def edit_issue_tags(
     )
 
     return msgs
+
+
+def add_deploykey_to_project(session, project, ssh_key, pushaccess, user):
+    ''' Add a deploy key to a specified project. '''
+    ssh_key = ssh_key.strip()
+
+    if '\n' in ssh_key:
+        raise pagure.exceptions.PagureException(
+            'Deploy key can only be single keys.'
+        )
+
+    ssh_short_key = is_valid_ssh_key(ssh_key)
+    if ssh_short_key in [None, False]:
+        raise pagure.exceptions.PagureException(
+            'Deploy key invalid.'
+        )
+
+    # We are sure that this only contains a single key, but ssh-keygen still
+    # return a \n at the end
+    ssh_short_key = ssh_short_key.split('\n')[0]
+
+    # Make sure that this key is not a deploy key in this or another project.
+    # If we dupe keys, gitolite might choke.
+    ssh_search_key = ssh_short_key.split(' ')[1]
+    if session.query(model.DeployKey).filter(
+            model.DeployKey.ssh_search_key==ssh_search_key).count() != 0:
+        raise pagure.exceptions.PagureException(
+            'Deploy key already exists.'
+        )
+
+    user_obj = get_user(session, user)
+    new_key_obj = model.DeployKey(
+        project_id=project.id,
+        pushaccess=pushaccess,
+        public_ssh_key=ssh_key,
+        ssh_short_key=ssh_short_key,
+        ssh_search_key=ssh_search_key,
+        creator_user_id=user_obj.id)
+
+    session.add(new_key_obj)
+    # Make sure we won't have SQLAlchemy error before we continue
+    session.flush()
+
+    # We do not send any notifications on purpose
+
+    return 'Deploy key added'
 
 
 def add_user_to_project(session, project, new_user, user):

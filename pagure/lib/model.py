@@ -635,6 +635,44 @@ class ProjectUser(BASE):
         index=True)
 
 
+class DeployKey(BASE):
+    """ Stores information about deployment keys.
+
+    Table -- deploykeys
+    """
+
+    __tablename__ = 'deploykeys'
+    id = sa.Column(sa.Integer, primary_key=True)
+    project_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(
+            'projects.id', onupdate='CASCADE', ondelete='CASCADE',
+        ))
+    pushaccess = sa.Column(sa.Boolean, nullable=False, default=False)
+    public_ssh_key = sa.Column(sa.Text, nullable=False)
+    ssh_short_key = sa.Column(sa.Text, nullable=False)
+    ssh_search_key = sa.Column(sa.Text, nullable=False)
+    creator_user_id = sa.Column(
+        sa.Integer,
+        sa.ForeignKey(
+            'users.id', onupdate='CASCADE',
+        ),
+        nullable=False,
+        index=True)
+    date_created = sa.Column(sa.DateTime, nullable=False,
+                             default=datetime.datetime.utcnow)
+
+    # Relations
+    project = relation(
+        'Project', foreign_keys=[project_id], remote_side=[Project.id],
+        backref=backref(
+            'deploykeys', cascade="delete, delete-orphan", single_parent=True)
+        )
+
+    creator_user = relation('User', foreign_keys=[creator_user_id],
+                    remote_side=[User.id])
+
+
 class Issue(BASE):
     """ Stores the issues reported on a project.
 
