@@ -5,8 +5,8 @@ Forks
 =====
 A fork in Pagure is a copy of a repository. When contributing to a project on
 Pagure, the first step is to fork it. This gives you a place to make changes
-to the project and, if you so wish, contribute back to the original upstream
-project. If you're not already familiar with Git's distributed workflow,
+to the project and, if you so wish, contribute back to the original project.
+If you're not already familiar with Git's distributed workflow,
 `the Pro Git book has an excellent introduction
 <https://git-scm.com/book/en/v2/Distributed-Git-Distributed-Workflows>`_.
 
