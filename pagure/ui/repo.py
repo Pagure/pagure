@@ -1926,9 +1926,6 @@ def regenerate_git(repo, username=None, namespace=None):
             flask.flash('Requests git repo updated')
         elif regenerate.lower() == 'tickets':
             for ticket in repo.issues:
-                # Do not store private issues in the git
-                if ticket.private:
-                    continue
                 pagure.lib.git.update_git(
                     ticket, repo=repo,
                     repofolder=APP.config['TICKETS_FOLDER'])
