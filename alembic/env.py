@@ -33,7 +33,7 @@ except ImportError:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-target_metadata = pagure.lib.model.BASE
+target_metadata = pagure.lib.model.BASE.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
