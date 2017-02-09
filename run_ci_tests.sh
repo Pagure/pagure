@@ -34,6 +34,7 @@ then
 else
     source pagureenv-$DATE-$HASH/bin/activate
 fi
+trap deactive SIGINT SIGTERM EXIT
 
 
 # Reload where the nosetests app is (within the venv)
@@ -48,4 +49,3 @@ PYTHONPATH=pagure ./nosetests -v --with-xcoverage --cover-erase --cover-package=
 PYTHONPATH=pagure pylint -f parseable pagure | tee pylint.out
 pep8 pagure/*.py pagure/*/*.py | tee pep8.out
 
-trap deactive INT TERM EXIT
