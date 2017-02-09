@@ -2291,7 +2291,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
         # After update, list tags
         tags = pagure.lib.get_tags_of_project(self.session, repo)
         self.assertEqual([tag.tag for tag in tags], ['blue', 'green', 'red'])
-        
+
+
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskIssuestests)
     unittest.TextTestRunner(verbosity=2).run(SUITE)
