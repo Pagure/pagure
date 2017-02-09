@@ -48,4 +48,4 @@ PYTHONPATH=pagure ./nosetests -v --with-xcoverage --cover-erase --cover-package=
 PYTHONPATH=pagure pylint -f parseable pagure | tee pylint.out
 pep8 pagure/*.py pagure/*/*.py | tee pep8.out
 
-deactivate
+trap deactive INT TERM EXIT
