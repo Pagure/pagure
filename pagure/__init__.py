@@ -615,7 +615,7 @@ def get_remote_repo_path(remote_git, branch_from, loop=False):
             repo.pull(branch=branch_from, force=True)
         except pygit2.GitError as err:
             LOG.debug('Error pull the repo: %s -- error: %s' % (repopath, err))
-            if str(err) != 'No Content-Type header in response':
+            if str(err).lower() != 'no content-type header in response':
                 LOG.exception(err)
                 flask.abort(
                     500,
