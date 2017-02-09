@@ -1924,7 +1924,10 @@ def regenerate_git(repo, username=None, namespace=None):
                     request, repo=repo,
                     repofolder=APP.config['REQUESTS_FOLDER'])
             flask.flash('Requests git repo updated')
-        elif regenerate.lower() == 'tickets':
+        elif (
+            regenerate.lower() == 'tickets' and
+            repo.settings.get('issue_tracker') and
+            pagure.APP.config.get('ENABLE_TICKETS')):
             for ticket in repo.issues:
                 pagure.lib.git.update_git(
                     ticket, repo=repo,
