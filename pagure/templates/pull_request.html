@@ -1393,6 +1393,16 @@ $("[data-line-number]").click(function (ev) {
 $(document).on('click', '#pr-tabs a', function() {
   window.location.hash = $(this).attr('href');
 });
+
+// Show an icon to open the changed file, when the user hovers over the
+// @@ -x,y +x,y @@ line in the diff. Clicking this icon opens the file (at the
+// relevant line number) in a new tab.
+$(document).on("mouseenter", "td.cell2", function(){
+	$(this).find("a.open_changed_file_icon_wrap").css('visibility', 'visible');
+});
+$(document).on("mouseleave", "td.cell2", function() {
+  $(this).find("a.open_changed_file_icon_wrap").css('visibility', 'hidden');
+});
 </script>
 
 

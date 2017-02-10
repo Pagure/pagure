@@ -67,6 +67,15 @@ html
     padding-right:3px;
 }
 
+.open_changed_file_icon_wrap {
+  /* Hidden until user hovers over it */
+  visibility: hidden;
+}
+
+.open_changed_file_icon {
+  width: 15px;
+}
+
 .alert-info pre
 {
     background-color:#CFE5F0;
