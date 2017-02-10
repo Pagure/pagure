@@ -718,8 +718,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<small><p><strong>Metadata Update from '\
 '<a href="https://pagure.org/user/pingou"> </a>'\
 '''<a href="https://pagure.org/user/pingou"> @pingou</a></strong>:<br>
-- Issue status updated to: Closed (was: Open)<br>
-- Issue close_status updated to: Fixed</p></small>''',
+- Issue close_status updated to: Fixed<br>
+- Issue status updated to: Closed (was: Open)</p></small>''',
                 output.data)
 
             # Add new comment
