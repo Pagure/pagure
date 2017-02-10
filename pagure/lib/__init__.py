@@ -1908,8 +1908,8 @@ def search_projects(
                 model.PagureGroup.id == model.ProjectGroup.group_id,
                 model.Project.id == model.ProjectGroup.project_id,
                 sqlalchemy.or_(
-                    model.ProjectUser.access == 'admin',
-                    model.ProjectUser.access == 'commit',
+                    model.ProjectGroup.access == 'admin',
+                    model.ProjectGroup.access == 'commit',
                 )
 
             )
