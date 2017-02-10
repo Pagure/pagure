@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            2.11
+Version:            2.12
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -335,6 +335,51 @@ install -m 644 pagure-logcom/pagure_logcom.service \
 
 
 %changelog
+* Fri Feb 10 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.12-1
+- Update to 2.12
+- Fix the place of the search and tags bars in the issues page (Pradeep CE)
+- Support removing all content of a custom field (Patrick Uiterwijk)
+- Improve the `My Pull Requests` page (Pradeep CE)
+- Fix displaying binary files in the documentation
+- Add a way to easily select multiple tags in the issues list and roadmap
+- Allow selecting multiple milestones easily in the UI of the roadmap
+- Fix displaying namespaced docs (Igor Gnatenko)
+- Fix the web-hook server
+- Add a way to view patch attached to a ticket as raw
+- Allow milestone to be set when creating an issue using the API (Mark Reynolds)
+- Fix adding and editing tags to/of a project
+- Make the usage section of the doc be at the top of it (Jeremy Cline)
+- Add notifications to issues for meta-data changes (Mark Reynolds)
+- Fix not updating the private status of an issue when loading it from JSON
+  (Vivek Anand)
+- Fix triggering web-hook notifications via the fedmsg hook
+- Add a configuration key allowing to hide some projects that users have access
+  to only via these groups
+- Fix figuring out which branches are not merged in namespaced project
+- Automatically link the commits mentionned in a ticket if their hash is 7 chars
+  or more
+- Allow dropping all the priorities info of an issue
+- Do not edit multiple times the milestone info when updating a ticket
+- Only update the custom field if there is a value to give it, otherwise remote
+  it
+- Make pagure compatible with flask-wtf >= 0.14.0
+- Add a button to test web-hook notifications
+- Fix the layout on the page listing all the closed issues (Rahul Bajaj)
+- Load priorities when refreshing the DB from the ticket git repos (Mark
+  Reynolds)
+- Ignore `No Content-Type header in response` error raised by libgit2 on pull
+  from repo hosted on github (for remote PR)
+- Add deployment keys (ssh key specific for a single project can be either read
+  and write or read-only) (Patrick Uiterwijk)
+- Fix install the logcom service to log commits
+- Fix deleting tickets that have a tag attached
+- Allow pre-filling title and content of an issue via URL arguments:
+  ?title=<title>&content=<issue description>
+- Re-initialize the backend git repos if there are no tickets/PRs in the DB
+  (Vivek Anand)
+- Fix invalid pagination when listing all the tickets (regardless of their
+  status) and then applying some filtering (Vibhor Verma)
+
 * Fri Jan 20 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.11-1
 - Update to 2.11
 - Fix the forked repo text on the user's PR page (Rahul Bajaj)

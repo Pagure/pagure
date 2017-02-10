@@ -3,31 +3,31 @@ Contributors to pagure
 
 Pagure would be nothing without its contributors.
 
-On Jan 20, 2016 (release 2.11), the list looks as follow:
+On Feb 10, 2016 (release 2.12), the list looks as follow:
 
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  4843              Pierre-Yves Chibon <pingou@pingoured.fr>
+  4910              Pierre-Yves Chibon <pingou@pingoured.fr>
    191              Ryan Lerch <rlerch@redhat.com>
     89              farhaanbukhsh <farhaan.bukhsh@gmail.com>
-    59              Clement Verna <cverna@tutanota.com>
+    72              Vivek Anand <vivekanand1101@gmail.com>
+    60              Clement Verna <cverna@tutanota.com>
     59              Johan Cwiklinski <johan@x-tnd.be>
-    58              Vivek Anand <vivekanand1101@gmail.com>
-    35              Mark Reynolds <mreynolds@redhat.com>
+    42              Mark Reynolds <mreynolds@redhat.com>
+    33              Patrick Uiterwijk <puiterwijk@redhat.com>
     32              Farhaan Bukhsh <farhaan.bukhsh@gmail.com>
     30              Lubomír Sedlář <lsedlar@redhat.com>
-    26              Patrick Uiterwijk <puiterwijk@redhat.com>
-    20              rahul Bajaj <you@example.com>
+    22              Pradeep CE (cep) <breathingcode@gmail.com>
+    21              rahul Bajaj <you@example.com>
+    20              Jeremy Cline <jeremy@jcline.org>
     19              Gaurav Kumar <aavrug@gmail.com>
     18              Sayan Chowdhury <sayan.chowdhury2012@gmail.com>
-    17              Pradeep CE (cep) <breathingcode@gmail.com>
-    16              Jeremy Cline <jeremy@jcline.org>
     15              Ralph Bean <rbean@redhat.com>
+    15              Vibhor Verma <vibhcool@gmail.com>
     14              Justin W. Flory <git@jwf.io>
     13              Ghost-script <subho.prp@gmail.com>
     13              Mathieu Bridon <bochecha@fedoraproject.org>
-    10              Vibhor Verma <vibhcool@gmail.com>
      8              Adam Williamson <awilliam@redhat.com>
      8              Lei Yang <yltt1234512@gmail.com>
      5              Mike McLean <mikem@redhat.com>
@@ -68,6 +68,7 @@ Number of commits  Contributor
      1              Brian (bex) Exelbierd <bex@pobox.com>
      1              David Caro <dcaroest@redhat.com>
      1              Haikel Guemar <hguemar@fedoraproject.org>
+     1              Igor Gnatenko <ignatenkobrain@fedoraproject.org>
      1              Kunaal Jain <kunaalus@gmail.com>
      1              Mathew Robinson <mathew.robinson3114@gmail.com>
      1              Pierre-YvesChibon <pingou@fedoraproject.org>
