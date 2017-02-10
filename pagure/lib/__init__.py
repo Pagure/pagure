@@ -2621,7 +2621,7 @@ def update_tags(session, obj, tags, username, ticketfolder):
             user=username,
             ticketfolder=ticketfolder,
         )
-        messages.append('Issue tagged with: %s' % ', '.join(toadd))
+        messages.append('Issue tagged with: %s' % ', '.join(sorted(toadd)))
 
     if torm:
         remove_tags_obj(
@@ -2631,7 +2631,8 @@ def update_tags(session, obj, tags, username, ticketfolder):
             user=username,
             ticketfolder=ticketfolder,
         )
-        messages.append('Issue **un**tagged with: %s' % ', '.join(torm))
+        messages.append('Issue **un**tagged with: %s' % ', '.join(
+            sorted(torm)))
 
     session.commit()
 
@@ -2652,7 +2653,7 @@ def update_dependency_issue(
     comment = ""
 
     # Add issue depending
-    for depend in toadd:
+    for depend in sorted([int(i) for i in toadd]):
         messages.append("Issue marked as depending on: #%s" % depend)
         issue_depend = search_issues(session, repo, issueid=depend)
         if issue_depend is None:
@@ -2670,7 +2671,7 @@ def update_dependency_issue(
         )
 
     # Remove issue depending
-    for depend in torm:
+    for depend in sorted([int(i) for i in torm]):
         messages.append("Issue **un**marked as depending on: #%s" % depend)
         issue_depend = search_issues(session, repo, issueid=depend)
         if issue_depend is None:  # pragma: no cover
@@ -2707,7 +2708,7 @@ def update_blocked_issue(
     messages = []
 
     # Add issue blocked
-    for block in toadd:
+    for block in sorted([int(i) for i in toadd]):
         messages.append("Issue marked as blocked by: #%s" % block)
         issue_block = search_issues(session, repo, issueid=block)
         if issue_block is None:
@@ -2727,7 +2728,7 @@ def update_blocked_issue(
         session.commit()
 
     # Remove issue blocked
-    for block in torm:
+    for block in sorted([int(i) for i in torm]):
         messages.append("Issue **un**marked as blocked by: #%s" % block)
         issue_block = search_issues(session, repo, issueid=block)
         if issue_block is None:  # pragma: no cover
@@ -3836,7 +3837,7 @@ def add_metadata_update_notif(session, issue, messages, user, ticketfolder):
     issue_comment = model.IssueComment(
         issue_uid=issue.uid,
         comment='**Metadata Update from @%s**:\n- %s' % (
-            user, '\n- '.join(messages)),
+            user, '\n- '.join(sorted(messages))),
         user_id=user_id,
         notification=True,
     )
