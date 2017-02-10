@@ -1255,7 +1255,7 @@ class PagureLibtests(tests.Modeltests):
         # have admin access in the project
         # Check with commit access first
         project = pagure.lib.get_project(self.session, name='test')
-        pagure.lib.add_user_to_project(
+        msg = pagure.lib.add_user_to_project(
             self.session,
             project=project,
             new_user='foo',
@@ -1263,17 +1263,22 @@ class PagureLibtests(tests.Modeltests):
             access='commit'
         )
 
+        self.assertEqual(msg, 'User added')
+        self.session.commit()
         projects = pagure.lib.search_projects(self.session, username='foo')
         self.assertEqual(len(projects), 1)
 
         # Now check with only ticket access
-        pagure.lib.add_user_to_project(
+        project = pagure.lib.get_project(self.session, name='test')
+        msg = pagure.lib.add_user_to_project(
             self.session,
             project=project,
             new_user='foo',
             user='pingou',
             access='ticket'
         )
+        self.assertEqual(msg, 'User access updated')
+        self.session.commit()
         projects = pagure.lib.search_projects(self.session, username='foo')
         self.assertEqual(len(projects), 0)
 
