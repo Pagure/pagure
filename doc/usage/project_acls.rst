@@ -41,9 +41,11 @@ Add/Update Access
   you will have to select the user or group (depending on whether you clicked Add User
   or Add Group) and the access you want the user/group to have.
 
-* If you want to update a user or a group's access, the procedure remains same as adding
-  a user/group. Go to settings page of the project, click on *Add User* or *Add Group*,
-  select the new access level you want the user/group to give and submit.
+* If you want to update a user or a group's access, go to settings page of the project.
+  There is a section which lists users associated with the project with the buttons to edit their
+  access and a different button to remove them from the project. If you click the edit
+  button, you will be taken to a different page where you can change the access and then
+  click on Update button.
 
 Points to be noted
 ==================
