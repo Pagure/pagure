@@ -1,14 +1,14 @@
 """access_id in user_projects
 
 Revision ID: 987edda096f5
-Revises: 38581a8fbae2
+Revises: 8a3b10926153
 Create Date: 2016-07-05 18:21:14.771273
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '987edda096f5'
-down_revision = '38581a8fbae2'
+down_revision = '8a3b10926153'
 
 from alembic import op
 import sqlalchemy as sa
