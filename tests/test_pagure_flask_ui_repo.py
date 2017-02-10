@@ -264,24 +264,12 @@ class PagureFlaskRepotests(tests.Modeltests):
                 'user': 'ralph',
             }
 
-            # Missing access
+            # Missing access and no CSRF
             output = self.app.post('/test/adduser', data=data)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<title>Add user - test - Pagure</title>', output.data)
             self.assertTrue('<strong>Add user to the' in output.data)
-
-            data['csrf_token'] = csrf_token
-            output = self.app.post('/test/adduser', data=data)
-            self.assertEqual(output.status_code, 200)
-            self.assertIn(
-                '<title>Add user - test - Pagure</title>', output.data)
-            self.assertIn('<strong>Add user to the', output.data)
-
-            data = {
-                'user': 'ralph',
-                'access': 'commit',
-            }
 
             # No CSRF
             output = self.app.post('/test/adduser', data=data)
@@ -289,27 +277,33 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
                 '<title>Add user - test - Pagure</title>', output.data)
 
-            # Unknown user
+            # Missing access
             data['csrf_token'] = csrf_token
             output = self.app.post('/test/adduser', data=data)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<title>Add user - test - Pagure</title>', output.data)
             self.assertIn('<strong>Add user to the', output.data)
-            self.assertIn(
-                '</button>\n                      No user &#34;ralph&#34; '
-                'found', output.data)
 
+            # Unknown user
+            data['access'] = 'commit'
+            output = self.app.post('/test/adduser', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Add user - test - Pagure</title>', output.data)
+            self.assertIn('<strong>Add user to the', output.data)
+            self.assertIn(
+                '</button>\n                      No user &#34;ralph&#34; found\n',
+                output.data)
+
+            # All correct
             data['user'] = 'foo'
             output = self.app.post(
                 '/test/adduser', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
-            self.assertIn(
-                '<title>Settings - test - Pagure</title>', output.data)
             self.assertIn('<h3>Settings for test</h3>', output.data)
             self.assertIn(
                 '</button>\n                      User added', output.data)
-
 
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_add_group_project_when_user_mngt_off(self, ast):
