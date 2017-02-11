@@ -60,11 +60,13 @@ def process_jenkins_build(session, project, build_id, requestfolder):
         raise pagure.exceptions.PagureException('Request not found')
 
     comment, percent = BUILD_STATS[result]
+    # Adding build ID to the CI type
+    username = project.ci_hook.ci_type + " #" + str(build_id)
 
     pagure.lib.add_pull_request_flag(
         session,
         request=request,
-        username=project.ci_hook.ci_type,
+        username=username,
         percent=percent,
         comment=comment,
         url=url,
