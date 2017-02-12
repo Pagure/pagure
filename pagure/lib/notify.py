@@ -53,20 +53,20 @@ def log(project, topic, msg, redis=None):
     ''' This is the place where we send notifications to user about actions
     occuring in pagure.
     '''
-    # Check so that no information regarding private project is leaked
-    if not project.private:
-        # Send fedmsg notification (if fedmsg is there and set-up)
-        if not project or project.settings.get('fedmsg_notifications', True):
-            fedmsg_publish(topic, msg)
 
-        if redis and project:
-            redis.publish(
-                'pagure.hook',
-                json.dumps({
-                    'project': project.fullname,
-                    'topic': topic,
-                    'msg': msg,
-                }))
+    # Send fedmsg notification (if fedmsg is there and set-up)
+    if not project or (project.settings.get('fedmsg_notifications', True)
+                       and not project.private):
+        fedmsg_publish(topic, msg)
+
+    if redis and project and not project.private:
+        redis.publish(
+            'pagure.hook',
+            json.dumps({
+                'project': project.fullname,
+                'topic': topic,
+                'msg': msg,
+            }))
 
 
 def _add_mentioned_users(emails, comment):
