@@ -21,9 +21,8 @@
             identifier=branchname)
       }}"><span class="oi" data-glyph="random"></span>&nbsp; {{ branchname }}</a></li>{%
     for file in filename.split('/') %}
-      {% if loop.first %}
       {% set path = file %}
-      {% else %}
+      {% if not loop.first %}
       {% set path = path + '/' + file %}
       {% endif %}
       {% if loop.index != loop.length %}<li><a
