@@ -254,6 +254,13 @@ class PagureFlaskForktests(tests.Modeltests):
         self.assertIn(
             'title="View file as of 2a552b">sources</a>', output.data)
 
+        # Test if the `open changed file icon` is displayed.
+        self.assertIn(
+            'class="open_changed_file_icon_wrap"><span '
+            'class="oi open_changed_file_icon" data-glyph="eye" '
+            'alt="Open changed file" title="Open changed file"></span>'
+            '</a>', output.data)
+
     @patch('pagure.lib.notify.send_email')
     def test_merge_request_pull_FF(self, send_email):
         """ Test the merge_request_pull endpoint with a FF PR. """
@@ -1422,6 +1429,12 @@ index 0000000..2a552bb
                 output.data)
             self.assertIn('<p>Test Initial Comment</p>', output.data)
 
+            # Test if the `open changed file icon` is displayed.
+            self.assertIn(
+                'class="open_changed_file_icon_wrap"><span '
+                'class="oi open_changed_file_icon" data-glyph="eye" '
+                'alt="Open changed file" title="Open changed file"></span>'
+                '</a>', output.data)
 
             # Case 2 - Add an empty initial comment
             data = {
