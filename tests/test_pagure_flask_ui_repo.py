@@ -1683,6 +1683,15 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertIn(
             '<a href="/test/blob/master/f/folder1/folder2">', output.data)
 
+        # Verify the nav links correctly when viewing a nested folder/file.
+        output = self.app.get('/test/blob/master/f/folder1/folder2')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(
+            '<li><a href="/test/blob/master/f/folder1">\n'
+            '            <span class="oi" data-glyph="folder">'
+            '</span>&nbsp; folder1</a>\n'
+            '          </li>', output.data)
+
         # View by image name -- with a non-existant file
         output = self.app.get('/test/blob/sources/f/testfoo.jpg')
         self.assertEqual(output.status_code, 404)
@@ -1728,6 +1737,16 @@ class PagureFlaskRepotests(tests.Modeltests):
         tests.add_commit_git_repo(
             os.path.join(self.path, 'forks', 'pingou', 'test3.git'),
             ncommits=10)
+
+        # Verify the nav links correctly when viewing a file/folder in a fork.
+        output = self.app.get(
+            '/fork/pingou/test3/blob/master/f/folder1/folder2/file')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn(
+            '<li><a href="/fork/pingou/test3/blob/master/f/folder1">\n'
+            '            <span class="oi" data-glyph="folder"></span>&nbsp; '
+            'folder1</a>\n          </li>', output.data)
+
 
         output = self.app.get('/fork/pingou/test3/blob/master/f/sources')
         self.assertEqual(output.status_code, 200)
@@ -3033,6 +3052,15 @@ index 0000000..fb7093d
                 '<textarea id="textareaCode" name="content">foo\n bar</textarea>',
                 output.data)
 
+            # Verify the nav links correctly when editing a file.
+            output = self.app.get('/test/blob/master/f/folder1/folder2/file')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li><a href="/test/blob/master/f/folder1">\n'
+                '            <span class="oi" data-glyph="folder">'
+                '</span>&nbsp; folder1</a>\n'
+                '          </li>', output.data)
+
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
 
@@ -3112,6 +3140,16 @@ index 0000000..fb7093d
             tests.add_commit_git_repo(
                 os.path.join(self.path, 'forks', 'pingou', 'test3.git'),
                 ncommits=10)
+
+            # Verify the nav links correctly when editing a file in a fork.
+            output = self.app.get(
+                '/fork/pingou/test3/edit/master/f/folder1/folder2/file')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<li><a\n      '
+                'href="/fork/pingou/test3/blob/master/f/folder1"\n        >'
+                '<span class="oi" data-glyph="folder"></span>&nbsp; folder1'
+                '</a>\n        </li>', output.data)
 
             output = self.app.get('/fork/pingou/test3/edit/master/f/sources')
             self.assertEqual(output.status_code, 200)
