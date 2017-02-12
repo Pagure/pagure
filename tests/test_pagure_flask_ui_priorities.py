@@ -216,6 +216,11 @@ class PagureFlaskPrioritiestests(tests.Modeltests):
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output.data)
             self.assertIn('<h3>Settings for test</h3>', output.data)
+            # Check the ordering
+            self.assertTrue(
+                output.data.find('High') < output.data.find('Normal'))
+            self.assertTrue(
+                output.data.find('Normal') < output.data.find('Low'))
             # Check the result of the action -- Priority recorded
             repo = pagure.lib.get_project(self.session, 'test')
             self.assertEqual(
