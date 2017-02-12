@@ -74,10 +74,7 @@
             </a>
           </li>
         {% for file in filename.split('/') %}
-          {% set path = file %}
-          {% if not loop.first %}
-          {% set path = path + '/' + file %}
-          {% endif %}
+          {% set path = '/'.join(filename.split('/')[:loop.index]) %}
           {% if loop.index != loop.length
         %}<li><a href="{{ url_for('view_file',
                 repo=repo.name,
