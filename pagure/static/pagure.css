@@ -43,6 +43,9 @@ html
 .code_table tr td pre{
     padding: 0;
     margin: 0;
+    /* prevent scrollbars appearing on each line when
+    zooming in some cases */
+    overflow: hidden;
 }
 
 .code_table tr .cell1{
@@ -73,7 +76,9 @@ html
 }
 
 .open_changed_file_icon {
-  width: 15px;
+  /* some adjustments to make the icon look better */
+  font-size: 13px !important; /* default size turns out too small here */
+  top: 3px !important; /* work around a small vertical misalignment */
 }
 
 .alert-info pre

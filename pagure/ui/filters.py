@@ -32,7 +32,6 @@ import pagure.lib
 import pagure.forms
 from pagure import (APP, SESSION, authenticated, is_repo_committer)
 
-from flask import url_for
 
 # Jinja filters
 
@@ -142,14 +141,14 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
         if line.startswith('<div'):
             line = line.split('<pre style="line-height: 125%">')[1]
             if prequest:
-                rangeline = line.split(
-                    '<span style="color: #800080; font-weight: bold">@@ ')[1] \
-                    or None
+                rangeline = line.partition('font-weight: bold">@@ ')[2] \
+                    if line.partition('font-weight: bold">@@ ')[1] == \
+                    'font-weight: bold">@@ ' else None
                 if rangeline:
                     rangeline = rangeline.split(' @@</span>')[0]
                     linenumber = rangeline.split('+')[1].split(',')[0]
                     line = line + '&nbsp;<a href="%s#_%s" target="_blank" ' % (
-                        url_for(
+                        flask.url_for(
                             'view_file',
                             repo=prequest.project_from.name,
                             username=prequest.project_from.user.username
