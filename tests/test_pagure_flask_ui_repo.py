@@ -1684,12 +1684,12 @@ class PagureFlaskRepotests(tests.Modeltests):
             '<a href="/test/blob/master/f/folder1/folder2">', output.data)
 
         # Verify the nav links correctly when viewing a nested folder/file.
-        output = self.app.get('/test/blob/master/f/folder1/folder2')
+        output = self.app.get('/test/blob/master/f/folder1/folder2/file')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<li><a href="/test/blob/master/f/folder1">\n'
+            '<li><a href="/test/blob/master/f/folder1/folder2">\n'
             '            <span class="oi" data-glyph="folder">'
-            '</span>&nbsp; folder1</a>\n'
+            '</span>&nbsp; folder2</a>\n'
             '          </li>', output.data)
 
         # View by image name -- with a non-existant file
@@ -1743,9 +1743,9 @@ class PagureFlaskRepotests(tests.Modeltests):
             '/fork/pingou/test3/blob/master/f/folder1/folder2/file')
         self.assertEqual(output.status_code, 200)
         self.assertIn(
-            '<li><a href="/fork/pingou/test3/blob/master/f/folder1">\n'
+            '<li><a href="/fork/pingou/test3/blob/master/f/folder1/folder2">\n'
             '            <span class="oi" data-glyph="folder"></span>&nbsp; '
-            'folder1</a>\n          </li>', output.data)
+            'folder2</a>\n          </li>', output.data)
 
 
         output = self.app.get('/fork/pingou/test3/blob/master/f/sources')
@@ -3056,9 +3056,9 @@ index 0000000..fb7093d
             output = self.app.get('/test/blob/master/f/folder1/folder2/file')
             self.assertEqual(output.status_code, 200)
             self.assertIn(
-                '<li><a href="/test/blob/master/f/folder1">\n'
+                '<li><a href="/test/blob/master/f/folder1/folder2">\n'
                 '            <span class="oi" data-glyph="folder">'
-                '</span>&nbsp; folder1</a>\n'
+                '</span>&nbsp; folder2</a>\n'
                 '          </li>', output.data)
 
             csrf_token = output.data.split(
@@ -3147,9 +3147,9 @@ index 0000000..fb7093d
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<li><a\n      '
-                'href="/fork/pingou/test3/blob/master/f/folder1"\n        >'
-                '<span class="oi" data-glyph="folder"></span>&nbsp; folder1'
-                '</a>\n        </li>', output.data)
+                'href="/fork/pingou/test3/blob/master/f/folder1/folder2"\n'
+                '        ><span class="oi" data-glyph="folder"></span>&nbsp; '
+                'folder2</a>\n        </li>', output.data)
 
             output = self.app.get('/fork/pingou/test3/edit/master/f/sources')
             self.assertEqual(output.status_code, 200)
