@@ -375,20 +375,21 @@ def is_repo_user(repo_obj):
 
 
 def get_authorized_project(session, project_name, user=None, namespace=None):
-    """ Retrieving the project with user permission constraint
+    ''' Retrieving the project with user permission constraint
 
-        :param session: The SQLAlchemy session to use
-        :type  session: sqlalchemy.orm.session.Session
-        :param project_name: Name of the project on pagure
-        :type  project_name: String
-        :param user: Pagure username
-        :type  user: String
-        :param namespace: Pagure namespace
-        :type  namespace: String
-        :return: The project object if project is public or user has
-                  permissions for the project else it returns None
-        :rtype:  pagure.lib.models.project
-    """
+    :arg session: The SQLAlchemy session to use
+    :type session: sqlalchemy.orm.session.Session
+    :arg project_name: Name of the project on pagure
+    :type project_name: String
+    :arg user: Pagure username
+    :type user: String
+    :arg namespace: Pagure namespace
+    :type namespace: String
+    :return: The project object if project is public or user has
+                permissions for the project else it returns None
+    :rtype: Project or [Project]
+
+    '''
     repo = pagure.lib._get_project(session, project_name, user, namespace)
 
     if repo and repo.private and not is_repo_admin(repo):
