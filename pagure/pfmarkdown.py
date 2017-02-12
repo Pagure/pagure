@@ -348,8 +348,8 @@ def _pr_exists(user, namespace, repo, idx):
 
 def _commit_exists(user, namespace, repo, githash):
     """ Utility method checking if a given commit exists. """
-    repo_obj = pagure.lib.get_project(
-        pagure.SESSION, name=repo, user=user, namespace=namespace)
+    repo_obj = pagure.get_authorized_project(
+        pagure.SESSION, project_name=repo, user=user, namespace=namespace)
     if not repo_obj:
         return False
 
