@@ -884,7 +884,7 @@ class PagurePrivateRepotest(tests.Modeltests):
         output = pagure.lib.update_tags(
             self.session, repo, 'infra', 'pingou',
             ticketfolder=None)
-        self.assertEqual(output, ['Tag added: infra'])
+        self.assertEqual(output, ['Issue tagged with: infra'])
 
         # Check after adding
         repo = pagure.lib._get_project(self.session, 'test4')
@@ -2483,7 +2483,10 @@ class PagurePrivateRepotest(tests.Modeltests):
             data = json.loads(output.get_data(as_text=True))
             self.assertDictEqual(
                 data,
-                {'message': 'Successfully edited issue #1'}
+                {'message':[
+                    'Issue status updated to: Closed (was: Open)',
+                    'Issue close_status updated to: Fixed'
+                ]}
             )
 
     @patch('pagure.lib.git.update_git')

@@ -569,7 +569,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn('Deploy key does not exist in project', output.data)
 
         # Add a deploy key to a project
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         msg = pagure.lib.add_deploykey_to_project(
             session=self.session,
             project=repo,

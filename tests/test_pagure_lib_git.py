@@ -159,7 +159,7 @@ repo requests/forks/pingou/test3
         """ Test write_gitolite_acls function to add deploy keys. """
         tests.create_projects(self.session)
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         # Add two deploy keys (one readonly one push)
         msg1 = pagure.lib.add_deploykey_to_project(
             session=self.session,

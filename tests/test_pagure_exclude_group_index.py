@@ -21,6 +21,7 @@ import mock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
+import pagure
 import pagure.lib
 import pagure.lib.model
 import tests
@@ -52,7 +53,7 @@ class PagureExcludeGroupIndex(tests.Modeltests):
             msg, 'User `pingou` added to the group `provenpackager`.')
 
         # Add the `provenpackager` group to the test2 project
-        project = pagure.lib.get_project(self.session, 'test2')
+        project = pagure.get_authorized_project(self.session, 'test2')
         msg = pagure.lib.add_group_to_project(
             session=self.session,
             project=project,

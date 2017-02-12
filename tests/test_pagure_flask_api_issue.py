@@ -1997,6 +1997,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             '/api/0/test/issue/1/status', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
+
         self.assertDictEqual(
             data,
             {'message':[

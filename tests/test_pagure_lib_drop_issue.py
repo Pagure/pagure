@@ -21,6 +21,7 @@ from mock import patch, MagicMock
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
+import pagure
 import pagure.lib
 import pagure.lib.model
 import tests
@@ -42,7 +43,7 @@ class PagureLibDropIssuetests(tests.Modeltests):
 
 
         tests.create_projects(self.session)
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
 
         # Before
         issues = pagure.lib.search_issues(self.session, repo)
@@ -92,7 +93,7 @@ class PagureLibDropIssuetests(tests.Modeltests):
         )
         self.session.commit()
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         self.assertEqual(
             str(repo.tags_colored),
             '[TagColored(id: 1, tag:red, tag_description:red tag, color:#ff0000)]'
@@ -110,7 +111,7 @@ class PagureLibDropIssuetests(tests.Modeltests):
         p_send_email.return_value = True
         p_ugt.return_value = True
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
 
         # Add tag to the second issue
         issue = pagure.lib.search_issues(self.session, repo, issueid=2)
@@ -125,7 +126,7 @@ class PagureLibDropIssuetests(tests.Modeltests):
 
         self.assertEqual(msgs, ['Issue tagged with: red'])
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.issues), 2)
         issue = pagure.lib.search_issues(self.session, repo, issueid=2)
         self.assertEqual(
@@ -139,7 +140,7 @@ class PagureLibDropIssuetests(tests.Modeltests):
             self.session, issue, user='pingou', ticketfolder=None)
         self.session.commit()
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.issues), 1)
 
     @patch('pagure.lib.git.update_git')
@@ -154,7 +155,7 @@ class PagureLibDropIssuetests(tests.Modeltests):
         p_send_email.return_value = True
         p_ugt.return_value = True
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
 
         # Add the tag to both issues
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
@@ -179,7 +180,7 @@ class PagureLibDropIssuetests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msgs, ['Issue tagged with: red'])
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.issues), 2)
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(
@@ -198,7 +199,7 @@ class PagureLibDropIssuetests(tests.Modeltests):
             self.session, issue, user='pingou', ticketfolder=None)
         self.session.commit()
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         self.assertEqual(len(repo.issues), 1)
 
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
