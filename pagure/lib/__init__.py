@@ -326,7 +326,7 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
     if notify:
         pagure.lib.notify.notify_new_comment(issue_comment, user=user_obj)
 
-    if not issue.private and not issue.project.private:
+    if not issue.private:
         pagure.lib.notify.log(
             issue.project,
             topic='issue.comment.added',
@@ -420,7 +420,7 @@ def add_tag_obj(session, obj, tags, user, ticketfolder):
         pagure.lib.git.update_git(
             obj, repo=obj.project, repofolder=ticketfolder)
 
-        if not obj.private and not obj.project.private:
+        if not obj.private:
             pagure.lib.notify.log(
                 obj.project,
                 topic='issue.tag.added',
@@ -462,7 +462,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder,
         if notify:
             pagure.lib.notify.notify_assigned_issue(issue, None, user_obj)
 
-        if not issue.private and not issue.project.private:
+        if not issue.private:
             pagure.lib.notify.log(
                 issue.project,
                 topic='issue.assigned.reset',
@@ -498,7 +498,7 @@ def add_issue_assignee(session, issue, assignee, user, ticketfolder,
             pagure.lib.notify.notify_assigned_issue(
                 issue, assignee_obj, user_obj)
 
-        if not issue.private and not issue.project.private:
+        if not issue.private:
             pagure.lib.notify.log(
                 issue.project,
                 topic='issue.assigned.added',
@@ -538,17 +538,16 @@ def add_pull_request_assignee(
 
         pagure.lib.notify.notify_assigned_request(request, None, user_obj)
 
-        if not request.project.private:
-            pagure.lib.notify.log(
-                request.project,
-                topic='request.assigned.reset',
-                msg=dict(
-                    request=request.to_json(public=True),
-                    project=request.project.to_json(public=True),
-                    agent=user_obj.username,
-                ),
-                redis=REDIS,
-            )
+        pagure.lib.notify.log(
+            request.project,
+            topic='request.assigned.reset',
+            msg=dict(
+                request=request.to_json(public=True),
+                project=request.project.to_json(public=True),
+                agent=user_obj.username,
+            ),
+            redis=REDIS,
+        )
 
         return 'Request reset'
     elif assignee is None and request.assignee is None:
@@ -568,17 +567,16 @@ def add_pull_request_assignee(
         pagure.lib.notify.notify_assigned_request(
             request, assignee_obj, user_obj)
 
-        if not request.project.private:
-            pagure.lib.notify.log(
-                request.project,
-                topic='request.assigned.added',
-                msg=dict(
-                    request=request.to_json(public=True),
-                    project=request.project.to_json(public=True),
-                    agent=user_obj.username,
-                ),
-                redis=REDIS,
-            )
+        pagure.lib.notify.log(
+            request.project,
+            topic='request.assigned.added',
+            msg=dict(
+                request=request.to_json(public=True),
+                project=request.project.to_json(public=True),
+                agent=user_obj.username,
+            ),
+            redis=REDIS,
+        )
 
         return 'Request assigned'
 
@@ -613,6 +611,8 @@ def add_issue_dependency(
         if not issue.private:
         #pagure.lib.notify.notify_assigned_issue(issue, user_obj)
         #pagure.lib.notify.notify_assigned_issue(issue_blocked, user_obj)
+
+        if not issue.private:
             pagure.lib.notify.log(
                 issue.project,
                 topic='issue.dependency.added',
@@ -672,6 +672,8 @@ def remove_issue_dependency(
         if not issue.private:
         #pagure.lib.notify.notify_assigned_issue(issue, user_obj)
         #pagure.lib.notify.notify_assigned_issue(issue_blocked, user_obj)
+
+        if not issue.private:
             pagure.lib.notify.log(
                 issue.project,
                 topic='issue.dependency.removed',
@@ -773,18 +775,17 @@ def remove_tags_obj(session, obj, tags, ticketfolder, user):
         pagure.lib.git.update_git(
             obj, repo=obj.project, repofolder=ticketfolder)
 
-        if not obj.project.private:
-            pagure.lib.notify.log(
-                obj.project,
-                topic='issue.tag.removed',
-                msg=dict(
-                    issue=obj.to_json(public=True),
-                    project=obj.project.to_json(public=True),
-                    tags=removed_tags,
-                    agent=user_obj.username,
-                ),
-                redis=REDIS,
-            )
+        pagure.lib.notify.log(
+            obj.project,
+            topic='issue.tag.removed',
+            msg=dict(
+                issue=obj.to_json(public=True),
+                project=obj.project.to_json(public=True),
+                tags=removed_tags,
+                agent=user_obj.username,
+            ),
+            redis=REDIS,
+        )
 
         # Send notification for the event-source server
         if REDIS and not obj.project.private:
@@ -1139,16 +1140,15 @@ def add_pull_request_comment(session, request, commit, tree_id, filename,
                 'pr': request.to_json(public=True, with_comments=False)
             }))
 
-    if not request.project.private:
-        pagure.lib.notify.log(
-            request.project,
-            topic='pull-request.comment.added',
-            msg=dict(
-                pullrequest=request.to_json(public=True),
-                agent=user_obj.username,
-            ),
-            redis=REDIS,
-        )
+    pagure.lib.notify.log(
+        request.project,
+        topic='pull-request.comment.added',
+        msg=dict(
+            pullrequest=request.to_json(public=True),
+            agent=user_obj.username,
+        ),
+        redis=REDIS,
+    )
 
     if trigger_ci and comment.strip().lower() in trigger_ci:
         # Send notification to the CI server
@@ -1192,18 +1192,17 @@ def edit_comment(session, parent, comment, user,
         id_ = 'issue_id'
         private = parent.private
 
-    if not private:
-        pagure.lib.notify.log(
-            parent.project,
-            topic=topic,
-            msg={
-                key: parent.to_json(public=True, with_comments=False),
-                'project': parent.project.to_json(public=True),
-                'comment': comment.to_json(public=True),
-                'agent': user_obj.username,
-            },
-            redis=REDIS,
-        )
+    pagure.lib.notify.log(
+        parent.project,
+        topic=topic,
+        msg={
+            key: parent.to_json(public=True, with_comments=False),
+            'project': parent.project.to_json(public=True),
+            'comment': comment.to_json(public=True),
+            'agent': user_obj.username,
+        },
+        redis=REDIS,
+    )
 
     if REDIS and not parent.project.private:
         if private:
@@ -1257,17 +1256,16 @@ def add_pull_request_flag(session, request, username, percent, comment, url,
     pagure.lib.git.update_git(
         request, repo=request.project, repofolder=requestfolder)
 
-    if not request.project.private:
-        pagure.lib.notify.log(
-            request.project,
-            topic='pull-request.flag.%s' % action,
-            msg=dict(
-                pullrequest=request.to_json(public=True),
-                flag=pr_flag.to_json(public=True),
-                agent=user_obj.username,
-            ),
-            redis=REDIS,
-        )
+    pagure.lib.notify.log(
+        request.project,
+        topic='pull-request.flag.%s' % action,
+        msg=dict(
+            pullrequest=request.to_json(public=True),
+            flag=pr_flag.to_json(public=True),
+            agent=user_obj.username,
+        ),
+        redis=REDIS,
+    )
 
     return 'Flag %s' % action
 
@@ -1430,15 +1428,14 @@ def new_project(session, user, name, blacklist, allowed_prefix,
 
     log_action(session, 'created', project, user_obj)
 
-    if not project.private:
-        pagure.lib.notify.log(
-            project,
-            topic='project.new',
-            msg=dict(
-                project=project.to_json(public=True),
-                agent=user_obj.username,
-            ),
-        )
+    pagure.lib.notify.log(
+        project,
+        topic='project.new',
+        msg=dict(
+            project=project.to_json(public=True),
+            agent=user_obj.username,
+        ),
+    )
 
     return 'Project "%s" created' % (
         '%s/%s' % (project.namespace, project.name) if project.namespace
@@ -1493,7 +1490,7 @@ def new_issue(session, repo, title, content, user, ticketfolder, issue_id=None,
     if notify:
         pagure.lib.notify.notify_new_issue(issue, user=user_obj)
 
-    if not private and not issue.project.private:
+    if not private:
         pagure.lib.notify.log(
             issue.project,
             topic='issue.new',
@@ -1521,7 +1518,7 @@ def drop_issue(session, issue, user, ticketfolder):
     pagure.lib.git.clean_git(
         issue, repo=issue.project, repofolder=ticketfolder)
 
-    if not private and not issue.project.private:
+    if not private:
         pagure.lib.notify.log(
             issue.project,
             topic='issue.drop',
@@ -1580,16 +1577,15 @@ def new_pull_request(session, branch_from,
     if notify:
         pagure.lib.notify.notify_new_pull_request(request)
 
-    if not request.project.private:
-        pagure.lib.notify.log(
-            request.project,
-            topic='pull-request.new',
-            msg=dict(
-                pullrequest=request.to_json(public=True),
-                agent=user_obj.username,
-            ),
-            redis=REDIS,
-        )
+    pagure.lib.notify.log(
+        request.project,
+        topic='pull-request.new',
+        msg=dict(
+            pullrequest=request.to_json(public=True),
+            agent=user_obj.username,
+        ),
+        redis=REDIS,
+    )
 
     # Send notification to the CI server
     if REDIS and request.project.ci_hook and PAGURE_CI \
@@ -1703,7 +1699,7 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
         log_action(session, status.lower(), issue, user_obj)
         pagure.lib.notify.notify_status_change_issue(issue, user_obj)
 
-    if not issue.private and edit and not issue.project.private:
+    if not issue.private and edit:
         pagure.lib.notify.log(
             issue.project,
             topic='issue.edit',
@@ -1777,17 +1773,16 @@ def update_project_settings(session, repo, settings, user):
         session.add(repo)
         session.flush()
 
-        if not repo.private:
-            pagure.lib.notify.log(
-                repo,
-                topic='project.edit',
-                msg=dict(
-                    project=repo.to_json(public=True),
-                    fields=update,
-                    agent=user_obj.username,
-                ),
-                redis=REDIS,
-            )
+        pagure.lib.notify.log(
+            repo,
+            topic='project.edit',
+            msg=dict(
+                project=repo.to_json(public=True),
+                fields=update,
+                agent=user_obj.username,
+            ),
+            redis=REDIS,
+        )
 
         return 'Edited successfully settings of repo: %s' % repo.fullname
 
@@ -1898,15 +1893,14 @@ def fork_project(session, user, repo, gitfolder,
         requestrepo, bare=True,
         mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
 
-    if not project.private:
-        pagure.lib.notify.log(
-            project,
-            topic='project.forked',
-            msg=dict(
-                project=project.to_json(public=True),
-                agent=user_obj.username,
-            ),
-        )
+    pagure.lib.notify.log(
+        project,
+        topic='project.forked',
+        msg=dict(
+            project=project.to_json(public=True),
+            agent=user_obj.username,
+        ),
+    )
 
     return 'Repo "{0}" cloned to "{1}/{0}"'.format(
         '%s/%s' % (repo.namespace, repo.name) if repo.namespace else repo.name,
@@ -2585,17 +2579,16 @@ def close_pull_request(session, request, user, requestfolder, merged=True):
         notify=False, notification=True
     )
 
-    if not request.project.private:
-        pagure.lib.notify.log(
-            request.project,
-            topic='pull-request.closed',
-            msg=dict(
-                pullrequest=request.to_json(public=True),
-                merged=merged,
-                agent=user_obj.username,
-            ),
-            redis=REDIS,
-        )
+    pagure.lib.notify.log(
+        request.project,
+        topic='pull-request.closed',
+        msg=dict(
+            pullrequest=request.to_json(public=True),
+            merged=merged,
+            agent=user_obj.username,
+        ),
+        redis=REDIS,
+    )
 
 
 def reset_status_pull_request(session, project):
