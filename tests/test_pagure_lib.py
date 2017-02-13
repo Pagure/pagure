@@ -3214,6 +3214,25 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(out, 'You are no longer watching this issue')
 
 
+    def test_tokenize_search_string(self):
+        """ Test the tokenize_search_string function. """
+        # These are the tests performed to make sure we tokenize correctly.
+        # This is in the form: input string, custom fields, remaining pattern
+        tests = [
+            ('test123', {}, 'test123'),
+            ('test:key test123', {'test': 'key'}, 'test123'),
+            ('test:"key with spaces" test123', {'test': 'key with spaces'},
+             'test123'),
+            ('test123 test:key test456', {'test': 'key'}, 'test123 test456'),
+            ('test123 test:"key with spaces" key2:value12 test456',
+             {'test': 'key with spaces', 'key2': 'value12'},
+             'test123 test456')
+            ]
+        for inp, flds, rem in tests:
+            self.assertEqual(pagure.lib.tokenize_search_string(inp),
+                             (flds, rem))
+
+
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibtests)
     unittest.TextTestRunner(verbosity=2).run(SUITE)
