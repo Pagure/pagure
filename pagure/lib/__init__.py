@@ -1197,8 +1197,8 @@ def new_project(session, user, name, blacklist, allowed_prefix,
                 ignore_existing_repo=False):
     ''' Create a new project based on the information provided.
     '''
-    if name in blacklist or (
-            namespace and '%s/%s' % (namespace, name) in blacklist):
+    if (not namespace and name in blacklist) \
+            or (namespace and '%s/%s' % (namespace, name) in blacklist):
         raise pagure.exceptions.ProjectBlackListedException(
             'No project "%s" are allowed to be created due to potential '
             'conflicts in URLs with pagure itself' % name
