@@ -297,8 +297,24 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertTrue(
             '<h2>\n      0 Open Issues' in output.data)
 
-        # Create issues to play with
         repo = pagure.lib.get_project(self.session, 'test')
+        # Create some custom fields to play with
+        msg = pagure.lib.set_custom_key_fields(
+            session=self.session,
+            project=repo,
+            fields=['test1'],
+            types=['text'],
+            data=[None]
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'List of custom fields updated')
+
+        cfield = pagure.lib.get_custom_key(
+            session=self.session,
+            project=repo,
+            keyname='test1')
+
+        # Create issues to play with
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -309,6 +325,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
+
+        msg = pagure.lib.set_custom_key_value(
+            session=self.session,
+            issue=msg,
+            key=cfield,
+            value='firstissue')
+        self.session.commit()
+        self.assertEqual(msg, 'Custom field test1 adjusted to firstissue')
 
         msg = pagure.lib.new_issue(
             session=self.session,
@@ -322,6 +346,14 @@ class PagureFlaskIssuestests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(msg.title, 'Test invalid issue')
+
+        msg = pagure.lib.set_custom_key_value(
+            session=self.session,
+            issue=msg,
+            key=cfield,
+            value='second issue')
+        self.session.commit()
+        self.assertEqual(msg, 'Custom field test1 adjusted to second issue')
 
         # Whole list
         output = self.app.get('/test/issues')
@@ -358,6 +390,20 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertIn('<title>Issues - test - Pagure</title>', output.data)
         self.assertTrue(
             '<h2>\n      2 Issues' in output.data)
+
+        # Custom key searching
+        output = self.app.get(
+            '/test/issues?status=all&search_pattern=test1:firstissue')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
+        self.assertIn('1 Issues', output.data)
+
+        # Custom key searching with space
+        output = self.app.get(
+            '/test/issues?status=all&search_pattern=test1:"second issue"')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
+        self.assertIn('1 Issues', output.data)
 
         # All tickets - different pagination
         before = pagure.APP.config['ITEM_PER_PAGE']
