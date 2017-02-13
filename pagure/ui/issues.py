@@ -603,6 +603,11 @@ def view_issues(repo, username=None, namespace=None):
         for idx, key in enumerate(custom_keys):
             custom_search[key] = custom_values[idx]
 
+    search_string = search_pattern
+    extra_fields, search_pattern = pagure.lib.tokenize_search_string(
+        search_pattern)
+    custom_search.update(extra_fields)
+
     repo = flask.g.repo
 
     if not repo.settings.get('issue_tracker', True):
@@ -710,7 +715,7 @@ def view_issues(repo, username=None, namespace=None):
         priority=priority,
         total_page=total_page,
         add_report_form=pagure.forms.AddReportForm(),
-        search_pattern=search_pattern,
+        search_pattern=search_string,
     )
 
 

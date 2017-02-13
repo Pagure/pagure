@@ -3863,3 +3863,41 @@ def add_metadata_update_notif(session, issue, messages, user, ticketfolder):
     session.add(issue_comment)
     # Make sure we won't have SQLAlchemy error before we continue
     session.commit()
+
+
+def tokenize_search_string(pattern):
+    """This function tokenizes search patterns into key:value and rest.
+
+    It will also correctly parse key values between quotes.
+    """
+    if pattern is None:
+        return {}, None
+    def finalize_token(token, custom_search):
+        if ':' in token:
+            # This was a "key:value" parameter
+            key, value = token.split(':', 1)
+            custom_search[key] = value
+            return ''
+        else:
+            # This was a token without colon, thus a search pattern
+            return '%s ' % token
+
+    custom_search = {}
+    # Remaining is the remaining real search_pattern (aka, non-key:values)
+    remaining = ''
+    # Token is the current "search token" we are processing
+    token = ''
+    in_quotes = False
+    for char in pattern:
+        if char == ' ' and not in_quotes:
+            remaining += finalize_token(token, custom_search)
+            token = ''
+        elif char == '"':
+            in_quotes = not in_quotes
+        else:
+            token += char
+
+    # Parse the final token
+    remaining += finalize_token(token, custom_search)
+
+    return custom_search, remaining.strip()
