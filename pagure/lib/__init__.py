@@ -245,7 +245,7 @@ def create_deploykeys_ssh_keys_on_disk(project, gitolite_keydir):
     for deploykey in project.deploykeys:
         # See the comment in lib/git.py:write_gitolite_acls about why this
         # name for a file is sane and does not inject a new security risk.
-        keyfile = 'deploykey_%s_%s' % (
+        keyfile = 'deploykey_%s_%s.pub' % (
             werkzeug.secure_filename(project.fullname),
             deploykey.id)
         if not os.path.exists(os.path.join(project_key_dir, keyfile)):
