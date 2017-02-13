@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            2.12
+Version:            2.12.1
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -335,6 +335,18 @@ install -m 644 pagure-logcom/pagure_logcom.service \
 
 
 %changelog
+* Mon Feb 13 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.12.1-1
+- Update to 2.12.1
+- Include the build id in the flag set by pagure-ci on PR (Farhaan Bukhsh)
+- Fix using the deploy keys (Patrick Uiterwijk)
+- Add the possibility to ignore existing git repo on disk when creating a new
+  project
+- Fix checking for blacklisted projects if they have no namespace
+- Link to the documentation in the footer (Rahul Bajaj)
+- Fix retrieving the list of branches available for pull-request
+- Order the project of a group alphabetically (case-insensitive)
+- Fix listing the priorities always in their right order
+
 * Fri Feb 10 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.12-1
 - Update to 2.12
 - Fix the place of the search and tags bars in the issues page (Pradeep CE)
