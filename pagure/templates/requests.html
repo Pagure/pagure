@@ -217,7 +217,7 @@ $(function() {
     url: '{{ url_for("internal_ns.get_pull_request_ready_branch") }}' ,
     type: 'POST',
     data: {
-      namespace: "{{ repo.namespace }}",
+      namespace: "{{ repo.namespace if repo.namespace }}",
       repo: "{{ repo.name }}",
       repouser: "{{ g.fas_user.username }}",
       csrf_token: "{{ form.csrf_token.current_token }}",
@@ -258,7 +258,7 @@ $(function() {
     type: 'POST',
     data: {
       repo: "{{ repo.name }}",
-      namespace: "{{ repo.namespace }}",
+      namespace: "{{ repo.namespace if repo.namespace }}",
       repouser: "",
       csrf_token: "{{ form.csrf_token.current_token }}",
     },
