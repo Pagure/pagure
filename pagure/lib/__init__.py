@@ -1193,7 +1193,8 @@ def new_project(session, user, name, blacklist, allowed_prefix,
                 gitfolder, docfolder, ticketfolder, requestfolder,
                 description=None, url=None, avatar_email=None,
                 parent_id=None, add_readme=False, userobj=None,
-                prevent_40_chars=False, namespace=None, user_ns=False):
+                prevent_40_chars=False, namespace=None, user_ns=False,
+                ignore_existing_repo=False):
     ''' Create a new project based on the information provided.
     '''
     if name in blacklist or (
@@ -1233,10 +1234,20 @@ def new_project(session, user, name, blacklist, allowed_prefix,
     if namespace:
         path = '%s/%s' % (namespace, name)
 
+    # Repo exists on disk
     gitrepo = os.path.join(gitfolder, '%s.git' % path)
     if os.path.exists(gitrepo):
+        if not ignore_existing_repo:
+            raise pagure.exceptions.RepoExistsException(
+                'The project repo "%s" already exists' % path
+            )
+
+    # Repo exists in the DB
+    repo = pagure.lib.get_project(session, name, namespace=namespace)
+    if repo:
         raise pagure.exceptions.RepoExistsException(
-            'The project repo "%s" already exists' % path
+            'The project repo "%s/%s" already exists in the database' % (
+            namespace, name)
         )
 
     project = model.Project(
@@ -1285,34 +1296,40 @@ def new_project(session, user, name, blacklist, allowed_prefix,
 
     docrepo = os.path.join(docfolder, project.path)
     if os.path.exists(docrepo):
-        shutil.rmtree(gitrepo)
-        raise pagure.exceptions.RepoExistsException(
-            'The docs repo "%s" already exists' % project.path
-        )
-    pygit2.init_repository(docrepo, bare=True)
+        if not ignore_existing_repo:
+            shutil.rmtree(gitrepo)
+            raise pagure.exceptions.RepoExistsException(
+                'The docs repo "%s" already exists' % project.path
+            )
+    else:
+        pygit2.init_repository(docrepo, bare=True)
 
     ticketrepo = os.path.join(ticketfolder, project.path)
     if os.path.exists(ticketrepo):
-        shutil.rmtree(gitrepo)
-        shutil.rmtree(docrepo)
-        raise pagure.exceptions.RepoExistsException(
-            'The tickets repo "%s" already exists' % project.path
-        )
-    pygit2.init_repository(
-        ticketrepo, bare=True,
-        mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
+        if not ignore_existing_repo:
+            shutil.rmtree(gitrepo)
+            shutil.rmtree(docrepo)
+            raise pagure.exceptions.RepoExistsException(
+                'The tickets repo "%s" already exists' % project.path
+            )
+    else:
+        pygit2.init_repository(
+            ticketrepo, bare=True,
+            mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
 
     requestrepo = os.path.join(requestfolder, project.path)
     if os.path.exists(requestrepo):
-        shutil.rmtree(gitrepo)
-        shutil.rmtree(docrepo)
-        shutil.rmtree(ticketrepo)
-        raise pagure.exceptions.RepoExistsException(
-            'The requests repo "%s" already exists' % project.path
-        )
-    pygit2.init_repository(
-        requestrepo, bare=True,
-        mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
+        if not ignore_existing_repo:
+            shutil.rmtree(gitrepo)
+            shutil.rmtree(docrepo)
+            shutil.rmtree(ticketrepo)
+            raise pagure.exceptions.RepoExistsException(
+                'The requests repo "%s" already exists' % project.path
+            )
+    else:
+        pygit2.init_repository(
+            requestrepo, bare=True,
+            mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP)
 
     # Install the default hook
     plugin = pagure.lib.plugins.get_plugin('default')

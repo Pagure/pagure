@@ -937,6 +937,51 @@ class PagureLibtests(tests.Modeltests):
         self.assertTrue(os.path.exists(ticketrepo))
         self.assertTrue(os.path.exists(requestrepo))
 
+        # Try re-creating it ignoring the existing repos - but repo in the DB
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.new_project,
+            session=self.session,
+            user='pingou',
+            name='testproject',
+            blacklist=[],
+            allowed_prefix=[],
+            gitfolder=gitfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
+            description='description for testproject',
+            parent_id=None
+        )
+        self.session.rollback()
+
+        # Re-create it, ignoring the existing repos on disk
+        repo = pagure.lib.get_project(self.session, 'testproject')
+        self.session.delete(repo)
+        self.session.commit()
+
+        msg = pagure.lib.new_project(
+            session=self.session,
+            user='pingou',
+            name='testproject',
+            blacklist=[],
+            allowed_prefix=[],
+            gitfolder=gitfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
+            description='description for testproject',
+            parent_id=None,
+            ignore_existing_repo=True
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Project "testproject" created')
+
+        self.assertTrue(os.path.exists(gitrepo))
+        self.assertTrue(os.path.exists(docrepo))
+        self.assertTrue(os.path.exists(ticketrepo))
+        self.assertTrue(os.path.exists(requestrepo))
+
         # Drop the main git repo and try again
         shutil.rmtree(gitrepo)
         self.assertRaises(
@@ -1026,7 +1071,6 @@ class PagureLibtests(tests.Modeltests):
             msg,
             'Project "pingou/ssssssssssssssssssssssssssssssssssssssss" '
             'created')
-
 
     def test_new_project_user_ns(self):
         """ Test the new_project of pagure.lib with user_ns on. """
