@@ -170,6 +170,75 @@ class PagureLibModeltests(tests.Modeltests):
             'TagIssueColored(issue:1, tag:foo, project:test)'
         )
 
+    def test_group_project_ordering(self):
+        """ Test the ordering of project.groups. """
+        # Create three projects
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='aaa',
+            description='Project aaa',
+            hook_token='aaabbbccc',
+        )
+        item.close_status = ['Invalid', 'Fixed', 'Duplicate']
+        self.session.add(item)
+
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='KKK',
+            description='project KKK',
+            hook_token='aaabbbddd',
+        )
+        item.close_status = ['Invalid', 'Fixed', 'Duplicate']
+        self.session.add(item)
+
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='zzz',
+            description='Namespaced project zzz',
+            hook_token='aaabbbeee',
+            namespace='somenamespace',
+        )
+        item.close_status = ['Invalid', 'Fixed', 'Duplicate']
+        self.session.add(item)
+
+        # Create a group
+        group = pagure.lib.model.PagureGroup(
+            group_name='testgrp',
+            display_name='Test group',
+            description=None,
+            group_type='users',
+            user_id=1,  # pingou
+        )
+        item.close_status = ['Invalid', 'Fixed', 'Duplicate']
+        self.session.add(group)
+
+        self.session.commit()
+
+        # Add projects to group
+        for ns, reponame in [
+                (None, 'aaa'), (None, 'KKK'), ('somenamespace', 'zzz')]:
+
+            repo = pagure.lib.get_project(
+                self.session, reponame, namespace=ns)
+            msg = pagure.lib.add_group_to_project(
+                self.session,
+                project=repo,
+                new_group='testgrp',
+                user='pingou',
+                create=False,
+                is_admin=False
+            )
+            self.session.commit()
+            self.assertEqual(msg, 'Group added')
+
+        # Check the ordering
+        group = pagure.lib.search_groups(self.session, group_name='testgrp')
+        self.assertEqual(
+            [p.fullname for p in group.projects],
+            ['aaa', 'KKK','somenamespace/zzz']
+        )
+
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibModeltests)

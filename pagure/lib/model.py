@@ -370,7 +370,10 @@ class Project(BASE):
         secondary="projects_groups",
         primaryjoin="projects.c.id==projects_groups.c.project_id",
         secondaryjoin="pagure_group.c.id==projects_groups.c.group_id",
-        backref="projects",
+        backref=backref(
+            "projects",
+            order_by="func.lower(projects.c.namespace), func.lower(projects.c.name)"
+        )
     )
 
     unwatchers = relation(
