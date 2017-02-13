@@ -235,7 +235,7 @@ def create_deploykeys_ssh_keys_on_disk(project, gitolite_keydir):
     project_key_dir = os.path.join(gitolite_keydir, 'deploykeys',
                                    project.fullname)
     if not os.path.exists(project_key_dir):
-        os.mkdir(project_key_dir)
+        os.makedirs(project_key_dir)
 
     for keyfile in os.listdir(project_key_dir):
         if keyfile not in keyfiles:
