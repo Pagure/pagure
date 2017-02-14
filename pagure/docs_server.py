@@ -111,7 +111,12 @@ def __get_tree_and_content(repo_obj, commit, path):
         ext = os.path.splitext(blob_or_tree.name)[1]
         blob_obj = repo_obj[blob_or_tree.oid]
         if not is_binary_string(blob_obj.data):
-            content, safe = pagure.doc_utils.convert_readme(blob_obj.data, ext)
+            try:
+                content, safe = pagure.doc_utils.convert_readme(
+                    blob_obj.data, ext)
+            except pagure.exceptions.PagureException:
+                safe = False
+                content = blob_obj.data
         else:
             safe = True
             content = blob_obj.data
