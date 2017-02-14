@@ -1,0 +1,14 @@
+[Unit]
+Description=Pagure service loading JSON files into the DB
+After=redis.target
+Documentation=https://pagure.io/pagure
+
+[Service]
+ExecStart=/usr/libexec/pagure-loadjson/pagure_loadjson_server.py
+Type=simple
+User=git
+Group=git
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
