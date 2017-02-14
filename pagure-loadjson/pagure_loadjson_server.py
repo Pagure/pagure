@@ -207,6 +207,9 @@ def handle_messages():
                     break
                 finally:
                     mail_body.append(tmp)
+            else:
+                tmp += ' ... ... SKIPPED - No JSON data'
+                mail_body.append(tmp)
 
         try:
             session.commit()
