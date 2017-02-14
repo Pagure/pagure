@@ -540,7 +540,7 @@ def update_ticket_from_git(
 
     else:
         # Edit existing issue
-        messages.extend(pagure.lib.edit_issue(
+        msgs = pagure.lib.edit_issue(
             session,
             issue=issue,
             ticketfolder=None,
@@ -551,7 +551,9 @@ def update_ticket_from_git(
             status=json_data.get('status'),
             close_status=json_data.get('close_status'),
             private=json_data.get('private'),
-        ))
+        )
+        if msgs:
+            messages.extend(msgs)
 
     session.commit()
 
@@ -610,30 +612,38 @@ def update_ticket_from_git(
 
     # Update tags
     tags = json_data.get('tags', [])
-    messages.extend(pagure.lib.update_tags(
-        session, issue, tags, username=user.user, ticketfolder=None))
+    msgs = pagure.lib.update_tags(
+        session, issue, tags, username=user.user, ticketfolder=None)
+    if msgs:
+        messages.extend(msgs)
 
     # Update assignee
     assignee = get_user_from_json(session, json_data, key='assignee')
     if assignee:
-        messages.append(pagure.lib.add_issue_assignee(
+        msg = pagure.lib.add_issue_assignee(
             session, issue, assignee.username,
-            user=user.user, ticketfolder=None, notify=False))
+            user=user.user, ticketfolder=None, notify=False)
+        if msg:
+            messages.append(msg)
 
     # Update depends
     depends = json_data.get('depends', [])
-    messages.extend(pagure.lib.update_dependency_issue(
+    msgs = pagure.lib.update_dependency_issue(
         session, issue.project, issue, depends,
-        username=user.user, ticketfolder=None))
+        username=user.user, ticketfolder=None)
+    if msgs:
+        messages.extend(msgs)
 
     # Update blocks
     blocks = json_data.get('blocks', [])
-    messages.extend(pagure.lib.update_blocked_issue(
+    msgs = pagure.lib.update_blocked_issue(
         session, issue.project, issue, blocks,
-        username=user.user, ticketfolder=None))
+        username=user.user, ticketfolder=None)
+    if msgs:
+        messages.extend(msgs)
 
     for comment in json_data['comments']:
-        user = get_user_from_json(session, comment)
+        usercomment = get_user_from_json(session, comment)
         commentobj = pagure.lib.get_issue_comment(
             session, issue_uid, comment['id'])
         if not commentobj:
@@ -641,12 +651,13 @@ def update_ticket_from_git(
                 session,
                 issue=issue,
                 comment=comment['comment'],
-                user=user.username,
+                user=usercomment.username,
                 ticketfolder=None,
                 notify=False,
                 date_created=datetime.datetime.utcfromtimestamp(
                     float(comment['date_created'])),
             )
+
     if messages:
         pagure.lib.add_metadata_update_notif(
             session=session,
