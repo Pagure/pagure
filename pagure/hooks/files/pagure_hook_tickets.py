@@ -63,15 +63,21 @@ def run_as_post_receive_hook():
             oldrev, newrev, abspath, refname)
 
         if REDIS:
-            print('Sending to redis to log activity')
+            print('Sending to redis to load the data')
             REDIS.publish('pagure.loadjson',
                 json.dumps({
                     'project': project.to_json(public=True),
                     'abspath': abspath,
                     'commits': commits,
                     'data_type': 'ticket',
+                    'agent': os.environ.get('GL_USER'),
                 }
             ))
+            print(
+                'A report will be emailed to you once the load is finished')
+        else:
+            print('Hook not configured to connect to pagure-loadjson')
+            print('/!\ Your data will not be loaded into the database!')
 
 
 def main(args):

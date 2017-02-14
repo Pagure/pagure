@@ -21,11 +21,13 @@ pagure can be really time-consuming).
 import json
 import logging
 import os
+import traceback
 
 import requests
 import trollius
 import trollius_redis
 
+from sqlalchemy.exc import SQLAlchemyError
 
 _log = logging.getLogger(__name__)
 
@@ -36,8 +38,28 @@ if 'PAGURE_CONFIG' not in os.environ \
 
 
 import pagure
+import pagure.exceptions
 import pagure.lib
+import pagure.lib.notify
 
+
+def format_callstack():
+    """ Format the callstack to find out the stack trace. """
+    ind = 0
+    for ind, frame in enumerate(f[0] for f in inspect.stack()):
+        if '__name__' not in frame.f_globals:
+            continue
+        modname = frame.f_globals['__name__'].split('.')[0]
+        if modname != "logging":
+            break
+
+    def _format_frame(frame):
+        """ Format the frame. """
+        return '  File "%s", line %i in %s\n    %s' % (frame)
+
+    stack = traceback.extract_stack()
+    stack = stack[:-ind]
+    return "\n".join([_format_frame(frame) for frame in stack])
 
 def get_files_to_load(title, new_commits_list, abspath):
 
@@ -89,7 +111,9 @@ def handle_messages():
             "b7b4059c44d692d7df3227ce58ce01191e5407bd",
             "f8d0899bb6654590ffdef66b539fd3b8cf873b35",
             "9b6fdc48d3edab82d3de28953271ea52b0a96117"
-          ]
+          ],
+          "data_type": "ticket",
+          "agent": "pingou",
         }
 
     '''
@@ -121,6 +145,7 @@ def handle_messages():
             if data['project']['parent'] else None
         namespace = data['project']['namespace']
         data_type = data['data_type']
+        agent = data['agent']
 
         if data_type not in ['ticket', 'pull-request']:
             _log.info('Invalid data_type retrieved: %s', data_type)
@@ -147,9 +172,11 @@ def handle_messages():
         file_list = set(get_files_to_load(project.fullname, commits, abspath))
         n = len(file_list)
         _log.info('%s files to process' % n)
+        mail_body = []
 
         for idx, filename in enumerate(file_list):
-            _log.info('Loading: %s -- %s/%s', filename, idx, n)
+            _log.info('Loading: %s -- %s/%s', filename, idx+1, n)
+            tmp = 'Loading: %s -- %s/%s' % (filename, idx+1, n)
             json_data = None
             data = ''.join(
                 pagure.lib.git.read_git_lines(
@@ -170,14 +197,32 @@ def handle_messages():
                             issue_uid=filename,
                             json_data=json_data
                         )
+                        tmp += ' ... ... Done'
                 except Exception as err:
                     _log.info('data: %s', json_data)
                     session.rollback()
                     _log.exception(err)
+                    tmp += ' ... ... FAILED\n'
+                    tmp += format_callstack()
                     break
+                finally:
+                    mail_body.append(tmp)
 
         try:
             session.commit()
+            _log.info(
+                'Emailing results for %s to %s', project.fullname, agent)
+            try:
+                if not agent:
+                    raise pagure.exceptions.PagureException(
+                        'No agent found: %s' % agent)
+                user_obj = pagure.lib.get_user(session, agent)
+                pagure.lib.notify.send_email(
+                    '\n'.join(mail_body),
+                    'Issue import report',
+                    user_obj.default_email)
+            except pagure.exceptions.PagureException as err:
+                _log.exception('Could not find user %s' % agent)
         except SQLAlchemyError as err:  # pragma: no cover
             session.rollback()
         finally:
