@@ -175,6 +175,23 @@ pagure-logcom contains the service that logs commits into the database so that
 the activity calendar heatmap is filled.
 
 
+%package            loadjson
+Summary:            The loadjson service for pagure
+BuildArch:          noarch
+
+BuildRequires:      systemd-devel
+Requires:           python-redis
+Requires:           python-trollius
+Requires:           python-trollius-redis
+Requires(post):     systemd
+Requires(preun):    systemd
+Requires(postun):   systemd
+%description        loadjson
+pagure-loadjson is the service allowing to update the database with the
+information provided in the JSON blobs that are stored in the tickets and
+pull-requests git repo.
+
+
 %prep
 %setup -q
 
@@ -251,6 +268,13 @@ install -m 755 pagure-logcom/pagure_logcom_server.py \
 install -m 644 pagure-logcom/pagure_logcom.service \
     $RPM_BUILD_ROOT/%{_unitdir}/pagure_logcom.service
 
+# Install the loadjson service
+mkdir -p $RPM_BUILD_ROOT/%{_libexecdir}/pagure-loadjson
+install -m 755 pagure-loadjson/pagure_loadjson_server.py \
+    $RPM_BUILD_ROOT/%{_libexecdir}/pagure-loadjson/pagure_loadjson_server.py
+install -m 644 pagure-loadjson/pagure_loadjson.service \
+    $RPM_BUILD_ROOT/%{_unitdir}/pagure_loadjson.service
+
 
 %post milters
 %systemd_post pagure_milter.service
@@ -262,6 +286,8 @@ install -m 644 pagure-logcom/pagure_logcom.service \
 %systemd_post pagure_ci.service
 %post logcom
 %systemd_post pagure_logcom.service
+%post loadjson
+%systemd_post pagure_loadjson.service
 
 %preun milters
 %systemd_preun pagure_milter.service
@@ -273,6 +299,8 @@ install -m 644 pagure-logcom/pagure_logcom.service \
 %systemd_preun pagure_ci.service
 %preun logcom
 %systemd_preun pagure_logcom.service
+%preun loadjson
+%systemd_preun pagure_loadjson.service
 
 %postun milters
 %systemd_postun_with_restart pagure_milter.service
@@ -284,6 +312,8 @@ install -m 644 pagure-logcom/pagure_logcom.service \
 %systemd_postun_with_restart pagure_ci.service
 %postun logcom
 %systemd_postun_with_restart pagure_logcom.service
+%postun loadjson
+%systemd_postun_with_restart pagure_loadjson.service
 
 
 %files
@@ -332,6 +362,12 @@ install -m 644 pagure-logcom/pagure_logcom.service \
 %license LICENSE
 %{_libexecdir}/pagure-logcom/
 %{_unitdir}/pagure_logcom.service
+
+
+%files loadjson
+%license LICENSE
+%{_libexecdir}/pagure-loadjson/
+%{_unitdir}/pagure_loadjson.service
 
 
 %changelog

@@ -10,3 +10,4 @@ recursive-include doc *
 recursive-include alembic *
 recursive-include ev-server *
 recursive-include webhook-server *
+recursive-include pagure-loadjson *
