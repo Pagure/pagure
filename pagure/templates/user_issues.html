@@ -18,11 +18,11 @@
     </div>
     <hr>
 
-    {% for issues in (user.issues, user.assigned_issues) %}
+    {% for issues in (user.assigned_issues, user.issues) %}
       {% if loop.index == 1 %}
-        <b>Opened Issues</b>
-      {% else %}
         <b>Assigned Issues</b>
+      {% else %}
+        <b>Opened Issues</b>
       {% endif %}
       <table class="table table-hover table-striped m-b-0 m-t-1">
         <thead class="thead-default">
