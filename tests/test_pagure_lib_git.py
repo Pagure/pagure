@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015 - Copyright Red Hat Inc
+ (c) 2015-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -12,11 +12,14 @@ __requires__ = ['SQLAlchemy >= 0.8']
 
 import pkg_resources
 
-import unittest
+import datetime
+import os
 import shutil
 import sys
-import os
 import tempfile
+import time
+import unittest
+
 import pygit2
 from mock import patch
 
@@ -1206,6 +1209,12 @@ index 0000000..60f7480
         #print patch
         self.assertEqual(patch, exp)
 
+        # Enforce having a different last_updated field
+        # This is required as the test run fine and fast with sqlite but is
+        # much slower with postgresql so we end-up with an updated
+        # last_updated in postgresql but not with sqlite
+        time.sleep(1)
+
         # Test again after adding a comment
         msg = pagure.lib.add_issue_comment(
             session=self.session,
@@ -1232,7 +1241,7 @@ diff --git a/123 b/456
 index 458821a..77674a8
 --- a/123
 +++ b/456
-@@ -3,7 +3,25 @@
+@@ -3,13 +3,31 @@
      "blocks": [],
      "close_status": null,
      "closed_at": null,
@@ -1259,6 +1268,13 @@ index 458821a..77674a8
      "content": "We should work on this",
      "custom_fields": [],
      "date_created": null,
+     "depends": [],
+     "id": 1,
+-    "last_updated": "<date>",
++    "last_updated": "<date>",
+     "milestone": null,
+     "priority": null,
+     "private": false,
 
 """
         npatch = []
@@ -1288,6 +1304,9 @@ index 458821a..77674a8
                 row = '--- a/123'
             elif row.startswith('+++ b/'):
                 row = '+++ b/456'
+            elif 'last_updated' in row:
+                t = row.split(': ')[0]
+                row = '%s: "<date>",' % t
             npatch.append(row)
         patch = '\n'.join(npatch)
         #print patch

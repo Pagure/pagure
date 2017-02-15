@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015 - Copyright Red Hat Inc
+ (c) 2015-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -205,7 +205,7 @@ class PagureLibModeltests(tests.Modeltests):
             group_name='testgrp',
             display_name='Test group',
             description=None,
-            group_type='users',
+            group_type='user',
             user_id=1,  # pingou
         )
         item.close_status = ['Invalid', 'Fixed', 'Duplicate']

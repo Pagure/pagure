@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015 - Copyright Red Hat Inc
+ (c) 2015-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -374,6 +374,7 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         """ Test the api_new_project method of the flask api. """
         p_gga.return_value = True
 
+        tests.create_projects(self.session)
         tests.create_projects_git(os.path.join(self.path, 'tickets'))
         tests.create_tokens(self.session)
         tests.create_tokens_acl(self.session)
@@ -437,7 +438,8 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-                "error": "The tickets repo \"test.git\" already exists",
+                "error": "The project repo \"test\" already exists "
+                    "in the database",
                 "error_code": "ENOCODE"
             }
         )
