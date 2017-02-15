@@ -41,13 +41,15 @@ from pagure.lib.repo import PagureRepo
 
 DB_PATH = 'sqlite:///:memory:'
 FAITOUT_URL = 'http://faitout.fedorainfracloud.org/'
+if os.environ.get('FAITOUT_URL'):
+    FAITOUT_URL = os.environ.get('FAITOUT_URL')
 HERE = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 LOG = logging.getLogger("pagure")
 LOG.setLevel(logging.DEBUG)
 
 
 LOG.info('BUILD_ID: %s', os.environ.get('BUILD_ID'))
-if os.environ.get('BUILD_ID'):
+if os.environ.get('BUILD_ID')or os.environ.get('FAITOUT_URL'):
     try:
         import requests
         req = requests.get('%s/new' % FAITOUT_URL)
