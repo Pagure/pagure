@@ -141,8 +141,8 @@ def ticket_add_comment():
     user_obj = pagure.lib.search_user(pagure.SESSION, email=useremail)
     admin = False
     if user_obj:
-        admin = user_obj == issue.project.user.user or (
-            user_obj in [user.user for user in issue.project.committers])
+        admin = user_obj.user == issue.project.user.user or (
+            user_obj.user in [user.user for user in issue.project.committers])
 
     if issue.private and user_obj and not admin \
             and not issue.user.user == user_obj.username:
