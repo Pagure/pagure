@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015 - Copyright Red Hat Inc
+ (c) 2015-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -347,8 +347,14 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(msg, 'User added')
-
         repo = pagure.lib.get_project(self.session, 'test')
+        self.assertEqual(
+            sorted([u.username for u in repo.users]), ['foo'])
+        self.assertEqual(
+            sorted([u.username for u in repo.committers]), [])
+        self.assertEqual(
+            sorted([u.username for u in repo.admins]), [])
+
         output = self.app.put('/pv/ticket/comment/', data=data)
         self.assertEqual(output.status_code, 403)
 
@@ -364,6 +370,14 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(msg, 'User access updated')
+        repo = pagure.lib.get_project(self.session, 'test')
+        self.assertEqual(
+            sorted([u.username for u in repo.users]), ['foo'])
+        self.assertEqual(
+            sorted([u.username for u in repo.committers]), ['foo'])
+        self.assertEqual(
+            sorted([u.username for u in repo.admins]), [])
+
         # Add comment
         output = self.app.put('/pv/ticket/comment/', data=data)
         self.assertEqual(output.status_code, 200)
@@ -385,6 +399,15 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(msg, 'User access updated')
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        self.assertEqual(
+            sorted([u.username for u in repo.users]), ['foo'])
+        self.assertEqual(
+            sorted([u.username for u in repo.committers]), ['foo'])
+        self.assertEqual(
+            sorted([u.username for u in repo.admins]), ['foo'])
+
         # Add comment
         output = self.app.put('/pv/ticket/comment/', data=data)
         self.assertEqual(output.status_code, 200)
