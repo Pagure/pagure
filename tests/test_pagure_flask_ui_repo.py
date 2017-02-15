@@ -264,13 +264,37 @@ class PagureFlaskRepotests(tests.Modeltests):
                 'user': 'ralph',
             }
 
+            # Missing access
             output = self.app.post('/test/adduser', data=data)
             self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Add user - test - Pagure</title>', output.data)
             self.assertTrue('<strong>Add user to the' in output.data)
 
             data['csrf_token'] = csrf_token
             output = self.app.post('/test/adduser', data=data)
             self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Add user - test - Pagure</title>', output.data)
+            self.assertIn('<strong>Add user to the', output.data)
+
+            data = {
+                'user': 'ralph',
+                'access': 'commit',
+            }
+
+            # No CSRF
+            output = self.app.post('/test/adduser', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Add user - test - Pagure</title>', output.data)
+
+            # Unknown user
+            data['csrf_token'] = csrf_token
+            output = self.app.post('/test/adduser', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Add user - test - Pagure</title>', output.data)
             self.assertIn('<strong>Add user to the', output.data)
             self.assertIn(
                 '</button>\n                      No user &#34;ralph&#34; '
@@ -412,18 +436,33 @@ class PagureFlaskRepotests(tests.Modeltests):
                 'group': 'ralph',
             }
 
+            # Missing CSRF
             output = self.app.post('/test/addgroup', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<strong>Add group to the' in output.data)
+            self.assertIn(
+                '<title>Add group - test - Pagure</title>', output.data)
+            self.assertIn('<strong>Add group to the', output.data)
 
+            # Missing access
             data['csrf_token'] = csrf_token
             output = self.app.post('/test/addgroup', data=data)
             self.assertEqual(output.status_code, 200)
-            self.assertTrue('<strong>Add group to the' in output.data)
+            self.assertIn(
+                '<title>Add group - test - Pagure</title>', output.data)
+            self.assertIn('<strong>Add group to the', output.data)
+
+            # Unknown group
+            data['access'] = 'ticket'
+            output = self.app.post('/test/addgroup', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Add group - test - Pagure</title>', output.data)
+            self.assertIn('<strong>Add group to the', output.data)
             self.assertIn(
                 '</button>\n                      No group ralph found.',
                 output.data)
 
+            # All good
             data['group'] = 'foo'
             output = self.app.post(
                 '/test/addgroup', data=data, follow_redirects=True)
@@ -609,8 +648,8 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<title>Settings - test - Pagure</title>', output.data)
             self.assertIn('<h3>Settings for test</h3>', output.data)
             self.assertIn(
-                '</button>\n                      User does not have commit rights, '
-                'or cannot have them removed', output.data)
+                '</button>\n                      User does not have any '
+                'access on the repo', output.data)
 
         # Add an user to a project
         repo = pagure.lib.get_project(self.session, 'test')

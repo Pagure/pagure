@@ -141,7 +141,7 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             '<div class="card-block">\n            '
-            '<h5><strong>Owners</strong></h5>', output.data)
+            '<h5><strong>Contributors</strong></h5>', output.data)
 
     @patch('pagure.lib.notify.send_email')
     def test_view_repo_branch(self, send_email):
@@ -162,7 +162,7 @@ class PagureFlaskSlashInBranchtests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             '<div class="card-block">\n            '
-            '<h5><strong>Owners</strong></h5>', output.data)
+            '<h5><strong>Contributors</strong></h5>', output.data)
 
     @patch('pagure.lib.notify.send_email')
     def test_view_commits(self, send_email):

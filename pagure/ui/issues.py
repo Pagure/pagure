@@ -999,7 +999,6 @@ def view_issue(repo, issueid, username=None, namespace=None):
         knowns_keys=knowns_keys,
         subscribers=pagure.lib.get_watch_list(SESSION, issue),
         attachments=issue.attachments,
-        subscribed=subscribed,
     )
 
 

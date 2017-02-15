@@ -113,7 +113,7 @@ class PagureFlaskSlashInNametests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             '<div class="card-block">\n            '
-            '<h5><strong>Owners</strong></h5>', output.data)
+            '<h5><strong>Contributors</strong></h5>', output.data)
         self.assertIn(
             '<p>The Project Creator has not pushed any code yet</p>',
             output.data)
@@ -156,7 +156,7 @@ class PagureFlaskSlashInNametests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             '<div class="card-block">\n            '
-            '<h5><strong>Owners</strong></h5>', output.data)
+            '<h5><strong>Contributors</strong></h5>', output.data)
         self.assertIn(
             '<p>The Project Creator has not pushed any code yet</p>',
             output.data)
@@ -188,7 +188,7 @@ class PagureFlaskSlashInNametests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             '<div class="card-block">\n            '
-            '<h5><strong>Owners</strong></h5>', output.data)
+            '<h5><strong>Contributors</strong></h5>', output.data)
 
         # We can't create the project `forks/test` the normal way
         self.assertRaises(
@@ -227,7 +227,7 @@ class PagureFlaskSlashInNametests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn(
             '<div class="card-block">\n            '
-            '<h5><strong>Owners</strong></h5>', output.data)
+            '<h5><strong>Contributors</strong></h5>', output.data)
         self.assertIn('Add sources file for testing', output.data)
         self.assertIn(
             '<title>Overview - forks/test - Pagure</title>', output.data)
