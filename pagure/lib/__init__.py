@@ -1299,8 +1299,8 @@ def new_project(session, user, name, blacklist, allowed_prefix,
     repo = pagure.lib.get_project(session, name, namespace=namespace)
     if repo:
         raise pagure.exceptions.RepoExistsException(
-            'The project repo "%s/%s" already exists in the database' % (
-            namespace, name)
+            'The project repo "%s" already exists in the database' % (
+            path)
         )
 
     project = model.Project(
