@@ -408,7 +408,7 @@ class Project(BASE):
         secondaryjoin="pagure_group.c.id==projects_groups.c.group_id",
         backref=backref(
             "projects",
-            order_by="func.lower(projects.c.namespace), func.lower(projects.c.name)"
+            order_by="func.lower(projects.c.namespace).desc(), func.lower(projects.c.name)"
         )
     )
 
