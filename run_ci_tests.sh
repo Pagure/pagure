@@ -7,6 +7,10 @@ git checkout origin/master
 git config --global user.email "you@example.com"
 git config --global user.name "Your Name"
 git merge --no-ff "proposed/$BRANCH" -m "Merge PR"
+
+echo "Running tests for branch $BRANCH of repo $REPO"
+echo "Last commit:"
+git log -1
 fi
 
 
