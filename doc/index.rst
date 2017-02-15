@@ -36,6 +36,7 @@ Contents:
    install_evs
    install_webhooks
    install_pagure_ci
+   install_pagure_loadjson
    configuration
    development
    contributing
