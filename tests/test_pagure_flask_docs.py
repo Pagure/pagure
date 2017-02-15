@@ -196,7 +196,7 @@ class PagureFlaskDocstests(tests.Modeltests):
 
     @mock.patch(
         'pagure.lib.encoding_utils.decode',
-        mock.MagicMock(side_effect=pagure.exceptions.PagureException))
+        mock.MagicMock(side_effect=pagure.exceptions.PagureEncodingException))
     def test_view_docs_encoding_error(self):
         """ Test viewing a file of which we cannot find the encoding. """
         tests.create_projects(self.session)
