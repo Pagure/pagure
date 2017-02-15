@@ -590,6 +590,7 @@ def view_issues(repo, username=None, namespace=None):
     assignee = flask.request.args.get('assignee', None)
     author = flask.request.args.get('author', None)
     search_pattern = flask.request.args.get('search_pattern', None)
+    milestones = flask.request.args.getlist('milestone', None)
 
     # Custom fields
     custom_keys = flask.request.args.getlist('ckeys')
@@ -599,6 +600,11 @@ def view_issues(repo, username=None, namespace=None):
         for idx, key in enumerate(custom_keys):
             custom_search[key] = custom_values[idx]
 
+    if "none" in milestones:
+        no_stone = True
+        milestones.remove("none")
+    else:
+        no_stone = False
     search_string = search_pattern
     extra_fields, search_pattern = pagure.lib.tokenize_search_string(
         search_pattern)
@@ -646,6 +652,8 @@ def view_issues(repo, username=None, namespace=None):
             limit=flask.g.limit,
             search_pattern=search_pattern,
             custom_search=custom_search,
+            milestones=milestones,
+            no_milestones=no_stone
         )
         issues_cnt = pagure.lib.search_issues(
             SESSION,
@@ -730,6 +738,7 @@ def view_roadmap(repo, username=None, namespace=None):
     milestones = flask.request.args.getlist('milestone', None)
     tags = flask.request.args.getlist('tag', None)
     all_stones = flask.request.args.get('all_stones')
+    no_stones = flask.request.args.get('no_stones')
 
     repo = flask.g.repo
 
@@ -745,6 +754,25 @@ def view_roadmap(repo, username=None, namespace=None):
     # If user is repo committer, show all tickets included the private ones
     if flask.g.repo_committer:
         private = None
+
+    if no_stones:
+        # Return only issues that do not have a milestone set
+        issues = pagure.lib.search_issues(
+            SESSION,
+            repo,
+            no_milestones=True,
+            status=status if status.lower() != 'all' else None,
+        )
+        return flask.render_template(
+            'roadmap.html',
+            select='issues',
+            repo=repo,
+            username=username,
+            status=status,
+            no_stones=True,
+            issues=issues,
+            tags=tags,
+        )
 
     all_milestones = sorted(list(repo.milestones.keys()))
     active_milestones = pagure.lib.get_active_milestones(SESSION, repo)

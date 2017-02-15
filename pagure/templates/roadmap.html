@@ -79,7 +79,7 @@
   <span class="btn-group btn-group-sm issues-tagbar" role="group">
   <span class="oi m-l-2 btn btn-nopad" title="Status"></span>
     <a class="btn {%
-      if not all_stones %}btn-primary{%
+      if not all_stones and not no_stones %}btn-primary{%
       else %}btn-secondary{%
       endif %} btn-sm" href="{{ url_for('view_roadmap',
         repo=repo.name,
@@ -97,6 +97,16 @@
         tag=tags,
         all_stones=true,
         status=status) }}" title="Display all milestone tags">All Milestones</a>
+    <a class="btn {%
+      if no_stones %}btn-primary{%
+      else %}btn-secondary{%
+      endif %} btn-sm" href="{{ url_for('view_roadmap',
+        repo=repo.name,
+        username=username,
+        namespace=repo.namespace,
+        tag=tags,
+        no_stones=true,
+        status=status) }}" title="Display issues with no milestone set">No Milestone</a>
   </span>
   <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
   <span class="oi m-l-2 btn btn-nopad" data-glyph="target" title="Milestones"></span>
@@ -141,6 +151,109 @@
   </tr>
   </div>
 {% endif %}
+
+{% if no_stones %}
+    <div class="card m-t-1">
+      <div class="card-block">
+        <table id="pagure-issues-list-nostone" class="table table-hover table-striped m-b-0 milestone-table">
+          <thead class="thead-default">
+            <tr>
+              <th>No Milestone
+              </th>
+              <th class="open_date">Opened</th>
+              {% if status and status|lower == 'closed' %}
+                <th class="close_date">Closed</th>
+              {% else %}
+                <th class="mod_date">Modified</th>
+              {% endif %}
+              <th class="priority" data-sort="int">
+                Priority
+              </th>
+                <th class="assigned">
+                  Assignee
+                </th>
+              <th class="issue_status">Status</th>
+            </tr>
+          </thead>
+          <tfoot></tfoot>
+          <tbody>
+          {% for issue in issues |sort(attribute='priority') %}
+            {% if status is none or status|lower == 'all' or issue.status == status %}
+              <tr {% if issue.status == 'Closed' %}class="text-muted"{% endif %}>
+                <td>
+                  <span class="label label-default">#{{ issue.id }}</span>
+                  {% if issue.private %}
+                  <span class="oi red-icon" data-glyph="lock-locked" title="Private issue"></span>
+                  {% endif %}
+                  <a {% if issue.status == 'Closed' %}class="text-muted"{% endif %} href="{{ url_for(
+                      'view_issue',
+                      repo=repo.name,
+                      username=username,
+                      namespace=repo.namespace,
+                      issueid=issue.id) }}">
+                    {{ issue.title | noJS("img") | safe }}
+                  </a>
+                  &nbsp;&nbsp;
+                  {% if issue.comments|count > 0 %}
+                  <span class="text-muted">
+                    <span class="oi" data-glyph="comment-square"
+                        title="Comments on the ticket"></span>
+                      {{issue.comments|count}}
+                  </span>
+                  {% endif %}
+                  {% for tag in issue.tags%}
+                    <span class="label label-info"
+                    style="background-color:{{ tag.tag_color
+                    }}">{{tag.tag}}</span>
+                  {% endfor%}
+                </td>
+                <td class="td-open_date nowrap">
+                  <span title="{{ issue.date_created.strftime('%Y-%m-%d %H:%M:%S')}}">{{
+                          issue.date_created | humanize}}</span>
+                </td>
+                <td class="td-mod_date nowrap">
+                  {% if status and status|lower == 'closed' %}
+                    <span title="{{ issue.closed_at.strftime('%Y-%m-%d %H:%M:%S')}}">{{
+                          issue.closed_at | humanize}}</span>
+                  {% else %}
+                  <span title="{{ issue.last_updated.strftime('%Y-%m-%d %H:%M:%S')}}">{{
+                          issue.last_updated | humanize}}</span>
+                  {% endif %}
+                </td>
+                <td class="td-priority nowrap" data-sort-value="{{
+                  issue.priority
+                  if issue.priority
+                  else repo.priorities | increment_largest_priority | string }}">
+                  {% if issue.priority %}
+                    {{ repo.priorities[issue.priority | string] }}
+                  {% endif %}
+                </td>
+                <td class="nowrap">
+                  {% if issue.assignee %}
+                    {{ issue.assignee.default_email | avatar(16) | safe }}
+                    {{ issue.assignee.user }}
+                  {% else %}
+                     <span class="text-muted">unassigned</span>
+                  {% endif %}
+                </td>
+                <td class="nowrap">
+                  <span class="label {%
+                    if issue.status != 'Open' -%}label-danger{%
+                    else %}label-success{% endif %}">{{ issue.status }}</span>
+                </td>
+              </tr>
+            {% endif %}
+            {% else %}
+              <tr>
+                <td colspan="5" class="noresult">No issues found</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+{% endif %}
+
 {% for milestone in milestones %}
   {% if issues[milestone] %}
     <div class="card m-t-1">
