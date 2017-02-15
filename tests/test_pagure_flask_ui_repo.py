@@ -1138,6 +1138,110 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<input id="issue_tracker" type="checkbox" value="y" '
                 'name="issue_tracker" checked=""/>', output.data)
 
+    @patch('pagure.ui.repo.admin_session_timedout')
+    def test_fields_in_view_settings(self, ast):
+        """ Test the default fields in view_settings endpoint. """
+        ast.return_value = False
+
+        # No Git repo
+        output = self.app.get('/foo/settings')
+        self.assertEqual(output.status_code, 404)
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/foo/settings')
+            self.assertEqual(output.status_code, 404)
+
+            item = pagure.lib.model.Project(
+                user_id=1,  # pingou
+                name='test',
+                description='test project #1',
+                hook_token='aaabbbccc',
+            )
+            self.session.add(item)
+            self.session.commit()
+            tests.create_projects_git(self.path)
+
+            output = self.app.get('/test/settings')
+            self.assertEqual(output.status_code, 403)
+
+        # User not logged in
+        output = self.app.get('/test/settings')
+        self.assertEqual(output.status_code, 302)
+
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            ast.return_value = True
+            output = self.app.get('/test/settings')
+            self.assertEqual(output.status_code, 302)
+
+            ast.return_value = False
+            output = self.app.get('/test/settings')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>', output.data)
+            self.assertIn('<h3>Settings for test</h3>', output.data)
+            # Check that the priorities have their empty fields
+            self.assertIn(
+            '''<div id="priorities">
+              <div class="row p-t-1">
+                <div class="col-sm-2 p-r-0">
+                  <input type="text" name="priority_weigth"
+                    value="" size="3" class="form-control"/>
+                </div>
+                <div class="col-sm-9 p-r-0">
+                  <input type="text" name="priority_title"
+                    value="" class="form-control"/>
+                </div>
+              </div>
+          </div>''', output.data)
+
+            # Check that the milestones have their empty fields
+            self.assertIn(
+            '''<div id="milestones">
+              <div class="row p-t-1">
+                <div class="col-sm-6 p-r-0">
+                  <input type="text" name="milestones"
+                    value="" size="3" class="form-control"/>
+                </div>
+                <div class="col-sm-6 p-r-0">
+                  <input type="text" name="milestone_dates"
+                    value="" class="form-control"/>
+                </div>
+              </div>''', output.data)
+
+            # Check that the close_status have its empty field
+            self.assertIn(
+            '''<div id="close_sstatus">
+              <div class="row p-t-1">
+                <div class="col-sm-12 p-r-0">
+                  <input type="text" name="close_status"
+                    value="" class="form-control"/>
+                </div>
+              </div>''', output.data)
+
+            # Check that the custom fields have their empty fields
+            self.assertIn(
+            '''<div id="custom_fields">
+              <div class="row p-t-1">
+                <div class="col-sm-4 p-r-0">
+                  <input type="text" name="custom_keys"
+                    value="" class="form-control"/>
+                </div>
+                <div class="col-sm-2 p-r-0">
+                  <select name="custom_keys_type" class="form-control">
+                    <option value="text" >Text</option>
+                    <option value="boolean" >Boolean</option>
+                    <option value="link" >Link</option>
+                    <option value="list" >List</option>
+                  </select>
+                </div>
+                <div class="col-sm-6 p-r-0">
+                    <input title="Comma separated list items" type="text" name="custom_keys_data"
+                      value="" class="form-control"/>
+                </div>
+              </div>''', output.data)
+
     def test_view_forks(self):
         """ Test the view_forks endpoint. """
 
