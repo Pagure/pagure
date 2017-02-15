@@ -83,7 +83,7 @@ def upgrade():
     )
 
     # alter the constraints
-    op.drop_constraint('user_projects_project_id_key', 'user_projects')
+    op.drop_constraint('user_projects_project_id_fkey', 'user_projects')
     op.create_unique_constraint(
             None,
             'user_projects',
