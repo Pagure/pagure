@@ -114,7 +114,7 @@ def __get_tree_and_content(repo_obj, commit, path):
             try:
                 content, safe = pagure.doc_utils.convert_readme(
                     blob_obj.data, ext)
-            except pagure.exceptions.PagureException:
+            except pagure.exceptions.PagureEncodingException:
                 safe = False
                 content = blob_obj.data
         else:

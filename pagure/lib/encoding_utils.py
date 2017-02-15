@@ -127,7 +127,7 @@ def guess_encoding(data):
             return encoding.encoding
         except UnicodeDecodeError:
             pass
-    raise PagureException('No encoding could be guessed for this file')
+    raise PagureEncodingException('No encoding could be guessed for this file')
 
 
 def decode(data):

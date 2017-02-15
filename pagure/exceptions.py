@@ -87,3 +87,10 @@ class NoCorrespondingPR(PagureException):
 class InvalidObjectException(PagureException):
     ''' Exception raised when a given object is not what was expected. '''
     pass
+
+
+class PagureEncodingException(PagureException, ValueError):
+    ''' Exception raised none of the encoding guessed could be applied to
+    the content examined
+    '''
+    pass
