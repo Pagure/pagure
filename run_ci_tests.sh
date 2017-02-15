@@ -50,6 +50,6 @@ python setup.py build
 
 PYTHONPATH=pagure ./nosetests -v --with-xcoverage --cover-erase --cover-package=pagure
 
-PYTHONPATH=pagure pylint -f parseable pagure | tee pylint.out
-pep8 pagure/*.py pagure/*/*.py | tee pep8.out
+PYTHONPATH=pagure pylint -f parseable pagure | tee pylint.out || true
+pep8 pagure/*.py pagure/*/*.py | tee pep8.out || true
 
