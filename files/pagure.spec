@@ -188,8 +188,8 @@ Requires(preun):    systemd
 Requires(postun):   systemd
 %description        loadjson
 pagure-loadjson is the service allowing to update the database with the
-information provided in the JSON blobs that are stored in the tickets and
-pull-requests git repo.
+information provided in the JSON blobs that are stored in the tickets (and
+in the future pull-requests) git repo.
 
 
 %prep
