@@ -38,7 +38,7 @@ then
 else
     source pagureenv-$DATE-$HASH/bin/activate
 fi
-trap deactive SIGINT SIGTERM EXIT
+trap deactivate SIGINT SIGTERM EXIT
 
 
 # Reload where the nosetests app is (within the venv)
