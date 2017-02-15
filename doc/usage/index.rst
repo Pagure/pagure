@@ -37,6 +37,7 @@ Contents:
    pull_requests
    markdown
    project_settings
+   project_acls
    roadmap
    using_doc
    using_webhooks
