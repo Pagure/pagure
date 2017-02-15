@@ -176,6 +176,9 @@ def view_docs(repo, username=None, namespace=None, filename=None):
                 filename += '/'
         except pagure.exceptions.FileNotFoundException as err:
             flask.flash(err.message, 'error')
+        except Exception as err:
+            LOG.exception(err)
+            flask.abort(500, 'Unkown error encountered and reported')
 
     mimetype = None
     if not filename:

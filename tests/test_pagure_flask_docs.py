@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015 - Copyright Red Hat Inc
+ (c) 2015-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -17,6 +17,7 @@ import shutil
 import sys
 import os
 
+import mock
 import pygit2
 from mock import patch
 
@@ -57,6 +58,53 @@ class PagureFlaskDocstests(tests.Modeltests):
         pagure.APP.config['DOCS_FOLDER'] = os.path.join(
             self.path, 'docs')
         self.app = pagure.docs_server.APP.test_client()
+
+    def _set_up_doc(self):
+        # forked doc repo
+        docrepo = os.path.join(self.path, 'docs', 'test', 'test.git')
+        repo = pygit2.init_repository(docrepo)
+
+        # Create files in that git repo
+        with open(os.path.join(docrepo, 'sources'), 'w') as stream:
+            stream.write('foo\n bar')
+        repo.index.add('sources')
+        repo.index.write()
+
+        folderpart = os.path.join(docrepo, 'folder1', 'folder2')
+        os.makedirs(folderpart)
+        with open(os.path.join(folderpart, 'test_file'), 'w') as stream:
+            stream.write('row1\nrow2\nrow3')
+        repo.index.add(os.path.join('folder1', 'folder2', 'test_file'))
+        repo.index.write()
+
+        # Commits the files added
+        tree = repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        repo.create_commit(
+            'refs/heads/master',  # the name of the reference to update
+            author,
+            committer,
+            'Add test files and folder',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            []
+        )
+
+        # Push the changes to the bare repo
+        remote = repo.create_remote(
+            'origin', os.path.join(self.path, 'docs', 'test.git'))
+
+        PagureRepo.push(remote, 'refs/heads/master:refs/heads/master')
+
+        # Turn on the docs project since it's off by default
+        repo = pagure.lib.get_project(self.session, 'test')
+        repo.settings = {'project_documentation': True}
+        self.session.add(repo)
+        self.session.commit()
 
     def test_view_docs_no_project(self):
         """ Test the view_docs endpoint with no project. """
@@ -113,51 +161,7 @@ class PagureFlaskDocstests(tests.Modeltests):
         output = self.app.get('/test/docs')
         self.assertEqual(output.status_code, 404)
 
-        # forked doc repo
-        docrepo = os.path.join(self.path, 'docs', 'test', 'test.git')
-        repo = pygit2.init_repository(docrepo)
-
-        # Create files in that git repo
-        with open(os.path.join(docrepo, 'sources'), 'w') as stream:
-            stream.write('foo\n bar')
-        repo.index.add('sources')
-        repo.index.write()
-
-        folderpart = os.path.join(docrepo, 'folder1', 'folder2')
-        os.makedirs(folderpart)
-        with open(os.path.join(folderpart, 'test_file'), 'w') as stream:
-            stream.write('row1\nrow2\nrow3')
-        repo.index.add(os.path.join('folder1', 'folder2', 'test_file'))
-        repo.index.write()
-
-        # Commits the files added
-        tree = repo.index.write_tree()
-        author = pygit2.Signature(
-            'Alice Author', 'alice@authors.tld')
-        committer = pygit2.Signature(
-            'Cecil Committer', 'cecil@committers.tld')
-        repo.create_commit(
-            'refs/heads/master',  # the name of the reference to update
-            author,
-            committer,
-            'Add test files and folder',
-            # binary string representing the tree object ID
-            tree,
-            # list of binary strings representing parents of the new commit
-            []
-        )
-
-        # Push the changes to the bare repo
-        remote = repo.create_remote(
-            'origin', os.path.join(self.path, 'docs', 'test.git'))
-
-        PagureRepo.push(remote, 'refs/heads/master:refs/heads/master')
-
-        # Turn on the docs project since it's off by default
-        repo = pagure.lib.get_project(self.session, 'test')
-        repo.settings = {'project_documentation': True}
-        self.session.add(repo)
-        self.session.commit()
+        self._set_up_doc()
 
         # Now check the UI
 
@@ -189,6 +193,50 @@ class PagureFlaskDocstests(tests.Modeltests):
 
         output = self.app.get('/test/folder1/foo/folder2')
         self.assertEqual(output.status_code, 404)
+
+    @mock.patch(
+        'pagure.lib.encoding_utils.decode',
+        mock.MagicMock(side_effect=pagure.exceptions.PagureException))
+    def test_view_docs_encoding_error(self):
+        """ Test viewing a file of which we cannot find the encoding. """
+        tests.create_projects(self.session)
+        repo = pygit2.init_repository(
+            os.path.join(self.path, 'docs', 'test.git'), bare=True)
+
+        output = self.app.get('/test/docs')
+        self.assertEqual(output.status_code, 404)
+
+        self._set_up_doc()
+
+        output = self.app.get('/test/sources')
+        self.assertEqual(output.status_code, 200)
+        self.assertEqual('foo\n bar', output.data)
+
+        output = self.app.get('/test/folder1')
+        self.assertEqual(output.status_code, 200)
+        self.assertTrue(
+            '<li><ul><a href="folder2/">folder2/</a></ul></li>'
+            in output.data)
+
+    @mock.patch(
+        'pagure.lib.encoding_utils.decode',
+        mock.MagicMock(side_effect=IOError))
+    def test_view_docs_unknown_error(self):
+        """ Test viewing a file of which we cannot find the encoding. """
+        tests.create_projects(self.session)
+        repo = pygit2.init_repository(
+            os.path.join(self.path, 'docs', 'test.git'), bare=True)
+
+        output = self.app.get('/test/docs')
+        self.assertEqual(output.status_code, 404)
+
+        self._set_up_doc()
+
+        output = self.app.get('/test/sources')
+        self.assertEqual(output.status_code, 500)
+
+        output = self.app.get('/test/folder1')
+        self.assertEqual(output.status_code, 500)
 
 
 if __name__ == '__main__':
