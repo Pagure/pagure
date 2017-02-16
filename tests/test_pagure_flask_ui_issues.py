@@ -337,6 +337,18 @@ class PagureFlaskIssuestests(tests.Modeltests):
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
+            title='Test issue with milestone',
+            content='Testing search',
+            user='pingou',
+            milestone='1.1',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue with milestone')
+
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
             title='Test invalid issue',
             content='This really is not related',
             user='pingou',
@@ -360,7 +372,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         self.assertIn('<title>Issues - test - Pagure</title>', output.data)
         self.assertTrue(
-            '<h2>\n      1 Open Issues' in output.data)
+            '<h2>\n      2 Open Issues' in output.data)
 
         # Status = closed (all but open)
         output = self.app.get('/test/issues?status=cloSED')
@@ -385,11 +397,10 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         # All tickets
         output = self.app.get('/test/issues?status=all')
-
         self.assertEqual(output.status_code, 200)
         self.assertIn('<title>Issues - test - Pagure</title>', output.data)
         self.assertTrue(
-            '<h2>\n      2 Issues' in output.data)
+            '<h2>\n      3 Issues' in output.data)
 
         # Custom key searching
         output = self.app.get(
@@ -411,9 +422,9 @@ class PagureFlaskIssuestests(tests.Modeltests):
         output = self.app.get('/test/issues?status=all')
         self.assertEqual(output.status_code, 200)
         self.assertIn('<title>Issues - test - Pagure</title>', output.data)
-        self.assertIn('<h2>\n      1 Issues (of 2)', output.data)
+        self.assertIn('<h2>\n      1 Issues (of 3)', output.data)
         self.assertIn(
-            '<li class="active">page 1 of 2</li>', output.data)
+            '<li class="active">page 1 of 3</li>', output.data)
 
         # All tickets - filtered for 1 - checking the pagination
         output = self.app.get(
@@ -424,6 +435,20 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertIn(
             '<li class="active">page 1 of 1</li>', output.data)
         pagure.APP.config['ITEM_PER_PAGE'] = before
+
+        # Search for issues with no milestone MARK
+        output = self.app.get(
+            '/test/issues?milestone=none')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
+        self.assertIn('1 Open Issues (of 2)', output.data)
+
+        # Search for issues with no milestone and milestone 1.1
+        output = self.app.get(
+            '/test/issues?milestone=none&milestone=1.1')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Issues - test - Pagure</title>', output.data)
+        self.assertIn('2 Open Issues (of 2)', output.data)
 
         # New issue button is shown
         user = tests.FakeUser()

@@ -2129,7 +2129,6 @@ def search_issues(
         query = query.filter(
             model.Issue.priority == priority
         )
-
     if tags is not None and tags != []:
         if isinstance(tags, basestring):
             tags = [tags]
