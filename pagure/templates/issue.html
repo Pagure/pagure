@@ -385,7 +385,7 @@
               {% if field.key_type == 'list' %}
                 <select class="form-control" name="{{ field.name }}" id="{{ field.name }}>
                   <option value="None">None</option>
-                  {% for item in field.data %}
+                  {% for item in field.data or [] %}
                     <option value="{{item}}" {% if field.name in knowns_keys and item == knowns_keys[field.name].value %} selected {% endif %}>
                       {{ item }}
                     </option>
