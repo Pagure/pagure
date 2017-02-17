@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2016 - Copyright Red Hat Inc
+ (c) 2016-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -46,7 +46,7 @@ def jenkins_ci_notification(
 
     project = pagure.lib.get_project(
         SESSION, repo, user=username, namespace=namespace)
-    if repo is None:
+    if not project:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
 
     if not constant_time.bytes_eq(
