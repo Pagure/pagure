@@ -20,7 +20,7 @@ import tempfile
 import os
 
 import pygit2
-from mock import patch
+from mock import patch, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -1893,6 +1893,28 @@ class PagureFlaskRepotests(tests.Modeltests):
             output.data)
         self.assertIn(
             '<td class="cell2"><pre> barRow 0</pre></td>', output.data)
+
+    @patch(
+        'pagure.lib.encoding_utils.decode',
+        MagicMock(side_effect=pagure.exceptions.PagureException))
+    def test_view_file_with_wrong_encoding(self):
+        """ Test the view_file endpoint. """
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(self.path, bare=True)
+
+        # Add some content to the git repo
+        tests.add_content_git_repo(os.path.join(self.path, 'test.git'))
+        tests.add_readme_git_repo(os.path.join(self.path, 'test.git'))
+        tests.add_binary_git_repo(
+            os.path.join(self.path, 'test.git'), 'test.jpg')
+        tests.add_binary_git_repo(
+            os.path.join(self.path, 'test.git'), 'test_binary')
+
+        # View file
+        output = self.app.get('/test/blob/master/f/sources')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('Binary files cannot be rendered.<br/>', output.data)
 
     def test_view_raw_file(self):
         """ Test the view_raw_file endpoint. """
