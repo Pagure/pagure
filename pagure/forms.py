@@ -99,6 +99,7 @@ def file_virus_validator(form, field):
 
 
 def ssh_key_validator(form, field):
+    ''' Form for ssh key validation '''
     if not pagure.lib.are_valid_ssh_keys(field.data):
         raise wtforms.ValidationError('Invalid SSH keys')
 
