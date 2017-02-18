@@ -48,3 +48,4 @@ Contents:
    pagure_ci
    quick_replies
    troubleshooting
+   tips_tricks
