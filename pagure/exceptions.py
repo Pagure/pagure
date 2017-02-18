@@ -37,8 +37,11 @@ class AccessLevelNotFound(PagureException):
 
 
 class FileNotFoundException(PagureException):
-    ''' Exception thrown when trying to create a repository that already
-    exists.
+    ''' Exception thrown when the desired file is not found.
+
+    This exception is found when the file is searched in a git repo or when
+    setting up one of the git hook.
+
     '''
     pass
 
