@@ -3887,7 +3887,6 @@ def get_user_activity_day(session, user, date):
 
 def log_action(session, action, obj, user_obj):
     ''' Log an user action on a project/issue/PR. '''
-
     project_id = None
     if obj.isa in ['issue', 'pull-request']:
         project_id = obj.project_id
@@ -3902,9 +3901,7 @@ def log_action(session, action, obj, user_obj):
         user_id=user_obj.id,
         project_id=project_id,
         log_type=action,
-        ref_id=obj.id,
-        date=obj.date_created.date(),
-        date_created=obj.date_created
+        ref_id=obj.id
     )
     if obj.isa == 'issue':
         setattr(log, 'issue_uid', obj.uid)
