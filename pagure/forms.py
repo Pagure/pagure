@@ -72,6 +72,9 @@ class MultipleEmail(wtforms.validators.Email):
 
 
 def file_virus_validator(form, field):
+    ''' Checks for virus in the file from flask request object,
+    raises wtf.ValidationError if virus is found else None. '''
+
     if not pagure.APP.config['VIRUS_SCAN_ATTACHMENTS']:
         return
     from pyclamd import ClamdUnixSocket
