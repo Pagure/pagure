@@ -667,6 +667,7 @@ def view_issues(repo, username=None, namespace=None):
             priority=priority,
             search_pattern=search_pattern,
             custom_search=custom_search,
+            milestones=milestones,
             no_milestones=no_stone,
             count=True
         )
@@ -682,6 +683,7 @@ def view_issues(repo, username=None, namespace=None):
             search_pattern=search_pattern,
             custom_search=custom_search,
             no_milestones=no_stone,
+            milestones=milestones,
             count=True,
         )
     else:
