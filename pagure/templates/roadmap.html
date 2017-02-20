@@ -109,6 +109,7 @@
         status=status) }}" title="Display issues with no milestone set">No Milestone</a>
   </span>
   <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
+  {% if milestones %}
   <span class="oi m-l-2 btn btn-nopad" data-glyph="target" title="Milestones"></span>
     {% for stone in milestones %}
       <a class="btn btn-secondary btn-sm{%
@@ -126,6 +127,7 @@
         {{ stone }}</a>
     {% endfor %}
   </span>
+  {% endif %}
   <span class="btn-group btn-group-sm issues-tagbar" role="group" aria-label="Basic example">
   <span class="oi m-l-2 btn btn-nopad" data-glyph="tag" title="Tags"></span>
     {% for tag in tag_list %}
