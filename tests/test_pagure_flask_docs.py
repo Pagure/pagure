@@ -237,7 +237,7 @@ class PagureFlaskDocstests(tests.Modeltests):
         self.assertEqual(output.status_code, 500)
 
         output = self.app.get('/test/folder1')
-        self.assertEqual(output.status_code, 500)
+        self.assertEqual(output.status_code, 200)
 
 
 if __name__ == '__main__':

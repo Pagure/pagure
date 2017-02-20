@@ -1,3 +1,5 @@
 #!/bin/bash
 
-PYTHONPATH=pagure ./nosetests --with-coverage --cover-erase --cover-package=pagure $*
+PAGURE_CONFIG=`pwd`/tests/test_config \
+PYTHONPATH=pagure \
+./nosetests --with-coverage --cover-erase --cover-package=pagure $*
