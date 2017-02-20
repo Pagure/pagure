@@ -605,6 +605,7 @@ def view_issues(repo, username=None, namespace=None):
         milestones.remove("none")
     else:
         no_stone = False
+
     search_string = search_pattern
     extra_fields, search_pattern = pagure.lib.tokenize_search_string(
         search_pattern)
@@ -755,12 +756,31 @@ def view_roadmap(repo, username=None, namespace=None):
     if flask.g.repo_committer:
         private = None
 
+    tag_list = [
+        tag.tag
+        for tag in pagure.lib.get_tags_of_project(SESSION, repo)
+    ]
+
+    all_milestones = sorted(list(repo.milestones.keys()))
+    active_milestones = pagure.lib.get_active_milestones(SESSION, repo)
+
+    milestones_list = active_milestones
+    if all_stones:
+        milestones_list = all_milestones
+
+    if 'unplanned' in all_milestones:
+        index = all_milestones.index('unplanned')
+        cnt = len(all_milestones)
+        all_milestones.insert(cnt, all_milestones.pop(index))
+
     if no_stones:
         # Return only issues that do not have a milestone set
         issues = pagure.lib.search_issues(
             SESSION,
             repo,
             no_milestones=True,
+            tags=tags,
+            private=private,
             status=status if status.lower() != 'all' else None,
         )
         return flask.render_template(
@@ -768,14 +788,14 @@ def view_roadmap(repo, username=None, namespace=None):
             select='issues',
             repo=repo,
             username=username,
+            tag_list=tag_list,
             status=status,
             no_stones=True,
             issues=issues,
             tags=tags,
+            all_stones=all_stones,
+            requested_stones=milestones,
         )
-
-    all_milestones = sorted(list(repo.milestones.keys()))
-    active_milestones = pagure.lib.get_active_milestones(SESSION, repo)
 
     issues = pagure.lib.search_issues(
         SESSION,
@@ -807,20 +827,6 @@ def view_roadmap(repo, username=None, namespace=None):
                     break
             if not active:
                 del milestone_issues[key]
-
-    tag_list = [
-        tag.tag
-        for tag in pagure.lib.get_tags_of_project(SESSION, repo)
-    ]
-
-    if 'unplanned' in all_milestones:
-        index = all_milestones.index('unplanned')
-        cnt = len(all_milestones)
-        all_milestones.insert(cnt, all_milestones.pop(index))
-
-    milestones_list = active_milestones
-    if all_stones:
-        milestones_list = all_milestones
 
     return flask.render_template(
         'roadmap.html',

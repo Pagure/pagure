@@ -122,6 +122,7 @@
           milestone=stone | add_or_remove(requested_stones[:]),
           tag=tags,
           all_stones=all_stones,
+          no_stones=no_stones,
           status=status) }}"
           title="Filter issues by milestone">
         {{ stone }}</a>
@@ -139,6 +140,7 @@
               status=status,
               tag=tag | add_or_remove(tags[:]),
               all_stones=all_stones,
+              no_stones=no_stones,
               milestone=requested_stones) }}"
               title="Filter issues by tag">
         {{ tag }}</a>
