@@ -647,6 +647,62 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
+    def test_view_issue_list_no_data(self, p_send_email, p_ugt):
+        """ Test the view_issue endpoint when the issue has a custom field
+        of type list with no data attached. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path), bare=True)
+
+        repo = pagure.lib.get_project(self.session, 'test')
+
+        # Add custom fields to the project
+        msg = pagure.lib.set_custom_key_fields(
+            session=self.session,
+            project=repo,
+            fields=['test1'],
+            types=['list'],
+            data=[None]
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'List of custom fields updated')
+
+        # Create issues to play with
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        # Assign a value to the custom key on that ticket
+        cfield = pagure.lib.get_custom_key(
+            session=self.session,
+            project=repo,
+            keyname='test1')
+        msg = pagure.lib.set_custom_key_value(
+            session=self.session,
+            issue=msg,
+            key=cfield,
+            value='item')
+        self.session.commit()
+        self.assertEqual(msg, 'Custom field test1 adjusted to item')
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/issue/1')
+            self.assertEqual(output.status_code, 200)
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_update_issue(self, p_send_email, p_ugt):
         """ Test the update_issue endpoint. """
         p_send_email.return_value = True
