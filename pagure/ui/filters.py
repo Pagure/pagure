@@ -568,10 +568,25 @@ def combine_url(url, page, pagetitle, **kwargs):
     """
     url_obj = urlparse.urlparse(url)
     url = url_obj.geturl().replace(url_obj.query, '').rstrip('?')
-    query = dict(urlparse.parse_qsl(url_obj.query))
+    query = {}
+    for k, v in urlparse.parse_qsl(url_obj.query):
+        if k in query:
+            if isinstance(query[k], list):
+                query[k].append(v)
+            else:
+                query[k] = [query[k], v]
+        else:
+            query[k] = v
     query[pagetitle] = page
     query.update(kwargs)
-    return url + '?' + '&'.join(['%s=%s' % (k, query[k]) for k in query])
+    args = ''
+    for key in query:
+        if isinstance(query[key], list):
+            for val in query[key]:
+                args += '&%s=%s' % (key, val)
+        else:
+            args += '&%s=%s' % (key, query[key])
+    return url + '?' + args[1:]
 
 
 @APP.template_filter('add_or_remove')
