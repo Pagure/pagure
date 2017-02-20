@@ -25,11 +25,6 @@ from mock import patch
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
 
-HERE = os.path.join(os.path.dirname(os.path.abspath(__file__)))
-CONFIG = os.path.join(HERE, 'test_config')
-
-os.environ['PAGURE_CONFIG'] = CONFIG
-
 import pagure.lib
 import tests
 from pagure.lib.repo import PagureRepo
@@ -41,8 +36,6 @@ class PagureFlaskRepoOldUrltests(tests.Modeltests):
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskRepoOldUrltests, self).setUp()
-
-        tests.reload_pagure(CONFIG)
 
         pagure.APP.config['TESTING'] = True
         pagure.SESSION = self.session
@@ -67,8 +60,6 @@ class PagureFlaskRepoOldUrltests(tests.Modeltests):
     def tearDown(self):
         """ Tear down the environnment, after every tests. """
         super(PagureFlaskRepoOldUrltests, self).tearDown()
-
-        tests.reload_pagure(CONFIG)
 
         pagure.APP.config['EMAIL_SEND'] = False
         pagure.LOG.handlers = []

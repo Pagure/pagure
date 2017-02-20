@@ -1,1 +1,1 @@
-OLD_VIEW_COMMIT_ENABLED = True
+PAGURE_CI_SERVICES = ['jenkins']

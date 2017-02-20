@@ -65,53 +65,6 @@ if os.environ.get('BUILD_ID')or os.environ.get('FAITOUT_URL'):
 # Remove the log handlers for the tests
 pagure.LOG.handlers = []
 
-
-def reload_pagure(config_file=None):
-    ''' Reload the different component of the pagure app.
-
-    You may want to use this for some tests that require a specific
-    configuration key to include or not a controller (for example the
-    old_commit endpoint that's included or not depending on a value in
-    the configuration file).
-    '''
-
-    # We need to reload pagure as otherwise the configuration file will
-    # not be taken into account
-    pagure.APP.view_functions = {}
-    if config_file:
-        os.environ['PAGURE_CONFIG'] = config_file
-    else:
-        if 'PAGURE_CONFIG' in os.environ:
-            del os.environ['PAGURE_CONFIG']
-
-    reload(pagure)
-    reload(pagure.lib)
-    reload(pagure.lib.model)
-    reload(pagure.hooks)
-    reload(pagure.hooks.mail)
-    reload(pagure.hooks.irc)
-    reload(pagure.hooks.fedmsg)
-    reload(pagure.hooks.pagure_force_commit)
-    reload(pagure.hooks.pagure_hook)
-    reload(pagure.hooks.pagure_request_hook)
-    reload(pagure.hooks.pagure_ticket_hook)
-    reload(pagure.hooks.pagure_ci)
-    reload(pagure.hooks.rtd)
-    reload(pagure.api)
-    reload(pagure.api.fork)
-    reload(pagure.api.issue)
-    reload(pagure.api.project)
-    reload(pagure.api.user)
-    reload(pagure.ui.admin)
-    reload(pagure.ui.app)
-    reload(pagure.ui.groups)
-    reload(pagure.ui.repo)
-    reload(pagure.ui.filters)
-    reload(pagure.ui.plugins)
-    reload(pagure.ui.issues)
-    reload(pagure.ui.fork)
-
-
 @contextmanager
 def user_set(APP, user):
     """ Set the provided user as fas_user in the provided application."""
