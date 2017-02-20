@@ -633,7 +633,6 @@ def view_issues(repo, username=None, namespace=None):
     if str(status).lower() in ['all']:
         status = None
 
-    oth_issues = None
     oth_issues_cnt = None
     total_issues_cnt = pagure.lib.search_issues(
             SESSION, repo, tags=tags, assignee=assignee,
@@ -671,7 +670,7 @@ def view_issues(repo, username=None, namespace=None):
             no_milestones=no_stone,
             count=True
         )
-        oth_issues = pagure.lib.search_issues(
+        oth_issues_cnt = pagure.lib.search_issues(
             SESSION,
             repo,
             closed=True if status.lower() != 'open' else False,
@@ -685,7 +684,6 @@ def view_issues(repo, username=None, namespace=None):
             no_milestones=no_stone,
             count=True,
         )
-        oth_issues_cnt = total_issues_cnt - issues_cnt
     else:
         issues = pagure.lib.search_issues(
             SESSION, repo, tags=tags, assignee=assignee,
@@ -714,7 +712,6 @@ def view_issues(repo, username=None, namespace=None):
         issues=issues,
         issues_cnt=issues_cnt,
         total_issues_cnt=total_issues_cnt,
-        oth_issues=oth_issues,
         oth_issues_cnt=oth_issues_cnt,
         tags=tags,
         assignee=assignee,

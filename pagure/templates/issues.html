@@ -48,7 +48,7 @@
       {% endif %}
     </span>
   </h2>
-    {% if oth_issues %}
+    {% if oth_issues_cnt %}
     <div class="addrem_bar issues_pbar m-b-1 {%
       if status|lower not in ['open', 'true'] %}closed{%
       endif %}" title="{{
@@ -56,7 +56,7 @@
       if status|lower in ['open', 'true'] %}closed{%
       else %}open{%
       endif %} issues on {{ total_issues_cnt }} issues in total">
-      {% if (issues | length + oth_issues) %}
+      {% if (issues | length + oth_issues_cnt) %}
         <span style="width: {{
           (100.0 * (issues_cnt / total_issues_cnt))|round|int }}%" title="{{
           (100.0 * (issues_cnt / total_issues_cnt))|round|int }}% of {%
