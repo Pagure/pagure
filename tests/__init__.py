@@ -149,6 +149,8 @@ class Modeltests(unittest.TestCase):
     def setUp(self):    # pylint: disable=invalid-name
         """ Set up the environnment, ran before every tests. """
         # Clean up eventual git repo left in the present folder.
+        pagure.REDIS = None
+        pagure.lib.REDIS = None
         self.path = tempfile.mkdtemp(prefix='pagure-tests')
         for folder in ['tickets', 'repos', 'forks', 'docs', 'requests',
                        'releases', 'remotes']:
