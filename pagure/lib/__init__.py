@@ -192,7 +192,7 @@ def search_user(session, username=None, email=None, token=None, pattern=None):
 
 
 def is_valid_ssh_key(key):
-""" Validates the ssh key using ssh-keygen. """
+    """ Validates the ssh key using ssh-keygen. """
     key = key.strip()
     if not key:
         return None
@@ -211,7 +211,7 @@ def is_valid_ssh_key(key):
 
 
 def are_valid_ssh_keys(keys):
-""" Checks if all the ssh keys are valid or not. """
+    """ Checks if all the ssh keys are valid or not. """
     return all([is_valid_ssh_key(key) is not False
                 for key in keys.split('\n')])
 
