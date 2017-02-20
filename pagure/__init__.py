@@ -204,6 +204,9 @@ pagure.lib.set_log(LOG)
 
 APP.wsgi_app = pagure.proxy.ReverseProxied(APP.wsgi_app)
 
+# Back port 'equalto' to older version of jinja2
+APP.jinja_env.tests.setdefault('equalto', lambda value, other: value == other)
+
 
 def authenticated():
     ''' Utility function checking if the current user is logged in or not.
