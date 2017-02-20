@@ -47,7 +47,9 @@ hash -r
 
 python setup.py build
 
-PYTHONPATH=pagure ./nosetests -v --with-xcoverage --cover-erase --cover-package=pagure
+PAGURE_CONFIG=`pwd`/tests/test_config \
+PYTHONPATH=pagure \
+./nosetests -v --with-xcoverage --cover-erase --cover-package=pagure
 
 if [ "$?" = "0" ]; then
 
