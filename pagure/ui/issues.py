@@ -668,6 +668,7 @@ def view_issues(repo, username=None, namespace=None):
             priority=priority,
             search_pattern=search_pattern,
             custom_search=custom_search,
+            no_milestones=no_stone,
             count=True
         )
         oth_issues = pagure.lib.search_issues(
@@ -681,6 +682,7 @@ def view_issues(repo, username=None, namespace=None):
             priority=priority,
             search_pattern=search_pattern,
             custom_search=custom_search,
+            no_milestones=no_stone,
             count=True,
         )
         oth_issues_cnt = total_issues_cnt - issues_cnt
