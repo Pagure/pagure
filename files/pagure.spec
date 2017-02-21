@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            2.12.1
+Version:            2.13
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -371,6 +371,24 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Tue Feb 21 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.13-1
+- Update to 2.13
+- Allow filtering issues for certain custom keys using <key>:<value> in the
+  search input (Patric Uiterwijk)
+- Make loading the JSON blob into the database its own async service
+- Add ACLs to pagure (Vivek Anand)
+- Fix running the tests against postgresql
+- Let the doc server return the content as is when it fails to decode it
+- Fix rendering a issue when one of the custom fields has not been properly
+  setup (ie a custom field of type list, with no options set-up but still having
+  a value for that ticket)
+- Fix auto-completion when adding a tag to a ticket
+- Add the possibility to filter the issues with no milestone assigned (Mark
+  Reynolds)
+- Fix the callback URL for jenkins for pagure-ci
+- Backport the equalto test to ensure it works on old jinja2 version (fixes
+  accessing the user's PR page)
+
 * Mon Feb 13 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.12.1-1
 - Update to 2.12.1
 - Include the build id in the flag set by pagure-ci on PR (Farhaan Bukhsh)
