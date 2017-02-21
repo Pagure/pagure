@@ -53,10 +53,8 @@ PAGURE_CONFIG=`pwd`/tests/test_config \
 PYTHONPATH=pagure \
 ./nosetests -v --with-xcoverage --cover-erase --cover-package=pagure
 
-if [ "$?" = "0" ]; then
-    set +e
+set +e
 
-    PYTHONPATH=pagure pylint -f parseable pagure | tee pylint.out
-    pep8 pagure/*.py pagure/*/*.py | tee pep8.out
+PYTHONPATH=pagure pylint -f parseable pagure | tee pylint.out
+pep8 pagure/*.py pagure/*/*.py | tee pep8.out
 
-fi
