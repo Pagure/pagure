@@ -9,8 +9,8 @@ git config --global user.name "Your Name"
 git merge --no-ff "proposed/$BRANCH" -m "Merge PR"
 
 echo "Running tests for branch $BRANCH of repo $REPO"
-echo "Last commit:"
-git log -1
+echo "Last commits:"
+git log -2
 fi
 
 
