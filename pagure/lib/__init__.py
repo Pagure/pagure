@@ -2197,11 +2197,11 @@ def search_issues(
                 )
         elif str(assignee).lower() in ['true', '1']:
             query = query.filter(
-                model.Issue.assignee_id != None
+                model.Issue.assignee_id.isnot(None)
             )
         else:
             query = query.filter(
-                model.Issue.assignee_id == None
+                model.Issue.assignee_id.is_(None)
             )
     if author is not None:
         query = query.filter(
@@ -2232,13 +2232,13 @@ def search_issues(
         if isinstance(milestones, basestring):
             milestones = [milestones]
         query = query.filter(
-            (model.Issue.milestone == None) |
+            (model.Issue.milestone.is_(None)) |
             (model.Issue.milestone.in_(milestones))
         )
     elif no_milestones:
         # Asking for issues without a milestone
         query = query.filter(
-            model.Issue.milestone == None
+            model.Issue.milestone.is_(None)
         )
     elif milestones is not None and milestones != []:
         # Asking for a single specific milestone
@@ -2428,11 +2428,11 @@ def search_pull_requests(
                 )
         elif str(assignee).lower() in ['true', '1']:
             query = query.filter(
-                model.PullRequest.assignee_id != None
+                model.PullRequest.assignee_id.isnot(None)
             )
         else:
             query = query.filter(
-                model.PullRequest.assignee_id == None
+                model.PullRequest.assignee_id.is_(None)
             )
 
     if author is not None:
