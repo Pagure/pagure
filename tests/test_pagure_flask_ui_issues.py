@@ -441,7 +441,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             '/test/issues?milestone=none')
         self.assertEqual(output.status_code, 200)
         self.assertIn('<title>Issues - test - Pagure</title>', output.data)
-        self.assertIn('1 Open Issues (of 2)', output.data)
+        self.assertIn('1 Open Issues (of 1)', output.data)
 
         # Search for issues with no milestone and milestone 1.1
         output = self.app.get(
