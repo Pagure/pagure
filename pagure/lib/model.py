@@ -8,8 +8,8 @@
 
 """
 
-__requires__ = ['SQLAlchemy >= 0.8', 'jinja2 >= 2.4']
-import pkg_resources
+__requires__ = ['SQLAlchemy >= 0.8', 'jinja2 >= 2.4']  # noqa
+import pkg_resources  # noqa
 
 import datetime
 import collections
@@ -32,7 +32,7 @@ from sqlalchemy.orm import relation
 CONVENTION = {
     "ix": 'ix_%(table_name)s_%(column_0_label)s',
     # Checks are currently buggy and prevent us from naming them correctly
-    #"ck": "ck_%(table_name)s_%(constraint_name)s",
+    # "ck": "ck_%(table_name)s_%(constraint_name)s",
     "fk": "%(table_name)s_%(column_0_name)s_fkey",
     "pk": "%(table_name)s_pkey",
     "uq": "%(table_name)s_%(column_0_name)s_key",
@@ -408,7 +408,8 @@ class Project(BASE):
         secondaryjoin="pagure_group.c.id==projects_groups.c.group_id",
         backref=backref(
             "projects",
-            order_by="func.lower(projects.c.namespace).desc(), func.lower(projects.c.name)"
+            order_by="func.lower(projects.c.namespace).desc(), \
+                      func.lower(projects.c.name)"
         )
     )
 
@@ -763,8 +764,10 @@ class DeployKey(BASE):
             'deploykeys', cascade="delete, delete-orphan", single_parent=True)
         )
 
-    creator_user = relation('User', foreign_keys=[creator_user_id],
-                    remote_side=[User.id])
+    creator_user = relation(
+        'User',
+        foreign_keys=[creator_user_id],
+        remote_side=[User.id])
 
 
 class Issue(BASE):
@@ -889,7 +892,9 @@ class Issue(BASE):
                     link, filename, display_name = extract_info(line)
                     attachments.append(
                         (link, filename, display_name,
-                         self.date_created.strftime('%Y-%m-%d %H:%M:%S'), None))
+                         self.date_created.strftime('%Y-%m-%d %H:%M:%S'),
+                         None)
+                    )
         if self.comments:
             # Check the comments for attachments
             for comment in self.comments:
@@ -903,7 +908,8 @@ class Issue(BASE):
                         link, filename, display_name = extract_info(line)
                         attachments.append(
                             (link, filename, display_name,
-                             comment.date_created.strftime('%Y-%m-%d %H:%M:%S'),
+                             comment.date_created.strftime(
+                                '%Y-%m-%d %H:%M:%S'),
                              str(comment.id)))
         return attachments
 
@@ -1173,13 +1179,15 @@ class IssueValues(BASE):
     issue = relation(
         'Issue', foreign_keys=[issue_uid], remote_side=[Issue.uid],
         backref=backref(
-            'other_fields', cascade="delete, delete-orphan", single_parent=True)
+            'other_fields',
+            cascade="delete, delete-orphan",
+            single_parent=True)
         )
 
     key = relation(
         'IssueKeys', foreign_keys=[key_id], remote_side=[IssueKeys.id],
         backref=backref('values', cascade="delete, delete-orphan")
-        )
+    )
 
 
 class Tag(BASE):
@@ -1226,7 +1234,6 @@ class TagIssue(BASE):
 
     def __repr__(self):
         return 'TagIssue(issue:%s, tag:%s)' % (self.issue.id, self.tag)
-
 
 
 class TagColored(BASE):
@@ -2088,7 +2095,9 @@ class PullRequestWatcher(BASE):
     )
 
     pull_request = relation(
-        'PullRequest', foreign_keys=[pull_request_uid], remote_side=[PullRequest.uid],
+        'PullRequest',
+        foreign_keys=[pull_request_uid],
+        remote_side=[PullRequest.uid],
         backref=backref(
             'watchers', cascade="delete, delete-orphan",
         ),
