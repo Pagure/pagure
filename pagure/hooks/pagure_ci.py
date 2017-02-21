@@ -115,7 +115,7 @@ class PagureCiForm(FlaskForm):
 
 
 class PagureCi(BaseHook):
-    ''' Mail hooks. '''
+    ''' Continuous Integration (CI) hooks. '''
 
     name = 'Pagure CI'
     description = 'Integrate continuous integration (CI) services into your '\

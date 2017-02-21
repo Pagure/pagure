@@ -24,7 +24,7 @@ from pagure import get_repo_path
 
 
 class MailTable(BASE):
-    """ Stores information about the irc hook deployed on a project.
+    """ Stores information about the mail hook deployed on a project.
 
     Table -- hook_mail
     """
