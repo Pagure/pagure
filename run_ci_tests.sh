@@ -44,6 +44,7 @@ trap deactivate SIGINT SIGTERM EXIT
 # Reload where the nosetests app is (within the venv)
 hash -r
 
+set -e
 
 python setup.py build
 
