@@ -14,8 +14,6 @@
 
 import pagure.exceptions
 import pagure.lib
-from pagure.lib import model
-from pagure.hooks import pagure_ci
 
 
 BUILD_STATS = {

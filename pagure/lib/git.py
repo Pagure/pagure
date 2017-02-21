@@ -1210,7 +1210,7 @@ def merge_pull_request(
     refname = '%s:refs/heads/%s' % (branch_ref.name, request.branch)
     if (
             (merge is not None and merge.is_uptodate)
-            or
+            or  # noqa
             (merge is None and
              mergecode & pygit2.GIT_MERGE_ANALYSIS_UP_TO_DATE)):
 
@@ -1236,7 +1236,7 @@ def merge_pull_request(
 
     elif (
             (merge is not None and merge.is_fastforward)
-            or
+            or  # noqa
             (merge is None and
              mergecode & pygit2.GIT_MERGE_ANALYSIS_FASTFORWARD)):
 
@@ -1349,7 +1349,8 @@ def diff_pull_request(
         raise pagure.exceptions.PagureException(
             'Fork is empty, there are no commits to request pulling')
 
-    if not orig_repo.is_empty and request.branch not in orig_repo.listall_branches():
+    if not orig_repo.is_empty \
+            and request.branch not in orig_repo.listall_branches():
         raise pagure.exceptions.PagureException(
             'The branch into which this pull-request was to be merged: %s '
             'seems to no longer be present in this repo' % request.branch)

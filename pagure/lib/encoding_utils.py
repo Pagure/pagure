@@ -17,7 +17,7 @@ import logging
 
 from chardet import universaldetector
 
-from pagure.exceptions import PagureException
+from pagure.exceptions import PagureEncodingException
 
 
 _log = logging.getLogger(__name__)

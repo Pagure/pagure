@@ -225,9 +225,6 @@ def create_deploykeys_ssh_keys_on_disk(project, gitolite_keydir):
         # Nothing to do here, move right along
         return
 
-        #keyline_file = os.path.join(gitolite_keydir,
-        #                            'keys_%i' % i,
-        #                            '%s.pub' % user.user)
     # First remove deploykeys that no longer exist
     keyfiles = ['deploykey_%s_%s.pub' %
                 (werkzeug.secure_filename(project.fullname),
@@ -605,9 +602,6 @@ def add_issue_dependency(
             repo=issue_blocked.project,
             repofolder=ticketfolder)
 
-        #pagure.lib.notify.notify_assigned_issue(issue, user_obj)
-        #pagure.lib.notify.notify_assigned_issue(issue_blocked, user_obj)
-
         if not issue.private:
             pagure.lib.notify.log(
                 issue.project,
@@ -664,9 +658,6 @@ def remove_issue_dependency(
             issue_blocked,
             repo=issue_blocked.project,
             repofolder=ticketfolder)
-
-        #pagure.lib.notify.notify_assigned_issue(issue, user_obj)
-        #pagure.lib.notify.notify_assigned_issue(issue_blocked, user_obj)
 
         if not issue.private:
             pagure.lib.notify.log(
@@ -810,8 +801,8 @@ def edit_issue_tags(
 
     # check for change
     no_change_in_tag = old_tag.tag == new_tag \
-                       and old_tag_description == new_tag_description \
-                       and old_tag_color == new_tag_color
+        and old_tag_description == new_tag_description \
+        and old_tag_color == new_tag_color
     if no_change_in_tag:
         raise pagure.exceptions.PagureException(
             'No change.  Old tag "%s(%s)[%s]" is the same as '
@@ -852,9 +843,12 @@ def edit_issue_tags(
             issue, repo=issue.project, repofolder=ticketfolder)
 
     msgs = []
-    msgs.append('Edited tag: %s(%s)[%s] to %s(%s)[%s]' %
-                (old_tag_name, old_tag_description, old_tag_color,
-                new_tag, new_tag_description, new_tag_color))
+    msgs.append(
+        'Edited tag: %s(%s)[%s] to %s(%s)[%s]' % (
+            old_tag_name, old_tag_description, old_tag_color,
+            new_tag, new_tag_description, new_tag_color
+        )
+    )
     pagure.lib.notify.log(
         project,
         topic='project.tag.edited',
@@ -897,7 +891,7 @@ def add_deploykey_to_project(session, project, ssh_key, pushaccess, user):
     # If we dupe keys, gitolite might choke.
     ssh_search_key = ssh_short_key.split(' ')[1]
     if session.query(model.DeployKey).filter(
-            model.DeployKey.ssh_search_key==ssh_search_key).count() != 0:
+            model.DeployKey.ssh_search_key == ssh_search_key).count() != 0:
         raise pagure.exceptions.PagureException(
             'Deploy key already exists.'
         )
@@ -926,8 +920,11 @@ def add_user_to_project(session, project, new_user, user, access='admin'):
     new_user_obj = get_user(session, new_user)
     user_obj = get_user(session, user)
 
-    users = set([user_.user for user_ in
-        get_project_users(session, project, access, combine=False)])
+    users = set([
+        user_.user
+        for user_ in get_project_users(
+            session, project, access, combine=False)
+    ])
     users.add(project.user.user)
 
     if new_user in users:
@@ -1014,8 +1011,11 @@ def add_group_to_project(
             'You are not allowed to add a group of users to this project'
         )
 
-    groups = set([group.group_name for group in
-        get_project_groups(session, project, access, combine=False)])
+    groups = set([
+        group.group_name
+        for group in get_project_groups(
+            session, project, access, combine=False)
+    ])
 
     if new_group in groups:
         raise pagure.exceptions.PagureException(
@@ -1302,7 +1302,7 @@ def new_project(session, user, name, blacklist, allowed_prefix,
     if repo:
         raise pagure.exceptions.RepoExistsException(
             'The project repo "%s" already exists in the database' % (
-            path)
+                path)
         )
 
     project = model.Project(
@@ -2505,7 +2505,7 @@ def close_pull_request(session, request, user, requestfolder, merged=True):
 def reset_status_pull_request(session, project):
     ''' Reset the status of all opened Pull-Requests of a project.
     '''
-    query = session.query(
+    session.query(
         model.PullRequest
     ).filter(
         model.PullRequest.project_id == project.id
@@ -2750,7 +2750,6 @@ def update_dependency_issue(
     toadd = set(depends) - set(issue.depends_text)
     torm = set(issue.depends_text) - set(depends)
     messages = []
-    comment = ""
 
     # Add issue depending
     for depend in sorted([int(i) for i in toadd]):
@@ -2816,7 +2815,6 @@ def update_blocked_issue(
         if issue_block.id in issue.blocks_text:  # pragma: no cover
             # we should never be in this case but better safe than sorry...
             continue
-
 
         add_issue_dependency(
             session,
@@ -3302,7 +3300,7 @@ def text2markdown(text, extended=True, readme=False):
     if text:
         try:
             text = md_processor.convert(text)
-        except Exception as err:
+        except Exception:
             LOG.debug(
                 'A markdown error occured while processing: ``%s``',
                 str(text))
@@ -3333,12 +3331,12 @@ def clean_input(text, ignore=None):
     attrs['table'] = ['class']
     attrs['span'] = ['class', 'id']
     attrs['div'] = ['class']
-    if not ignore or not 'img' in ignore:
+    if not ignore or 'img' not in ignore:
         attrs['img'] = filter_img_src
 
     tags = bleach.ALLOWED_TAGS + [
         'p', 'br', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-        'table', 'td', 'tr', 'th', 'thead','tbody',
+        'table', 'td', 'tr', 'th', 'thead', 'tbody',
         'col', 'pre', 'img', 'hr', 'dl', 'dt', 'dd', 'span',
         'kbd', 'var', 'del', 'cite',
     ]
@@ -3971,6 +3969,7 @@ def tokenize_search_string(pattern):
     """
     if pattern is None:
         return {}, None
+
     def finalize_token(token, custom_search):
         if ':' in token:
             # This was a "key:value" parameter
