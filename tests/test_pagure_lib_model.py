@@ -218,7 +218,7 @@ class PagureLibModeltests(tests.Modeltests):
         for ns, reponame in [
                 (None, 'aaa'), (None, 'KKK'), ('somenamespace', 'zzz')]:
 
-            repo = pagure.lib.get_project(
+            repo = pagure.get_authorized_project(
                 self.session, reponame, namespace=ns)
             msg = pagure.lib.add_group_to_project(
                 self.session,

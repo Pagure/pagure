@@ -1179,7 +1179,7 @@ class PagureLibtests(tests.Modeltests):
         self.session.rollback()
 
         # Re-create it, ignoring the existing repos on disk
-        repo = pagure.lib.get_project(self.session, 'testproject')
+        repo = pagure.lib._get_project(self.session, 'testproject')
         self.session.delete(repo)
         self.session.commit()
 

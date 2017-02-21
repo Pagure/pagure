@@ -1324,7 +1324,7 @@ def new_project(session, user, name, blacklist, allowed_prefix,
             )
 
     # Repo exists in the DB
-    repo = pagure.lib.get_project(session, name, namespace=namespace)
+    repo = pagure.get_authorized_project(session, name, namespace=namespace)
     if repo:
         raise pagure.exceptions.RepoExistsException(
             'The project repo "%s" already exists in the database' % (
