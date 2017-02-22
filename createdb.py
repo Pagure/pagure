@@ -4,8 +4,7 @@ from __future__ import print_function
 
 # These two lines are needed to run on EL6
 __requires__ = ['SQLAlchemy >= 0.8', 'jinja2 >= 2.4']
-import pkg_resources
-import sys
+import pkg_resources  # noqa
 
 import argparse
 import sys
@@ -46,20 +45,9 @@ if args.alembic_cfg:
 from pagure import APP
 from pagure.lib import model
 
-
 model.create_tables(
     APP.config['DB_URL'],
-    APP.config.get('PATH_ALEMBIC_INI', None),
+    APP.config.get('PATH_ALEMBIC_INI', args.alembic_cfg),
     acls=APP.config.get('ACLS', {}),
-    debug=True)
-
-
-if args.alembic_cfg:
-    from alembic import command
-    from alembic.config import Config
-
-    alembic_cfg = Config(args.alembic_cfg)
-    alembic_cfg.set_main_option("url", APP.config['DB_URL'])
-    command.stamp(alembic_cfg, "head")
-    print('Current alembic revision id is at:')
-    command.current(alembic_cfg)
+    debug=True
+)
