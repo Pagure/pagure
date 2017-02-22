@@ -81,6 +81,10 @@ html
   top: 3px !important; /* work around a small vertical misalignment */
 }
 
+.open_changed_file_icon:hover {
+  cursor: pointer;
+}
+
 .alert-info pre
 {
     background-color:#CFE5F0;
