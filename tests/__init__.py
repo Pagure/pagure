@@ -301,7 +301,7 @@ def create_tokens_acl(session, token_id='aaabbbcccddd'):
     session.commit()
 
 
-def add_content_git_repo(folder):
+def add_content_git_repo(folder, branch='master'):
     """ Create some content for the specified git repo. """
     if not os.path.exists(folder):
         os.makedirs(folder)
@@ -319,7 +319,8 @@ def add_content_git_repo(folder):
     parents = []
     commit = None
     try:
-        commit = repo.revparse_single('HEAD')
+        commit = repo.revparse_single(
+            'HEAD' if branch == 'master' else branch)
     except KeyError:
         pass
     if commit:
@@ -332,7 +333,7 @@ def add_content_git_repo(folder):
     committer = pygit2.Signature(
         'Cecil Committer', 'cecil@committers.tld')
     repo.create_commit(
-        'refs/heads/master',  # the name of the reference to update
+        'refs/heads/%s' % branch,  # the name of the reference to update
         author,
         committer,
         'Add sources file for testing',
@@ -345,7 +346,8 @@ def add_content_git_repo(folder):
     parents = []
     commit = None
     try:
-        commit = repo.revparse_single('HEAD')
+        commit = repo.revparse_single(
+            'HEAD' if branch == 'master' else branch)
     except KeyError:
         pass
     if commit:
@@ -370,7 +372,7 @@ def add_content_git_repo(folder):
     committer = pygit2.Signature(
         'Cecil Committer', 'cecil@committers.tld')
     repo.create_commit(
-        'refs/heads/master',  # the name of the reference to update
+        'refs/heads/%s' % branch,  # the name of the reference to update
         author,
         committer,
         'Add some directory and a file for more testing',
@@ -382,7 +384,8 @@ def add_content_git_repo(folder):
 
     # Push to origin
     ori_remote = repo.remotes[0]
-    master_ref = repo.lookup_reference('HEAD').resolve()
+    master_ref = repo.lookup_reference(
+        'HEAD' if branch == 'master' else 'refs/heads/%s' % branch).resolve()
     refname = '%s:%s' % (master_ref.name, master_ref.name)
 
     PagureRepo.push(ori_remote, refname)
