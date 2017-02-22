@@ -1364,7 +1364,7 @@ index 458821a..77674a8
         repo_obj = pygit2.init_repository(self.gitrepo, bare=True)
 
         repo = pagure.lib.get_project(self.session, 'test_ticket_repo')
-        # Create an issue to play with
+        # Create a PR to play with
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=repo,
@@ -2352,6 +2352,88 @@ index 0000000..60f7480
 
         custom_fields_of_issue = updated_issue.to_json().get('custom_fields')
         self.assertEqual(custom_fields_of_issue, custom_fields)
+
+    @patch('pagure.lib.notify.send_email')
+    @patch('pagure.lib.git.update_git')
+    def test_merge_pull_request_no_master(self, email_f, up_git):
+        """ Test the merge_pull_request function when there are no master
+        branch in the repo. """
+        email_f.return_value = True
+        up_git.return_value = True
+
+        gitfolder = os.path.join(self.path, 'repos')
+        docfolder = os.path.join(self.path, 'docs')
+        ticketfolder = os.path.join(self.path, 'tickets')
+        requestfolder = os.path.join(self.path, 'requests')
+
+        # Create project
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test',
+            description='test project',
+            hook_token='aaabbbwww',
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        gitrepo = os.path.join(gitfolder, repo.path)
+        docrepo = os.path.join(docfolder, repo.path)
+        ticketrepo = os.path.join(ticketfolder, repo.path)
+        requestrepo = os.path.join(requestfolder, repo.path)
+        os.makedirs(os.path.join(self.path, 'repos', 'forks', 'foo'))
+
+        self.gitrepo = os.path.join(self.path, 'repos', 'test.git')
+        os.makedirs(self.gitrepo)
+        repo_obj = pygit2.init_repository(self.gitrepo, bare=True)
+
+        # Fork the project
+        msg = pagure.lib.fork_project(
+            session=self.session,
+            user='foo',
+            repo=repo,
+            gitfolder=gitfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
+        )
+        self.session.commit()
+        self.assertEqual(
+            msg, 'Repo "test" cloned to "foo/test"')
+
+        # Create repo, with some content
+        self.gitrepo = os.path.join(
+            self.path, 'repos', 'forks', 'foo', 'test.git')
+        tests.add_content_git_repo(self.gitrepo, branch='feature')
+
+        fork_repo = pagure.lib.get_project(self.session, 'test', user='foo')
+        # Create a PR to play with
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=fork_repo,
+            branch_from='feature',
+            repo_to=repo,
+            branch_to='master',
+            title='test PR',
+            user='pingou',
+            requestfolder=self.path,
+            requestuid='foobar',
+            requestid=None,
+            status='Open',
+            notify=True
+        )
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test PR')
+
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.git.merge_pull_request,
+            self.session,
+            request=req,
+            username='pingou',
+            request_folder=os.path.join(self.path, 'requests'),
+            domerge=False
+        )
 
 
 if __name__ == '__main__':
