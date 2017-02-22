@@ -1251,7 +1251,8 @@ function updateHighlight(onload) {
       $('#pr-wrapper .tab-pane').removeClass('active');
       // When the hash points to 'Files Changed' tab, or a highlight.
       if (location.hash.indexOf("request_diff") > -1 ||
-          location.hash.indexOf("_") === 1) {
+          location.hash.indexOf("_") === 1 ||
+          location.hash.indexOf("c-") === 1) {
         $('[href="#request_diff"]').addClass('active');
         $('#request_diff').addClass('active');
       }
