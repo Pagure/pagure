@@ -221,8 +221,8 @@ tables, the database scheme.
 For changes to existing tables, we rely on `Alembic <http://alembic.readthedocs.org/>`_.
 It uses `revisions` to perform the upgrades, but to know which upgrades are
 needed and which are already done, the current revision needs to be saved
-in the database. This will allow alembic to know apply the new revision when
-running it.
+in the database. This will allow alembic to know and apply the new revision
+when running it.
 
 In the ``alembic.ini`` file, one of the configuration key is most important:
 ``script_location`` which is the path to the ``versions`` folder containing
@@ -265,6 +265,9 @@ pagure.
         changes upon upgrades, but the ``--initial`` argument should only
         be used the first time as it will otherwise break upgrading the
         database schema via alembic.
+
+.. note:: When install from source the script is called ``createdb.py`` and
+        not ``pagure_createdb.py``.
 
 
 Set up virus scanning
