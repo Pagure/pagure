@@ -1129,12 +1129,12 @@ def get_branch_ref(repo, branchname):
     if branchname not in repo.listall_branches():
         branchname = 'origin/%s' % branchname
         location = pygit2.GIT_BRANCH_REMOTE
-    branch_ref = repo.lookup_branch(branchname, location).resolve()
+    branch_ref = repo.lookup_branch(branchname, location)
 
-    if not branch_ref:
+    if not branch_ref or not branch_ref.resolve():
         raise pagure.exceptions.PagureException(
             'No refs found for %s' % branchname)
-    return branch_ref
+    return branch_ref.resolve()
 
 
 def merge_pull_request(
