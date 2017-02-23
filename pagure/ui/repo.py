@@ -476,7 +476,6 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
     """ Displays the content of a file or a tree for the specified repo.
     """
     repo = flask.g.repo
-    reponame = flask.g.reponame
     repo_obj = flask.g.repo_obj
 
     if repo_obj.is_empty:
@@ -512,7 +511,6 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
     if not content:
         flask.abort(404, 'File not found')
 
-    encoding = None
     readme = None
     safe = False
     readme_ext = None
@@ -565,6 +563,8 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
                         noclasses=True,
                         style=style,)
                 )
+                output_type = 'file'
+            else:
                 output_type = 'file'
         else:
             output_type = 'binary'
