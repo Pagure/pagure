@@ -3271,20 +3271,23 @@ def text2markdown(text, extended=True, readme=False):
     """ Simple text to html converter using the markdown library.
     """
     extensions = [
-        'markdown.extensions.abbr',
         'markdown.extensions.def_list',
         'markdown.extensions.fenced_code',
-        'markdown.extensions.footnotes',
         'markdown.extensions.tables',
         'markdown.extensions.smart_strong',
         # All of the above are the .extra extensions - the attribute lists one
         'markdown.extensions.admonition',
         'markdown.extensions.codehilite',
         'markdown.extensions.sane_lists',
-        'markdown.extensions.toc',
     ]
     # Some extensions are disabled for READMEs and enabled otherwise
-    if not readme:
+    if readme:
+        extensions.append(
+            'markdown.extensions.abbr',
+            'markdown.extensions.footnotes',
+            'markdown.extensions.toc',
+        )
+    else:
         extensions.append(
             'markdown.extensions.nl2br',
         )
