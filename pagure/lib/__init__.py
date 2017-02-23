@@ -337,7 +337,11 @@ def add_issue_comment(session, issue, comment, user, ticketfolder,
             redis=REDIS,
         )
 
-    if REDIS:
+    # TODO: we should notify the SSE server even on update of the ticket
+    # via git push to the ticket repo (the only case where notify=False
+    # basically), but this causes problem with some of our markdown extension
+    # so until we figure this out, we won't do live-refresh
+    if REDIS and notify:
         if issue.private:
             REDIS.publish('pagure.%s' % issue.uid, json.dumps({
                 'issue': 'private',
