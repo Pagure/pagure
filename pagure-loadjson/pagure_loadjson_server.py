@@ -136,7 +136,9 @@ def handle_messages():
         _log.info(
             'Received: %s on channel: %s',
             repr(reply.value), reply.channel)
+        _log.info('Loading the json')
         data = json.loads(reply.value)
+        _log.info('Done: loading the json')
 
         commits = data['commits']
         abspath = data['abspath']
@@ -154,7 +156,7 @@ def handle_messages():
         session = pagure.lib.create_session(pagure.APP.config['DB_URL'])
 
         _log.info('Looking for project: %s%s of user: %s',
-                 '%s/' % namespacerepo if namespace else '',
+                 '%s/' % namespace if namespace else '',
                  repo, username)
         project = pagure.lib.get_project(
             session, repo, user=username, namespace=namespace)
