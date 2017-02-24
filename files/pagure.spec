@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            2.13.1
+Version:            2.13.2
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -371,6 +371,12 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Fri Feb 24 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.13.2-1
+- Update to 2.13.2
+- Fix running the test suite due to bugs in the code:
+- Fix picking which markdown extensions are available
+- Fix rendering empty text files
+
 * Fri Feb 24 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.13.1-1
 - Update to 2.13.1
 - Add a cancel button on the edit file page (shivani)
