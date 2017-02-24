@@ -3286,11 +3286,11 @@ def text2markdown(text, extended=True, readme=False):
     ]
     # Some extensions are disabled for READMEs and enabled otherwise
     if readme:
-        extensions.append(
+        extensions.extend([
             'markdown.extensions.abbr',
             'markdown.extensions.footnotes',
             'markdown.extensions.toc',
-        )
+        ])
     else:
         extensions.append(
             'markdown.extensions.nl2br',
