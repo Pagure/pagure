@@ -159,14 +159,9 @@
         {% endif %}
 
     {% if output_type=='file' %}
-        {% if content.size != 0 %}
-            {% autoescape false %}
-            {{ content | format_loc }}
-            {% endautoescape %}
-        {% else %}
-            <p> No content in the file </p>
-        {% endif %}
-
+        {% autoescape false %}
+        {{ content | format_loc }}
+        {% endautoescape %}
     {% elif output_type == 'markup' %}
         <div class="m-a-2">
         {% autoescape false %}

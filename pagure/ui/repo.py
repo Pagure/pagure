@@ -541,7 +541,7 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
                 # file and let the user download it instead of displaying
                 # it.
                 output_type = 'binary'
-            if file_content:
+            if file_content is not None:
                 try:
                     lexer = guess_lexer_for_filename(
                         filename,
@@ -565,7 +565,7 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
                 )
                 output_type = 'file'
             else:
-                output_type = 'file'
+                output_type = 'binary'
         else:
             output_type = 'binary'
     else:
