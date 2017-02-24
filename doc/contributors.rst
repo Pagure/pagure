@@ -3,12 +3,12 @@ Contributors to pagure
 
 Pagure would be nothing without its contributors.
 
-On Feb 21, 2016 (release 2.13), the list looks as follow:
+On Feb 24, 2016 (release 2.13.1), the list looks as follow:
 
 =================  ===========
 Number of commits  Contributor
 =================  ===========
-  4979              Pierre-Yves Chibon <pingou@pingoured.fr>
+  4989              Pierre-Yves Chibon <pingou@pingoured.fr>
    191              Ryan Lerch <rlerch@redhat.com>
    116              Vivek Anand <vivekanand1101@gmail.com>
     89              farhaanbukhsh <farhaan.bukhsh@gmail.com>
@@ -16,9 +16,9 @@ Number of commits  Contributor
     59              Johan Cwiklinski <johan@x-tnd.be>
     45              Mark Reynolds <mreynolds@redhat.com>
     39              Patrick Uiterwijk <puiterwijk@redhat.com>
-    33              Farhaan Bukhsh <farhaan.bukhsh@gmail.com>
+    34              Farhaan Bukhsh <farhaan.bukhsh@gmail.com>
+    32              Pradeep CE (cep) <breathingcode@gmail.com>
     30              Lubomír Sedlář <lsedlar@redhat.com>
-    27              Pradeep CE (cep) <breathingcode@gmail.com>
     22              rahul Bajaj <you@example.com>
     20              Jeremy Cline <jeremy@jcline.org>
     19              Gaurav Kumar <aavrug@gmail.com>
@@ -61,6 +61,7 @@ Number of commits  Contributor
      2              William Moreno Reyes <williamjmorenor@gmail.com>
      2              bruno <bruno@wolff.to>
      2              dhrish20 <dhrish20@gmail.com>
+     2              shivani <smshivani579@gmail.com>
      2              “AnjaliPardeshi” <“anjalipardeshi92@gmail.com”>
      1              Aleksandra Fedorova (bookwar) <afedorova@mirantis.com>
      1              Amol Kahat <akahat@redhat.com>
@@ -86,7 +87,6 @@ Number of commits  Contributor
      1              pingou <pingou@fedoraproject.org>
      1              rishika7000 <rishika7000@gmail.com>
      1              ryanlerch <rlerch@redhat.com>
-     1              shivani <smshivani579@gmail.com>
      1              skrzepto <skrzepto@gmail.com>
      1              vibhcool <vibhcool@gmail.com>
 =================  ===========
