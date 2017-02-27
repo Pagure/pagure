@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2016 - Copyright Red Hat Inc
+ (c) 2014-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -140,7 +140,7 @@ def format_loc(loc, commit=None, filename=None, tree_id=None, prequest=None,
             continue
         if line.startswith('<div'):
             line = line.split('<pre style="line-height: 125%">')[1]
-            if prequest:
+            if prequest and prequest.project_from:
                 rangeline = line.partition('font-weight: bold">@@ ')[2] \
                     if line.partition('font-weight: bold">@@ ')[1] == \
                     'font-weight: bold">@@ ' else None
