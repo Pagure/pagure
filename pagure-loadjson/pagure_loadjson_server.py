@@ -177,7 +177,9 @@ def handle_messages():
         mail_body = []
 
         for idx, filename in enumerate(file_list):
-            _log.info('Loading: %s -- %s/%s', filename, idx+1, n)
+            _log.info(
+                'Loading: %s: %s -- %s/%s', project.fullname, filename,
+                idx+1, n)
             tmp = 'Loading: %s -- %s/%s' % (filename, idx+1, n)
             json_data = None
             data = ''.join(
