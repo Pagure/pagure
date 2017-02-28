@@ -295,45 +295,43 @@ def api_view_issues(repo, username=None, namespace=None):
     if is_repo_committer(repo):
         private = None
 
+    params = {
+        'session': SESSION,
+        'repo': repo,
+        'tags': tags,
+        'assignee': assignee,
+        'author': author,
+        'private': private,
+    }
+
     if status is not None:
-        params = {
-            'session': SESSION,
-            'repo': repo,
-            'tags': tags,
-            'assignee': assignee,
-            'author': author,
-            'private': private
-        }
-        if status.lower() == 'closed':
+        if status.lower() == 'all':
+            params.update({'status': None})
+        elif status.lower() == 'closed':
             params.update({'closed': True})
-        elif status.lower() != 'all':
+        else:
             params.update({'status': status})
-        issues = pagure.lib.search_issues(**params)
-    else:
-        updated_after = None
-        if since:
-            # Validate and convert the time
-            if since.isdigit():
-                # We assume its a timestamp, so convert it to datetime
-                try:
-                    updated_after = \
-                        datetime.datetime.fromtimestamp(int(since))
-                except ValueError:
-                    raise pagure.exceptions.APIError(
-                        400, error_code=APIERROR.ETIMESTAMP)
-            else:
-                # We assume datetime format, so validate it
-                try:
-                    updated_after= datetime.datetime.strptime(
-                        since, '%Y-%m-%d')
-                except ValueError:
-                    raise pagure.exceptions.APIError(
-                        400, error_code=APIERROR.EDATETIME)
 
-        issues = pagure.lib.search_issues(
-            SESSION, repo, status='Open', tags=tags, assignee=assignee,
-            author=author, private=private, updated_after=updated_after)
+    updated_after = None
+    if since:
+        # Validate and convert the time
+        if since.isdigit():
+            # We assume its a timestamp, so convert it to datetime
+            try:
+                updated_after = datetime.datetime.fromtimestamp(int(since))
+            except ValueError:
+                raise pagure.exceptions.APIError(
+                    400, error_code=APIERROR.ETIMESTAMP)
+        else:
+            # We assume datetime format, so validate it
+            try:
+                updated_after = datetime.datetime.strptime(since, '%Y-%m-%d')
+            except ValueError:
+                raise pagure.exceptions.APIError(
+                    400, error_code=APIERROR.EDATETIME)
 
+    params.update({'updated_after': updated_after})
+    issues = pagure.lib.search_issues(**params)
     jsonout = flask.jsonify({
         'total_issues': len(issues),
         'issues': [issue.to_json(public=True) for issue in issues],
