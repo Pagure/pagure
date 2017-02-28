@@ -1957,7 +1957,7 @@ def search_projects(
         pattern = pattern.replace('*', '%')
         if '%' in pattern:
             projects = projects.filter(
-                model.Project.name.like(pattern)
+                model.Project.name.ilike(pattern)
             )
         else:
             projects = projects.filter(
