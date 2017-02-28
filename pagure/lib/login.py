@@ -48,27 +48,6 @@ def get_session_by_visitkey(session, sessionid):
     return query.first()
 
 
-def get_users_by_group(session, group):
-    ''' Return the list of users for a specified group.
-
-    :arg session: the session with which to connect to the database.
-
-    '''
-    query = session.query(
-        model.User
-    ).filter(
-        model.User.id == model.PagureUserGroup.user_id
-    ).filter(
-        model.PagureUserGroup.group_id == model.PagureGroup.id
-    ).filter(
-        model.PagureGroup.group_name == group
-    ).order_by(
-        model.User.user
-    )
-
-    return query.all()
-
-
 def generate_hashed_value(password):
     """ Generate hash value for password
     """

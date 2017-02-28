@@ -40,12 +40,6 @@ class PagureLibLogintests(tests.Modeltests):
             'aaa'
         )
 
-    def test_get_users_by_group(self):
-        ''' Test pagure.lib.login.get_users_by_group. '''
-
-        users = pagure.lib.login.get_users_by_group(self.session, 'foo')
-        self.assertEqual(users, [])
-
     def test_get_session_by_visitkey(self):
         ''' Test pagure.lib.login.get_session_by_visitkey. '''
 
