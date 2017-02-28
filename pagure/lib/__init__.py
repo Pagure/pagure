@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2016 - Copyright Red Hat Inc
+ (c) 2014-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -1162,6 +1162,7 @@ def edit_comment(session, parent, comment, user,
     topic = 'unknown'
     key = 'unknown'
     id_ = 'unknown'
+    private = False
     if parent.isa == 'pull-request':
         topic = 'pull-request.comment.edited'
         key = 'pullrequest'
@@ -1170,21 +1171,23 @@ def edit_comment(session, parent, comment, user,
         topic = 'issue.comment.edited'
         key = 'issue'
         id_ = 'issue_id'
+        private = parent.private
 
-    pagure.lib.notify.log(
-        parent.project,
-        topic=topic,
-        msg={
-            key: parent.to_json(public=True, with_comments=False),
-            'project': parent.project.to_json(public=True),
-            'comment': comment.to_json(public=True),
-            'agent': user_obj.username,
-        },
-        redis=REDIS,
-    )
+    if not private:
+        pagure.lib.notify.log(
+            parent.project,
+            topic=topic,
+            msg={
+                key: parent.to_json(public=True, with_comments=False),
+                'project': parent.project.to_json(public=True),
+                'comment': comment.to_json(public=True),
+                'agent': user_obj.username,
+            },
+            redis=REDIS,
+        )
 
     if REDIS:
-        if parent.isa == 'issue' and comment.parent.private:
+        if private:
             REDIS.publish('pagure.%s' % comment.parent.uid, json.dumps({
                 'comment_updated': 'private',
                 'comment_id': comment.id,
