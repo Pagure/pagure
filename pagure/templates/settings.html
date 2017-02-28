@@ -1007,7 +1007,7 @@
             namespace=repo.namespace) }}"
               method="post" class="icon">
           <button class="btn btn-danger" type="submit"
-            onclick="return confirm('Are you sure to delete {{repo.name}}? \nThis is final and cannot be un-done.');"
+            onclick="return confirm('Are you sure to delete {{ repo.fullname }}? \nThis is final and cannot be un-done.');"
             title="Delete the project/fork">
               <span class="oi" data-glyph="trash"></span>&nbsp; Delete the {{repo.name}} project
           </button>
