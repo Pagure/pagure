@@ -108,16 +108,16 @@
                       username=username,
                       namespace=repo.namespace,
                       repo=repo.name ) }}" method="GET">
-          <div class="input-group">
             <input type="hidden" name="status" value="{{ status or 'all' }}" />
             {% for tag in tags %}
             <input type="hidden" name="tags" value="{{ tag }}" />
             {% endfor %}
-             <input type="text" class="form-control input-sm"
+          <div class="input-group input-group-sm">
+             <input type="text" class="form-control"
                     name="search_pattern" placeholder="Search"
                     value="{{ search_pattern or '' }}" />
              <span class="input-group-btn">
-                <input type="submit" class="btn btn-secondary btn-sm" value="Go!" />
+                <input type="submit" class="btn btn-secondary" value="Go!" />
              </span>
           </div>
        </form>
