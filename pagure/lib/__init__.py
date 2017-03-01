@@ -1507,7 +1507,8 @@ def new_pull_request(session, branch_from,
                      requestfolder, initial_comment=None,
                      repo_from=None, remote_git=None,
                      requestuid=None, requestid=None,
-                     status='Open', notify=True):
+                     status='Open', notify=True,
+                     commit_start=None, commit_stop=None):
     ''' Create a new pull request on the specified repo. '''
     if not repo_from and not remote_git:
         raise pagure.exceptions.PagureException(
@@ -1528,6 +1529,8 @@ def new_pull_request(session, branch_from,
         initial_comment=initial_comment or None,
         user_id=user_obj.id,
         status=status,
+        commit_start=commit_start,
+        commit_stop=commit_stop,
     )
     request.last_updated = datetime.datetime.utcnow()
 

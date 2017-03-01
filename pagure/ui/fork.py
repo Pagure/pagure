@@ -1061,6 +1061,10 @@ def new_request_pull(
                 orig_commit = orig_commit.oid.hex
 
             initial_comment = form.initial_comment.data.strip() or None
+            commit_start = commit_stop = None
+            if diff_commits:
+                commit_stop = diff_commits[0].oid.hex
+                commit_start = diff_commits[-1].oid.hex
             request = pagure.lib.new_pull_request(
                 SESSION,
                 repo_to=parent,
@@ -1071,6 +1075,8 @@ def new_request_pull(
                 initial_comment=initial_comment,
                 user=flask.g.fas_user.username,
                 requestfolder=APP.config['REQUESTS_FOLDER'],
+                commit_start=commit_start,
+                commit_stop=commit_stop,
             )
 
             try:
