@@ -295,7 +295,7 @@
               {% endif %}
             </div>
           </fieldset>
-          {% if authenticated and g.repo_admin %}
+          {% if authenticated and g.repo_user %}
             {{ render_bootstrap_field(form.milestone,
               formclass="issue-metadata-form") }}
           {% endif%}
