@@ -51,7 +51,8 @@ def get_session_by_visitkey(session, sessionid):
 def generate_hashed_value(password):
     """ Generate hash value for password
     """
-    return '$2$' + bcrypt.hashpw(to_unicode(password), bcrypt.gensalt())
+    return '$2$' + bcrypt.hashpw(to_unicode(password).encode('UTF_8'),
+                                 bcrypt.gensalt())
 
 
 def check_password(entered_password, user_password, seed=None):
@@ -65,7 +66,8 @@ def check_password(entered_password, user_password, seed=None):
     _, version, user_password = user_password.split('$', 2)
 
     if version == '2':
-        password = bcrypt.hashpw(to_unicode(entered_password), user_password)
+        password = bcrypt.hashpw(to_unicode(entered_password).encode('UTF_8'),
+                                 user_password)
 
     elif version == '1':
         password = '%s%s' % (to_unicode(entered_password), seed)
