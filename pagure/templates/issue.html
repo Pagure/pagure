@@ -307,7 +307,7 @@
             <label><strong class="red-icon">Private</strong></label>
           </fieldset>
           {% endif %}
-          {% if authenticated and g.repo_admin %}
+          {% if authenticated and g.repo_user %}
             {{ render_bootstrap_field(form.private,
               formclass="issue-metadata-form") }}
           {% endif%}
