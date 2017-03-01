@@ -15,6 +15,10 @@
 import pagure.exceptions
 import pagure.lib
 
+# This import is needed as pagure.lib relies on Project.ci_hook to be
+# defined and accessible and this happens in pagure.hooks.pagure_ci
+from pagure.hooks import pagure_ci  # noqa
+
 
 BUILD_STATS = {
     'SUCCESS': ('Build successful', 100),
