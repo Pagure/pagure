@@ -1466,8 +1466,11 @@ def get_git_tags_objects(project):
     tags = {}
     for tag in repo_obj.listall_references():
         if 'refs/tags/' in tag and repo_obj.lookup_reference(tag):
-            commit_time = ""
-            theobject = repo_obj[repo_obj.lookup_reference(tag).target]
+            commit_time = None
+            try:
+                theobject = repo_obj[repo_obj.lookup_reference(tag).target]
+            except ValueError:
+                theobject = None
             objecttype = ""
             if isinstance(theobject, pygit2.Tag):
                 commit_time = theobject.get_object().commit_time
@@ -1477,7 +1480,7 @@ def get_git_tags_objects(project):
                 objecttype = "commit"
 
             tags[commit_time] = {
-                "object": repo_obj[repo_obj.lookup_reference(tag).target],
+                "object": theobject,
                 "tagname": tag.replace("refs/tags/", ""),
                 "date": commit_time,
                 "objecttype": objecttype,
