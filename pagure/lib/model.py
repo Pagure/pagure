@@ -379,7 +379,8 @@ class Project(BASE):
         secondary="user_projects",
         primaryjoin="projects.c.id==user_projects.c.project_id",
         secondaryjoin="users.c.id==user_projects.c.user_id",
-        backref='co_projects'
+        backref='co_projects',
+        viewonly=True
     )
 
     admins = relation(
@@ -388,7 +389,8 @@ class Project(BASE):
         primaryjoin="projects.c.id==user_projects.c.project_id",
         secondaryjoin="and_(users.c.id==user_projects.c.user_id,\
                 user_projects.c.access=='admin')",
-        backref='co_projects_admins'
+        backref='co_projects_admins',
+        viewonly=True
     )
 
     committers = relation(
@@ -398,7 +400,8 @@ class Project(BASE):
         secondaryjoin="and_(users.c.id==user_projects.c.user_id,\
                 or_(user_projects.c.access=='commit',\
                     user_projects.c.access=='admin'))",
-        backref='co_projects_committers'
+        backref='co_projects_committers',
+        viewonly=True
     )
 
     groups = relation(
@@ -410,7 +413,8 @@ class Project(BASE):
             "projects",
             order_by="func.lower(projects.c.namespace).desc(), \
                       func.lower(projects.c.name)"
-        )
+        ),
+        viewonly=True
     )
 
     admin_groups = relation(
@@ -420,6 +424,7 @@ class Project(BASE):
         secondaryjoin="and_(pagure_group.c.id==projects_groups.c.group_id,\
                 projects_groups.c.access=='admin')",
         backref="projects_admin_groups",
+        viewonly=True
     )
 
     committer_groups = relation(
@@ -430,6 +435,7 @@ class Project(BASE):
                 or_(projects_groups.c.access=='admin',\
                     projects_groups.c.access=='commit'))",
         backref="projects_committer_groups",
+        viewonly=True
     )
 
     unwatchers = relation(
@@ -725,7 +731,11 @@ class ProjectUser(BASE):
 
     project = relation(
         'Project', remote_side=[Project.id],
-        backref='user_projects')
+        backref=backref(
+            'user_projects', cascade="delete,delete-orphan",
+            single_parent=True
+        )
+    )
 
     user = relation('User', backref='user_projects')
 
@@ -826,8 +836,10 @@ class Issue(BASE):
     project = relation(
         'Project', foreign_keys=[project_id], remote_side=[Project.id],
         backref=backref(
-            'issues', cascade="delete, delete-orphan", single_parent=True)
-        )
+            'issues', cascade="delete, delete-orphan",
+        ),
+        single_parent=True
+    )
 
     user = relation('User', foreign_keys=[user_id],
                     remote_side=[User.id], backref='issues')
@@ -847,6 +859,7 @@ class Issue(BASE):
         secondary="tags_issues_colored",
         primaryjoin="issues.c.uid==tags_issues_colored.c.issue_uid",
         secondaryjoin="tags_issues_colored.c.tag_id==tags_colored.c.id",
+        viewonly=True
     )
 
     def __repr__(self):
@@ -1262,7 +1275,10 @@ class TagColored(BASE):
 
     project = relation(
         'Project', foreign_keys=[project_id], remote_side=[Project.id],
-        backref="tags_colored",
+        backref=backref(
+            'tags_colored', cascade="delete,delete-orphan",
+            single_parent=True
+        )
     )
 
     def __repr__(self):
@@ -1846,8 +1862,12 @@ class ProjectGroup(BASE):
         nullable=False)
 
     project = relation(
-        'Project', remote_side=[Project.id],
-        backref='projects_groups')
+        'Project', foreign_keys=[project_id], remote_side=[Project.id],
+        backref=backref(
+            'projects_groups', cascade="delete,delete-orphan",
+            single_parent=True
+        )
+    )
 
     group = relation('PagureGroup', backref='projects_groups')
 

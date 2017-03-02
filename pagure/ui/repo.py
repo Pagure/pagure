@@ -1485,14 +1485,8 @@ def delete_repo(repo, username=None, namespace=None):
             'You are not allowed to change the settings for this project')
 
     try:
-        for issue in repo.issues:
-            for comment in issue.comments:
-                SESSION.delete(comment)
-            SESSION.commit()
-            SESSION.delete(issue)
         SESSION.delete(repo)
         SESSION.commit()
-
     except SQLAlchemyError as err:  # pragma: no cover
         SESSION.rollback()
         APP.logger.exception(err)

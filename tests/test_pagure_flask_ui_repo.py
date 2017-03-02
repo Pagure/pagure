@@ -2714,7 +2714,6 @@ index 0000000..fb7093d
 
         pagure.APP.config['ENABLE_DEL_PROJECTS'] = True
 
-
     @patch('pagure.lib.notify.send_email')
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_delete_repo(self, ast, send_email):
@@ -2975,6 +2974,274 @@ index 0000000..fb7093d
             self.assertIn(
                 'Forks <span class="label label-default">0</span>',
                 output.data)
+
+    @patch('pagure.lib.notify.send_email')
+    @patch('pagure.ui.repo.admin_session_timedout')
+    def test_delete_repo_with_users(self, ast, send_email):
+        """ Test the delete_repo endpoint. """
+        ast.return_value = False
+        send_email.return_value = True
+
+        user = tests.FakeUser()
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            # Create new project
+            item = pagure.lib.model.Project(
+                user_id=1,  # pingou
+                name='test',
+                description='test project #1',
+                hook_token='aaabbbiii',
+            )
+            self.session.add(item)
+            self.session.commit()
+
+            # Create all the git repos
+            tests.create_projects_git(self.path)
+            tests.create_projects_git(
+                os.path.join(self.path, 'docs'), bare=True)
+            tests.create_projects_git(
+                os.path.join(self.path, 'tickets'), bare=True)
+            tests.create_projects_git(
+                os.path.join(self.path, 'requests'), bare=True)
+
+            # Check repo was created
+            output = self.app.get('/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n            My Projects <span '
+                'class="label label-default">1</span>', output.data)
+            self.assertIn(
+                'Forks <span class="label label-default">0</span>',
+                output.data)
+
+            # add user
+            repo = pagure.lib.get_project(self.session, 'test')
+            msg = pagure.lib.add_user_to_project(
+                session=self.session,
+                project=repo,
+                new_user='foo',
+                user='pingou',
+            )
+            self.session.commit()
+            self.assertEqual(msg, 'User added')
+
+            # Check before deleting the project
+            output = self.app.get('/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n            My Projects <span '
+                'class="label label-default">1</span>', output.data)
+            self.assertIn(
+                'Forks <span class="label label-default">0</span>',
+                output.data)
+            repo = pagure.lib.get_project(self.session, 'test')
+            self.assertNotEqual(repo, None)
+            repo = pagure.lib.get_project(self.session, 'test2')
+            self.assertEqual(repo, None)
+
+            # Delete the project
+            output = self.app.post('/test/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n            Projects <span '
+                'class="label label-default">0</span>', output.data)
+            self.assertIn(
+                'Forks <span class="label label-default">0</span>',
+                output.data)
+
+            # Check after
+            repo = pagure.lib.get_project(self.session, 'test')
+            self.assertEqual(repo, None)
+            repo = pagure.lib.get_project(self.session, 'test2')
+            self.assertEqual(repo, None)
+
+    @patch('pagure.lib.notify.send_email')
+    @patch('pagure.ui.repo.admin_session_timedout')
+    def test_delete_repo_with_group(self, ast, send_email):
+        """ Test the delete_repo endpoint. """
+        ast.return_value = False
+        send_email.return_value = True
+
+        user = tests.FakeUser()
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            # Create new project
+            item = pagure.lib.model.Project(
+                user_id=1,  # pingou
+                name='test',
+                description='test project #1',
+                hook_token='aaabbbiii',
+            )
+            self.session.add(item)
+            self.session.commit()
+
+            # Create all the git repos
+            tests.create_projects_git(self.path)
+            tests.create_projects_git(
+                os.path.join(self.path, 'docs'), bare=True)
+            tests.create_projects_git(
+                os.path.join(self.path, 'tickets'), bare=True)
+            tests.create_projects_git(
+                os.path.join(self.path, 'requests'), bare=True)
+
+            # Check repo was created
+            output = self.app.get('/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n            My Projects <span '
+                'class="label label-default">1</span>', output.data)
+            self.assertIn(
+                'Forks <span class="label label-default">0</span>',
+                output.data)
+
+            # Create group
+            msg = pagure.lib.add_group(
+                self.session,
+                group_name='foo',
+                display_name='foo group',
+                description=None,
+                group_type='bar',
+                user='pingou',
+                is_admin=False,
+                blacklist=[],
+            )
+            self.session.commit()
+            self.assertEqual(msg, 'User `pingou` added to the group `foo`.')
+
+            # Add group to the project
+            repo = pagure.lib.get_project(self.session, 'test')
+            msg = pagure.lib.add_group_to_project(
+                session=self.session,
+                project=repo,
+                new_group='foo',
+                user='pingou',
+            )
+            self.session.commit()
+            self.assertEqual(msg, 'Group added')
+
+            # check if group where we expect it
+            repo = pagure.lib.get_project(self.session, 'test')
+            self.assertEqual(len(repo.projects_groups), 1)
+
+            # Check before deleting the project
+            output = self.app.get('/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n            My Projects <span '
+                'class="label label-default">1</span>', output.data)
+            self.assertIn(
+                'Forks <span class="label label-default">0</span>',
+                output.data)
+            repo = pagure.lib.get_project(self.session, 'test')
+            self.assertNotEqual(repo, None)
+
+            # Delete the project
+            output = self.app.post('/test/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n            Projects <span '
+                'class="label label-default">0</span>', output.data)
+            self.assertIn(
+                'Forks <span class="label label-default">0</span>',
+                output.data)
+
+            # Check after
+            repo = pagure.lib.get_project(self.session, 'test')
+            self.assertEqual(repo, None)
+
+    @patch('pagure.lib.notify.send_email')
+    @patch('pagure.ui.repo.admin_session_timedout')
+    def test_delete_repo_with_coloredtag(self, ast, send_email):
+        """ Test the delete_repo endpoint. """
+        ast.return_value = False
+        send_email.return_value = True
+
+        user = tests.FakeUser()
+        user = tests.FakeUser(username='pingou')
+        with tests.user_set(pagure.APP, user):
+            # Create new project
+            item = pagure.lib.model.Project(
+                user_id=1,  # pingou
+                name='test',
+                description='test project #1',
+                hook_token='aaabbbiii',
+            )
+            self.session.add(item)
+            self.session.commit()
+
+            # Create all the git repos
+            tests.create_projects_git(self.path)
+            tests.create_projects_git(
+                os.path.join(self.path, 'docs'), bare=True)
+            tests.create_projects_git(
+                os.path.join(self.path, 'tickets'), bare=True)
+            tests.create_projects_git(
+                os.path.join(self.path, 'requests'), bare=True)
+
+            # Check repo was created
+            output = self.app.get('/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n            My Projects <span '
+                'class="label label-default">1</span>', output.data)
+            self.assertIn(
+                'Forks <span class="label label-default">0</span>',
+                output.data)
+
+            # Create the issue
+            repo = pagure.lib.get_project(self.session, 'test')
+            msg = pagure.lib.new_issue(
+                session=self.session,
+                repo=repo,
+                title='Test issue',
+                content='We should work on this',
+                user='pingou',
+                ticketfolder=os.path.join(self.path, 'tickets')
+            )
+            self.session.commit()
+            self.assertEqual(msg.title, 'Test issue')
+
+            # Add a tag to the issue
+            repo = pagure.lib.get_project(self.session, 'test')
+            issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+            msg = pagure.lib.add_tag_obj(
+                session=self.session,
+                obj=issue,
+                tags='tag1',
+                user='pingou',
+                ticketfolder=None)
+            self.session.commit()
+            self.assertEqual(msg, 'Issue tagged with: tag1')
+
+            # Check before deleting the project
+            output = self.app.get('/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n            My Projects <span '
+                'class="label label-default">1</span>', output.data)
+            self.assertIn(
+                'Forks <span class="label label-default">0</span>',
+                output.data)
+            repo = pagure.lib.get_project(self.session, 'test')
+            self.assertNotEqual(repo, None)
+            repo = pagure.lib.get_project(self.session, 'test2')
+            self.assertEqual(repo, None)
+
+            # Delete the project
+            output = self.app.post('/test/delete', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n            Projects <span '
+                'class="label label-default">0</span>', output.data)
+            self.assertIn(
+                'Forks <span class="label label-default">0</span>',
+                output.data)
+
+            # Check after
+            repo = pagure.lib.get_project(self.session, 'test')
+            self.assertEqual(repo, None)
+            repo = pagure.lib.get_project(self.session, 'test2')
+            self.assertEqual(repo, None)
 
     @patch('pagure.ui.repo.admin_session_timedout')
     def test_new_repo_hook_token(self, ast):
