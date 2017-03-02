@@ -55,7 +55,8 @@ def jinja_render(tmpl, **kwargs):
 def humanize_date(date):
     """ Template filter returning the last commit date of the provided repo.
     """
-    return arrow.get(date).humanize()
+    if date:
+        return arrow.get(date).humanize()
 
 
 @APP.template_filter('format_ts')
