@@ -4091,6 +4091,51 @@ class PagureLibtests(tests.Modeltests):
             self.assertEqual(pagure.lib.tokenize_search_string(inp),
                              (flds, rem))
 
+    def test_save_report(self):
+        """ Test the save_report function. """
+        # Create the projects
+        tests.create_projects(self.session)
+
+        project = pagure.lib.get_project(self.session, name='test')
+        self.assertEqual(project.reports, {})
+
+        name = 'test report'
+        url = '?foo=bar&baz=biz'
+
+        pagure.lib.save_report(
+            self.session,
+            repo=project,
+            name=name,
+            url=url,
+            username=None
+        )
+
+        project = pagure.lib.get_project(self.session, name='test')
+        self.assertEqual(
+            project.reports,
+            {'test report': {'baz': 'biz', 'foo': 'bar'}}
+        )
+
+        name = 'test report #2'
+        url = '?foo=bar&foo=none&foo=baz'
+
+        pagure.lib.save_report(
+            self.session,
+            repo=project,
+            name=name,
+            url=url,
+            username=None
+        )
+
+        project = pagure.lib.get_project(self.session, name='test')
+        self.assertEqual(
+            project.reports,
+            {
+                'test report': {'baz': 'biz', 'foo': 'bar'},
+                'test report #2': {'foo': ['bar', 'none', 'baz']}
+            }
+        )
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibtests)
