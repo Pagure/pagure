@@ -110,7 +110,7 @@
             repo=repo.parent.name,
             username=repo.parent.user.user if repo.parent.is_fork else None,
             namespace=repo.parent.namespace)}}">
-            {{ repo.parent.namespace + '/' if repo.parent.namespace }}{{ repo.parent.fullname }}
+            {{ repo.parent.fullname }}
           </a>
         </div>
         {% elif repo.is_fork and not repo.parent %}
