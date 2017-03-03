@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2016 - Copyright Red Hat Inc
+ (c) 2016-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -166,7 +166,7 @@ class PagureFlaskSlashInNametests(tests.Modeltests):
         self.assertIn(
             '<title>Issues - forks/test - Pagure</title>', output.data)
         self.assertIn(
-            '<td colspan="5" class="noresult">No issues found</td>',
+            '<td colspan="6" class="noresult">No issues found</td>',
             output.data)
 
     @patch('pagure.lib.notify.send_email')
@@ -238,7 +238,7 @@ class PagureFlaskSlashInNametests(tests.Modeltests):
         self.assertIn(
             '<title>Issues - forks/test - Pagure</title>', output.data)
         self.assertIn(
-            '<td colspan="5" class="noresult">No issues found</td>',
+            '<td colspan="6" class="noresult">No issues found</td>',
             output.data)
 
         # Try accessing the commit
