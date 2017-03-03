@@ -3715,7 +3715,15 @@ def save_report(session, repo, name, url, username):
     """
     url_obj = urlparse.urlparse(url)
     url = url_obj.geturl().replace(url_obj.query, '')
-    query = dict(urlparse.parse_qsl(url_obj.query))
+    query = {}
+    for k, v in urlparse.parse_qsl(url_obj.query):
+        if k in query:
+            if isinstance(query[k], list):
+                query[k].append(v)
+            else:
+                query[k] = [query[k], v]
+        else:
+            query[k] = v
     reports = repo.reports
     reports[name] = query
     repo.reports = reports
