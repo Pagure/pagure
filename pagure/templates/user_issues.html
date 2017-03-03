@@ -20,9 +20,9 @@
 
     {% for issues in (user.assigned_issues, user.issues) %}
       {% if loop.index == 1 %}
-        <b>Assigned Issues</b>
+        <b>Assigned Issues {{ issues | length }}</b>
       {% else %}
-        <b>Opened Issues</b>
+        <b>Opened Issues {{ issues | length }}</b>
       {% endif %}
       <table class="table table-hover table-striped m-b-0 m-t-1">
         <thead class="thead-default">
