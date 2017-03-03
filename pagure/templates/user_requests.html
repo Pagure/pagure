@@ -45,6 +45,7 @@
               <th class="nowrap">#</th>
               <th>Status</th>
               <th>Title</th>
+              <th>Merge Status</th>
               <th class="open_date nowrap">Opened</th>
               <th class="nowrap">Project</th>
               <th class="nowrap">Opened by</th>
@@ -79,6 +80,15 @@
                 {{ request.title | noJS("img") | safe }}
               </a>
             </td>
+            <td>
+              <span class="label {%
+                if request.merge_status|lower in ['no_change', 'fforward'] %}label-success{%
+                elif request.merge_status|lower == 'conflicts' %}label-danger{%
+                elif request.merge_status|lower == 'merge' %}label-primary{%
+                endif%}">
+                {{request.merge_status or 'No Status' | lower}}
+              </span>
+            </td>
             <td class="nowrap">
               <span title="{{request.date_created.strftime('%Y-%m-%d %H:%M:%S')}}">{{
                 request.date_created | humanize}}</span>
@@ -109,7 +119,7 @@
           </tr>
         {% endfor %}
           <tr>
-            <td colspan="7" class="pr-status noresult" style="display:none;">
+            <td colspan="8" class="pr-status noresult" style="display:none;">
               No pull-requests found
             </td>
           </tr>
