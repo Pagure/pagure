@@ -761,11 +761,11 @@ function drop_issue(){
 {% endif %}
 
 function setup_btn_take_drop(){
-  {% if authenticated and g.repo_admin %}
+  {% if authenticated and g.repo_user %}
   $("#take-btn").click(take_issue)
   {% endif %}
   {% if authenticated and (
-    g.repo_admin
+    g.repo_user
     or issue.user.user == g.fas_user.username
     or issue.assignee.user == g.fas_user.username) %}
   $("#drop-btn").click(drop_issue);
