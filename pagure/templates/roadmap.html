@@ -70,7 +70,10 @@
             </td>
             <td class="td-mod_date nowrap">
               {% if status and status|lower == 'closed' %}
-                <span title="{{ issue.closed_at.strftime('%Y-%m-%d %H:%M:%S')}}">{{
+                <span title="{{
+                    issue.closed_at.strftime('%Y-%m-%d %H:%M:%S')
+                    if issue.closed_at
+                    }}">{{
                       issue.closed_at | humanize }}</span>
               {% else %}
               <span title="{{ issue.last_updated.strftime('%Y-%m-%d %H:%M:%S')}}">{{
