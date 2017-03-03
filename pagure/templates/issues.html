@@ -104,7 +104,9 @@
           assignee=assignee) }}">All</a>
     </span>
     <span class="col-lg-3 col-sm-5 pull-xs-right tiny p-r-0">
-       <form action="{{ url_for('view_issues', username=username,
+       <form action="{{ url_for('view_issues',
+                      username=username,
+                      namespace=repo.namespace,
                       repo=repo.name ) }}" method="GET">
           <div class="input-group">
             <input type="hidden" name="status" value="{{ status or 'all' }}" />
