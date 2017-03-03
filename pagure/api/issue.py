@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015 - Copyright Red Hat Inc
+ (c) 2015-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -413,7 +413,7 @@ def api_view_issue(repo, issueid, username=None, namespace=None):
     issue_id = issue_uid = None
     try:
         issue_id = int(issueid)
-    except:
+    except ValueError:
         issue_uid = issueid
 
     issue = pagure.lib.search_issues(
@@ -500,7 +500,7 @@ def api_view_issue_comment(
     issue_id = issue_uid = None
     try:
         issue_id = int(issueid)
-    except:
+    except ValueError:
         issue_uid = issueid
 
     issue = pagure.lib.search_issues(
