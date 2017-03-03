@@ -186,7 +186,7 @@
           <span class="oi" data-glyph="share-boxed"></span>
         </a>
       {% endif %}
-      {% if g.repo_admin or (
+      {% if g.repo_committer or (
         g.fas_user and g.fas_user.username == comment.user.username) %}
       <a class="btn btn-primary btn-sm" href="{{
           url_for('edit_issue',
@@ -197,7 +197,7 @@
           }}" title="Edit this issue">
       <span class="oi" data-glyph="pencil"></span></a>
       {% endif %}
-      {% if g.repo_admin %}
+      {% if g.repo_committer %}
         <button class="btn btn-danger btn-sm" type="submit" id="closeticket"
             title="Delete this ticket">
           <span class="oi" data-glyph="trash"></span>

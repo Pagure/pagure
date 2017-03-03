@@ -1049,10 +1049,10 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output.data)
 
             # can edit them
-            self.assertNotIn(
+            self.assertIn(
                 '<select class="form-control c-select" id="milestone" '
-                ' name="milestone"><option value=""></option><option '
-                'selected value="77">77</option></select>',
+                'name="milestone"><option value=""></option><option selected '
+                'value="77">77</option></select>\n      <div>\n',
                 output.data)
 
             # can view depends on
@@ -1275,17 +1275,17 @@ class PagureFlaskIssuestests(tests.Modeltests):
             output = self.app.get('/test/issue/1')
             self.assertEqual(output.status_code, 200)
 
-            # the user can't edit the issue
-            self.assertNotIn(
+            # the user can edit the issue
+            self.assertIn(
                 '<a class="btn btn-primary btn-sm" '
                 'href="/test/issue/1/edit" title="Edit this issue">',
                 output.data)
-            self.assertNotIn(
+            self.assertIn(
                 '<button class="btn btn-danger btn-sm" type="submit"',
                 output.data)
 
-            # the user still can't delete the ticket
-            self.assertNotIn('title="Delete this ticket">', output.data)
+            # the user can delete the ticket
+            self.assertIn('title="Delete this ticket">', output.data)
 
             csrf_token = output.data.split(
                 'name="csrf_token" type="hidden" value="')[1].split('">')[0]
@@ -1312,12 +1312,11 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output.data)
 
             # can edit them
-            self.assertNotIn(
+            self.assertIn(
                 '<select class="form-control c-select" id="milestone" '
-                ' name="milestone"><option value=""></option><option '
-                'selected value="77">77</option></select>',
+                'name="milestone"><option value=""></option><option selected '
+                'value="77">77</option></select>\n      <div>\n',
                 output.data)
-
             # can view depends on
             self.assertIn(
                 '<label><strong>Depends on</strong></label>',
@@ -1575,10 +1574,10 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 output.data)
 
             # can edit them
-            self.assertNotIn(
+            self.assertIn(
                 '<select class="form-control c-select" id="milestone" '
-                ' name="milestone"><option value=""></option><option '
-                'selected value="77">77</option></select>',
+                'name="milestone"><option value=""></option><option selected '
+                'value="77">77</option></select>\n      <div>\n',
                 output.data)
 
             # can view depends on
