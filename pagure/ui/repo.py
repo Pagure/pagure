@@ -2575,3 +2575,55 @@ def update_custom_keys(repo, username=None, namespace=None):
     return flask.redirect(flask.url_for(
         'view_settings', username=username, repo=repo.name,
         namespace=namespace))
+
+
+@APP.route('/<repo>/delete/report', methods=['POST'])
+@APP.route('/<namespace>/<repo>/delete/report', methods=['POST'])
+@APP.route('/fork/<username>/<repo>/delete/report', methods=['POST'])
+@APP.route(
+    '/fork/<username>/<namespace>/<repo>/delete/report',
+    methods=['POST'])
+@login_required
+def delete_report(repo, username=None, namespace=None):
+    """ Delete a report from a project.
+    """
+    if admin_session_timedout():
+        flask.flash('Action canceled, try it again', 'error')
+        url = flask.url_for(
+            'view_settings', username=username, repo=repo,
+            namespace=namespace)
+        return flask.redirect(
+            flask.url_for('auth_login', next=url))
+
+    repo = flask.g.repo
+
+    if not repo.settings.get('issue_tracker', True):
+        flask.abort(404, 'No issue tracker found for this project')
+
+    if not flask.g.repo_admin:
+        flask.abort(
+            403,
+            'You are not allowed to change the settings for this project')
+
+    form = pagure.forms.ConfirmationForm()
+
+    error = False
+    if form.validate_on_submit():
+        report = flask.request.form.get('report')
+        reports = repo.reports
+        if report not in reports:
+            flask.flash('Unknown report: %s' % report, 'error')
+        else:
+            del(reports[report])
+            repo.reports = reports
+            try:
+                SESSION.add(repo)
+                SESSION.commit()
+                flask.flash('List of reports updated')
+            except SQLAlchemyError as err:  # pragma: no cover
+                SESSION.rollback()
+                flask.flash(str(err), 'error')
+
+    return flask.redirect(flask.url_for(
+        'view_settings', username=username, repo=repo.name,
+        namespace=namespace))

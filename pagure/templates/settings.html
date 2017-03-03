@@ -934,6 +934,49 @@
         </form>
       </div>
     </div>
+
+    <div class="col-md-8 col-md-offset-2">
+      <div class="card">
+        <div class="card-header">
+          <strong>Reports</strong>
+        </div>
+        <div class="card-block">
+          <p>
+            Here is the list of reports saved for this project.
+          </p>
+        </div>
+        <ul class="list-group list-group-flush">
+        {% for report in repo.reports %}
+          <li class="list-group-item clearfix">
+            <a href="{{ url_for(
+                'view_report',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace,
+                report=report) }}">
+              <span class="oi" data-glyph="box"></span>&nbsp; {{ report }}
+            </a>
+            <div class="pull-xs-right">
+            <form class="icon del_icon pull-xs-right" method="POST"
+              action="{{ url_for(
+                'delete_report',
+                repo=repo.name,
+                username=username,
+                namespace=repo.namespace) }}">
+              <input type="hidden" value="{{ report }}" name="report" />
+              {{ tag_form.csrf_token }}
+              <button
+                onclick="return confirm('Do you really want to remove the report: {{ report }}?');"
+                title="Delete report" class="btn btn-danger btn-sm">
+                <span class="oi" data-glyph="trash"></span>
+              </button>
+            </form>
+            </div>
+          </li>
+        {% endfor %}
+        </ul>
+      </div>
+    </div>
     {% endif %}
 
     {% if (config.get('ENABLE_TICKETS', True)
