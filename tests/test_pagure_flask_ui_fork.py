@@ -1452,6 +1452,58 @@ index 0000000..2a552bb
             self.assertNotIn('<div id="comment-', output.data)
 
     @patch('pagure.lib.notify.send_email')
+    def test_request_pull_commit_start_stop(self, send_email):
+        """ Test the the commit start and stop of brand new PR. """
+        send_email.return_value = True
+
+        self.test_fork_project()
+
+        tests.create_projects_git(
+            os.path.join(self.path, 'requests'), bare=True)
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        fork = pagure.lib.get_project(self.session, 'test', user='foo')
+
+        self.set_up_git_repo(
+            new_project=fork, branch_from='feature', mtype='FF')
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/diff/master..feature')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Create new Pull Request for master - test\n - '
+                'Pagure</title>', output.data)
+            self.assertIn(
+                '<input type="submit" class="btn btn-primary" value="Create">',
+                output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            # Case 1 - Add an initial comment
+            data = {
+                'csrf_token': csrf_token,
+                'title': 'foo bar PR',
+                'initial_comment': 'Test Initial Comment',
+            }
+
+            output = self.app.post(
+                '/test/diff/master..feature', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>PR#2: foo bar PR - test\n - Pagure</title>',
+                output.data)
+            self.assertIn('<p>Test Initial Comment</p>', output.data)
+
+        # Check if commit start and stop have been set for PR#2
+        request = pagure.lib.search_pull_requests(
+            self.session, project_id=1, requestid=2)
+        self.assertIsNotNone(request.commit_start)
+        self.assertIsNotNone(request.commit_stop)
+
+    @patch('pagure.lib.notify.send_email')
     def test_new_request_pull_empty_repo(self, send_email):
         """ Test the new_request_pull endpoint against an empty repo. """
         send_email.return_value = True
