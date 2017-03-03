@@ -4146,6 +4146,209 @@ index 0000000..fb7093d
                 '</button>\n                      You are now'
                 ' watching this repo.', output.data)
 
+    def test_delete_report(self):
+        """ Test the  delete_report endpoint. """
+
+        output = self.app.post('/test/delete/report')
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(self.path, bare=True)
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+
+            output = self.app.get('/new/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<strong>Create new Project</strong>', output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            # No report specified
+            data = {
+                'csrf_token':csrf_token
+            }
+            output = self.app.post(
+                '/test/delete/report', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '</button>\n                      Unknown report: None',
+                output.data)
+
+            # Report specified not in the project's reports
+            data = {
+                'csrf_token':csrf_token,
+                'report': 'foo'
+            }
+            output = self.app.post(
+                '/test/delete/report', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '</button>\n                      Unknown report: foo',
+                output.data)
+
+            # Create a report
+            project = pagure.lib.get_project(self.session, name='test')
+            self.assertEqual(project.reports, {})
+            name = 'test report'
+            url = '?foo=bar&baz=biz'
+            pagure.lib.save_report(
+                self.session,
+                repo=project,
+                name=name,
+                url=url,
+                username=None
+            )
+            self.session.commit()
+            project = pagure.lib.get_project(self.session, name='test')
+            self.assertEqual(
+                project.reports,
+                {'test report': {'baz': 'biz', 'foo': 'bar'}}
+            )
+
+            # Missing CSRF
+            data = {
+                'report': 'test report'
+            }
+            output = self.app.post(
+                '/test/delete/report', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - test - Pagure</title>',
+                output.data)
+
+            project = pagure.lib.get_project(self.session, name='test')
+            self.assertEqual(
+                project.reports,
+                {'test report': {'baz': 'biz', 'foo': 'bar'}}
+            )
+
+            # Delete the report
+            data = {
+                'csrf_token':csrf_token,
+                'report': 'test report'
+            }
+            output = self.app.post(
+                '/test/delete/report', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '</button>\n                      List of reports updated',
+                output.data)
+            project = pagure.lib.get_project(self.session, name='test')
+            self.assertEqual(project.reports, {})
+
+    def test_delete_report_ns_project(self):
+        """ Test the  delete_report endpoint on a namespaced project. """
+
+        output = self.app.post('/foo/test/delete/report')
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(self.path, bare=True)
+
+        user = tests.FakeUser()
+        user.username = 'pingou'
+        with tests.user_set(pagure.APP, user):
+
+            output = self.app.get('/new/')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn('<strong>Create new Project</strong>', output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            item = pagure.lib.model.Project(
+                user_id=1,  # pingou
+                namespace='foo',
+                name='test',
+                description='foo project #2',
+                hook_token='aaabbb',
+            )
+            self.session.add(item)
+            self.session.commit()
+            gitrepo = os.path.join(self.path, 'foo', 'test.git')
+            pygit2.init_repository(gitrepo, bare=True)
+
+            # No report specified
+            data = {
+                'csrf_token':csrf_token
+            }
+            output = self.app.post(
+                '/foo/test/delete/report', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '</button>\n                      Unknown report: None',
+                output.data)
+
+            # Report specified not in the project's reports
+            data = {
+                'csrf_token':csrf_token,
+                'report': 'foo'
+            }
+            output = self.app.post(
+                '/foo/test/delete/report', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '</button>\n                      Unknown report: foo',
+                output.data)
+
+            # Create a report
+            project = pagure.lib.get_project(
+                self.session, name='test', namespace='foo')
+            self.assertEqual(project.reports, {})
+            name = 'test report'
+            url = '?foo=bar&baz=biz'
+            pagure.lib.save_report(
+                self.session,
+                repo=project,
+                name=name,
+                url=url,
+                username=None
+            )
+            self.session.commit()
+            project = pagure.lib.get_project(
+                self.session, name='test', namespace='foo')
+            self.assertEqual(
+                project.reports,
+                {'test report': {'baz': 'biz', 'foo': 'bar'}}
+            )
+
+            # Missing CSRF
+            data = {
+                'report': 'test report'
+            }
+            output = self.app.post(
+                '/foo/test/delete/report', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Settings - foo/test - Pagure</title>',
+                output.data)
+
+            project = pagure.lib.get_project(
+                self.session, name='test', namespace='foo')
+            self.assertEqual(
+                project.reports,
+                {'test report': {'baz': 'biz', 'foo': 'bar'}}
+            )
+
+            # Delete the report
+            data = {
+                'csrf_token':csrf_token,
+                'report': 'test report'
+            }
+            output = self.app.post(
+                '/foo/test/delete/report', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '</button>\n                      List of reports updated',
+                output.data)
+
+            project = pagure.lib.get_project(
+                self.session, name='test', namespace='foo')
+            self.assertEqual(project.reports, {})
+
+
 if __name__ == '__main__':
-    SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureFlaskRepotests)
-    unittest.TextTestRunner(verbosity=2).run(SUITE)
+    unittest.main(verbosity=2)
