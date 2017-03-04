@@ -509,7 +509,7 @@ def api_pull_request_add_comment(
         raise pagure.exceptions.APIError(
             404, error_code=APIERROR.EPULLREQUESTSDISABLED)
 
-    if repo.fullname != flask.g.token.project.fullname:
+    if flask.g.token.project and repo != flask.g.token.project:
         raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
     request = pagure.lib.search_pull_requests(
@@ -646,14 +646,16 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
     output = {}
 
     if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.ENOPROJECT)
 
     if not repo.settings.get('pull_requests', True):
         raise pagure.exceptions.APIError(
             404, error_code=APIERROR.EPULLREQUESTSDISABLED)
 
-    if repo.fullname != flask.g.token.project.fullname:
-        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
+    if flask.g.token.project and repo != flask.g.token.project:
+        raise pagure.exceptions.APIError(
+            401, error_code=APIERROR.EINVALIDTOK)
 
     request = pagure.lib.search_pull_requests(
         SESSION, project_id=repo.id, requestid=requestid)

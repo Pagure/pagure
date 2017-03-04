@@ -100,14 +100,16 @@ def api_new_issue(repo, username=None, namespace=None):
     output = {}
 
     if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.ENOPROJECT)
 
     if not repo.settings.get('issue_tracker', True):
         raise pagure.exceptions.APIError(
             404, error_code=APIERROR.ETRACKERDISABLED)
 
-    if repo != flask.g.token.project:
-        raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
+    if flask.g.token.project and repo != flask.g.token.project:
+        raise pagure.exceptions.APIError(
+            401, error_code=APIERROR.EINVALIDTOK)
 
     user_obj = pagure.lib.get_user(
         SESSION, flask.g.fas_user.username)
@@ -723,7 +725,7 @@ def api_comment_issue(repo, issueid, username=None, namespace=None):
             404, error_code=APIERROR.ETRACKERDISABLED)
 
     if api_authenticated():
-        if repo != flask.g.token.project:
+        if flask.g.token.project and repo != flask.g.token.project:
             raise pagure.exceptions.APIError(
                 401, error_code=APIERROR.EINVALIDTOK)
 

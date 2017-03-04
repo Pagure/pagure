@@ -460,6 +460,96 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         )
 
     @patch('pagure.lib.git.generate_gitolite_acls')
+    def test_api_new_project_user_token(self, p_gga):
+        """ Test the api_new_project method of the flask api. """
+        p_gga.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'tickets'))
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token foo_token'}
+
+        # Invalid token
+        output = self.app.post('/api/0/new', headers=headers)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.data)
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
+                         data['error_code'])
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # No input
+        output = self.app.post('/api/0/new', headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid or incomplete input submited",
+              "error_code": "EINVALIDREQ",
+              "errors": {
+                "name": ["This field is required."],
+                "description": ["This field is required."]
+              }
+            }
+        )
+
+        data = {
+            'name': 'test',
+        }
+
+        # Incomplete request
+        output = self.app.post(
+            '/api/0/new', data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid or incomplete input submited",
+              "error_code": "EINVALIDREQ",
+              "errors": {"description": ["This field is required."]}
+            }
+        )
+
+        data = {
+            'name': 'test',
+            'description': 'Just a small test project',
+        }
+
+        # Valid request but repo already exists
+        output = self.app.post(
+            '/api/0/new/', data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                "error": "The project repo \"test\" already exists "
+                    "in the database",
+                "error_code": "ENOCODE"
+            }
+        )
+
+        data = {
+            'name': 'test_42',
+            'description': 'Just another small test project',
+        }
+
+        # Valid request
+        output = self.app.post(
+            '/api/0/new/', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'Project "test_42" created'}
+        )
+
+    @patch('pagure.lib.git.generate_gitolite_acls')
     def test_api_new_project_user_ns(self, p_gga):
         """ Test the api_new_project method of the flask api. """
         pagure.APP.config['USER_NAMESPACE'] = True
@@ -518,6 +608,130 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             tests.create_projects_git(
                 os.path.join(self.path, folder), bare=True)
         tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        headers = {'Authorization': 'token foo_token'}
+
+        # Invalid token
+        output = self.app.post('/api/0/fork', headers=headers)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.data)
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
+                         data['error_code'])
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # No input
+        output = self.app.post('/api/0/fork', headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid or incomplete input submited",
+              "error_code": "EINVALIDREQ",
+              "errors": {"repo": ["This field is required."]}
+            }
+        )
+
+        data = {
+            'name': 'test',
+        }
+
+        # Incomplete request
+        output = self.app.post(
+            '/api/0/fork', data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid or incomplete input submited",
+              "error_code": "EINVALIDREQ",
+              "errors": {"repo": ["This field is required."]}
+            }
+        )
+
+        data = {
+            'repo': 'test',
+        }
+
+        # Valid request
+        output = self.app.post(
+            '/api/0/fork/', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                "message": "Repo \"test\" cloned to \"pingou/test\""
+            }
+        )
+
+        data = {
+            'repo': 'test',
+        }
+
+        # project already forked
+        output = self.app.post(
+            '/api/0/fork/', data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                "error": "Repo \"forks/pingou/test\" already exists",
+                "error_code": "ENOCODE"
+            }
+        )
+
+        data = {
+            'repo': 'test',
+            'username': 'pingou',
+        }
+
+        # Fork already exists
+        output = self.app.post(
+            '/api/0/fork/', data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                "error": "Repo \"forks/pingou/test\" already exists",
+                "error_code": "ENOCODE"
+            }
+        )
+
+        data = {
+            'repo': 'test',
+            'namespace': 'pingou',
+        }
+
+        # Repo does not exists
+        output = self.app.post(
+            '/api/0/fork/', data=data, headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                "error": "Project not found",
+                "error_code": "ENOPROJECT"
+            }
+        )
+
+    @patch('pagure.lib.git.generate_gitolite_acls')
+    def test_api_fork_project_user_token(self, p_gga):
+        """ Test the api_fork_project method of the flask api. """
+        p_gga.return_value = True
+
+        tests.create_projects(self.session)
+        for folder in ['docs', 'tickets', 'requests', 'repos']:
+            tests.create_projects_git(
+                os.path.join(self.path, folder), bare=True)
+        tests.create_tokens(self.session, project_id=None)
         tests.create_tokens_acl(self.session)
 
         headers = {'Authorization': 'token foo_token'}
