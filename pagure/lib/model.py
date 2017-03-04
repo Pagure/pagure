@@ -2169,7 +2169,7 @@ class Token(BASE):
         sa.ForeignKey(
             'projects.id', onupdate='CASCADE',
         ),
-        nullable=False,
+        nullable=True,
         index=True)
     expiration = sa.Column(
         sa.DateTime, nullable=False, default=datetime.datetime.utcnow)
