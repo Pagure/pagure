@@ -1,11 +1,15 @@
+{% if repo %}
 {% extends "repo_master.html" %}
+{% else %}
+{% extends "master.html" %}
+{% endif %}
 {% from "_formhelper.html" import render_field_in_row %}
 
 {% set tag = "home" %}
 {% block title %}Create token{% endblock %}
 
-
-{% block repo %}
+{% macro render_page() %}
+<div class="container p-t-3">
   <div class="row">
     <div class="col-md-8 col-md-offset-2">
       <div class="card">
@@ -21,10 +25,14 @@
             After that, click 'Create' to generate a token with the selected
             permissions.
           </p>
+          {% if repo %}
           <form action="{{
               url_for('.add_token', username=username,
                       repo=repo.name, namespace=repo.namespace)
           }}" method="post">
+          {% else %}
+          <form action="{{ url_for('.add_user_token') }}" method="post">
+          {% endif %}
             {% for acl in acls %}
             <div>
               <label class="c-input c-checkbox">
@@ -37,8 +45,15 @@
           </table>
           <div class="p-t-2">
             <input type="submit" class="btn btn-primary" value="Create">
+            {% if repo %}
             <a class="btn btn-secondary" href="{{ url_for('.view_settings',
-                username=username, repo=repo.name, namespace=repo.namespace) }}">Cancel</a>
+                username=username, repo=repo.name, namespace=repo.namespace)
+                }}">Cancel</a>
+            {% else %}
+            <a class="btn btn-secondary" href="{{ url_for('.user_settings')
+                }}">Cancel</a>
+            {% endif %}
+
             {{ form.csrf_token }}
           </div>
         </form>
@@ -46,4 +61,14 @@
       </div>
     </div>
   </div>
+</div>
+{% endmacro %}
+
+
+{% block content %}
+    {{ render_page() }}
+{% endblock %}
+
+{% block repo %}
+    {{ render_page() }}
 {% endblock %}

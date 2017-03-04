@@ -3231,7 +3231,7 @@ def get_api_token(session, token_str):
     return query.first()
 
 
-def get_acls(session):
+def get_acls(session, restrict=None):
     """ Returns all the possible ACLs a token can have according to the
     database.
     """
@@ -3240,6 +3240,15 @@ def get_acls(session):
     ).order_by(
         model.ACL.name
     )
+    if restrict:
+        if isinstance(restrict, list):
+            query = query.filter(
+                model.ACL.name.in_(restrict)
+            )
+        else:
+            query = query.filter(
+                model.ACL.name == restrict
+            )
 
     return query.all()
 
@@ -3259,7 +3268,7 @@ def add_token_to_user(session, project, acls, username):
     token = pagure.lib.model.Token(
         id=pagure.lib.login.id_generator(64),
         user_id=user.id,
-        project_id=project.id,
+        project_id=project.id if project else None,
         expiration=datetime.datetime.utcnow() + datetime.timedelta(days=60)
     )
     session.add(token)

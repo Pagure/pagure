@@ -148,12 +148,104 @@
     </div>
   </div>
 
-    <div class="card m-b-3">
-        {% if config.get('PAGURE_AUTH')=='local' %}
-            <a href="{{ url_for('change_password', username=g.fas_user.username) }}">Change password</a>
+    {% if config.get('PAGURE_AUTH')=='local' %}
+      <div class="card m-b-3">
+          <a href="{{ url_for('change_password', username=g.fas_user.username) }}">Change password</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="col-md-8 col-md-offset-2">
+    <div class="card">
+      <div class="card-header">
+        <strong>API Keys</strong>
+      </div>
+      <div class="card-block">
+        <p>
+          API keys are tokens used to authenticate you on pagure. They can also
+          be used to grant access to 3rd party application to behave on all
+          projects in your name.
+        </p>
+        <p>
+          These are your personal tokens; they are not visible to others.
+        </p>
+        <p>
+          These keys are valid for <span class="strong">60</span> days.
+        </p>
+        <p>
+          These keys are private, make sure to store in a safe place and
+          do not share it.
+        </p>
+      </div>
+      {% if user.tokens %}
+      <ul class="list-group list-group-flush">
+      {% for token in user.tokens %}
+        {% if not token.project %}
+          <li class="list-group-item">
+            <div class="form-group">
+              <div class="input-group">
+                <div class="input-group-addon"><span class="oi" data-glyph="key"></span></div>
+                <input class="form-control" type="text" value="{{ token.id }}" readonly>
+              </div>
+            </div>
+          {% if token.expired %}
+            <span class="text-danger btn-align"><strong>Expired</strong> since {{ token.expiration.date() }}</span>
+          {% else %}
+            <span class="text-success btn-align"><strong>Valid</strong> until: {{ token.expiration.date() }}</span>
+            <form class="pull-xs-right" action="{{ url_for(
+                '.revoke_api_user_token', token_id=token.id) }}"
+              method="post" class="icon">
+              <button class="btn btn-danger" type="submit"
+                  onclick="return confirm('Are you sure to revoke this token ?'
+                      + '\nThis will break all application using it and '
+                      + 'cannot be un-done.');"
+                  title="Revoke token">
+                <span class="oi" data-glyph="trash"></span> &nbsp;Revoke
+              </button>
+              {{ form.csrf_token }}
+            </form>
+          {% endif %}
+            <button type="button" class="btn btn-link"
+              data-toggle="modal" data-target="#acls{{ token.id }}">
+              ACLs
+            </button>
+            <div class="modal fade" id="acls{{ token.id }}" tabindex="-1"
+                  role="dialog" aria-labelledby="ACLs" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                      <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">ACLs</h4>
+                  </div>
+                  <div class="modal-body">
+                    <ul>
+                      {% for acl in token.acls_list_pretty %}
+                        <li>{{ acl }}</li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
         {% endif %}
+      {% endfor %}
+      </ul>
+      {% endif %}
+      <div class="card-block">
+        <a href="{{ url_for('.add_user_token') }}" method="post" class="icon">
+        <button class="btn btn-primary" type="submit"
+          title="Generate a new API token">
+          Create new key
+        </button>
+        </a>
+      </div>
     </div>
   </div>
+
 </div>
 
 {% endblock %}

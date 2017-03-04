@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2015 - Copyright Red Hat Inc
+ (c) 2014-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
 
-import flask
+import datetime
 from math import ceil
 
+import flask
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.exceptions
@@ -756,3 +757,92 @@ def ssh_hostkey():
     return flask.render_template(
         'doc_ssh_keys.html',
     )
+
+
+@APP.route('/settings/token/new/', methods=('GET', 'POST'))
+@APP.route('/settings/token/new', methods=('GET', 'POST'))
+@login_required
+def add_user_token():
+    """ Create an user token (not project specific).
+    """
+    if admin_session_timedout():
+        if flask.request.method == 'POST':
+            flask.flash('Action canceled, try it again', 'error')
+        return flask.redirect(
+            flask.url_for('auth_login', next=flask.request.url))
+
+    # Ensure the user is in the DB at least
+    user = pagure.lib.search_user(
+        SESSION, username=flask.g.fas_user.username)
+    if not user:
+        flask.abort(404, 'User not found')
+
+    acls = pagure.lib.get_acls(
+        SESSION, restrict=APP.config.get('CROSS_PROJECT_ACLS'))
+    form = pagure.forms.NewTokenForm(acls=acls)
+
+    if form.validate_on_submit():
+        try:
+            msg = pagure.lib.add_token_to_user(
+                SESSION,
+                project=None,
+                acls=form.acls.data,
+                username=flask.g.fas_user.username,
+            )
+            SESSION.commit()
+            flask.flash(msg)
+            return flask.redirect(flask.url_for('.user_settings'))
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash('API key could not be added', 'error')
+
+    # When form is displayed after an empty submission, show an error.
+    if form.errors.get('acls'):
+        flask.flash('You must select at least one permission.', 'error')
+
+    return flask.render_template(
+        'add_token.html',
+        select='settings',
+        form=form,
+        acls=acls,
+    )
+
+
+@APP.route('/settings/token/revoke/<token_id>/', methods=['POST'])
+@APP.route('/settings/token/revoke/<token_id>', methods=['POST'])
+@login_required
+def revoke_api_user_token(token_id):
+    """ Revokie an user token (ie: not project specific).
+    """
+    if admin_session_timedout():
+        flask.flash('Action canceled, try it again', 'error')
+        url = flask.url_for(
+            'view_settings', username=username, repo=repo,
+            namespace=namespace)
+        return flask.redirect(
+            flask.url_for('auth_login', next=url))
+
+    token = pagure.lib.get_api_token(SESSION, token_id)
+
+    if not token \
+            or token.user.username != flask.g.fas_user.username:
+        flask.abort(404, 'Token not found')
+
+    form = pagure.forms.ConfirmationForm()
+
+    if form.validate_on_submit():
+        try:
+            if token.expiration >= datetime.datetime.utcnow():
+                token.expiration = datetime.datetime.utcnow()
+                SESSION.add(token)
+            SESSION.commit()
+            flask.flash('Token revoked')
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            APP.logger.exception(err)
+            flask.flash(
+                'Token could not be revoked, please contact an admin',
+                'error')
+
+    return flask.redirect(flask.url_for('.user_settings'))

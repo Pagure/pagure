@@ -11,6 +11,7 @@
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
+import datetime
 import unittest
 import shutil
 import sys
@@ -1207,6 +1208,174 @@ class PagureFlaskApptests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
         pagure.APP.config['ENABLE_TICKETS'] = True
 
+    @patch('pagure.ui.app.admin_session_timedout')
+    def test_add_user_token(self, ast):
+        """ Test the add_user_token endpoint. """
+        ast.return_value = False
+        self.test_new_project()
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/settings/token/new/')
+            self.assertEqual(output.status_code, 404)
+            self.assertTrue('<h2>Page not found (404)</h2>' in output.data)
+
+        user.username = 'foo'
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/settings/token/new')
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<div class="card-header">\n          <strong>'
+                'Create a new token</strong>\n', output.data)
+            self.assertIn(
+                '<input type="checkbox" name="acls" value="create_project">',
+                output.data)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+                'acls': ['create_project', 'fork_project']
+            }
+
+            # missing CSRF
+            output = self.app.post('/settings/token/new', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Create token - Pagure</title>', output.data)
+            self.assertIn(
+                '<div class="card-header">\n          <strong>'
+                'Create a new token</strong>\n', output.data)
+            self.assertIn(
+                '<input type="checkbox" name="acls" value="create_project">',
+                output.data)
+
+            data = {
+                'acls': ['new_project'],
+                'csrf_token':  csrf_token
+            }
+
+            # Invalid ACLs
+            output = self.app.post('/settings/token/new', data=data)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>Create token - Pagure</title>', output.data)
+            self.assertIn(
+                '<div class="card-header">\n          <strong>'
+                'Create a new token</strong>\n', output.data)
+            self.assertIn(
+                '<input type="checkbox" name="acls" value="create_project">',
+                output.data)
+
+            data = {
+                'acls': ['create_project', 'fork_project'],
+                'csrf_token':  csrf_token
+            }
+
+            # All good
+            output = self.app.post(
+                '/settings/token/new', data=data, follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                '<title>foo\'s settings - Pagure</title>', output.data)
+            self.assertIn(
+                '</button>\n                      Token created\n',
+                output.data)
+            self.assertEqual(
+                output.data.count(
+                    '<span class="text-success btn-align"><strong>Valid'
+                    '</strong> until: '), 1)
+
+            ast.return_value = True
+            output = self.app.get('/settings/token/new')
+            self.assertEqual(output.status_code, 302)
+
+    @patch('pagure.ui.app.admin_session_timedout')
+    def test_revoke_api_user_token(self, ast):
+        """ Test the revoke_api_user_token endpoint. """
+        ast.return_value = False
+        self.test_new_project()
+
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            # Token doesn't exist
+            output = self.app.post('/settings/token/revoke/foobar')
+            self.assertEqual(output.status_code, 404)
+            self.assertTrue('<h2>Page not found (404)</h2>' in output.data)
+
+            # Create the foobar API token but associated w/ the user 'foo'
+            item = pagure.lib.model.Token(
+                id='foobar',
+                user_id=2,  # foo
+                expiration=datetime.datetime.utcnow() \
+                    + datetime.timedelta(days=30)
+            )
+            self.session.add(item)
+            self.session.commit()
+
+            # Token not associated w/ this user
+            output = self.app.post('/settings/token/revoke/foobar')
+            self.assertEqual(output.status_code, 404)
+            self.assertTrue('<h2>Page not found (404)</h2>' in output.data)
+
+        user.username = 'foo'
+        with tests.user_set(pagure.APP, user):
+            # Missing CSRF token
+            output = self.app.post(
+                '/settings/token/revoke/foobar', follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                "<title>foo's settings - Pagure</title>", output.data)
+            self.assertEqual(
+                output.data.count(
+                    '<span class="text-success btn-align"><strong>Valid'
+                    '</strong> until: '), 1)
+
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            data = {
+                'csrf_token': csrf_token
+            }
+
+            # All good - token is deleted
+            output = self.app.post(
+                '/settings/token/revoke/foobar', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                "<title>foo's settings - Pagure</title>", output.data)
+            self.assertEqual(
+                output.data.count(
+                    '<span class="text-success btn-align"><strong>Valid'
+                    '</strong> until: '), 0)
+
+            user = pagure.lib.get_user(self.session, key='foo')
+            self.assertEqual(len(user.tokens), 1)
+            expiration_dt = user.tokens[0].expiration
+
+            # Token was already deleted - no changes
+            output = self.app.post(
+                '/settings/token/revoke/foobar', data=data,
+                follow_redirects=True)
+            self.assertEqual(output.status_code, 200)
+            self.assertIn(
+                "<title>foo's settings - Pagure</title>", output.data)
+            self.assertEqual(
+                output.data.count(
+                    '<span class="text-success btn-align"><strong>Valid'
+                    '</strong> until: '), 0)
+
+            # Ensure the expiration date did not change
+            user = pagure.lib.get_user(self.session, key='foo')
+            self.assertEqual(len(user.tokens), 1)
+            self.assertEqual(
+                expiration_dt, user.tokens[0].expiration
+            )
+
+            ast.return_value = True
+            output = self.app.get('/settings/token/new')
+            self.assertEqual(output.status_code, 302)
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(verbosity=2)
