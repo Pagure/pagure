@@ -221,6 +221,17 @@ ACLS = {
     'issue_update_custom_fields': 'Update the custom fields of an issue',
 }
 
+# From the ACLs above lists which ones are tolerated to be associated with
+# an API token that isn't linked to a particular project.
+CROSS_PROJECT_ACLS = [
+    'create_project',
+    'fork_project',
+    'issue_comment',
+    'issue_create',
+    'pull_request_flag',
+    'pull_request_comment',
+]
+
 # Bootstrap URLS
 BOOTSTRAP_URLS_CSS = 'https://apps.fedoraproject.org/global/' \
     'fedora-bootstrap-1.0.1/fedora-bootstrap.css'
