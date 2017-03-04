@@ -2133,7 +2133,9 @@ def revoke_api_token(repo, token_id, username=None, namespace=None):
 
     if form.validate_on_submit():
         try:
-            token.expiration = datetime.datetime.utcnow()
+            if token.expiration >= datetime.datetime.utcnow():
+                token.expiration = datetime.datetime.utcnow()
+                SESSION.add(token)
             SESSION.commit()
             flask.flash('Token revoked')
         except SQLAlchemyError as err:  # pragma: no cover
