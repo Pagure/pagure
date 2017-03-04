@@ -233,16 +233,16 @@
   <li class="nav-item">
     <a class="nav-link {% if not pull_request %}active{%
         endif %}" data-toggle="tab" role="tab" href="#request_diff">
-      <span class="hidden-sm-down">Files Changed&nbsp;</span>
-      <span class="label label-default label-pill hidden-sm-down">
+      <span>Files Changed&nbsp;</span>
+      <span class="label label-default label-pill">
         {{ diff|length if diff else 0}}
       </span>
     </a>
   </li>
   <li class="nav-item">
     <a class="nav-link" data-toggle="tab" role="tab" href="#commit_list">
-      <span class="hidden-sm-down">Commits&nbsp;</span>
-      <span class="label label-default label-pill hidden-sm-down">
+      <span>Commits&nbsp;</span>
+      <span class="label label-default label-pill">
         {{ diff_commits|length }}
       </span>
     </a>

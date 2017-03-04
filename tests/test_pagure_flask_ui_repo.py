@@ -1595,9 +1595,9 @@ class PagureFlaskRepotests(tests.Modeltests):
                 % (c2.oid.hex, c1.oid.hex),
                 output.data)
             self.assertIn(
-                '<span class="hidden-sm-down">Commits&nbsp;</span>\n      ' +
+                '<span>Commits&nbsp;</span>\n      ' +
                 '<span ' +
-                'class="label label-default label-pill hidden-sm-down">' +
+                'class="label label-default label-pill">' +
                 '\n        2\n      </span>',
                 output.data)
             self.assertIn(
@@ -1611,9 +1611,9 @@ class PagureFlaskRepotests(tests.Modeltests):
                 (c1.oid.hex, c2.oid.hex),
                 output.data)
             self.assertIn(
-                '<span class="hidden-sm-down">Commits&nbsp;</span>\n      ' +
+                '<span>Commits&nbsp;</span>\n      ' +
                 '<span ' +
-                'class="label label-default label-pill hidden-sm-down">' +
+                'class="label label-default label-pill">' +
                 '\n        2\n      </span>',
                 output.data)
             self.assertIn(
@@ -1643,9 +1643,9 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<span style="color: #00A000; background-color: ' +
                 '#ddffdd">+ Row 0'), 2)
             self.assertIn(
-                '<span class="hidden-sm-down">Commits&nbsp;</span>\n      ' +
+                '<span>Commits&nbsp;</span>\n      ' +
                 '<span ' +
-                'class="label label-default label-pill hidden-sm-down">' +
+                'class="label label-default label-pill">' +
                 '\n        3\n      </span>',
                 output.data)
             self.assertIn(
@@ -1671,9 +1671,9 @@ class PagureFlaskRepotests(tests.Modeltests):
                 '<span style="color: #a40000; background-color: #ffdddd">- ' +
                 'Row 0</span>', output.data)
             self.assertIn(
-                '<span class="hidden-sm-down">Commits&nbsp;</span>\n      ' +
+                '<span>Commits&nbsp;</span>\n      ' +
                 '<span ' +
-                'class="label label-default label-pill hidden-sm-down">' +
+                'class="label label-default label-pill">' +
                 '\n        3\n      </span>',
                 output.data)
             self.assertIn(
