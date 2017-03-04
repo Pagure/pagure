@@ -1224,7 +1224,7 @@ class PagureFlaskRepotests(tests.Modeltests):
             self.assertIn(
             '''<div id="custom_fields">
               <div class="row p-t-1">
-                <div class="col-sm-4 p-r-0">
+                <div class="col-sm-3 p-r-0">
                   <input type="text" name="custom_keys"
                     value="" class="form-control"/>
                 </div>
@@ -1239,6 +1239,10 @@ class PagureFlaskRepotests(tests.Modeltests):
                 <div class="col-sm-6 p-r-0">
                     <input title="Comma separated list items" type="text" name="custom_keys_data"
                       value="" class="form-control"/>
+                </div>
+                <div class="col-sm-1 p-r-0">
+                  <input type="checkbox" name="custom_keys_notify-1" title="Trigger email notification when updated"
+                  class="form-control"/>
                 </div>
               </div>''', output.data)
 

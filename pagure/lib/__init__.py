@@ -3730,7 +3730,7 @@ def save_report(session, repo, name, url, username):
     session.add(repo)
 
 
-def set_custom_key_fields(session, project, fields, types, data):
+def set_custom_key_fields(session, project, fields, types, data, notify):
     """ Set or update the custom key fields of a project with the values
     provided.  "data" is currently only used for lists
     """
@@ -3750,16 +3750,23 @@ def set_custom_key_fields(session, project, fields, types, data):
                     for item in data[idx].split(',')
                 ]
 
+        if notify[idx] == "on":
+            notify_flag = True
+        else:
+            notify_flag = False
+
         if key in current_keys:
             issuekey = current_keys[key]
             issuekey.key_type = types[idx]
             issuekey.data = data[idx]
+            issuekey.key_notify = notify_flag
         else:
             issuekey = model.IssueKeys(
                 project_id=project.id,
                 name=key,
                 key_type=types[idx],
-                data=data[idx]
+                data=data[idx],
+                key_notify=notify_flag
             )
         session.add(issuekey)
 

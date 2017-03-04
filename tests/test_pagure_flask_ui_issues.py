@@ -304,7 +304,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             project=repo,
             fields=['test1'],
             types=['text'],
-            data=[None]
+            data=[None],
+            notify=[None]
         )
         self.session.commit()
         self.assertEqual(msg, 'List of custom fields updated')
@@ -690,7 +691,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
             project=repo,
             fields=['test1'],
             types=['list'],
-            data=[None]
+            data=[None],
+            notify=[None]
         )
         self.session.commit()
         self.assertEqual(msg, 'List of custom fields updated')

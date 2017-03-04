@@ -2562,10 +2562,15 @@ def update_custom_keys(repo, username=None, namespace=None):
         custom_keys_data = [
             w.strip() for w in flask.request.form.getlist('custom_keys_data')
         ]
+        custom_keys_notify = []
+        for idx in range(len(custom_keys)):
+            custom_keys_notify.append(str(
+                flask.request.form.get('custom_keys_notify-%s' % (idx + 1))))
 
         try:
             msg = pagure.lib.set_custom_key_fields(
-                SESSION, repo, custom_keys, custom_keys_type, custom_keys_data)
+                SESSION, repo, custom_keys, custom_keys_type, custom_keys_data,
+                custom_keys_notify)
             SESSION.commit()
             flask.flash(msg)
         except SQLAlchemyError as err:  # pragma: no cover

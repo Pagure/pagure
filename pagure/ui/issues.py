@@ -289,6 +289,10 @@ def update_issue(repo, issueid, username=None, namespace=None):
 
                     msg = pagure.lib.set_custom_key_value(
                         SESSION, issue, key, value)
+                    if key.key_notify and msg is not None:
+                        # Custom field changed that is set for notifications
+                        pagure.lib.notify.notify_meta_change_issue(
+                            issue, flask.g.fas_user, msg)
                     if msg:
                         messages.add(msg)
 

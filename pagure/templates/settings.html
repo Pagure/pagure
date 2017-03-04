@@ -792,7 +792,7 @@
           {{ tag_form.csrf_token }}
           <div class="card-block">
             <div class="row">
-              <div class="col-sm-4">
+              <div class="col-sm-3">
                 <strong>Fields</strong>
               </div>
               <div class="col-sm-2">
@@ -801,11 +801,14 @@
               <div class="col-sm-6">
                 <strong>Field Values</strong> <i>(Lists only)</i>
               </div>
+              <div class="col-sm-1">
+                <strong>Notify</strong>
+              </div>
             </div>
             <div id="custom_fields">
             {% for field in repo.issue_keys or [dict(key_type="", name="")] | sort %}
               <div class="row p-t-1">
-                <div class="col-sm-4 p-r-0">
+                <div class="col-sm-3 p-r-0">
                   <input type="text" name="custom_keys"
                     value="{{ field.name }}" class="form-control"/>
                 </div>
@@ -828,6 +831,13 @@
                 <div class="col-sm-6 p-r-0">
                     <input title="Comma separated list items" type="text" name="custom_keys_data"
                       value={% if field.data is none %}""{% else %}"{{ field.data | join(', ') }}"{% endif %} class="form-control"/>
+                </div>
+                <div class="col-sm-1 p-r-0">
+                  <input type="checkbox" name="custom_keys_notify-{{ loop.index }}" title="Trigger email notification when updated"
+                    {% if field.key_notify == True %}
+                      checked="y"
+                    {% endif %}
+                  class="form-control"/>
                 </div>
               </div>
             {% endfor %}

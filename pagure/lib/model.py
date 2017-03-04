@@ -1141,6 +1141,7 @@ class IssueKeys(BASE):
     name = sa.Column(sa.Text(), nullable=False)
     key_type = sa.Column(sa.String(255), nullable=False)
     key_data = sa.Column(sa.Text())
+    key_notify = sa.Column(sa.Boolean, default=False, nullable=False)
 
     __table_args__ = (sa.UniqueConstraint('project_id', 'name'),)
 

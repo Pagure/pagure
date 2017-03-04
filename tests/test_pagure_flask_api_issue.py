@@ -1952,7 +1952,8 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             self.session, repo,
             ['bugzilla', 'upstream', 'reviewstatus'],
             ['link', 'boolean', 'list'],
-            ['unused data for non-list type', '', 'ack, nack ,  needs review'])
+            ['unused data for non-list type', '', 'ack, nack ,  needs review'],
+            [None, None, None])
         self.session.commit()
         self.assertEqual(msg, 'List of custom fields updated')
 
