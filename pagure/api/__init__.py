@@ -447,6 +447,10 @@ def api():
         issues.append(load_doc(issue.api_view_issue))
         issues.append(load_doc(issue.api_view_issue_comment))
         issues.append(load_doc(issue.api_comment_issue))
+        issues.append(load_doc(issue.api_update_custom_field))
+        issues.append(load_doc(issue.api_change_status_issue))
+        issues.append(load_doc(issue.api_assign_issue))
+        issues.append(load_doc(issue.api_subscribe_issue))
 
     ci_doc = []
     if pagure.APP.config.get('PAGURE_CI_SERVICES', True):
