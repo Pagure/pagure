@@ -59,7 +59,7 @@ def create_tables(db_url, alembic_ini=None, acls=None, debug=False):
           ie: <engine>://<user>:<password>@<host>/<dbname>
     :kwarg alembic_ini, path to the alembic ini file. This is necessary
         to be able to use alembic correctly, but not for the unit-tests.
-    :kwarg debug, a boolean specifying wether we should have the verbose
+    :kwarg debug, a boolean specifying whether we should have the verbose
         output of sqlalchemy or not.
     :return a session that can be used to query the database.
 
@@ -2206,7 +2206,7 @@ class Token(BASE):
 
     @property
     def expired(self):
-        ''' Returns wether a token has expired or not. '''
+        ''' Returns whether a token has expired or not. '''
         if datetime.datetime.utcnow().date() >= self.expiration.date():
             return True
         else:

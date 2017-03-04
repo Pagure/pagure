@@ -98,7 +98,7 @@ def create_session(db_url, debug=False, pool_recycle=3600):
     information with regards to the database engine, the host to connect
     to, the user and password and the database name.
       ie: <engine>://<user>:<password>@<host>/<dbname>
-    :kwarg debug: a boolean specifying wether we should have the verbose
+    :kwarg debug: a boolean specifying whether we should have the verbose
         output of sqlalchemy or not.
     :return a Session that can be used to query the database.
 
@@ -3362,7 +3362,7 @@ def clean_input(text, ignore=None):
 
 
 def could_be_text(text):
-    """ Returns wether we think this chain of character could be text or not
+    """ Returns whether we think this chain of character could be text or not
     """
     try:
         text.decode('utf-8')

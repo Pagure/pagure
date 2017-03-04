@@ -179,7 +179,7 @@ PAGURE_AUTH = 'fas'
 SESSION_COOKIE_SECURE = False
 SESSION_COOKIE_NAME = 'pagure'
 
-# Boolean specifying wether to check the user's IP address when retrieving
+# Boolean specifying whether to check the user's IP address when retrieving
 # its session. This make things more secure (thus is on by default) but
 # under certain setup it might not work (for example is there are proxies
 # in front of the application).

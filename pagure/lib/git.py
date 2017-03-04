@@ -1039,7 +1039,7 @@ def get_revs_between(oldrev, newrev, abspath, refname, forced=False):
 
 
 def is_forced_push(oldrev, newrev, abspath):
-    """ Returns wether there was a force push between HEAD and BASE.
+    """ Returns whether there was a force push between HEAD and BASE.
     Doc: http://stackoverflow.com/a/12258773
     """
 
