@@ -58,6 +58,8 @@ setup(
     entry_points="""
     [pygments.styles]
     diffstyle = pagure.ui.diff_style:DiffStyle
+    [console_scripts]
+    pagure-admin=pagure.cli.admin:main
     """,
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
