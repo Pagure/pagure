@@ -226,10 +226,15 @@ ACLS = {
 CROSS_PROJECT_ACLS = [
     'create_project',
     'fork_project',
+]
+
+# ACLs with which admins are allowed to create project-less API tokens
+ADMIN_API_ACLS = [
     'issue_comment',
     'issue_create',
     'pull_request_flag',
     'pull_request_comment',
+    'pull_request_merge',
 ]
 
 # Bootstrap URLS
