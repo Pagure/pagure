@@ -413,7 +413,7 @@ def api_view_issue(repo, issueid, username=None, namespace=None):
     issue_id = issue_uid = None
     try:
         issue_id = int(issueid)
-    except ValueError:
+    except (ValueError, TypeError):
         issue_uid = issueid
 
     issue = pagure.lib.search_issues(
@@ -500,7 +500,7 @@ def api_view_issue_comment(
     issue_id = issue_uid = None
     try:
         issue_id = int(issueid)
-    except ValueError:
+    except (ValueError, TypeError):
         issue_uid = issueid
 
     issue = pagure.lib.search_issues(
