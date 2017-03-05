@@ -137,12 +137,10 @@ def write_gitolite_acls(session, configfile):
             stream.write(row + '\n')
 
 
-def generate_gitolite_acls():
-    """ Generate the gitolite configuration file for all repos
+def _get_gitolite_command():
+    """ Return the gitolite command to run based on the info in the
+    configuration file.
     """
-    pagure.lib.git.write_gitolite_acls(
-        pagure.SESSION, pagure.APP.config['GITOLITE_CONFIG'])
-
     gitolite_folder = pagure.APP.config.get('GITOLITE_HOME', None)
     gitolite_version = pagure.APP.config.get('GITOLITE_VERSION', 3)
     if gitolite_folder:
@@ -161,6 +159,17 @@ def generate_gitolite_acls():
             raise pagure.exceptions.PagureException(
                 'Non-supported gitolite version "%s"' % gitolite_version
             )
+        return cmd
+
+
+def generate_gitolite_acls():
+    """ Generate the gitolite configuration file for all repos
+    """
+    pagure.lib.git.write_gitolite_acls(
+        pagure.SESSION, pagure.APP.config['GITOLITE_CONFIG'])
+
+    cmd = _get_gitolite_command()
+    if cmd:
         subprocess.Popen(
             cmd,
             shell=True,
