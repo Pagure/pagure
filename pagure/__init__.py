@@ -757,7 +757,6 @@ urlpattern = re.compile(urlregex)
 
 # Import the application
 import pagure.ui.app
-import pagure.ui.admin
 import pagure.ui.fork
 import pagure.ui.groups
 if APP.config.get('ENABLE_TICKETS', True):
