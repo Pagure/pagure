@@ -318,7 +318,7 @@ def api_pull_request_merge(repo, requestid, username=None, namespace=None):
         raise pagure.exceptions.APIError(
             404, error_code=APIERROR.EPULLREQUESTSDISABLED)
 
-    if repo != flask.g.token.project:
+    if flask.g.token.project and repo != flask.g.token.project:
         raise pagure.exceptions.APIError(401, error_code=APIERROR.EINVALIDTOK)
 
     request = pagure.lib.search_pull_requests(

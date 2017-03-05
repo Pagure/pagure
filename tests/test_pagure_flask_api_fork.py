@@ -560,6 +560,121 @@ class PagureFlaskApiForktests(tests.Modeltests):
         )
 
     @patch('pagure.lib.notify.send_email')
+    @patch('pagure.lib.git.merge_pull_request')
+    def test_api_pull_request_merge_user_token(self, mpr, send_email):
+        """ Test the api_pull_request_merge method of the flask api. """
+        mpr.return_value = 'Changes merged!'
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_tokens(self.session, project_id=None)
+        tests.create_tokens_acl(self.session)
+
+        # Create the pull-request to close
+        repo = pagure.lib.get_project(self.session, 'test')
+        forked_repo = pagure.lib.get_project(self.session, 'test')
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='master',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Invalid project
+        output = self.app.post(
+            '/api/0/foo/pull-request/1/merge', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Project not found",
+              "error_code": "ENOPROJECT",
+            }
+        )
+
+        # Valid token, invalid PR
+        output = self.app.post(
+            '/api/0/test2/pull-request/1/merge', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'error': 'Pull-Request not found', 'error_code': "ENOREQ"}
+        )
+
+        # Valid token, invalid PR - other project
+        output = self.app.post(
+            '/api/0/test/pull-request/2/merge', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'error': 'Pull-Request not found', 'error_code': "ENOREQ"}
+        )
+
+        # Create a token for foo for this project
+        item = pagure.lib.model.Token(
+            id='foobar_token',
+            user_id=2,
+            project_id=1,
+            expiration=datetime.datetime.utcnow() + datetime.timedelta(
+                days=30)
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        # Allow the token to merge PR
+        acls = pagure.lib.get_acls(self.session)
+        acl = None
+        for acl in acls:
+            if acl.name == 'pull_request_merge':
+                break
+        item = pagure.lib.model.TokenAcl(
+            token_id='foobar_token',
+            acl_id=acl.id,
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        headers = {'Authorization': 'token foobar_token'}
+
+        # User not admin
+        output = self.app.post(
+            '/api/0/test/pull-request/1/merge', headers=headers)
+        self.assertEqual(output.status_code, 403)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                'error': 'You are not allowed to merge/close pull-request '
+                    'for this project',
+                'error_code': "ENOPRCLOSE",
+            }
+        )
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Merge PR
+        output = self.app.post(
+            '/api/0/test/pull-request/1/merge', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {"message": "Changes merged!"}
+        )
+
+    @patch('pagure.lib.notify.send_email')
     def test_api_pull_request_add_comment(self, mockemail):
         """ Test the api_pull_request_add_comment method of the flask api. """
         mockemail.return_value = True
