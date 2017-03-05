@@ -188,7 +188,7 @@ def handle_messages():
             if data and not filename.startswith('files/'):
                 try:
                     json_data = json.loads(data)
-                except:
+                except ValueError:
                     pass
             if json_data:
                 try:

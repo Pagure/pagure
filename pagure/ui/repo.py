@@ -298,7 +298,7 @@ def view_commits(repo, branchname=None, username=None, namespace=None):
 
     try:
         page = int(flask.request.args.get('page', 1))
-    except ValueError:
+    except (ValueError, TypeError):
         page = 1
 
     author = flask.request.args.get('author', None)
@@ -306,7 +306,7 @@ def view_commits(repo, branchname=None, username=None, namespace=None):
     if author:
         try:
             author_obj = pagure.lib.get_user(SESSION, author)
-        except:
+        except pagure.exceptions.PagureException:
             pass
         if not author_obj:
             flask.flash(
@@ -1271,7 +1271,7 @@ def update_priorities(repo, username=None, namespace=None):
         ]
         try:
             weights = [int(w) for w in weights]
-        except:
+        except (ValueError, TypeError):
             flask.flash(
                 'Priorities weights must be numbers',
                 'error')

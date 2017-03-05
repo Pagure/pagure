@@ -80,7 +80,7 @@ def run_as_post_receive_hook():
         if data:
             try:
                 json_data = json.loads(data)
-            except:
+            except ValueError:
                 pass
         if json_data:
             pagure.lib.git.update_request_from_git(

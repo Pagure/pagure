@@ -103,7 +103,7 @@ class ExplicitLinkPattern(markdown.inlinepatterns.Pattern):
 
         try:
             idx = int(idx)
-        except:
+        except (ValueError, TypeError):
             return text
 
         issue = _issue_exists(user, namespace, repo, idx)
@@ -161,7 +161,7 @@ class ImplicitIssuePattern(markdown.inlinepatterns.Pattern):
         text = ' #%s' % idx
         try:
             idx = int(idx)
-        except:
+        except (ValueError, TypeError):
             return text
 
         try:
@@ -200,7 +200,7 @@ class ImplicitPRPattern(markdown.inlinepatterns.Pattern):
         text = ' PR#%s' % idx
         try:
             idx = int(idx)
-        except:
+        except (ValueError, TypeError):
             return text
 
         try:

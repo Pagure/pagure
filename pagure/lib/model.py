@@ -891,7 +891,7 @@ class Issue(BASE):
                     display_name = filename[:50] + "..."
                 else:
                     display_name = filename
-            except:
+            except AttributeError:
                 # Search failed, return the original string
                 return (text, text, text)
             return (link, filename, display_name)

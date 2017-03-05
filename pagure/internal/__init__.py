@@ -449,7 +449,7 @@ def get_branches_of_commit():
 
     try:
         commit_id in repo_obj
-    except:
+    except ValueError:
         response = flask.jsonify({
             'code': 'ERROR',
             'message': 'This commit could not be found in this repo',

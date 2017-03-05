@@ -19,7 +19,7 @@ import sys
 import os
 try:
     import pyclamd
-except:
+except ImportError:
     pyclamd = None
 import tempfile
 

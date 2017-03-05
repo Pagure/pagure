@@ -176,7 +176,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
         new_priority = None
         try:
             new_priority = int(form.priority.data)
-        except:
+        except (ValueError, TypeError):
             pass
         tags = [
             tag.strip()
@@ -187,7 +187,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
         try:
             if repo.milestones:
                 new_milestone = form.milestone.data.strip() or None
-        except:
+        except AttributeError:
             pass
 
         try:
@@ -618,7 +618,7 @@ def view_issues(repo, username=None, namespace=None):
 
     try:
         priority = int(priority)
-    except:
+    except (ValueError, TypeError):
         priority = None
 
     # Hide private tickets

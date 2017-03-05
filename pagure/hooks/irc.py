@@ -15,7 +15,7 @@ import pygit2
 import wtforms
 try:
     from flask_wtf import FlaskForm
-except:
+except ImportError:
     from flask_wtf import Form as FlaskForm
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref

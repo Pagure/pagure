@@ -1623,7 +1623,7 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
     if priority != -1:
         try:
             priority = int(priority)
-        except:
+        except (ValueError, TypeError):
             priority = None
         if priority != issue.priority:
             old_priority = issue.priority
@@ -1705,7 +1705,7 @@ def update_project_settings(session, repo, settings, user):
                     try:
                         settings[key] = int(settings[key]) \
                             if settings[key] else -1
-                    except ValueError:
+                    except (ValueError, TypeError):
                         raise pagure.exceptions.PagureException(
                             "Please enter a numeric value for the 'minimum "
                             "score to merge pull request' field.")
@@ -3367,7 +3367,7 @@ def could_be_text(text):
     try:
         text.decode('utf-8')
         return True
-    except:
+    except UnicodeDecodeError:
         return False
 
 

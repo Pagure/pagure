@@ -89,18 +89,10 @@ class ContextInjector(logging.Filter):  # pragma: no cover
 
         record.callstack = self.format_callstack()
 
-        record.url = '-'
-        record.args = '-'
+        record.url = getattr(flask.request, 'url', '-')
+        record.args = getattr(flask.request, 'args', '-')
         record.form = '-'
         record.username = '-'
-        try:
-            record.url = flask.request.url
-        except RuntimeError:
-            pass
-        try:
-            record.args = flask.request.args
-        except RuntimeError:
-            pass
         try:
             record.form = dict(flask.request.form)
             if 'csrf_token' in record.form:
