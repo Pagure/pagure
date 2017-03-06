@@ -1,4 +1,4 @@
-"""empty message
+"""Add key_notify to the issues_keys table
 
 Revision ID: 11470abae0d6
 Revises: 987edda096f5
@@ -20,8 +20,14 @@ def upgrade():
     '''
     op.add_column(
         'issue_keys',
-        sa.Column('key_notify', sa.Boolean, default=False, nullable=False)
+        sa.Column(
+            'key_notify', sa.Boolean, default=False, nullable=True
+        )
     )
+    op.execute('UPDATE issue_keys SET key_notify=False')
+    op.alter_column(
+        'issue_keys', 'key_notify',
+        nullable=False, existing_nullable=True)
 
 
 def downgrade():
