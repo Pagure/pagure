@@ -910,12 +910,59 @@ function setup_reply_btns() {
 };
 
 
-  function showTab(){
-   $('#pr-tabs a[href="#request_diff"]').tab('show')
-  }
+function showTab(){
+  $('#pr-tabs a[href="#request_diff"]').tab('show')
+}
 
+function show_merge_status(){
+  function process_response(res) {
+      $('#spinner').hide();
+      if (res.code == 'FFORWARD'){
+        $('#merge_btn').addClass("btn-success");
+        $('#merge-alert').addClass("alert-success");
+        $('#merge-alert-message').append(res.message);
+        $('#merge-alert').show();
+      }
+      else if (res.code == 'MERGE') {
+        $('#merge_btn').addClass("btn-warning");
+        $('#merge-alert').addClass("alert-warning");
+        $('#merge-alert-message').append(res.message);
+        $('#merge-alert').show();
+      }
+      else if (res.code == 'CONFLICTS') {
+        $('#merge_btn').hide();
+        $('#merge-alert').addClass("alert-danger");
+        $('#merge-alert-message').append(res.message);
+        $('#merge-alert').show();
+      }
+      else if (res.code == 'NO_CHANGE') {
+        $('#merge_btn').hide();
+        $('#merge-alert').addClass("alert-info");
+        $('#merge-alert-message').append(res.message);
+        $('#merge-alert').show();
+      }
+  };
+  $('#spinner').show();
+  $.ajax({
+    url: '{{ url_for("internal_ns.mergeable_request_pull") }}' ,
+    type: 'POST',
+    data: {
+      requestid: "{{ pull_request.uid }}",
+      csrf_token: "{{ mergeform.csrf_token.current_token }}",
+    },
+    dataType: 'json',
+    success: function(res) {
+      process_response(res)
+    },
+    error: function(res) {
+      process_response(res.responseJSON);
+      $('#merge_btn').attr("disabled", "disabled");
+    }
+  });
+  return false;
+}
 
- $(document).ready(function() {
+$(document).ready(function() {
 
   $(".inline-comments").hide();
   $( ".inline-btn" ).click(function() {
@@ -1073,53 +1120,7 @@ function setup_reply_btns() {
   });
 
   {% if pull_request.status == 'Open' %}
-  $(function(){
-    function process_response(res) {
-        $('#spinner').hide();
-        if (res.code == 'FFORWARD'){
-          $('#merge_btn').addClass("btn-success");
-          $('#merge-alert').addClass("alert-success");
-          $('#merge-alert-message').append(res.message);
-          $('#merge-alert').show();
-        }
-        else if (res.code == 'MERGE') {
-          $('#merge_btn').addClass("btn-warning");
-          $('#merge-alert').addClass("alert-warning");
-          $('#merge-alert-message').append(res.message);
-          $('#merge-alert').show();
-        }
-        else if (res.code == 'CONFLICTS') {
-          $('#merge_btn').hide();
-          $('#merge-alert').addClass("alert-danger");
-          $('#merge-alert-message').append(res.message);
-          $('#merge-alert').show();
-        }
-        else if (res.code == 'NO_CHANGE') {
-          $('#merge_btn').hide();
-          $('#merge-alert').addClass("alert-info");
-          $('#merge-alert-message').append(res.message);
-          $('#merge-alert').show();
-        }
-    };
-    $('#spinner').show();
-    $.ajax({
-      url: '{{ url_for("internal_ns.mergeable_request_pull") }}' ,
-      type: 'POST',
-      data: {
-        requestid: "{{ pull_request.uid }}",
-        csrf_token: "{{ mergeform.csrf_token.current_token }}",
-      },
-      dataType: 'json',
-      success: function(res) {
-        process_response(res)
-      },
-      error: function(res) {
-        process_response(res.responseJSON);
-        $('#merge_btn').attr("disabled", "disabled");
-      }
-    });
-    return false;
-  });
+    show_merge_status()
   {% endif %}
 
 {% endif %}
@@ -1146,12 +1147,12 @@ $('#assignee').selectize({
   }
 });
 
-  $( ".editmetadatatoggle" ).click(
-    function() {
-      $( ".issue-metadata-form" ).toggle();
-      $( ".issue-metadata-display" ).toggle();
-    }
-  );
+$( ".editmetadatatoggle" ).click(
+  function() {
+    $( ".issue-metadata-form" ).toggle();
+    $( ".issue-metadata-display" ).toggle();
+  }
+);
 
 function set_ui_for_comment(setting){
   console.log(setting)
