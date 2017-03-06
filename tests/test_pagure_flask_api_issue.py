@@ -1013,7 +1013,146 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             }
         )
 
-        # Test since
+    def test_api_view_issues_since(self):
+        """ Test the api_view_issues method of the flask api for since option """
+        self.test_api_new_issue()
+
+        # Invalid repo
+        output = self.app.get('/api/0/foo/issues')
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Project not found",
+              "error_code": "ENOPROJECT",
+            }
+        )
+
+        # List all opened issues
+        output = self.app.get('/api/0/test/issues')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        for idx in range(len(data['issues'])):
+            data['issues'][idx]['date_created'] = '1431414800'
+            data['issues'][idx]['last_updated'] = '1431414800'
+        self.assertDictEqual(
+            data,
+            {
+              "args": {
+                "assignee": None,
+                "author": None,
+                "since": None,
+                "status": None,
+                "tags": []
+              },
+              "issues": FULL_ISSUE_LIST[3:],
+              "total_issues": 6
+            }
+        )
+
+        # Create private issue
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None,
+            private=True,
+            milestone=""
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        # Access issues un-authenticated
+        output = self.app.get('/api/0/test/issues')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        for idx in range(len(data['issues'])):
+            data['issues'][idx]['date_created'] = '1431414800'
+            data['issues'][idx]['last_updated'] = '1431414800'
+        self.assertDictEqual(
+            data,
+            {
+              "args": {
+                "assignee": None,
+                "author": None,
+                "since": None,
+                "status": None,
+                "tags": []
+              },
+              "issues": FULL_ISSUE_LIST[3:],
+              "total_issues": 6
+            }
+        )
+        headers = {'Authorization': 'token aaabbbccc'}
+
+        # Access issues authenticated but non-existing token
+        output = self.app.get('/api/0/test/issues', headers=headers)
+        self.assertEqual(output.status_code, 401)
+
+        # Create a new token for another user
+        item = pagure.lib.model.Token(
+            id='bar_token',
+            user_id=2,
+            project_id=1,
+            expiration=datetime.datetime.utcnow() + datetime.timedelta(
+                days=30)
+        )
+        self.session.add(item)
+
+        headers = {'Authorization': 'token bar_token'}
+
+        # Access issues authenticated but wrong token
+        output = self.app.get('/api/0/test/issues', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        for idx in range(len(data['issues'])):
+            data['issues'][idx]['date_created'] = '1431414800'
+            data['issues'][idx]['last_updated'] = '1431414800'
+        self.assertDictEqual(
+            data,
+            {
+              "args": {
+                "assignee": None,
+                "author": None,
+                "since": None,
+                "status": None,
+                "tags": []
+              },
+              "issues": FULL_ISSUE_LIST[3:],
+              "total_issues": 6
+            }
+        )
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Access issues authenticated correctly
+        output = self.app.get('/api/0/test/issues', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        for idx in range(len(data['issues'])):
+            data['issues'][idx]['date_created'] = '1431414800'
+            data['issues'][idx]['last_updated'] = '1431414800'
+
+        self.assertDictEqual(
+            data,
+            {
+              "args": {
+                "assignee": None,
+                "author": None,
+                "since": None,
+                "status": None,
+                "tags": []
+              },
+              "issues": FULL_ISSUE_LIST,
+              "total_issues": 9
+            }
+        )
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        # Test since for a value before creation of issues
         output = self.app.get(
             '/api/0/test/issues?since=1431414700', headers=headers)
         self.assertEqual(output.status_code, 200)
@@ -1036,7 +1175,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             }
         )
 
-        # Test since
+        # Test since for a value after creation of all the issues
         output = self.app.get(
             '/api/0/test/issues?since=1531414800', headers=headers)
         self.assertEqual(output.status_code, 200)
@@ -1061,7 +1200,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
 
         # Test since when status is 'all'
         output = self.app.get(
-            '/api/0/test/issues?status=all&since=1431414700', headers=headers)
+            '/api/0/test/issues?status=all&since=1231414800', headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         for idx in range(len(data['issues'])):
@@ -1073,11 +1212,11 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "args": {
                 "assignee": None,
                 "author": None,
-                "since": '1431414700',
+                "since": '1231414800',
                 "status": "all",
                 "tags": []
               },
-              "issues": FULL_ISSUE_LIST,
+                "issues": FULL_ISSUE_LIST,
               "total_issues": 9
             }
         )
@@ -1100,7 +1239,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "status": "Open",
                 "tags": []
               },
-              "issues": FULL_ISSUE_LIST,
+                "issues": FULL_ISSUE_LIST,
               "total_issues": 9
             }
         )
@@ -1150,7 +1289,6 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "total_issues": 0
             }
         )
-
 
     def test_api_view_issue(self):
         """ Test the api_view_issue method of the flask api. """
