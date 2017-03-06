@@ -406,7 +406,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
         # Allow the token to close PR
         acls = pagure.lib.get_acls(self.session)
-        acl = None
         for acl in acls:
             if acl.name == 'pull_request_close':
                 break
@@ -520,7 +519,6 @@ class PagureFlaskApiForktests(tests.Modeltests):
 
         # Allow the token to merge PR
         acls = pagure.lib.get_acls(self.session)
-        acl = None
         for acl in acls:
             if acl.name == 'pull_request_merge':
                 break
