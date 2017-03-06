@@ -1274,6 +1274,7 @@ function updateHighlight(onload) {
     }
   }
 }
+
 $(document).ready(function () {
   updateHighlight(true)
  {% if form %}
@@ -1370,7 +1371,9 @@ $(document).ready(function () {
     $("#initial_comment").atwho(issueAndPrConfig);
   });
 } );
+
 $(window).on('hashchange', updateHighlight);
+
 var selected = [];
 $("[data-line-number]").click(function (ev) {
   var line = $(this).attr('data-line-number');
@@ -1392,14 +1395,18 @@ $("[data-line-number]").click(function (ev) {
 // Update hash links in the addressbar according to which tab is clicked
 // on the PR page.
 $(document).on('click', '#pr-tabs a', function() {
-  window.location.hash = $(this).attr('href');
+  if ($(this).text().trim() == 'Comments' || $(this).text().trim() == 'Patch'){
+    window.location.hash = '';
+  }  else {
+    window.location.hash = $(this).attr('href');
+  }
 });
 
 // Show an icon to open the changed file, when the user hovers over the
 // @@ -x,y +x,y @@ line in the diff. Clicking this icon opens the file (at the
 // relevant line number) in a new tab.
 $(document).on("mouseenter", "td.cell2", function(){
-	$(this).find("a.open_changed_file_icon_wrap").css('visibility', 'visible');
+    $(this).find("a.open_changed_file_icon_wrap").css('visibility', 'visible');
 });
 $(document).on("mouseleave", "td.cell2", function() {
   $(this).find("a.open_changed_file_icon_wrap").css('visibility', 'hidden');
