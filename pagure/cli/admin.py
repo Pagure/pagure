@@ -36,13 +36,13 @@ def parse_arguments():
     # refresh-gitolite
     parser_gitolite = subparsers.add_parser(
         'refresh-gitolite',
-        help='Re-generate the gitolite confi file')
+        help='Re-generate the gitolite config file')
     parser_gitolite.set_defaults(func=do_generate_acl)
 
     # refresh-ssh
     parser_ssh = subparsers.add_parser(
         'refresh-ssh',
-        help='Re-write to disk every user\'s ssh key stored in the database')
+        help="Re-write to disk every user's ssh key stored in the database")
     parser_ssh.set_defaults(func=do_refresh_ssh)
 
     # clear-hook-token
