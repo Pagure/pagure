@@ -927,6 +927,23 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Project "testproject" created')
 
+        # Try creating an existing project using a different case
+        self.assertRaises(
+            pagure.exceptions.PagureException,
+            pagure.lib.new_project,
+            session=self.session,
+            user='pingou',
+            name='TestProject',
+            blacklist=[],
+            allowed_prefix=[],
+            gitfolder=gitfolder,
+            docfolder=docfolder,
+            ticketfolder=ticketfolder,
+            requestfolder=requestfolder,
+            description='description for testproject',
+            parent_id=None,
+        )
+
         repo = pagure.lib.get_project(self.session, 'testproject')
         self.assertEqual(repo.path, 'testproject.git')
 

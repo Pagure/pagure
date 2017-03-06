@@ -2012,10 +2012,15 @@ def get_project(session, name, user=None, namespace=None):
     query = session.query(
         model.Project
     ).filter(
-        model.Project.name == name
-    ).filter(
-        model.Project.namespace == namespace
+        func.lower(model.Project.name) == name.lower()
     )
+
+    if namespace:
+        query = query.filter(
+            func.lower(model.Project.namespace) == namespace.lower()
+        )
+    else:
+        query = query.filter(model.Project.namespace == namespace)
 
     if user is not None:
         query = query.filter(
