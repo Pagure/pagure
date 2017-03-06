@@ -549,6 +549,48 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
             {'message': 'Project "test_42" created'}
         )
 
+        # Project with a namespace
+        pagure.APP.config['ALLOWED_PREFIX'] = ['rpms']
+        data = {
+            'name': 'test_42',
+            'namespace': 'pingou',
+            'description': 'Just another small test project',
+        }
+
+        # Invalid namespace
+        output = self.app.post(
+            '/api/0/new/', data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                "error": "Invalid or incomplete input submited",
+                "error_code": "EINVALIDREQ",
+                "errors": {
+                    "namespace": [
+                        "Not a valid choice"
+                    ]
+                }
+            }
+        )
+
+        data = {
+            'name': 'test_42',
+            'namespace': 'rpms',
+            'description': 'Just another small test project',
+        }
+
+        # All good
+        output = self.app.post(
+            '/api/0/new/', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'Project "rpms/test_42" created'}
+        )
+
     @patch('pagure.lib.git.generate_gitolite_acls')
     def test_api_new_project_user_ns(self, p_gga):
         """ Test the api_new_project method of the flask api. """
