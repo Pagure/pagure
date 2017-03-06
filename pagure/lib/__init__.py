@@ -3730,7 +3730,8 @@ def save_report(session, repo, name, url, username):
     session.add(repo)
 
 
-def set_custom_key_fields(session, project, fields, types, data, notify):
+def set_custom_key_fields(
+        session, project, fields, types, data, notify=None):
     """ Set or update the custom key fields of a project with the values
     provided.  "data" is currently only used for lists
     """
@@ -3750,7 +3751,7 @@ def set_custom_key_fields(session, project, fields, types, data, notify):
                     for item in data[idx].split(',')
                 ]
 
-        if notify[idx] == "on":
+        if notify and notify[idx] == "on":
             notify_flag = True
         else:
             notify_flag = False
