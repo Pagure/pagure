@@ -3838,7 +3838,7 @@ def set_custom_key_value(session, issue, key, value):
             output += ' (was: %s)' % old_value
         return output
     elif updated and old_value:
-        return 'Custom field %s reset' % key.name
+        return 'Custom field %s reset (from %s)' % (key.name, old_value)
 
 
 def get_yearly_stats_user(session, user, date):

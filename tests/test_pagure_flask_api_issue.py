@@ -2037,7 +2037,8 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertDictEqual(
             data,
             {
-              "message": "Custom field bugzilla reset"
+              "message": "Custom field bugzilla reset "
+                  "(from https://bugzilla.redhat.com/1234)"
             }
         )
 
