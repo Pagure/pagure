@@ -1036,6 +1036,29 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             }
         )
 
+        # Test since when status is 'Open'
+        output = self.app.get(
+            '/api/0/test/issues?status=Open&since=1431414700', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        for idx in range(len(data['issues'])):
+            data['issues'][idx]['last_updated'] = '1431414800'
+            data['issues'][idx]['date_created'] = '1431414800'
+        self.assertDictEqual(
+            data,
+            {
+              "args": {
+                "assignee": None,
+                "author": None,
+                "since": '1431414700',
+                "status": "Open",
+                "tags": []
+              },
+              "issues": FULL_ISSUE_LIST,
+              "total_issues": 9
+            }
+        )
+
     def test_api_view_issue(self):
         """ Test the api_view_issue method of the flask api. """
         self.test_api_new_issue()
