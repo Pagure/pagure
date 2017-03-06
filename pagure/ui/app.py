@@ -762,7 +762,7 @@ def ssh_hostkey():
 @APP.route('/settings/token/new/', methods=('GET', 'POST'))
 @APP.route('/settings/token/new', methods=('GET', 'POST'))
 @login_required
-def add_user_token():
+def add_api_user_token():
     """ Create an user token (not project specific).
     """
     if admin_session_timedout():

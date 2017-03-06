@@ -31,7 +31,7 @@
                       repo=repo.name, namespace=repo.namespace)
           }}" method="post">
           {% else %}
-          <form action="{{ url_for('.add_user_token') }}" method="post">
+          <form action="{{ url_for('.add_api_user_token') }}" method="post">
           {% endif %}
             {% for acl in acls %}
             <div>

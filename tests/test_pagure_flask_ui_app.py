@@ -703,8 +703,8 @@ class PagureFlaskApptests(tests.Modeltests):
 
     @patch('pagure.lib.notify.send_email')
     @patch('pagure.ui.app.admin_session_timedout')
-    def test_add_user_email(self, ast, send_email):
-        """ Test the add_user_email endpoint. """
+    def test_add_api_user_email(self, ast, send_email):
+        """ Test the add_api_user_email endpoint. """
         send_email.return_value = True
         ast.return_value = False
         self.test_new_project()
