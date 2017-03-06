@@ -1013,6 +1013,52 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             }
         )
 
+        # Test since
+        output = self.app.get(
+            '/api/0/test/issues?since=1431414700', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        for idx in range(len(data['issues'])):
+            data['issues'][idx]['last_updated'] = '1431414800'
+            data['issues'][idx]['date_created'] = '1431414800'
+        self.assertDictEqual(
+            data,
+            {
+              "args": {
+                "assignee": None,
+                "author": None,
+                "since": '1431414700',
+                "status": None,
+                "tags": []
+              },
+              "issues": FULL_ISSUE_LIST,
+              "total_issues": 9
+            }
+        )
+
+        # Test since
+        output = self.app.get(
+            '/api/0/test/issues?since=1531414800', headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        for idx in range(len(data['issues'])):
+            data['issues'][idx]['last_updated'] = '1431414800'
+            data['issues'][idx]['date_created'] = '1431414800'
+        self.assertDictEqual(
+            data,
+            {
+              "args": {
+                "assignee": None,
+                "author": None,
+                "since": '1531414800',
+                "status": None,
+                "tags": []
+              },
+              "issues": [],
+              "total_issues": 0
+            }
+        )
+
         # Test since when status is 'all'
         output = self.app.get(
             '/api/0/test/issues?status=all&since=1431414700', headers=headers)
