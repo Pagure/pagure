@@ -478,10 +478,12 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         data = json.loads(output.data)
         data['issue']['date_created'] = '1431414800'
         data['issue']['last_updated'] = '1431414800'
+        exp = FULL_ISSUE_LIST[1]
+        exp['id'] = 8
         self.assertDictEqual(
             data,
             {
-              "issue": FULL_ISSUE_LIST[1],
+              "issue": exp,
               "message": "Issue created"
             }
         )
@@ -723,6 +725,28 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             data,
             {
               "issue": FULL_ISSUE_LIST[1],
+              "message": "Issue created"
+            }
+        )
+
+        # Private issue: 'true'
+        data = {
+            'title': 'test issue1',
+            'issue_content': 'This issue needs attention',
+            'private': 'true',
+        }
+        output = self.app.post(
+            '/api/0/test/new_issue', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        data['issue']['date_created'] = '1431414800'
+        data['issue']['last_updated'] = '1431414800'
+        exp = FULL_ISSUE_LIST[1]
+        exp['id'] = 9
+        self.assertDictEqual(
+            data,
+            {
+              "issue": exp,
               "message": "Issue created"
             }
         )
