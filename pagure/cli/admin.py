@@ -11,6 +11,12 @@ from __future__ import print_function
 
 import argparse
 import logging
+import os
+
+if 'PAGURE_CONFIG' not in os.environ \
+        and os.path.exists('/etc/pagure/pagure.cfg'):
+    print('Using configuration file `/etc/pagure/pagure.cfg`')
+    os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
 import pagure.exceptions
 import pagure.lib
@@ -97,11 +103,6 @@ def do_generate_hook_token():
 
 def main():
     """ Start of the application. """
-
-    # TODO: figure out if the user is allowed to run this tool at all
-    #   -> require root?
-    #   -> check if pagure's config file is readable?
-    #   -> Ask for something private in pagure's config file?
 
     # Parse the arguments
     args = parse_arguments()
