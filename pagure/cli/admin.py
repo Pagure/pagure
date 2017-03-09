@@ -13,16 +13,17 @@ import argparse
 import datetime
 import logging
 import os
+import sys
 
 if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
     print('Using configuration file `/etc/pagure/pagure.cfg`')
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
-import pagure.exceptions
-import pagure.lib
-import pagure.lib.git
-from pagure import (SESSION, APP, generate_user_key_files)
+import pagure.exceptions  # noqa
+import pagure.lib  # noqa
+import pagure.lib.git  # noqa
+from pagure import (SESSION, APP, generate_user_key_files)  # noqa
 
 
 _log = logging.getLogger(__name__)
@@ -36,7 +37,7 @@ def parse_arguments():
     parser.add_argument(
         '--debug', default=False, action='store_true',
         help='Increase the verbosity of the information displayed')
-    parser.set_defaults(func=lambda a, k : print(parser.format_help()))
+    parser.set_defaults(func=lambda a, k: print(parser.format_help()))
 
     subparsers = parser.add_subparsers(title='actions')
 
@@ -118,7 +119,8 @@ def do_generate_acl(_):
     if not cmd:
         raise pagure.exceptions.PagureException(
             '/!\ un-able to generate the right gitolite command')
-    print('Do you want to re-generate the gitolite.conf file then '
+    print(
+        'Do you want to re-generate the gitolite.conf file then '
         'calling: %s' % cmd)
     if _ask_confirmation():
         pagure.lib.git.generate_gitolite_acls()
@@ -127,7 +129,8 @@ def do_generate_acl(_):
 
 def do_refresh_ssh(_):
     """ Regenerate the user key files. """
-    print('Do you want to re-generate all the ssh keys for every user in '
+    print(
+        'Do you want to re-generate all the ssh keys for every user in '
         'the database? (Depending on your instance this may take a while '
         'and result in an outage while it lasts)')
     if _ask_confirmation():
@@ -138,7 +141,8 @@ def do_refresh_ssh(_):
 
 def do_generate_hook_token():
     """ Regenerate the hook_token for each projects in the DB. """
-    print('Do you want to re-generate all the hook token for every user in '
+    print(
+        'Do you want to re-generate all the hook token for every user in '
         'the database? This will break every web-hook set-up on this '
         'instance. You should only ever run this for a security issue')
     if _ask_confirmation():
@@ -206,7 +210,7 @@ def do_create_admin_token(args):
     """ Create a new admin token. """
     _log.debug('user:          %s', args.user)
     # Validate user first
-    user_obj = pagure.lib.get_user(SESSION, args.user)
+    pagure.lib.get_user(SESSION, args.user)
 
     acls_list = APP.config['ADMIN_API_ACLS']
     for idx, acl in enumerate(acls_list):
