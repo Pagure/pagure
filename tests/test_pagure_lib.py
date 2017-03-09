@@ -363,15 +363,15 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(msg, 'Issue marked as depending on: #2')
 
         # After
-        self.assertEqual(len(issue.parents), 1)
-        self.assertEqual(issue.parents[0].id, 2)
-        self.assertEqual(len(issue.children), 0)
-        self.assertEqual(issue.children, [])
+        self.assertEqual(len(issue.parents), 0)
+        self.assertEqual(issue.parents, [])
+        self.assertEqual(len(issue.children), 1)
+        self.assertEqual(issue.children[0].id, 2)
 
-        self.assertEqual(len(issue_blocked.parents), 0)
-        self.assertEqual(issue_blocked.parents, [])
-        self.assertEqual(len(issue_blocked.children), 1)
-        self.assertEqual(issue_blocked.children[0].id, 1)
+        self.assertEqual(len(issue_blocked.children), 0)
+        self.assertEqual(issue_blocked.children, [])
+        self.assertEqual(len(issue_blocked.parents), 1)
+        self.assertEqual(issue_blocked.parents[0].id, 1)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -2010,15 +2010,15 @@ class PagureLibtests(tests.Modeltests):
             self.session, repo, issueid=2)
 
         # Before
-        self.assertEqual(len(issue.parents), 1)
-        self.assertEqual(issue.parents[0].id, 2)
-        self.assertEqual(len(issue.children), 0)
-        self.assertEqual(issue.children, [])
+        self.assertEqual(len(issue.children), 1)
+        self.assertEqual(issue.children[0].id, 2)
+        self.assertEqual(len(issue.parents), 0)
+        self.assertEqual(issue.parents, [])
 
-        self.assertEqual(len(issue_blocked.parents), 0)
-        self.assertEqual(issue_blocked.parents, [])
-        self.assertEqual(len(issue_blocked.children), 1)
-        self.assertEqual(issue_blocked.children[0].id, 1)
+        self.assertEqual(len(issue_blocked.children), 0)
+        self.assertEqual(issue_blocked.children, [])
+        self.assertEqual(len(issue_blocked.parents), 1)
+        self.assertEqual(issue_blocked.parents[0].id, 1)
 
         self.assertRaises(
             pagure.exceptions.PagureException,
@@ -2236,10 +2236,10 @@ class PagureLibtests(tests.Modeltests):
             ticketfolder=None)
         self.assertEqual(
             messages, [
-                'Issue marked as blocked by: #3',
-                'Issue marked as blocked by: #4',
-                'Issue marked as blocked by: #5',
-                'Issue **un**marked as blocked by: #2'])
+                'Issue marked as blocking: #3',
+                'Issue marked as blocking: #4',
+                'Issue marked as blocking: #5',
+                'Issue **un**marked as blocking: #2'])
 
         # after
         self.assertEqual(issue.tags_text, [])

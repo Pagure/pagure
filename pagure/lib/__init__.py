@@ -591,8 +591,8 @@ def add_issue_dependency(
 
     if issue_blocked not in issue.children:
         i2i = model.IssueToIssue(
-            parent_issue_id=issue_blocked.uid,
-            child_issue_id=issue.uid
+            parent_issue_id=issue.uid,
+            child_issue_id=issue_blocked.uid
         )
         session.add(i2i)
         # Make sure we won't have SQLAlchemy error before we continue
@@ -645,12 +645,12 @@ def remove_issue_dependency(
             'An issue cannot depend on itself'
         )
 
-    if issue_blocked in issue.children:
-        child_del = []
-        for child in issue.children:
-            if child.uid == issue_blocked.uid:
-                child_del.append(child.id)
-                issue.children.remove(child)
+    if issue_blocked in issue.parents:
+        parent_del = []
+        for parent in issue.parents:
+            if parent.uid == issue_blocked.uid:
+                parent_del.append(parent.id)
+                issue.parents.remove(parent)
 
         # Make sure we won't have SQLAlchemy error before we continue
         session.flush()
@@ -670,7 +670,7 @@ def remove_issue_dependency(
                 msg=dict(
                     issue=issue.to_json(public=True),
                     project=issue.project.to_json(public=True),
-                    removed_dependency=child_del,
+                    removed_dependency=parent_del,
                     agent=user_obj.username,
                 ),
                 redis=REDIS,
@@ -679,7 +679,7 @@ def remove_issue_dependency(
         # Send notification for the event-source server
         if REDIS:
             REDIS.publish('pagure.%s' % issue.uid, json.dumps({
-                'removed_dependency': child_del,
+                'removed_dependency': parent_del,
                 'issue_uid': issue.uid,
                 'type': 'children',
             }))
@@ -690,7 +690,7 @@ def remove_issue_dependency(
             }))
 
         return 'Issue **un**marked as depending on: #%s' % ' #'.join(
-            [str(id) for id in child_del])
+            [str(id) for id in parent_del])
 
 
 def remove_tags(session, project, tags, ticketfolder, user):

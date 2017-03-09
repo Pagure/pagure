@@ -946,12 +946,12 @@ class Issue(BASE):
     @property
     def depending_text(self):
         ''' Return the list of issue this issue depends on in simple text. '''
-        return [issue.id for issue in self.children]
+        return [issue.id for issue in self.parents]
 
     @property
     def blocking_text(self):
         ''' Return the list of issue this issue blocks on in simple text. '''
-        return [issue.id for issue in self.parents]
+        return [issue.id for issue in self.children]
 
     @property
     def user_comments(self):

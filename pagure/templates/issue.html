@@ -225,7 +225,7 @@
           <fieldset class="form-group issue-metadata-display">
             <label><strong>Blocking</strong></label>
             <div id="blocklist">
-              {% for ticket in issue.parents %}
+              {% for ticket in issue.children %}
                 <a id="block-{{ ticket.id }}" class="label label-default"
                   href="{{ url_for('view_issue',
                     repo=repo.name,
@@ -249,7 +249,7 @@
           <fieldset class="form-group issue-metadata-display">
             <label><strong>Depending on</strong></label>
             <div id="dependlist">
-              {% for ticket in issue.children %}
+              {% for ticket in issue.parents %}
                 <a id="depend-{{ ticket.id }}" class="label label-default"
                   href="{{ url_for('view_issue',
                     repo=repo.name,

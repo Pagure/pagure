@@ -168,7 +168,7 @@ class PagureFlaskDumpLoadTicketTests(tests.Modeltests):
         cnt = len([commit
             for commit in repo.walk(
                 repo.head.target, pygit2.GIT_SORT_TOPOLOGICAL)])
-        self.assertEqual(cnt, 10)
+        self.assertEqual(cnt, 9)
 
         last_commit = repo.revparse_single('HEAD')
         patch = pagure.lib.git.commit_to_patch(repo, last_commit)
