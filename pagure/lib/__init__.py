@@ -4218,3 +4218,55 @@ def get_obj_access(session, project_obj, obj):
         )
 
     return query.first()
+
+
+def search_token(
+        session, acls, user=None, token=None, active=False, expired=False):
+    ''' Searches the API tokens corresponding to the criterias specified.
+
+    :arg session: the session to use to connect to the database.
+    :arg acls: List of the ACL associated with these API tokens
+    :arg user: restrict the API tokens to this given user
+    :arg token: restrict the API tokens to this specified token (if it
+        exists)
+    '''
+    query = session.query(
+        model.Token
+    ).filter(
+        model.Token.id == model.TokenAcl.token_id
+    ).filter(
+        model.TokenAcl.acl_id == model.ACL.id
+    )
+
+    if isinstance(acls, list):
+        query = query.filter(
+            model.ACL.name.in_(acls)
+        )
+    else:
+        query = query.filter(
+            model.ACL.name == acls
+        )
+
+    if user:
+        query = query.filter(
+            model.Token.user_id == model.User.id
+        ).filter(
+            model.User.user == user
+        )
+
+    if active:
+        query = query.filter(
+            model.Token.expiration > datetime.datetime.utcnow()
+        )
+    elif expired:
+        query = query.filter(
+            model.Token.expiration <= datetime.datetime.utcnow()
+        )
+
+    if token:
+        query = query.filter(
+            model.Token.id == token
+        )
+        return query.first()
+    else:
+        return query.all()
