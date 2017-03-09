@@ -457,6 +457,66 @@ class PagureLibGetWatchListtests(tests.Modeltests):
             set(['foo', 'bar', 'pingou'])
         )
 
+    def test_get_watch_list_project_w_private_issue(self):
+        """ Test get_watch_list when the project has one contributor watching
+        the project and the issue is private """
+        # Create a project ns/test3
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test3',
+            namespace='ns',
+            description='test project #1',
+            hook_token='aaabbbcccdd',
+        )
+        item.close_status = ['Invalid', 'Insufficient data', 'Fixed']
+        self.session.add(item)
+        self.session.commit()
+
+        # Add a new user
+        item = pagure.lib.model.User(
+            user='bar',
+            fullname='bar foo',
+            password='foo',
+            default_email='bar@bar.com',
+        )
+        self.session.add(item)
+        item = pagure.lib.model.UserEmail(
+            user_id=3,
+            email='bar@bar.com')
+        self.session.add(item)
+
+        # Set the user `bar` to watch the project
+        project = pagure.lib.get_project(
+            self.session, 'test3', namespace='ns')
+        msg = pagure.lib.update_watch_status(
+            session=self.session,
+            project=project,
+            user='bar',
+            watch=True,
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'You are now watching this repo.')
+
+        # Create the ticket
+        iss = pagure.lib.new_issue(
+            issue_id=4,
+            session=self.session,
+            repo=project,
+            title='test issue',
+            content='content test issue',
+            user='pingou',
+            private=True,
+            ticketfolder=None,
+        )
+        self.session.commit()
+        self.assertEqual(iss.id, 4)
+        self.assertEqual(iss.title, 'test issue')
+
+        self.assertEqual(
+            pagure.lib.get_watch_list(self.session, iss),
+            set(['pingou'])
+        )
+
 
 if __name__ == '__main__':
     unittest.main()

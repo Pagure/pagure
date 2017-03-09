@@ -3656,7 +3656,9 @@ def set_watch_obj(session, user, obj, watch_status):
 def get_watch_list(session, obj):
     """ Return a list of all the users that are watching the "object"
     """
+    private = False
     if obj.isa == "issue":
+        private = obj.private
         obj_watchers_query = session.query(
             model.IssueWatcher
         ).filter(
@@ -3700,21 +3702,23 @@ def get_watch_list(session, obj):
         for member in group.users:
             users.add(member.username)
 
-    # Add all the people watching the repo, remove those who opted-out
-    for watcher in project_watchers_query.all():
-        if watcher.watch:
-            users.add(watcher.user.username)
-        else:
-            if watcher.user.username in users:
-                users.remove(watcher.user.username)
+    # If the issue isn't private:
+    if not private:
+        # Add all the people watching the repo, remove those who opted-out
+        for watcher in project_watchers_query.all():
+            if watcher.watch:
+                users.add(watcher.user.username)
+            else:
+                if watcher.user.username in users:
+                    users.remove(watcher.user.username)
 
-    # Add all the people watching this object, remove those who opted-out
-    for watcher in obj_watchers_query.all():
-        if watcher.watch:
-            users.add(watcher.user.username)
-        else:
-            if watcher.user.username in users:
-                users.remove(watcher.user.username)
+        # Add all the people watching this object, remove those who opted-out
+        for watcher in obj_watchers_query.all():
+            if watcher.watch:
+                users.add(watcher.user.username)
+            else:
+                if watcher.user.username in users:
+                    users.remove(watcher.user.username)
 
     return users
 
