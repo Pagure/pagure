@@ -914,6 +914,7 @@ function showTab(){
   $('#pr-tabs a[href="#request_diff"]').tab('show')
 }
 
+{% if pull_request %}
 function show_merge_status(){
   function process_response(res) {
       $('#spinner').hide();
@@ -961,6 +962,7 @@ function show_merge_status(){
   });
   return false;
 }
+{% endif %}
 
 $(document).ready(function() {
 

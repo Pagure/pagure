@@ -84,7 +84,7 @@
       <div class="card-header">
         <strong>Email Addresses</strong>
             <a class="btn btn-success btn-sm pull-xs-right" href="{{
-                url_for('add_api_user_email') }}">
+                url_for('add_user_email') }}">
                   Add Email
             </a>
       </div>
@@ -237,7 +237,7 @@
       </ul>
       {% endif %}
       <div class="card-block">
-        <a href="{{ url_for('.add_user_token') }}" method="post" class="icon">
+        <a href="{{ url_for('.add_api_user_token') }}" method="post" class="icon">
         <button class="btn btn-primary" type="submit"
           title="Generate a new API token">
           Create new key
