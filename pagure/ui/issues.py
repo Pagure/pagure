@@ -302,7 +302,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     username=flask.g.fas_user.username,
                     ticketfolder=APP.config['TICKETS_FOLDER'],
                 )
-                messages.union(set(msgs))
+                messages = messages.union(set(msgs))
 
                 # Update ticket(s) depending on this one
                 msgs = pagure.lib.update_blocked_issue(
@@ -310,7 +310,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     username=flask.g.fas_user.username,
                     ticketfolder=APP.config['TICKETS_FOLDER'],
                 )
-                messages.union(set(msgs))
+                messages = messages.union(set(msgs))
 
             if not is_js:
                 for message in messages:
