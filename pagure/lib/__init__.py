@@ -1586,7 +1586,7 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
     ''' Edit the specified issue.
     '''
     user_obj = get_user(session, user)
-    if status != 'Open' and issue.parents:
+    if status and status != 'Open' and issue.parents:
         for parent in issue.parents:
             if parent.status == 'Open':
                 raise pagure.exceptions.PagureException(
