@@ -223,7 +223,7 @@
           {% endif%}
 
           <fieldset class="form-group issue-metadata-display">
-            <label><strong>Blocked</strong></label>
+            <label><strong>Blocking</strong></label>
             <div id="blocklist">
               {% for ticket in issue.parents %}
                 <a id="block-{{ ticket.id }}" class="label label-default"
@@ -238,16 +238,16 @@
           </fieldset>
 
           {% if authenticated and g.repo_user %}
-                <fieldset class="form-group issue-metadata-form">
-                  <label for="blocks"><strong>Blocked</strong></label>
-                  <input class="form-control" id="blocks" type="text"
-                    placeholder="issue blocked" name="blocks"
-                    value="{{ issue.blocks_text | join(',') }}" />
-                </fieldset>
+            <fieldset class="form-group issue-metadata-form">
+              <label for="blocking"><strong>Blocking</strong></label>
+              <input class="form-control" id="blocking" type="text"
+                placeholder="issue blocking" name="blocking"
+                value="{{ issue.blocking_text | join(',') }}" />
+            </fieldset>
           {% endif%}
 
           <fieldset class="form-group issue-metadata-display">
-            <label><strong>Depends on</strong></label>
+            <label><strong>Depending on</strong></label>
             <div id="dependlist">
               {% for ticket in issue.children %}
                 <a id="depend-{{ ticket.id }}" class="label label-default"
@@ -263,10 +263,10 @@
 
           {% if authenticated and g.repo_user %}
             <fieldset class="form-group issue-metadata-form">
-              <label for="depends"><strong>Depends on</strong></label>
-              <input class="form-control" id="depends" type="text"
-                placeholder="issue depending" name="depends"
-                value="{{ issue.depends_text | join(',') }}" />
+              <label for="depending"><strong>Depending on</strong></label>
+              <input class="form-control" id="depending" type="text"
+                placeholder="issue depending" name="depending"
+                value="{{ issue.depending_text | join(',') }}" />
             </fieldset>
           {% endif%}
 
@@ -826,7 +826,7 @@ $( document ).ready(function() {
       }
   });
 
-  $('#blocks').selectize({
+  $('#blocking').selectize({
     plugins: ['remove_button'],
     valueField: 'id',
     labelField: 'id',
@@ -857,7 +857,7 @@ $( document ).ready(function() {
     }
   });
 
-  $('#depends').selectize({
+  $('#depending').selectize({
     plugins: ['remove_button'],
     valueField: 'id',
     labelField: 'id',

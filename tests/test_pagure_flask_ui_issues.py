@@ -1207,7 +1207,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             # Add a dependent ticket
             data = {
                 'csrf_token': csrf_token,
-                'depends': '2',
+                'depending': '2',
             }
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
@@ -1223,7 +1223,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             # Add an invalid dependent ticket
             data = {
                 'csrf_token': csrf_token,
-                'depends': '2,abc',
+                'depending': '2,abc',
             }
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
@@ -1242,8 +1242,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         repo = pagure.lib.get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        self.assertEqual(issue.depends_text, [2])
-        self.assertEqual(issue.blocks_text, [])
+        self.assertEqual(issue.depending_text, [2])
+        self.assertEqual(issue.blocking_text, [])
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -1296,7 +1296,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             # Add a dependent ticket
             data = {
                 'csrf_token': csrf_token,
-                'blocks': '2',
+                'blocking': '2',
             }
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
@@ -1307,8 +1307,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
             repo = pagure.lib.get_project(self.session, 'test')
             issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-            self.assertEqual(issue.depends_text, [])
-            self.assertEqual(issue.blocks_text, [])
+            self.assertEqual(issue.depending_text, [])
+            self.assertEqual(issue.blocking_text, [])
 
         user = tests.FakeUser()
         user.username = 'pingou'
@@ -1329,7 +1329,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             # Add a dependent ticket
             data = {
                 'csrf_token': csrf_token,
-                'blocks': '2',
+                'blocking': '2',
             }
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
@@ -1345,7 +1345,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             # Add an invalid dependent ticket
             data = {
                 'csrf_token': csrf_token,
-                'blocks': '2,abc',
+                'blocking': '2,abc',
             }
             output = self.app.post(
                 '/test/issue/1/update', data=data, follow_redirects=True)
@@ -1364,8 +1364,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         repo = pagure.lib.get_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
-        self.assertEqual(issue.depends_text, [])
-        self.assertEqual(issue.blocks_text, [2])
+        self.assertEqual(issue.depending_text, [])
+        self.assertEqual(issue.blocking_text, [2])
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')

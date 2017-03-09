@@ -2762,8 +2762,8 @@ def update_dependency_issue(
     if isinstance(depends, basestring):
         depends = [depends]
 
-    toadd = set(depends) - set(issue.depends_text)
-    torm = set(issue.depends_text) - set(depends)
+    toadd = set(depends) - set(issue.depending_text)
+    torm = set(issue.depending_text) - set(depends)
     messages = []
 
     # Add issue depending
@@ -2772,7 +2772,7 @@ def update_dependency_issue(
         issue_depend = search_issues(session, repo, issueid=depend)
         if issue_depend is None:
             continue
-        if issue_depend.id in issue.depends_text:  # pragma: no cover
+        if issue_depend.id in issue.depending_text:  # pragma: no cover
             # we should never be in this case but better safe than sorry...
             continue
 
@@ -2792,7 +2792,7 @@ def update_dependency_issue(
             # We cannot test this as it would mean we managed to put in an
             # invalid ticket as dependency earlier
             continue
-        if issue_depend.id not in issue.depends_text:  # pragma: no cover
+        if issue_depend.id not in issue.depending_text:  # pragma: no cover
             # we should never be in this case but better safe than sorry...
             continue
 
@@ -2817,17 +2817,17 @@ def update_blocked_issue(
     if isinstance(blocks, basestring):
         blocks = [blocks]
 
-    toadd = set(blocks) - set(issue.blocks_text)
-    torm = set(issue.blocks_text) - set(blocks)
+    toadd = set(blocks) - set(issue.blocking_text)
+    torm = set(issue.blocking_text) - set(blocks)
     messages = []
 
     # Add issue blocked
     for block in sorted([int(i) for i in toadd]):
-        messages.append("Issue marked as blocked by: #%s" % block)
+        messages.append("Issue marked as blocking: #%s" % block)
         issue_block = search_issues(session, repo, issueid=block)
         if issue_block is None:
             continue
-        if issue_block.id in issue.blocks_text:  # pragma: no cover
+        if issue_block.id in issue.blocking_text:  # pragma: no cover
             # we should never be in this case but better safe than sorry...
             continue
 
@@ -2842,14 +2842,14 @@ def update_blocked_issue(
 
     # Remove issue blocked
     for block in sorted([int(i) for i in torm]):
-        messages.append("Issue **un**marked as blocked by: #%s" % block)
+        messages.append("Issue **un**marked as blocking: #%s" % block)
         issue_block = search_issues(session, repo, issueid=block)
         if issue_block is None:  # pragma: no cover
             # We cannot test this as it would mean we managed to put in an
             # invalid ticket as dependency earlier
             continue
 
-        if issue_block.id not in issue.blocks_text:  # pragma: no cover
+        if issue_block.id not in issue.blocking_text:  # pragma: no cover
             # we should never be in this case but better safe than sorry...
             continue
 

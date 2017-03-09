@@ -175,15 +175,15 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 'selected value="77">77</option></select>',
                 output.data)
 
-            # can view depends on
+            # can view depending
             self.assertIn(
-                '<label><strong>Depends on</strong></label>',
+                '<label><strong>Depending on</strong></label>',
                 output.data)
 
-            # can't edit depends on
+            # can't edit depending on
             self.assertNotIn(
-                '<input class="form-control" id="depends" type="text"\n\
-                                placeholder="issue depending" name="depends"\n\
+                '<input class="form-control" id="depending" type="text"\n\
+                                placeholder="issue depending" name="depending"\n\
                                 value="" />',
                 output.data)
 
@@ -250,15 +250,15 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 'selected value="77">77</option></select>',
                 output.data)
 
-            # can view depends on
+            # can view depending
             self.assertIn(
-                '<label><strong>Depends on</strong></label>',
+                '<label><strong>Depending on</strong></label>',
                 output.data)
 
-            # can't edit depends on
+            # can't edit depending on
             self.assertNotIn(
-                '<input class="form-control" id="depends" type="text"\n\
-                                placeholder="issue depending" name="depends"\n\
+                '<input class="form-control" id="depending" type="text"\n\
+                                placeholder="issue depending" name="depending"\n\
                                 value="" />',
                 output.data)
 
@@ -439,15 +439,15 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 'selected value="77">77</option></select>',
                 output.data)
 
-            # can view depends on
+            # can view depending
             self.assertIn(
-                '<label><strong>Depends on</strong></label>',
+                '<label><strong>Depending on</strong></label>',
                 output.data)
 
-            # can't edit depends on
+            # can't edit depending on
             self.assertNotIn(
-                '<input class="form-control" id="depends" type="text"\n\
-                                placeholder="issue depending" name="depends"\n\
+                '<input class="form-control" id="depending" type="text"\n\
+                                placeholder="issue depending" name="depending"\n\
                                 value="" />',
                 output.data)
 
@@ -510,15 +510,15 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 'value="77">77</option></select>\n      <div>\n',
                 output.data)
 
-            # can view depends on
+            # can view depending
             self.assertIn(
-                '<label><strong>Depends on</strong></label>',
+                '<label><strong>Depending on</strong></label>',
                 output.data)
 
-            # can edit depends on
+            # can edit depending on
             self.assertIn(
-                '<input class="form-control" id="depends" type="text"'
-                '\n                placeholder="issue depending" name="depends"\n',
+                '<input class="form-control" id="depending" type="text"'
+                '\n                placeholder="issue depending" name="depending"\n',
                 output.data)
 
             # the user should be able to do public -> private
@@ -702,15 +702,15 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 'selected value="77">77</option></select>',
                 output.data)
 
-            # can view depends on
+            # can view depending
             self.assertIn(
-                '<label><strong>Depends on</strong></label>',
+                '<label><strong>Depending on</strong></label>',
                 output.data)
 
-            # can't edit depends on
+            # can't edit depending on
             self.assertNotIn(
-                '<input class="form-control" id="depends" type="text"\n\
-                                placeholder="issue depending" name="depends"\n\
+                '<input class="form-control" id="depending" type="text"\n\
+                                placeholder="issue depending" name="depending"\n\
                                 value="" />',
                 output.data)
 
@@ -772,15 +772,15 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 'name="milestone"><option value=""></option><option selected '
                 'value="77">77</option></select>\n      <div>\n',
                 output.data)
-            # can view depends on
+            # can view depending
             self.assertIn(
-                '<label><strong>Depends on</strong></label>',
+                '<label><strong>Depending on</strong></label>',
                 output.data)
 
-            # can edit depends on
+            # can edit depending on
             self.assertIn(
-                '<input class="form-control" id="depends" type="text"'
-                '\n                placeholder="issue depending" name="depends"\n',
+                '<input class="form-control" id="depending" type="text"'
+                '\n                placeholder="issue depending" name="depending"\n',
                 output.data)
 
             # the user should be able to do public -> private
@@ -964,15 +964,15 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 'selected value="77">77</option></select>',
                 output.data)
 
-            # can view depends on
+            # can view depending
             self.assertIn(
-                '<label><strong>Depends on</strong></label>',
+                '<label><strong>Depending on</strong></label>',
                 output.data)
 
-            # can't edit depends on
+            # can't edit depending on
             self.assertNotIn(
-                '<input class="form-control" id="depends" type="text"\n\
-                                placeholder="issue depending" name="depends"\n\
+                '<input class="form-control" id="depending" type="text"\n\
+                                placeholder="issue depending" name="depending"\n\
                                 value="" />',
                 output.data)
 
@@ -1035,15 +1035,15 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 'value="77">77</option></select>\n      <div>\n',
                 output.data)
 
-            # can view depends on
+            # can view depending
             self.assertIn(
-                '<label><strong>Depends on</strong></label>',
+                '<label><strong>Depending on</strong></label>',
                 output.data)
 
-            # can edit depends on
+            # can edit depending on
             self.assertIn(
-                '<input class="form-control" id="depends" type="text"'
-                '\n                placeholder="issue depending" name="depends"\n',
+                '<input class="form-control" id="depending" type="text"'
+                '\n                placeholder="issue depending" name="depending"\n',
                 output.data)
 
             # the user should be able to do public -> private

@@ -150,7 +150,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
 
         comment = form.comment.data
         depends = []
-        for depend in form.depends.data.split(','):
+        for depend in form.depending.data.split(','):
             if depend.strip():
                 try:
                     depends.append(int(depend.strip()))
@@ -158,7 +158,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     pass
 
         blocks = []
-        for block in form.blocks.data.split(','):
+        for block in form.blocking.data.split(','):
             if block.strip():
                 try:
                     blocks.append(int(block.strip()))

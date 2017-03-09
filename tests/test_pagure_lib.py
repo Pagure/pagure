@@ -2175,8 +2175,8 @@ class PagureLibtests(tests.Modeltests):
 
         # before
         self.assertEqual(issue.tags_text, [])
-        self.assertEqual(issue.depends_text, [])
-        self.assertEqual(issue.blocks_text, [])
+        self.assertEqual(issue.depending_text, [])
+        self.assertEqual(issue.blocking_text, [])
 
         messages = pagure.lib.update_dependency_issue(
             self.session, repo, issue, '2', 'pingou', ticketfolder=None)
@@ -2196,8 +2196,8 @@ class PagureLibtests(tests.Modeltests):
 
         # after
         self.assertEqual(issue.tags_text, [])
-        self.assertEqual(issue.depends_text, [3])
-        self.assertEqual(issue.blocks_text, [])
+        self.assertEqual(issue.depending_text, [3])
+        self.assertEqual(issue.blocking_text, [])
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -2225,8 +2225,8 @@ class PagureLibtests(tests.Modeltests):
 
         # before
         self.assertEqual(issue.tags_text, [])
-        self.assertEqual(issue.depends_text, [])
-        self.assertEqual(issue.blocks_text, [])
+        self.assertEqual(issue.depending_text, [])
+        self.assertEqual(issue.blocking_text, [])
 
         messages = pagure.lib.update_blocked_issue(
             self.session, repo, issue, '2', 'pingou', ticketfolder=None)
@@ -2243,8 +2243,8 @@ class PagureLibtests(tests.Modeltests):
 
         # after
         self.assertEqual(issue.tags_text, [])
-        self.assertEqual(issue.depends_text, [])
-        self.assertEqual(issue.blocks_text, [3])
+        self.assertEqual(issue.depending_text, [])
+        self.assertEqual(issue.blocking_text, [3])
 
     @patch('pagure.lib.notify.send_email')
     def test_add_pull_request_assignee(self, mockemail):

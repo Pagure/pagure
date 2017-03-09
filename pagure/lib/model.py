@@ -944,12 +944,12 @@ class Issue(BASE):
         return [tag.tag for tag in self.tags]
 
     @property
-    def depends_text(self):
+    def depending_text(self):
         ''' Return the list of issue this issue depends on in simple text. '''
         return [issue.id for issue in self.children]
 
     @property
-    def blocks_text(self):
+    def blocking_text(self):
         ''' Return the list of issue this issue blocks on in simple text. '''
         return [issue.id for issue in self.parents]
 
@@ -989,8 +989,8 @@ class Issue(BASE):
             'user': self.user.to_json(public=public),
             'private': self.private,
             'tags': self.tags_text,
-            'depends': [str(item) for item in self.depends_text],
-            'blocks': [str(item) for item in self.blocks_text],
+            'depends': [str(item) for item in self.depending_text],
+            'blocks': [str(item) for item in self.blocking_text],
             'assignee': self.assignee.to_json(
                 public=public) if self.assignee else None,
             'priority': self.priority,

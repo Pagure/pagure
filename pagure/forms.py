@@ -316,11 +316,11 @@ class UpdateIssueForm(PagureForm):
             wtforms.validators.Length(max=255),
         ]
     )
-    depends = wtforms.TextField(
-        'dependency issue', [wtforms.validators.Optional()]
+    depending = wtforms.TextField(
+        'depending issue', [wtforms.validators.Optional()]
     )
-    blocks = wtforms.TextField(
-        'blocked issue', [wtforms.validators.Optional()]
+    blocking = wtforms.TextField(
+        'blocking issue', [wtforms.validators.Optional()]
     )
     comment = wtforms.TextAreaField(
         'Comment', [wtforms.validators.Optional()]
