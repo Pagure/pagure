@@ -57,7 +57,7 @@ class RtdTable(BASE):
 class RtdForm(FlaskForm):
     ''' Form to configure the pagure hook. '''
     project_name = wtforms.TextField(
-        'Project name on readthedoc.org',
+        'Project name on readthedocs.org',
         [RequiredIf('active')]
     )
     branches = wtforms.TextField(
