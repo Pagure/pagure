@@ -3317,6 +3317,11 @@ def text2markdown(text, extended=True, readme=False):
     md_processor = markdown.Markdown(
         safe_mode="escape",
         extensions=extensions,
+        extension_configs = {
+            'markdown.extensions.codehilite': {
+                'guess_lang': False,
+            }
+        }
     )
 
     if text:
