@@ -15,6 +15,7 @@ import datetime
 import unittest
 import shutil
 import sys
+import time
 import os
 
 import json
@@ -1015,6 +1016,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
 
     def test_api_view_issues_since(self):
         """ Test the api_view_issues method of the flask api for since option """
+        start = datetime.datetime.utcnow().strftime('%s')
         self.test_api_new_issue()
 
         # Invalid repo
@@ -1066,95 +1068,13 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
 
-        # Access issues un-authenticated
-        output = self.app.get('/api/0/test/issues')
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        for idx in range(len(data['issues'])):
-            data['issues'][idx]['date_created'] = '1431414800'
-            data['issues'][idx]['last_updated'] = '1431414800'
-        self.assertDictEqual(
-            data,
-            {
-              "args": {
-                "assignee": None,
-                "author": None,
-                "since": None,
-                "status": None,
-                "tags": []
-              },
-              "issues": FULL_ISSUE_LIST[3:],
-              "total_issues": 6
-            }
-        )
-        headers = {'Authorization': 'token aaabbbccc'}
-
-        # Access issues authenticated but non-existing token
-        output = self.app.get('/api/0/test/issues', headers=headers)
-        self.assertEqual(output.status_code, 401)
-
-        # Create a new token for another user
-        item = pagure.lib.model.Token(
-            id='bar_token',
-            user_id=2,
-            project_id=1,
-            expiration=datetime.datetime.utcnow() + datetime.timedelta(
-                days=30)
-        )
-        self.session.add(item)
-
-        headers = {'Authorization': 'token bar_token'}
-
-        # Access issues authenticated but wrong token
-        output = self.app.get('/api/0/test/issues', headers=headers)
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        for idx in range(len(data['issues'])):
-            data['issues'][idx]['date_created'] = '1431414800'
-            data['issues'][idx]['last_updated'] = '1431414800'
-        self.assertDictEqual(
-            data,
-            {
-              "args": {
-                "assignee": None,
-                "author": None,
-                "since": None,
-                "status": None,
-                "tags": []
-              },
-              "issues": FULL_ISSUE_LIST[3:],
-              "total_issues": 6
-            }
-        )
+        time.sleep(1)
 
         headers = {'Authorization': 'token aaabbbcccddd'}
 
-        # Access issues authenticated correctly
-        output = self.app.get('/api/0/test/issues', headers=headers)
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        for idx in range(len(data['issues'])):
-            data['issues'][idx]['date_created'] = '1431414800'
-            data['issues'][idx]['last_updated'] = '1431414800'
-
-        self.assertDictEqual(
-            data,
-            {
-              "args": {
-                "assignee": None,
-                "author": None,
-                "since": None,
-                "status": None,
-                "tags": []
-              },
-              "issues": FULL_ISSUE_LIST,
-              "total_issues": 9
-            }
-        )
-        headers = {'Authorization': 'token aaabbbcccddd'}
         # Test since for a value before creation of issues
         output = self.app.get(
-            '/api/0/test/issues?since=1431414700', headers=headers)
+            '/api/0/test/issues?since=%s' % start, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         for idx in range(len(data['issues'])):
@@ -1166,7 +1086,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "args": {
                 "assignee": None,
                 "author": None,
-                "since": '1431414700',
+                "since": start,
                 "status": None,
                 "tags": []
               },
@@ -1175,9 +1095,10 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             }
         )
 
+        late = datetime.datetime.utcnow().strftime('%s')
         # Test since for a value after creation of all the issues
         output = self.app.get(
-            '/api/0/test/issues?since=1531414800', headers=headers)
+            '/api/0/test/issues?since=%s' % late, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         for idx in range(len(data['issues'])):
@@ -1189,7 +1110,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "args": {
                 "assignee": None,
                 "author": None,
-                "since": '1531414800',
+                "since": late,
                 "status": None,
                 "tags": []
               },
@@ -1200,7 +1121,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
 
         # Test since when status is 'all'
         output = self.app.get(
-            '/api/0/test/issues?status=all&since=1231414800', headers=headers)
+            '/api/0/test/issues?status=all&since=%s' % start, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         for idx in range(len(data['issues'])):
@@ -1212,7 +1133,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "args": {
                 "assignee": None,
                 "author": None,
-                "since": '1231414800',
+                "since": start,
                 "status": "all",
                 "tags": []
               },
@@ -1223,7 +1144,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
 
         # Test since when status is 'Open'
         output = self.app.get(
-            '/api/0/test/issues?status=Open&since=1431414700', headers=headers)
+            '/api/0/test/issues?status=Open&since=%s' % start, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         for idx in range(len(data['issues'])):
@@ -1235,7 +1156,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "args": {
                 "assignee": None,
                 "author": None,
-                "since": '1431414700',
+                "since": start,
                 "status": "Open",
                 "tags": []
               },
@@ -1246,7 +1167,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
 
         # Test since when status is 'Closed'
         output = self.app.get(
-            '/api/0/test/issues?status=Closed&since=1431414700', headers=headers)
+            '/api/0/test/issues?status=Closed&since=%s' % start, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         for idx in range(len(data['issues'])):
@@ -1258,7 +1179,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "args": {
                 "assignee": None,
                 "author": None,
-                "since": '1431414700',
+                "since": start,
                 "status": "Closed",
                 "tags": []
               },
@@ -1269,7 +1190,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
 
         # Test since when status is an absurd input
         output = self.app.get(
-            '/api/0/test/issues?status=hello&since=1431414700', headers=headers)
+            '/api/0/test/issues?status=hello&since=%s' % start, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         for idx in range(len(data['issues'])):
@@ -1281,7 +1202,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "args": {
                 "assignee": None,
                 "author": None,
-                "since": '1431414700',
+                "since": start,
                 "status": "hello",
                 "tags": []
               },
