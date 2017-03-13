@@ -107,14 +107,20 @@ def parse_arguments():
 
 
 def _ask_confirmation():
-    ''' Ask to confirm an action
+    ''' Ask to confirm an action.
     '''
     action = raw_input('Do you want to continue? [y/N]')
     return action.lower() in ['y', 'yes']
 
 
 def do_generate_acl(_):
-    """ Regenerate the gitolite ACL file. """
+    """ Regenerate the gitolite ACL file.
+
+
+    :arg _: the argparse object returned by ``parse_arguments()``, which is
+        ignored as there are no argument to pass to this action.
+
+    """
     cmd = pagure.lib.git._get_gitolite_command()
     if not cmd:
         raise pagure.exceptions.PagureException(
@@ -128,7 +134,12 @@ def do_generate_acl(_):
 
 
 def do_refresh_ssh(_):
-    """ Regenerate the user key files. """
+    """ Regenerate the user key files.
+
+    :arg _: the argparse object returned by ``parse_arguments()``, which is
+        ignored as there are no argument to pass to this action.
+
+    """
     print(
         'Do you want to re-generate all the ssh keys for every user in '
         'the database? (Depending on your instance this may take a while '
@@ -139,8 +150,13 @@ def do_refresh_ssh(_):
         do_generate_acl()
 
 
-def do_generate_hook_token():
-    """ Regenerate the hook_token for each projects in the DB. """
+def do_generate_hook_token(_):
+    """ Regenerate the hook_token for each projects in the DB.
+
+    :arg _: the argparse object returned by ``parse_arguments()``, which is
+        ignored as there are no argument to pass to this action.
+
+    """
     print(
         'Do you want to re-generate all the hook token for every user in '
         'the database? This will break every web-hook set-up on this '
@@ -151,7 +167,11 @@ def do_generate_hook_token():
 
 
 def do_list_admin_token(args):
-    """ List the admin token. """
+    """ List the admin token.
+
+    :arg args: the argparse object returned by ``parse_arguments()``.
+
+    """
     _log.debug('user:           %s', args.user)
     _log.debug('token:          %s', args.token)
     _log.debug('active:         %s', args.active)
@@ -168,7 +188,11 @@ def do_list_admin_token(args):
 
 
 def do_info_admin_token(args):
-    """ Print out information about the specified API token. """
+    """ Print out information about the specified API token.
+
+    :arg args: the argparse object returned by ``parse_arguments()``.
+
+    """
     _log.debug('token:          %s', args.token)
 
     acls = APP.config['ADMIN_API_ACLS']
@@ -184,7 +208,11 @@ def do_info_admin_token(args):
 
 
 def do_expire_admin_token(args):
-    """ Expire a specific admin token. """
+    """ Expire a specific admin token.
+
+    :arg args: the argparse object returned by ``parse_arguments()``.
+
+    """
     _log.debug('token:          %s', args.token)
 
     acls = APP.config['ADMIN_API_ACLS']
@@ -207,7 +235,11 @@ def do_expire_admin_token(args):
 
 
 def do_create_admin_token(args):
-    """ Create a new admin token. """
+    """ Create a new admin token.
+
+    :arg args: the argparse object returned by ``parse_arguments()``.
+
+    """
     _log.debug('user:          %s', args.user)
     # Validate user first
     pagure.lib.get_user(SESSION, args.user)
