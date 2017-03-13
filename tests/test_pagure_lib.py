@@ -327,6 +327,116 @@ class PagureLibtests(tests.Modeltests):
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
+    def test_edit_issue_depending(self, p_send_email, p_ugt):
+        """ Test the edit_issue of pagure.lib when the issue depends on
+        another.
+        """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        tests.create_projects(self.session)
+        repo = pagure.lib.get_project(self.session, 'test')
+
+        # Create 3 issues
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #1',
+            content='We should work on this for the second time',
+            user='foo',
+            status='Open',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #1')
+
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #2',
+            content='We should work on this for the second time',
+            user='foo',
+            status='Open',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #2')
+
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #3',
+            content='We should work on this for the second time',
+            user='foo',
+            status='Open',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #3')
+
+        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
+
+        self.assertEqual(repo.open_tickets, 3)
+        self.assertEqual(repo.open_tickets_public, 3)
+
+        # Make issue #2 blocking on issue #1
+        msgs = pagure.lib.update_blocked_issue(
+            self.session,
+            repo,
+            issue,
+            blocks=['1'],
+            username='pingou',
+            ticketfolder=None,
+        )
+        self.assertEqual(msgs, ['Issue marked as blocking: #1'])
+
+        # Make issue #2 depend on issue #3
+        msgs = pagure.lib.update_dependency_issue(
+            self.session,
+            repo,
+            issue,
+            depends=['3'],
+            username='pingou',
+            ticketfolder=None,
+        )
+        self.assertEqual(msgs, ['Issue marked as depending on: #3'])
+
+        # Edit the issue #3
+        issue = pagure.lib.search_issues(self.session, repo, issueid=3)
+        msg = pagure.lib.edit_issue(
+            session=self.session,
+            issue=issue,
+            user='pingou',
+            ticketfolder=None)
+        self.session.commit()
+        self.assertEqual(msg, None)
+
+        msg = pagure.lib.edit_issue(
+            session=self.session,
+            issue=issue,
+            user='pingou',
+            ticketfolder=None,
+            title='Foo issue #2',
+            content='We should work on this period',
+            status='Closed',
+            close_status='Invalid',
+            private=True,
+        )
+        self.session.commit()
+        self.assertEqual(
+            msg,
+            [
+                'Issue status updated to: Closed (was: Open)',
+                'Issue close_status updated to: Invalid',
+                'Issue private status set to: True'
+            ]
+        )
+
+        self.assertEqual(repo.open_tickets, 2)
+        self.assertEqual(repo.open_tickets_public, 2)
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_add_issue_dependency(self, p_send_email, p_ugt):
         """ Test the add_issue_dependency of pagure.lib. """
         p_send_email.return_value = True
