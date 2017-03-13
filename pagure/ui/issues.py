@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2016 - Copyright Red Hat Inc
+ (c) 2014-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -210,7 +210,8 @@ def update_issue(repo, issueid, username=None, namespace=None):
             # The status field can be updated by both the admin and the
             # person who opened the ticket.
             # Update status
-            if flask.g.repo_user or flask.g.fas_user.username == issue.user.user:
+            if flask.g.repo_user \
+                    or flask.g.fas_user.username == issue.user.user:
                 if new_status in status:
                     msgs = pagure.lib.edit_issue(
                         SESSION,
@@ -342,8 +343,8 @@ def update_issue(repo, issueid, username=None, namespace=None):
             SESSION.rollback()
             APP.logger.exception(err)
             flask.flash(
-                    'We could not save all the info, please try again',
-                    'error')
+                'We could not save all the info, please try again',
+                'error')
     else:
         if is_js:
             return 'notok: %s' % form.errors
@@ -469,7 +470,9 @@ def update_tags(repo, username=None, namespace=None):
         tags = [
             tag.strip()
             for tag in flask.request.form.getlist('tag')
-            if tag.strip() and tag.strip() not in seen and not seen.add(tag.strip())
+            if tag.strip()
+            and tag.strip() not in seen  # noqa
+            and not seen.add(tag.strip())
         ]
 
         tag_descriptions = [
@@ -482,7 +485,9 @@ def update_tags(repo, username=None, namespace=None):
         colors = [
             col.strip()
             for col in flask.request.form.getlist('tag_color')
-            if col.strip() and col.strip() not in seen and not seen.add(col.strip())
+            if col.strip()
+            and col.strip() not in seen
+            and not seen.add(col.strip())
         ]
 
         color_pattern = re.compile('^#\w{3,6}$')
@@ -638,8 +643,8 @@ def view_issues(repo, username=None, namespace=None):
 
     oth_issues_cnt = None
     total_issues_cnt = pagure.lib.search_issues(
-            SESSION, repo, tags=tags, assignee=assignee,
-            author=author, private=private, priority=priority, count=True)
+        SESSION, repo, tags=tags, assignee=assignee,
+        author=author, private=private, priority=priority, count=True)
     if status is not None:
         issues = pagure.lib.search_issues(
             SESSION,
@@ -706,7 +711,10 @@ def view_issues(repo, username=None, namespace=None):
         )
     tag_list = pagure.lib.get_tags_of_project(SESSION, repo)
 
-    total_page = int(ceil(issues_cnt / float(flask.g.limit)) if issues_cnt > 0 else 1)
+    total_page = 1
+    if issues_cnt:
+        total_page = int(ceil(issues_cnt / float(flask.g.limit)))
+
     return flask.render_template(
         'issues.html',
         select='issues',
@@ -933,8 +941,8 @@ def new_issue(repo, username=None, namespace=None):
             SESSION.rollback()
             APP.logger.exception(err)
             flask.flash(
-                    'We could not save all the info, please try again',
-                    'error')
+                'We could not save all the info, please try again',
+                'error')
 
     types = None
     default = None
@@ -1202,8 +1210,8 @@ def edit_issue(repo, issueid, username=None, namespace=None):
             SESSION.rollback()
             APP.logger.exception(err)
             flask.flash(
-                    'We could not save all the info, please try again',
-                    'error')
+                'We could not save all the info, please try again',
+                'error')
 
     elif flask.request.method == 'GET':
         form.title.data = issue.title
@@ -1268,8 +1276,8 @@ def upload_issue(repo, issueid, username=None, namespace=None):
             SESSION.rollback()
             APP.logger.exception(err)
             flask.flash(
-                    'We could not save all the info, please try again',
-                    'error')
+                'We could not save all the info, please try again',
+                'error')
 
         return flask.jsonify({
             'output': 'ok',
@@ -1434,8 +1442,8 @@ def edit_comment_issue(
             SESSION.rollback()
             APP.logger.exception(err)
             flask.flash(
-                    'We could not save all the info, please try again',
-                    'error')
+                'We could not save all the info, please try again',
+                'error')
 
         if is_js:
             return 'ok'

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2016 - Copyright Red Hat Inc
+ (c) 2016-2017 - Copyright Red Hat Inc
 
  Authors:
    Mark Reynolds <mreynolds@redhat.com>
@@ -13,7 +13,7 @@ from pygments.token import Keyword, Name, Comment, String, Error, \
      Number, Operator, Generic, Whitespace, Punctuation, Other, Literal
 
 
-class DiffStyle(Style):
+class DiffStyle(Style):  # flake8: noqa  - Ignore this entire file
     """This style is based off of "tango", and has been updated to show the
     background color of changed lines so that trailing white spaces can be
     identified."""

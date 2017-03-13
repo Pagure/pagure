@@ -286,7 +286,8 @@ def blame_loc(loc, repo, username, blame):
         return
 
     if not isinstance(loc, six.text_type):
-        raise ValueError('"loc" must be a unicode string, not ' + str(type(loc)))
+        raise ValueError(
+            '"loc" must be a unicode string, not ' + str(type(loc)))
 
     output = [
         '<div class="highlight">',
@@ -325,11 +326,12 @@ def blame_loc(loc, repo, username, blame):
 
         output.append(
             '<td class="cell_commit"><a href="%s">%s</a></td>' % (
-                flask.url_for('view_commit',
-                        repo=repo.name,
-                        username=username,
-                        namespace=repo.namespace,
-                        commitid=diff.final_commit_id
+                flask.url_for(
+                    'view_commit',
+                    repo=repo.name,
+                    username=username,
+                    namespace=repo.namespace,
+                    commitid=diff.final_commit_id
                 ),
                 shorted_commit(diff.final_commit_id)
             )
@@ -541,10 +543,10 @@ def int_to_rgb(percent):
         percent = int(percent)
         if percent < 50:
             red = 255
-            green = (255.0/50) * percent
+            green = (255.0 / 50) * percent
         else:
             green = 255
-            red = (255.0/50) * (100 - percent)
+            red = (255.0 / 50) * (100 - percent)
         output = "rgb(%s, %s, 0);" % (int(red), int(green))
     except ValueError:
         pass

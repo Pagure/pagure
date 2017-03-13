@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2016 - Copyright Red Hat Inc
+ (c) 2014-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -31,8 +31,6 @@ import pagure.lib
 import pagure.lib.git
 import pagure.forms
 from pagure import APP, SESSION, LOG, login_required, __get_file_in_tree
-
-
 
 
 def _get_parent_repo_path(repo):
@@ -202,15 +200,15 @@ def request_pulls(repo, username=None, namespace=None):
             author=author,
             count=True)
 
-    reponame = flask.g.reponame
     repo_obj = flask.g.repo_obj
     if not repo_obj.is_empty and not repo_obj.head_is_unborn:
         head = repo_obj.head.shorthand
     else:
         head = 'master'
 
-    total_page = int(ceil(requests_cnt / float(flask.g.limit)) \
-    if requests_cnt > 0 else 1)
+    total_page = 1
+    if requests_cnt:
+        total_page = int(ceil(requests_cnt / float(flask.g.limit)))
 
     return flask.render_template(
         'requests.html',
@@ -826,7 +824,7 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
            methods=['POST'])
 @APP.route(
     '/fork/<username>/<namespace>/<repo>/pull-request/cancel/<int:requestid>',
-   methods=['POST'])
+    methods=['POST'])
 @login_required
 def cancel_request_pull(repo, requestid, username=None, namespace=None):
     """ Cancel request pulling request.
@@ -867,8 +865,8 @@ def cancel_request_pull(repo, requestid, username=None, namespace=None):
             SESSION.rollback()
             APP.logger.exception(err)
             flask.flash(
-                    'We could not save all the info, please try again',
-                    'error')
+                'We could not save all the info, please try again',
+                'error')
 
     else:
         flask.flash('Invalid input submitted', 'error')
@@ -880,7 +878,8 @@ def cancel_request_pull(repo, requestid, username=None, namespace=None):
 @APP.route(
     '/<repo>/pull-request/<int:requestid>/assign', methods=['POST'])
 @APP.route(
-    '/<namespace>/<repo>/pull-request/<int:requestid>/assign', methods=['POST'])
+    '/<namespace>/<repo>/pull-request/<int:requestid>/assign',
+    methods=['POST'])
 @APP.route(
     '/fork/<username>/<repo>/pull-request/<int:requestid>/assign',
     methods=['POST'])
@@ -1029,7 +1028,6 @@ def new_request_pull(
     if not parent.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-request allowed on this project')
 
-    repopath = flask.g.reponame
     repo_obj = flask.g.repo_obj
 
     parentpath = _get_parent_repo_path(repo)
@@ -1111,8 +1109,8 @@ def new_request_pull(
             SESSION.rollback()
             APP.logger.exception(err)
             flask.flash(
-                    'We could not save all the info, please try again',
-                    'error')
+                'We could not save all the info, please try again',
+                'error')
 
     if not flask.g.repo_committer:
         form = None
@@ -1180,7 +1178,6 @@ def new_remote_request_pull(repo, username=None, namespace=None):
     if not repo.settings.get('pull_requests', True):
         flask.abort(404, 'No pull-request allowed on this project')
 
-    parentpath = flask.g.reponame
     orig_repo = flask.g.repo_obj
 
     form = pagure.forms.RemoteRequestPullForm()

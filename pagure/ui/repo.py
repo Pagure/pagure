@@ -77,7 +77,6 @@ def view_repo(repo, username=None, namespace=None):
     """ Front page of a specific repo.
     """
     repo_db = flask.g.repo
-    reponame = flask.g.reponame
     repo_obj = flask.g.repo_obj
 
     if not repo_obj.is_empty and not repo_obj.head_is_unborn:
@@ -143,7 +142,6 @@ def view_repo_branch(repo, branchname, username=None, namespace=None):
     ''' Returns the list of branches in the repo. '''
 
     repo = flask.g.repo
-    reponame = flask.g.reponame
     repo_obj = flask.g.repo_obj
 
     if branchname not in repo_obj.listall_branches():
@@ -292,9 +290,7 @@ def view_commits(repo, branchname=None, username=None, namespace=None):
                 branch.get_object().hex, pygit2.GIT_SORT_TIME):
 
             # Filters the commits for an user
-            filters = None
             if author_obj:
-                filters = True
                 tmp = False
                 for email in author_obj.emails:
                     if email.email == commit.author.email:
@@ -440,7 +436,8 @@ def compare_commits(repo, commit1, commit2, username=None, namespace=None):
 @APP.route(
     '/fork/<username>/<repo>/blob/<path:identifier>/f/<path:filename>')
 @APP.route(
-    '/fork/<username>/<namespace>/<repo>/blob/<path:identifier>/f/<path:filename>')
+    '/fork/<username>/<namespace>/<repo>/blob/<path:identifier>/f/'
+    '<path:filename>')
 def view_file(repo, identifier, filename, username=None, namespace=None):
     """ Displays the content of a file or a tree for the specified repo.
     """
@@ -504,7 +501,8 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
         elif not is_binary_string(content.data):
             file_content = None
             try:
-                file_content = encoding_utils.decode(ktc.to_bytes(content.data))
+                file_content = encoding_utils.decode(
+                    ktc.to_bytes(content.data))
             except pagure.exceptions.PagureException:
                 # We cannot decode the file, so let's pretend it's a binary
                 # file and let the user download it instead of displaying
@@ -582,12 +580,12 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
 @APP.route(
     '/fork/<username>/<repo>/raw/<path:identifier>/f/<path:filename>')
 @APP.route(
-    '/fork/<username>/<namespace>/<repo>/raw/<path:identifier>/f/<path:filename>')
+    '/fork/<username>/<namespace>/<repo>/raw/<path:identifier>/f/'
+    '<path:filename>')
 def view_raw_file(
         repo, identifier, filename=None, username=None, namespace=None):
     """ Displays the raw content of a file of a commit for the specified repo.
     """
-    repo = flask.g.repo
     repo_obj = flask.g.repo_obj
 
     if repo_obj.is_empty:
@@ -678,7 +676,6 @@ def view_blame_file(repo, filename, username=None, namespace=None):
     """ Displays the blame of a file or a tree for the specified repo.
     """
     repo = flask.g.repo
-    reponame = flask.g.reponame
     repo_obj = flask.g.repo_obj
 
     branchname = flask.request.args.get('identifier', 'master')
@@ -782,7 +779,6 @@ def view_commit(repo, commitid, username=None, namespace=None):
 def view_commit_patch(repo, commitid, username=None, namespace=None):
     """ Render a commit in a repo as patch
     """
-    repo = flask.g.repo
     repo_obj = flask.g.repo_obj
 
     try:
@@ -1106,7 +1102,8 @@ def view_settings(repo, username=None, namespace=None):
 
 @APP.route('/<repo>/settings/test_hook', methods=('GET', 'POST'))
 @APP.route('/<namespace>/<repo>/settings/test_hook', methods=('GET', 'POST'))
-@APP.route('/fork/<username>/<repo>/settings/test_hook', methods=('GET', 'POST'))
+@APP.route(
+    '/fork/<username>/<repo>/settings/test_hook', methods=('GET', 'POST'))
 @APP.route(
     '/fork/<username>/<namespace>/<repo>/settings/test_hook',
     methods=('GET', 'POST'))
@@ -1122,7 +1119,6 @@ def test_web_hook(repo, username=None, namespace=None):
             flask.url_for('auth_login', next=flask.request.url))
 
     repo = flask.g.repo
-    repo_obj = flask.g.repo_obj
 
     if not flask.g.repo_admin:
         flask.abort(
@@ -1184,7 +1180,7 @@ def update_project(repo, username=None, namespace=None):
             repo.description = form.description.data
             repo.avatar_email = form.avatar_email.data.strip()
             repo.url = form.url.data.strip()
-            messages = pagure.lib.update_tags(
+            pagure.lib.update_tags(
                 SESSION, repo,
                 tags=[t.strip() for t in form.tags.data.split(',')],
                 username=flask.g.fas_user.username,
@@ -1354,7 +1350,8 @@ def update_milestones(repo, username=None, namespace=None):
                 break
 
         for milestone_date in milestone_dates:
-            if milestone_date.strip() and milestone_dates.count(milestone_date) != 1:
+            if milestone_date.strip() \
+                    and milestone_dates.count(milestone_date) != 1:
                 flask.flash(
                     'Date %s is present %s times' % (
                         milestone_date, milestone_dates.count(milestone_date)
@@ -1401,7 +1398,6 @@ def change_ref_head(repo, username=None, namespace=None):
             flask.url_for('auth_login', next=url))
 
     repo = flask.g.repo
-    reponame = flask.g.reponame
     repo_obj = flask.g.repo_obj
 
     if not flask.g.repo_admin:
@@ -1963,8 +1959,7 @@ def regenerate_git(repo, username=None, namespace=None):
     form = pagure.forms.ConfirmationForm()
     if form.validate_on_submit():
         if regenerate.lower() == 'requests'\
-            and repo.settings.get('pull_requests'):
-
+                and repo.settings.get('pull_requests'):
 
             # delete the requests repo and reinit
             # in case there are no requests
@@ -2129,14 +2124,13 @@ def revoke_api_token(repo, token_id, username=None, namespace=None):
     '/fork/<username>/<repo>/edit/<path:branchname>/f/<path:filename>',
     methods=('GET', 'POST'))
 @APP.route(
-    '/fork/<username>/<namespace>/<repo>/edit/<path:branchname>/f/<path:filename>',
-    methods=('GET', 'POST'))
+    '/fork/<username>/<namespace>/<repo>/edit/<path:branchname>/f/'
+    '<path:filename>', methods=('GET', 'POST'))
 @login_required
 def edit_file(repo, branchname, filename, username=None, namespace=None):
     """ Edit a file online.
     """
     repo = flask.g.repo
-    reponame = flask.g.reponame
     repo_obj = flask.g.repo_obj
 
     if not flask.g.repo_admin:
@@ -2220,7 +2214,6 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
 def delete_branch(repo, branchname, username=None, namespace=None):
     """ Delete the branch of a project.
     """
-    reponame = flask.g.reponame
     repo_obj = flask.g.repo_obj
 
     if not flask.g.repo_committer:
@@ -2354,7 +2347,6 @@ def update_public_notifications(repo, username=None, namespace=None):
 
     form = pagure.forms.PublicNotificationForm()
 
-    error = False
     if form.validate_on_submit():
         issue_notifs = [
             w.strip()
@@ -2418,7 +2410,6 @@ def update_close_status(repo, username=None, namespace=None):
 
     form = pagure.forms.ConfirmationForm()
 
-    error = False
     if form.validate_on_submit():
         close_status = [
             w.strip() for w in flask.request.form.getlist('close_status')
@@ -2520,7 +2511,6 @@ def update_custom_keys(repo, username=None, namespace=None):
 
     form = pagure.forms.ConfirmationForm()
 
-    error = False
     if form.validate_on_submit():
         custom_keys = [
             w.strip() for w in flask.request.form.getlist('custom_keys')
@@ -2583,7 +2573,6 @@ def delete_report(repo, username=None, namespace=None):
 
     form = pagure.forms.ConfirmationForm()
 
-    error = False
     if form.validate_on_submit():
         report = flask.request.form.get('report')
         reports = repo.reports

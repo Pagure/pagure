@@ -817,9 +817,7 @@ def revoke_api_user_token(token_id):
     """
     if admin_session_timedout():
         flask.flash('Action canceled, try it again', 'error')
-        url = flask.url_for(
-            'view_settings', username=username, repo=repo,
-            namespace=namespace)
+        url = flask.url_for('.user_settings')
         return flask.redirect(
             flask.url_for('auth_login', next=url))
 
