@@ -367,11 +367,15 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(issue.parents, [])
         self.assertEqual(len(issue.children), 1)
         self.assertEqual(issue.children[0].id, 2)
+        self.assertEqual(issue.depending_text, [])
+        self.assertEqual(issue.blocking_text, [2])
 
         self.assertEqual(len(issue_blocked.children), 0)
         self.assertEqual(issue_blocked.children, [])
         self.assertEqual(len(issue_blocked.parents), 1)
         self.assertEqual(issue_blocked.parents[0].id, 1)
+        self.assertEqual(issue_blocked.depending_text, [1])
+        self.assertEqual(issue_blocked.blocking_text, [])
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
@@ -2230,7 +2234,7 @@ class PagureLibtests(tests.Modeltests):
 
         messages = pagure.lib.update_blocked_issue(
             self.session, repo, issue, '2', 'pingou', ticketfolder=None)
-        self.assertEqual(messages, ['Issue marked as blocked by: #2'])
+        self.assertEqual(messages, ['Issue marked as blocking: #2'])
         messages = pagure.lib.update_blocked_issue(
             self.session, repo, issue, ['3', '4', 5], 'pingou',
             ticketfolder=None)
