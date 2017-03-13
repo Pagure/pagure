@@ -4099,12 +4099,9 @@ index 0000000..fb7093d
             data = {
                 'csrf_token':csrf_token
             }
-            output = self.app.post(
-                '/watch', data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 404)
 
             output = self.app.post(
-                '/foo/watch/settings', data=data, follow_redirects=True)
+                '/foo/watch/settings/1', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
             output = self.app.post(
