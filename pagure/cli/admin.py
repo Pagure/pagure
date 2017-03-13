@@ -29,6 +29,95 @@ from pagure import (SESSION, APP, generate_user_key_files)  # noqa
 _log = logging.getLogger(__name__)
 
 
+def _parser_refresh_gitolite(subparser):
+    """ Set up the CLI argument parser for the refresh-gitolite action. """
+    local_parser = subparser.add_parser(
+        'refresh-gitolite',
+        help='Re-generate the gitolite config file')
+    local_parser.set_defaults(func=do_generate_acl)
+
+
+def _parser_refresh_ssh(subparser):
+    """ Set up the CLI argument parser for the refresh-ssh action. """
+    local_parser = subparser.add_parser(
+        'refresh-ssh',
+        help="Re-write to disk every user's ssh key stored in the database")
+    local_parser.set_defaults(func=do_refresh_ssh)
+
+
+def _parser_clear_hook_token(subparser):
+    """ Set up the CLI argument parser for the clear-hook-token action. """
+    local_parser = subparser.add_parser(
+        'clear-hook-token',
+        help='Generate a new hook token for every project in this instance')
+    local_parser.set_defaults(func=do_generate_hook_token)
+
+
+def _parser_admin_token_list(subparser):
+    """ Set up the CLI argument parser for the admin-token list action. """
+    local_parser = subparser.add_parser(
+        'list',  help="List the API admin token")
+    local_parser.add_argument(
+        '--user',
+        help="User to associate or associated with the token")
+    local_parser.add_argument(
+        '--token', help="API token")
+    local_parser.add_argument(
+        '--active', default=False, action='store_true',
+        help="Only list active API token")
+    local_parser.add_argument(
+        '--expired', default=False, action='store_true',
+        help="Only list expired API token")
+    local_parser.set_defaults(func=do_list_admin_token)
+
+
+def _parser_admin_token_info(subparser):
+    """ Set up the CLI argument parser for the admin-token info action. """
+    local_parser = subparser.add_parser(
+        'info',  help="Provide some information about a specific API token")
+    local_parser.add_argument(
+        'token', help="API token")
+    local_parser.set_defaults(func=do_info_admin_token)
+
+
+def _parser_admin_token_expire(subparser):
+    """ Set up the CLI argument parser for the admin-token expire action. """
+    # Expire admin token
+    local_parser = subparser.add_parser(
+        'expire',  help="Expire a specific API token")
+    local_parser.add_argument(
+        'token', help="API token")
+    local_parser.set_defaults(func=do_expire_admin_token)
+
+
+def _parser_admin_token_create(subparser):
+    """ Set up the CLI argument parser for the admin-token create action. """
+    # Create admin token
+    local_parser = subparser.add_parser(
+        'create',  help="Create a new API token")
+    local_parser.add_argument(
+        'user', help="User to associate with the token")
+    local_parser.set_defaults(func=do_create_admin_token)
+
+
+def _parser_admin_token(subparser):
+    """ Set up the CLI argument parser for the admin-token action. """
+    local_parser = subparser.add_parser(
+        'admin-token',
+        help='Manages the admin tokens for this instance')
+
+    subsubparser = local_parser.add_subparsers(title='actions')
+
+    # list
+    _parser_admin_token_list(subsubparser)
+    # info
+    _parser_admin_token_info(subsubparser)
+    # expire
+    _parser_admin_token_expire(subsubparser)
+    # create
+    _parser_admin_token_create(subsubparser)
+
+
 def parse_arguments():
     """ Set-up the argument parsing. """
     parser = argparse.ArgumentParser(
@@ -39,69 +128,19 @@ def parse_arguments():
         help='Increase the verbosity of the information displayed')
     parser.set_defaults(func=lambda a, k: print(parser.format_help()))
 
-    subparsers = parser.add_subparsers(title='actions')
+    subparser = parser.add_subparsers(title='actions')
 
     # refresh-gitolite
-    parser_gitolite = subparsers.add_parser(
-        'refresh-gitolite',
-        help='Re-generate the gitolite config file')
-    parser_gitolite.set_defaults(func=do_generate_acl)
+    _parser_refresh_gitolite(subparser)
 
     # refresh-ssh
-    parser_ssh = subparsers.add_parser(
-        'refresh-ssh',
-        help="Re-write to disk every user's ssh key stored in the database")
-    parser_ssh.set_defaults(func=do_refresh_ssh)
+    _parser_refresh_ssh(subparser)
 
     # clear-hook-token
-    parser_hook_token = subparsers.add_parser(
-        'clear-hook-token',
-        help='Generate a new hook token for every project in this instance')
-    parser_hook_token.set_defaults(func=do_generate_hook_token)
+    _parser_clear_hook_token(subparser)
 
     # Admin token actions
-    parser_admin_token = subparsers.add_parser(
-        'admin-token',
-        help='Manages the admin tokens for this instance')
-
-    subsubparsers = parser_admin_token.add_subparsers(title='actions')
-
-    # List admin token
-    parser_admin_list_token = subsubparsers.add_parser(
-        'list',  help="List the API admin token")
-    parser_admin_list_token.add_argument(
-        '--user',
-        help="User to associate or associated with the token")
-    parser_admin_list_token.add_argument(
-        '--token', help="API token")
-    parser_admin_list_token.add_argument(
-        '--active', default=False, action='store_true',
-        help="Only list active API token")
-    parser_admin_list_token.add_argument(
-        '--expired', default=False, action='store_true',
-        help="Only list expired API token")
-    parser_admin_token.set_defaults(func=do_list_admin_token)
-
-    # Info about admin token
-    parser_admin_info_token = subsubparsers.add_parser(
-        'info',  help="Provide some information about a specific API token")
-    parser_admin_info_token.add_argument(
-        'token', help="API token")
-    parser_admin_info_token.set_defaults(func=do_info_admin_token)
-
-    # Expire admin token
-    parser_admin_expire_token = subsubparsers.add_parser(
-        'expire',  help="Expire a specific API token")
-    parser_admin_expire_token.add_argument(
-        'token', help="API token")
-    parser_admin_expire_token.set_defaults(func=do_expire_admin_token)
-
-    # Create admin token
-    parser_admin_create_token = subsubparsers.add_parser(
-        'create',  help="Create a new API token")
-    parser_admin_create_token.add_argument(
-        'user', help="User to associate with the token")
-    parser_admin_create_token.set_defaults(func=do_create_admin_token)
+    _parser_admin_token(subparser)
 
     return parser.parse_args()
 
