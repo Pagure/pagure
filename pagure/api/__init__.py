@@ -26,11 +26,11 @@ import markupsafe
 API = flask.Blueprint('api_ns', __name__, url_prefix='/api/0')
 
 
-import pagure
-import pagure.lib
-from pagure import __api_version__, APP, SESSION, authenticated
-from pagure.doc_utils import load_doc, modify_rst, modify_html
-from pagure.exceptions import APIError
+import pagure  # noqa
+import pagure.lib  # noqa
+from pagure import __api_version__, APP, SESSION, authenticated  # noqa
+from pagure.doc_utils import load_doc, modify_rst, modify_html  # noqa
+from pagure.exceptions import APIError  # noqa
 
 
 def preload_docs(endpoint):
@@ -207,13 +207,13 @@ def api_method(function):
 
 
 if pagure.APP.config.get('ENABLE_TICKETS', True):
-    from pagure.api import issue
-from pagure.api import fork
-from pagure.api import project
-from pagure.api import user
+    from pagure.api import issue  # noqa
+from pagure.api import fork  # noqa
+from pagure.api import project  # noqa
+from pagure.api import user  # noqa
 
 if pagure.APP.config.get('PAGURE_CI_SERVICES', False):
-    from pagure.api.ci import jenkins
+    from pagure.api.ci import jenkins  # noqa
 
 
 @API.route('/version/')
@@ -428,7 +428,10 @@ def api_error_codes():
         }
 
     '''
-    errors = {val.name: val.value for val in APIERROR.__members__.values()}     # pylint: disable=no-member
+    errors = {
+        val.name: val.value
+        for val in APIERROR.__members__.values()
+    }  # pylint: disable=no-member
 
     return flask.jsonify(errors)
 

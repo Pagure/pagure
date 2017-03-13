@@ -64,7 +64,12 @@ def api_view_user(username):
               "tags": [],
               "namespace": None,
               "priorities": {},
-              "close_status": ["Invalid", "Insufficient data", "Fixed", "Duplicated"],
+              "close_status": [
+                "Invalid",
+                "Insufficient data",
+                "Fixed",
+                "Duplicated"
+              ],
               "milestones": {},
               "user": {
                 "fullname": "ralph",
@@ -118,7 +123,6 @@ def api_view_user(username):
     jsonout = flask.jsonify(output)
     jsonout.status_code = httpcode
     return jsonout
-
 
 
 @API.route('/user/<username>/activity/stats')
@@ -296,7 +300,7 @@ def api_view_user_activity_date(username, date):
           ]
         }
 
-    """
+    """  # noqa
     grouped = str(flask.request.args.get('grouped')).lower() in ['1', 'true']
 
     try:

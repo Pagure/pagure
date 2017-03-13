@@ -305,7 +305,7 @@ def api_pull_request_merge(repo, requestid, username=None, namespace=None):
           "message": "Changes merged!"
         }
 
-    """
+    """  # noqa
     output = {}
 
     repo = pagure.lib.get_project(
@@ -392,7 +392,7 @@ def api_pull_request_close(repo, requestid, username=None, namespace=None):
           "message": "Pull-request closed!"
         }
 
-    """
+    """  # noqa
     output = {}
 
     repo = pagure.lib.get_project(
@@ -497,7 +497,7 @@ def api_pull_request_add_comment(
           "message": "Comment added"
         }
 
-    """
+    """  # noqa
     repo = pagure.lib.get_project(
         SESSION, repo, user=username, namespace=namespace)
     output = {}
@@ -640,7 +640,7 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
           "message": "Flag updated"
         }
 
-    """
+    """  # noqa
     repo = pagure.lib.get_project(
         SESSION, repo, user=username, namespace=namespace)
     output = {}

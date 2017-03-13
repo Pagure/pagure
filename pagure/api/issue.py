@@ -18,7 +18,8 @@ import pagure.exceptions
 import pagure.lib
 
 from pagure import (
-    APP, SESSION, is_repo_committer, api_authenticated, urlpattern
+    APP, SESSION, is_repo_committer, api_authenticated, urlpattern,
+    is_repo_admin
 )
 from pagure.api import (
     API, api_method, api_login_required, api_login_optional, APIERROR
@@ -485,7 +486,7 @@ def api_view_issue_comment(
           }
         }
 
-    """
+    """  # noqa
 
     repo = pagure.lib.get_project(
         SESSION, repo, user=username, namespace=namespace)
@@ -879,7 +880,8 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
 
 
 @API.route('/<repo>/issue/<int:issueid>/subscribe', methods=['POST'])
-@API.route('/<namespace>/<repo>/issue/<int:issueid>/subscribe', methods=['POST'])
+@API.route(
+    '/<namespace>/<repo>/issue/<int:issueid>/subscribe', methods=['POST'])
 @API.route(
     '/fork/<username>/<repo>/issue/<int:issueid>/subscribe', methods=['POST'])
 @API.route(
@@ -925,7 +927,7 @@ def api_subscribe_issue(repo, issueid, username=None, namespace=None):
           "message": "User subscribed"
         }
 
-    """
+    """  # noqa
     repo = pagure.lib.get_project(
         SESSION, repo, user=username, namespace=namespace)
     output = {}
@@ -1027,7 +1029,7 @@ def api_update_custom_field(
           "message": "Custom field adjusted"
         }
 
-    """
+    """  # noqa
     repo = pagure.lib.get_project(
         SESSION, repo, user=username, namespace=namespace)
 
@@ -1094,7 +1096,6 @@ def api_update_custom_field(
         print err
         SESSION.rollback()
         raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
-
 
     if message:
         pagure.lib.add_metadata_update_notif(

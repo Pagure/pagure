@@ -220,7 +220,6 @@ def api_project(repo, username=None, namespace=None):
     return jsonout
 
 
-
 @API.route('/new/', methods=['POST'])
 @API.route('/new', methods=['POST'])
 @api_login_required(acls=['create_project'])
