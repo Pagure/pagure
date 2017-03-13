@@ -1016,8 +1016,61 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
 
     def test_api_view_issues_since(self):
         """ Test the api_view_issues method of the flask api for since option """
+
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        repo = pagure.lib.get_project(self.session, 'test')
+
+        # Create 1st tickets
         start = datetime.datetime.utcnow().strftime('%s')
-        self.test_api_new_issue()
+        issue = pagure.lib.model.Issue(
+            id=pagure.lib.get_next_id(self.session, repo.id),
+            project_id=repo.id,
+            title='Issue #1',
+            content='Description',
+            user_id=1,  # pingou
+            uid='issue#1',
+            private=False,
+        )
+        self.session.add(issue)
+        self.session.commit()
+
+        time.sleep(1)
+        middle = datetime.datetime.utcnow().strftime('%s')
+
+        # Create 2nd tickets
+        issue = pagure.lib.model.Issue(
+            id=pagure.lib.get_next_id(self.session, repo.id),
+            project_id=repo.id,
+            title='Issue #2',
+            content='Description',
+            user_id=1,  # pingou
+            uid='issue#2',
+            private=False,
+        )
+        self.session.add(issue)
+        self.session.commit()
+
+        time.sleep(1)
+        final = datetime.datetime.utcnow().strftime('%s')
+
+        # Create private issue
+        issue = pagure.lib.model.Issue(
+            id=pagure.lib.get_next_id(self.session, repo.id),
+            project_id=repo.id,
+            title='Issue #3',
+            content='Description',
+            user_id=1,  # pingou
+            uid='issue#3',
+            private=True,
+        )
+        self.session.add(issue)
+        self.session.commit()
 
         # Invalid repo
         output = self.app.get('/api/0/foo/issues')
@@ -1030,6 +1083,49 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "error_code": "ENOPROJECT",
             }
         )
+
+        LCL_ISSUES = [
+          {
+            'assignee': None,
+            'blocks': [],
+            'close_status': None,
+            'closed_at': None,
+            'comments': [],
+            'content': 'Description',
+            'custom_fields': [],
+            'date_created': '1431414800',
+            'depends': [],
+            'id': 2,
+            'last_updated': '1431414800',
+            'milestone': None,
+            'priority': None,
+            'private': False,
+            'status': 'Open',
+            'tags': [],
+            'title': 'Issue #2',
+            'user': {'fullname': 'PY C', 'name': 'pingou'}
+          },
+          {
+            'assignee': None,
+            'blocks': [],
+            'close_status': None,
+            'closed_at': None,
+            'comments': [],
+            'content': 'Description',
+            'custom_fields': [],
+            'date_created': '1431414800',
+            'depends': [],
+            'id': 1,
+            'last_updated': '1431414800',
+            'milestone': None,
+            'priority': None,
+            'private': False,
+            'status': 'Open',
+            'tags': [],
+            'title': 'Issue #1',
+            'user': {'fullname': 'PY C', 'name': 'pingou'}
+           }
+        ]
 
         # List all opened issues
         output = self.app.get('/api/0/test/issues')
@@ -1048,33 +1144,85 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "status": None,
                 "tags": []
               },
-              "issues": FULL_ISSUE_LIST[3:],
-              "total_issues": 6
+              "issues": LCL_ISSUES,
+              "total_issues": 2
             }
         )
 
-        # Create private issue
-        repo = pagure.lib.get_project(self.session, 'test')
-        msg = pagure.lib.new_issue(
-            session=self.session,
-            repo=repo,
-            title='Test issue',
-            content='We should work on this',
-            user='pingou',
-            ticketfolder=None,
-            private=True,
-            milestone=""
-        )
-        self.session.commit()
-        self.assertEqual(msg.title, 'Test issue')
-
         time.sleep(1)
+        late = datetime.datetime.utcnow().strftime('%s')
+
+        # List all opened issues from the start
+        output = self.app.get('/api/0/test/issues?since=%s' % start)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        for idx in range(len(data['issues'])):
+            data['issues'][idx]['date_created'] = '1431414800'
+            data['issues'][idx]['last_updated'] = '1431414800'
+        self.assertDictEqual(
+            data,
+            {
+              "args": {
+                "assignee": None,
+                "author": None,
+                "since": start,
+                "status": None,
+                "tags": []
+              },
+              "issues": LCL_ISSUES,
+              "total_issues": 2
+            }
+        )
+
+        # List all opened issues from the middle
+        output = self.app.get('/api/0/test/issues?since=%s' % middle)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        for idx in range(len(data['issues'])):
+            data['issues'][idx]['date_created'] = '1431414800'
+            data['issues'][idx]['last_updated'] = '1431414800'
+        self.assertDictEqual(
+            data,
+            {
+              "args": {
+                "assignee": None,
+                "author": None,
+                "since": middle,
+                "status": None,
+                "tags": []
+              },
+              "issues": LCL_ISSUES[:1],
+              "total_issues": 1
+            }
+        )
+
+        # List all opened issues at the end
+        output = self.app.get('/api/0/test/issues?since=%s' % final)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        for idx in range(len(data['issues'])):
+            data['issues'][idx]['date_created'] = '1431414800'
+            data['issues'][idx]['last_updated'] = '1431414800'
+        self.assertDictEqual(
+            data,
+            {
+              "args": {
+                "assignee": None,
+                "author": None,
+                "since": final,
+                "status": None,
+                "tags": []
+              },
+              "issues": [],
+              "total_issues": 0
+            }
+        )
 
         headers = {'Authorization': 'token aaabbbcccddd'}
 
         # Test since for a value before creation of issues
         output = self.app.get(
-            '/api/0/test/issues?since=%s' % start, headers=headers)
+            '/api/0/test/issues?since=%s' % final, headers=headers)
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         for idx in range(len(data['issues'])):
@@ -1086,128 +1234,31 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "args": {
                 "assignee": None,
                 "author": None,
-                "since": start,
+                "since": final,
                 "status": None,
                 "tags": []
               },
-              "issues": FULL_ISSUE_LIST,
-              "total_issues": 9
-            }
-        )
-
-        late = datetime.datetime.utcnow().strftime('%s')
-        # Test since for a value after creation of all the issues
-        output = self.app.get(
-            '/api/0/test/issues?since=%s' % late, headers=headers)
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        for idx in range(len(data['issues'])):
-            data['issues'][idx]['last_updated'] = '1431414800'
-            data['issues'][idx]['date_created'] = '1431414800'
-        self.assertDictEqual(
-            data,
-            {
-              "args": {
-                "assignee": None,
-                "author": None,
-                "since": late,
-                "status": None,
-                "tags": []
-              },
-              "issues": [],
-              "total_issues": 0
-            }
-        )
-
-        # Test since when status is 'all'
-        output = self.app.get(
-            '/api/0/test/issues?status=all&since=%s' % start, headers=headers)
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        for idx in range(len(data['issues'])):
-            data['issues'][idx]['last_updated'] = '1431414800'
-            data['issues'][idx]['date_created'] = '1431414800'
-        self.assertDictEqual(
-            data,
-            {
-              "args": {
-                "assignee": None,
-                "author": None,
-                "since": start,
-                "status": "all",
-                "tags": []
-              },
-                "issues": FULL_ISSUE_LIST,
-              "total_issues": 9
-            }
-        )
-
-        # Test since when status is 'Open'
-        output = self.app.get(
-            '/api/0/test/issues?status=Open&since=%s' % start, headers=headers)
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        for idx in range(len(data['issues'])):
-            data['issues'][idx]['last_updated'] = '1431414800'
-            data['issues'][idx]['date_created'] = '1431414800'
-        self.assertDictEqual(
-            data,
-            {
-              "args": {
-                "assignee": None,
-                "author": None,
-                "since": start,
-                "status": "Open",
-                "tags": []
-              },
-                "issues": FULL_ISSUE_LIST,
-              "total_issues": 9
-            }
-        )
-
-        # Test since when status is 'Closed'
-        output = self.app.get(
-            '/api/0/test/issues?status=Closed&since=%s' % start, headers=headers)
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        for idx in range(len(data['issues'])):
-            data['issues'][idx]['last_updated'] = '1431414800'
-            data['issues'][idx]['date_created'] = '1431414800'
-        self.assertDictEqual(
-            data,
-            {
-              "args": {
-                "assignee": None,
-                "author": None,
-                "since": start,
-                "status": "Closed",
-                "tags": []
-              },
-              "issues": [],
-              "total_issues": 0
-            }
-        )
-
-        # Test since when status is an absurd input
-        output = self.app.get(
-            '/api/0/test/issues?status=hello&since=%s' % start, headers=headers)
-        self.assertEqual(output.status_code, 200)
-        data = json.loads(output.data)
-        for idx in range(len(data['issues'])):
-            data['issues'][idx]['last_updated'] = '1431414800'
-            data['issues'][idx]['date_created'] = '1431414800'
-        self.assertDictEqual(
-            data,
-            {
-              "args": {
-                "assignee": None,
-                "author": None,
-                "since": start,
-                "status": "hello",
-                "tags": []
-              },
-              "issues": [],
-              "total_issues": 0
+              "issues": [{
+                'assignee': None,
+                'blocks': [],
+                'close_status': None,
+                'closed_at': None,
+                'comments': [],
+                'content': 'Description',
+                'custom_fields': [],
+                'date_created': '1431414800',
+                'depends': [],
+                'id': 3,
+                'last_updated': '1431414800',
+                'milestone': None,
+                'priority': None,
+                'private': True,
+                'status': 'Open',
+                'tags': [],
+                'title': 'Issue #3',
+                'user': {'fullname': 'PY C', 'name': 'pingou'}}
+              ],
+              "total_issues": 1
             }
         )
 
