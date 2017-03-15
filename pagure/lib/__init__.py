@@ -3485,6 +3485,14 @@ def update_watch_status(session, project, user, watch):
         )
     ).first()
 
+    if watch == '-1':
+        if not watcher:
+            return 'Watch status is already reset'
+
+        session.delete(watcher)
+        session.flush()
+        return 'Watch status reset'
+
     if not watcher:
         watcher = model.Watcher(
             project_id=project.id,

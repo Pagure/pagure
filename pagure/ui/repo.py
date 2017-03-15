@@ -2342,7 +2342,7 @@ def watch_repo(repo, watch, username=None, namespace=None):
     if not form.validate_on_submit():
         flask.abort(400)
 
-    if str(watch) not in ['0', '1']:
+    if str(watch) not in ['0', '1', '-1']:
         flask.abort(400)
 
     try:

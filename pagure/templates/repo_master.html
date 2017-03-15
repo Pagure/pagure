@@ -90,13 +90,14 @@
                   repo.user.user if repo.is_fork else None,
                   repo.namespace)
                %}
-               <a class="dropdown-item" id="unwatch_button">Stop watching {{
+               <a class="dropdown-item" id="unwatch_button">Unwatch {{
                   repo.name }}</a>
                {% else %}
                <a class="dropdown-item" id="watch_button">Watch {{
                   repo.name }}</a>
                {% endif -%}
-
+               <a class="dropdown-item" id="reset_button">Reset Watch Status {{
+                  repo.name }}</a>
                 {{ forkbuttonform.csrf_token }}
               </form>
             </div>
@@ -305,10 +306,14 @@ $(document).ready(function() {
   $(".watch-menu a").click(function(){
     var selectedValue = $(this).attr('id');
     var action = $("#watch_project").attr('action');
-      if (selectedValue != "unwatch_button") {
+      if (selectedValue === "watch_button") {
         action = action.replace('/settings/0', '/settings/1');
         $('#watch_project').attr('action', action);
+      } else if (selectedValue === "reset_button") {
+        action = action.replace('/settings/0', '/settings/-1');
+        $('#watch_project').attr('action', action);
       }
+
       $('#watch_project').submit();
 
   });
