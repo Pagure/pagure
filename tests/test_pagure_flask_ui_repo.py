@@ -4134,6 +4134,13 @@ index 0000000..fb7093d
             pygit2.init_repository(gitrepo, bare=True)
 
             output = self.app.post(
+                '/fork/foo/test/watch/settings/-1', data=data,
+                follow_redirects=True)
+            self.assertIn(
+                '</button>\n                      Watch status is already reset',
+                output.data)
+
+            output = self.app.post(
                 '/fork/foo/test/watch/settings/0', data=data,
                 follow_redirects=True)
             self.assertIn(
@@ -4146,6 +4153,14 @@ index 0000000..fb7093d
             self.assertIn(
                 '</button>\n                      You are now'
                 ' watching this repo.', output.data)
+
+            output = self.app.post(
+                '/fork/foo/test/watch/settings/-1', data=data,
+                follow_redirects=True)
+            self.assertIn(
+                '</button>\n                      Watch status reset',
+                output.data)
+
 
     def test_delete_report(self):
         """ Test the  delete_report endpoint. """

@@ -3034,6 +3034,16 @@ class PagureLibtests(tests.Modeltests):
             watch=True,
         )
 
+        # All good and when user seleted reset watch option.
+        msg = pagure.lib.update_watch_status(
+            session=self.session,
+            project=project,
+            user='pingou',
+            watch='-1',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Watch status is already reset')
+
         # All good and when user seleted watch option.
         msg = pagure.lib.update_watch_status(
             session=self.session,
@@ -3053,6 +3063,16 @@ class PagureLibtests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(msg, 'You are no longer watching this repo.')
+
+        # All good and when user seleted reset watch option.
+        msg = pagure.lib.update_watch_status(
+            session=self.session,
+            project=project,
+            user='pingou',
+            watch='-1',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'Watch status reset')
 
     def test_is_watching(self):
         """ Test the is_watching method of pagure.lib. """
