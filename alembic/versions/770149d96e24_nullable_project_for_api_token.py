@@ -1,14 +1,14 @@
 """nullable project for api token
 
 Revision ID: 770149d96e24
-Revises: 987edda096f5
+Revises: 11470abae0d6
 Create Date: 2017-03-04 18:05:07.956057
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '770149d96e24'
-down_revision = '987edda096f5'
+down_revision = '11470abae0d6'
 
 from alembic import op
 import sqlalchemy as sa
