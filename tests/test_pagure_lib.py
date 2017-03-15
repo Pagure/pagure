@@ -3345,6 +3345,10 @@ class PagureLibtests(tests.Modeltests):
             'pingou opened the PR forks/pingou/test#2',
             'fork/pingou/ns/test#8 is private',
             'pingou committed on test#9364354a4555ba17aa60f0dc844d70b74eb1aecd',
+            'irc://pagure.io',
+            'ircs://pagure.io',
+            'http://pagure.io',
+            'https://pagure.io',
         ]
         expected = [
             # 'foo bar test#1 see?',
@@ -3383,7 +3387,18 @@ class PagureLibtests(tests.Modeltests):
             '<p>pingou committed on <a href="http://pagure.org/'
             'test/c/9364354a4555ba17aa60f0dc844d70b74eb1aecd" '
             'title="Commit 9364354a4555ba17aa60f0dc844d70b74eb1aecd"'
-            '>test#9364354a4555ba17aa60f0dc844d70b74eb1aecd</a></p>'
+            '>test#9364354a4555ba17aa60f0dc844d70b74eb1aecd</a></p>',
+            # 'irc://pagure.io'
+            '<p><a href="irc://pagure.io">irc://pagure.io</a></p>',
+            # 'ircs://pagure.io' - This is getting cleaned by python-bleach
+            # and the version 1.4.3 that we have won't let us adjust the
+            # list of supported protocols
+            # '<p><a href="ircs://pagure.io">ircs://pagure.io</a></p>',
+            '<p><a>irc://pagure.io</a></p>',
+            # 'http://pagure.io'
+            '<p><a href="http://pagure.io">http://pagure.io</a></p>',
+            # 'https://pagure.io'
+            '<p><a href="https://pagure.io">https://pagure.io</a></p>',
         ]
 
         with pagure.APP.app_context():

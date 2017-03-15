@@ -282,8 +282,10 @@ class PagureExtension(markdown.extensions.Extension):
     def extendMarkdown(self, md, md_globals):
         # First, make it so that bare links get automatically linkified.
         markdown.inlinepatterns.AUTOLINK_RE = '(%s)' % '|'.join([
-            r'<(?:f|ht)tps?://[^>]*>',
-            r'\b(?:f|ht)tps?://[^)<>\s]+[^.,)<>\s]',
+            r'<((?:[Ff]|[Hh][Tt])[Tt][Pp][Ss]?://[^>]*)>',
+            r'\b(?:[Ff]|[Hh][Tt])[Tt][Pp][Ss]?://[^)<>\s]+[^.,)<>\s]',
+            r'<(Ii][Rr][Cc][Ss]?://[^>]*)>',
+            r'\b[Ii][Rr][Cc][Ss]?://[^)<>\s]+[^.,)<>\s]',
         ])
 
         md.inlinePatterns['mention'] = MentionPattern(MENTION_RE)
