@@ -119,7 +119,7 @@ https://pagure.org/test/issue/1
         self.assertEqual(args[0], exptext)
 
         # Mail subject should be as expected.
-        self.assertEqual(args[1], u'Issue #1 `issue`')
+        self.assertEqual(args[1], u'Issue #1: issue')
 
         # Mail should be sent to user #1.
         self.assertEqual(args[2], self.user1.default_email)
@@ -155,7 +155,7 @@ https://pagure.org/somenamespace/test3/issue/1
         self.assertEqual(args[0], exptext)
 
         # Mail subject should be as expected.
-        self.assertEqual(args[1], u'Issue #1 `namespaced project issue`')
+        self.assertEqual(args[1], u'Issue #1: namespaced project issue')
 
         # Mail should be sent to user #1.
         self.assertEqual(args[2], self.user1.default_email)
@@ -186,7 +186,7 @@ https://pagure.org/fork/foo/test/issue/1
         self.assertEqual(args[0], exptext)
 
         # Mail subject should be as expected.
-        self.assertEqual(args[1], u'Issue #1 `forked project issue`')
+        self.assertEqual(args[1], u'Issue #1: forked project issue')
 
         # Mail should be sent to user #1.
         # NOTE: Not sent to user #2...
