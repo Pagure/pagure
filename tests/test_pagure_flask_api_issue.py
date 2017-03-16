@@ -11,6 +11,7 @@
 __requires__ = ['SQLAlchemy >= 0.8']
 import pkg_resources
 
+import copy
 import datetime
 import unittest
 import shutil
@@ -235,6 +236,50 @@ FULL_ISSUE_LIST = [
       "name": "pingou"
     }
   }
+]
+
+
+LCL_ISSUES = [
+  {
+    'assignee': None,
+    'blocks': [],
+    'close_status': None,
+    'closed_at': None,
+    'comments': [],
+    'content': 'Description',
+    'custom_fields': [],
+    'date_created': '1431414800',
+    'depends': [],
+    'id': 2,
+    'last_updated': '1431414800',
+    'milestone': None,
+    'priority': None,
+    'private': False,
+    'status': 'Open',
+    'tags': [],
+    'title': 'Issue #2',
+    'user': {'fullname': 'PY C', 'name': 'pingou'}
+  },
+  {
+    'assignee': None,
+    'blocks': [],
+    'close_status': None,
+    'closed_at': None,
+    'comments': [],
+    'content': 'Description',
+    'custom_fields': [],
+    'date_created': '1431414800',
+    'depends': [],
+    'id': 1,
+    'last_updated': '1431414800',
+    'milestone': None,
+    'priority': None,
+    'private': False,
+    'status': 'Open',
+    'tags': [],
+    'title': 'Issue #1',
+    'user': {'fullname': 'PY C', 'name': 'pingou'}
+   }
 ]
 
 
@@ -1023,9 +1068,95 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             }
         )
 
+    def test_api_view_issues_milestone(self):
+        """ Test the api_view_issues method of the flask api when filtering
+        for a milestone.
+        """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        repo = pagure.lib.get_project(self.session, 'test')
+
+        # Create 2 tickets but only 1 has a milestone
+        start = datetime.datetime.utcnow().strftime('%s')
+        issue = pagure.lib.model.Issue(
+            id=pagure.lib.get_next_id(self.session, repo.id),
+            project_id=repo.id,
+            title='Issue #1',
+            content='Description',
+            user_id=1,  # pingou
+            uid='issue#1',
+            private=False,
+        )
+        self.session.add(issue)
+        self.session.commit()
+
+        issue = pagure.lib.model.Issue(
+            id=pagure.lib.get_next_id(self.session, repo.id),
+            project_id=repo.id,
+            title='Issue #2',
+            content='Description',
+            user_id=1,  # pingou
+            uid='issue#2',
+            private=False,
+            milestone='v1.0',
+        )
+        self.session.add(issue)
+        self.session.commit()
+
+        # List all opened issues
+        output = self.app.get('/api/0/test/issues')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        for idx in range(len(data['issues'])):
+            data['issues'][idx]['date_created'] = '1431414800'
+            data['issues'][idx]['last_updated'] = '1431414800'
+        lcl_issues = copy.deepcopy(LCL_ISSUES)
+        lcl_issues[0]['milestone'] = 'v1.0'
+        self.assertDictEqual(
+            data,
+            {
+              "args": {
+                "assignee": None,
+                "author": None,
+                'milestones': [],
+                "since": None,
+                "status": None,
+                "tags": [],
+              },
+              "issues": lcl_issues,
+              "total_issues": 2
+            }
+        )
+
+        # List all issues of the milestone v1.0
+        output = self.app.get('/api/0/test/issues?milestones=v1.0')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        for idx in range(len(data['issues'])):
+            data['issues'][idx]['date_created'] = '1431414800'
+            data['issues'][idx]['last_updated'] = '1431414800'
+        self.assertDictEqual(
+            data,
+            {
+              "args": {
+                "assignee": None,
+                "author": None,
+                'milestones': ['v1.0'],
+                "since": None,
+                "status": None,
+                "tags": [],
+              },
+              "issues": [lcl_issues[0]],
+              "total_issues": 1
+            }
+        )
+
     def test_api_view_issues_since(self):
         """ Test the api_view_issues method of the flask api for since option """
-
 
         tests.create_projects(self.session)
         tests.create_projects_git(
@@ -1092,49 +1223,6 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "error_code": "ENOPROJECT",
             }
         )
-
-        LCL_ISSUES = [
-          {
-            'assignee': None,
-            'blocks': [],
-            'close_status': None,
-            'closed_at': None,
-            'comments': [],
-            'content': 'Description',
-            'custom_fields': [],
-            'date_created': '1431414800',
-            'depends': [],
-            'id': 2,
-            'last_updated': '1431414800',
-            'milestone': None,
-            'priority': None,
-            'private': False,
-            'status': 'Open',
-            'tags': [],
-            'title': 'Issue #2',
-            'user': {'fullname': 'PY C', 'name': 'pingou'}
-          },
-          {
-            'assignee': None,
-            'blocks': [],
-            'close_status': None,
-            'closed_at': None,
-            'comments': [],
-            'content': 'Description',
-            'custom_fields': [],
-            'date_created': '1431414800',
-            'depends': [],
-            'id': 1,
-            'last_updated': '1431414800',
-            'milestone': None,
-            'priority': None,
-            'private': False,
-            'status': 'Open',
-            'tags': [],
-            'title': 'Issue #1',
-            'user': {'fullname': 'PY C', 'name': 'pingou'}
-           }
-        ]
 
         # List all opened issues
         output = self.app.get('/api/0/test/issues')
