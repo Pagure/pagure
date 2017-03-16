@@ -1216,6 +1216,11 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.session.add(issue)
         self.session.commit()
 
+        # Set some priorities to the project
+        repo.priorities = {'1': 'High', '2': 'Normal'}
+        self.session.add(repo)
+        self.session.commit()
+
         # List all opened issues
         output = self.app.get('/api/0/test/issues')
         self.assertEqual(output.status_code, 200)
@@ -1224,7 +1229,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             data['issues'][idx]['date_created'] = '1431414800'
             data['issues'][idx]['last_updated'] = '1431414800'
         lcl_issues = copy.deepcopy(LCL_ISSUES)
-        lcl_issues[0]['priority'] = 'high'
+        lcl_issues[0]['priority'] = 1
         self.assertDictEqual(
             data,
             {
@@ -1243,8 +1248,8 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             }
         )
 
-        # List all issues of the milestone v1.0
-        output = self.app.get('/api/0/test/issues?priority=1')
+        # List all issues of the priority high (ie: 1)
+        output = self.app.get('/api/0/test/issues?priority=high')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         for idx in range(len(data['issues'])):
@@ -1265,6 +1270,42 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               },
               "issues": [lcl_issues[0]],
               "total_issues": 1
+            }
+        )
+
+        output = self.app.get('/api/0/test/issues?priority=1')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        for idx in range(len(data['issues'])):
+            data['issues'][idx]['date_created'] = '1431414800'
+            data['issues'][idx]['last_updated'] = '1431414800'
+        self.assertDictEqual(
+            data,
+            {
+              "args": {
+                "assignee": None,
+                "author": None,
+                'milestones': [],
+                'no_stones': None,
+                'priority': '1',
+                "since": None,
+                "status": None,
+                "tags": [],
+              },
+              "issues": [lcl_issues[0]],
+              "total_issues": 1
+            }
+        )
+
+        # Try getting issues with an invalid priority
+        output = self.app.get('/api/0/test/issues?priority=foobar')
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Invalid priority submitted",
+              "error_code": "EINVALIDPRIORITY"
             }
         )
 

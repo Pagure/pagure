@@ -314,6 +314,23 @@ def api_view_issues(repo, username=None, namespace=None):
     tags = flask.request.args.getlist('tags')
     tags = [tag.strip() for tag in tags if tag.strip()]
 
+    priority_key = None
+    if priority:
+        found = False
+        if priority in repo.priorities:
+            found = True
+            priority_key = int(priority)
+        else:
+            for key, val in repo.priorities.items():
+                if val.lower() == priority.lower():
+                    priority_key = key
+                    found = True
+                    break
+
+        if not found:
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.EINVALIDPRIORITY)
+
     # Hide private tickets
     private = False
     # If user is authenticated, show him/her his/her private tickets
@@ -334,7 +351,7 @@ def api_view_issues(repo, username=None, namespace=None):
         'author': author,
         'private': private,
         'milestones': milestone,
-        'priority': priority,
+        'priority': priority_key,
         'no_milestones': no_stones,
     }
 

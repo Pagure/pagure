@@ -83,6 +83,7 @@ class APIERROR(enum.Enum):
     EINVALIDISSUEFIELD = 'Invalid custom field submitted'
     EINVALIDISSUEFIELD_LINK = 'Invalid custom field submitted, the value '\
         'is not a link'
+    EINVALIDPRIORITY = 'Invalid priority submitted'
 
 
 def check_api_acls(acls, optional=False):
