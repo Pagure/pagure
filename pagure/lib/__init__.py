@@ -2262,6 +2262,10 @@ def search_issues(
         query = query.filter(
             model.Issue.milestone.in_(milestones)
         )
+    elif no_milestones is False:
+        query = query.filter(
+            model.Issue.milestone.isnot(None)
+        )
 
     if custom_search:
         constraints = []

@@ -232,6 +232,12 @@ def api_view_issues(repo, username=None, namespace=None):
     | ``priority``  | string  | Optional     | | Filter the issues       |
     |               |         |              |   by priority             |
     +---------------+---------+--------------+---------------------------+
+    | ``no_stones`` | boolean | Optional     | | If true returns only the|
+    |               |         |              |   issues having no        |
+    |               |         |              |   milestone, if false     |
+    |               |         |              |   returns only the issues |
+    |               |         |              |   having a milestone      |
+    +---------------+---------+--------------+---------------------------+
     | ``since``     | string  | Optional     | | Filter the issues       |
     |               |         |              |   updated after this date.|
     |               |         |              |   The date can either be  |
@@ -249,6 +255,7 @@ def api_view_issues(repo, username=None, namespace=None):
             "assignee": null,
             "author": null,
             'milestones': [],
+            'no_stones': null,
             'priority': null,
             "since": null,
             "status": "Closed",
@@ -295,6 +302,12 @@ def api_view_issues(repo, username=None, namespace=None):
     assignee = flask.request.args.get('assignee', None)
     author = flask.request.args.get('author', None)
     milestone = flask.request.args.getlist('milestones', None)
+    no_stones = flask.request.args.get('no_stones', None)
+    if no_stones is not None:
+        if str(no_stones).lower() in ['1', 'true', 't']:
+            no_stones = True
+        else:
+            no_stones = False
     priority =  flask.request.args.get('priority', None)
     since = flask.request.args.get('since', None)
     status = flask.request.args.get('status', None)
@@ -322,6 +335,7 @@ def api_view_issues(repo, username=None, namespace=None):
         'private': private,
         'milestones': milestone,
         'priority': priority,
+        'no_milestones': no_stones,
     }
 
     if status is not None:
@@ -359,6 +373,7 @@ def api_view_issues(repo, username=None, namespace=None):
             'assignee': assignee,
             'author': author,
             'milestones': milestone,
+            'no_stones': no_stones,
             'priority': priority,
             'since': since,
             'status': status,
