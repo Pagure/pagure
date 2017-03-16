@@ -2263,6 +2263,7 @@ def search_issues(
             model.Issue.milestone.in_(milestones)
         )
     elif no_milestones is False:
+        # Asking for all ticket with a milestone
         query = query.filter(
             model.Issue.milestone.isnot(None)
         )
