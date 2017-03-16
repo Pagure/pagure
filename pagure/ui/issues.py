@@ -604,11 +604,10 @@ def view_issues(repo, username=None, namespace=None):
         for idx, key in enumerate(custom_keys):
             custom_search[key] = custom_values[idx]
 
+    no_stone = None
     if "none" in milestones:
         no_stone = True
         milestones.remove("none")
-    else:
-        no_stone = False
 
     search_string = search_pattern
     extra_fields, search_pattern = pagure.lib.tokenize_search_string(
