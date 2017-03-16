@@ -830,7 +830,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 'priority': None,
                 "since": None,
                 "status": None,
-                "tags": []
+                "tags": [],
               },
               "issues": FULL_ISSUE_LIST[3:],
               "total_issues": 6

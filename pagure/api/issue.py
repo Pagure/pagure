@@ -232,6 +232,12 @@ def api_view_issues(repo, username=None, namespace=None):
     | ``priority``  | string  | Optional     | | Filter the issues       |
     |               |         |              |   by priority             |
     +---------------+---------+--------------+---------------------------+
+    | ``since``     | string  | Optional     | | Filter the issues       |
+    |               |         |              |   updated after this date.|
+    |               |         |              |   The date can either be  |
+    |               |         |              |   provided as an unix date|
+    |               |         |              |   or in the format Y-M-D  |
+    +---------------+---------+--------------+---------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -242,6 +248,9 @@ def api_view_issues(repo, username=None, namespace=None):
           "args": {
             "assignee": null,
             "author": null,
+            'milestones': [],
+            'priority': null,
+            "since": null,
             "status": "Closed",
             "tags": [
               "0.1"
@@ -283,14 +292,14 @@ def api_view_issues(repo, username=None, namespace=None):
         raise pagure.exceptions.APIError(
             404, error_code=APIERROR.ETRACKERDISABLED)
 
-    status = flask.request.args.get('status', None)
-    tags = flask.request.args.getlist('tags')
-    tags = [tag.strip() for tag in tags if tag.strip()]
     assignee = flask.request.args.get('assignee', None)
     author = flask.request.args.get('author', None)
     milestone = flask.request.args.getlist('milestones', None)
     priority =  flask.request.args.get('priority', None)
     since = flask.request.args.get('since', None)
+    status = flask.request.args.get('status', None)
+    tags = flask.request.args.getlist('tags')
+    tags = [tag.strip() for tag in tags if tag.strip()]
 
     # Hide private tickets
     private = False
@@ -347,13 +356,13 @@ def api_view_issues(repo, username=None, namespace=None):
         'total_issues': len(issues),
         'issues': [issue.to_json(public=True) for issue in issues],
         'args': {
-            'status': status,
-            'tags': tags,
             'assignee': assignee,
             'author': author,
-            'since': since
             'milestones': milestone,
             'priority': priority,
+            'since': since,
+            'status': status,
+            'tags': tags,
         }
     })
     return jsonout
