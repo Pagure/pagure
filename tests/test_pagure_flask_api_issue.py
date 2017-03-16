@@ -781,6 +781,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "args": {
                 "assignee": None,
                 "author": None,
+                'milestones': [],
                 "since": None,
                 "status": None,
                 "tags": []
@@ -818,6 +819,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "args": {
                 "assignee": None,
                 "author": None,
+                'milestones': [],
                 "since": None,
                 "status": None,
                 "tags": []
@@ -857,6 +859,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "args": {
                 "assignee": None,
                 "author": None,
+                'milestones': [],
                 "since": None,
                 "status": None,
                 "tags": []
@@ -882,6 +885,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "args": {
                 "assignee": None,
                 "author": None,
+                'milestones': [],
                 "since": None,
                 "status": None,
                 "tags": []
@@ -921,6 +925,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "args": {
                 "assignee": None,
                 "author": None,
+                'milestones': [],
                 "since": None,
                 "status": None,
                 "tags": []
@@ -945,6 +950,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "args": {
                 "assignee": None,
                 "author": None,
+                'milestones': [],
                 "since": None,
                 "status": None,
                 "tags": []
@@ -964,6 +970,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "args": {
                 "assignee": None,
                 "author": None,
+                'milestones': [],
                 "since": None,
                 "status": "Closed",
                 "tags": []
@@ -983,6 +990,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "args": {
                 "assignee": None,
                 "author": None,
+                'milestones': [],
                 "since": None,
                 "status": "Invalid",
                 "tags": []
@@ -1005,6 +1013,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "args": {
                 "assignee": None,
                 "author": None,
+                'milestones': [],
                 "since": None,
                 "status": "All",
                 "tags": []
@@ -1140,6 +1149,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "args": {
                 "assignee": None,
                 "author": None,
+                'milestones': [],
                 "since": None,
                 "status": None,
                 "tags": []
@@ -1165,6 +1175,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "args": {
                 "assignee": None,
                 "author": None,
+                'milestones': [],
                 "since": start,
                 "status": None,
                 "tags": []
@@ -1187,6 +1198,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "args": {
                 "assignee": None,
                 "author": None,
+                'milestones': [],
                 "since": middle,
                 "status": None,
                 "tags": []
@@ -1209,6 +1221,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "args": {
                 "assignee": None,
                 "author": None,
+                'milestones': [],
                 "since": final,
                 "status": None,
                 "tags": []
@@ -1234,6 +1247,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
               "args": {
                 "assignee": None,
                 "author": None,
+                'milestones': [],
                 "since": final,
                 "status": None,
                 "tags": []
