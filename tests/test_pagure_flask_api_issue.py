@@ -1211,7 +1211,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             user_id=1,  # pingou
             uid='issue#2',
             private=False,
-            priority='high',
+            priority=1,
         )
         self.session.add(issue)
         self.session.commit()
@@ -1244,7 +1244,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         )
 
         # List all issues of the milestone v1.0
-        output = self.app.get('/api/0/test/issues?priority=high')
+        output = self.app.get('/api/0/test/issues?priority=1')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         for idx in range(len(data['issues'])):
