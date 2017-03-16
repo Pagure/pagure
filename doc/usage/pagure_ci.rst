@@ -17,3 +17,14 @@ Contents:
    :maxdepth: 2
 
    pagure_ci_jenkins
+
+
+Tips and tricks
+---------------
+
+* How to re-trigger a run of pagure-ci on a pull-request?
+
+To manually trigger a run of pagure-ci on a given pull-request, simply add
+a comment saying: ``pretty please pagure-ci rebuild``.
+
+.. note:: To always have this handy, you can save it in the ``Quick Replies``!
