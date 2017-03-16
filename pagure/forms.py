@@ -417,7 +417,7 @@ class AddPullRequestFlagForm(PagureForm):
 class UserSettingsForm(PagureForm):
     ''' Form to create or edit project. '''
     ssh_key = wtforms.TextAreaField(
-        'Public SSH key <span class="error">*</span>',
+        'Public SSH keys <span class="error">*</span>',
         [wtforms.validators.Required(),
          ssh_key_validator]
     )
