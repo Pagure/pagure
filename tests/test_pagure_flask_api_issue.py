@@ -2017,6 +2017,207 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                          data['error_code'])
         self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
 
+    def test_api_change_milestone_issue(self):
+        """ Test the api_change_milestone_issue method of the flask api. """
+        tests.create_projects(self.session)
+        tests.create_projects_git(os.path.join(self.path, 'tickets'))
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        # Set some milestones to the project
+        repo = pagure.lib.get_project(self.session, 'test')
+        repo.milestones = {'v1.0': None, 'v2.0': 'Soon'}
+        self.session.add(repo)
+        self.session.commit()
+
+        headers = {'Authorization': 'token aaabbbcccddd'}
+
+        # Invalid project
+        output = self.app.post('/api/0/foo/issue/1/milestone', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Project not found",
+              "error_code": "ENOPROJECT",
+            }
+        )
+
+        # Valid token, wrong project
+        output = self.app.post('/api/0/test2/issue/1/milestone', headers=headers)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.data)
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
+                         data['error_code'])
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+
+        # No issue
+        output = self.app.post('/api/0/test/issue/1/milestone', headers=headers)
+        self.assertEqual(output.status_code, 404)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+              "error": "Issue not found",
+              "error_code": "ENOISSUE",
+            }
+        )
+
+        # Create normal issue
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue #1',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None,
+            private=False,
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue #1')
+
+        # Check milestone before
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(issue.milestone, None)
+
+        data = {
+            'milestone': '',
+        }
+
+        # Valid request but no milestone specified
+        output = self.app.post(
+            '/api/0/test/issue/1/milestone', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {'message': 'No changes'}
+        )
+
+        # No change
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(issue.milestone, None)
+
+        data = {
+            'milestone': 'milestone-1-0',
+        }
+
+        # Invalid milestone specified
+        output = self.app.post(
+            '/api/0/test/issue/1/milestone', data=data, headers=headers)
+        self.assertEqual(output.status_code, 400)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                "error": "Invalid or incomplete input submited",
+                "error_code": "EINVALIDREQ",
+                "errors": {
+                    "milestone": [
+                        "Not a valid choice"
+                    ]
+                }
+            }
+        )
+
+        data = {
+            'milestone': 'v1.0',
+        }
+
+        # Valid requests
+        output = self.app.post(
+            '/api/0/test/issue/1/milestone', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                "message": [
+                    "Issue set to the milestone: v1.0"
+                ]
+            }
+        )
+
+        # remove milestone
+        data = {
+            'milestone': '',
+        }
+
+        # Valid requests
+        output = self.app.post(
+            '/api/0/test/issue/1/milestone', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                "message": [
+                    "Issue set to the milestone: None (was: v1.0)"
+                ]
+            }
+        )
+
+        # Change recorded
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(issue.milestone, None)
+
+        data = {
+            'milestone': 'v1.0',
+        }
+
+        # Valid requests
+        output = self.app.post(
+            '/api/0/test/issue/1/milestone', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                "message": [
+                    "Issue set to the milestone: v1.0"
+                ]
+            }
+        )
+
+        # remove milestone by using no milestone in JSON
+        data = {}
+
+        # Valid requests
+        output = self.app.post(
+            '/api/0/test/issue/1/milestone', data=data, headers=headers)
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        self.assertDictEqual(
+            data,
+            {
+                "message": [
+                    "Issue set to the milestone: None (was: v1.0)"
+                ]
+            }
+        )
+
+        # Change recorded
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=1)
+        self.assertEqual(issue.milestone, None)
+
+        headers = {'Authorization': 'token pingou_foo'}
+
+        # Un-authorized issue
+        output = self.app.post(
+            '/api/0/foo/issue/1/milestone', data=data, headers=headers)
+        self.assertEqual(output.status_code, 401)
+        data = json.loads(output.data)
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.name,
+                         data['error_code'])
+        self.assertEqual(pagure.api.APIERROR.EINVALIDTOK.value, data['error'])
+
+
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
     def test_api_comment_issue(self, p_send_email, p_ugt):

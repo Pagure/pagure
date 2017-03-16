@@ -286,6 +286,28 @@ class StatusForm(PagureForm):
             self.close_status.choices.insert(0, ('', ''))
 
 
+class MilestoneForm(PagureForm):
+    ''' Form to change the milestone of an issue. '''
+    milestone = wtforms.SelectField(
+        'Milestone',
+        [wtforms.validators.Optional()],
+        choices=[],
+        coerce=convert_value
+    )
+
+    def __init__(self, *args, **kwargs):
+        """ Calls the default constructor with the normal argument but
+        uses the list of collection provided to fill the choices of the
+        drop-down list.
+        """
+        super(MilestoneForm, self).__init__(*args, **kwargs)
+        self.milestone.choices = []
+        if 'milestones' in kwargs and kwargs['milestones']:
+            for key in sorted(kwargs['milestones']):
+                self.milestone.choices.append((key, key))
+            self.milestone.choices.insert(0, ('', ''))
+
+
 class NewTokenForm(PagureForm):
     ''' Form to add/change the status of an issue. '''
     description = wtforms.TextField(

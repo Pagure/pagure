@@ -219,6 +219,7 @@ ACLS = {
     'issue_subscribe': 'Subscribe the user with this token to an issue',
     'issue_update': 'Update an issue, status, comments, custom fields...',
     'issue_update_custom_fields': 'Update the custom fields of an issue',
+    'issue_update_milestone': 'Update the milestone of an issue',
 }
 
 # From the ACLs above lists which ones are tolerated to be associated with

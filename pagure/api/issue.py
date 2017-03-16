@@ -720,6 +720,128 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
     return jsonout
 
 
+@API.route('/<repo>/issue/<int:issueid>/milestone', methods=['POST'])
+@API.route('/<namespace>/<repo>/issue/<int:issueid>/milestone', methods=['POST'])
+@API.route(
+    '/fork/<username>/<repo>/issue/<int:issueid>/milestone', methods=['POST'])
+@API.route(
+    '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/milestone',
+    methods=['POST'])
+@api_login_required(acls=['issue_update_milestone', 'issue_update'])
+@api_method
+def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
+    """
+    Change issue milestone
+    -------------------
+    Change the milestone of an issue.
+
+    ::
+
+        POST /api/0/<repo>/issue/<issue id>/milestone
+        POST /api/0/<namespace>/<repo>/issue/<issue id>/milestone
+
+    ::
+
+        POST /api/0/fork/<username>/<repo>/issue/<issue id>/milestone
+        POST /api/0/fork/<username>/<namespace>/<repo>/issue/<issue id>/milestone
+
+    Input
+    ^^^^^
+
+    +----------------- +---------+--------------+------------------------+
+    | Key              | Type    | Optionality  | Description            |
+    +==================+=========+==============+========================+
+    | ``milestone``    | string  | Optional     | The new milestone of   |
+    |                  |         |              | the issue, can be any  |
+    |                  |         |              | of defined milestones  |
+    |                  |         |              | or empty to unset the  |
+    |                  |         |              | milestone              |
+    +----------------- +---------+--------------+------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "message": "Successfully edited issue #1"
+        }
+
+    """
+    repo = pagure.lib.get_project(
+        SESSION, repo, user=username, namespace=namespace)
+
+    output = {}
+
+    if repo is None:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
+
+    if not repo.settings.get('issue_tracker', True):
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.ETRACKERDISABLED)
+
+    if api_authenticated():
+        if repo != flask.g.token.project:
+            raise pagure.exceptions.APIError(
+                401, error_code=APIERROR.EINVALIDTOK)
+
+    issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
+
+    if issue is None or issue.project != repo:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOISSUE)
+
+    if issue.private and not is_repo_committer(repo) \
+            and (not api_authenticated() or
+                 not issue.user.user == flask.g.fas_user.username):
+        raise pagure.exceptions.APIError(
+            403, error_code=APIERROR.EISSUENOTALLOWED)
+
+    form = pagure.forms.MilestoneForm(
+        milestones=repo.milestones.keys(),
+        csrf_enabled=False)
+
+    if form.validate_on_submit():
+        new_milestone = form.milestone.data
+        if new_milestone == '':
+            new_milestone = None  # unset milestone
+        try:
+            # Update status
+            message = pagure.lib.edit_issue(
+                SESSION,
+                issue=issue,
+                milestone=new_milestone,
+                user=flask.g.fas_user.username,
+                ticketfolder=APP.config['TICKETS_FOLDER'],
+            )
+            SESSION.commit()
+            if message:
+                output['message'] = message
+            else:
+                output['message'] = 'No changes'
+
+            if message:
+                pagure.lib.add_metadata_update_notif(
+                    session=SESSION,
+                    issue=issue,
+                    messages=message,
+                    user=flask.g.fas_user.username,
+                    ticketfolder=APP.config['TICKETS_FOLDER']
+                )
+        except pagure.exceptions.PagureException as err:
+            raise pagure.exceptions.APIError(
+                400, error_code=APIERROR.ENOCODE, error=str(err))
+        except SQLAlchemyError as err:  # pragma: no cover
+            SESSION.rollback()
+            raise pagure.exceptions.APIError(400, error_code=APIERROR.EDBERROR)
+
+    else:
+        raise pagure.exceptions.APIError(
+            400, error_code=APIERROR.EINVALIDREQ, errors=form.errors)
+
+    jsonout = flask.jsonify(output)
+    return jsonout
+
+
 @API.route('/<repo>/issue/<int:issueid>/comment', methods=['POST'])
 @API.route('/<namespace>/<repo>/issue/<int:issueid>/comment', methods=['POST'])
 @API.route(
