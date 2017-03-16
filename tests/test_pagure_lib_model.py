@@ -232,9 +232,15 @@ class PagureLibModeltests(tests.Modeltests):
 
         # Check the ordering
         group = pagure.lib.search_groups(self.session, group_name='testgrp')
+        # Default PostgreSQL order
+        order = ['aaa', 'KKK', 'somenamespace/zzz']
+        # Odd, SQLite order
+        if str(self.session.bind.engine.url).startswith('sqlite:'):
+            order = ['somenamespace/zzz', 'aaa', 'KKK']
+
         self.assertEqual(
             [p.fullname for p in group.projects],
-            ['aaa', 'KKK','somenamespace/zzz']
+            order
         )
 
 
