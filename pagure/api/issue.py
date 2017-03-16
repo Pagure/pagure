@@ -229,6 +229,9 @@ def api_view_issues(repo, username=None, namespace=None):
     | ``milestones``| list of | Optional     | | Filter the issues       |
     |               | strings |              |   by milestone            |
     +---------------+---------+--------------+---------------------------+
+    | ``priority``  | string  | Optional     | | Filter the issues       |
+    |               |         |              |   by priority             |
+    +---------------+---------+--------------+---------------------------+
 
     Sample response
     ^^^^^^^^^^^^^^^
@@ -286,6 +289,7 @@ def api_view_issues(repo, username=None, namespace=None):
     assignee = flask.request.args.get('assignee', None)
     author = flask.request.args.get('author', None)
     milestone = flask.request.args.getlist('milestones', None)
+    priority =  flask.request.args.get('priority', None)
     since = flask.request.args.get('since', None)
 
     # Hide private tickets
@@ -308,6 +312,7 @@ def api_view_issues(repo, username=None, namespace=None):
         'author': author,
         'private': private,
         'milestones': milestone,
+        'priority': priority,
     }
 
     if status is not None:
@@ -348,6 +353,7 @@ def api_view_issues(repo, username=None, namespace=None):
             'author': author,
             'since': since
             'milestones': milestone,
+            'priority': priority,
         }
     })
     return jsonout

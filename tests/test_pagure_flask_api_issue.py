@@ -827,6 +827,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "assignee": None,
                 "author": None,
                 'milestones': [],
+                'priority': None,
                 "since": None,
                 "status": None,
                 "tags": []
@@ -865,6 +866,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "assignee": None,
                 "author": None,
                 'milestones': [],
+                'priority': None,
                 "since": None,
                 "status": None,
                 "tags": []
@@ -905,6 +907,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "assignee": None,
                 "author": None,
                 'milestones': [],
+                'priority': None,
                 "since": None,
                 "status": None,
                 "tags": []
@@ -931,6 +934,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "assignee": None,
                 "author": None,
                 'milestones': [],
+                'priority': None,
                 "since": None,
                 "status": None,
                 "tags": []
@@ -971,6 +975,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "assignee": None,
                 "author": None,
                 'milestones': [],
+                'priority': None,
                 "since": None,
                 "status": None,
                 "tags": []
@@ -996,6 +1001,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "assignee": None,
                 "author": None,
                 'milestones': [],
+                'priority': None,
                 "since": None,
                 "status": None,
                 "tags": []
@@ -1016,6 +1022,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "assignee": None,
                 "author": None,
                 'milestones': [],
+                'priority': None,
                 "since": None,
                 "status": "Closed",
                 "tags": []
@@ -1036,6 +1043,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "assignee": None,
                 "author": None,
                 'milestones': [],
+                'priority': None,
                 "since": None,
                 "status": "Invalid",
                 "tags": []
@@ -1059,6 +1067,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "assignee": None,
                 "author": None,
                 'milestones': [],
+                'priority': None,
                 "since": None,
                 "status": "All",
                 "tags": []
@@ -1123,6 +1132,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "assignee": None,
                 "author": None,
                 'milestones': [],
+                'priority': None,
                 "since": None,
                 "status": None,
                 "tags": [],
@@ -1146,6 +1156,96 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "assignee": None,
                 "author": None,
                 'milestones': ['v1.0'],
+                'priority': None,
+                "since": None,
+                "status": None,
+                "tags": [],
+              },
+              "issues": [lcl_issues[0]],
+              "total_issues": 1
+            }
+        )
+
+    def test_api_view_issues_priority(self):
+        """ Test the api_view_issues method of the flask api when filtering
+        for a priority.
+        """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
+        repo = pagure.lib.get_project(self.session, 'test')
+
+        # Create 2 tickets but only 1 has a priority
+        start = datetime.datetime.utcnow().strftime('%s')
+        issue = pagure.lib.model.Issue(
+            id=pagure.lib.get_next_id(self.session, repo.id),
+            project_id=repo.id,
+            title='Issue #1',
+            content='Description',
+            user_id=1,  # pingou
+            uid='issue#1',
+            private=False,
+        )
+        self.session.add(issue)
+        self.session.commit()
+
+        issue = pagure.lib.model.Issue(
+            id=pagure.lib.get_next_id(self.session, repo.id),
+            project_id=repo.id,
+            title='Issue #2',
+            content='Description',
+            user_id=1,  # pingou
+            uid='issue#2',
+            private=False,
+            priority='high',
+        )
+        self.session.add(issue)
+        self.session.commit()
+
+        # List all opened issues
+        output = self.app.get('/api/0/test/issues')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        for idx in range(len(data['issues'])):
+            data['issues'][idx]['date_created'] = '1431414800'
+            data['issues'][idx]['last_updated'] = '1431414800'
+        lcl_issues = copy.deepcopy(LCL_ISSUES)
+        lcl_issues[0]['priority'] = 'high'
+        self.assertDictEqual(
+            data,
+            {
+              "args": {
+                "assignee": None,
+                "author": None,
+                'milestones': [],
+                'priority': None,
+                "since": None,
+                "status": None,
+                "tags": [],
+              },
+              "issues": lcl_issues,
+              "total_issues": 2
+            }
+        )
+
+        # List all issues of the milestone v1.0
+        output = self.app.get('/api/0/test/issues?priority=high')
+        self.assertEqual(output.status_code, 200)
+        data = json.loads(output.data)
+        for idx in range(len(data['issues'])):
+            data['issues'][idx]['date_created'] = '1431414800'
+            data['issues'][idx]['last_updated'] = '1431414800'
+        self.assertDictEqual(
+            data,
+            {
+              "args": {
+                "assignee": None,
+                "author": None,
+                'milestones': [],
+                'priority': 'high',
                 "since": None,
                 "status": None,
                 "tags": [],
@@ -1238,6 +1338,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "assignee": None,
                 "author": None,
                 'milestones': [],
+                'priority': None,
                 "since": None,
                 "status": None,
                 "tags": []
@@ -1264,6 +1365,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "assignee": None,
                 "author": None,
                 'milestones': [],
+                'priority': None,
                 "since": start,
                 "status": None,
                 "tags": []
@@ -1287,6 +1389,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "assignee": None,
                 "author": None,
                 'milestones': [],
+                'priority': None,
                 "since": middle,
                 "status": None,
                 "tags": []
@@ -1310,6 +1413,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "assignee": None,
                 "author": None,
                 'milestones': [],
+                'priority': None,
                 "since": final,
                 "status": None,
                 "tags": []
@@ -1336,6 +1440,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
                 "assignee": None,
                 "author": None,
                 'milestones': [],
+                'priority': None,
                 "since": final,
                 "status": None,
                 "tags": []
