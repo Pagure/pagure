@@ -303,13 +303,14 @@ def get_pull_request_ready_branch():
                     except StopIteration:
                         pass
                 try:
-                    com = branch_walker.next()
-                    branch_commits.append(com.hex)
+                    branch_commit = branch_walker.next()
                 except StopIteration:
-                    break
+                    branch_commit = None
 
-                if main_commits.intersection(set(branch_commits)):
+                if main_commits.intersection(set(
+                        branch_commits + [branch_commit.hex])):
                     break
+                branch_commits.append(branch_commit.hex)
 
             if branch_commits:
                 branches[branchname] = branch_commits
