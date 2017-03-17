@@ -3394,7 +3394,7 @@ class PagureLibtests(tests.Modeltests):
             # and the version 1.4.3 that we have won't let us adjust the
             # list of supported protocols
             # '<p><a href="ircs://pagure.io">ircs://pagure.io</a></p>',
-            '<p><a>irc://pagure.io</a></p>',
+            '<p><a>ircs://pagure.io</a></p>',
             # 'http://pagure.io'
             '<p><a href="http://pagure.io">http://pagure.io</a></p>',
             # 'https://pagure.io'
