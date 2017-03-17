@@ -527,6 +527,7 @@ def pull_request_add_comment(
                 comment=comment,
                 user=flask.g.fas_user.username,
                 requestfolder=APP.config['REQUESTS_FOLDER'],
+                trigger_ci=APP.config['TRIGGER_CI'],
             )
             SESSION.commit()
             if not is_js:

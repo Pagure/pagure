@@ -1073,7 +1073,8 @@ def add_group_to_project(
 
 def add_pull_request_comment(session, request, commit, tree_id, filename,
                              row, comment, user, requestfolder,
-                             notify=True, notification=False):
+                             notify=True, notification=False,
+                             trigger_ci=None):
     ''' Add a comment to a pull-request. '''
     user_obj = get_user(session, user)
 
@@ -1139,7 +1140,7 @@ def add_pull_request_comment(session, request, commit, tree_id, filename,
         redis=REDIS,
     )
 
-    if comment.strip().lower() == "pretty please pagure-ci rebuild":
+    if trigger_ci and comment.strip().lower() in trigger_ci:
         # Send notification to the CI server
         if REDIS and request.project.ci_hook and PAGURE_CI:
             REDIS.publish('pagure.ci', json.dumps({

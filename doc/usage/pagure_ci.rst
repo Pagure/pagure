@@ -28,3 +28,6 @@ To manually trigger a run of pagure-ci on a given pull-request, simply add
 a comment saying: ``pretty please pagure-ci rebuild``.
 
 .. note:: To always have this handy, you can save it in the ``Quick Replies``!
+
+.. note:: This trigger can also be configured per pagure instance via the
+          configuration file.

@@ -252,3 +252,5 @@ USER_NAMESPACE = False
 # List of groups whose projects should not be shown on the user's info page
 # unless the user has direct access to it.
 EXCLUDE_GROUP_INDEX = []
+
+TRIGGER_CI = ['pretty please pagure-ci rebuild']

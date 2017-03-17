@@ -623,6 +623,24 @@ the groups of forks of that users.
 Defaults to: ``[]``
 
 
+TRIGGER_CI
+~~~~~~~~~~
+
+A run of pagure-ci can be manually triggered if some key sentences are added
+as comment to a pull-request. This allows to re-run a test that failed due
+to some network outage or other unexpected issues unrelated to the test
+suite.
+
+This configuration key allows to define all the sentences that can be used
+to trigger this pagure-ci run.
+
+Defaults to: ``['pretty please pagure-ci rebuild']``
+
+.. note:: The sentences defined in this configuration key should be lower
+          case only!
+
+
+
 Deprecated configuration keys
 -----------------------------
 
