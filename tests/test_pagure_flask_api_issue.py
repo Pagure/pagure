@@ -1297,6 +1297,16 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             }
         )
 
+    def test_api_view_issues_priority_invalid(self):
+        """ Test the api_view_issues method of the flask api when filtering
+        for an invalid priority.
+        """
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'tickets'), bare=True)
+        tests.create_tokens(self.session)
+        tests.create_tokens_acl(self.session)
+
         # Try getting issues with an invalid priority
         output = self.app.get('/api/0/test/issues?priority=foobar')
         self.assertEqual(output.status_code, 400)
