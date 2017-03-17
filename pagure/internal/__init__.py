@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015-2016 - Copyright Red Hat Inc
+ (c) 2015-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -272,9 +272,6 @@ def get_pull_request_ready_branch():
                 repo_obj.head.shorthand)
         else:
             compare_branch = None
-
-            compare_commits = []
-
 
         for branchname in repo_obj.listall_branches():
             branch = repo_obj.lookup_branch(branchname)
