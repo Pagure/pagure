@@ -270,12 +270,6 @@ def get_pull_request_ready_branch():
         if not repo_obj.head_is_unborn:
             compare_branch = repo_obj.lookup_branch(
                 repo_obj.head.shorthand)
-            compare_commits = [
-                commit.oid.hex
-                for commit in repo_obj.walk(
-                    compare_branch.get_object().hex,
-                    pygit2.GIT_SORT_TIME)
-            ]
         else:
             compare_branch = None
 
@@ -290,18 +284,35 @@ def get_pull_request_ready_branch():
                     and compare_branch.branch_name == branch.branch_name:
                 continue
 
-            diff_commits = []
-
             repo_commit = repo_obj[branch.get_object().hex]
 
-            for commit in repo_obj.walk(
-                    repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
-                if commit.oid.hex in compare_commits:
+            if compare_branch:
+                main_walker = repo_obj.walk(
+                    compare_branch.get_object().hex,
+                    pygit2.GIT_SORT_TIME)
+            branch_walker = repo_obj.walk(
+                    repo_commit.oid.hex,
+                    pygit2.GIT_SORT_TIME)
+            main_commits = set()
+            branch_commits = list()
+            while 1:
+                if compare_branch:
+                    try:
+                        com = main_walker.next()
+                        main_commits.add(com.hex)
+                    except StopIteration:
+                        pass
+                try:
+                    com = branch_walker.next()
+                    branch_commits.append(com.hex)
+                except StopIteration:
                     break
-                diff_commits.append(commit.oid.hex)
 
-            if diff_commits:
-                branches[branchname] = diff_commits
+                if main_commits.intersection(set(branch_commits)):
+                    break
+
+            if branch_commits:
+                branches[branchname] = branch_commits
 
     prs = pagure.lib.search_pull_requests(
         pagure.SESSION,
