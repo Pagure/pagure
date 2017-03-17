@@ -265,36 +265,32 @@ def get_pull_request_ready_branch():
     reponame = pagure.get_repo_path(repo)
     repo_obj = pygit2.Repository(reponame)
 
+    if not repo_obj.is_empty and not repo_obj.head_is_unborn:
+        compare_branch = repo_obj.lookup_branch(
+            repo_obj.head.shorthand)
+        compare_commits = [
+            commit.oid.hex
+            for commit in repo_obj.walk(
+                compare_branch.get_object().hex,
+                pygit2.GIT_SORT_TIME)
+        ]
+    else:
+        compare_branch = None
+
+        compare_commits = []
+
     branches = {}
 
-    for branchname in repo_obj.listall_branches():
-        branch = repo_obj.lookup_branch(branchname)
+    if repo_obj.listall_branches() > 1:
+        for branchname in repo_obj.listall_branches():
+            branch = repo_obj.lookup_branch(branchname)
 
-        diff_commits = []
+            # Do not compare a branch to itself
+            if compare_branch \
+                    and compare_branch.branch_name == branch.branch_name:
+                continue
 
-        parentpath = os.path.join(
-            pagure.APP.config['GIT_FOLDER'], repo.path)
-
-        orig_repo = pygit2.Repository(parentpath)
-
-        if not repo_obj.is_empty and not orig_repo.is_empty \
-                and repo_obj.listall_branches() > 1:
-
-            if not orig_repo.head_is_unborn:
-                compare_branch = orig_repo.lookup_branch(
-                    orig_repo.head.shorthand)
-            else:
-                compare_branch = None
-
-            compare_commits = []
-
-            if compare_branch:
-                compare_commits = [
-                    commit.oid.hex
-                    for commit in orig_repo.walk(
-                        compare_branch.get_object().hex,
-                        pygit2.GIT_SORT_TIME)
-                ]
+            diff_commits = []
 
             repo_commit = repo_obj[branch.get_object().hex]
 
@@ -304,8 +300,8 @@ def get_pull_request_ready_branch():
                     break
                 diff_commits.append(commit.oid.hex)
 
-        if diff_commits:
-            branches[branchname] = diff_commits
+            if diff_commits:
+                branches[branchname] = diff_commits
 
     prs = pagure.lib.search_pull_requests(
         pagure.SESSION,
