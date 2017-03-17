@@ -265,23 +265,23 @@ def get_pull_request_ready_branch():
     reponame = pagure.get_repo_path(repo)
     repo_obj = pygit2.Repository(reponame)
 
-    if not repo_obj.is_empty and not repo_obj.head_is_unborn:
-        compare_branch = repo_obj.lookup_branch(
-            repo_obj.head.shorthand)
-        compare_commits = [
-            commit.oid.hex
-            for commit in repo_obj.walk(
-                compare_branch.get_object().hex,
-                pygit2.GIT_SORT_TIME)
-        ]
-    else:
-        compare_branch = None
-
-        compare_commits = []
-
     branches = {}
+    if not repo_obj.is_empty and repo_obj.listall_branches() > 1:
+        if not repo_obj.head_is_unborn:
+            compare_branch = repo_obj.lookup_branch(
+                repo_obj.head.shorthand)
+            compare_commits = [
+                commit.oid.hex
+                for commit in repo_obj.walk(
+                    compare_branch.get_object().hex,
+                    pygit2.GIT_SORT_TIME)
+            ]
+        else:
+            compare_branch = None
 
-    if repo_obj.listall_branches() > 1:
+            compare_commits = []
+
+
         for branchname in repo_obj.listall_branches():
             branch = repo_obj.lookup_branch(branchname)
 
