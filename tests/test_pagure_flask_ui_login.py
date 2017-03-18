@@ -86,6 +86,15 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             'confirm_password': 'barpass',
         }
 
+        # This has all the data needed
+        data_non_ascii = {
+            'user': 'foo_bar',
+            'fullname': 'user foo',
+            'email_address': 'bar@foo.com',
+            'password': 'ö',
+            'confirm_password': 'ö',
+        }
+
         # Submit this form  -  Doesn't work since there is no csrf token
         output = self.app.post('/user/new', data=data)
         self.assertEqual(output.status_code, 200)
@@ -121,9 +130,18 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             'User created, please check your email to activate the account',
             output.data)
 
+        # Submit the form with proper data with password being non-ascii
+        data_non_ascii['csrf_token'] = csrf_token
+        output = self.app.post('/user/new', data=data_non_ascii, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn(
+            'User created, please check your email to activate the account',
+            output.data)
+
         # Check after:
         items = pagure.lib.search_user(self.session)
-        self.assertEqual(3, len(items))
+        self.assertEqual(4, len(items))
 
     @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
     @patch.dict('pagure.config.config', {'CHECK_SESSION_IP': False})
@@ -166,7 +184,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.test_new_user()
 
         items = pagure.lib.search_user(self.session)
-        self.assertEqual(3, len(items))
+        self.assertEqual(4, len(items))
 
         # Submit the form with the csrf token  -  but user not confirmed
         data['csrf_token'] = csrf_token
@@ -181,6 +199,16 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
 
         # User in the DB, csrf provided  -  but wrong password submitted
         data['password'] = 'password'
+        output = self.app.post('/dologin', data=data, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn(
+            '<form action="/dologin" method="post">', output.data)
+        self.assertIn('Username or password invalid.', output.data)
+
+        # User in the DB, csrf provided  -  but wrong password submitted
+        # And checking for non-ascii character
+        data['password'] = 'ö'
         output = self.app.post('/dologin', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
         self.assertIn('<title>Login - Pagure</title>', output.data)
@@ -225,12 +253,45 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             '<a class="nav-link btn btn-primary" '
             'href="/login/?next=http://localhost/">', output.data)
 
+        # Login but cannot save the session to the DB due to the missing IP
+        # address in the flask request
+        # This has all the data needed
+
+        # Confirm the user so that we can log in
+        item = pagure.lib.search_user(self.session, username='foo_bar')
+        self.assertEqual(item.user, 'foo_bar')
+        self.assertNotEqual(item.token, None)
+
+        # Remove the token
+        item.token = None
+        self.session.add(item)
+        self.session.commit
+
+        # Check the user
+        item = pagure.lib.search_user(self.session, username='foo_bar')
+        self.assertEqual(item.user, 'foo_bar')
+        self.assertEqual(item.token, None)
+
+        data_non_ascii = {
+            'username': 'foo_bar',
+            'password': 'ö',
+        }
+        data_non_ascii['csrf_token'] = csrf_token
+        print data_non_ascii
+        output = self.app.post('/dologin',
+                               data=data_non_ascii, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Home - Pagure</title>', output.data)
+        self.assertIn(
+            '<a class="nav-link btn btn-primary" '
+            'href="/login/?next=http://localhost/">', output.data)
+
         # I'm not sure if the change was in flask or werkzeug, but in older
         # version flask.request.remote_addr was returning None, while it
         # now returns 127.0.0.1 making our logic pass where it used to
         # partly fail
         if hasattr(flask, '__version__') and \
-                tuple(flask.__version__.split('.')) <= (0,12,0):
+                tuple(flask.__version__.split('.')) <= (0, 12, 0):
             self.assertIn(
                 'Could not set the session in the db, please report '
                 'this error to an admin', output.data)
@@ -302,7 +363,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         # now returns 127.0.0.1 making our logic pass where it used to
         # partly fail
         if hasattr(flask, '__version__') and \
-                tuple(flask.__version__.split('.')) <= (0,12,0):
+                tuple(flask.__version__.split('.')) <= (0, 12, 0):
             self.assertIn(
                 'Could not set the session in the db, please report '
                 'this error to an admin', output.data)
@@ -321,7 +382,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.test_new_user()
 
         items = pagure.lib.search_user(self.session)
-        self.assertEqual(3, len(items))
+        self.assertEqual(4, len(items))
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertTrue(item.password.startswith('$2$'))

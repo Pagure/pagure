@@ -11,9 +11,9 @@
 
 import random
 import string
+import hashlib
 import bcrypt
 
-import hashlib
 import pagure
 from pagure.lib import model
 from kitchen.text.converters import to_unicode, to_bytes
@@ -51,7 +51,7 @@ def get_session_by_visitkey(session, sessionid):
 def generate_hashed_value(password):
     """ Generate hash value for password
     """
-    return '$2$' + bcrypt.hashpw(to_unicode(password).encode('UTF_8'),
+    return '$2$' + bcrypt.hashpw(password.encode('UTF_8'),
                                  bcrypt.gensalt())
 
 
@@ -66,7 +66,7 @@ def check_password(entered_password, user_password, seed=None):
     _, version, user_password = user_password.split('$', 2)
 
     if version == '2':
-        password = bcrypt.hashpw(to_unicode(entered_password).encode('UTF_8'),
+        password = bcrypt.hashpw(entered_password.encode('UTF_8'),
                                  user_password)
 
     elif version == '1':
