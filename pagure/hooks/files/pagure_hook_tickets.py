@@ -38,7 +38,7 @@ def run_as_post_receive_hook():
         print('user:', username)
         print('namespace:', namespace)
 
-    project = pagure.lib.get_project(
+    project = pagure.lib._get_project(
         pagure.SESSION, repo, user=username, namespace=namespace)
 
     for line in sys.stdin:
@@ -65,14 +65,14 @@ def run_as_post_receive_hook():
         if REDIS:
             print('Sending to redis to load the data')
             REDIS.publish('pagure.loadjson',
-                json.dumps({
-                    'project': project.to_json(public=True),
-                    'abspath': abspath,
-                    'commits': commits,
-                    'data_type': 'ticket',
-                    'agent': os.environ.get('GL_USER'),
-                }
-            ))
+                    json.dumps({
+                        'project': project.to_json(public=True),
+                        'abspath': abspath,
+                        'commits': commits,
+                        'data_type': 'ticket',
+                        'agent': os.environ.get('GL_USER'),
+                    }
+                    ))
             print(
                 'A report will be emailed to you once the load is finished')
         else:

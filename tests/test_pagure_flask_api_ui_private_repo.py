@@ -1904,6 +1904,9 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "args": {
                         "assignee": None,
                         "author": None,
+                        "milestones": [],
+                        "no_stones": None,
+                        "priority": None,
                         "since": None,
                         "status": None,
                         "tags": []
@@ -1969,6 +1972,9 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "args": {
                         "assignee": None,
                         "author": None,
+                        "milestones": [],
+                        "no_stones": None,
+                        "priority": None,
                         "status": None,
                         "since": None,
                         "tags": []
@@ -2047,6 +2053,9 @@ class PagurePrivateRepotest(tests.Modeltests):
                 "args": {
                     "assignee": None,
                     "author": None,
+                    "milestones": [],
+                    "no_stones": None,
+                    "priority": None,
                     "status": None,
                     "since": None,
                     "tags": []
@@ -2115,6 +2124,9 @@ class PagurePrivateRepotest(tests.Modeltests):
                 "args": {
                     "assignee": None,
                     "author": None,
+                    "milestones": [],
+                    "no_stones": None,
+                    "priority": None,
                     "status": "Closed",
                     "since": None,
                     "tags": []
@@ -2135,6 +2147,9 @@ class PagurePrivateRepotest(tests.Modeltests):
                 "args": {
                     "assignee": None,
                     "author": None,
+                    "milestones": [],
+                    "no_stones": None,
+                    "priority": None,
                     "status": "Invalid",
                     "since": None,
                     "tags": []
@@ -2159,6 +2174,9 @@ class PagurePrivateRepotest(tests.Modeltests):
                 "args": {
                     "assignee": None,
                     "author": None,
+                    "milestones": [],
+                    "no_stones": None,
+                    "priority": None,
                     "since": None,
                     "status": "All",
                     "tags": []

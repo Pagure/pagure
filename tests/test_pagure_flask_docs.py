@@ -103,7 +103,7 @@ class PagureFlaskDocstests(tests.Modeltests):
         PagureRepo.push(remote, 'refs/heads/master:refs/heads/master')
 
         # Turn on the docs project since it's off by default
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         repo.settings = {'project_documentation': True}
         self.session.add(repo)
         self.session.commit()

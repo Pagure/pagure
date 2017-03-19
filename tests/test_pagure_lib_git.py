@@ -276,7 +276,7 @@ repo requests/forks/pingou/test3
         when the new uesr is just a ticketer """
         tests.create_projects(self.session)
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         # Add an user to a project
         # The user will be an admin of the project
         msg = pagure.lib.add_user_to_project(
@@ -378,7 +378,7 @@ repo requests/forks/pingou/test3
         when the new uesr is just a committer """
         tests.create_projects(self.session)
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         # Add an user to a project
         # The user will be an admin of the project
         msg = pagure.lib.add_user_to_project(
@@ -642,7 +642,7 @@ repo requests/forks/pingou/test2
         """
         tests.create_projects(self.session)
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
 
         # Add a couple of groups
         # They would be ticketers
@@ -795,7 +795,7 @@ repo requests/forks/pingou/test2
         """
         tests.create_projects(self.session)
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
 
         # Add a couple of groups
         # They would be committers
@@ -2689,7 +2689,7 @@ index 0000000..60f7480
         self.session.add(item)
         self.session.commit()
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         gitrepo = os.path.join(gitfolder, repo.path)
         docrepo = os.path.join(docfolder, repo.path)
         ticketrepo = os.path.join(ticketfolder, repo.path)
@@ -2719,7 +2719,7 @@ index 0000000..60f7480
             self.path, 'repos', 'forks', 'foo', 'test.git')
         tests.add_content_git_repo(self.gitrepo, branch='feature')
 
-        fork_repo = pagure.lib.get_project(self.session, 'test', user='foo')
+        fork_repo = pagure.get_authorized_project(self.session, 'test', user='foo')
         # Create a PR to play with
         req = pagure.lib.new_pull_request(
             session=self.session,

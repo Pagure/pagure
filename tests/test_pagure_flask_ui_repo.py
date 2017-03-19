@@ -3033,7 +3033,7 @@ index 0000000..fb7093d
                 output.data)
 
             # add user
-            repo = pagure.lib.get_project(self.session, 'test')
+            repo = pagure.get_authorized_project(self.session, 'test')
             msg = pagure.lib.add_user_to_project(
                 session=self.session,
                 project=repo,
@@ -3052,9 +3052,9 @@ index 0000000..fb7093d
             self.assertIn(
                 'Forks <span class="label label-default">0</span>',
                 output.data)
-            repo = pagure.lib.get_project(self.session, 'test')
+            repo = pagure.get_authorized_project(self.session, 'test')
             self.assertNotEqual(repo, None)
-            repo = pagure.lib.get_project(self.session, 'test2')
+            repo = pagure.get_authorized_project(self.session, 'test2')
             self.assertEqual(repo, None)
 
             # Delete the project
@@ -3068,9 +3068,9 @@ index 0000000..fb7093d
                 output.data)
 
             # Check after
-            repo = pagure.lib.get_project(self.session, 'test')
+            repo = pagure.get_authorized_project(self.session, 'test')
             self.assertEqual(repo, None)
-            repo = pagure.lib.get_project(self.session, 'test2')
+            repo = pagure.get_authorized_project(self.session, 'test2')
             self.assertEqual(repo, None)
 
     @patch('pagure.lib.notify.send_email')
@@ -3127,7 +3127,7 @@ index 0000000..fb7093d
             self.assertEqual(msg, 'User `pingou` added to the group `foo`.')
 
             # Add group to the project
-            repo = pagure.lib.get_project(self.session, 'test')
+            repo = pagure.get_authorized_project(self.session, 'test')
             msg = pagure.lib.add_group_to_project(
                 session=self.session,
                 project=repo,
@@ -3138,7 +3138,7 @@ index 0000000..fb7093d
             self.assertEqual(msg, 'Group added')
 
             # check if group where we expect it
-            repo = pagure.lib.get_project(self.session, 'test')
+            repo = pagure.get_authorized_project(self.session, 'test')
             self.assertEqual(len(repo.projects_groups), 1)
 
             # Check before deleting the project
@@ -3150,7 +3150,7 @@ index 0000000..fb7093d
             self.assertIn(
                 'Forks <span class="label label-default">0</span>',
                 output.data)
-            repo = pagure.lib.get_project(self.session, 'test')
+            repo = pagure.get_authorized_project(self.session, 'test')
             self.assertNotEqual(repo, None)
 
             # Delete the project
@@ -3164,7 +3164,7 @@ index 0000000..fb7093d
                 output.data)
 
             # Check after
-            repo = pagure.lib.get_project(self.session, 'test')
+            repo = pagure.get_authorized_project(self.session, 'test')
             self.assertEqual(repo, None)
 
     @patch('pagure.lib.notify.send_email')
@@ -3207,7 +3207,7 @@ index 0000000..fb7093d
                 output.data)
 
             # Create the issue
-            repo = pagure.lib.get_project(self.session, 'test')
+            repo = pagure.get_authorized_project(self.session, 'test')
             msg = pagure.lib.new_issue(
                 session=self.session,
                 repo=repo,
@@ -3220,7 +3220,7 @@ index 0000000..fb7093d
             self.assertEqual(msg.title, 'Test issue')
 
             # Add a tag to the issue
-            repo = pagure.lib.get_project(self.session, 'test')
+            repo = pagure.get_authorized_project(self.session, 'test')
             issue = pagure.lib.search_issues(self.session, repo, issueid=1)
             msg = pagure.lib.add_tag_obj(
                 session=self.session,
@@ -3240,9 +3240,9 @@ index 0000000..fb7093d
             self.assertIn(
                 'Forks <span class="label label-default">0</span>',
                 output.data)
-            repo = pagure.lib.get_project(self.session, 'test')
+            repo = pagure.get_authorized_project(self.session, 'test')
             self.assertNotEqual(repo, None)
-            repo = pagure.lib.get_project(self.session, 'test2')
+            repo = pagure.get_authorized_project(self.session, 'test2')
             self.assertEqual(repo, None)
 
             # Delete the project
@@ -3256,9 +3256,9 @@ index 0000000..fb7093d
                 output.data)
 
             # Check after
-            repo = pagure.lib.get_project(self.session, 'test')
+            repo = pagure.get_authorized_project(self.session, 'test')
             self.assertEqual(repo, None)
-            repo = pagure.lib.get_project(self.session, 'test2')
+            repo = pagure.get_authorized_project(self.session, 'test2')
             self.assertEqual(repo, None)
 
     @patch('pagure.ui.repo.admin_session_timedout')
@@ -4224,7 +4224,7 @@ index 0000000..fb7093d
                 output.data)
 
             # Create a report
-            project = pagure.lib.get_project(self.session, name='test')
+            project = pagure.get_authorized_project(self.session, project_name='test')
             self.assertEqual(project.reports, {})
             name = 'test report'
             url = '?foo=bar&baz=biz'
@@ -4236,7 +4236,7 @@ index 0000000..fb7093d
                 username=None
             )
             self.session.commit()
-            project = pagure.lib.get_project(self.session, name='test')
+            project = pagure.get_authorized_project(self.session, project_name='test')
             self.assertEqual(
                 project.reports,
                 {'test report': {'baz': 'biz', 'foo': 'bar'}}
@@ -4253,7 +4253,7 @@ index 0000000..fb7093d
                 '<title>Settings - test - Pagure</title>',
                 output.data)
 
-            project = pagure.lib.get_project(self.session, name='test')
+            project = pagure.get_authorized_project(self.session, project_name='test')
             self.assertEqual(
                 project.reports,
                 {'test report': {'baz': 'biz', 'foo': 'bar'}}
@@ -4270,7 +4270,7 @@ index 0000000..fb7093d
             self.assertIn(
                 '</button>\n                      List of reports updated',
                 output.data)
-            project = pagure.lib.get_project(self.session, name='test')
+            project = pagure.get_authorized_project(self.session, project_name='test')
             self.assertEqual(project.reports, {})
 
     def test_delete_report_ns_project(self):
@@ -4329,8 +4329,8 @@ index 0000000..fb7093d
                 output.data)
 
             # Create a report
-            project = pagure.lib.get_project(
-                self.session, name='test', namespace='foo')
+            project = pagure.get_authorized_project(
+                self.session, project_name='test', namespace='foo')
             self.assertEqual(project.reports, {})
             name = 'test report'
             url = '?foo=bar&baz=biz'
@@ -4342,8 +4342,8 @@ index 0000000..fb7093d
                 username=None
             )
             self.session.commit()
-            project = pagure.lib.get_project(
-                self.session, name='test', namespace='foo')
+            project = pagure.get_authorized_project(
+                self.session, project_name='test', namespace='foo')
             self.assertEqual(
                 project.reports,
                 {'test report': {'baz': 'biz', 'foo': 'bar'}}
@@ -4360,8 +4360,8 @@ index 0000000..fb7093d
                 '<title>Settings - foo/test - Pagure</title>',
                 output.data)
 
-            project = pagure.lib.get_project(
-                self.session, name='test', namespace='foo')
+            project = pagure.get_authorized_project(
+                self.session, project_name='test', namespace='foo')
             self.assertEqual(
                 project.reports,
                 {'test report': {'baz': 'biz', 'foo': 'bar'}}
@@ -4379,8 +4379,8 @@ index 0000000..fb7093d
                 '</button>\n                      List of reports updated',
                 output.data)
 
-            project = pagure.lib.get_project(
-                self.session, name='test', namespace='foo')
+            project = pagure.get_authorized_project(
+                self.session, project_name='test', namespace='foo')
             self.assertEqual(project.reports, {})
 
 

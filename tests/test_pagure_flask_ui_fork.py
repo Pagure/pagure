@@ -1467,8 +1467,8 @@ index 0000000..2a552bb
         tests.create_projects_git(
             os.path.join(self.path, 'requests'), bare=True)
 
-        repo = pagure.lib.get_project(self.session, 'test')
-        fork = pagure.lib.get_project(self.session, 'test', user='foo')
+        repo = pagure.get_authorized_project(self.session, 'test')
+        fork = pagure.get_authorized_project(self.session, 'test', user='foo')
 
         self.set_up_git_repo(
             new_project=fork, branch_from='feature', mtype='FF')

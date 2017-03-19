@@ -486,7 +486,7 @@ class PagureLibGetWatchListtests(tests.Modeltests):
         self.session.add(item)
 
         # Set the user `bar` to watch the project
-        project = pagure.lib.get_project(
+        project = pagure.get_authorized_project(
             self.session, 'test3', namespace='ns')
         msg = pagure.lib.update_watch_status(
             session=self.session,

@@ -74,7 +74,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # Create issues to play with
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -268,7 +268,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 output.data)
 
         # Create private issue
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -325,7 +325,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # Create issues to play with
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
 
         # Add user 'foo' with ticket access on repo
         msg = pagure.lib.add_user_to_project(
@@ -338,7 +338,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.assertEqual(msg, 'User added')
         self.session.commit()
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -531,7 +531,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 output.data)
 
         # Create private issue
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -588,7 +588,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # Create issues to play with
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
 
         # Add user 'foo' with ticket access on repo
         msg = pagure.lib.add_user_to_project(
@@ -601,7 +601,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.assertEqual(msg, 'User added')
         self.session.commit()
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -793,7 +793,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 output.data)
 
         # Create private issue
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -850,7 +850,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # Create issues to play with
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
 
         # Add user 'foo' with ticket access on repo
         msg = pagure.lib.add_user_to_project(
@@ -863,7 +863,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
         self.assertEqual(msg, 'User added')
         self.session.commit()
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -1056,7 +1056,7 @@ class PagureFlaskIssuesACLtests(tests.Modeltests):
                 output.data)
 
         # Create private issue
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,

@@ -158,7 +158,7 @@ def handle_messages():
         _log.info('Looking for project: %s%s of user: %s',
                  '%s/' % namespace if namespace else '',
                  repo, username)
-        project = pagure.lib.get_project(
+        project = pagure.lib._get_project(
             session, repo, user=username, namespace=namespace)
 
         if not project:

@@ -21,7 +21,6 @@ import json
 import logging
 import os
 
-import requests
 import trollius
 import trollius_redis
 
@@ -99,7 +98,7 @@ def handle_messages():
         _log.info('Looking for project: %s%s of %s',
                  '%s/' % namespacerepo if namespace else '',
                  repo, username)
-        project = pagure.lib.get_project(
+        project = pagure.lib._get_project(
             pagure.SESSION, repo, user=username, namespace=namespace)
 
         if not project:

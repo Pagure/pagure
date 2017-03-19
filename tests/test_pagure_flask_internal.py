@@ -307,7 +307,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         tests.create_projects(self.session)
 
         # Create issues to play with
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -320,7 +320,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg.title, 'Test issue')
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         issue = repo.issues[0]
         self.assertEqual(len(issue.comments), 0)
 
@@ -336,7 +336,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         output = self.app.put('/pv/ticket/comment/', data=data)
         self.assertEqual(output.status_code, 403)
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         # Let's promote him to be a ticketer
         # He shoudn't be able to comment even then though
         msg = pagure.lib.add_user_to_project(
@@ -348,7 +348,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(msg, 'User added')
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         self.assertEqual(
             sorted([u.username for u in repo.users]), ['foo'])
         self.assertEqual(
@@ -359,7 +359,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         output = self.app.put('/pv/ticket/comment/', data=data)
         self.assertEqual(output.status_code, 403)
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         # Let's promote him to be a committer
         # He should be able to comment
         msg = pagure.lib.add_user_to_project(
@@ -371,7 +371,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(msg, 'User access updated')
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         self.assertEqual(
             sorted([u.username for u in repo.users]), ['foo'])
         self.assertEqual(
@@ -385,7 +385,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         js_data = json.loads(output.data)
         self.assertDictEqual(js_data, {'message': 'Comment added'})
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         issue = repo.issues[0]
         self.assertEqual(len(issue.comments), 1)
 
@@ -401,7 +401,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'User access updated')
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         self.assertEqual(
             sorted([u.username for u in repo.users]), ['foo'])
         self.assertEqual(
@@ -415,7 +415,7 @@ class PagureFlaskInternaltests(tests.Modeltests):
         js_data = json.loads(output.data)
         self.assertDictEqual(js_data, {'message': 'Comment added'})
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         issue = repo.issues[0]
         self.assertEqual(len(issue.comments), 2)
 

@@ -493,11 +493,7 @@ def api_pull_request_add_comment(
           "message": "Comment added"
         }
 
-<<<<<<< a8fb3f131e9001d3b8a7952180d3f92540aea426
     """  # noqa
-=======
-    """
->>>>>>> Fix using get_authorized_project in api/fork
     repo = pagure.get_authorized_project(SESSION, repo, user=username, namespace=namespace)
 
     output = {}

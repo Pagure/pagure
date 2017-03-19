@@ -401,7 +401,7 @@ class PagureLibtests(tests.Modeltests):
         p_ugt.return_value = True
 
         tests.create_projects(self.session)
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
 
         # Create 3 issues
         msg = pagure.lib.new_issue(
@@ -1467,7 +1467,7 @@ class PagureLibtests(tests.Modeltests):
         # Also check if the project shows up if a user doesn't
         # have admin access in the project
         # Check with commit access first
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
         msg = pagure.lib.add_user_to_project(
             self.session,
             project=project,
@@ -1482,7 +1482,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(len(projects), 1)
 
         # Now check with only ticket access
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
         msg = pagure.lib.add_user_to_project(
             self.session,
             project=project,
@@ -3567,7 +3567,7 @@ class PagureLibtests(tests.Modeltests):
         '''
 
         tests.create_projects(self.session)
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
 
         # Default value of combine is True
         # which means the an admin is a user, committer as well
@@ -3602,7 +3602,7 @@ class PagureLibtests(tests.Modeltests):
         # since, he is an admin, the msg should be 'User added'
         self.assertEqual(msg, 'User added')
 
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
         users = project.get_project_users(access='admin')
 
         self.assertEqual(len(users), 1)
@@ -3631,7 +3631,7 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'User access updated')
 
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
         # No admin now, even though pingou the creator is there
         users = project.get_project_users(access='admin')
         self.assertEqual(len(users), 0)
@@ -3658,7 +3658,7 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'User access updated')
 
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
         # No admin now, even though pingou the creator is there
         users = project.get_project_users(access='admin')
         self.assertEqual(len(users), 0)
@@ -3678,7 +3678,7 @@ class PagureLibtests(tests.Modeltests):
         '''
 
         tests.create_projects(self.session)
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
 
         # Let's add a new user to the project, 'foo'
         # By default, if no access is specified, he becomes an admin
@@ -3718,8 +3718,9 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(msg, 'User access updated')
 
         # He is just a committer
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
         users = project.get_project_users(access='admin', combine=False)
+
         self.assertEqual(len(users), 0)
 
         # He is just a committer
@@ -3743,8 +3744,9 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(msg, 'User access updated')
 
         # He is just a ticketer
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
         users = project.get_project_users(access='admin',combine=False)
+
         self.assertEqual(len(users), 0)
 
         # He is just a ticketer
@@ -3781,7 +3783,7 @@ class PagureLibtests(tests.Modeltests):
 
         # Add the group to project we just created, test
         # First add it as an admin
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
         msg = pagure.lib.add_group_to_project(
             self.session,
             project=project,
@@ -3793,8 +3795,9 @@ class PagureLibtests(tests.Modeltests):
 
         # Now, the group is an admin in the project
         # so, it must have access to everything
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
         groups = project.get_project_groups(access='admin')
+
         self.assertEqual(len(groups), 1)
         self.assertEqual(groups[0].display_name, 'Justice League')
         self.assertEqual(len(project.admin_groups), 1)
@@ -3824,7 +3827,7 @@ class PagureLibtests(tests.Modeltests):
         )
 
         # Update the access level of the group, JL to commit
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
         msg = pagure.lib.add_group_to_project(
             self.session,
             project=project,
@@ -3836,8 +3839,9 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(msg, 'Group access updated')
 
         # It shouldn't be an admin
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
         groups = project.get_project_groups(access='admin')
+
         self.assertEqual(len(groups), 0)
         self.assertEqual(len(project.admin_groups), 0)
 
@@ -3873,8 +3877,9 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(msg, 'Group access updated')
 
         # It is not an admin
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
         groups = project.get_project_groups(access='admin')
+
         self.assertEqual(len(groups), 0)
         self.assertEqual(len(project.admin_groups), 0)
 
@@ -3918,7 +3923,7 @@ class PagureLibtests(tests.Modeltests):
 
         # Add the group to project we just created, test
         # First add it as an admin
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
         msg = pagure.lib.add_group_to_project(
             self.session,
             project=project,
@@ -3930,8 +3935,9 @@ class PagureLibtests(tests.Modeltests):
 
         # Now, the group is an admin in the project
         # so, it must have access to everything
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
         groups = project.get_project_groups(access='admin', combine=False)
+
         self.assertEqual(len(groups), 1)
         self.assertEqual(groups[0].display_name, 'Justice League')
         self.assertEqual(len(project.admin_groups), 1)
@@ -3949,7 +3955,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(len(groups), 0)
 
         # Update the access level of the group, JL to commit
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
         msg = pagure.lib.add_group_to_project(
             self.session,
             project=project,
@@ -3961,8 +3967,9 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(msg, 'Group access updated')
 
         # It shouldn't be an admin
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
         groups = project.get_project_groups(access='admin', combine=False)
+
         self.assertEqual(len(groups), 0)
 
         # It is a committer
@@ -3991,8 +3998,9 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(msg, 'Group access updated')
 
         # It is not an admin
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
         groups = project.get_project_groups(access='admin', combine=False)
+
         self.assertEqual(len(groups), 0)
 
         # The group shouldn't be a committer
@@ -4017,7 +4025,7 @@ class PagureLibtests(tests.Modeltests):
         tests.create_projects(self.session)
 
         # Add a user object - make him an admin first
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
         msg = pagure.lib.add_user_to_project(
             self.session,
             project=project,
@@ -4046,7 +4054,7 @@ class PagureLibtests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(msg, 'User access updated')
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
 
         # He should be a committer
         access_obj = pagure.lib.get_obj_access(
@@ -4066,7 +4074,7 @@ class PagureLibtests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(msg, 'User access updated')
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
 
         # He should be a ticketer
         access_obj = pagure.lib.get_obj_access(
@@ -4101,7 +4109,7 @@ class PagureLibtests(tests.Modeltests):
         )
 
         # Add a group object - make him an admin first
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
         msg = pagure.lib.add_group_to_project(
             self.session,
             project=project,
@@ -4131,7 +4139,7 @@ class PagureLibtests(tests.Modeltests):
         self.session.commit()
         self.assertEqual(msg, 'Group access updated')
 
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
         # He should be a committer
         access_obj = pagure.lib.get_obj_access(
             self.session,
@@ -4150,7 +4158,7 @@ class PagureLibtests(tests.Modeltests):
         )
         self.session.commit()
         self.assertEqual(msg, 'Group access updated')
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
 
         # He should be a ticketer
         access_obj = pagure.lib.get_obj_access(
@@ -4241,7 +4249,7 @@ class PagureLibtests(tests.Modeltests):
         # Create the projects
         tests.create_projects(self.session)
 
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
         self.assertEqual(project.reports, {})
 
         name = 'test report'
@@ -4255,7 +4263,7 @@ class PagureLibtests(tests.Modeltests):
             username=None
         )
 
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
         self.assertEqual(
             project.reports,
             {'test report': {'baz': 'biz', 'foo': 'bar'}}
@@ -4272,7 +4280,7 @@ class PagureLibtests(tests.Modeltests):
             username=None
         )
 
-        project = pagure.lib.get_project(self.session, name='test')
+        project = pagure.get_authorized_project(self.session, project_name='test')
         self.assertEqual(
             project.reports,
             {

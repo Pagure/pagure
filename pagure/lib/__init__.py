@@ -611,8 +611,6 @@ def add_issue_dependency(
         if not issue.private:
         #pagure.lib.notify.notify_assigned_issue(issue, user_obj)
         #pagure.lib.notify.notify_assigned_issue(issue_blocked, user_obj)
-
-        if not issue.private:
             pagure.lib.notify.log(
                 issue.project,
                 topic='issue.dependency.added',
@@ -672,8 +670,6 @@ def remove_issue_dependency(
         if not issue.private:
         #pagure.lib.notify.notify_assigned_issue(issue, user_obj)
         #pagure.lib.notify.notify_assigned_issue(issue_blocked, user_obj)
-
-        if not issue.private:
             pagure.lib.notify.log(
                 issue.project,
                 topic='issue.dependency.removed',

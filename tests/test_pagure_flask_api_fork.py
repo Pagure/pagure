@@ -607,8 +607,8 @@ class PagureFlaskApiForktests(tests.Modeltests):
         tests.create_tokens_acl(self.session)
 
         # Create the pull-request to close
-        repo = pagure.lib.get_project(self.session, 'test')
-        forked_repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.get_authorized_project(self.session, 'test')
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
@@ -871,8 +871,8 @@ class PagureFlaskApiForktests(tests.Modeltests):
         )
 
         # Create a pull-request
-        repo = pagure.lib.get_project(self.session, 'test')
-        forked_repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.get_authorized_project(self.session, 'test')
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,
@@ -1129,8 +1129,8 @@ class PagureFlaskApiForktests(tests.Modeltests):
         )
 
         # Create a pull-request
-        repo = pagure.lib.get_project(self.session, 'test')
-        forked_repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
+        forked_repo = pagure.get_authorized_project(self.session, 'test')
         req = pagure.lib.new_pull_request(
             session=self.session,
             repo_from=forked_repo,

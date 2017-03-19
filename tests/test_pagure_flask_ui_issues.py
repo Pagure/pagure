@@ -889,7 +889,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         tests.create_projects_git(
             os.path.join(self.path), bare=True)
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
 
         # Add custom fields to the project
         msg = pagure.lib.set_custom_key_fields(
