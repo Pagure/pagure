@@ -257,9 +257,6 @@ git push -u origin master</pre>
                     </div>
                     <div><small>
                       {{ commit.message.split('\n')[0] }}
-                      {% if diff_commits and commit.oid.hex in diff_commits %}
-                        <span class="new_commit" title="Commit not in the main repo">*</span>
-                      {% endif %}
                     </small></div>
                   </a>
                 {% endfor %}
