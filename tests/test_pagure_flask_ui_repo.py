@@ -1271,6 +1271,8 @@ class PagureFlaskRepotests(tests.Modeltests):
         output = self.app.get('/test')
         # No git repo associated
         self.assertEqual(output.status_code, 404)
+        self.perfMaxWalks(0, 0)
+        self.perfReset()
 
         tests.create_projects_git(self.path, bare=True)
 
@@ -1280,6 +1282,8 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertIn(
             '<div class="projectinfo m-t-1 m-b-1">\n'
             'test project #1        </div>', output.data)
+        self.perfMaxWalks(0, 0)
+        self.perfReset()
 
         output = self.app.get('/test/')
         self.assertEqual(output.status_code, 200)
@@ -1287,10 +1291,13 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertIn(
             '<div class="projectinfo m-t-1 m-b-1">\n'
             'test project #1        </div>', output.data)
+        self.perfMaxWalks(0, 0)
+        self.perfReset()
 
         # Add some content to the git repo
         tests.add_content_git_repo(os.path.join(self.path, 'test.git'))
         tests.add_readme_git_repo(os.path.join(self.path, 'test.git'))
+        self.perfReset()
 
         output = self.app.get('/test')
         self.assertEqual(output.status_code, 200)
@@ -1299,6 +1306,8 @@ class PagureFlaskRepotests(tests.Modeltests):
         self.assertIn(
             '<div class="projectinfo m-t-1 m-b-1">\n'
             'test project #1        </div>', output.data)
+        self.perfMaxWalks(3, 8)  # Target: (1, 3)
+        self.perfReset()
 
         # Turn that repo into a fork
         repo = pagure.lib.get_project(self.session, 'test')
@@ -1324,6 +1333,8 @@ class PagureFlaskRepotests(tests.Modeltests):
             '<div class="projectinfo m-t-1 m-b-1">\n'
             'test project #1        </div>', output.data)
         self.assertTrue('Forked from' in output.data)
+        self.perfMaxWalks(1, 3)
+        self.perfReset()
 
         # Add a fork of a fork
         item = pagure.lib.model.Project(
@@ -1352,6 +1363,8 @@ class PagureFlaskRepotests(tests.Modeltests):
             '<div class="projectinfo m-t-1 m-b-1">\n'
             'test project #3        </div>', output.data)
         self.assertTrue('Forked from' in output.data)
+        self.perfMaxWalks(3, 18)  # Ideal: (1, 3)
+        self.perfReset()
 
     def test_view_repo_empty(self):
         """ Test the view_repo endpoint on a repo w/o master branch. """

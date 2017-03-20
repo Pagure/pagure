@@ -19,6 +19,9 @@ import tempfile
 import os
 logging.basicConfig(stream=sys.stderr)
 
+# Always enable performance counting for tests
+os.environ['PAGURE_PERFREPO'] = 'true'
+
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
@@ -38,6 +41,7 @@ import pagure
 import pagure.lib
 import pagure.lib.model
 from pagure.lib.repo import PagureRepo
+import pagure.perfrepo as perfrepo
 
 DB_PATH = 'sqlite:///:memory:'
 FAITOUT_URL = 'http://faitout.fedorainfracloud.org/'
@@ -99,8 +103,32 @@ class Modeltests(unittest.TestCase):
         self.gitrepo = None
         self.gitrepos = None
 
+    def perfMaxWalks(self, max_walks, max_steps):
+        """ Check that we have not performed too many walks/steps. """
+        num_walks = 0
+        num_steps = 0
+        for reqstat in perfrepo.REQUESTS:
+            for walk in reqstat['walks'].values():
+                num_walks += 1
+                num_steps += walk['steps']
+        self.assertLessEqual(num_walks, max_walks,
+                             '%s git repo walks performed, at most %s allowed'
+                             % (num_walks, max_walks))
+        self.assertLessEqual(num_steps, max_steps,
+                             '%s git repo steps performed, at most %s allowed'
+                             % (num_steps, max_steps))
+
+    def perfReset(self):
+        """ Reset perfrepo stats. """
+        perfrepo.reset_stats()
+        perfrepo.REQUESTS = []
+
     def setUp(self):    # pylint: disable=invalid-name
         """ Set up the environnment, ran before every tests. """
+        # Clean up test performance info
+        perfrepo.reset_stats()
+        perfrepo.REQUESTS = []
+
         # Clean up eventual git repo left in the present folder.
         pagure.REDIS = None
         pagure.lib.REDIS = None
