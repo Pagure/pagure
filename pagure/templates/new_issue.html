@@ -10,6 +10,8 @@
 {% block header %}
 <link href="{{ url_for('static', filename='emoji/emojione.sprites.css') }}"
   rel="stylesheet" />
+<link href="{{ url_for('static', filename='atwho/jquery.atwho.css') }}"
+  rel="stylesheet" />
 {% endblock %}
 
 
@@ -137,6 +139,13 @@
 <script type="text/javascript"
     src="{{ url_for('static', filename='emoji/emojicomplete.js') }}">
 </script>
+<script type="text/javascript"
+    src="{{ url_for('static', filename='atwho/jquery.caret.min.js') }}">
+</script>
+<script type="text/javascript"
+    src="{{ url_for('static', filename='atwho/jquery.atwho.min.js') }}">
+</script>
+
 <script type="text/javascript">
 {% if authenticated and form %}
 $(document).ready(function() {
@@ -154,6 +163,20 @@ $(document).ready(function() {
         filename='') }}" + this.file;
 
     $("#issue_content").val(_txt + '<!!image>');
+  });
+
+  // List username in @ drop-down
+  $.get("{{ url_for('api_ns.api_users') }}", {
+    pattern: '*'
+  }).done(function(resp) {
+    var userConfig = {
+      at: '@',
+      data: resp['mention'],
+      insertTpl: '@${username}',
+      displayTpl: "<li><img src=\"${image}\"> ${username} <small>${name}</small></li>",
+      searchKey: "username"
+    }
+    $("#issue_content").atwho(userConfig);
   });
 
   var emojiStrategy;
