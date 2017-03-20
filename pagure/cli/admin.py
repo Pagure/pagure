@@ -152,6 +152,11 @@ def _ask_confirmation():
     return action.lower() in ['y', 'yes']
 
 
+def _get_input(text):
+    ''' Ask the user for input. '''
+    return raw_input(text)
+
+
 def do_generate_acl(_):
     """ Regenerate the gitolite ACL file.
 
@@ -288,7 +293,7 @@ def do_create_admin_token(args):
         print('%s.  %s' % (idx, acl))
 
     print('Which ACLs do you want to associated with this token?')
-    acls = raw_input('(Conna separated list): ')
+    acls = _get_input('(Coma separated list): ')
     acls_idx = [int(acl.strip()) for acl in acls.split(',')]
     acls = [acls_list[acl] for acl in acls_idx]
 
