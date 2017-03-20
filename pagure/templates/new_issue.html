@@ -61,7 +61,7 @@
         {% endif %}
         {{ render_bootstrap_field(form.private, field_description="Do you want to keep the issue private?") }}
           <fieldset class="form-group">
-            <label for="issue_content"><strong>Description</strong></label>
+            <label for="issue_content"><strong>Description<span class="error">*</span></strong></label>
             <small class="text-muted pull-xs-right">
               <span class="btn btn-sm btn-secondary inactive"
                 aria-pressed="false" id="previewinmarkdown">Preview</span>
