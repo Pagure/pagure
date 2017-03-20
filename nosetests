@@ -4,6 +4,7 @@ __requires__ = ['nose>=0.10.4', 'SQLAlchemy >= 0.7', 'jinja2 >= 2.4']
 import sys
 from pkg_resources import load_entry_point
 
-sys.exit(
-   load_entry_point('nose>=0.10.4', 'console_scripts', 'nosetests')()
-)
+import nose.core
+from utils.perfplugin import PerfPlugin
+
+nose.core.main(addplugins=[PerfPlugin()])
