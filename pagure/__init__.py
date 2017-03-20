@@ -38,10 +38,22 @@ from flask_multistatic import MultiStaticFlask
 
 from werkzeug.routing import BaseConverter
 
+if os.environ.get('PAGURE_PERFREPO'):
+    import pagure.perfrepo as perfrepo
+else:
+    perfrepo = None
+
 import pagure.exceptions
 
 # Create the application.
 APP = MultiStaticFlask(__name__)
+
+if perfrepo:
+    # Do this as early as possible.
+    # We want the perfrepo before_request to be the very first thing to be run,
+    # so that we can properly setup the stats before the request.
+    APP.before_request(perfrepo.reset_stats)
+
 APP.jinja_env.trim_blocks = True
 APP.jinja_env.lstrip_blocks = True
 
@@ -783,3 +795,8 @@ if APP.config.get('PAGURE_AUTH', None) == 'local':
 def shutdown_session(exception=None):
     """ Remove the DB session at the end of each request. """
     SESSION.remove()
+
+
+if perfrepo:
+    # Do this at the very end, so that the after_request comes last.
+    APP.after_request(perfrepo.print_stats)

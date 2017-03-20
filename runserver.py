@@ -23,6 +23,10 @@ parser.add_argument(
     default=False,
     help='Profile Pagure.')
 parser.add_argument(
+    '--perf-verbose', dest='perfverbose', action='store_true',
+    default=False,
+    help='Enable per-request printing of performance statistics.')
+parser.add_argument(
     '--port', '-p', default=5000,
     help='Port for the Pagure to run on.')
 parser.add_argument(
@@ -38,6 +42,10 @@ if args.config:
         here = os.path.join(os.path.dirname(os.path.abspath(__file__)))
         config = os.path.join(here, config)
     os.environ['PAGURE_CONFIG'] = config
+
+if args.perfverbose:
+    os.environ['PAGURE_PERFREPO'] = 'true'
+    os.environ['PAGURE_PERFREPO_VERBOSE'] = 'true'
 
 from pagure import APP
 
