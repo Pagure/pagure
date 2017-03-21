@@ -3965,7 +3965,7 @@ index 0000000..fb7093d
 
             output = self.app.post('/test/b/bar/delete')
             self.assertEqual(output.status_code, 404)
-            self.assertIn('<p>Branch no found</p>', output.data)
+            self.assertIn('<p>Branch not found</p>', output.data)
 
             # Add a branch that we can delete
             path = os.path.join(self.path, 'test.git')

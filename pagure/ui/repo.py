@@ -145,7 +145,7 @@ def view_repo_branch(repo, branchname, username=None, namespace=None):
     repo_obj = flask.g.repo_obj
 
     if branchname not in repo_obj.listall_branches():
-        flask.abort(404, 'Branch no found')
+        flask.abort(404, 'Branch not found')
 
     branch = repo_obj.lookup_branch(branchname)
     if not repo_obj.is_empty and not repo_obj.head_is_unborn:
@@ -248,7 +248,7 @@ def view_commits(repo, branchname=None, username=None, namespace=None):
     repo_obj = flask.g.repo_obj
 
     if branchname and branchname not in repo_obj.listall_branches():
-        flask.abort(404, 'Branch no found')
+        flask.abort(404, 'Branch not found')
 
     if branchname:
         branch = repo_obj.lookup_branch(branchname)
@@ -457,7 +457,7 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
             branchname = identifier
         except ValueError:
             if 'master' not in repo_obj.listall_branches():
-                flask.abort(404, 'Branch no found')
+                flask.abort(404, 'Branch not found')
             # If it's not a commit id then it's part of the filename
             commit = repo_obj[repo_obj.head.target]
             branchname = 'master'
@@ -599,7 +599,7 @@ def view_raw_file(
             commit = repo_obj.get(identifier)
         except ValueError:
             if 'master' not in repo_obj.listall_branches():
-                flask.abort(404, 'Branch no found')
+                flask.abort(404, 'Branch not found')
             # If it's not a commit id then it's part of the filename
             commit = repo_obj[repo_obj.head.target]
 
@@ -2225,7 +2225,7 @@ def delete_branch(repo, branchname, username=None, namespace=None):
         flask.abort(403, 'You are not allowed to delete the master branch')
 
     if branchname not in repo_obj.listall_branches():
-        flask.abort(404, 'Branch no found')
+        flask.abort(404, 'Branch not found')
 
     try:
         branch = repo_obj.lookup_branch(branchname)
