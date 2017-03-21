@@ -32,6 +32,7 @@
                 <th>Title</th>
                 <th class="open_date nowrap">Opened</th>
                 <th class="open_date nowrap">Modified</th>
+                <th class="nowrap">Priority</th>
                 <th class="nowrap">Project</th>
                 <th class="assigned nowrap">Created by</th>
                 <th class="assigned nowrap">Assigned to</th>
@@ -71,6 +72,9 @@
                     <span title="{{issue.last_updated.strftime('%Y-%m-%d %H:%M:%S')}}">{{
                         issue.last_updated | humanize}}</span>
                 </td>
+                <td>
+                    {{ issue.project.priorities[issue.priority | string] or '' }}
+                </td>
                 <td class="nowrap">
                   <a href="{{ url_for(
                     'view_repo',
@@ -97,7 +101,7 @@
             </tr>
         {% else %}
             <tr>
-                <td colspan="5" class="noresult">No issues found</td>
+                <td colspan="9" class="noresult">No issues found</td>
             </tr>
         {% endfor %}
         </tbody>
