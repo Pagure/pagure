@@ -86,15 +86,6 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             'confirm_password': 'barpass',
         }
 
-        # This has all the data needed
-        data_non_ascii = {
-            'user': 'foo_bar',
-            'fullname': 'user foo',
-            'email_address': 'bar@foo.com',
-            'password': 'ö',
-            'confirm_password': 'ö',
-        }
-
         # Submit this form  -  Doesn't work since there is no csrf token
         output = self.app.post('/user/new', data=data)
         self.assertEqual(output.status_code, 200)
@@ -130,18 +121,9 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
             'User created, please check your email to activate the account',
             output.data)
 
-        # Submit the form with proper data with password being non-ascii
-        data_non_ascii['csrf_token'] = csrf_token
-        output = self.app.post('/user/new', data=data_non_ascii, follow_redirects=True)
-        self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
-        self.assertIn(
-            'User created, please check your email to activate the account',
-            output.data)
-
         # Check after:
         items = pagure.lib.search_user(self.session)
-        self.assertEqual(4, len(items))
+        self.assertEqual(3, len(items))
 
     @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
     @patch.dict('pagure.config.config', {'CHECK_SESSION_IP': False})
@@ -184,7 +166,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.test_new_user()
 
         items = pagure.lib.search_user(self.session)
-        self.assertEqual(4, len(items))
+        self.assertEqual(3, len(items))
 
         # Submit the form with the csrf token  -  but user not confirmed
         data['csrf_token'] = csrf_token
@@ -199,16 +181,6 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
 
         # User in the DB, csrf provided  -  but wrong password submitted
         data['password'] = 'password'
-        output = self.app.post('/dologin', data=data, follow_redirects=True)
-        self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Login - Pagure</title>', output.data)
-        self.assertIn(
-            '<form action="/dologin" method="post">', output.data)
-        self.assertIn('Username or password invalid.', output.data)
-
-        # User in the DB, csrf provided  -  but wrong password submitted
-        # And checking for non-ascii character
-        data['password'] = 'ö'
         output = self.app.post('/dologin', data=data, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
         self.assertIn('<title>Login - Pagure</title>', output.data)
@@ -247,39 +219,6 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         # address in the flask request
         data['password'] = 'barpass'
         output = self.app.post('/dologin', data=data, follow_redirects=True)
-        self.assertEqual(output.status_code, 200)
-        self.assertIn('<title>Home - Pagure</title>', output.data)
-        self.assertIn(
-            '<a class="nav-link btn btn-primary" '
-            'href="/login/?next=http://localhost/">', output.data)
-
-        # Login but cannot save the session to the DB due to the missing IP
-        # address in the flask request
-        # This has all the data needed
-
-        # Confirm the user so that we can log in
-        item = pagure.lib.search_user(self.session, username='foo_bar')
-        self.assertEqual(item.user, 'foo_bar')
-        self.assertNotEqual(item.token, None)
-
-        # Remove the token
-        item.token = None
-        self.session.add(item)
-        self.session.commit
-
-        # Check the user
-        item = pagure.lib.search_user(self.session, username='foo_bar')
-        self.assertEqual(item.user, 'foo_bar')
-        self.assertEqual(item.token, None)
-
-        data_non_ascii = {
-            'username': 'foo_bar',
-            'password': 'ö',
-        }
-        data_non_ascii['csrf_token'] = csrf_token
-        print data_non_ascii
-        output = self.app.post('/dologin',
-                               data=data_non_ascii, follow_redirects=True)
         self.assertEqual(output.status_code, 200)
         self.assertIn('<title>Home - Pagure</title>', output.data)
         self.assertIn(
@@ -369,6 +308,159 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
                 'this error to an admin', output.data)
 
     @patch.dict('pagure.config.config', {'PAGURE_AUTH': 'local'})
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
+    def test_non_ascii_password(self):
+        """ Test login and create user functionality when the password is
+            non-ascii.
+        """
+
+        # Check before:
+        items = pagure.lib.search_user(self.session)
+        self.assertEqual(2, len(items))
+
+        # First access the new user page
+        output = self.app.get('/user/new')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>New user - Pagure</title>', output.data)
+        self.assertIn(
+            '<form action="/user/new" method="post">', output.data)
+
+        # Create the form to send there
+        # This has all the data needed
+
+        data = {
+            'user': 'foo',
+            'fullname': 'user foo',
+            'email_address': 'foo@bar.com',
+            'password': 'ö',
+            'confirm_password': 'ö',
+        }
+
+        # Submit this form  -  Doesn't work since there is no csrf token
+        output = self.app.post('/user/new', data=data)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>New user - Pagure</title>', output.data)
+        self.assertIn(
+            '<form action="/user/new" method="post">', output.data)
+
+        csrf_token = output.data.split(
+            'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+        # Submit the form with the csrf token
+        data['csrf_token'] = csrf_token
+        output = self.app.post('/user/new', data=data, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>New user - Pagure</title>', output.data)
+        self.assertIn(
+            '<form action="/user/new" method="post">', output.data)
+        self.assertIn('Username already taken.', output.data)
+
+        # Submit the form with another username
+        data['user'] = 'foobar'
+        output = self.app.post('/user/new', data=data, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>New user - Pagure</title>', output.data)
+        self.assertIn('Email address already taken.', output.data)
+
+        # Submit the form with proper data
+        data['email_address'] = 'foobar@foobar.com'
+        output = self.app.post('/user/new', data=data, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn(
+            'User created, please check your email to activate the account',
+            output.data)
+
+        # Check after:
+        items = pagure.lib.search_user(self.session)
+        self.assertEqual(3, len(items))
+
+        # Checking for the /login page
+        output = self.app.get('/login/')
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn(
+            '<form action="/dologin" method="post">', output.data)
+
+        # This has all the data needed
+        data = {
+            'username': 'foob_bar',
+            'password': 'ö',
+        }
+
+        # Submit this form  -  Doesn't work since there is no csrf token
+        output = self.app.post('/dologin', data=data, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn(
+            '<form action="/dologin" method="post">', output.data)
+        self.assertIn('Insufficient information provided', output.data)
+
+        # Submit the form with the csrf token  -  but invalid user
+        data['csrf_token'] = csrf_token
+        output = self.app.post('/dologin', data=data, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn(
+            '<form action="/dologin" method="post">', output.data)
+        self.assertIn('Username or password invalid.', output.data)
+
+        # Submit the form with the csrf token  -  but user not confirmed
+        data['username'] = "foobar"
+        output = self.app.post('/dologin', data=data, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn(
+            '<form action="/dologin" method="post">', output.data)
+        self.assertIn(
+            'Invalid user, did you confirm the creation with the url '
+            'provided by email?', output.data)
+
+        # User in the DB, csrf provided  -  but wrong password submitted
+        data['password'] = 'öö'
+        output = self.app.post('/dologin', data=data, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn(
+            '<form action="/dologin" method="post">', output.data)
+        self.assertIn('Username or password invalid.', output.data)
+
+        # When account is not confirmed i.e user_obj != None
+        data['password'] = 'ö'
+        output = self.app.post('/dologin', data=data, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Login - Pagure</title>', output.data)
+        self.assertIn(
+            '<form action="/dologin" method="post">', output.data)
+        self.assertIn(
+            'Invalid user, did you confirm the creation with the url '
+            'provided by email?', output.data)
+
+        # Confirm the user so that we can log in
+        item = pagure.lib.search_user(self.session, username='foobar')
+        self.assertEqual(item.user, 'foobar')
+        self.assertNotEqual(item.token, None)
+
+        # Remove the token
+        item.token = None
+        self.session.add(item)
+        self.session.commit()
+
+        # Login but cannot save the session to the DB due to the missing IP
+        # address in the flask request
+        data['password'] = 'ö'
+        output = self.app.post('/dologin', data=data, follow_redirects=True)
+        self.assertEqual(output.status_code, 200)
+        self.assertIn('<title>Home - Pagure</title>', output.data)
+        self.assertIn(
+            '<a class="nav-link btn btn-primary" '
+            'href="/login/?next=http://localhost/">', output.data)
+
+        # Check the user
+        item = pagure.lib.search_user(self.session, username='foobar')
+        self.assertEqual(item.user, 'foobar')
+        self.assertEqual(item.token, None)
+
     def test_confirm_user(self):
         """ Test the confirm_user endpoint. """
 
@@ -382,7 +474,7 @@ class PagureFlaskLogintests(tests.SimplePagureTest):
         self.test_new_user()
 
         items = pagure.lib.search_user(self.session)
-        self.assertEqual(4, len(items))
+        self.assertEqual(3, len(items))
         item = pagure.lib.search_user(self.session, username='foouser')
         self.assertEqual(item.user, 'foouser')
         self.assertTrue(item.password.startswith('$2$'))
