@@ -3382,7 +3382,24 @@ def clean_input(text, ignore=None):
             if tag in tags:
                 tags.remove(tag)
 
-    return bleach.clean(text, tags=tags, attributes=attrs)
+    args = {
+        'tags': tags,
+        'attributes': attrs
+    }
+
+    # newer bleach allow to customize the protocol supported
+    bleach_v = bleach.__version__.split('.')
+    for idx, val in enumerate(bleach_v):
+        try:
+            val = int(val)
+        except ValueError:
+            pass
+        bleach_v[idx] = val
+    if tuple(bleach_v) >= (1, 5, 0):
+        protocols=bleach.ALLOWED_PROTOCOLS + ['irc', 'ircs']
+        args['protocols'] = protocols
+
+    return bleach.clean(text, **args)
 
 
 def could_be_text(text):

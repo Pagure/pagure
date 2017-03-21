@@ -3333,6 +3333,16 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(iss.id, 8)
         self.assertEqual(iss.title, 'private issue #8')
 
+        # newer bleach allow to customize the protocol supported
+        import bleach
+        bleach_v = bleach.__version__.split('.')
+        for idx, val in enumerate(bleach_v):
+            try:
+                val = int(val)
+            except ValueError:
+                pass
+            bleach_v[idx] = val
+
         texts = [
             'foo bar test#1 see?',
             'foo bar pingou/test#2 I mean, really',
@@ -3394,7 +3404,9 @@ class PagureLibtests(tests.Modeltests):
             # and the version 1.4.3 that we have won't let us adjust the
             # list of supported protocols
             # '<p><a href="ircs://pagure.io">ircs://pagure.io</a></p>',
-            '<p><a>ircs://pagure.io</a></p>',
+            '<p><a href="ircs://pagure.io">ircs://pagure.io</a></p>' if
+            tuple(bleach_v) >= (1, 5, 0)
+            else '<p><a>ircs://pagure.io</a></p>',
             # 'http://pagure.io'
             '<p><a href="http://pagure.io">http://pagure.io</a></p>',
             # 'https://pagure.io'
