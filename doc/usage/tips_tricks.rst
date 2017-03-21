@@ -1,6 +1,10 @@
 Tips and tricks
 ===============
 
+This page contains some tips and tricks on how to use pagure. These do not
+fit in their own page but are worth mentioning.
+
+
 Pre-fill issue template using the URL
 -------------------------------------
 
