@@ -3382,7 +3382,7 @@ def clean_input(text, ignore=None):
             if tag in tags:
                 tags.remove(tag)
 
-    args = {
+    kwargs = {
         'tags': tags,
         'attributes': attrs
     }
@@ -3397,9 +3397,9 @@ def clean_input(text, ignore=None):
         bleach_v[idx] = val
     if tuple(bleach_v) >= (1, 5, 0):
         protocols=bleach.ALLOWED_PROTOCOLS + ['irc', 'ircs']
-        args['protocols'] = protocols
+        kwargs['protocols'] = protocols
 
-    return bleach.clean(text, **args)
+    return bleach.clean(text, **kwargs)
 
 
 def could_be_text(text):
