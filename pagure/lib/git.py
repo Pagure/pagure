@@ -1365,17 +1365,30 @@ def diff_pull_request(
             'seems to no longer be present in this repo' % request.branch)
 
     if not repo_obj.is_empty and not orig_repo.is_empty:
-        # Pull-request open
-        master_commits = [
-            commit.oid.hex
-            for commit in orig_repo.walk(
-                orig_repo.lookup_branch(request.branch).get_object().hex,
-                pygit2.GIT_SORT_TIME)
-        ]
-        for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
-            if request.status and commit.oid.hex in master_commits:
+
+        main_walker = repo_obj.walk(
+            orig_repo.lookup_branch(request.branch).get_object().hex,
+            pygit2.GIT_SORT_TIME)
+        branch_walker = repo_obj.walk(commitid, pygit2.GIT_SORT_TIME)
+        main_commits = set()
+        branch_commits = set()
+
+        while 1:
+            try:
+                com = main_walker.next()
+                main_commits.add(com.hex)
+            except StopIteration:
+                pass
+            try:
+                branch_commit = branch_walker.next()
+            except StopIteration:
+                branch_commit = None
+
+            branch_commits.add(branch_commit.oid.hex)
+            if main_commits.intersection(branch_commits):
                 break
-            diff_commits.append(commit)
+
+            diff_commits.append(branch_commit)
 
         if request.status and diff_commits:
             first_commit = repo_obj[diff_commits[-1].oid.hex]
