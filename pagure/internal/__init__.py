@@ -298,14 +298,21 @@ def get_pull_request_ready_branch():
                         com = main_walker.next()
                         main_commits.add(com.hex)
                     except StopIteration:
-                        pass
+                        com = None
                 try:
                     branch_commit = branch_walker.next()
                 except StopIteration:
                     branch_commit = None
 
-                if main_commits.intersection(set(
-                        branch_commits + [branch_commit.hex])):
+                # We sure never end up here but better safe than sorry
+                if com is None and branch_commit is None:
+                    break
+
+                if branch_commit:
+                    tmp = set(branch_commits + [branch_commit.hex])
+                else:
+                    tmp = set(branch_commits)
+                if main_commits.intersection(tmp):
                     break
                 branch_commits.append(branch_commit.hex)
 

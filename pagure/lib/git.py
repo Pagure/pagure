@@ -1379,13 +1379,19 @@ def diff_pull_request(
                 com = main_walker.next()
                 main_commits.add(com.hex)
             except StopIteration:
-                pass
+                com = None
+
             try:
                 branch_commit = branch_walker.next()
             except StopIteration:
                 branch_commit = None
 
-            branch_commits.add(branch_commit.oid.hex)
+            # We sure never end up here but better safe than sorry
+            if com is None and branch_commit is None:
+                break
+
+            if branch_commit:
+                branch_commits.add(branch_commit.oid.hex)
             if main_commits.intersection(branch_commits):
                 break
 
