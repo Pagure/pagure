@@ -1068,8 +1068,8 @@ def api_subscribe_issue(repo, issueid, username=None, namespace=None):
     """
     Subscribe to an issue
     ---------------------
-    Allows someone to subscribe or unscribe to the notifications related to
-    an issue.
+    Allows someone to subscribe to or unsubscribe from the notifications
+    related to an issue.
 
     ::
 
@@ -1087,10 +1087,10 @@ def api_subscribe_issue(repo, issueid, username=None, namespace=None):
     +--------------+----------+---------------+---------------------------+
     | Key          | Type     | Optionality   | Description               |
     +==============+==========+===============+===========================+
-    | ``status``   | boolean   | Mandatory    | | The subscription status |
-    |              |          |               |   to subscribe or         |
-    |              |          |               |   unsubscribe to the.     |
-    |              |          |               |   issue.                  |
+    | ``status``   | boolean  | Mandatory     | The intended subscription |
+    |              |          |               | status. ``true`` for      |
+    |              |          |               | subscribing, ``false``    |
+    |              |          |               | for unsubscribing.        |
     +--------------+----------+---------------+---------------------------+
 
     Sample response

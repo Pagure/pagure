@@ -694,7 +694,7 @@ class PublicNotificationForm(PagureForm):
 
 
 class SubscribtionForm(PagureForm):
-    ''' Form to subscribe or unsubscribe to an issue or a PR. '''
+    ''' Form to subscribe to or unsubscribe from an issue or a PR. '''
     status = wtforms.BooleanField(
         'Subscription status',
         [wtforms.validators.optional()],
