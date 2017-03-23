@@ -1403,7 +1403,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,96 @@
+@@ -0,0 +1,98 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
@@ -1422,6 +1422,7 @@ index 0000000..60f7480
 +        "custom_keys": [],
 +        "date_created": null,
 +        "description": "test project for ticket",
++        "fullname": "test_ticket_repo",
 +        "id": 1,
 +        "milestones": {},
 +        "name": "test_ticket_repo",
@@ -1457,6 +1458,7 @@ index 0000000..60f7480
 +        "custom_keys": [],
 +        "date_created": null,
 +        "description": "test project for ticket",
++        "fullname": "test_ticket_repo",
 +        "id": 1,
 +        "milestones": {},
 +        "name": "test_ticket_repo",

@@ -88,98 +88,124 @@ class PagureFlaskApiUSertests(tests.Modeltests):
         output = self.app.get('/api/0/user/pingou')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
+        data['repos'][0]['date_created'] = "1490272832"
+        data['repos'][1]['date_created'] = "1490272832"
+        data['repos'][2]['date_created'] = "1490272832"
         exp = {
             "forks": [],
-            "repos": [{
-                "custom_keys": [],
-                "description": "test project #1",
-                "parent": None,
-                "settings": {
-                    "issues_default_to_private": False,
-                    "Minimum_score_to_merge_pull-request": -1,
-                    "Web-hooks": None,
-                    "fedmsg_notifications": True,
-                    "always_merge": False,
-                    "project_documentation": False,
+            "repos": [
+                {
+                  "close_status": [
+                    "Invalid",
+                    "Insufficient data",
+                    "Fixed",
+                    "Duplicate"
+                  ],
+                  "custom_keys": [],
+                  "date_created": "1490272832",
+                  "description": "test project #1",
+                  "fullname": "test",
+                  "id": 1,
+                  "milestones": {},
+                  "name": "test",
+                  "namespace": None,
+                  "parent": None,
+                  "priorities": {},
+                  "settings": {
                     "Enforce_signed-off_commits_in_pull-request": False,
-                    "pull_requests": True,
+                    "Minimum_score_to_merge_pull-request": -1,
                     "Only_assignee_can_merge_pull-request": False,
-                    "issue_tracker": True
-                },
-                "tags": [],
-                "namespace": None,
-                "priorities": {},
-                "close_status": ["Invalid", "Insufficient data", "Fixed",  "Duplicate"],
-                "milestones": {},
-                "user": {
+                    "Web-hooks": None,
+                    "always_merge": False,
+                    "fedmsg_notifications": True,
+                    "issue_tracker": True,
+                    "issues_default_to_private": False,
+                    "project_documentation": False,
+                    "pull_requests": True
+                  },
+                  "tags": [],
+                  "user": {
                     "fullname": "PY C",
                     "name": "pingou"
+                  }
                 },
-                "date_created": data['repos'][0]['date_created'],
-                "id": 1,
-                "name": "test"},
                 {
-                "custom_keys": [],
-                "description": "test project #2",
-                "parent": None,
-                "settings": {
-                    "issues_default_to_private": False,
-                    "Minimum_score_to_merge_pull-request": -1,
-                    "Web-hooks": None,
-                    "fedmsg_notifications": True,
-                    "always_merge": False,
-                    "project_documentation": False,
+                  "close_status": [
+                    "Invalid",
+                    "Insufficient data",
+                    "Fixed",
+                    "Duplicate"
+                  ],
+                  "custom_keys": [],
+                  "date_created": "1490272832",
+                  "description": "test project #2",
+                  "fullname": "test2",
+                  "id": 2,
+                  "milestones": {},
+                  "name": "test2",
+                  "namespace": None,
+                  "parent": None,
+                  "priorities": {},
+                  "settings": {
                     "Enforce_signed-off_commits_in_pull-request": False,
-                    "pull_requests": True,
-                    "Only_assignee_can_merge_pull-request": False,
-                    "issue_tracker": True
-                },
-                "tags": [],
-                "namespace": None,
-                "priorities": {},
-                "close_status": ["Invalid", "Insufficient data", "Fixed",  "Duplicate"],
-                "milestones": {},
-                "user": {
-                     "fullname": "PY C",
-                     "name": "pingou"
-                },
-                "date_created": data['repos'][1]['date_created'],
-                "id": 2,
-                "name": "test2"},
-                {
-                "custom_keys": [],
-                "description": "namespaced test project",
-                "parent": None,
-                "settings": {
-                    "issues_default_to_private": False,
                     "Minimum_score_to_merge_pull-request": -1,
-                    "Web-hooks": None,
-                    "fedmsg_notifications": True,
-                    "always_merge": False,
-                    "project_documentation": False,
-                    "Enforce_signed-off_commits_in_pull-request": False,
-                    "pull_requests": True,
                     "Only_assignee_can_merge_pull-request": False,
-                    "issue_tracker": True
-                    },
-                "tags": [],
-                "namespace": "somenamespace",
-                "priorities": {},
-                "close_status": ["Invalid", "Insufficient data", "Fixed",  "Duplicate"],
-                "milestones": {},
-                "user": {
+                    "Web-hooks": None,
+                    "always_merge": False,
+                    "fedmsg_notifications": True,
+                    "issue_tracker": True,
+                    "issues_default_to_private": False,
+                    "project_documentation": False,
+                    "pull_requests": True
+                  },
+                  "tags": [],
+                  "user": {
                     "fullname": "PY C",
                     "name": "pingou"
-                    },
-                "date_created": data['repos'][2]['date_created'],
-                "id": 3,
-                "name": "test3"},
+                  }
+                },
+                {
+                  "close_status": [
+                    "Invalid",
+                    "Insufficient data",
+                    "Fixed",
+                    "Duplicate"
+                  ],
+                  "custom_keys": [],
+                  "date_created": "1490272832",
+                  "description": "namespaced test project",
+                  "fullname": "somenamespace/test3",
+                  "id": 3,
+                  "milestones": {},
+                  "name": "test3",
+                  "namespace": "somenamespace",
+                  "parent": None,
+                  "priorities": {},
+                  "settings": {
+                    "Enforce_signed-off_commits_in_pull-request": False,
+                    "Minimum_score_to_merge_pull-request": -1,
+                    "Only_assignee_can_merge_pull-request": False,
+                    "Web-hooks": None,
+                    "always_merge": False,
+                    "fedmsg_notifications": True,
+                    "issue_tracker": True,
+                    "issues_default_to_private": False,
+                    "project_documentation": False,
+                    "pull_requests": True
+                  },
+                  "tags": [],
+                  "user": {
+                    "fullname": "PY C",
+                    "name": "pingou"
+                  }
+                }
             ],
             "user": {
                 "fullname": "PY C",
                 "name": "pingou"
             }
         }
+
         self.assertEqual(data, exp)
 
     @patch('pagure.lib.notify.send_email')

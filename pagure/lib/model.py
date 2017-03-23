@@ -679,6 +679,7 @@ class Project(BASE):
         output = {
             'id': self.id,
             'name': self.name,
+            'fullname': self.fullname,
             'description': self.description,
             'namespace': self.namespace,
             'parent': self.parent.to_json(

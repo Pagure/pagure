@@ -117,6 +117,7 @@ def api_projects():
               "description": "A web-based calendar for Fedora",
               "id": 7,
               "name": "fedocal",
+              "fullname": "fedocal",
               "parent": null,
               "user": {
                 "fullname": "Pierre-Yves C",
@@ -128,11 +129,13 @@ def api_projects():
               "description": "An awesome messaging servicefor everyone",
               "id": 12,
               "name": "fedmsg",
+              "fullname": "forks/pingou/fedmsg",
               "parent": {
                 "date_created": "1433423298",
                 "description": "An awesome messaging servicefor everyone",
                 "id": 11,
                 "name": "fedmsg",
+                "fullname": "fedmsg",
                 "parent": null,
                 "user": {
                   "fullname": "Ralph B",
