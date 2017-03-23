@@ -1397,6 +1397,14 @@ def diff_pull_request(
 
             diff_commits.append(branch_commit)
 
+        # If master is ahead of branch, we need to remove the commits
+        # that are already in master
+        diff_commits = [
+            com
+            for com in diff_commits
+            if com.oid.hex not in main_commits
+        ]
+
         if request.status and diff_commits:
             first_commit = repo_obj[diff_commits[-1].oid.hex]
             # Check if we can still rely on the merge_status

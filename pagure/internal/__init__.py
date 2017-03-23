@@ -316,6 +316,14 @@ def get_pull_request_ready_branch():
                     break
                 branch_commits.append(branch_commit.hex)
 
+            # If master is ahead of branch, we need to remove the commits
+            # that are already in master
+            branch_commits = [
+                com
+                for com in branch_commits
+                if com.oid.hex not in main_commits
+            ]
+
             if branch_commits:
                 branches[branchname] = branch_commits
 
