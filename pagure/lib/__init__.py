@@ -1630,17 +1630,23 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
             msg += ' (was: %s)' % old_status
         messages.append(msg)
     if priority != -1:
+        priorities = issue.project.priorities
         try:
             priority = int(priority)
         except (ValueError, TypeError):
             priority = None
+
+        if str(priority) not in priorities:
+            priority = None
+
         if priority != issue.priority:
             old_priority = issue.priority
             issue.priority = priority
             edit.append('priority')
-            msg = 'Issue priority set to: %s' % priority
+            msg = 'Issue priority set to: %s' % priorities[str(priority)]
             if old_priority:
-                msg += ' (was: %s)' % old_priority
+                msg += ' (was: %s)' % priorities.get(
+                    str(old_priority), old_priority)
             messages.append(msg)
     if private in [True, False] and private != issue.private:
         old_private = issue.private
