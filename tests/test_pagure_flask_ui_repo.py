@@ -3853,7 +3853,6 @@ index 0000000..fb7093d
             }
 
             # New token created
-            data = {'csrf_token': csrf_token, 'acls': ['issue_create']}
             output = self.app.post(
                 '/test/token/new/', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 200)
