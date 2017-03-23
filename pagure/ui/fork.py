@@ -84,20 +84,31 @@ def _get_pr_info(repo_obj, orig_repo, branch_from, branch_to):
     if not repo_obj.is_empty and not orig_repo.is_empty:
         orig_commit = orig_repo[
             orig_repo.lookup_branch(branch_to).get_object().hex]
-
-        master_commits = [
-            commit.oid.hex
-            for commit in orig_repo.walk(
-                orig_commit.oid.hex, pygit2.GIT_SORT_TIME)
-        ]
-
         repo_commit = repo_obj[commitid]
 
-        for commit in repo_obj.walk(
-                repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
-            if commit.oid.hex in master_commits:
+        main_walker = repo_obj.walk(
+            orig_commit.oid.hex, pygit2.GIT_SORT_TIME)
+        branch_walker = repo_obj.walk(
+            repo_commit.oid.hex, pygit2.GIT_SORT_TIME)
+        main_commits = set()
+        branch_commits = set()
+
+        while 1:
+            try:
+                com = main_walker.next()
+                main_commits.add(com.hex)
+            except StopIteration:
+                pass
+            try:
+                branch_commit = branch_walker.next()
+            except StopIteration:
+                branch_commit = None
+
+            branch_commits.add(branch_commit.oid.hex)
+            if main_commits.intersection(branch_commits):
                 break
-            diff_commits.append(commit)
+
+            diff_commits.append(branch_commit)
 
         if diff_commits:
             first_commit = repo_obj[diff_commits[-1].oid.hex]
