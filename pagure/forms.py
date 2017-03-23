@@ -288,6 +288,9 @@ class StatusForm(PagureForm):
 
 class NewTokenForm(PagureForm):
     ''' Form to add/change the status of an issue. '''
+    description = wtforms.TextField(
+        'description', [wtforms.validators.Optional()]
+    )
     acls = wtforms.SelectMultipleField(
         'ACLs',
         [wtforms.validators.Required()],

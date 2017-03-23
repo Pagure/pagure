@@ -786,6 +786,7 @@ def add_api_user_token():
             msg = pagure.lib.add_token_to_user(
                 SESSION,
                 project=None,
+                description=form.description.data.strip() or None,
                 acls=form.acls.data,
                 username=flask.g.fas_user.username,
             )

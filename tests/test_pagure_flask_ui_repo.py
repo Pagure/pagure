@@ -3846,7 +3846,11 @@ index 0000000..fb7093d
                     '</button>\n                      You must select at least '
                     'one permission.', output.data)
 
-            data = {'csrf_token': csrf_token, 'acls': ['issue_create']}
+            data = {
+                'csrf_token': csrf_token,
+                'acls': ['issue_create'],
+                'description': 'Test token',
+            }
 
             # New token created
             data = {'csrf_token': csrf_token, 'acls': ['issue_create']}
@@ -3858,6 +3862,7 @@ index 0000000..fb7093d
             self.assertIn(
                 '<title>Settings - test - Pagure</title>', output.data)
             self.assertIn('<h3>Settings for test</h3>', output.data)
+            self.assertIn('<strong>Test token</strong>', output.data)
             self.assertIn(
                 '<span class="text-success btn-align"><strong>Valid</strong> until: ',
                 output.data)

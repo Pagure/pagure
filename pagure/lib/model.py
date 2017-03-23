@@ -2171,6 +2171,7 @@ class Token(BASE):
         ),
         nullable=True,
         index=True)
+    description = sa.Column(sa.Text(), nullable=True)
     expiration = sa.Column(
         sa.DateTime, nullable=False, default=datetime.datetime.utcnow)
     created = sa.Column(

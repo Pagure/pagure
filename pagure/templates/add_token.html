@@ -3,7 +3,7 @@
 {% else %}
 {% extends "master.html" %}
 {% endif %}
-{% from "_formhelper.html" import render_field_in_row %}
+{% from "_formhelper.html" import render_bootstrap_field %}
 
 {% set tag = "home" %}
 {% block title %}Create token{% endblock %}
@@ -33,16 +33,18 @@
           {% else %}
           <form action="{{ url_for('.add_api_user_token') }}" method="post">
           {% endif %}
-            {% for acl in acls %}
-            <div>
-              <label class="c-input c-checkbox">
-                <input type="checkbox" name="acls" value="{{ acl.name }}">
-                <span class="c-indicator"></span>
-                {{ acl.description }}
-              </label>
-            </div>
-            {% endfor %}
-          </table>
+          {{ render_bootstrap_field(
+              form.description, field_description="Small description of this API token") }}
+          <strong><label for="acls">ACLs</label></strong>
+          {% for acl in acls %}
+          <div>
+            <label class="c-input c-checkbox">
+              <input type="checkbox" name="acls" value="{{ acl.name }}">
+              <span class="c-indicator"></span>
+              {{ acl.description }}
+            </label>
+          </div>
+          {% endfor %}
           <div class="p-t-2">
             <input type="submit" class="btn btn-primary" value="Create">
             {% if repo %}

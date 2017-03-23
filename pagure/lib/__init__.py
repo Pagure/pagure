@@ -3272,7 +3272,7 @@ def get_acls(session, restrict=None):
     return query.all()
 
 
-def add_token_to_user(session, project, acls, username):
+def add_token_to_user(session, project, acls, username, description=None):
     """ Create a new token for the specified user on the specified project
     with the given ACLs.
     """
@@ -3288,6 +3288,7 @@ def add_token_to_user(session, project, acls, username):
         id=pagure.lib.login.id_generator(64),
         user_id=user.id,
         project_id=project.id if project else None,
+        description=description,
         expiration=datetime.datetime.utcnow() + datetime.timedelta(days=60)
     )
     session.add(token)

@@ -2033,6 +2033,7 @@ def add_token(repo, username=None, namespace=None):
             msg = pagure.lib.add_token_to_user(
                 SESSION,
                 repo,
+                description=form.description.data.strip() or None,
                 acls=form.acls.data,
                 username=flask.g.fas_user.username,
             )
