@@ -67,7 +67,8 @@ def _get_issue(repo, issueid, issueuid=None):
     :raises pagure.exceptions.APIError: when issues doesn't exists
     :return: issue
     """
-    issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid, issueuid=issueuid)
+    issue = pagure.lib.search_issues(
+        SESSION, repo, issueid=issueid, issueuid=issueuid)
 
     if issue is None or issue.project != repo:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOISSUE)
@@ -494,7 +495,7 @@ def api_view_issue(repo, issueid, username=None, namespace=None):
 
     issue = _get_issue(repo, issue_id, issueuid=issue_uid)
 
-    if issue.private and not is_repo_committer(repo) \
+    if issue.private and not is_repo_committer(issue.project) \
             and (not api_authenticated() or
                  not issue.user.user == flask.g.fas_user.username):
         raise pagure.exceptions.APIError(
@@ -642,7 +643,7 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
 
     issue = _get_issue(repo, issueid)
 
-    if issue.private and not is_repo_committer(repo) \
+    if issue.private and not is_repo_committer(issue.project) \
             and (not api_authenticated() or
                  not issue.user.user == flask.g.fas_user.username):
         raise pagure.exceptions.APIError(
@@ -758,7 +759,7 @@ def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
 
     issue = _get_issue(repo, issueid)
 
-    if issue.private and not is_repo_committer(repo) \
+    if issue.private and not is_repo_committer(issue.project) \
             and (not api_authenticated() or
                  not issue.user.user == flask.g.fas_user.username):
         raise pagure.exceptions.APIError(
@@ -865,7 +866,7 @@ def api_comment_issue(repo, issueid, username=None, namespace=None):
 
     issue = _get_issue(repo, issueid)
 
-    if issue.private and not is_repo_committer(repo) \
+    if issue.private and not is_repo_committer(issue.project) \
             and (not api_authenticated() or
                  not issue.user.user == flask.g.fas_user.username):
         raise pagure.exceptions.APIError(
@@ -950,7 +951,7 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
 
     issue = _get_issue(repo, issueid)
 
-    if issue.private and not is_repo_committer(repo) \
+    if issue.private and not is_repo_committer(issue.project) \
             and (not api_authenticated() or
                  not issue.user.user == flask.g.fas_user.username):
         raise pagure.exceptions.APIError(
