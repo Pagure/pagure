@@ -193,20 +193,6 @@ def update_issue(repo, issueid, username=None, namespace=None):
         try:
             messages = set()
 
-            # New comment
-            if comment:
-                message = pagure.lib.add_issue_comment(
-                    SESSION,
-                    issue=issue,
-                    comment=comment,
-                    user=flask.g.fas_user.username,
-                    ticketfolder=APP.config['TICKETS_FOLDER'],
-                )
-                SESSION.commit()
-                if not is_js:
-                    if message:
-                        messages.add(message)
-
             # The status field can be updated by both the admin and the
             # person who opened the ticket.
             # Update status
@@ -239,9 +225,10 @@ def update_issue(repo, issueid, username=None, namespace=None):
                 )
                 messages = messages.union(set(msgs))
 
-            # The meta-data can only be changed by admins, which means they
-            # will be missing for non-admin and thus reset if we let them
-            if flask.g.repo_user:
+                # The meta-data can only be changed by admins, which means
+                # they will be missing for non-admin and thus reset if we
+                # let them
+
                 # Assign or update assignee of the ticket
                 message = pagure.lib.add_issue_assignee(
                     SESSION,
@@ -269,7 +256,6 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     user=flask.g.fas_user.username,
                     ticketfolder=APP.config['TICKETS_FOLDER'],
                 )
-                SESSION.commit()
                 if msgs:
                     messages = messages.union(set(msgs))
 
@@ -312,6 +298,24 @@ def update_issue(repo, issueid, username=None, namespace=None):
                     ticketfolder=APP.config['TICKETS_FOLDER'],
                 )
                 messages = messages.union(set(msgs))
+
+            SESSION.commit()
+
+            # New comment
+            if comment:
+                message = pagure.lib.add_issue_comment(
+                    SESSION,
+                    issue=issue,
+                    comment=comment,
+                    user=flask.g.fas_user.username,
+                    ticketfolder=APP.config['TICKETS_FOLDER'],
+                )
+
+                if not is_js:
+                    if message:
+                        messages.add(message)
+
+            SESSION.commit()
 
             if not is_js:
                 for message in messages:
