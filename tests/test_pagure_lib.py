@@ -327,6 +327,71 @@ class PagureLibtests(tests.Modeltests):
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
+    def test_edit_issue_priority(self, p_send_email, p_ugt):
+        """ Test the edit_issue of pagure.lib when changing the priority.
+        """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        self.test_new_issue()
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        issue = pagure.lib.search_issues(self.session, repo, issueid=2)
+
+        # Set some priorities to the repo
+        repo = pagure.lib.get_project(self.session, 'test')
+        repo.priorities = {'1': 'High', '2': 'Normal'}
+        self.session.add(repo)
+        self.session.commit()
+
+        self.assertEqual(repo.open_tickets, 2)
+        self.assertEqual(repo.open_tickets_public, 2)
+
+        # Edit the issue -- Wrong priority value: No changes
+        msg = pagure.lib.edit_issue(
+            session=self.session,
+            issue=issue,
+            user='pingou',
+            ticketfolder=None,
+            priority=3,
+        )
+        self.session.commit()
+        self.assertEqual(msg, None)
+
+        # Edit the issue -- Good priority
+        msg = pagure.lib.edit_issue(
+            session=self.session,
+            issue=issue,
+            user='pingou',
+            ticketfolder=None,
+            priority=2,
+        )
+        self.session.commit()
+        self.assertEqual(
+            msg,
+            [
+                'Issue priority set to: Normal'
+            ]
+        )
+
+        # Edit the issue -- Update priority
+        msg = pagure.lib.edit_issue(
+            session=self.session,
+            issue=issue,
+            user='pingou',
+            ticketfolder=None,
+            priority=1,
+        )
+        self.session.commit()
+        self.assertEqual(
+            msg,
+            [
+                'Issue priority set to: High (was: Normal)'
+            ]
+        )
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_edit_issue_depending(self, p_send_email, p_ugt):
         """ Test the edit_issue of pagure.lib when the issue depends on
         another.
