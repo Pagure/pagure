@@ -26,6 +26,28 @@ from pagure.api import (
 )
 
 
+def _get_repo(repo_name, username=None, namespace=None):
+    """Check if repository exists and get repository name
+    :param repo_name: name of repository
+    :param username:
+    :param namespace:
+    :raises pagure.exceptions.APIError: when repository doesn't exists or is disabled
+    :return: repository name
+    """
+    repo = pagure.lib.get_project(
+        SESSION, repo_name, user=username, namespace=namespace)
+
+    if repo is None:
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.ENOPROJECT)
+
+    if not repo.settings.get('issue_tracker', True):
+        raise pagure.exceptions.APIError(
+            404, error_code=APIERROR.ETRACKERDISABLED)
+
+    return repo
+
+
 @API.route('/<repo>/new_issue', methods=['POST'])
 @API.route('/<namespace>/<repo>/new_issue', methods=['POST'])
 @API.route('/fork/<username>/<repo>/new_issue', methods=['POST'])
@@ -96,17 +118,8 @@ def api_new_issue(repo, username=None, namespace=None):
         }
 
     """
-    repo = pagure.lib.get_project(
-        SESSION, repo, user=username, namespace=namespace)
     output = {}
-
-    if repo is None:
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.ENOPROJECT)
-
-    if not repo.settings.get('issue_tracker', True):
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.ETRACKERDISABLED)
+    repo = _get_repo(repo, username, namespace)
 
     if flask.g.token.project and repo != flask.g.token.project:
         raise pagure.exceptions.APIError(
@@ -288,16 +301,7 @@ def api_view_issues(repo, username=None, namespace=None):
         }
 
     """
-
-    repo = pagure.lib.get_project(
-        SESSION, repo, user=username, namespace=namespace)
-
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if not repo.settings.get('issue_tracker', True):
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.ETRACKERDISABLED)
+    repo = _get_repo(repo, username, namespace)
 
     assignee = flask.request.args.get('assignee', None)
     author = flask.request.args.get('author', None)
@@ -454,15 +458,7 @@ def api_view_issue(repo, issueid, username=None, namespace=None):
     if str(comments).lower() in ['0', 'False']:
         comments = False
 
-    repo = pagure.lib.get_project(
-        SESSION, repo, user=username, namespace=namespace)
-
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if not repo.settings.get('issue_tracker', True):
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.ETRACKERDISABLED)
+    repo = _get_repo(repo, username, namespace)
 
     issue_id = issue_uid = None
     try:
@@ -541,15 +537,7 @@ def api_view_issue_comment(
 
     """  # noqa
 
-    repo = pagure.lib.get_project(
-        SESSION, repo, user=username, namespace=namespace)
-
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if not repo.settings.get('issue_tracker', True):
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.ETRACKERDISABLED)
+    repo = _get_repo(repo, username, namespace)
 
     issue_id = issue_uid = None
     try:
@@ -637,17 +625,9 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
         }
 
     """
-    repo = pagure.lib.get_project(
-        SESSION, repo, user=username, namespace=namespace)
-
     output = {}
 
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if not repo.settings.get('issue_tracker', True):
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.ETRACKERDISABLED)
+    repo = _get_repo(repo, username, namespace)
 
     if api_authenticated():
         if repo != flask.g.token.project:
@@ -768,17 +748,8 @@ def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
         }
 
     """
-    repo = pagure.lib.get_project(
-        SESSION, repo, user=username, namespace=namespace)
-
     output = {}
-
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if not repo.settings.get('issue_tracker', True):
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.ETRACKERDISABLED)
+    repo = _get_repo(repo, username, namespace)
 
     if api_authenticated():
         if repo != flask.g.token.project:
@@ -887,16 +858,8 @@ def api_comment_issue(repo, issueid, username=None, namespace=None):
         }
 
     """
-    repo = pagure.lib.get_project(
-        SESSION, repo, user=username, namespace=namespace)
     output = {}
-
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if not repo.settings.get('issue_tracker', True):
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.ETRACKERDISABLED)
+    repo = _get_repo(repo, username, namespace)
 
     if api_authenticated():
         if flask.g.token.project and repo != flask.g.token.project:
@@ -986,16 +949,8 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
         }
 
     """
-    repo = pagure.lib.get_project(
-        SESSION, repo, user=username, namespace=namespace)
     output = {}
-
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if not repo.settings.get('issue_tracker', True):
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.ETRACKERDISABLED)
+    repo = _get_repo(repo, username, namespace)
 
     if api_authenticated():
         if repo != flask.g.token.project:
@@ -1103,16 +1058,8 @@ def api_subscribe_issue(repo, issueid, username=None, namespace=None):
         }
 
     """  # noqa
-    repo = pagure.lib.get_project(
-        SESSION, repo, user=username, namespace=namespace)
     output = {}
-
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if not repo.settings.get('issue_tracker', True):
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.ETRACKERDISABLED)
+    repo = _get_repo(repo, username, namespace)
 
     if api_authenticated():
         if repo != flask.g.token.project:
@@ -1205,17 +1152,8 @@ def api_update_custom_field(
         }
 
     """  # noqa
-    repo = pagure.lib.get_project(
-        SESSION, repo, user=username, namespace=namespace)
-
     output = {}
-
-    if repo is None:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
-
-    if not repo.settings.get('issue_tracker', True):
-        raise pagure.exceptions.APIError(
-            404, error_code=APIERROR.ETRACKERDISABLED)
+    repo = _get_repo(repo, username, namespace)
 
     if api_authenticated():
         if repo != flask.g.token.project:
