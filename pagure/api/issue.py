@@ -313,6 +313,7 @@ def api_view_issues(repo, username=None, namespace=None):
 
     """
     repo = _get_repo(repo, username, namespace)
+    _check_token(repo)
 
     assignee = flask.request.args.get('assignee', None)
     author = flask.request.args.get('author', None)
@@ -350,9 +351,6 @@ def api_view_issues(repo, username=None, namespace=None):
     private = False
     # If user is authenticated, show him/her his/her private tickets
     if api_authenticated():
-        if repo != flask.g.token.project:
-            raise pagure.exceptions.APIError(
-                401, error_code=APIERROR.EINVALIDTOK)
         private = flask.g.fas_user.username
     # If user is repo committer, show all tickets included the private ones
     if is_repo_committer(repo):
@@ -470,6 +468,7 @@ def api_view_issue(repo, issueid, username=None, namespace=None):
         comments = False
 
     repo = _get_repo(repo, username, namespace)
+    _check_token(repo)
 
     issue_id = issue_uid = None
     try:
@@ -482,8 +481,6 @@ def api_view_issue(repo, issueid, username=None, namespace=None):
 
     if issue is None or issue.project != repo:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOISSUE)
-
-    _check_token(repo)
 
     if issue.private and not is_repo_committer(repo) \
             and (not api_authenticated() or
@@ -546,6 +543,7 @@ def api_view_issue_comment(
     """  # noqa
 
     repo = _get_repo(repo, username, namespace)
+    _check_token(repo)
 
     issue_id = issue_uid = None
     try:
@@ -558,8 +556,6 @@ def api_view_issue_comment(
 
     if issue is None or issue.project != repo:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOISSUE)
-
-    _check_token(repo)
 
     if issue.private and not is_repo_committer(issue.project) \
             and (not api_authenticated() or
