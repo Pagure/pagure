@@ -48,6 +48,17 @@ def _get_repo(repo_name, username=None, namespace=None):
     return repo
 
 
+def _check_token(repo):
+    """Check if token is valid for the repo
+    :param repo: repository name
+    :raises pagure.exceptions.APIError: when token is not valid for repo
+    """
+    if api_authenticated():
+        if repo != flask.g.token.project:
+            raise pagure.exceptions.APIError(
+                401, error_code=APIERROR.EINVALIDTOK)
+
+
 @API.route('/<repo>/new_issue', methods=['POST'])
 @API.route('/<namespace>/<repo>/new_issue', methods=['POST'])
 @API.route('/fork/<username>/<repo>/new_issue', methods=['POST'])
@@ -472,10 +483,7 @@ def api_view_issue(repo, issueid, username=None, namespace=None):
     if issue is None or issue.project != repo:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOISSUE)
 
-    if api_authenticated():
-        if repo != flask.g.token.project:
-            raise pagure.exceptions.APIError(
-                401, error_code=APIERROR.EINVALIDTOK)
+    _check_token(repo)
 
     if issue.private and not is_repo_committer(repo) \
             and (not api_authenticated() or
@@ -551,10 +559,7 @@ def api_view_issue_comment(
     if issue is None or issue.project != repo:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOISSUE)
 
-    if api_authenticated():
-        if repo != flask.g.token.project:
-            raise pagure.exceptions.APIError(
-                401, error_code=APIERROR.EINVALIDTOK)
+    _check_token(repo)
 
     if issue.private and not is_repo_committer(issue.project) \
             and (not api_authenticated() or
@@ -629,10 +634,7 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
 
     repo = _get_repo(repo, username, namespace)
 
-    if api_authenticated():
-        if repo != flask.g.token.project:
-            raise pagure.exceptions.APIError(
-                401, error_code=APIERROR.EINVALIDTOK)
+    _check_token(repo)
 
     issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
 
@@ -751,10 +753,7 @@ def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
     output = {}
     repo = _get_repo(repo, username, namespace)
 
-    if api_authenticated():
-        if repo != flask.g.token.project:
-            raise pagure.exceptions.APIError(
-                401, error_code=APIERROR.EINVALIDTOK)
+    _check_token(repo)
 
     issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
 
@@ -952,10 +951,7 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
     output = {}
     repo = _get_repo(repo, username, namespace)
 
-    if api_authenticated():
-        if repo != flask.g.token.project:
-            raise pagure.exceptions.APIError(
-                401, error_code=APIERROR.EINVALIDTOK)
+    _check_token(repo)
 
     issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
 
@@ -1061,10 +1057,7 @@ def api_subscribe_issue(repo, issueid, username=None, namespace=None):
     output = {}
     repo = _get_repo(repo, username, namespace)
 
-    if api_authenticated():
-        if repo != flask.g.token.project:
-            raise pagure.exceptions.APIError(
-                401, error_code=APIERROR.EINVALIDTOK)
+    _check_token(repo)
 
     issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
 
@@ -1155,10 +1148,7 @@ def api_update_custom_field(
     output = {}
     repo = _get_repo(repo, username, namespace)
 
-    if api_authenticated():
-        if repo != flask.g.token.project:
-            raise pagure.exceptions.APIError(
-                401, error_code=APIERROR.EINVALIDTOK)
+    _check_token(repo)
 
     issue = pagure.lib.search_issues(SESSION, repo, issueid=issueid)
 
