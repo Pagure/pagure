@@ -218,9 +218,15 @@
             </span>
               {% endif %}
               {% for tag in issue.tags %}
-                <span class="label label-info"
+                <a class="label label-info"
+                   href="{{ url_for('view_issues',
+                         repo=repo.name,
+                         username=username,
+                         namespace=repo.namespace,
+                         tags=tag.tag,
+                         status=status or 'all') }}"
                   style="background-color:{{tag.tag_color}}"
-                  title="{{ tag.tag_description or '' }}">{{tag.tag}}</span>
+                  title="{{ tag.tag_description or '' }}">{{tag.tag}}</a>
               {% endfor%}
             </td>
             <td class="td-open_date nowrap">
