@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
- (c) 2015 - Copyright Red Hat Inc
+ (c) 2015-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -19,7 +19,6 @@ nc localhost 8080
 
 """
 
-import datetime
 import logging
 import os
 import urlparse
@@ -36,9 +35,9 @@ if 'PAGURE_CONFIG' not in os.environ \
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
 
-import pagure
-import pagure.lib
-from pagure.exceptions import PagureEvException
+import pagure  # noqa
+import pagure.lib  # noqa
+from pagure.exceptions import PagureEvException  # noqa
 
 SERVER = None
 
@@ -110,7 +109,8 @@ def _parse_path(path):
     try:
         objtype = [item for item in items if item in OBJECTS][-1]
     except IndexError:
-        raise PagureEvException("No known object type found in path: %s" % path)
+        raise PagureEvException(
+            "No known object type found in path: %s" % path)
     try:
         # objid is the item after objtype, we need all items up to it
         items = items[:items.index(objtype) + 2]
@@ -118,7 +118,8 @@ def _parse_path(path):
         (repo, objtype, objid) = items[-3:]
         items = items[:-3]
     except (IndexError, ValueError):
-        raise PagureEvException("No project or object ID found in path: %s" % path)
+        raise PagureEvException(
+            "No project or object ID found in path: %s" % path)
     # now check for a fork
     if items and items[0] == 'fork':
         try:
@@ -126,22 +127,26 @@ def _parse_path(path):
             username = items[1]
             items = items[2:]
         except IndexError:
-            raise PagureEvException("Path starts with /fork but no user found! Path: %s" % path)
+            raise PagureEvException(
+                "Path starts with /fork but no user found! Path: %s" % path)
     # if we still have an item left, it must be the namespace
     if items:
         namespace = items.pop(0)
     # if we have any items left at this point, we've no idea
     if items:
-        raise PagureEvException("More path components than expected! Path: %s" % path)
+        raise PagureEvException(
+            "More path components than expected! Path: %s" % path)
 
-    return (username, namespace, repo, objtype, objid)
+    return username, namespace, repo, objtype, objid
 
 
 def get_obj_from_path(path):
     """ Return the Ticket or Request object based on the path provided.
     """
     (username, namespace, reponame, objtype, objid) = _parse_path(path)
-    repo = pagure.lib.get_project(pagure.SESSION, reponame, user=username, namespace=namespace)
+    repo = pagure.lib.get_project(
+        pagure.SESSION, reponame, user=username, namespace=namespace)
+
     if repo is None:
         raise PagureEvException("Project '%s' not found" % reponame)
 
@@ -178,7 +183,7 @@ def handle_client(client_reader, client_writer):
         log.warning("No URL provided: %s" % data)
         return
 
-    if not '/' in data[1]:
+    if '/' not in data[1]:
         log.warning("Invalid URL provided: %s" % data[1])
         return
 
@@ -218,7 +223,6 @@ def handle_client(client_reader, client_writer):
         # Inside a while loop, wait for incoming events.
         while True:
             reply = yield trollius.From(subscriber.next_published())
-            #print(u'Received: ', repr(reply.value), u'on channel', reply.channel)
             log.info(reply)
             log.info("Sending %s", reply.value)
             client_writer.write(('data: %s\n\n' % reply.value).encode())
@@ -248,7 +252,6 @@ def stats(client_reader, client_writer):
 
     except trollius.ConnectionResetError as err:
         log.info(err)
-        pass
     finally:
         client_writer.close()
     return
@@ -265,7 +268,8 @@ def main():
             port=pagure.APP.config['EVENTSOURCE_PORT'],
             loop=loop)
         SERVER = loop.run_until_complete(coro)
-        log.info('Serving server at {}'.format(SERVER.sockets[0].getsockname()))
+        log.info(
+            'Serving server at {}'.format(SERVER.sockets[0].getsockname()))
         if pagure.APP.config.get('EV_STATS_PORT'):
             stats_coro = trollius.start_server(
                 stats,
@@ -280,7 +284,7 @@ def main():
         pass
     except trollius.ConnectionResetError as err:
         log.exception("ERROR: ConnectionResetError in main")
-    except Exception as err:
+    except Exception:
         log.exception("ERROR: Exception in main")
     finally:
         # Close the server
