@@ -122,7 +122,7 @@ def _get_pr_info(repo_obj, orig_repo, branch_from, branch_to):
         diff = repo_commit.tree.diff_to_tree(swap=True)
     else:
         raise pagure.exceptions.PagureException(
-            'Fork is empty, there are no commits to request pulling'
+            'Fork is empty, there are no commits to create a pull request with'
         )
 
     return(diff, diff_commits, orig_commit)
@@ -137,7 +137,7 @@ def _get_pr_info(repo_obj, orig_repo, branch_from, branch_to):
 @APP.route('/fork/<username>/<namespace>/<repo>/pull-requests/')
 @APP.route('/fork/<username>/<namespace>/<repo>/pull-requests')
 def request_pulls(repo, username=None, namespace=None):
-    """ Request pulling the changes from the fork into the project.
+    """ Create a pull request with the changes from the fork into the project.
     """
     status = flask.request.args.get('status', 'Open')
     assignee = flask.request.args.get('assignee', None)
@@ -238,7 +238,7 @@ def request_pulls(repo, username=None, namespace=None):
 @APP.route(
     '/fork/<username>/<namespace>/<repo>/pull-request/<int:requestid>')
 def request_pull(repo, requestid, username=None, namespace=None):
-    """ Request pulling the changes from the fork into the project.
+    """ Create a pull request with the changes from the fork into the project.
     """
 
     repo = flask.g.repo
@@ -443,7 +443,7 @@ def request_pull_edit(repo, requestid, username=None, namespace=None):
         SESSION.add(request)
         try:
             SESSION.commit()
-            flask.flash('Request pull edited!')
+            flask.flash('Pull request edited!')
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             APP.logger.exception(err)
@@ -749,7 +749,7 @@ def pull_request_edit_comment(
     methods=['POST'])
 @login_required
 def merge_request_pull(repo, requestid, username=None, namespace=None):
-    """ Request pulling the changes from the fork into the project.
+    """ Create a pull request with the changes from the fork into the project.
     """
 
     form = pagure.forms.ConfirmationForm()
@@ -828,7 +828,7 @@ def merge_request_pull(repo, requestid, username=None, namespace=None):
     methods=['POST'])
 @login_required
 def cancel_request_pull(repo, requestid, username=None, namespace=None):
-    """ Cancel request pulling request.
+    """ Cancel a pull request.
     """
 
     form = pagure.forms.ConfirmationForm()
@@ -855,7 +855,7 @@ def cancel_request_pull(repo, requestid, username=None, namespace=None):
             merged=False)
         try:
             SESSION.commit()
-            flask.flash('Request pull canceled!')
+            flask.flash('Pull request canceled!')
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
             APP.logger.exception(err)
@@ -1016,7 +1016,7 @@ def fork_project(repo, username=None, namespace=None):
     '<path:branch_to>..<path:branch_from>', methods=('GET', 'POST'))
 def new_request_pull(
         repo, branch_to, branch_from, username=None, namespace=None):
-    """ Request pulling the changes from the fork into the project.
+    """ Create a pull request with the changes from the fork into the project.
     """
     branch_to = flask.request.values.get('branch_to', branch_to)
 
@@ -1170,7 +1170,8 @@ def new_request_pull(
     methods=('GET', 'POST'))
 @login_required
 def new_remote_request_pull(repo, username=None, namespace=None):
-    """ Request pulling the changes from a remote fork into the project.
+    """ Create a pull request with the changes from a remote fork into the
+        project.
     """
     confirm = flask.request.values.get('confirm', False)
 

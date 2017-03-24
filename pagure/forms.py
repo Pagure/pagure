@@ -207,7 +207,7 @@ class IssueForm(IssueFormSimplied):
 
 
 class RequestPullForm(PagureForm):
-    ''' Form to create a request pull. '''
+    ''' Form to create a pull request. '''
     title = wtforms.TextField(
         'Title<span class="error">*</span>',
         [wtforms.validators.Required()]
@@ -217,7 +217,7 @@ class RequestPullForm(PagureForm):
 
 
 class RemoteRequestPullForm(RequestPullForm):
-    ''' Form to create a remote request pull. '''
+    ''' Form to create a remote pull request. '''
     git_repo = wtforms.TextField(
         'Git repo address<span class="error">*</span>',
         [wtforms.validators.Required()]

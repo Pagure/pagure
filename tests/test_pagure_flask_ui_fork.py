@@ -717,7 +717,7 @@ class PagureFlaskForktests(tests.Modeltests):
             '<title>Overview - test - Pagure</title>', output.data)
         self.assertIn(
             '</button>\n                      Fork is empty, there are no '
-            'commits to request pulling', output.data)
+            'commits to create a pull request with', output.data)
 
         shutil.rmtree(newpath)
 
@@ -1089,7 +1089,7 @@ index 0000000..2a552bb
             '<title>Overview - test - Pagure</title>', output.data)
         self.assertIn(
             '</button>\n                      Fork is empty, there are no '
-            'commits to request pulling', output.data)
+            'commits to create a pull request with', output.data)
 
         shutil.rmtree(newpath)
 
@@ -1171,7 +1171,7 @@ index 0000000..2a552bb
             self.assertIn(
                 '<title>Overview - test - Pagure</title>', output.data)
             self.assertIn(
-                '</button>\n                      Request pull canceled!',
+                '</button>\n                      Pull request canceled!',
                 output.data)
 
     @patch('pagure.lib.notify.send_email')
@@ -1536,7 +1536,7 @@ index 0000000..2a552bb
                 '<title>Overview - test - Pagure</title>', output.data)
             self.assertIn(
                 '</button>\n                      Fork is empty, there are '
-                'no commits to request pulling', output.data)
+                'no commits to create a pull request with', output.data)
 
             output = self.app.get('/test/new_issue')
             csrf_token = output.data.split(
@@ -1554,7 +1554,7 @@ index 0000000..2a552bb
                 '<title>Overview - test - Pagure</title>', output.data)
             self.assertIn(
                 '</button>\n                      Fork is empty, there are '
-                'no commits to request pulling', output.data)
+                'no commits to create a pull request with', output.data)
 
         shutil.rmtree(newpath)
 
@@ -1590,7 +1590,7 @@ index 0000000..2a552bb
                 '<title>Overview - test - Pagure</title>', output.data)
             self.assertIn(
                 '</button>\n                      Fork is empty, there are '
-                'no commits to request pulling', output.data)
+                'no commits to create a pull request with', output.data)
 
         shutil.rmtree(newpath)
 
