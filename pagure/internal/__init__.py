@@ -321,7 +321,7 @@ def get_pull_request_ready_branch():
             branch_commits = [
                 com
                 for com in branch_commits
-                if com.oid.hex not in main_commits
+                if com not in main_commits
             ]
 
             if branch_commits:
