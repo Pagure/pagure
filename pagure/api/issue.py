@@ -76,6 +76,23 @@ def _get_issue(repo, issueid, issueuid=None):
     return issue
 
 
+def _check_issue_access_repo_commiter(issue):
+    """Check if user can access issue. Must be repo commiter
+    or author to see private issues.
+    :param issue: issue object
+    :raises pagure.exceptions.APIError: when access denied
+    """
+    if (
+        issue.private and
+        not is_repo_committer(issue.project) and (
+            not api_authenticated() or
+            not issue.user.user == flask.g.fas_user.username
+        )
+    ):
+        raise pagure.exceptions.APIError(
+            403, error_code=APIERROR.EISSUENOTALLOWED)
+
+
 @API.route('/<repo>/new_issue', methods=['POST'])
 @API.route('/<namespace>/<repo>/new_issue', methods=['POST'])
 @API.route('/fork/<username>/<repo>/new_issue', methods=['POST'])
@@ -494,12 +511,7 @@ def api_view_issue(repo, issueid, username=None, namespace=None):
         issue_uid = issueid
 
     issue = _get_issue(repo, issue_id, issueuid=issue_uid)
-
-    if issue.private and not is_repo_committer(issue.project) \
-            and (not api_authenticated() or
-                 not issue.user.user == flask.g.fas_user.username):
-        raise pagure.exceptions.APIError(
-            403, error_code=APIERROR.EISSUENOTALLOWED)
+    _check_issue_access_repo_commiter(issue)
 
     jsonout = flask.jsonify(
         issue.to_json(public=True, with_comments=comments))
@@ -565,12 +577,7 @@ def api_view_issue_comment(
         issue_uid = issueid
 
     issue = _get_issue(repo, issue_id, issueuid=issue_uid)
-
-    if issue.private and not is_repo_committer(issue.project) \
-            and (not api_authenticated() or
-                 not issue.user.user == flask.g.fas_user.username):
-        raise pagure.exceptions.APIError(
-            403, error_code=APIERROR.EISSUENOTALLOWED)
+    _check_issue_access_repo_commiter(issue)
 
     comment = pagure.lib.get_issue_comment(SESSION, issue.uid, commentid)
     if not comment:
@@ -642,12 +649,8 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
     _check_token(repo)
 
     issue = _get_issue(repo, issueid)
+    _check_issue_access_repo_commiter(issue)
 
-    if issue.private and not is_repo_committer(issue.project) \
-            and (not api_authenticated() or
-                 not issue.user.user == flask.g.fas_user.username):
-        raise pagure.exceptions.APIError(
-            403, error_code=APIERROR.EISSUENOTALLOWED)
 
     status = pagure.lib.get_issue_statuses(SESSION)
     form = pagure.forms.StatusForm(
@@ -758,12 +761,7 @@ def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
     _check_token(repo)
 
     issue = _get_issue(repo, issueid)
-
-    if issue.private and not is_repo_committer(issue.project) \
-            and (not api_authenticated() or
-                 not issue.user.user == flask.g.fas_user.username):
-        raise pagure.exceptions.APIError(
-            403, error_code=APIERROR.EISSUENOTALLOWED)
+    _check_issue_access_repo_commiter(issue)
 
     form = pagure.forms.MilestoneForm(
         milestones=repo.milestones.keys(),
@@ -865,12 +863,7 @@ def api_comment_issue(repo, issueid, username=None, namespace=None):
                 401, error_code=APIERROR.EINVALIDTOK)
 
     issue = _get_issue(repo, issueid)
-
-    if issue.private and not is_repo_committer(issue.project) \
-            and (not api_authenticated() or
-                 not issue.user.user == flask.g.fas_user.username):
-        raise pagure.exceptions.APIError(
-            403, error_code=APIERROR.EISSUENOTALLOWED)
+    _check_issue_access_repo_commiter(issue)
 
     form = pagure.forms.CommentForm(csrf_enabled=False)
     if form.validate_on_submit():
@@ -950,12 +943,7 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
     _check_token(repo)
 
     issue = _get_issue(repo, issueid)
-
-    if issue.private and not is_repo_committer(issue.project) \
-            and (not api_authenticated() or
-                 not issue.user.user == flask.g.fas_user.username):
-        raise pagure.exceptions.APIError(
-            403, error_code=APIERROR.EISSUENOTALLOWED)
+    _check_issue_access_repo_commiter(issue)
 
     form = pagure.forms.AssignIssueForm(csrf_enabled=False)
     if form.validate_on_submit():
