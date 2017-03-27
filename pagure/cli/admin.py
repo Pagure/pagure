@@ -227,7 +227,11 @@ def do_list_admin_token(args):
 
     acls = APP.config['ADMIN_API_ACLS']
     tokens = pagure.lib.search_token(
-        SESSION, acls, active=args.active, expired=args.expired)
+        SESSION, acls,
+        user=args.user,
+        active=args.active,
+        expired=args.expired)
+
     for token in tokens:
         print('%s -- %s -- %s' % (
             token.id, token.user.user, token.expiration))

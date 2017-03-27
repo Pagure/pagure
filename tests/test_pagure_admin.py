@@ -299,6 +299,31 @@ class PagureAdminAdminTokentests(tests.Modeltests):
 
     @patch('pagure.cli.admin._get_input')
     @patch('pagure.cli.admin._ask_confirmation')
+    def test_do_list_admin_token(self, conf, rinp):
+        """ Test the do_list_admin_token function of pagure-admin. """
+        # Create an admin token to use
+        conf.return_value = True
+        rinp.return_value = '1,2,3'
+
+        args = munch.Munch({'user': 'pingou'})
+        pagure.cli.admin.do_create_admin_token(args)
+
+        # Retrieve all tokens
+        cmd = ['python', PAGURE_ADMIN, 'admin-token', 'list']
+        output = _get_ouput(cmd)[0]
+        self.assertNotEqual(output, 'No user "pingou" found\n')
+        self.assertEqual(len(output.split('\n')), 2)
+        self.assertIn(' -- pingou -- ', output)
+
+        # Retrieve pfrields's tokens
+        cmd = [
+            'python', PAGURE_ADMIN,
+            'admin-token', 'list', '--user', 'pfrields']
+        output = _get_ouput(cmd)[0]
+        self.assertEqual(output, 'No admin tokens found\n')
+
+    @patch('pagure.cli.admin._get_input')
+    @patch('pagure.cli.admin._ask_confirmation')
     def test_do_info_admin_token(self, conf, rinp):
         """ Test the do_info_admin_token function of pagure-admin. """
         # Create an admin token to use
