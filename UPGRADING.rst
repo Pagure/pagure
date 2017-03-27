@@ -1,8 +1,16 @@
 Upgrading Pagure
 ================
 
+From 2.13 to 2.14
+-----------------
+
+The 2.14 release brings some adjustments to the database scheme.
+
+* Update the database schame using alembic: ``alembic upgrade head``
+
+
 From 2.12 to 2.13
-----------------
+-----------------
 
 The 2.13 release brings some adjustments to the database scheme.
 
@@ -10,7 +18,7 @@ The 2.13 release brings some adjustments to the database scheme.
 
 
 From 2.11 to 2.12
-----------------
+-----------------
 
 From this release on, we will have alembic migration script for new table
 creation, so there will no longer be a need to use ``createdb.py``
@@ -21,7 +29,7 @@ The 2.12 release brings some adjustments to the database scheme.
 
 
 From 2.10 to 2.11
-----------------
+-----------------
 
 The 2.10 releases brings some adjustments to the database scheme.
 

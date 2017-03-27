@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            2.13.2
+Version:            2.14
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -329,6 +329,7 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 %{_datadir}/pagure/alembic/
 %{python_sitelib}/pagure/
 %{python_sitelib}/pagure*.egg-info
+%{_bindir}/pagure-admin
 
 
 %files milters
@@ -371,6 +372,80 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Mon Mar 27 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.14-1
+- Update to 2.14
+- Update the label of the button to comment on a PR (Abhijeet Kasurde)
+- Make search case insensitive (Vivek Anand)
+- Improve the debugging on pagure_loadjson
+- Only link the diff to the file if the PR is local and not remote
+- Do not log on fedmsg edition to private comment
+- When deleting a project, give the fullname in the confirmation window
+- Add link to the FPCA indicating where to sign it when complaining that the
+  user did not sign it (Charelle Collett)
+- Fix the error: 'Project' object has no attribute 'ci_hook'
+- Fix input text height to match to button (Abhijeet Kasurde)
+- Fix the data model to make deleting a project straight forward
+- Fix searching issues in the right project by including the namespace
+- When creating the pull-request, save the commit_start and commit_stop
+- Ensure there is a date before trying to humanize it
+- Fixing showing tags even when some of them are not formatted as expected
+- Allow repo user to Take/Drop assigment of issue (Vivek Anand)
+- Add merge status column in pull requests page (Abhijeet Kasurde)
+- Allow user with ticket access to edit custom fields, metadata and the privacy
+  flag (Vivek Anand)
+- Add number of issues in my issues page (Abhijeet Kasurde)
+- Allow report to filter for a key multiple times
+- Add the support to delete a report in a project
+- Fix rendering the roadmap when there are tickets closed without a close date
+- Fix to show tabs in pull request page on mobile (Abhijeet Kasurde)
+- Document some existing API endpoints that were missing from the doc
+- Make issues and pull-requests tables behave in responsive way (Abhijeet Kasurde)
+- Add option to custom field for email notification (Mark Reynolds)
+- When resetting the value of a custom field, indicate what the old value was
+- Add instance wide API token
+- Move the admin functions out of the UI and into a CLI tool pagure-admin
+- Do not update the hash in the URL for every tabs on the PR page
+- Fix heatmap to show current datetime not when when object was created (Smit
+  Thakkar and Vivek Anand)
+- Do not include watchers in the subscribers of a private issue
+- Do not highlight code block unless a language is specified
+- Make getting a project be case insensitive
+- Do not change the privacy status of an issue unless one is specified
+- Fix the logic of the `since` keyword in the API (Vivek Anand)
+- Fix the logic around ticket dependencies
+- Add reset watch button making it go back to the default (Vivek Anand)
+- Do not show dates that are None object, instead make them empty strings
+- Allow filtering tickets by milestones in the API
+- Allow filtering tickets by priorities in the API
+- Expand the API to support filtering issues having or not having a milestone
+- Use plural form for SSH key textfield (Martin Basti)
+- Support irc:// links in our markdown and adjust the regex
+- Remove backticks from email subject (Martin Basti)
+- Adjust the logic when filtering issues by priorities in the API
+- Remove mentioning if a commit is in master on the front page
+- Optimize finding out which branches are in a PR or can be
+- Add required asterisk to Description on new issues (Abhijeet Kasurde)
+- Fix misc typo in 404 messages (Abhijeet Kasurde)
+- Add performance git repo analyzer/framework (Patrick Uiterwijk)
+- Added tip_tricks in doc to document how to pre-fill issues using the url
+  (Eashan)
+- Document how to filter out for issues having a certain tag in the tips and
+  tricks section
+- Allow to manually triggering a run of pagure-ci via a list of sentences set in
+  the configuration
+- Add support for admin API token to pagure-admin
+- Make clicking on 'Unassigned' filter the unassigned PR as it does for issues
+- Add Priority column to My Issues page (Abhijeet Kasurde)
+- Optimize diffing pull-requests
+- Add a description to the API tokens
+- Include the fullname in the API output, in the project representation
+- Add the possibility to edit issue milestone in the API (Martin Basti)
+- Fix some wording (Till Maas)
+- Rename "request pull" to pull request (Stanislav Laznicka)
+- Make tags in issue list clickable (Martin Basti)
+- Include the priority name in the notification rather than its level
+- Update the ticket metadata before adding the new comment (if there is one)
+
 * Fri Feb 24 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.13.2-1
 - Update to 2.13.2
 - Fix running the test suite due to bugs in the code:
