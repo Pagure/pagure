@@ -41,11 +41,17 @@ def _get_repo(repo_name, username=None, namespace=None):
         raise pagure.exceptions.APIError(
             404, error_code=APIERROR.ENOPROJECT)
 
+    return repo
+
+
+def _check_issue_tracker(repo):
+    """Check if issue tracker is enabled for repository
+    :param repo: repository
+    :raises pagure.exceptions.APIError: when issue tracker is disabled
+    """
     if not repo.settings.get('issue_tracker', True):
         raise pagure.exceptions.APIError(
             404, error_code=APIERROR.ETRACKERDISABLED)
-
-    return repo
 
 
 def _check_token(repo, project_token=True):
@@ -170,6 +176,7 @@ def api_new_issue(repo, username=None, namespace=None):
     """
     output = {}
     repo = _get_repo(repo, username, namespace)
+    _check_issue_tracker(repo)
 
     if flask.g.token.project and repo != flask.g.token.project:
         raise pagure.exceptions.APIError(
@@ -352,6 +359,7 @@ def api_view_issues(repo, username=None, namespace=None):
 
     """
     repo = _get_repo(repo, username, namespace)
+    _check_issue_tracker(repo)
     _check_token(repo)
 
     assignee = flask.request.args.get('assignee', None)
@@ -507,6 +515,7 @@ def api_view_issue(repo, issueid, username=None, namespace=None):
         comments = False
 
     repo = _get_repo(repo, username, namespace)
+    _check_issue_tracker(repo)
     _check_token(repo)
 
     issue_id = issue_uid = None
@@ -573,6 +582,7 @@ def api_view_issue_comment(
     """  # noqa
 
     repo = _get_repo(repo, username, namespace)
+    _check_issue_tracker(repo)
     _check_token(repo)
 
     issue_id = issue_uid = None
@@ -650,7 +660,7 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
     output = {}
 
     repo = _get_repo(repo, username, namespace)
-
+    _check_issue_tracker(repo)
     _check_token(repo)
 
     issue = _get_issue(repo, issueid)
@@ -762,7 +772,7 @@ def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
     """
     output = {}
     repo = _get_repo(repo, username, namespace)
-
+    _check_issue_tracker(repo)
     _check_token(repo)
 
     issue = _get_issue(repo, issueid)
@@ -861,6 +871,7 @@ def api_comment_issue(repo, issueid, username=None, namespace=None):
     """
     output = {}
     repo = _get_repo(repo, username, namespace)
+    _check_issue_tracker(repo)
     _check_token(repo, project_token=False)
 
     issue = _get_issue(repo, issueid)
@@ -940,7 +951,7 @@ def api_assign_issue(repo, issueid, username=None, namespace=None):
     """
     output = {}
     repo = _get_repo(repo, username, namespace)
-
+    _check_issue_tracker(repo)
     _check_token(repo)
 
     issue = _get_issue(repo, issueid)
@@ -1038,7 +1049,7 @@ def api_subscribe_issue(repo, issueid, username=None, namespace=None):
     """  # noqa
     output = {}
     repo = _get_repo(repo, username, namespace)
-
+    _check_issue_tracker(repo)
     _check_token(repo)
 
     issue = _get_issue(repo, issueid)
@@ -1121,7 +1132,7 @@ def api_update_custom_field(
     """  # noqa
     output = {}
     repo = _get_repo(repo, username, namespace)
-
+    _check_issue_tracker(repo)
     _check_token(repo)
 
     issue = _get_issue(repo, issueid)
