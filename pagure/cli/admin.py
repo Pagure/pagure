@@ -94,7 +94,7 @@ def _parser_admin_token_create(subparser):
     """ Set up the CLI argument parser for the admin-token create action. """
     # Create admin token
     local_parser = subparser.add_parser(
-        'create',  help="Create a new API token")
+        'create', help="Create a new API token")
     local_parser.add_argument(
         'user', help="User to associate with the token")
     local_parser.set_defaults(func=do_create_admin_token)
@@ -126,11 +126,6 @@ def parse_arguments():
     parser.add_argument(
         '--debug', default=False, action='store_true',
         help='Increase the verbosity of the information displayed')
-
-    def _f(*args, **kwargs):
-        print(parser.format_help())
-
-    parser.set_defaults(func=_f)
 
     subparser = parser.add_subparsers(title='actions')
 
