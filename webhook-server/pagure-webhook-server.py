@@ -81,8 +81,8 @@ def call_web_hooks(project, topic, msg, urls):
         'X-Pagure-Signature': hashhex,
         'X-Pagure-Signature-256': hashhex256,
         'X-Pagure-Topic': topic,
+        'Content-Type': 'application/json',
     }
-    msg = json.dumps(msg)
     for url in urls:
         url = url.strip()
         log.info('Calling url %s' % url)
@@ -90,7 +90,7 @@ def call_web_hooks(project, topic, msg, urls):
             req = requests.post(
                 url,
                 headers=headers,
-                data={'payload': msg},
+                data=content,
                 timeout=60,
             )
             if not req:
