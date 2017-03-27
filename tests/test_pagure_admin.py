@@ -53,6 +53,17 @@ def _get_ouput(cmd):
 class PagureAdminHelptests(tests.Modeltests):
     """ Tests for pagure-admin --help """
 
+    def test_parse_arguments(self):
+        """ Test the parse_arguments function of pagure-admin. """
+        cmd = ['python', PAGURE_ADMIN]
+        output = _get_ouput(cmd)
+        self.assertEqual(output[0], '')
+        self.assertEqual(output[1], '''usage: admin.py [-h] [--debug]
+                {refresh-gitolite,refresh-ssh,clear-hook-token,admin-token}
+                ...
+admin.py: error: too few arguments
+''')
+
     def test_parse_arguments_help(self):
         """ Test the parse_arguments function of pagure-admin. """
         cmd = ['python', PAGURE_ADMIN, '--help']
