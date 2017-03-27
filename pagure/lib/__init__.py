@@ -1643,7 +1643,8 @@ def edit_issue(session, issue, ticketfolder, user, repo=None,
             old_priority = issue.priority
             issue.priority = priority
             edit.append('priority')
-            msg = 'Issue priority set to: %s' % priorities[str(priority)]
+            msg = 'Issue priority set to: %s' % (
+                priorities[str(priority)] if priority else None)
             if old_priority:
                 msg += ' (was: %s)' % priorities.get(
                     str(old_priority), old_priority)

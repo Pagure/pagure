@@ -1538,11 +1538,51 @@ index 0000000..60f7480
         #print patch
         self.assertEqual(patch, exp)
 
+    def test_update_ticket_from_git_no_priority(self):
+        """ Test the update_ticket_from_git method from pagure.lib.git. """
+        tests.create_projects(self.session)
+
+        repo = pagure.lib.get_project(self.session, 'test')
+
+        # Before
+        self.assertEqual(len(repo.issues), 0)
+        self.assertEqual(repo.issues, [])
+
+        data = {
+            "status": "Open", "title": "foo", "comments": [],
+            "content": "bar", "date_created": "1426500263",
+            "user": {
+                "name": "pingou", "emails": ["pingou@fedoraproject.org"]},
+            "milestone": "Next Release",
+            "priority": 1,
+        }
+
+        pagure.lib.git.update_ticket_from_git(
+            self.session, reponame='test', namespace=None, username=None,
+            issue_uid='foobar', json_data=data
+        )
+        self.session.commit()
+
+        # Data contained a priority but not the project, so bailing
+        self.assertEqual(len(repo.issues), 1)
+        self.assertEqual(repo.issues[0].id, 1)
+        self.assertEqual(repo.issues[0].uid, 'foobar')
+        self.assertEqual(repo.issues[0].title, 'foo')
+        self.assertEqual(repo.issues[0].depending_text, [])
+        self.assertEqual(repo.issues[0].blocking_text, [])
+        self.assertEqual(repo.issues[0].milestone, 'Next Release')
+        self.assertEqual(repo.issues[0].priority, None)
+        self.assertEqual(repo.milestones, {'Next Release': None})
+
     def test_update_ticket_from_git(self):
         """ Test the update_ticket_from_git method from pagure.lib.git. """
         tests.create_projects(self.session)
 
         repo = pagure.lib.get_project(self.session, 'test')
+        # Set some priorities to the project
+        repo.priorities = {'1': 'High', '2': 'Normal'}
+        self.session.add(repo)
+        self.session.commit()
 
         # Before
         self.assertEqual(len(repo.issues), 0)
