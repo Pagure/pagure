@@ -86,7 +86,7 @@ def _get_pr_info(repo_obj, orig_repo, branch_from, branch_to):
             orig_repo.lookup_branch(branch_to).get_object().hex]
         repo_commit = repo_obj[commitid]
 
-        main_walker = repo_obj.walk(
+        main_walker = orig_repo.walk(
             orig_commit.oid.hex, pygit2.GIT_SORT_TIME)
         branch_walker = repo_obj.walk(
             repo_commit.oid.hex, pygit2.GIT_SORT_TIME)
