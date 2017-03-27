@@ -1557,6 +1557,25 @@ index 0000000..60f7480
             "priority": 1,
         }
 
+        # Create the issue
+        pagure.lib.git.update_ticket_from_git(
+            self.session, reponame='test', namespace=None, username=None,
+            issue_uid='foobar', json_data=data
+        )
+        self.session.commit()
+
+        # Data contained a priority but not the project, so bailing
+        self.assertEqual(len(repo.issues), 1)
+        self.assertEqual(repo.issues[0].id, 1)
+        self.assertEqual(repo.issues[0].uid, 'foobar')
+        self.assertEqual(repo.issues[0].title, 'foo')
+        self.assertEqual(repo.issues[0].depending_text, [])
+        self.assertEqual(repo.issues[0].blocking_text, [])
+        self.assertEqual(repo.issues[0].milestone, 'Next Release')
+        self.assertEqual(repo.issues[0].priority, None)
+        self.assertEqual(repo.milestones, {'Next Release': None})
+
+        # Edit the issue
         pagure.lib.git.update_ticket_from_git(
             self.session, reponame='test', namespace=None, username=None,
             issue_uid='foobar', json_data=data

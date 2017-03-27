@@ -1437,6 +1437,15 @@ def new_issue(session, repo, title, content, user, ticketfolder, issue_id=None,
     ''' Create a new issue for the specified repo. '''
     user_obj = get_user(session, user)
 
+    # Only store the priority if there is one in the project
+    priorities = repo.priorities
+    try:
+        priority = int(priority)
+    except (ValueError, TypeError):
+        priority = None
+    if str(priority) not in priorities:
+        priority = None
+
     issue = model.Issue(
         id=issue_id or get_next_id(session, repo.id),
         project_id=repo.id,
