@@ -1041,12 +1041,7 @@ def api_subscribe_issue(repo, issueid, username=None, namespace=None):
     _check_token(repo)
 
     issue = _get_issue(repo, issueid)
-
-    if issue.private and not is_repo_admin(repo) \
-            and (not api_authenticated() or
-                 not issue.user.user == flask.g.fas_user.username):
-        raise pagure.exceptions.APIError(
-            403, error_code=APIERROR.EISSUENOTALLOWED)
+    _check_issue_access_repo_commiter(issue)
 
     form = pagure.forms.SubscribtionForm(csrf_enabled=False)
     if form.validate_on_submit():
@@ -1129,12 +1124,7 @@ def api_update_custom_field(
     _check_token(repo)
 
     issue = _get_issue(repo, issueid)
-
-    if issue.private and not is_repo_admin(repo) \
-            and (not api_authenticated() or
-                 not issue.user.user == flask.g.fas_user.username):
-        raise pagure.exceptions.APIError(
-            403, error_code=APIERROR.EISSUENOTALLOWED)
+    _check_issue_access_repo_commiter(issue)
 
     fields = {k.name: k for k in repo.issue_keys}
     if field not in fields:
