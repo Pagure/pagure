@@ -126,7 +126,11 @@ def parse_arguments():
     parser.add_argument(
         '--debug', default=False, action='store_true',
         help='Increase the verbosity of the information displayed')
-    parser.set_defaults(func=lambda a, k: print(parser.format_help()))
+
+    def _f(*args, **kwargs):
+        print(parser.format_help())
+
+    parser.set_defaults(func=_f)
 
     subparser = parser.add_subparsers(title='actions')
 
