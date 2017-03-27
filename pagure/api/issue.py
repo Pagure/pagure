@@ -48,13 +48,18 @@ def _get_repo(repo_name, username=None, namespace=None):
     return repo
 
 
-def _check_token(repo):
+def _check_token(repo, project_token=True):
     """Check if token is valid for the repo
     :param repo: repository name
+    :param project_token: set True when project token is required,
+        otherwise any token can be used
     :raises pagure.exceptions.APIError: when token is not valid for repo
     """
     if api_authenticated():
-        if repo != flask.g.token.project:
+        if (
+            (project_token or flask.g.token.project) and
+            repo != flask.g.token.project
+        ):
             raise pagure.exceptions.APIError(
                 401, error_code=APIERROR.EINVALIDTOK)
 
@@ -856,11 +861,7 @@ def api_comment_issue(repo, issueid, username=None, namespace=None):
     """
     output = {}
     repo = _get_repo(repo, username, namespace)
-
-    if api_authenticated():
-        if flask.g.token.project and repo != flask.g.token.project:
-            raise pagure.exceptions.APIError(
-                401, error_code=APIERROR.EINVALIDTOK)
+    _check_token(repo, project_token=False)
 
     issue = _get_issue(repo, issueid)
     _check_issue_access_repo_commiter(issue)
