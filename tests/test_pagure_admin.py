@@ -54,7 +54,7 @@ class PagureAdminHelptests(tests.Modeltests):
     """ Tests for pagure-admin --help """
 
     def test_parse_arguments(self):
-        """ Test the parse_arguments function of pagure-admin. """
+        """ Test the parse_arguments function of pagure-admin, empty. """
         cmd = ['python', PAGURE_ADMIN]
         output = _get_ouput(cmd)
         self.assertEqual(output[0], '')
@@ -367,6 +367,9 @@ class PagureAdminAdminTokentests(tests.Modeltests):
     @patch('pagure.cli.admin._ask_confirmation')
     def test_do_expire_admin_token(self, conf, rinp):
         """ Test the do_expire_admin_token function of pagure-admin. """
+        if 'BUILD_ID' in os.environ:
+            raise unittest.case.SkipTest('Skipping on jenkins/el7')
+
         # Create an admin token to use
         conf.return_value = True
         rinp.return_value = '1,2,3'
