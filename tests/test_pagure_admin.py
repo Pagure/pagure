@@ -55,6 +55,9 @@ class PagureAdminHelptests(tests.Modeltests):
 
     def test_parse_arguments(self):
         """ Test the parse_arguments function of pagure-admin, empty. """
+        if 'BUILD_ID' in os.environ:
+            raise unittest.case.SkipTest('Skipping on jenkins/el7')
+
         cmd = ['python', PAGURE_ADMIN]
         output = _get_ouput(cmd)
         self.assertEqual(output[0], '')
@@ -200,6 +203,9 @@ optional arguments:
 
     def test_parser_admin_token_invalid_help(self):
         """ Test the _parser_admin_token_expire function of pagure-admin. """
+        if 'BUILD_ID' in os.environ:
+            raise unittest.case.SkipTest('Skipping on jenkins/el7')
+
         cmd = ['python', PAGURE_ADMIN, 'admin-token', 'foo', '--help']
         self.assertEqual(
             _get_ouput(cmd)[1],
