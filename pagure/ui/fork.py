@@ -114,7 +114,8 @@ def _get_pr_info(repo_obj, orig_repo, branch_from, branch_to):
             if main_commits.intersection(branch_commits):
                 break
 
-            diff_commits.append(branch_commit)
+            if branch_commit:
+                diff_commits.append(branch_commit)
 
         # If master is ahead of branch, we need to remove the commits
         # that are already in master

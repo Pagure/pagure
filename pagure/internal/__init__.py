@@ -314,7 +314,9 @@ def get_pull_request_ready_branch():
                     tmp = set(branch_commits)
                 if main_commits.intersection(tmp):
                     break
-                branch_commits.append(branch_commit.hex)
+
+                if branch_commit:
+                    branch_commits.append(branch_commit.hex)
 
             # If master is ahead of branch, we need to remove the commits
             # that are already in master

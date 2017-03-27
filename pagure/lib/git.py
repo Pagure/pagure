@@ -1395,7 +1395,8 @@ def diff_pull_request(
             if main_commits.intersection(branch_commits):
                 break
 
-            diff_commits.append(branch_commit)
+            if branch_commit:
+                diff_commits.append(branch_commit)
 
         # If master is ahead of branch, we need to remove the commits
         # that are already in master
