@@ -1157,7 +1157,7 @@ index 0000000..2a552bb
                 '/test/pull-request/cancel/1', data=data, follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
-            # Project w/o pull-request
+            # Project w/ pull-request
             repo = pagure.lib.get_project(self.session, 'test')
             settings = repo.settings
             settings['pull_requests'] = True
@@ -1912,6 +1912,136 @@ index 0000000..2a552bb
             self.assertIn(
                 '<small><p>Pull-Request has been merged by pingou</p></small>',
                 output.data)
+
+    @patch('pagure.lib.notify.send_email')
+    def test_internal_endpoint_main_ahead(self, send_email):
+        """ Test the new_request_pull endpoint when the main repo is ahead
+        of the fork.
+        """
+        send_email.return_value = True
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path, 'requests'), bare=True)
+
+        self.set_up_git_repo(
+            new_project=None,
+            branch_from='feature')
+
+        gitrepo = os.path.join(self.path, 'repos', 'test.git')
+        repo = pygit2.init_repository(gitrepo, bare=True)
+
+        # Make the main repo be ahead of the fork
+
+        # First commit
+        newpath = tempfile.mkdtemp(prefix='pagure-test')
+        repopath = os.path.join(newpath, 'test')
+        clone_repo = pygit2.clone_repository(gitrepo, repopath)
+
+        # Create a file in that git repo
+        with open(os.path.join(repopath, 'testfile'), 'w') as stream:
+            stream.write('foo\n bar')
+        clone_repo.index.add('testfile')
+        clone_repo.index.write()
+
+        # Commits the files added
+        last_commit = clone_repo.revparse_single('HEAD')
+        tree = clone_repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        clone_repo.create_commit(
+            'refs/heads/master',  # the name of the reference to update
+            author,
+            committer,
+            'Add testfile file for testing',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            [last_commit.oid.hex]
+        )
+
+        # Second commit
+        with open(os.path.join(repopath, 'testfile'), 'a') as stream:
+            stream.write('\nfoo2\n bar2')
+        clone_repo.index.add('testfile')
+        clone_repo.index.write()
+
+        # Commits the files added
+        last_commit = clone_repo.revparse_single('HEAD')
+        tree = clone_repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        clone_repo.create_commit(
+            'refs/heads/master',  # the name of the reference to update
+            author,
+            committer,
+            'Add a second commit to testfile for testing',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            [last_commit.oid.hex]
+        )
+
+        # Third commit
+        with open(os.path.join(repopath, 'testfile'), 'a') as stream:
+            stream.write('\nfoo3\n bar3')
+        clone_repo.index.add('testfile')
+        clone_repo.index.write()
+
+        # Commits the files added
+        last_commit = clone_repo.revparse_single('HEAD')
+        tree = clone_repo.index.write_tree()
+        author = pygit2.Signature(
+            'Alice Author', 'alice@authors.tld')
+        committer = pygit2.Signature(
+            'Cecil Committer', 'cecil@committers.tld')
+        clone_repo.create_commit(
+            'refs/heads/master',  # the name of the reference to update
+            author,
+            committer,
+            'Add a third commit to testfile for testing',
+            # binary string representing the tree object ID
+            tree,
+            # list of binary strings representing parents of the new commit
+            [last_commit.oid.hex]
+        )
+
+        refname = 'refs/heads/master:refs/heads/master'
+        ori_remote = clone_repo.remotes[0]
+        PagureRepo.push(ori_remote, refname)
+
+        shutil.rmtree(newpath)
+
+        user = tests.FakeUser()
+        user.username = 'foo'
+        with tests.user_set(pagure.APP, user):
+
+            output = self.app.get('/new')
+            csrf_token = output.data.split(
+                'name="csrf_token" type="hidden" value="')[1].split('">')[0]
+
+            output = self.app.post(
+                '/pv/pull-request/ready',
+                data={'repo': 'test', 'csrf_token': csrf_token}
+            )
+            self.assertEqual(output.status_code, 200)
+            data = json.loads(output.data)
+            self.assertEqual(
+                data,
+                {
+                  "code": "OK",
+                  "message": {
+                    "branch_w_pr": {
+                      "feature": 1
+                    },
+                    "new_branch": {}
+                  }
+                }
+            )
 
     @patch('pagure.lib.notify.send_email')
     def test_fork_edit_file(self, send_email):
