@@ -1130,17 +1130,20 @@ index 0000000..2a552bb
 
             # Invalid project
             output = self.app.post(
-                '/foo/pull-request/cancel/1', data=data, follow_redirects=True)
+                '/foo/pull-request/cancel/1', data=data,
+                follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
             # Invalid PR id
             output = self.app.post(
-                '/test/pull-request/cancel/100', data=data, follow_redirects=True)
+                '/test/pull-request/cancel/100', data=data,
+                follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
             # Invalid user for this project
             output = self.app.post(
-                '/test/pull-request/cancel/1', data=data, follow_redirects=True)
+                '/test/pull-request/cancel/1', data=data,
+                follow_redirects=True)
             self.assertEqual(output.status_code, 403)
 
         user.username = 'pingou'
@@ -1154,7 +1157,8 @@ index 0000000..2a552bb
             self.session.commit()
 
             output = self.app.post(
-                '/test/pull-request/cancel/1', data=data, follow_redirects=True)
+                '/test/pull-request/cancel/1', data=data,
+                follow_redirects=True)
             self.assertEqual(output.status_code, 404)
 
             # Project w/ pull-request
@@ -1166,7 +1170,8 @@ index 0000000..2a552bb
             self.session.commit()
 
             output = self.app.post(
-                '/test/pull-request/cancel/1', data=data, follow_redirects=True)
+                '/test/pull-request/cancel/1', data=data,
+                follow_redirects=True)
             self.assertEqual(output.status_code, 200)
             self.assertIn(
                 '<title>Overview - test - Pagure</title>', output.data)
