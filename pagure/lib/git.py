@@ -1377,7 +1377,7 @@ def diff_pull_request(
         while 1:
             try:
                 com = main_walker.next()
-                main_commits.add(com.hex)
+                main_commits.add(com.oid.hex)
             except StopIteration:
                 com = None
 
@@ -1392,19 +1392,17 @@ def diff_pull_request(
 
             if branch_commit:
                 branch_commits.add(branch_commit.oid.hex)
+                diff_commits.append(branch_commit)
             if main_commits.intersection(branch_commits):
                 break
 
-            if branch_commit:
-                diff_commits.append(branch_commit)
-
         # If master is ahead of branch, we need to remove the commits
-        # that are already in master
-        diff_commits = [
-            com
-            for com in diff_commits
-            if com.oid.hex not in main_commits
-        ]
+        # that are after the first one found in master
+        i = 0
+        for i in range(len(diff_commits)):
+            if diff_commits[i].oid.hex in main_commits:
+                break
+        diff_commits = diff_commits[:i]
 
         if request.status and diff_commits:
             first_commit = repo_obj[diff_commits[-1].oid.hex]

@@ -296,7 +296,7 @@ def get_pull_request_ready_branch():
                 if compare_branch:
                     try:
                         com = main_walker.next()
-                        main_commits.add(com.hex)
+                        main_commits.add(com.oid.hex)
                     except StopIteration:
                         com = None
                 try:
@@ -309,22 +309,17 @@ def get_pull_request_ready_branch():
                     break
 
                 if branch_commit:
-                    tmp = set(branch_commits + [branch_commit.hex])
-                else:
-                    tmp = set(branch_commits)
-                if main_commits.intersection(tmp):
+                    branch_commits.append(branch_commit.hex)
+                if main_commits.intersection(set(branch_commits)):
                     break
 
-                if branch_commit:
-                    branch_commits.append(branch_commit.hex)
-
             # If master is ahead of branch, we need to remove the commits
-            # that are already in master
-            branch_commits = [
-                com
-                for com in branch_commits
-                if com not in main_commits
-            ]
+            # that are after the first one found in master
+            i = 0
+            for i in range(len(branch_commits)):
+                if branch_commits[i] in main_commits:
+                    break
+            branch_commits = branch_commits[:i]
 
             if branch_commits:
                 branches[branchname] = branch_commits
