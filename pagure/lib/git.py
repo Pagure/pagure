@@ -1367,7 +1367,7 @@ def diff_pull_request(
 
     if not repo_obj.is_empty and not orig_repo.is_empty:
 
-        main_walker = repo_obj.walk(
+        main_walker = orig_repo.walk(
             orig_repo.lookup_branch(request.branch).get_object().hex,
             pygit2.GIT_SORT_TIME)
         branch_walker = repo_obj.walk(commitid, pygit2.GIT_SORT_TIME)
