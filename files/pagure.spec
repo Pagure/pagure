@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            2.14
+Version:            2.14.1
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -372,6 +372,14 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Wed Mar 29 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.14.1-1
+- Update to 2.14.1
+- Fix typo for walking the repo when creating a diff of a PR
+- Have the web-hook use the signed content and have a content-type header
+- Fix running the tests on jenkins via a couple of fixes to pagure-admin and
+  skipping a couple of tests on jenkins due to the current pygit2/libgit2
+  situation in epel7
+
 * Mon Mar 27 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.14-1
 - Update to 2.14
 - Update the label of the button to comment on a PR (Abhijeet Kasurde)
