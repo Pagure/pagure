@@ -175,7 +175,7 @@ def generate_gitolite_acls():
             shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            cwd=gitolite_folder
+            cwd=pagure.APP.config['GITOLITE_HOME']
         )
 
 
