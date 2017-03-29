@@ -58,100 +58,6 @@ def _get_parent_request_repo_path(repo):
     return parentpath
 
 
-def _get_pr_info(repo_obj, orig_repo, branch_from, branch_to):
-    ''' Return the info needed to see a diff or make a Pull-Request between
-    the two specified repo.
-    '''
-    frombranch = repo_obj.lookup_branch(branch_from)
-    if not frombranch and not repo_obj.is_empty:
-        flask.abort(
-            400,
-            'Branch %s does not exist' % branch_from)
-
-    branch = orig_repo.lookup_branch(branch_to)
-    if not branch and not orig_repo.is_empty:
-        flask.abort(
-            400,
-            'Branch %s could not be found in the target repo' % branch_to)
-
-    branch = repo_obj.lookup_branch(branch_from)
-    commitid = None
-    if branch:
-        commitid = branch.get_object().hex
-
-    diff_commits = []
-    diff = None
-    if not repo_obj.is_empty and not orig_repo.is_empty:
-        orig_commit = orig_repo[
-            orig_repo.lookup_branch(branch_to).get_object().hex]
-        repo_commit = repo_obj[commitid]
-
-        main_walker = orig_repo.walk(
-            orig_commit.oid.hex, pygit2.GIT_SORT_TIME)
-        branch_walker = repo_obj.walk(
-            repo_commit.oid.hex, pygit2.GIT_SORT_TIME)
-        main_commits = set()
-        branch_commits = set()
-
-        while 1:
-            try:
-                com = main_walker.next()
-                main_commits.add(com.oid.hex)
-            except StopIteration:
-                com = None
-
-            try:
-                branch_commit = branch_walker.next()
-            except StopIteration:
-                branch_commit = None
-
-            # We sure never end up here but better safe than sorry
-            if com is None and branch_commit is None:
-                break
-
-            if branch_commit:
-                branch_commits.add(branch_commit.oid.hex)
-                diff_commits.append(branch_commit)
-            if main_commits.intersection(branch_commits):
-                break
-
-        # If master is ahead of branch, we need to remove the commits
-        # that are after the first one found in master
-        i = 0
-        for i in range(len(diff_commits)):
-            if diff_commits[i].oid.hex in main_commits:
-                break
-        diff_commits = diff_commits[:i]
-
-        if diff_commits:
-            first_commit = repo_obj[diff_commits[-1].oid.hex]
-            if len(first_commit.parents) > 0:
-                diff = repo_obj.diff(
-                    repo_obj.revparse_single(first_commit.parents[0].oid.hex),
-                    repo_obj.revparse_single(diff_commits[0].oid.hex)
-                )
-
-    elif orig_repo.is_empty and not repo_obj.is_empty:
-        orig_commit = None
-        if 'master' in repo_obj.listall_branches():
-            repo_commit = repo_obj[repo_obj.head.target]
-        else:
-            branch = repo_obj.lookup_branch(branch_from)
-            repo_commit = branch.get_object()
-
-        for commit in repo_obj.walk(
-                repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
-            diff_commits.append(commit)
-
-        diff = repo_commit.tree.diff_to_tree(swap=True)
-    else:
-        raise pagure.exceptions.PagureException(
-            'Fork is empty, there are no commits to create a pull request with'
-        )
-
-    return(diff, diff_commits, orig_commit)
-
-
 @APP.route('/<repo>/pull-requests/')
 @APP.route('/<repo>/pull-requests')
 @APP.route('/<namespace>/<repo>/pull-requests/')
@@ -1059,13 +965,10 @@ def new_request_pull(
     orig_repo = pygit2.Repository(parentpath)
 
     try:
-        diff, diff_commits, orig_commit = _get_pr_info(
+        diff, diff_commits, orig_commit = pagure.lib.git.get_diff_info(
             repo_obj, orig_repo, branch_from, branch_to)
     except pagure.exceptions.PagureException as err:
-        flask.flash(err.message, 'error')
-        return flask.redirect(flask.url_for(
-            'view_repo', username=username, repo=repo.name,
-            namespace=namespace))
+        flask.abort(400, str(err))
 
     repo_committer = flask.g.repo_committer
 
@@ -1216,7 +1119,7 @@ def new_remote_request_pull(repo, username=None, namespace=None):
         repo_obj = pygit2.Repository(repopath)
 
         try:
-            diff, diff_commits, orig_commit = _get_pr_info(
+            diff, diff_commits, orig_commit = pagure.lib.git.get_diff_info(
                 repo_obj, orig_repo, branch_from, branch_to)
         except pagure.exceptions.PagureException as err:
             flask.flash(err.message, 'error')

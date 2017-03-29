@@ -23,6 +23,7 @@ from sqlalchemy.exc import SQLAlchemyError
 PV = flask.Blueprint('internal_ns', __name__, url_prefix='/pv')
 
 import pagure
+import pagure.exceptions
 import pagure.forms
 import pagure.lib
 import pagure.lib.git
@@ -268,62 +269,26 @@ def get_pull_request_ready_branch():
     branches = {}
     if not repo_obj.is_empty and repo_obj.listall_branches() > 1:
         if not repo_obj.head_is_unborn:
-            compare_branch = repo_obj.lookup_branch(
-                repo_obj.head.shorthand)
+            compare_branch = repo_obj.head.shorthand
         else:
             compare_branch = None
 
         for branchname in repo_obj.listall_branches():
-            branch = repo_obj.lookup_branch(branchname)
 
             # Do not compare a branch to itself
             if compare_branch \
-                    and compare_branch.branch_name == branch.branch_name:
+                    and compare_branch == branchname:
                 continue
 
-            repo_commit = repo_obj[branch.get_object().hex]
+            diff_commits = None
+            try:
+                _, diff_commits, _ = pagure.lib.git.get_diff_info(
+                    repo_obj, repo_obj, branchname, compare_branch)
+            except pagure.exceptions.PagureException:
+                pass
 
-            if compare_branch:
-                main_walker = repo_obj.walk(
-                    compare_branch.get_object().hex,
-                    pygit2.GIT_SORT_TIME)
-            branch_walker = repo_obj.walk(
-                    repo_commit.oid.hex,
-                    pygit2.GIT_SORT_TIME)
-            main_commits = set()
-            branch_commits = list()
-            while 1:
-                com = None
-                if compare_branch:
-                    try:
-                        com = main_walker.next()
-                        main_commits.add(com.oid.hex)
-                    except StopIteration:
-                        com = None
-                try:
-                    branch_commit = branch_walker.next()
-                except StopIteration:
-                    branch_commit = None
-
-                # We sure never end up here but better safe than sorry
-                if com is None and branch_commit is None:
-                    break
-
-                if branch_commit:
-                    branch_commits.append(branch_commit.hex)
-                if main_commits.intersection(set(branch_commits)):
-                    break
-
-            # If master is ahead of branch, we need to remove the commits
-            # that are after the first one found in master
-            i = 0
-            for i in range(len(branch_commits)):
-                if branch_commits[i] in main_commits:
-                    break
-            branch_commits = branch_commits[:i]
-
-            if branch_commits:
-                branches[branchname] = branch_commits
+            if diff_commits:
+                branches[branchname] = [c.oid.hex for c in diff_commits]
 
     prs = pagure.lib.search_pull_requests(
         pagure.SESSION,

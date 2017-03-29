@@ -1536,12 +1536,10 @@ index 0000000..2a552bb
             output = self.app.get(
                 '/fork/foo/test/diff/master..feature',
                 follow_redirects=True)
-            self.assertEqual(output.status_code, 200)
+            self.assertEqual(output.status_code, 400)
             self.assertIn(
-                '<title>Overview - test - Pagure</title>', output.data)
-            self.assertIn(
-                '</button>\n                      Fork is empty, there are '
-                'no commits to create a pull request with', output.data)
+                '<p>Fork is empty, there are no commits to create a '
+                'pull request with</p>', output.data)
 
             output = self.app.get('/test/new_issue')
             csrf_token = output.data.split(
@@ -1554,12 +1552,10 @@ index 0000000..2a552bb
 
             output = self.app.post(
                 '/test/diff/master..feature', data=data, follow_redirects=True)
-            self.assertEqual(output.status_code, 200)
+            self.assertEqual(output.status_code, 400)
             self.assertIn(
-                '<title>Overview - test - Pagure</title>', output.data)
-            self.assertIn(
-                '</button>\n                      Fork is empty, there are '
-                'no commits to create a pull request with', output.data)
+                '<p>Fork is empty, there are no commits to create a '
+                'pull request with</p>', output.data)
 
         shutil.rmtree(newpath)
 
@@ -1591,11 +1587,10 @@ index 0000000..2a552bb
         with tests.user_set(pagure.APP, user):
             output = self.app.get(
                 '/fork/foo/test/diff/master..master', follow_redirects=True)
+            self.assertEqual(output.status_code, 400)
             self.assertIn(
-                '<title>Overview - test - Pagure</title>', output.data)
-            self.assertIn(
-                '</button>\n                      Fork is empty, there are '
-                'no commits to create a pull request with', output.data)
+                '<p>Fork is empty, there are no commits to create a '
+                'pull request with</p>', output.data)
 
         shutil.rmtree(newpath)
 

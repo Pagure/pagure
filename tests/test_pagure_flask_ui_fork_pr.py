@@ -160,6 +160,8 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         refname = 'refs/heads/feature_foo:refs/heads/feature_foo'
         PagureRepo.push(ori_remote, refname)
 
+        shutil.rmtree(newpath)
+
     def test_get_pr_info(self):
         """ Test pagure.ui.fork._get_pr_info """
 
@@ -167,7 +169,7 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         gitrepo2 = os.path.join(
             self.path, 'repos', 'forks', 'pingou', 'test.git')
 
-        diff, diff_commits, orig_commit = pagure.ui.fork._get_pr_info(
+        diff, diff_commits, orig_commit = pagure.lib.git.get_diff_info(
             repo_obj=PagureRepo(gitrepo2),
             orig_repo=PagureRepo(gitrepo),
             branch_from='feature_foo',

@@ -1358,46 +1358,60 @@ def merge_pull_request(
     return 'Changes merged!'
 
 
-def diff_pull_request(
-        session, request, repo_obj, orig_repo, requestfolder,
-        with_diff=True):
-    """ Returns the diff and the list of commits between the two git repos
-    mentionned in the given pull-request.
-    """
+def get_diff_info(repo_obj, orig_repo, branch_from, branch_to):
+    ''' Return the info needed to see a diff or make a Pull-Request between
+    the two specified repo.
 
-    commitid = None
-    diff = None
-    diff_commits = []
-    branch = repo_obj.lookup_branch(request.branch_from)
-    if branch:
-        commitid = branch.get_object().hex
+    :arg repo_obj: The pygit2.Repository object of the first git repo
+    :arg orig_repo:  The pygit2.Repository object of the second git repo
+    :arg branch_from: the name of the branch having the changes, in the
+        first git repo
+    : arg branch_to: the name of the branch in which we want to merge the
+        changes in the second git repo
 
-    if repo_obj.is_empty:
-        raise pagure.exceptions.PagureException(
-            'Fork is empty, there are no commits to create a pull request with'
+    '''
+    frombranch = repo_obj.lookup_branch(branch_from)
+    if not frombranch and not repo_obj.is_empty:
+        raise pagure.exceptions.BranchNotFoundException(
+            'Branch %s does not exist' % branch_from
         )
 
-    if not orig_repo.is_empty \
-            and request.branch not in orig_repo.listall_branches():
-        raise pagure.exceptions.PagureException(
-            'The branch into which this pull-request was to be merged: %s '
-            'seems to no longer be present in this repo' % request.branch)
+    branch = None
+    if branch_to:
+        branch = orig_repo.lookup_branch(branch_to)
+        if not branch and not orig_repo.is_empty:
+            raise pagure.exceptions.BranchNotFoundException(
+                'Branch %s could not be found in the target repo' % branch_to
+            )
 
+    commitid = None
+    if frombranch:
+        commitid = frombranch.get_object().hex
+
+    diff_commits = []
+    diff = None
+    orig_commit = None
     if not repo_obj.is_empty and not orig_repo.is_empty:
+        if branch:
+            orig_commit = orig_repo[branch.get_object().hex]
+            main_walker = orig_repo.walk(
+                orig_commit.oid.hex, pygit2.GIT_SORT_TIME)
 
-        main_walker = orig_repo.walk(
-            orig_repo.lookup_branch(request.branch).get_object().hex,
-            pygit2.GIT_SORT_TIME)
-        branch_walker = repo_obj.walk(commitid, pygit2.GIT_SORT_TIME)
+        repo_commit = repo_obj[commitid]
+        branch_walker = repo_obj.walk(
+            repo_commit.oid.hex, pygit2.GIT_SORT_TIME)
+
         main_commits = set()
         branch_commits = set()
 
         while 1:
-            try:
-                com = main_walker.next()
-                main_commits.add(com.oid.hex)
-            except StopIteration:
-                com = None
+            com = None
+            if branch:
+                try:
+                    com = main_walker.next()
+                    main_commits.add(com.oid.hex)
+                except StopIteration:
+                    com = None
 
             try:
                 branch_commit = branch_walker.next()
@@ -1417,82 +1431,111 @@ def diff_pull_request(
         # If master is ahead of branch, we need to remove the commits
         # that are after the first one found in master
         i = 0
-        for i in range(len(diff_commits)):
-            if diff_commits[i].oid.hex in main_commits:
-                break
-        diff_commits = diff_commits[:i]
+        if diff_commits and main_commits:
+            for i in range(len(diff_commits)):
+                if diff_commits[i].oid.hex in main_commits:
+                    break
+            diff_commits = diff_commits[:i]
 
-        if request.status and diff_commits:
+        if diff_commits:
             first_commit = repo_obj[diff_commits[-1].oid.hex]
-            # Check if we can still rely on the merge_status
-            commenttext = None
-            if request.commit_start != first_commit.oid.hex or\
-                    request.commit_stop != diff_commits[0].oid.hex:
-                request.merge_status = None
-                if request.commit_start:
-                    new_commits_count = 0
-                    commenttext = ""
-                    for i in diff_commits:
-                        if i.oid.hex == request.commit_stop:
-                            break
-                        new_commits_count = new_commits_count + 1
-                        commenttext = '%s * %s\n' % (
-                            commenttext, i.message.strip().split('\n')[0])
-                    if new_commits_count == 1:
-                        commenttext = "**%d new commit added**\n\n%s" % (
-                            new_commits_count, commenttext)
-                    else:
-                        commenttext = "**%d new commits added**\n\n%s" % (
-                            new_commits_count, commenttext)
-                if request.commit_start and \
-                        request.commit_start != first_commit.oid.hex:
-                    commenttext = 'rebased'
-            request.commit_start = first_commit.oid.hex
-            request.commit_stop = diff_commits[0].oid.hex
-            session.add(request)
-            session.commit()
-            if commenttext:
-                pagure.lib.add_pull_request_comment(
-                    session, request,
-                    commit=None, tree_id=None, filename=None, row=None,
-                    comment='%s' % commenttext,
-                    user=request.user.username,
-                    requestfolder=requestfolder,
-                    notify=False, notification=True
+            if len(first_commit.parents) > 0:
+                diff = repo_obj.diff(
+                    repo_obj.revparse_single(first_commit.parents[0].oid.hex),
+                    repo_obj.revparse_single(diff_commits[0].oid.hex)
                 )
-                session.commit()
-            pagure.lib.git.update_git(
-                request, repo=request.project,
-                repofolder=requestfolder)
-
-        if diff_commits and with_diff and len(diff_commits[-1].parents) > 0:
-            diff = repo_obj.diff(
-                repo_obj.revparse_single(diff_commits[-1].parents[0].oid.hex),
-                repo_obj.revparse_single(diff_commits[0].oid.hex)
-            )
-
     elif orig_repo.is_empty and not repo_obj.is_empty:
-        for commit in repo_obj.walk(commitid, pygit2.GIT_SORT_TIME):
+        if 'master' in repo_obj.listall_branches():
+            repo_commit = repo_obj[repo_obj.head.target]
+        else:
+            branch = repo_obj.lookup_branch(branch_from)
+            repo_commit = branch.get_object()
+
+        for commit in repo_obj.walk(
+                repo_commit.oid.hex, pygit2.GIT_SORT_TIME):
             diff_commits.append(commit)
-        if request.status and diff_commits:
-            first_commit = repo_obj[diff_commits[-1].oid.hex]
-            # Check if we can still rely on the merge_status
-            if request.commit_start != first_commit.oid.hex or\
-                    request.commit_stop != diff_commits[0].oid.hex:
-                request.merge_status = None
-            request.commit_start = first_commit.oid.hex
-            request.commit_stop = diff_commits[0].oid.hex
-            session.add(request)
+
+        diff = repo_commit.tree.diff_to_tree(swap=True)
+    else:
+        raise pagure.exceptions.PagureException(
+            'Fork is empty, there are no commits to create a pull '
+            'request with'
+        )
+
+    return(diff, diff_commits, orig_commit)
+
+
+def diff_pull_request(
+        session, request, repo_obj, orig_repo, requestfolder,
+        with_diff=True):
+    """ Returns the diff and the list of commits between the two git repos
+    mentionned in the given pull-request.
+
+    :arg session: The sqlalchemy session to connect to the database
+    :arg request: The pagure.lib.model.PullRequest object of the pull-request
+        to look into
+    :arg repo_obj: The pygit2.Repository object of the first git repo
+    :arg orig_repo:  The pygit2.Repository object of the second git repo
+    :arg requestfolder: The folder in which are stored the git repositories
+        containing the metadata of the different pull-requests
+    :arg with_diff: A boolean on whether to return the diff with the list
+        of commits (or just the list of commits)
+
+    """
+
+    commitid = None
+    diff = None
+    diff_commits = []
+    diff, diff_commits, _ = get_diff_info(
+        repo_obj, orig_repo, request.branch_from, request.branch)
+
+    if request.status and diff_commits:
+        first_commit = repo_obj[diff_commits[-1].oid.hex]
+        # Check if we can still rely on the merge_status
+        commenttext = None
+        if request.commit_start != first_commit.oid.hex or\
+                request.commit_stop != diff_commits[0].oid.hex:
+            request.merge_status = None
+            if request.commit_start:
+                new_commits_count = 0
+                commenttext = ""
+                for i in diff_commits:
+                    if i.oid.hex == request.commit_stop:
+                        break
+                    new_commits_count = new_commits_count + 1
+                    commenttext = '%s * %s\n' % (
+                        commenttext, i.message.strip().split('\n')[0])
+                if new_commits_count == 1:
+                    commenttext = "**%d new commit added**\n\n%s" % (
+                        new_commits_count, commenttext)
+                else:
+                    commenttext = "**%d new commits added**\n\n%s" % (
+                        new_commits_count, commenttext)
+            if request.commit_start and \
+                    request.commit_start != first_commit.oid.hex:
+                commenttext = 'rebased'
+        request.commit_start = first_commit.oid.hex
+        request.commit_stop = diff_commits[0].oid.hex
+        session.add(request)
+        session.commit()
+        if commenttext:
+            pagure.lib.add_pull_request_comment(
+                session, request,
+                commit=None, tree_id=None, filename=None, row=None,
+                comment='%s' % commenttext,
+                user=request.user.username,
+                requestfolder=requestfolder,
+                notify=False, notification=True
+            )
             session.commit()
-            pagure.lib.git.update_git(
-                request, repo=request.project,
-                repofolder=requestfolder)
+        pagure.lib.git.update_git(
+            request, repo=request.project,
+            repofolder=requestfolder)
 
-        repo_commit = repo_obj[request.commit_stop]
-        if with_diff:
-            diff = repo_commit.tree.diff_to_tree(swap=True)
-
-    return (diff_commits, diff)
+    if with_diff:
+        return (diff_commits, diff)
+    else:
+        diff_commits
 
 
 def get_git_tags(project):
