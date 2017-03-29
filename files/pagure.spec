@@ -2,7 +2,7 @@
 %distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 
 Name:               pagure
-Version:            2.14.1
+Version:            2.14.2
 Release:            1%{?dist}
 Summary:            A git-centered forge
 
@@ -372,6 +372,10 @@ install -m 644 pagure-loadjson/pagure_loadjson.service \
 
 
 %changelog
+* Wed Mar 29 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.14.2-1
+- Update to 2.14.2
+- Fix a bug in the logic around diff branches in repos
+
 * Wed Mar 29 2017 Pierre-Yves Chibon <pingou@pingoured.fr> - 2.14.1-1
 - Update to 2.14.1
 - Fix typo for walking the repo when creating a diff of a PR
