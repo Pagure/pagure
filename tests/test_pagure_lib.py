@@ -3431,6 +3431,7 @@ class PagureLibtests(tests.Modeltests):
             "during F26AH boot 'error_name=org.freedesktop.systemd1."
             "NoSuchDynamicUser'~~",
             '``~~foo bar~~``',
+            '~~foo bar~~ and ~~another ~~',
         ]
         expected = [
             # 'foo bar test#1 see?',
@@ -3498,6 +3499,8 @@ class PagureLibtests(tests.Modeltests):
             "org.freedesktop.systemd1.NoSuchDynamicUser'</del></p>",
             # '``~~foo bar~~``'
             '<p><code>~~foo bar~~</code></p>',
+            # '~~foo bar~~ and ~~another ~~',
+            '<p><del>foo bar</del> and <del>another </del></p>',
         ]
 
         with pagure.APP.app_context():
