@@ -54,7 +54,7 @@ COMMIT_LINK_RE = r'(?<!\w)'\
 IMPLICIT_ISSUE_RE = r'[^|\w](?<!\w)#([0-9]+)'
 IMPLICIT_PR_RE = r'[^|\w](?<!\w)PR#([0-9]+)'
 IMPLICIT_COMMIT_RE = r'[^|\w](?<![>\w#])([a-f0-9]{7,40})'
-STRIKE_THROUGH_RE = r'~~(\w+)~~'
+STRIKE_THROUGH_RE = r'~~(.*)~~'
 
 
 class MentionPattern(markdown.inlinepatterns.Pattern):

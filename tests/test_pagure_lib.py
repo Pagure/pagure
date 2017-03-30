@@ -3424,6 +3424,13 @@ class PagureLibtests(tests.Modeltests):
             'ircs://pagure.io',
             'http://pagure.io',
             'https://pagure.io',
+            '~~foo~~',
+            '~~foo bar~~',
+            '~~[BZ#1435310](https://bugzilla.redhat.com/1435310)~~',
+            "~~[BZ#1435310](https://bugzilla.redhat.com/1435310) avc denial "
+            "during F26AH boot 'error_name=org.freedesktop.systemd1."
+            "NoSuchDynamicUser'~~",
+            '``~~foo bar~~``',
         ]
         expected = [
             # 'foo bar test#1 see?',
@@ -3476,6 +3483,21 @@ class PagureLibtests(tests.Modeltests):
             '<p><a href="http://pagure.io">http://pagure.io</a></p>',
             # 'https://pagure.io'
             '<p><a href="https://pagure.io">https://pagure.io</a></p>',
+            # '~~foo~~'
+            '<p><del>foo</del></p>',
+            # '~~foo bar~~'
+            '<p><del>foo bar</del></p>',
+            # '~~[BZ#1435310](https://bugzilla.redhat.com/1435310)~~'
+            '<p><del><a href="https://bugzilla.redhat.com/1435310">'
+            'BZ#1435310</a></del></p>',
+            # '~~[BZ#1435310](https://bugzilla.redhat.com/1435310) avc
+            # denial during F26AH boot 'error_name=org.freedesktop.systemd1
+            # .NoSuchDynamicUser~~'
+            "<p><del><a href=\"https://bugzilla.redhat.com/1435310\">"
+            "BZ#1435310</a> avc denial during F26AH boot 'error_name="
+            "org.freedesktop.systemd1.NoSuchDynamicUser'</del></p>",
+            # '``~~foo bar~~``'
+            '<p><code>~~foo bar~~</code></p>',
         ]
 
         with pagure.APP.app_context():
