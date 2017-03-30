@@ -2515,7 +2515,20 @@ index 0000000..60f7480
             domerge=False
         )
 
+    @patch('subprocess.Popen')
+    def test_generate_gitolite_acls(self, popen):
+        """ Test calling generate_gitolite_acls. """
+        pagure.SESSION = self.session
+        pagure.lib.git.SESSION = self.session
+        pagure.APP.config['GITOLITE_HOME'] = '/tmp'
+
+        pagure.lib.git.generate_gitolite_acls()
+        popen.assert_called_with(
+            'HOME=/tmp gitolite compile && '
+            'HOME=/tmp gitolite trigger POST_COMPILE',
+            cwd='/tmp', shell=True, stderr=-1, stdout=-1
+        )
+
 
 if __name__ == '__main__':
-    SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibGittests)
-    unittest.TextTestRunner(verbosity=2).run(SUITE)
+    unittest.main(verbosity=2)
