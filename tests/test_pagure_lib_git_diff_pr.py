@@ -19,7 +19,7 @@ import tempfile  # noqa
 import os  # noqa
 
 import pygit2  # noqa
-from mock import patch  # noqa
+from mock import patch, MagicMock  # noqa
 
 sys.path.insert(0, os.path.join(os.path.dirname(
     os.path.abspath(__file__)), '..'))
@@ -32,6 +32,7 @@ from pagure.lib.repo import PagureRepo  # noqa
 class PagureFlaskForkPrtests(tests.Modeltests):
     """ Tests for flask fork controller of pagure regarding diffing PRs """
 
+    @patch('pagure.lib.notify.send_email', MagicMock(return_value=True))
     def setUp(self):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskForkPrtests, self).setUp()
@@ -43,6 +44,32 @@ class PagureFlaskForkPrtests(tests.Modeltests):
             self.path, 'docs')
         pagure.APP.config['REQUESTS_FOLDER'] = os.path.join(
             self.path, 'requests')
+
+        # Create the main project in the DB
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test',
+            description='test project #1',
+            hook_token='aaabbbccc',
+        )
+        item.close_status = [
+            'Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
+        self.session.add(item)
+        self.session.commit()
+
+        # Create the fork
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test',
+            description='test project #1',
+            hook_token='aaabbbcccdd',
+            parent_id=1,
+            is_fork=True,
+        )
+        item.close_status = [
+            'Invalid', 'Insufficient data', 'Fixed', 'Duplicate']
+        self.session.add(item)
+        self.session.commit()
 
         # Create two git repos, one has 6 commits, the other 4 of which only
         # 1 isn't present in the first repo
@@ -162,6 +189,24 @@ class PagureFlaskForkPrtests(tests.Modeltests):
 
         shutil.rmtree(newpath)
 
+        # Create the PR between the two repos
+        repo = pagure.lib.get_project(self.session, 'test')
+        forked_repo = pagure.lib.get_project(
+            self.session, 'test', user='pingou')
+
+        req = pagure.lib.new_pull_request(
+            session=self.session,
+            repo_from=forked_repo,
+            branch_from='feature_foo',
+            repo_to=repo,
+            branch_to='master',
+            title='test pull-request',
+            user='pingou',
+            requestfolder=None,
+        )
+        self.assertEqual(req.id, 1)
+        self.assertEqual(req.title, 'test pull-request')
+
     def test_get_pr_info(self):
         """ Test pagure.ui.fork._get_pr_info """
 
@@ -183,6 +228,54 @@ class PagureFlaskForkPrtests(tests.Modeltests):
         self.assertEqual(
             orig_commit.message,
             'Editing the file sources for testing #5'
+        )
+
+    def test_get_pr_info_raises(self):
+        """ Test pagure.ui.fork._get_pr_info """
+
+        gitrepo = os.path.join(self.path, 'repos', 'test.git')
+        gitrepo2 = os.path.join(
+            self.path, 'repos', 'forks', 'pingou', 'test.git')
+
+        self.assertRaises(
+            pagure.exceptions.BranchNotFoundException,
+            pagure.lib.git.get_diff_info,
+            repo_obj=PagureRepo(gitrepo2),
+            orig_repo=PagureRepo(gitrepo),
+            branch_from='feature',
+            branch_to='master'
+        )
+
+        self.assertRaises(
+            pagure.exceptions.BranchNotFoundException,
+            pagure.lib.git.get_diff_info,
+            repo_obj=PagureRepo(gitrepo2),
+            orig_repo=PagureRepo(gitrepo),
+            branch_from='feature_foo',
+            branch_to='bar'
+        )
+
+    def test_diff_pull_request(self):
+        """ Test pagure.lib.git.diff_pull_request """
+        gitrepo = os.path.join(self.path, 'repos', 'test.git')
+        gitrepo2 = os.path.join(
+            self.path, 'repos', 'forks', 'pingou', 'test.git')
+        request = pagure.lib.search_pull_requests(
+            self.session, requestid=1, project_id=1)
+
+        diff_commits, diff = pagure.lib.git.diff_pull_request(
+            self.session,
+            request=request,
+            repo_obj=PagureRepo(gitrepo2),
+            orig_repo=PagureRepo(gitrepo),
+            requestfolder=None,
+            with_diff=True
+        )
+
+        self.assertEqual(len(diff_commits), 1)
+        self.assertEqual(
+            diff_commits[0].message,
+            'New edition on side branch of the file sources for testing'
         )
 
 
