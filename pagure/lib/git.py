@@ -799,84 +799,89 @@ def add_file_to_git(repo, issue, ticketfolder, user, filename, filestream):
     # Get the fork
     repopath = os.path.join(ticketfolder, repo.path)
 
-    # Clone the repo into a temp folder
-    newpath = tempfile.mkdtemp(prefix='pagure-')
-    new_repo = pygit2.clone_repository(repopath, newpath)
+    lockfile = '%s.lock' % repopath
 
-    folder_path = os.path.join(newpath, 'files')
-    file_path = os.path.join(folder_path, filename)
+    lock = filelock.FileLock(lockfile)
+    with lock:
 
-    # Get the current index
-    index = new_repo.index
+        # Clone the repo into a temp folder
+        newpath = tempfile.mkdtemp(prefix='pagure-')
+        new_repo = pygit2.clone_repository(repopath, newpath)
 
-    # Are we adding files
-    added = False
-    if not os.path.exists(file_path):
-        added = True
-    else:
-        # File exists, remove the clone and return
+        folder_path = os.path.join(newpath, 'files')
+        file_path = os.path.join(folder_path, filename)
+
+        # Get the current index
+        index = new_repo.index
+
+        # Are we adding files
+        added = False
+        if not os.path.exists(file_path):
+            added = True
+        else:
+            # File exists, remove the clone and return
+            shutil.rmtree(newpath)
+            return os.path.join('files', filename)
+
+        if not os.path.exists(folder_path):
+            os.mkdir(folder_path)
+
+        # Write down what changed
+        filestream.seek(0)
+        with open(file_path, 'w') as stream:
+            stream.write(filestream.read())
+
+        # Retrieve the list of files that changed
+        diff = new_repo.diff()
+        files = [patch.new_file_path for patch in diff]
+
+        # Add the changes to the index
+        if added:
+            index.add(os.path.join('files', filename))
+        for filename in files:
+            index.add(filename)
+
+        # If not change, return
+        if not files and not added:
+            shutil.rmtree(newpath)
+            return
+
+        # See if there is a parent to this commit
+        parent = None
+        try:
+            parent = new_repo.head.get_object().oid
+        except pygit2.GitError:
+            pass
+
+        parents = []
+        if parent:
+            parents.append(parent)
+
+        # Author/commiter will always be this one
+        author = pygit2.Signature(
+            name=user.username.encode('utf-8'),
+            email=user.default_email.encode('utf-8')
+        )
+
+        # Actually commit
+        new_repo.create_commit(
+            'refs/heads/master',
+            author,
+            author,
+            'Add file %s to ticket %s: %s' % (filename, issue.uid, issue.title),
+            new_repo.index.write_tree(),
+            parents)
+        index.write()
+
+        # Push to origin
+        ori_remote = new_repo.remotes[0]
+        master_ref = new_repo.lookup_reference('HEAD').resolve()
+        refname = '%s:%s' % (master_ref.name, master_ref.name)
+
+        PagureRepo.push(ori_remote, refname)
+
+        # Remove the clone
         shutil.rmtree(newpath)
-        return os.path.join('files', filename)
-
-    if not os.path.exists(folder_path):
-        os.mkdir(folder_path)
-
-    # Write down what changed
-    filestream.seek(0)
-    with open(file_path, 'w') as stream:
-        stream.write(filestream.read())
-
-    # Retrieve the list of files that changed
-    diff = new_repo.diff()
-    files = [patch.new_file_path for patch in diff]
-
-    # Add the changes to the index
-    if added:
-        index.add(os.path.join('files', filename))
-    for filename in files:
-        index.add(filename)
-
-    # If not change, return
-    if not files and not added:
-        shutil.rmtree(newpath)
-        return
-
-    # See if there is a parent to this commit
-    parent = None
-    try:
-        parent = new_repo.head.get_object().oid
-    except pygit2.GitError:
-        pass
-
-    parents = []
-    if parent:
-        parents.append(parent)
-
-    # Author/commiter will always be this one
-    author = pygit2.Signature(
-        name=user.username.encode('utf-8'),
-        email=user.default_email.encode('utf-8')
-    )
-
-    # Actually commit
-    new_repo.create_commit(
-        'refs/heads/master',
-        author,
-        author,
-        'Add file %s to ticket %s: %s' % (filename, issue.uid, issue.title),
-        new_repo.index.write_tree(),
-        parents)
-    index.write()
-
-    # Push to origin
-    ori_remote = new_repo.remotes[0]
-    master_ref = new_repo.lookup_reference('HEAD').resolve()
-    refname = '%s:%s' % (master_ref.name, master_ref.name)
-
-    PagureRepo.push(ori_remote, refname)
-
-    # Remove the clone
-    shutil.rmtree(newpath)
 
     return os.path.join('files', filename)
 
