@@ -28,6 +28,15 @@ from pagure import (APP, SESSION, login_required, is_safe_url,
 _log = logging.getLogger(__name__)
 
 
+def _get_user(username):
+    """ Check if user exists or not
+    """
+    try:
+        return pagure.lib.get_user(SESSION, username)
+    except pagure.exceptions.PagureException as e:
+        flask.abort(404, e.message)
+
+
 @APP.route('/browse/projects', endpoint='browse_projects')
 @APP.route('/browse/projects/', endpoint='browse_projects')
 @APP.route('/')
@@ -76,10 +85,7 @@ def index():
 def index_auth():
     """ Front page for authenticated user.
     """
-    user = pagure.lib.search_user(SESSION, username=flask.g.fas_user.username)
-    if not user:
-        flask.abort(404, 'No user `%s` found, re-login maybe?' % (
-            flask.g.fas_user.username))
+    user = _get_user(username=flask.g.fas_user.username)
 
     repopage = flask.request.args.get('repopage', 1)
     try:
@@ -296,9 +302,7 @@ def view_projects(pattern=None, namespace=None):
 def view_user(username):
     """ Front page of a specific user.
     """
-    user = pagure.lib.search_user(SESSION, username=username)
-    if not user:
-        flask.abort(404, 'No user `%s` found' % username)
+    user = _get_user(username=username)
 
     repopage = flask.request.args.get('repopage', 1)
     try:
@@ -377,9 +381,7 @@ def view_user(username):
 def view_user_requests(username):
     """ Shows the pull-requests for the specified user.
     """
-    user = pagure.lib.search_user(SESSION, username=username)
-    if not user:
-        flask.abort(404, 'No user `%s` found' % username)
+    user = _get_user(username=username)
 
     requests = pagure.lib.get_pull_request_of_user(
         SESSION,
@@ -407,9 +409,7 @@ def view_user_issues(username):
     if not APP.config.get('ENABLE_TICKETS', True):
         flask.abort(404, 'Tickets have been disabled on this pagure instance')
 
-    user = pagure.lib.search_user(SESSION, username=username)
-    if not user:
-        flask.abort(404, 'No user `%s` found' % username)
+    user = _get_user(username=username)
 
     return flask.render_template(
         'user_issues.html',
@@ -531,10 +531,7 @@ def user_settings():
         return flask.redirect(
             flask.url_for('auth_login', next=flask.request.url))
 
-    user = pagure.lib.search_user(
-        SESSION, username=flask.g.fas_user.username)
-    if not user:
-        flask.abort(404, 'User not found')
+    user = _get_user(username=flask.g.fas_user.username)
 
     form = pagure.forms.UserSettingsForm()
     if form.validate_on_submit():
@@ -578,10 +575,7 @@ def update_user_settings():
         return flask.redirect(
             flask.url_for('auth_login', next=flask.request.url))
 
-    user = pagure.lib.search_user(
-        SESSION, username=flask.g.fas_user.username)
-    if not user:
-        flask.abort(404, 'User not found')
+    user = _get_user(username=flask.g.fas_user.username)
 
     form = pagure.forms.ConfirmationForm()
 
@@ -632,10 +626,7 @@ def remove_user_email():
         return flask.redirect(
             flask.url_for('auth_login', next=flask.request.url))
 
-    user = pagure.lib.search_user(
-        SESSION, username=flask.g.fas_user.username)
-    if not user:
-        flask.abort(404, 'User not found')
+    user = _get_user(username=flask.g.fas_user.username)
 
     if len(user.emails) == 1:
         flask.flash(
@@ -683,10 +674,7 @@ def add_user_email():
         return flask.redirect(
             flask.url_for('auth_login', next=flask.request.url))
 
-    user = pagure.lib.search_user(
-        SESSION, username=flask.g.fas_user.username)
-    if not user:
-        flask.abort(404, 'User not found')
+    user = _get_user(username=flask.g.fas_user.username)
 
     form = pagure.forms.UserEmailForm(
         emails=[mail.email for mail in user.emails])
@@ -721,10 +709,7 @@ def set_default_email():
         return flask.redirect(
             flask.url_for('auth_login', next=flask.request.url))
 
-    user = pagure.lib.search_user(
-        SESSION, username=flask.g.fas_user.username)
-    if not user:
-        flask.abort(404, 'User not found')
+    user = _get_user(username=flask.g.fas_user.username)
 
     form = pagure.forms.UserEmailForm()
     if form.validate_on_submit():
@@ -762,10 +747,7 @@ def reconfirm_email():
         return flask.redirect(
             flask.url_for('auth_login', next=flask.request.url))
 
-    user = pagure.lib.search_user(
-        SESSION, username=flask.g.fas_user.username)
-    if not user:
-        flask.abort(404, 'User not found')
+    user = _get_user(username=flask.g.fas_user.username)
 
     form = pagure.forms.UserEmailForm()
     if form.validate_on_submit():
@@ -837,10 +819,7 @@ def add_api_user_token():
             flask.url_for('auth_login', next=flask.request.url))
 
     # Ensure the user is in the DB at least
-    user = pagure.lib.search_user(
-        SESSION, username=flask.g.fas_user.username)
-    if not user:
-        flask.abort(404, 'User not found')
+    user = _get_user(username=flask.g.fas_user.username)
 
     acls = pagure.lib.get_acls(
         SESSION, restrict=APP.config.get('CROSS_PROJECT_ACLS'))

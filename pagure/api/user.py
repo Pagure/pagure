@@ -21,6 +21,15 @@ from pagure import SESSION
 from pagure.api import API, api_method, APIERROR
 
 
+def _get_user(username):
+    """ Check user is valid or not
+    """
+    try:
+        return pagure.lib.get_user(SESSION, username)
+    except pagure.exceptions.PagureException:
+        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOUSER)
+
+
 @API.route('/user/<username>')
 @api_method
 def api_view_user(username):
@@ -90,9 +99,7 @@ def api_view_user(username):
     httpcode = 200
     output = {}
 
-    user = pagure.lib.search_user(SESSION, username=username)
-    if not user:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOUSER)
+    user = _get_user(username=username)
 
     repopage = flask.request.args.get('repopage', 1)
     try:
@@ -203,9 +210,7 @@ def api_view_user_activity_stats(username):
     """
     date_format = flask.request.args.get('format', 'isoformat')
 
-    user = pagure.lib.search_user(SESSION, username=username)
-    if not user:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOUSER)
+    user = _get_user(username=username)
 
     stats = pagure.lib.get_yearly_stats_user(
         SESSION,
@@ -310,9 +315,7 @@ def api_view_user_activity_date(username, date):
         raise pagure.exceptions.APIError(
             400, error_code=APIERROR.ENOCODE, error=str(err))
 
-    user = pagure.lib.search_user(SESSION, username=username)
-    if not user:
-        raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOUSER)
+    user = _get_user(username=username)
 
     activities = pagure.lib.get_user_activity_day(SESSION, user, date)
     js_act = []
