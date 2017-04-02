@@ -293,6 +293,7 @@ def get_pull_request_ready_branch():
             main_commits = set()
             branch_commits = list()
             while 1:
+                com = None
                 if compare_branch:
                     try:
                         com = main_walker.next()
