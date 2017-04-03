@@ -717,7 +717,7 @@ function try_async_comment(form) {
 {% endif %}
 <script type="text/javascript">
 
-{% if authenticated and g.repo_admin %}
+{% if authenticated and g.repo_user %}
 function take_issue(){
   var _url = "{{ url_for('api_ns.api_assign_issue',
             repo=repo.name, namespace=repo.namespace, username=username,
@@ -739,7 +739,7 @@ function take_issue(){
 {% endif %}
 
 {% if authenticated and (
-    g.repo_admin
+    g.repo_user
     or issue.user.user == g.fas_user.username
     or issue.assignee.user == g.fas_user.username) %}
 function drop_issue(){
