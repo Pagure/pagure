@@ -947,6 +947,210 @@ repo requests/forks/pingou/test2
         os.unlink(outputconf)
         self.assertFalse(os.path.exists(outputconf))
 
+    def test_write_gitolite_project_pr_only(self):
+        """ Test the write_gitolite_acls function of pagure.lib.git.
+        when the project enforces the PR approach.
+        """
+        tests.create_projects(self.session)
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        # Make the project enforce the PR workflow
+        settings = repo.settings
+        settings['pull_request_access_only'] = True
+        repo.settings = settings
+        self.session.add(repo)
+        self.session.commit()
+
+        # Add an user to a project
+        # The user will be an admin of the project
+        msg = pagure.lib.add_user_to_project(
+            session=self.session,
+            project=repo,
+            new_user='foo',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User added')
+        # Add a forked project
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test3',
+            description='test project #2',
+            is_fork=True,
+            parent_id=1,
+            hook_token='aaabbbvvv',
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        outputconf = os.path.join(self.path, 'test_gitolite.conf')
+
+        pagure.lib.git.write_gitolite_acls(self.session, outputconf)
+
+        self.assertTrue(os.path.exists(outputconf))
+
+        with open(outputconf) as stream:
+            data = stream.read()
+
+        exp = """
+repo docs/test
+  R   = @all
+  RW+ = pingou
+  RW+ = foo
+
+repo tickets/test
+  RW+ = pingou
+  RW+ = foo
+
+repo requests/test
+  RW+ = pingou
+  RW+ = foo
+
+repo test2
+  R   = @all
+  RW+ = pingou
+
+repo docs/test2
+  R   = @all
+  RW+ = pingou
+
+repo tickets/test2
+  RW+ = pingou
+
+repo requests/test2
+  RW+ = pingou
+
+repo somenamespace/test3
+  R   = @all
+  RW+ = pingou
+
+repo docs/somenamespace/test3
+  R   = @all
+  RW+ = pingou
+
+repo tickets/somenamespace/test3
+  RW+ = pingou
+
+repo requests/somenamespace/test3
+  RW+ = pingou
+
+repo forks/pingou/test3
+  R   = @all
+  RW+ = pingou
+
+repo docs/forks/pingou/test3
+  R   = @all
+  RW+ = pingou
+
+repo tickets/forks/pingou/test3
+  RW+ = pingou
+
+repo requests/forks/pingou/test3
+  RW+ = pingou
+
+"""
+        #print data
+        self.assertEqual(data, exp)
+
+        os.unlink(outputconf)
+        self.assertFalse(os.path.exists(outputconf))
+
+    def test_write_gitolite_global_pr_only(self):
+        """ Test the write_gitolite_acls function of pagure.lib.git.
+        when the project enforces the PR approach.
+        """
+        tests.create_projects(self.session)
+
+        pagure.APP.config['PR_ONLY'] = True
+
+        repo = pagure.lib.get_project(self.session, 'test')
+        # Add an user to a project
+        # The user will be an admin of the project
+        msg = pagure.lib.add_user_to_project(
+            session=self.session,
+            project=repo,
+            new_user='foo',
+            user='pingou',
+        )
+        self.session.commit()
+        self.assertEqual(msg, 'User added')
+        # Add a forked project
+        item = pagure.lib.model.Project(
+            user_id=1,  # pingou
+            name='test3',
+            description='test project #2',
+            is_fork=True,
+            parent_id=1,
+            hook_token='aaabbbvvv',
+        )
+        self.session.add(item)
+        self.session.commit()
+
+        outputconf = os.path.join(self.path, 'test_gitolite.conf')
+
+        pagure.lib.git.write_gitolite_acls(self.session, outputconf)
+
+        self.assertTrue(os.path.exists(outputconf))
+
+        with open(outputconf) as stream:
+            data = stream.read()
+
+        exp = """
+repo docs/test
+  R   = @all
+  RW+ = pingou
+  RW+ = foo
+
+repo tickets/test
+  RW+ = pingou
+  RW+ = foo
+
+repo requests/test
+  RW+ = pingou
+  RW+ = foo
+
+repo docs/test2
+  R   = @all
+  RW+ = pingou
+
+repo tickets/test2
+  RW+ = pingou
+
+repo requests/test2
+  RW+ = pingou
+
+repo docs/somenamespace/test3
+  R   = @all
+  RW+ = pingou
+
+repo tickets/somenamespace/test3
+  RW+ = pingou
+
+repo requests/somenamespace/test3
+  RW+ = pingou
+
+repo forks/pingou/test3
+  R   = @all
+  RW+ = pingou
+
+repo docs/forks/pingou/test3
+  R   = @all
+  RW+ = pingou
+
+repo tickets/forks/pingou/test3
+  RW+ = pingou
+
+repo requests/forks/pingou/test3
+  RW+ = pingou
+
+"""
+        #print data
+        self.assertEqual(data, exp)
+
+        os.unlink(outputconf)
+        self.assertFalse(os.path.exists(outputconf))
+        pagure.APP.config['PR_ONLY'] = False
+
     def test_commit_to_patch(self):
         """ Test the commit_to_patch function of pagure.lib.git. """
         # Create a git repo to play with
@@ -1403,7 +1607,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,98 @@
+@@ -0,0 +1,100 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
@@ -1439,6 +1643,7 @@ index 0000000..60f7480
 +            "issue_tracker": true,
 +            "issues_default_to_private": false,
 +            "project_documentation": false,
++            "pull_request_access_only": false,
 +            "pull_requests": true
 +        },
 +        "tags": [],
@@ -1475,6 +1680,7 @@ index 0000000..60f7480
 +            "issue_tracker": true,
 +            "issues_default_to_private": false,
 +            "project_documentation": false,
++            "pull_request_access_only": false,
 +            "pull_requests": true
 +        },
 +        "tags": [],

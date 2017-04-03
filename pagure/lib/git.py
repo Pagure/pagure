@@ -88,6 +88,7 @@ def write_gitolite_acls(session, configfile):
     ''' Generate the configuration file for gitolite for all projects
     on the forge.
     '''
+    global_pr_only = pagure.APP.config.get('PR_ONLY', False)
     config = []
     groups = {}
     for project in session.query(model.Project).all():
@@ -96,8 +97,16 @@ def write_gitolite_acls(session, configfile):
                 groups[group.group_name] = [
                     user.username for user in group.users]
 
+        # Check if the project or the pagure instance enforce the PR only
+        # development model.
+        pr_only = project.settings.get(
+            'pull_request_access_only', False) or global_pr_only
+
         for repos in ['repos', 'docs/', 'tickets/', 'requests/']:
             if repos == 'repos':
+                # Do not grand access to project enforcing the PR model
+                if pr_only and not project.is_fork:
+                    continue
                 repos = ''
 
             config.append('repo %s%s' % (repos, project.fullname))

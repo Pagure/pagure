@@ -487,6 +487,7 @@ class Project(BASE):
             'always_merge': False,
             'issues_default_to_private': False,
             'fedmsg_notifications': True,
+            'pull_request_access_only': False,
         }
 
         if self._settings:

@@ -121,6 +121,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                     "issue_tracker": True,
                     "issues_default_to_private": False,
                     "project_documentation": False,
+                    "pull_request_access_only": False,
                     "pull_requests": True
                   },
                   "tags": [],
@@ -156,6 +157,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                     "issue_tracker": True,
                     "issues_default_to_private": False,
                     "project_documentation": False,
+                    "pull_request_access_only": False,
                     "pull_requests": True
                   },
                   "tags": [],
@@ -191,6 +193,7 @@ class PagureFlaskApiUSertests(tests.Modeltests):
                     "issue_tracker": True,
                     "issues_default_to_private": False,
                     "project_documentation": False,
+                    "pull_request_access_only": False,
                     "pull_requests": True
                   },
                   "tags": [],

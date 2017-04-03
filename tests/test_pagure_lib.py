@@ -1390,6 +1390,7 @@ class PagureLibtests(tests.Modeltests):
                 'always_merge': False,
                 'issues_default_to_private': False,
                 'fedmsg_notifications': True,
+                'pull_request_access_only': False,
             },
             user='pingou',
         )
@@ -1408,6 +1409,7 @@ class PagureLibtests(tests.Modeltests):
                 'Enforce_signed-off_commits_in_pull-request': False,
                 'issues_default_to_private': False,
                 'fedmsg_notifications': True,
+                'pull_request_access_only': False,
             },
             user='pingou',
         )
