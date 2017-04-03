@@ -94,8 +94,9 @@ def _check_issue_access_repo_commiter(issue):
     :raises pagure.exceptions.APIError: when access denied
     """
     if (
-        issue.private and
-        not is_repo_committer(issue.project) and (
+        issue.private
+        and not is_repo_committer(issue.project)
+        and (
             not api_authenticated() or
             not issue.user.user == flask.g.fas_user.username
         )
