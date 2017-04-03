@@ -336,11 +336,11 @@ class PagureLibtests(tests.Modeltests):
 
         self.test_new_issue()
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=2)
 
         # Set some priorities to the repo
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         repo.priorities = {'1': 'High', '2': 'Normal'}
         self.session.add(repo)
         self.session.commit()

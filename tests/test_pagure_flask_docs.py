@@ -141,7 +141,7 @@ class PagureFlaskDocstests(tests.Modeltests):
         docs.
         """
         tests.create_projects(self.session)
-        repo = pagure.lib._get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         tests.create_projects_git(os.path.join(self.path, 'docs'))
 
         output = self.app.get('/test/docs')
@@ -164,51 +164,6 @@ class PagureFlaskDocstests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         self._set_up_doc()
-        # forked doc repo
-        docrepo = os.path.join(self.path, 'docs', 'test', 'test.git')
-        repo = pygit2.init_repository(docrepo)
-
-        # Create files in that git repo
-        with open(os.path.join(docrepo, 'sources'), 'w') as stream:
-            stream.write('foo\n bar')
-        repo.index.add('sources')
-        repo.index.write()
-
-        folderpart = os.path.join(docrepo, 'folder1', 'folder2')
-        os.makedirs(folderpart)
-        with open(os.path.join(folderpart, 'test_file'), 'w') as stream:
-            stream.write('row1\nrow2\nrow3')
-        repo.index.add(os.path.join('folder1', 'folder2', 'test_file'))
-        repo.index.write()
-
-        # Commits the files added
-        tree = repo.index.write_tree()
-        author = pygit2.Signature(
-            'Alice Author', 'alice@authors.tld')
-        committer = pygit2.Signature(
-            'Cecil Committer', 'cecil@committers.tld')
-        repo.create_commit(
-            'refs/heads/master',  # the name of the reference to update
-            author,
-            committer,
-            'Add test files and folder',
-            # binary string representing the tree object ID
-            tree,
-            # list of binary strings representing parents of the new commit
-            []
-        )
-
-        # Push the changes to the bare repo
-        remote = repo.create_remote(
-            'origin', os.path.join(self.path, 'docs', 'test.git'))
-
-        PagureRepo.push(remote, 'refs/heads/master:refs/heads/master')
-
-        # Turn on the docs project since it's off by default
-        repo = pagure.get_authorized_project(self.session, 'test')
-        repo.settings = {'project_documentation': True}
-        self.session.add(repo)
-        self.session.commit()
 
         # Now check the UI
 

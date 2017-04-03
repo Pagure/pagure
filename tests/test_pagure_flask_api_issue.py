@@ -2025,7 +2025,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         tests.create_tokens_acl(self.session)
 
         # Set some milestones to the project
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         repo.milestones = {'v1.0': None, 'v2.0': 'Soon'}
         self.session.add(repo)
         self.session.commit()
@@ -2065,7 +2065,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         )
 
         # Create normal issue
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -2079,7 +2079,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         self.assertEqual(msg.title, 'Test issue #1')
 
         # Check milestone before
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.milestone, None)
 
@@ -2098,7 +2098,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         )
 
         # No change
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.milestone, None)
 
@@ -2162,7 +2162,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         )
 
         # Change recorded
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.milestone, None)
 
@@ -2202,7 +2202,7 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
         )
 
         # Change recorded
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         issue = pagure.lib.search_issues(self.session, repo, issueid=1)
         self.assertEqual(issue.milestone, None)
 

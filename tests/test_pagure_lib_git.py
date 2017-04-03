@@ -1776,7 +1776,7 @@ index 0000000..60f7480
         """ Test the update_ticket_from_git method from pagure.lib.git. """
         tests.create_projects(self.session)
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
 
         # Before
         self.assertEqual(len(repo.issues), 0)
