@@ -1405,7 +1405,7 @@ class PagureLibtests(tests.Modeltests):
                 'pull_requests': False,
                 'Only_assignee_can_merge_pull-request': None,
                 'Minimum_score_to_merge_pull-request': None,
-                'Web-hooks': '',
+                'Web-hooks': 'https://pagure.io/foobar',
                 'Enforce_signed-off_commits_in_pull-request': False,
                 'issues_default_to_private': False,
                 'fedmsg_notifications': True,

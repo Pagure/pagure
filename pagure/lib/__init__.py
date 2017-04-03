@@ -1725,25 +1725,33 @@ def update_project_settings(session, repo, settings, user):
     new_settings = repo.settings
     for key in new_settings:
         if key in settings:
+            if key == 'Minimum_score_to_merge_pull-request':
+                try:
+                    settings[key] = int(settings[key]) \
+                        if settings[key] else -1
+                except (ValueError, TypeError):
+                    raise pagure.exceptions.PagureException(
+                        "Please enter a numeric value for the 'minimum "
+                        "score to merge pull request' field.")
+            elif key == 'Web-hooks':
+                settings[key] = settings[key] or None
+            else:
+                # All the remaining keys are boolean, so True is provided
+                # as 'y' by the html, let's convert it back
+                settings[key] = settings[key] in ['y', True]
+
             if new_settings[key] != settings[key]:
                 update.append(key)
-                if key == 'Minimum_score_to_merge_pull-request':
-                    try:
-                        settings[key] = int(settings[key]) \
-                            if settings[key] else -1
-                    except (ValueError, TypeError):
-                        raise pagure.exceptions.PagureException(
-                            "Please enter a numeric value for the 'minimum "
-                            "score to merge pull request' field.")
-                elif key == 'Web-hooks':
-                    settings[key] = settings[key] or None
                 new_settings[key] = settings[key]
         else:
-            update.append(key)
             val = False
             if key == 'Web-hooks':
                 val = None
-            new_settings[key] = val
+
+            # Ensure the default value is different from what is stored.
+            if new_settings[key] != val:
+                update.append(key)
+                new_settings[key] = val
 
     if not update:
         return 'No settings to change'
