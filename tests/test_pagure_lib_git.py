@@ -1057,7 +1057,7 @@ repo requests/forks/pingou/test3
 
     def test_write_gitolite_global_pr_only(self):
         """ Test the write_gitolite_acls function of pagure.lib.git.
-        when the project enforces the PR approach.
+        when the pagure instance enforces the PR approach.
         """
         tests.create_projects(self.session)
 

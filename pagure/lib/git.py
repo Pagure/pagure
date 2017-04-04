@@ -104,7 +104,7 @@ def write_gitolite_acls(session, configfile):
 
         for repos in ['repos', 'docs/', 'tickets/', 'requests/']:
             if repos == 'repos':
-                # Do not grand access to project enforcing the PR model
+                # Do not grant access to project enforcing the PR model
                 if pr_only and not project.is_fork:
                     continue
                 repos = ''
