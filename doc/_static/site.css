@@ -14,3 +14,5 @@ h1.pagure-logo {
     margin-top: -10px;
     margin-bottom: 12px;
 }
+
+.strike { text-decoration: line-through; }
