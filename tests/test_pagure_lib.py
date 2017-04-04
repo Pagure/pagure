@@ -2037,6 +2037,7 @@ class PagureLibtests(tests.Modeltests):
         mockemail.return_value = True
 
         self.test_new_pull_request()
+        tests.create_tokens(self.session)
 
         request = pagure.lib.search_pull_requests(self.session, requestid=1)
         self.assertEqual(len(request.flags), 0)
@@ -2050,12 +2051,14 @@ class PagureLibtests(tests.Modeltests):
             url="http://jenkins.cloud.fedoraproject.org",
             uid="jenkins_build_pagure_34",
             user='foo',
+            token='aaabbbcccddd',
             requestfolder=None,
         )
         self.assertEqual(msg, 'Flag added')
         self.session.commit()
 
         self.assertEqual(len(request.flags), 1)
+        self.assertEqual(request.flags[0].token_id, 'aaabbbcccddd')
 
     def test_search_pull_requests(self):
         """ Test search_pull_requests of pagure.lib. """

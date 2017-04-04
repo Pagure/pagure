@@ -1705,6 +1705,11 @@ class PullRequestFlag(BASE):
             'pull_requests.uid', ondelete='CASCADE', onupdate='CASCADE',
         ),
         nullable=False)
+    token_id = sa.Column(
+        sa.String(64), sa.ForeignKey(
+            'tokens.id',
+        ),
+        nullable=False)
     user_id = sa.Column(
         sa.Integer,
         sa.ForeignKey(

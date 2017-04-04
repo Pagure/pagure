@@ -681,6 +681,7 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
                 url=url,
                 uid=uid,
                 user=flask.g.fas_user.username,
+                token=flask.g.token.id,
                 requestfolder=APP.config['REQUESTS_FOLDER'],
             )
             SESSION.commit()

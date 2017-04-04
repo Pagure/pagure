@@ -1218,7 +1218,7 @@ def edit_comment(session, parent, comment, user,
 
 
 def add_pull_request_flag(session, request, username, percent, comment, url,
-                          uid, user, requestfolder):
+                          uid, user, token, requestfolder):
     ''' Add a flag to a pull-request. '''
     user_obj = get_user(session, user)
 
@@ -1238,6 +1238,7 @@ def add_pull_request_flag(session, request, username, percent, comment, url,
             comment=comment,
             url=url,
             user_id=user_obj.id,
+            token_id=token,
         )
     session.add(pr_flag)
     # Make sure we won't have SQLAlchemy error before we continue
