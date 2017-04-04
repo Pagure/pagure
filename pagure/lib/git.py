@@ -99,13 +99,12 @@ def write_gitolite_acls(session, configfile):
 
         # Check if the project or the pagure instance enforce the PR only
         # development model.
-        pr_only = project.settings.get(
-            'pull_request_access_only', False) or global_pr_only
+        pr_only = project.settings.get('pull_request_access_only', False)
 
         for repos in ['repos', 'docs/', 'tickets/', 'requests/']:
             if repos == 'repos':
                 # Do not grant access to project enforcing the PR model
-                if pr_only and not project.is_fork:
+                if pr_only or (global_pr_only and not project.is_fork):
                     continue
                 repos = ''
 
