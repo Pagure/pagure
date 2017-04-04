@@ -123,7 +123,8 @@ def api_pull_request_views(repo, username=None, namespace=None):
 
     """
 
-    repo = pagure.get_authorized_project(SESSION, repo, user=username, namespace=namespace)
+    repo = pagure.get_authorized_project(
+        SESSION, repo, user=username, namespace=namespace)
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
@@ -248,7 +249,8 @@ def api_pull_request_view(repo, requestid, username=None, namespace=None):
 
     """
 
-    repo = pagure.get_authorized_project(SESSION, repo, user=username, namespace=namespace)
+    repo = pagure.get_authorized_project(
+        SESSION, repo, user=username, namespace=namespace)
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
@@ -306,7 +308,8 @@ def api_pull_request_merge(repo, requestid, username=None, namespace=None):
     """  # noqa
     output = {}
 
-    repo = pagure.get_authorized_project(SESSION, repo, user=username, namespace=namespace)
+    repo = pagure.get_authorized_project(
+        SESSION, repo, user=username, namespace=namespace)
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
@@ -392,7 +395,8 @@ def api_pull_request_close(repo, requestid, username=None, namespace=None):
     """  # noqa
     output = {}
 
-    repo = pagure.get_authorized_project(SESSION, repo, user=username, namespace=namespace)
+    repo = pagure.get_authorized_project(
+        SESSION, repo, user=username, namespace=namespace)
 
     if repo is None:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOPROJECT)
@@ -494,7 +498,8 @@ def api_pull_request_add_comment(
         }
 
     """  # noqa
-    repo = pagure.get_authorized_project(SESSION, repo, user=username, namespace=namespace)
+    repo = pagure.get_authorized_project(
+        SESSION, repo, user=username, namespace=namespace)
 
     output = {}
 
@@ -637,7 +642,8 @@ def api_pull_request_add_flag(repo, requestid, username=None, namespace=None):
         }
 
     """  # noqa
-    repo = pagure.get_authorized_project(SESSION, repo, user=username, namespace=namespace)
+    repo = pagure.get_authorized_project(
+        SESSION, repo, user=username, namespace=namespace)
 
     output = {}
 

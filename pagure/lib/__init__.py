@@ -140,6 +140,7 @@ def get_next_id(session, projectid):
 
 def search_user(session, username=None, email=None, token=None, pattern=None):
     ''' Searches the database for the user or users matching the given
+    criterias.
 
     :arg session: the session to use to connect to the database.
     :kwarg username: the username of the user to look for.
@@ -609,8 +610,6 @@ def add_issue_dependency(
             repofolder=ticketfolder)
 
         if not issue.private:
-        #pagure.lib.notify.notify_assigned_issue(issue, user_obj)
-        #pagure.lib.notify.notify_assigned_issue(issue_blocked, user_obj)
             pagure.lib.notify.log(
                 issue.project,
                 topic='issue.dependency.added',
@@ -668,8 +667,6 @@ def remove_issue_dependency(
             repofolder=ticketfolder)
 
         if not issue.private:
-        #pagure.lib.notify.notify_assigned_issue(issue, user_obj)
-        #pagure.lib.notify.notify_assigned_issue(issue_blocked, user_obj)
             pagure.lib.notify.log(
                 issue.project,
                 topic='issue.dependency.removed',
@@ -1129,8 +1126,8 @@ def add_pull_request_comment(session, request, commit, tree_id, filename,
         # Send notification to the CI server, if the comment added was a
         # notification and the PR is still open and project is not private
         if notification and request.status == 'Open' \
-                and request.project.ci_hook and PAGURE_CI \
-                    and not request.project.private:
+            and request.project.ci_hook and PAGURE_CI \
+                and not request.project.private:
             REDIS.publish('pagure.ci', json.dumps({
                 'ci_type': request.project.ci_hook.ci_type,
                 'pr': request.to_json(public=True, with_comments=False)
@@ -1188,17 +1185,18 @@ def edit_comment(session, parent, comment, user,
         id_ = 'issue_id'
         private = parent.private
 
-    pagure.lib.notify.log(
-        parent.project,
-        topic=topic,
-        msg={
-            key: parent.to_json(public=True, with_comments=False),
-            'project': parent.project.to_json(public=True),
-            'comment': comment.to_json(public=True),
-            'agent': user_obj.username,
-        },
-        redis=REDIS,
-    )
+    if not private:
+        pagure.lib.notify.log(
+            parent.project,
+            topic=topic,
+            msg={
+                key: parent.to_json(public=True, with_comments=False),
+                'project': parent.project.to_json(public=True),
+                'comment': comment.to_json(public=True),
+                'agent': user_obj.username,
+            },
+            redis=REDIS,
+        )
 
     if REDIS and not parent.project.private:
         if private:
@@ -2000,7 +1998,6 @@ def search_projects(
                         model.Project.private == True,
                     )
                 )
-
         )
 
     if fork is not None:
@@ -2012,7 +2009,6 @@ def search_projects(
             projects = projects.filter(
                 model.Project.is_fork == False
             )
-
     if tags:
         if not isinstance(tags, (list, tuple)):
             tags = [tags]
@@ -2022,7 +2018,6 @@ def search_projects(
         ).filter(
             model.TagProject.tag.in_(tags)
         )
-
 
     if pattern:
         pattern = pattern.replace('*', '%')

@@ -387,7 +387,7 @@ def get_authorized_project(session, project_name, user=None, namespace=None):
     :type namespace: String
     :return: The project object if project is public or user has
                 permissions for the project else it returns None
-    :rtype: Project or [Project]
+    :rtype: Project
 
     '''
     repo = pagure.lib._get_project(session, project_name, user, namespace)

@@ -615,6 +615,8 @@ class PagureFlaskApiIssuetests(tests.Modeltests):
             'title': 'test issue',
             'issue_content': 'This issue needs attention',
         }
+
+        # Valid request
         output = self.app.post(
             '/api/0/test/new_issue', data=data, headers=headers)
         self.assertEqual(output.status_code, 200)

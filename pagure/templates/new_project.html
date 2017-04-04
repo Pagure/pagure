@@ -21,7 +21,7 @@
             {{ render_bootstrap_field(form.url, field_description="url of the project's website") }}
             {{ render_bootstrap_field(form.avatar_email, field_description="libravatar email address avatar email") }}
             {% if config.get('PRIVATE_PROJECTS', False) %}
-                    {{ render_bootstrap_field(form.private, field_description="To mark the repo private") }}
+              {{ render_bootstrap_field(form.private, field_description="To mark the repo private") }}
             {% endif %}
             {{ render_bootstrap_field(form.create_readme, field_description="Create a README file automatically") }}
             <input class="btn btn-primary" type="submit" value="Create" title="Update description">

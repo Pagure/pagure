@@ -50,9 +50,8 @@ import pagure.forms
 import pagure
 import pagure.ui.plugins
 from pagure import (APP, SESSION, LOG, __get_file_in_tree, login_required,
-                    is_repo_admin, admin_session_timedout)
+                    admin_session_timedout)
 from pagure.lib import encoding_utils
-
 
 
 @APP.route('/<repo>.git')
@@ -2101,9 +2100,6 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
         flask.abort(
             403,
             'You are not allowed to change the settings for this project')
-
-    if repo.private and not is_repo_admin(repo):
-        flask.abort(401, 'Forbidden')
 
     user = pagure.lib.search_user(
         SESSION, username=flask.g.fas_user.username)

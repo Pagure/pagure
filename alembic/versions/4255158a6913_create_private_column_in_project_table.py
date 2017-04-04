@@ -26,7 +26,7 @@ def upgrade():
 
     op.alter_column(
         'projects',
-        column_name='private', new_column_name='private',
+        column_name='private',
         nullable=False, existing_nullable=True)
 
 
