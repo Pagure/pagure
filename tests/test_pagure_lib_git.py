@@ -1055,15 +1055,16 @@ repo requests/forks/pingou/test3
         os.unlink(outputconf)
         self.assertFalse(os.path.exists(outputconf))
 
+    @patch.dict('pagure.APP.config', {'PR_ONLY': True})
     def test_write_gitolite_global_pr_only(self):
         """ Test the write_gitolite_acls function of pagure.lib.git.
         when the pagure instance enforces the PR approach.
         """
         tests.create_projects(self.session)
 
-        pagure.APP.config['PR_ONLY'] = True
-
         repo = pagure.lib.get_project(self.session, 'test')
+        self.assertFalse(repo.settings['pull_request_access_only'])
+
         # Add an user to a project
         # The user will be an admin of the project
         msg = pagure.lib.add_user_to_project(
@@ -1149,7 +1150,6 @@ repo requests/forks/pingou/test3
 
         os.unlink(outputconf)
         self.assertFalse(os.path.exists(outputconf))
-        pagure.APP.config['PR_ONLY'] = False
 
     def test_commit_to_patch(self):
         """ Test the commit_to_patch function of pagure.lib.git. """
