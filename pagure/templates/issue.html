@@ -379,7 +379,7 @@
               </p>
             </div>
           </fieldset>
-          {% if authenticated and g.repo_admin %}
+          {% if authenticated and g.repo_user %}
             <fieldset class="form-group issue-custom-form">
               <label for="field"><strong>{{ field.name }}</strong></label>
               {% if field.key_type == 'list' %}
