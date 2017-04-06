@@ -1607,7 +1607,7 @@ new file mode 100644
 index 0000000..60f7480
 --- /dev/null
 +++ b/456
-@@ -0,0 +1,100 @@
+@@ -0,0 +1,126 @@
 +{
 +    "assignee": null,
 +    "branch": "master",
@@ -1622,6 +1622,19 @@ index 0000000..60f7480
 +    "initial_comment": null,
 +    "last_updated": null,
 +    "project": {
++        "access_groups": {
++            "admin": [],
++            "commit": [],
++            "ticket": []
++        },
++        "access_users": {
++            "admin": [],
++            "commit": [],
++            "owner": [
++                "pingou"
++            ],
++            "ticket": []
++        },
 +        "close_status": [],
 +        "custom_keys": [],
 +        "date_created": null,
@@ -1659,6 +1672,19 @@ index 0000000..60f7480
 +    },
 +    "remote_git": null,
 +    "repo_from": {
++        "access_groups": {
++            "admin": [],
++            "commit": [],
++            "ticket": []
++        },
++        "access_users": {
++            "admin": [],
++            "commit": [],
++            "owner": [
++                "pingou"
++            ],
++            "ticket": []
++        },
 +        "close_status": [],
 +        "custom_keys": [],
 +        "date_created": null,
@@ -1741,7 +1767,7 @@ index 0000000..60f7480
                 row = '+++ b/456'
             npatch.append(row)
         patch = '\n'.join(npatch)
-        #print patch
+        # print patch
         self.assertEqual(patch, exp)
 
     def test_update_ticket_from_git_no_priority(self):

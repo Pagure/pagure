@@ -774,6 +774,26 @@ class Project(BASE):
         }
 
     @property
+    def access_users_json(self):
+        json_access_users = {'owner': [self.user.username]}
+        for access, users in self.access_users.items():
+            json_access_users[access] = []
+            for user in users:
+                json_access_users[access].append(user.user)
+
+        return json_access_users
+
+    @property
+    def access_groups_json(self):
+        json_access_groups = {}
+        for access, groups in self.access_groups.items():
+            json_access_groups[access] = []
+            for group in groups:
+                json_access_groups[access].append(group.group_name)
+
+        return json_access_groups
+
+    @property
     def access_groups(self):
         ''' Return a dictionary with all group access
         '''
@@ -800,6 +820,8 @@ class Project(BASE):
                 public=public, api=api) if self.parent else None,
             'date_created': self.date_created.strftime('%s'),
             'user': self.user.to_json(public=public),
+            'access_users': self.access_users_json,
+            'access_groups': self.access_groups_json,
             'tags': self.tags_text,
             'priorities': self.priorities,
             'custom_keys': custom_keys,

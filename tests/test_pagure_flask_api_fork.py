@@ -93,88 +93,105 @@ class PagureFlaskApiForktests(tests.Modeltests):
         data['requests'][0]['repo_from']['date_created'] = '1431414800'
         data['requests'][0]['uid'] = '1431414800'
         data['requests'][0]['last_updated'] = '1431414800'
-        self.assertDictEqual(
-            data,
-            {
-              "args": {
+        expected_data = {
+            "args": {
                 "assignee": None,
                 "author": None,
                 "status": True
-              },
-              "total_requests": 1,
-              "requests": [
-                {
-                  "assignee": None,
-                  "branch": "master",
-                  "branch_from": "master",
-                  "closed_at": None,
-                  "closed_by": None,
-                  "comments": [],
-                  "commit_start": None,
-                  "commit_stop": None,
-                  "date_created": "1431414800",
-                  "id": 1,
-                  "initial_comment": None,
-                  "last_updated": "1431414800",
-                  "project": {
+            },
+            "requests": [{
+                "assignee": None,
+                "branch": "master",
+                "branch_from": "master",
+                "closed_at": None,
+                "closed_by": None,
+                "comments": [],
+                "commit_start": None,
+                "commit_stop": None,
+                "date_created": "1431414800",
+                "id": 1,
+                "initial_comment": None,
+                "last_updated": "1431414800",
+                "project": {
+                    "access_groups": {
+                        "admin": [],
+                        "commit": [],
+                        "ticket": []
+                    },
+                    "access_users": {
+                        "admin": [],
+                        "commit": [],
+                        "owner": ["pingou"],
+                        "ticket": []
+                    },
                     "close_status": [
-                      "Invalid",
-                      "Insufficient data",
-                      "Fixed",
-                      "Duplicate"
+                        "Invalid",
+                        "Insufficient data",
+                        "Fixed",
+                        "Duplicate"
                     ],
                     "custom_keys": [],
                     "date_created": "1431414800",
                     "description": "test project #1",
+                    "fullname": "test",
                     "id": 1,
                     "milestones": {},
                     "name": "test",
-                    "fullname": "test",
                     "namespace": None,
                     "parent": None,
                     "priorities": {},
                     "tags": [],
                     "user": {
-                      "fullname": "PY C",
-                      "name": "pingou"
+                        "fullname": "PY C",
+                        "name": "pingou"
                     }
-                  },
-                  "remote_git": None,
-                  "repo_from": {
+                },
+                "remote_git": None,
+                "repo_from": {
+                    "access_groups": {
+                        "admin": [],
+                        "commit": [],
+                        "ticket": []},
+                    "access_users": {
+                        "admin": [],
+                        "commit": [],
+                        "owner": ["pingou"],
+                        "ticket": []
+                    },
                     "close_status": [
-                      "Invalid",
-                      "Insufficient data",
-                      "Fixed",
-                      "Duplicate"
+                        "Invalid",
+                        "Insufficient data",
+                        "Fixed",
+                        "Duplicate"
                     ],
                     "custom_keys": [],
                     "date_created": "1431414800",
                     "description": "test project #1",
+                    "fullname": "test",
                     "id": 1,
                     "milestones": {},
                     "name": "test",
-                    "fullname": "test",
                     "namespace": None,
                     "parent": None,
                     "priorities": {},
                     "tags": [],
                     "user": {
-                      "fullname": "PY C",
-                      "name": "pingou"
+                        "fullname": "PY C",
+                        "name": "pingou"
                     }
-                  },
-                  "status": 'Open',
-                  "title": "test pull-request",
-                  "uid": "1431414800",
-                  "updated_on": "1431414800",
-                  "user": {
+                },
+                "status": "Open",
+                "title": "test pull-request",
+                "uid": "1431414800",
+                "updated_on": "1431414800",
+                "user": {
                     "fullname": "PY C",
                     "name": "pingou"
-                  }
                 }
-              ]
-            }
-        )
+            }],
+            "total_requests": 1
+        }
+        self.assertDictEqual(data, expected_data)
 
         headers = {'Authorization': 'token aaabbbcccddd'}
 
@@ -249,78 +266,95 @@ class PagureFlaskApiForktests(tests.Modeltests):
         data['repo_from']['date_created'] = '1431414800'
         data['uid'] = '1431414800'
         data['last_updated'] = '1431414800'
-        self.assertDictEqual(
-            data,
-            {
-              "assignee": None,
-              "branch": "master",
-              "branch_from": "master",
-              "closed_at": None,
-              "closed_by": None,
-              "comments": [],
-              "commit_start": None,
-              "commit_stop": None,
-              "date_created": "1431414800",
-              "id": 1,
-              "initial_comment": None,
-              "last_updated": "1431414800",
-              "project": {
+        expected_data = {
+            "assignee": None,
+            "branch": "master",
+            "branch_from": "master",
+            "closed_at": None,
+            "closed_by": None,
+            "comments": [],
+            "commit_start": None,
+            "commit_stop": None,
+            "date_created": "1431414800",
+            "id": 1,
+            "initial_comment": None,
+            "last_updated": "1431414800",
+            "project": {
+                "access_groups": {
+                    "admin": [],
+                    "commit": [],
+                    "ticket": []
+                },
+                "access_users": {
+                    "admin": [],
+                    "commit": [],
+                    "owner": ["pingou"],
+                    "ticket": []
+                },
                 "close_status": [
-                  "Invalid",
-                  "Insufficient data",
-                  "Fixed",
-                  "Duplicate"
+                    "Invalid",
+                    "Insufficient data",
+                    "Fixed",
+                    "Duplicate"
                 ],
                 "custom_keys": [],
                 "date_created": "1431414800",
                 "description": "test project #1",
+                "fullname": "test",
                 "id": 1,
                 "milestones": {},
                 "name": "test",
-                "fullname": "test",
                 "namespace": None,
                 "parent": None,
                 "priorities": {},
                 "tags": [],
                 "user": {
-                  "fullname": "PY C",
-                  "name": "pingou"
+                    "fullname": "PY C",
+                    "name": "pingou"
                 }
-              },
-              "remote_git": None,
-              "repo_from": {
+            },
+            "remote_git": None,
+            "repo_from": {
+                "access_groups": {
+                    "admin": [],
+                    "commit": [],
+                    "ticket": []},
+                "access_users": {
+                    "admin": [],
+                    "commit": [],
+                    "owner": ["pingou"],
+                    "ticket": []},
                 "close_status": [
-                  "Invalid",
-                  "Insufficient data",
-                  "Fixed",
-                  "Duplicate"
-                ],
-                "custom_keys": [],
-                "date_created": "1431414800",
-                "description": "test project #1",
-                "id": 1,
-                "milestones": {},
-                "name": "test",
-                "fullname": "test",
-                "namespace": None,
-                "parent": None,
-                "priorities": {},
-                "tags": [],
-                "user": {
-                  "fullname": "PY C",
-                  "name": "pingou"
-                }
-              },
-              "status": 'Open',
-              "title": "test pull-request",
-              "uid": "1431414800",
-              "updated_on": "1431414800",
-              "user": {
+                    "Invalid",
+                    "Insufficient data",
+                    "Fixed",
+                    "Duplicate"],
+                    "custom_keys": [],
+                    "date_created": "1431414800",
+                    "description": "test project #1",
+                    "fullname": "test",
+                    "id": 1,
+                    "milestones": {},
+                    "name": "test",
+                    "namespace": None,
+                    "parent": None,
+                    "priorities": {},
+                    "tags": [],
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou"
+                    }
+            },
+            "status": "Open",
+            "title": "test pull-request",
+            "uid": "1431414800",
+            "updated_on": "1431414800",
+            "user": {
                 "fullname": "PY C",
                 "name": "pingou"
-              }
             }
-        )
+        }
+        self.assertDictEqual(data, expected_data)
 
         headers = {'Authorization': 'token aaabbbcccddd'}
 

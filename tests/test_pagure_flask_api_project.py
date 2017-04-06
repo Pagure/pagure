@@ -141,177 +141,213 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['projects'][0]['date_created'] = "1436527638"
-        self.assertDictEqual(
-            data,
-            {
-              "args": {
-                "fork": None,
-                "pattern": None,
-                "tags": [
-                  "infra"
+        expected_data = {
+            'args': {
+                'fork': None,
+                'pattern': None,
+                'tags': ['infra'],
+                'username': None
+            },
+            'projects': [{
+                'access_groups': {
+                    'admin': [],
+                    'commit': [],
+                    'ticket': []},
+                'access_users': {
+                     'admin': [],
+                     'commit': [],
+                     'owner': ['pingou'],
+                     'ticket': []},
+                'close_status': [
+                    'Invalid',
+                    'Insufficient data',
+                    'Fixed',
+                    'Duplicate'
                 ],
-                "username": None
-              },
-              "total_projects": 1,
-              "projects": [
-                {
-                  "close_status": [
-                    "Invalid",
-                    "Insufficient data",
-                    "Fixed",
-                    "Duplicate"
-                  ],
-                  "custom_keys": [],
-                  "date_created": "1436527638",
-                  "description": "test project #1",
-                  "id": 1,
-                  "milestones": {},
-                  "name": "test",
-                  "fullname": "test",
-                  "namespace": None,
-                  "parent": None,
-                  "priorities": {},
-                  "tags": ["infra"],
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
+                'custom_keys': [],
+                'date_created': '1436527638',
+                'description': 'test project #1',
+                'fullname': 'test',
+                'id': 1,
+                'milestones': {},
+                'name': 'test',
+                'namespace': None,
+                'parent': None,
+                'priorities': {},
+                'tags': ['infra'],
+                'user': {
+                    'fullname': 'PY C',
+                    'name': 'pingou'
                 }
-              ]
-            }
-        )
+            }],
+            'total_projects': 1
+        }
+        self.assertDictEqual(data, expected_data)
+
         output = self.app.get('/api/0/projects?username=pingou')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['projects'][0]['date_created'] = "1436527638"
         data['projects'][1]['date_created'] = "1436527638"
         data['projects'][2]['date_created'] = "1436527638"
-        self.assertDictEqual(
-            data,
-            {
-              "args": {
+        expected_data = {
+            "args": {
                 "fork": None,
                 "pattern": None,
                 "tags": [],
-                "username": "pingou",
-              },
-              "total_projects": 3,
-              "projects": [
+                "username": "pingou"
+            },
+            "projects": [
                 {
-                  "close_status": [
-                      "Invalid",
-                      "Insufficient data",
-                      "Fixed",
-                      "Duplicate"
+                    "access_groups": {
+                        "admin": [],
+                        "commit": [],
+                        "ticket": []},
+                    "access_users": {
+                        "admin": [],
+                        "commit": [],
+                        "owner": ["pingou"],
+                        "ticket": []
+                    },
+                    "close_status": [
+                        "Invalid",
+                        "Insufficient data",
+                        "Fixed",
+                        "Duplicate"
                     ],
-                  "custom_keys": [],
-                  "date_created": "1436527638",
-                  "description": "test project #1",
-                  "id": 1,
-                  "milestones": {},
-                  "name": "test",
-                  "fullname": "test",
-                  "namespace": None,
-                  "parent": None,
-                  "priorities": {},
-                  "tags": ["infra"],
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
+                    "custom_keys": [],
+                    "date_created": "1436527638",
+                    "description": "test project #1",
+                    "fullname": "test",
+                    "id": 1,
+                    "milestones": {},
+                    "name": "test",
+                    "namespace": None,
+                    "parent": None,
+                    "priorities": {},
+                    "tags": ["infra"],
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou"
+                    }
                 },
                 {
-                  "close_status": [
-                      "Invalid",
-                      "Insufficient data",
-                      "Fixed",
-                      "Duplicate"
+                    "access_groups": {
+                        "admin": [],
+                        "commit": [],
+                        "ticket": []
+                    },
+                    "access_users": {
+                        "admin": [],
+                        "commit": [],
+                        "owner": ["pingou"],
+                        "ticket": []
+                    },
+                    "close_status": [
+                        "Invalid",
+                        "Insufficient data",
+                        "Fixed",
+                        "Duplicate"
                     ],
-                  "custom_keys": [],
-                  "date_created": "1436527638",
-                  "description": "test project #2",
-                  "id": 2,
-                  "milestones": {},
-                  "name": "test2",
-                  "fullname": "test2",
-                  "namespace": None,
-                  "parent": None,
-                  "priorities": {},
-                  "tags": [],
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
+                    "custom_keys": [],
+                    "date_created": "1436527638",
+                    "description": "test project #2",
+                    "fullname": "test2",
+                    "id": 2,
+                    "milestones": {},
+                    "name": "test2",
+                    "namespace": None,
+                    "parent": None,
+                    "priorities": {},
+                    "tags": [],
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou"
+                    }
                 },
                 {
-                  "close_status": [
-                      "Invalid",
-                      "Insufficient data",
-                      "Fixed",
-                      "Duplicate"
+                    "access_groups": {
+                        "admin": [],
+                        "commit": [],
+                        "ticket": []},
+                    "access_users": {
+                        "admin": [],
+                        "commit": [],
+                        "owner": ["pingou"],
+                        "ticket": []},
+                    "close_status": [
+                        "Invalid",
+                        "Insufficient data",
+                        "Fixed",
+                        "Duplicate"
                     ],
-                  "custom_keys": [],
-                  "date_created": "1436527638",
-                  "description": "namespaced test project",
-                  "id": 3,
-                  "milestones": {},
-                  "name": "test3",
-                  "fullname": "somenamespace/test3",
-                  "namespace": "somenamespace",
-                  "parent": None,
-                  "priorities": {},
-                  "tags": [],
-                  "user": {
-                    "fullname": "PY C",
-                    "name": "pingou"
-                  }
+                    "custom_keys": [],
+                    "date_created": "1436527638",
+                    "description": "namespaced test project",
+                    "fullname": "somenamespace/test3",
+                    "id": 3,
+                    "milestones": {},
+                    "name": "test3",
+                    "namespace": "somenamespace",
+                    "parent": None,
+                    "priorities": {},
+                    "tags": [],
+                    "user": {
+                        "fullname": "PY C",
+                        "name": "pingou"
+                    }
                 }
-              ]
-            }
-        )
+            ],
+            "total_projects": 3
+        }
+        self.assertDictEqual(data, expected_data)
+
         output = self.app.get('/api/0/projects?username=pingou&tags=infra')
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['projects'][0]['date_created'] = "1436527638"
-        self.assertDictEqual(
-            data,
-            {
-              "args": {
+        expected_data = {
+            "args": {
                 "fork": None,
                 "pattern": None,
-                "tags": [
-                  "infra"
-                ],
+                "tags": ["infra"],
                 "username": "pingou"
-              },
-              "total_projects": 1,
-              "projects": [
-                {
-                  "close_status": [
-                      "Invalid",
-                      "Insufficient data",
-                      "Fixed",
-                      "Duplicate"
-                    ],
-                  "custom_keys": [],
-                  "date_created": "1436527638",
-                  "description": "test project #1",
-                  "id": 1,
-                  "milestones": {},
-                  "name": "test",
-                  "fullname": "test",
-                  "namespace": None,
-                  "parent": None,
-                  "priorities": {},
-                  "tags": ["infra"],
-                  "user": {
+            },
+            "projects": [{
+                "access_groups": {
+                    "admin": [],
+                    "commit": [],
+                    "ticket": []
+                },
+                "access_users": {
+                    "admin": [],
+                    "commit": [],
+                    "owner": ["pingou"],
+                    "ticket": []},
+                "close_status": [
+                    "Invalid",
+                    "Insufficient data",
+                    "Fixed",
+                    "Duplicate"],
+                "custom_keys": [],
+                "date_created": "1436527638",
+                "description": "test project #1",
+                "fullname": "test",
+                "id": 1,
+                "milestones": {},
+                "name": "test",
+                "namespace": None,
+                "parent": None,
+                "priorities": {},
+                "tags": ["infra"],
+                "user": {
                     "fullname": "PY C",
                     "name": "pingou"
-                  }
                 }
-              ]
-            }
-        )
+            }],
+            "total_projects": 1
+        }
+        self.assertDictEqual(data, expected_data)
 
     def test_api_project(self):
         """ Test the api_project method of the flask api. """
@@ -348,32 +384,40 @@ class PagureFlaskApiProjecttests(tests.Modeltests):
         self.assertEqual(output.status_code, 200)
         data = json.loads(output.data)
         data['date_created'] = "1436527638"
-        self.assertDictEqual(
-            data,
-            {
-              "close_status": [
+        expected_data ={
+            "access_groups": {
+                "admin": [],
+                "commit": [],
+                "ticket": []
+            },
+            "access_users": {
+                "admin": [],
+                "commit": [],
+                "owner": ["pingou"],
+                "ticket": []},
+            "close_status": [
                 "Invalid",
                 "Insufficient data",
                 "Fixed",
                 "Duplicate"
-              ],
-              "custom_keys": [],
-              "date_created": "1436527638",
-              "description": "test project #1",
-              "id": 1,
-              "milestones": {},
-              "name": "test",
-              "fullname": "test",
-              "namespace": None,
-              "parent": None,
-              "priorities": {},
-              "tags": ["infra"],
-              "user": {
+            ],
+            "custom_keys": [],
+            "date_created": "1436527638",
+            "description": "test project #1",
+            "fullname": "test",
+            "id": 1,
+            "milestones": {},
+            "name": "test",
+            "namespace": None,
+            "parent": None,
+            "priorities": {},
+            "tags": ["infra"],
+            "user": {
                 "fullname": "PY C",
                 "name": "pingou"
-              }
             }
-        )
+        }
+        self.assertDictEqual(data, expected_data)
 
     @patch('pagure.lib.git.generate_gitolite_acls')
     def test_api_new_project(self, p_gga):
