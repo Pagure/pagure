@@ -689,6 +689,126 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
+    def test_view_issue_custom_field_user_ticket(self, p_send_email, p_ugt):
+        """ Test the view_issue endpoint. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        output = self.app.get('/foo/issue/1')
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path), bare=True)
+
+        output = self.app.get('/test/issue/1')
+        self.assertEqual(output.status_code, 404)
+
+        # Create issues to play with
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        # Add user 'foo' with ticket access on repo
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.add_user_to_project(
+            self.session,
+            repo,
+            new_user='foo',
+            user='pingou',
+            access='ticket',
+        )
+        self.assertEqual(msg, 'User added')
+        self.session.commit()
+
+        # Set some custom fields
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.set_custom_key_fields(
+            self.session,
+            repo,
+            ['bugzilla', 'upstream', 'reviewstatus'],
+            ['link', 'boolean', 'list'],
+            ['unused data for non-list type', '', 'ack, nack ,  needs review'],
+            [None, None, None])
+        self.session.commit()
+        self.assertEqual(msg, 'List of custom fields updated')
+
+        # User with no rights
+        user = tests.FakeUser()
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/issue/1')
+            self.assertEqual(output.status_code, 200)
+            self.assertNotIn(
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
+            self.assertNotIn(
+                '<button class="btn btn-danger btn-sm" type="submit"',
+                output.data)
+            self.assertNotIn('title="Delete this ticket">', output.data)
+            # user no ACLs = no take action/button
+            self.assertNotIn('function take_issue(){',output.data)
+            self.assertNotIn('function drop_issue(){',output.data)
+            self.assertNotIn(
+                '<button class="btn btn-sm pull-xs-right" id="take-btn"',
+                output.data)
+
+            # user no ACLs = no metadata form
+            self.assertNotIn(
+                '<input                  class="form-control" '
+                'name="bugzilla" id="bugzilla"/>',output.data)
+            self.assertNotIn(
+                '<select class="form-control" name="reviewstatus" '
+                'id="reviewstatus>',output.data)
+            self.assertNotIn(
+                '<input type="checkbox"                   '
+                'class="form-control" name="upstream" id="upstream"/>',
+                output.data)
+
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/issue/1')
+            self.assertEqual(output.status_code, 200)
+            self.assertNotIn(
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
+            self.assertNotIn(
+                '<button class="btn btn-danger btn-sm" type="submit"',
+                output.data)
+            self.assertNotIn('title="Delete this ticket">', output.data)
+            self.assertFalse(
+                '<a href="/login/">Login</a> to comment on this ticket.'
+                in output.data)
+            # user has ticket = take ok
+            self.assertIn('function take_issue(){',output.data)
+            self.assertIn('function drop_issue(){',output.data)
+            self.assertIn(
+                '<button class="btn btn-sm pull-xs-right" id="take-btn"',
+                output.data)
+
+            # user has ticket == Sees the metadata
+            self.assertIn(
+                '<input                  class="form-control" '
+                'name="bugzilla" id="bugzilla"/>',output.data)
+            self.assertIn(
+                '<select class="form-control" name="reviewstatus" '
+                'id="reviewstatus>',output.data)
+            self.assertIn(
+                '<input type="checkbox"                   '
+                'class="form-control" name="upstream" id="upstream"/>',
+                output.data)
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
     def test_view_issue_non_ascii_milestone(self, p_send_email, p_ugt):
         """ Test the view_issue endpoint with non-ascii milestone. """
         p_send_email.return_value = True
