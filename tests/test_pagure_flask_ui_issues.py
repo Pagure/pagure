@@ -536,6 +536,12 @@ class PagureFlaskIssuestests(tests.Modeltests):
             self.assertFalse(
                 '<a href="/login/">Login</a> to comment on this ticket.'
                 in output.data)
+            # Not author nor admin = No take
+            self.assertNotIn('function take_issue(){',output.data)
+            self.assertNotIn('function drop_issue(){',output.data)
+            self.assertNotIn(
+                '<button class="btn btn-sm pull-xs-right" id="take-btn"',
+                output.data)
 
         user.username = 'pingou'
         with tests.user_set(pagure.APP, user):
@@ -601,6 +607,85 @@ class PagureFlaskIssuestests(tests.Modeltests):
 
         output = self.app.get('/test/issue/1')
         self.assertEqual(output.status_code, 404)
+
+    @patch('pagure.lib.git.update_git')
+    @patch('pagure.lib.notify.send_email')
+    def test_view_issue_user_ticket(self, p_send_email, p_ugt):
+        """ Test the view_issue endpoint. """
+        p_send_email.return_value = True
+        p_ugt.return_value = True
+
+        output = self.app.get('/foo/issue/1')
+        self.assertEqual(output.status_code, 404)
+
+        tests.create_projects(self.session)
+        tests.create_projects_git(
+            os.path.join(self.path), bare=True)
+
+        output = self.app.get('/test/issue/1')
+        self.assertEqual(output.status_code, 404)
+
+        # Create issues to play with
+        repo = pagure.lib.get_project(self.session, 'test')
+        msg = pagure.lib.new_issue(
+            session=self.session,
+            repo=repo,
+            title='Test issue',
+            content='We should work on this',
+            user='pingou',
+            ticketfolder=None
+        )
+        self.session.commit()
+        self.assertEqual(msg.title, 'Test issue')
+
+        output = self.app.get('/test/issue/1')
+        self.assertEqual(output.status_code, 200)
+        # Not authentified = No edit
+        self.assertNotIn(
+            '<a class="btn btn-primary btn-sm" href="/test/issue/1/edit" '
+            'title="Edit this issue">',
+            output.data)
+        self.assertTrue(
+            '<a href="/login/?next=http%3A%2F%2Flocalhost%2Ftest%2Fissue%2F1">'
+            'Login</a>\n            to comment on this ticket.'
+            in output.data)
+
+        # Create issues to play with
+        repo = pagure.lib.get_project(self.session, 'test')
+
+        # Add user 'foo' with ticket access on repo
+        msg = pagure.lib.add_user_to_project(
+            self.session,
+            repo,
+            new_user='foo',
+            user='pingou',
+            access='ticket',
+        )
+        self.assertEqual(msg, 'User added')
+        self.session.commit()
+
+        user = tests.FakeUser(username='foo')
+        with tests.user_set(pagure.APP, user):
+            output = self.app.get('/test/issue/1')
+            self.assertEqual(output.status_code, 200)
+            # Not author nor admin = No edit
+            self.assertNotIn(
+                '<a class="btn btn-primary btn-sm" '
+                'href="/test/issue/1/edit" title="Edit this issue">',
+                output.data)
+            self.assertNotIn(
+                '<button class="btn btn-danger btn-sm" type="submit"',
+                output.data)
+            self.assertNotIn('title="Delete this ticket">', output.data)
+            self.assertFalse(
+                '<a href="/login/">Login</a> to comment on this ticket.'
+                in output.data)
+            # user has ticket = take ok
+            self.assertIn('function take_issue(){',output.data)
+            self.assertIn('function drop_issue(){',output.data)
+            self.assertIn(
+                '<button class="btn btn-sm pull-xs-right" id="take-btn"',
+                output.data)
 
     @patch('pagure.lib.git.update_git')
     @patch('pagure.lib.notify.send_email')
