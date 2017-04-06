@@ -1044,53 +1044,13 @@ def view_settings(repo, username=None, namespace=None):
     if flask.request.method == 'GET' and branchname:
         branches_form.branches.data = branchname
 
-    access_users = {
-        'admin': pagure.lib.get_project_users(
-            SESSION,
-            project_obj=repo,
-            access='admin',
-            combine=False
-        ),
-        'commit': pagure.lib.get_project_users(
-            SESSION,
-            project_obj=repo,
-            access='commit',
-            combine=False
-        ),
-        'ticket': pagure.lib.get_project_users(
-            SESSION,
-            project_obj=repo,
-            access='ticket',
-            combine=False
-        ),
-    }
-    access_groups = {
-        'admin': pagure.lib.get_project_groups(
-            SESSION,
-            project_obj=repo,
-            access='admin',
-            combine=False
-        ),
-        'commit': pagure.lib.get_project_groups(
-            SESSION,
-            project_obj=repo,
-            access='commit',
-            combine=False
-        ),
-        'ticket': pagure.lib.get_project_groups(
-            SESSION,
-            project_obj=repo,
-            access='ticket',
-            combine=False
-        ),
-    }
     return flask.render_template(
         'settings.html',
         select='settings',
         username=username,
         repo=repo,
-        access_users=access_users,
-        access_groups=access_groups,
+        access_users=repo.access_users,
+        access_groups=repo.access_groups,
         form=form,
         tag_form=tag_form,
         branches_form=branches_form,

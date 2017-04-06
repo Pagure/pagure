@@ -3552,8 +3552,8 @@ class PagureLibtests(tests.Modeltests):
         )
 
     def test_get_project_users(self):
-        ''' Test the get_project_users method in pagure.lib.__init__
-        when combine is True '''
+        ''' Test the get_project_users method when combine is True
+        '''
 
         tests.create_projects(self.session)
         project = pagure.lib.get_project(self.session, name='test')
@@ -3562,11 +3562,7 @@ class PagureLibtests(tests.Modeltests):
         # which means the an admin is a user, committer as well
         # and a committer is also a user
         # and a user is just a user
-        users = pagure.lib.get_project_users(
-            self.session,
-            project_obj=project,
-            access='admin',
-        )
+        users = project.get_project_users(access='admin')
 
         # Only pingou is the admin as of now
         # But, he is the creator and
@@ -3579,9 +3575,7 @@ class PagureLibtests(tests.Modeltests):
         # Wrong access level, should raise Accesslevelnotfound exception
         self.assertRaises(
             pagure.exceptions.AccessLevelNotFound,
-            pagure.lib.get_project_users,
-            self.session,
-            project_obj=project,
+            project.get_project_users,
             access='owner',
         )
 
@@ -3598,31 +3592,19 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(msg, 'User added')
 
         project = pagure.lib.get_project(self.session, name='test')
-        users = pagure.lib.get_project_users(
-            self.session,
-            project_obj=project,
-            access='admin',
-        )
+        users = project.get_project_users(access='admin')
 
         self.assertEqual(len(users), 1)
         self.assertEqual(users[0].username, 'foo')
 
         # foo should be a committer as well, since he is an admin
-        users = pagure.lib.get_project_users(
-            self.session,
-            project_obj=project,
-            access='commit',
-        )
+        users = project.get_project_users(access='commit')
 
         self.assertEqual(len(users), 1)
         self.assertEqual(users[0].username, 'foo')
 
         # the admin also has ticket access
-        users = pagure.lib.get_project_users(
-            self.session,
-            project_obj=project,
-            access='ticket',
-        )
+        users = project.get_project_users(access='ticket')
 
         self.assertEqual(len(users), 1)
         self.assertEqual(users[0].username, 'foo')
@@ -3640,27 +3622,15 @@ class PagureLibtests(tests.Modeltests):
 
         project = pagure.lib.get_project(self.session, name='test')
         # No admin now, even though pingou the creator is there
-        users = pagure.lib.get_project_users(
-            self.session,
-            project_obj=project,
-            access='admin',
-        )
+        users = project.get_project_users(access='admin')
         self.assertEqual(len(users), 0)
 
-        users = pagure.lib.get_project_users(
-            self.session,
-            project_obj=project,
-            access='commit',
-        )
+        users = project.get_project_users(access='commit')
         # foo is the committer currently
         self.assertEqual(len(users), 1)
         self.assertEqual(users[0].username, 'foo')
 
-        users = pagure.lib.get_project_users(
-            self.session,
-            project_obj=project,
-            access='ticket',
-        )
+        users = project.get_project_users(access='ticket')
 
         # foo also has ticket rights
         self.assertEqual(len(users), 1)
@@ -3679,34 +3649,22 @@ class PagureLibtests(tests.Modeltests):
 
         project = pagure.lib.get_project(self.session, name='test')
         # No admin now, even though pingou the creator is there
-        users = pagure.lib.get_project_users(
-            self.session,
-            project_obj=project,
-            access='admin',
-        )
+        users = project.get_project_users(access='admin')
         self.assertEqual(len(users), 0)
 
-        users = pagure.lib.get_project_users(
-            self.session,
-            project_obj=project,
-            access='commit',
-        )
+        users = project.get_project_users(access='commit')
         # foo deosn't have commit rights now
         self.assertEqual(len(users), 0)
 
-        users = pagure.lib.get_project_users(
-            self.session,
-            project_obj=project,
-            access='ticket',
-        )
+        users = project.get_project_users(access='ticket')
 
         # foo does have tickets right though
         self.assertEqual(len(users), 1)
         self.assertEqual(users[0].username, 'foo')
 
     def test_get_project_users_combine_false(self):
-        ''' Test the get_project_users method in pagure.lib.__init__
-        when combine is False '''
+        ''' Test the get_project_users method when combine is False
+        '''
 
         tests.create_projects(self.session)
         project = pagure.lib.get_project(self.session, name='test')
@@ -3724,32 +3682,17 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(msg, 'User added')
 
         # only one admin
-        users = pagure.lib.get_project_users(
-            self.session,
-            project_obj=project,
-            access='admin',
-            combine=False,
-        )
+        users = project.get_project_users(access='admin', combine=False)
 
         self.assertEqual(len(users), 1)
         self.assertEqual(users[0].username, 'foo')
 
         # No user with only commit access
-        users = pagure.lib.get_project_users(
-            self.session,
-            project_obj=project,
-            access='commit',
-            combine=False,
-        )
+        users = project.get_project_users(access='commit', combine=False)
         self.assertEqual(len(users), 0)
 
         # No user with only ticket access
-        users = pagure.lib.get_project_users(
-            self.session,
-            project_obj=project,
-            access='ticket',
-            combine=False,
-        )
+        users = project.get_project_users(access='ticket', combine=False)
         self.assertEqual(len(users), 0)
 
         # Update the access level of foo user to commit
@@ -3765,31 +3708,16 @@ class PagureLibtests(tests.Modeltests):
 
         # He is just a committer
         project = pagure.lib.get_project(self.session, name='test')
-        users = pagure.lib.get_project_users(
-            self.session,
-            project_obj=project,
-            access='admin',
-            combine=False,
-        )
+        users = project.get_project_users(access='admin', combine=False)
         self.assertEqual(len(users), 0)
 
         # He is just a committer
-        users = pagure.lib.get_project_users(
-            self.session,
-            project_obj=project,
-            access='commit',
-            combine=False,
-        )
+        users = project.get_project_users(access='commit', combine=False)
         self.assertEqual(len(users), 1)
         self.assertEqual(users[0].username, 'foo')
 
         # He is just a committer
-        users = pagure.lib.get_project_users(
-            self.session,
-            project_obj=project,
-            access='ticket',
-            combine=False,
-        )
+        users = project.get_project_users(access='ticket', combine=False)
         self.assertEqual(len(users), 0)
 
         # Update the access level of foo user to ticket
@@ -3805,36 +3733,21 @@ class PagureLibtests(tests.Modeltests):
 
         # He is just a ticketer
         project = pagure.lib.get_project(self.session, name='test')
-        users = pagure.lib.get_project_users(
-            self.session,
-            project_obj=project,
-            access='admin',
-            combine=False,
-        )
+        users = project.get_project_users(access='admin',combine=False)
         self.assertEqual(len(users), 0)
 
         # He is just a ticketer
-        users = pagure.lib.get_project_users(
-            self.session,
-            project_obj=project,
-            access='commit',
-            combine=False,
-        )
+        users = project.get_project_users(access='commit', combine=False)
         self.assertEqual(len(users), 0)
 
         # He is just a ticketer
-        users = pagure.lib.get_project_users(
-            self.session,
-            project_obj=project,
-            access='ticket',
-            combine=False,
-        )
+        users = project.get_project_users(access='ticket', combine=False)
         self.assertEqual(len(users), 1)
         self.assertEqual(users[0].username, 'foo')
 
     def test_get_project_groups(self):
-        ''' Test the get_project_groups method in pagure.lib
-        when combine is True '''
+        ''' Test the get_project_groups method when combine is True
+        '''
 
         # Create some projects
         tests.create_projects(self.session)
@@ -3870,11 +3783,7 @@ class PagureLibtests(tests.Modeltests):
         # Now, the group is an admin in the project
         # so, it must have access to everything
         project = pagure.lib.get_project(self.session, name='test')
-        groups = pagure.lib.get_project_groups(
-            self.session,
-            project_obj=project,
-            access='admin',
-        )
+        groups = project.get_project_groups(access='admin')
         self.assertEqual(len(groups), 1)
         self.assertEqual(groups[0].display_name, 'Justice League')
         self.assertEqual(len(project.admin_groups), 1)
@@ -3884,11 +3793,7 @@ class PagureLibtests(tests.Modeltests):
         )
 
         # The group should be committer as well
-        groups = pagure.lib.get_project_groups(
-            self.session,
-            project_obj=project,
-            access='commit',
-        )
+        groups = project.get_project_groups(access='commit')
         self.assertEqual(len(groups), 1)
         self.assertEqual(groups[0].display_name, 'Justice League')
         self.assertEqual(len(project.committer_groups), 1)
@@ -3898,11 +3803,7 @@ class PagureLibtests(tests.Modeltests):
         )
 
         # The group should be ticketer as well
-        groups = pagure.lib.get_project_groups(
-            self.session,
-            project_obj=project,
-            access='ticket',
-        )
+        groups = project.get_project_groups(access='ticket')
         self.assertEqual(len(groups), 1)
         self.assertEqual(groups[0].display_name, 'Justice League')
         self.assertEqual(len(project.groups), 1)
@@ -3925,20 +3826,12 @@ class PagureLibtests(tests.Modeltests):
 
         # It shouldn't be an admin
         project = pagure.lib.get_project(self.session, name='test')
-        groups = pagure.lib.get_project_groups(
-            self.session,
-            project_obj=project,
-            access='admin',
-        )
+        groups = project.get_project_groups(access='admin')
         self.assertEqual(len(groups), 0)
         self.assertEqual(len(project.admin_groups), 0)
 
         # It is a committer
-        groups = pagure.lib.get_project_groups(
-            self.session,
-            project_obj=project,
-            access='commit',
-        )
+        groups = project.get_project_groups(access='commit')
         self.assertEqual(len(groups), 1)
         self.assertEqual(groups[0].display_name, 'Justice League')
         self.assertEqual(len(project.committer_groups), 1)
@@ -3948,11 +3841,7 @@ class PagureLibtests(tests.Modeltests):
         )
 
         # The group should be ticketer as well
-        groups = pagure.lib.get_project_groups(
-            self.session,
-            project_obj=project,
-            access='ticket',
-        )
+        groups = project.get_project_groups(access='ticket')
         self.assertEqual(len(groups), 1)
         self.assertEqual(groups[0].display_name, 'Justice League')
         self.assertEqual(len(project.groups), 1)
@@ -3974,29 +3863,17 @@ class PagureLibtests(tests.Modeltests):
 
         # It is not an admin
         project = pagure.lib.get_project(self.session, name='test')
-        groups = pagure.lib.get_project_groups(
-            self.session,
-            project_obj=project,
-            access='admin',
-        )
+        groups = project.get_project_groups(access='admin')
         self.assertEqual(len(groups), 0)
         self.assertEqual(len(project.admin_groups), 0)
 
         # The group shouldn't be a committer
-        groups = pagure.lib.get_project_groups(
-            self.session,
-            project_obj=project,
-            access='commit',
-        )
+        groups = project.get_project_groups(access='commit')
         self.assertEqual(len(groups), 0)
         self.assertEqual(len(project.committer_groups), 0)
 
         # The group should be ticketer
-        groups = pagure.lib.get_project_groups(
-            self.session,
-            project_obj=project,
-            access='ticket',
-        )
+        groups = project.get_project_groups(access='ticket')
         self.assertEqual(len(groups), 1)
         self.assertEqual(groups[0].display_name, 'Justice League')
         self.assertEqual(len(project.groups), 1)
@@ -4006,8 +3883,8 @@ class PagureLibtests(tests.Modeltests):
         )
 
     def test_get_project_groups_combine_false(self):
-        ''' Test the get_project_groups method in pagure.lib
-        when combine is False '''
+        ''' Test the get_project_groups method when combine is False
+        '''
 
         # Create some projects
         tests.create_projects(self.session)
@@ -4043,12 +3920,7 @@ class PagureLibtests(tests.Modeltests):
         # Now, the group is an admin in the project
         # so, it must have access to everything
         project = pagure.lib.get_project(self.session, name='test')
-        groups = pagure.lib.get_project_groups(
-            self.session,
-            project_obj=project,
-            access='admin',
-            combine=False,
-        )
+        groups = project.get_project_groups(access='admin', combine=False)
         self.assertEqual(len(groups), 1)
         self.assertEqual(groups[0].display_name, 'Justice League')
         self.assertEqual(len(project.admin_groups), 1)
@@ -4058,21 +3930,11 @@ class PagureLibtests(tests.Modeltests):
         )
 
         # The group shoudn't be a committer
-        groups = pagure.lib.get_project_groups(
-            self.session,
-            project_obj=project,
-            access='commit',
-            combine=False,
-        )
+        groups = project.get_project_groups(access='commit', combine=False)
         self.assertEqual(len(groups), 0)
 
         # The group shoudn't be a ticketer
-        groups = pagure.lib.get_project_groups(
-            self.session,
-            project_obj=project,
-            access='ticket',
-            combine=False,
-        )
+        groups = project.get_project_groups(access='ticket', combine=False)
         self.assertEqual(len(groups), 0)
 
         # Update the access level of the group, JL to commit
@@ -4089,21 +3951,11 @@ class PagureLibtests(tests.Modeltests):
 
         # It shouldn't be an admin
         project = pagure.lib.get_project(self.session, name='test')
-        groups = pagure.lib.get_project_groups(
-            self.session,
-            project_obj=project,
-            access='admin',
-            combine=False,
-        )
+        groups = project.get_project_groups(access='admin', combine=False)
         self.assertEqual(len(groups), 0)
 
         # It is a committer
-        groups = pagure.lib.get_project_groups(
-            self.session,
-            project_obj=project,
-            access='commit',
-            combine=False,
-        )
+        groups = project.get_project_groups(access='commit', combine=False)
         self.assertEqual(len(groups), 1)
         self.assertEqual(groups[0].display_name, 'Justice League')
         self.assertEqual(len(project.committer_groups), 1)
@@ -4113,12 +3965,7 @@ class PagureLibtests(tests.Modeltests):
         )
 
         # The group shouldn't be ticketer
-        groups = pagure.lib.get_project_groups(
-            self.session,
-            project_obj=project,
-            access='ticket',
-            combine=False,
-        )
+        groups = project.get_project_groups(access='ticket', combine=False)
         self.assertEqual(len(groups), 0)
 
         # Update the access of group JL to ticket
@@ -4134,30 +3981,15 @@ class PagureLibtests(tests.Modeltests):
 
         # It is not an admin
         project = pagure.lib.get_project(self.session, name='test')
-        groups = pagure.lib.get_project_groups(
-            self.session,
-            project_obj=project,
-            access='admin',
-            combine=False,
-        )
+        groups = project.get_project_groups(access='admin', combine=False)
         self.assertEqual(len(groups), 0)
 
         # The group shouldn't be a committer
-        groups = pagure.lib.get_project_groups(
-            self.session,
-            project_obj=project,
-            access='commit',
-            combine=False,
-        )
+        groups = project.get_project_groups(access='commit', combine=False)
         self.assertEqual(len(groups), 0)
 
         # The group should be ticketer
-        groups = pagure.lib.get_project_groups(
-            self.session,
-            project_obj=project,
-            access='ticket',
-            combine=False,
-        )
+        groups = project.get_project_groups(access='ticket', combine=False)
         self.assertEqual(len(groups), 1)
         self.assertEqual(groups[0].display_name, 'Justice League')
         self.assertEqual(len(project.groups), 1)

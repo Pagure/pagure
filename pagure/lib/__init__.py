@@ -926,8 +926,7 @@ def add_user_to_project(session, project, new_user, user, access='admin'):
 
     users = set([
         user_.user
-        for user_ in get_project_users(
-            session, project, access, combine=False)
+        for user_ in project.get_project_users(access, combine=False)
     ])
     users.add(project.user.user)
 
@@ -1017,8 +1016,7 @@ def add_group_to_project(
 
     groups = set([
         group.group_name
-        for group in get_project_groups(
-            session, project, access, combine=False)
+        for group in project.get_project_groups(access, combine=False)
     ])
 
     if new_group in groups:
@@ -4114,102 +4112,6 @@ def get_access_levels(session):
 
     access_level_objs = session.query(model.AccessLevels).all()
     return [access_level.access for access_level in access_level_objs]
-
-
-def get_project_users(session, project_obj, access, combine=True):
-    ''' Returns the list of users/groups of the project according
-    to the given access.
-
-    :arg session: the session to use to connect to the database.
-    :arg project_obj: SQLAlchemy object of Project class.
-    :arg access: the access level to query for, can be: 'admin',
-        'commit' or 'ticket'.
-    :type access: string
-    :arg combine: The access levels have some hierarchy -
-        like: all the users having commit access also has
-        ticket access and the admins have all the access
-        that commit and ticket access users have. If combine
-        is set to False, this function will only return those
-        users which have the given access and no other access.
-        ex: if access is 'ticket' and combine is True, it will
-        return all the users with ticket access which includes
-        all the committers and admins. If combine were False,
-        it would have returned only the users with ticket access
-        and would not have included committers and admins.
-    :type combine: boolean
-    '''
-
-    if access not in ['admin', 'commit', 'ticket']:
-        raise pagure.exceptions.AccessLevelNotFound(
-            'The access level does not exist')
-
-    if combine:
-        if access == 'admin':
-            return project_obj.admins
-        elif access == 'commit':
-            return project_obj.committers
-        elif access == 'ticket':
-            return project_obj.users
-    else:
-        if access == 'admin':
-            return project_obj.admins
-        elif access == 'commit':
-            committers = set(project_obj.committers)
-            admins = set(project_obj.admins)
-            return list(committers - admins)
-        elif access == 'ticket':
-            committers = set(project_obj.committers)
-            admins = set(project_obj.admins)
-            users = set(project_obj.users)
-            return list(users - committers - admins)
-
-
-def get_project_groups(session, project_obj, access, combine=True):
-    ''' Returns the list of groups of the project according
-    to the given access.
-
-    :arg session: the session to use to connect to the database.
-    :arg project_obj: SQLAlchemy object of Project class.
-    :arg access: the access level to query for, can be: 'admin',
-        'commit' or 'ticket'.
-    :type access: string
-    :arg combine: The access levels have some hierarchy -
-        like: all the groups having commit access also has
-        ticket access and the admin_groups have all the access
-        that committer_groups and ticket access groups have.
-        If combine is set to False, this function will only return
-        those groups which have the given access and no other access.
-        ex: if access is 'ticket' and combine is True, it will
-        return all the groups with ticket access which includes
-        all the committer_groups and admin_groups. If combine were False,
-        it would have returned only the groups with ticket access
-        and would not have included committer_groups and admin_groups.
-    :type combine: boolean
-    '''
-
-    if access not in ['admin', 'commit', 'ticket']:
-        raise pagure.exceptions.AccessLevelNotFound(
-            'The access level does not exist')
-
-    if combine:
-        if access == 'admin':
-            return project_obj.admin_groups
-        elif access == 'commit':
-            return project_obj.committer_groups
-        elif access == 'ticket':
-            return project_obj.groups
-    else:
-        if access == 'admin':
-            return project_obj.admin_groups
-        elif access == 'commit':
-            committers = set(project_obj.committer_groups)
-            admins = set(project_obj.admin_groups)
-            return list(committers - admins)
-        elif access == 'ticket':
-            committers = set(project_obj.committer_groups)
-            admins = set(project_obj.admin_groups)
-            groups = set(project_obj.groups)
-            return list(groups - committers - admins)
 
 
 def get_obj_access(session, project_obj, obj):

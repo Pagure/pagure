@@ -29,6 +29,8 @@ from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import validates
 
+import pagure.exceptions
+
 
 CONVENTION = {
     "ix": 'ix_%(table_name)s_%(column_0_label)s',
@@ -670,6 +672,116 @@ class Project(BASE):
             contributors[group.access].append(group.group)
 
         return contributors
+
+    def get_project_users(self, access, combine=True):
+        ''' Returns the list of users/groups of the project according
+        to the given access.
+
+        :arg access: the access level to query for, can be: 'admin',
+            'commit' or 'ticket'.
+        :type access: string
+        :arg combine: The access levels have some hierarchy -
+            like: all the users having commit access also has
+            ticket access and the admins have all the access
+            that commit and ticket access users have. If combine
+            is set to False, this function will only return those
+            users which have the given access and no other access.
+            ex: if access is 'ticket' and combine is True, it will
+            return all the users with ticket access which includes
+            all the committers and admins. If combine were False,
+            it would have returned only the users with ticket access
+            and would not have included committers and admins.
+        :type combine: boolean
+        '''
+
+        if access not in ['admin', 'commit', 'ticket']:
+            raise pagure.exceptions.AccessLevelNotFound(
+                'The access level does not exist')
+
+        if combine:
+            if access == 'admin':
+                return self.admins
+            elif access == 'commit':
+                return self.committers
+            elif access == 'ticket':
+                return self.users
+        else:
+            if access == 'admin':
+                return self.admins
+            elif access == 'commit':
+                committers = set(self.committers)
+                admins = set(self.admins)
+                return list(committers - admins)
+            elif access == 'ticket':
+                committers = set(self.committers)
+                admins = set(self.admins)
+                users = set(self.users)
+                return list(users - committers - admins)
+
+    def get_project_groups(self, access, combine=True):
+        ''' Returns the list of groups of the project according
+        to the given access.
+
+        :arg access: the access level to query for, can be: 'admin',
+            'commit' or 'ticket'.
+        :type access: string
+        :arg combine: The access levels have some hierarchy -
+            like: all the groups having commit access also has
+            ticket access and the admin_groups have all the access
+            that committer_groups and ticket access groups have.
+            If combine is set to False, this function will only return
+            those groups which have the given access and no other access.
+            ex: if access is 'ticket' and combine is True, it will
+            return all the groups with ticket access which includes
+            all the committer_groups and admin_groups. If combine were False,
+            it would have returned only the groups with ticket access
+            and would not have included committer_groups and admin_groups.
+        :type combine: boolean
+        '''
+
+        if access not in ['admin', 'commit', 'ticket']:
+            raise pagure.exceptions.AccessLevelNotFound(
+                'The access level does not exist')
+
+        if combine:
+            if access == 'admin':
+                return self.admin_groups
+            elif access == 'commit':
+                return self.committer_groups
+            elif access == 'ticket':
+                return self.groups
+        else:
+            if access == 'admin':
+                return self.admin_groups
+            elif access == 'commit':
+                committers = set(self.committer_groups)
+                admins = set(self.admin_groups)
+                return list(committers - admins)
+            elif access == 'ticket':
+                committers = set(self.committer_groups)
+                admins = set(self.admin_groups)
+                groups = set(self.groups)
+                return list(groups - committers - admins)
+
+    @property
+    def access_users(self):
+        ''' Return a dictionary with all user access
+        '''
+        return {
+            'admin': self.get_project_users(access='admin', combine=False),
+            'commit': self.get_project_users(access='commit', combine=False),
+            'ticket': self.get_project_users(access='ticket', combine=False),
+        }
+
+    @property
+    def access_groups(self):
+        ''' Return a dictionary with all group access
+        '''
+        return {
+            'admin': self.get_project_groups(access='admin', combine=False),
+            'commit': self.get_project_groups(access='commit', combine=False),
+            'ticket': self.get_project_groups(access='ticket', combine=False),
+        }
 
     def to_json(self, public=False, api=False):
         ''' Return a representation of the project as JSON.
