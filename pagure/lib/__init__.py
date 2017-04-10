@@ -3339,7 +3339,8 @@ def text2markdown(text, extended=True, readme=False):
         'markdown.extensions.fenced_code',
         'markdown.extensions.tables',
         'markdown.extensions.smart_strong',
-        # All of the above are the .extra extensions - the attribute lists one
+        # All of the above are the .extra extensions
+        # w/o the "attribute lists" one
         'markdown.extensions.admonition',
         'markdown.extensions.codehilite',
         'markdown.extensions.sane_lists',
