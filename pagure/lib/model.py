@@ -1750,7 +1750,8 @@ class PullRequestFlag(BASE):
 
     @validates('token_id')
     def validate_token_id(self, _, token_id):
-        assert token_id is not None
+        if token_id is None:
+            raise ValueError('token_id may not be None.')
         return token_id
 
     def to_json(self, public=False):

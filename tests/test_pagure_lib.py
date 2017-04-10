@@ -2072,7 +2072,7 @@ class PagureLibtests(tests.Modeltests):
         self.assertEqual(len(request.flags), 0)
 
         self.assertRaises(
-            AssertionError,
+            ValueError,
             pagure.lib.add_pull_request_flag,
             session=self.session,
             request=request,
