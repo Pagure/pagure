@@ -1366,7 +1366,8 @@ class PagureLibtests(tests.Modeltests):
             self.assertTrue(os.path.exists(path))
             shutil.rmtree(path)
 
-    def test_update_project_settings(self):
+    @patch('pagure.lib.notify.log')
+    def test_update_project_settings(self, mock_log):
         """ Test the update_project_settings of pagure.lib. """
 
         tests.create_projects(self.session)
@@ -1395,6 +1396,7 @@ class PagureLibtests(tests.Modeltests):
             user='pingou',
         )
         self.assertEqual(msg, 'No settings to change')
+        mock_log.assert_not_called()
 
         msg = pagure.lib.update_project_settings(
             session=self.session,
@@ -1414,6 +1416,18 @@ class PagureLibtests(tests.Modeltests):
             user='pingou',
         )
         self.assertEqual(msg, 'Edited successfully settings of repo: test2')
+        mock_log.assert_called_once()
+        args = mock_log.call_args
+        self.assertEqual(len(args), 2)
+        self.assertEqual(args[0][0].fullname, 'test2')
+        self.assertEqual(
+            args[1]['msg']['fields'],
+            [
+                'Web-hooks', 'project_documentation',
+                'issue_tracker', 'pull_requests'
+            ]
+        )
+        self.assertEqual(args[1]['topic'], 'project.edit')
 
         # After
         repo = pagure.lib.get_project(self.session, 'test2')
