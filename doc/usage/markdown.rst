@@ -9,27 +9,27 @@ formatting, but it also has some unique syntax for more advanced
 formatting. This help page helps demonstrate how to use Markdown in Pagure.
 
 
-Headers
--------
+Pagure relies on the `Markdown <http://pythonhosted.org/Markdown/>`_ python
+module to do the convertion.
+It has enabled a few extensions:
 
-To create headings, you will use the `#` symbol before the text. The number
-of hashes before the text determines the header size.
+- `Definition Lists <http://pythonhosted.org/Markdown/extensions/definition_lists.html>`_
+- `Fenced Code Blocks <http://pythonhosted.org/Markdown/extensions/fenced_code_blocks.html>`_
+- `Tables <http://pythonhosted.org/Markdown/extensions/tables.html>`_
+- `Smart Strong <http://pythonhosted.org/Markdown/extensions/smart_strong.html>`_
+- `Admonition <http://pythonhosted.org/Markdown/extensions/admonition.html>`_
+- `CodeHilite <http://pythonhosted.org/Markdown/extensions/code_hilite.html>`_
+- `Sane lists <http://pythonhosted.org/Markdown/extensions/sane_lists.html>`_
 
-::
+README files can also rely on:
 
-    # header1
-    ## header2
-    ### header3
+- `Abbreviations <http://pythonhosted.org/Markdown/extensions/abbreviations.html>`_
+- `Foonotes <http://pythonhosted.org/Markdown/extensions/footnotes.html>`_
+- `Table of Contents <http://pythonhosted.org/Markdown/extensions/toc.html>`_
 
+While comments use:
 
-header 1
-========
-
-header2
--------
-
-header3
-^^^^^^^
+- `New Line to Break <http://pythonhosted.org/Markdown/extensions/nl2br.html>`_
 
 
 Styling
