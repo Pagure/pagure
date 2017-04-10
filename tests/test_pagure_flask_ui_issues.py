@@ -537,8 +537,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<a href="/login/">Login</a> to comment on this ticket.'
                 in output.data)
             # Not author nor admin = No take
-            self.assertNotIn('function take_issue(){',output.data)
-            self.assertNotIn('function drop_issue(){',output.data)
+            self.assertNotIn('function take_issue(){', output.data)
+            self.assertNotIn('function drop_issue(){', output.data)
             self.assertNotIn(
                 '<button class="btn btn-sm pull-xs-right" id="take-btn"',
                 output.data)
@@ -681,8 +681,8 @@ class PagureFlaskIssuestests(tests.Modeltests):
                 '<a href="/login/">Login</a> to comment on this ticket.'
                 in output.data)
             # user has ticket = take ok
-            self.assertIn('function take_issue(){',output.data)
-            self.assertIn('function drop_issue(){',output.data)
+            self.assertIn('function take_issue(){', output.data)
+            self.assertIn('function drop_issue(){', output.data)
             self.assertIn(
                 '<button class="btn btn-sm pull-xs-right" id="take-btn"',
                 output.data)

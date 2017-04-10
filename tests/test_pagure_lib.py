@@ -3580,9 +3580,9 @@ class PagureLibtests(tests.Modeltests):
         self.assertRaises(
             pagure.exceptions.AccessLevelNotFound,
             pagure.lib.get_project_users,
-                self.session,
-                project_obj=project,
-                access='owner',
+            self.session,
+            project_obj=project,
+            access='owner',
         )
 
         # Let's add a new user to the project, 'foo'
