@@ -4284,6 +4284,46 @@ class PagureLibtests(tests.Modeltests):
             }
         )
 
+    def test_text2markdown_table(self):
+        """ Test the text2markdown function with a markdown table. """
+
+        text = """
+| Left-aligned | Center-aligned | Right-aligned |
+| :---         |    :---:       |          ---: |
+| git status   | git status     | git status    |
+| git diff     | git diff       | git diff      |
+
+
+foo bar
+        """
+
+        expected = """<table>
+<thead>
+<tr>
+<th align="left">Left-aligned</th>
+<th align="center">Center-aligned</th>
+<th align="right">Right-aligned</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">git status</td>
+<td align="center">git status</td>
+<td align="right">git status</td>
+</tr>
+<tr>
+<td align="left">git diff</td>
+<td align="center">git diff</td>
+<td align="right">git diff</td>
+</tr>
+</tbody>
+</table>
+<p>foo bar</p>"""
+
+        with pagure.APP.app_context():
+            html = pagure.lib.text2markdown(text)
+            self.assertEqual(html, expected)
+
 
 if __name__ == '__main__':
     SUITE = unittest.TestLoader().loadTestsFromTestCase(PagureLibtests)
