@@ -23,6 +23,19 @@ html
     border-bottom:1px solid #DDD;
 }
 
+.issue_comment table {
+    margin-bottom: 1em;
+}
+
+.issue_comment table, .issue_comment th, .issue_comment td {
+    border: 1px solid #e5e5e5;
+    padding: .35em;
+}
+
+.issue_comment th {
+    background-color: #f5f5f5;
+}
+
 
 .notification-spacer
 {
