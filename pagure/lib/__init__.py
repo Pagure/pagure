@@ -3404,6 +3404,8 @@ def clean_input(text, ignore=None):
     attrs['table'] = ['class']
     attrs['span'] = ['class', 'id']
     attrs['div'] = ['class']
+    attrs['td'] = ['align']
+    attrs['th'] = ['align']
     if not ignore or 'img' not in ignore:
         attrs['img'] = filter_img_src
 
