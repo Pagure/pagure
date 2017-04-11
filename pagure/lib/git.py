@@ -91,7 +91,12 @@ def write_gitolite_acls(session, configfile):
     global_pr_only = pagure.APP.config.get('PR_ONLY', False)
     config = []
     groups = {}
-    for project in session.query(model.Project).all():
+    query = session.query(
+        model.Project
+    ).order_by(
+        model.Project.id
+    )
+    for project in query.all():
         for group in project.committer_groups:
             if group.group_name not in groups:
                 groups[group.group_name] = [
