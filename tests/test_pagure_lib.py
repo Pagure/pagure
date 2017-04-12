@@ -1416,7 +1416,7 @@ class PagureLibtests(tests.Modeltests):
             user='pingou',
         )
         self.assertEqual(msg, 'Edited successfully settings of repo: test2')
-        mock_log.assert_called_once()
+        self.assertEqual(mock_log.call_count, 1)
         args = mock_log.call_args
         self.assertEqual(len(args), 2)
         self.assertEqual(args[0][0].fullname, 'test2')
