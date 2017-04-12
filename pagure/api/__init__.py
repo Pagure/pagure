@@ -359,55 +359,6 @@ def api_project_tags(repo, username=None):
     )
 
 
-@API.route('/groups/')
-@API.route('/groups')
-def api_groups():
-    '''
-    List groups
-    -----------
-    Retrieve groups on this Pagure instance.
-    This can then be used as input for autocompletion in some forms/fields.
-
-    ::
-
-        GET /api/0/groups
-
-    Parameters
-    ^^^^^^^^^^
-
-    +---------------+----------+---------------+--------------------------+
-    | Key           | Type     | Optionality   | Description              |
-    +===============+==========+===============+==========================+
-    | ``pattern``   | string   | Optional      | | Filters the starting   |
-    |               |          |               |   letters of the group   |
-    |               |          |               |   names                  |
-    +---------------+----------+---------------+--------------------------+
-
-    Sample response
-    ^^^^^^^^^^^^^^^
-
-    ::
-
-        {
-          "total_groups": 2,
-          "groups": ["group1", "group2"]
-        }
-
-    '''
-    pattern = flask.request.args.get('pattern', None)
-    if pattern is not None and not pattern.endswith('*'):
-        pattern += '*'
-
-    groups = pagure.lib.search_groups(SESSION, pattern=pattern)
-
-    return flask.jsonify(
-        {
-            'total_groups': len(groups),
-            'groups': [group.group_name for group in groups]
-        }
-    )
-
-
 @API.route('/error_codes/')
 @API.route('/error_codes')
 def api_error_codes():
@@ -483,10 +434,10 @@ def api():
         user.api_view_user_activity_date)
 
     api_view_group_doc = load_doc(group.api_view_group)
+    api_groups_doc = load_doc(group.api_groups)
 
     if pagure.APP.config.get('ENABLE_TICKETS', True):
         api_project_tags_doc = load_doc(api_project_tags)
-    api_groups_doc = load_doc(api_groups)
     api_error_codes_doc = load_doc(api_error_codes)
 
     extras = [
@@ -519,11 +470,11 @@ def api():
         users=[
             api_users_doc,
             api_view_user_doc,
-            api_groups_doc,
             api_view_user_activity_stats_doc,
             api_view_user_activity_date_doc,
         ],
         groups=[
+            api_groups_doc,
             api_view_group_doc
         ],
         ci=ci_doc,

@@ -4,6 +4,7 @@
  (c) 2017 - Copyright Red Hat Inc
 
  Authors:
+   Pierre-Yves Chibon <pingou@pingoured.fr>
    Matt Prahl <mprahl@redhat.com>
 
 """
@@ -15,6 +16,55 @@ import pagure.exceptions
 import pagure.lib
 from pagure import SESSION
 from pagure.api import API, api_method, APIERROR
+
+
+@API.route('/groups/')
+@API.route('/groups')
+def api_groups():
+    '''
+    List groups
+    -----------
+    Retrieve groups on this Pagure instance.
+    This can then be used as input for autocompletion in some forms/fields.
+
+    ::
+
+        GET /api/0/groups
+
+    Parameters
+    ^^^^^^^^^^
+
+    +---------------+----------+---------------+--------------------------+
+    | Key           | Type     | Optionality   | Description              |
+    +===============+==========+===============+==========================+
+    | ``pattern``   | string   | Optional      | | Filters the starting   |
+    |               |          |               |   letters of the group   |
+    |               |          |               |   names                  |
+    +---------------+----------+---------------+--------------------------+
+
+    Sample response
+    ^^^^^^^^^^^^^^^
+
+    ::
+
+        {
+          "total_groups": 2,
+          "groups": ["group1", "group2"]
+        }
+
+    '''
+    pattern = flask.request.args.get('pattern', None)
+    if pattern is not None and not pattern.endswith('*'):
+        pattern += '*'
+
+    groups = pagure.lib.search_groups(SESSION, pattern=pattern)
+
+    return flask.jsonify(
+        {
+            'total_groups': len(groups),
+            'groups': [group.group_name for group in groups]
+        }
+    )
 
 
 @API.route('/group/<group>')
