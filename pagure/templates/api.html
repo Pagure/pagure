@@ -76,6 +76,18 @@
         {% endfor %}
         </div>
 
+        <h2>
+            Groups
+            <a name="groups" title="Permalink to this headline" href="#groups">
+              <span class="oi" data-glyph="link-intact"></span>
+            </a>
+        </h2>
+        <div class="accordion">
+        {% for html in groups %}
+        {{ html | InsertDiv | safe }}
+        {% endfor %}
+        </div>
+
         {% if config.get('PAGURE_CI_SERVICES') %}
         <h2>
             Continous Integration Services

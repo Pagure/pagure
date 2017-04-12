@@ -1978,6 +1978,7 @@ class PagureGroup(BASE):
             'group_type': self.group_type,
             'creator': self.creator.to_json(public=public),
             'date_created': self.created.strftime('%s'),
+            'members': [user.username for user in self.users]
         }
 
         return output

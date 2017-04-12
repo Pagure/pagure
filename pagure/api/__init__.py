@@ -84,6 +84,7 @@ class APIERROR(enum.Enum):
     EINVALIDISSUEFIELD_LINK = 'Invalid custom field submitted, the value '\
         'is not a link'
     EINVALIDPRIORITY = 'Invalid priority submitted'
+    ENOGROUP = 'Group not found'
 
 
 def check_api_acls(acls, optional=False):
@@ -212,6 +213,7 @@ if pagure.APP.config.get('ENABLE_TICKETS', True):
 from pagure.api import fork  # noqa
 from pagure.api import project  # noqa
 from pagure.api import user  # noqa
+from pagure.api import group  # noqa
 
 if pagure.APP.config.get('PAGURE_CI_SERVICES', False):
     from pagure.api.ci import jenkins  # noqa
@@ -480,6 +482,8 @@ def api():
     api_view_user_activity_date_doc = load_doc(
         user.api_view_user_activity_date)
 
+    api_view_group_doc = load_doc(group.api_view_group)
+
     if pagure.APP.config.get('ENABLE_TICKETS', True):
         api_project_tags_doc = load_doc(api_project_tags)
     api_groups_doc = load_doc(api_groups)
@@ -518,6 +522,9 @@ def api():
             api_groups_doc,
             api_view_user_activity_stats_doc,
             api_view_user_activity_date_doc,
+        ],
+        groups=[
+            api_view_group_doc
         ],
         ci=ci_doc,
         extras=extras,
