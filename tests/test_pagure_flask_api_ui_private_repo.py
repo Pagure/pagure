@@ -933,6 +933,19 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "total_projects": 1,
                     "projects": [
                         {
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "ticket": []
+                            },
+                            "access_users": {
+                                "admin": [],
+                                "commit": [],
+                                "owner": [
+                                    "pingou"
+                                ],
+                                "ticket": []
+                            },
                             "close_status": [],
                             "custom_keys": [],
                             "date_created": "1436527638",
@@ -970,6 +983,19 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "total_projects": 1,
                     "projects": [
                         {
+                            "access_groups": {
+                                "admin": [],
+                                "commit": [],
+                                "ticket": []
+                            },
+                            "access_users": {
+                                "admin": [],
+                                "commit": [],
+                                "owner": [
+                                    "pingou"
+                                ],
+                                "ticket": []
+                            },
                             "close_status": [],
                             "custom_keys": [],
                             "date_created": "1436527638",
@@ -1074,6 +1100,19 @@ class PagurePrivateRepotest(tests.Modeltests):
                             "id": 1,
                             "initial_comment": None,
                             "project": {
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "ticket": []
+                                },
+                                "access_users": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "owner": [
+                                        "pingou"
+                                    ],
+                                    "ticket": []
+                                },
                                 "close_status": [],
                                 "custom_keys": [],
                                 "date_created": "1431414800",
@@ -1093,6 +1132,19 @@ class PagurePrivateRepotest(tests.Modeltests):
                             },
                             "remote_git": None,
                             "repo_from": {
+                                "access_groups": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "ticket": []
+                                },
+                                "access_users": {
+                                    "admin": [],
+                                    "commit": [],
+                                    "owner": [
+                                        "pingou"
+                                    ],
+                                    "ticket": []
+                                },
                                 "close_status": [],
                                 "custom_keys": [],
                                 "date_created": "1431414800",
@@ -1164,6 +1216,19 @@ class PagurePrivateRepotest(tests.Modeltests):
                     "id": 1,
                     "initial_comment": None,
                     "project": {
+                        "access_groups": {
+                            "admin": [],
+                            "commit": [],
+                            "ticket": []
+                        },
+                        "access_users": {
+                            "admin": [],
+                            "commit": [],
+                            "owner": [
+                                "pingou"
+                            ],
+                            "ticket": []
+                        },
                         "close_status": [],
                         "custom_keys": [],
                         "date_created": "1431414800",
@@ -1183,6 +1248,19 @@ class PagurePrivateRepotest(tests.Modeltests):
                     },
                     "remote_git": None,
                     "repo_from": {
+                         "access_groups": {
+                            "admin": [],
+                            "commit": [],
+                            "ticket": []
+                        },
+                        "access_users": {
+                            "admin": [],
+                            "commit": [],
+                            "owner": [
+                                "pingou"
+                            ],
+                            "ticket": []
+                        },
                         "close_status": [],
                         "custom_keys": [],
                         "date_created": "1431414800",

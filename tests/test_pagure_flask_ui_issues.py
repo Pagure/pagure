@@ -652,7 +652,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
             in output.data)
 
         # Create issues to play with
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
 
         # Add user 'foo' with ticket access on repo
         msg = pagure.lib.add_user_to_project(
@@ -706,7 +706,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # Create issues to play with
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,
@@ -719,7 +719,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(msg.title, 'Test issue')
 
         # Add user 'foo' with ticket access on repo
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         msg = pagure.lib.add_user_to_project(
             self.session,
             repo,
@@ -731,7 +731,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.session.commit()
 
         # Set some custom fields
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         msg = pagure.lib.set_custom_key_fields(
             self.session,
             repo,
@@ -826,7 +826,7 @@ class PagureFlaskIssuestests(tests.Modeltests):
         self.assertEqual(output.status_code, 404)
 
         # Create issues to play with
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.get_authorized_project(self.session, 'test')
         msg = pagure.lib.new_issue(
             session=self.session,
             repo=repo,

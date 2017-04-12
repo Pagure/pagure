@@ -954,7 +954,7 @@ repo requests/forks/pingou/test2
         """
         tests.create_projects(self.session)
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         # Make the project enforce the PR workflow
         settings = repo.settings
         settings['pull_request_access_only'] = True
@@ -1063,7 +1063,7 @@ repo requests/forks/pingou/test3
         """
         tests.create_projects(self.session)
 
-        repo = pagure.lib.get_project(self.session, 'test')
+        repo = pagure.lib._get_project(self.session, 'test')
         self.assertFalse(repo.settings['pull_request_access_only'])
 
         # Add an user to a project
