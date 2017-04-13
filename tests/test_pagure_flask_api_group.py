@@ -87,12 +87,14 @@ class PagureFlaskApiGroupTests(tests.Modeltests):
         self.assertEqual(sorted(data.keys()), ['groups', 'total_groups'])
         self.assertEqual(data['total_groups'], 1)
 
-    def test_api_view_group(self):
+    def test_api_view_group_authenticated(self):
         """
-            Test the api_view_group method of the flask api
-            The tested group has one member.
+            Test the api_view_group method of the flask api with an
+            authenticated user. The tested group has one member.
         """
-        output = self.app.get("/api/0/group/some_group")
+        tests.create_tokens(self.session)
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        output = self.app.get('/api/0/group/some_group', headers=headers)
         self.assertEqual(output.status_code, 200)
         exp = {
             "display_name": "Some Group",
@@ -115,10 +117,33 @@ class PagureFlaskApiGroupTests(tests.Modeltests):
         data['date_created'] = '1492020239'
         self.assertDictEqual(data, exp)
 
-    def test_api_view_group_two_members(self):
+    def test_api_view_group_unauthenticated(self):
         """
-            Test the api_view_group method of the flask api
-            The tested group has two members.
+            Test the api_view_group method of the flask api with an
+            unauthenticated user. The tested group has one member.
+        """
+        output = self.app.get('/api/0/group/some_group')
+        self.assertEqual(output.status_code, 200)
+        exp = {
+            "display_name": "Some Group",
+            "description": None,
+            "creator": {
+                "fullname": "PY C",
+                "name": "pingou"
+            },
+            "members": ["pingou"],
+            "date_created": "1492020239",
+            "group_type": "user",
+            "name": "some_group"
+        }
+        data = json.loads(output.data)
+        data['date_created'] = '1492020239'
+        self.assertDictEqual(data, exp)
+
+    def test_api_view_group_two_members_authenticated(self):
+        """
+            Test the api_view_group method of the flask api with an
+            authenticated user. The tested group has two members.
         """
         user = pagure.lib.model.User(
             user='mprahl',
@@ -132,7 +157,10 @@ class PagureFlaskApiGroupTests(tests.Modeltests):
         result = pagure.lib.add_user_to_group(
             self.session, user.username, group, user.username, True)
         self.session.commit()
-        output = self.app.get("/api/0/group/some_group")
+
+        tests.create_tokens(self.session)
+        headers = {'Authorization': 'token aaabbbcccddd'}
+        output = self.app.get('/api/0/group/some_group', headers=headers)
         self.assertEqual(output.status_code, 200)
         exp = {
             "display_name": "Some Group",

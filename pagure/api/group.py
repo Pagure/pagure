@@ -15,7 +15,7 @@ import pagure
 import pagure.exceptions
 import pagure.lib
 from pagure import SESSION
-from pagure.api import API, api_method, APIERROR
+from pagure.api import API, APIERROR, api_method, api_login_optional
 
 
 @API.route('/groups/')
@@ -68,6 +68,7 @@ def api_groups():
 
 
 @API.route('/group/<group>')
+@api_login_optional()
 @api_method
 def api_view_group(group):
     """
@@ -112,6 +113,7 @@ def api_view_group(group):
     if not group:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOGROUP)
 
-    jsonout = flask.jsonify(group.to_json())
+    jsonout = flask.jsonify(group.to_json(
+        public=(not pagure.api_authenticated())))
     jsonout.status_code = 200
     return jsonout
