@@ -302,7 +302,7 @@ def request_pull_patch(repo, requestid, username=None, namespace=None):
             diff_commits = pagure.lib.git.diff_pull_request(
                 SESSION, request, repo_obj, orig_repo,
                 requestfolder=APP.config['REQUESTS_FOLDER'],
-                with_diff=False)[0]
+                with_diff=False)
         except pagure.exceptions.PagureException as err:
             flask.flash(err.message, 'error')
             return flask.redirect(flask.url_for(

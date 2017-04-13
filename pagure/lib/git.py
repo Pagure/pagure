@@ -1188,7 +1188,7 @@ def merge_pull_request(
     # Update the start and stop commits in the DB, one last time
     diff_commits = diff_pull_request(
         session, request, fork_obj, PagureRepo(parentpath),
-        requestfolder=request_folder, with_diff=False)[0]
+        requestfolder=request_folder, with_diff=False)
 
     if request.project.settings.get(
             'Enforce_signed-off_commits_in_pull-request', False):
@@ -1535,7 +1535,7 @@ def diff_pull_request(
     if with_diff:
         return (diff_commits, diff)
     else:
-        diff_commits
+        return diff_commits
 
 
 def get_git_tags(project):
