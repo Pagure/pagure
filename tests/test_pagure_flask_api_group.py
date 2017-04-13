@@ -92,6 +92,7 @@ class PagureFlaskApiGroupTests(tests.Modeltests):
             Test the api_view_group method of the flask api with an
             authenticated user. The tested group has one member.
         """
+        tests.create_projects(self.session)
         tests.create_tokens(self.session)
         headers = {'Authorization': 'token aaabbbcccddd'}
         output = self.app.get('/api/0/group/some_group', headers=headers)
@@ -158,7 +159,9 @@ class PagureFlaskApiGroupTests(tests.Modeltests):
             self.session, user.username, group, user.username, True)
         self.session.commit()
 
+        tests.create_projects(self.session)
         tests.create_tokens(self.session)
+
         headers = {'Authorization': 'token aaabbbcccddd'}
         output = self.app.get('/api/0/group/some_group', headers=headers)
         self.assertEqual(output.status_code, 200)
