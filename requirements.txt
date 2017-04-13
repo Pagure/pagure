@@ -2,10 +2,10 @@
 # Use this file by running "$ pip install -r requirements.txt"
 alembic
 arrow
-binaryornot
+binaryornot < 0.4.3
 bleach < 2.0
 blinker
-chardet
+chardet < 3.0.0
 docutils
 enum34
 filelock
