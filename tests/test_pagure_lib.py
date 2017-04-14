@@ -4295,11 +4295,57 @@ class PagureLibtests(tests.Modeltests):
         v = tuple([int(c) for c in markdown.version.split('.')])
 
         if v < (2, 6, 7):
-            raise unittest.case.SkipTest('Skipping on old markdown')
+            raise unittest.case.SkipTest(
+                'Skipping on old markdown that do not strip the orientation row'
+            )
 
         text = """
 | Left-aligned | Center-aligned | Right-aligned |
 | :---         |    :---:       |          ---: |
+| git status   | git status     | git status    |
+| git diff     | git diff       | git diff      |
+
+
+foo bar
+        """
+
+        expected = """<table>
+<thead>
+<tr>
+<th align="left">Left-aligned</th>
+<th align="center">Center-aligned</th>
+<th align="right">Right-aligned</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">git status</td>
+<td align="center">git status</td>
+<td align="right">git status</td>
+</tr>
+<tr>
+<td align="left">git diff</td>
+<td align="center">git diff</td>
+<td align="right">git diff</td>
+</tr>
+</tbody>
+</table>
+<p>foo bar</p>"""
+
+        with pagure.APP.app_context():
+            html = pagure.lib.text2markdown(text)
+            self.assertEqual(html, expected)
+
+
+    def test_text2markdown_table_old_mk(self):
+        """ Test the text2markdown function with a markdown table using the old
+        format where the orientation instruction are provided next to the column
+        delimiter unlike what can be done with more recent version of markdown.
+        """
+
+        text = """
+| Left-aligned | Center-aligned | Right-aligned |
+|:---          |:--------------:|           ---:|
 | git status   | git status     | git status    |
 | git diff     | git diff       | git diff      |
 
