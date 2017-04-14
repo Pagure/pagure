@@ -1,14 +1,14 @@
 """Create private column in project table
 
 Revision ID: 4255158a6913
-Revises: 3ffec872dfdf
+Revises: 4df75d40bafa
 Create Date: 2016-06-06 14:33:47.039207
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '4255158a6913'
-down_revision = '3ffec872dfdf'
+down_revision = '4df75d40bafa'
 
 from alembic import op
 import sqlalchemy as sa
