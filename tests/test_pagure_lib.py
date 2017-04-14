@@ -16,6 +16,7 @@ import shutil
 import sys
 import os
 
+import markdown
 from mock import patch, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(
@@ -4291,6 +4292,10 @@ class PagureLibtests(tests.Modeltests):
 
     def test_text2markdown_table(self):
         """ Test the text2markdown function with a markdown table. """
+        v = tuple([int(c) for c in markdown.version.split('.')])
+
+        if v < (2, 6, 7):
+            raise unittest.case.SkipTest('Skipping on old markdown')
 
         text = """
 | Left-aligned | Center-aligned | Right-aligned |
