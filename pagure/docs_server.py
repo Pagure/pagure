@@ -158,7 +158,14 @@ def view_docs(repo, username=None, namespace=None, filename=None):
     if not repo_obj.is_empty:
         commit = repo_obj[repo_obj.head.target]
     else:
-        flask.abort(404, 'No content found is the repository')
+        flask.abort(
+            404,
+            flask.Markup(
+                'No content found is the repository, you may want to read '
+                'the <a href="https://docs.pagure.org/pagure/usage/using_doc.html">'
+                'Using the doc repository of your project</a> documentation'
+            )
+        )
     branchname = 'master'
 
     content = None

@@ -154,6 +154,26 @@ class PagureFlaskDocstests(tests.Modeltests):
         output = self.app.get('/test/docs', follow_redirects=True)
         self.assertEqual(output.status_code, 404)
 
+    def test_view_docs_empty_repo(self):
+        """ Test the view_docs endpoint when the git repo is empty. """
+        tests.create_projects(self.session)
+        repo = pygit2.init_repository(
+            os.path.join(self.path, 'docs', 'test.git'), bare=True)
+
+        # Turn on the docs project since it's off by default
+        repo = pagure.get_authorized_project(self.session, 'test')
+        repo.settings = {'project_documentation': True}
+        self.session.add(repo)
+        self.session.commit()
+
+        output = self.app.get('/test/docs')
+        self.assertEqual(output.status_code, 404)
+        self.assertIn(
+            '<p>No content found is the repository, you may want to read '
+            'the <a href="https://docs.pagure.org/pagure/usage/'
+            'using_doc.html">Using the doc repository of your project</a> '
+            'documentation</p>', output.data)
+
     def test_view_docs(self):
         """ Test the view_docs endpoint. """
         tests.create_projects(self.session)
