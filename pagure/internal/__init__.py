@@ -10,8 +10,6 @@ Internal endpoints.
 
 """
 
-import shutil
-import tempfile
 import os
 
 import flask
@@ -22,13 +20,13 @@ from sqlalchemy.exc import SQLAlchemyError
 
 PV = flask.Blueprint('internal_ns', __name__, url_prefix='/pv')
 
-import pagure
-import pagure.exceptions
-import pagure.forms
-import pagure.lib
-import pagure.lib.git
-import pagure.ui.fork
-from pagure import is_repo_admin, authenticated
+import pagure  # noqa
+import pagure.exceptions  # noqa
+import pagure.forms  # noqa
+import pagure.lib  # noqa
+import pagure.lib.git  # noqa
+import pagure.ui.fork  # noqa
+from pagure import is_repo_admin, authenticated  # noqa
 
 
 MERGE_OPTIONS = {
