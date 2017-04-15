@@ -18,8 +18,7 @@ import pagure.exceptions
 import pagure.lib
 
 from pagure import (
-    APP, SESSION, is_repo_committer, api_authenticated, urlpattern,
-    is_repo_admin
+    APP, SESSION, is_repo_committer, api_authenticated, urlpattern
 )
 from pagure.api import (
     API, api_method, api_login_required, api_login_optional, APIERROR
@@ -31,7 +30,8 @@ def _get_repo(repo_name, username=None, namespace=None):
     :param repo_name: name of repository
     :param username:
     :param namespace:
-    :raises pagure.exceptions.APIError: when repository doesn't exists or is disabled
+    :raises pagure.exceptions.APIError: when repository doesn't exists or
+        is disabled
     :return: repository name
     """
     repo = pagure.get_authorized_project(
@@ -372,7 +372,7 @@ def api_view_issues(repo, username=None, namespace=None):
             no_stones = True
         else:
             no_stones = False
-    priority =  flask.request.args.get('priority', None)
+    priority = flask.request.args.get('priority', None)
     since = flask.request.args.get('since', None)
     status = flask.request.args.get('status', None)
     tags = flask.request.args.getlist('tags')
@@ -667,7 +667,6 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
     issue = _get_issue(repo, issueid)
     _check_issue_access_repo_commiter(issue)
 
-
     status = pagure.lib.get_issue_statuses(SESSION)
     form = pagure.forms.StatusForm(
         status=status,
@@ -724,9 +723,11 @@ def api_change_status_issue(repo, issueid, username=None, namespace=None):
 
 
 @API.route('/<repo>/issue/<int:issueid>/milestone', methods=['POST'])
-@API.route('/<namespace>/<repo>/issue/<int:issueid>/milestone', methods=['POST'])
 @API.route(
-    '/fork/<username>/<repo>/issue/<int:issueid>/milestone', methods=['POST'])
+    '/<namespace>/<repo>/issue/<int:issueid>/milestone', methods=['POST'])
+@API.route(
+    '/fork/<username>/<repo>/issue/<int:issueid>/milestone',
+    methods=['POST'])
 @API.route(
     '/fork/<username>/<namespace>/<repo>/issue/<int:issueid>/milestone',
     methods=['POST'])
@@ -770,7 +771,7 @@ def api_change_milestone_issue(repo, issueid, username=None, namespace=None):
           "message": "Successfully edited issue #1"
         }
 
-    """
+    """  # noqa
     output = {}
     repo = _get_repo(repo, username, namespace)
     _check_issue_tracker(repo)

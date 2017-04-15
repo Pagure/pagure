@@ -165,7 +165,8 @@ def api_projects():
         private = flask.g.fas_user.username
 
     projects = pagure.lib.search_projects(
-        SESSION, username=username, fork=fork, tags=tags, pattern=pattern, private=private)
+        SESSION, username=username, fork=fork,
+        tags=tags, pattern=pattern, private=private)
 
     if not projects:
         raise pagure.exceptions.APIError(

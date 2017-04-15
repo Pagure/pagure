@@ -91,24 +91,24 @@ def api_view_group(group):
 
         {
           "creator": {
-            "default_email": "user1@example.com", 
+            "default_email": "user1@example.com",
             "emails": [
               "user1@example.com"
-            ], 
-            "fullname": "User1", 
+            ],
+            "fullname": "User1",
             "name": "user1"
-          }, 
-          "date_created": "1492011511", 
-          "description": "Some Group", 
-          "display_name": "Some Group", 
-          "group_type": "user", 
+          },
+          "date_created": "1492011511",
+          "description": "Some Group",
+          "display_name": "Some Group",
+          "group_type": "user",
           "members": [
-            "user1", 
+            "user1",
             "user2"
-          ], 
+          ],
           "name": "some_group_name"
         }
-    """
+    """  # noqa
     group = pagure.lib.search_groups(SESSION, group_name=group)
     if not group:
         raise pagure.exceptions.APIError(404, error_code=APIERROR.ENOGROUP)

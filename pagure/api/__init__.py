@@ -187,14 +187,14 @@ def api_method(function):
 
             if err.error_code in [APIERROR.ENOCODE]:
                 output = {
-                        'error': err.error,
-                        'error_code': err.error_code.name
-                    }
+                    'error': err.error,
+                    'error_code': err.error_code.name
+                }
             else:
                 output = {
-                        'error': err.error_code.value,
-                        'error_code': err.error_code.name,
-                    }
+                    'error': err.error_code.value,
+                    'error_code': err.error_code.name,
+                }
 
             if err.errors:
                 output['errors'] = err.errors
