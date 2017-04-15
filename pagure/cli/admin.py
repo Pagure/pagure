@@ -56,7 +56,7 @@ def _parser_clear_hook_token(subparser):
 def _parser_admin_token_list(subparser):
     """ Set up the CLI argument parser for the admin-token list action. """
     local_parser = subparser.add_parser(
-        'list',  help="List the API admin token")
+        'list', help="List the API admin token")
     local_parser.add_argument(
         '--user',
         help="User to associate or associated with the token")
@@ -74,7 +74,7 @@ def _parser_admin_token_list(subparser):
 def _parser_admin_token_info(subparser):
     """ Set up the CLI argument parser for the admin-token info action. """
     local_parser = subparser.add_parser(
-        'info',  help="Provide some information about a specific API token")
+        'info', help="Provide some information about a specific API token")
     local_parser.add_argument(
         'token', help="API token")
     local_parser.set_defaults(func=do_info_admin_token)
@@ -84,7 +84,7 @@ def _parser_admin_token_expire(subparser):
     """ Set up the CLI argument parser for the admin-token expire action. """
     # Expire admin token
     local_parser = subparser.add_parser(
-        'expire',  help="Expire a specific API token")
+        'expire', help="Expire a specific API token")
     local_parser.add_argument(
         'token', help="API token")
     local_parser.set_defaults(func=do_expire_admin_token)
