@@ -140,8 +140,8 @@ def view_docs(repo, username=None, namespace=None, filename=None):
     if '.' in repo:
         namespace, repo = repo.split('.', 1)
 
-    repo = pagure.get_authorized_project(SESSION, repo, user=username,
-            namespace=namespace)
+    repo = pagure.get_authorized_project(
+        SESSION, repo, user=username, namespace=namespace)
 
     if not repo:
         flask.abort(404, 'Project not found')
@@ -162,11 +162,11 @@ def view_docs(repo, username=None, namespace=None, filename=None):
             404,
             flask.Markup(
                 'No content found is the repository, you may want to read '
-                'the <a href="https://docs.pagure.org/pagure/usage/using_doc.html">'
+                'the <a href="'
+                'https://docs.pagure.org/pagure/usage/using_doc.html">'
                 'Using the doc repository of your project</a> documentation'
             )
         )
-    branchname = 'master'
 
     content = None
     tree = None

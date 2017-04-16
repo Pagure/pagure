@@ -14,7 +14,6 @@ import docutils.core
 import docutils.examples
 import kitchen.text.converters as ktc
 import markupsafe
-import markdown
 import textwrap
 
 import pagure.lib

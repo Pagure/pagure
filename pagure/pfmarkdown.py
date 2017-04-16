@@ -19,8 +19,6 @@ Author: Ralph Bean <rbean@redhat.com>
         Pierre-Yves Chibon <pingou@pingoured.fr>
 """
 
-import re
-
 import flask
 
 import markdown.inlinepatterns
@@ -39,18 +37,20 @@ MENTION_RE = r'@(\w+)'
 #  4) See if we have a `namespace/`
 #  5) Get the last part `project`
 #  6) Get the identifier `#<id>`
-EXPLICIT_LINK_RE = r'(?<!\w)'\
-'(fork[s]?/)?'\
-'([a-zA-Z0-9_-]*?/)?'\
-'([a-zA-Z0-9_-]*?/)?'\
-'([a-zA-Z0-9_-]+)'\
-'#(?P<id>[0-9]+)'
-COMMIT_LINK_RE = r'(?<!\w)'\
-'(fork[s]?/)?'\
-'([a-zA-Z0-9_-]*?/)?'\
-'([a-zA-Z0-9_-]*?/)?'\
-'([a-zA-Z0-9_-]+)'\
-'#(?P<id>[\w]{40})'
+EXPLICIT_LINK_RE = \
+    r'(?<!\w)'\
+    '(fork[s]?/)?'\
+    '([a-zA-Z0-9_-]*?/)?'\
+    '([a-zA-Z0-9_-]*?/)?'\
+    '([a-zA-Z0-9_-]+)'\
+    '#(?P<id>[0-9]+)'
+COMMIT_LINK_RE = \
+    r'(?<!\w)'\
+    '(fork[s]?/)?'\
+    '([a-zA-Z0-9_-]*?/)?'\
+    '([a-zA-Z0-9_-]*?/)?'\
+    '([a-zA-Z0-9_-]+)'\
+    '#(?P<id>[\w]{40})'
 IMPLICIT_ISSUE_RE = r'[^|\w](?<!\w)#([0-9]+)'
 IMPLICIT_PR_RE = r'[^|\w](?<!\w)PR#([0-9]+)'
 IMPLICIT_COMMIT_RE = r'[^|\w](?<![>\w#])([a-f0-9]{7,40})'
@@ -109,7 +109,6 @@ class ExplicitLinkPattern(markdown.inlinepatterns.Pattern):
         issue = _issue_exists(user, namespace, repo, idx)
         if issue:
             return _obj_anchor_tag(user, namespace, repo, issue, text)
-
 
         request = _pr_exists(user, namespace, repo, idx)
         if request:
@@ -368,12 +367,12 @@ def _obj_anchor_tag(user, namespace, repo, obj, text):
     if isinstance(obj, basestring):
         url = flask.url_for(
             'view_commit', username=user, namespace=namespace, repo=repo,
-             commitid=obj)
+            commitid=obj)
         title = 'Commit %s' % obj
     elif obj.isa == 'issue':
         url = flask.url_for(
             'view_issue', username=user, namespace=namespace, repo=repo,
-             issueid=obj.id)
+            issueid=obj.id)
         if obj.private:
             title = 'Private issue'
         else:

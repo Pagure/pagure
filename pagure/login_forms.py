@@ -26,8 +26,6 @@ try:
 except ImportError:
     from flask_wtf import Form as FlaskForm
 
-from pagure.forms import ConfirmationForm
-
 
 def same_password(form, field):
     ''' Check if the data in the field is the same as in the password field.

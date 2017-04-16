@@ -10,40 +10,40 @@
 
 # These two lines are needed to run on EL6
 __requires__ = ['SQLAlchemy >= 0.8', 'jinja2 >= 2.4']
-import pkg_resources
+import pkg_resources  # noqa
 
 __version__ = '2.14.2'
 __api_version__ = '0.12'
 
 
-import datetime
-import logging
-import os
-import re
-import subprocess
-import urlparse
-from logging.handlers import SMTPHandler
+import datetime  # noqa
+import logging  # noqa
+import os  # noqa
+import re  # noqa
+import subprocess  # noqa
+import urlparse  # noqa
+from logging.handlers import SMTPHandler  # noqa
 
-import flask
-import pygit2
-import werkzeug
-from functools import wraps
-from sqlalchemy.exc import SQLAlchemyError
+import flask  # noqa
+import pygit2  # noqa
+import werkzeug  # noqa
+from functools import wraps  # noqa
+from sqlalchemy.exc import SQLAlchemyError  # noqa
 
-from pygments import highlight
-from pygments.lexers.text import DiffLexer
-from pygments.formatters import HtmlFormatter
+from pygments import highlight  # noqa
+from pygments.lexers.text import DiffLexer  # noqa
+from pygments.formatters import HtmlFormatter  # noqa
 
-from flask_multistatic import MultiStaticFlask
+from flask_multistatic import MultiStaticFlask  # noqa
 
-from werkzeug.routing import BaseConverter
+from werkzeug.routing import BaseConverter  # noqa
 
 if os.environ.get('PAGURE_PERFREPO'):
-    import pagure.perfrepo as perfrepo
+    import pagure.perfrepo as perfrepo  # noqa
 else:
     perfrepo = None
 
-import pagure.exceptions
+import pagure.exceptions  # noqa
 
 # Create the application.
 APP = MultiStaticFlask(__name__)
@@ -93,13 +93,13 @@ if APP.config.get('THEME_STATIC_FOLDER', False):
     ]
 
 
-import pagure.doc_utils
-import pagure.forms
-import pagure.lib
-import pagure.lib.git
-import pagure.login_forms
-import pagure.mail_logging
-import pagure.proxy
+import pagure.doc_utils  # noqa
+import pagure.forms  # noqa
+import pagure.lib  # noqa
+import pagure.lib.git  # noqa
+import pagure.login_forms  # noqa
+import pagure.mail_logging  # noqa
+import pagure.proxy  # noqa
 
 # Only import flask_fas_openid if it is needed
 if APP.config.get('PAGURE_AUTH', None) in ['fas', 'openid']:
@@ -426,9 +426,10 @@ def login_required(function):
             return flask.redirect(
                 flask.url_for('auth_login', next=flask.request.url))
         elif auth_method == 'fas' and not flask.g.fas_user.cla_done:
-            flask.flash(flask.Markup('You must <a href="https://admin.fedoraproject'
-                        '.org/accounts/">sign the FPCA</a> (Fedora Project '
-                        'Contributor Agreement) to use pagure'), 'errors')
+            flask.flash(flask.Markup(
+                'You must <a href="https://admin.fedoraproject'
+                '.org/accounts/">sign the FPCA</a> (Fedora Project '
+                'Contributor Agreement) to use pagure'), 'errors')
             return flask.redirect(flask.url_for('.index'))
         return function(*args, **kwargs)
     return decorated_function
@@ -504,12 +505,12 @@ def set_variables():
             SESSION, repo, user=username, namespace=namespace)
         if authenticated():
             flask.g.repo_forked = pagure.get_authorized_project(
-                    SESSION, repo, user=flask.g.fas_user.username,
-                    namespace=namespace)
+                SESSION, repo, user=flask.g.fas_user.username,
+                namespace=namespace)
 
         if not flask.g.repo \
-            and APP.config.get('OLD_VIEW_COMMIT_ENABLED', False) \
-            and len(repo) == 40:
+                and APP.config.get('OLD_VIEW_COMMIT_ENABLED', False) \
+                and len(repo) == 40:
             return flask.redirect(flask.url_for(
                 'view_commit', repo=namespace, commitid=repo,
                 username=username, namespace=None))
@@ -726,29 +727,31 @@ ip_middle_octet = u"(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5]))"
 ip_last_octet = u"(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))"
 
 """
-regex based on https://github.com/kvesteri/validators/blob/master/validators/url.py
+regex based on https://github.com/kvesteri/validators/blob/
+master/validators/url.py
 LICENSED on Dec 16th 2016 as MIT:
 
 The MIT License (MIT)
 
 Copyright (c) 2013-2014 Konsta Vesterinen
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+IN THE SOFTWARE.
 
 """
 urlregex = re.compile(
@@ -792,18 +795,18 @@ urlregex = re.compile(
 urlpattern = re.compile(urlregex)
 
 # Import the application
-import pagure.ui.app
-import pagure.ui.fork
-import pagure.ui.groups
+import pagure.ui.app  # noqa
+import pagure.ui.fork  # noqa
+import pagure.ui.groups  # noqa
 if APP.config.get('ENABLE_TICKETS', True):
-    import pagure.ui.issues
-import pagure.ui.plugins
-import pagure.ui.repo
+    import pagure.ui.issues  # noqa
+import pagure.ui.plugins  # noqa
+import pagure.ui.repo  # noqa
 
-from pagure.api import API
+from pagure.api import API  # noqa
 APP.register_blueprint(API)
 
-import pagure.internal
+import pagure.internal  # noqa
 APP.register_blueprint(pagure.internal.PV)
 
 

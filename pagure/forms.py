@@ -14,7 +14,6 @@
 
 import datetime
 import re
-import tempfile
 
 import flask
 import flask_wtf as wtf
@@ -41,7 +40,7 @@ class PagureForm(FlaskForm):
     def __init__(self, *args, **kwargs):
         delta = pagure.APP.config.get('WTF_CSRF_TIME_LIMIT', 3600)
         if delta \
-                and (not hasattr(wtf, '__version__') \
+                and (not hasattr(wtf, '__version__')
                 or tuple(
                     int(v) for v in wtf.__version__.split('.')
                 ) < (0, 10, 0)):
@@ -65,7 +64,6 @@ class MultipleEmail(wtforms.validators.Email):
     of wtforms.
     """
     def __call__(self, form, field):
-        regex = re.compile(r'^.+@[^.].*\.[a-z]{2,10}$', re.IGNORECASE)
         message = field.gettext('One or more invalid email address.')
         for data in field.data.split(','):
             data = data.strip()
