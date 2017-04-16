@@ -1989,15 +1989,15 @@ def search_projects(
     # project is viewing the project
     elif isinstance(private, basestring) and private != username:
         projects = projects.filter(
-                sqlalchemy.or_(
-                    model.Project.private == False,
-                    sqlalchemy.and_(
-                        model.User.user == private,
-                        model.User.id == model.ProjectUser.user_id,
-                        model.ProjectUser.project_id == model.Project.id,
-                        model.Project.private == True,
-                    )
+            sqlalchemy.or_(
+                model.Project.private == False,
+                sqlalchemy.and_(
+                    model.User.user == private,
+                    model.User.id == model.ProjectUser.user_id,
+                    model.ProjectUser.project_id == model.Project.id,
+                    model.Project.private == True,
                 )
+            )
         )
 
     if fork is not None:
@@ -3389,7 +3389,7 @@ def text2markdown(text, extended=True, readme=False):
     md_processor = markdown.Markdown(
         safe_mode="escape",
         extensions=extensions,
-        extension_configs = {
+        extension_configs={
             'markdown.extensions.codehilite': {
                 'guess_lang': False,
             }
@@ -3460,7 +3460,7 @@ def clean_input(text, ignore=None):
             pass
         bleach_v[idx] = val
     if tuple(bleach_v) >= (1, 5, 0):
-        protocols=bleach.ALLOWED_PROTOCOLS + ['irc', 'ircs']
+        protocols = bleach.ALLOWED_PROTOCOLS + ['irc', 'ircs']
         kwargs['protocols'] = protocols
 
     return bleach.clean(text, **kwargs)

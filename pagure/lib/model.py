@@ -909,8 +909,10 @@ class DeployKey(BASE):
     project = relation(
         'Project', foreign_keys=[project_id], remote_side=[Project.id],
         backref=backref(
-            'deploykeys', cascade="delete, delete-orphan", single_parent=True)
+            'deploykeys', cascade="delete, delete-orphan",
+            single_parent=True
         )
+    )
 
     creator_user = relation(
         'User',
@@ -1060,8 +1062,9 @@ class Issue(BASE):
                         attachments.append(
                             (link, filename, display_name,
                              comment.date_created.strftime(
-                                '%Y-%m-%d %H:%M:%S'),
-                             str(comment.id)))
+                                 '%Y-%m-%d %H:%M:%S'),
+                             str(comment.id))
+                        )
         return attachments
 
     @property
@@ -1286,8 +1289,10 @@ class IssueKeys(BASE):
     project = relation(
         'Project', foreign_keys=[project_id], remote_side=[Project.id],
         backref=backref(
-            'issue_keys', cascade="delete, delete-orphan", single_parent=True)
+            'issue_keys', cascade="delete, delete-orphan",
+            single_parent=True
         )
+    )
 
     @property
     def data(self):
@@ -1333,8 +1338,9 @@ class IssueValues(BASE):
         backref=backref(
             'other_fields',
             cascade="delete, delete-orphan",
-            single_parent=True)
+            single_parent=True
         )
+    )
 
     key = relation(
         'IssueKeys', foreign_keys=[key_id], remote_side=[IssueKeys.id],
@@ -1381,8 +1387,9 @@ class TagIssue(BASE):
     issue = relation(
         'Issue', foreign_keys=[issue_uid], remote_side=[Issue.uid],
         backref=backref(
-            'old_tags', cascade="delete, delete-orphan", single_parent=True)
+            'old_tags', cascade="delete, delete-orphan", single_parent=True
         )
+    )
 
     def __repr__(self):
         return 'TagIssue(issue:%s, tag:%s)' % (self.issue.id, self.tag)
@@ -1489,8 +1496,9 @@ class TagProject(BASE):
     project = relation(
         'Project', foreign_keys=[project_id], remote_side=[Project.id],
         backref=backref(
-            'tags', cascade="delete, delete-orphan", single_parent=True)
+            'tags', cascade="delete, delete-orphan", single_parent=True
         )
+    )
 
     def __repr__(self):
         return 'TagProject(project:%s, tag:%s)' % (

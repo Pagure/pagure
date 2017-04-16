@@ -709,7 +709,7 @@ def update_request_from_git(
     """
 
     repo = pagure.lib._get_project(
-            session, reponame, user=username, namespace=namespace)
+        session, reponame, user=username, namespace=namespace)
     if not repo:
         raise pagure.exceptions.PagureException(
             'Unknown repo %s of username: %s in namespace: %s' % (
@@ -882,7 +882,8 @@ def add_file_to_git(repo, issue, ticketfolder, user, filename, filestream):
             'refs/heads/master',
             author,
             author,
-            'Add file %s to ticket %s: %s' % (filename, issue.uid, issue.title),
+            'Add file %s to ticket %s: %s' % (
+                filename, issue.uid, issue.title),
             new_repo.index.write_tree(),
             parents)
         index.write()
@@ -1484,7 +1485,6 @@ def diff_pull_request(
 
     """
 
-    commitid = None
     diff = None
     diff_commits = []
     diff, diff_commits, _ = get_diff_info(
@@ -1647,6 +1647,6 @@ def reinit_git(project, repofolder):
 
     # create it again
     pygit2.init_repository(
-            repo_path, bare=True,
-            mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP
+        repo_path, bare=True,
+        mode=pygit2.C.GIT_REPOSITORY_INIT_SHARED_GROUP
     )
