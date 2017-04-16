@@ -262,7 +262,6 @@ def view_projects(pattern=None, namespace=None):
         SESSION, pattern=pattern, namespace=namespace,
         fork=forks, start=start, limit=limit, private=private)
 
-
     if len(projects) == 1:
         flask.flash('Only one result found, redirecting you to it')
         return flask.redirect(flask.url_for(
