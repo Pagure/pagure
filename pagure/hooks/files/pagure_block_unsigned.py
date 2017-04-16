@@ -8,20 +8,16 @@ statement.
 import os
 import sys
 
-from sqlalchemy.exc import SQLAlchemyError
-
-import sys
-sys.path.insert(0, '/home/pierrey/repos/gitrepo/pagure/')
 
 if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
 
-import pagure
-import pagure.exceptions
-import pagure.lib.link
-import pagure.ui.plugins
+import pagure  # noqa
+import pagure.exceptions  # noqa
+import pagure.lib.link  # noqa
+import pagure.ui.plugins  # noqa
 
 
 abspath = os.path.abspath(os.environ['GIT_DIR'])

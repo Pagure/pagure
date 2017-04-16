@@ -9,18 +9,16 @@ import sys
 
 import requests
 
-from sqlalchemy.exc import SQLAlchemyError
-
 
 if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
 
-import pagure
-import pagure.exceptions
-import pagure.lib.link
-import pagure.lib.plugins
+import pagure  # noqa
+import pagure.exceptions  # noqa
+import pagure.lib.link  # noqa
+import pagure.lib.plugins  # noqa
 
 
 abspath = os.path.abspath(os.environ['GIT_DIR'])
@@ -36,12 +34,12 @@ def run_as_post_receive_hook():
         print 'namespace:', namespace
 
     repo = pagure.get_authorized_project(
-            pagure.SESSION, reponame, user=username, namespace=namespace)
+        pagure.SESSION, reponame, user=username, namespace=namespace)
     if not repo:
         print 'Unknown repo %s of username: %s' % (reponame, username)
         sys.exit(1)
 
-    plugin = pagure.lib.plugins.get_plugin('Read the Doc')
+    pagure.lib.plugins.get_plugin('Read the Doc')
     # Get the list of branches
     branches = [
         branch.strip()

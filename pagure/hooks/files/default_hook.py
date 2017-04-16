@@ -18,11 +18,11 @@ if 'PAGURE_CONFIG' not in os.environ \
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
 
-import pagure
-import pagure.exceptions
-import pagure.lib.link
+import pagure  # noqa
+import pagure.exceptions  # noqa
+import pagure.lib.link  # noqa
 
-from pagure.lib import REDIS
+from pagure.lib import REDIS  # noqa
 
 
 abspath = os.path.abspath(os.environ['GIT_DIR'])
@@ -39,7 +39,7 @@ def run_as_post_receive_hook():
         print('namespace:', namespace)
 
     project = pagure.lib._get_project(
-            pagure.SESSION, repo, user=username, namespace=namespace)
+        pagure.SESSION, repo, user=username, namespace=namespace)
 
     for line in sys.stdin:
         if pagure.APP.config.get('HOOK_DEBUG', False):
@@ -75,13 +75,14 @@ def run_as_post_receive_hook():
 
         if REDIS:
             print('Sending to redis to log activity')
-            REDIS.publish('pagure.logcom',
+            REDIS.publish(
+                'pagure.logcom',
                 json.dumps({
                     'project': project.to_json(public=True),
                     'abspath': abspath,
                     'commits': commits,
-                }
-            ))
+                })
+            )
 
     try:
         # Reset the merge_status of all opened PR to refresh their cache

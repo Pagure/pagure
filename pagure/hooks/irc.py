@@ -8,8 +8,6 @@
 
 """
 
-import os
-
 import sqlalchemy as sa
 import pygit2
 import wtforms
@@ -120,7 +118,7 @@ class Hook(BaseHook):
         '''
         repopaths = [get_repo_path(project)]
 
-        repo_obj = pygit2.Repository(repopaths[0])
+        repo_obj = pygit2.Repository(repopaths[0])  # noqa
 
         # Configure the hook
         # repo_obj.config.set_multivar()
@@ -136,6 +134,6 @@ class Hook(BaseHook):
             should be installed
 
         '''
-        repopaths = [get_repo_path(project)]
+        repopaths = [get_repo_path(project)]  # noqa
 
         # cls.base_remove(repopaths, 'irc')

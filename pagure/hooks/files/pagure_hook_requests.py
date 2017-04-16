@@ -7,9 +7,7 @@ based on the information pushed in the requests git repository.
 
 import json
 import os
-import re
 import sys
-import subprocess
 
 
 # We need to access the database
@@ -18,7 +16,7 @@ if 'PAGURE_CONFIG' not in os.environ \
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
 
-import pagure.lib.git
+import pagure.lib.git  # noqa
 
 
 abspath = os.path.abspath(os.environ['GIT_DIR'])

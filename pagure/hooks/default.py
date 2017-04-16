@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2016 - Copyright Red Hat Inc
+ (c) 2016-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -17,10 +17,9 @@ except ImportError:
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import backref
 
-import pagure.lib
-from pagure.hooks import BaseHook, RequiredIf
+from pagure.hooks import BaseHook
 from pagure.lib.model import BASE, Project
-from pagure import SESSION, APP, get_repo_path
+from pagure import get_repo_path
 
 
 class DefaultTable(BASE):

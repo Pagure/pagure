@@ -1,11 +1,7 @@
 #!/usr/bin/env python
 
-import getpass
 import os
-import subprocess
 import sys
-
-from collections import defaultdict
 
 import fedmsg
 import fedmsg.config
@@ -16,8 +12,8 @@ if 'PAGURE_CONFIG' not in os.environ \
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
 
-import pagure
-import pagure.lib.git
+import pagure  # noqa
+import pagure.lib.git  # noqa
 
 abspath = os.path.abspath(os.environ['GIT_DIR'])
 

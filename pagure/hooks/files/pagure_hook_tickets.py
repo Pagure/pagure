@@ -8,9 +8,7 @@ from __future__ import print_function
 
 import json
 import os
-import re
 import sys
-import subprocess
 
 
 # We need to access the database
@@ -18,10 +16,10 @@ if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
-import pagure
-import pagure.lib.git
+import pagure  # noqa
+import pagure.lib.git  # noqa
 
-from pagure.lib import REDIS
+from pagure.lib import REDIS  # noqa
 
 
 abspath = os.path.abspath(os.environ['GIT_DIR'])
@@ -64,7 +62,8 @@ def run_as_post_receive_hook():
 
         if REDIS:
             print('Sending to redis to load the data')
-            REDIS.publish('pagure.loadjson',
+            REDIS.publish(
+                'pagure.loadjson',
                 json.dumps({
                     'project': project.to_json(public=True),
                     'abspath': abspath,
