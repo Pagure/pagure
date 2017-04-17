@@ -40,10 +40,12 @@ class PagureForm(FlaskForm):
     def __init__(self, *args, **kwargs):
         delta = pagure.APP.config.get('WTF_CSRF_TIME_LIMIT', 3600)
         if delta \
-                and (not hasattr(wtf, '__version__')
-                or tuple(
-                    int(v) for v in wtf.__version__.split('.')
-                ) < (0, 10, 0)):
+                and (
+                    not hasattr(wtf, '__version__')
+                    or tuple(
+                        int(v) for v in wtf.__version__.split('.')
+                    ) < (0, 10, 0)
+                ):
             self.TIME_LIMIT = datetime.timedelta(seconds=delta)
         else:
             self.TIME_LIMIT = delta
