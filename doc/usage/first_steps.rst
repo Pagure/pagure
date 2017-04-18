@@ -1,3 +1,5 @@
+.. _first-steps:
+
 First Steps on pagure
 =====================
 
@@ -21,6 +23,8 @@ If you run your own pagure instance which uses the local authentication
 system, then you will find on the login page an option to create a new
 account.
 
+
+.. _upload-your-ssh-key:
 
 Upload your SSH key
 -------------------

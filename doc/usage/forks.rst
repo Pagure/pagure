@@ -54,12 +54,18 @@ It's a good idea to give the branch a descriptive name so you can find it later.
 Next, make your changes. Once you're satisfied, add the changes to Git's staging
 area and commit the changes::
 
-    $ git add -A  # Adds everything
-    $ git commit -s
+    $ git add -A  # add all changes
+    $ git commit -s # prepare changes for upload
 
 Your text editor of choice will open and you can write your commit message.
+If you have not done so already :ref:`upload-your-ssh-key` now.
 Afterwards, you are ready to push your changes to your remote fork::
 
-    $ git push -u origin my-feature-or-bugfix
+    $ git push -u origin my-feature-or-bugfix # upload changes
 
-You are now ready to :ref:`open-pull-request`
+In case you cloned the repo using `https://pagure.io/forks/jcline/pagure.git <https://pagure.io/forks/jcline/pagure.git>`_
+the push will fail. An easy temporary workaround is to use::
+
+    $ git push -u origin my-feature-or-bugfix ssh://git@pagure.io/forks/jcline/pagure.git
+
+You are now ready to :ref:`open-pull-request`.
