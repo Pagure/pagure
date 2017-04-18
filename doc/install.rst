@@ -3,7 +3,7 @@ Installing pagure
 
 There are two ways to install pagure:
 
-* via the RPM package (recommended if you are using a RPM-based linux distribution)
+* via the RPM package (recommended if you are using a RPM-based GNU/Linux distribution)
 * via the setup.py
 
 
@@ -265,7 +265,7 @@ which returns the most recent revision found by alembic, and since the
 database was just created, it is at the latest revision.
 
 
-Set up virus scannining
+Set up virus scanning
 -----------------------
 Pagure can automatically scan uploaded attachments for viruses using Clam.
 To set this up, first install clamav-data-empty, clamav-server,

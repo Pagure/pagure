@@ -58,7 +58,7 @@ area and commit the changes::
     $ git commit -s
 
 Your text editor of choice will open and you can write your commit message.
-Afterwords, you are ready to push your changes to your remote fork::
+Afterwards, you are ready to push your changes to your remote fork::
 
     $ git push -u origin my-feature-or-bugfix
 

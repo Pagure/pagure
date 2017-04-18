@@ -36,7 +36,7 @@ you can declare that your database is at this given revision using:
 
 Eventually, if you do not know where your database is or should be, you can
 do an iterative process stamping the database for every revision, one by one
-trying everytime to ``alembic upgrade`` until it works.
+trying every time to ``alembic upgrade`` until it works.
 
 * The database used does not support some of the changes
 

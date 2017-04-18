@@ -12,7 +12,7 @@ These components are:
 Before going into the overall picture, one should realize that most of the
 components listed above are optional.
 
-Here is a diagram representing pagure without all the optionals components:
+Here is a diagram representing pagure without all the optional components:
 
 .. image:: _static/overview_simple.png
         :target: _static/overview_simple.png
@@ -48,7 +48,7 @@ Pagure doc server
 
 While integrated into the main application at first, it has been split out
 for security concern, displaying information directly provided by the user
-without a clear/safe way of filtering for un-safe script or hacks is a
+without a clear/safe way of filtering for unsafe script or hacks is a
 security hole.
 For this reason we also strongly encourage anyone wanting to deploy their
 own instance of pagure with the doc server, to run this application on a

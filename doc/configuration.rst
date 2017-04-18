@@ -24,7 +24,7 @@ SALT_EMAIL
 
 This configuration key is used to ensure that when sending
 notifications to different users, each one of them has a different, unique
-and un-fakable ``Reply-To`` header. This header is then used by the milter to find
+and unfakeable ``Reply-To`` header. This header is then used by the milter to find
 out if the response received is a real one or a fake/invalid one.
 
 
@@ -57,7 +57,7 @@ Defaults to: ``https://pagure.org/``
 EMAIL_ERROR
 ~~~~~~~~~~~
 
-Pagure sends email when it catches an un-expected error (which saves you from
+Pagure sends email when it catches an unexpected error (which saves you from
 having to monitor the logs regularly; but if you like, the error is still
 present in the logs).
 This configuration key allows you to specify to which email address to send
@@ -148,7 +148,7 @@ are stored and served from.
 UPLOAD_FOLDER_URL
 ~~~~~~~~~~~~~~~~~~
 
-Full URL to where the uploads are available. It is highly recommanded for
+Full URL to where the uploads are available. It is highly recommended for
 security reasons that this URL lives on a different domain than the main
 application (an entirely different domain, not just a sub-domain).
 
@@ -354,7 +354,7 @@ Optional options
 SSH_KEYS
 ~~~~~~~~
 
-It is a good pratice to publish the fingerprint and public SSH key of a
+It is a good practice to publish the fingerprint and public SSH key of a
 server you provide access to.
 Pagure offers the possibility to expose this information based on the values
 set in the configuration file, in the ``SSH_KEYS`` configuration key.
@@ -501,7 +501,7 @@ Defaults to: ``4 * 1024 * 1024`` which corresponds to 4 megabytes.
 ENABLE_TICKETS
 ~~~~~~~~~~~~~~
 
-This configuration key activates or de-activates the ticketing system
+This configuration key activates or deactivates the ticketing system
 for all the projects hosted on this pagure instance.
 
 Defaults to: ``True``
@@ -519,7 +519,7 @@ Defaults to: ``True``
 ENABLE_DEL_PROJECTS
 ~~~~~~~~~~~~~~~~~~~
 
-This configuration key permits or forbids deletiion of projects via
+This configuration key permits or forbids deletion of projects via
 the user interface of this pagure instance.
 
 Defaults to: ``True``
@@ -575,7 +575,7 @@ INSTANCE_NAME
 ~~~~~~~~~~~~~
 
 This allows giving a name to this running instance of pagure. The name is
-then used in the welcome screen showns upon first login.
+then used in the welcome screen shown upon first login.
 
 Defaults to: ``Pagure``
 
@@ -625,7 +625,7 @@ The use-case is the following: the Fedora project is deploying pagure has a
 front-end for the git repos of the packages in the distribution, that means
 about 17,000 git repositories in pagure. The project has a group of people
 that have access to all of these repositories, so when viewing the user's
-page of one member ot that group, instead of seeing all the project that
+page of one member of that group, instead of seeing all the project that
 this user works on, you can see all the projects hosted in that pagure
 instance. Using this configuration key, pagure will hide all the projects
 that this user has access to via the specified groups and thus return only

@@ -67,7 +67,7 @@ the commit or commits in this pull request by doing::
     $ git remote add -f jcline https://pagure.io/forks/jcline/pagure.git  # Add and fetch the remote
     $ git checkout jcline/doc-prs-locally
 
-You will now be in a "detatched HEAD" state. If you want to build off this pull
+You will now be in a "detached HEAD" state. If you want to build off this pull
 request, just create a local branch, add some commits, push it to your fork,
 and open your own pull request::
 

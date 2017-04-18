@@ -74,8 +74,8 @@ This option can be used for project wishing to enforce having a minimum
 number of people reviewing a pull-request before it can be merged.
 
 If this option is enabled, anyone can vote in favor or against a pull-request
-and the sum of the votes in favor minus the sum of the votes againsts give
-the pull-request a score that should be equal or great to the value
+and the sum of the votes in favor minus the sum of the votes against give
+the pull-request a score that should be equal or greater than the value
 entered in this option for the pull-request to be allowed to be merged.
 
 .. note:: Only the main comments (ie: not in-line) are taken into account

@@ -32,7 +32,7 @@ With Project ACL feature, We can now have three levels of access:
 Add/Update Access
 =================
 
-* Everytime you add a new user or a new group to the project, you will be asked to
+* Every time you add a new user or a new group to the project, you will be asked to
   provide the level of access you want to give to that user or group. It's a required
   field in the form.
 

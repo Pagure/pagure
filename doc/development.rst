@@ -95,7 +95,7 @@ For example, create the file ``config`` with in it:
     EVENTSOURCE_PORT = '8080'
     DOC_APP_URL = '*'
 
-    # Avoid sending email when developping
+    # Avoid sending email when developing
     EMAIL_SEND = False
 
 and run the server with:
@@ -190,7 +190,7 @@ your source.
 
 We are also inspecting the code using `pylint
 <http://pypi.python.org/pypi/pylint>`_ and aim of course for a 10/10 code
-(but it is an assymptotic goal).
+(but it is an asymptotic goal).
 
 .. note:: both pep8 and pylint are available in Fedora:
 
