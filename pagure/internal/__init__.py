@@ -20,13 +20,13 @@ from sqlalchemy.exc import SQLAlchemyError
 
 PV = flask.Blueprint('internal_ns', __name__, url_prefix='/pv')
 
-import pagure  # noqa
-import pagure.exceptions  # noqa
-import pagure.forms  # noqa
-import pagure.lib  # noqa
-import pagure.lib.git  # noqa
-import pagure.ui.fork  # noqa
-from pagure import is_repo_admin, authenticated  # noqa
+import pagure  # noqa: E402
+import pagure.exceptions  # noqa: E402
+import pagure.forms  # noqa: E402
+import pagure.lib  # noqa: E402
+import pagure.lib.git  # noqa: E402
+import pagure.ui.fork  # noqa: E402
+from pagure import is_repo_admin, authenticated  # noqa: E402
 
 
 MERGE_OPTIONS = {

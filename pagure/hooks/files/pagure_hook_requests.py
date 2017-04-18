@@ -16,7 +16,7 @@ if 'PAGURE_CONFIG' not in os.environ \
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
 
-import pagure.lib.git  # noqa
+import pagure.lib.git  # noqa: E402
 
 
 abspath = os.path.abspath(os.environ['GIT_DIR'])

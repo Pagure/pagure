@@ -26,11 +26,11 @@ import markupsafe
 API = flask.Blueprint('api_ns', __name__, url_prefix='/api/0')
 
 
-import pagure  # noqa
-import pagure.lib  # noqa
-from pagure import __api_version__, APP, SESSION, authenticated  # noqa
-from pagure.doc_utils import load_doc, modify_rst, modify_html  # noqa
-from pagure.exceptions import APIError  # noqa
+import pagure  # noqa: E402
+import pagure.lib  # noqa: E402
+from pagure import __api_version__, APP, SESSION, authenticated  # noqa: E402
+from pagure.doc_utils import load_doc, modify_rst, modify_html  # noqa: E402
+from pagure.exceptions import APIError  # noqa: E402
 
 
 def preload_docs(endpoint):
@@ -209,14 +209,14 @@ def api_method(function):
 
 
 if pagure.APP.config.get('ENABLE_TICKETS', True):
-    from pagure.api import issue  # noqa
-from pagure.api import fork  # noqa
-from pagure.api import project  # noqa
-from pagure.api import user  # noqa
-from pagure.api import group  # noqa
+    from pagure.api import issue  # noqa: E402
+from pagure.api import fork  # noqa: E402
+from pagure.api import project  # noqa: E402
+from pagure.api import user  # noqa: E402
+from pagure.api import group  # noqa: E402
 
 if pagure.APP.config.get('PAGURE_CI_SERVICES', False):
-    from pagure.api.ci import jenkins  # noqa
+    from pagure.api.ci import jenkins  # noqa: E402
 
 
 @API.route('/version/')

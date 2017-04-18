@@ -35,9 +35,9 @@ if 'PAGURE_CONFIG' not in os.environ \
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
 
-import pagure  # noqa
-import pagure.lib  # noqa
-from pagure.exceptions import PagureEvException  # noqa
+import pagure  # noqa: E402
+import pagure.lib  # noqa: E402
+from pagure.exceptions import PagureEvException  # noqa: E402
 
 SERVER = None
 

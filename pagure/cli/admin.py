@@ -20,10 +20,10 @@ if 'PAGURE_CONFIG' not in os.environ \
     print('Using configuration file `/etc/pagure/pagure.cfg`')
     os.environ['PAGURE_CONFIG'] = '/etc/pagure/pagure.cfg'
 
-import pagure.exceptions  # noqa
-import pagure.lib  # noqa
-import pagure.lib.git  # noqa
-from pagure import (SESSION, APP, generate_user_key_files)  # noqa
+import pagure.exceptions  # noqa: E402
+import pagure.lib  # noqa: E402
+import pagure.lib.git  # noqa: E402
+from pagure import (SESSION, APP, generate_user_key_files)  # noqa: E402
 
 
 _log = logging.getLogger(__name__)

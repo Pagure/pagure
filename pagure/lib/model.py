@@ -9,7 +9,7 @@
 """
 
 __requires__ = ['SQLAlchemy >= 0.8', 'jinja2 >= 2.4']  # noqa
-import pkg_resources  # noqa
+import pkg_resources  # noqa: E402
 
 import datetime
 import collections

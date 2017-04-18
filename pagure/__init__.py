@@ -10,40 +10,40 @@
 
 # These two lines are needed to run on EL6
 __requires__ = ['SQLAlchemy >= 0.8', 'jinja2 >= 2.4']
-import pkg_resources  # noqa
+import pkg_resources  # noqa: E402
 
 __version__ = '2.14.2'
 __api_version__ = '0.12'
 
 
-import datetime  # noqa
-import logging  # noqa
-import os  # noqa
-import re  # noqa
-import subprocess  # noqa
-import urlparse  # noqa
-from logging.handlers import SMTPHandler  # noqa
+import datetime  # noqa: E402
+import logging  # noqa: E402
+import os  # noqa: E402
+import re  # noqa: E402
+import subprocess  # noqa: E402
+import urlparse  # noqa: E402
+from logging.handlers import SMTPHandler  # noqa: E402
 
-import flask  # noqa
-import pygit2  # noqa
-import werkzeug  # noqa
-from functools import wraps  # noqa
-from sqlalchemy.exc import SQLAlchemyError  # noqa
+import flask  # noqa: E402
+import pygit2  # noqa: E402
+import werkzeug  # noqa: E402
+from functools import wraps  # noqa: E402
+from sqlalchemy.exc import SQLAlchemyError  # noqa: E402
 
-from pygments import highlight  # noqa
-from pygments.lexers.text import DiffLexer  # noqa
-from pygments.formatters import HtmlFormatter  # noqa
+from pygments import highlight  # noqa: E402
+from pygments.lexers.text import DiffLexer  # noqa: E402
+from pygments.formatters import HtmlFormatter  # noqa: E402
 
-from flask_multistatic import MultiStaticFlask  # noqa
+from flask_multistatic import MultiStaticFlask  # noqa: E402
 
-from werkzeug.routing import BaseConverter  # noqa
+from werkzeug.routing import BaseConverter  # noqa: E402
 
 if os.environ.get('PAGURE_PERFREPO'):
-    import pagure.perfrepo as perfrepo  # noqa
+    import pagure.perfrepo as perfrepo  # noqa: E402
 else:
     perfrepo = None
 
-import pagure.exceptions  # noqa
+import pagure.exceptions  # noqa: E402
 
 # Create the application.
 APP = MultiStaticFlask(__name__)
@@ -93,13 +93,13 @@ if APP.config.get('THEME_STATIC_FOLDER', False):
     ]
 
 
-import pagure.doc_utils  # noqa
-import pagure.forms  # noqa
-import pagure.lib  # noqa
-import pagure.lib.git  # noqa
-import pagure.login_forms  # noqa
-import pagure.mail_logging  # noqa
-import pagure.proxy  # noqa
+import pagure.doc_utils  # noqa: E402
+import pagure.forms  # noqa: E402
+import pagure.lib  # noqa: E402
+import pagure.lib.git  # noqa: E402
+import pagure.login_forms  # noqa: E402
+import pagure.mail_logging  # noqa: E402
+import pagure.proxy  # noqa: E402
 
 # Only import flask_fas_openid if it is needed
 if APP.config.get('PAGURE_AUTH', None) in ['fas', 'openid']:
@@ -795,18 +795,18 @@ urlregex = re.compile(
 urlpattern = re.compile(urlregex)
 
 # Import the application
-import pagure.ui.app  # noqa
-import pagure.ui.fork  # noqa
-import pagure.ui.groups  # noqa
+import pagure.ui.app  # noqa: E402
+import pagure.ui.fork  # noqa: E402
+import pagure.ui.groups  # noqa: E402
 if APP.config.get('ENABLE_TICKETS', True):
-    import pagure.ui.issues  # noqa
-import pagure.ui.plugins  # noqa
-import pagure.ui.repo  # noqa
+    import pagure.ui.issues  # noqa: E402
+import pagure.ui.plugins  # noqa: E402
+import pagure.ui.repo  # noqa: E402
 
-from pagure.api import API  # noqa
+from pagure.api import API  # noqa: E402
 APP.register_blueprint(API)
 
-import pagure.internal  # noqa
+import pagure.internal  # noqa: E402
 APP.register_blueprint(pagure.internal.PV)
 
 
