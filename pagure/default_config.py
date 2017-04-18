@@ -26,8 +26,8 @@ DB_URL = 'sqlite:////var/tmp/pagure_dev.sqlite'
 INSTANCE_NAME = 'Pagure'
 
 # url to datagrepper (optional):
-#DATAGREPPER_URL = 'https://apps.fedoraproject.org/datagrepper'
-#DATAGREPPER_CATEGORY = 'pagure'
+# DATAGREPPER_URL = 'https://apps.fedoraproject.org/datagrepper'
+# DATAGREPPER_CATEGORY = 'pagure'
 
 # The FAS group in which the admin of pagure are
 ADMIN_GROUP = 'sysadmin-main'
@@ -152,7 +152,7 @@ GL_RC = None
 GL_BINDIR = None
 
 
-#SMTP settings
+# SMTP settings
 SMTP_SERVER = 'localhost'
 SMTP_PORT = 25
 SMTP_SSL = False
