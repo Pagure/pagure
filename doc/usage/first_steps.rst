@@ -72,14 +72,14 @@ the top right corner, there, select ``My settings``.
 Configure the default email address
 -----------------------------------
 
-If the pagure instance you use is using local user authentication, then when
-you created your account you could choose whichever email address you prefer
-to use, but in the case (like pagure.io) where the pagure instance relies
+If the pagure instance you use is using local user authentication, you can
+choose whichever email address you prefer to use during account creation.
+But in the case (like pagure.io) where the pagure instance relies
 on an external authentication service, the email address provided by this
 service may be different from the one you prefer.
 
-Your settings' page (cf the image above for how to access to the page) allow
-you to add multiple email address and set one as default.
+The settings page of your account (see above for how to access the page)
+allows you to add multiple email addresses and set one as default.
 
 Your default email address is the address that will be used to send you
 notifications and also as the email address in the git commit if you merge
@@ -89,6 +89,6 @@ For online editing, when doing the commit, you will be presented with the
 list of valid email addresses associated with your account and you will be
 able to choose which one you wish to use.
 
-.. note:: All email address will need to be confirmed to be activated, this
+.. note:: All email addresses will need to be confirmed to be activated, this
           is done via a link sent by email to the address. If you do not
           receive this link, don't forget to check your spam folder!
