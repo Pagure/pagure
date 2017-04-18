@@ -204,6 +204,7 @@ def reset_stats():
                           'diffs': 0,
                           'inits': 0}}
 
+
 # Make sure we start blank
 reset_stats()
 
