@@ -580,7 +580,7 @@ def api_view_issue_comment(
           }
         }
 
-    """  # noqa
+    """  # noqa: E501
 
     repo = _get_repo(repo, username, namespace)
     _check_issue_tracker(repo)
