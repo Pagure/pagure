@@ -20,9 +20,7 @@ import datetime  # noqa: E402
 import logging  # noqa: E402
 import os  # noqa: E402
 import re  # noqa: E402
-import subprocess  # noqa: E402
 import urlparse  # noqa: E402
-from logging.handlers import SMTPHandler  # noqa: E402
 
 import flask  # noqa: E402
 import pygit2  # noqa: E402
@@ -30,13 +28,7 @@ import werkzeug  # noqa: E402
 from functools import wraps  # noqa: E402
 from sqlalchemy.exc import SQLAlchemyError  # noqa: E402
 
-from pygments import highlight  # noqa: E402
-from pygments.lexers.text import DiffLexer  # noqa: E402
-from pygments.formatters import HtmlFormatter  # noqa: E402
-
 from flask_multistatic import MultiStaticFlask  # noqa: E402
-
-from werkzeug.routing import BaseConverter  # noqa: E402
 
 if os.environ.get('PAGURE_PERFREPO'):
     import pagure.perfrepo as perfrepo  # noqa: E402

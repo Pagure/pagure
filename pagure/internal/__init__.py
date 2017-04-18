@@ -26,7 +26,6 @@ import pagure.forms  # noqa: E402
 import pagure.lib  # noqa: E402
 import pagure.lib.git  # noqa: E402
 import pagure.ui.fork  # noqa: E402
-from pagure import is_repo_admin, authenticated  # noqa: E402
 
 
 MERGE_OPTIONS = {
