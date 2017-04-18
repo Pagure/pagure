@@ -190,6 +190,7 @@ class PerfRepo(object):
         TOTALS['steps'] += 1
         return self.iter.next()
 
+
 pygit2.Repository = PerfRepo
 
 
