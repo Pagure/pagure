@@ -22,6 +22,7 @@ except ImportError:
     import json
 
 import datetime
+import logging
 import markdown
 import os
 import shutil
@@ -56,7 +57,7 @@ from pagure.lib import model
 
 REDIS = None
 PAGURE_CI = None
-LOG = None
+_log = logging.getLogger(__name__)
 
 
 def set_redis(host, port, dbname):
@@ -70,12 +71,6 @@ def set_pagure_ci(services):
     """ Set the list of CI services supported by this pagure instance. """
     global PAGURE_CI
     PAGURE_CI = services
-
-
-def set_log(logger):
-    """ Set a logger that can be used in this module. """
-    global LOG
-    LOG = logger
 
 
 def get_user(session, key):
@@ -3400,7 +3395,7 @@ def text2markdown(text, extended=True, readme=False):
         try:
             text = md_processor.convert(text)
         except Exception:
-            LOG.debug(
+            _log.debug(
                 'A markdown error occured while processing: ``%s``',
                 str(text))
         return clean_input(text)

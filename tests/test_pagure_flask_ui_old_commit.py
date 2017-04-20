@@ -63,7 +63,6 @@ class PagureFlaskRepoOldUrltests(tests.Modeltests):
 
         pagure.APP.config['EMAIL_SEND'] = False
         pagure.APP.config['OLD_VIEW_COMMIT_ENABLED'] = False
-        pagure.LOG.handlers = []
 
     def test_view_commit_old(self):
         """ Test the view_commit_old endpoint. """

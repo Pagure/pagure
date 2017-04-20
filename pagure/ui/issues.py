@@ -35,7 +35,7 @@ import pagure.exceptions
 import pagure.lib
 import pagure.lib.encoding_utils
 import pagure.forms
-from pagure import (APP, SESSION, LOG, __get_file_in_tree,
+from pagure import (APP, SESSION, __get_file_in_tree,
                     login_required, authenticated, urlpattern)
 
 
@@ -136,7 +136,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
             except SQLAlchemyError as err:  # pragma: no cover
                 is_js = False
                 SESSION.rollback()
-                LOG.error(err)
+                APP.logger.error(err)
                 if not is_js:
                     flask.flash(
                         'Could not remove the comment: %s' % commentid,
@@ -428,7 +428,7 @@ def edit_tag(repo, tag, username=None, namespace=None):
                 flask.flash(msg)
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            LOG.error(err)
+            APP.logger.error(err)
             flask.flash('Could not edit tag: %s' % tag, 'error')
 
         return flask.redirect(flask.url_for(
@@ -575,7 +575,7 @@ def remove_tag(repo, username=None, namespace=None):
                 flask.flash(msg)
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            LOG.error(err)
+            APP.logger.error(err)
             flask.flash(
                 'Could not remove tag: %s' % ','.join(tags), 'error')
 
@@ -1373,7 +1373,7 @@ def view_issue_raw_file(
                 ktc.to_bytes(data))
         except pagure.exceptions.PagureException:
             # We cannot decode the file, so bail but warn the admins
-            LOG.exception('File could not be decoded')
+            APP.logger.exception('File could not be decoded')
 
     if encoding:
         mimetype += '; charset={encoding}'.format(encoding=encoding)
@@ -1437,7 +1437,7 @@ def edit_comment_issue(
                 flask.flash(message)
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
-            LOG.error(err)
+            APP.logger.error(err)
             if is_js:
                 return 'error'
             flask.flash(

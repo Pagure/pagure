@@ -30,7 +30,7 @@ import pagure.exceptions
 import pagure.lib
 import pagure.lib.git
 import pagure.forms
-from pagure import APP, SESSION, LOG, login_required, __get_file_in_tree
+from pagure import APP, SESSION, login_required, __get_file_in_tree
 
 
 def _get_parent_repo_path(repo):
@@ -562,7 +562,7 @@ def pull_request_drop_comment(
                 flask.flash('Comment removed')
             except SQLAlchemyError as err:  # pragma: no cover
                 SESSION.rollback()
-                LOG.error(err)
+                APP.logger.error(err)
                 flask.flash(
                     'Could not remove the comment: %s' % commentid, 'error')
 
@@ -632,7 +632,7 @@ def pull_request_edit_comment(
                 flask.flash(message)
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
-            LOG.error(err)
+            APP.logger.error(err)
             if is_js:
                 return 'error'
             else:

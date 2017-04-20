@@ -18,6 +18,7 @@ __api_version__ = '0.12'
 
 import datetime  # noqa: E402
 import logging  # noqa: E402
+import logging.config  # noqa: E402
 import os  # noqa: E402
 import re  # noqa: E402
 import urlparse  # noqa: E402
@@ -38,7 +39,7 @@ else:
 import pagure.exceptions  # noqa: E402
 
 # Create the application.
-APP = MultiStaticFlask(__name__)
+APP = MultiStaticFlask('pagure')
 
 if perfrepo:
     # Do this as early as possible.
@@ -54,6 +55,8 @@ APP.config.from_object('pagure.default_config')
 
 if 'PAGURE_CONFIG' in os.environ:
     APP.config.from_envvar('PAGURE_CONFIG')
+
+logging.config.dictConfig(APP.config.get('LOGGING') or {'version': 1})
 
 
 if APP.config.get('THEME_TEMPLATE_FOLDER', False):
@@ -145,7 +148,7 @@ if APP.config.get('PAGURE_AUTH', None) in ['fas', 'openid']:
                             is_admin=is_admin(),
                         )
                     except pagure.exceptions.PagureException as err:
-                        LOG.debug(err)
+                        APP.logger.debug(err)
                 # Remove the old groups
                 for group in groups - fas_groups:
                     try:
@@ -158,13 +161,12 @@ if APP.config.get('PAGURE_AUTH', None) in ['fas', 'openid']:
                             force=True,
                         )
                     except pagure.exceptions.PagureException as err:
-                        LOG.debug(err)
+                        APP.logger.debug(err)
 
             SESSION.commit()
         except SQLAlchemyError as err:
             SESSION.rollback()
-            LOG.debug(err)
-            LOG.exception(err)
+            APP.logger.exception(err)
             flask.flash(
                 'Could not set up you as a user properly, please contact '
                 'an admin', 'error')
@@ -197,14 +199,6 @@ if not APP.debug:
         from_email=APP.config.get('FROM_EMAIL', 'pagure@fedoraproject.org')
     ))
 
-# Send classic logs into syslog
-SHANDLER = logging.StreamHandler()
-SHANDLER.setLevel(APP.config.get('LOG_LEVEL', 'INFO'))
-APP.logger.addHandler(SHANDLER)
-
-LOG = APP.logger
-LOG.setLevel(APP.config.get('LOG_LEVEL', 'INFO'))
-pagure.lib.set_log(LOG)
 
 APP.wsgi_app = pagure.proxy.ReverseProxied(APP.wsgi_app)
 
@@ -689,7 +683,7 @@ def get_remote_repo_path(remote_git, branch_from, loop=False):
             pygit2.clone_repository(
                 remote_git, repopath, checkout_branch=branch_from)
         except Exception as err:
-            LOG.exception(err)
+            APP.logger.exception(err)
             flask.abort(
                 500,
                 'The following error was raised when trying to clone the '
@@ -700,16 +694,17 @@ def get_remote_repo_path(remote_git, branch_from, loop=False):
         try:
             repo.pull(branch=branch_from, force=True)
         except pygit2.GitError as err:
-            LOG.debug('Error pull the repo: %s -- error: %s' % (repopath, err))
+            APP.logger.debug(
+                'Error pull the repo: %s -- error: %s' % (repopath, err))
             if str(err).lower() != 'no content-type header in response':
-                LOG.exception(err)
+                APP.logger.exception(err)
                 flask.abort(
                     500,
                     'The following error was raised when trying to pull the '
                     'changes from the remote: %s' % str(err)
                 )
         except pagure.exceptions.PagureException as err:
-            LOG.exception(err)
+            APP.logger.exception(err)
             flask.abort(500, str(err))
 
     return repopath

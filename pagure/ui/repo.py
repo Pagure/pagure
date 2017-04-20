@@ -49,7 +49,7 @@ import pagure.lib.plugins
 import pagure.forms
 import pagure
 import pagure.ui.plugins
-from pagure import (APP, SESSION, LOG, __get_file_in_tree, login_required,
+from pagure import (APP, SESSION, __get_file_in_tree, login_required,
                     admin_session_timedout)
 from pagure.lib import encoding_utils
 
@@ -492,7 +492,7 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
                 Image.open(StringIO(content.data))
                 output_type = 'image'
             except IOError as err:
-                LOG.debug(
+                APP.logger.debug(
                     'Failed to load image %s, error: %s', filename, err
                 )
                 output_type = 'binary'
@@ -658,7 +658,7 @@ def view_raw_file(
             encoding = encoding_utils.guess_encoding(ktc.to_bytes(data))
         except pagure.exceptions.PagureException:
             # We cannot decode the file, so bail but warn the admins
-            LOG.exception('File could not be decoded')
+            APP.logger.exception('File could not be decoded')
 
     if encoding:
         mimetype += '; charset={encoding}'.format(encoding=encoding)
@@ -699,7 +699,7 @@ def view_blame_file(repo, filename, username=None, namespace=None):
         content = encoding_utils.decode(content.data)
     except pagure.exceptions.PagureException:
         # We cannot decode the file, so bail but warn the admins
-        LOG.exception('File could not be decoded')
+        APP.logger.exception('File could not be decoded')
         flask.abort(500, 'File could not be decoded')
 
     lexer = TextLexer()

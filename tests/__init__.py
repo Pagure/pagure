@@ -48,8 +48,12 @@ FAITOUT_URL = 'http://faitout.fedorainfracloud.org/'
 if os.environ.get('FAITOUT_URL'):
     FAITOUT_URL = os.environ.get('FAITOUT_URL')
 HERE = os.path.join(os.path.dirname(os.path.abspath(__file__)))
-LOG = logging.getLogger("pagure")
+LOG = logging.getLogger(__name__)
 LOG.setLevel(logging.DEBUG)
+
+PAGLOG = logging.getLogger('pagure')
+PAGLOG.setLevel(logging.CRITICAL)
+PAGLOG.handlers = []
 
 
 LOG.info('BUILD_ID: %s', os.environ.get('BUILD_ID'))
@@ -67,7 +71,7 @@ if os.environ.get('BUILD_ID')or os.environ.get('FAITOUT_URL'):
         pass
 
 # Remove the log handlers for the tests
-pagure.LOG.handlers = []
+pagure.APP.logger.handlers = []
 
 @contextmanager
 def user_set(APP, user):

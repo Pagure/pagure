@@ -17,6 +17,7 @@
 import datetime
 import hashlib
 import json
+import logging
 import os
 import shutil
 import subprocess
@@ -34,6 +35,9 @@ import pagure.lib
 import pagure.lib.notify
 from pagure.lib import model
 from pagure.lib.repo import PagureRepo
+
+
+_log = logging.getLogger(__name__)
 
 
 def commit_to_patch(repo_obj, commits):
@@ -88,6 +92,7 @@ def write_gitolite_acls(session, configfile):
     ''' Generate the configuration file for gitolite for all projects
     on the forge.
     '''
+    _log.info('Write down the gitolite configuration file')
     global_pr_only = pagure.APP.config.get('PR_ONLY', False)
     config = []
     groups = {}
@@ -97,6 +102,7 @@ def write_gitolite_acls(session, configfile):
         model.Project.id
     )
     for project in query.all():
+        _log.debug('    Processing project: %s', project.fullname)
         for group in project.committer_groups:
             if group.group_name not in groups:
                 groups[group.group_name] = [
@@ -154,6 +160,7 @@ def _get_gitolite_command():
     """ Return the gitolite command to run based on the info in the
     configuration file.
     """
+    _log.info('Compiling the gitolite configuration')
     gitolite_folder = pagure.APP.config.get('GITOLITE_HOME', None)
     gitolite_version = pagure.APP.config.get('GITOLITE_VERSION', 3)
     if gitolite_folder:
@@ -172,12 +179,14 @@ def _get_gitolite_command():
             raise pagure.exceptions.PagureException(
                 'Non-supported gitolite version "%s"' % gitolite_version
             )
+        _log.debug('Command: %s', cmd)
         return cmd
 
 
 def generate_gitolite_acls():
     """ Generate the gitolite configuration file for all repos
     """
+    _log.info('Refresh gitolite configuration')
     pagure.lib.git.write_gitolite_acls(
         pagure.SESSION, pagure.APP.config['GITOLITE_CONFIG'])
 
@@ -200,6 +209,7 @@ def update_git(obj, repo, repofolder):
     changes commit them and push them back to the original repo.
 
     """
+    _log.info('Update the git repo: %s for: %s', repo.path, obj)
 
     if not repofolder:
         return
@@ -297,6 +307,8 @@ def clean_git(obj, repo, repofolder):
 
     if not repofolder:
         return
+
+    _log.info('Update the git repo: %s to remove: %s', repo.path, obj)
 
     # Get the fork
     repopath = os.path.join(repofolder, repo.path)
@@ -800,6 +812,9 @@ def add_file_to_git(repo, issue, ticketfolder, user, filename, filestream):
     :arg filestream: the actual content of the file
 
     '''
+    _log.info(
+        'Addinf file: %s to the git repo: %s',
+        repo.path, werkzeug.secure_filename(filename))
 
     if not ticketfolder:
         return
@@ -913,6 +928,7 @@ def update_file_in_git(
     :arg user: the user object with its username and email
 
     '''
+    _log.info('Updating file: %s in the repo: %s', filename, repo.path)
 
     # Get the fork
     repopath = pagure.get_repo_path(repo)
@@ -1170,6 +1186,13 @@ def merge_pull_request(
         session, request, username, request_folder, domerge=True):
     ''' Merge the specified pull-request.
     '''
+    if domerge:
+        _log.info(
+            '%s asked to merge the pull-request: %s', username, request)
+    else:
+        _log.info(
+            '%s asked to diff the pull-request: %s', username, request)
+
     if request.remote:
         # Get the fork
         repopath = pagure.get_remote_repo_path(
@@ -1185,18 +1208,21 @@ def merge_pull_request(
 
     # Clone the original repo into a temp folder
     newpath = tempfile.mkdtemp(prefix='pagure-pr-merge')
+    _log.info('  working directory: %s', newpath)
     new_repo = pygit2.clone_repository(parentpath, newpath)
 
     # Update the start and stop commits in the DB, one last time
     diff_commits = diff_pull_request(
         session, request, fork_obj, PagureRepo(parentpath),
         requestfolder=request_folder, with_diff=False)
+    _log.info('  %s commit to merge', len(diff_commits))
 
     if request.project.settings.get(
             'Enforce_signed-off_commits_in_pull-request', False):
         for commit in diff_commits:
             if 'signed-off-by' not in commit.message.lower():
                 shutil.rmtree(newpath)
+                _log.info('  Missing a required: signed-off-by: Bailing')
                 raise pagure.exceptions.PagureException(
                     'This repo enforces that all commits are '
                     'signed off by their author. ')
@@ -1205,6 +1231,7 @@ def merge_pull_request(
     branch_ref = get_branch_ref(new_repo, request.branch)
     if not branch_ref:
         shutil.rmtree(newpath)
+        _log.info('  Target branch could not be found')
         raise pagure.exceptions.BranchNotFoundException(
             'Branch %s could not be found in the repo %s' % (
                 request.branch, request.project.fullname
@@ -1215,6 +1242,7 @@ def merge_pull_request(
     branch = get_branch_ref(fork_obj, request.branch_from)
     if not branch:
         shutil.rmtree(newpath)
+        _log.info('  Branch of origin could not be found')
         raise pagure.exceptions.BranchNotFoundException(
             'Branch %s could not be found in the repo %s' % (
                 request.branch_from, request.project_from.fullname
@@ -1227,14 +1255,17 @@ def merge_pull_request(
     # Add the fork as remote repo
     reponame = '%s_%s' % (request.user.user, request.uid)
 
+    _log.info('  Adding remote: %s pointing to: %s', reponame, repopath)
     remote = new_repo.create_remote(reponame, repopath)
 
     # Fetch the commits
     remote.fetch()
 
     merge = new_repo.merge(repo_commit.oid)
+    _log.debug('  Merge: %s', merge)
     if merge is None:
         mergecode = new_repo.merge_analysis(repo_commit.oid)[0]
+        _log.debug('  Mergecode: %s', mergecode)
 
     refname = '%s:refs/heads/%s' % (branch_ref.name, request.branch)
     if (
@@ -1244,6 +1275,7 @@ def merge_pull_request(
              mergecode & pygit2.GIT_MERGE_ANALYSIS_UP_TO_DATE)):
 
         if domerge:
+            _log.info('  PR up to date, closing it')
             pagure.lib.close_pull_request(
                 session, request, username,
                 requestfolder=request_folder)
@@ -1252,12 +1284,14 @@ def merge_pull_request(
                 session.commit()
             except SQLAlchemyError as err:  # pragma: no cover
                 session.rollback()
+                _log.exception('  Could not merge the PR in the DB')
                 pagure.APP.logger.exception(err)
                 raise pagure.exceptions.PagureException(
                     'Could not close this pull-request')
             raise pagure.exceptions.PagureException(
                 'Nothing to do, changes were already merged')
         else:
+            _log.info('  PR up to date, reporting it')
             request.merge_status = 'NO_CHANGE'
             session.commit()
             shutil.rmtree(newpath)
@@ -1270,6 +1304,7 @@ def merge_pull_request(
              mergecode & pygit2.GIT_MERGE_ANALYSIS_FASTFORWARD)):
 
         if domerge:
+            _log.info('  PR merged using fast-forward')
             head = new_repo.lookup_reference('HEAD').get_object()
             if not request.project.settings.get('always_merge', False):
                 if merge is not None:
@@ -1292,11 +1327,13 @@ def merge_pull_request(
                     tree,
                     [head.hex, repo_commit.oid.hex])
 
+            _log.info('  New head: %s', commit)
             PagureRepo.push(ori_remote, refname)
             fork_obj.run_hook(
                 head.hex, commit, 'refs/heads/%s' % request.branch,
                 username)
         else:
+            _log.info('  PR merged using fast-forward, reporting it')
             request.merge_status = 'FFORWARD'
             session.commit()
             shutil.rmtree(newpath)
@@ -1306,16 +1343,23 @@ def merge_pull_request(
         tree = None
         try:
             tree = new_repo.index.write_tree()
-        except pygit2.GitError:
+        except pygit2.GitError as err:
+            _log.exception(
+                '  Could not write down the new tree: merge conflicts')
+            pagure.APP.logger.exception(
+                '  Could not write down the new tree: merge conflicts')
             shutil.rmtree(newpath)
             if domerge:
+                _log.info('  Merge conflict: Bailing')
                 raise pagure.exceptions.PagureException('Merge conflicts!')
             else:
+                _log.info('  Merge conflict, reporting it')
                 request.merge_status = 'CONFLICTS'
                 session.commit()
                 return 'CONFLICTS'
 
         if domerge:
+            _log.info('  Writing down merge commit')
             head = new_repo.lookup_reference('HEAD').get_object()
             user_obj = pagure.lib.get_user(session, username)
             author = pygit2.Signature(
@@ -1329,24 +1373,28 @@ def merge_pull_request(
                 tree,
                 [head.hex, repo_commit.oid.hex])
 
+            _log.info('  New head: %s', commit)
             PagureRepo.push(ori_remote, refname)
             fork_obj.run_hook(
                 head.hex, commit, 'refs/heads/%s' % request.branch,
                 username)
 
         else:
+            _log.info('  PR can be merged with a merge commit, reporting it')
             request.merge_status = 'MERGE'
             session.commit()
             shutil.rmtree(newpath)
             return 'MERGE'
 
     # Update status
+    _log.info('  Closing the PR in the DB')
     pagure.lib.close_pull_request(
         session, request, username,
         requestfolder=request_folder,
     )
     try:
         # Reset the merge_status of all opened PR to refresh their cache
+        _log.info('  Clear the cached merged status of the other PRs')
         pagure.lib.reset_status_pull_request(session, request.project)
         session.commit()
     except SQLAlchemyError as err:  # pragma: no cover
