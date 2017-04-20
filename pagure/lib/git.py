@@ -312,58 +312,62 @@ def clean_git(obj, repo, repofolder):
 
     # Get the fork
     repopath = os.path.join(repofolder, repo.path)
+    lockfile = '%s.lock' % repopath
 
-    # Clone the repo into a temp folder
-    newpath = tempfile.mkdtemp(prefix='pagure-')
-    new_repo = pygit2.clone_repository(repopath, newpath)
+    lock = filelock.FileLock(lockfile)
+    with lock:
 
-    file_path = os.path.join(newpath, obj.uid)
+        # Clone the repo into a temp folder
+        newpath = tempfile.mkdtemp(prefix='pagure-')
+        new_repo = pygit2.clone_repository(repopath, newpath)
 
-    # Get the current index
-    index = new_repo.index
+        file_path = os.path.join(newpath, obj.uid)
 
-    # Are we adding files
-    if not os.path.exists(file_path):
+        # Get the current index
+        index = new_repo.index
+
+        # Are we adding files
+        if not os.path.exists(file_path):
+            shutil.rmtree(newpath)
+            return
+
+        # Remove the file
+        os.unlink(file_path)
+
+        # Add the changes to the index
+        index.remove(obj.uid)
+
+        # See if there is a parent to this commit
+        parent = None
+        if not new_repo.is_empty:
+            parent = new_repo.head.get_object().oid
+
+        parents = []
+        if parent:
+            parents.append(parent)
+
+        # Author/commiter will always be this one
+        author = pygit2.Signature(name='pagure', email='pagure')
+
+        # Actually commit
+        new_repo.create_commit(
+            'refs/heads/master',
+            author,
+            author,
+            'Removed %s %s: %s' % (obj.isa, obj.uid, obj.title),
+            new_repo.index.write_tree(),
+            parents)
+        index.write()
+
+        # Push to origin
+        ori_remote = new_repo.remotes[0]
+        master_ref = new_repo.lookup_reference('HEAD').resolve()
+        refname = '%s:%s' % (master_ref.name, master_ref.name)
+
+        PagureRepo.push(ori_remote, refname)
+
+        # Remove the clone
         shutil.rmtree(newpath)
-        return
-
-    # Remove the file
-    os.unlink(file_path)
-
-    # Add the changes to the index
-    index.remove(obj.uid)
-
-    # See if there is a parent to this commit
-    parent = None
-    if not new_repo.is_empty:
-        parent = new_repo.head.get_object().oid
-
-    parents = []
-    if parent:
-        parents.append(parent)
-
-    # Author/commiter will always be this one
-    author = pygit2.Signature(name='pagure', email='pagure')
-
-    # Actually commit
-    new_repo.create_commit(
-        'refs/heads/master',
-        author,
-        author,
-        'Removed %s %s: %s' % (obj.isa, obj.uid, obj.title),
-        new_repo.index.write_tree(),
-        parents)
-    index.write()
-
-    # Push to origin
-    ori_remote = new_repo.remotes[0]
-    master_ref = new_repo.lookup_reference('HEAD').resolve()
-    refname = '%s:%s' % (master_ref.name, master_ref.name)
-
-    PagureRepo.push(ori_remote, refname)
-
-    # Remove the clone
-    shutil.rmtree(newpath)
 
 
 def get_user_from_json(session, jsondata, key='user'):
