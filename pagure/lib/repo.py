@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2015-2016 - Copyright Red Hat Inc
+ (c) 2015-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
 
 """
 
+import logging
 import os
 import subprocess
 
@@ -15,6 +16,9 @@ import pygit2
 
 import pagure
 import pagure.exceptions
+
+
+_log = logging.getLogger(__name__)
 
 
 def get_pygit2_version():
@@ -74,7 +78,7 @@ class PagureRepo(pygit2.Repository):
                     raise pagure.exceptions.GitConflictsException(
                         'Pulling remote changes leads to a conflict')
                 else:
-                    pagure.LOG.debug(
+                    _log.debug(
                         'Un-expected merge result: %s' % (
                             pygit2.GIT_MERGE_ANALYSIS_NORMAL))
                     raise AssertionError('Unknown merge analysis result')

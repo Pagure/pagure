@@ -16,10 +16,11 @@
 # pylint: disable=too-many-lines
 
 
-import flask
+import logging
 import os
 from math import ceil
 
+import flask
 import filelock
 import pygit2
 from sqlalchemy.exc import SQLAlchemyError
@@ -31,6 +32,9 @@ import pagure.lib
 import pagure.lib.git
 import pagure.forms
 from pagure import APP, SESSION, login_required, __get_file_in_tree
+
+
+_log = logging.getLogger(__name__)
 
 
 def _get_parent_repo_path(repo):
@@ -224,7 +228,7 @@ def request_pull(repo, requestid, username=None, namespace=None):
                 namespace=namespace))
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash(
                 'Could not update this pull-request in the database',
                 'error')
@@ -309,7 +313,7 @@ def request_pull_patch(repo, requestid, username=None, namespace=None):
                 namespace=namespace))
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash(
                 'Could not update this pull-request in the database',
                 'error')
@@ -375,7 +379,7 @@ def request_pull_edit(repo, requestid, username=None, namespace=None):
             flask.flash('Pull request edited!')
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash(
                 'Could not edit this pull-request in the database',
                 'error')
@@ -463,14 +467,14 @@ def pull_request_add_comment(
                 flask.flash(message)
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             if is_js:
                 return 'error'
             else:
                 flask.flash(str(err), 'error')
         except filelock.Timeout as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             if is_js:
                 return 'error'
             else:
@@ -562,7 +566,7 @@ def pull_request_drop_comment(
                 flask.flash('Comment removed')
             except SQLAlchemyError as err:  # pragma: no cover
                 SESSION.rollback()
-                APP.logger.error(err)
+                _log.error(err)
                 flask.flash(
                     'Could not remove the comment: %s' % commentid, 'error')
 
@@ -632,7 +636,7 @@ def pull_request_edit_comment(
                 flask.flash(message)
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.error(err)
+            _log.error(err)
             if is_js:
                 return 'error'
             else:
@@ -640,7 +644,7 @@ def pull_request_edit_comment(
                     'Could not edit the comment: %s' % commentid, 'error')
         except filelock.Timeout as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             if is_js:
                 return 'error'
             else:
@@ -790,13 +794,13 @@ def cancel_request_pull(repo, requestid, username=None, namespace=None):
             flask.flash('Pull request canceled!')
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash(
                 'Could not update this pull-request in the database',
                 'error')
         except filelock.Timeout as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash(
                 'We could not save all the info, please try again',
                 'error')
@@ -857,11 +861,11 @@ def set_assignee_requests(repo, requestid, username=None, namespace=None):
             flask.flash(err.message, 'error')
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash(str(err), 'error')
         except filelock.Timeout as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash(
                 'We could not save all the info, please try again',
                 'error')
@@ -1011,7 +1015,7 @@ def new_request_pull(
                 SESSION.commit()
             except SQLAlchemyError as err:  # pragma: no cover
                 SESSION.rollback()
-                APP.logger.exception(err)
+                _log.exception(err)
                 flask.flash(
                     'Could not register this pull-request in the database',
                     'error')
@@ -1037,7 +1041,7 @@ def new_request_pull(
             flask.flash(str(err), 'error')
         except filelock.Timeout as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash(
                 'We could not save all the info, please try again',
                 'error')
@@ -1191,7 +1195,7 @@ def new_remote_request_pull(repo, username=None, namespace=None):
                 flask.flash('Request created')
             except SQLAlchemyError as err:  # pragma: no cover
                 SESSION.rollback()
-                APP.logger.exception(err)
+                _log.exception(err)
                 flask.flash(
                     'Could not register this pull-request in '
                     'the database', 'error')

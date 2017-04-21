@@ -15,12 +15,13 @@
 
 
 import datetime
-import flask
+import logging
 import os
 import re
 from collections import defaultdict
 from math import ceil
 
+import flask
 import filelock
 import pygit2
 import werkzeug.datastructures
@@ -38,6 +39,8 @@ import pagure.forms
 from pagure import (APP, SESSION, __get_file_in_tree,
                     login_required, authenticated, urlpattern)
 
+
+_log = logging.getLogger(__name__)
 
 # URLs
 
@@ -136,7 +139,7 @@ def update_issue(repo, issueid, username=None, namespace=None):
             except SQLAlchemyError as err:  # pragma: no cover
                 is_js = False
                 SESSION.rollback()
-                APP.logger.error(err)
+                _log.error(err)
                 if not is_js:
                     flask.flash(
                         'Could not remove the comment: %s' % commentid,
@@ -340,12 +343,12 @@ def update_issue(repo, issueid, username=None, namespace=None):
         except SQLAlchemyError as err:  # pragma: no cover
             is_js = False
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash(str(err), 'error')
         except filelock.Timeout as err:  # pragma: no cover
             is_js = False
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash(
                 'We could not save all the info, please try again',
                 'error')
@@ -428,7 +431,7 @@ def edit_tag(repo, tag, username=None, namespace=None):
                 flask.flash(msg)
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.error(err)
+            _log.error(err)
             flask.flash('Could not edit tag: %s' % tag, 'error')
 
         return flask.redirect(flask.url_for(
@@ -575,7 +578,7 @@ def remove_tag(repo, username=None, namespace=None):
                 flask.flash(msg)
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.error(err)
+            _log.error(err)
             flask.flash(
                 'Could not remove tag: %s' % ','.join(tags), 'error')
 
@@ -943,7 +946,7 @@ def new_issue(repo, username=None, namespace=None):
             flask.flash(str(err), 'error')
         except filelock.Timeout as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash(
                 'We could not save all the info, please try again',
                 'error')
@@ -1092,7 +1095,7 @@ def delete_issue(repo, issueid, username=None, namespace=None):
                 namespace=namespace))
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash('Could not delete the issue', 'error')
 
     return flask.redirect(flask.url_for(
@@ -1212,7 +1215,7 @@ def edit_issue(repo, issueid, username=None, namespace=None):
             flask.flash(str(err), 'error')
         except filelock.Timeout as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash(
                 'We could not save all the info, please try again',
                 'error')
@@ -1278,7 +1281,7 @@ def upload_issue(repo, issueid, username=None, namespace=None):
             )
         except filelock.Timeout as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash(
                 'We could not save all the info, please try again',
                 'error')
@@ -1373,7 +1376,7 @@ def view_issue_raw_file(
                 ktc.to_bytes(data))
         except pagure.exceptions.PagureException:
             # We cannot decode the file, so bail but warn the admins
-            APP.logger.exception('File could not be decoded')
+            _log.exception('File could not be decoded')
 
     if encoding:
         mimetype += '; charset={encoding}'.format(encoding=encoding)
@@ -1437,14 +1440,14 @@ def edit_comment_issue(
                 flask.flash(message)
         except SQLAlchemyError, err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.error(err)
+            _log.error(err)
             if is_js:
                 return 'error'
             flask.flash(
                 'Could not edit the comment: %s' % commentid, 'error')
         except filelock.Timeout as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash(
                 'We could not save all the info, please try again',
                 'error')

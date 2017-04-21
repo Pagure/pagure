@@ -43,7 +43,7 @@ CONVENTION = {
 
 BASE = declarative_base(metadata=MetaData(naming_convention=CONVENTION))
 
-ERROR_LOG = logging.getLogger('pagure.model')
+_log = logging.getLogger(__name__)
 
 # hit w/ all the id field we use
 # pylint: disable=invalid-name
@@ -114,7 +114,7 @@ def create_default_status(session, acls=None):
             session.commit()
         except SQLAlchemyError:  # pragma: no cover
             session.rollback()
-            ERROR_LOG.debug('Status %s could not be added', ticket_stat)
+            _log.debug('Status %s could not be added', ticket_stat)
 
     for status in ['Open', 'Closed', 'Merged']:
         pr_stat = StatusPullRequest(status=status)
@@ -123,7 +123,7 @@ def create_default_status(session, acls=None):
             session.commit()
         except SQLAlchemyError:  # pragma: no cover
             session.rollback()
-            ERROR_LOG.debug('Status %s could not be added', pr_stat)
+            _log.debug('Status %s could not be added', pr_stat)
 
     for grptype in ['user', 'admin']:
         grp_type = PagureGroupType(group_type=grptype)
@@ -132,7 +132,7 @@ def create_default_status(session, acls=None):
             session.commit()
         except SQLAlchemyError:  # pragma: no cover
             session.rollback()
-            ERROR_LOG.debug('Type %s could not be added', grptype)
+            _log.debug('Type %s could not be added', grptype)
 
     for acl in sorted(acls) or {}:
         item = ACL(
@@ -144,7 +144,7 @@ def create_default_status(session, acls=None):
             session.commit()
         except SQLAlchemyError:  # pragma: no cover
             session.rollback()
-            ERROR_LOG.debug('ACL %s could not be added', acl)
+            _log.debug('ACL %s could not be added', acl)
 
     for access in ['ticket', 'commit', 'admin']:
         access_obj = AccessLevels(access=access)
@@ -153,7 +153,7 @@ def create_default_status(session, acls=None):
             session.commit()
         except SQLAlchemyError:
             session.rollback()
-            ERROR_LOG.debug('Access level %s could not be added', access)
+            _log.debug('Access level %s could not be added', access)
 
 
 class AccessLevels(BASE):

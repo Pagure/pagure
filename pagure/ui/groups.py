@@ -8,14 +8,18 @@
 
 """
 
-import flask
+import logging
 
+import flask
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure
 import pagure.forms
 import pagure.lib
 import pagure.lib.git
+
+
+_log = logging.getLogger(__name__)
 
 
 @pagure.APP.route('/groups/')
@@ -93,10 +97,9 @@ def view_group(group):
                 'Could not add user `%s` to group `%s`.' % (
                     username, group.group_name),
                 'error')
-            pagure.APP.logger.debug(
+            _log.exception(
                 'Could not add user `%s` to group `%s`.' % (
                     username, group.group_name))
-            pagure.APP.logger.exception(err)
 
     member = False
     if pagure.authenticated():
@@ -156,9 +159,8 @@ def edit_group(group):
             flask.flash(
                 'Could not edit group `%s`.' % (group.group_name),
                 'error')
-            pagure.APP.logger.debug(
+            _log.exception(
                 'Could not edit group `%s`.' % (group.group_name))
-            pagure.APP.logger.exception(err)
     elif flask.request.method == 'GET':
         form.display_name.data = group.display_name
         form.description.data = group.description
@@ -207,10 +209,9 @@ def group_user_delete(user, group):
                 'Could not remove user `%s` from the group `%s`.' % (
                     user.user, group),
                 'error')
-            pagure.APP.logger.debug(
+            _log.exception(
                 'Could not remove user `%s` from the group `%s`.' % (
                     user.user, group))
-            pagure.APP.logger.exception(err)
 
     return flask.redirect(flask.url_for('.view_group', group=group))
 
@@ -314,8 +315,7 @@ def add_group():
         except SQLAlchemyError as err:  # pragma: no cover
             pagure.SESSION.rollback()
             flask.flash('Could not create group.')
-            pagure.APP.logger.debug('Could not create group.')
-            pagure.APP.logger.exception(err)
+            _log.exception('Could not create group.')
 
     return flask.render_template(
         'add_group.html',

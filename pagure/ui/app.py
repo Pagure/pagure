@@ -10,6 +10,7 @@
 """
 
 import datetime
+import logging
 from math import ceil
 
 import flask
@@ -22,6 +23,9 @@ import pagure.forms
 import pagure.ui.filters
 from pagure import (APP, SESSION, login_required,
                     authenticated, admin_session_timedout)
+
+
+_log = logging.getLogger(__name__)
 
 
 @APP.route('/browse/projects', endpoint='browse_projects')
@@ -631,7 +635,7 @@ def remove_user_email():
             flask.flash('Email removed')
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash('Email could not be removed', 'error')
 
     return flask.redirect(flask.url_for('.user_settings'))
@@ -666,7 +670,7 @@ def add_user_email():
             flask.flash(str(err), 'error')
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash('Email could not be added', 'error')
 
     return flask.render_template(
@@ -711,7 +715,7 @@ def set_default_email():
             flask.flash('Default email set to: %s' % email)
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash('Default email could not be set', 'error')
 
     return flask.redirect(flask.url_for('.user_settings'))
@@ -743,7 +747,7 @@ def reconfirm_email():
             flask.flash(str(err), 'error')
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash('Confirmation email could not be re-sent', 'error')
 
     return flask.redirect(flask.url_for('.user_settings'))
@@ -772,7 +776,7 @@ def confirm_email(token):
             flask.flash(
                 'Could not set the account as active in the db, '
                 'please report this error to an admin', 'error')
-            APP.logger.exception(err)
+            _log.exception(err)
 
     return flask.redirect(flask.url_for('.user_settings'))
 
@@ -824,7 +828,7 @@ def add_api_user_token():
             return flask.redirect(flask.url_for('.user_settings'))
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash('API key could not be added', 'error')
 
     # When form is displayed after an empty submission, show an error.
@@ -868,7 +872,7 @@ def revoke_api_user_token(token_id):
             flask.flash('Token revoked')
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash(
                 'Token could not be revoked, please contact an admin',
                 'error')

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2016 - Copyright Red Hat Inc
+ (c) 2014-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -10,6 +10,7 @@
 """
 
 import datetime
+import logging
 import urlparse
 
 import flask
@@ -22,6 +23,9 @@ import pagure.lib.model as model
 import pagure.lib.notify
 from pagure import APP, SESSION, login_required
 from pagure.lib.login import generate_hashed_value, check_password
+
+
+_log = logging.getLogger(__name__)
 
 
 @APP.route('/user/new/', methods=['GET', 'POST'])
@@ -62,11 +66,10 @@ def new_user():
             flask.flash(
                 'User created, please check your email to activate the '
                 'account')
-        except SQLAlchemyError as err:  # pragma: no cover
+        except SQLAlchemyError:  # pragma: no cover
             SESSION.rollback()
             flask.flash('Could not create user.')
-            APP.logger.debug('Could not create user.')
-            APP.logger.exception(err)
+            _log.exception('Could not create user.')
 
         return flask.redirect(flask.url_for('auth_login'))
 
@@ -97,7 +100,7 @@ def do_login():
                 form.password.data, user_obj.password,
                 seed=APP.config.get('PASSWORD_SEED', None))
         except pagure.exceptions.PagureException as err:
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash('Username or password of invalid format.', 'error')
             return flask.redirect(flask.url_for('auth_login'))
 
@@ -137,7 +140,7 @@ def do_login():
                 flask.flash(
                     'Could not set the session in the db, '
                     'please report this error to an admin', 'error')
-                APP.logger.exception(err)
+                _log.exception(err)
 
         return flask.redirect(next_url)
     else:
@@ -165,7 +168,7 @@ def confirm_user(token):
             flask.flash(
                 'Could not set the account as active in the db, '
                 'please report this error to an admin', 'error')
-            APP.logger.exception(err)
+            _log.exception(err)
 
     return flask.redirect(flask.url_for('index'))
 
@@ -204,13 +207,12 @@ def lost_password():
             send_lostpassword_email(user_obj)
             flask.flash(
                 'Check your email to finish changing your password')
-        except SQLAlchemyError as err:  # pragma: no cover
+        except SQLAlchemyError:  # pragma: no cover
             SESSION.rollback()
             flask.flash(
                 'Could not set the token allowing changing a password.',
                 'error')
-            APP.logger.debug('Password lost change - Error setting token.')
-            APP.logger.exception(err)
+            _log.exception('Password lost change - Error setting token.')
 
         return flask.redirect(flask.url_for('auth_login'))
 
@@ -248,12 +250,11 @@ def reset_password(token):
             SESSION.commit()
             flask.flash(
                 'Password changed')
-        except SQLAlchemyError as err:  # pragma: no cover
+        except SQLAlchemyError:  # pragma: no cover
             SESSION.rollback()
             flask.flash('Could not set the new password.', 'error')
-            APP.logger.debug(
+            _log.exception(
                 'Password lost change - Error setting password.')
-            APP.logger.exception(err)
 
         return flask.redirect(flask.url_for('auth_login'))
 
@@ -288,7 +289,7 @@ def change_password():
                 form.old_password.data, user_obj.password,
                 seed=APP.config.get('PASSWORD_SEED', None))
         except pagure.exceptions.PagureException as err:
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash(
                 'Could not update your password, either user or password '
                 'could not be checked', 'error')
@@ -308,12 +309,11 @@ def change_password():
             SESSION.commit()
             flask.flash(
                 'Password changed')
-        except SQLAlchemyError as err:  # pragma: no cover
+        except SQLAlchemyError:  # pragma: no cover
             SESSION.rollback()
             flask.flash('Could not set the new password.', 'error')
-            APP.logger.debug(
+            _log.exception(
                 'Password change  - Error setting new password.')
-            APP.logger.exception(err)
 
         return flask.redirect(flask.url_for('auth_login'))
 
@@ -435,7 +435,7 @@ def _check_session_cookie():
                     flask.flash(
                         'Could not prolong the session in the db, '
                         'please report this error to an admin', 'error')
-                    APP.logger.exception(err)
+                    _log.exception(err)
 
     flask.g.fas_session_id = session_id
     flask.g.fas_user = user

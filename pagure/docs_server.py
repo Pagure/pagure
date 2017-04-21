@@ -45,7 +45,7 @@ SHANDLER = logging.StreamHandler()
 SHANDLER.setLevel(APP.config.get('log_level', 'INFO'))
 APP.logger.addHandler(SHANDLER)
 
-LOG = APP.logger
+_log = logging.getLogger(__name__)
 
 TMPL_HTML = '''
 <!DOCTYPE html>
@@ -185,7 +185,7 @@ def view_docs(repo, username=None, namespace=None, filename=None):
         except pagure.exceptions.FileNotFoundException as err:
             flask.flash(err.message, 'error')
         except Exception as err:
-            LOG.exception(err)
+            _log.exception(err)
             flask.abort(500, 'Unkown error encountered and reported')
 
     mimetype = None

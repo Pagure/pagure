@@ -38,7 +38,6 @@ class PagureFlaskDocstests(tests.Modeltests):
         """ Set up the environnment, ran before every tests. """
         super(PagureFlaskDocstests, self).setUp()
 
-        pagure.docs_server.LOG.handlers = []
         pagure.docs_server.APP.config['TESTING'] = True
         pagure.docs_server.SESSION = self.session
 

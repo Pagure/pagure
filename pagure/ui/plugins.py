@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2016 - Copyright Red Hat Inc
+ (c) 2014-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -11,8 +11,9 @@
 
 # pylint: disable=too-many-branches
 
-import flask
+import logging
 
+import flask
 from sqlalchemy.exc import SQLAlchemyError
 
 import pagure.exceptions
@@ -21,6 +22,9 @@ import pagure.lib.plugins
 import pagure.forms
 from pagure import APP, SESSION, login_required
 from pagure.exceptions import FileNotFoundException
+
+
+_log = logging.getLogger(__name__)
 
 
 @APP.route('/<repo>/settings/<plugin>/', methods=('GET', 'POST'))
@@ -114,8 +118,7 @@ def view_plugin(repo, plugin, username=None, namespace=None, full=True):
             SESSION.flush()
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.debug('Could not add plugin %s', plugin.name)
-            APP.logger.exception(err)
+            _log.exception('Could not add plugin %s', plugin.name)
             flask.flash(
                 'Could not add plugin %s, please contact an admin'
                 % plugin.name)
@@ -139,14 +142,14 @@ def view_plugin(repo, plugin, username=None, namespace=None, full=True):
                 plugin.install(repo, dbobj)
                 flask.flash('Hook %s activated' % plugin.name)
             except FileNotFoundException as err:
-                pagure.APP.logger.exception(err)
+                _log.exception(err)
                 flask.abort(404, 'No git repo found')
         else:
             try:
                 plugin.remove(repo)
                 flask.flash('Hook %s deactivated' % plugin.name)
             except FileNotFoundException as err:
-                pagure.APP.logger.exception(err)
+                _log.exception(err)
                 flask.abort(404, 'No git repo found')
 
         SESSION.commit()

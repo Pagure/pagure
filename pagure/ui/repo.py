@@ -19,8 +19,10 @@
 
 import datetime
 import json
+import logging
 import shutil
 import os
+from cStringIO import StringIO
 from math import ceil
 
 import flask
@@ -28,7 +30,6 @@ import pygit2
 import kitchen.text.converters as ktc
 import werkzeug
 
-from cStringIO import StringIO
 from PIL import Image
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
@@ -52,6 +53,9 @@ import pagure.ui.plugins
 from pagure import (APP, SESSION, __get_file_in_tree, login_required,
                     admin_session_timedout)
 from pagure.lib import encoding_utils
+
+
+_log = logging.getLogger(__name__)
 
 
 @APP.route('/<repo>.git')
@@ -492,7 +496,7 @@ def view_file(repo, identifier, filename, username=None, namespace=None):
                 Image.open(StringIO(content.data))
                 output_type = 'image'
             except IOError as err:
-                APP.logger.debug(
+                _log.debug(
                     'Failed to load image %s, error: %s', filename, err
                 )
                 output_type = 'binary'
@@ -658,7 +662,7 @@ def view_raw_file(
             encoding = encoding_utils.guess_encoding(ktc.to_bytes(data))
         except pagure.exceptions.PagureException:
             # We cannot decode the file, so bail but warn the admins
-            APP.logger.exception('File could not be decoded')
+            _log.exception('File could not be decoded')
 
     if encoding:
         mimetype += '; charset={encoding}'.format(encoding=encoding)
@@ -699,7 +703,7 @@ def view_blame_file(repo, filename, username=None, namespace=None):
         content = encoding_utils.decode(content.data)
     except pagure.exceptions.PagureException:
         # We cannot decode the file, so bail but warn the admins
-        APP.logger.exception('File could not be decoded')
+        _log.exception('File could not be decoded')
         flask.abort(500, 'File could not be decoded')
 
     lexer = TextLexer()
@@ -959,7 +963,7 @@ def new_release(repo, username=None, namespace=None):
             except pagure.exceptions.PagureException as err:
                 flask.flash(str(err), 'error')
             except Exception as err:  # pragma: no cover
-                APP.logger.exception(err)
+                _log.exception(err)
                 flask.flash('Upload failed', 'error')
         return flask.redirect(flask.url_for(
             'view_tags', repo=repo.name, username=username,
@@ -1378,7 +1382,7 @@ def change_ref_head(repo, username=None, namespace=None):
             repo_obj.set_head(reference.name)
             flask.flash('Default branch updated to %s' % branchname)
         except Exception as err:  # pragma: no cover
-            APP.logger.exception(err)
+            _log.exception(err)
 
     return flask.redirect(flask.url_for(
         'view_settings', username=username, repo=repo.name,
@@ -1416,7 +1420,7 @@ def delete_repo(repo, username=None, namespace=None):
         SESSION.commit()
     except SQLAlchemyError as err:  # pragma: no cover
         SESSION.rollback()
-        APP.logger.exception(err)
+        _log.exception(err)
         flask.flash('Could not delete the project', 'error')
 
     repopath = os.path.join(APP.config['GIT_FOLDER'], repo.path)
@@ -1430,7 +1434,7 @@ def delete_repo(repo, username=None, namespace=None):
         shutil.rmtree(ticketpath)
         shutil.rmtree(requestpath)
     except (OSError, IOError) as err:
-        APP.logger.exception(err)
+        _log.exception(err)
         flask.flash(
             'Could not delete all the repos from the system', 'error')
 
@@ -1475,7 +1479,7 @@ def new_repo_hook_token(repo, username=None, namespace=None):
         flask.flash('New hook token generated')
     except SQLAlchemyError as err:  # pragma: no cover
         SESSION.rollback()
-        APP.logger.exception(err)
+        _log.exception(err)
         flask.flash('Could not generate a new token for this project', 'error')
 
     return flask.redirect(flask.url_for(
@@ -1535,7 +1539,7 @@ def remove_deploykey(repo, keyid, username=None, namespace=None):
             flask.flash('Deploy key removed')
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash('Deploy key could not be removed', 'error')
 
     return flask.redirect(flask.url_for(
@@ -1593,7 +1597,7 @@ def remove_user(repo, userid, username=None, namespace=None):
             flask.flash('User removed')
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash('User could not be removed', 'error')
 
     return flask.redirect(flask.url_for(
@@ -1656,7 +1660,7 @@ def add_deploykey(repo, username=None, namespace=None):
             flask.flash(msg, 'error')
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash('Deploy key could not be added', 'error')
 
     return flask.render_template(
@@ -1734,7 +1738,7 @@ def add_user(repo, username=None, namespace=None):
             flask.flash(msg, 'error')
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash('User could not be added', 'error')
 
     access_levels = pagure.lib.get_access_levels(SESSION)
@@ -1801,7 +1805,7 @@ def remove_group_project(repo, groupid, username=None, namespace=None):
             flask.flash('Group removed')
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash('Group could not be removed', 'error')
 
     return flask.redirect(flask.url_for(
@@ -1878,7 +1882,7 @@ def add_group_project(repo, username=None, namespace=None):
             flask.flash(msg, 'error')
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash('Group could not be added', 'error')
 
     access_levels = pagure.lib.get_access_levels(SESSION)
@@ -2006,7 +2010,7 @@ def add_token(repo, username=None, namespace=None):
                 namespace=namespace))
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash('User could not be added', 'error')
 
     # When form is displayed after an empty submission, show an error.
@@ -2067,7 +2071,7 @@ def revoke_api_token(repo, token_id, username=None, namespace=None):
             flask.flash('Token revoked')
         except SQLAlchemyError as err:  # pragma: no cover
             SESSION.rollback()
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash(
                 'Token could not be revoked, please contact an admin',
                 'error')
@@ -2138,7 +2142,7 @@ def edit_file(repo, branchname, filename, username=None, namespace=None):
                     namespace=namespace, branchname=form.branch.data)
             )
         except pagure.exceptions.PagureException as err:  # pragma: no cover
-            APP.logger.exception(err)
+            _log.exception(err)
             flask.flash('Commit could not be done', 'error')
             data = form.content.data
     elif flask.request.method == 'GET':
@@ -2195,7 +2199,7 @@ def delete_branch(repo, branchname, username=None, namespace=None):
         branch.delete()
         flask.flash('Branch `%s` deleted' % branchname)
     except pygit2.GitError as err:
-        APP.logger.exception(err)
+        _log.exception(err)
         flask.flash('Could not delete `%s`' % branchname, 'error')
 
     return flask.redirect(flask.url_for(

@@ -25,7 +25,7 @@ import trollius
 import trollius_redis
 
 
-LOG = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 if 'PAGURE_CONFIG' not in os.environ \
         and os.path.exists('/etc/pagure/pagure.cfg'):
@@ -59,7 +59,7 @@ def handle_messages():
     # Inside a while loop, wait for incoming events.
     while True:
         reply = yield trollius.From(subscriber.next_published())
-        LOG.info(
+        _log.info(
             'Received: %s on channel: %s',
             repr(reply.value), reply.channel)
         data = json.loads(reply.value)
@@ -67,19 +67,19 @@ def handle_messages():
         pr_id = data['pr']['id']
         pr_uid = data['pr']['uid']
         branch = data['pr']['branch_from']
-        LOG.info('Looking for PR: %s', pr_uid)
+        _log.info('Looking for PR: %s', pr_uid)
         session = pagure.lib.create_session(pagure.APP.config['DB_URL'])
         request = pagure.lib.get_request_by_uid(session, pr_uid)
 
-        LOG.info('PR retrieved: %s', request)
+        _log.info('PR retrieved: %s', request)
 
         if not request:
-            LOG.warning(
+            _log.warning(
                 'No request could be found from the message %s', data)
             session.close()
             continue
 
-        LOG.info(
+        _log.info(
             "Trigger on %s PR #%s from %s: %s",
             request.project.fullname, pr_id,
             request.project_from.fullname, branch)
@@ -91,7 +91,7 @@ def handle_messages():
             repo = '%s/%s' % (
                 pagure.APP.config['GIT_URL_GIT'].rstrip('/'),
                 request.project_from.path)
-            LOG.info(
+            _log.info(
                 'Triggering the build at: %s, for repo: %s', url, repo)
             requests.post(
                 url,
@@ -103,10 +103,10 @@ def handle_messages():
                 }
             )
         else:
-            LOG.warning('Un-supported CI type')
+            _log.warning('Un-supported CI type')
 
         session.close()
-        LOG.info('Ready for another')
+        _log.info('Ready for another')
 
 
 def main():
@@ -124,9 +124,9 @@ def main():
     except trollius.ConnectionResetError:
         pass
 
-    LOG.info("End Connection")
+    _log.info("End Connection")
     loop.close()
-    LOG.info("End")
+    _log.info("End")
 
 
 if __name__ == '__main__':
@@ -136,7 +136,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
 
     # setup console logging
-    LOG.setLevel(logging.DEBUG)
+    _log.setLevel(logging.DEBUG)
     shellhandler = logging.StreamHandler()
     shellhandler.setLevel(logging.DEBUG)
 
@@ -146,5 +146,5 @@ if __name__ == '__main__':
     aslog.setLevel(logging.DEBUG)
 
     shellhandler.setFormatter(formatter)
-    LOG.addHandler(shellhandler)
+    _log.addHandler(shellhandler)
     main()

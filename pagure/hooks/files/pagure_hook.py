@@ -5,6 +5,7 @@
 relates to an issue.
 """
 
+import logging
 import os
 import sys
 
@@ -21,6 +22,8 @@ import pagure  # noqa: E402
 import pagure.exceptions  # noqa: E402
 import pagure.lib.link  # noqa: E402
 
+
+_log = logging.getLogger(__name__)
 
 abspath = os.path.abspath(os.environ['GIT_DIR'])
 
@@ -86,7 +89,7 @@ def relates_commit(commitid, issue, app_url=None):
         print err
     except SQLAlchemyError as err:  # pragma: no cover
         pagure.SESSION.rollback()
-        pagure.APP.logger.exception(err)
+        _log.exception(err)
 
 
 def fixes_relation(commitid, relation, app_url=None):
@@ -131,7 +134,7 @@ def fixes_relation(commitid, relation, app_url=None):
         print err
     except SQLAlchemyError as err:  # pragma: no cover
         pagure.SESSION.rollback()
-        pagure.LOG.exception(err)
+        _log.exception(err)
 
     try:
         if relation.isa == 'issue':
@@ -154,7 +157,7 @@ def fixes_relation(commitid, relation, app_url=None):
     except SQLAlchemyError as err:  # pragma: no cover
         pagure.SESSION.rollback()
         print 'ERROR', err
-        pagure.LOG.exception(err)
+        _log.exception(err)
 
 
 def run_as_post_receive_hook():

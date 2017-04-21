@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
- (c) 2014-2016 - Copyright Red Hat Inc
+ (c) 2014-2017 - Copyright Red Hat Inc
 
  Authors:
    Pierre-Yves Chibon <pingou@pingoured.fr>
@@ -17,6 +17,7 @@ from __future__ import print_function
 import datetime
 import hashlib
 import json
+import logging
 import urlparse
 import re
 import smtplib
@@ -28,6 +29,9 @@ import pagure
 
 from email.header import Header
 from email.mime.text import MIMEText
+
+
+_log = logging.getLogger(__name__)
 
 
 REPLY_MSG = 'To reply, visit the link below'
@@ -286,7 +290,7 @@ def send_email(text, subject, to_mail,
                 [mailto],
                 msg.as_string())
         except smtplib.SMTPException as err:
-            pagure.LOG.exception(err)
+            _log.exception(err)
     if smtp:
         smtp.quit()
     return msg
