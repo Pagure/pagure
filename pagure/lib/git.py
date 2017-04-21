@@ -259,7 +259,9 @@ def update_git(obj, repo, repofolder):
         # If not change, return
         if not files and not added:
             shutil.rmtree(newpath)
-            os.unlink(lockfile)
+            if os.path.exists(lockfile):
+                # Remove the lock file
+                os.unlink(lockfile)
             return
 
         # See if there is a parent to this commit
@@ -296,8 +298,9 @@ def update_git(obj, repo, repofolder):
         # Remove the clone
         shutil.rmtree(newpath)
 
-    # Remove the lock file
-    os.unlink(lockfile)
+    if os.path.exists(lockfile):
+        # Remove the lock file
+        os.unlink(lockfile)
 
 
 def clean_git(obj, repo, repofolder):
@@ -368,6 +371,10 @@ def clean_git(obj, repo, repofolder):
 
         # Remove the clone
         shutil.rmtree(newpath)
+
+    if os.path.exists(lockfile):
+        # Remove the lock file
+        os.unlink(lockfile)
 
 
 def get_user_from_json(session, jsondata, key='user'):
@@ -917,6 +924,10 @@ def add_file_to_git(repo, issue, ticketfolder, user, filename, filestream):
         # Remove the clone
         shutil.rmtree(newpath)
 
+    if os.path.exists(lockfile):
+        # Remove the lock file
+        os.unlink(lockfile)
+
     return os.path.join('files', filename)
 
 
@@ -974,7 +985,9 @@ def update_file_in_git(
         # If not change, return
         if not files and not added:
             shutil.rmtree(newpath)
-            os.unlink(lockfile)
+            if os.path.exists(lockfile):
+                # Remove the lock file
+                os.unlink(lockfile)
             return
 
         # See if there is a parent to this commit
@@ -1015,7 +1028,9 @@ def update_file_in_git(
         try:
             PagureRepo.push(ori_remote, refname)
         except pygit2.GitError as err:  # pragma: no cover
-            os.unlink(lockfile)
+            if os.path.exists(lockfile):
+                # Remove the lock file
+                os.unlink(lockfile)
             shutil.rmtree(newpath)
             raise pagure.exceptions.PagureException(
                 'Commit could not be done: %s' % err)
@@ -1023,8 +1038,9 @@ def update_file_in_git(
         # Remove the clone
         shutil.rmtree(newpath)
 
-    # Remove the lock file
-    os.unlink(lockfile)
+    if os.path.exists(lockfile):
+        # Remove the lock file
+        os.unlink(lockfile)
 
     return os.path.join('files', filename)
 
