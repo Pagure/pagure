@@ -79,7 +79,6 @@ class PagureRepo(pygit2.Repository):
                         'Pulling remote changes leads to a conflict')
                 else:
                     _log.debug(
-                        'Un-expected merge result: %s' % (
                         'Unexpected merge result: %s' % (
                             pygit2.GIT_MERGE_ANALYSIS_NORMAL))
                     raise AssertionError('Unknown merge analysis result')

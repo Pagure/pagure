@@ -247,7 +247,7 @@ You can save the current revision in the database using the following command:
 ::
 
     cd /etc/pagure
-    alembic stamp $(alembic heads |awk '{ print $1 }')
+    alembic stamp $(alembic heads | awk '{ print $1 }')
 
 The ``cd /etc/pagure`` is needed as the command must be run in the folder
 where the file ``alembic.ini`` is. This file contains two important pieces
@@ -266,7 +266,7 @@ database was just created, it is at the latest revision.
 
 
 Set up virus scanning
------------------------
+---------------------
 Pagure can automatically scan uploaded attachments for viruses using Clam.
 To set this up, first install clamav-data-empty, clamav-server,
 clamav-server-systemd and clamav-update.
