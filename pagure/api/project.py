@@ -115,22 +115,60 @@ def api_projects():
           "total_projects": 2,
           "projects": [
             {
+              "access_groups": {
+                "admin": [],
+                "commit": [],
+                "ticket": []
+              },
+              "access_users": {
+                "admin": [],
+                "commit": [
+                  "some_user"
+                ],
+                "owner": [
+                  "pingou"
+                ],
+                "ticket": []
+              },
+              "close_status": [],
+              "custom_keys": [],
               "date_created": "1427441537",
               "description": "A web-based calendar for Fedora",
+              "milestones": {},
+              "namespace": null,
               "id": 7,
               "name": "fedocal",
               "fullname": "fedocal",
               "parent": null,
+              "priorities": {},
+              "tags": [],
               "user": {
                 "fullname": "Pierre-Yves C",
                 "name": "pingou"
               }
             },
             {
+              "access_groups": {
+                "admin": [],
+                "commit": [],
+                "ticket": []
+              },
+              "access_users": {
+                "admin": [],
+                "commit": [],
+                "owner": [
+                  "pingou"
+                ],
+                "ticket": []
+              },
+              "close_status": [],
+              "custom_keys": [],
               "date_created": "1431666007",
               "description": "An awesome messaging servicefor everyone",
               "id": 12,
+              "milestones": {},
               "name": "fedmsg",
+              "namespace": null,
               "fullname": "forks/pingou/fedmsg",
               "parent": {
                 "date_created": "1433423298",
@@ -144,6 +182,8 @@ def api_projects():
                   "name": "ralph"
                 }
               },
+              "priorities": {},
+              "tags": [],
               "user": {
                 "fullname": "Pierre-Yves C",
                 "name": "pingou"
